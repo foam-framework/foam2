@@ -77,14 +77,14 @@ foam.CLASS({
           })
         .end()
         .add(this.slot(function(cjStatus) {
-          return this.E().start(self.ReadOnlyEnumView, { data: cjStatus })
+          return this.E().start(self.ReadOnlyEnumView, { data : cjStatus, clsInfo : cjStatus.cls_.LABEL.name, default : cjStatus.label })
             .addClass(style.myClass('badge'))
             .style({ 'background-color': cjStatus.background })
           .end();
         }))
         .start()
           .addClass(style.myClass('card-title'))
-          .add(( self.data.name != '') ? self.data.name : self.data.id)
+          .add(( self.data.name != '') ? { data : self.data, clsInfo : self.data.cls_.NAME.name, default : self.data.name } : self.data.id)
         .end()
         .start()
           .addClass(style.myClass('card-subtitle'))
@@ -92,12 +92,12 @@ foam.CLASS({
             .where(this.EQ(foam.nanos.crunch.CapabilityCategory.VISIBLE, true)), function (category) {
               return this.E('span')
                 .addClass(style.myClass('category'))
-                .add(category.name);
+                .add({ data : category, clsInfo : category.cls_.NAME.name, default : category.name });
           })
         .end()
         .start()
           .addClass(style.myClass('card-description'))
-          .add(self.data.description)
+          .add({ data : self.data, clsInfo : self.data.cls_.DESCRIPTION.name, default : self.data.description })
         .end();
     }
   ],

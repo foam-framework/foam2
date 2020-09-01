@@ -137,12 +137,19 @@ foam.CLASS({
             } else if ( words[1].toLowerCase().equals("realuser") ) {
               objectToSave = ((Subject) objectToSave).getRealUser();
             }
+            try {
+              objectToSave = dao.find(((User)objectToSave).getId());
+            } catch(Exception e) {
+              throw e;
+            }
           } else {                                                              // 2- Case if anything other then subject specified
             objectToSave = (FObject) x.get(contextDAOFindKey);
 
             if ( objectToSave == null )
               throw new RuntimeException("@UserCapabilityJunction capability.contextDAOFindKey not found in context. Please check capability: " + getTargetId() + " and its contextDAOFindKey: " + contextDAOFindKey);
           }
+          // TODO - the try block above that finds objectToSave from dao - should be moved here
+          //        however need to work on casting the (FObject)objectToSave to understand objectToSave.getId()
         } else {
           try {                                                                 // 3- Case where contextDAOFindKey not specified:
             // Create new object of DAO type to copy over properties

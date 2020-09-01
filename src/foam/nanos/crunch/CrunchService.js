@@ -12,6 +12,10 @@ foam.INTERFACE({
     services.
   `,
 
+  javaImports: [
+    'foam.nanos.crunch.lite.CapablePayload'
+  ],
+
   methods: [
     {
       name: 'getGrantPath',
@@ -174,6 +178,21 @@ foam.INTERFACE({
           type: 'String'
         }
       ]
+    },
+    {
+      name: 'getCapableObjectPayloads',
+      async: true,
+      type: 'CapablePayload[]',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityIds',
+          type: 'String[]'
+        },
+      ]
     }
-  ],
+  ]
 });

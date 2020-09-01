@@ -8,6 +8,10 @@ foam.CLASS({
   package: 'foam.u2.wizard',
   name: 'StepWizardConfig',
 
+  implements: [
+    'foam.core.ContextAware'
+  ],
+
   properties: [
     {
       name: 'allowSkipping',
@@ -20,4 +24,10 @@ foam.CLASS({
       value: true
     }
   ],
-})
+
+  methods: [
+    async function execute(){
+      return;
+    }
+  ]
+});

@@ -14,17 +14,13 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'mustBeValid',
-      class: 'Boolean'
-    },
-    {
       name: 'currentSection',
       transient: true
     },
     {
       name: 'isValid',
       class: 'Boolean',
-      expression: function (mustBeValid, of, data, currentSection, data$errors_) {
+      expression: function (of, data, currentSection, data$errors_) {
         let sectionErrors = [];
         if ( currentSection && data$errors_ ) {
           sectionErrors = data$errors_.filter(error =>
@@ -32,7 +28,6 @@ foam.CLASS({
           );
         }
 
-        if ( ! mustBeValid ) return true;
         if ( ! this.of ) return true;
         if ( ( ! data ) || currentSection ? sectionErrors.length > 0 : data$errors_) return false;
         return true;

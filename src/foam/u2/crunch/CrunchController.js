@@ -30,6 +30,7 @@ foam.CLASS({
     'foam.log.LogLevel',
     'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.u2.crunch.wizardflow.ConfigureFlowAgent',
     'foam.u2.crunch.wizardflow.CapabilityAdaptAgent',
     'foam.u2.crunch.wizardflow.CheckPendingAgent',
     'foam.u2.crunch.wizardflow.LoadCapabilitiesAgent',
@@ -39,6 +40,7 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.StepWizardAgent',
     'foam.u2.crunch.wizardflow.PutFinalJunctionsAgent',
     'foam.u2.crunch.wizardflow.TestAgent',
+    'foam.u2.crunch.wizardflow.LoadTopConfig',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
     'foam.u2.crunch.CapabilityInterceptView'
@@ -68,12 +70,14 @@ foam.CLASS({
       return this.Sequence.create(null, this.__subContext__.createSubContext({
         rootCapability: capabilityOrId
       }))
+        .add(this.ConfigureFlowAgent)
         .add(this.CapabilityAdaptAgent)
         .add(this.LoadCapabilitiesAgent)
         .add(this.CheckPendingAgent)
         .add(this.CreateWizardletsAgent)
         .add(this.FilterWizardletsAgent)
         .add(this.RequirementsPreviewAgent)
+        .add(this.LoadTopConfig)
         .add(this.StepWizardAgent)
         .add(this.PutFinalJunctionsAgent)
         // .add(this.TestAgent)
