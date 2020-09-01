@@ -22,10 +22,6 @@ foam.CLASS({
       name: 'allowBacktracking',
       class: 'Boolean',
       value: true
-    },
-    {
-      name: 'allMustBeValid',
-      class: 'Boolean'
     }
   ],
 

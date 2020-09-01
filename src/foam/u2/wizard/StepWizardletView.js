@@ -287,8 +287,8 @@ foam.CLASS({
     {
       name: 'goNext',
       label: 'Next',
-      isEnabled: function (data$canGoNext, data$config$allowSkipping) {
-        return data$config$allowSkipping || data$canGoNext;
+      isEnabled: function (data$canGoNext) {
+        return data$canGoNext;
       },
       code: function(x) {
         this.data.next().then((isFinished) => {
