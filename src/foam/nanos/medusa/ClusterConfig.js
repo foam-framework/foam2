@@ -129,6 +129,12 @@ foam.CLASS({
       storageTransient: true
     },
     {
+      name: 'pingTime',
+      class: 'Long',
+      visibility: 'RO',
+      storageTransient: true
+    },
+    {
       name: 'errorMessage',
       class: 'String',
       visibility: 'RO',

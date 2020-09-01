@@ -153,6 +153,8 @@ foam.CLASS({
             config = (ClusterConfig) config.fclone();
             config.setStatus(Status.ONLINE);
             ((DAO) x.get("localClusterConfigDAO")).put(config);
+
+             // TODO/REVIEW: disable monitor? is it needed
           }
         } else if ( config.getType() != MedusaType.MEDIATOR &&
                     config.getStatus() == Status.OFFLINE ) {

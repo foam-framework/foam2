@@ -12,10 +12,14 @@ foam.CLASS({
   documentation: 'Attempt to contact Nodes and Mediators, record ping time and mark them ONLINE or OFFLINE.',
 
   javaImports: [
+    'foam.core.Agency',
+    'foam.core.ContextAgent',
     'foam.core.FObject',
+    'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'foam.nanos.pm.PM'
   ],
 
   axioms: [
@@ -63,23 +67,36 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
-      ClusterConfig myConfig = support.getConfig(getX(), support.getConfigId());
-      ClusterConfig config = (ClusterConfig) ((FObject)obj).fclone();
-      DAO client = support.getClientDAO(getX(), "clusterConfigDAO", myConfig, config);
-      try {
-        ClusterConfig cfg = (ClusterConfig) client.find_(getX(), config.getId());
-        if ( cfg != null ) {
-          getDao().put_(getX(), cfg);
+      final ClusterConfig config = (ClusterConfig) obj;
+
+      Agency agency = (Agency) getX().get("threadPool");
+      agency.submit(getX(), new ContextAgent() {
+        public void execute(X x) {
+          ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+          ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
+          DAO client = support.getClientDAO(x, "clusterConfigDAO", myConfig, config);
+          PM pm = new PM("ClusterConfigPingSink", config.getId());
+          try {
+            ClusterConfig cfg = (ClusterConfig) client.find_(x, config.getId());
+            pm.log(x);
+            if ( cfg != null ) {
+              cfg.setPingTime(pm.getEndTime().getTime() - pm.getStartTime().getTime());
+              getDao().put_(x, cfg);
+            } else {
+              getLogger().warning("client,find,returned,null");
+            }
+          } catch ( Throwable t ) {
+            pm.error(x, t);
+            getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage());
+            if ( config.getStatus() != Status.OFFLINE ) {
+              ClusterConfig cfg = (ClusterConfig) config.fclone();
+              cfg.setStatus(Status.OFFLINE);
+              getDao().put_(x, cfg);
+              // TODO: Alarm.
+            }
+          }
         }
-      } catch ( RuntimeException t ) {
-        getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage());
-        if ( config.getStatus() != Status.OFFLINE ) {
-          config.setStatus(Status.OFFLINE);
-          config = (ClusterConfig) getDao().put_(getX(), config);
-        // TODO: Alarm.
-        }
-      }
+      }, this.getClass().getSimpleName());
       `
     },
     {

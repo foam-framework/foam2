@@ -312,8 +312,8 @@ configuration for contacting the primary node.`,
       long zone = config.getZone();
       while ( zone > 0 ) {
         zone -= 1;
-        DAO clusterConfigDAO = (DAO) getX().get("clusterConfigDAO");
-        List<ClusterConfig> configs = ((ArraySink) clusterConfigDAO
+        DAO dao = (DAO) getX().get("clusterConfigDAO");
+        dao = dao
           .where(
             AND(
               EQ(ClusterConfig.ENABLED, true),
@@ -322,12 +322,19 @@ configuration for contacting the primary node.`,
               EQ(ClusterConfig.STATUS, Status.ONLINE),
               EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
               EQ(ClusterConfig.ZONE, zone)
-            ))
-          .orderBy(foam.mlang.MLang.DESC(ClusterConfig.IS_PRIMARY))
-          .select(new ArraySink())).getArray();
+            ));
+        if ( zone == 0 ) {
+          dao = dao.orderBy(foam.mlang.MLang.DESC(ClusterConfig.IS_PRIMARY));
+        } else {
+          dao = dao.orderBy(ClusterConfig.PING_TIME);
+        }
+        List<ClusterConfig> configs = ((ArraySink) dao.select(new ArraySink())).getArray();
         if ( configs.size() > 0 ) {
-          return configs.get(0);
+          // return configs.get(0);
           // return configs.get(configs.size() -1);
+          ClusterConfig cfg = configs.get(0);
+          getLogger().info("nextZone", "configs", configs.size(), "config", cfg.getId(), cfg.getZone(), cfg.getIsPrimary(), cfg.getPingTime());
+          return cfg;
         }
       }
       throw new RuntimeException("Next Zone not found.");
