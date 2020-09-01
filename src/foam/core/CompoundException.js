@@ -43,21 +43,21 @@ foam.CLASS({
         {
             name: 'add',
             args: [{ name: 't', javaType: 'Throwable' }],
-            javaCode: 'exceptions_.add(t);'
+            javaCode: 'getExceptions().add(t);'
         },
         {
             name: 'maybeThrow',
-            javaCode: 'if ( exceptions_.size() != 0 ) throw this;'
+            javaCode: 'if ( getExceptions().size() != 0 ) throw this;'
         },
         {
             name: 'getMessage',
             type: 'String',
             javaType: `
-            var str = sb_.get();
-            var size = exceptions_.size();
+            var str = getSb().get();
+            var size = getExceptions().size();
         
             for ( int i = 0; i < size; i++ ) {
-              Throwable t = (Throwable) exceptions_.get(i);
+              Throwable t = (Throwable) getExceptions().get(i);
               var counter = i + 1;
         
               str.append('[').append(counter).append('/').append(size).append("] ")

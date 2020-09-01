@@ -40,8 +40,8 @@ FOAM_FILES([
   { name: 'foam/nanos/alarming/MonitoringReport' },
   { name: 'foam/nanos/alarming/MonitorType' },
   { name: 'foam/nanos/alarming/AlarmAndMonitoring' },
+  { name: 'foam/nanos/alarming/AddAlarmNameDAO' },
   { name: 'foam/nanos/alarming/OMName' },
-  { name: 'foam/nanos/alarming/AlarmConfigName' },
   { name: 'foam/nanos/alarming/AlarmingUniqueNameDAO' },
   { name: "foam/nanos/auth/DayOfWeek" },
   { name: "foam/nanos/auth/Hours" },
@@ -326,6 +326,7 @@ FOAM_FILES([
   // foam/nanos/crunch
   { name: "foam/nanos/crunch/crunchtest/FakeTestObject" },
   // models
+  { name: "foam/nanos/crunch/Renewable" },
   { name: "foam/nanos/crunch/Capability" },
   { name: "foam/nanos/crunch/MinMaxCapability" },
   { name: "foam/nanos/crunch/lite/CapablePayload" },
@@ -337,6 +338,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/CapabilityCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/CapabilityCategoryCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/AssociatedEntity" },
+  { name: "foam/nanos/crunch/RenewableData" },
   { name: "foam/nanos/crunch/connection/CapabilityPayload" },
   //daos
   { name: "foam/nanos/crunch/UserCapabilityJunctionDAO" },
@@ -354,6 +356,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ruler/SetUCJStatusOnPut" },
   { name: "foam/nanos/crunch/ruler/ConfigureUCJExpiryOnGranted" },
   { name: "foam/nanos/crunch/ruler/SaveUCJDataOnGranted" },
+  { name: "foam/nanos/crunch/ruler/IsDataUpdate" },
   //views
   { name: "foam/nanos/crunch/ui/CapabilityView" },
 

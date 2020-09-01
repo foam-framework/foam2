@@ -26,10 +26,14 @@ foam.CLASS({
     'sourceId',
     'targetId',
     'status',
-    'created',
+    // 'created', todo, use createaware instead
     'expiry',
-    'graceDaysLeft',
+    'gracePeriod',
     'data'
+  ],
+
+  sections: [
+    { name: 'ucjExpirySection' }
   ],
 
   properties: [
@@ -61,17 +65,6 @@ foam.CLASS({
       }
     },
     {
-      name: 'created',
-      class: 'DateTime',
-      factory: function() {
-        return new Date();
-      }
-    },
-    {
-      name: 'expiry',
-      class: 'DateTime'
-    },
-    {
       name: 'data',
       class: 'foam.core.FObjectProperty',
       of: 'foam.core.FObject',
@@ -84,14 +77,13 @@ foam.CLASS({
       of: 'foam.nanos.crunch.CapabilityJunctionStatus',
       value: foam.nanos.crunch.CapabilityJunctionStatus.ACTION_REQUIRED
     },
-    {
-      name: 'graceDaysLeft',
-      class: 'Int',
-      documentation: `
-      Number of days left that a user can use the Capability in this ucj after it goes into GRACE_PERIOD status.
-      Set when the ucj is first granted.
-      `
-    }
+    // renewable
+    { name: 'isExpired', section: 'ucjExpirySection' },
+    { name: 'isRenewable', section: 'ucjExpirySection' },
+    { name: 'isInRenewablePeriod', section: 'ucjExpirySection' },
+    { name: 'isInGracePeriod', section: 'ucjExpirySection' },
+    { name: 'expiry', section: 'ucjExpirySection' },
+    { name: 'gracePeriod', section: 'ucjExpirySection' }
   ],
 
   methods: [
@@ -145,12 +137,19 @@ foam.CLASS({
             } else if ( words[1].toLowerCase().equals("realuser") ) {
               objectToSave = ((Subject) objectToSave).getRealUser();
             }
+            try {
+              objectToSave = dao.find(((User)objectToSave).getId());
+            } catch(Exception e) {
+              throw e;
+            }
           } else {                                                              // 2- Case if anything other then subject specified
             objectToSave = (FObject) x.get(contextDAOFindKey);
 
             if ( objectToSave == null )
               throw new RuntimeException("@UserCapabilityJunction capability.contextDAOFindKey not found in context. Please check capability: " + getTargetId() + " and its contextDAOFindKey: " + contextDAOFindKey);
           }
+          // TODO - the try block above that finds objectToSave from dao - should be moved here
+          //        however need to work on casting the (FObject)objectToSave to understand objectToSave.getId()
         } else {
           try {                                                                 // 3- Case where contextDAOFindKey not specified:
             // Create new object of DAO type to copy over properties

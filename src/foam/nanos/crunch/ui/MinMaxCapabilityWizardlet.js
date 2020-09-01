@@ -25,11 +25,6 @@ foam.CLASS({
       }
     },
     {
-      name: 'mustBeValid',
-      class: 'Boolean',
-      value: true
-    },
-    {
       name: 'min',
       class: 'Int',
       factory: function(){
