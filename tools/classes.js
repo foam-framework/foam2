@@ -193,6 +193,7 @@ var classes = [
   'foam.mlang.sink.Sum',
   'foam.mlang.sink.Average',
   'foam.mlang.sink.Map',
+  'foam.nanos.alarming.AddAlarmNameDAO',
   'foam.nanos.alarming.Alarm',
   'foam.nanos.alarming.AlarmConfig',
   'foam.nanos.alarming.AlarmConfigOMNameDAO',
@@ -205,7 +206,6 @@ var classes = [
   'foam.nanos.alarming.MonitoringReport',
   'foam.nanos.alarming.MonitorType',
   'foam.nanos.alarming.OMName',
-  'foam.nanos.alarming.AlarmConfigName',
   'foam.nanos.actioncommand.ActionCommand',
   'foam.nanos.NanoService',
   'foam.nanos.boot.NSpec',
@@ -637,7 +637,7 @@ var classes = [
   'foam.nanos.crunch.AssociatedEntity',
   'foam.nanos.crunch.CapabilityAvailabilityDAO',
   'foam.nanos.crunch.connection.CapabilityPayload',
-  
+
   //daos
   'foam.nanos.crunch.connection.CapabilityPayloadDAO',
   'foam.nanos.crunch.UserCapabilityJunctionDAO',

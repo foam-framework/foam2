@@ -16,7 +16,9 @@ foam.CLASS({
   imports: [
     'capabilities',
     'wizardlets',
-    'wizardConfig'
+    'wizardConfig',
+    'pushView',
+    'popView'
   ],
 
   requires: [
@@ -24,20 +26,43 @@ foam.CLASS({
     'foam.u2.wizard.StepWizardletController'
   ],
 
+  properties: [
+    {
+      name: 'config',
+      class: 'FObjectProperty',
+      of: 'foam.u2.wizard.StepWizardConfig',
+      factory: function() { return null; }
+    },
+    {
+      name: 'view',
+      value: {
+        class: 'foam.u2.wizard.StepWizardletView',
+      }
+    },
+    {
+      name: 'overrideTopCapabilityConfig',
+      documentation: `
+        Set this to true and this StepWizardAgent's config will override
+        any wizard configuration specified by the root capability being
+        granted.
+      `
+    }
+  ],
+
   methods: [
     function execute() {
       return new Promise((resolve, _) => {
-        ctrl.add(this.Popup.create({ closeable: false }).tag({
-          class: 'foam.u2.wizard.StepWizardletView',
+        this.pushView({
+          ...this.view,
           data: this.StepWizardletController.create({
             wizardlets: this.wizardlets,
             config: this.wizardConfig
           }),
           onClose: (x) => {
-            x.closeDialog();
+            this.popView(x)
             resolve();
           }
-        }));
+        });
       });
     }
   ]

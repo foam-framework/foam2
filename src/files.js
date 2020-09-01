@@ -278,6 +278,7 @@ FOAM_FILES([
 
   { name: 'foam/nanos/approval/AuthenticatedApprovalDAOAuthorizer' },
 
+  { name: 'foam/nanos/alarming/AddAlarmNameDAO' },
   { name: "foam/nanos/approval/ApprovalRequestNotificationNotificationCitationView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/SignUp" },
   { name: "foam/nanos/u2/navigation/SignIn" },
@@ -587,6 +588,7 @@ FOAM_FILES([
   { name: "foam/u2/stack/StackView", flags: ['web'] },
   { name: "foam/u2/crunch/Style", flags: ['web'] },
   { name: "foam/u2/crunch/CrunchController", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/ConfigureFlowAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/CapabilityAdaptAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/CheckPendingAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/LoadCapabilitiesAgent", flags: ['web'] },
