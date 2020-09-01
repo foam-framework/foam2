@@ -11,28 +11,28 @@ foam.CLASS({
   flags: ['java'],
 
   javaImports: [
-    'foam.dao.*',
     'foam.core.FObject',
     'foam.core.X',
+    'foam.dao.*',
+    'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.Sink',
-    'foam.dao.ArraySink',
-    'foam.mlang.predicate.Predicate',
     'foam.mlang.order.Comparator',
+    'foam.mlang.predicate.Predicate',
+    'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
+    'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.connection.CapabilityPayload',
+    'foam.nanos.crunch.CrunchService',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.util.SafetyUtil',
-    'foam.nanos.auth.Subject',
-    'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.CrunchService',
-    'foam.nanos.crunch.connection.CapabilityPayload',
     'java.util.ArrayList',
+    'java.util.HashMap',
     'java.util.List',
     'java.util.Map',
-    'java.util.HashMap',
     'static foam.mlang.MLang.AND',
-    'static foam.mlang.MLang.OR',
-    'static foam.mlang.MLang.EQ'
+    'static foam.mlang.MLang.EQ',
+    'static foam.mlang.MLang.OR'
   ],
 
   documentation: `
@@ -59,12 +59,11 @@ foam.CLASS({
           private Map<String, FObject> walkGrantPath(List grantPath, X x) {
             DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
             var capabilityDAO = (DAO) x.get("capabilityDAO");
-            var user = ((Subject)x.get("subject")).getUser();
-            var businessId = user.getId();
-            var userId = user.getCreatedBy();
+            var userId = ((Subject)x.get("subject")).getRealUser().getId();
+            var businessId = ((Subject)x.get("subject")).getUser().getId();
 
             // Collect all capabilities that belong to either the user or business
-            var capabilities = new ArrayList<Capability>();
+            var capabilities = new HashMap<String, Capability>();
             ((ArraySink) userCapabilityJunctionDAO.where(
               OR(
                 EQ(UserCapabilityJunction.SOURCE_ID, userId),
@@ -73,7 +72,7 @@ foam.CLASS({
             ).select(new ArraySink())).getArray().forEach((ucj) -> {
               var capability = (Capability) capabilityDAO.find(((UserCapabilityJunction)ucj).getTargetId());
               if ( capability != null )
-                capabilities.add(capability);
+                capabilities.put(capability.getName(), capability);
             });
       
             Map<String,FObject> capabilityDataObjects = new HashMap<>();
@@ -85,11 +84,10 @@ foam.CLASS({
                 FObject capDataObject = null;
                 if ( cap.getOf() != null ){
                   try {
-                    for ( var capability : capabilities ) {
-                      if ( capability.getName() == cap.getName() )
-                        capDataObject = capability;
-                    }
-                    if ( capDataObject == null )
+                    var capability = capabilities.get(cap.getName());
+                    if ( capability != null )
+                      capDataObject = capability;
+                    else
                       capDataObject = (FObject) cap.getOf().newInstance();
                   } catch (Exception e){
                     throw new RuntimeException(e);
