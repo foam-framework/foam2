@@ -240,8 +240,8 @@ foam.CLASS({
     {
       name: 'canGoNext',
       class: 'Boolean',
-      expression: function(currentWizardlet$isValid) {
-        return currentWizardlet$isValid;
+      expression: function(currentWizardlet$isValid, config$allowSkipping) {
+        return currentWizardlet$isValid || config$allowSkipping;
       }
     },
     {
