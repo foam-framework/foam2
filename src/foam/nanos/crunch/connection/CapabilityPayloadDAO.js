@@ -63,16 +63,17 @@ foam.CLASS({
             var businessId = ((Subject)x.get("subject")).getUser().getId();
 
             // Collect all capabilities that belong to either the user or business
-            var capabilities = new HashMap<String, Capability>();
+            var capabilityDataMap = new HashMap<String, FObject>();
             ((ArraySink) userCapabilityJunctionDAO.where(
               OR(
                 EQ(UserCapabilityJunction.SOURCE_ID, userId),
                 EQ(UserCapabilityJunction.SOURCE_ID, businessId)
               )
-            ).select(new ArraySink())).getArray().forEach((ucj) -> {
-              var capability = (Capability) capabilityDAO.find(((UserCapabilityJunction)ucj).getTargetId());
+            ).select(new ArraySink())).getArray().forEach((item) -> {
+              var ucj = (UserCapabilityJunction) item;
+              var capability = (Capability) capabilityDAO.find(ucj.getTargetId());
               if ( capability != null )
-                capabilities.put(capability.getName(), capability);
+                capabilityDataMap.put(capability.getName(), ucj.getData());
             });
       
             Map<String,FObject> capabilityDataObjects = new HashMap<>();
@@ -84,9 +85,9 @@ foam.CLASS({
                 FObject capDataObject = null;
                 if ( cap.getOf() != null ){
                   try {
-                    var capability = capabilities.get(cap.getName());
-                    if ( capability != null )
-                      capDataObject = capability;
+                    var capabilityData = capabilityDataMap.get(cap.getName());
+                    if ( capabilityData != null )
+                      capDataObject = capabilityData;
                     else
                       capDataObject = (FObject) cap.getOf().newInstance();
                   } catch (Exception e){
