@@ -82,7 +82,11 @@ public class ServerCrunchService implements CrunchService {
         for ( int i = prereqs.size() - 1; i >= 0; i-- ) {
           CapabilityCapabilityJunction prereq = (CapabilityCapabilityJunction) prereqs.get(i);
 
-          minMaxArray.add(this.getGrantPath(x,  prereq.getTargetId()));
+          var prereqGrantPath = this.getGrantPath(x,  prereq.getTargetId());
+
+          // Essentially we reserve arrays to denote  ANDs and ORs, must be at least 2  elements
+          if ( prereqGrantPath.size() > 1 ) minMaxArray.add(prereqGrantPath);
+          else minMaxArray.add(prereqGrantPath.get(0));
         }
 
         /**
