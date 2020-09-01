@@ -34,4 +34,4 @@ foam.CLASS({
       return;
     }
   ]
-})
+});
