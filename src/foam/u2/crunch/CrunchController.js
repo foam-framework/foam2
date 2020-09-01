@@ -30,6 +30,7 @@ foam.CLASS({
     'foam.log.LogLevel',
     'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.u2.crunch.wizardflow.ConfigureFlowAgent',
     'foam.u2.crunch.wizardflow.CapabilityAdaptAgent',
     'foam.u2.crunch.wizardflow.CheckPendingAgent',
     'foam.u2.crunch.wizardflow.LoadCapabilitiesAgent',
@@ -67,6 +68,7 @@ foam.CLASS({
       return this.Sequence.create(null, this.__subContext__.createSubContext({
         rootCapability: capabilityOrId
       }))
+        .add(this.ConfigureFlowAgent)
         .add(this.CapabilityAdaptAgent)
         .add(this.LoadCapabilitiesAgent)
         .add(this.CheckPendingAgent)
