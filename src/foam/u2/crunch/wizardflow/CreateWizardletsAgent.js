@@ -38,55 +38,66 @@ foam.CLASS({
   ],
 
   methods: [
-    function execute() {
-      return Promise.all(this.capabilities
-        .reduce((updateUCJPromiseList, cap) => {
-          var associatedEntity, wizardlet;
-            
-          if ( Array.isArray(cap) && ( foam.nanos.crunch.MinMaxCapability.isInstance(cap[cap.length - 1]) ) ){
-            var minMaxCap = cap[cap.length - 1];
+    function parseArrayToWizards(array, parentWizardlet){
+      var isOr = foam.nanos.crunch.MinMaxCapability.isInstance(array[array.length - 1]) ? true : false;
+      var updateUcjPromiseList = [];
 
-            minMaxArray = [];
+      var currentCap = array[array.length - 1];
+      var currentWizardlet  = currentCap.wizardlet.clone().copyFrom(
+        {
+          capability: currentCap,
+        },
+        this.__subContext__
+      );
 
-            var choiceWizardlets = cap.slice(0, cap.length - 1).map(
-              capability => {
-                wizardlet = capability.wizardlet.cls_.create(
-                { 
-                  capability: capability, 
-                  isAvailable: false,
-                  ...capability.wizardlet.instance_ 
-                }, this)
+      array.slice(0, array.length - 1).forEach(
+        prereqCap => {
+          if ( Array.isArray(prereqCap) ){
+            updateUcjPromiseList = updateUcjPromiseList.concat(this.parseArrayToWizards(prereqCap, currentWizardlet));
+          } else {
+            var prereqWizardlet = prereqCap.wizardlet.clone().copyFrom(
+              {
+                capability: prereqCap
+              },
+              this.__subContext__
+            );
+  
+            associatedEntity = prereqCap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
 
-                associatedEntity = capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
+            if (isOr){
+              prereqWizardlet.isAvailable = false;
+              currentWizardlet.choiceWizardlets.push(prereqWizardlet);
+            } else {
+              prereqWizardlet.isAvailable$.follow(currentWizardlet.isAvailable$);
+            }
 
-                minMaxArray.push(this.updateUCJ(wizardlet, associatedEntity))
-
-                // TODO:  also instantiate updateUCJ for the choice prereqs and push to promise array
-                // TODO: slot the prereqs isAvaialble to wizardlet.isAvailable$
-                return wizardlet;
-              }
-            )
-            var minMaxWizardlet = foam.nanos.crunch.ui.MinMaxCapabilityWizardlet.create({
-              capability: minMaxCap,
-              ...minMaxCap.wizardlet.instance_,
-              choiceWizardlets: choiceWizardlets
-            })
-
-            associatedEntity = minMaxCap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
-            
-            minMaxArray.unshift(this.updateUCJ(minMaxWizardlet, associatedEntity));
-            updateUCJPromiseList = updateUCJPromiseList.concat(minMaxArray);
-            
-
-          } else if ( cap.of ) {
-            associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
-            wizardlet = cap.wizardlet.cls_.create({ capability: cap, ...cap.wizardlet.instance_ }, this);
-
-            updateUCJPromiseList.push(this.updateUCJ(wizardlet, associatedEntity));
+            updateUcjPromiseList.push(this.updateUCJ(prereqWizardlet, associatedEntity))
           }
+        }
+      )
 
-          return updateUCJPromiseList
-        }, [])
+      if ( parentWizardlet !== null ){
+        if ( foam.nanos.crunch.ui.MinMaxCapabilityWizardlet.isInstance(parentWizardlet)  ){
+          currentWizardlet.isAvailable = false;
+          parentWizardlet.choiceWizardlets.push(currentWizardlet);
+        } else {
+          currentWizardlet.isAvailable$.follow(parentWizardlet.isAvailable$);
+        }      
+      }
+
+      //  in cases of min max, the min max wizard has to appear first before all it's prereqs in order to select appropriately
+      if ( isOr ){
+        updateUcjPromiseList.unshift(this.updateUCJ(currentWizardlet, associatedEntity));
+      } else {  
+        updateUcjPromiseList.push(this.updateUCJ(currentWizardlet, associatedEntity));
+      }
+        
+      return updateUcjPromiseList;
+    },
+
+    function execute() {
+      return Promise.all(
+        this.parseArrayToWizards(this.capabilities, null)
       ).then(wizardlets => {
         this.unfilteredWizardlets = wizardlets;
       });
