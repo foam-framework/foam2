@@ -43,39 +43,35 @@ foam.CLASS({
       var updateUcjPromiseList = [];
 
       var currentCap = array[array.length - 1];
-      var currentWizardlet  = isOr 
-        ? foam.nanos.crunch.ui.MinMaxCapabilityWizardlet.create({
-            capability: currentCap,
-            ...currentCap.wizardlet.instance_,
-            choiceWizardlets: []
-          }, this.__subContext__)
-        : currentCap.wizardlet.cls_.create(
-          { 
-            capability: currentCap, 
-            ...currentCap.wizardlet.instance_ 
-          }, this.__subContext__)
-      
+      var currentWizardlet  = currentCap.wizardlet.clone().clone().copyFrom(
+        {
+          capability: currentCap,
+        },
+        this.__subContext__
+      );
+
       array.slice(0, array.length - 1).forEach(
         prereqCap => {
           if ( Array.isArray(prereqCap) ){
             updateUcjPromiseList = updateUcjPromiseList.concat(this.parseArrayToWizards(prereqCap, currentWizardlet));
           } else {
-            var prereqWizardlet = prereqCap.wizardlet.cls_.create(
-              { 
-                capability: prereqCap, 
-                ...prereqCap.wizardlet.instance_ ,
-              }, this.__subContext__)
+            var prereqWizardlet = prereqCap.wizardlet.clone().copyFrom(
+              {
+                capability: prereqCap
+              },
+              this.__subContext__
+            );
   
-              associatedEntity = prereqCap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
+            associatedEntity = prereqCap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
 
-              if (isOr){
-                prereqWizardlet.isAvailable = false;
-                currentWizardlet.choiceWizardlets.push(prereqWizardlet);
-              } else {
-                prereqWizardlet.isAvailable$.follow(currentWizardlet.isAvailable$);
-              }
-  
-              updateUcjPromiseList.push(this.updateUCJ(prereqWizardlet, associatedEntity))
+            if (isOr){
+              prereqWizardlet.isAvailable = false;
+              currentWizardlet.choiceWizardlets.push(prereqWizardlet);
+            } else {
+              prereqWizardlet.isAvailable$.follow(currentWizardlet.isAvailable$);
+            }
+
+            updateUcjPromiseList.push(this.updateUCJ(prereqWizardlet, associatedEntity))
           }
         }
       )
