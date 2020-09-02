@@ -34,6 +34,13 @@ foam.CLASS({
           public void execute(X x) {
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj; 
 
+            Capability cap = (Capability) ucj.findTargetId(x);
+            System.out.println(">>>>>>>>> SET UCJ STATUS ON PUT");
+            System.out.println("ucj = " + cap.getName());
+            System.out.println("status = " + ucj.getStatus());
+            UserCapabilityJunction oldUcj = (UserCapabilityJunction) (((foam.dao.DAO) x.get("bareUserCapabilityJunctionDAO")).find(ucj.getId()));
+            System.out.println("olducj = " + (oldUcj == null ? "null" : oldUcj.getStatus()));
+
             CapabilityJunctionStatus chainedStatus = checkPrereqsChainedStatus(x, ucj);
             
             if ( ucj.getStatus() != CapabilityJunctionStatus.PENDING && ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return;
@@ -49,6 +56,8 @@ foam.CLASS({
             // Update current UCJ status
 
             ucj.setStatus(chainedStatus);
+            System.out.println("ucj = " + capability.getName());
+            System.out.println("chainedStatus = " + chainedStatus);
             if ( chainedStatus == CapabilityJunctionStatus.PENDING && reviewRequired && wasApproved ) {
               ucj.setStatus(CapabilityJunctionStatus.APPROVED);
             } else if ( chainedStatus == CapabilityJunctionStatus.GRANTED && reviewRequired ) {

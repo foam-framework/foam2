@@ -29,7 +29,11 @@ foam.CLASS({
     // 'created', todo, use createaware instead
     'expiry',
     'gracePeriod',
-    'data'
+    // 'data'
+    'isRenewable',
+    'isInRenewablePeriod',
+    'isInGracePeriod',
+    'isExpired'
   ],
 
   sections: [

@@ -27,6 +27,8 @@ public class DecrementGraceDaysLeftCron implements ContextAgent {
     logger = (Logger) x.get("logger");
     userCapabilityJunctionDAO = (DAO) x.get("bareUserCapabilityJunctionDAO");
 
+System.out.println("DECREMENT_GRACE_DAYS_LEFT :: " + ( new java.util.Date()));
+
     List<UserCapabilityJunction> junctions = ((ArraySink) userCapabilityJunctionDAO
       .where(AND(
         EQ(UserCapabilityJunction.IS_IN_GRACE_PERIOD, true),
@@ -37,6 +39,8 @@ public class DecrementGraceDaysLeftCron implements ContextAgent {
 
     for ( UserCapabilityJunction ucj : junctions ) {
       ucj.setGracePeriod(ucj.getGracePeriod() - 1);
+
+          System.out.println("ucj = " + ucj);
       logger.debug("Decrementing grace days left for UserCapabilityJunction : " + ucj.getId());
       userCapabilityJunctionDAO.put(ucj);
     }
