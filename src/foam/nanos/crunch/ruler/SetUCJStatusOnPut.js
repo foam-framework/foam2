@@ -30,6 +30,7 @@ foam.CLASS({
       name: 'applyAction',
       javaCode: `
         agency.submit(x, new ContextAgent() {
+          X systemX = ruler.getX();
           @Override
           public void execute(X x) {
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj; 
@@ -41,7 +42,8 @@ foam.CLASS({
             // the following should be checked if the result of previous rule ( validateUCJDataOnPut ) 
             // is not ACTION_REQUIRED. In the ACTION_REQUIRED case, the ucj should be put into the
             // dao without any additional checks
-            Capability capability = (Capability) ucj.findTargetId(x);
+
+            Capability capability = (Capability) ucj.findTargetId(systemX);
 
             boolean reviewRequired = capability.getReviewRequired();
             boolean wasApproved = ucj.getStatus() == CapabilityJunctionStatus.APPROVED;

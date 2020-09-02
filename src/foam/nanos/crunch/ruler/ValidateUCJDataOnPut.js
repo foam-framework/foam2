@@ -27,6 +27,7 @@ foam.CLASS({
       name: 'applyAction',
       javaCode: `
         agency.submit(x, new ContextAgent() {
+          X systemX = ruler.getX();
           @Override
           public void execute(X x) {
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
@@ -38,7 +39,7 @@ foam.CLASS({
               ucj.getStatus() == CapabilityJunctionStatus.APPROVED ) 
               return;
 
-            Capability capability = (Capability) ucj.findTargetId(x);
+            Capability capability = (Capability) ucj.findTargetId(systemX);
 
             if ( ! isRenewable ) ucj.setStatus(CapabilityJunctionStatus.ACTION_REQUIRED);
 
