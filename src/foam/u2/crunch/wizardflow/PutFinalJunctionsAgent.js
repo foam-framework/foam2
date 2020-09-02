@@ -31,25 +31,12 @@ foam.CLASS({
       //   At the time of writing this comment, CrunchService does
       //   not have a method to create the correct empty UCJ when
       //   none already exists.
-      console.log('this.wizardlets', this.wizardlets);
-
       // Save no-data capabilities (i.e. not displayed in wizard)
-      console.log('this.capabilities', this.capabilities);
       return Promise.all(this.wizardlets.filter(wizardlet => {
-        console.log('wia', wizardlet.isAvailable);
-        console.log('wiof',wizardlet.of)
-        console.log( 'tot', wizardlet.isAvailable 
-        // &&  foam.nanos.crunch.ui.CapabilityWizardlet.isInstance(wizardlet)
-        && ! wizardlet.capability.of  )
-
         return wizardlet.isAvailable; 
-        // &&  foam.nanos.crunch.ui.CapabilityWizardlet.isInstance(wizardlet)
-        // && ! wizardlet.of 
       }).map(
         filteredWizard => {
           var cap = filteredWizard.capability; 
-
-          console.log('filteredWizard', filteredWizard);
 
           var associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
            return this.userCapabilityJunctionDAO.find(
