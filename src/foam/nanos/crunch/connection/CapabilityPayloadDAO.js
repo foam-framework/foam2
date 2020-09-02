@@ -119,7 +119,7 @@ foam.CLASS({
         }
 
         CrunchService crunchService = (CrunchService) x.get("crunchService");
-        Map<String,FObject> capabilityDataObjects = walkGrantPath(crunchService.getGrantPath(x, idToString), x);
+        var capabilityDataObjects = walkGrantPath(crunchService.getGrantPath(x, idToString), x);
 
         CapabilityPayload capabilityPayload = new CapabilityPayload.Builder(x)
           .setCapabilityDataObjects(new HashMap<String,FObject>(capabilityDataObjects))
