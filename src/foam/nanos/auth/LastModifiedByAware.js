@@ -15,7 +15,8 @@ foam.INTERFACE({
       name: 'lastModifiedBy',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      documentation: 'User who last modified entry'
+      documentation: 'User who last modified entry',
+      storageOptional: true
     }
   ]
 });

@@ -265,6 +265,26 @@ public class ServerCrunchService implements CrunchService {
     }
   }
 
+  public boolean isRenewable(X x, String capabilityId) {
+    DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+    DAO prerequisitesDAO = ((DAO) x.get("prerequisiteCapabilityJunctionDAO")).where(EQ(CapabilityCapabilityJunction.SOURCE_ID, capabilityId));
+    CrunchService crunchService = (CrunchService) x.get("crunchService");
+
+    Capability capability = (Capability) capabilityDAO.find(capabilityId);
+    UserCapabilityJunction ucj = crunchService.getJunction(x, capabilityId);
+      if ( ! capability.getEnabled() ) return false;
+
+    List<CapabilityCapabilityJunction> ccJunctions = ((ArraySink) prerequisitesDAO.select(new ArraySink())).getArray();
+    boolean topLevelRenewable = ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ucj.getIsRenewable();
+
+    if ( ccJunctions.size() == 0 || topLevelRenewable ) return topLevelRenewable;
+
+    for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
+      if ( isRenewable(x, ccJunction.getTargetId())  ) return true;
+    }
+    return false;
+  }
+
   public boolean maybeReopen(X x, String capabilityId) {
     DAO capabilityDAO = (DAO) x.get("capabilityDAO");
     DAO prerequisitesDAO = ((DAO) x.get("prerequisiteCapabilityJunctionDAO")).where(EQ(CapabilityCapabilityJunction.SOURCE_ID, capabilityId));
@@ -272,18 +292,15 @@ public class ServerCrunchService implements CrunchService {
 
     Capability capability = (Capability) capabilityDAO.find(capabilityId);
     UserCapabilityJunction ucj = crunchService.getJunction(x, capabilityId);
+      if ( ! capability.getEnabled() ) return false;
 
     List<CapabilityCapabilityJunction> ccJunctions = ((ArraySink) prerequisitesDAO.select(new ArraySink())).getArray();
-    
     boolean shouldReopenTopLevel = shouldReopenUserCapabilityJunction(ucj);
 
     if ( ccJunctions.size() == 0 || shouldReopenTopLevel ) return shouldReopenTopLevel;
 
     for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
-      Capability cap = (Capability) ccJunction.findTargetId(x);
-      if ( ! cap.getEnabled() ) continue;
-      UserCapabilityJunction ucJunction = crunchService.getJunction(x, ccJunction.getTargetId());
-      if ( shouldReopenUserCapabilityJunction(ucJunction) ) return true;
+      if ( maybeReopen(x, ccJunction.getTargetId())  ) return true;
     }
     return false;
   }
