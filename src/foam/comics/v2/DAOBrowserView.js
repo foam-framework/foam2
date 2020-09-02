@@ -265,7 +265,8 @@ foam.CLASS({
                   .end();
               })
               .start(self.summaryView,{
-                data: self.predicatedDAO$proxy
+                data: self.predicatedDAO$proxy,
+                config: self.config
               })
                 .addClass(self.myClass('browse-view-container'))
               .end()

@@ -9,14 +9,20 @@
   name: 'ScrollTableView',
   extends: 'foam.u2.Element',
 
+  imports: [
+    'stack'
+  ],
+
   exports: [
-    'as summaryView'
+    'as summaryView',
+    'dblclick'
   ],
 
   requires: [
     'foam.dao.FnSink',
     'foam.mlang.sink.Count',
-    'foam.u2.view.TableView'
+    'foam.u2.view.TableView',
+    'foam.comics.v2.DAOControllerConfig'
   ],
 
   css: `
@@ -152,6 +158,14 @@
       class: 'Map',
       name: 'renderedPages_'
     },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.comics.v2.DAOControllerConfig',
+      name: 'config',
+      factory: function() {
+        return this.DAOControllerConfig.create({ dao: this.data });
+      }
+    }
   ],
 
   reactions: [
@@ -274,6 +288,15 @@
 
         this.style({ height: `${remainingSpace}px` });
       }
-    }
+    },
+    function dblclick(obj) {
+      if ( ! this.stack ) return;
+      this.stack.push({
+        class: 'foam.comics.v2.DAOSummaryView',
+        data: obj,
+        config: this.config,
+        of: this.config.of
+      }, this.__subContext__);
+    },
   ]
 });
