@@ -42,8 +42,8 @@ foam.CLASS({
         if ( ! this.of ) return null;
 
         var ret = this.of.getAxiomByName('capability') ?
-          this.of.create({ capability: this.capability }, this.__subContext__) :
-          this.of.create({}, this.__subContext__);
+          this.of.create({ capability: this.capability }, this) :
+          this.of.create({}, this);
 
         if ( this.ucj === null ) return ret;
       
