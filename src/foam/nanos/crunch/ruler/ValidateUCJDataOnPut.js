@@ -16,6 +16,7 @@ foam.CLASS({
     'foam.core.ContextAgent',
     'foam.core.FObject',
     'foam.core.X',
+    'foam.dao.DAO',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
@@ -38,7 +39,8 @@ foam.CLASS({
               ucj.getStatus() == CapabilityJunctionStatus.APPROVED ) 
               return;
 
-            Capability capability = (Capability) ucj.findTargetId(x);
+            DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+            Capability capability = (Capability) capabilityDAO.find(ucj.getTargetId());
 
             if ( ! isRenewable ) ucj.setStatus(CapabilityJunctionStatus.ACTION_REQUIRED);
 

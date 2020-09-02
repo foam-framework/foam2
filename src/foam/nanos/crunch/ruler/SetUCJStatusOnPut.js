@@ -41,7 +41,8 @@ foam.CLASS({
             // the following should be checked if the result of previous rule ( validateUCJDataOnPut ) 
             // is not ACTION_REQUIRED. In the ACTION_REQUIRED case, the ucj should be put into the
             // dao without any additional checks
-            Capability capability = (Capability) ucj.findTargetId(x);
+            DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+            Capability capability = (Capability) capabilityDAO.find(ucj.getTargetId());
 
             boolean reviewRequired = capability.getReviewRequired();
             boolean wasApproved = ucj.getStatus() == CapabilityJunctionStatus.APPROVED;
