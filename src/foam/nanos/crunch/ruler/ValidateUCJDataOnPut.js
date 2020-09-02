@@ -17,6 +17,7 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.X',
     'foam.dao.DAO',
+    'foam.dao.ProxyDAO',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
@@ -40,7 +41,7 @@ foam.CLASS({
               return;
 
             DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-            Capability capability = (Capability) capabilityDAO.find(ucj.getTargetId());
+            Capability capability = (Capability) ucj.findTargetId(((ProxyDAO) capabilityDAO).getX());
 
             if ( ! isRenewable ) ucj.setStatus(CapabilityJunctionStatus.ACTION_REQUIRED);
 

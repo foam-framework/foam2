@@ -17,6 +17,7 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.dao.ProxyDAO',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -42,7 +43,7 @@ foam.CLASS({
             // is not ACTION_REQUIRED. In the ACTION_REQUIRED case, the ucj should be put into the
             // dao without any additional checks
             DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-            Capability capability = (Capability) capabilityDAO.find(ucj.getTargetId());
+            Capability capability = (Capability) ucj.findTargetId(((ProxyDAO) capabilityDAO).getX());
 
             boolean reviewRequired = capability.getReviewRequired();
             boolean wasApproved = ucj.getStatus() == CapabilityJunctionStatus.APPROVED;
