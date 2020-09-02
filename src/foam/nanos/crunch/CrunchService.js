@@ -180,6 +180,21 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'isRenewable',
+      async: true,
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        }
+      ]
+    },
+    {
       name: 'getCapableObjectPayloads',
       async: true,
       type: 'CapablePayload[]',
