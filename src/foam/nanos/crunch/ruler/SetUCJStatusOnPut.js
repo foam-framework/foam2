@@ -17,7 +17,6 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
-    'foam.dao.ProxyDAO',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -31,6 +30,7 @@ foam.CLASS({
       name: 'applyAction',
       javaCode: `
         agency.submit(x, new ContextAgent() {
+          X systemX = ruler.getX();
           @Override
           public void execute(X x) {
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj; 
@@ -42,8 +42,8 @@ foam.CLASS({
             // the following should be checked if the result of previous rule ( validateUCJDataOnPut ) 
             // is not ACTION_REQUIRED. In the ACTION_REQUIRED case, the ucj should be put into the
             // dao without any additional checks
-            DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-            Capability capability = (Capability) ucj.findTargetId(((ProxyDAO) capabilityDAO).getX());
+
+            Capability capability = (Capability) ucj.findTargetId(systemX);
 
             boolean reviewRequired = capability.getReviewRequired();
             boolean wasApproved = ucj.getStatus() == CapabilityJunctionStatus.APPROVED;
