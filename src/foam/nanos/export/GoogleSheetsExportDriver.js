@@ -66,7 +66,7 @@ foam.CLASS({
       var sink = await dao.select(expr);
       
       var sheetId  = '';
-      var stringArray = await self.outputter.returnTable(X, dao.of, propNames, sink.array);
+      var stringArray = await self.outputter.returnTable(X, dao.of, propNames, sink.projection);
 
       sheetId = await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, this);
       if ( ! sheetId || sheetId.length == 0)
