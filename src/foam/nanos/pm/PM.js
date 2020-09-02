@@ -166,6 +166,12 @@ foam.CLASS({
                 .setIsActive(true)
                 .build();
               alarmDAO.put(alarm);
+
+              AlarmConfig alarmConfig = new AlarmConfig.Builder(x)
+                .setName(pm.getKey())
+                .setSendEmail(false)
+                .build();
+              configDAO.put(alarmConfig);
             }
           }, "PM alarm");
      `

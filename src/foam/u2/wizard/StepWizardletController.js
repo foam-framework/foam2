@@ -3,7 +3,6 @@
  * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-
 foam.CLASS({
   package: 'foam.u2.wizard',
   name: 'StepWizardletController',
@@ -142,7 +141,7 @@ foam.CLASS({
     {
       name: 'currentSection',
       expression: function(sections, wizardPosition) {
-        return sections[wizardPosition.wizardletIndex][wizardPosition.sectionIndex];
+        return this.currentWizardlet.currentSection = sections[wizardPosition.wizardletIndex][wizardPosition.sectionIndex];
       }
     },
     {
@@ -241,8 +240,8 @@ foam.CLASS({
     {
       name: 'canGoNext',
       class: 'Boolean',
-      expression: function(currentWizardlet$isValid) {
-        return currentWizardlet$isValid;
+      expression: function(currentWizardlet$isValid, config$allowSkipping) {
+        return currentWizardlet$isValid || config$allowSkipping;
       }
     },
     {
