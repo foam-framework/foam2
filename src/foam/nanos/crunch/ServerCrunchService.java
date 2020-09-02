@@ -80,7 +80,7 @@ public class ServerCrunchService implements CrunchService {
           ))
           .select(new ArraySink()) ).getArray();
 
-        for ( int i = prereqs.size() - 1; i >= 0; i-- ) {
+        for ( int i = prereqs.size() - 1 ; i >= 0 ; i-- ) {
           CapabilityCapabilityJunction prereq = (CapabilityCapabilityJunction) prereqs.get(i);
 
           var prereqGrantPath = this.getGrantPath(x,  prereq.getTargetId());
@@ -112,8 +112,8 @@ public class ServerCrunchService implements CrunchService {
           EQ(CapabilityCapabilityJunction.SOURCE_ID, sourceCapabilityId),
           NOT(IN(CapabilityCapabilityJunction.TARGET_ID, alreadyListed))
         ))
-        .select(new ArraySink()) ).getArray();
-      for ( int i = prereqs.size() - 1; i >= 0; i-- ) {
+        .select(new ArraySink())).getArray();
+      for ( int i = prereqs.size() - 1 ; i >= 0 ; i-- ) {
         CapabilityCapabilityJunction prereq = (CapabilityCapabilityJunction) prereqs.get(i);
         nextSources.add(prereq.getTargetId());
       }
