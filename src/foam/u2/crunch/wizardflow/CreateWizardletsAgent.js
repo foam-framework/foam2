@@ -43,7 +43,7 @@ foam.CLASS({
       var updateUcjPromiseList = [];
 
       var currentCap = array[array.length - 1];
-      var currentWizardlet  = currentCap.wizardlet.clone().clone().copyFrom(
+      var currentWizardlet  = currentCap.wizardlet.clone().copyFrom(
         {
           capability: currentCap,
         },
