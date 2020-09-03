@@ -261,7 +261,7 @@ public class JSONFObjectFormatter
       output((Map) value);
     } else if ( value instanceof List ) {
       output((List) value);
-    } else /*if ( value == null )*/ {
+    } else {
       System.err.println(this.getClass().getSimpleName()+".output, Unexpected value type: "+value.getClass().getName());
       append("null");
     }
