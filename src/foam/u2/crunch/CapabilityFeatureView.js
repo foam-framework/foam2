@@ -14,12 +14,15 @@ foam.CLASS({
   ],
 
   imports: [
+    'crunchService',
+    'ctrl',
     'subject',
     'userCapabilityJunctionDAO'
   ],
 
   requires: [
     'foam.nanos.crunch.AgentCapabilityJunction',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.u2.view.ReadOnlyEnumView',
     'foam.u2.crunch.Style'
@@ -37,6 +40,12 @@ foam.CLASS({
     ^ .foam-u2-crunch-Style-badge {
       position: absolute;
       bottom: 8px;
+      right: 8px;
+    }
+
+    ^ .foam-u2-crunch-Style-renewable-description {
+      position: absolute;
+      bottom: 32px;
       right: 8px;
     }
   `,
@@ -58,6 +67,10 @@ foam.CLASS({
       factory: function() {
         return foam.nanos.crunch.CapabilityJunctionStatus.AVAILABLE;
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'isRenewable'
     }
   ],
 
@@ -85,11 +98,17 @@ foam.CLASS({
           .style({
             'background-image': "url('" + self.data.icon + "')"
           })
-          .add(this.slot(function(cjStatus) {
-            return this.E().start(self.ReadOnlyEnumView, { data: cjStatus })
-              .addClass(style.myClass('badge'))
-              .style({ 'background-color': cjStatus.background })
-            .end();
+          .add(this.slot(function(cjStatus, isRenewable) {
+            return this.E('span')
+              .style({ 'float' : 'right' })
+              .start()
+                .addClass(style.myClass('renewable-description'))
+                .add(isRenewable ? "Capability is renewable" : "")
+              .end()
+              .start(self.ReadOnlyEnumView, { data : cjStatus, clsInfo : cjStatus.cls_.LABEL.name, default : cjStatus.label })
+                .addClass(style.myClass('badge'))
+                .style({ 'background-color': cjStatus.background })
+              .end();
           }))
         .end()
         .start()
@@ -130,6 +149,11 @@ foam.CLASS({
           )
         ).then(ucj => {
           if ( ucj ) this.cjStatus = ucj.status;
+          if ( this.cjStatus === this.CapabilityJunctionStatus.GRANTED ){
+            this.crunchService.isRenewable(this.ctrl.__subContext__, ucj.targetId).then(
+              isRenewable => this.isRenewable = isRenewable
+            );
+          }
         });
       }
     }
