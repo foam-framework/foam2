@@ -498,7 +498,7 @@ foam.CLASS({
       var M = m.toUpperCase();
 
       return css.replace(
-        new RegExp('/\\*%' + M + '%\\*/[^;]*', 'g'),
+        new RegExp('/\\*%' + M + '%\\*/[^;!]*', 'g'),
         '/*%' + M + '%*/ ' + this.theme[m]);
     },
 

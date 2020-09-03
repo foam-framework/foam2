@@ -59,6 +59,7 @@ foam.CLASS({
       `,
       expression: function(wizardlets) {
         return wizardlets.map(wizardlet => {
+          // TODO: If no of and if createView DNE null, then we need to spoof a section
           return this.AbstractSectionedDetailView.create({
             of: wizardlet.of,
           }).sections;
@@ -141,6 +142,7 @@ foam.CLASS({
     {
       name: 'currentSection',
       expression: function(sections, wizardPosition) {
+        this.currentWizardlet = this.wizardlets[wizardPosition.wizardletIndex];
         return this.currentWizardlet.currentSection = sections[wizardPosition.wizardletIndex][wizardPosition.sectionIndex];
       }
     },
@@ -178,7 +180,10 @@ foam.CLASS({
             continue;
           }
 
-          if ( sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() ) {
+          if ( 
+            sectionAvailableSlots[p.wizardletIndex].length > 0 && 
+            sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() 
+            ) {
             return p;
           }
         }
@@ -212,7 +217,10 @@ foam.CLASS({
           }
 
           // Land on an available section
-          if ( sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() ) {
+          if ( 
+            sectionAvailableSlots[p.wizardletIndex].length > 0 && 
+            sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() 
+            ) {
             return p;
           }
         }
@@ -240,8 +248,8 @@ foam.CLASS({
     {
       name: 'canGoNext',
       class: 'Boolean',
-      expression: function(currentWizardlet$isValid) {
-        return currentWizardlet$isValid;
+      expression: function(currentWizardlet$isValid, config$allowSkipping) {
+        return currentWizardlet$isValid || config$allowSkipping;
       }
     },
     {

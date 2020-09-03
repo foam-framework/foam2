@@ -149,7 +149,6 @@ foam.CLASS({
     }
 
     ^badge {
-      float: right;
       height: 24px;
       border-radius: 12px;
       margin-top: 12px;
@@ -181,6 +180,15 @@ foam.CLASS({
     }
     ^badge-bad {
       background-color: #bf3232;
+    }
+
+    ^renewable-description {
+      font-size: 10px;
+      font-weight: 500;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 24px;
+      color: #DC143C;
     }
 
     ^category {

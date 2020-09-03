@@ -487,7 +487,11 @@ p({
     \"cache\":true}"
 })
 
-p({"class":"foam.nanos.boot.NSpec", "name":"blobStore",                          "serviceClass":"foam.blob.BlobStore"})
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"blobStore",
+  "serviceClass":"foam.blob.BlobStore"
+})
 
 p({
   "class": "foam.nanos.boot.NSpec",
@@ -506,6 +510,16 @@ p({
   "serviceScript": """
     fileService = new foam.nanos.blob.FileService(x, x.get("blobStore"));
     return new foam.nanos.http.SessionWebAgent("service.run.httpFileService", fileService);
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "file",
+  "authenticate": false,
+  "serviceScript": """
+    fileService = new foam.nanos.http.UnauthenticatedFileService(x, "file", x.get("blobStore"));
+    return new foam.nanos.http.ProxyWebAgent(fileService);
   """
 })
 

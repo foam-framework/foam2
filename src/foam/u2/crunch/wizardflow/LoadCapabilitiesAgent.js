@@ -26,7 +26,7 @@ foam.CLASS({
   methods: [
     // If Property expressions ever unwrap promises this method can be blank.
     function execute() {
-      return this.crunchService.getGrantPath(null, this.rootCapability.id)
+      return this.crunchService.getCapabilityPath(null, this.rootCapability.id, false)
         .then(capabilities => { this.capabilities = capabilities });
     }
   ]

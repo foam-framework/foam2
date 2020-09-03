@@ -211,6 +211,7 @@ var classes = [
   'foam.mlang.sink.Sum',
   'foam.mlang.sink.Average',
   'foam.mlang.sink.Map',
+  'foam.nanos.alarming.AddAlarmNameDAO',
   'foam.nanos.alarming.Alarm',
   'foam.nanos.alarming.AlarmConfig',
   'foam.nanos.alarming.AlarmConfigOMNameDAO',
@@ -223,7 +224,6 @@ var classes = [
   'foam.nanos.alarming.MonitoringReport',
   'foam.nanos.alarming.MonitorType',
   'foam.nanos.alarming.OMName',
-  'foam.nanos.alarming.AlarmConfigName',
   'foam.nanos.actioncommand.ActionCommand',
   'foam.nanos.NanoService',
   'foam.nanos.boot.NSpec',
@@ -705,6 +705,7 @@ var classes = [
   // Crunch
   'foam.nanos.crunch.crunchtest.FakeTestObject',
   //models
+  'foam.nanos.crunch.Renewable',
   'foam.nanos.crunch.Capability',
   'foam.nanos.crunch.MinMaxCapability',
   'foam.nanos.crunch.lite.Capable',
@@ -717,6 +718,8 @@ var classes = [
   'foam.nanos.crunch.CapabilityCapabilityJunction',
   'foam.nanos.crunch.AssociatedEntity',
   'foam.nanos.crunch.CapabilityAvailabilityDAO',
+  'foam.nanos.crunch.RenewableData',
+
   'foam.nanos.crunch.connection.CapabilityPayload',
 
   //daos
@@ -735,6 +738,7 @@ var classes = [
   'foam.nanos.crunch.ruler.SetUCJStatusOnPut',
   'foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted',
   'foam.nanos.crunch.ruler.SaveUCJDataOnGranted',
+  'foam.nanos.crunch.ruler.IsDataUpdate',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
   // userQueryService

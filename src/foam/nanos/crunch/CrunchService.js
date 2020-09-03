@@ -12,6 +12,10 @@ foam.INTERFACE({
     services.
   `,
 
+  javaImports: [
+    'foam.nanos.crunch.lite.CapablePayload'
+  ],
+
   methods: [
     {
       name: 'getGrantPath',
@@ -154,6 +158,56 @@ foam.INTERFACE({
           type: 'String[]'
         },
       ]
+    },
+    {
+      name: 'maybeReopen',
+      documentation: `
+        Checks if a capability can be reopened from the appstore by checking if its :
+          - non-PENDING
+          - non-GRANTED or renewable
+      `,
+      async: true,
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        }
+      ]
+    },
+    {
+      name: 'isRenewable',
+      async: true,
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        }
+      ]
+    },
+    {
+      name: 'getCapableObjectPayloads',
+      async: true,
+      type: 'CapablePayload[]',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityIds',
+          type: 'String[]'
+        },
+      ]
     }
-  ],
+  ]
 });

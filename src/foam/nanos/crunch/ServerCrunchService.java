@@ -13,6 +13,7 @@ import foam.dao.DAO;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
+import foam.nanos.crunch.lite.CapablePayload;
 import foam.nanos.logger.Logger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public class ServerCrunchService implements CrunchService {
     while ( nextSources.size() > 0 ) {
       String sourceCapabilityId = nextSources.poll();
 
-      if ( ! filterGrantedUCJ ) {
+      if ( filterGrantedUCJ ) {
         UserCapabilityJunction ucj = crunchService.getJunction(x, sourceCapabilityId);
         if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
           continue;
@@ -69,7 +70,38 @@ public class ServerCrunchService implements CrunchService {
       alreadyListed.add(sourceCapabilityId);
 
       if ( cap instanceof MinMaxCapability && ! rootId.equals(sourceCapabilityId) ) {
-        grantPath.add(this.getGrantPath(x, sourceCapabilityId));
+        List minMaxArray = new ArrayList<>();
+
+        // Manually grab the direct  prereqs to the  MinMaxCapability
+        List prereqs = ( (ArraySink) prerequisiteDAO
+          .where(AND(
+            EQ(CapabilityCapabilityJunction.SOURCE_ID, sourceCapabilityId),
+            NOT(IN(CapabilityCapabilityJunction.TARGET_ID, alreadyListed))
+          ))
+          .select(new ArraySink()) ).getArray();
+
+        for ( int i = prereqs.size() - 1 ; i >= 0 ; i-- ) {
+          CapabilityCapabilityJunction prereq = (CapabilityCapabilityJunction) prereqs.get(i);
+
+          var prereqGrantPath = this.getGrantPath(x,  prereq.getTargetId());
+
+          // Essentially we reserve arrays to denote  ANDs and ORs, must be at least 2  elements
+          if ( prereqGrantPath.size() > 1 ) minMaxArray.add(prereqGrantPath);
+          else minMaxArray.add(prereqGrantPath.get(0));
+        }
+
+        /**
+            Format of a min max for getGrantPath
+            [[prereqsChoiceA, choiceA], [prereqsChoiceB,choiceB], minMaxCapa]
+         */
+        minMaxArray.add(cap);
+
+        /**
+            Format of a min max for getGrantPath as a prereq for another  capability
+            [[[prereqsChoiceA, choiceA], [prereqsChoiceB,choiceB], minMaxCap],cap]
+         */
+        grantPath.add(minMaxArray);
+
         continue;
       }
       grantPath.add(cap);
@@ -80,8 +112,8 @@ public class ServerCrunchService implements CrunchService {
           EQ(CapabilityCapabilityJunction.SOURCE_ID, sourceCapabilityId),
           NOT(IN(CapabilityCapabilityJunction.TARGET_ID, alreadyListed))
         ))
-        .select(new ArraySink()) ).getArray();
-      for ( int i = prereqs.size() - 1; i >= 0; i-- ) {
+        .select(new ArraySink())).getArray();
+      for ( int i = prereqs.size() - 1 ; i >= 0 ; i-- ) {
         CapabilityCapabilityJunction prereq = (CapabilityCapabilityJunction) prereqs.get(i);
         nextSources.add(prereq.getTargetId());
       }
@@ -215,11 +247,7 @@ public class ServerCrunchService implements CrunchService {
     boolean satisfied = false;
     for ( String capId : capabilityOptions ) {
       UserCapabilityJunction ucj = this.getJunction(x, capId);
-      if ( ucj != null && (
-        // TODO: use getStatus().getBroadStatus() when available
-        ucj.getStatus() == CapabilityJunctionStatus.GRANTED
-        || ucj.getStatus() == CapabilityJunctionStatus.GRACE_PERIOD
-      ) ) {
+      if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
         satisfied = true;
         break;
       }
@@ -235,5 +263,104 @@ public class ServerCrunchService implements CrunchService {
       }
       throw ex;
     }
+  }
+
+  public boolean isRenewable(X x, String capabilityId) {
+    DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+    DAO prerequisitesDAO = ((DAO) x.get("prerequisiteCapabilityJunctionDAO")).where(EQ(CapabilityCapabilityJunction.SOURCE_ID, capabilityId));
+    CrunchService crunchService = (CrunchService) x.get("crunchService");
+
+    Capability capability = (Capability) capabilityDAO.find(capabilityId);
+    UserCapabilityJunction ucj = crunchService.getJunction(x, capabilityId);
+      if ( ! capability.getEnabled() ) return false;
+
+    List<CapabilityCapabilityJunction> ccJunctions = ((ArraySink) prerequisitesDAO.select(new ArraySink())).getArray();
+    boolean topLevelRenewable = ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ucj.getIsRenewable();
+
+    if ( ccJunctions.size() == 0 || topLevelRenewable ) return topLevelRenewable;
+
+    for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
+      if ( isRenewable(x, ccJunction.getTargetId())  ) return true;
+    }
+    return false;
+  }
+
+  public boolean maybeReopen(X x, String capabilityId) {
+    DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+    DAO prerequisitesDAO = ((DAO) x.get("prerequisiteCapabilityJunctionDAO")).where(EQ(CapabilityCapabilityJunction.SOURCE_ID, capabilityId));
+    CrunchService crunchService = (CrunchService) x.get("crunchService");
+
+    Capability capability = (Capability) capabilityDAO.find(capabilityId);
+    UserCapabilityJunction ucj = crunchService.getJunction(x, capabilityId);
+      if ( ! capability.getEnabled() ) return false;
+
+    List<CapabilityCapabilityJunction> ccJunctions = ((ArraySink) prerequisitesDAO.select(new ArraySink())).getArray();
+    boolean shouldReopenTopLevel = shouldReopenUserCapabilityJunction(ucj);
+
+    if ( ccJunctions.size() == 0 || shouldReopenTopLevel ) return shouldReopenTopLevel;
+
+    for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
+      if ( maybeReopen(x, ccJunction.getTargetId())  ) return true;
+    }
+    return false;
+  }
+
+  public boolean shouldReopenUserCapabilityJunction(UserCapabilityJunction ucj) {
+    if ( ucj == null ) return true;
+    else if ( ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ucj.getIsRenewable() ) return true;
+    else if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED && 
+              ucj.getStatus() != CapabilityJunctionStatus.PENDING && 
+              ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return true;
+    return false;
+  }
+
+  public CapablePayload[] getCapableObjectPayloads(X x, String[] capabilityIds) {
+    List<CapablePayload> payloads = new ArrayList<>();
+
+    CrunchService crunchService = (CrunchService) x.get("crunchService");
+    List crunchPath = crunchService.getMultipleCapabilityPath(
+      x, capabilityIds, false);
+
+    for ( Object obj : crunchPath ) {
+      if ( ! (obj instanceof Capability) ) {
+        // Lists correspond to capabilityIds with their own prerequisite
+        // logic, such as MinMaxCapability. Clients will need to be
+        // made aware of these capabilities separately.
+        if ( obj instanceof List ) {
+          List list = (List) obj;
+
+          // Add payload object prerequisites
+          List prereqs = new ArrayList();
+          for ( int i = 0 ; i < list.size() - 1 ; i++ ) {
+            Capability prereqCap = (Capability) list.get(i);
+            list.add(new CapablePayload.Builder(x)
+              .setCapability(prereqCap)
+              .build());
+          }
+
+          // Add payload object
+          /* TODO: Figure out why this is an error when adding
+                    support for MinMaxCapability
+          Capability cap = (Capability) list.get(list.size() - 1);
+          payloads.add(new CapablePayload.Builder(x)
+            .setCapability(cap)
+            .setPrerequisites(prereqs.toArray(
+              new CapablePayload[list.size()]))
+            .build());
+          */
+          continue;
+        }
+
+        throw new RuntimeException(
+          "Expected capability or list");
+      }
+      Capability cap = (Capability) obj;
+      payloads.add(new CapablePayload.Builder(x)
+        .setCapability(cap)
+        .build());
+    }
+    
+    // Re-FObjectArray
+    return payloads.toArray(new CapablePayload[payloads.size()]);
   }
 }
