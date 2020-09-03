@@ -521,10 +521,10 @@ p({
 
 p({
   "class": "foam.nanos.boot.NSpec",
-  "name": "unauthenticatedHttpFileService",
+  "name": "file",
   "authenticate": false,
   "serviceScript": """
-    fileService = new foam.nanos.http.UnauthenticatedFileService(x, "unauthenticatedHttpFileService", x.get("blobStore"));
+    fileService = new foam.nanos.http.UnauthenticatedFileService(x, "file", x.get("blobStore"));
     return new foam.nanos.http.ProxyWebAgent(fileService);
   """
 })
