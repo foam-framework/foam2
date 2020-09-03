@@ -94,7 +94,7 @@ foam.CLASS({
               .add(isRenewable ? "Capability is renewable" : "")
             .end()
           .end();
-        }))      
+        }))
         .start()
           .addClass(style.myClass('card-title'))
           .add(( self.data.name != '') ? { data : self.data, clsInfo : self.data.cls_.NAME.name, default : self.data.name } : self.data.id)
