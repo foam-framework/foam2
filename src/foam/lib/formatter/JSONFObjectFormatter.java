@@ -229,7 +229,9 @@ public class JSONFObjectFormatter
   }
 
   public void output(Object value) {
-    if ( value instanceof OutputJSON ) {
+    if ( value == null ) {
+      append("null");
+    } else if ( value instanceof OutputJSON ) {
       ((OutputJSON) value).formatJSON(this);
     } else if ( value instanceof String ) {
       output((String) value);
@@ -260,6 +262,7 @@ public class JSONFObjectFormatter
     } else if ( value instanceof List ) {
       output((List) value);
     } else /*if ( value == null )*/ {
+      System.err.println(this.getClass().getSimpleName()+".output, Unexpected value type: "+value.getClass().getName());
       append("null");
     }
   }
@@ -282,7 +285,11 @@ public class JSONFObjectFormatter
   }
 
   public void output(Date date) {
-    output(date.getTime());
+    if ( date != null ) {
+      output(date.getTime());
+    } else {
+      append("null");
+    }
   }
 
   protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
