@@ -43,7 +43,8 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.LoadTopConfig',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
-    'foam.u2.crunch.CapabilityInterceptView'
+    'foam.u2.crunch.CapabilityInterceptView',
+    'foam.u2.dialog.Popup'
   ],
 
   properties: [

@@ -21,6 +21,7 @@ foam.CLASS({
     'foam.log.LogLevel',
     'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.u2.detail.AbstractSectionedDetailView',
     'foam.u2.detail.SectionView'
   ],
 
@@ -36,8 +37,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'StringArray',
-      name: 'capabilityIDs'
+      name: 'capable'
     },
     {
       class: 'FObjectArray',
@@ -50,7 +50,16 @@ foam.CLASS({
       of: 'foam.u2.wizard.BaseWizardlet',
       name: 'wizardlets',
       documentation: 'wizardlets for the capability',
-      value: []
+      factory: function() {
+        if ( this.capable === undefined ) return [];
+        return this.crunchController.getCapableWizard(this.capable);
+      },
+      postSet: function(_, newWizardlets) {
+        for ( wizardlet of newWizardlets ) {
+          this.populateData(wizardlet);
+          this.addListeners(wizardlet, wizardlet.data);
+        }
+      }
     },
     {
       class: 'Array',
@@ -59,7 +68,12 @@ foam.CLASS({
         sections for wizardlets
         wizardletSectionsList[i] stores sections for wizardlets[i]
       `,
-      value: []
+      factory: function() {
+        return this.wizardlets.map(wizardlet =>
+          this.AbstractSectionedDetailView.create({
+            of: wizardlet.of
+          }).sections);
+      }
     },
     {
       name: 'showTitle',
@@ -68,28 +82,28 @@ foam.CLASS({
   ],
 
   methods: [
-    async function init() {
-      for ( let capID of this.capabilityIDs ) {
-        // get capabilities and wizardlets for capID
-        const { caps: curCaps, wizCaps: curWizardlets } =
-          await this.crunchController.getCapsAndWizardlets(capID);
+    // async function init() {
+    //   for ( let capID of this.capabilityIDs ) {
+    //     // get capabilities and wizardlets for capID
+    //     const { caps: curCaps, wizCaps: curWizardlets } =
+    //       await this.crunchController.getCapsAndWizardlets(capID);
 
-        // pre-populate curWizardlets' data and add listeners to it
-        for ( let wizardlet of curWizardlets ) {
-          this.populateData(wizardlet);
-          this.addListeners(wizardlet, wizardlet.data);
-        }
+    //     // pre-populate curWizardlets' data and add listeners to it
+    //     for ( let wizardlet of curWizardlets ) {
+    //       this.populateData(wizardlet);
+    //       this.addListeners(wizardlet, wizardlet.data);
+    //     }
 
-        // get all the sections associated with curWizardlets
-        const curWizardletSectionsList = this.crunchController.generateSections(curWizardlets);
+    //     // get all the sections associated with curWizardlets
+    //     const curWizardletSectionsList = this.crunchController.generateSections(curWizardlets);
 
-        this.capabilities = this.capabilities.concat(curCaps);
-        this.wizardlets = this.wizardlets.concat(curWizardlets);
-        this.wizardletSectionsList = this.wizardletSectionsList.concat(curWizardletSectionsList);
-      }
-    },
+    //     this.capabilities = this.capabilities.concat(curCaps);
+    //     this.wizardlets = this.wizardlets.concat(curWizardlets);
+    //     this.wizardletSectionsList = this.wizardletSectionsList.concat(curWizardletSectionsList);
+    //   }
+    // },
 
-    async function initE() {
+    function initE() {
       const self = this;
 
       this.start().addClass(this.myClass())
