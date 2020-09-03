@@ -45,8 +45,8 @@ foam.CLASS({
     {
       name: 'javaInfoType',
       flags: ['java'],
-      value: 'foam.core.AbstractDAOPropertyPropertyInfo',
-    },
+      value: 'foam.core.AbstractDAOPropertyPropertyInfo'
+    }
   ],
 
   methods: [
