@@ -51,8 +51,8 @@ foam.CLASS({
       }
     },
     {
-      name: 'isRenewable',
-      class: 'Boolean'
+      class: 'Boolean',
+      name: 'isRenewable'     
     }
   ],
 
@@ -83,7 +83,7 @@ foam.CLASS({
           })
         .end()
         .add(this.slot(function(cjStatus, isRenewable) {
-          return this.E('span').start()
+          return this.E('span')
             .style({ 'float' : 'right' })
             .start(self.ReadOnlyEnumView, { data : cjStatus, clsInfo : cjStatus.cls_.LABEL.name, default : cjStatus.label })
               .addClass(style.myClass('badge'))
@@ -92,8 +92,7 @@ foam.CLASS({
             .start()
               .addClass(style.myClass('renewable-description'))
               .add(isRenewable ? "Capability is renewable" : "")
-            .end()
-          .end();
+            .end();
         }))
         .start()
           .addClass(style.myClass('card-title'))
@@ -133,7 +132,7 @@ foam.CLASS({
           )
         ).then(ucj => {
           if ( ucj ) this.cjStatus = ucj.status;
-          if ( this.cjStatus === foam.nanos.crunch.CapabilityJunctionStatus.GRANTED ){
+          if ( this.cjStatus === this.CapabilityJunctionStatus.GRANTED ){
             this.crunchService.isRenewable(this.ctrl.__subContext__, ucj.targetId).then(
               isRenewable => this.isRenewable = isRenewable
             );
