@@ -14,6 +14,8 @@ foam.CLASS({
   ],
 
   imports: [
+    'crunchService',
+    'ctrl',
     'subject',
     'userCapabilityJunctionDAO'
   ],
@@ -39,6 +41,12 @@ foam.CLASS({
       bottom: 8px;
       right: 8px;
     }
+
+    ^ .foam-u2-crunch-Style-renewable-description {
+      position: absolute;
+      bottom: 32px;
+      right: 8px;
+    }
   `,
 
   properties: [
@@ -58,6 +66,10 @@ foam.CLASS({
       factory: function() {
         return foam.nanos.crunch.CapabilityJunctionStatus.AVAILABLE;
       }
+    },
+    {
+      name: 'isRenewable',
+      class: 'Boolean'
     }
   ],
 
@@ -85,12 +97,19 @@ foam.CLASS({
           .style({
             'background-image': "url('" + self.data.icon + "')"
           })
-          .add(this.slot(function(cjStatus) {
-            return this.E().start(self.ReadOnlyEnumView, { data: cjStatus })
-              .addClass(style.myClass('badge'))
-              .style({ 'background-color': cjStatus.background })
+          .add(this.slot(function(cjStatus, isRenewable) {
+            return this.E('span').start()
+              .style({ 'float' : 'right' })
+              .start()
+                .addClass(style.myClass('renewable-description'))
+                .add(isRenewable ? "Capability is renewable" : "")
+              .end()
+              .start(self.ReadOnlyEnumView, { data : cjStatus, clsInfo : cjStatus.cls_.LABEL.name, default : cjStatus.label })
+                .addClass(style.myClass('badge'))
+                .style({ 'background-color': cjStatus.background })
+              .end()
             .end();
-          }))
+          }))  
         .end()
         .start()
           .addClass(style.myClass('card-title'))
@@ -130,6 +149,11 @@ foam.CLASS({
           )
         ).then(ucj => {
           if ( ucj ) this.cjStatus = ucj.status;
+          if ( this.cjStatus === foam.nanos.crunch.CapabilityJunctionStatus.GRANTED ){
+            this.crunchService.isRenewable(this.ctrl.__subContext__, ucj.targetId).then(
+              isRenewable => this.isRenewable = isRenewable
+            );
+          }
         });
       }
     }

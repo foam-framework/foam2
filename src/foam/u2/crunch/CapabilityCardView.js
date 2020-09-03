@@ -22,6 +22,8 @@ foam.CLASS({
   ],
 
   imports: [
+    'crunchService',
+    'ctrl',
     'subject',
     'userCapabilityJunctionDAO'
   ],
@@ -47,6 +49,10 @@ foam.CLASS({
       factory: function() {
         return foam.nanos.crunch.CapabilityJunctionStatus.AVAILABLE;
       }
+    },
+    {
+      name: 'isRenewable',
+      class: 'Boolean'
     }
   ],
 
@@ -76,12 +82,19 @@ foam.CLASS({
             'float': 'left'
           })
         .end()
-        .add(this.slot(function(cjStatus) {
-          return this.E().start(self.ReadOnlyEnumView, { data : cjStatus, clsInfo : cjStatus.cls_.LABEL.name, default : cjStatus.label })
-            .addClass(style.myClass('badge'))
-            .style({ 'background-color': cjStatus.background })
+        .add(this.slot(function(cjStatus, isRenewable) {
+          return this.E('span').start()
+            .style({ 'float' : 'right' })
+            .start(self.ReadOnlyEnumView, { data : cjStatus, clsInfo : cjStatus.cls_.LABEL.name, default : cjStatus.label })
+              .addClass(style.myClass('badge'))
+              .style({ 'background-color': cjStatus.background })
+            .end()
+            .start()
+              .addClass(style.myClass('renewable-description'))
+              .add(isRenewable ? "Capability is renewable" : "")
+            .end()
           .end();
-        }))
+        }))      
         .start()
           .addClass(style.myClass('card-title'))
           .add(( self.data.name != '') ? { data : self.data, clsInfo : self.data.cls_.NAME.name, default : self.data.name } : self.data.id)
@@ -120,6 +133,11 @@ foam.CLASS({
           )
         ).then(ucj => {
           if ( ucj ) this.cjStatus = ucj.status;
+          if ( this.cjStatus === foam.nanos.crunch.CapabilityJunctionStatus.GRANTED ){
+            this.crunchService.isRenewable(this.ctrl.__subContext__, ucj.targetId).then(
+              isRenewable => this.isRenewable = isRenewable
+            );
+          }
         });
       }
     }
