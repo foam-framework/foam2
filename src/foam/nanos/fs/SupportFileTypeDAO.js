@@ -29,7 +29,7 @@ foam.CLASS({
           public SupportFileTypeDAO(X x, DAO delegate) {
             setX(x);
             setDelegate(delegate);
-          }  
+          }
         `
         );
       }
@@ -45,7 +45,7 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       if (!(obj instanceof File)) {
-        return super.put_(x, obj);
+        return file;
       }
 
       File file = (File) obj;
@@ -64,7 +64,7 @@ foam.CLASS({
           .build()
         ).build();
       }
-      return file;
+      return super.put_(x, obj);
       `
     }
   ]
