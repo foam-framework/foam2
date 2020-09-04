@@ -299,7 +299,6 @@ FOAM_FILES([
   { name: "foam/nanos/http/ProxyWebAgent" },
   { name: "foam/nanos/http/HttpParameters" },
   { name: "foam/nanos/http/DefaultHttpParameters" },
-  { name: "foam/nanos/http/Ping" },
   { name: "foam/nanos/doc/DocumentationView" },
   { name: 'foam/nanos/demo/relationship/CourseType' },
   { name: 'foam/nanos/demo/relationship/Course' },

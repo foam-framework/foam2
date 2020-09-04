@@ -571,7 +571,6 @@ var classes = [
   'foam.nanos.http.Format',
   'foam.nanos.http.DefaultHttpParameters',
   'foam.nanos.http.HttpParameters',
-  'foam.nanos.http.Ping',
   'foam.nanos.dig.DIG',
   'foam.nanos.dig.SUGAR',
   'foam.nanos.dig.DUGRule',
