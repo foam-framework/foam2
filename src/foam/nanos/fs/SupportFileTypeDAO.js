@@ -45,7 +45,7 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       if (!(obj instanceof File)) {
-        return file;
+        return obj;
       }
 
       File file = (File) obj;
