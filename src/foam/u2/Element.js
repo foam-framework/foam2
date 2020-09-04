@@ -2348,14 +2348,11 @@ foam.CLASS({
       const DisplayMode = foam.u2.DisplayMode;
 
       var slot = foam.core.ProxySlot.create({
-        delegate$: controllerMode$.map((controllerMode) => {
+        delegate$: controllerMode$.map(controllerMode => {
           var value = controllerMode.getVisibilityValue(this);
 
-          if ( foam.String.isInstance(value) ) {
-            return foam.core.ConstantSlot.create({
-              value: DisplayMode[foam.String.constantize(value)]
-            });
-          }
+          if ( foam.String.isInstance(value) )
+            value = DisplayMode[foam.String.constantize(value)];
 
           if ( DisplayMode.isInstance(value) ) {
             return foam.core.ConstantSlot.create({ value: value });
@@ -2405,7 +2402,7 @@ foam.CLASS({
             });
         });
 
-        slot = foam.core.ArraySlot.create({ slots: [visSlot, permSlot] }).map((arr) => {
+        slot = foam.core.ArraySlot.create({slots: [visSlot, permSlot] }).map((arr) => {
           var vis  = arr[0];
           var perm = arr[1] || PPVC.HIDDEN;
 
