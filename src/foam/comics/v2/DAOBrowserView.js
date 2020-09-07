@@ -167,6 +167,7 @@ foam.CLASS({
       }
     }
   ],
+
   actions: [
     {
       name: 'export',
@@ -193,6 +194,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function init() {
       // Reset the search filters when a different canned query is selected
