@@ -173,7 +173,7 @@ p({
           { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isRenewable","propValue":true,"isNew":false }
         ]
       },
-      { "class":"foam.nanos.crunch.ruler.IsDataUpdate" }
+      { "class":"foam.nanos.ruler.predicate.PropertyChangePredicate", "propName":"data" }
     ]
   },
   "lifecycleState":1
@@ -220,7 +220,7 @@ p({
           { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isRenewable","propValue":true,"isNew":false }
         ]
       },
-      { "class":"foam.nanos.crunch.ruler.IsDataUpdate" }
+      { "class":"foam.nanos.ruler.predicate.PropertyChangePredicate", "propName":"data" }
     ]
   },
   "lifecycleState":1

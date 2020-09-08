@@ -657,7 +657,6 @@ var classes = [
   'foam.nanos.crunch.ruler.SetUCJStatusOnPut',
   'foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted',
   'foam.nanos.crunch.ruler.SaveUCJDataOnGranted',
-  'foam.nanos.crunch.ruler.IsDataUpdate',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
   // userQueryService
