@@ -230,7 +230,7 @@ foam.CLASS({
         });
       });
 
-      this.memento$.sub(this.mementoChange);
+      this.onDetach(this.memento$.sub(this.mementoChange));
       this.mementoChange();
     }
   ],
@@ -238,7 +238,11 @@ foam.CLASS({
   listeners: [
     function mementoChange() {
       var m = this.memento;
-      /*if ( this.stack.depth > 1 ) */this.stack.back();
+      console.log('****************************** mementoChange',m);
+
+      return;
+
+      /*if ( this.stack.depth > 1 )*/ this.stack.back();
 
       if ( ! m ) return;
 
