@@ -59,8 +59,6 @@ foam.CLASS({
     setKey(key);
   }
 
-  private static AtomicLong flushId_ = new AtomicLong(0);
-
   protected static final ThreadLocal<foam.lib.formatter.FObjectFormatter> formatter_ = new ThreadLocal<foam.lib.formatter.FObjectFormatter>() {
     @Override
     protected foam.lib.formatter.JSONFObjectFormatter initialValue() {
@@ -88,7 +86,6 @@ foam.CLASS({
       name: 'send',
       javaCode: `
       X x = msg.getX();
-      Long flushId = flushId_.incrementAndGet();
       DataOutputStream out = (DataOutputStream) x.get("socketOutputStream");
 
       try {
@@ -102,12 +99,6 @@ foam.CLASS({
           out.writeInt(messageBytes.length);
           out.write(messageBytes);
           out.flush();
-          // if ( flushId == flushId_.get() ) {
-          //   getLogger().debug("flush");
-          //   out.flush();
-          // } else {
-          //   getLogger().info("flush", "skip", flushId, flushId_.get());
-          // }
         }
       } catch (Throwable t) {
         getLogger().error(t);
