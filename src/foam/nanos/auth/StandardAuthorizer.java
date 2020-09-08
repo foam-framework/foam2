@@ -17,18 +17,18 @@ public class StandardAuthorizer implements Authorizer {
   // Standard authorizer to be used for authorization on object not implementing the authorizable interface
   // Performs authorization by checking permission generated from permissionPrefix passed in
 
-  protected String permissionPrefix_;
+  protected String permissionPrefix_ = "";
 
   public StandardAuthorizer(String permissionPrefix) {
     permissionPrefix_ = permissionPrefix;
   }
 
   public String createPermission(String op) {
-    return permissionPrefix_.contact(".").concat(op);
+    return permissionPrefix_ + "." + op;
   }
 
   public String createPermission(String op, Object id) {
-    return permissionPrefix_.concat(".").concat(op).concat(".").concat(id.toString());
+    return permissionPrefix_ + "." + op + "." + id;
   }
 
   public void authorizeOnCreate(X x, FObject obj) throws AuthorizationException {
