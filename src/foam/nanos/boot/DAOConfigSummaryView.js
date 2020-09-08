@@ -61,7 +61,7 @@ foam.CLASS({
             start().
               addClass(this.myClass('title')).
               start('a').
-                add('Data Management').on('click', () => this.memento = '').
+                add('Data Management').on('click', () => { this.memento = ''; }).
               end().
               add(' / ', this.title).
             end().
@@ -131,7 +131,8 @@ foam.CLASS({
        type: 'search',
        onKey: true
       }
-    }
+    },
+    'currentMemento_'
   ],
 
   methods: [
@@ -230,7 +231,8 @@ foam.CLASS({
         });
       });
 
-      this.onDetach(this.memento$.sub(this.mementoChange));
+//      this.onDetach(this.memento$.sub(this.mementoChange));
+      this.memento$.sub(this.mementoChange);
       this.mementoChange();
     }
   ],
@@ -238,13 +240,14 @@ foam.CLASS({
   listeners: [
     function mementoChange() {
       var m = this.memento;
-      console.log('****************************** mementoChange',m);
 
-      return;
+      if ( ! m ) {
+        if ( this.currentMemento_ ) this.stack.back();
+        this.currentMemento_ = '';
+        return;
+      }
 
-      /*if ( this.stack.depth > 1 )*/ this.stack.back();
-
-      if ( ! m ) return;
+      this.currentMemento_ = m;
 
       var x = this.__subContext__.createSubContext();
       x.register(this.DAOUpdateControllerView, 'foam.comics.DAOUpdateControllerView');
