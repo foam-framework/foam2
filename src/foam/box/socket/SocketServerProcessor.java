@@ -120,10 +120,10 @@ public class SocketServerProcessor
             throw new RuntimeException("Failed to parse.");
           }
           pm.log(x);
-          { // TODO: remove - debug only
-            String serviceKey = (String) msg.getAttributes().get("serviceKey");
-            logger_.debug("execute", "service", serviceKey, message);
-          }
+          // { // TODO: remove - debug only
+          //   String serviceKey = (String) msg.getAttributes().get("serviceKey");
+          //   logger_.debug("execute", "service", serviceKey, message);
+          // }
           socketRouter_.service(msg);
         } catch ( java.net.SocketTimeoutException e ) {
           continue;

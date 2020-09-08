@@ -166,7 +166,7 @@ foam.CLASS({
         message = formatter.builder().toString();
         byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
         synchronized (out_) {
-          getLogger().debug("send", message);
+          // getLogger().debug("send", message);
           out_.writeLong(System.currentTimeMillis());
           out_.writeInt(messageBytes.length);
           out_.write(messageBytes);
@@ -234,7 +234,7 @@ foam.CLASS({
               getLogger().error("Received empty message from", socket != null ? socket.getRemoteSocketAddress() : "NA");
               throw new RuntimeException("Received empty message.");
             }
-            getLogger().debug("receive", message);
+            // getLogger().debug("receive", message);
             Message msg = (Message) x.create(JSONParser.class).parseString(message);
             if ( msg == null ) {
               getLogger().warning("Failed to parse message", message);
