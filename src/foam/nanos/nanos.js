@@ -205,6 +205,7 @@ FOAM_FILES([
   { name: 'foam/nanos/medusa/benchmark/DaggerLinkBenchmark' },
   { name: 'foam/nanos/medusa/benchmark/DaggerVerifyBenchmark' },
   { name: 'foam/nanos/medusa/benchmark/MedusaBenchmark' },
+  { name: 'foam/nanos/medusa/test/MedusaTestObject' },
   { name: 'foam/nanos/benchmark/UUIDBenchmark' },
   { name: "foam/nanos/u2/navigation/TopNavigation", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/FooterView", flags: ['web'] },

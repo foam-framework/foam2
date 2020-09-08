@@ -17,7 +17,6 @@ foam.CLASS({
     'foam.mlang.sink.Count',
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.LifecycleState',
-    'foam.nanos.auth.Language',
     'foam.nanos.bench.Benchmark',
     'foam.nanos.boot.NSpec',
     'foam.nanos.logger.PrefixLogger',
@@ -25,6 +24,7 @@ foam.CLASS({
     'foam.nanos.logger.StdoutLogger',
     'foam.nanos.medusa.MedusaEntry',
     'foam.nanos.medusa.DaggerService',
+    'foam.nanos.medusa.test.MedusaTestObject',
     'static foam.mlang.MLang.EQ',
     'java.util.UUID'
   ],
@@ -33,7 +33,7 @@ foam.CLASS({
     {
       name: 'serviceName',
       class: 'String',
-      value: 'benchmarkLanguageDAO'
+      value: 'benchmarkMedusaTestObjectDAO'
     },
     {
       name: 'logger',
@@ -81,10 +81,10 @@ foam.CLASS({
     }
 
     DAO dao = (DAO) x.get(getServiceName());
-    Language language = new Language();
-    language.setCode(UUID.randomUUID().toString());
-    language.setName(language.getCode());
-    dao.put(language);
+    MedusaTestObject test = new MedusaTestObject();
+    test.setId(UUID.randomUUID().toString());
+    test.setName(test.getId());
+    dao.put(test);
       `
     },
     {
