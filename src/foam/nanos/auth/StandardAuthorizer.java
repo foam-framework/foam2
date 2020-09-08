@@ -17,24 +17,18 @@ public class StandardAuthorizer implements Authorizer {
   // Standard authorizer to be used for authorization on object not implementing the authorizable interface
   // Performs authorization by checking permission generated from permissionPrefix passed in
 
-  protected String permissionPrefix_ = "";
+  protected String permissionPrefix_;
 
   public StandardAuthorizer(String permissionPrefix) {
     permissionPrefix_ = permissionPrefix;
   }
 
   public String createPermission(String op) {
-    return permissionPrefix_ + "." + op;
+    return permissionPrefix_.contact(".").concat(op);
   }
 
   public String createPermission(String op, Object id) {
-    try {
-      return permissionPrefix_ + "." + op + "." + id;
-    } catch (NullPointerException t) {
-      System.err.println(this.getClass().getSimpleName()+","+t.getMessage()+","+"id"+","+id.getClass().getSimpleName()+","+id.toString());
-      return permissionPrefix_ + "." + op + "." + id.toString();
-      //      throw t;
-    }
+    return permissionPrefix_.concat(".").concat(op).concat(".").concat(id.toString());
   }
 
   public void authorizeOnCreate(X x, FObject obj) throws AuthorizationException {
@@ -57,6 +51,7 @@ public class StandardAuthorizer implements Authorizer {
   }
 
   public void authorizeOnUpdate(X x, FObject oldObj, FObject obj) throws AuthorizationException {
+
     String permission = createPermission("update", obj.getProperty("id"));
     AuthService authService = (AuthService) x.get("auth");
 
