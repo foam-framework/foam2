@@ -92,7 +92,6 @@ var classes = [
   'foam.box.ProxyBox',
   'foam.box.SubBox',
   'foam.box.Message',
-  'foam.box.MessageReplyBox',
   'foam.box.RegisterSelfMessage',
   'foam.box.SubBoxMessage',
   'foam.box.SubscribeMessage',
