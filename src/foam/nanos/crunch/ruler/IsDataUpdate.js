@@ -38,7 +38,10 @@ foam.CLASS({
           for ( foam.core.PropertyInfo prop : props ) {
             if ( prop.getStorageTransient() ) 
               continue;
-            if ( ! prop.f(oldData).equals(prop.f(newData)) ) 
+            Object newProp = prop.f(newData);
+            Object oldProp = prop.f(oldData);
+            if ( newProp == null && oldProp == null ) continue;
+            if ( newProp == null || oldProp == null || ! oldProp.equals(newProp) ) 
               return true;
           }
         }
