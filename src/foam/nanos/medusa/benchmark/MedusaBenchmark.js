@@ -33,7 +33,7 @@ foam.CLASS({
     {
       name: 'serviceName',
       class: 'String',
-      value: 'benchmarkMedusaTestObjectDAO'
+      value: 'medusaTestObjectDAO'
     },
     {
       name: 'logger',
