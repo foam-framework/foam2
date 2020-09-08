@@ -82,8 +82,7 @@ foam.CLASS({
 
     DAO dao = (DAO) x.get(getServiceName());
     MedusaTestObject test = new MedusaTestObject();
-    test.setId(UUID.randomUUID().toString());
-    test.setName(test.getId());
+    test.setName(UUID.randomUUID().toString());
     dao.put(test);
       `
     },
