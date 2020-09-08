@@ -533,9 +533,9 @@ foam.CLASS({
         menu.launch(this);
         menu = menu.id;
       }
-
       /** Use to load a specific menu. **/
-      this.memento.value = menu;
+      // Do it this way so as to not reset mementoTail if set
+      if ( this.memento.head != menu ) this.memento.value = menu;
     },
 
     function requestLogin() {
