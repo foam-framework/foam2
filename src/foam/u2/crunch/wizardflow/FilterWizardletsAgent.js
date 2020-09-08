@@ -15,7 +15,7 @@ foam.CLASS({
   imports: [
     'crunchService',
     'ctrl',
-    'unfilteredWizardlets'
+    'wizardlets as unfilteredWizardlets'
   ],
 
   exports: [
