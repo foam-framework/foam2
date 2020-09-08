@@ -10,6 +10,7 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.auth.EnabledAware',
+    'foam.nanos.auth.LastModifiedAware',
     'foam.nanos.auth.LastModifiedByAware',
     'foam.nanos.medusa.Clusterable'
   ],
@@ -42,6 +43,7 @@ foam.CLASS({
   ],
 
   tableColumns: [
+    'id',
     'description',
     'server',
     'lastDuration',
@@ -108,11 +110,16 @@ foam.CLASS({
       includeInDigest: false,
       documentation: 'Description of the script.',
       tableWidth: 300,
-      tableCellFormatter: function(value, obj) {
-        this.start()
-          .add( ! obj.description ? obj.id : obj.description )
-          .end();
-      }
+      // tableCellFormatter: function(value, obj) {
+      //   var v = value;
+      //   if ( obj ) {
+      //     v = obj.description ? obj.id : obj.description;
+      //   }
+
+      //   this.start()
+      //     .add( v )
+      //     .end();
+      // }
     },
     {
       class: 'Int',
@@ -234,6 +241,13 @@ foam.CLASS({
       name: 'lastModifiedBy',
       includeInDigest: true,
       documentation: 'User who last modified script'
+    },
+    {
+      class: 'DateTime',
+      name: 'lastModified',
+      includeInDigest: false,
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO'
     },
     {
       class: 'String',
