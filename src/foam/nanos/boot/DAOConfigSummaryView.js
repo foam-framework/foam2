@@ -257,7 +257,7 @@ foam.CLASS({
         title: m,
         inner: {
           class: this.BrowserView,
-          data: this.__context__[m],
+          data:  this.__context__[m],
           stack: this.stack
         }
       }, x);
