@@ -344,7 +344,7 @@ foam.CLASS({
         if ( user == null
          || (user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE)
        ) {
-          ((Logger) x.get("logger")).warning("Session", "User not found.", userId, user);
+          ((Logger) x.get("logger")).warning("Session", "User not found.", userId);
           throw new RuntimeException(String.format("User with id '%d' not found.", userId));
         }
 
