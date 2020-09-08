@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'BaseNotificationClientDAO',
   extends: 'foam.dao.AbstractDAO',
 
+  documentation: `NotificationClientDAO is a send and forget DAO, not waiting on a response like the ClientDAO.`,
+
   properties: [
     {
       class: 'Stub',
