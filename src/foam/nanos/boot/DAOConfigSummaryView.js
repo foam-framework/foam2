@@ -32,7 +32,7 @@ foam.CLASS({
       name: 'BackBorder',
       extends: 'foam.u2.Element',
 
-      imports: [ 'stack' ],
+      imports: [ 'memento', 'stack' ],
 
       css: `
         ^title {
@@ -57,28 +57,17 @@ foam.CLASS({
         function initE() {
           this.SUPER();
 
-          var self = this;
-
           this.
             start().
               addClass(this.myClass('title')).
               start('a').
-                add('Data Management').on('click', function() { self.stack.back(); }).
-                // The next line should work but doesn't.
-                // add('Data Management').on('click', this.back).
+                add('Data Management').on('click', () => { this.memento = ''; }).
               end().
               add(' / ', this.title).
             end().
             tag(this.inner);
         }
-      ]/*,
-
-      actions: [
-        function back() {
-          debugger;
-          this.stack.back();
-        }
-      ]*/
+      ]
     }
   ],
 
@@ -115,7 +104,7 @@ foam.CLASS({
 
   implements: [ 'foam.mlang.Expressions' ],
 
-  imports: [ 'nSpecDAO', 'stack' ],
+  imports: [ 'memento', 'nSpecDAO', 'stack' ],
 
   properties: [
     {
@@ -123,9 +112,6 @@ foam.CLASS({
       factory: function() {
        return this.nSpecDAO;
       }
-    },
-    {
-      name: 'memento'
     },
     {
       name: 'filteredDAO',
@@ -145,7 +131,8 @@ foam.CLASS({
        type: 'search',
        onKey: true
       }
-    }
+    },
+    'currentMemento_'
   ],
 
   methods: [
@@ -171,21 +158,6 @@ foam.CLASS({
           .end()
         .end()
       .end();
-
-      var x = this.__subContext__.createSubContext();
-      x.register(this.DAOUpdateControllerView, 'foam.comics.DAOUpdateControllerView');
-
-      this.memento$.sub(function() {
-        self.stack.push({
-          class: self.BackBorder,
-          title: self.memento,
-          inner: {
-            class: self.BrowserView,
-            data: self.__context__[self.memento],
-            stack: self.stack
-          }
-        }, x);
-      });
 
       var updateSections = [];
       var i = 0;
@@ -236,9 +208,7 @@ foam.CLASS({
               .addClass(self.myClass('dao'))
               .add(label)
               .attrs({title: spec.description})
-              .on('click', function() {
-                self.memento = spec.id;
-              });
+              .on('click', function() { self.memento = spec.id; });
 
               self.search$.sub(function() {
                 var contains = false;
@@ -260,6 +230,37 @@ foam.CLASS({
               });
         });
       });
+
+//      this.onDetach(this.memento$.sub(this.mementoChange));
+      this.memento$.sub(this.mementoChange);
+      this.mementoChange();
+    }
+  ],
+
+  listeners: [
+    function mementoChange() {
+      var m = this.memento;
+
+      if ( ! m ) {
+        if ( this.currentMemento_ ) this.stack.back();
+        this.currentMemento_ = '';
+        return;
+      }
+
+      this.currentMemento_ = m;
+
+      var x = this.__subContext__.createSubContext();
+      x.register(this.DAOUpdateControllerView, 'foam.comics.DAOUpdateControllerView');
+
+      this.stack.push({
+        class: this.BackBorder,
+        title: m,
+        inner: {
+          class: this.BrowserView,
+          data: this.__context__[m],
+          stack: this.stack
+        }
+      }, x);
     }
   ]
 });

@@ -30,6 +30,8 @@ FOAM_FILES([
   { name: "foam/nanos/app/EmailConfig" },
   { name: "foam/nanos/notification/email/SMTPConfig" },
   { name: "foam/nanos/app/ClientAppConfigService" },
+  { name: "foam/nanos/controller/WindowHash" },
+  { name: "foam/nanos/controller/Memento" },
   { name: "foam/nanos/controller/ApplicationController" },
   { name: "foam/nanos/app/Mode" },
   { name: 'foam/nanos/alarming/Alarm' },
