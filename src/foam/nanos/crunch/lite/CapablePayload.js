@@ -34,7 +34,7 @@ foam.CLASS({
     {
       name: 'prerequisites',
       class: 'FObjectArray',
-      of: 'CapablePayload',
+      of: 'foam.nanos.crunch.lite.CapablePayload',
       documentation: `
         Specifies prerequisites that were not present in the higher-level
         capability path, for example options for a MinMaxCapability.
