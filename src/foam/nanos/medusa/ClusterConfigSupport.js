@@ -87,7 +87,7 @@ configuration for contacting the primary node.`,
       class: 'Boolean',
       // STANDALONE, SINGLE
       value: false,
-      // value: true,
+      // value: true, // STANDALONE
       visibility: 'RO'
     },
     {
@@ -191,7 +191,7 @@ configuration for contacting the primary node.`,
       class: 'Int',
       // STANDALONE, SINGLE
       value: 2
-      // value: 1
+      // value: 1 // STANDALONE
     },
     {
       documentation: 'Additional node redundancy in each bucket.',
@@ -199,7 +199,7 @@ configuration for contacting the primary node.`,
       class: 'Int',
       // STANDALONE, SINGLE
       value: 1
-      // value: 0
+      // value: 0 // STANDALONE
     },
     {
       name: 'nodeGroups',
@@ -333,7 +333,10 @@ configuration for contacting the primary node.`,
           // return configs.get(0);
           // return configs.get(configs.size() -1);
           ClusterConfig cfg = configs.get(0);
-          getLogger().info("nextZone", "configs", configs.size(), "config", cfg.getId(), cfg.getZone(), cfg.getIsPrimary(), cfg.getPingTime());
+          getLogger().info("nextZone", "configs", configs.size(), "selected", cfg.getId(), cfg.getZone(), cfg.getIsPrimary(), cfg.getPingTime());
+          for ( ClusterConfig c : configs ) {
+            getLogger().info("nextZone", "other", cfg.getId(), cfg.getZone(), cfg.getIsPrimary(), cfg.getPingTime());
+          }
           return cfg;
         }
       }
@@ -520,7 +523,7 @@ configuration for contacting the primary node.`,
         if ( host != null ) {
           address = host.getAddress();
         }
-        getLogger().debug("getSocketClientBox", serviceName, address, host, receiveClusterConfig.getPort());
+        // getLogger().debug("getSocketClientBox", serviceName, address, host, receiveClusterConfig.getPort());
         SocketClientBox clientBox = new SocketClientBox();
         clientBox.setX(x);
         clientBox.setHost(address);

@@ -26,11 +26,17 @@ foam.CLASS({
       javaCode: `
       return null;
       `
-   },
+    },
     {
       name: 'notify',
       javaCode: `
       // nop
+      `
+    },
+    {
+      name: 'count',
+      javaCode: `
+      return 0L;
       `
     }
   ]

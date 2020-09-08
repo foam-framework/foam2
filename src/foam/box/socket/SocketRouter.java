@@ -82,7 +82,7 @@ public class SocketRouter
 
     X requestContext = getX()
       .put("logger", new PrefixLogger(new Object[] {
-            "[Service]",
+            this.getClass().getSimpleName(),
             spec.getName()
           }, (Logger) getX().get("logger")))
       .put(NSpec.class, spec);

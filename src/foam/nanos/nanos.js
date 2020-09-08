@@ -153,7 +153,7 @@ FOAM_FILES([
   { name: 'foam/nanos/medusa/ClusterCommandHop' },
   { name: 'foam/nanos/medusa/ClusterConfig' },
   { name: 'foam/nanos/medusa/ClusterConfigMonitor' },
-  { name: 'foam/nanos/medusa/ClusterConfigPingSink' },
+  { name: 'foam/nanos/medusa/ClusterConfigMonitorAgent' },
   { name: 'foam/nanos/medusa/ClusterConfigReplayDAO' },
   { name: 'foam/nanos/medusa/ClusterConfigReplayingInfoDAO' },
   { name: 'foam/nanos/medusa/ClusterConfigStatusDAO' },

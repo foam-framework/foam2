@@ -13,9 +13,6 @@ foam.CLASS({
   documentation: `Enforce unique indexes on nodes`,
 
   javaImports: [
-    'foam.mlang.sink.Count',
-    'static foam.mlang.MLang.COUNT',
-    'static foam.mlang.MLang.EQ',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger'
   ],

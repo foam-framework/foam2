@@ -21,6 +21,7 @@ foam.CLASS({
     'static foam.mlang.MLang.EQ',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'foam.nanos.pm.PM',
     'java.util.ArrayList',
     'java.util.concurrent.CountDownLatch',
     'java.util.HashMap',
@@ -117,7 +118,9 @@ foam.CLASS({
       ],
       type: 'FObject',
       javaCode: `
+      PM pm1= new PM(this.getClass().getSimpleName(), "wait-setup");
       CountDownLatch latch = null;
+      try {
       synchronized ( String.valueOf(id).intern() ) {
         latch = (CountDownLatch) getLatches().get(id);
         if ( latch == null ) {
@@ -137,6 +140,10 @@ foam.CLASS({
           latch = latch(x, id);
         }
       }
+      } finally {
+        pm1.log(x);
+      }
+      PM pm = new PM(this.getClass().getSimpleName(), "wait");
       try {
         getLogger().debug("wait", id);
         latch.await();
@@ -146,11 +153,12 @@ foam.CLASS({
         // nop
         return null;
       } finally {
+        pm.log(x);
         getLatches().remove(id);
         getEntries().remove(id);
       }
       `
-   },
+    },
     {
       name: 'notify',
       args: [
@@ -183,6 +191,27 @@ foam.CLASS({
       getLogger().debug("notify", id);
       latch.countDown();
       `
-    }
-  ]
+    },
+    {
+      name: 'count',
+      args: [
+        {
+          name: 'x',
+          type: 'X'
+        },
+        {
+          name: 'id',
+          type: 'Long'
+        }
+      ],
+      type: 'Long',
+      javaCode: `
+      CountDownLatch latch = (CountDownLatch) getLatches().get(id);
+      if ( latch == null ) {
+        return 0;
+      }
+      return latch.getCount();
+      `
+   },
+ ]
 });

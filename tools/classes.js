@@ -368,7 +368,7 @@ var classes = [
   'foam.nanos.medusa.ClusterCommandHop',
   'foam.nanos.medusa.ClusterConfig',
   'foam.nanos.medusa.ClusterConfigMonitor',
-  'foam.nanos.medusa.ClusterConfigPingSink',
+  'foam.nanos.medusa.ClusterConfigMonitorAgent',
   'foam.nanos.medusa.ClusterConfigReplayDAO',
   'foam.nanos.medusa.ClusterConfigReplayingInfoDAO',
   'foam.nanos.medusa.ClusterConfigStatusDAO',

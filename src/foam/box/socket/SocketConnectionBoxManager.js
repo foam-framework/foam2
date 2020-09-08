@@ -159,7 +159,7 @@ foam.CLASS({
           return box;
         // } catch ( ConnectException | SocketException | SocketTimeoutException e ) {
         } catch ( IOException e ) {
-          getLogger().error(host, port, e.getMessage());
+          getLogger().error(host, port, e.getClass().getSimpleName(), e.getMessage());
           remove(box);
           throw new RuntimeException(e);
         } catch ( Throwable t ) {

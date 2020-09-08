@@ -117,7 +117,6 @@ foam.CLASS({
   protected DataInputStream in_;
   protected DataOutputStream out_;
   private static AtomicLong replyBoxId_ = new AtomicLong(0);
-  private static AtomicLong flushId_ = new AtomicLong(0);
 
   protected static final ThreadLocal<foam.lib.formatter.FObjectFormatter> formatter_ = new ThreadLocal<foam.lib.formatter.FObjectFormatter>() {
     @Override
@@ -146,7 +145,6 @@ foam.CLASS({
       name: 'send',
       javaCode: `
       PM pm = PM.create(getX(), this.getClass().getSimpleName(), getHost()+":"+getPort()+":send");
-      Long flushId = flushId_.incrementAndGet();
       Box replyBox = (Box) msg.getAttributes().get("replyBox");
       if ( replyBox != null ) {
         Long replyBoxId = replyBoxId_.incrementAndGet();
@@ -168,24 +166,19 @@ foam.CLASS({
         message = formatter.builder().toString();
         byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
         synchronized (out_) {
+          getLogger().debug("send", message);
           out_.writeLong(System.currentTimeMillis());
           out_.writeInt(messageBytes.length);
           out_.write(messageBytes);
+          // TODO/REVIEW
           out_.flush();
-          // REVIEW: this does not work.
-          // if ( flushId == flushId_.get() ) {
-          //   getLogger().debug("flush");
-          //   out_.flush();
-          // } else {
-          //   getLogger().info("flush", "skip", flushId, flushId_.get());
-          // }
         }
       } catch ( Exception e ) {
         pm.error(getX(), e);
         // TODO: perhaps report last exception on host port via manager.
-        getLogger().error(e.getMessage(), "message", message, e);
+        getLogger().error("Error sending message", message, e);
         setValid(false);
-        throw new RuntimeException(e);
+        //throw new RuntimeException(e);
       } finally {
         pm.log(getX());
       }
@@ -241,10 +234,10 @@ foam.CLASS({
               getLogger().error("Received empty message from", socket != null ? socket.getRemoteSocketAddress() : "NA");
               throw new RuntimeException("Received empty message.");
             }
-            // getLogger().debug("receive", "message", message);
+            getLogger().debug("receive", message);
             Message msg = (Message) x.create(JSONParser.class).parseString(message);
             if ( msg == null ) {
-              getLogger().warning("Failed to parse", "message", message);
+              getLogger().warning("Failed to parse message", message);
               throw new RuntimeException("Failed to parse.");
             }
             Long replyBoxId = (Long) msg.getAttributes().get(REPLY_BOX_ID);
@@ -260,17 +253,6 @@ foam.CLASS({
               throw new RuntimeException("ReplyBox not found.");
             }
           } catch ( java.net.SocketTimeoutException e ) {
-            // getLogger().debug("SocketTimeoutException");
-
-            // // REVIEW: The flush logic in 'send' in buggy and stalling.  This
-            // // will periodically flush the 'send' output stream.
-            // synchronized ( out_ ) {
-            //   try {
-            //     out_.flush();
-            //   } catch ( IOException ioe ) {
-            //     // nop
-            //   }
-            // }
             continue;
           } catch ( java.io.IOException e ) {
             getLogger().debug(e.getMessage());

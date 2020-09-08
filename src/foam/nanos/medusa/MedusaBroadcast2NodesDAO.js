@@ -63,10 +63,9 @@ foam.CLASS({
 `,
       name: 'put_',
       javaCode: `
-      MedusaEntry entry = (MedusaEntry) obj;
-      getLogger().debug("put", entry.getIndex());
+      final MedusaEntry entry = (MedusaEntry) obj;
       final ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
+      final ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
       int groups = support.getNodeGroups();
       Map buckets = support.getNodeBuckets();
@@ -90,8 +89,6 @@ foam.CLASS({
                 getClients().put(config.getId(), dao);
               }
 
-              getLogger().debug("put_", "job", entry.getIndex(), config.getName(), "data", (entry.getData() != null) ? entry.getData().getClass().getSimpleName():"null");
-              entry.setNode(support.getConfigId());
               dao.put_(x, entry);
             } catch ( Throwable t ) {
               getLogger().error(t);

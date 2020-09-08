@@ -20,6 +20,7 @@ p({
       .setRuler(false)
       .setAuthorize(false)
       .setPm(true)
+      .setStorageOptionalEnabled(false)
       .setDecorator(new foam.nanos.medusa.ClusterConfigReplayDAO.Builder(x)
       .setDelegate(new foam.nanos.medusa.ClusterConfigStatusDAO.Builder(x)
       .setDelegate(new foam.nanos.medusa.ClusterConfigSupportDAO.Builder(x)
@@ -187,6 +188,13 @@ p({
   "name": "daggerService",
   "serve": false,
   "service": {"class":"foam.nanos.medusa.DefaultDaggerService"}
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"clusterConfigMonitor",
+  "lazy": false,
+  "serviceClass":"foam.nanos.medusa.ClusterConfigMonitor"
 })
 
 // See deployment/mm and mn for type specific setup

@@ -44,7 +44,6 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       ClusterConfig nu = (ClusterConfig) obj;
-      getLogger().debug("put", nu.getName());
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       if ( support.getStandAlone() ) {
         return getDelegate().put_(x, nu);
@@ -106,7 +105,7 @@ foam.CLASS({
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
       int groups = support.getNodeGroups();
-      List nodes = ((ArraySink)((DAO) getX().get("localClusterConfigDAO"))
+      List nodes = ((ArraySink)((DAO) x.get("localClusterConfigDAO"))
         .where(
           AND(
             EQ(ClusterConfig.ENABLED, true),

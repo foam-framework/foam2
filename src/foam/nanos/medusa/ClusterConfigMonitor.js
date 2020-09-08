@@ -12,8 +12,7 @@ foam.CLASS({
 
   implements: [
     'foam.core.ContextAgent',
-    'foam.nanos.NanoService',
-    'foam.nanos.auth.EnabledAware'
+    'foam.nanos.NanoService'
   ],
 
   javaImports: [
@@ -26,6 +25,7 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
+    'static foam.mlang.MLang.LT',
     'static foam.mlang.MLang.MAX',
     'static foam.mlang.MLang.NEQ',
     'static foam.mlang.MLang.NOT',
@@ -33,7 +33,9 @@ foam.CLASS({
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'java.util.ArrayList',
+    'java.util.HashMap',
     'java.util.List',
+    'java.util.Map',
     'java.util.Timer'
   ],
 
@@ -44,8 +46,6 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  protected static Timer timer_ = null;
-  protected static Boolean isRunning_ = false;
           `
         }));
       }
@@ -54,19 +54,23 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'enabled',
-      class: 'Boolean',
-      value: true
-    },
-    {
       name: 'timerInterval',
       class: 'Long',
-      value: 5000
+      value: 60000
     },
     {
       name: 'initialTimerDelay',
       class: 'Int',
       value: 5000
+    },
+    {
+      name: 'agents',
+      class: 'Map',
+      javaFactory: `return new HashMap();`
+    },
+    {
+      name: 'timer',
+      class: 'Object'
     },
     {
       name: 'logger',
@@ -89,12 +93,9 @@ foam.CLASS({
       javaCode: `
       getLogger().info("start");
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
-      if ( timer_ != null ) {
-        getLogger().warning("multiple instances", new Exception());
-        return;
-      }
-      timer_ = new Timer(this.getClass().getSimpleName(), true);
-      timer_.scheduleAtFixedRate(
+      Timer timer = new Timer(this.getClass().getSimpleName(), true);
+      setTimer(timer);
+      timer.scheduleAtFixedRate(
         new AgencyTimerTask(getX(), support.getThreadPoolName(), this),
         getInitialTimerDelay(),
         getTimerInterval());
@@ -109,19 +110,6 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      if ( ! getEnabled() ) {
-        return;
-      }
-      getLogger().debug("execute");
-      synchronized ( timer_ ) {
-       if ( isRunning_ ) {
-          getLogger().debug("already running");
-          return;
-        }
-        isRunning_ = true;
-      }
-
-      try {
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
         ClusterConfig config = support.getConfig(x, support.getConfigId());
         // getLogger().debug("execute", config.getId(), config.getType().getLabel(), config.getStatus().getLabel());
@@ -183,8 +171,9 @@ foam.CLASS({
             dao.put_(x, node);
           }
           // no need for timer in standalone mode.
-          timer_.cancel();
-          timer_.purge();
+          Timer timer = (Timer) getTimer();
+          timer.cancel();
+          timer.purge();
           getLogger().debug("timer", "cancel");
           return;
         }
@@ -196,19 +185,22 @@ foam.CLASS({
         dao.find_(x, config.getId());
 
         dao = (DAO) x.get("localClusterConfigDAO");
-        dao = dao.where(
-          AND(
-            EQ(ClusterConfig.ENABLED, true),
-            NOT(EQ(ClusterConfig.ID, support.getConfigId())),
-            EQ(ClusterConfig.REALM, config.getRealm())
-          ));
-        dao.select(new ClusterConfigPingSink(x, dao));
-      } finally {
-        synchronized ( timer_ ) {
-          isRunning_ = false;
+        List<ClusterConfig> configs = (ArrayList) ((ArraySink) dao
+          .where(
+            AND(
+              EQ(ClusterConfig.ENABLED, true),
+              NOT(EQ(ClusterConfig.ID, config.getId())),
+              EQ(ClusterConfig.REALM, config.getRealm())
+            ))
+            .select(new ArraySink())).getArray();
+        for ( ClusterConfig cfg : configs ) {
+          if ( getAgents().get(cfg.getId()) == null ) {
+            ClusterConfigMonitorAgent agent = new ClusterConfigMonitorAgent(x, cfg.getId(), dao);
+            getAgents().put(cfg.getId(), agent);
+            agent.start();
+          }
+          // TODO: deal with instance ENABLED true -> false.
         }
-        getLogger().debug("execute", "exit");
-      }
 
      // See ConsensusDAO for Mediators - they transition to ONLINE when replay complete.
       `

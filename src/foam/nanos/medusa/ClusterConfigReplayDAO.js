@@ -49,15 +49,11 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       ClusterConfig nu = (ClusterConfig) obj;
-      getLogger().debug("put", nu.getName());
       ClusterConfig old = (ClusterConfig) find_(x, nu.getId());
-
       nu = (ClusterConfig) getDelegate().put_(x, nu);
-
       if ( old != null &&
            old.getStatus() != nu.getStatus() &&
            nu.getStatus() == Status.ONLINE ) {
-
         ClusterConfig config = nu;
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
         ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
@@ -157,6 +153,7 @@ foam.CLASS({
             if ( replaying.getIndex() >= replaying.getReplayIndex() &&
                  support.getHasNodeQuorum() ) {
               // special intial case - no data, or baseline
+              // FIXME/REVIEW - not working - on fresh start, zone 1 mediators never go online.
               ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
             }
           }
@@ -170,11 +167,7 @@ foam.CLASS({
             cmd = (ReplayCmd) clientDAO.cmd_(x, cmd);
             getLogger().info("ReplayCmd", "from", myConfig.getId(), "to", config.getId(), "response");
           }
-        } else {
-          getLogger().debug("no match");
         }
-      } else {
-        getLogger().debug("not online");
       }
       return nu;
       `

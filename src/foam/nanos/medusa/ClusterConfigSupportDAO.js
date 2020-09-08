@@ -37,7 +37,6 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       ClusterConfig nu = (ClusterConfig) obj;
-      getLogger().debug("put", nu.getName());
       ClusterConfig old = (ClusterConfig) find_(x, nu.getId());
       nu = (ClusterConfig) getDelegate().put_(x, nu);
 
@@ -60,6 +59,9 @@ foam.CLASS({
         ClusterConfigSupport.NEXT_ZONE.clear(support);
         ClusterConfigSupport.NEXT_SERVER.clear(support);
         ClusterConfigSupport.ACTIVE_REGION.clear(support);
+      } else if ( old != null &&
+                  old.getPingTime() != nu.getPingTime() ) {
+        ClusterConfigSupport.NEXT_ZONE.clear(support);
       }
 
       return nu;

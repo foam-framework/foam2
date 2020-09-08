@@ -81,45 +81,42 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
+      MedusaEntry old = (MedusaEntry) getDelegate().find_(x, entry.getId());
+
       if ( support.getStandAlone() ) {
-        if ( getDelegate().find_(x, entry.getId()) == null ) {
+        if ( old == null ) {
           entry = (MedusaEntry) getDelegate().put_(x, entry);
           return ((DAO) x.get(getServiceName())).put_(x, entry);
         }
         return entry;
       }
 
-      entry = (MedusaEntry) getDelegate().put_(x, entry);
       if ( entry.isFrozen() ) {
-        return entry;
+        entry = (MedusaEntry) entry.fclone();
       }
+      entry.setNode(support.getConfigId());
+      entry = (MedusaEntry) getDelegate().put_(x, entry);
 
       if ( myConfig.getType() == MedusaType.NODE ) {
+        entry = (MedusaEntry) submit(x, entry, DOP.PUT);
         ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
-        // NOTE: don't sync, just for reporting purposes. 
-        // synchronized ( indexLock_ ) {
+        synchronized ( indexLock_ ) {
           if ( entry.getIndex() > replaying.getIndex() ) {
             replaying.setIndex(entry.getIndex());
           }
-        // }
-
-        submit(x, entry, DOP.PUT);
+        }
       } else if ( myConfig.getType() == MedusaType.MEDIATOR &&
-        // Broadcast promoted entries to other MEDIATORS
-        // REVIEW: to avoid broadcast during reply, wait until ONLINE,
-        // mediators may miss data between replayComplete and status change to ONLINE.
                   myConfig.getStatus() == Status.ONLINE &&
                   entry.getPromoted() ) {
-                  // REVIEW: can't test for old, freezing is off so old always equals new.
-                  // ( entry.getPromoted() &&
-                  //   ( old == null ||
-                  //     ! old.getPromoted() ) ) ) {
+
+        // Broadcast promoted entries to other MEDIATORS
+        // REVIEW: mediators may miss data between replayComplete and status change to ONLINE.
+
         entry = (MedusaEntry) submit(x, entry, DOP.PUT);
 
-        // REVIEW: broadcasted, can now copy and delete data put to save space
-        // entry = (MedusaEntry) entry.shallowClone();
+        // REVIEW: broadcasted, can now copy and delete 'data' to save space
+        // entry = (MedusaEntry) entry.fclone();
         // entry.setData(null);
-        // entry.__frozen__ = true;
         // entry = (MedusaEntry) getDelegate().put_(x, entry);
       }
       return entry;
@@ -156,9 +153,10 @@ foam.CLASS({
 
       final ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       final ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
+
       Agency agency = (Agency) x.get("threadPool");
       for ( ClusterConfig config : support.getBroadcastMediators() ) {
-        getLogger().debug("submit", "job", config.getId(), dop.getLabel(), "assembly");
+        // getLogger().debug("submit", "job", config.getId(), dop.getLabel(), "assembly");
         agency.submit(x, new ContextAgent() {
           public void execute(X x) {
             getLogger().debug("agency", "execute", config.getId());
@@ -176,19 +174,8 @@ foam.CLASS({
               }
 
               if ( DOP.PUT == dop ) {
-                MedusaEntry entry = (MedusaEntry) obj;
-                // REVIEW: mediator moosehead in zone 1 - which is slower, halts consensus when it
-                // receives a entry from a 'node' rather than a zone 0 mediator.  Happens repeated
-                // when benchmarking. cloning before setting node, but also note, that moosehead only
-                // receives one entry - it gets no others from other nodes or mediators.
-                if ( myConfig.getType() == MedusaType.MEDIATOR ) {
-                  entry = (MedusaEntry) entry.shallowClone();
-                }
-                entry.setNode(support.getConfigId());
-                getLogger().debug("agency", "execute", config.getId(), dop.getLabel(), entry.getIndex());
-                dao.put_(x, entry);
+                dao.put_(x, (FObject) obj);
               } else if ( DOP.CMD == dop ) {
-                getLogger().debug("agency", "execute", config.getId(), dop.getLabel(), obj.getClass().getSimpleName());
                 dao.cmd_(x, obj);
               }
             } catch ( Throwable t ) {

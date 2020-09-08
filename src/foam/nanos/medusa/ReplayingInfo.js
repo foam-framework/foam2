@@ -8,6 +8,10 @@ foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'ReplayingInfo',
 
+  implements: [
+    'foam.nanos.auth.LastModifiedAware'
+  ],
+
   javaImports: [
     'java.util.HashMap',
     'java.util.Map'
@@ -34,6 +38,12 @@ foam.CLASS({
     {
       documentation: 'Index, when received will mark replay complete.',
       name: 'replayIndex',
+      class: 'Long',
+      visibility: 'RO',
+    },
+    {
+      documentation: 'MedusaEntry has not reached consensus on this index.',
+      name: 'nonConsensusIndex',
       class: 'Long',
       visibility: 'RO',
     },
@@ -130,7 +140,14 @@ foam.CLASS({
       name: 'replayNodes',
       class: 'Map',
       javaFactory: 'return new HashMap();',
+      visibility: 'RO'
+    },
+    {
+      name: 'lastModified',
+      label: 'Stored',
+      class: 'DateTime',
       visibility: 'RO',
+      includeInDigest: false,
     }
   ]
 });

@@ -188,18 +188,19 @@ foam.CLASS({
   ],
 
   methods: [
-    {
-      name: 'freeze',
-      type: 'FObject',
-      javaCode: `
-      return this;
-      `
-    },
+    // {
+    //   name: 'freeze',
+    //   type: 'FObject',
+    //   javaCode: `
+    //   return this;
+    //   `
+    // },
     {
       name: 'fclone',
       type: 'FObject',
       javaCode: `
-      return this;
+      // return this;
+      return this.shallowClone();
       `
     },
     {

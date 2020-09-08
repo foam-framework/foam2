@@ -300,18 +300,24 @@ foam.CLASS({
       PM pm = new PM(this.getClass().getSimpleName(), "submit");
       MedusaEntry entry = x.create(MedusaEntry.class);
       try {
+        PM pmLink = new PM(this.getClass().getSimpleName(), "submit", "link");
         DaggerService dagger = (DaggerService) x.get("daggerService");
         entry = dagger.link(x, entry);
         entry.setNSpecName(getNSpec().getName());
         entry.setDop(dop);
         entry.setData(data);
+        pmLink.log(x);
 
         getLogger().debug("submit", entry.getId());
 
         MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
         registry.register(x, (Long) entry.getId());
+        PM pmPut = new PM(this.getClass().getSimpleName(), "submit", "put");
         entry = (MedusaEntry) getMedusaEntryDAO().put_(x, entry);
+        pmPut.log(x);
+        PM pmWait = new PM(this.getClass().getSimpleName(), "submit", "wait");
         registry.wait(x, (Long) entry.getId());
+        pmWait.log(x);
         return entry;
       } catch (Throwable t) {
         pm.error(x, entry.toSummary(), t);

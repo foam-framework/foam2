@@ -123,58 +123,48 @@ foam.CLASS({
       int retryAttempt = 0;
       int retryDelay = 10;
 
-      // getLogger().debug("submit", dop);
-
-      // TODO: Previously in RepayBatchSink. Need to decorate this sink.
-      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      if ( obj instanceof MedusaEntry ) {
-        MedusaEntry entry = (MedusaEntry) obj;
-        entry.setNode(support.getConfigId());
-      }
-
-      PM pm = PM.create(x, getClass().getSimpleName()+":"+getName(), dop);
+      PM pm = PM.create(x, getClass().getSimpleName(), getName(), dop);
       try {
-      while ( true ) {
-        try {
-          if ( DOP.PUT == dop ) {
-            return getDelegate().put_(x, (FObject)obj);
-          } else if ( DOP.REMOVE == dop ) {
-            return getDelegate().remove_(x, (FObject)obj);
-          } else if ( DOP.CMD == dop ) {
-            return getDelegate().cmd_(x, obj);
-          } else {
-            throw new UnsupportedOperationException("Unknown operation: "+dop);
-          }
-        } catch ( Throwable t ) {
-//          getLogger().error(t.getMessage(), t);
-          getLogger().error(t.getMessage());
-
-          if ( getMaxRetryAttempts() > -1 &&
-               retryAttempt >= getMaxRetryAttempts() ) {
-            getLogger().warning("retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
-
-            // TODO: Alarm
-            //throw new RuntimeException("Rejected, retry limit reached.", t);
-            pm.error(x, "Retry limit reached.");
-            break;
-          }
-          retryAttempt += 1;
-
-          // delay
+        while ( true ) {
           try {
-            retryDelay *= 2;
-            if ( retryDelay > getMaxRetryDelay() ) {
-              retryDelay = 10;
+            if ( DOP.PUT == dop ) {
+              return getDelegate().put_(x, (FObject)obj);
+            } else if ( DOP.REMOVE == dop ) {
+              return getDelegate().remove_(x, (FObject)obj);
+            } else if ( DOP.CMD == dop ) {
+              return getDelegate().cmd_(x, obj);
+            } else {
+              throw new UnsupportedOperationException("Unknown operation: "+dop);
             }
-            getLogger().info("retry attempt", retryAttempt, "delay", retryDelay);
-            Thread.sleep(retryDelay);
-          } catch(InterruptedException e) {
-            Thread.currentThread().interrupt();
-            // getLogger().debug("InterruptedException");
-            break;
+          } catch ( Throwable t ) {
+            // getLogger().error(t.getMessage(), t);
+            getLogger().error(t.getMessage());
+
+            if ( getMaxRetryAttempts() > -1 &&
+                 retryAttempt >= getMaxRetryAttempts() ) {
+              getLogger().warning("retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
+
+              // TODO: Alarm
+              pm.error(x, "Retry limit reached.");
+              throw new RuntimeException("Rejected, retry limit reached.", t);
+              //break;
+            }
+            retryAttempt += 1;
+
+            // delay
+            try {
+              retryDelay *= 2;
+              if ( retryDelay > getMaxRetryDelay() ) {
+                retryDelay = 10;
+              }
+              getLogger().info("retry attempt", retryAttempt, "delay", retryDelay);
+              Thread.sleep(retryDelay);
+            } catch(InterruptedException e) {
+              Thread.currentThread().interrupt();
+              break;
+            }
           }
         }
-      }
       } finally {
         pm.log(x);
       }

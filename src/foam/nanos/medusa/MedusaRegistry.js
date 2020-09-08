@@ -53,6 +53,34 @@ foam.INTERFACE({
           type: 'foam.nanos.medusa.MedusaEntry'
         }
       ]
+    },
+    {
+      name: 'wait',
+      args: [
+        {
+          name: 'x',
+          type: 'X'
+        },
+        {
+          name: 'id',
+          type: 'Long'
+        }
+      ],
+      type: 'FObject'
+    },
+    {
+      name: 'count',
+      args: [
+        {
+          name: 'x',
+          type: 'X'
+        },
+        {
+          name: 'id',
+          type: 'Long'
+        }
+      ],
+      type: 'Long'
     }
   ]
 });
