@@ -21,7 +21,6 @@ foam.CLASS({
       name: 'value',
       value: '',
       postSet: function(o, n) {
-        console.log('**************** memento: ', n);
         if ( this.feedback_ ) return;
         this.feedback_ = true;
         var i = n.indexOf(this.SEPARATOR);
@@ -39,7 +38,6 @@ foam.CLASS({
       name: 'head',
       value: '',
       postSet: function(o, n) {
-        console.log('**************** head: ', n);
         if ( this.feedback_ ) return;
         this.feedback_ = true;
         debugger;
@@ -51,7 +49,6 @@ foam.CLASS({
       name: 'tail',
       value: '',
       postSet: function(o, n) {
-        console.log('**************** tail: ', n);
         if ( this.feedback_ ) return;
         this.feedback_ = true;
         this.value = this.combine(this.head, n);
