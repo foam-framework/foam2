@@ -23,7 +23,7 @@ public class Util {
     int start = 0;
     int len = 0;
 
-    if ( src != null )
+    if ( src != null && ! src.equals("") )
       len = src.length();
 
     for ( int i = 0 ; i < len ; i++ ) {
