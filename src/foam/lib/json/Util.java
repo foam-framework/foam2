@@ -23,7 +23,7 @@ public class Util {
     int start = 0;
     int len = 0;
 
-    if ( src != null && ! src.equals("") )
+    if ( ! foam.util.SafetyUtil.isEmpty(src) )
       len = src.length();
 
     for ( int i = 0 ; i < len ; i++ ) {
