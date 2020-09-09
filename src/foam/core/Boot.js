@@ -208,7 +208,7 @@ foam.LIB({
 
         return cls;
       };
-      let l = localStorage.getItem('localeLanguage');
+      let l = global.localStorage && global.localStorage.getItem('localeLanguage');
       if ( l !== undefined ) foam.locale = l;
     },
 
