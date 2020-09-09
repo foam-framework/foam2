@@ -43,8 +43,8 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.start('div').add(this.yourName$.label).end().start('div').add(this.YOUR_NAME).end();
-      this.start('h1').add(this.greeting$.label).add(this.yourName$).add('!').end();
+      this.start('div').add(this.YOUR_NAME.label).end().start('div').add(this.YOUR_NAME).end();
+      this.start('h1').add(this.GREETING.label).add(this.yourName$).add('!').end();
     }
   ]
 });

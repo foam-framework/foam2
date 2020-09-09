@@ -208,6 +208,8 @@ foam.LIB({
 
         return cls;
       };
+      let l = localStorage.getItem('localeLanguage');
+      if ( l !== undefined ) foam.locale = l;
     },
 
     /** Start second phase of bootstrap process. */

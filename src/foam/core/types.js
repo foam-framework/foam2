@@ -48,10 +48,10 @@ foam.CLASS({
       value: function(_, a, p) {
         if ( foam.Object.isInstance(a) )
         {
-          if ( a[foam.language] !== undefined )
-            return a[foam.language];
-          if ( a[foam.language.substring(0, foam.language.indexOf('-'))] !== undefined )
-            return a[foam.language];
+          if ( a[foam.locale] !== undefined )
+            return a[foam.locale];
+          if ( a[foam.locale.substring(0, foam.locale.indexOf('-'))] !== undefined )
+            return a[foam.locale.substring(0, foam.locale.indexOf('-'))];
           return a['en'];// default language.
         }
         var s = typeof a === 'function' ? foam.String.multiline(a) :
