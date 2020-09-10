@@ -628,6 +628,7 @@ var classes = [
   'foam.nanos.crunch.Capability',
   'foam.nanos.crunch.MinMaxCapability',
   'foam.nanos.crunch.lite.Capable',
+  'foam.nanos.crunch.lite.CapableAdapterDAO',
   'foam.nanos.crunch.lite.CapablePayload',
   'foam.nanos.crunch.CapabilityCategory',
   'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
