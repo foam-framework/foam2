@@ -1,0 +1,39 @@
+p({
+    "class":"foam.nanos.ruler.Rule",
+    "id":"520c5c8a-f3a8-11ea-adc1-0242ac120002",
+    "name":"Capable Payload Create Approvals Rule Action",
+    "priority":100,
+    "daoKey":"capableObjectDAO",
+    "ruleGroup":"capableObject",
+    "operation":0,
+    "after":false,
+    "action":{
+        "class":"foam.nanos.crunch.lite.CapablePayloadCreateApprovalsRuleAction",
+        "capabilitiesToApprove":[
+            // TODO: Fill out capabilities which need to be approved
+        ]
+    },
+    "enabled":true,
+    "saveHistory":false,
+    "lifecycleState":1
+})
+
+p({
+    "class":"foam.nanos.ruler.Rule",
+    "id":"58280fe2-f3a8-11ea-adc1-0242ac120002",
+    "name":"Capable Payload Approvable Rule Action",
+    "priority":100,
+    "daoKey":"approvableDAO",
+    "ruleGroup":"approvables",
+    "operation":1,
+    "after":false,
+    "predicate":{
+        "class":"foam.nanos.approval.FulfilledNestedJournalApprovablePredicate",
+    },
+    "action":{
+        "class":"foam.nanos.crunch.lite.CapablePayloadApprovableRuleAction"
+    },
+    "enabled":true,
+    "saveHistory":false,
+    "lifecycleState":1
+})

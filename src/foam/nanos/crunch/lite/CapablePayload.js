@@ -21,7 +21,18 @@ foam.CLASS({
     'foam.core.Validator'
   ],
 
+  // TODO: Can section off view
+
   properties: [
+    {
+      class: 'String',
+      name: 'daoKey'
+    },
+    {
+      class: 'Object',
+      javaType: 'Object',
+      name: 'objId',
+    },
     {
       name: 'capability',
       class: 'FObjectProperty',

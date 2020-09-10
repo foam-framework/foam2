@@ -103,13 +103,13 @@ foam.INTERFACE({
             { name: 'x', type: 'X' }
           ],
           body: `
-            DAO capableDAO = new CapableAdapterDAO.Builder(x)
+            DAO capableAdapterDAO = new CapableAdapterDAO.Builder(x)
               .setCapable(this)
               .setOf(CapablePayload.getOwnClassInfo())
               .build();
-            x = x.put("capableDAO", capableDAO);
+            x = x.put("capableAdapterDAO", capableAdapterDAO);
             RulerDAO rulerDAO = new RulerDAO(
-              x, capableDAO, "capableObjectDAO");
+              x, capableAdapterDAO, "capableObjectDAO");
             return rulerDAO;
           `
         }));

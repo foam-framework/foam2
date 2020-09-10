@@ -4,11 +4,14 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
- foam.CLASS({
+foam.CLASS({
   package: 'foam.nanos.approval',
-  name: 'FulfilledApprovablePredicate',
+  name: 'FulfilledNestedJournalApprovablePredicate',
 
-  documentation: 'Returns true if from the approvableDAO and the Approvable is APPROVED',
+  documentation: `
+    Returns true if from the approvableDAO and the Approvable is APPROVED 
+    & nested journal is true',
+  `,
 
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: ['foam.core.Serializable'],
@@ -26,7 +29,7 @@
         return
           AND(
             EQ(DOT(NEW_OBJ, Approvable.STATUS), ApprovalStatus.APPROVED),
-            EQ(DOT(NEW_OBJ, Approvable.IS_USING_NESTED_JOURNAL), false)
+            EQ(DOT(NEW_OBJ, Approvable.IS_USING_NESTED_JOURNAL), true)
           )
         .f(obj);
       `
