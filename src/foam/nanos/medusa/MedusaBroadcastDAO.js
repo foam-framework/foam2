@@ -82,20 +82,15 @@ foam.CLASS({
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
       MedusaEntry old = (MedusaEntry) getDelegate().find_(x, entry.getId());
+      entry = (MedusaEntry) getDelegate().put_(x, entry);
 
       if ( support.getStandAlone() ) {
         if ( old == null ) {
-          entry = (MedusaEntry) getDelegate().put_(x, entry);
           return ((DAO) x.get(getServiceName())).put_(x, entry);
         }
         return entry;
       }
 
-      if ( entry.isFrozen() ) {
-        entry = (MedusaEntry) entry.fclone();
-      }
-      entry.setNode(support.getConfigId());
-      entry = (MedusaEntry) getDelegate().put_(x, entry);
 
       if ( myConfig.getType() == MedusaType.NODE ) {
         entry = (MedusaEntry) submit(x, entry, DOP.PUT);
