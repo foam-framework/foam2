@@ -84,15 +84,13 @@ foam.CLASS({
             })
             .start(self.Grid)
               .forEach(section.properties, function(p, index) {
-                var s1 = self.SimpleSlot.create();
-                var s2 = self.SimpleSlot.create();
-                this.start(self.GUnit, { columns: p.gridColumns }, s1)
+                this.start(self.GUnit, {columns: p.gridColumns})
+                  .show(p.createVisibilityFor(self.data$, self.controllerMode$).map(mode => mode !== self.DisplayMode.HIDDEN))
                   .tag(self.SectionedDetailPropertyView, {
                     prop: p,
                     data$: self.data$
-                  }, s2)
+                  })
                 .end();
-                s1.get().show(self.ProxySlot.create({ delegate$: s2.get().visibilitySlot$ }).map((mode) => mode !== self.DisplayMode.HIDDEN));
               })
             .end()
             .start(self.Cols)

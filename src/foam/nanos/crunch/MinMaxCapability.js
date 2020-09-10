@@ -26,7 +26,17 @@ foam.CLASS({
       name: 'max',
       class: 'Int',
       value: 0
-    }
+    },
+    {
+      class: 'Object',
+      name: 'wizardlet',
+      documentation: `
+        Defines a wizardlet used when displaying this capability on related client crunch wizards.
+      `,
+      factory: function() {
+        return foam.nanos.crunch.ui.MinMaxCapabilityWizardlet.create({}, this);
+      }
+    },
   ],
 
   methods: [

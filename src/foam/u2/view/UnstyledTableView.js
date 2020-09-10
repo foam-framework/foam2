@@ -465,7 +465,9 @@ foam.CLASS({
                       if (
                         evt.target.nodeName === 'DROPDOWN-OVERLAY' ||
                         evt.target.classList.contains(view.myClass('vertDots'))
-                      ) return;
+                      ) {
+                        return;
+                      }
 
                       if  ( ! thisObjValue ) {
                         dao.find(val[0]).then(v => {

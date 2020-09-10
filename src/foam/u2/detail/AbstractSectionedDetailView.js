@@ -25,7 +25,7 @@ foam.CLASS({
       class: 'Array',
       name: 'useSections',
       documentation: `List of sections to be used in section detail view. Set if you would like to
-          filter section list, alternative to default behaviour where all sections of class and parent classes are used.`
+        filter section list, alternative to default behaviour where all sections of class and parent classes are used.`
     },
     {
       class: 'FObjectProperty',
@@ -66,9 +66,9 @@ foam.CLASS({
         foam.assert(ps, 'Properties required.');
         for ( var i = 0; i < ps.length; i++ ) {
           foam.assert(
-              foam.core.Property.isInstance(ps[i]),
-              `Non-Property in 'properties' list:`,
-              ps);
+            foam.core.Property.isInstance(ps[i]),
+            `Non-Property in 'properties' list:`,
+            ps);
         }
         return ps;
       }
@@ -103,7 +103,6 @@ foam.CLASS({
             return map;
           }, {});
 
-
         if ( ! this.useSections.length ) {
           var unusedProperties = of.getAxiomsByClass(this.Property)
               .filter((p) => ! usedAxioms[p.name])
@@ -118,7 +117,6 @@ foam.CLASS({
             }));
           }
         }
-
 
         if ( this.propertyWhitelist ) {
           sections = sections
@@ -141,10 +139,10 @@ foam.CLASS({
         // it could be hidden under certain conditions and visible otherwise.
         sections = sections.filter(s => {
           return s.actions.length > 0 ||
-                 s.properties.some(p => {
-                   var visVal = this.controllerMode.getVisibilityValue(p);
-                   return visVal !== foam.u2.DisplayMode.HIDDEN && visVal !== 'HIDDEN';
-                 });
+            s.properties.some(p => {
+              var visVal = this.controllerMode.getVisibilityValue(p);
+              return visVal !== foam.u2.DisplayMode.HIDDEN && visVal !== 'HIDDEN';
+            });
         });
 
         return sections;

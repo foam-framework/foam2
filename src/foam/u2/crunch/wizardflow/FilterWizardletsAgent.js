@@ -9,14 +9,13 @@ foam.CLASS({
   name: 'FilterWizardletsAgent',
 
   implements: [
-    'foam.core.ContextAgent',
-    'foam.mlang.Expressions'
+    'foam.core.ContextAgent'
   ],
 
   imports: [
     'crunchService',
     'ctrl',
-    'unfilteredWizardlets'
+    'wizardlets as unfilteredWizardlets'
   ],
 
   exports: [
@@ -30,12 +29,6 @@ foam.CLASS({
       of: 'foam.u2.wizard.Wizardlet',
       factory: () => { return []; }
     }
-  ],
-
-  messages: [
-    { name: 'CANNOT_OPEN_GRANTED', message: 'This capability has already been granted to you.' },
-    { name: 'CANNOT_OPEN_PENDING', message: 'This capability is awaiting approval, updates are not permitted at this time.' },
-    { name: 'CANNOT_OPEN_ACTION_PENDING', message: 'This capability is awaiting review, updates are not permitted at this time.' }
   ],
 
   methods: [

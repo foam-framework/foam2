@@ -1,0 +1,15 @@
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"3A06FA2C-733C-4830-AFFE-6B44B68B1F86",
+  "name":"PM Alarming",
+  "priority":"100",
+  "ruleGroup":"am",
+  "documentation":"Check PM for error and generate alarm.",
+  "daoKey":"DAOPMLogger",
+  "operation":0,
+  "after":false,
+  "action":{"class":"foam.nanos.pm.PM"},
+  "enabled":true,
+  "saveHistory":false,
+  "lifecycleState":1
+})
