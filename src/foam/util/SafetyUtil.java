@@ -209,7 +209,7 @@ public class SafetyUtil {
     return s == null ? null : s.trim();
   }
 
-  public static void Validate(Validatable v, X x) {
+  public static void Validate(X x, Validatable v) {
     if ( v == null ) {
       throw new IllegalStateException("Object is null");
     }
