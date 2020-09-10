@@ -99,6 +99,7 @@ foam.CLASS({
 
   properties: [
     {
+      tags: ['web'],
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(_, obj, axiom) {
@@ -112,6 +113,7 @@ foam.CLASS({
       }
     },
     {
+      tags: ['web'],
       name: 'tableHeaderFormatter',
       value: function(axiom) {
         this.add(axiom.label);
