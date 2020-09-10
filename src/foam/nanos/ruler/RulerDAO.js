@@ -362,6 +362,9 @@ for ( Object key : groups.getGroupKeys() ) {
       setX(x);
       setDelegate(delegate);
       setDaoKey(serviceName);
+      // This doesn't get called when using Builder,
+      //   it must be called manually in this case.
+      updateRules(x);
     }
       `
          );

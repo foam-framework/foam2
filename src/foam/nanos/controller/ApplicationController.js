@@ -528,20 +528,16 @@ foam.CLASS({
       }
     },
 
-    function pushMenu(menu) {
+    function pushMenu(menu, opt_forceReload) {
       if ( menu.id ) {
         menu.launch(this);
         menu = menu.id;
       }
       /** Use to load a specific menu. **/
       // Do it this way so as to not reset mementoTail if set
-      if ( this.memento.head == menu ) {
-        // TODO: maybe we should set memento tail to ''
-        this.mementoChange();
-      } else {
+      if ( this.memento.head != menu || opt_forceReload ) {
         this.memento.value = menu;
       }
-
     },
 
     function requestLogin() {
