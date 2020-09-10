@@ -538,7 +538,8 @@ foam.CLASS({
       documentation: 'The date and time the User was last modified.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative'
+      section: 'administrative',
+      storageOptional: true
     },
     {
       class: 'foam.core.Enum',
