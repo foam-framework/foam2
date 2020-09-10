@@ -42,26 +42,27 @@ foam.CLASS({
 
             DAO capablePayloadDAO = capableObject.getCapablePayloadDAO(x);
 
-            FObject objectToPut;
-
             if ( approvable.getOperation() == Operations.CREATE ){
               try {
-                objectToPut =  (FObject) approvable.getOf().newInstance();
+                CapablePayload objectToPut =  (CapablePayload) CapablePayload.getOwnClassInfo().newInstance();
+
+                Map propsToUpdate = approvable.getPropertiesToUpdate();
+
+                for ( Object propName : propsToUpdate.keySet() ){
+                  String propNameString = (String) propName;
+                  objectToPut.setProperty(propNameString,propsToUpdate.get(propNameString));
+                }
+
+                objectToPut.setStatus(foam.nanos.crunch.CapabilityJunctionStatus.GRANTED);
+
+                capablePayloadDAO.put(objectToPut);
+
               } catch ( Exception e ){
                 throw new RuntimeException(e);
               }
             } else {
               throw new RuntimeException("Unsupported approvable operation.");
             }
-
-            Map propsToUpdate = approvable.getPropertiesToUpdate();
-
-            for ( Object propName : propsToUpdate.keySet() ){
-              String propNameString = (String) propName;
-              objectToPut.setProperty(propNameString,propsToUpdate.get(propNameString));
-            }
-
-            capablePayloadDAO.put(objectToPut);
           }
         }, "Updated the payload based on a approved approvable");
       `
