@@ -152,15 +152,18 @@ foam.CLASS({
           return m;
         }
         var result = {};
-        for ( i = 0; i < referenceObjectsArray.length; i++ ) {
-          if ( daoContents.groupKeys.includes(referenceObjectsArray[i].id) ) {
-            var objectId = referenceObjectsArray[i].id;
-            var summary = referenceObjectsArray[i].toSummary();
+        for ( i = 0; i < daoContents.groupKeys.length; i++ ) {
+          var refObj = referenceObjectsArray.find(r => r.id == daoContents.groupKeys[i] );
+          if ( refObj ) {
+            var objectId = refObj.id;
+            var summary = refObj.toSummary();
             if ( summary ) {
               result[objectId] = summary;
             } else {
               result[objectId] = `ID: ${objectId}`;
             }
+          } else {
+            result[0] = '';
           }
         }
         return result;
@@ -221,8 +224,8 @@ foam.CLASS({
         generate a new main predicate and also reciprocate the changes to the
         other Search Views.
       `,
-      expression: function(selectedOptions, idToStringDisplayMap) {
-        if ( selectedOptions.length <= 0 || Object.keys(idToStringDisplayMap).length === 0 ) {
+      expression: function(selectedOptions) {
+        if ( selectedOptions.length <= 0 || Object.keys(this.idToStringDisplayMap).length === 0 ) {
           return this.TRUE;
         }
         if ( selectedOptions.length === 1 ) {
@@ -274,7 +277,7 @@ foam.CLASS({
           .end()
         .end()
         .start().addClass(self.myClass('container-filter'))
-        .add(this.slot(function(property, selectedOptions, isLoading) {
+        .add(this.slot(function(property, selectedOptions, isLoading, idToStringDisplayMap) {
           var element = this.E();
           if ( isLoading || selectedOptions.length <= 0 ) return element;
           return element
@@ -296,7 +299,7 @@ foam.CLASS({
             });
           });
         }))
-        .add(this.slot(function(property, selectedOptions, filteredOptions, isLoading) {
+        .add(this.slot(function(property, selectedOptions, filteredOptions, isLoading, idToStringDisplayMap) {
           var element = this.E();
           if ( isLoading ) {
             return element
