@@ -72,13 +72,14 @@ foam.CLASS({
       background-color: %WHITE%;
       padding: 50px;
       overflow-y: auto;
-      max-height: 800px;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
     }
     ^rightside {
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
       background-color: %GREY5%;
       overflow-y: hidden;
     }
@@ -86,7 +87,6 @@ foam.CLASS({
       flex-grow: 1;
       -webkit-mask-image: -webkit-gradient(linear, left 15, left top, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
       overflow-y: auto;
-      max-height: 600px;
       padding: 0 50px;
     }
     ^rightside ^top-buttons {
