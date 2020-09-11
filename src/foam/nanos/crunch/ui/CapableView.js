@@ -27,16 +27,20 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'capable'
+      name: 'capableObj',
+      documentation: 'a capable object'
     },
     {
       class: 'FObjectArray',
       of: 'foam.u2.wizard.BaseWizardlet',
       name: 'wizardlets',
-      documentation: 'wizardlets for the capability',
+      documentation: 'wizardlets for capable payloads',
       factory: function() {
-        if ( this.capable === undefined ) return [];
-        return this.crunchController.getCapableWizard(this.capable);
+        if ( this.capableObj === undefined ) return [];
+        return this.crunchController.getCapableWizard(this.capableObj);
+      },
+      postSet: function() {
+        this.addListeners();
       }
     },
     {
@@ -54,17 +58,19 @@ foam.CLASS({
       }
     },
     {
-      name: 'showTitle',
-      value: false
+      class: 'Boolean',
+      name: 'showTitle'
     }
   ],
 
   methods: [
     async function initE() {
+      this.SUPER();
+
       const self = this;
 
       // set capable payloads for capabilities (stored as an array in capableRequirements)
-      await this.capable.setRequirements(this.capable.capableRequirements);
+      await this.capableObj.setRequirements(this.capableObj.capableRequirements);
 
       this.start().addClass(this.myClass())
         .add(self.slot(function(wizardletSectionsList) {
@@ -79,6 +85,26 @@ foam.CLASS({
           });
         }))
       .end();
+    },
+
+    // add listeners to payloads
+    function addListeners() {
+      for ( payload of this.capableObj.capablePayloads ) {
+        payload.data.sub(this.clonePayloads.bind(this));
+      }
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'clonePayloads',
+      documentation: `
+        This listener reassgins capablePayloads array each time its element gets updated.
+        The purpose of this is to listen to changes for payloads in bankAccountWizard save.
+      `,
+      code: function() {
+        this.capableObj.capablePayloads = [...this.capableObj.capablePayloads];
+      }
     }
   ]
 });
