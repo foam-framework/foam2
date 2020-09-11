@@ -59,7 +59,6 @@ foam.CLASS({
 
   methods: [
     function combine(head, tail) {
-      console.log('*************************** combine', head, tail);
       return tail ?
         head + this.SEPARATOR + tail :
         head ;
