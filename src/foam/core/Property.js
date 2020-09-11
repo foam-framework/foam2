@@ -295,8 +295,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'sheetsOutput',
-      value: false
+      name: 'sheetsOutput'
     },
     'valueToString'
   ],
