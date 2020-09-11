@@ -242,7 +242,7 @@ foam.CLASS({
           delegate = new foam.nanos.auth.LastModifiedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
 
         if ( getCapable() )
-          delegate = new foam.nanos.crunch.lite.CapableDAO.Builder(getX()).setDelegate(delegate).build();
+          delegate = new foam.nanos.crunch.lite.CapableDAO.Builder(getX()).setDaoKey(getName()).setDelegate(delegate).build();
 
         if ( getContextualize() ) {
           delegate = new foam.dao.ContextualizingDAO.Builder(getX()).

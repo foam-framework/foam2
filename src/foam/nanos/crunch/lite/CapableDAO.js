@@ -19,6 +19,12 @@ foam.CLASS({
     'java.util.List'
   ],
 
+  properties: [
+    {
+      class: 'String',
+      name: 'daoKey'
+    }
+  ],
 
   methods: [
     {
@@ -36,6 +42,8 @@ foam.CLASS({
           for (int i = 0; i < capablePayloadsArray.length; i++){
             CapablePayload currentCapablePayload = capablePayloadsArray[i];
             currentCapablePayload.setStatus(foam.nanos.crunch.CapabilityJunctionStatus.ACTION_REQUIRED);
+            currentCapablePayload.setDaoKey(getDaoKey());
+            currentCapablePayload.setObjId(obj.getProperty("id"));
           }
 
           List<CapablePayload> capablePayloads = new ArrayList<CapablePayload>(Arrays.asList(capableObj.getCapablePayloads()));
