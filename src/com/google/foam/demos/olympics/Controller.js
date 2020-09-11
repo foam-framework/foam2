@@ -101,7 +101,7 @@ foam.CLASS({
 
   axioms: [
     foam.u2.CSS.create({
-      code: function CSS() {`
+      code: `
         ^ {
           display: flex;
           flex-grow: 1;
@@ -122,7 +122,7 @@ foam.CLASS({
         td {
           padding: 8px;
         }
-      `}
+      `
     })
   ]
 });
