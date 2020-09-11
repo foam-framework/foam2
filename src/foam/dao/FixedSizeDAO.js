@@ -50,7 +50,7 @@ foam.CLASS({
         obj = getDelegate().put_(x, obj);
         Count count = new Count();
         count = (Count) this.getDelegate().select(count);
-        if ( count.getValue() + 1 > getSize() + getSize() * getPurgePercent() / 100 ) {
+        if ( count.getValue() > getSize() + getSize() * getPurgePercent() / 100 ) {
           this.getDelegate()
             .where(getPredicate())
             .orderBy(getComparator())
