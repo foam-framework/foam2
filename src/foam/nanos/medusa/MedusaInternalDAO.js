@@ -62,7 +62,7 @@ Update: it appears there are multiple DAOs in the context.`,
       name: 'put_',
       javaCode: `
       // getLogger().debug("put");
-      return getDao().put_(x, obj);
+      return getDelegate().put_(x, getDao().put_(x, obj));
       `
     }
   ]

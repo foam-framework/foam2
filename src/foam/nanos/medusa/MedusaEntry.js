@@ -153,8 +153,7 @@ foam.CLASS({
       documentation: 'Set when journal on the Node. Used to distinguish unique entries during consensus determination.',
       name: 'node',
       class: 'String',
-      visibility: 'RO',
-      storageTransient: true
+      visibility: 'RO'
     },
     {
       name: 'created',

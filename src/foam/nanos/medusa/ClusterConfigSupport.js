@@ -721,6 +721,46 @@ configuration for contacting the primary node.`,
       `
     },
     {
+      name: 'getHTTPClientDAO',
+      type: 'foam.dao.DAO',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'serviceName',
+          type: 'String',
+        },
+        {
+          name: 'sendClusterConfig',
+          type: 'ClusterConfig'
+        },
+        {
+          name: 'receiveClusterConfig',
+          type: 'ClusterConfig'
+        }
+      ],
+      javaCode: `
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "getHTTPClientDAO");
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      try {
+        return new foam.dao.ClientDAO.Builder(x)
+          .setDelegate(new foam.box.SessionClientBox.Builder(x)
+          .setSessionID(sendClusterConfig.getSessionId())
+          .setDelegate(new foam.box.HTTPBox.Builder(x)
+            .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
+            .setSessionID(sendClusterConfig.getSessionId())
+            .setUrl(support.buildURL(x, serviceName, null, null, receiveClusterConfig))
+            .build())
+          .build())
+        .build();
+      } finally {
+        pm.log(x);
+      }
+      `
+    },
+    {
       documentation: 'Notification client is send and forget, does not register a reply box.',
       name: 'getBroadcastClientDAO',
       type: 'foam.dao.DAO',
