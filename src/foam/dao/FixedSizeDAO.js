@@ -16,12 +16,11 @@ foam.CLASS({
     affect memory.  Install via EasyDAO to it is installed in the correct
     place.`,
 
+  javaImports: [
+    'foam.mlang.sink.Count'
+  ],
+
   properties: [
-    {
-      class: 'FObjectProperty',
-      of: 'foam.mlang.order.Comparator',
-      name: 'comparator'
-    },
     {
       //class: 'foam.mlang.predicate.PredicateProperty',
       class: 'FObjectProperty',
@@ -29,8 +28,13 @@ foam.CLASS({
       name: 'predicate'
     },
     {
-      class: 'Int',
-      name: 'size'
+      class: 'Long',
+      name: 'purgeSize'
+    },
+    {
+      class: 'Long',
+      name: 'purgePercent',
+      value: 10
     }
   ],
 
@@ -38,12 +42,14 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
+        Count count = new Count();
+        count = (Count) this.getDelegate().select(count);
+        if ( count.getValue() + 1 > getPurgeSize() + getPurgeSize() * getPurgePercent() / 100 ) {
+          this.getDelegate()
+            .where(getPredicate())
+            .removeAll();
+        }
         obj = getDelegate().put_(x, obj);
-        this.getDelegate()
-          .where(getPredicate())
-          .orderBy(getComparator())
-          .skip(getSize())
-          .removeAll();
         return obj;
       `
     },
