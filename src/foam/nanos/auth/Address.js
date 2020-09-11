@@ -277,11 +277,11 @@ foam.CLASS({
         sb.append(", ");
         sb.append(this.getCity());
         sb.append(", ");
-        sb.append(this.getRegionId());
+        sb.append(getRegionId());
         sb.append(", ");
-        sb.append(this.getCountryId());
+        sb.append(getCountryId());
         sb.append(", ");
-        sb.append(this.getPostalCode());
+        sb.append(getPostalCode());
         String rtn = sb.toString();
         return rtn.equals(", , , , ") ? "" : rtn;
       `
@@ -306,18 +306,18 @@ foam.CLASS({
       },
       javaCode: `
       StringBuilder sb = new StringBuilder();
-      if ( this.getStructured() ) {
-        if ( this.getSuite() != null && ! this.getSuite().equals("") ) {
-          sb.append(this.getSuite());
+      if ( getStructured() ) {
+        if ( getSuite() != null && ! getSuite().equals("") ) {
+          sb.append(getSuite());
           sb.append("-");
         }
-        sb.append(this.getStreetNumber());
+        sb.append(getStreetNumber());
         sb.append(" ");
-        sb.append(this.getStreetName());
+        sb.append(getStreetName());
       } else {
-        sb.append(this.getAddress1());
+        sb.append(getAddress1());
         sb.append(" ");
-        sb.append(this.getAddress2());
+        sb.append(getAddress2());
       }
       return sb.toString().trim();
       `
