@@ -358,7 +358,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ruler/SaveUCJDataOnGranted" },
   { name: "foam/nanos/crunch/ruler/IsDataUpdate" },
   //views
-  { name: "foam/nanos/crunch/ui/CapabilityView" },
+  { name: "foam/nanos/crunch/ui/CapableView" },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },
