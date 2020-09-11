@@ -638,6 +638,11 @@ model from which to test ServiceProvider ID (spid)`,
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.LastModifiedByAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
+      name: 'capable',
+      class: 'Boolean',
+      javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.crunch.lite.Capable.class.isAssignableFrom(getOf().getObjClass());'
+    },
+    {
       name: 'fixedSize',
       class: 'FObjectProperty',
       of: 'foam.dao.FixedSizeDAO'
