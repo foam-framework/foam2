@@ -20,7 +20,7 @@ foam.CLASS({
           predicateFactory: function(e) {
             return e.REG_EXP(
               foam.nanos.auth.Phone.NUMBER,
-              /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/);
+              /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$|^(?:\+?)[5]{2}[-.●]?\(?([0-9]{4})\)?[-.●]?([0-9]{4,5})$/);
           },
           errorString: 'Please enter phone number'
         }

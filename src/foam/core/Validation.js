@@ -402,7 +402,7 @@ foam.CLASS({
       name: 'validationPredicates',
       factory: function() {
         var self = this;
-        const PHONE_NUMBER_REGEX = /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/;
+        const PHONE_NUMBER_REGEX = /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$|^(?:\+?)[5]{2}[-.●]?\(?([0-9]{4})\)?[-.●]?([0-9]{4,5})$/;
         return this.required
           ? [
               {
