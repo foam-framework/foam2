@@ -47,7 +47,7 @@ foam.CLASS({
 
     ^card-title {
       min-height: 20px;
-      font-family: IBMPlexSans;
+      font-family: /*%FONT1%*/;
       font-size: 16px;
       font-weight: 600;
       font-style: normal;
@@ -59,7 +59,7 @@ foam.CLASS({
 
     ^card-subtitle {
       height: 14px;
-      font-family: IBMPlexSans;
+      font-family: /*%FONT1%*/;
       font-size: 11px;
       font-weight: normal;
       font-style: italic;
@@ -72,7 +72,7 @@ foam.CLASS({
     ^card-description {
       margin-top: 9px;
       height: 20px;
-      font-family: IBMPlexSans Helvetica;
+      font-family: /*%FONT1%*/ Helvetica;
       font-size: 14px;
       font-weight: normal;
       font-style: normal;
@@ -149,22 +149,23 @@ foam.CLASS({
     }
 
     ^badge {
-      float: right;
-      width: auto;
       height: 24px;
       border-radius: 12px;
+      margin-top: 12px;
+      margin-right: 7px;
+      width: 71px;
 
       padding: 0 8px;
       background-color: #b5b5b5;
 
-      font-family: IBMPlexSans;
-      font-size: 11px;
+      font-family: /*%FONT1%*/;
+      font-size: 10px;
       font-weight: 500;
       font-style: normal;
       font-stretch: normal;
       line-height: 24px;
       letter-spacing: normal;
-      text-align: right;
+      text-align: center;
       color: #ffffff;
     }
 
@@ -179,6 +180,15 @@ foam.CLASS({
     }
     ^badge-bad {
       background-color: #bf3232;
+    }
+
+    ^renewable-description {
+      font-size: 10px;
+      font-weight: 500;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 24px;
+      color: #DC143C;
     }
 
     ^category {

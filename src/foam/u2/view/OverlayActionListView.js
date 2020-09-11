@@ -59,8 +59,8 @@ foam.CLASS({
       name: 'imageURL_',
       expression: function(restingImageURL, hoverImageURL, disabledImageURL, activeImageURL, hovered_, disabled_, active_) {
         if ( disabled_ ) return `url(${disabledImageURL})`;
-        if ( active_ ) return `url(${activeImageURL})`;
-        if ( hovered_ ) return `url(${hoverImageURL})`;
+        if ( active_   ) return `url(${activeImageURL})`;
+        if ( hovered_  ) return `url(${hoverImageURL})`;
         return `url(${restingImageURL})`;
       }
     },
@@ -129,13 +129,7 @@ foam.CLASS({
   methods: [
     async function initE() {
       var self = this;
-      if ( ! this.obj ) 
-        this.obj = await this.dao.find(this.objId);
       this.onDetach(this.active_$.follow(this.overlay_.opened$));
-      this.onDetach(this.disabled_$.follow(this.ExpressionSlot.create({
-        args: this.data.map((action) => action.createIsAvailable$(this.__context__, this.obj)),
-        code: (...rest) => ! rest.reduce((l, r) => l || r, false)
-      })));
 
       this.
         addClass(this.myClass()).
@@ -158,14 +152,17 @@ foam.CLASS({
         end();
     },
 
-    function initializeOverlay() {
+    async function initializeOverlay() {
       var self = this;
 
-      if( ! this.obj ) {
-        this.dao.find(this.objId).then(function(val) {
-          self.obj = val;
-        });
+      if ( ! this.obj ) {
+        this.obj = await this.dao.inX(ctrl.__subContext__).find(this.objId);
       }
+
+      this.onDetach(this.disabled_$.follow(this.ExpressionSlot.create({
+        args: this.data.map((action) => action.createIsAvailable$(this.__context__, this.obj)),
+        code: (...rest) => ! rest.reduce((l, r) => l || r, false)
+      })));
 
       this.overlay_.add(this.slot(function() {
         return this.E().forEach(this.data, function(action) {

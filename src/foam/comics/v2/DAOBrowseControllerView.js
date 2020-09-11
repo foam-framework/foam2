@@ -82,6 +82,7 @@ foam.CLASS({
       }
     }
   ],
+
   actions: [
     {
       name: 'create',
@@ -89,7 +90,7 @@ foam.CLASS({
         if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
           try {
             let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.CREATE, data);
-  
+
             return this.auth.check(null, permissionString);
           } catch(e) {
             return false;
@@ -115,6 +116,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function initE() {
     this.SUPER();

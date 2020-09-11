@@ -173,6 +173,15 @@ foam.CLASS({
           .filter(f => global.FOAM_FLAGS[f]);
         return foam.util.flagFilter(enabledFlags)(this);
       }
+    },
+    {
+      class: 'String',
+      name: 'extends',
+      value: 'FObject',
+      documentation: `
+        Only used for many to many relationships.
+        Name of the class that this junction class should inherit from.
+      `
     }
     /* FUTURE:
     {
@@ -290,6 +299,7 @@ foam.CLASS({
       foam.CLASS({
         package: this.package,
         name: name,
+        extends: this.extends,
         ids: ['sourceId', 'targetId'],
         properties: [
           {

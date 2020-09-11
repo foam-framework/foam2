@@ -289,7 +289,7 @@ foam.CLASS({
         var of = this.dao.of
         if ( of._CHOICE_TEXT_ ) {
           this.dao.select(this.PROJECTION(of.ID, of._CHOICE_TEXT_)).then((s) => {
-            this.choices = s.array;
+            this.choices = s.projection;
           });
           return;
         } else {

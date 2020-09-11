@@ -429,9 +429,7 @@
       name: 'authorizeOnCreate',
       javaCode: `
         var auth = (AuthService) x.get("auth");
-        if ( ! auth.check(x, "rule.create")
-          && ! auth.check(x, "spid.update." + getSpid())
-        ) {
+        if ( ! auth.check(x, "rule.create") ) {
           throw new AuthorizationException("You do not have permission to create the rule.");
         }
       `
@@ -451,9 +449,7 @@
       name: 'authorizeOnUpdate',
       javaCode: `
         var auth = (AuthService) x.get("auth");
-        if ( ! auth.check(x, "rule.update." + getId())
-          && ! auth.check(x, "spid.update." + getSpid())
-        ) {
+        if ( ! auth.check(x, "rule.update." + getId()) ) {
           throw new AuthorizationException("You do not have permission to update the rule.");
         }
       `

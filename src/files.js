@@ -73,6 +73,7 @@ FOAM_FILES([
   { name: "foam/core/Enum" },
   { name: "foam/core/JSON" },
   { name: "foam/core/XML" },
+  { name: "foam/core/CompoundException" },
   { name: "foam/lib/csv/CSVParser" },
   { name: "foam/lib/csv/CSVOutputter" },
   { name: "foam/lib/csv/CSVOutputterImpl" },
@@ -168,6 +169,7 @@ FOAM_FILES([
   { name: "foam/util/EmailTest" },
   { name: "foam/util/PasswordTest" },
   { name: "foam/util/SecurityUtilTest" },
+  { name: "foam/util/async/Sequence" },
   { name: "foam/log/LogLevel" },
   { name: "foam/log/Logger" },
   { name: "foam/log/ConsoleLogger" },
@@ -224,6 +226,7 @@ FOAM_FILES([
   { name: "foam/mlang/expr/DateGrouping" },
   { name: "foam/mlang/expr/DateGroupingExpr" },
   { name: "foam/mlang/expr/Ref" },
+  { name: "foam/mlang/expr/TimeOfDay" },
   { name: "foam/swift/refines/MLang", flags: ['swift'] },
   { name: "foam/swift/refines/Predicate", flags: ['swift'] },
   { name: "foam/swift/refines/AbstractDAO", flags: ['swift'] },
@@ -275,6 +278,7 @@ FOAM_FILES([
 
   { name: 'foam/nanos/approval/AuthenticatedApprovalDAOAuthorizer' },
 
+  { name: 'foam/nanos/alarming/AddAlarmNameDAO' },
   { name: "foam/nanos/approval/ApprovalRequestNotificationNotificationCitationView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/SignUp" },
   { name: "foam/nanos/u2/navigation/SignIn" },
@@ -478,6 +482,7 @@ FOAM_FILES([
   { name: "foam/u2/svg/graph/ZoomedOutFObjectGraphNodeView", flags: ['web'] },
   { name: "foam/u2/svg/TreeGraph", flags: ['web'] },
   { name: "foam/u2/svg/TestView", flags: ['web'] },
+  { name: "foam/u2/view/EnumLegendView", flags: ['web'] },
   { name: "foam/u2/view/LoginView", flags: ['web'] },
   { name: "foam/u2/view/ValueView", flags: ['web'] },
   { name: "foam/u2/view/PreView", flags: ['web'] },
@@ -543,6 +548,8 @@ FOAM_FILES([
   { name: "foam/u2/view/StringArrayView", flags: ['web'] },
   { name: "foam/u2/view/ImageView", flags: ['web'] },
   { name: "foam/u2/view/ExprView", flags: ['web'] },
+  { name: "foam/u2/view/MultiChoiceView", flags: ['web'] },
+  { name: "foam/u2/view/CardSelectView", flags: ['web'] },
   { name: "foam/u2/EnumView", flags: ['web'] },
   { name: "foam/u2/ClassView", flags: ['web'] },
   { name: "foam/u2/view/ReferenceView", flags: ['web'] },
@@ -581,6 +588,17 @@ FOAM_FILES([
   { name: "foam/u2/stack/StackView", flags: ['web'] },
   { name: "foam/u2/crunch/Style", flags: ['web'] },
   { name: "foam/u2/crunch/CrunchController", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/ConfigureFlowAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/CapabilityAdaptAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/CheckPendingAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/LoadCapabilitiesAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/CreateWizardletsAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/FilterWizardletsAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/RequirementsPreviewAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/StepWizardAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/PutFinalJunctionsAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/TestAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/LoadTopConfig", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityRequirementView", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityCardView", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityFeatureView", flags: ['web'] },
@@ -699,6 +717,7 @@ FOAM_FILES([
   { name: "foam/lib/StorageOptionalPropertyPredicate" },
   { name: "foam/lib/StoragePropertyPredicate" },
   { name: "foam/lib/AndPropertyPredicate" },
+  { name: "foam/lib/json/JSONParser" },
   { name: "foam/lib/json/OutputterMode" },
   { name: "foam/lib/json/ClassReferenceParserTest" },
   { name: "foam/lib/json/PropertyReferenceParserTest" },
@@ -718,8 +737,12 @@ FOAM_FILES([
   { name: "foam/core/FObjectTest" },
 
   { name: "foam/flow/Document" },
+  { name: "foam/flow/DocumentMenu" },
   { name: "foam/flow/MarkupEditor" },
   { name: "foam/flow/DocumentationFolderDAO" },
+  { name: "foam/flow/widgets/PropertyShortSummary" },
+  { name: "foam/flow/widgets/EnumSummary" },
+  { name: "foam/flow/widgets/DocumentationIncomplete" },
 
   { name: "org/chartjs/Lib" },
   { name: "org/chartjs/ChartCView" },
@@ -821,6 +844,8 @@ FOAM_FILES([
   { name: "foam/u2/wizard/ScrollWizardletView" },
   { name: "foam/u2/wizard/DAOWizardlet" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
+  { name: "foam/nanos/crunch/ui/CapableObjectWizardlet" },
+  { name: "foam/nanos/crunch/ui/MinMaxCapabilityWizardlet" },
 
   { name: "foam/graphics/ZoomMapView" },
   { name: "foam/core/CoreTypesValidationTest" },
@@ -851,6 +876,14 @@ FOAM_FILES([
   { name: "foam/nanos/column/NestedPropertiesExpression" },
   { name: "foam/nanos/column/TableColumnOutputter" },
 
+  // Translation Support
+  { name: 'foam/i18n/XLIFFTranslationValue' },
+  { name: 'foam/i18n/Locale' },
+
   { name: "foam/nanos/pool/AbstractFixedThreadPool" },
-  { name: "foam/nanos/pool/ThreadPoolAgency" }
+  { name: "foam/nanos/pool/ThreadPoolAgency" },
+
+  // fs
+  { name: 'foam/nanos/fs/fileDropZone/FileDropZone', flags: ['web'] },
+  { name: 'foam/nanos/fs/fileDropZone/FileCard', flags: ['web'] }
 ]);

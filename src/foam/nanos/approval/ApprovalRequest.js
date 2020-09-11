@@ -238,7 +238,7 @@
       name: 'classification',
       label: 'Approval Type',
       section: 'requestDetails',
-      tableWidth: 150,
+      tableWidth: 450,
       documentation: `Should be unique to a certain type of requests and created within a single rule.
       For example "IdentityMind Business approval".
       When retrieving approval requests from a dao, do not use daoKey, use classification instead:

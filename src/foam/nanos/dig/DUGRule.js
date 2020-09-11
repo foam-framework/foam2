@@ -25,7 +25,7 @@ foam.CLASS({
     'url',
     'enabled',
     'daoKey',
-    'operation',
+    'operation'
   ],
 
   sections: [
@@ -114,9 +114,9 @@ foam.CLASS({
         class: 'foam.u2.view.ChoiceView',
         choices: [
           ['JSON', 'JSON'],
-          ['XML', 'XML'],
+          ['XML',  'XML']
         ],
-        placeholder: '--',
+        placeholder: '--'
       },
     },
     {
@@ -157,11 +157,11 @@ foam.CLASS({
     },
     {
       name: 'validity',
-      hidden: true,
+      hidden: true
     },
     {
       name: 'saveHistory',
-      hidden: true,
+      hidden: true
     },
     {
       name: 'operation',
@@ -180,6 +180,5 @@ foam.CLASS({
       name: 'createdByAgent',
       hidden: true
     }
-  ],
-
+  ]
 });

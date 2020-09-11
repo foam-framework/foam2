@@ -34,6 +34,8 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.client.ClientBuilder',
+    'foam.nanos.controller.Memento',
+    'foam.nanos.controller.WindowHash',
     'foam.nanos.auth.Group',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Subject',
@@ -73,6 +75,7 @@ foam.CLASS({
     'lastMenuLaunched',
     'lastMenuLaunchedListener',
     'loginSuccess',
+    'mementoTail as memento',
     'theme',
     'menuListener',
     'notify',
@@ -136,7 +139,8 @@ foam.CLASS({
   messages: [
     { name: 'GROUP_FETCH_ERR', message: 'Error fetching group' },
     { name: 'GROUP_NULL_ERR', message: 'Group was null' },
-    { name: 'LOOK_AND_FEEL_NOT_FOUND', message: 'Could not fetch look and feel object.' }
+    { name: 'LOOK_AND_FEEL_NOT_FOUND', message: 'Could not fetch look and feel object.' },
+    { name: 'LANGUAGE_FETCH_ERR', message: 'Error fetching language' },
   ],
 
   css: `
@@ -166,6 +170,13 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'memento',
+      factory: function() {
+        return this.Memento.create({tail$: this.mementoTail$});
+      }
+    },
+    'mementoTail',
+    {
       name: 'loginVariables',
       expression: function(client$userDAO) {
         return {
@@ -190,7 +201,7 @@ foam.CLASS({
           self.client = cls.create(null, self);
           return self.client;
         });
-      },
+      }
     },
     {
       name: 'client',
@@ -307,20 +318,13 @@ foam.CLASS({
 
       var self = this;
 
-      window.onpopstate = async function(event) {
-        var hid = location.hash.substr(1);
-        if ( hid ) {
-          if ( self.client ) {
-            var menu = await self.client.menuDAO.find(hid);
-            menu && menu.launch(this);
-          } else {
-            self.clientPromise.then(async () => {
-              var menu = await self.client.menuDAO.find(hid);
-              menu && menu.launch(this);
-            });
-          }
-        }
-      };
+      // Start Memento Support
+      var hash = this.WindowHash.create();
+      this.memento.value$ = hash.value$
+
+      this.memento.head$.sub(this.mementoChange);
+      this.mementoChange();
+      // End Memento Support
 
       this.clientPromise.then(async function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
@@ -349,6 +353,7 @@ foam.CLASS({
         // the line above before executing this one.
         await self.fetchGroup();
         await self.fetchTheme();
+        await self.fetchLanguage();
         self.onUserAgentAndGroupLoaded();
       });
     },
@@ -401,6 +406,52 @@ foam.CLASS({
       });
     },
 
+    async function fetchLanguage() {
+      try {
+        let l = localStorage.getItem('localeLanguage');
+        if ( l !== undefined ) foam.locale = l;
+        //TODO manage more complicated language. 'en-CA'
+        if ( foam.locale !== 'en' && foam.locale !== 'en-US' ) {
+          let ctx = this.__subContext__;
+          let d = await  this.__subContext__.localeDAO;
+          d.select().then(e => {
+            var expr = foam.mlang.Expressions.create();
+            d.where(
+              expr.OR(
+                expr.EQ(foam.i18n.Locale.LOCALE, foam.locale),
+                expr.EQ(foam.i18n.Locale.LOCALE, foam.locale.substring(0,foam.locale.indexOf('-')))
+              )
+            ).select().then(e => {
+              let arr = e.array;
+              arr.forEach(ea =>
+                {
+                  let s = null;
+                  try {
+                    let i, obj;
+                    do {
+                      i = ea.source.indexOf('.',++i);
+                      if (i != -1) {
+                        s = eval(ea.source.substring(0,i))
+                      }
+                    } while (i > 0 && !!s);
+                  }
+                  catch(err) {
+                    console.log(ea.source)
+                    console.log(err)
+                  }
+                  if (!!s) {
+                    s[ea.source.substring(ea.source.lastIndexOf('.')+1)] = ea.target;
+                  }
+                })
+            })
+          })
+        }
+      } catch (err) {//TODO
+        this.notify(this.LANGUAGE_FETCH_ERR, 'error');
+        console.error(err.message || this.LANGUAGE_FETCH_ERR);
+      }
+    },
+
     async function fetchGroup() {
       try {
         var group = await this.client.auth.getCurrentGroup();
@@ -449,7 +500,7 @@ foam.CLASS({
       var M = m.toUpperCase();
 
       return css.replace(
-        new RegExp('/\\*%' + M + '%\\*/[^;]*', 'g'),
+        new RegExp('/\\*%' + M + '%\\*/[^;!]*', 'g'),
         '/*%' + M + '%*/ ' + this.theme[m]);
     },
 
@@ -477,15 +528,15 @@ foam.CLASS({
       }
     },
 
-    function pushMenu(menu) {
+    function pushMenu(menu, opt_forceReload) {
       if ( menu.id ) {
         menu.launch(this);
         menu = menu.id;
       }
-
       /** Use to load a specific menu. **/
-      if ( window.location.hash.substr(1) != menu ) {
-        window.location.hash = menu;
+      // Do it this way so as to not reset mementoTail if set
+      if ( this.memento.head != menu || opt_forceReload ) {
+        this.memento.value = menu;
       }
     },
 
@@ -537,6 +588,19 @@ foam.CLASS({
   ],
 
   listeners: [
+    async function mementoChange() {
+      // TODO: make a latch instead
+      if ( this.client ) {
+        var menu = await this.client.menuDAO.find(this.memento.head);
+        menu && menu.launch(this);
+      } else {
+        this.clientPromise.then(async () => {
+          var menu = await this.client.menuDAO.find(this.memento.head);
+          menu && menu.launch(this);
+        });
+      }
+    },
+
     function onUserAgentAndGroupLoaded() {
       /**
        * Called whenever the group updates.

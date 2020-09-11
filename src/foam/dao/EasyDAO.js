@@ -683,7 +683,13 @@ model from which to test ServiceProvider ID (spid)`,
       name: 'storageOptionalEnabled',
       class: 'Boolean',
       documentation: 'Discard DAO updates which result in only storageOptional properties changing, like LastModified, for example.',
-      javaFactory: 'return false;'
+      javaFactory: `
+        java.util.List<foam.core.PropertyInfo> props = getOf().getAxiomsByClass(foam.core.PropertyInfo.class);
+        for ( foam.core.PropertyInfo prop : props ) {
+          if ( prop.getStorageOptional() ) return true;
+        }
+        return false;
+      `
     }
   ],
 
@@ -941,7 +947,7 @@ model from which to test ServiceProvider ID (spid)`,
       name: 'addPropertyIndex',
       type: 'foam.dao.EasyDAO',
       args: [ { javaType: 'foam.core.PropertyInfo...', name: 'props' } ],
-      code:     function addPropertyIndex() {
+      code: function addPropertyIndex() {
         this.mdao && this.mdao.addPropertyIndex.apply(this.mdao, arguments);
         return this;
       },

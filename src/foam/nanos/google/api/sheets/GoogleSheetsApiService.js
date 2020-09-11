@@ -377,7 +377,7 @@ foam.CLASS({
         }
         Projection p = ( new foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder() ).buildProjectionForPropertyNamesArray(x, of, propNamesArr);
         dao.select(p);
-        java.util.List<Object[]> values = p.getArray();
+        java.util.List<Object[]> values = p.getProjection();
  
         for ( int i = 0 ; i < indexesOfUnitValuePropertyName.size() ; i++ ) {
           int indexOfMetadataPropertyName = indexesOfUnitValuePropertyName.get(i);

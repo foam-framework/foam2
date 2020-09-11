@@ -120,12 +120,6 @@ foam.CLASS({
       },
     },
     {
-      name: 'admissionCapability',
-      class: 'Reference',
-      of: 'foam.nanos.crunch.Capability',
-      documentation: 'Specifies the top-level capability that must be granted before we admit a user to the system.'
-    },
-    {
       name: 'domains',
       class: 'Array',
       of: 'String',
@@ -162,6 +156,10 @@ foam.CLASS({
       documentation: 'Menu user redirects to after login.',
       of: 'foam.nanos.menu.Menu',
       section: 'navigation'
+    },
+    {
+      class: 'Map',
+      name: 'headConfig'
     },
     {
       class: 'Image',
@@ -240,6 +238,11 @@ foam.CLASS({
     {
       class: 'Code',
       name: 'customCSS',
+      section: 'sectionCss'
+    },
+    {
+      class: 'String',
+      name: 'font1',
       section: 'sectionCss'
     },
     {

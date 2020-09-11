@@ -18,6 +18,9 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.dao.Sink',
     'foam.mlang.sink.Count',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
+    'foam.nanos.logger.Logger',
     'java.util.Date',
     'java.util.List',
     'static foam.mlang.MLang.*'
@@ -136,8 +139,8 @@ foam.CLASS({
       value: 0,
       documentation: `To be used in the case where expiry is duration based, represents the number of DAYS the user can keep permissions
       granted by this capability after the duration runs out.
-      If the gracePeriod is greater than 0, the UserCapabilityJunction will go
-      into GRACE_PERIOD status with the property graceDaysLeft set to be equals to this property. Otherwise, the UserCapabilityJunction will
+      If the gracePeriod is greater than 0, the UserCapabilityJunction will set isInGracePeriod property to true 
+      and set gracePeriod property to be equals to this. Otherwise, the UserCapabilityJunction will
       go into EXPIRED status.`
     },
     {
@@ -233,6 +236,26 @@ foam.CLASS({
       javaFactory: `
         return foam.nanos.crunch.AssociatedEntity.USER;
       `
+    },
+    {
+      class: 'Object',
+      name: 'wizardlet',
+      documentation: `
+        Defines a wizardlet used when displaying this capability on related client crunch wizards.
+      `,
+      factory: function() {
+        return foam.nanos.crunch.ui.CapabilityWizardlet.create({}, this);
+      }
+    },
+    {
+      class: 'Object',
+      name: 'wizardletConfig',
+      documentation: `
+        Configuration placed on top level capabilities defining various configuration options supported by client capability wizards.
+      `,
+      factory: function() {
+        return foam.u2.wizard.StepWizardConfig.create({}, this);
+      }
     }
   ],
 
@@ -321,12 +344,71 @@ foam.CLASS({
 
       return today.after(capabilityExpiry);
       `
+    },
+    {
+      name: 'getPrereqsChainedStatus',
+      type: 'CapabilityJunctionStatus',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'ucj', type: 'UserCapabilityJunction' }
+      ],
+      documentation: `
+        Check statuses of all prerequisite capabilities - returning:
+        GRANTED: If all pre-reqs are in granted status
+        PENDING: At least one pre-req is still in pending status
+        ACTION_REQUIRED: If not any of the above
+      `,
+      javaCode: `
+        // CrunchService used to get capability junctions
+        CrunchService crunchService = (CrunchService) x.get("crunchService");
+
+        boolean allGranted = true;
+        DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+        DAO myPrerequisitesDAO = ((DAO)
+          x.get("prerequisiteCapabilityJunctionDAO"))
+            .where(
+              EQ(CapabilityCapabilityJunction.SOURCE_ID, getId()));
+
+        List<CapabilityCapabilityJunction> ccJunctions =
+          ((ArraySink) myPrerequisitesDAO.select(new ArraySink()))
+          .getArray();
+        
+
+        DAO userDAO = (DAO) x.get("userDAO");
+
+        Subject subject = new Subject(x);
+        subject.setUser((User) userDAO.find(ucj.getSourceId()));
+        if ( ucj instanceof AgentCapabilityJunction ) {
+          AgentCapabilityJunction acj = (AgentCapabilityJunction) ucj;
+          subject.setUser((User) userDAO.find(acj.getEffectiveUser())); // "user"
+        }
+
+        for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
+          Capability cap = (Capability) ccJunction.findSourceId(x);
+          if ( ! cap.getEnabled() ) continue;
+          UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(x, ccJunction.getTargetId(), subject);
+
+          if ( ucJunction != null && ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) 
+            continue;
+
+          if ( ucJunction == null ) {
+            return CapabilityJunctionStatus.ACTION_REQUIRED;
+          }
+          if ( ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED
+               && ucJunction.getStatus() != CapabilityJunctionStatus.PENDING ) {
+            return CapabilityJunctionStatus.ACTION_REQUIRED;
+          }
+          if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING ) allGranted = false; 
+        }
+        return allGranted ? CapabilityJunctionStatus.GRANTED : CapabilityJunctionStatus.PENDING;
+      `,
     }
   ]
 });
 
 foam.RELATIONSHIP({
   package: 'foam.nanos.crunch',
+  extends:'foam.nanos.crunch.Renewable',
   sourceModel: 'foam.nanos.auth.User',
   targetModel: 'foam.nanos.crunch.Capability',
   cardinality: '*:*',
@@ -343,6 +425,23 @@ foam.CLASS({
   name: 'CRUNCHUserRefinement',
   refines: 'foam.nanos.auth.User',
   sections: [{ name: 'capabilities' }]
+});
+
+foam.CLASS({
+  package: 'foam.nanos.crunch',
+  name: 'CRUNCHThemeRefinement',
+  refines: 'foam.nanos.theme.Theme',
+
+  properties: [
+    {
+      name: 'admissionCapability',
+      class: 'String',
+      // TODO: Why doesn't a Reference property work here?
+      // class: 'Reference',
+      of: 'foam.nanos.crunch.Capability',
+      documentation: 'Specifies the top-level capability that must be granted before we admit a user to the system.'
+    },
+  ],
 });
 
 foam.RELATIONSHIP({

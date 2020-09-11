@@ -659,6 +659,10 @@ foam.CLASS({
     'getElementById'
   ],
 
+  implements: [
+    'foam.mlang.Expressions',
+  ],
+
   topics: [
     'onload',
     'onunload'
@@ -1628,7 +1632,29 @@ foam.CLASS({
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
         } else {
-          es.push(c);
+          if ( typeof c === 'object' && c.data !== undefined && c.data.id !== undefined ) {
+            var self = this;
+            var expr = foam.mlang.Expressions.create();
+            let d =  this.__subContext__.localeDAO;
+            this.add(this.PromiseSlot.create({
+              promise://TODO support more that one language (add language to the id)
+                d.where(
+                  expr.AND(
+                    expr.OR(
+                      expr.EQ(foam.i18n.Locale.LOCALE, foam.locale),
+                      expr.EQ(foam.i18n.Locale.LOCALE, foam.locale.substring(0,foam.locale.indexOf('-')))),
+                    expr.EQ(foam.i18n.Locale.ID, c.data.id+'.'+c.clsInfo)))
+                .select().then(function(a){
+                  let arr = a.array;
+                  if ( arr.length > 0 ) {
+                    let ea = arr[0];
+                    return ea.target;
+                  }
+                  return c.default || 'no value';
+                })
+            }))
+          } else
+            es.push(c);
         }
       }
 
@@ -1853,7 +1879,7 @@ foam.CLASS({
     },
 
     function toString() {
-      return this.cls_.id + '(nodeName=' + this.nodeName + ', state=' + this.state + ')';
+      return this.cls_.id + '(id=' + this.id + ', nodeName=' + this.nodeName + ', state=' + this.state + ')';
       /* Converts Element to HTML String without transitioning state. */
       /*
         TODO: put this somewhere useful for debugging
@@ -1876,11 +1902,11 @@ foam.CLASS({
       if ( ! Array.isArray(children) ) children = [ children ];
 
       var Y = this.__subSubContext__;
-      children = children.map(function(e) {
+      children = children.map(e => {
         e = e.toE ? e.toE(null, Y) : e;
         e.parentNode = this;
         return e;
-      }.bind(this));
+      });
 
       var index = before ? i : (i + 1);
       this.childNodes.splice.apply(this.childNodes, [index, 0].concat(children));
@@ -1969,15 +1995,27 @@ foam.CLASS({
       }
 
       var e = nextE();
-      var l = function() {
+      var l = this.framed(function() {
         if ( self.state !== self.LOADED ) {
           return;
         }
         var first = Array.isArray(e) ? e[0] : e;
-        var tmp   = self.E();
+
+        if ( first.state == first.INITIAL ) {
+          // updated requested before initial element loaded
+          // not a problem, just defer loading
+          first.onload.sub(foam.events.oneTime(l));
+          return;
+        }
+
+        var tmp = self.E();
         self.insertBefore(tmp, first);
         if ( Array.isArray(e) ) {
-          for ( var i = 0 ; i < e.length ; i++ ) { e[i].remove(); e[i].detach(); }
+          for ( var i = 0 ; i < e.length ; i++ ) {
+            if ( e[i].state === e[i].LOADED ) {
+              e[i].remove(); e[i].detach();
+            }
+          }
         } else {
           if ( e.state === e.LOADED ) { e.remove(); e.detach(); }
         }
@@ -1985,9 +2023,9 @@ foam.CLASS({
         self.insertBefore(e2, tmp);
         tmp.remove();
         e = e2;
-      };
+      });
 
-      this.onDetach(slot.sub(this.framed(l)));
+      this.onDetach(slot.sub(l));
 
       return e;
     },
@@ -2088,7 +2126,7 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'U2Context',
 
-  documentation: 'Context which includes U2 functionality.',
+  documentation: 'Context which includes U2 functionality. Replaces foam.__context__.',
 
   exports: [
     'E',
@@ -2106,6 +2144,8 @@ foam.CLASS({
 
   methods: [
     {
+      // A Method which has the call-site context added as the first arg
+      // when exported.
       class: 'foam.core.ContextMethod',
       name: 'E',
       code: function E(ctx, opt_nodeName) {
@@ -2133,10 +2173,10 @@ foam.CLASS({
 foam.SCRIPT({
   package: 'foam.u2',
   name: 'U2ContextScript',
-  requires: [
-    'foam.u2.U2Context',
-  ],
+
+  requires: [ 'foam.u2.U2Context' ],
   flags: ['web'],
+
   code: function() {
     foam.__context__ = foam.u2.U2Context.create().__subContext__;
   }
@@ -2164,7 +2204,7 @@ foam.ENUM({
   properties: [
     {
       class: 'Array',
-      name: 'allowedValues',
+      name: 'allowedValues'
     },
     {
       class: 'Enum',
@@ -2308,14 +2348,11 @@ foam.CLASS({
       const DisplayMode = foam.u2.DisplayMode;
 
       var slot = foam.core.ProxySlot.create({
-        delegate$: controllerMode$.map((controllerMode) => {
+        delegate$: controllerMode$.map(controllerMode => {
           var value = controllerMode.getVisibilityValue(this);
 
-          if ( foam.String.isInstance(value) ) {
-            return foam.core.ConstantSlot.create({
-              value: DisplayMode[foam.String.constantize(value)]
-            });
-          }
+          if ( foam.String.isInstance(value) )
+            value = DisplayMode[foam.String.constantize(value)];
 
           if ( DisplayMode.isInstance(value) ) {
             return foam.core.ConstantSlot.create({ value: value });
@@ -2365,7 +2402,7 @@ foam.CLASS({
             });
         });
 
-        slot = foam.core.ArraySlot.create({ slots: [visSlot, permSlot] }).map((arr) => {
+        slot = foam.core.ArraySlot.create({slots: [visSlot, permSlot] }).map((arr) => {
           var vis  = arr[0];
           var perm = arr[1] || PPVC.HIDDEN;
 

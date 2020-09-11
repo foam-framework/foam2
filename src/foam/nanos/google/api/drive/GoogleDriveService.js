@@ -87,7 +87,7 @@ foam.CLASS({
       javaCode: `
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
-        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,  googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
+        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,  googleApiAuthService.addHttpTimeout(googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES)))
           .setApplicationName("nanopay")
           .build();
         FileList result = service.files().list()
@@ -133,7 +133,7 @@ foam.CLASS({
       javaCode: `
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
-        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,  googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
+        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,  googleApiAuthService.addHttpTimeout(googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES)))
           .setApplicationName("nanopay")
           .build();
         File fileMetadata = new File();

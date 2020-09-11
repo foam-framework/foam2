@@ -8,6 +8,8 @@ package foam.util;
 
 import java.util.regex.Pattern;
 import foam.core.FObject;
+import foam.core.Validatable;
+import foam.core.X;
 
 /** Convenience methods for performing standard operations with null checks. **/
 public class SafetyUtil {
@@ -205,6 +207,13 @@ public class SafetyUtil {
 
   public static String trim(String s) {
     return s == null ? null : s.trim();
+  }
+
+  public static void validate(X x, Validatable v) {
+    if ( v == null ) {
+      throw new IllegalStateException("Object is null");
+    }
+    v.validate(x);
   }
 
 }
