@@ -90,7 +90,7 @@ foam.CLASS({
     // add listeners to payloads
     function addListeners() {
       for ( payload of this.capableObj.capablePayloads ) {
-        payload.data.sub(this.clonePayloads.bind(this));
+        payload.data.sub(this.clonePayloads);
       }
     }
   ],
@@ -99,8 +99,10 @@ foam.CLASS({
     {
       name: 'clonePayloads',
       documentation: `
-        This listener reassgins capablePayloads array each time its element gets updated.
-        The purpose of this is to listen to changes for payloads in bankAccountWizard save.
+        This listener reassgins capablePayloads array each time its elements get updated.
+        The purpose of this is to listen to changes for payloads of a capable object
+        that calls this view. (e.g., for bank accounts which are an capable object, we want to
+        know if acceptance doc payloads are valid or not)
       `,
       code: function() {
         this.capableObj.capablePayloads = [...this.capableObj.capablePayloads];
