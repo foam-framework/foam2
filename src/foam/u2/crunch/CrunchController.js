@@ -85,6 +85,21 @@ foam.CLASS({
         ;
     },
 
+    // Excludes UCJ-related logic
+    function createLiteWizardSequence(capabilityOrId) {
+      return this.Sequence.create(null, this.__subContext__.createSubContext({
+        rootCapability: capabilityOrId
+      }))
+        .add(this.ConfigureFlowAgent)
+        .add(this.CapabilityAdaptAgent)
+        .add(this.LoadCapabilitiesAgent)
+        .add(this.CreateWizardletsAgent)
+        .add(this.LoadTopConfig)
+        .add(this.StepWizardAgent)
+        // .add(this.TestAgent)
+        ;
+    },
+
     function maybeLaunchInterceptView(intercept) {
       // Clear stale intercepts (ones which have been closed already)
       this.activeIntercepts = this.activeIntercepts.filter((ic) => {
@@ -183,7 +198,7 @@ foam.CLASS({
             console.log('should be a cap id', capabilityId);
             if ( ! userWantsToContinue ) return false;
             return this
-              .createWizardSequence(capabilityId).execute();
+              .createLiteWizardSequence(capabilityId).execute();
           }),
           p
         );
