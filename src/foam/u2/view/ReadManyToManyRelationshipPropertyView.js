@@ -20,7 +20,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.tag(this.ScrollTableView, {
-        data: this.data.dao,
+        data: this.data.dao.delegate,
         enableDynamicTableHeight: false,
         config: this.DAOControllerConfig.create({ dao: this.data.dao.delegate })
       });
