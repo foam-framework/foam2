@@ -442,13 +442,7 @@ foam.CLASS({
                   }).
                   callIf(view.dblclick && ! view.disableUserSelection, function() {
                     tableRowElement.on('dblclick', function() {
-                      if ( ! thisObjValue ) {
-                        dao.inX(ctrl.__subContext__).find(obj.id).then(function(v) {
-                          thisObjValue = v;//as we here do not have whole object we need 
-                          view.dblclick && view.dblclick(thisObjValue);
-                        });
-                      } else
-                        view.dblclick && view.dblclick(thisObjValue);
+                      view.dblclick && view.dblclick(null, val[0]);
                     });
                   }).
                   callIf( ! view.disableUserSelection, function() {
@@ -458,7 +452,9 @@ foam.CLASS({
                       if (
                         evt.target.nodeName === 'DROPDOWN-OVERLAY' ||
                         evt.target.classList.contains(view.myClass('vertDots'))
-                      ) return;
+                      ) {
+                        return;
+                      }
 
                       if  ( !thisObjValue ) {
                         dao.inX(ctrl.__subContext__).find(obj.id).then(v => {

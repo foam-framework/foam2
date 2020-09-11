@@ -1,3 +1,4 @@
+  
 /**
  * @license
  * Copyright 2019 The FOAM Authors. All Rights Reserved.
@@ -14,19 +15,34 @@ foam.CLASS({
   documentation: `Returns true if the status of the usercapabilityjunction has been updated`,
 
   javaImports: [
-    'static foam.mlang.MLang.*'
+    'foam.core.X'
+  ],
+
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'includeRenewalStatus',
+      value: true
+    }
   ],
 
   methods: [
     {
-      name: 'f',
+      name: 'f', 
       javaCode: `
-        return OR(
-          EQ(OLD_OBJ, null),
-          NEQ(DOT(OLD_OBJ, UserCapabilityJunction.STATUS), DOT(NEW_OBJ, UserCapabilityJunction.STATUS))
-        ).f(obj);
+        X x = (X) obj;
+        UserCapabilityJunction old = (UserCapabilityJunction) x.get("OLD");
+        UserCapabilityJunction ucj = (UserCapabilityJunction) x.get("NEW");
+
+        if ( old == null ) return true;
+        if ( getIncludeRenewalStatus() ) {
+          if ( ucj.getRenewalStatusChanged(old) ) return true;
+          else return false;
+        }
+        if ( old.getStatus() != ucj.getStatus() ) return true;
+
+        return false;
       `
     }
   ]
 });
-    

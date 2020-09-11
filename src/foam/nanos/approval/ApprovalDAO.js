@@ -94,7 +94,7 @@ foam.CLASS({
       javaCode: `
         String daoKey = request.getServerDaoKey() != null && ! SafetyUtil.isEmpty(request.getServerDaoKey()) ? request.getServerDaoKey() : request.getDaoKey();
         DAO dao = (DAO) x.get(daoKey);
-        FObject found = dao.inX(x).find(request.getObjId()).fclone();
+        FObject found = dao.find(request.getObjId()).fclone();
 
         DAO userDAO = (DAO) x.get("localUserDAO");
         User initiatingUser = (User) userDAO.find(((ApprovalRequest) request).getCreatedBy());

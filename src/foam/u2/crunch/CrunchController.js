@@ -30,14 +30,17 @@ foam.CLASS({
     'foam.log.LogLevel',
     'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.u2.crunch.wizardflow.ConfigureFlowAgent',
     'foam.u2.crunch.wizardflow.CapabilityAdaptAgent',
     'foam.u2.crunch.wizardflow.CheckPendingAgent',
     'foam.u2.crunch.wizardflow.LoadCapabilitiesAgent',
     'foam.u2.crunch.wizardflow.CreateWizardletsAgent',
+    'foam.u2.crunch.wizardflow.FilterWizardletsAgent',
     'foam.u2.crunch.wizardflow.RequirementsPreviewAgent',
     'foam.u2.crunch.wizardflow.StepWizardAgent',
     'foam.u2.crunch.wizardflow.PutFinalJunctionsAgent',
     'foam.u2.crunch.wizardflow.TestAgent',
+    'foam.u2.crunch.wizardflow.LoadTopConfig',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
     'foam.u2.crunch.CapabilityInterceptView'
@@ -67,13 +70,31 @@ foam.CLASS({
       return this.Sequence.create(null, this.__subContext__.createSubContext({
         rootCapability: capabilityOrId
       }))
+        .add(this.ConfigureFlowAgent)
         .add(this.CapabilityAdaptAgent)
         .add(this.LoadCapabilitiesAgent)
         .add(this.CheckPendingAgent)
         .add(this.CreateWizardletsAgent)
+        .add(this.FilterWizardletsAgent)
         .add(this.RequirementsPreviewAgent)
+        .add(this.LoadTopConfig)
         .add(this.StepWizardAgent)
         .add(this.PutFinalJunctionsAgent)
+        // .add(this.TestAgent)
+        ;
+    },
+
+    // Excludes UCJ-related logic
+    function createLiteWizardSequence(capabilityOrId) {
+      return this.Sequence.create(null, this.__subContext__.createSubContext({
+        rootCapability: capabilityOrId
+      }))
+        .add(this.ConfigureFlowAgent)
+        .add(this.CapabilityAdaptAgent)
+        .add(this.LoadCapabilitiesAgent)
+        .add(this.CreateWizardletsAgent)
+        .add(this.LoadTopConfig)
+        .add(this.StepWizardAgent)
         // .add(this.TestAgent)
         ;
     },
@@ -114,7 +135,7 @@ foam.CLASS({
     },
 
     function save(wizardlet) {
-      // TODO: ignore saving when wizardlet.isAvailable === false
+      if ( ! wizardlet.isAvailable ) return Promise.resolve(); 
       var isAssociation = wizardlet.capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.ACTING_USER;
       var associatedEntity = isAssociation ? this.subject.realUser : 
       wizardlet.capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
@@ -176,7 +197,7 @@ foam.CLASS({
             console.log('should be a cap id', capabilityId);
             if ( ! userWantsToContinue ) return false;
             return this
-              .createWizardSequence(capabilityId).execute();
+              .createLiteWizardSequence(capabilityId).execute();
           }),
           p
         );

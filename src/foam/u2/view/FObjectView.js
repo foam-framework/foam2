@@ -26,9 +26,7 @@ foam.CLASS({
       of: 'foam.core.Latch',
       name: 'choicesLoaded',
       documentation: 'A latch used to wait on choices loaded.',
-      factory: function() {
-        return this.Latch.create();
-      }
+      factory: function() { return this.Latch.create(); }
     },
     {
       class: 'String',
@@ -75,6 +73,17 @@ foam.CLASS({
     {
       class: 'Function',
       name: 'copyOldData',
+      documentation: `
+        Function to copy data from old object to new object when objectClass changes.
+        The default implementation copies all properties with the same name, but
+        if you don't want this behaviour, then implement your own copy method.
+        Ex. if we only wanted to copy two fields:
+          copyOldData: function(o) { return {
+            field1: o.field1,
+            field2: o.field2
+        }; }
+        You do not need to handle the case where the old object is null.
+      `,
       value: function(o) { return o; }
     },
     {
@@ -125,6 +134,7 @@ foam.CLASS({
     function updateChoices() {
       if ( this.of == null ) {
         this.choices = [];
+        this.choicesLoaded.resolve();
         return;
       }
 

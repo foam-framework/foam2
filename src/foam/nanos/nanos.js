@@ -30,6 +30,8 @@ FOAM_FILES([
   { name: "foam/nanos/app/EmailConfig" },
   { name: "foam/nanos/notification/email/SMTPConfig" },
   { name: "foam/nanos/app/ClientAppConfigService" },
+  { name: "foam/nanos/controller/WindowHash" },
+  { name: "foam/nanos/controller/Memento" },
   { name: "foam/nanos/controller/ApplicationController" },
   { name: "foam/nanos/app/Mode" },
   { name: 'foam/nanos/alarming/Alarm' },
@@ -40,8 +42,8 @@ FOAM_FILES([
   { name: 'foam/nanos/alarming/MonitoringReport' },
   { name: 'foam/nanos/alarming/MonitorType' },
   { name: 'foam/nanos/alarming/AlarmAndMonitoring' },
+  { name: 'foam/nanos/alarming/AddAlarmNameDAO' },
   { name: 'foam/nanos/alarming/OMName' },
-  { name: 'foam/nanos/alarming/AlarmConfigName' },
   { name: 'foam/nanos/alarming/AlarmingUniqueNameDAO' },
   { name: "foam/nanos/auth/DayOfWeek" },
   { name: "foam/nanos/auth/Hours" },
@@ -328,17 +330,20 @@ FOAM_FILES([
   // foam/nanos/crunch
   { name: "foam/nanos/crunch/crunchtest/FakeTestObject" },
   // models
+  { name: "foam/nanos/crunch/Renewable" },
   { name: "foam/nanos/crunch/Capability" },
   { name: "foam/nanos/crunch/MinMaxCapability" },
+  { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
   { name: "foam/nanos/crunch/lite/CapablePayload" },
   { name: "foam/nanos/crunch/lite/Capable" },
+  { name: "foam/nanos/crunch/lite/CapableAdapterDAO" },
   { name: "foam/nanos/crunch/lite/CapableObjectData" },
   { name: "foam/nanos/crunch/CapabilityCategory" },
-  { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/CapabilityCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/CapabilityCategoryCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/AssociatedEntity" },
+  { name: "foam/nanos/crunch/RenewableData" },
   { name: "foam/nanos/crunch/connection/CapabilityPayload" },
   //daos
   { name: "foam/nanos/crunch/UserCapabilityJunctionDAO" },
@@ -358,6 +363,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ruler/SaveUCJDataOnGranted" },
   //views
   { name: "foam/nanos/crunch/ui/CapabilityView" },
+  { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },

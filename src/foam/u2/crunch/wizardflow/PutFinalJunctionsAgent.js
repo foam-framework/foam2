@@ -16,6 +16,7 @@ foam.CLASS({
     'capabilities',
     'crunchService',
     'subject',
+    'wizardlets',
     'userCapabilityJunctionDAO'
   ],
 
@@ -30,12 +31,15 @@ foam.CLASS({
       //   At the time of writing this comment, CrunchService does
       //   not have a method to create the correct empty UCJ when
       //   none already exists.
-
       // Save no-data capabilities (i.e. not displayed in wizard)
-      return Promise.all(this.capabilities.filter(cap => ! cap.of).map(
-        cap => {
+      return Promise.all(this.wizardlets.filter(wizardlet => {
+        return wizardlet.isAvailable && ( ! wizardlet.capability.of ); 
+      }).map(
+        filteredWizard => {
+          var cap = filteredWizard.capability; 
+
           var associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
-          this.userCapabilityJunctionDAO.find(
+           return this.userCapabilityJunctionDAO.find(
             this.AND(
               this.OR(
                 this.AND(
@@ -57,7 +61,7 @@ foam.CLASS({
                 targetId: cap.id
               });
             }
-            this.userCapabilityJunctionDAO.put(ucj).then(() => console.log('SAVED (no-data cap)', cap.id));
+            return this.userCapabilityJunctionDAO.put(ucj).then(() => console.log('SAVED (no-data cap)', cap.id));
           });
         }
       ));

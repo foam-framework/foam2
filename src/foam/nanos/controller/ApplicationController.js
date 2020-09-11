@@ -34,6 +34,8 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.client.ClientBuilder',
+    'foam.nanos.controller.Memento',
+    'foam.nanos.controller.WindowHash',
     'foam.nanos.auth.Group',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Subject',
@@ -73,6 +75,7 @@ foam.CLASS({
     'lastMenuLaunched',
     'lastMenuLaunchedListener',
     'loginSuccess',
+    'mementoTail as memento',
     'theme',
     'menuListener',
     'notify',
@@ -167,6 +170,13 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'memento',
+      factory: function() {
+        return this.Memento.create({tail$: this.mementoTail$});
+      }
+    },
+    'mementoTail',
+    {
       name: 'loginVariables',
       expression: function(client$userDAO) {
         return {
@@ -191,7 +201,7 @@ foam.CLASS({
           self.client = cls.create(null, self);
           return self.client;
         });
-      },
+      }
     },
     {
       name: 'client',
@@ -308,20 +318,13 @@ foam.CLASS({
 
       var self = this;
 
-      window.onpopstate = async function(event) {
-        var hid = location.hash.substr(1);
-        if ( hid ) {
-          if ( self.client ) {
-            var menu = await self.client.menuDAO.find(hid);
-            menu && menu.launch(this);
-          } else {
-            self.clientPromise.then(async () => {
-              var menu = await self.client.menuDAO.find(hid);
-              menu && menu.launch(this);
-            });
-          }
-        }
-      };
+      // Start Memento Support
+      var hash = this.WindowHash.create();
+      this.memento.value$ = hash.value$
+
+      this.memento.head$.sub(this.mementoChange);
+      this.mementoChange();
+      // End Memento Support
 
       this.clientPromise.then(async function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
@@ -449,7 +452,6 @@ foam.CLASS({
       }
     },
 
-
     async function fetchGroup() {
       try {
         var group = await this.client.auth.getCurrentGroup();
@@ -498,7 +500,7 @@ foam.CLASS({
       var M = m.toUpperCase();
 
       return css.replace(
-        new RegExp('/\\*%' + M + '%\\*/[^;]*', 'g'),
+        new RegExp('/\\*%' + M + '%\\*/[^;!]*', 'g'),
         '/*%' + M + '%*/ ' + this.theme[m]);
     },
 
@@ -526,15 +528,15 @@ foam.CLASS({
       }
     },
 
-    function pushMenu(menu) {
+    function pushMenu(menu, opt_forceReload) {
       if ( menu.id ) {
         menu.launch(this);
         menu = menu.id;
       }
-
       /** Use to load a specific menu. **/
-      if ( window.location.hash.substr(1) != menu ) {
-        window.location.hash = menu;
+      // Do it this way so as to not reset mementoTail if set
+      if ( this.memento.head != menu || opt_forceReload ) {
+        this.memento.value = menu;
       }
     },
 
@@ -586,6 +588,19 @@ foam.CLASS({
   ],
 
   listeners: [
+    async function mementoChange() {
+      // TODO: make a latch instead
+      if ( this.client ) {
+        var menu = await this.client.menuDAO.find(this.memento.head);
+        menu && menu.launch(this);
+      } else {
+        this.clientPromise.then(async () => {
+          var menu = await this.client.menuDAO.find(this.memento.head);
+          menu && menu.launch(this);
+        });
+      }
+    },
+
     function onUserAgentAndGroupLoaded() {
       /**
        * Called whenever the group updates.

@@ -287,9 +287,6 @@ foam.CLASS({
     {
       name: 'goNext',
       label: 'Next',
-      isEnabled: function (data$canGoNext) {
-        return data$canGoNext;
-      },
       code: function(x) {
         this.data.next().then((isFinished) => {
           if ( isFinished ) {

@@ -193,6 +193,7 @@ var classes = [
   'foam.mlang.sink.Sum',
   'foam.mlang.sink.Average',
   'foam.mlang.sink.Map',
+  'foam.nanos.alarming.AddAlarmNameDAO',
   'foam.nanos.alarming.Alarm',
   'foam.nanos.alarming.AlarmConfig',
   'foam.nanos.alarming.AlarmConfigOMNameDAO',
@@ -205,7 +206,6 @@ var classes = [
   'foam.nanos.alarming.MonitoringReport',
   'foam.nanos.alarming.MonitorType',
   'foam.nanos.alarming.OMName',
-  'foam.nanos.alarming.AlarmConfigName',
   'foam.nanos.actioncommand.ActionCommand',
   'foam.nanos.NanoService',
   'foam.nanos.boot.NSpec',
@@ -423,6 +423,7 @@ var classes = [
   'foam.u2.ElementState',
   'foam.u2.DefaultValidator',
   'foam.u2.DisplayMode',
+  'foam.u2.wizard.StepWizardConfig',
   'foam.nanos.export.ClientGoogleSheetsExportService',
   'foam.nanos.export.ExportDriverRegistry',
   'foam.nanos.export.GoogleSheetsExport',
@@ -625,20 +626,26 @@ var classes = [
   // Crunch
   'foam.nanos.crunch.crunchtest.FakeTestObject',
   //models
+  'foam.nanos.crunch.Renewable',
   'foam.nanos.crunch.Capability',
   'foam.nanos.crunch.MinMaxCapability',
   'foam.nanos.crunch.lite.Capable',
+  'foam.nanos.crunch.lite.CapableAdapterDAO',
   'foam.nanos.crunch.lite.CapablePayload',
   'foam.nanos.crunch.CapabilityCategory',
   'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
   'foam.nanos.crunch.CapabilityJunctionStatus',
   'foam.nanos.crunch.UserCapabilityJunction',
+  'foam.nanos.crunch.ui.CapabilityWizardlet',
+  'foam.u2.wizard.BaseWizardlet',
   'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
   'foam.nanos.crunch.AssociatedEntity',
   'foam.nanos.crunch.CapabilityAvailabilityDAO',
+  'foam.nanos.crunch.RenewableData',
+
   'foam.nanos.crunch.connection.CapabilityPayload',
-  
+
   //daos
   'foam.nanos.crunch.connection.CapabilityPayloadDAO',
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
