@@ -22,14 +22,19 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.order.Comparator',
+      name: 'comparator'
+    },
+    {
       //class: 'foam.mlang.predicate.PredicateProperty',
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'predicate'
     },
     {
-      class: 'Long',
-      name: 'purgeSize'
+      class: 'Int',
+      name: 'size'
     },
     {
       class: 'Long',
@@ -42,14 +47,16 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
+        obj = getDelegate().put_(x, obj);
         Count count = new Count();
         count = (Count) this.getDelegate().select(count);
-        if ( count.getValue() + 1 > getPurgeSize() + getPurgeSize() * getPurgePercent() / 100 ) {
+        if ( count.getValue() + 1 > getSize() + getSize() * getPurgePercent() / 100 ) {
           this.getDelegate()
             .where(getPredicate())
+            .orderBy(getComparator())
+            .skip(getSize())
             .removeAll();
         }
-        obj = getDelegate().put_(x, obj);
         return obj;
       `
     },
