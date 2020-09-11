@@ -118,13 +118,15 @@ foam.CLASS({
       name: 'start',
       javaCode: `
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
-      setHashingEnabled(support.getHashingEnabled());
       ClusterConfig config = support.getConfig(getX(), support.getConfigId());
-      if ( config != null &&
-           config.getType() == MedusaType.NODE ) {
-        getLogger().debug("start", "node", "exit");
+      if ( config == null ||
+           config.getType() == MedusaType.NODE ||
+           config.getZone() > 0L ) {
+        getLogger().debug("start", "exit");
         return;
       }
+
+      setHashingEnabled(support.getHashingEnabled());
       DAO dao = getDao();
       MedusaEntry entry = new MedusaEntry();
       entry.setNSpecName("DAG Bootstrap");
@@ -135,6 +137,7 @@ foam.CLASS({
       entry.setHash2("9232622261b1df4dff84067b2df22ecae387162742626326216bf9b4d0d29a3f");
       entry.setHash(hash(getX(), entry));
       entry.setAlgorithm(getAlgorithm());
+      entry.setPromoted(true);
       entry = (MedusaEntry) dao.put_(getX(), entry);
       updateLinks(getX(), entry);
 
@@ -147,6 +150,7 @@ foam.CLASS({
       entry.setHash2("50c1071e836bdd4f2d4b5907bb6090fae6891d6cacdb70dcd72770bfd43dc814");
       entry.setHash(hash(getX(), entry));
       entry.setAlgorithm(getAlgorithm());
+      entry.setPromoted(true);
       entry = (MedusaEntry) dao.put_(getX(), entry);
       updateLinks(getX(), entry);
      `

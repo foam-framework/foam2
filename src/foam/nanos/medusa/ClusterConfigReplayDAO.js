@@ -54,6 +54,9 @@ foam.CLASS({
       if ( old != null &&
            old.getStatus() != nu.getStatus() &&
            nu.getStatus() == Status.ONLINE ) {
+
+        getLogger().info(nu.getName(), old.getStatus().getLabel(), "->", nu.getStatus().getLabel().toUpperCase());
+
         ClusterConfig config = nu;
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
         ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
@@ -134,11 +137,12 @@ foam.CLASS({
           getLogger().info("ReplayDetailsCmd", "from", myConfig.getId(), "to", config.getId(), "response", details);
 
           synchronized ( this ) {
+            DaggerService dagger = (DaggerService) x.get("daggerService");
             ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
             if ( replaying.getStartTime() == null ) {
               replaying.setStartTime(new java.util.Date());
+              replaying.setIndex(dagger.getGlobalIndex(x));
             }
-            DaggerService dagger = (DaggerService) x.get("daggerService");
             if ( details.getMaxIndex() > dagger.getGlobalIndex(x)) {
               dagger.setGlobalIndex(x, details.getMaxIndex());
             }

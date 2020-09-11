@@ -34,7 +34,6 @@ foam.CLASS({
     'foam.util.SafetyUtil',
     'java.util.Arrays',
     'java.util.ArrayList',
-    'java.util.concurrent.atomic.AtomicInteger',
     'java.util.HashMap',
     'java.util.List',
     'java.util.Map',
@@ -47,7 +46,6 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  protected Object indexLock_ = new Object();
   protected Object promoterLock_ = new Object();
           `
         }));
@@ -57,19 +55,6 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'index',
-      class: 'Long',
-      factory: function() { return this.initialIndexOffset; },
-      javaFactory: 'return getInitialIndexOffset();',
-      visibility: 'RO',
-    },
-    {
-      documentation: 'Starting at 2 as indexes 1 and 2 are used to prime the system.',
-      name: 'initialIndexOffset',
-      class: 'Long',
-      value: 2
-    },
-    {
       name: 'timerInterval',
       class: 'Long',
       value: 5000
@@ -77,7 +62,7 @@ foam.CLASS({
     {
       name: 'initialTimerDelay',
       class: 'Long',
-      value: 60000
+      value: 30000
     },
     {
       name: 'logger',
@@ -99,20 +84,21 @@ foam.CLASS({
       MedusaEntry entry = (MedusaEntry) obj;
       Object id = entry.getProperty("id");
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
-      // getLogger().debug("put", getIndex(), replaying.getReplayIndex(), entry.toSummary(), "from", entry.getNode());
+      // getLogger().debug("put", getIndex(x), replaying.getReplayIndex(), entry.toSummary(), "from", entry.getNode());
+      getLogger().debug("put", getIndex(x), entry.toSummary(), "from", entry.getNode());
       PM pm = null;
       try {
         MedusaEntry existing = (MedusaEntry) getDelegate().find_(x, id);
         if ( existing != null &&
              existing.getPromoted() ) {
-          getLogger().debug("put", getIndex(), entry.toSummary(), "from", entry.getNode(), "discarding");
+          getLogger().debug("put", getIndex(x), entry.toSummary(), "from", entry.getNode(), "discarding");
           return existing;
         }
         synchronized ( id.toString().intern() ) {
           existing = (MedusaEntry) getDelegate().find_(x, id);
           if ( existing != null ) {
             if ( existing.getPromoted() ) {
-              getLogger().debug("put", getIndex(), entry.toSummary(), "from", entry.getNode(), "discarding", "in-lock");
+              getLogger().debug("put", getIndex(x), entry.toSummary(), "from", entry.getNode(), "discarding", "in-lock");
               return existing;
             }
             // getLogger().debug("put", entry.toSummary(), "from", entry.getNode(), "existing");
@@ -138,28 +124,16 @@ foam.CLASS({
 
           ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
           if ( nodes.size() >= support.getNodeQuorum() &&
-               entry.getIndex() == getIndex() + 1 ) {
+               entry.getIndex() == getIndex(x) + 1 ) {
             if ( entry.isFrozen() ) {
-              getLogger().debug("put", "Entry is frozen", entry.getId());
               entry = (MedusaEntry) entry.fclone();
             }
             entry.setConsensusCount(nodes.size());
             entry.setConsensusNodes(nodes.keySet().toArray(new String[0]));
             MedusaEntry.CONSENSUS_HASHES.clear(entry);
-            entry = (MedusaEntry) getDelegate().put_(x, entry);
             entry = promote(x, entry);
-            // REVIEW: troubleshooting what should be promoted entries not being promoted.
-            MedusaEntry p = (MedusaEntry) getDelegate().find_(x, entry.getId());
-            if ( ! p.getPromoted() ) {
-              entry.setX(null);
-              getLogger().error("Promoted not promoted", entry);
-              System.err.println("Promoted not promoted. ");
-              System.err.println(entry);
-              System.exit(1);
-            }
           } else {
             if ( existing.isFrozen() ) {
-              getLogger().debug("put", "Entry is frozen", existing.getId());
               existing = (MedusaEntry) existing.fclone();
             }
             existing.setConsensusHashes(hashes);
@@ -182,6 +156,30 @@ foam.CLASS({
       `
     },
     {
+      documentation: `The current max consensus index.  On Primary, after Replay, the GlobalIndex is incremented by MedusaAdapter when the next MedusaEntry is created.  Otherwise it's incremented during this Consensus. So on Primary the consensus index is global -1, as we are testing for the MedusaEntry that was just created by the MedusaAdapter.`,
+      name: 'getIndex',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+      ],
+      type: 'Long',
+      javaCode: `
+      ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
+      if ( replaying.getReplaying() ) {
+        return replaying.getIndex();
+      }
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      ClusterConfig config = support.getConfig(x, support.getConfigId());
+      DaggerService dagger = (DaggerService) x.get("daggerService");
+      if ( config.getIsPrimary() ) {
+        return dagger.getGlobalIndex(x) - 1;
+      }
+      return dagger.getGlobalIndex(x);
+      `
+    },
+    {
       documentation: 'Make an entry available for Dagger hashing.',
       name: 'promote',
       args: [
@@ -199,23 +197,18 @@ foam.CLASS({
       PM pm = PM.create(x, this.getClass().getSimpleName(), "promote");
       // PM pm = new PM(this.getClass().getSimpleName(), "promote");
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
-      getLogger().debug("promote", entry.getIndex(), getIndex());
-      // getLogger().debug("promote", entry.getIndex(), getIndex(), replaying.getReplayIndex(), replaying.getReplaying());
+      DaggerService dagger = (DaggerService) x.get("daggerService");
+      getLogger().debug("promote", entry.getIndex(), getIndex(x));
+      // getLogger().debug("promote", entry.getIndex(), getIndex(x), replaying.getReplayIndex(), replaying.getReplaying());
       try {
-        DaggerService dagger = (DaggerService) x.get("daggerService");
         dagger.verify(x, entry);
-
-        if ( entry.isFrozen() ) {
-          getLogger().debug("promote", "Entry is frozen", entry.getId());
-          entry = (MedusaEntry) entry.fclone();
+        dagger.updateLinks(x, entry);
+        // test to save a synchronized call
+        if ( entry.getIndex() > dagger.getGlobalIndex(x) ) {
+          dagger.setGlobalIndex(x, entry.getIndex());
         }
 
-        entry.setVerified(true);
-
-        dagger.updateLinks(x, entry);
-
         entry.setPromoted(true);
-
         entry = (MedusaEntry) getDelegate().put_(x, entry);
 
         entry = mdao(x, entry);
@@ -224,18 +217,13 @@ foam.CLASS({
         MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
         registry.notify(x, entry);
 
-        synchronized ( indexLock_ ) {
-          if ( entry.getIndex() == getIndex() + 1 ) {
-            setIndex(entry.getIndex());
-            replaying.setIndex(getIndex());
-            replaying.setNonConsensusIndex(0);
-            replaying.setLastModified(new java.util.Date());
-            if ( replaying.getReplaying() &&
-                 getIndex() >= replaying.getReplayIndex() ) {
-              getLogger().info("promote", "replayComplete", "index");
-              ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
-            }
-          }
+        replaying.setIndex(entry.getIndex());
+        replaying.setNonConsensusIndex(0);
+        replaying.setLastModified(new java.util.Date());
+        if ( replaying.getReplaying() &&
+             replaying.getIndex() >= replaying.getReplayIndex() ) {
+          getLogger().info("promote", "replayComplete", replaying.getIndex());
+          ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
         }
       } finally {
         pm.log(x);
@@ -273,7 +261,7 @@ foam.CLASS({
           PM pm = PM.create(x, "MedusaConsensusDAO", "promoter");
           MedusaEntry entry = null;
           try {
-            Long nextIndex = getIndex() + 1;
+            Long nextIndex = getIndex(x) + 1;
             // getLogger().debug("promoter", "next", nextIndex);
             MedusaEntry next = (MedusaEntry) getDelegate().find_(x, nextIndex);
             if ( next != null ) {
@@ -290,13 +278,11 @@ foam.CLASS({
                         break;
                       }
                       if ( entry.isFrozen() ) {
-                        getLogger().debug("execute", "Entry is frozen", entry.getId());
                         entry = (MedusaEntry) entry.fclone();
                       }
                       entry.setConsensusCount(nodes.size());
                       entry.setConsensusNodes(nodes.keySet().toArray(new String[0]));
                       MedusaEntry.CONSENSUS_HASHES.clear(entry);
-                      entry = (MedusaEntry) getDelegate().put_(x, entry);
                       entry = promote(x, entry);
                     } else {
                       getLogger().error("promoter", next, "Multiple consensus detected", next.toSummary(), next.getConsensusCount(), support.getNodeQuorum());

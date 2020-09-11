@@ -290,7 +290,7 @@ configuration for contacting the primary node.`,
           AND(
             EQ(ClusterConfig.ZONE, zone),
             EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
-            EQ(ClusterConfig.STATUS, Status.ONLINE),
+            //EQ(ClusterConfig.STATUS, Status.ONLINE),
             EQ(ClusterConfig.ENABLED, true),
             EQ(ClusterConfig.REGION, myConfig.getRegion()),
             EQ(ClusterConfig.REALM, myConfig.getRealm())

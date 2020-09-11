@@ -130,13 +130,6 @@ foam.CLASS({
       transient: true,
     },
     {
-      name: 'verified',
-      class: 'Boolean',
-      visibility: 'RO',
-      storageTransient: true,
-      clusterTransient: true,
-    },
-    {
       name: 'promoted',
       class: 'Boolean',
       visibility: 'RO',
