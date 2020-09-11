@@ -35,7 +35,7 @@ foam.CLASS({
           null, capabilityIds
         ).then(result => {
           this.capablePayloads = result;
-        })
+        });
       }
     }
   ]
