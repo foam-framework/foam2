@@ -30,6 +30,8 @@ FOAM_FILES([
   { name: "foam/nanos/app/EmailConfig" },
   { name: "foam/nanos/notification/email/SMTPConfig" },
   { name: "foam/nanos/app/ClientAppConfigService" },
+  { name: "foam/nanos/controller/WindowHash" },
+  { name: "foam/nanos/controller/Memento" },
   { name: "foam/nanos/controller/ApplicationController" },
   { name: "foam/nanos/app/Mode" },
   { name: 'foam/nanos/alarming/Alarm' },
@@ -329,11 +331,12 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/Renewable" },
   { name: "foam/nanos/crunch/Capability" },
   { name: "foam/nanos/crunch/MinMaxCapability" },
+  { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
   { name: "foam/nanos/crunch/lite/CapablePayload" },
   { name: "foam/nanos/crunch/lite/Capable" },
+  { name: "foam/nanos/crunch/lite/CapableAdapterDAO" },
   { name: "foam/nanos/crunch/lite/CapableObjectData" },
   { name: "foam/nanos/crunch/CapabilityCategory" },
-  { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/CapabilityCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/CapabilityCategoryCapabilityJunctionRefine" },
@@ -356,9 +359,9 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ruler/SetUCJStatusOnPut" },
   { name: "foam/nanos/crunch/ruler/ConfigureUCJExpiryOnGranted" },
   { name: "foam/nanos/crunch/ruler/SaveUCJDataOnGranted" },
-  { name: "foam/nanos/crunch/ruler/IsDataUpdate" },
   //views
   { name: "foam/nanos/crunch/ui/CapableView" },
+  { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },
