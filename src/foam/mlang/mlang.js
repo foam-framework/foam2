@@ -2714,7 +2714,7 @@ foam.CLASS({
       documentation: 'An array of full objects created from the projection. Only properties included in exprs/the-projection will be set.',
       factory: function() {
         return this.projectionWithClass.map(p => {
-          var o = foam.lookup(p[0]).create(null, this.__context__);
+          var o = foam.lookup(p[0]).create(null, this);
           for ( var i = 0 ; i < this.exprs.length ; i++ ) {
             try {
               this.exprs[i].set(o, p[i+1]);
@@ -2735,8 +2735,13 @@ foam.CLASS({
             Object    o   = ci.newInstance();
 
             for ( int j = 0 ; j < es.length ; j++ ) {
-              PropertyInfo e = (PropertyInfo) es[j];//probably not all the expressions can be casted to PropInfo eg NestedPropExpr
-              e.set(o, arr[i]);
+              if ( es[j] instanceof PropertyInfo ) {
+                PropertyInfo e = (PropertyInfo) es[j];
+                e.set(o, arr[i]);
+              } else if ( es[j] instanceof foam.nanos.column.NestedPropertiesExpression ) {
+                foam.nanos.column.NestedPropertiesExpression e = (foam.nanos.column.NestedPropertiesExpression) es[j];
+                e.set(o, arr[i]);
+              }
             }
 
             a.set(i, o);
