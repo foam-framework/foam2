@@ -202,13 +202,14 @@ foam.CLASS({
         this.searchPredicate = foam.mlang.predicate.True.create();
       }));
     },
-    function dblclick(obj) {
+    function dblclick(obj, id) {
       if ( ! this.stack ) return;
       this.stack.push({
         class: 'foam.comics.v2.DAOSummaryView',
         data: obj,
         config: this.config,
-        of: this.config.of
+        of: this.config.of,
+        id: id
       }, this.__subContext__);
     },
     function initE() {

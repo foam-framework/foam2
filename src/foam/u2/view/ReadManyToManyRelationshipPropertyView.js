@@ -22,7 +22,7 @@ foam.CLASS({
       this.tag(this.ScrollTableView, {
         data: this.data.dao,
         enableDynamicTableHeight: false,
-        config: this.DAOControllerConfig.create({ dao: this.data.dao })
+        config: this.DAOControllerConfig.create({ dao: this.data.dao.delegate })
       });
     }
   ]

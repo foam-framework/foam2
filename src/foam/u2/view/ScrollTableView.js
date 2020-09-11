@@ -289,14 +289,15 @@
         this.style({ height: `${remainingSpace}px` });
       }
     },
-    function dblclick(obj) {
+    function dblclick(obj, id) {
       if ( ! this.stack ) return;
       this.stack.push({
         class: 'foam.comics.v2.DAOSummaryView',
         data: obj,
         config: this.config,
-        of: this.config.of
-      }, this.__subContext__);
+        of: this.config.of,
+        id: id
+      }, this);
     },
   ]
 });
