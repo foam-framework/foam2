@@ -449,13 +449,7 @@ foam.CLASS({
                   }).
                   callIf(view.dblclick && ! view.disableUserSelection, function() {
                     tableRowElement.on('dblclick', function() {
-                      if ( ! thisObjValue ) {
-                        dao.find(val[0]).then(function(v) {
-                          thisObjValue = v;
-                          view.dblclick && view.dblclick(thisObjValue);
-                        });
-                      } else
-                        view.dblclick && view.dblclick(thisObjValue);
+                      view.dblclick && view.dblclick(null, val[0]);
                     });
                   }).
                   callIf( ! view.disableUserSelection, function() {

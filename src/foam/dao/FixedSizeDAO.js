@@ -16,6 +16,10 @@ foam.CLASS({
     affect memory.  Install via EasyDAO to it is installed in the correct
     place.`,
 
+  javaImports: [
+    'foam.mlang.sink.Count'
+  ],
+
   properties: [
     {
       class: 'FObjectProperty',
@@ -31,6 +35,11 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'size'
+    },
+    {
+      class: 'Long',
+      name: 'purgePercent',
+      value: 10
     }
   ],
 
@@ -39,11 +48,15 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
         obj = getDelegate().put_(x, obj);
-        this.getDelegate()
-          .where(getPredicate())
-          .orderBy(getComparator())
-          .skip(getSize())
-          .removeAll();
+        Count count = new Count();
+        count = (Count) this.getDelegate().select(count);
+        if ( count.getValue() > getSize() + getSize() * getPurgePercent() / 100 ) {
+          this.getDelegate()
+            .where(getPredicate())
+            .orderBy(getComparator())
+            .skip(getSize())
+            .removeAll();
+        }
         return obj;
       `
     },
