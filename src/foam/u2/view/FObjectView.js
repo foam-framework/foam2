@@ -26,9 +26,7 @@ foam.CLASS({
       of: 'foam.core.Latch',
       name: 'choicesLoaded',
       documentation: 'A latch used to wait on choices loaded.',
-      factory: function() {
-        return this.Latch.create();
-      }
+      factory: function() { return this.Latch.create(); }
     },
     {
       class: 'String',
@@ -136,6 +134,7 @@ foam.CLASS({
     function updateChoices() {
       if ( this.of == null ) {
         this.choices = [];
+        this.choicesLoaded.resolve();
         return;
       }
 

@@ -33,7 +33,7 @@ foam.CLASS({
       //   none already exists.
       // Save no-data capabilities (i.e. not displayed in wizard)
       return Promise.all(this.wizardlets.filter(wizardlet => {
-        return wizardlet.isAvailable; 
+        return wizardlet.isAvailable && ( ! wizardlet.capability.of ); 
       }).map(
         filteredWizard => {
           var cap = filteredWizard.capability; 

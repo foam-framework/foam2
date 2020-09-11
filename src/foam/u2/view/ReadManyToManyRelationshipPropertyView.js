@@ -12,7 +12,8 @@ foam.CLASS({
   documentation: 'A read-only view of a ManyToManyRelationshipProperty.',
 
   requires: [
-    'foam.u2.view.ScrollTableView'
+    'foam.u2.view.ScrollTableView',
+    'foam.comics.v2.DAOControllerConfig'
   ],
 
   methods: [
@@ -20,7 +21,8 @@ foam.CLASS({
       this.SUPER();
       this.tag(this.ScrollTableView, {
         data: this.data.dao,
-        enableDynamicTableHeight: false
+        enableDynamicTableHeight: false,
+        config: this.DAOControllerConfig.create({ dao: this.data.dao.delegate })
       });
     }
   ]
