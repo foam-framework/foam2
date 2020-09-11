@@ -47,7 +47,13 @@ foam.CLASS({
       javaFactory: `
         return null;
       `
-    }
+    },
+    {
+      name: 'status',
+      class: 'Enum',
+      of: 'foam.nanos.crunch.CapabilityJunctionStatus',
+      value: foam.nanos.crunch.CapabilityJunctionStatus.ACTION_REQUIRED
+    },
   ],
 
   methods: [

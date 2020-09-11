@@ -14,6 +14,15 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'of',
+      class: 'Class'
+    },
+    {
+      name: 'title',
+      class: 'String'
+    },
+    {
+      flags: ['web'],
       name: 'currentSection',
       transient: true
     },
@@ -32,6 +41,16 @@ foam.CLASS({
         if ( ( ! data ) || currentSection ? sectionErrors.length > 0 : data$errors_) return false;
         return true;
       }
+    },
+    {
+      name: 'isAvailable',
+      class: 'Boolean',
+      value: true,
+      documentation: `
+        Specify the availability of this wizardlet. If true, wizardlet is
+        available iff at least one section is available. If false, wizardlet
+        does not display even if some sections are available.
+      `,
     }
   ],
 

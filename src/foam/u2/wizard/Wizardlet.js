@@ -34,9 +34,11 @@ foam.INTERFACE({
 
   methods: [
     {
+      flags: ['web'],
       name: 'save'
     },
     {
+      flags: ['web'],
       name: 'createView',
       args: [
         {

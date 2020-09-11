@@ -34,6 +34,21 @@ foam.CLASS({
     this.booleanView is a ViewSpec for each choice. It defaults to foam.u2.CheckBox
   `,
 
+  css: `
+    ^helpTextRow {
+      font-size: 14pt;
+      padding: 8pt 0;
+    }
+    ^flexer {
+      flex-wrap: wrap;
+      align-items: stretch;
+    }
+    ^innerFlexer {
+      display: inline-flex;
+      flex-grow: 1;
+    }
+  `,
+
   properties: [
     {
       name: 'choices',
@@ -151,6 +166,22 @@ foam.CLASS({
       value: function(obj) {
         return [ obj.id, obj.toSummary() ];
       }
+    },
+    {
+      name: 'helpText_',
+      expression: function (minSelected, maxSelected) {
+        // TODO: Change this when formatted messages are supported
+        return ( maxSelected > 0 )
+          ? ( minSelected == maxSelected )
+            ? ( minSelected == 1 )
+              ? 'Choose one of the following options'
+              : `Choose exactly ${minSelected} options`
+            : `Choose ${minSelected} - ${maxSelected} options`
+          : ( minSelected == 1 )
+            ? 'Choose at least one option'
+            : `Choose at least ${minSelected} options`
+          ;
+      }
     }
   ],
 
@@ -162,21 +193,20 @@ foam.CLASS({
 
       this
         .start()
-          .add(self.slot(function(showMinMaxHelper, minSelected, maxSelected) {
+          .add(self.slot(function(showMinMaxHelper, helpText_) {
             return self.E().callIf(showMinMaxHelper, function() {
               this
               .start(foam.u2.layout.Rows)
                 .start()
-                  .add(`Min number of choices: ${minSelected}`)
-                .end()
-                .start()
-                  .add(`Max number of choices: ${maxSelected}`)
+                  .addClass(self.myClass('helpTextRow'))
+                  .add(self.helpText_)
                 .end()
               .end()
             })
           }))
         .end()
-        .start(self.isVertical ? foam.u2.layout.Rows : foam.u2.layout.Cols).style({'flex-wrap': 'wrap;'})
+        .start(self.isVertical ? foam.u2.layout.Rows : foam.u2.layout.Cols)
+          .addClass(self.myClass('flexer'))
           .add(
             self.isDaoFetched$.map(isDaoFetched => {
 
@@ -201,7 +231,11 @@ foam.CLASS({
 
                 arraySlotForChoices.slots.push(arraySlotForChoice);
 
-                return self.E().style({ 'height': '100%;', 'width':`${100 / self.numberOfColumns}%` })
+                return self.E()
+                  .addClass(self.myClass('innerFlexer'))
+                  .style({
+                    'width':`${100 / self.numberOfColumns}%`
+                  })
                   .tag(self.booleanView, {
                       data$: simpSlot2,
                       label$: simpSlot1,

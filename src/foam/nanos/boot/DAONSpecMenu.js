@@ -17,7 +17,7 @@ foam.CLASS({
     'foam.comics.v2.DAOControllerConfig',
     'foam.dao.ArrayDAO',
     'foam.dao.PromisedDAO',
-    'foam.nanos.menu.DAOMenu2',
+    'foam.nanos.menu.LinkMenu',
     'foam.nanos.menu.Menu'
   ],
 
@@ -36,14 +36,10 @@ foam.CLASS({
             this.EQ(foam.nanos.boot.NSpec.SERVE,     true)
           )).select((spec) => {
             var menu = this.Menu.create({
-              id:     'dao.' + spec.id,
-              label:  foam.String.labelize(spec.name),
-              parent: this.id,
-              handler: this.DAOMenu2.create({
-                config: this.DAOControllerConfig.create({
-                  daoKey: spec.id
-                })
-              })
+              id:      'admin.data#' + spec.id,
+              label:   foam.String.labelize(spec.name),
+              parent:  this.id,
+              handler: this.LinkMenu.create({link: '#admin.data#' + spec.id})
             });
             aDAO.put(menu);
         }).then(() => pDAO.promise.resolve(aDAO));
