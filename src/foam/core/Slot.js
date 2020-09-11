@@ -485,14 +485,17 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'PromiseSlot',
   extends: 'foam.core.SimpleSlot',
+
   documentation: `
     A slot that takes a promise and sets its value to its value when it
     resolves.
   `,
+
   properties: [
     {
       name: 'promise',
@@ -503,12 +506,14 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function set() {
       throw new Error(this.cls_.id + ' does not support setting.');
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
@@ -554,11 +559,13 @@ foam.CLASS({
   package: 'foam.core',
   name: 'SimpleSlot',
   implements: [ 'foam.core.Slot' ],
+
   properties: [
     {
       name: 'value'
     }
   ],
+
   methods: [
     function get() { return this.value; },
     function set(v) { this.value = v; },
@@ -569,6 +576,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',

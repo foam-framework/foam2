@@ -16,6 +16,8 @@ foam.INTERFACE({
     'foam.core.FObject',
     'foam.core.Validator',
     'foam.core.X',
+    'foam.dao.DAO',
+    'foam.nanos.ruler.RulerDAO',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CrunchService',
     'java.util.ArrayList',
@@ -91,6 +93,24 @@ foam.INTERFACE({
                 validator.validate(x, dataObject);
               }
             }
+          `
+        }));
+        cls.methods.push(foam.java.Method.create({
+          name: 'getCapablePayloadDAO',
+          type: 'foam.dao.DAO',
+          visibility: 'default',
+          args: [
+            { name: 'x', type: 'X' }
+          ],
+          body: `
+            DAO capableDAO = new CapableAdapterDAO.Builder(x)
+              .setCapable(this)
+              .setOf(CapablePayload.getOwnClassInfo())
+              .build();
+            x = x.put("capableDAO", capableDAO);
+            RulerDAO rulerDAO = new RulerDAO(
+              x, capableDAO, "capableObjectDAO");
+            return rulerDAO;
           `
         }));
       }

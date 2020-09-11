@@ -131,10 +131,10 @@ foam.CLASS({
       code: function() {
         if ( ! this.stack ) return;
         this.stack.push({
-          class: 'foam.comics.v2.DAOUpdateView',
-          data: this.data,
+          class:  'foam.comics.v2.DAOUpdateView',
+          data:   this.data,
           config: this.config,
-          of: this.config.of
+          of:     this.config.of
         }, this.__subContext__);
       }
     },
@@ -212,9 +212,11 @@ foam.CLASS({
       var self = this;
       this.SUPER();
 
+      var promise = this.data ? Promise.resolve(this.data) : this.config.dao.find(this.id);
+
       // Get a fresh copy of the data, especially when we've been returned
       // to this view from the edit view on the stack.
-      this.config.dao.inX(this.__subContext__).find(this.data).then(d => {
+      promise.then(d => {
         if ( d ) self.data = d;
 
         this

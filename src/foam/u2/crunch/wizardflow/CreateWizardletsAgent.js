@@ -19,12 +19,12 @@ foam.CLASS({
     'userCapabilityJunctionDAO'
   ],
   exports: [
-    'unfilteredWizardlets'
+    'wizardlets'
   ],
 
   properties: [
     {
-      name: 'unfilteredWizardlets',
+      name: 'wizardlets',
       class: 'FObjectArray',
       of: 'foam.u2.wizard.Wizardlet'
     }
@@ -99,7 +99,7 @@ foam.CLASS({
       return Promise.all(
         this.parseArrayToWizards(this.capabilities, null)
       ).then(wizardlets => {
-        this.unfilteredWizardlets = wizardlets;
+        this.wizardlets = wizardlets;
       });
     },
     async function updateUCJ(wizardlet, associatedEntity) {
