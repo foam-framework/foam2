@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.export.report',
   name: 'Template',
@@ -5,7 +11,7 @@ foam.CLASS({
     {
       name: 'id',
       class: 'String',
-      documetation: 'file id',
+      documetation: 'file id'
     },
     {
       name: 'daoKey',
