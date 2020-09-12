@@ -854,7 +854,7 @@ configuration for contacting the primary node.`,
       ],
       type: 'foam.dao.DAO',
       javaCode: `
-      getLogger().debug("mdao", serviceName);
+      // getLogger().debug("mdao", serviceName);
       Object obj = getMdaos().get(serviceName);
       DAO dao;
 // REVIEW: periodically the result returned from get is a Map.
@@ -864,7 +864,7 @@ configuration for contacting the primary node.`,
            obj instanceof DAO ) {
         dao = (DAO) obj;
 
-        getLogger().debug("mdao", "cache", serviceName);
+        // getLogger().debug("mdao", "cache", serviceName);
         return dao;
       }
       PM pm = PM.create(x, this.getClass().getSimpleName(), "getMdao");

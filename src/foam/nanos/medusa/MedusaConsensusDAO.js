@@ -302,11 +302,13 @@ foam.CLASS({
                   replaying.setNonConsensusIndex(nextIndex);
                   replaying.setLastModified(new java.util.Date());
                 }
-                // TODO: if no-consensus for more than some time window, initiate replay.
-                if ( System.currentTimeMillis() - replaying.getLastModified().getTime() > 30000 ) {
+                // TODO: alarming configuration.
+                if ( replaying.getReplaying() ) {
+                  if ( System.currentTimeMillis() - replaying.getLastModified().getTime() > 60000 ) {
+                    getLogger().warning("promoter", "no consensus", next.getConsensusCount(), support.getNodeQuorum(), "since", replaying.getLastModified(), "on", next.toSummary());
+                  }
+                } else if ( System.currentTimeMillis() - replaying.getLastModified().getTime() > 5000 ) {
                   getLogger().warning("promoter", "no consensus", next.getConsensusCount(), support.getNodeQuorum(), "since", replaying.getLastModified(), "on", next.toSummary());
-                } else {
-                  getLogger().debug("promoter", "no consensus", next.getConsensusCount(), support.getNodeQuorum(), "since", replaying.getLastModified(), "on", next.toSummary());
                 }
               }
             }
