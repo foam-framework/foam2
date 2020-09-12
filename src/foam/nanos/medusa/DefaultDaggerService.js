@@ -57,6 +57,14 @@ foam.CLASS({
     }
   ],
 
+  constants: [
+    {
+      name: 'BOOTSTRAP_INDEX',
+      value: -1,
+      type: 'Long'
+    }
+  ],
+
   properties: [
     {
       name: 'index',
@@ -75,6 +83,7 @@ foam.CLASS({
       value: 'SHA-256'
     },
     {
+      documentation: `Current links[] index to use. linksIndex flips back forth between 0 and 1.`,
       name: 'linksIndex',
       class: 'Int',
       value: 1,
@@ -114,10 +123,11 @@ foam.CLASS({
 
   methods: [
     {
-      // TODO: get initial hashes from HSM for new deployment
       name: 'start',
       javaCode: `
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      setHashingEnabled(support.getHashingEnabled());
+
       ClusterConfig config = support.getConfig(getX(), support.getConfigId());
       if ( config == null ||
            config.getType() == MedusaType.NODE ||
@@ -126,34 +136,43 @@ foam.CLASS({
         return;
       }
 
-      setHashingEnabled(support.getHashingEnabled());
+      updateLinks(getX(), new MedusaEntry.Builder(getX()).setIndex(BOOTSTRAP_INDEX).setHash(getBootstrapHash(getX())).build());
+      updateLinks(getX(), new MedusaEntry.Builder(getX()).setIndex(BOOTSTRAP_INDEX).setHash(getBootstrapHash(getX())).build());
+
       DAO dao = getDao();
+
       MedusaEntry entry = new MedusaEntry();
-      entry.setNSpecName("DAG Bootstrap");
-      entry.setIndex(getNextGlobalIndex(getX()));
-      entry.setIndex1(-1L);
-      entry.setHash1("466c58623cd600209e95a981bad03e5d899ea6d6905cebee5ea0746bf16e1534");
-      entry.setIndex2(-1L);
-      entry.setHash2("9232622261b1df4dff84067b2df22ecae387162742626326216bf9b4d0d29a3f");
-      entry.setHash(hash(getX(), entry));
-      entry.setAlgorithm(getAlgorithm());
+      entry = link(getX(), entry);
+      entry = hash(getX(), entry);
+      entry.setNSpecName("daggerService");
+      entry.setNode(support.getConfigId());
       entry.setPromoted(true);
       entry = (MedusaEntry) dao.put_(getX(), entry);
       updateLinks(getX(), entry);
 
       entry = new MedusaEntry();
-      entry.setNSpecName("DAG Bootstrap");
-      entry.setIndex(getNextGlobalIndex(getX()));
-      entry.setIndex1(-1L);
-      entry.setHash1("a651071e965f3c0e07cf9d09761e124a57f27dd75316a4c18079bc0e5accf9d2");
-      entry.setIndex2(-1L);
-      entry.setHash2("50c1071e836bdd4f2d4b5907bb6090fae6891d6cacdb70dcd72770bfd43dc814");
-      entry.setHash(hash(getX(), entry));
-      entry.setAlgorithm(getAlgorithm());
+      entry = link(getX(), entry);
+      entry = hash(getX(), entry);
+      entry.setNSpecName("daggerService");
+      entry.setNode(support.getConfigId());
       entry.setPromoted(true);
       entry = (MedusaEntry) dao.put_(getX(), entry);
       updateLinks(getX(), entry);
      `
+    },
+    {
+      documentation: `// TODO: get initial hash from HSM for new deployment`,
+      name: 'getBootstrapHash',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      type: 'String',
+      javaCode: `
+      return "466c58623cd600209e95a981bad03e5d899ea6d6905cebee5ea0746bf16e1534";
+      `
     },
     {
       name: 'link',
@@ -175,7 +194,9 @@ foam.CLASS({
       PM pm = PM.create(x, DefaultDaggerService.getOwnClassInfo(), "hash");
       try {
         if ( ! getHashingEnabled() ) {
-          return byte2Hex(Long.toString(entry.getIndex()).getBytes(StandardCharsets.UTF_8));
+          entry.setHash(byte2Hex(Long.toString(entry.getIndex()).getBytes(StandardCharsets.UTF_8)));
+          entry.setAlgorithm("NONE");
+          return entry;
         }
 
         MessageDigest md = MessageDigest.getInstance(getAlgorithm());
@@ -186,7 +207,10 @@ foam.CLASS({
         if ( ! SafetyUtil.isEmpty(entry.getData()) ) {
           md.update(entry.getData().getBytes(StandardCharsets.UTF_8));
         }
-        return byte2Hex(md.digest());
+        String hash = byte2Hex(md.digest());
+        entry.setHash(hash);
+        entry.setAlgorithm(getAlgorithm());
+        return entry;
       } finally {
         pm.log(x);
       }
@@ -207,12 +231,29 @@ foam.CLASS({
         DAO dao = getDao();
         MedusaEntry parent1 = (MedusaEntry) dao.find(EQ(MedusaEntry.INDEX, entry.getIndex1()));
         if ( parent1 == null ) {
+          if ( entry.getIndex1() <= getLinks().length &&
+               entry.getIndex2() <= getLinks().length &&
+               entry.getIndex() <= getLinks().length ) {
+             // ok - bootstrapping non zone 0 mediator
+            getLogger().info("verify", "bootstrap", entry.getIndex());
+            return;
+          }
           getLogger().error("verify", entry.getIndex(), "parent not found", entry.getIndex1(), "entry", entry.toSummary());
+          getLogger().error("verify", entry, entry.getIndex1(), entry.getIndex2());
           throw new DaggerException("Hash Verification Failed on: "+entry.toSummary());
         }
         MedusaEntry parent2 = (MedusaEntry) dao.find(EQ(MedusaEntry.INDEX, entry.getIndex2()));
         if ( parent2 == null ) {
+          if ( entry.getIndex1() <= getLinks().length &&
+               entry.getIndex2() <= getLinks().length &&
+               entry.getIndex() <= getLinks().length ) {
+            // ok - bootstrapping non zone 0 mediator
+            getLogger().info("verify", "bootstrap", entry.getIndex());
+            return;
+          }
           getLogger().error("verify", entry.getIndex(), "parent not found", entry.getIndex2(), "entry", entry.toSummary());
+          entry.setX(null);
+          getLogger().error("verify", entry, entry.getIndex1(), entry.getIndex2());
 // TODO: Add Index to exception.
           throw new DaggerException("Hash Verification Failed on: "+entry.toSummary());
         }

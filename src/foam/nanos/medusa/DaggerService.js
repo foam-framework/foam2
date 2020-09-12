@@ -10,6 +10,16 @@ foam.INTERFACE({
 
   methods: [
     {
+      name: 'getBootstrapHash',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      type: 'String'
+    },
+    {
       name: 'getNextLinks',
       args: [
         {
@@ -49,7 +59,7 @@ foam.INTERFACE({
     },
     {
       name: 'hash',
-      type: 'String',
+      type: 'foam.nanos.medusa.MedusaEntry',
       javaThrows: ['java.security.NoSuchAlgorithmException'],
       args: [
         {

@@ -38,9 +38,9 @@ foam.CLASS({
       // TODO:
       MedusaEntry entry = (MedusaEntry) obj;
       getLogger().debug("put", entry.getIndex());
-      DaggerService service = (DaggerService) x.get("daggerService");
+      DaggerService dagger = (DaggerService) x.get("daggerService");
       try {
-        entry.setHash(service.hash(x, entry));
+        entry = dagger.hash(x, entry);
         return getDelegate().put_(x, entry);
       } catch ( Exception e ) {
         getLogger().error("put", e.getMessage(), entry, e);
