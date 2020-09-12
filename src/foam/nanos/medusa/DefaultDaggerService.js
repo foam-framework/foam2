@@ -238,9 +238,8 @@ foam.CLASS({
             getLogger().info("verify", "bootstrap", entry.getIndex());
             return;
           }
-          getLogger().error("verify", entry.getIndex(), "parent not found", entry.getIndex1(), "entry", entry.toSummary());
-          getLogger().error("verify", entry, entry.getIndex1(), entry.getIndex2());
-          throw new DaggerException("Hash Verification Failed on: "+entry.toSummary());
+          getLogger().error("verify", entry.getIndex(), "parent not found", entry.getIndex1(), "entry", entry.toSummary(), entry.getNode());
+          throw new DaggerException("Hash Verification Failed on: "+entry.toSummary()+" from: "+entry.getNode());
         }
         MedusaEntry parent2 = (MedusaEntry) dao.find(EQ(MedusaEntry.INDEX, entry.getIndex2()));
         if ( parent2 == null ) {
@@ -251,11 +250,8 @@ foam.CLASS({
             getLogger().info("verify", "bootstrap", entry.getIndex());
             return;
           }
-          getLogger().error("verify", entry.getIndex(), "parent not found", entry.getIndex2(), "entry", entry.toSummary());
-          entry.setX(null);
-          getLogger().error("verify", entry, entry.getIndex1(), entry.getIndex2());
-// TODO: Add Index to exception.
-          throw new DaggerException("Hash Verification Failed on: "+entry.toSummary());
+          getLogger().error("verify", entry.getIndex(), "parent not found", entry.getIndex2(), "entry", entry.toSummary(), entry.getNode());
+          throw new DaggerException("Hash Verification Failed on: "+entry.toSummary()+" from: "+entry.getNode());
         }
 
         try {
