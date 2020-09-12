@@ -100,7 +100,8 @@ foam.CLASS({
 
   exports: [
     'dblclick',
-    'filteredTableColumns'
+    'filteredTableColumns',
+    'serviceName'
   ],
 
   properties: [
@@ -164,6 +165,13 @@ foam.CLASS({
       name: 'searchFilterDAO',
       expression: function(config, cannedPredicate) {
         return config.dao$proxy.where(cannedPredicate);
+      }
+    },
+    {
+      name: 'serviceName',
+      class: 'String',
+      factory: function() {
+        return this.data.serviceName;
       }
     }
   ],
