@@ -515,9 +515,13 @@
     },
     {
       name: 'toSummary',
+      type: 'String',
       code: function() {
         return `(${this.classification}) ${this.operation}`;
-      }
+      },
+      javaCode: `
+        return foam.util.SafetyUtil.isEmpty(getClassification()) ? "" : "(" + getClassification() + ")" + getOperation().toString();
+      `
     },
     {
       name: 'approveWithMemo',

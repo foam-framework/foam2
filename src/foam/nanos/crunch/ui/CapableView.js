@@ -69,8 +69,15 @@ foam.CLASS({
 
       const self = this;
 
-      // set capable payloads for capabilities (stored as an array in capableRequirements)
-      await this.capableObj.setRequirements(this.capableObj.capableRequirements);
+      // set capable payloads for capabilities if they don't already exist
+      if ( ! this.capableObj.capablePayloads ||
+        Object.keys(this.capableObj.capablePayloads).length === 0 ) {
+          try {
+            await this.capableObj.setRequirements(this.capableObj.capableRequirements);
+          } catch (e) {
+            this.notify(e.message, '', this.LogLevel.ERROR, true);
+          }
+      }
 
       this.start().addClass(this.myClass())
         .add(self.slot(function(wizardletSectionsList) {
