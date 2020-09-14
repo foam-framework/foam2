@@ -17,7 +17,7 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.script.ScriptStatus',
-    'foam.nanos.notification.notifications.ScriptRunNotification'
+    'foam.nanos.notification.ScriptRunNotification'
   ],
 
   imports: [
