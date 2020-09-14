@@ -8,6 +8,9 @@
   package: 'foam.nanos.column',
   name: 'TableColumnOutputter',
 
+  javaImports: [
+    'java.util.ArrayList'
+  ], 
 
   documentation: 'Class for returning 2d-array ( ie table ) for array of values ',
 
@@ -122,6 +125,89 @@
         }
         return columnHeaders;
       }
+    },
+    {
+      name: 'returnTableForMetadata',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'metadata',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]'
+        },
+        {
+          name: 'arrOfObjectValues',
+          javaType: 'java.util.List<Object[]>'
+        }
+      ],
+      javaType: 'java.util.List<java.util.List<Object>>',
+      javaCode: `
+        java.util.List<java.util.List<Object>> result = new ArrayList<>();
+      
+        java.util.List<Object> columnHeaders = new ArrayList<>();
+
+        for ( int i = 0 ; i < metadata.length ; i++ ) {
+          columnHeaders.add(metadata[i].getColumnLabel());
+        }
+        result.add(columnHeaders);
+
+        for ( int i = 0 ; i < arrOfObjectValues.size() ; i++ ) {
+          java.util.List<Object> row = new ArrayList<>();
+          for ( int j = 0 ; j < metadata.length ; j++ ) {
+            row.add(returnStringValueForMetadata(x, metadata[j], arrOfObjectValues.get(i)[j], null));
+          }
+          result.add(row);
+        }
+
+        return result;
+      `
+    },
+    {
+      name: 'returnStringValueForMetadata',
+      type: 'Object',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'metadata',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata'
+        },
+        {
+          name: 'obj',
+          javaType: 'Object'
+        },
+        {
+          name: 'unitPropValue',
+          type: 'String'
+        }
+      ],
+      javaCode: `
+      if ( obj == null || obj == "" )
+        return "";
+
+      switch(metadata.getCellType()) {
+        case "STRING":
+        case "NUMBER":
+        case "BOOLEAN":
+          return obj;
+        case "CURRENCY":
+          return new Long(obj.toString()) / 100.0 ;
+        case "DATE":
+          return obj.toString().substring(0, 10);
+        case "DATETIME":
+          return obj.toString().substring(0, 24);
+        case "TIME":
+          return obj.toString().substring(0, 8);
+        case "ENUM":
+          return obj.toString();
+        default:
+          return ((foam.core.FObject)obj).toSummary();
+      }
+      `
     }
   ]
 });

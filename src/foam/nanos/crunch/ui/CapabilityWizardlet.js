@@ -26,7 +26,8 @@ foam.CLASS({
       name: 'of',
       class: 'Class',
       expression: function(capability) {
-        return capability && capability.of;
+        if ( ! capability || ! capability.of ) return null;
+        return capability.of;
       }
     },
     {
@@ -49,7 +50,8 @@ foam.CLASS({
       name: 'title',
       class: 'String',
       expression: function(capability) {
-        return capability && capability.name;
+        if ( ! capability || ! capability.name ) return '';
+        return capability.name;
       }
     }
   ],

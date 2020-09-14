@@ -530,9 +530,13 @@ foam.CLASS({
   methods: [
     {
       name: 'toSummary',
+      type: 'String',
       code: function() {
         return this.name + ' ' + this.description;
-      }
+      },
+      javaCode: `
+        return foam.util.SafetyUtil.isEmpty(getName()) || foam.util.SafetyUtil.isEmpty(getDescription()) ? "" : getName() + " " + getDescription();
+      `
     },
   ]
 });

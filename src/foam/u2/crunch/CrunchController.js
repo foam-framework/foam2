@@ -43,7 +43,8 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.LoadTopConfig',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
-    'foam.u2.crunch.CapabilityInterceptView'
+    'foam.u2.crunch.CapabilityInterceptView',
+    'foam.u2.dialog.Popup'
   ],
 
   properties: [
@@ -208,7 +209,7 @@ foam.CLASS({
       });
     },
 
-    function createCapableWizard(capable) {
+    function getCapableWizard(capable) {
       var wizardlets = [];
       for ( let i = 0 ; i < capable.capablePayloads.length ; i++ ) {
         let capablePayload = capable.capablePayloads[i];
@@ -221,7 +222,8 @@ foam.CLASS({
         }
         let wizardlet = wizardletClass.create({
           capability: capablePayload.capability,
-          targetPayload: capablePayload
+          targetPayload: capablePayload,
+          data$: capablePayload.data$
         }, capable);
         if ( capablePayload.data ) {
           wizardlet.data = capablePayload.data;
@@ -230,12 +232,14 @@ foam.CLASS({
         wizardlets.push(wizardlet);
       }
 
-      console.log(wizardlets);
+      return wizardlets;
+    },
 
+    function createCapableWizard(capable) {
       return {
         class: 'foam.u2.wizard.StepWizardletView',
         data: foam.u2.wizard.StepWizardletController.create({
-          wizardlets: wizardlets
+          wizardlets: this.getCapableWizard(capable)
         }),
         onClose: (x) => {
           x.closeDialog();

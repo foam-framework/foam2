@@ -1110,6 +1110,28 @@ p({
 })
 
 p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"reportTemplateDAO",
+  "lazy":false,
+  "serve":true,
+  "authenticate": true,
+  "serviceScript":"""
+    import foam.dao.DAO;
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.export.report.Template.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("reportTemplates")
+      .setAuthorize(true)
+      .build();
+  """,
+  "client":
+  """
+    {
+      \"of\":\"foam.nanos.export.report.Template\"
+    }
+  """
+})
+p({
   "class": "foam.nanos.boot.NSpec",
   "name": "userPropertyAvailabilityService",
   "serve": true,

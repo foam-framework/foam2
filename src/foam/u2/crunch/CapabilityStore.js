@@ -244,7 +244,7 @@ foam.CLASS({
     function accountAndAccountingCard() {
       // Capability Store Section Previews
       var self = this;
-      return self.E()
+      return self.E().style({ 'width': '94%', 'margin': 'auto '})
         .select(self.visibleCategoryDAO$proxy, function(category) {
           var sectionElement = this.E('span');
           var returnElement = this.E()
