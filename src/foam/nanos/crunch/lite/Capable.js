@@ -17,15 +17,19 @@ foam.INTERFACE({
     'foam.core.Validator',
     'foam.core.X',
     'foam.dao.DAO',
-    'foam.nanos.ruler.RulerDAO',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CrunchService',
+    'foam.nanos.ruler.RulerDAO',
+    
     'java.util.ArrayList',
+    'java.util.Arrays',
     'java.util.HashMap',
     'java.util.HashSet',
     'java.util.List',
     'java.util.Map',
     'java.util.Set',
+
+    'org.apache.commons.lang.ArrayUtils'
   ],
 
   axioms: [
@@ -48,6 +52,25 @@ foam.INTERFACE({
                 x, capabilityIds
               )
             );
+          `
+        }));
+        cls.methods.push(foam.java.Method.create({
+          name: 'addRequirement',
+          type: 'void',
+          visibility: 'default',
+          args: [
+            { name: 'x', type: 'X' },
+            { name: 'capabilityId', type: 'String' }
+          ],
+          body: `
+          CrunchService crunchService = (CrunchService) x.get("crunchService");
+
+          var oldCapabilityPayloads = getCapablePayloads();
+          
+          if ( ! Arrays.stream(oldCapabilityPayloads).map((cap) -> cap.getCapability().getId() ).anyMatch((cap) -> cap == capabilityId)) {
+            var newCapabilityPayload = crunchService.getCapableObjectPayloads(x, new String[] { capabilityId });
+            setCapablePayloads(ArrayUtils.addAll(oldCapabilityPayloads, newCapabilityPayload));
+          }
           `
         }));
         cls.methods.push(foam.java.Method.create({
