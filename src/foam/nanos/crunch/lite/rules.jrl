@@ -4,7 +4,7 @@ p({
     "name":"SetCapablePayloadStatusOnPut",
     "priority":100,
     "daoKey":"capablePayloadDAO",
-    "ruleGroup":"crunchLogic",
+    "ruleGroup":"crunch",
     "operation":1,
     "after":false,
     "action":{
@@ -20,7 +20,7 @@ p({
     "name":"ReputDependantPayloads",
     "priority":200,
     "daoKey":"capablePayloadDAO",
-    "ruleGroup":"crunchLogic",
+    "ruleGroup":"crunch",
     "operation":1,
     "after":false,
     "action":{
