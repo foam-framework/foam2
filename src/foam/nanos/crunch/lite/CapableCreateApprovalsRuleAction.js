@@ -100,6 +100,7 @@ foam.CLASS({
                   .setObjId(capablePayload.getObjId())
                   .setOperation(operation)
                   .setOf(obj.getClassInfo())
+                  .setIsUsingNestedJournal(true)
                   .setPropertiesToUpdate(propertiesToApprove).build());
 
                 ApprovalRequest  approvalRequest = new ApprovalRequest.Builder(getX())
