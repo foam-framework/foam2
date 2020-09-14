@@ -57,7 +57,7 @@ foam.CLASS({
     {
       name: 'timerInterval',
       class: 'Long',
-      value: 5000
+      value: 10000
     },
     {
       name: 'initialTimerDelay',
