@@ -1,4 +1,35 @@
-
+p({
+    "class":"foam.nanos.ruler.Rule",
+    "id":"2c53640d-cc3f-46d3-bff1-6d50715265cd",
+    "name":"SetCapablePayloadStatusOnPut",
+    "priority":100,
+    "daoKey":"capablePayloadDAO",
+    "ruleGroup":"crunchLogic",
+    "operation":1,
+    "after":false,
+    "action":{
+        "class":"foam.nanos.crunch.lite.ruler.SetCapablePayloadStatusOnPut"
+    },
+    "enabled":true,
+    "saveHistory":false,
+    "lifecycleState":1
+})
+p({
+    "class":"foam.nanos.ruler.Rule",
+    "id":"bf858643-105f-4e61-b5a6-d5bbc4a14f54",
+    "name":"ReputDependantPayloads",
+    "priority":200,
+    "daoKey":"capablePayloadDAO",
+    "ruleGroup":"crunchLogic",
+    "operation":1,
+    "after":false,
+    "action":{
+        "class":"foam.nanos.crunch.lite.ruler.ReputDependantPayloads"
+    },
+    "enabled":true,
+    "saveHistory":false,
+    "lifecycleState":1
+})
 p({
     "class":"foam.nanos.ruler.Rule",
     "id":"58280fe2-f3a8-11ea-adc1-0242ac120002",
