@@ -1131,6 +1131,7 @@ p({
     }
   """
 })
+p({
   "class": "foam.nanos.boot.NSpec",
   "name": "userPropertyAvailabilityService",
   "serve": true,
