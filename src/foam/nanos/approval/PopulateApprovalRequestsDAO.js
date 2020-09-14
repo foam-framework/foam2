@@ -27,7 +27,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'daoKey',
-      documentation: 'DAO key for looking up the associated approval requests'
+      documentation: 'Client side DAO key for looking up the associated approval requests'
     },
     {
       class: 'String',

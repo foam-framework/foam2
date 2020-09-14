@@ -418,24 +418,6 @@
       writePermissionRequired: true
     },
     {
-      class: 'String',
-      name: 'daoKey_',
-      readPermissionRequired: true,
-      writePermissionRequired: true,
-      factory: function(o, n) {
-        var key = this.daoKey;
-        var X = this.ctrl.__subContext__;
-
-        if ( ! X[key] ) {
-          if ( key.startsWith('local') ) {
-            key = key.replace('local', '');
-            key = key.charAt(0).toLowerCase() + key.slice(1);
-          }
-        }
-        return key;
-      }
-    },
-    {
       class: 'Boolean',
       name: 'isTrackingRequest',
       value: false
@@ -659,10 +641,10 @@
              return false;
         }
 
-        if ( self.__subContext__[self.daoKey_] ) {
-          var property = self.__subContext__[self.daoKey_].of.ID;
+        if ( self.__subContext__[self.daoKey] ) {
+          var property = self.__subContext__[self.daoKey].of.ID;
           var objId = property.adapt.call(property, self.objId, self.objId, property);
-          return self.__subContext__[this.daoKey_]
+          return self.__subContext__[this.daoKey]
             .find(objId)
             .then((obj) => {
               return !! obj;
@@ -683,9 +665,9 @@
              return;
         }
 
-        var objId = X[self.daoKey_].of.ID.type === 'Long' ? parseInt(this.objId) : this.objId;
+        var objId = X[self.daoKey].of.ID.type === 'Long' ? parseInt(this.objId) : this.objId;
 
-        return X[this.daoKey_]
+        return X[this.daoKey]
           .find(objId)
           .then((obj) => {
             var of = obj.cls_;
@@ -749,7 +731,7 @@
               data: obj,
               of: of,
               config: foam.comics.v2.DAOControllerConfig.create({
-                daoKey: this.daoKey_,
+                daoKey: this.daoKey,
                 of: of,
                 editPredicate: foam.mlang.predicate.False.create(),
                 createPredicate: foam.mlang.predicate.False.create(),
