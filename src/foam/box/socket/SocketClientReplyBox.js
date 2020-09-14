@@ -17,7 +17,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Long',
+      class: 'String',
       name: 'replyBoxId'
     },
     {
@@ -33,7 +33,7 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  public SocketClientReplyBox(Long replyBoxId) {
+  public SocketClientReplyBox(String replyBoxId) {
     setReplyBoxId(replyBoxId);
     setCreated(new java.util.Date());
   }
@@ -49,6 +49,10 @@ foam.CLASS({
       javaCode: `
       X x = msg.getX();
       Socket socket = (Socket) x.get("socket");
+      if ( socket == null ) {
+        x = getX();
+        socket = (Socket) x.get("socket");
+      }
       if ( socket != null ) {
         msg.getAttributes().put(SocketConnectionBox.REPLY_BOX_ID, getReplyBoxId());
         Box box = ((SocketConnectionBoxManager) x.get("socketConnectionBoxManager")).getReplyBox(x, socket.getRemoteSocketAddress().toString());
@@ -58,7 +62,7 @@ foam.CLASS({
         if ( logger == null ) {
           logger = new foam.nanos.logger.StdoutLogger();
         }
-        logger.error(this.getClass().getSimpleName(), "send,Socket not found", "message abandoned", msg);
+        logger.error(this.getClass().getSimpleName(), "send,Socket not found", "replyBoxId", getReplyBoxId(), "message abandoned", msg, new Exception("Socket not found."));
       }
       `
     }
