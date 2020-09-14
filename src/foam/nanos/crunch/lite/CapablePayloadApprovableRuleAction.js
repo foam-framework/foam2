@@ -55,14 +55,15 @@ foam.CLASS({
 
                 objectToPut.setStatus(foam.nanos.crunch.CapabilityJunctionStatus.GRANTED);
 
-                capablePayloadDAO.put(objectToPut);
+                CapablePayload = capablePayloadDAO.put(objectToPut);
+
+                dao.put(capableObject);
 
               } catch ( Exception e ){
                 throw new RuntimeException(e);
               }
-            } else {
-              throw new RuntimeException("Unsupported approvable operation.");
             }
+            throw new RuntimeException("Unsupported approvable operation.")
           }
         }, "Updated the payload based on a approved approvable");
       `

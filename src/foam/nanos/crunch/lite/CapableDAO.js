@@ -23,6 +23,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'daoKey'
+    },
+    {
+      class: 'Enum',
+      name: 'defaultStatus',
+      of: 'foam.nanos.crunch.CapabilityJunctionStatus',
+      value: foam.nanos.crunch.CapabilityJunctionStatus.ACTION_REQUIRED
     }
   ],
 
@@ -41,7 +47,7 @@ foam.CLASS({
           // just to ensure everything received from the client is clean
           for (int i = 0; i < capablePayloadsArray.length; i++){
             CapablePayload currentCapablePayload = capablePayloadsArray[i];
-            currentCapablePayload.setStatus(foam.nanos.crunch.CapabilityJunctionStatus.ACTION_REQUIRED);
+            currentCapablePayload.setStatus(getDefaultStatus());
             currentCapablePayload.setDaoKey(getDaoKey());
             currentCapablePayload.setObjId(obj.getProperty("id"));
           }
@@ -52,6 +58,7 @@ foam.CLASS({
             capablePayloadDAO.put(currentPayload);
           }
         }
+
         return super.put_(x, obj);
       `
     }
