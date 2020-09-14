@@ -624,6 +624,7 @@ var classes = [
 
   // Crunch
   'foam.nanos.crunch.crunchtest.FakeTestObject',
+  'foam.nanos.crunch.crunchtest.TestCapable',
   //models
   'foam.nanos.crunch.Renewable',
   'foam.nanos.crunch.Capability',
@@ -635,6 +636,7 @@ var classes = [
   'foam.nanos.crunch.lite.CapableCreateApprovalsRuleAction',
   'foam.nanos.crunch.lite.CapablePayloadApprovableRuleAction',
 
+  'foam.nanos.crunch.lite.CapableCompatibleCapability',
   'foam.nanos.crunch.CapabilityCategory',
   'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
   'foam.nanos.crunch.CapabilityJunctionStatus',
