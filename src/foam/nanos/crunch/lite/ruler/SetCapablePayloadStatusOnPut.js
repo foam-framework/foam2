@@ -1,9 +1,19 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.crunch.lite.ruler',
   name: 'SetCapablePayloadStatusOnPut',
 
   implements: [
     'foam.nanos.ruler.RuleAction',
+  ],
+
+  javaImports: [
+    'foam.nanos.crunch.Capability',
     'static foam.nanos.crunch.CapabilityJunctionStatus.*'
   ],
 
@@ -16,15 +26,20 @@ foam.CLASS({
         
         CapablePayload payload = (CapablePayload) obj;
 
-        if ( payload.getStatus() == ACTION_REQUIRED ) {
-          return;
-        }
+        CapabilityJunctionStatus defaultStatus = PENDING;
 
         FObject data = payload.getData();
         if ( data != null ) {
           data.validate(x);
-          ucj.setStatus(CapabilityJunctionStatus.PENDING);
+          payload.setStatus(defaultStatus);
         }
+
+        if ( payload.getStatus() != defaultStatus ) {
+          return;
+        }
+
+        Capability cap = payload.getCapability();
+        payload.setStatus(cap.getCapableChainedStatus(x));
       `,
     }
   ]
