@@ -20,7 +20,7 @@ foam.INTERFACE({
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CrunchService',
     'foam.nanos.ruler.RulerDAO',
-    
+
     'java.util.ArrayList',
     'java.util.Arrays',
     'java.util.HashMap',
@@ -69,7 +69,7 @@ foam.INTERFACE({
           
           if ( ! Arrays.stream(oldCapabilityPayloads).map((cap) -> cap.getCapability().getId() ).anyMatch((cap) -> cap == capabilityId)) {
             var newCapabilityPayload = crunchService.getCapableObjectPayloads(x, new String[] { capabilityId });
-            setCapablePayloads(ArrayUtils.addAll(oldCapabilityPayloads, newCapabilityPayload));
+            setCapablePayloads((CapablePayload[]) ArrayUtils.addAll(oldCapabilityPayloads, newCapabilityPayload));
           }
           `
         }));
