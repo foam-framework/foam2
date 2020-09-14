@@ -16,6 +16,7 @@ foam.CLASS({
     'foam.box.Box',
     'foam.box.Message',
     'foam.box.ReplyBox',
+    'foam.box.RPCErrorMessage',
     'foam.core.ContextAgent',
     'foam.core.FObject',
     'foam.core.X',
@@ -116,7 +117,6 @@ foam.CLASS({
 
   protected DataInputStream in_;
   protected DataOutputStream out_;
-  private static AtomicLong replyBoxId_ = new AtomicLong(0);
 
   protected static final ThreadLocal<foam.lib.formatter.FObjectFormatter> formatter_ = new ThreadLocal<foam.lib.formatter.FObjectFormatter>() {
     @Override
@@ -146,17 +146,17 @@ foam.CLASS({
       javaCode: `
       PM pm = PM.create(getX(), this.getClass().getSimpleName(), getHost()+":"+getPort()+":send");
       Box replyBox = (Box) msg.getAttributes().get("replyBox");
+      String replyBoxId = null;
       if ( replyBox != null ) {
-        Long replyBoxId = replyBoxId_.incrementAndGet();
+        replyBoxId = java.util.UUID.randomUUID().toString();
         getReplyBoxes().put(replyBoxId, new BoxHolder(replyBox, PM.create(getX(), this.getOwnClassInfo(), getHost()+":"+getPort()+":roundtrip")));
         SocketClientReplyBox box = new SocketClientReplyBox(replyBoxId);
         if ( replyBox instanceof ReplyBox ) {
           ((ReplyBox)replyBox).setDelegate(box);
-          getLogger().debug("send", "replyBox.setDelegate");
+          // getLogger().debug("send", "replyBox.setDelegate");
         } else {
-          replyBox = box;
+          msg.getAttributes().put("replyBox", box);
         }
-        msg.getAttributes().put("replyBox", replyBox);
       }
       String message = null;
       try {
@@ -166,7 +166,7 @@ foam.CLASS({
         message = formatter.builder().toString();
         byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
         synchronized (out_) {
-          // getLogger().debug("send", message);
+          getLogger().debug("send", message);
           out_.writeLong(System.currentTimeMillis());
           out_.writeInt(messageBytes.length);
           out_.write(messageBytes);
@@ -179,6 +179,12 @@ foam.CLASS({
         getLogger().error("Error sending message", message, e);
         setValid(false);
         //throw new RuntimeException(e);
+        if ( replyBox != null ) {
+          Message reply = new Message();
+          reply.setObject(new RPCErrorMessage(e.getMessage()));
+          replyBox.send(reply);
+          getReplyBoxes().remove(replyBoxId);
+        }
       } finally {
         pm.log(getX());
       }
@@ -240,7 +246,7 @@ foam.CLASS({
               getLogger().warning("Failed to parse message", message);
               throw new RuntimeException("Failed to parse.");
             }
-            Long replyBoxId = (Long) msg.getAttributes().get(REPLY_BOX_ID);
+            String replyBoxId = (String) msg.getAttributes().get(REPLY_BOX_ID);
             BoxHolder holder = (BoxHolder) getReplyBoxes().get(replyBoxId);
             if ( holder != null ) {
               Box replyBox = holder.getBox();
@@ -253,6 +259,7 @@ foam.CLASS({
               throw new RuntimeException("ReplyBox not found.");
             }
           } catch ( java.net.SocketTimeoutException e ) {
+            // getLogger().debug("SocketTimeoutException", e.getMessage());
             continue;
           } catch ( java.io.IOException e ) {
             getLogger().debug(e.getMessage());
