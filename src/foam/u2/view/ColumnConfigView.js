@@ -37,15 +37,12 @@ foam.CLASS({
         //selectedColumnNames misleading name cause it may contain objects
         data.selectedColumnNames = data.selectedColumnNames.map(c => 
           {
-            var name = foam.Array.isInstance(c) ? c[0] : c;
-            name = foam.String.isInstance(c) ? c : c;
-            return name; 
+            return this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(this, c); 
           });
         var tableColumns = this.data.columns;
-        tableColumns = tableColumns.map(c => Array.isArray(c) ? c[0] : c).filter( c => foam.String.isInstance(c) ? data.allColumns.includes(c) : data.allColumns.includes(c.name) );
+        tableColumns = tableColumns.filter( c => data.allColumns.includes(this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(this, c))).map(c => this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(this, c));
         //to keep record of columns that are selected
         var topLevelProps = [];
-        //to remove properties that are FObjectProperty or Reference and are not nested
         //or some kind of outputter might be used to convert property to number of nested properties eg 'address' to [ 'address.city', 'address.region', ... ]
         var columnThatShouldBeDeleted = [];
 
@@ -59,19 +56,16 @@ foam.CLASS({
               axiom = tableColumns.find(c => c.name === data.selectedColumnNames[i]);
               if ( ! axiom )
                 axiom = data.of.getAxiomByName(data.selectedColumnNames[i]);
-              if ( foam.core.FObjectProperty.isInstance(axiom) || foam.core.Reference.isInstance(axiom) ) {
-                columnThatShouldBeDeleted.push(data.selectedColumnNames[i]);
-                continue;
-              }
             }
             if ( ! axiom || axiom.networkTransient ) {
               continue;
             }
-            rootProperty = [ axiom.name, axiom.label ? axiom.label : axiom.name ];
+            rootProperty = [ axiom.name, this.columnHandler.returnAxiomHeader(axiom) ];
           } else 
             rootProperty = data.selectedColumnNames[i];
 
-          if ( ! topLevelProps.includes(foam.Array.isInstance(rootProperty) ? rootProperty[0] : rootProperty.name) ) {
+          var rootPropertyName = this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(this, rootProperty);
+          if ( ! topLevelProps.includes(rootPropertyName) ) {
             arr.push(foam.u2.view.SubColumnSelectConfig.create({ 
               index:i, 
               rootProperty:rootProperty, 
@@ -79,7 +73,7 @@ foam.CLASS({
               of:data.of, 
               selectedColumns$:data.selectedColumnNames$, 
             }));
-            topLevelProps.push(foam.Array.isInstance(rootProperty) ? rootProperty[0] : rootProperty.name);
+            topLevelProps.push(rootPropertyName);
           }
         }
 
@@ -91,9 +85,9 @@ foam.CLASS({
           return ! topLevelProps.includes(c);
         });
         //to add properties that are specified in 'tableColumns' as an option
-        tableColumns = tableColumns.filter(c => ! topLevelProps.includes(foam.String.isInstance(c) ? c : c.name));
+        tableColumns = tableColumns.filter(c => ! topLevelProps.includes(c));
         for ( var i = 0 ; i < tableColumns.length ; i++ ) {
-          var indexOfTableColumn = notSelectedColumns.indexOf(foam.String.isInstance(tableColumns[i]) ? tableColumns[i] : tableColumns[i].name);
+          var indexOfTableColumn = notSelectedColumns.indexOf(tableColumns[i]);
           if ( indexOfTableColumn === -1)
             notSelectedColumns.push(tableColumns[i]);
           else
@@ -102,14 +96,15 @@ foam.CLASS({
         var nonSelectedViewModels = [];
         for ( i = 0 ; i < notSelectedColumns.length ; i++ ) {
           var rootProperty;
-          if ( foam.String.isInstance(notSelectedColumns[i]) ) {
+          if ( this.columnHandler.canColumnBeTreatedAsAnAxiom(this, notSelectedColumns[i]) )
+            rootProperty = notSelectedColumns[i];
+          else {
             var axiom =  tableColumns.find(c => c.name === notSelectedColumns[i]);
             axiom = axiom || data.of.getAxiomByName(notSelectedColumns[i]);
             if ( axiom.networkTransient )
               continue;
-            rootProperty = [ axiom.name, axiom.label ? axiom.label : axiom.name ];
-          } else 
-            rootProperty = notSelectedColumns[i];
+            rootProperty = [ axiom.name, this.columnHandler.returnAxiomHeader(axiom) ];
+          }
           
           nonSelectedViewModels.push(foam.u2.view.SubColumnSelectConfig.create({ 
             index:data.selectedColumnNames.length + i, 
@@ -120,8 +115,8 @@ foam.CLASS({
           }));
         }
         nonSelectedViewModels.sort((a, b) => { 
-          var aName = foam.Array.isInstance(a.rootProperty) ?  a.rootProperty[1] : a.rootProperty.label ? a.rootProperty.label : a.rootProperty.name;
-          var bName = foam.Array.isInstance(b.rootProperty) ? b.rootProperty[1] : b.rootProperty.label ? b.rootProperty.label : b.rootProperty.name;
+          var aName = this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(this, a.rootProperty);
+          var bName = this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(this, b.rootProperty);
           return aName.toLowerCase().localeCompare(bName.toLowerCase());
         });
         arr = arr.concat(nonSelectedViewModels);
@@ -163,6 +158,14 @@ foam.CLASS({
         for ( var i = 0 ; i < this.columns.length ; i++ ) {
           this.columns[i].updateOnSearch(this.menuSearch);
         }
+      }
+    },
+    {
+      name: 'columnHandler',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.column.CommonColumnHandler',
+      factory: function() {
+        return foam.nanos.column.CommonColumnHandler.create();
       }
     }
   ],
@@ -245,8 +248,6 @@ foam.CLASS({
           for ( var j = 0 ; j < propSelectedTraversed.length ; j++ ) {
             if ( foam.Array.isInstance(propSelectedTraversed[j]) )
               arr.push(propSelectedTraversed[j].join('.'));
-            else
-              arr.push(propSelectedTraversed[j]);
           }
         }
       }
@@ -276,15 +277,15 @@ foam.CLASS({
 
       startUnselectedIndex =  startUnselectedIndex.index;
       if ( startUnselectedIndex - draggableIndex === 1 ) {
-        var currentProp = foam.Array.isInstance(views[draggableIndex].prop.rootProperty) ? views[draggableIndex].prop.rootProperty[1] : views[draggableIndex].prop.rootProperty.name;
-        var comparedToProp = foam.Array.isInstance(views[startUnselectedIndex].prop.rootProperty) ? views[startUnselectedIndex].prop.rootProperty[1] : views[startUnselectedIndex].prop.rootProperty.name;
-        if ( views[draggableIndex].prop.rootProperty[1].toLowerCase().localeCompare(views[startUnselectedIndex].prop.rootProperty[1].toLowerCase()) < 1 )
+        var currentProp = this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(this, views[draggableIndex].prop.rootProperty);
+        var comparedToProp =  this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(this, views[startUnselectedIndex].prop.rootProperty);
+        if ( currentProp.toLowerCase().localeCompare(comparedToProp.toLowerCase()) < 1 )
           return this.resetProperties(views, startUnselectedIndex-1, draggableIndex);
       }
       
       while(startUnselectedIndex < views.length) {
-        var currentProp = foam.Array.isInstance(views[draggableIndex].prop.rootProperty) ? views[draggableIndex].prop.rootProperty[1] : views[draggableIndex].prop.rootProperty.name;
-        var comparedToProp = foam.Array.isInstance(views[startUnselectedIndex].prop.rootProperty) ? views[startUnselectedIndex].prop.rootProperty[1] : views[startUnselectedIndex].prop.rootProperty.name;
+        var currentProp = this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(this, views[draggableIndex].prop.rootProperty);
+        var comparedToProp =  this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(this, views[startUnselectedIndex].prop.rootProperty);
         if ( currentProp.toLowerCase().localeCompare(comparedToProp.toLowerCase()) < 0 ) {
           break;
         }
@@ -423,7 +424,15 @@ foam.CLASS({
     }
   ],
   properties: [
-    'onSelectionChangedParentFunction'
+    'onSelectionChangedParentFunction',
+    {
+      name: 'columnHandler',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.column.CommonColumnHandler',
+      factory: function() {
+        return foam.nanos.column.CommonColumnHandler.create();
+      }
+    }
   ],
   methods: [
     function initE() {
@@ -444,7 +453,7 @@ foam.CLASS({
             .end()
             .start('span')
               .style({'padding-left' : this.data.isPropertySelected$.map(function(s) { return s ? '4px' : '13px';})})
-              .add(foam.Array.isInstance(this.data.rootProperty) ? this.data.rootProperty[1] : this.data.rootProperty.label)
+              .add(this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(this, this.data.rootProperty))
             .end()
             .start('span')
               .show(this.data.hasSubProperties)
@@ -584,9 +593,9 @@ foam.CLASS({
       expression: function(rootProperty) {
         if ( ! this.of || ! this.of.getAxiomByName )
           return [];
-        var r = this.of.getAxiomByName(foam.Array.isInstance(rootProperty) ? this.rootProperty[0] : rootProperty.name);
+        var r = this.of.getAxiomByName(this.columnHandler.checkIfArrayAndReturnPropertyNameForRootProperty(this, rootProperty));
         if ( r && r.cls_ && ( foam.core.FObjectProperty.isInstance(r) || foam.core.Reference.isInstance(r) ) )
-          return r.of.getAxiomsByClass(foam.core.Property).map(p => [p.name, p.label ? p.label : p.name]);
+          return r.of.getAxiomsByClass(foam.core.Property).map(p => [p.name, this.columnHandler.returnAxiomHeader(p)]);
         return [];
       }
     },
@@ -602,7 +611,7 @@ foam.CLASS({
         var selectedSubProperties = [];
         var otherSubProperties = [];
 
-        var thisRootPropName = foam.Array.isInstance(this.rootProperty) ? this.rootProperty[0] : this.rootProperty.name;
+        var thisRootPropName = this.columnHandler.checkIfArrayAndReturnPropertyNameForRootProperty(this, this.rootProperty);
         //find selectedColumn for the root property 
         var selectedColumn = this.selectedColumns.filter(c => {
           var thisSelectedColumn = foam.String.isInstance(c) ? c : c.name;
@@ -650,7 +659,7 @@ foam.CLASS({
       name: 'isPropertySelected',
       class: 'Boolean',
       expression: function() {
-        var thisPropName = foam.Array.isInstance(this.rootProperty) ? this.rootProperty[0] : this.rootProperty.name;
+        var thisPropName = this.columnHandler.checkIfArrayAndReturnPropertyNameForRootProperty(this, this.rootProperty);
         return typeof this.selectedColumns.find(s => {
           var propName = foam.String.isInstance(s) ? s.split('.') : s.name;
           return foam.Array.isInstance(propName) ? ( this.level < propName.length && propName[this.level] === thisPropName ) : thisPropName === propName;
@@ -679,6 +688,14 @@ foam.CLASS({
       name: 'showOnSearch',
       class: 'Boolean',
       value: true
+    },
+    {
+      name: 'columnHandler',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.column.CommonColumnHandler',
+      factory: function() {
+        return foam.nanos.column.CommonColumnHandler.create();
+      }
     }
   ],
   methods: [
@@ -687,15 +704,7 @@ foam.CLASS({
       this.expanded = false;
     },
     function returnSelectedProps() {
-      if ( ! this.hasSubProperties ) {
-        if ( this.level === 0 ) {
-          if ( foam.Array.isInstance(this.rootProperty) )
-            return [[this.rootProperty[0]]];
-          else
-            return [this.rootProperty];
-        } else 
-          return [this.rootProperty[0]];
-      } else {
+      if ( this.hasSubProperties ) {
         var arr = [];
         for ( var i = 0 ; i < this.subColumnSelectConfig.length ; i++ ) {
           if ( this.subColumnSelectConfig[i].isPropertySelected ) {
@@ -704,8 +713,15 @@ foam.CLASS({
             arr.push(childProps);
           }
         }
-        return arr;
+        if ( arr && arr.length > 0 )
+          return arr;
       }
+      if ( this.level === 0 ) {
+        if ( foam.Array.isInstance(this.rootProperty) )
+          return [[this.rootProperty[0]]];
+        return [this.rootProperty];
+      }
+      return [this.rootProperty[0]];
     },
     function updateOnSearch(query) {
       if ( ! this.hasSubProperties ) {

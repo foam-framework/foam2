@@ -13,8 +13,10 @@ foam.CLASS({
 
   imports: [
     'exportDriverRegistryDAO',
-    'filteredTableColumns'
+    'filteredTableColumns',
+    'serviceName'
   ],
+
 
   requires: [
     'foam.u2.ModalHeader',
@@ -132,7 +134,6 @@ foam.CLASS({
         self.isOpenAvailable = self.exportDriverReg.isOpenable;
       });
 
-
       this
       .tag(this.ModalHeader.create({
         title: 'Export'
@@ -234,8 +235,6 @@ foam.CLASS({
         }).finally(() => {
           if ( this.exportAllColumns )
             this.filteredTableColumns = filteredColumnsCopy;
-          if ( this.exportDriver.tearDown )
-            this.exportDriver.tearDown(self.__context__, exportDataResult);
         });
       }
     },

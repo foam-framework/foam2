@@ -86,7 +86,7 @@ public class ServiceWebAgent
         resp.setHeader("Access-Control-Allow-Origin", "*");
       } else if ( ! req.getHeader("Origin").equals("null") ){
         URL url = new URL(req.getHeader("Origin"));
-        if ( ((VirtualHostRoutingServlet) http.getServletMappings()[0].getServletObject()).getHostMapping().containsKey(url.getHost()) )
+        if ( http.containsHostDomain(url.getHost()) )
           resp.setHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));
       }
 

@@ -30,6 +30,7 @@ foam.CLASS({
     'foam.nanos.auth.Group',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
+    'foam.util.SafetyUtil',
     'javax.servlet.http.HttpServletRequest',
     'org.eclipse.jetty.server.Request'
   ],
@@ -78,6 +79,9 @@ Later themes:
             var groupTheme = await group.theme$find;
             if ( groupTheme ) {
               theme = theme && theme.copyFrom(groupTheme) || theme;
+              if ( !! group.defaultMenu ) {
+                theme.defaultMenu = group.defaultMenu;
+              }
             }
             group = await group.parent$find;
           }
@@ -122,6 +126,9 @@ Later themes:
           Theme groupTheme = group.findTheme(x);
           if ( groupTheme != null ) {
             theme = (Theme) theme.fclone().copyFrom(groupTheme);
+            if ( ! SafetyUtil.isEmpty(group.getDefaultMenu()) ) {
+              theme.setDefaultMenu(group.getDefaultMenu());
+            }
           }
           group = (Group) groupDAO.find(group.getParent());
         }

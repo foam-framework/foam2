@@ -29,11 +29,17 @@ foam.CLASS({
         value -= seconds * 1000;
         var milliseconds = value % 1000;
 
-        // For long durations, don't show seconds
-        if ( hours ) seconds = 0;
-
-        // For longer durations, don't show milliseconds
-        if ( minutes || hours ) milliseconds = 0;
+        // For long durations, don't show smaller components
+        if ( days ) {
+          minutes = 0;
+          seconds = 0;
+          milliseconds = 0;
+        } else if ( hours ) {
+          seconds = 0;
+          milliseconds = 0;
+        } else if ( minutes ) {
+          milliseconds = 0;
+        }
 
         var formatted = [[days, 'd'], [hours, 'h'], [minutes, 'm'], [seconds, 's'], [milliseconds, 'ms']].reduce((acc, cur) => {
           return cur[0] > 0 ? acc.concat([cur[0] + cur[1]]) : acc;

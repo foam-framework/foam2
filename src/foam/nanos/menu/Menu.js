@@ -16,7 +16,7 @@
   tableColumns: [
     'enabled',
     'id',
-    'parent',
+    'parent.id',
     'label',
     'order'
   ],

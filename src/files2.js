@@ -183,7 +183,7 @@ FOAM_FILES([
   { name: "foam/dao/DAO" },
   { name: "foam/dao/daoUtils" },
   { name: "foam/dao/ArraySink" },
-  { name: "foam/dao/DAODecorator" },
+  { name: "foam/dao/DAOInterceptor" },
   { name: "foam/dao/AbstractDAO" },
   { name: "foam/dao/FilteredDAO" },
   { name: "foam/dao/DAOProperty" },
@@ -582,5 +582,9 @@ FOAM_FILES([
   { name: "foam/build/ClassLoaderContext" },
 
   { name: "foam/core/CoreTypesValidationTest" },
-  { name: "foam/core/CoreTypesValidationTestModel" }
+  { name: "foam/core/CoreTypesValidationTestModel" },
+  
+  // Translation Support
+  { name: "foam/i18n/XLIFFTranslationValue" },
+  { name: "foam/i18n/Locale" },
 ]);

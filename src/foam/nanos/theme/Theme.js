@@ -158,6 +158,10 @@ foam.CLASS({
       section: 'navigation'
     },
     {
+      class: 'Map',
+      name: 'headConfig'
+    },
+    {
       class: 'Image',
       name: 'logo',
       documentation: 'The logo to display in the application.',
@@ -237,6 +241,11 @@ foam.CLASS({
       section: 'sectionCss'
     },
     {
+      class: 'String',
+      name: 'font1',
+      section: 'sectionCss'
+    },
+    {
       class: 'Color',
       name: 'primary1',
       section: 'colours'
@@ -259,6 +268,31 @@ foam.CLASS({
     {
       class: 'Color',
       name: 'primary5',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'secondary1',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'secondary2',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'secondary3',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'secondary4',
+      section: 'colours'
+    },
+    {
+      class: 'Color',
+      name: 'secondary5',
       section: 'colours'
     },
     {
@@ -496,9 +530,13 @@ foam.CLASS({
   methods: [
     {
       name: 'toSummary',
+      type: 'String',
       code: function() {
         return this.name + ' ' + this.description;
-      }
+      },
+      javaCode: `
+        return foam.util.SafetyUtil.isEmpty(getName()) || foam.util.SafetyUtil.isEmpty(getDescription()) ? "" : getName() + " " + getDescription();
+      `
     },
   ]
 });

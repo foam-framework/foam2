@@ -11,25 +11,43 @@ foam.CLASS({
   requires: [
     'foam.u2.DetailView',
     'foam.u2.view.ColumnConfigPropView',
-    'foam.u2.view.ColumnOptionsSelectConfig',
     'foam.u2.view.SubColumnSelectConfig'
   ],
   css: `
-  ^drop-down-bg {
-    font-size:        12px; 
-    position:         fixed; 
-    width:            100%; 
-    height:           100%; 
-    top:              0; 
-    left:             0; 
-    z-index:          100;
-    background:       rgba(0, 0, 0, 0.4);
-  }
+    ^drop-down-bg {
+      font-size:        12px;
+      position:         fixed;
+      width:            100%;
+      height:           100%;
+      top:              0;
+      left:             0;
+      z-index:          100;
+      background:       rgba(0, 0, 0, 0.4);
+    }
+    ^ .foam-u2-ActionView-closeButton {
+      width: 24px;
+      height: 35px;
+      margin: 0;
+      cursor: pointer;
+      display: inline-block;
+      float: right;
+      outline: 0;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      padding-top: 15px;
+      margin-right: 15px;
+    }
+    ^ .foam-u2-ActionView-closeButton:hover {
+      outline: none;
+      border: none;
+      background: transparent;
+    }
   `,
   properties: [
     {
       name: 'selectColumnsExpanded',
-      class: 'Boolean' 
+      class: 'Boolean'
     },
     'parentId',
     'columnConfigPropView'
@@ -47,24 +65,46 @@ foam.CLASS({
       var self = this;
       this.columnConfigPropView = foam.u2.view.ColumnConfigPropView.create({data:self.data});
       this.start()
+      .addClass(this.myClass())
         .show(this.selectColumnsExpanded$)
         .addClass(this.myClass('drop-down-bg'))
         .start()
           .style({
-            'border-radius': '5px',
-            'border': '1px solid /*%GREY4%*/ #e7eaec',
-            'background-color': '#f9f9f9',
             'right': '40px',
-            'top': '120px',
-            'position': 'fixed',
-            'height': 'fit-content',
-            'max-height': window.innerHeight - 100 > 0 ? window.innerHeight - 100 : window.innerHeight + 'px',
-            'width': '300px'
+            'top': '80px',
+            'position': 'fixed'
           })
-          .add(this.columnConfigPropView)
+          .startContext({data: this})
+            .add(this.CLOSE_BUTTON)
+          .endContext()
+          .start()
+            .style({
+              'border-radius': '5px',
+              'border': '1px solid /*%GREY4%*/ #e7eaec',
+              'background-color': '#f9f9f9',
+              'right': '60px',
+              'top': '120px',
+              'position': 'fixed',
+              'height': 'fit-content',
+              'max-height': window.innerHeight - 100 > 0 ? window.innerHeight - 100 : window.innerHeight + 'px',
+              'width': '300px'
+            })
+            .add(this.columnConfigPropView)
+          .end()
         .end()
       .on('click', this.closeDropDown.bind(this))
       .end();
+    }
+  ],
+  actions: [
+    {
+      name: 'closeButton',
+      label: '',
+      icon: 'images/ic-cancelwhite.svg',
+      code: function(X) {
+        this.columnConfigPropView.onClose();
+        this.selectColumnsExpanded = ! this.selectColumnsExpanded;
+      }
     }
   ]
 });

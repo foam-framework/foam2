@@ -34,7 +34,7 @@ foam.CLASS({
 
         return getDelegate().where(
             MLang.EQ(Notification.USER_ID, user.getId())
-          ).select_(x, sink, skip, limit, order, predicate);
+          ).select_(getX(), sink, skip, limit, order, predicate);
       `
     }
   ],

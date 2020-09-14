@@ -12,7 +12,8 @@ foam.INTERFACE({
     {
       class: 'DateTime',
       name: 'lastModified',
-      documentation: 'Last modified date'
+      documentation: 'Last modified date',
+      storageOptional: true
     }
   ]
 });

@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'org.chartjs',
   name: 'Pie',
   extends: 'org.chartjs.AbstractChartCView',
+  flags: ['web'],
   properties: [
     [ 'chartType', 'pie' ],
     {

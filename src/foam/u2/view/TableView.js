@@ -14,6 +14,7 @@ foam.CLASS({
       background: white;
       display: flex;
       height: 48px;
+      justify-content: space-between;
     }
 
     ^tbody > ^tr {
@@ -42,7 +43,7 @@ foam.CLASS({
       box-sizing: border-box;
       color: /*%BLACK%*/ #1e1f21;
       display: flex;
-      font-family: Roboto, 'Helvetica Neue', helvetica, sans-serif;
+      font-family: /*%FONT1%*/, Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       line-height: 1.5;
       overflow: hidden;

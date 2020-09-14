@@ -47,7 +47,7 @@ foam.CLASS({
       font-weight: normal;
       display: inline-block;
       color: #9BA1A6;
-      font-family: 'IBM Plex Sans', sans-serif;
+      font-family: /*%FONT1%*/, Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       font-weight: normal;
     }
@@ -347,6 +347,7 @@ foam.CLASS({
   css: `
     ^ {
       padding-top: 10px;
+      overflow-y: scroll;
     }
   `,
 

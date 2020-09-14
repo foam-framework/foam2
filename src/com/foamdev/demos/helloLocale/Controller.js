@@ -16,7 +16,7 @@ foam.CLASS({
 
   css: `
     h1 { color: #aaa; }
-    body, input[text] { color: #888; font-family: Cambria, Georgia; }
+    body, input[text] { color: #888; font-family: /*%FONT1%*/, Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif; }
   `,
 
   properties: [
@@ -43,8 +43,8 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.start('div').add(this.yourName$.label).end().start('div').add(this.YOUR_NAME).end();
-      this.start('h1').add(this.greeting$.label).add(this.yourName$).add('!').end();
+      this.start('div').add(this.YOUR_NAME.label).end().start('div').add(this.YOUR_NAME).end();
+      this.start('h1').add(this.GREETING.label).add(this.yourName$).add('!').end();
     }
   ]
 });

@@ -47,7 +47,6 @@ foam.CLASS({
     'foam.parse.ImperativeGrammar',
     'foam.parse.LiteralIC',
     'foam.parse.Parsers',
-    'foam.parse.PropertyRefinement',
     'foam.parse.StringPStream'
   ],
 
@@ -229,7 +228,7 @@ foam.CLASS({
         });
 
         var base = foam.Function.withArgs(this.baseGrammar_,
-            this.Parsers.create(), this);
+          this.Parsers.create(), this);
         var grammar = {
           __proto__: base,
           fieldname: this.Alternate.create({ args: fields })
@@ -240,7 +239,7 @@ foam.CLASS({
         // range spanning that whole year.
         var maybeConvertYearToDateRange = function(prop, num) {
           var isDateField = foam.core.Date.isInstance(prop) ||
-              foam.core.Date.isInstance(prop);
+            foam.core.Date.isInstance(prop);
           var isDateRange = Array.isArray(num) && num[0] instanceof Date;
 
           if ( isDateField && ! isDateRange ) {

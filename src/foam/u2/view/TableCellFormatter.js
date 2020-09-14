@@ -51,6 +51,12 @@ foam.CLASS({
       }
     },
     {
+      name: 'tableHeader',
+      value: function() {
+        return this.label || foam.String.labelize(this.name);
+      }
+    },
+    {
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       factory: function() {
@@ -72,11 +78,28 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2.view',
+  name: 'TableHeaderActionRefinement',
+
+  refines: 'foam.core.Action',
+
+  properties: [
+    {
+      name: 'tableHeader',
+      value: function() {
+        return this.label || foam.String.labelize(this.name);
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2.view',
   name: 'ActionTableCellFormatterRefinement',
   refines: 'foam.core.Action',
 
   properties: [
     {
+      tags: ['web'],
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(_, obj, axiom) {
@@ -90,6 +113,7 @@ foam.CLASS({
       }
     },
     {
+      tags: ['web'],
       name: 'tableHeaderFormatter',
       value: function(axiom) {
         this.add(axiom.label);

@@ -51,8 +51,7 @@ foam.CLASS({
   tableColumns: [
     'id',
     'type',
-    'group',
-    'legalName',
+    'group.id',
     'organization',
     'email'
   ],
@@ -637,8 +636,8 @@ foam.CLASS({
 
         if (
           ! SafetyUtil.equals(this.getId(), user.getId()) &&
-          ! auth.check(x, "user.delete." + this.getId()) &&
-          ! auth.check(x, "spid.delete." + this.getSpid())
+          ! auth.check(x, "user.remove." + this.getId()) &&
+          ! auth.check(x, "spid.remove." + this.getSpid())
         ) {
           throw new RuntimeException("You do not have permission to delete that user.");
         }

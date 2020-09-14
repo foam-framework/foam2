@@ -192,8 +192,8 @@ foam.CLASS({
     ^ .foam-u2-view-RadioView label {
       margin-left: 12px;
     }
-    
-    ^ .foam-u2-layout-Cols { 
+
+    ^ .foam-u2-layout-Cols {
       padding-bottom: 4px;
       display: flex;
       align-items: center;
@@ -210,15 +210,7 @@ foam.CLASS({
   ],
 
   properties: [
-    'prop',
-    {
-      class: 'FObjectProperty',
-      of: 'foam.core.Slot',
-      name: 'visibilitySlot',
-      expression: function(prop) {
-        return prop.createVisibilityFor(this.data$, this.controllerMode$);
-      }
-    }
+    'prop'
   ],
 
   methods: [
@@ -226,8 +218,7 @@ foam.CLASS({
       var self = this;
       this.SUPER();
 
-      const vis$ = this.ProxySlot.create({ delegate$: this.visibilitySlot$ });
-      this.onDetach(this.mode$.follow(vis$));
+      this.onDetach(this.mode$.follow(self.prop.createVisibilityFor(self.data$, self.controllerMode$)));
 
       this
         .addClass(this.myClass())
@@ -250,7 +241,7 @@ foam.CLASS({
                 .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                 .start()
                   .style({ 'flex-grow': 1, 'max-width': '100%' })
-                  .tag(prop, { mode$: vis$ })
+                  .tag(prop, { mode$: self.mode$ })
                   .callIf(prop.validationStyleEnabled, function() {
                     this.enableClass(self.myClass('error'), errorSlot);
                   })
@@ -258,10 +249,7 @@ foam.CLASS({
                 .callIf(prop.help, function() {
                   this.start()
                     .addClass(self.myClass('tooltip'))
-                    .start({
-                      class: 'foam.u2.tag.Image',
-                      data: 'images/question-icon.svg'
-                    })
+                    .start({class: 'foam.u2.tag.Image', data: 'images/question-icon.svg'})
                       .addClass(self.myClass('helper-icon'))
                     .end()
 

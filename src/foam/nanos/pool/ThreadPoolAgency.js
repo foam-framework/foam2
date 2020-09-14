@@ -20,6 +20,7 @@ foam.CLASS({
     'foam.core.Agency',
     'foam.core.ContextAgent',
     'foam.core.X',
+    'foam.core.XLocator',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
     'java.util.concurrent.LinkedBlockingQueue',
@@ -64,10 +65,12 @@ foam.CLASS({
       PM     pm     = new PM(this.getClass(), agent_.getClass().getSimpleName()+":"+description_);
 
       try {
+        XLocator.set(x_);
         agent_.execute(x_);
       } catch (Throwable t) {
         logger.error(this.getClass(), agent_.getClass().getSimpleName(), description_, t.getMessage(), t);
       } finally {
+        XLocator.set(null);
         incrExecuting(-1);
         incrExecuted();
         pm.log(x_);
@@ -95,11 +98,11 @@ foam.CLASS({
 
         public Thread newThread(Runnable runnable) {
           Thread thread = new Thread(
-                                     Thread.currentThread().getThreadGroup(),
-                                     runnable,
-                                     getPrefix() + "-" + threadNumber.getAndIncrement(),
-                                     0
-                                     );
+            Thread.currentThread().getThreadGroup(),
+            runnable,
+            getPrefix() + "-" + threadNumber.getAndIncrement(),
+            0
+            );
           // Thread don not block server from shut down.
           thread.setDaemon(true);
           thread.setPriority(Thread.NORM_PRIORITY);

@@ -8,21 +8,8 @@ foam.CLASS({
   name: 'CapabilityWizardlet',
   extends: 'foam.u2.wizard.BaseWizardlet',
 
-  implements: [
-    'foam.mlang.Expressions'
-  ],
-
   imports: [
-    'user',
-    'userCapabilityJunctionDAO'
-  ],
-
-  requires: [
-    'foam.core.Action',
-    'foam.core.Property',
-    'foam.layout.Section',
-    'foam.layout.SectionAxiom',
-    'foam.nanos.crunch.UserCapabilityJunction'
+    'crunchController'
   ],
 
   properties: [
@@ -38,25 +25,32 @@ foam.CLASS({
     {
       name: 'of',
       class: 'Class',
-      expression: function (capability) {
+      expression: function(capability) {
+        if ( ! capability || ! capability.of ) return null;
         return capability.of;
       }
     },
     {
       name: 'data',
-      factory: function () {
+      flags: ['web'],
+      factory: function() {
         if ( ! this.of ) return null;
 
-        var ret = this.of.create({}, this);
+        var ret = this.of.getAxiomByName('capability') ?
+          this.of.create({ capability: this.capability }, this) :
+          this.of.create({}, this);
+
         if ( this.ucj === null ) return ret;
-      
+
         ret = Object.assign(ret, this.ucj.data);
         return ret;
       }
     },
     {
       name: 'title',
+      class: 'String',
       expression: function(capability) {
+        if ( ! capability || ! capability.name ) return '';
         return capability.name;
       }
     }
@@ -66,37 +60,7 @@ foam.CLASS({
     {
       name: 'save',
       code: function() {
-        return this.updateUCJ().then(() => {
-          var ucj = this.ucj;
-          if ( ucj === null ) {
-            ucj = this.UserCapabilityJunction.create({
-              sourceId: this.user.id,
-              targetId: this.capability.id
-            })
-          }
-          if ( this.of ) ucj.data = this.data;
-          return this.userCapabilityJunctionDAO.put(ucj);
-        });
-      }
-    },
-    {
-      // This can be moved to an expression on the 'data' property
-      // iff property expressions unwrap promises.
-      name: 'updateUCJ',
-      async: true,
-      code: function () {
-        return this.userCapabilityJunctionDAO.find(
-          this.AND(
-            this.EQ(
-              this.UserCapabilityJunction.SOURCE_ID,
-              this.user.id),
-            this.EQ(
-              this.UserCapabilityJunction.TARGET_ID,
-              this.capability.id))
-        ).then(ucj => {
-          this.ucj = ucj;
-          return this;
-        });
+        return this.crunchController && this.crunchController.save(this);
       }
     }
   ]

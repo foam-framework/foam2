@@ -38,8 +38,8 @@ foam.CLASS({
 
   css: `
     ^ {
-      width: max-content;
       margin: 24px auto 0 auto;
+      padding: 0 32px;
     }
 
     ^top-row {
@@ -58,8 +58,7 @@ foam.CLASS({
     }
 
     ^container {
-      display: flex;
-      justify-content: space-around;
+      padding: 0 0px;
     }
 
     ^ .actions {
@@ -74,10 +73,13 @@ foam.CLASS({
     ^full-search-container {
       flex: 0 0 250px;
       padding-right: 18px;
+      width: 250px;
+      float: left;
+      padding-top: 23px;
     }
 
-    ^ .foam-u2-view-TableView {
-      width: 1024px;
+    ^manual-width-adjust {
+      width: inherit;
     }
   `,
 
@@ -143,6 +145,7 @@ foam.CLASS({
         this.E()
           .addClass(this.myClass())
           .start()
+          .start()
             .addClass(this.myClass('top-row'))
             .addClass(this.myClass('separate'))
             .start()
@@ -174,7 +177,7 @@ foam.CLASS({
                 }))
               .end();
             })
-            .start()
+            .start().addClass(this.myClass('manual-width-adjust'))
               .start()
                 .addClass(this.myClass('separate'))
                 .callIf(this.data.searchMode === this.SearchMode.SIMPLE, function() {
@@ -185,35 +188,29 @@ foam.CLASS({
                       }))
                     .end();
                 })
-                .start()
-                  .addClass('actions')
-                  .show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW))
-                  .start()
-                    .forEach(self.cls.getAxiomsByClass(foam.core.Action).filter((action) => {
-                      return action.name !== self.data.primaryAction.name;
-                    }), function(action) {
-                      this.tag(action, { buttonStyle: 'TERTIARY' });
-                    })
-                    .add()
-                  .end()
+                .start().show(self.mode$.map(m => m === foam.u2.DisplayMode.RW))
+                  .forEach(self.cls.getAxiomsByClass(foam.core.Action).filter(action => {
+                    return action.name !== self.data.primaryAction.name;
+                  }), function(action) {
+                    this.tag(action, { buttonStyle: 'TERTIARY' });
+                  })
+                  .add()
                 .end()
               .end()
-              .start()
-                .style({ 'overflow-x': 'auto' })
-                .tag(this.summaryView, {
-                  data$: this.data.filteredDAO$,
-                  multiSelectEnabled: !! this.data.relationship,
-                  selectedObjects$: this.data.selectedObjects$
-                })
-              .end()
+              .tag(this.summaryView, {
+                data$: this.data.filteredDAO$,
+                multiSelectEnabled: !! this.data.relationship,
+                selectedObjects$: this.data.selectedObjects$
+              })
             .end()
-          .end());
+          .end()
+        .end());
 
       this.add(this.data.border);
       if ( this.isIframe() ) this.tag(this.IFrameTopNavigation);
     },
 
-    function isIframe () {
+    function isIframe() {
       try {
         return window.self !== window.top;
       } catch (e) {

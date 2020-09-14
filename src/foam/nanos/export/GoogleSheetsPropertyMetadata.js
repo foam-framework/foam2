@@ -36,6 +36,15 @@
     {
       name: 'propName',
       class: 'String'
+    },
+    {
+      name: 'prop',
+      javaType: 'foam.core.PropertyInfo',
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+    },
+    {
+      name: 'unitPropName',
+      class: 'String'
     }
   ]
 });

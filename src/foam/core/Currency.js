@@ -27,7 +27,7 @@
     {
       buildJavaClass: function(cls) {
         cls.extras.push(`
-          public String format(Long amount) {
+          public String format(long amount) {
             return format(amount, false);
           }
         `);
@@ -107,13 +107,19 @@
   methods: [
     {
       name: 'toSummary',
+      type: 'String',
       documentation: `When using a reference to the currencyDAO, the labels associated
         to it will show a chosen property rather than the first alphabetical string
         property. In this case, we are using the id.
       `,
       code: function(x) {
         return this.id + " - " + this.name;
-      }
+      },
+      javaCode: `
+        if ( foam.util.SafetyUtil.isEmpty(getId()) || foam.util.SafetyUtil.isEmpty(getName()) )
+          return "";
+        return getId() + " - " + getName();
+      `
     },
     {
       name: 'format',

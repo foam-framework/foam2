@@ -508,6 +508,11 @@ foam.CLASS({
       swiftCode: 'return true',
       javaCode: 'return true;'
     },
+    {
+      name: 'partialEval',
+      code: function() { return this },
+      javaCode: 'return foam.mlang.MLang.TRUE;'
+    }
   ]
 });
 
@@ -533,6 +538,11 @@ foam.CLASS({
       type: 'String',
       javaCode: 'return " 1 <> 1 ";',
       code: function() { return "1 <> 1"; }
+    },
+    {
+      name: 'partialEval',
+      code: function() { return this },
+      javaCode: 'return foam.mlang.MLang.FALSE;'
     }
   ]
 });
@@ -774,15 +784,24 @@ foam.CLASS({
     function toSummary() {
       return this.toString();
     },
-    function toString() {
-      var s = foam.String.constantize(this.cls_.name) + '(';
-      for ( var i = 0 ; i < this.args.length ; i++ ) {
-        var a = this.args[i];
-        s += a.toString();
-        if ( i < this.args.length - 1 ) s += ', ';
-      }
-      return s + ')';
+    {
+      name: 'toString',
+      code: function() {
+        return foam.String.constantize(this.cls_.name) + '(' +
+          this.args.map(a => a.toString()) + ')';
+      },
+      javaCode: `
+        StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getSimpleName()).append('(');
+        for ( int i = 0; i < getArgs().length; i++ ) {
+          if ( i > 0 ) sb.append(", ");
+          sb.append(getArgs()[i].toString());
+        }
+        sb.append(')');
+        return sb.toString();
+      `
     },
+
     function reduce_(args, shortCircuit, methodName) {
       for ( var i = 0; i < args.length - 1; i++ ) {
         for ( var j = i + 1; j < args.length; j++ ) {
@@ -1698,7 +1717,11 @@ foam.CLASS({
         x && (x).toString();
     },
 
-    function toString() { return this.toString_(this.value); },
+    {
+      name: 'toString',
+      code: function() { return this.toString_(this.value); },
+      javaCode: 'return getValue() == null ? "null" : getValue().toString();'
+    },
 
     // TODO(adamvy): Re-enable when we can parse this in java more correctly.
     function xxoutputJSON(os) {
@@ -2300,11 +2323,50 @@ foam.CLASS({
     }
   ],
 
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'checkingNestedFObject_',
+      value: false,
+      transient: true,
+      visibility: 'HIDDEN',
+      documentation: 'Support keyword search on the first level nested FObject.'
+    }
+  ],
+
   methods: [
     {
       name: 'f',
       code: function f(obj) {
-        return this.fInner_(obj, true);
+        var arg = this.arg1.f(obj);
+        if ( ! arg || typeof arg !== 'string' ) return false;
+
+        arg = arg.toLowerCase();
+
+
+        var s = '';
+        const props = obj.cls_.getAxiomsByClass(foam.core.Property);
+        for ( let i = 0; i < props.length; i++ ) {
+          try {
+            const prop = props[i];
+            if ( this.FObjectProperty.isInstance(prop) ) {
+              if ( this.checkNestedFObject(prop.f(obj)) ) return true;
+            } else if ( this.Enum.isInstance(prop) ) {
+              s = prop.f(obj).label.toLowerCase();
+            } else if ( this.Long.isInstance(prop) ) {
+              s = prop.f(obj).toString().toLowerCase();
+            } else if ( this.Date.isInstance(prop) ) {
+              s = prop.f(obj).toISOString().toLowerCase();
+            } else if ( ! this.String.isInstance(prop) ) {
+              continue;
+            } else {
+              s = prop.f(obj).toLowerCase();
+            }
+          } catch (err) {}
+          if ( s.toLowerCase().includes(arg) ) return true;
+        }
+
+        return false;
       },
       javaCode: `
 if ( ! ( getArg1().f(obj) instanceof String ) ) return false;
@@ -2319,7 +2381,7 @@ while ( i.hasNext() ) {
   try {
     String s = "";
     if ( prop instanceof foam.core.AbstractFObjectPropertyInfo ) {
-      if ( this.f(prop.f(obj)) ) return true;
+      if ( checkNestedFObject(prop.f(obj)) ) return true;
     } else if ( prop instanceof foam.core.AbstractEnumPropertyInfo ) {
       Object value = prop.f(obj);
       if ( value == null ) continue;
@@ -2354,56 +2416,28 @@ while ( i.hasNext() ) {
 return false;`
     },
     {
-      name: 'fInner_',
-      documentation: `
-        A private convenience method so we don't break the interface for the 'f'
-        method. The second argument determines whether the MLang should
-        recursively apply to nested FObjects or not.
-      `,
-      code: function(obj, checkSubObjects) {
-        var arg = this.arg1.f(obj);
-        if ( ! arg || typeof arg !== 'string' ) return false;
-
-        arg = arg.toLowerCase();
-
-        try {
-          var props = obj.cls_.getAxiomsByClass(this.String);
-          for ( let i = 0; i < props.length; i++ ) {
-            s = props[i].f(obj);
-            if ( ! s || typeof s !== 'string' ) continue;
-            if ( s.toLowerCase().includes(arg) ) return true;
-          }
-
-          if ( checkSubObjects ) {
-            var objectProps = obj.cls_.getAxiomsByClass(this.FObjectProperty);
-            for ( let i = 0; i < objectProps.length; i++ ) {
-              var prop = objectProps[i];
-              var subObject = prop.f(obj);
-              if ( this.fInner_(subObject, false) ) return true;
-            }
-          }
-
-          var longProps = obj.cls_.getAxiomsByClass(this.Long);
-          for ( let i = 0; i < longProps.length; i++ ) {
-            var s = (longProps[i]).toString();
-            if ( s.toLowerCase().includes(arg) ) return true;
-          }
-
-          var enumProps = obj.cls_.getAxiomsByClass(this.Enum);
-          for ( let i = 0; i < enumProps.length; i++ ) {
-            var s = (enumProps[i]).label;
-            if ( s.toLowerCase().includes(arg) ) return true;
-          }
-
-          var dateProps = obj.cls_.getAxiomsByClass(this.Date);
-          for ( let i = 0; i < dateProps.length; i++ ) {
-            var s = (dateProps[i]).toISOString();
-            if ( s.toLowerCase().includes(arg) ) return true;
-          }
-        } catch (err) {}
-
-        return false;
-      }
+      name: 'checkNestedFObject',
+      type: 'Boolean',
+      args: [
+        { name: 'obj', type: 'Any' }
+      ],
+      code: function(obj) {
+        if ( obj === undefined || obj === null || this.checkingNestedFObject_ ) {
+          return false;
+        }
+        this.checkingNestedFObject_ = true;
+        return this.f(obj);
+      },
+      javaCode: `
+        if ( obj == null || getCheckingNestedFObject_() ) return false;
+        setCheckingNestedFObject_(true);
+        return this.f(obj);
+      `
+    },
+    {
+      name: 'toString',
+      code: function() { return 'Keyword(' + this.arg1.toString() + ')'; },
+      javaCode: 'return "Keyword(" + getArg1().toString() + ")";'
     }
   ]
 });
@@ -2645,7 +2679,13 @@ foam.CLASS({
   implements: [ 'foam.core.Serializable' ],
 
   javaImports: [
+    'foam.core.ClassInfo',
+    'foam.core.FObject',
+    'foam.core.PropertyInfo',
     'foam.mlang.Expr',
+    'java.util.Arrays',
+    'java.util.ArrayList',
+    'java.util.List',
     'java.util.StringJoiner'
   ],
 
@@ -2653,13 +2693,70 @@ foam.CLASS({
     {
       class: 'Array',
       type: 'foam.mlang.Expr[]',
-      name: 'exprs'
+      name: 'exprs',
+      documentation: 'The expressions to be evaluated and returned in the projection. Typically are Properties.',
+    },
+    {
+      class: 'List',
+      name: 'projectionWithClass',
+      documentation: 'The projection but with the class in position 0 with all other values offset by 1.',
+      factory: function() { return []; },
+      javaFactory: `return new java.util.ArrayList();`
+    },
+    {
+      class: 'List',
+      documentation: 'The projection with the class removed and all values in the same position as in "exprs".',
+      name: 'projection',
+      transient: true,
+      getter: function() { return this.projectionWithClass.map(p => p.slice(1)); },
+      javaFactory: `
+        List result = new ArrayList();
+        if ( getProjectionWithClass() != null ) {
+          for ( Object list: (ArrayList)getProjectionWithClass() ) {
+            Object[] obj1 = Arrays.copyOfRange((Object[])list, 1, ((Object[])list).length);
+            result.add(obj1);
+          }
+        }
+        return result;
+      `
     },
     {
       class: 'List',
       name: 'array',
-      factory: function() { return []; },
-      javaFactory: `return new java.util.ArrayList();`
+      transient: true,
+      documentation: 'An array of full objects created from the projection. Only properties included in exprs/the-projection will be set.',
+      factory: function() {
+        return this.projectionWithClass.map(p => {
+          var o = foam.lookup(p[0]).create();
+          for ( var i = 0 ; i < this.exprs.length ; i++ ) {
+            try {
+              this.exprs[i].set(o, p[i+1]);
+            } catch (x) {
+            }
+          }
+          return o;
+        });
+      },
+      javaFactory: `
+        var a  = new java.util.ArrayList();
+        var es = getExprs();
+        var p  = getProjectionWithClass();
+        for ( int i = 0 ; i < p.size() ; i++ ) {
+          try {
+            Object[]  arr = (Object[]) p.get(i);
+            ClassInfo ci  = (ClassInfo) arr[0];
+            Object    o   = ci.newInstance();
+
+            for ( int j = 0 ; j < es.length ; j++ ) {
+              PropertyInfo e = (PropertyInfo) es[j];
+              e.set(o, arr[i]);
+            }
+
+            a.set(i, o);
+          } catch (Throwable t) {}
+        }
+        return a;
+      `
     }
   ],
 
@@ -2667,19 +2764,20 @@ foam.CLASS({
     {
       name: 'put',
       code: function put(o, sub) {
-        var a = [];
+        var a = [o.cls_];
         for ( var i = 0 ; i < this.exprs.length ; i++ )
-          a[i] = this.exprs[i].f(o);
-        this.array.push(a);
+          a[i+1] = this.exprs[i].f(o);
+        this.projectionWithClass.push(a);
       },
 // TODO:      swiftCode: 'array.append(obj)',
       javaCode: `
-        Object[] a = new Object[getExprs().length];
+        Object[] a = new Object[getExprs().length+1];
 
+        a[0] = ((FObject) obj).getClassInfo();
         for ( int i = 0 ; i < getExprs().length ; i++ )
-          a[i] = getExprs()[i].f(obj);
+          a[i+1] = getExprs()[i].f(obj);
 
-        getArray().add(a);
+        getProjectionWithClass().add(a);
       `
     },
     {
@@ -3223,16 +3321,14 @@ foam.CLASS({
   extends: 'foam.mlang.AbstractExpr',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'A Binary Predicate which applies arg2.f() to arg1.f().',
+  documentation: `
+    A Binary Expression which evaluates arg1 and passes the result to arg2.
+    In other word, the output of arg1 is the receiver of arg2.
 
-  javaImports: [
-    'foam.core.AbstractFObjectPropertyInfo',
-    'foam.core.FObject',
-    'foam.core.PropertyInfo',
-    'foam.nanos.logger.Logger',
-    'foam.nanos.logger.StdoutLogger',
-    'foam.util.StringUtil'
-  ],
+    For example, to get city from user address:
+
+    DOT(User.ADDRESS, Address.CITY).f(user); // return user.address.city
+  `,
 
   properties: [
     {
@@ -3249,38 +3345,12 @@ foam.CLASS({
     {
       name: 'f',
       code: function(o) {
-        if ( foam.core.Reference.isInstance(this.arg1) ) {
-          return o[property.name + '$find'].then(val => this.arg2.f(val));
-        }
         return this.arg2.f(this.arg1.f(o));
       },
       javaCode: `
-        if ( getArg1() instanceof PropertyInfo && getArg2() instanceof PropertyInfo ) {
-          StringBuilder sb = new StringBuilder("find");
-          PropertyInfo p1 = (PropertyInfo) getArg1();
-          FObject obj1;
-          if ( p1 instanceof AbstractFObjectPropertyInfo ) {
-            Object val = getArg1().f(obj);
-            return val == null ? null : getArg2().f(val);
-          }
-          try {
-            obj1 = (FObject)obj.getClass().getMethod(StringUtil.capitalize(p1.getName()), foam.core.X.class).invoke(obj, ((FObject)obj).getX());
-          } catch ( Throwable t ) {
-            return null;
-          }
-          if ( obj1 == null ) return null;
-          try {
-            return getArg2().f(obj1);
-          } catch ( Throwable t ) {
-            Logger logger = (Logger) getX().get("logger");
-            if ( logger == null ) {
-              logger = new StdoutLogger();
-            }
-            logger.error(t);
-            return null;
-          }
-        }
-        return getArg2().f(getArg1().f(obj));
+        Object receiver = getArg1().f(obj);
+        if ( receiver == null ) return null;
+        return getArg2().f(receiver);
       `
     },
 
@@ -3439,6 +3509,7 @@ foam.CLASS({
     'foam.mlang.expr.Add',
     'foam.mlang.expr.Divide',
     'foam.mlang.expr.Dot',
+    'foam.mlang.expr.Ref',
     'foam.mlang.expr.MaxFunc',
     'foam.mlang.expr.MinFunc',
     'foam.mlang.expr.Multiply',
@@ -3532,6 +3603,7 @@ foam.CLASS({
     function ENDS_WITH(a, b) { return this._binary_("EndsWith", a, b); },
     function FUNC(fn) { return this.Func.create({ fn: fn }); },
     function DOT(a, b) { return this._binary_("Dot", a, b); },
+    function REF(a) { return this._unary_("Ref", a); },
     function DOT_F(a, b) { return this._binary_("DotF", a, b); },
     function ADD() { return this._nary_("Add", arguments); },
     function SUB() { return this._nary_("Subtract", arguments); },
@@ -3656,7 +3728,6 @@ foam.CLASS({
   name: 'CurrentTime',
   extends: 'foam.mlang.AbstractExpr',
   axioms: [
-    // TODO (michal): remove singleton if all calls to foam.mlang.CurrentTime.create() returns the same instance.
     { class: 'foam.pattern.Singleton' }
   ],
   methods: [
@@ -3668,6 +3739,11 @@ foam.CLASS({
       javaCode: `
         return new java.util.Date();
       `
+    },
+    {
+      name: 'toString',
+      code: function() { return 'CurrentTime'; },
+      javaCode: 'return "CurrentTime";'
     }
   ]
 });
@@ -3853,6 +3929,11 @@ foam.CLASS({
 
   documentation: 'Formula base-class',
 
+  javaImports: [
+    'java.util.ArrayList',
+    'java.util.List'
+  ],
+
   properties: [
     {
       class: 'foam.mlang.ExprArrayProperty',
@@ -3906,6 +3987,28 @@ foam.CLASS({
         { name: 'accumulator', type: 'Double' },
         { name: 'currentValue', type: 'Double' }
       ]
+    },
+    {
+      name: 'partialEval',
+      type: 'foam.mlang.Expr',
+      javaCode: `
+        List<Double> list = new ArrayList<>();
+        for ( var arg : getArgs() ) {
+          arg = arg.partialEval();
+          if ( arg instanceof Constant ) {
+            var value = ((Number) arg.f(this)).doubleValue();
+            list.add(value);
+          }
+        }
+
+        if ( list.size() == getArgs().length ) {
+          var result = list.stream().reduce(this::reduce).get();
+          if ( Double.isFinite(result) ) {
+            return new Constant(result);
+          }
+        }
+        return this;
+      `
     },
     {
       name: 'toString',

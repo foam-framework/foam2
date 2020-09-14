@@ -14,7 +14,7 @@ foam.CLASS({
   ],
   methods: [
     {
-      name: 'getColumnMethadata',
+      name: 'getColumnMetadata',
       type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
       code: async function(x, cls, propNames) {
         var metadata = [];
@@ -33,7 +33,7 @@ foam.CLASS({
           if ( props[i].cls_.id === "foam.core.Action" )
             continue;
           
-          metadata.push(this.returnMetadataForProperty(props[i], propNames[i]));
+          metadata.push(this.returnMetadataForProperty(x, cls, props[i], propNames[i]));
         }
         return metadata;
       }
@@ -52,41 +52,45 @@ foam.CLASS({
     },
     {
       name: 'returnMetadataForProperty',
-      code: function(prop, propName) {
+      code: function(x, of, prop, propName) {
+        var columnConfig = x.columnConfigToPropertyConverter;
           //to constants?
-          var cellType = 'STRING';
+          var cellType = '';
           var pattern = '';
+          var unitProp;
           if ( foam.core.UnitValue.isInstance(prop) ) {
             cellType = 'CURRENCY';
             pattern = '\"$\"#0.00\" CAD\"';
+            unitProp = of.getAxiomByName(prop.unitPropName).name;
           } else if ( foam.core.Date.isInstance(prop) ) {
             cellType = 'DATE';
             pattern = 'yyyy-mm-dd';
           } else if ( foam.core.DateTime.isInstance(prop) ) {
             cellType = 'DATE_TIME';
+            pattern = 'ddd mmm d yyyy hh/mm/ss';
           } else if ( foam.core.Time.isInstance(prop) ) {
             cellType = 'TIME';
+            pattern = 'hh/mm/ss';
+          }  else if ( foam.core.Enum.isInstance(prop) || foam.core.AbstractEnum.isInstance(prop) ) {
+            cellType = "ENUM";
+          } else if ( foam.core.Int.isInstance(prop) || foam.core.Float.isInstance(prop) || foam.core.Long.isInstance(prop) || foam.core.Double.isInstance(prop) ) {
+            cellType = 'NUMBER';
+          }  else if ( foam.core.Boolean.isInstance(prop) ) {
+            cellType = 'BOOLEAN';
+          } else if ( foam.core.String.isInstance(prop) ) {
+            cellType = 'STRING';
           }
 
           return this.GoogleSheetsPropertyMetadata.create({
             columnName: prop.name,
-            columnLabel: prop.label,
+            columnLabel: columnConfig.returnColumnHeader(of, propName),
             columnWidth: prop.tableWidth ? prop.tableWidth : 0,
             cellType: cellType,
             pattern: pattern,
-            propName: propName
+            propName: propName,
+            prop: prop,
+            unitPropName: unitProp
           });
-      }
-    },
-    {
-      name: 'outputTable',
-      code: async function(x, cls, arr, columnsMetadata) {
-        var columnConfig = x.columnConfigToPropertyConverter;
-        columnConfig = columnConfig || this.ColumnConfigToPropertyConverter.create();
-
-        var props = columnConfig.returnProperties(cls, columnsMetadata.map(m => m.propName));
-
-        return await this.returnTable(x, props, arr);
       }
     }
   ]

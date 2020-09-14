@@ -21,7 +21,7 @@ foam.CLASS({
 
   documentation: 'A Group of Users.',
 
-  tableColumns: [ 'id', 'description', 'defaultMenu', 'parent' ],
+  tableColumns: [ 'id', 'description', 'defaultMenu.id', 'parent.id' ],
 
   searchColumns: [ 'id', 'description' ],
 
@@ -161,9 +161,16 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        List<GroupPermissionJunction> junctions = ((ArraySink) getPermissions(x).getJunctionDAO().where(EQ(GroupPermissionJunction.SOURCE_ID, getId())).select(new ArraySink())).getArray();
+        List<GroupPermissionJunction> junctions = ((ArraySink) getPermissions(x)
+          .getJunctionDAO()
+            .where(EQ(GroupPermissionJunction.SOURCE_ID, getId()))
+            .select(new ArraySink())).getArray();
 
         for ( GroupPermissionJunction j : junctions ) {
+          if ( j.getTargetId().isBlank() ) {
+            continue;
+          }
+
           if ( j.getTargetId().startsWith("@") ) {
             DAO   dao   = (DAO) x.get("groupDAO");
             Group group = (Group) dao.find(j.getTargetId().substring(1));

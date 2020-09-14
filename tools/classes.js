@@ -19,6 +19,7 @@ var classes = [
   'foam.core.CoreTypesValidationTest',
   'foam.core.CoreTypesValidationTestModel',
   'foam.core.Validator',
+  'foam.core.CompoundException',
   'foam.glang.EndOfTimeSpan',
   'foam.glang.EndOfDay',
   'foam.glang.EndOfWeek',
@@ -65,6 +66,7 @@ var classes = [
   'foam.mlang.ArrayConstant',
   'foam.mlang.expr.Dot',
   'foam.mlang.expr.PropertyExpr',
+  'foam.mlang.expr.Ref',
   'foam.mlang.expr.DateTypes',
   'foam.mlang.expr.DateGrouping',
   'foam.mlang.expr.DateGroupingExpr',
@@ -78,6 +80,7 @@ var classes = [
   'foam.mlang.PredicatedExpr',
   'foam.mlang.ContextObject',
   'foam.mlang.CurrentTime',
+  'foam.mlang.expr.TimeOfDay',
   'foam.mlang.predicate.RegExp',
   'foam.mlang.predicate.OlderThan',
   'foam.mlang.predicate.isAuthorizedToRead',
@@ -136,12 +139,15 @@ var classes = [
   'foam.dao.AbstractFileJournal',
   'foam.dao.F3FileJournal',
   'foam.dao.FileJournal',
+  'foam.dao.ReadOnlyFileJournal',
+  'foam.dao.ReadOnlyF3FileJournal',
   'foam.dao.RoutingJournal',
   'foam.dao.RoutingJournalTest',
   'foam.dao.RoutingJDAO',
   'foam.dao.JournalType',
   'foam.dao.WriteOnlyJDAO',
   'foam.dao.WriteOnlyFileJournal',
+  'foam.dao.WriteOnlyF3FileJournal',
   'foam.dao.BaseClientDAO',
   'foam.dao.ClientDAO',
   'foam.dao.ClientSink',
@@ -187,6 +193,7 @@ var classes = [
   'foam.mlang.sink.Sum',
   'foam.mlang.sink.Average',
   'foam.mlang.sink.Map',
+  'foam.nanos.alarming.AddAlarmNameDAO',
   'foam.nanos.alarming.Alarm',
   'foam.nanos.alarming.AlarmConfig',
   'foam.nanos.alarming.AlarmConfigOMNameDAO',
@@ -237,8 +244,10 @@ var classes = [
   'foam.nanos.auth.Subject',
   'foam.nanos.auth.PriorPassword',
   'foam.nanos.auth.ruler.AddPasswordHistoryAction',
+  'foam.nanos.auth.ruler.PreventDuplicateUsernameAction',
   'foam.nanos.auth.test.PasswordPolicyTest',
   'foam.nanos.auth.Country',
+  'foam.nanos.auth.PropertyType',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.PMAuthService',
   'foam.nanos.auth.UserUserJunction',
@@ -278,6 +287,8 @@ var classes = [
   'foam.nanos.auth.twofactor.ClientOTPAuthService',
   'foam.nanos.auth.twofactor.GoogleTOTPAuthService',
   'foam.nanos.auth.twofactor.TwoFactorAuthService',
+  'foam.nanos.auth.UserPropertyAvailabilityService',
+  'foam.nanos.auth.ClientUserPropertyAvailabilityService',
   'foam.nanos.auth.LogoutDisabledUserDAO',
   'foam.nanos.auth.DeletedAware',
   'foam.nanos.auth.DeletedAwareDummy',
@@ -286,6 +297,8 @@ var classes = [
   'foam.nanos.auth.EnabledCheckAuthService',
   'foam.nanos.http.HttpParameters',
   'foam.nanos.http.DefaultHttpParameters',
+  'foam.nanos.session.LocalSetting',
+  'foam.nanos.session.LocalSettingSessionDAO',
   'foam.nanos.session.Session',
   'foam.nanos.session.SessionService',
   'foam.nanos.session.SimpleSessionService',
@@ -297,6 +310,7 @@ var classes = [
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',
+  'foam.nanos.auth.TimeZone',
   'foam.nanos.logger.LogMessage',
   'foam.nanos.logger.LogMessageDAO',
   'foam.nanos.logger.LogLevelFilterLogger',
@@ -377,6 +391,7 @@ var classes = [
   'foam.nanos.notification.EmailSetting',
   'foam.nanos.notification.NotificationSetting',
   'foam.nanos.notification.NotificationHostnameRuleAction',
+  'foam.nanos.notification.SlackSetting',
   'foam.nanos.notification.ToastNotificationDAO',
   'foam.nanos.notification.ToastState',
   'foam.nanos.notification.ResendNotificationServiceInterface',
@@ -389,6 +404,7 @@ var classes = [
   'foam.nanos.column.ColumnConfigToPropertyConverter',
   'foam.nanos.column.ColumnPropertyValue',
   'foam.nanos.column.NestedPropertiesExpression',
+  'foam.nanos.column.TableColumnOutputter',
   'foam.nanos.cron.Cron',
   'foam.nanos.cron.TimeHMS',
   'foam.nanos.cron.Schedule',
@@ -408,12 +424,16 @@ var classes = [
   'foam.u2.ElementState',
   'foam.u2.DefaultValidator',
   'foam.u2.DisplayMode',
+  'foam.u2.wizard.StepWizardConfig',
+  'foam.nanos.export.ClientGoogleSheetsExportService',
   'foam.nanos.export.ExportDriverRegistry',
+  'foam.nanos.export.GoogleSheetsBasedExportDriver',
   'foam.nanos.export.GoogleSheetsExport',
   'foam.nanos.export.GoogleSheetsExportDriver',
   'foam.nanos.export.GoogleSheetsServiceConfig',
   'foam.nanos.export.GoogleSheetsPropertyMetadata',
   'foam.nanos.export.PDFGoogleSheetsExportDriver',
+  'foam.nanos.export.report.Template',
   'foam.nanos.google.api.auth.GoogleApiAuthService',
   'foam.nanos.google.api.auth.GoogleApiCredentials',
   'foam.nanos.google.api.drive.GoogleDriveService',
@@ -435,6 +455,7 @@ var classes = [
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
   'foam.lib.parse.BlobPStream',
+  'foam.lib.json.JSONParser',
   'foam.lib.json.OutputJSON',
   'foam.lib.json.OutputterMode',
   'foam.lib.json.UnknownFObject',
@@ -468,7 +489,8 @@ var classes = [
   'foam.nanos.demo.relationship.CourseType',
   'foam.nanos.demo.relationship.StudentCourseJunction',
   'foam.nanos.fs.File',
-
+  'foam.nanos.fs.FileType',
+  'foam.nanos.fs.SupportFileTypeDAO',
   'foam.crypto.hash.Hasher',
   'foam.crypto.hash.HashableTest',
 
@@ -518,6 +540,7 @@ var classes = [
   'foam.nanos.dig.exception.AuthorizationException',
   'foam.flow.Document',
   'foam.flow.DocumentationFolderDAO',
+  'foam.flow.DocumentMenu',
 
   'foam.nanos.ruler.RuleGroup',
   'foam.nanos.ruler.Rule',
@@ -610,20 +633,42 @@ var classes = [
   // Crunch
   'foam.nanos.crunch.crunchtest.FakeTestObject',
   //models
+  'foam.nanos.crunch.Renewable',
   'foam.nanos.crunch.Capability',
+  'foam.nanos.crunch.MinMaxCapability',
+  'foam.nanos.crunch.lite.Capable',
+  'foam.nanos.crunch.lite.CapableAdapterDAO',
+  'foam.nanos.crunch.lite.CapablePayload',
   'foam.nanos.crunch.CapabilityCategory',
   'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
   'foam.nanos.crunch.CapabilityJunctionStatus',
   'foam.nanos.crunch.UserCapabilityJunction',
+  'foam.nanos.crunch.ui.CapabilityWizardlet',
+  'foam.u2.wizard.BaseWizardlet',
   'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
+  'foam.nanos.crunch.AssociatedEntity',
+  'foam.nanos.crunch.CapabilityAvailabilityDAO',
+  'foam.nanos.crunch.RenewableData',
+
+  'foam.nanos.crunch.connection.CapabilityPayload',
+
   //daos
+  'foam.nanos.crunch.connection.CapabilityPayloadDAO',
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
   //rules
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
   'foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate',
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
-  'foam.nanos.crunch.CascadeInvalidate',
+  'foam.nanos.crunch.CrunchService',
+  'foam.nanos.crunch.ReputDependentUCJs',
+
+  //ucjdao rules
+  'foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut',
+  'foam.nanos.crunch.ruler.ValidateUCJDataOnPut',
+  'foam.nanos.crunch.ruler.SetUCJStatusOnPut',
+  'foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted',
+  'foam.nanos.crunch.ruler.SaveUCJDataOnGranted',
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
   // userQueryService
@@ -657,7 +702,11 @@ var classes = [
   'foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer',
   'foam.nanos.approval.PopulateApprovalRequestsDAO',
 
-  'foam.core.NumberSet'
+  'foam.core.NumberSet',
+
+  // Translation Support
+  'foam.i18n.XLIFFTranslationValue',
+  'foam.i18n.Locale'
 ];
 
 var abstractClasses = [
@@ -675,15 +724,18 @@ var skeletons = [
   'foam.nanos.auth.email.EmailDocInterface',
   'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.auth.token.TokenService',
+  'foam.nanos.auth.UserPropertyAvailabilityServiceInterface',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.push.PushService',
+  'foam.nanos.notification.ResendNotificationServiceInterface',
   'foam.nanos.session.SessionService',
   'foam.nanos.test.EchoService',
   'foam.strategy.StrategizerService',
   'foam.nanos.auth.UserQueryService',
   'foam.nanos.export.GoogleSheetsExport',
-  'foam.nanos.google.api.sheets.GoogleSheetsDataImportService'
+  'foam.nanos.google.api.sheets.GoogleSheetsDataImportService',
+  'foam.nanos.crunch.CrunchService'
 ];
 
 var proxies = [
@@ -697,6 +749,7 @@ var proxies = [
   'foam.blob.BlobService',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.twofactor.OTPAuthService',
+  'foam.nanos.auth.UserPropertyAvailabilityServiceInterface',
   'foam.nanos.http.WebAgent',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.push.PushService',

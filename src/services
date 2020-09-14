@@ -474,7 +474,11 @@ p({
     \"cache\":true}"
 })
 
-p({"class":"foam.nanos.boot.NSpec", "name":"blobStore",                          "serviceClass":"foam.blob.BlobStore"})
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"blobStore",
+  "serviceClass":"foam.blob.BlobStore"
+})
 
 p({
   "class": "foam.nanos.boot.NSpec",
@@ -496,6 +500,16 @@ p({
   """
 })
 
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "file",
+  "authenticate": false,
+  "serviceScript": """
+    fileService = new foam.nanos.http.UnauthenticatedFileService(x, "file", x.get("blobStore"));
+    return new foam.nanos.http.ProxyWebAgent(fileService);
+  """
+})
+
 p({"class":"foam.nanos.boot.NSpec", "name":"blobService",                        "serve":true,  "client": "{ \"class\":\"foam.blob.RestBlobService\", \"serviceName\":\"service/httpBlobService\" }"})
 p({"class":"foam.nanos.boot.NSpec", "name":"resetPasswordToken",                 "serve":true,  "authenticate": false, "serviceClass":"foam.nanos.auth.resetPassword.ResetPasswordTokenService","boxClass":"foam.nanos.auth.token.TokenServiceSkeleton","client":"{\"class\":\"foam.nanos.auth.token.ClientTokenService\"}"})
 
@@ -506,41 +520,33 @@ p({
   "serviceScript": "return new foam.nanos.dig.DigWebAgent()"
 })
 
-p({"class":"foam.nanos.boot.NSpec", "name":"digDAO",                            "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setPm(true).setGuid(true).setOf(foam.nanos.dig.DIG.getOwnClassInfo()).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"digs\").build();","client":"{\"of\":\"foam.nanos.dig.DIG\",\"decorators\": [{\"class\":\"foam.nanos.fs.FileDAODecorator\"},{\"class\":\"foam.nanos.fs.FileArrayDAODecorator\"}]}"})
-p({"class":"foam.nanos.boot.NSpec", "name":"demoObjectDAO",                      "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"demoObjects\").setGuid(true).setOf(foam.nanos.demo.DemoObject.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.demo.DemoObject\", \"remoteListenerSupport\": false}"})
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"fileDAO",
+  "name":"digDAO",
   "serve":true,
   "serviceScript":
   """
-    dao = new foam.dao.KeyValueDAO.Builder(x)
-      .setDelegate(new foam.dao.NullDAO(x, foam.nanos.fs.File.getOwnClassInfo()))
-      .build();
-
-    return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setGuid(true)
-      .setDecorator(dao)
-      .setOf(foam.nanos.fs.File.getOwnClassInfo())
-      .setJournalName("files")
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .build()
-  """,
-  "client":
-  """
-    {
-      "of":"foam.nanos.fs.File",
-      "cache":false,
-      "decorators":
-      [
+  return new foam.dao.EasyDAO.Builder(x)
+    .setPm(true)
+    .setGuid(true)
+    .setOf(foam.nanos.dig.DIG.getOwnClassInfo())
+    .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+    .setJournalName("digs")
+    .setServiceProviderAware(true)
+    .setServiceProviderAwarePropertyInfos(
+      foam.util.Arrays.asMap(new Object[]
         {
-          "class":"foam.blob.BlobServiceDecorator"
+          foam.nanos.dig.DIG.class.getName(),
+          new foam.core.PropertyInfo[] { foam.nanos.dig.DIG.CREATED_BY }
         }
-      ]
-    }
-  """
+      )
+    )
+    .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.dig.DIG\",\"decorators\": [{\"class\":\"foam.nanos.fs.FileDAODecorator\"},{\"class\":\"foam.nanos.fs.FileArrayDAODecorator\"}]}"
 })
+
+p({"class":"foam.nanos.boot.NSpec", "name":"demoObjectDAO",                      "serve":true,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"demoObjects\").setGuid(true).setOf(foam.nanos.demo.DemoObject.getOwnClassInfo()).build();", "client":"{\"of\":\"foam.nanos.demo.DemoObject\", \"remoteListenerSupport\": false}"})
 
 p({
   "class":"foam.nanos.boot.NSpec",
@@ -705,7 +711,16 @@ p({
       .setGuid(true)
       .setOf(foam.nanos.dig.SUGAR.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"sugars\")
+      .setJournalName("sugars")
+      .setServiceProviderAware(true)
+      .setServiceProviderAwarePropertyInfos(
+        foam.util.Arrays.asMap(new Object[]
+          {
+            foam.nanos.dig.SUGAR.class.getName(),
+            new foam.core.PropertyInfo[] { foam.nanos.dig.SUGAR.CREATED_BY }
+          }
+        )
+      )
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.dig.SUGAR\"}"
@@ -718,6 +733,7 @@ p({
   "serviceScript": """
     dao = new foam.dao.EasyDAO.Builder(x)
       .setEnableInterfaceDecorators(false)
+      .setServiceProviderAware(true)
       .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
       .setInnerDAO(x.get("localRuleDAO"))
       .build();
@@ -752,6 +768,8 @@ p({
       .build();
 
     dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.NAME });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.DAO_KEY });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.ENABLED });
 
     return dao;
   """,
@@ -807,12 +825,15 @@ p({
   "name":"localGroupPermissionJunctionDAO",
   "description":"The junction DAO for the many-to-many relationship between groups and permissions",
   "serviceScript":"""
-    return new foam.dao.EasyDAO.Builder(x)
+    dao = new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.auth.GroupPermissionJunction.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("groupPermissionJunctions")
       .setPm(true)
       .build();
+
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.auth.GroupPermissionJunction.SOURCE_ID });
+    return dao;
   """
 })
 p({
@@ -867,9 +888,10 @@ p({
   "serviceScript":
   """
     return new foam.nanos.analytics.FoldManagerDAODecorator.Builder(x)
-      .setDelegate(new foam.dao.NullDAO.Builder(x)
-      .setOf(foam.nanos.pm.PM.getOwnClassInfo())
-      .build())
+      .setDelegate(
+        new foam.nanos.ruler.RulerDAO(x, new foam.dao.NullDAO.Builder(x)
+        .setOf(foam.nanos.pm.PM.getOwnClassInfo())
+        .build(), "pmDAO"))
       .setFm((foam.nanos.analytics.DAOFoldManager) x.get("pmFoldManager"))
       .build();
   """,
@@ -1106,4 +1128,84 @@ p({
         }
     }
   """
+})
+  "class":"foam.nanos.boot.NSpec",
+  "name":"localSettingDAO",
+  "lazy":false,
+  "serve":true,
+  "authenticate": true,
+  "serviceScript":"""
+    import foam.dao.DAO;
+    return new foam.dao.EasyDAO.Builder(x)
+      .setDecorator(new foam.nanos.session.LocalSettingSessionDAO(x, new foam.dao.NullDAO(x, foam.nanos.session.LocalSetting.getOwnClassInfo())))
+      .setAuthorize(true)
+      .setOf(foam.nanos.session.LocalSetting.getOwnClassInfo())
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.session.LocalSetting\", \"remoteListenerSupport\": false}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"reportTemplateDAO",
+  "lazy":false,
+  "serve":true,
+  "authenticate": true,
+  "serviceScript":"""
+    import foam.dao.DAO;
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.export.report.Template.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("reportTemplates")
+      .setAuthorize(true)
+      .build();
+  """,
+  "client":
+  """
+    {
+      \"of\":\"foam.nanos.export.report.Template\"
+    }
+  """
+})
+  "class": "foam.nanos.boot.NSpec",
+  "name": "userPropertyAvailabilityService",
+  "serve": true,
+  "authenticate": false,
+  "boxClass":"foam.nanos.auth.UserPropertyAvailabilityServiceInterfaceSkeleton",
+  "serviceClass": "foam.nanos.auth.UserPropertyAvailabilityService",
+  "client":
+    """
+      {
+        "class":"foam.nanos.auth.ClientUserPropertyAvailabilityService",
+        "delegate": {
+          "class":"foam.box.SessionClientBox",
+          "delegate": {
+            "class":"foam.box.HTTPBox",
+            "url":
+            "service/userPropertyAvailabilityService"
+          }
+        }
+      }
+    """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "timezoneDAO",
+  "description": "A DAO which contains information about timezones in countries.",
+  "serve": true,
+  "serviceScript": """
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("timezoneDAO"))
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("timezones")
+      .setOf(foam.nanos.auth.TimeZone.getOwnClassInfo())
+      .build();
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.auth.TimeZone.DISPLAY_NAME });
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.auth.TimeZone.COUNTRY_ID });
+
+    return dao;
+  """,
+  "client": "{\"of\":\"foam.nanos.auth.TimeZone\"}"
 })
