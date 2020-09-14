@@ -338,7 +338,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/lite/CapableAdapterDAO" },
   { name: "foam/nanos/crunch/lite/CapableObjectData" },
   { name: "foam/nanos/crunch/lite/CapablePayloadApprovableRuleAction" },
-  { name: "foam/nanos/crunch/lite/CapablePayloadCreateApprovalsRuleAction" },
+  { name: "foam/nanos/crunch/lite/CapableCreateApprovalsRuleAction" },
   { name: "foam/nanos/crunch/crunchtest/TestCapable" },
   { name: "foam/nanos/crunch/lite/CapableCompatibleCapability" },
   { name: "foam/nanos/crunch/lite/CapabilityRefinement" },

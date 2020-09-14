@@ -37,32 +37,37 @@ foam.CLASS({
           public void execute(X x) {
             Approvable approvable = (Approvable) obj;
             DAO dao = (DAO) getX().get(approvable.getServerDaoKey());
+            
+            FObject objectToReput = dao.find(approvable.getObjId());
 
-            Capable capableObject = (Capable) dao.find(approvable.getObjId());
+            Capable capableObjectToReput = (Capable) objectToReput;
 
-            DAO capablePayloadDAO = capableObject.getCapablePayloadDAO(x);
+            DAO capablePayloadDAO = capableObjectToReput.getCapablePayloadDAO(x);
 
             if ( approvable.getOperation() == Operations.CREATE ){
               try {
-                CapablePayload objectToPut =  (CapablePayload) CapablePayload.getOwnClassInfo().newInstance();
+                CapablePayload capablePayloadToUpdate =  (CapablePayload) CapablePayload.getOwnClassInfo().newInstance();
 
                 Map propsToUpdate = approvable.getPropertiesToUpdate();
 
                 for ( Object propName : propsToUpdate.keySet() ){
                   String propNameString = (String) propName;
-                  objectToPut.setProperty(propNameString,propsToUpdate.get(propNameString));
+                  capablePayloadToUpdate.setProperty(propNameString,propsToUpdate.get(propNameString));
                 }
 
-                objectToPut.setStatus(foam.nanos.crunch.CapabilityJunctionStatus.GRANTED);
+                capablePayloadToUpdate.setStatus(foam.nanos.crunch.CapabilityJunctionStatus.GRANTED);
 
-                capablePayloadDAO.put(objectToPut);
+                // first update the object's capable payloads
+                capablePayloadDAO.put(capablePayloadToUpdate);
+
+                // then reput the actual capable object into it's dao
+                dao.put(objectToReput);
 
               } catch ( Exception e ){
                 throw new RuntimeException(e);
               }
-            } else {
-              throw new RuntimeException("Unsupported approvable operation.");
             }
+            throw new RuntimeException("Unsupported approvable operation.");
           }
         }, "Updated the payload based on a approved approvable");
       `
