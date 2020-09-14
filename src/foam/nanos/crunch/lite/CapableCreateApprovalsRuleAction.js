@@ -45,7 +45,7 @@ foam.CLASS({
       javaFactory: 'return new java.util.ArrayList();'
     },
     {
-      class: 'String'
+      class: 'String',
       name: 'daoToReput',
       required: true
     }
@@ -78,8 +78,6 @@ foam.CLASS({
               DAO approvableDAO = (DAO) getX().get("approvableDAO");
 
               Operations operation = Operations.CREATE;
-
-              Capability capability  = (Capability) capablePayload.getCapability();
 
               String hashedId = new StringBuilder("d")
                 .append(capablePayload.getDaoKey())
