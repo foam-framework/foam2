@@ -11,40 +11,97 @@ foam.CLASS({
     'foam.nanos.export.ExportDriver',
     'foam.nanos.export.GoogleSheetsServiceConfig'
   ],
-  extends: 'foam.nanos.export.TableExportDriver',
-
-  requires: [
-    'foam.nanos.export.GoogleSheetsOutputter'
-  ],
 
   properties: [
+    {
+      name: 'outputter',
+      factory: function() {
+        return foam.nanos.export.GoogleSheetsOutputter.create();
+      },
+      hidden: true,
+      flags: ['js']
+    },
     {
       class: 'String',
       name: 'title'
     },
     {
-      name: 'outputter',
-      hidden: true,
-      factory: function() {
-        return this.GoogleSheetsOutputter.create();
-      },
-      flags: ['js']
+      class: 'Reference',
+      of: 'foam.nanos.export.report.Template',
+      name: 'template',
+      targetDAOKey: 'reportTemplateDAO',
+      view: function(args, X) {
+        var expr = foam.mlang.Expressions.create();
+        if ( ! X.serviceName ) return [];
+        
+        return foam.u2.view.ChoiceView.create({
+            placeholder: 'Please select template...',
+            dao: X.reportTemplateDAO.where(expr.EQ(foam.nanos.export.report.Template.DAO_KEY, X.serviceName.split('/')[1])),
+            objToChoice: function(a) {
+              return [a.id, a.name];
+          }
+        });
+      }
+    },
+    {
+      name: 'serviceName',
+      class: 'String',
+      hidden: true
+    },
+    {
+      name: 'exportClsInfo',
+      class: 'Class',
+      javaType: 'foam.core.ClassInfo',
+      hidden: true
     }
   ],
 
   methods: [
     async function exportFObjectAndReturnSheetId(X, obj) {
-      var propNames = this.getPropName(X, obj.cls_);
-      var objToTable = await this.exportFObjectAndReturnTable(X, obj, propNames);
-      var metadata = await this.outputter.getColumnMethadata(X, obj.cls_, propNames);
-      return await X.googleSheetsDataExport.createSheet(X, objToTable, metadata, this);
+      var self = this;
+      
+      var sheetId  = '';
+      var columnConfig = X.columnConfigToPropertyConverter;
+
+      var propNames = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(obj.cls);
+      propNames = columnConfig.filterExportedProps(X, obj.cls_, propNames);
+      
+      var metadata = await self.outputter.getColumnMetadata(X, obj.cls_, propNames);
+
+      sheetId = await X.googleSheetsDataExport.createSheetAndPopulateWithData(X, metadata, this);
+      if ( ! sheetId || sheetId.length === 0)
+        return '';
+      return sheetId;
     },
     async function exportDAOAndReturnSheetId(X, dao) {
+      this.serviceName = X.serviceName.split('/')[1];
       var self = this;
-      var propNames = this.getPropName(X, dao.of);
-      var metadata = await self.outputter.getColumnMethadata(X, dao.of, propNames);
-      var stringArray = await this.exportDAOAndReturnTable(X, dao, propNames);
-      return await X.googleSheetsDataExport.createSheet(X, stringArray, metadata, this);
+      this.exportClsInfo = dao.of;
+
+      var columnConfig = X.columnConfigToPropertyConverter;
+
+      var propNames;
+      if ( ! this.template )
+        propNames =  X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
+      else {
+        var expr1 = foam.mlang.Expressions.create();
+        var template = await X.reportTemplateDAO.find(expr1.EQ(foam.nanos.export.report.Template.ID, this.template));
+        propNames = template && template.columnNames && template.columnNames.length > 0 ? template.columnNames : X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
+      }
+       
+      propNames = columnConfig.filterExportedProps(dao.of, propNames);
+
+      var metadata = await self.outputter.getColumnMetadata(X, dao.of, propNames);
+
+      var sheetId  = '';
+
+      if ( this.template )
+        sheetId = await X.googleSheetsDataExport.createSheetByCopyingTemplate(X, metadata, this);
+      else
+        sheetId = await X.googleSheetsDataExport.createSheetAndPopulateWithData(X, metadata, this);
+      if ( ! sheetId || sheetId.length == 0)
+        return '';
+      return sheetId;
     }
   ]
 });

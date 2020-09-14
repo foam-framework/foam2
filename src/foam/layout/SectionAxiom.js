@@ -90,7 +90,8 @@ foam.CLASS({
         ).map(
           p => p.createVisibilityFor(data$,
             data.__subContext__.controllerMode$ ||
-            data.__subContext__.ctrl.controllerMode$
+            (data.__subContext__.ctrl && data.__subContext__.ctrl.controllerMode$) ||
+            foam.core.ConstantSlot.create({value: foam.u2.ControllerMode.CREATE})
           )
         )
       }).map(arr => arr.some(m => {

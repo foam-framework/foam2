@@ -185,7 +185,7 @@ FOAM_FILES([
   { name: "foam/nanos/export/CSVTableExportDriver"},
   { name: "foam/nanos/export/ExportDriverRegistry"},
   { name: "foam/nanos/export/ExportDriver" },
-  { name: "foam/nanos/export/GoogleSheetsBasedExportDriver"},
+  { name: "foam/nanos/export/GoogleSheetsBasedExportDriver" },
   { name: "foam/nanos/export/GoogleSheetsExport" },
   { name: "foam/nanos/export/GoogleSheetsExportDriver" },
   { name: "foam/nanos/export/GoogleSheetsOutputter" },
@@ -194,6 +194,7 @@ FOAM_FILES([
   { name: "foam/nanos/export/JSONDriver"},
   { name: "foam/nanos/export/JSONJDriver"},
   { name: "foam/nanos/export/XMLDriver"},
+  { name: "foam/nanos/export/report/Template" },
   { name: "foam/nanos/export/PDFGoogleSheetsExportDriver" },
   { name: "foam/nanos/export/TableExportDriver"},
   { name: "foam/nanos/google/api/auth/GoogleApiAuthService" },
@@ -362,7 +363,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ruler/ConfigureUCJExpiryOnGranted" },
   { name: "foam/nanos/crunch/ruler/SaveUCJDataOnGranted" },
   //views
-  { name: "foam/nanos/crunch/ui/CapabilityView" },
+  { name: "foam/nanos/crunch/ui/CapableView" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
 
   // approval

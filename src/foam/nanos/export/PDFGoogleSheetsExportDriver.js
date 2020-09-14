@@ -17,20 +17,18 @@ foam.CLASS({
   `,
 
   methods: [
-    async function exportFObject(X, obj) {
-      var sheetId = await this.exportFObjectAndReturnSheetId(X, obj);
-      if ( ! sheetId || sheetId.length === 0)
-        return '';
-      return  `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=3`;
-    },
-    async function exportDAO(X, dao) {
-      var sheetId = await this.exportDAOAndReturnSheetId(X, dao);
+    async function exportFObject(X, obj) {      
+      var sheetId  = await this.exportFObjectAndReturnSheetId(X, obj);
+      
       if ( ! sheetId || sheetId.length === 0)
         return '';
       return `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=1`;
+    },
+    async function exportDAO(X, dao) {
+      var sheetId  = await this.exportDAOAndReturnSheetId(X, dao);
+      if ( ! sheetId || sheetId.length == 0)
+        return '';
+      return `https://docs.google.com/spreadsheets/d/${sheetId}/export?exportFormat=pdf&format=pdf&scale=1`;
     }
-  ],
-  constants: {
-    SPREADSHEET_ID_REGEX: '/spreadsheets/d/([a-zA-Z0-9-_]+)',
-  }
+  ]
 });

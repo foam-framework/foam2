@@ -13,8 +13,10 @@ foam.CLASS({
 
   imports: [
     'exportDriverRegistryDAO',
-    'filteredTableColumns'
+    'filteredTableColumns',
+    'serviceName'
   ],
+
 
   requires: [
     'foam.u2.ModalHeader',
@@ -131,7 +133,6 @@ foam.CLASS({
         self.isDownloadAvailable = self.exportDriverReg.isDownloadable;
         self.isOpenAvailable = self.exportDriverReg.isOpenable;
       });
-
 
       this
       .tag(this.ModalHeader.create({

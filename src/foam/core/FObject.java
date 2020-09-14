@@ -536,4 +536,8 @@ public interface FObject
   {
     if ( isFrozen() ) throw new UnsupportedOperationException("Object is frozen.");
   }
+
+  default String toSummary() {
+    return toString();
+  }
 }

@@ -148,7 +148,10 @@ foam.CLASS({
             )
           )
         ).then(ucj => {
-          if ( ucj ) this.cjStatus = ucj.status;
+          if ( ucj ) {
+            this.cjStatus = ucj.status === this.CapabilityJunctionStatus.APPROVED ? 
+              this.CapabilityJunctionStatus.PENDING : ucj.status;
+          }
           if ( this.cjStatus === this.CapabilityJunctionStatus.GRANTED ){
             this.crunchService.isRenewable(this.ctrl.__subContext__, ucj.targetId).then(
               isRenewable => this.isRenewable = isRenewable

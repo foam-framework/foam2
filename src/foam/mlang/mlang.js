@@ -2683,6 +2683,9 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.mlang.Expr',
+    'java.util.Arrays',
+    'java.util.ArrayList',
+    'java.util.List',
     'java.util.StringJoiner'
   ],
 
@@ -2705,7 +2708,17 @@ foam.CLASS({
       documentation: 'The projection with the class removed and all values in the same position as in "exprs".',
       name: 'projection',
       transient: true,
-      getter: function() { return this.projectionWithClass.map(p => p.slice(1)); }
+      getter: function() { return this.projectionWithClass.map(p => p.slice(1)); },
+      javaFactory: `
+        List result = new ArrayList();
+        if ( getProjectionWithClass() != null ) {
+          for ( Object list: (ArrayList)getProjectionWithClass() ) {
+            Object[] obj1 = Arrays.copyOfRange((Object[])list, 1, ((Object[])list).length);
+            result.add(obj1);
+          }
+        }
+        return result;
+      `
     },
     {
       class: 'List',
