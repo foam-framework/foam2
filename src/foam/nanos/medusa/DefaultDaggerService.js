@@ -60,7 +60,7 @@ foam.CLASS({
   constants: [
     {
       name: 'BOOTSTRAP_INDEX',
-      value: -1,
+      value: 0,
       type: 'Long'
     }
   ],
