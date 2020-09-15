@@ -130,6 +130,7 @@ foam.INTERFACE({
               .setCapable(this)
               .setOf(CapablePayload.getOwnClassInfo())
               .build();
+            x.put("capableAdapterDAO", capableAdapterDAO);
             RulerDAO rulerDAO = new RulerDAO(
               x, capableAdapterDAO, "capablePayloadDAO");
             return rulerDAO;

@@ -26,7 +26,8 @@ foam.CLASS({
     {
       name: 'applyAction',
       javaCode: `
-        Capable capableTarget = ((CapableAdapterDAO) x.get("capableObjectDAO")).getCapable();
+        CapableAdapterDAO payloadDAO = (CapableAdapterDAO) x.get("capableAdapterDAO");
+        Capable capableTarget = payloadDAO.getCapable();
         
         CapablePayload payload = (CapablePayload) obj;
 
@@ -43,7 +44,8 @@ foam.CLASS({
         }
 
         Capability cap = payload.getCapability();
-        payload.setStatus(cap.getCapableChainedStatus(x));
+        payload.setStatus(cap.getCapableChainedStatus(
+          x, payloadDAO, payload));
       `,
     }
   ]
