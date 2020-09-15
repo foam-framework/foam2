@@ -26,6 +26,7 @@ foam.CLASS({
     'java.util.Map',
     'java.util.ArrayList',
     'java.util.List',
+    'foam.util.SafetyUtil',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.lite.Capable',
     'foam.nanos.crunch.lite.CapablePayload'
@@ -59,13 +60,22 @@ foam.CLASS({
 
         List<String> capabilitiesToApprove = getCapabilitiesToApprove();
 
-        Capable capableObj = (Capable) obj;
+        FObject clonedObj = obj.fclone();
+
+        Capable capableObj = (Capable) clonedObj;
 
         agency.submit(x, new ContextAwareAgent() {
           
           @Override
           public void execute(X x) {
             for ( CapablePayload capablePayload : capableObj.getCapablePayloads() ){
+
+              if ( 
+                capablePayload.getObjId() == null || 
+                SafetyUtil.isEmpty((String) capablePayload.getObjId())
+              ){
+                capablePayload.setObjId(obj.getProperty("id"));
+              }
 
               Capability capability = capablePayload.getCapability();
 
@@ -120,7 +130,7 @@ foam.CLASS({
             // everything at this point  is either PENDING or GRANTED we need to reput
             DAO daoToReput = (DAO) x.get(getDaoToReput());
 
-            daoToReput.put(obj);
+            daoToReput.put(clonedObj);
           }
 
         }, "Sent out approval requests for needed payloads and granted the others");
