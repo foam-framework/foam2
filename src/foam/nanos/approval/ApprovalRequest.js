@@ -405,12 +405,26 @@
       writePermissionRequired: true
     },
     {
-      class: 'String',
-      name: 'refObj',
+      class: 'Object',
+      name: 'refObjId',
       hidden: true,
       readPermissionRequired: true,
       writePermissionRequired: true,
       documentation: `
+        ID of obj displayed in view reference
+        To be used in view reference action when the approvalrequest
+        needs to specify its own reference, for example in the case of 
+        UserCapabilityJunctions where data is null.
+      `
+    },
+    {
+      class: 'String',
+      name: 'refDaoKey',
+      hidden: true,
+      readPermissionRequired: true,
+      writePermissionRequired: true,
+      documentation: `
+        Daokey of obj displayed in view reference.
         To be used in view reference action when the approvalrequest
         needs to specify its own reference, for example in the case of 
         UserCapabilityJunctions where data is null.
@@ -668,9 +682,23 @@
             })
             .catch((err) => {
               console.warn(err.message || err);
-              return false;
+              if ( self.refObjId && self.refDaoKey && self.__subContext__[self.refDaoKey_] ) {
+                property = self.__subContext__[self.refDaoKey].of.ID;
+                objId = property.adapt.call(property, self.refObjId, self.refObjId, property);
+                return self.__subContext__[self.refDaoKey]
+                  .find(objId)
+                  .then((obj) => {
+                    return !! obj;
+                  })
+                  .catch((err) => {
+                    console.warn(err.message || err);
+                    return false;
+                  });
+              } else {
+                return false;
+              }
             });
-          }
+        }
       },
       code: function(X) {
         var self = this;
@@ -682,14 +710,15 @@
              return;
         }
 
-        var objId, daoKey;
-        if ( self.refObj ) {
-          var res = self.refObj.split(':');
-          daoKey = res[0];
-          objId = X[daoKey].of.ID.type === 'Long' ? parseInt(res[1]) : res[1];
+        var objId, daoKey, property;
+        if ( self.refObjId && self.refDaoKey ) {
+          daoKey = self.refDaoKey
+          property = X[daoKey].of.ID;
+          objId = property.adapt.call(property, self.refObjId, self.refObjId, property);
         } else {
-          objId = X[self.daoKey_].of.ID.type === 'Long' ? parseInt(self.objId) : self.objId;
           daoKey = self.daoKey_;
+          property = X[daoKey].of.ID;
+          objId = property.adapt.call(property, self.objId, self.objId, property);
         }
         
         return X[daoKey]
