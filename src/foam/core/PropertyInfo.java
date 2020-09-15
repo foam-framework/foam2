@@ -21,6 +21,7 @@ public interface PropertyInfo
   extends Axiom, Comparator, Expr, SQLStatement, Validator, Hasher, Signer, Comparable, ClassInfoAware
 {
 
+  public boolean getDigTransient();
   public boolean getNetworkTransient();
   public boolean getReadPermissionRequired();
   public boolean getWritePermissionRequired();

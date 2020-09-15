@@ -45,6 +45,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'digTransient'
+    },
+    {
+      class: 'Boolean',
       name: 'storageTransient'
     },
     {
@@ -296,6 +300,15 @@ foam.CLASS({
             type: 'boolean',
             visibility: 'public',
             body: 'return ' + this.networkTransient + ';'
+          });
+        }
+
+        if ( this.digTransient ) {
+          m.push({
+            name: 'getDigTransient',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.digTransient + ';'
           });
         }
 

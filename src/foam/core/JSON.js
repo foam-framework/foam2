@@ -681,6 +681,18 @@ foam.LIB({
       propertyPredicate: function(o, p) { return ! p.networkTransient; }
     }),
 
+    // Short, but exclude network-transient properties.
+    Dig: foam.json.Outputter.create({
+      pretty: true,
+      strict: false,
+      formatDatesAsNumbers: false,
+      outputDefaultValues: true,
+      useShortNames: false,
+      // TODO: Currently faster to use strict JSON and native JSON.parse
+      convertUnserializableToStubs: true,
+      propertyPredicate: function(o, p) { return ! p.digTransient && ! p.networkTransient; }
+    }),
+
     // Short, but exclude storage-transient properties.
     Storage: foam.json.Outputter.create({
       pretty: false,

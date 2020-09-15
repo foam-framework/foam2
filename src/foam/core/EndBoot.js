@@ -213,6 +213,13 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'digTransient',
+      expression: function(transient) {
+        return transient;
+      }
+    },
+    {
+      class: 'Boolean',
       name: 'storageTransient',
       expression: function(transient) {
         return transient;

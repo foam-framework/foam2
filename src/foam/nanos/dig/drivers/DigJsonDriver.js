@@ -88,6 +88,7 @@ foam.CLASS({
         .setPropertyPredicate(
           new foam.lib.AndPropertyPredicate(x, 
             new foam.lib.PropertyPredicate[] {
+              new foam.lib.DigPropertyPredicate(),
               new foam.lib.NetworkPropertyPredicate(), 
               new foam.lib.PermissionedPropertyPredicate()}));
 
