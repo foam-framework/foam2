@@ -12,8 +12,10 @@ foam.CLASS({
   javaImports: [
     'foam.core.FObject',
     'foam.dao.DAO',
+    'foam.util.SafetyUtil',
     'foam.nanos.crunch.lite.Capable',
     'foam.nanos.crunch.lite.CapablePayload',
+    'foam.nanos.crunch.Capability',
     'java.util.Arrays',
     'java.util.ArrayList',
     'java.util.List'
@@ -36,27 +38,68 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-        // only on create
-        if ( obj instanceof Capable && getDelegate().find_(x, obj) == null ) {
-          Capable capableObj =  (Capable) obj;
+        FObject currentObjectInDao = getDelegate().find_(x, obj);
+        Capable toPutCapableObj =  (Capable) obj;
+        DAO toPutCapablePayloadDAO = toPutCapableObj.getCapablePayloadDAO(x);
 
-          DAO capablePayloadDAO = capableObj.getCapablePayloadDAO(x);
+        CapablePayload[] toPutCapablePayloadArray = (CapablePayload[]) toPutCapableObj.getCapablePayloads();
 
-          CapablePayload[] capablePayloadsArray = (CapablePayload[]) capableObj.getCapablePayloads();
+        // For both create and update,
+        // we need to handle the cleaning of data if it is from the client
+        // and we also need to populate the CapablePayload.daoKey and 
+        // CapablePayload.objId fields since they don't get filled out by client
+        if ( currentObjectInDao == null ) {
+          for (int i = 0; i < toPutCapablePayloadArray.length; i++){
+        
+            CapablePayload currentCapablePayload = toPutCapablePayloadArray[i];
 
-          // just to ensure everything received from the client is clean
-          for (int i = 0; i < capablePayloadsArray.length; i++){
-            CapablePayload currentCapablePayload = capablePayloadsArray[i];
-            currentCapablePayload.setStatus(getDefaultStatus());
+            if ( ! currentCapablePayload.getHasSafeStatus() ){
+              currentCapablePayload.setStatus(getDefaultStatus());
+            }
+
             currentCapablePayload.setDaoKey(getDaoKey());
             currentCapablePayload.setObjId(obj.getProperty("id"));
-          }
+          }          
+        } else {
+          Capable storedCapableObj = (Capable) currentObjectInDao;
 
-          List<CapablePayload> capablePayloads = new ArrayList<CapablePayload>(Arrays.asList(capableObj.getCapablePayloads()));
-          
-          for ( CapablePayload currentPayload : capablePayloads ){
-            capablePayloadDAO.put(currentPayload);
+          DAO storedCapablePayloadDAO = storedCapableObj.getCapablePayloadDAO(x);
+
+          for ( int i = 0; i < toPutCapablePayloadArray.length; i++ ){
+            CapablePayload toPutCapablePayload = (CapablePayload) toPutCapablePayloadArray[i];
+
+            if ( ! toPutCapablePayload.getHasSafeStatus() ){
+              Capability capability = (Capability) toPutCapablePayload.getCapability();
+
+              CapablePayload storedCapablePayload = (CapablePayload) storedCapablePayloadDAO.find(capability.getId());
+
+              if ( storedCapablePayload != null ){
+                toPutCapablePayload.setStatus(storedCapablePayload.getStatus());
+                toPutCapablePayload.setDaoKey(storedCapablePayload.getDaoKey());
+                toPutCapablePayload.setObjId(storedCapablePayload.getObjId());
+              }
+            }
+
+            if ( 
+              toPutCapablePayload.getDaoKey() == null || 
+              SafetyUtil.isEmpty(toPutCapablePayload.getDaoKey()) 
+            ){
+              toPutCapablePayload.setDaoKey(getDaoKey());
+            }
+
+            if ( 
+              toPutCapablePayload.getObjId() == null || 
+              SafetyUtil.isEmpty((String) toPutCapablePayload.getObjId()) 
+            ){
+              toPutCapablePayload.setObjId(obj.getProperty("id"));
+            }
           }
+        }
+
+        List<CapablePayload> capablePayloads = new ArrayList<CapablePayload>(Arrays.asList(toPutCapablePayloadArray));
+
+        for ( CapablePayload currentPayload : capablePayloads ){
+          toPutCapablePayloadDAO.put(currentPayload);
         }
 
         return super.put_(x, obj);

@@ -65,6 +65,14 @@ foam.CLASS({
       of: 'foam.nanos.crunch.CapabilityJunctionStatus',
       value: foam.nanos.crunch.CapabilityJunctionStatus.ACTION_REQUIRED
     },
+    {
+      class: 'Boolean',
+      name: 'hasSafeStatus',
+      documentation: `
+        TODO: 
+      `,
+      transient: true
+    },
   ],
 
   methods: [

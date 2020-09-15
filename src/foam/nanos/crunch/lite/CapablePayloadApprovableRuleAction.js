@@ -56,6 +56,7 @@ foam.CLASS({
                 }
 
                 capablePayloadToUpdate.setStatus(foam.nanos.crunch.CapabilityJunctionStatus.GRANTED);
+                capablePayloadToUpdate.setHasSafeStatus(true);
 
                 // first update the object's capable payloads
                 capablePayloadDAO.put(capablePayloadToUpdate);
