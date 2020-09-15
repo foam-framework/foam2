@@ -14,7 +14,7 @@ To set up credentials required for Google Sheets Export or Import follow through
 6. Save credentials
 
 
-Note if you cannot access this links please post request on slack to add your email to this projects.
+Note if you cannot access this links please post request on slack to add your email to this project.
 
 To add users to project:
 1. Open navigation menu (top left corner hamburger button)
