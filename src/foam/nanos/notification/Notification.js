@@ -11,7 +11,7 @@ foam.CLASS({
   implements: [
     'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
-    'foam.nanos.auth.CreatedByAware'
+    // 'foam.nanos.auth.CreatedByAware'
   ],
 
   documentation: 'Notification model responsible for system and integrated messaging notifications.',

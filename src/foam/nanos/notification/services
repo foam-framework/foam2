@@ -28,11 +28,12 @@ p({
   "class": "foam.nanos.boot.NSpec",
   "name": "notificationDAO",
   "lazy": false,
+  "authenticate": false,
   "serve": true,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.notification.Notification.getOwnClassInfo())
-      .setAuthorize(true)
+      .setAuthorize(false)
       .setInnerDAO((foam.dao.DAO) x.get("localNotificationDAO"))
       .setDecorator(new foam.nanos.notification.ToastNotificationDAO.Builder(x).build())
       .build();
