@@ -575,6 +575,22 @@ foam.CLASS({
     },
 
     function notify(toastMessage, toastSubMessage, severity, transient) {
+      var userNotificationQueryId = this.subject && this.subject.realUser ?
+      this.subject.realUser.id : this.user.id;
+      this.__subSubContext__.notificationDAO.where(
+        this.EQ(this.Notification.USER_ID, userNotificationQueryId)
+      ).on.put.sub((sub, on, put, obj) => {
+        if ( obj.toastState == this.ToastState.REQUESTED ) {
+          this.add(this.NotificationMessage.create({
+            message: obj.toastMessage,
+            type: obj.severity,
+            description: obj.toastSubMessage
+          }));
+          var clonedNotification = obj.clone();
+          clonedNotification.toastState = this.ToastState.DISPLAYED;
+          this.__subSubContext__.notificationDAO.put(clonedNotification);
+        }
+      });
       var notification = this.Notification.create();
       notification.userId = this.subject && this.subject.realUser ?
         this.subject.realUser.id : this.user.id;
