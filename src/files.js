@@ -205,6 +205,7 @@ FOAM_FILES([
   { name: "foam/version/VersionedClassFactory" },
   { name: "foam/dao/Sink" },
   { name: "foam/dao/DAO" },
+  { name: "foam/dao/OptionDAO" },
   { name: "foam/dao/daoUtils" },
   { name: "foam/dao/ArraySink" },
   { name: "foam/dao/DAOInterceptor" },
