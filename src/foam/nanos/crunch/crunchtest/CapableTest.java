@@ -34,6 +34,8 @@ public class CapableTest extends Test {
     capable.setRequirements(x, new String[]{"A", "B"});
     DAO capablePayloadDAO = capable.getCapablePayloadDAO(x);
     CapablePayload payload = null;
+
+    // Default capability tests
     payload = (CapablePayload) capablePayloadDAO.find("AA");
     payload.setStatus(GRANTED);
     capablePayloadDAO.put(payload);
@@ -57,6 +59,15 @@ public class CapableTest extends Test {
     payload = (CapablePayload) capablePayloadDAO.find("A");
     test(payload.getStatus() == GRANTED,
       "Dependant capability should be GRANTED"
+    );
+
+    // MinMaxCapability tests
+    payload = (CapablePayload) capablePayloadDAO.find("BA");
+    payload.setStatus(PENDING);
+    capablePayloadDAO.put(payload);
+    payload = (CapablePayload) capablePayloadDAO.find("B");
+    test(payload.getStatus() == PENDING,
+      "Dependant MinMax capability should be PENDING"
     );
   }
 

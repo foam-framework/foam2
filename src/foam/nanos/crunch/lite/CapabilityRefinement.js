@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.crunch.lite',
   name: 'CapabilityRefinement',
-  refines: 'foam.nanos.crunch.MinMaxCapability',
+  refines: 'foam.nanos.crunch.Capability',
 
   javaImports: [
     'foam.dao.DAO',
