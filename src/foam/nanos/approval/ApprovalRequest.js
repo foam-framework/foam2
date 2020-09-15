@@ -407,15 +407,14 @@
     {
       class: 'String',
       name: 'refObj',
-      transient: true,
-      expression: function(daoKey, objId) {
-        return daoKey + ':' + objId;
-      },
-      javaGetter: `
-        return getDaoKey() + ": " + getObjId();
-      `,
+      hidden: true,
       readPermissionRequired: true,
-      writePermissionRequired: true
+      writePermissionRequired: true,
+      documentation: `
+        To be used in view reference action when the approvalrequest
+        needs to specify its own reference, for example in the case of 
+        UserCapabilityJunctions where data is null.
+      `
     },
     {
       class: 'String',
@@ -683,9 +682,17 @@
              return;
         }
 
-        var objId = X[self.daoKey_].of.ID.type === 'Long' ? parseInt(this.objId) : this.objId;
-
-        return X[this.daoKey_]
+        var objId, daoKey;
+        if ( self.refObj ) {
+          var res = self.refObj.split(':');
+          daoKey = res[0];
+          objId = X[daoKey].of.ID.type === 'Long' ? parseInt(res[1]) : res[1];
+        } else {
+          objId = X[self.daoKey_].of.ID.type === 'Long' ? parseInt(self.objId) : self.objId;
+          daoKey = self.daoKey_;
+        }
+        
+        return X[daoKey]
           .find(objId)
           .then((obj) => {
             var of = obj.cls_;
@@ -749,7 +756,7 @@
               data: obj,
               of: of,
               config: foam.comics.v2.DAOControllerConfig.create({
-                daoKey: this.daoKey_,
+                daoKey: daoKey,
                 of: of,
                 editPredicate: foam.mlang.predicate.False.create(),
                 createPredicate: foam.mlang.predicate.False.create(),
