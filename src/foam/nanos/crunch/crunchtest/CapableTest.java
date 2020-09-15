@@ -26,7 +26,7 @@ public class CapableTest extends Test {
 
     // Rules
     testCapablePayloadDAO(x);
-    // testSetCapablePayloadStatusOnPut(x);
+    testSetCapablePayloadStatusOnPut(x);
   }
 
   public void testSetCapablePayloadStatusOnPut(X x) {

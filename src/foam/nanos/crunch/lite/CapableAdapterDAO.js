@@ -62,7 +62,12 @@ foam.CLASS({
     {
       name: 'find_',
       javaCode: `
-        String idString = (String) id;
+        String idString = null;
+        if ( id instanceof CapablePayload ) {
+          idString = ((CapablePayload) id).getCapability().getId();
+        } else {
+          idString = (String) id;
+        }
         CapablePayload[] payloads = getCapable().getCapablePayloads();
         for ( int i = 0 ; i < payloads.length ; i++ ) {
           if (
