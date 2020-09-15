@@ -14,7 +14,11 @@ foam.CLASS({
 
   javaImports: [
     'foam.nanos.crunch.Capability',
-    'static foam.nanos.crunch.CapabilityJunctionStatus.*'
+    'static foam.nanos.crunch.CapabilityJunctionStatus.*',
+    'foam.nanos.crunch.lite.Capable',
+    'foam.nanos.crunch.lite.CapablePayload',
+    'foam.nanos.crunch.lite.CapableAdapterDAO',
+    'foam.dao.DAO'
   ],
 
   methods: [
@@ -22,16 +26,20 @@ foam.CLASS({
       name: 'applyAction',
       javaCode: `
         CapableAdapterDAO payloadDAO = (CapableAdapterDAO) x.get("capableObjectDAO");
-        Capable capableTarget = payload.getCapable();
-        
         CapablePayload payload = (CapablePayload) obj;
 
+        DAO capableObjectDAO = (DAO) x.get(payload.getDaoKey());
+
+        Object capableObject = capableObjectDAO.find(payload.getObjId());
+
+        Capable capableTarget = (Capable) capableObject;
+        
         // Instead of querying the prerequisite DAO, take a shortcut of
         // reputting all the payloads, since there will never be a large
         // amount and it doesn't create journal writes.
         CapablePayload[] payloads = capableTarget.getCapablePayloads();
-        for ( CapablePayload payload : payloads ) {
-          payloadDAO.put(payload);
+        for ( CapablePayload currentPayload : payloads ) {
+          payloadDAO.put(currentPayload);
         }
       `,
     }

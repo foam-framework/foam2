@@ -43,7 +43,7 @@ p({
         "class":"foam.nanos.approval.FulfilledNestedJournalApprovablePredicate",
     },
     "action":{
-        "class":"foam.nanos.crunch.lite.CapablePayloadApprovableRuleAction"
+        "class":"foam.nanos.crunch.lite.ruler.CapablePayloadApprovableRuleAction"
     },
     "enabled":true,
     "saveHistory":false,

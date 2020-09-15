@@ -14,6 +14,11 @@ foam.CLASS({
 
   javaImports: [
     'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.lite.Capable',
+    'foam.nanos.crunch.lite.CapablePayload',
+    'foam.nanos.crunch.lite.CapableAdapterDAO',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.core.FObject',
     'static foam.nanos.crunch.CapabilityJunctionStatus.*'
   ],
 
@@ -21,8 +26,7 @@ foam.CLASS({
     {
       name: 'applyAction',
       javaCode: `
-        Capable capableTarget =
-          ((CapableAdapterDAO) x.get("capableObjectDAO")).getCapable();
+        Capable capableTarget = ((CapableAdapterDAO) x.get("capableObjectDAO")).getCapable();
         
         CapablePayload payload = (CapablePayload) obj;
 

@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.crunch.lite',
+  package: 'foam.nanos.crunch.lite.ruler',
   name: 'CapablePayloadApprovableRuleAction',
 
   documentation: `
@@ -20,6 +20,7 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.nanos.approval.Approvable',
     'foam.nanos.crunch.lite.Capable',
+    'foam.nanos.crunch.lite.CapablePayload',
     'foam.nanos.ruler.Operations',
     'foam.nanos.auth.Subject',
     'java.util.Map'

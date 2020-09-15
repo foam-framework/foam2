@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.crunch.lite',
+  package: 'foam.nanos.crunch.lite.ruler',
   name: 'CapableCreateApprovalsRuleAction',
 
   documentation: `

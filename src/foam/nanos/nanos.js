@@ -339,11 +339,16 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/lite/CapableDAO" },
   { name: "foam/nanos/crunch/lite/CapableAdapterDAO" },
   { name: "foam/nanos/crunch/lite/CapableObjectData" },
-  { name: "foam/nanos/crunch/lite/CapablePayloadApprovableRuleAction" },
-  { name: "foam/nanos/crunch/lite/CapableCreateApprovalsRuleAction" },
   { name: "foam/nanos/crunch/crunchtest/TestCapable" },
   { name: "foam/nanos/crunch/lite/CapableCompatibleCapability" },
   { name: "foam/nanos/crunch/lite/CapabilityRefinement" },
+
+  // crunch lite rulers
+  { name: "foam/nanos/crunch/lite/ruler/CapablePayloadApprovableRuleAction" },
+  { name: "foam/nanos/crunch/lite/ruler/CapableCreateApprovalsRuleAction" },
+  { name: "foam/nanos/crunch/lite/ruler/SetCapablePayloadStatusOnPut" },
+  { name: "foam/nanos/crunch/lite/ruler/ReputDependantPayloads" },
+
   { name: "foam/nanos/crunch/CapabilityCategory" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/CapabilityCapabilityJunctionRefine" },
