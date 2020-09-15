@@ -124,7 +124,7 @@ foam.CLASS({
       /* ON NO IMG SPLIT & IMG SPLIT */
   ^ .disclaimer-login {
     width: 35vw;
-    font-family: /*%FONT1%*/, Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 0.75em;
     color: #8e9090;
     margin-left: 12vw;

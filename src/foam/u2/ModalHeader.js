@@ -32,7 +32,7 @@ foam.CLASS({
       border-bottom: solid 1px #CBCFD4;
     }
     ^title{
-      font-family: /*%FONT1%*/, Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 18px;
       font-weight: 600;
       color: #1E1F21;
