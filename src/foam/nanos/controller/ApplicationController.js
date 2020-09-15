@@ -364,7 +364,7 @@ foam.CLASS({
 
       var userNotificationQueryId = this.subject && this.subject.realUser ?
       this.subject.realUser.id : this.user.id;
-
+      //is it called?
       this.__subSubContext__.notificationDAO.where(
         this.EQ(this.Notification.USER_ID, userNotificationQueryId)
       ).on.put.sub((sub, on, put, obj) => {
