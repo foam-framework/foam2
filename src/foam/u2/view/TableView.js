@@ -43,7 +43,7 @@ foam.CLASS({
       box-sizing: border-box;
       color: /*%BLACK%*/ #1e1f21;
       display: flex;
-      font-family: /*%FONT1%*/, Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       line-height: 1.5;
       overflow: hidden;

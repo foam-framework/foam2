@@ -986,14 +986,15 @@ foam.CLASS({
 
     function find_(x, id) {
       return Promise.resolve(this.blobs[id] ?
-                             this.BlobBlob.create({ blob: this.blobs[id] }) :
-                             null);
+        this.BlobBlob.create({ blob: this.blobs[id] }) :
+        null);
     },
 
     function urlFor_(x, blob) {
       if ( this.IdentifiedBlob.isInstance(blob) ) {
         return URL.createObjectURL(this.blobs[blob.id]);
-      } else if ( this.BlobBlob.isInstance(blob) ) {
+      }
+      if ( this.BlobBlob.isInstance(blob) ) {
         return URL.createObjectURL(blob.blob);
       }
 

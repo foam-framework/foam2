@@ -34,11 +34,11 @@ foam.CLASS({
       var props = obj.cls_.getAxiomsByClass(foam.nanos.fs.FileArray);
 
       var promises = props.map((prop) => {
-        var files = prop.f(obj);
+        let files = prop.f(obj);
         return Promise.all(files.map(async f => {
           if ( f.filesize <= this.maxStringDataSize ) {
             f.dataString = await this.encode(f.data.blob);
-            delete f.instance_.data;
+            f.data = undefined;
           }
           return self.fileDAO.put(f);
         }))
