@@ -24,7 +24,6 @@ foam.CLASS({
       name: 'subTitle'
     },
     {
-      class: 'String',
       name: 'help'
     },
     {
