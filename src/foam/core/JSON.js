@@ -688,7 +688,6 @@ foam.LIB({
       formatDatesAsNumbers: false,
       outputDefaultValues: true,
       useShortNames: false,
-      // TODO: Currently faster to use strict JSON and native JSON.parse
       convertUnserializableToStubs: true,
       propertyPredicate: function(o, p) { return ! p.digTransient && ! p.networkTransient; }
     }),
