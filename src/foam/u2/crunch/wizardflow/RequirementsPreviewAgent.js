@@ -29,7 +29,14 @@ foam.CLASS({
       var sectionsList = this.generateSections(this.wizardlets);
       var arrOfRequiredCapabilities = sectionsList.flat()
         .filter(eachSection => eachSection && eachSection.help)
-        .map(eachSection => eachSection.help);
+        .map((eachSection, curIndex) => {
+          if ( typeof eachSection.help === 'function' ) {
+            const curCap = this.wizardlets[curIndex].capability;
+            const generateHelpText = eachSection.help.bind(curCap.of.create({}, this));
+            return generateHelpText(curCap);
+          }
+          return eachSection.help;
+        });
       if ( arrOfRequiredCapabilities.length < 1 ) {
         // if nothing to show don't open this dialog - push directly to wizard
         return Promise.resolve();
