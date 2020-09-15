@@ -3275,6 +3275,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Average',
@@ -3694,6 +3695,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'OlderThan',
@@ -3723,6 +3725,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'CurrentTime',
@@ -3748,6 +3751,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'StringLength',
@@ -3767,6 +3771,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'IdentityExpr',
@@ -3782,6 +3787,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang',
@@ -3810,6 +3816,7 @@ return true;
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
@@ -3866,6 +3873,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'isAuthorizedToDelete',
@@ -3920,6 +3928,7 @@ foam.CLASS({
     },
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang',
@@ -4030,6 +4039,7 @@ foam.CLASS({
   ]
 })
 
+
 foam.CLASS({
   package: 'foam.mlang.expr',
   name: 'Add',
@@ -4045,6 +4055,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.expr',
@@ -4062,6 +4073,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.expr',
   name: 'Multiply',
@@ -4077,6 +4089,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.expr',
@@ -4094,6 +4107,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.expr',
   name: 'MinFunc',
@@ -4109,6 +4123,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.expr',
