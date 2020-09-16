@@ -83,7 +83,7 @@ foam.CLASS({
       ],
       javaCode: `
         if ( getPredicate().f(obj) ) {
-          return getOptionDelegate();
+          return getPredicatedDelegate();
         }
 
         return getDelegate();
