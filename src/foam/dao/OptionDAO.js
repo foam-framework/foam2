@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -10,8 +10,13 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   documentation: `
-    OptionDAO allows for two different dao branches based on a predicate evaluation.
-    Currently only supports put_ and  remove_.
+    OptionDAO allows the user to pass a delegate to either the default delegate (OptionDAO.delegate) or
+    the option Delegate (OptionDAO.optionDelegate). Passing to the option delegate will occur if the
+    OptionDAO.optionPredicate evaluates to true.
+
+    To use, add optionDAO as the delegate of the proxyDAO you want to start branching from.
+
+    Currently only supports put_ and remove_.
   `,
 
   javaImports: [
@@ -56,26 +61,28 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-        if  ( getOptionPredicate().f(obj) ) {
-          DAO optionDelegate = (DAO) getOptionDelegate();
-
-          return optionDelegate.put_(x, obj);
-        }
-
-        return getDelegate().put_(x, obj);
+        return getDelegateFor(obj).put_(x, obj);
       `
     },
     {
       name: 'remove_',
       javaCode: `
-        if  ( getOptionPredicate().f(obj) ) {
-          DAO optionDelegate = (DAO) getOptionDelegate();
-
-          return optionDelegate.remove_(x, obj);
-        }
-
-        return getDelegate().remove_(x, obj);
+        return getDelegateFor(obj).remove_(x, obj);
       `
     },
+    {
+      name: 'getDelegateFor',
+      type: 'foam.dao.DAO',
+      args: [
+        { name: 'obj', type: 'foam.core.FObject' },
+      ],
+      javaCode: `
+        if ( getOptionPredicate().f(obj) ) {
+          return getOptionDelegate();
+        }
+
+        return getDelegate();
+      `
+    }
   ],
 });
