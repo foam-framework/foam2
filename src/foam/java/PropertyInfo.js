@@ -45,6 +45,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'externalTransient'
+    },
+    {
+      class: 'Boolean',
       name: 'storageTransient'
     },
     {
@@ -296,6 +300,15 @@ foam.CLASS({
             type: 'boolean',
             visibility: 'public',
             body: 'return ' + this.networkTransient + ';'
+          });
+        }
+
+        if ( this.externalTransient ) {
+          m.push({
+            name: 'getExternalTransient',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.externalTransient + ';'
           });
         }
 

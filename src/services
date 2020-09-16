@@ -755,6 +755,7 @@ p({
       .setServiceProviderAware(true)
       .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
       .setInnerDAO(x.get("localRuleDAO"))
+      .setRuler(false)
       .build();
 
     dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.NAME });
@@ -782,7 +783,8 @@ p({
       .setJournalName("rules")
       .setContextualize(true)
       .setValidated(true)
-      .setRuler(false)
+      .setRuler(true)
+      .setRulerDaoKey("localRuleDAO")
       .setAuthorize(false)
       .build();
 
@@ -791,11 +793,6 @@ p({
     dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.ENABLED });
 
     return dao;
-  """,
-  "client": """
-    {
-      "of": "foam.nanos.ruler.Rule"
-    }
   """
 })
 
