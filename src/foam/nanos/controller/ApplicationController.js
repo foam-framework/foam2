@@ -329,6 +329,23 @@ foam.CLASS({
       this.clientPromise.then(async function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
 
+        var userNotificationQueryId = self.subject && self.subject.realUser ?
+        self.subject.realUser.id : self.user.id;
+        self.__subContext__.notificationDAO.where(
+          self.EQ(this.Notification.USER_ID, userNotificationQueryId)
+        ).on.put.sub((sub, on, put, obj) => {
+          if ( obj.toastState == self.ToastState.REQUESTED ) {
+            self.add(self.NotificationMessage.create({
+              message: obj.toastMessage,
+              type: obj.severity,
+              description: obj.toastSubMessage
+            }));
+            var clonedNotification = obj.clone();
+            clonedNotification.toastState = self.ToastState.DISPLAYED;
+            self.__subContext__.notificationDAO.put(clonedNotification);
+          }
+        });
+
         await self.fetchSubject();
 
         // add user and agent for backward compatibility
@@ -575,22 +592,6 @@ foam.CLASS({
     },
 
     function notify(toastMessage, toastSubMessage, severity, transient) {
-      var userNotificationQueryId = this.subject && this.subject.realUser ?
-      this.subject.realUser.id : this.user.id;
-      this.__subSubContext__.notificationDAO.where(
-        this.EQ(this.Notification.USER_ID, userNotificationQueryId)
-      ).on.put.sub((sub, on, put, obj) => {
-        if ( obj.toastState == this.ToastState.REQUESTED ) {
-          this.add(this.NotificationMessage.create({
-            message: obj.toastMessage,
-            type: obj.severity,
-            description: obj.toastSubMessage
-          }));
-          var clonedNotification = obj.clone();
-          clonedNotification.toastState = this.ToastState.DISPLAYED;
-          this.__subSubContext__.notificationDAO.put(clonedNotification);
-        }
-      });
       var notification = this.Notification.create();
       notification.userId = this.subject && this.subject.realUser ?
         this.subject.realUser.id : this.user.id;
