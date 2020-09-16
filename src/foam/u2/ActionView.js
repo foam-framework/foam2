@@ -36,7 +36,7 @@ foam.CLASS({
 
   css: `
     ^ {
-      font-family: /*%FONT1%*/, Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       border-radius: 4px;
       text-align: center;
       display: inline-flex;
