@@ -245,6 +245,7 @@ var classes = [
   'foam.nanos.auth.PriorPassword',
   'foam.nanos.auth.ruler.AddPasswordHistoryAction',
   'foam.nanos.auth.ruler.PreventDuplicateUsernameAction',
+  'foam.nanos.auth.ruler.EnsurePropertyOnCreateRule',
   'foam.nanos.auth.test.PasswordPolicyTest',
   'foam.nanos.auth.Country',
   'foam.nanos.auth.PropertyType',
