@@ -30,7 +30,7 @@ foam.CLASS({
 
   methods: [
     function write(X, dao, obj, existing) {
-      var self = this;
+      var self  = this;
       var props = obj.cls_.getAxiomsByClass(foam.nanos.fs.FileArray);
 
       var promises = props.map((prop) => {
@@ -39,6 +39,8 @@ foam.CLASS({
           if ( f.filesize <= this.maxStringDataSize ) {
             f.dataString = await this.encode(f.data.blob);
             f.data = undefined;
+          } else {
+            f.dataString = undefined;
           }
           return self.fileDAO.put(f);
         }))
@@ -54,10 +56,10 @@ foam.CLASS({
 
     async function encode(file) {
       const toBase64 = file => new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = error => reject(error);
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload  = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
       });
       return await toBase64(file);
     }
