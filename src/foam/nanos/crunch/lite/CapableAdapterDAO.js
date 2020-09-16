@@ -87,7 +87,7 @@ foam.CLASS({
         DAO mdao = new MDAO(CapablePayload.getOwnClassInfo());
         CapablePayload[] payloads = getCapable().getCapablePayloads();
         for ( int i = 0 ; i < payloads.length ; i++ ) {
-          mdao.put(payloads[i]);
+          mdao.put_(x,payloads[i]);
         }
         return mdao.select_(x, sink, skip, limit, order, predicate);
       `
