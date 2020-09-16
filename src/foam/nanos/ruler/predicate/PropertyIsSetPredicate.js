@@ -25,7 +25,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isNew',
-      value: true
+      value: true,
+      documentation: 'If true (default) test new object, otherwise test old object.'
     }
   ],
 
