@@ -36,7 +36,7 @@ public class CapabilityRuntimeException extends AuthorizationException {
     capabilities_.add(capabilityId);
   }
 
-  public String[] getCapables() {
+  public Capable[] getCapables() {
     return capables_.toArray(new Capable[capables_.size()]);
   }
 
