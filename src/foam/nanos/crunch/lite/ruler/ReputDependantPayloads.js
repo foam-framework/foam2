@@ -13,6 +13,9 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.ContextAwareAgent',
+    'foam.core.FObject',
+    'foam.core.X',
     'foam.nanos.crunch.Capability',
     'static foam.nanos.crunch.CapabilityJunctionStatus.*',
     'foam.nanos.crunch.lite.Capable',
@@ -25,22 +28,27 @@ foam.CLASS({
     {
       name: 'applyAction',
       javaCode: `
-        CapableAdapterDAO payloadDAO = (CapableAdapterDAO) x.get("capableObjectDAO");
-        CapablePayload payload = (CapablePayload) obj;
+        agency.submit(x, new ContextAwareAgent() {
+          @Override
+          public void execute(X x) {
+            CapableAdapterDAO payloadDAO = (CapableAdapterDAO) x.get("capablePayloadDAO");
+            CapablePayload payload = (CapablePayload) obj;
 
-        DAO capableObjectDAO = (DAO) x.get(payload.getDaoKey());
+            DAO capablePayloadDAO = (DAO) x.get(payload.getDaoKey());
 
-        Object capableObject = capableObjectDAO.find(payload.getObjId());
+            Object capableObject = capablePayloadDAO.find(payload.getObjId());
 
-        Capable capableTarget = (Capable) capableObject;
-        
-        // Instead of querying the prerequisite DAO, take a shortcut of
-        // reputting all the payloads, since there will never be a large
-        // amount and it doesn't create journal writes.
-        CapablePayload[] payloads = capableTarget.getCapablePayloads();
-        for ( CapablePayload currentPayload : payloads ) {
-          payloadDAO.put(currentPayload);
-        }
+            Capable capableTarget = (Capable) capableObject;
+            
+            // Instead of querying the prerequisite DAO, take a shortcut of
+            // reputting all the payloads, since there will never be a large
+            // amount and it doesn't create journal writes.
+            CapablePayload[] payloads = capableTarget.getCapablePayloads();
+            for ( CapablePayload currentPayload : payloads ) {
+              payloadDAO.put(currentPayload);
+            }
+          }
+        }, "Reput dependent payloads");
       `,
     }
   ]

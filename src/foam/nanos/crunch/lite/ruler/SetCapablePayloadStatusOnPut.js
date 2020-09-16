@@ -13,6 +13,8 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.ContextAwareAgent',
+    'foam.core.X',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.lite.Capable',
     'foam.nanos.crunch.lite.CapablePayload',
@@ -26,26 +28,31 @@ foam.CLASS({
     {
       name: 'applyAction',
       javaCode: `
-        CapableAdapterDAO payloadDAO = (CapableAdapterDAO) x.get("capableAdapterDAO");
-        Capable capableTarget = payloadDAO.getCapable();
-        
-        CapablePayload payload = (CapablePayload) obj;
-
-        CapabilityJunctionStatus defaultStatus = PENDING;
-
-        FObject data = payload.getData();
-        if ( data != null ) {
-          data.validate(x);
-          payload.setStatus(defaultStatus);
-        }
-
-        if ( payload.getStatus() != defaultStatus ) {
-          return;
-        }
-
-        Capability cap = payload.getCapability();
-        payload.setStatus(cap.getCapableChainedStatus(
-          x, payloadDAO, payload));
+        agency.submit(x, new ContextAwareAgent() {
+          @Override
+          public void execute(X x) {
+            CapableAdapterDAO payloadDAO = (CapableAdapterDAO) x.get("capablePayloadDAO");
+            Capable capableTarget = payloadDAO.getCapable();
+            
+            CapablePayload payload = (CapablePayload) obj;
+    
+            CapabilityJunctionStatus defaultStatus = PENDING;
+    
+            FObject data = payload.getData();
+            if ( data != null ) {
+              data.validate(x);
+              payload.setStatus(defaultStatus);
+            }
+    
+            if ( payload.getStatus() != defaultStatus ) {
+              return;
+            }
+    
+            Capability cap = payload.getCapability();
+            payload.setStatus(cap.getCapableChainedStatus(
+              x, payloadDAO, payload));
+          }
+        }, "Set capable payload status on put");
       `,
     }
   ]
