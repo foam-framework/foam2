@@ -86,7 +86,7 @@ foam.CLASS({
     },
 
     // Excludes UCJ-related logic
-    function createLiteWizardSequence(capabilityOrId) {
+    function createCapableWizardSequence(capabilityOrId) {
       return this.Sequence.create(null, this.__subContext__.createSubContext({
         rootCapability: capabilityOrId
       }))
@@ -198,11 +198,13 @@ foam.CLASS({
             console.log('should be a cap id', capabilityId);
             if ( ! userWantsToContinue ) return false;
             return this
-              .createLiteWizardSequence(capabilityId).execute();
+              .createWizardSequence(capabilityId).execute();
           }),
           p
         );
       }
+
+      // TODO: replace with createCapableWizardSequence when it's ready
       var capableWizard = this.createCapableWizard(capable);
       p.then(userWantsToContinue => {
         ctrl.add(this.Popup.create().tag(capableWizard));
