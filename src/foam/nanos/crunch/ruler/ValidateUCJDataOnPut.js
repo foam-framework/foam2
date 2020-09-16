@@ -16,6 +16,9 @@ foam.CLASS({
     'foam.core.ContextAgent',
     'foam.core.FObject',
     'foam.core.X',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
+    'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
@@ -51,7 +54,16 @@ foam.CLASS({
             FObject data = ucj.getData();
             if ( data != null ) {
               try {
-                data.validate(x);
+                Subject subject = new Subject.Builder(x).build();
+                User user = (User) ucj.findSourceId(systemX);
+                subject.setUser(user);
+                if ( ucj instanceof AgentCapabilityJunction ) {
+                  User effectiveUser = (User) ((AgentCapabilityJunction) ucj).findEffectiveUser(systemX);
+                  subject.setUser(effectiveUser);
+                }
+                X sourceX = (X) x.put("subject", subject);
+
+                data.validate(sourceX);
                 ucj.setStatus(CapabilityJunctionStatus.PENDING);
                 ucj.resetRenewalStatus();
               } catch (IllegalStateException e) {
