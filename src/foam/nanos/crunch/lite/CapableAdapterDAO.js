@@ -10,6 +10,7 @@ foam.CLASS({
   extends: 'foam.dao.AbstractDAO',
 
   javaImports: [
+    'foam.core.X',
     'foam.dao.DAO',
     'foam.dao.MDAO',
     'java.util.Arrays'
@@ -85,9 +86,11 @@ foam.CLASS({
       name: 'select_',
       javaCode: `
         DAO mdao = new MDAO(CapablePayload.getOwnClassInfo());
+        X xTmp = x.put("capablePayloadMDAO", mdao);
         CapablePayload[] payloads = getCapable().getCapablePayloads();
         for ( int i = 0 ; i < payloads.length ; i++ ) {
-          mdao.put_(x,payloads[i]);
+          DAO dao = (DAO) xTmp.get("capablePayloadMDAO");
+          dao.put(payloads[i]);
         }
         return mdao.select_(x, sink, skip, limit, order, predicate);
       `
