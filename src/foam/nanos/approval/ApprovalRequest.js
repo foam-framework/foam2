@@ -677,9 +677,7 @@
           var objId = property.adapt.call(property, self.objId, self.objId, property);
           return self.__subContext__[this.daoKey_]
             .find(objId)
-            .then((obj) => {
-              return !! obj;
-            })
+            .then(obj => !! obj)
             .catch((err) => {
               console.warn(err.message || err);
               if ( self.refObjId && self.refDaoKey && self.__subContext__[self.refDaoKey_] ) {
@@ -687,9 +685,7 @@
                 objId = property.adapt.call(property, self.refObjId, self.refObjId, property);
                 return self.__subContext__[self.refDaoKey]
                   .find(objId)
-                  .then((obj) => {
-                    return !! obj;
-                  })
+                  .then(obj => !! obj)
                   .catch((err) => {
                     console.warn(err.message || err);
                     return false;
