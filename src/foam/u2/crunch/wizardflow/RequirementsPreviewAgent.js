@@ -27,16 +27,6 @@ foam.CLASS({
     // If Property expressions ever unwrap promises this method can be blank.
     function execute() {
       var sectionsList = this.generateSections(this.wizardlets);
-      // var arrOfRequiredCapabilities = sectionsList.flat()
-      //   .filter(eachSection => eachSection && eachSection.help)
-      //   .map((eachSection, curIndex) => {
-      //     if ( typeof eachSection.help === 'function' ) {
-      //       const curCap = this.wizardlets[curIndex].capability;
-      //       const generateHelpText = eachSection.help.bind(curCap.of.create({}, this));
-      //       return generateHelpText(curCap);
-      //     }
-      //     return eachSection.help;
-      //   });
       const arrOfRequiredCapabilities = [];
       for ( let i = 0; i < sectionsList.length; i++ ) {
         for ( let j = 0; j < sectionsList[i].length; j++ ) {
