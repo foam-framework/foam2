@@ -689,7 +689,7 @@ foam.LIB({
       outputDefaultValues: true,
       useShortNames: false,
       convertUnserializableToStubs: true,
-      propertyPredicate: function(o, p) { return ! p.digTransient && ! p.networkTransient; }
+      propertyPredicate: function(o, p) { return ! p.externalTransient && ! p.networkTransient; }
     }),
 
     // Short, but exclude storage-transient properties.

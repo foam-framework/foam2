@@ -45,7 +45,7 @@ public abstract class AbstractPropertyInfo
     return false;
   }
 
-  public boolean getDigTransient() {
+  public boolean getExternalTransient() {
     return false;
   }
 

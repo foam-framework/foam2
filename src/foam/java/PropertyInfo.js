@@ -45,7 +45,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'digTransient'
+      name: 'externalTransient'
     },
     {
       class: 'Boolean',
@@ -303,12 +303,12 @@ foam.CLASS({
           });
         }
 
-        if ( this.digTransient ) {
+        if ( this.externalTransient ) {
           m.push({
-            name: 'getDigTransient',
+            name: 'getExternalTransient',
             type: 'boolean',
             visibility: 'public',
-            body: 'return ' + this.digTransient + ';'
+            body: 'return ' + this.externalTransient + ';'
           });
         }
 

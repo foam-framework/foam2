@@ -22,7 +22,7 @@ import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.lib.AndPropertyPredicate;
-import foam.lib.DigPropertyPredicate;
+import foam.lib.ExternalPropertyPredicate;
 import foam.lib.NetworkPropertyPredicate;
 import foam.lib.PermissionedPropertyPredicate;
 import foam.lib.PropertyPredicate;
@@ -199,7 +199,7 @@ public class SugarWebAgent
 
       Outputter outputterJson = new Outputter(x).setPropertyPredicate(
         new AndPropertyPredicate(x, new PropertyPredicate[] {
-          new DigPropertyPredicate(),
+          new ExternalPropertyPredicate(),
           new NetworkPropertyPredicate(), 
           new PermissionedPropertyPredicate()}));
       outputterJson.setOutputDefaultValues(true);

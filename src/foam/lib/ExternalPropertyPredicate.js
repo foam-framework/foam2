@@ -6,14 +6,14 @@
 
   foam.CLASS({
     package: 'foam.lib',
-    name: 'DigPropertyPredicate',
+    name: 'ExternalPropertyPredicate',
     implements: [ 'foam.lib.PropertyPredicate'],
 
     methods: [
       {
         name: 'propertyPredicateCheck',
         javaCode: `
-  return ! prop.getDigTransient();
+  return ! prop.getExternalTransient();
   `
       }
     ]

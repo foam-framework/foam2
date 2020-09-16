@@ -443,7 +443,7 @@ var classes = [
   'foam.lib.PropertyPredicate',
   'foam.lib.PermissionedPropertyPredicate',
   'foam.lib.NetworkPropertyPredicate',
-  'foam.lib.DigPropertyPredicate',
+  'foam.lib.ExternalPropertyPredicate',
   'foam.lib.StorageOptionalPropertyPredicate',
   'foam.lib.StoragePropertyPredicate',
   'foam.lib.AndPropertyPredicate',
