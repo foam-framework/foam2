@@ -97,15 +97,15 @@ foam.CLASS({
       getter: function() {
         if ( this.dataString ) {
           let b64Data = this.dataString.split(',')[1];
-          const b64toBlob = (b64Data, contentType=this.mimeType, sliceSize=512) => {
+          const b64toBlob = (b64Data, contentType = this.mimeType, sliceSize = 512) => {
             const byteCharacters = atob(b64Data);
             const byteArrays = [];
 
-            for ( let offset = 0; offset < byteCharacters.length; offset += sliceSize ) {
+            for ( let offset = 0 ; offset < byteCharacters.length ; offset += sliceSize ) {
               const slice = byteCharacters.slice(offset, offset + sliceSize);
 
               const byteNumbers = new Array(slice.length);
-              for ( let i = 0; i < slice.length; i++ ) {
+              for ( let i = 0 ; i < slice.length ; i++ ) {
                 byteNumbers[i] = slice.charCodeAt(i);
               }
 
@@ -113,14 +113,13 @@ foam.CLASS({
               byteArrays.push(byteArray);
             }
 
-            const blob = new Blob(byteArrays, {type: contentType});
-            return  blob;
+            return new Blob(byteArrays, {type: contentType});
           }
           return this.BlobBlob.create({
             blob: b64toBlob(b64Data)
           });
         } else {
-          var v = this.instance_["data"];
+          var v = this.instance_.data;
           return v !== undefined ? v : null ;
         }
       },
