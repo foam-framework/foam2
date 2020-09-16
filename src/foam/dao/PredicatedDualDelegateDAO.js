@@ -55,7 +55,7 @@ foam.CLASS({
       return foam.mlang.MLang.TRUE;
       `,
       documentation: `
-        PredicatedDualDelegateDAO.optionPredicate is checked against an object; 
+        PredicatedDualDelegateDAO.predicate is checked against an object; 
         if returns true, PredicatedDualDelegateDAO.optionDelegate is used.
         else uses PredicatedDualDelegateDAO.delegate.
       `
