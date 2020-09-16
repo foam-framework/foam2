@@ -30,7 +30,7 @@ foam.CLASS({
     {
       class: 'Proxy',
       of: 'foam.dao.DAO',
-      name: 'optionDelegate',
+      name: 'predicatedDelegate',
       forwards: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_', 'cmd_', 'listen_' ],
       topics: [ 'on' ], // TODO: Remove this when all users of it are updated.
       factory: function() { return this.NullDAO.create() },
