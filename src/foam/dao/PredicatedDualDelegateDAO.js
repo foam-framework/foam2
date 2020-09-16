@@ -47,7 +47,7 @@ foam.CLASS({
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
-      name: 'optionPredicate',
+      name: 'predicate',
       factory: function () {
         return foam.mlang.predicate.True.create();
       },
