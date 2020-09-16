@@ -32,8 +32,8 @@ foam.CLASS({
         for ( let j = 0; j < sectionsList[i].length; j++ ) {
           if ( sectionsList[i][j].help ) {
             if ( typeof sectionsList[i][j].help === 'function' ) {
-              const curCap = this.wizardlets[i].capability;
-              const generateHelpText = sectionsList[i][j].help.bind(curCap.of.create({}, this));
+              let curCap = this.wizardlets[i].capability;
+              let generateHelpText = sectionsList[i][j].help.bind(curCap.of.create({}, this));
               sectionsList[i][j].help = generateHelpText(curCap);
             }
             arrOfRequiredCapabilities.push(sectionsList[i][j].help);
