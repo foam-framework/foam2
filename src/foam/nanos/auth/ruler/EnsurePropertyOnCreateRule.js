@@ -15,9 +15,8 @@ foam.CLASS({
     The rule is run after the object is put/created.
 
     The predicate of EnsurePropertyOnCreateRule will check for
-    1. NEW_OBJ.spid == rule.spid
-    2. NEW_OBJ is an instance of the "targetClass"
-    3. The "propName" property on NEW_OBJ is not set
+    1. NEW_OBJ is an instance of the "targetClass"
+    2. The "propName" property on NEW_OBJ is not set
 
     Then EnsurePropertyOnCreateRuleAction will set the object "propName"
     property the value of the "propValue" and re-put the object back to the DAO.
@@ -63,10 +62,6 @@ foam.CLASS({
       transient: true,
       visibility: 'HIDDEN',
       javaGetter: `
-        var spidPredicate = new PropertyEQValue();
-        spidPredicate.setPropName("spid");
-        spidPredicate.setPropValue(getSpid());
-
         var isInstanceOfPredicate = new IsInstancePredicate();
         isInstanceOfPredicate.setOf(getTargetClass());
 
@@ -74,7 +69,6 @@ foam.CLASS({
         propertyIsSetPredicate.setPropName(getPropName());
 
         return AND(
-          spidPredicate,
           isInstanceOfPredicate,
           NOT(propertyIsSetPredicate)
         );
