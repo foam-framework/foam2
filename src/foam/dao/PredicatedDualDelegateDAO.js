@@ -12,7 +12,7 @@ foam.CLASS({
   documentation: `
     PredicatedDualDelegateDAO allows the user to pass a delegate to either 
     the default delegate (PredicatedDualDelegateDAO.delegate) or
-    the option Delegate (PredicatedDualDelegateDAO.optionDelegate). 
+    the option Delegate (PredicatedDualDelegateDAO.predicatedDelegate). 
     Passing to the option delegate will occur if the
     PredicatedDualDelegateDAO.optionPredicate evaluates to true.
 
