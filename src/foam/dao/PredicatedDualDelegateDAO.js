@@ -14,7 +14,7 @@ foam.CLASS({
     the default delegate (PredicatedDualDelegateDAO.delegate) or
     the option Delegate (PredicatedDualDelegateDAO.predicatedDelegate). 
     Passing to the option delegate will occur if the
-    PredicatedDualDelegateDAO.optionPredicate evaluates to true.
+    PredicatedDualDelegateDAO.predicate evaluates to true.
 
     To use, add PredicatedDualDelegateDAO as the delegate of the proxyDAO you want to start branching from.
 
