@@ -124,17 +124,14 @@ foam.CLASS({
       }
       // Register intercept for later occurances of the check above
       this.activeIntercepts.push(intercept);
-
-      if ( intercept.capabilityOptions.length > 1 ) {
-        // Pop up the popup
-        this.ctrl.add(this.Popup.create({ closeable: false })
+      // Pop up the popup
+      this.ctrl.add(this.Popup.create({ closeable: false })
         .start(this.MarginBorder)
           .tag(this.CapabilityInterceptView, {
             data: intercept
           })
         .end()
-        );
-      }
+      );
       return intercept.promise;
     },
 
