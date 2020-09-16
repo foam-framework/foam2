@@ -122,7 +122,7 @@ var classes = [
   'foam.box.SessionReplyBox',
   'foam.box.SessionClientBox',
   'foam.dao.DAO',
-  'foam.dao.OptionDAO',
+  'foam.dao.PredicatedDualDelegateDAO',
   'foam.dao.CSVSink',
   'foam.lib.csv.CSVOutputter',
   'foam.lib.csv.PrefixedCSVOutputter',

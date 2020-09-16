@@ -6,15 +6,17 @@
 
 foam.CLASS({
   package: 'foam.dao',
-  name: 'OptionDAO',
+  name: 'PredicatedDualDelegateDAO',
   extends: 'foam.dao.ProxyDAO',
 
   documentation: `
-    OptionDAO allows the user to pass a delegate to either the default delegate (OptionDAO.delegate) or
-    the option Delegate (OptionDAO.optionDelegate). Passing to the option delegate will occur if the
-    OptionDAO.optionPredicate evaluates to true.
+    PredicatedDualDelegateDAO allows the user to pass a delegate to either 
+    the default delegate (PredicatedDualDelegateDAO.delegate) or
+    the option Delegate (PredicatedDualDelegateDAO.optionDelegate). 
+    Passing to the option delegate will occur if the
+    PredicatedDualDelegateDAO.optionPredicate evaluates to true.
 
-    To use, add optionDAO as the delegate of the proxyDAO you want to start branching from.
+    To use, add PredicatedDualDelegateDAO as the delegate of the proxyDAO you want to start branching from.
 
     Currently only supports put_ and remove_.
   `,
@@ -52,8 +54,11 @@ foam.CLASS({
       javaFactory: `
       return foam.mlang.MLang.TRUE;
       `,
-      documentation: 'OptionDAO.optionPredicate is checked against an object; if returns true, OptionDAO.optionDelegate is used.'+
-      'Default uses OptionDAO.delegate.'
+      documentation: `
+        PredicatedDualDelegateDAO.optionPredicate is checked against an object; 
+        if returns true, PredicatedDualDelegateDAO.optionDelegate is used.
+        else uses PredicatedDualDelegateDAO.delegate.
+      `
     },
   ],
 
