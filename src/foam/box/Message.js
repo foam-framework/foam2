@@ -74,6 +74,8 @@ foam.CLASS({
           wrapperCapability.setMessage(t.getMessage());
           wrapperCapability.setCapabilityOptions(
             tCapability.getCapabilities());
+          wrapperCapability.setCapableRequirements(
+            tCapability.getCapables());
           wrapper = wrapperCapability;
         }
 

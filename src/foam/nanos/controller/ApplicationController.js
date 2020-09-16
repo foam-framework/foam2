@@ -571,7 +571,25 @@ foam.CLASS({
         capabilityOptions: capabilityInfo.capabilityOptions
       });
 
-      return self.crunchController.maybeLaunchInterceptView(intercept);
+      // Allow zero or more promises to block this method
+      let p = Promise.resolve();
+
+      // Intercept view for regular user capability options
+      if ( capabilityInfo.capabilityOptions.length > 0 ) {
+        p = p.then(() =>
+          self.crunchController.maybeLaunchInterceptView(intercept));
+      }
+
+      // Wizard for Capable objects and required user capabilities
+      // (note: no intercept view; this case immediately invokes a wizard)
+      if ( capabilityInfo.capableRequirements.length > 0 ) {
+        capabilityInfo.capableRequirements.forEach(capable => {
+          p = p.then(() =>
+            self.crunchController.launchCapableWizard(capable));
+        })
+      }
+
+      return p;
     },
 
     function notify(toastMessage, toastSubMessage, severity, transient) {

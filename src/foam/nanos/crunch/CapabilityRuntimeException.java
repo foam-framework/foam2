@@ -6,13 +6,16 @@
 package foam.nanos.crunch;
 
 import java.util.ArrayList;
+import foam.nanos.crunch.lite.Capable;
 import foam.nanos.auth.AuthorizationException;
 
 public class CapabilityRuntimeException extends AuthorizationException {
-  private ArrayList<String> capabilities;
+  private ArrayList<String> capabilities_;
+  private ArrayList<Capable> capables_;
 
   private void init() {
-    capabilities = new ArrayList<String>();
+    capabilities_ = new ArrayList<String>();
+    capables_ = new ArrayList<Capable>();
   }
 
   public CapabilityRuntimeException() {
@@ -26,10 +29,18 @@ public class CapabilityRuntimeException extends AuthorizationException {
   }
 
   public String[] getCapabilities() {
-    return capabilities.toArray(new String[capabilities.size()]);
+    return capabilities_.toArray(new String[capabilities_.size()]);
   }
 
   public void addCapabilityId(String capabilityId) {
-    capabilities.add(capabilityId);
+    capabilities_.add(capabilityId);
+  }
+
+  public String[] getCapables() {
+    return capables_.toArray(new Capable[capables_.size()]);
+  }
+
+  public void addCapable(Capable capable) {
+    capables_.add(capable);
   }
 }
