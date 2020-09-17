@@ -66,6 +66,7 @@ public class RuleEngine extends ContextAwareSupport {
     for (Rule rule : rules) {
       try {
         if ( stops_.get() ) break;
+        if ( ! checkPermission(rule, obj) ) continue;
         if ( ! isRuleApplicable(rule, obj, oldObj)) continue;
         PM pm = (PM) x_.get("PM");
         pm.setKey(RulerDAO.getOwnClassInfo().getId());
@@ -180,6 +181,15 @@ public class RuleEngine extends ContextAwareSupport {
       && rule.f(userX_, obj, oldObj);
   }
 
+  private boolean checkPermission(Rule rule, FObject obj) {
+    var user = rule.getUser(getX(), obj);
+    if ( user != null ) {
+      var auth = (AuthService) getX().get("auth");
+      return auth.checkUser(getX(), user, "rule.read." + rule.getId());
+    }
+    return true;
+  }
+
   private void asyncApplyRules(List<Rule> rules, FObject obj, FObject oldObj) {
     if (rules.isEmpty()) return;
     ((Agency) getX().get("threadPool")).submit(userX_, x -> {
@@ -188,7 +198,8 @@ public class RuleEngine extends ContextAwareSupport {
         if ( stops_.get() ) return;
 
         currentRule_ = rule;
-        if ( rule.getAsyncAction() != null
+        if ( checkPermission(rule, obj)
+          && rule.getAsyncAction() != null
           && rule.f(x, obj, oldObj)
         ) {
           // We assume the original object `obj` is stale when running after rules.
