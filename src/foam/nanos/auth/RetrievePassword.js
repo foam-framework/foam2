@@ -67,14 +67,16 @@ foam.CLASS({
         this.resetPasswordToken.generateToken(null, user).then((_) => {
           this.ctrl.add(this.NotificationMessage.create({
             message: `${this.INSTRUC_ONE} ${this.email}. ${this.INSTRUC_TWO}`,
-            type: this.LogLevel.INFO
+            type: this.LogLevel.INFO,
+            transient: true
           }));
           this.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, this);
         })
         .catch((err) => {
           this.ctrl.add(this.NotificationMessage.create({
             message: err.message || this.ERROR_MSG,
-            type: this.LogLevel.ERROR
+            type: this.LogLevel.ERROR,
+            transient: true
           }));
         });
       }
