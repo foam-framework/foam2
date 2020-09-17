@@ -8,10 +8,7 @@ package foam.nanos.ruler;
 
 import foam.core.*;
 import foam.dao.DAO;
-import foam.nanos.auth.LastModifiedAware;
-import foam.nanos.auth.LastModifiedByAware;
-import foam.nanos.auth.LifecycleAware;
-import foam.nanos.auth.LifecycleState;
+import foam.nanos.auth.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
