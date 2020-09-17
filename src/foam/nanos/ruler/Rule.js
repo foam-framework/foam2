@@ -464,6 +464,23 @@
           throw new AuthorizationException("You do not have permission to delete the rule.");
         }
       `
+    },
+    {
+      name: 'getUser',
+      type: 'foam.nanos.auth.User',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'obj', type: 'FObject' }
+      ],
+      documentation: `Return user extracted from obj to be used for checking the
+        user permission to access (i.e. execute) the rule.
+
+        Return null (default) to skip access permission check on the rule.
+
+        Subclasses of Rule should override "getUser" method to return the
+        appropriate user for which the permission is checked.
+      `,
+      javaCode: 'return null;'
     }
   ],
 
