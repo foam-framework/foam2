@@ -20,7 +20,7 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .add(this.slot(function(sections, data) {
+        .add(this.slot(function(of, sections, data) {
           if ( ! data ) return;
           return self.E()
             .start(self.Rows)
