@@ -98,9 +98,17 @@ foam.CLASS({
       color: white;
       font-weight: 800;
     }
+    /* TODO: scope this better so it doesn't affect nested AltViews also */
+    .foam-u2-view-AltView .property-selectedView {
+      margin-left: 24px;
+    }
   `,
 
-  requires: [ 'foam.comics.BrowserView', 'foam.nanos.boot.NSpec' ],
+  requires: [
+    'foam.comics.BrowserView',
+    'foam.nanos.boot.NSpec',
+    'foam.comics.v2.DAOBrowserView'
+  ],
 
   implements: [ 'foam.mlang.Expressions' ],
 
@@ -256,9 +264,24 @@ foam.CLASS({
         class: this.BackBorder,
         title: m,
         inner: {
-          class: this.BrowserView,
-          data:  this.__context__[m],
-          stack: this.stack
+          class: 'foam.u2.view.AltView',
+          data: this.__context__[m],
+          views: [
+            [
+              {
+                class: this.BrowserView,
+                stack: this.stack
+              },
+              'Controller 1'
+            ],
+            [
+              {
+                class: this.DAOBrowserView,
+                stack: this.stack
+              },
+              'Controller 2'
+            ]
+          ]
         }
       }, x);
     }

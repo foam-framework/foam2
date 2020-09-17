@@ -45,6 +45,10 @@ public abstract class AbstractPropertyInfo
     return false;
   }
 
+  public boolean getExternalTransient() {
+    return false;
+  }
+
   public boolean getStorageTransient() {
     return false;
   }

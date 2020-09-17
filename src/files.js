@@ -207,6 +207,7 @@ FOAM_FILES([
   { name: "foam/dao/Sink" },
   { name: "foam/dao/DAO" },
   { name: "foam/dao/DOP" },
+  { name: "foam/dao/PredicatedDualDelegateDAO" },
   { name: "foam/dao/daoUtils" },
   { name: "foam/dao/ArraySink" },
   { name: "foam/dao/DAOInterceptor" },

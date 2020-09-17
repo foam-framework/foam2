@@ -27,9 +27,19 @@ foam.CLASS({
     // If Property expressions ever unwrap promises this method can be blank.
     function execute() {
       var sectionsList = this.generateSections(this.wizardlets);
-      var arrOfRequiredCapabilities = sectionsList.flat()
-        .filter(eachSection => eachSection && eachSection.help)
-        .map(eachSection => eachSection.help);
+      const arrOfRequiredCapabilities = [];
+      for ( let i = 0; i < sectionsList.length; i++ ) {
+        for ( let j = 0; j < sectionsList[i].length; j++ ) {
+          if ( sectionsList[i][j].help ) {
+            if ( typeof sectionsList[i][j].help === 'function' ) {
+              let curCap = this.wizardlets[i].capability;
+              let generateHelpText = sectionsList[i][j].help.bind(curCap.of.create({}, this));
+              sectionsList[i][j].help = generateHelpText(curCap);
+            }
+            arrOfRequiredCapabilities.push(sectionsList[i][j].help);
+          }
+        }
+      }
       if ( arrOfRequiredCapabilities.length < 1 ) {
         // if nothing to show don't open this dialog - push directly to wizard
         return Promise.resolve();

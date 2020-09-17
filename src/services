@@ -750,6 +750,7 @@ p({
       .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
       .setCluster(false)
       .setInnerDAO(x.get("localRuleDAO"))
+      .setRuler(false)
       .build();
 
     dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.NAME });
@@ -778,7 +779,8 @@ p({
       .setJournalName("rules")
       .setContextualize(true)
       .setValidated(true)
-      .setRuler(false)
+      .setRuler(true)
+      .setRulerDaoKey("localRuleDAO")
       .setCluster(false)
       .setAuthorize(false)
       .build();
@@ -788,11 +790,6 @@ p({
     dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.ruler.Rule.ENABLED });
 
     return dao;
-  """,
-  "client": """
-    {
-      "of": "foam.nanos.ruler.Rule"
-    }
   """
 })
 
@@ -1131,6 +1128,7 @@ p({
     }
   """
 })
+p({
   "class": "foam.nanos.boot.NSpec",
   "name": "userPropertyAvailabilityService",
   "serve": true,
