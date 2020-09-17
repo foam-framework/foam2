@@ -45,6 +45,31 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
+      code: function() {
+        var typeToIdx = {
+          year: 0,
+          month: 1,
+          day: 2
+        };
+        var zonetime = new Intl.DateTimeFormat('default', {
+          timeZone: this.timezone,
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit"
+        });
+        var formatted = zonetime.formatToParts(new Date());
+        var p = {};
+        for ( var i = 0 ; i < formatted.length ; i++ ) {
+          var { type, value } = formatted[i];
+          var offset = typeToIdx[type];
+
+          if ( ! (offset === undefined) ) {
+            p[type] = parseInt(value, 10);
+          }
+        }
+        var d = new Date(p.year, p.month, p.day, this.hour, this.minute, thie.second);
+        return d;
+      },
       javaCode: `
         var zone = ZoneId.of(getTimezone());
         var time = LocalDate.now(zone).atStartOfDay(zone);
@@ -59,14 +84,14 @@ foam.CLASS({
       name: 'toString',
       type: 'String',
       code: function() {
-        return 'TimeZone(hour:' + this.hour +
+        return 'TimeOfDay(hour:' + this.hour +
                         ', minute:' + this.minute +
                         ', second:' + this.second +
                         ', country:' + this.country +
                         ', timezone:' + this.timezone + ')';
       },
       javaCode: `
-        return "TimeZone(hour:" + getHour() +
+        return "TimeOfDay(hour:" + getHour() +
                         ", minute:" + getMinute() +
                         ", second:" + getSecond() +
                         ", country:" + getCountry() +

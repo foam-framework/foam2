@@ -87,7 +87,7 @@ foam.CLASS({
       javaCode: `
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
-        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,  googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
+        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,  googleApiAuthService.addHttpTimeout(googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES)))
           .setApplicationName("nanopay")
           .build();
         FileList result = service.files().list()
@@ -133,7 +133,7 @@ foam.CLASS({
       javaCode: `
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
-        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,  googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
+        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,  googleApiAuthService.addHttpTimeout(googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES)))
           .setApplicationName("nanopay")
           .build();
         File fileMetadata = new File();
@@ -146,6 +146,51 @@ foam.CLASS({
         File file = service.files().create(fileMetadata)
           .setFields("id")
           .execute();
+        return file.getId();
+      `
+    },
+    {
+
+      name: 'createAndCopyFromFile',
+      type: 'String',
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'folderId',
+          javaType: 'String'
+        },
+        {
+          name: 'title',
+          javaType: 'String'
+        },
+        {
+          name: 'templateId',
+          javaType: 'String'
+        }
+      ],
+      javaThrows: [
+        'java.io.IOException',
+        'java.security.GeneralSecurityException'
+      ],
+      javaCode: `
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
+        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,  googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
+          .setApplicationName("nanopay")
+          .build();
+        File fileMetadata = new File();
+        fileMetadata.setName(title);
+        if ( folderId != null ) {
+          fileMetadata.setParents(new ArrayList<String>() {{ add(folderId); }});
+        }
+
+        File file = service.files().copy(templateId, fileMetadata)
+          .setFields("id")
+          .execute();
+
         return file.getId();
       `
     }

@@ -34,7 +34,7 @@ foam.CLASS({
     ^ .company-name {
       margin-right: 10px;
       float: left;
-      font-family: Roboto;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 12px;
       font-weight: bold;
       font-style: normal;
@@ -48,7 +48,7 @@ foam.CLASS({
       padding-right: 0px;
     }
     ^ .date {
-      font-family: Roboto;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 10px;
       font-weight: normal;
       font-style: normal;
@@ -61,7 +61,7 @@ foam.CLASS({
       display: inline-block;
     }
     ^ .text {
-      font-family: Roboto;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 12px;
       font-weight: normal;
       font-style: normal;

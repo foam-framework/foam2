@@ -42,7 +42,6 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'REJECTED_MSG', message: 'Your choice to bypass this was stored, please refresh page to revert cancel selection.' },
     { name: 'TITLE', message: 'Welcome to Capability unlock options' },
     { name: 'CAP_TITLE', message: 'Capabilities Available' },
     { name: 'SUBTITLE_1', message: 'You do not have access to undertake your previous selected action.' },
@@ -116,7 +115,8 @@ foam.CLASS({
                     data: cap
                   })
                   .on('click', () => {
-                    self.crunchController.launchWizard(cap.id);
+                    self.crunchController
+                      .createWizardSequence(cap.id).execute();
                   });
               }).addClass(this.myClass('capList-css'));
             }))
@@ -164,7 +164,6 @@ foam.CLASS({
       this.data.capabilityOptions.forEach(c => {
         this.capabilityCache.set(c, true);
       });
-      this.notify(this.REJECTED_MSG, '', this.LogLevel.INFO, true);
       this.onClose(x);
     }
   ],

@@ -72,13 +72,14 @@ foam.CLASS({
       background-color: %WHITE%;
       padding: 50px;
       overflow-y: auto;
-      max-height: 800px;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
     }
     ^rightside {
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
       background-color: %GREY5%;
       overflow-y: hidden;
     }
@@ -86,7 +87,6 @@ foam.CLASS({
       flex-grow: 1;
       -webkit-mask-image: -webkit-gradient(linear, left 15, left top, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
       overflow-y: auto;
-      max-height: 600px;
       padding: 0 50px;
     }
     ^rightside ^top-buttons {
@@ -183,7 +183,13 @@ foam.CLASS({
             .start()
               .addClass(this.myClass('entry'))
               .start()
-                .add(this.slot(function (data$currentWizardlet, data$currentSection) {
+                .add(this.slot(function (data, data$currentWizardlet, data$currentSection) {
+                  var createView = data$currentWizardlet.createView(data);
+        
+                  if ( createView !== null && foam.u2.View.isInstance(createView) ) {
+                    return createView;
+                  }
+
                   var ctx = this.__subContext__.createSubContext();
                   ctx.register(
                     this.VerticalDetailView,
@@ -250,7 +256,7 @@ foam.CLASS({
       },
       confirmationRequired: true,
       code: function(x) {
-        this.onClose(x);
+        this.onClose(x, false);
       }
     },
     {
@@ -258,7 +264,7 @@ foam.CLASS({
       label: 'Save & Dismiss',
       code: function(x) {
         this.data.saveProgress().then(() => {
-          this.onClose(x);
+          this.onClose(x, false);
         }).catch(e => {
           console.error(e);
           x.ctrl.notify(this.ERROR_MSG_DRAFT, '', this.LogLevel.ERROR, true);
@@ -287,7 +293,7 @@ foam.CLASS({
       code: function(x) {
         this.data.next().then((isFinished) => {
           if ( isFinished ) {
-            this.onClose(x);
+            this.onClose(x, true);
           }
         }).catch(e => {
           console.error(e);

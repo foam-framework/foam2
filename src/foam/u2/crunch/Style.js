@@ -47,7 +47,7 @@ foam.CLASS({
 
     ^card-title {
       min-height: 20px;
-      font-family: /*%FONT1%*/;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 16px;
       font-weight: 600;
       font-style: normal;
@@ -59,7 +59,7 @@ foam.CLASS({
 
     ^card-subtitle {
       height: 14px;
-      font-family: /*%FONT1%*/;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 11px;
       font-weight: normal;
       font-style: italic;
@@ -72,7 +72,7 @@ foam.CLASS({
     ^card-description {
       margin-top: 9px;
       height: 20px;
-      font-family: /*%FONT1%*/ Helvetica;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       font-weight: normal;
       font-style: normal;
@@ -149,7 +149,6 @@ foam.CLASS({
     }
 
     ^badge {
-      float: right;
       height: 24px;
       border-radius: 12px;
       margin-top: 12px;
@@ -159,7 +158,7 @@ foam.CLASS({
       padding: 0 8px;
       background-color: #b5b5b5;
 
-      font-family: /*%FONT1%*/;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 10px;
       font-weight: 500;
       font-style: normal;
@@ -181,6 +180,15 @@ foam.CLASS({
     }
     ^badge-bad {
       background-color: #bf3232;
+    }
+
+    ^renewable-description {
+      font-size: 10px;
+      font-weight: 500;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 24px;
+      color: #DC143C;
     }
 
     ^category {

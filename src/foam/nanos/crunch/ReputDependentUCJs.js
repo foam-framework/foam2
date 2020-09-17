@@ -39,11 +39,21 @@ foam.CLASS({
               EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
               EQ(UserCapabilityJunction.TARGET_ID, ucj.getTargetId())
             ));
-            CapabilityJunctionStatus status = ucj.getStatus();
 
-            boolean isInvalidate = ucj.getStatus() != CapabilityJunctionStatus.GRANTED || ucj.getStatus() != CapabilityJunctionStatus.GRACE_PERIOD;
+            boolean isInvalidate = ucj.getStatus() != CapabilityJunctionStatus.GRANTED || 
+              ( ucj.getStatus() == CapabilityJunctionStatus.APPROVED && (
+                 old.getStatus() != CapabilityJunctionStatus.APPROVED ||
+                 old.getStatus() != CapabilityJunctionStatus.GRANTED ) );
             
-            DAO filteredUserCapabilityJunctionDAO = (DAO) userCapabilityJunctionDAO.where((EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId())));
+            Long effectiveUser = ( ucj instanceof AgentCapabilityJunction ) ? ((AgentCapabilityJunction) ucj).getEffectiveUser() : null;
+            DAO filteredUserCapabilityJunctionDAO = (DAO) userCapabilityJunctionDAO
+              .where(AND(
+                EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
+                OR(
+                  NOT(INSTANCE_OF(foam.nanos.crunch.AgentCapabilityJunction.class)),
+                  EQ(AgentCapabilityJunction.EFFECTIVE_USER, effectiveUser)
+                )
+              ));
             DAO filteredPrerequisiteCapabilityJunctionDAO = (DAO) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
               .where(EQ(CapabilityCapabilityJunction.TARGET_ID, ucj.getTargetId()));
             
@@ -60,7 +70,7 @@ foam.CLASS({
             }
 
             for ( UserCapabilityJunction ucjToReput : ucjsToReput ) {
-              if ( isInvalidate ) ucjToReput.setStatus(cascadeInvalidateStatus(x, ucjToReput, status));
+              if ( isInvalidate ) ucjToReput.setStatus(cascadeInvalidateStatus(x, ucjToReput, ucj));
               userCapabilityJunctionDAO.inX(x).put(ucjToReput);
             }
           }
@@ -72,7 +82,7 @@ foam.CLASS({
       args: [
         { name: 'x', javaType: 'foam.core.X' },
         { name: 'ucj', javaType: 'foam.nanos.crunch.UserCapabilityJunction' },
-        { name: 'prereqStatus', javaType: 'foam.nanos.crunch.CapabilityJunctionStatus' }
+        { name: 'prereq', javaType: 'foam.nanos.crunch.UserCapabilityJunction' }
       ],
       javaType: 'foam.nanos.crunch.CapabilityJunctionStatus',
       javaCode: `
@@ -80,6 +90,7 @@ foam.CLASS({
 
         Capability capability = (Capability) ucj.findTargetId(x);
         boolean reviewRequired = capability.getReviewRequired();
+        CapabilityJunctionStatus prereqStatus = prereq.getStatus();
 
         switch ( (CapabilityJunctionStatus) prereqStatus ) {
           case AVAILABLE : 
@@ -91,23 +102,23 @@ foam.CLASS({
           case PENDING : 
             newStatus = reviewRequired && 
               ( newStatus == CapabilityJunctionStatus.APPROVED || 
-                newStatus == CapabilityJunctionStatus.GRANTED || 
-                newStatus == CapabilityJunctionStatus.GRACE_PERIOD 
+                newStatus == CapabilityJunctionStatus.GRANTED
               ) ? 
                 CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
             break;
           case APPROVED : 
             newStatus = reviewRequired && 
             ( newStatus == CapabilityJunctionStatus.APPROVED || 
-              newStatus == CapabilityJunctionStatus.GRANTED || 
-              newStatus == CapabilityJunctionStatus.GRACE_PERIOD 
+              newStatus == CapabilityJunctionStatus.GRANTED
             ) ? 
               CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
             break;
           case EXPIRED :
             newStatus = CapabilityJunctionStatus.ACTION_REQUIRED;
             break;
-          default : // GRACE_PERIOD AND GRANTED
+          default : // GRANTED
+            if ( prereq.getIsInGracePeriod() ) ucj.setIsInGracePeriod(true);
+            if ( prereq.getIsRenewable() ) ucj.setIsRenewable(true);
         }
         return newStatus;
 

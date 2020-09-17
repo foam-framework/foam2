@@ -515,6 +515,34 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
+      name: 'finalFObjectView',
+      label: 'Final FObject',
+      factory: function() { return foam.util.Timer.create(); },
+      view: {
+        class: 'foam.u2.view.FObjectView',
+        classIsFinal: true,
+        choices: [
+          [ 'foam.util.Timer', 'Timer' ],
+          [ 'foam.core.Property', 'Property' ],
+          [ 'foam.nanos.menu.DAOMenu',  'DAO'     ],
+          [ 'foam.nanos.menu.SubMenu',  'SubMenu' ],
+          [ 'foam.nanos.menu.TabsMenu', 'Tabs'    ]
+        ]
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'fObjectViewWithOneChoice',
+      label: 'FObjectView With One Choice',
+      view: {
+        class: 'foam.u2.view.FObjectView',
+        choices: [
+          [ 'foam.util.Timer', 'Timer' ]
+        ]
+      }
+    },
+    {
+      class: 'FObjectProperty',
       name: 'fObjectViewWithChoicesValueSet',
       label: 'FObjectView With Choices (Value Set)',
       value: foam.util.Timer.create(),

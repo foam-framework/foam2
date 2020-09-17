@@ -16,18 +16,31 @@ foam.CLASS({
   css: `
     ^ {
       display: flex;
-      padding-top: 5%;
-      padding-bottom: 5%;
+      padding: 5%;
       margin: 1%;
       justify-content: center;
+      flex-grow: 1;
+      align-items: center;
     }
 
     ^selected {
       border-color: /*%PRIMARY3%*/ #406dea !important;
     }
+
     ^disabled {
       background-color: /*%GREY5%*/ #f5f7fa !important;
       color: /*%GREY2%*/ #9ba1a6;
+    }
+
+    ^selected-disabled {
+      border-color: /*%PRIMARY5%*/ #b2c4f6 !important;
+      background-color: /*%GREY5%*/ #f5f7fa !important;
+      color: /*%GREY2%*/ #9ba1a6;
+    }
+
+    ^innerFlexer {
+      display: inline-flex;
+      flex-grow: 1;
     }
   `,
 
@@ -48,11 +61,17 @@ foam.CLASS({
   methods: [
     function initE() {
       this
+        .addClass(this.myClass('innerFlexer'))
         .start(this.CardBorder)
           .addClass(this.myClass())
-          .enableClass(this.myClass('selected'), this.data$)
+          .enableClass(this.myClass('selected'), this.slot((data, mode) => {
+            return data && mode !== foam.u2.DisplayMode.DISABLED
+          }))
           .enableClass(this.myClass('disabled'), this.slot((data, mode) => {
             return ! data && mode === foam.u2.DisplayMode.DISABLED
+          }))
+          .enableClass(this.myClass('selected-disabled'), this.slot((data, mode) => {
+            return data && mode === foam.u2.DisplayMode.DISABLED
           }))
           .on('click', this.onClick)
           .add(this.label) 

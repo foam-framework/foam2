@@ -98,6 +98,7 @@ public class PreventPrivilegeEscalationTest
       .setEmail("ppet@example.com")
       .setGroup(groupId)
       .setSpid("spid")
+      .setLifecycleState(foam.nanos.auth.LifecycleState.ACTIVE)
       .build();
     testUser = (User) bareUserDAO.put(testUser);
     return Auth.sudo(x, testUser);

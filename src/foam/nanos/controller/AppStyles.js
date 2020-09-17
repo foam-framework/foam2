@@ -13,7 +13,7 @@ foam.CLASS({
 
   css: `
     body {
-      font-family: Roboto, 'Helvetica Neue', helvetica, sans-serif;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       letter-spacing: 0.2px;
       color: #373a3c;
@@ -52,7 +52,7 @@ foam.CLASS({
     }
     ^ .generic-status {
       display: inline-block;
-      font-family: Roboto, 'Helvetica Neue', helvetica, sans-serif;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 12px;
       font-weight: normal;
       font-style: normal;

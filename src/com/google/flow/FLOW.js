@@ -193,7 +193,7 @@ foam.CLASS({
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
-        font-family: 'Roboto', sans-serif;
+        font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
         color: #444;
         }
 

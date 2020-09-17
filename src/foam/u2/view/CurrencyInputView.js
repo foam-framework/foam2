@@ -29,7 +29,7 @@ foam.CLASS({
     'data as parentObj'
   ],
 
-  expors: [
+  exports: [
     'as data'
   ],
 

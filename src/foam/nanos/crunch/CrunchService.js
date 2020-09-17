@@ -12,6 +12,10 @@ foam.INTERFACE({
     services.
   `,
 
+  javaImports: [
+    'foam.nanos.crunch.lite.CapablePayload'
+  ],
+
   methods: [
     {
       name: 'getGrantPath',
@@ -29,6 +33,52 @@ foam.INTERFACE({
         {
           name: 'sourceId',
           type: 'String'
+        }
+      ]
+    },
+    {
+      name: 'getCapabilityPath',
+      documentation: `
+        getGrantPath provides an array of capability objects representing
+        the list of capabilities required to grant the desired capability.
+      `,
+      async: true,
+      type: 'List',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'sourceId',
+          type: 'String'
+        },
+        {
+          name: 'filterGrantedUCJ',
+          type: 'boolean'
+        }
+      ]
+    },
+    {
+      name: 'getMultipleCapabilityPath',
+      documentation: `
+        getGrantPath provides an array of capability objects representing
+        the list of capabilities required to grant the desired capability.
+      `,
+      async: true,
+      type: 'List',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityIds',
+          type: 'String[]'
+        },
+        {
+          name: 'filterGrantedUCJ',
+          type: 'boolean'
         }
       ]
     },
@@ -52,6 +102,29 @@ foam.INTERFACE({
       ],
     },
     {
+      name: 'getJunctionForSubject',
+      documentation: `
+        getJunction provides the correct UserCapabilityJunction based on the
+        subject provided.
+      `,
+      async: true,
+      type: 'UserCapabilityJunction',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        },
+        {
+          name: 'subject',
+          type: 'foam.nanos.auth.Subject'
+        }
+      ],
+    },
+    {
       name: 'updateJunction',
       args: [
         {
@@ -67,6 +140,74 @@ foam.INTERFACE({
           type: 'foam.core.FObject'
         }
       ],
+    },
+    {
+      name: 'maybeIntercept',
+      documentation: `
+        Invoke a capability intercept if no capabilities from the list of
+        options are granted. The intercept will have the specified
+        capabilities options for the user.
+      `,
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'capabilityId',
+          type: 'String[]'
+        },
+      ]
+    },
+    {
+      name: 'maybeReopen',
+      documentation: `
+        Checks if a capability can be reopened from the appstore by checking if its :
+          - non-PENDING
+          - non-GRANTED or renewable
+      `,
+      async: true,
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        }
+      ]
+    },
+    {
+      name: 'isRenewable',
+      async: true,
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        }
+      ]
+    },
+    {
+      name: 'getCapableObjectPayloads',
+      async: true,
+      type: 'CapablePayload[]',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityIds',
+          type: 'String[]'
+        },
+      ]
     }
-  ],
+  ]
 });

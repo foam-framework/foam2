@@ -37,6 +37,9 @@ foam.CLASS({
     }
   ],
   methods: [
+    function set(o, val) {
+      o.cls_.getAxiomByName(this.nestedProperty).set(o, val);
+    },
     {
       name: 'toString',
       code: function() {
@@ -62,7 +65,7 @@ foam.CLASS({
         if ( e == null )
           return null;
         FObject copy = ((FObject)obj).shallowClone();
-        copy.setX(getX());
+        copy.setX(foam.core.XLocator.get());
         return e.f(copy);
       `
     },
@@ -107,7 +110,7 @@ foam.CLASS({
 
         if ( i == propName.length - 1 )
           return expr == null ? prop : DOT(expr, prop);
-        
+
         Expr propExpr = buildPropertyExpr(prop, expr);
 
         try {
@@ -152,10 +155,10 @@ foam.CLASS({
           javaType: 'foam.mlang.Expr'
         }
       ],
-      code: function(prop, expr) {          
+      code: function(prop, expr) {
         if ( foam.core.Reference.isInstance(prop) )
           prop = foam.mlang.Expressions.create().REF(prop);
-        
+
         return ! expr ? prop :
           foam.mlang.Expressions.create().DOT(expr, prop);
       },
@@ -178,7 +181,7 @@ foam.CLASS({
       javaCode: `
         if ( prop instanceof foam.core.AbstractFObjectPropertyInfo )
           return false;
-        
+
         return getFinderMethod(prop) != null;
       `
     },
@@ -224,6 +227,10 @@ foam.CLASS({
       type: 'foam.mlang.Expr[]',
       args: [
         {
+          name: 'x',
+          type: 'Context'
+        },
+        {
           name: 'objClass',
           class: 'Object',
           javaType: 'foam.core.ClassInfo'
@@ -245,18 +252,29 @@ foam.CLASS({
       javaCode: `
         ArrayList<foam.mlang.Expr> exprs = new ArrayList();
         for ( int i = 0 ; i < propNames.length ; i++ ) {
-          Expr expr = new NestedPropertiesExpression.Builder(getX()).setObjClass(objClass).setNestedProperty( propNames[i]).build();
+          Expr expr = new NestedPropertiesExpression.Builder(x).setObjClass(objClass).setNestedProperty( propNames[i]).build();
           if ( expr != null ) {
             exprs.add(expr);
           }
         }
-        return (Expr[]) exprs.toArray();
+
+        Expr[] exprsArr = new Expr[exprs.size()];
+
+        for ( int i = 0 ; i < exprs.size() ; i++ ) {
+          exprsArr[i] = exprs.get(i);
+        }
+        return exprsArr;
       `
     },
     {
       name: 'buildProjectionForPropertyNamesArray',
       type: 'Any',
+      javaType: 'foam.mlang.sink.Projection',
       args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
         {
           name: 'of',
           class: 'Class',
@@ -271,8 +289,8 @@ foam.CLASS({
         return foam.mlang.sink.Projection.create({ exprs: this.returnArrayOfExprForArrayOfProperties(of, propNames) });
       },
       javaCode: `
-        Expr[] exprs = returnArrayOfExprForArrayOfProperties(of, propNames);
-        return new Projection.Builder(getX()).setExprs(exprs).build();
+        Expr[] exprs = returnArrayOfExprForArrayOfProperties(x, of, propNames);
+        return new Projection.Builder(x).setExprs(exprs).build();
       `
     }
   ]

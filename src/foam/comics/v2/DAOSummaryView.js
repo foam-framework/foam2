@@ -131,10 +131,10 @@ foam.CLASS({
       code: function() {
         if ( ! this.stack ) return;
         this.stack.push({
-          class: 'foam.comics.v2.DAOUpdateView',
-          data: this.data,
+          class:  'foam.comics.v2.DAOUpdateView',
+          data:   this.data,
           config: this.config,
-          of: this.config.of
+          of:     this.config.of
         }, this.__subContext__);
       }
     },
@@ -212,9 +212,11 @@ foam.CLASS({
       var self = this;
       this.SUPER();
 
+      var promise = this.data ? Promise.resolve(this.data) : this.config.dao.inX(this.__subContext__).find(this.id);
+
       // Get a fresh copy of the data, especially when we've been returned
       // to this view from the edit view on the stack.
-      this.config.dao.inX(this.__subContext__).find(this.data).then(d => {
+      promise.then(d => {
         if ( d ) self.data = d;
 
         this
@@ -234,7 +236,7 @@ foam.CLASS({
                   .start(self.Cols).style({ 'align-items': 'center' })
                     .start()
                       .add(data.toSummary())
-                      .addClass(this.myClass('account-name'))
+                      .addClass(self.myClass('account-name'))
                       .addClass('truncate-ellipsis')
                     .end()
                     .startContext({ data }).add(self.primary).endContext()
@@ -242,7 +244,7 @@ foam.CLASS({
                 .end()
 
                 .start(self.Cols)
-                  .start(self.Cols).addClass(this.myClass('actions-header'))
+                  .start(self.Cols).addClass(self.myClass('actions-header'))
                     .startContext({ data: self })
                       .tag(self.EDIT, {
                         buttonStyle: foam.u2.ButtonStyle.TERTIARY,
@@ -259,9 +261,8 @@ foam.CLASS({
                     .endContext()
                   .end()
                 .end()
-
                 .start(config$viewBorder)
-                  .start(viewView, { data }).addClass(this.myClass('view-container')).end()
+                  .start(viewView, { data }).addClass(self.myClass('view-container')).end()
                 .end()
               .end();
           }));

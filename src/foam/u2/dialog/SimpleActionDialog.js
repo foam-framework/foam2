@@ -20,7 +20,7 @@ foam.CLASS({
 
   css: `
     ^ .headerTitle {
-      font-family: Lato;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 24px;
       font-weight: 900;
       font-style: normal;

@@ -3,7 +3,6 @@
  * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-
 foam.CLASS({
   package: 'foam.u2.wizard',
   name: 'StepWizardletController',
@@ -60,10 +59,32 @@ foam.CLASS({
       `,
       expression: function(wizardlets) {
         return wizardlets.map(wizardlet => {
+          // TODO: If no of and if createView DNE null, then we need to spoof a section
           return this.AbstractSectionedDetailView.create({
             of: wizardlet.of,
           }).sections;
         });
+      }
+    },
+    {
+      name: 'wizardletAvailableSlots',
+      documentation: `
+        Used to gather all the slots across all the Wizardlets so that nextScreen can change
+        depending on the availablity of all the wizardlets
+
+        Array format is similar to sections.
+      `,
+      expression: function(wizardlets) {
+        var availableSlots = wizardlets.map(wizardlet =>  wizardlet.isAvailable$)
+        availableSlots.forEach(availableSlot => {
+            availableSlot.sub(() => {
+              this.wizardPosition = this.WizardPosition.create({
+                wizardletIndex: this.wizardPosition.wizardletIndex,
+                sectionIndex: this.wizardPosition.sectionIndex
+              });
+            });
+          });
+        return availableSlots;
       }
     },
     {
@@ -121,7 +142,8 @@ foam.CLASS({
     {
       name: 'currentSection',
       expression: function(sections, wizardPosition) {
-        return sections[wizardPosition.wizardletIndex][wizardPosition.sectionIndex];
+        this.currentWizardlet = this.wizardlets[wizardPosition.wizardletIndex];
+        return this.currentWizardlet.currentSection = sections[wizardPosition.wizardletIndex][wizardPosition.sectionIndex];
       }
     },
     {
@@ -154,9 +176,18 @@ foam.CLASS({
         };
 
         for ( let p = decr(wizardPosition) ; p != null ; p = decr(p) ) {
-          if ( sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() ) {
+          if ( ! this.wizardlets[p.wizardletIndex].isAvailable ) {
+            continue;
+          }
+
+          if ( 
+            sectionAvailableSlots[p.wizardletIndex].length > 0 && 
+            sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() 
+            ) {
             return p;
           }
+
+          if ( p.sectionIndex < -1 ) return null;
         }
 
         return null;
@@ -164,7 +195,7 @@ foam.CLASS({
     },
     {
       name: 'nextScreen',
-      expression: function(sectionAvailableSlots, wizardPosition) {
+      expression: function(sectionAvailableSlots, wizardPosition, wizardletAvailableSlots) {
         var incr = pos => {
           let subWi = pos.wizardletIndex;
           let subSi = pos.sectionIndex;
@@ -182,7 +213,16 @@ foam.CLASS({
         };
 
         for ( let p = incr(wizardPosition) ; p != null ; p = incr(p) ) {
-          if ( sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() ) {
+          // Skip unavailable wizardlets
+          if ( ! this.wizardlets[p.wizardletIndex].isAvailable ) {
+            continue;
+          }
+
+          // Land on an available section
+          if ( 
+            sectionAvailableSlots[p.wizardletIndex].length > 0 && 
+            sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() 
+            ) {
             return p;
           }
         }
@@ -210,13 +250,24 @@ foam.CLASS({
     {
       name: 'canGoNext',
       class: 'Boolean',
-      expression: function(currentWizardlet$isValid) {
-        return currentWizardlet$isValid;
+      expression: function(currentWizardlet$isValid, config$allowSkipping) {
+        return currentWizardlet$isValid || config$allowSkipping;
       }
+    },
+    {
+      name: 'availabilityInvalidate',
+      class: 'Int'
     }
   ],
 
   methods: [
+    function init() {
+      return this.wizardlets.forEach(wizardlet => {
+        wizardlet.isAvailable$.sub(() => {
+          this.availabilityInvalidate++;
+        })
+      })
+    },
     function saveProgress() {
       var p = Promise.resolve();
       return this.wizardlets.slice(0, this.highestIndex).reduce(

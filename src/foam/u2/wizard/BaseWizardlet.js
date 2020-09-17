@@ -14,24 +14,52 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'mustBeValid',
-      class: 'Boolean'
+      name: 'of',
+      class: 'Class'
+    },
+    {
+      name: 'title',
+      class: 'String'
+    },
+    {
+      flags: ['web'],
+      name: 'currentSection',
+      transient: true
     },
     {
       name: 'isValid',
       class: 'Boolean',
-      expression: function (mustBeValid, of, data, data$errors_) {
-        if ( ! mustBeValid ) return true;
+      expression: function (of, data, currentSection, data$errors_) {
+        let sectionErrors = [];
+        if ( currentSection && data$errors_ ) {
+          sectionErrors = data$errors_.filter(error =>
+            currentSection.properties.includes(error[0])
+          );
+        }
+
         if ( ! this.of ) return true;
-        if ( ( ! data ) || data$errors_ ) return false;
+        if ( ( ! data ) || currentSection ? sectionErrors.length > 0 : data$errors_) return false;
         return true;
       }
+    },
+    {
+      name: 'isAvailable',
+      class: 'Boolean',
+      value: true,
+      documentation: `
+        Specify the availability of this wizardlet. If true, wizardlet is
+        available iff at least one section is available. If false, wizardlet
+        does not display even if some sections are available.
+      `,
     }
   ],
 
   methods: [
     function validate() {
       return this.isValid;
+    },
+    function createView(data) {
+      return null;
     }
   ]
 });

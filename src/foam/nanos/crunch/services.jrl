@@ -45,7 +45,12 @@ p({
       .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
       .build();
   """,
-  "client":"{\"of\":\"foam.nanos.crunch.Capability\"}"
+  "client":"""
+    {
+      "of":"foam.nanos.crunch.Capability",
+      "cache": false
+    }
+  """
 })
 
 p({
@@ -70,6 +75,22 @@ p({
   "name":"userCapabilityJunctionDAO",
   "serve":true,
   "serviceScript":"""    
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(false)
+      .setInnerDAO(x.get("bareUserCapabilityJunctionDAO"))
+      .setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo())
+      .build();
+    userCap =  new foam.nanos.crunch.UserCapabilityJunctionDAO.Builder(x).setDelegate(dao).build();
+    return userCap;
+  """,
+  "client":"{\"of\":\"foam.nanos.crunch.UserCapabilityJunction\", \"remoteListenerSupport\": false}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"bareUserCapabilityJunctionDAO",
+  "serve":true,
+  "serviceScript":"""    
     decorator = new foam.dao.history.HistoryDAO(x, "userCapabilityJunctionHistoryDAO", new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo()).build());
     dao = new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(false)
@@ -79,11 +100,15 @@ p({
       .setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo())
       .setDecorator(decorator)
       .build();
-    userCap =  new foam.nanos.crunch.UserCapabilityJunctionDAO.Builder(x).setDelegate(dao).build();
-    ruler = new foam.nanos.ruler.RulerDAO(x, userCap, "userCapabilityJunctionDAO");
-    return ruler;
+    return dao;
   """,
-  "client":"{\"of\":\"foam.nanos.crunch.UserCapabilityJunction\", \"remoteListenerSupport\": false}"
+  "client":
+  """
+    {
+      "of":"foam.nanos.crunch.UserCapabilityJunction",
+      "remoteListenerSupport": false
+    }
+  """
 })
 
 p({
@@ -166,31 +191,17 @@ p({
 
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"connectedCapabilityDAO",
+  "name":"capabilityPayloadDAO",
   "lazy":true,
   "serve":true,
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
-      .setGuid(true)
-      .setDecorator(new foam.nanos.crunch.connection.ConnectedCapabilityDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.connection.ConnectedCapability.getOwnClassInfo())))
-      .setInnerDAO(new foam.dao.MDAO(foam.nanos.crunch.connection.ConnectedCapability.getOwnClassInfo()))
-      .setOf(foam.nanos.crunch.connection.ConnectedCapability.getOwnClassInfo())
+      .setAuthorize(false)
+      .setPermissioned(false)
+      .setNullify(true)
+      .setDecorator(new foam.nanos.crunch.connection.CapabilityPayloadDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.connection.CapabilityPayload.getOwnClassInfo())))
+      .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
       .build();
   """,
-  "client":"{\"of\":\"foam.nanos.crunch.connection.ConnectedCapability\"}"
-})
-
-p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"flatCapabilityDAO",
-  "lazy":true,
-  "serve":true,
-  "serviceScript":"""
-    return new foam.dao.EasyDAO.Builder(x)
-      .setDecorator(new foam.nanos.crunch.connection.FlatCapabilityDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.connection.ConnectedCapability.getOwnClassInfo())))
-      .setInnerDAO(x.get("capabilityDAO"))
-      .setOf(foam.nanos.crunch.connection.FlatCapability.getOwnClassInfo())
-      .build();
-  """,
-  "client":"{\"of\":\"foam.nanos.crunch.connection.FlatCapability\"}"
+  "client":"{\"of\":\"foam.nanos.crunch.Capability\"}"
 })

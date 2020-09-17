@@ -63,7 +63,14 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
-      name: 'forwardedForProxyWhitelist',
+      name: 'forwardedForProxyWhitelist'
+    },
+    {
+      class: 'StringArray',
+      name: 'hostDomains',
+      javaPreSet: `
+        Arrays.sort(val);
+      `
     },
     {
       class: 'FObjectArray',
@@ -143,6 +150,7 @@ foam.CLASS({
         handler.setWelcomeFiles(getWelcomeFiles());
 
         handler.setAttribute("X", getX());
+        handler.setAttribute("httpServer", this);
 
         for ( foam.nanos.servlet.ServletMapping mapping : getServletMappings() ) {
           org.eclipse.jetty.servlet.ServletHolder holder;
@@ -292,6 +300,17 @@ foam.CLASS({
         }
   
       }
+      `
+    },
+    {
+      name: 'containsHostDomain',
+      type: 'Boolean',
+      documentation: `Returns true if given domain is contained in server's host domains.`,
+      args: [
+        { name: 'domain', javaType: 'String' }
+      ],
+      javaCode: `
+        return Arrays.binarySearch(getHostDomains(), domain) >= 0;
       `
     }
   ]

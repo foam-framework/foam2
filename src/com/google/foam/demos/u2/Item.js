@@ -81,7 +81,7 @@ foam.CLASS({
 
   css: `
     body {
-      font-family: 'Roboto', sans-serif;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     }
     ^ th {
       text-align: left;

@@ -93,8 +93,8 @@ foam.CLASS({
       section: 'infoSection',
     },
     {
-      name: 'enabled',
       class: 'Boolean',
+      name: 'enabled',
       value: true,
       includeInDigest: true,
       section: 'administration'
@@ -120,8 +120,8 @@ foam.CLASS({
       },
     },
     {
-      name: 'domains',
       class: 'Array',
+      name: 'domains',
       of: 'String',
       factory: function(){
         return  ['localhost'];
@@ -156,6 +156,10 @@ foam.CLASS({
       documentation: 'Menu user redirects to after login.',
       of: 'foam.nanos.menu.Menu',
       section: 'navigation'
+    },
+    {
+      class: 'Map',
+      name: 'headConfig'
     },
     {
       class: 'Image',
@@ -418,8 +422,8 @@ foam.CLASS({
       section: 'inputs'
     },
     {
-      name: 'appConfig',
       class: 'foam.core.FObjectProperty',
+      name: 'appConfig',
       of: 'foam.nanos.app.AppConfig',
       section: 'applicationSection',
       factory: function() { return foam.nanos.app.AppConfig.create({}); }
@@ -526,9 +530,13 @@ foam.CLASS({
   methods: [
     {
       name: 'toSummary',
+      type: 'String',
       code: function() {
         return this.name + ' ' + this.description;
-      }
+      },
+      javaCode: `
+        return foam.util.SafetyUtil.isEmpty(getName()) || foam.util.SafetyUtil.isEmpty(getDescription()) ? "" : getName() + " " + getDescription();
+      `
     },
   ]
 });

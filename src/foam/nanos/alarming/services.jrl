@@ -41,11 +41,15 @@ p({
   "name":"alarmDAO",
   "serve":true,
   "serviceScript":`
+    dao = new foam.nanos.alarming.AddAlarmNameDAO.Builder(x)
+        .setDelegate(new foam.dao.NullDAO(x, foam.nanos.alarming.Alarm.getOwnClassInfo()))
+        .build();
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.alarming.Alarm.getOwnClassInfo())
       .setSeqNo(true)
       .setPm(true)
       .setPipelinePm(true)
+      .setDecorator(dao)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("alarms")
       .setOrder(new foam.mlang.order.Comparator[] {

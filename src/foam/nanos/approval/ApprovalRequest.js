@@ -238,7 +238,7 @@
       name: 'classification',
       label: 'Approval Type',
       section: 'requestDetails',
-      tableWidth: 150,
+      tableWidth: 450,
       documentation: `Should be unique to a certain type of requests and created within a single rule.
       For example "IdentityMind Business approval".
       When retrieving approval requests from a dao, do not use daoKey, use classification instead:
@@ -405,17 +405,30 @@
       writePermissionRequired: true
     },
     {
-      class: 'String',
-      name: 'refObj',
-      transient: true,
-      expression: function(daoKey, objId) {
-        return daoKey + ':' + objId;
-      },
-      javaGetter: `
-        return getDaoKey() + ": " + getObjId();
-      `,
+      class: 'Object',
+      name: 'refObjId',
+      hidden: true,
       readPermissionRequired: true,
-      writePermissionRequired: true
+      writePermissionRequired: true,
+      documentation: `
+        ID of obj displayed in view reference
+        To be used in view reference action when the approvalrequest
+        needs to specify its own reference, for example in the case of 
+        UserCapabilityJunctions where data is null.
+      `
+    },
+    {
+      class: 'String',
+      name: 'refDaoKey',
+      hidden: true,
+      readPermissionRequired: true,
+      writePermissionRequired: true,
+      documentation: `
+        Daokey of obj displayed in view reference.
+        To be used in view reference action when the approvalrequest
+        needs to specify its own reference, for example in the case of 
+        UserCapabilityJunctions where data is null.
+      `
     },
     {
       class: 'String',
@@ -515,9 +528,13 @@
     },
     {
       name: 'toSummary',
+      type: 'String',
       code: function() {
         return `(${this.classification}) ${this.operation}`;
-      }
+      },
+      javaCode: `
+        return foam.util.SafetyUtil.isEmpty(getClassification()) ? "" : "(" + getClassification() + ")" + getOperation().toString();
+      `
     },
     {
       name: 'approveWithMemo',
@@ -660,14 +677,24 @@
           var objId = property.adapt.call(property, self.objId, self.objId, property);
           return self.__subContext__[this.daoKey_]
             .find(objId)
-            .then((obj) => {
-              return !! obj;
-            })
+            .then(obj => !! obj)
             .catch((err) => {
               console.warn(err.message || err);
-              return false;
+              if ( self.refObjId && self.refDaoKey && self.__subContext__[self.refDaoKey_] ) {
+                property = self.__subContext__[self.refDaoKey].of.ID;
+                objId = property.adapt.call(property, self.refObjId, self.refObjId, property);
+                return self.__subContext__[self.refDaoKey]
+                  .find(objId)
+                  .then(obj => !! obj)
+                  .catch((err) => {
+                    console.warn(err.message || err);
+                    return false;
+                  });
+              } else {
+                return false;
+              }
             });
-          }
+        }
       },
       code: function(X) {
         var self = this;
@@ -679,9 +706,18 @@
              return;
         }
 
-        var objId = X[self.daoKey_].of.ID.type === 'Long' ? parseInt(this.objId) : this.objId;
-
-        return X[this.daoKey_]
+        var objId, daoKey, property;
+        if ( self.refObjId && self.refDaoKey ) {
+          daoKey = self.refDaoKey
+          property = X[daoKey].of.ID;
+          objId = property.adapt.call(property, self.refObjId, self.refObjId, property);
+        } else {
+          daoKey = self.daoKey_;
+          property = X[daoKey].of.ID;
+          objId = property.adapt.call(property, self.objId, self.objId, property);
+        }
+        
+        return X[daoKey]
           .find(objId)
           .then((obj) => {
             var of = obj.cls_;
@@ -745,7 +781,7 @@
               data: obj,
               of: of,
               config: foam.comics.v2.DAOControllerConfig.create({
-                daoKey: this.daoKey_,
+                daoKey: daoKey,
                 of: of,
                 editPredicate: foam.mlang.predicate.False.create(),
                 createPredicate: foam.mlang.predicate.False.create(),

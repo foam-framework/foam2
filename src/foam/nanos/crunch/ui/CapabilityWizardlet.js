@@ -12,13 +12,6 @@ foam.CLASS({
     'crunchController'
   ],
 
-  requires: [
-    'foam.core.Action',
-    'foam.core.Property',
-    'foam.layout.Section',
-    'foam.layout.SectionAxiom'
-  ],
-
   properties: [
     // Properties specific to CapabilityWizardSection
     {
@@ -32,25 +25,32 @@ foam.CLASS({
     {
       name: 'of',
       class: 'Class',
-      expression: function (capability) {
+      expression: function(capability) {
+        if ( ! capability || ! capability.of ) return null;
         return capability.of;
       }
     },
     {
       name: 'data',
-      factory: function () {
+      flags: ['web'],
+      factory: function() {
         if ( ! this.of ) return null;
 
-        var ret = this.of.create({ capability: this.capability }, this);
+        var ret = this.of.getAxiomByName('capability') ?
+          this.of.create({ capability: this.capability }, this) :
+          this.of.create({}, this);
+
         if ( this.ucj === null ) return ret;
-      
+
         ret = Object.assign(ret, this.ucj.data);
         return ret;
       }
     },
     {
       name: 'title',
+      class: 'String',
       expression: function(capability) {
+        if ( ! capability || ! capability.name ) return '';
         return capability.name;
       }
     }
@@ -60,7 +60,7 @@ foam.CLASS({
     {
       name: 'save',
       code: function() {
-        return this.crunchController.save(this);
+        return this.crunchController && this.crunchController.save(this);
       }
     }
   ]

@@ -73,6 +73,7 @@ FOAM_FILES([
   { name: "foam/core/Enum" },
   { name: "foam/core/JSON" },
   { name: "foam/core/XML" },
+  { name: "foam/core/CompoundException" },
   { name: "foam/lib/csv/CSVParser" },
   { name: "foam/lib/csv/CSVOutputter" },
   { name: "foam/lib/csv/CSVOutputterImpl" },
@@ -169,6 +170,7 @@ FOAM_FILES([
   { name: "foam/util/EmailTest" },
   { name: "foam/util/PasswordTest" },
   { name: "foam/util/SecurityUtilTest" },
+  { name: "foam/util/async/Sequence" },
   { name: "foam/log/LogLevel" },
   { name: "foam/log/Logger" },
   { name: "foam/log/ConsoleLogger" },
@@ -206,6 +208,7 @@ FOAM_FILES([
   { name: "foam/version/VersionedClassFactory" },
   { name: "foam/dao/Sink" },
   { name: "foam/dao/DAO" },
+  { name: "foam/dao/PredicatedDualDelegateDAO" },
   { name: "foam/dao/daoUtils" },
   { name: "foam/dao/ArraySink" },
   { name: "foam/dao/DAOInterceptor" },
@@ -279,6 +282,7 @@ FOAM_FILES([
 
   { name: 'foam/nanos/approval/AuthenticatedApprovalDAOAuthorizer' },
 
+  { name: 'foam/nanos/alarming/AddAlarmNameDAO' },
   { name: "foam/nanos/approval/ApprovalRequestNotificationNotificationCitationView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/SignUp" },
   { name: "foam/nanos/u2/navigation/SignIn" },
@@ -293,6 +297,7 @@ FOAM_FILES([
   { name: 'foam/nanos/auth/UserPropertyAvailabilityService' },
   { name: 'foam/nanos/auth/UserPropertyAvailabilityServiceInterface' },
   { name: 'foam/nanos/auth/ClientUserPropertyAvailabilityService' },
+//  { name: 'foam/nanos/auth/UserCitationView' },
   { name: "foam/nanos/logger/Logger" },
   { name: "foam/nanos/logger/DAOLogger" },
   { name: "foam/nanos/logger/LoggingDAO" },
@@ -587,6 +592,17 @@ FOAM_FILES([
   { name: "foam/u2/stack/StackView", flags: ['web'] },
   { name: "foam/u2/crunch/Style", flags: ['web'] },
   { name: "foam/u2/crunch/CrunchController", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/ConfigureFlowAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/CapabilityAdaptAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/CheckPendingAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/LoadCapabilitiesAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/CreateWizardletsAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/FilterWizardletsAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/RequirementsPreviewAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/StepWizardAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/PutFinalJunctionsAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/TestAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/LoadTopConfig", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityRequirementView", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityCardView", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityFeatureView", flags: ['web'] },
@@ -832,6 +848,8 @@ FOAM_FILES([
   { name: "foam/u2/wizard/ScrollWizardletView" },
   { name: "foam/u2/wizard/DAOWizardlet" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
+  { name: "foam/nanos/crunch/ui/CapableObjectWizardlet" },
+  { name: "foam/nanos/crunch/ui/MinMaxCapabilityWizardlet" },
 
   { name: "foam/graphics/ZoomMapView" },
   { name: "foam/core/CoreTypesValidationTest" },
@@ -888,4 +906,8 @@ FOAM_FILES([
   { name: 'foam/u2/dao/MDBrowserListView', flags: ['web']},
   { name: "foam/u2/md/Controller" },
   { name: "foam/u2/md/OverlayDropdown", flags: ['web'] },
+
+  // fs
+  { name: 'foam/nanos/fs/fileDropZone/FileDropZone', flags: ['web'] },
+  { name: 'foam/nanos/fs/fileDropZone/FileCard', flags: ['web'] }
 ]);

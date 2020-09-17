@@ -39,9 +39,9 @@ foam.CLASS({
       margin-top: 0;
     }
     body { margin: 2em; }
-    body, input[text], button { color: #888; font-family: Cambria, Georgia; }
+    body, input[text], button { color: #888; font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif; }
     ^starred .foam-u2-DAOList { display: flex; }
-    * { font-family: Arial; }
+    * { font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif; }
     input {
       font-size: 1em;
       height: 2em;

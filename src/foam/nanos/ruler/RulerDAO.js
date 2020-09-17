@@ -214,9 +214,10 @@ for ( Object key : sink.getGroupKeys() ) {
           type: 'Context'
         }
       ],
-      javaCode: `DAO localRuleDAO = ((DAO) x.get("localRuleDAO")).where(
-  EQ(Rule.DAO_KEY, getDaoKey())
-);
+      javaCode: `DAO localRuleDAO = new foam.dao.ProxyDAO(x,
+  getDaoKey().equals("localRuleDAO") ? this : (DAO) x.get("localRuleDAO")
+).where( EQ(Rule.DAO_KEY, getDaoKey()) );
+
 localRuleDAO.listen(
   new UpdateRulesListSink.Builder(getX())
     .setDao(this)
@@ -310,6 +311,8 @@ for ( Object key : groups.getGroupKeys() ) {
       setX(x);
       setDelegate(delegate);
       setDaoKey(serviceName);
+      // This doesn't get called when using Builder,
+      //   it must be called manually in this case.
       updateRules(x);
     }
       `

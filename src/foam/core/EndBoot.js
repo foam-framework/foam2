@@ -123,11 +123,13 @@ foam.CLASS({
           },
           set: function(x) {
             if ( x ) {
+              // Set either contextParent or __context__, depending on if x is
+              // an FObject or Context
               this.setPrivate_(
-                  foam.core.FObject.isInstance(x) ?
-                      'contextParent' :
-                      '__context__',
-                  x);
+                foam.core.FObject.isInstance(x) ?
+                    'contextParent' :
+                    '__context__',
+                x);
             }
           }
         });
@@ -140,8 +142,8 @@ foam.CLASS({
               get: function() { return this.__context__; },
               set: function() {
                 throw new Error(
-                    'Attempted to set unsettable __subContext__ in ' +
-                    this.cls_.id);
+                  'Attempted to set unsettable __subContext__ in ' +
+                  this.cls_.id);
               }
             });
       }
@@ -205,6 +207,13 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'networkTransient',
+      expression: function(transient) {
+        return transient;
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'externalTransient',
       expression: function(transient) {
         return transient;
       }

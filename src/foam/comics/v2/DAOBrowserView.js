@@ -100,7 +100,8 @@ foam.CLASS({
 
   exports: [
     'dblclick',
-    'filteredTableColumns'
+    'filteredTableColumns',
+    'serviceName'
   ],
 
   properties: [
@@ -165,8 +166,16 @@ foam.CLASS({
       expression: function(config, cannedPredicate) {
         return config.dao$proxy.where(cannedPredicate);
       }
+    },
+    {
+      name: 'serviceName',
+      class: 'String',
+      factory: function() {
+        return this.data.serviceName;
+      }
     }
   ],
+
   actions: [
     {
       name: 'export',
@@ -193,6 +202,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function init() {
       // Reset the search filters when a different canned query is selected
@@ -200,13 +210,14 @@ foam.CLASS({
         this.searchPredicate = foam.mlang.predicate.True.create();
       }));
     },
-    function dblclick(obj) {
+    function dblclick(obj, id) {
       if ( ! this.stack ) return;
       this.stack.push({
         class: 'foam.comics.v2.DAOSummaryView',
         data: obj,
         config: this.config,
-        of: this.config.of
+        of: this.config.of,
+        id: id
       }, this.__subContext__);
     },
     function initE() {
@@ -265,7 +276,8 @@ foam.CLASS({
                   .end();
               })
               .start(self.summaryView,{
-                data: self.predicatedDAO$proxy
+                data: self.predicatedDAO$proxy,
+                config: self.config
               })
                 .addClass(self.myClass('browse-view-container'))
               .end()
