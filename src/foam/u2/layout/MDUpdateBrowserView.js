@@ -134,16 +134,15 @@ foam.CLASS({
 
   css: `
     ^ .foam-u2-ActionView-delete {
-      background-color: /*%PRIMARY4%*/ #937dff;
+      background-color: /*%PRIMARY2%*/ #937dff;
       width: 100%;
       height: 8rem;
-      color: black;
+      color: white;
       font-weight: 600;
       font-size: 3rem;
       bottom: 0;
       position: absolute;
       z-index: 99;
-      box-shadow: inset 0px 2px 10px 0px white;
     }
   `,
 });

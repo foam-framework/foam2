@@ -7,32 +7,9 @@
 // documentation: handles login with SignUp.js and SignIn.js. And a property with img. Will use split border
 
 foam.CLASS({
-  package: 'foam.u2.view',
-  name: 'LoginView',
+  package: 'foam.u2.layout',
+  name: 'MDLoginView',
   extends: 'foam.u2.View',
-
-  documentation: `User View for SignUp or SignIn.
-
-  DEPENDING ON MODEL PASSED IN:
-
-  MESSAGEs possible for this view:
-  TITLE: if exists will be ontop of model,
-  FOOTER_TXT: if exists will be under model,
-  FOOTER_LINK: if exists will be under FOOTER and the text associated to footerLink(),
-  SUB_FOOTER_TXT: needed an additional option for the forgot password,
-  SUB_FOOTER_LINK: needed an additional option for the forgot password,
-  DISCLAIMER: if exists will be under img defined in imgPath. If imgPath empty, DISCLAIMER under SUB_FOOTER
-
-  METHODs possible for this view:
-  footerLink: code associated to footer msg and link,
-  subfooterLink: code associated to subfooter msg
-
-  DEPENDING ON PASSED IN ARGUMENTS:
-
-  Property functionality:
-  imgPath: if present view uses SplitScreenBorder (-USED to toggle splitScreen - picked up from ApplicationController)
-  backLink_: if on model uses string link from model, other wise gets appConfig.url (-USED for top-top nav- toggled by this.topBarShow_)
-  `,
 
   imports: [
     'appConfig',
@@ -55,7 +32,7 @@ foam.CLASS({
 
   /* ON RIGHT SIDE ALL **** */
   ^ .centerVertical {
-    padding-top: 3vh; 
+    padding-top: 3vh;
     max-width: 30vw;
     margin: 0 auto;
   }
@@ -81,14 +58,20 @@ foam.CLASS({
   /* TITLE TXT ON MODEL */
   ^ .title-top {
     font-size: 2.5em;
-    padding-top: 2vh;
+    padding-bottom: 6rem;
     font-weight: bold;
   }
 
   /* ON MODEL */
   ^ .content-form {
-    width: 32vw;
-    padding-top: 6.5em;
+    font-size: 2rem;
+    padding-top: 20%;
+    width: 70%;
+    /* justify-content: center; */
+    /* align-items: center; */
+    height: 100%;
+    margin: auto;
+    text-align: center;
   }
 
   /* ON ALL FOOTER TEXT */
@@ -145,6 +128,20 @@ foam.CLASS({
     margin-top: -90vh;
     margin-left: 10vw;
   }
+  ^ .foam-u2-ActionView-login {
+      margin: auto;
+      padding: 1.5rem;
+      font-size: 2.5rem;
+  }
+
+  ^ .foam-u2-detail-SectionedDetailPropertyView m3 {
+    font-size: 2rem;
+  }
+
+  ^ .foam-u2-detail-SectionedDetailPropertyView input {
+      height: 4rem;
+      font-size: 2rem;
+    }
   `,
 
   properties: [
@@ -228,16 +225,10 @@ foam.CLASS({
       this.onDetach(() => {
         this.document.removeEventListener('keyup', this.onKeyPressed);
       });
-      let logo = this.theme.largeLogo ? this.theme.largeLogo : this.theme.logo;
+      this.addClass(this.myClass());
+//      let logo = this.theme.largeLogo ? this.theme.largeLogo : this.theme.logo;
       // CREATE MODEL VIEW
-      var right = this.Element.create({}, this)
-      // Header on-top of rendering model
-        .start().show(this.topBarShow).addClass('topBar-logo-Back')
-          .start('img')
-            .attr('src', logo)
-            .addClass('top-bar-img')
-          .end()
-      .end()
+      this.start('div').addClass('login-container')
       // Title txt and Model
         .start().addClass('title-top').add(this.model.TITLE).end()
         .startContext({ data: this })
@@ -262,53 +253,11 @@ foam.CLASS({
               this.model.subfooterLink();
             })
           .end()
+        .end()
         .end();
 
-      // CREATE SPLIT VIEW
-      if ( this.imgPath ) {
-        var split = foam.u2.borders.SplitScreenBorder.create();
-        split.rightPanel.add(right);
-      } else {
-        right.addClass('centerVertical').start().addClass('disclaimer-login').add(this.model.DISCLAIMER).end();
-      }
 
-      // RENDER EVERYTHING ONTO PAGE
-      this.addClass(this.myClass())
-      // full width bar with navigation to app landing page
-        .start().addClass('top-bar-nav').show(this.topBarShow_)
-          .start()
-            .start().addClass('topBar-txt-link')
-              .start('span')
-                .addClass('horizontal-flip')
-                .addClass('inline-block')
-                .add('➔')
-              .end()
-              .start('span').add(this.GO_BACK).add(this.backLinkTxt_)
-                .on('click', () => {
-                  window.location = this.backLink_;
-                })
-              .end()
-            .end()
-          .end()
-        .end()
-      // deciding to render half screen with img and model or just centered model
-        .callIfElse( !! this.imgPath && !! split, () => {
-          this.add(split)
-          .start()
-            .addClass('cover-img-block1')
-              .start('img')
-                .addClass('image-one')
-                .attr('src', this.imgPath)
-              .end()
-      // add a disclaimer under img
-              .start('p')
-                .addClass('disclaimer-login').addClass('disclaimer-login-img')
-                .add(this.model.DISCLAIMER)
-              .end()
-            .end();
-        }, function() {
-          this.add(right);
-        });
+//      this.addClass('centerVertical').start().addClass('disclaimer-login').add(this.model.DISCLAIMER).end();
     }
   ],
 

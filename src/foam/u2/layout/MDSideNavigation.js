@@ -18,6 +18,7 @@ foam.CLASS({
     'auth',
     'currentMenu',
     'isMenuOpen',
+    'loginSuccess',
     'menuDAO',
     'menuListener',
     'pushMenu',
@@ -52,7 +53,7 @@ foam.CLASS({
       name: 'profileImg',
       factory: function() {
         return this.MDProfileImageView.create({ label: this.user.legalName,
-          src: this.user.profilePicture || 'images/ic-placeholder.png' });
+          src: 'images/ic-placeholder.png' });
       }
     }
   ],
@@ -61,6 +62,7 @@ foam.CLASS({
     function initE() {
       var self = this;
       this
+      .show(this.loginSuccess$)
       .addClass(this.myClass())
       .addClass(this.slot(function(isMenuOpen) {
         return isMenuOpen ? 'menuOpen' : 'menuClosed';
@@ -135,10 +137,12 @@ foam.CLASS({
       height: 100rem;
       position: absolute;
       box-shadow: 0px 0px 50px 0px #000;
+      top: 0;
     }
     ^ input[type="search"] {
       width: 90%;
       height: 7rem;
+      font-size: 3rem;
     }
 
     ^ .side-nav-view {
@@ -165,6 +169,7 @@ foam.CLASS({
 
     ^ .foam-u2-view-TreeViewRow-label {
       font-size: 2.5rem;
+      font-weight: 500;
       display: inline-flex;
       justify-content: space-between;
       align-items: center;
@@ -176,7 +181,7 @@ foam.CLASS({
      }
 
     ^ .foam-u2-view-TreeViewRow-heading {
-        height: 12rem;
+        height: 10rem;
         padding-left: 3rem !important;
         border-bottom: 1px solid #efefef;
     }
@@ -200,7 +205,6 @@ foam.CLASS({
 
 
     ^ .child-menu {
-      background-color: black;
       padding-left: 3rem;
     }
 
@@ -210,7 +214,7 @@ foam.CLASS({
       }
 
     ^ .child-menu .foam-u2-view-TreeViewRow-label {
-      color: red;
+      font-weight: 300;
     }
 
     ^ .child-menu .foam-u2-view-TreeViewRow-heading {

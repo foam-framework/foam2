@@ -113,7 +113,7 @@ foam.CLASS({
       // Hides the keyboard on mobile.
       var active = this.document.activeElement;
       if ( active ) active.blur();
-      this.datePicker_ = this.DatePicker.create({ data$: this.realData$ });
+      this.datePicker_ = this.MDDatePicker.create({ data$: this.realData$ });
       this.dialog_ = this.EasyDialog.create({
         title: this.datePicker_.titleE,
         body: this.datePicker_.bodyE,
@@ -131,7 +131,7 @@ foam.CLASS({
   css: `
     ^ {
       align-items: stretch;
-      display: flex;
+      display: inline-grid;
       flex-direction: column;
       padding: 2rem 0 0 0;
       position: relative;
@@ -141,7 +141,7 @@ foam.CLASS({
       flex-grow: 1;
       font-size: inherit;
       font-weight: 500;
-      position: absolute;
+//      position: absolute;
 //      top: 32px;
       transition: font-size 0.5s, top 0.5s;
       z-index: 0;

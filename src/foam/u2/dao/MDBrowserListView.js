@@ -90,9 +90,9 @@ foam.CLASS({
 //      height: 100rem;
       overflow: scroll;
     }
-    ^ .foam-u2-layout-MDSideNavigation {
-      top: 0;
-    }
+//    ^ .foam-u2-layout-MDSideNavigation {
+//      top: 0;
+//    }
 
     ^ .create-btn {
       position: fixed;
@@ -100,10 +100,10 @@ foam.CLASS({
       right: 3rem;
       border-radius: 100%;
       padding: 3rem;
-      color: black;
+      color: white;
       font-weight: 900;
       font-size: 4rem;
-      background-color: /*%PRIMARY4%*/ #937dff;
+      background-color: /*%PRIMARY2%*/ #937dff;
       box-shadow: inset 0px 0px 15px 0px white;
     }
 

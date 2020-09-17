@@ -60,6 +60,49 @@ foam.CLASS({
     ^ .foam-u2-view-StringView {
       width: 100%;
     }
+
+    ^ .foam-u2-md-CheckBox {
+      width: 3rem;
+      height: 3rem;
+    }
+
+    ^ .foam-u2-md-CheckBox-label {
+      position: unset;
+    }
+
+    ^ .foam-u2-property-MDDatePicker-body {
+      height: 22rem;
+      width: 22rem;
+    }
+
+    ^ .foam-u2-property-MDCalendar-heading {
+      font-size: 1.5rem;
+      padding-bottom: 1rem;
+    }
+
+    ^ .foam-u2-property-MDCalendar-table {
+      font-size: 1.5rem;
+    }
+
+    ^ span button {
+      font-size: 2rem;
+    }
+
+    ^ .foam-u2-tag-Select {
+      font-size: 2rem;
+      height: 4rem;
+      width: fit-content;
+    }
+
+    ^ .foam-u2-view-RichChoiceView-selection-view {
+      height: 4rem;
+      font-size: 2rem;
+      width: fit-content;
+    }
+
+    ^ .DefaultRowView-row {
+      font-size: 2rem;
+    }
   `,
   properties: [
     {
@@ -86,7 +129,7 @@ foam.CLASS({
             addClass(this.myClass()).
             forEach(properties, function(p) {
               if ( p.cls_ != foam.dao.OneToManyRelationshipProperty &&
-                p.cls_ != foam.dao.ManyToManyRelationshipProperty ) {
+                p.cls_ != foam.dao.ManyToManyRelationshipProperty && p.label != "User Feedback") {
                 this.start().addClass('property-item').add(p).end();
               }
             })

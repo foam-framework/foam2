@@ -12,7 +12,7 @@ foam.CLASS({
 
   requires: [
     'foam.input.touch.GestureTarget',
-    'foam.u2.md.Calendar'
+    'foam.u2.property.MDCalendar'
   ],
 
   imports: [
@@ -299,9 +299,9 @@ foam.CLASS({
           'for the currently viewed month, and creates the adjacent months.',
       code: function() {
         var newCals = [
-          this.Calendar.create({ data$: this.softData$, year: this.leftYear, month: this.leftMonth }),
-          this.Calendar.create({ data$: this.softData$, year: this.viewYear, month: this.viewMonth }),
-          this.Calendar.create({ data$: this.softData$, year: this.rightYear, month: this.rightMonth })
+          this.MDCalendar.create({ data$: this.softData$, year: this.leftYear, month: this.leftMonth }),
+          this.MDCalendar.create({ data$: this.softData$, year: this.viewYear, month: this.viewMonth }),
+          this.MDCalendar.create({ data$: this.softData$, year: this.rightYear, month: this.rightMonth })
         ];
         // TODO(braden): Setting this.xPos here should be sufficient, but it
         // causes jank. The postSet on xPos calls adjustX, which is framed like

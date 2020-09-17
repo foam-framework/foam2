@@ -7,11 +7,17 @@
 foam.CLASS({
   package: 'foam.u2.md',
   name: 'Controller',
-  extends: 'foam.nanos.controller.ApplicationController',
+  extends: 'net.nanopay.ui.Controller',
 
   requires: [
     'foam.u2.dao.MDBrowserListView',
-    'foam.nanos.mobile.ui.AppStyles'
+    'foam.nanos.mobile.ui.AppStyles',
+    'foam.core.Latch',
+    'net.nanopay.ui.style.AppStyles',
+    'net.nanopay.sme.ui.SMEStyles',
+    'net.nanopay.invoice.ui.style.InvoiceStyles',
+    'net.nanopay.cico.ui.bankAccount.form.BankPadAuthorization',
+    'foam.u2.layout.MDLoginView'
   ],
 
   css: `
@@ -74,54 +80,56 @@ foam.CLASS({
       position: unset;
     }
 
-    ^ .foam-u2-view-LoginView .centerVertical {
-        max-width: 100%;
-        font-size: 2rem;
-        padding: 8rem;
-        padding-top: 10rem;
+
+    ^ .net-nanopay-ui-TopSideNavigation {
+      display: none;
     }
 
-    ^ .foam-u2-view-LoginView .foam-u2-detail-VerticalDetailView {
-      padding-top: 4rem;
-      width: 40rem;
-        padding-bottom: 4rem;
+    ^ .foam-u2-layout-MDLoginView {
+      height: 100%;
+      width: 100%;
     }
-
-    ^ .foam-u2-view-LoginView .foam-u2-TextField {
-      height: 5rem;
-    }
-    ^ .foam-u2-LoginView .foam-u2-layout-Rows m3 {
-      font-size: 4rem;
-    }
-    ^ .foam-u2-LoginView .foam-u2-layout-Cols > button {
-        font-size: 2rem;
-        width: 25rem;
-        padding: 2rem;
-        margin: auto;
-      }
   `,
+
+  properties: [
+
+  ],
 
   methods: [
     async function initE() {
 
-     await this.clientPromise;
-     await this.fetchTheme();
+      window.addEventListener('resize', this.updateDisplayWidth);
+      this.updateDisplayWidth();
 
-     await this.themeInstalled;
-     this.__subContext__.register(this.MDBrowserListView, 'foam.comics.v2.DAOBrowseControllerView');
-     this.__subContext__.register(this.MDBrowserListView, 'foam.comics.BrowserView');
+      await this.clientPromise;
+      await this.fetchTheme();
 
-     this
-      .addClass(this.myClass())
-      .start()
-        .addClass('stack-wrapper')
-        .enableClass('login-stack', this.loginSuccess$.map( ls => ! ls ))
-        .tag({
-          class: 'foam.u2.stack.StackView',
-          data: this.stack,
-          showActions: false
-        })
-      .end();
+      this.client.nSpecDAO.find('appConfig').then(config => {
+        this.appConfig.copyFrom(config.service);
+
+        this.__subContext__.register(this.MDBrowserListView, 'foam.comics.v2.DAOBrowseControllerView');
+        this.__subContext__.register(this.MDBrowserListView, 'foam.comics.BrowserView');
+        this.__subContext__.register(this.MDLoginView, 'foam.u2.view.LoginView');
+
+      this.themeInstalled.resolve();
+
+      });
+      await this.themeInstalled;
+        this
+          .addClass(this.myClass())
+          .add(this.slot( async function(loginSuccess, topNavigation_) {
+            if ( ! loginSuccess ) return null;
+            await this.themeUpdated;
+            return this.E().tag(topNavigation_);
+          }))
+          .start()
+            .addClass('stack-wrapper')
+            .enableClass('login-stack', this.loginSuccess$.map( ls => ! ls ))
+            .tag(this.StackView.create({
+                data: this.stack,
+                showActions: false
+              }))
+          .end()
     }
   ]
 });

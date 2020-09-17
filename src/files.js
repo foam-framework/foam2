@@ -297,7 +297,7 @@ FOAM_FILES([
   { name: 'foam/nanos/auth/UserPropertyAvailabilityService' },
   { name: 'foam/nanos/auth/UserPropertyAvailabilityServiceInterface' },
   { name: 'foam/nanos/auth/ClientUserPropertyAvailabilityService' },
-//  { name: 'foam/nanos/auth/UserCitationView' },
+  { name: 'foam/nanos/auth/UserCitationView' },
   { name: "foam/nanos/logger/Logger" },
   { name: "foam/nanos/logger/DAOLogger" },
   { name: "foam/nanos/logger/LoggingDAO" },
@@ -906,6 +906,7 @@ FOAM_FILES([
   { name: 'foam/u2/dao/MDBrowserListView', flags: ['web']},
   { name: "foam/u2/md/Controller" },
   { name: "foam/u2/md/OverlayDropdown", flags: ['web'] },
+  { name: "foam/u2/layout/MDLoginView", flags: ['web'] },
 
   // fs
   { name: 'foam/nanos/fs/fileDropZone/FileDropZone', flags: ['web'] },
