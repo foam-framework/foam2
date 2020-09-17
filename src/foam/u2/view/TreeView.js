@@ -57,7 +57,6 @@ foam.CLASS({
       border-left: 4px solid rgba(0,0,0,0);
       display: flex;
       align-items: center;
-      padding: 25px;
     }
 
     ^select-level {
@@ -66,7 +65,7 @@ foam.CLASS({
 
     ^selected > ^heading {
       background-color: /*%PRIMARY5%*/ #e5f1fc !important;
-      border-left: 0.5rem solid /*%PRIMARY3%*/ #406dea;
+      border-left: 4px solid /*%PRIMARY3%*/ #406dea;
     }
 
     ^selected > ^heading > ^label{
@@ -201,9 +200,9 @@ foam.CLASS({
         }).
         start().
           addClass(self.myClass('heading')).
-//            style({
-//              'padding-left': ((( self.level - 1) * 16 + 28) + 'px')
-//            }).
+            style({
+              'padding-left': ((( self.level - 1) * 16 + 28) + 'px')
+            }).
             add(this.slot( function(level, selected, id) {
               if ( level === 1 ) {
                 var isDefault = ! this.data.icon || ! this.data.activeIcon;
@@ -213,7 +212,7 @@ foam.CLASS({
                 }
                 return this.E().start('img').
                   addClass(self.myClass('label-icon')).
-                  attrs({ 'src': imgUrl, 'width': '30px', 'height': '30px' }).
+                  attrs({ 'src': imgUrl, 'width': '16px', 'height': '16px' }).
                 end();
               }
             }, self.level$, this.selection$, this.data$.dot('id'))).
@@ -226,10 +225,11 @@ foam.CLASS({
               addClass(self.myClass('label')).
               call(this.formatter, [self.data]).
               start('span').
+              addClass('toggle-icon').
               show(this.hasChildren$).
               style({
                 'visibility':     'visible',
-                'font-size':      '4rem',
+                'font-size':      '16px',
                 'transform':      this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)'; })
               }).
               on('click', this.toggleExpanded).
@@ -250,7 +250,7 @@ foam.CLASS({
                 query:            controlledSearchSlot,
                 onClickAddOn:     self.onClickAddOn,
                 level:            self.level + 1
-              }, self));
+              }, self)).addClass('child-menu');
             });
           })).
         end();
@@ -348,6 +348,7 @@ foam.CLASS({
   css: `
     ^ {
       padding-top: 10px;
+      overflow-y: scroll;
     }
   `,
 

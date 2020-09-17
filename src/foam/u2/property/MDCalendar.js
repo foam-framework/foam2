@@ -5,8 +5,8 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2.md',
-  name: 'Calendar',
+  package: 'foam.u2.property',
+  name: 'MDCalendar',
   extends: 'foam.u2.View',
 
   imports: [

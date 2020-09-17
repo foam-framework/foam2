@@ -32,26 +32,14 @@ foam.CLASS({
   ^ input[type="search"] {
     width: 210px;
   }
-  ^ .foam-u2-view-TreeViewRow > div:nth-child(2){
-      padding-left: 2em;
-      padding-top: 1em;
-    }
-  ^ .foam-u2-view-TreeViewRow-label {
-    font-size: 3.5rem;
-  }
-
-   ^ .foam-u2-view-TreeViewRow-select-level .foam-u2-view-TreeViewRow-label >span:nth-child(1) {
-    font-size: 1rem;
-   }
-
 
   ^ .side-nav-view {
-//    font-size: medium!important;
-//    font-weight: normal;
+    font-size: medium!important;
+    font-weight: normal;
     display: inline-block;
     position: absolute;
-    height: 100%;
-//    width: 250px;
+    height: calc(100vh - 80px);
+    width: 250px;
     overflow-x: hidden;
     z-index: 100;
     font-size: 26px;

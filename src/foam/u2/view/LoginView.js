@@ -87,7 +87,7 @@ foam.CLASS({
 
   /* ON MODEL */
   ^ .content-form {
-    width: 32vw;
+//    width: 32vw;
     padding-top: 6.5em;
   }
 

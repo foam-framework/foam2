@@ -5,13 +5,13 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2.md',
-  name: 'DateField',
+  package: 'foam.u2.property',
+  name: 'MDDateField',
   extends: 'foam.u2.View',
 
   requires: [
     'foam.u2.EasyDialog',
-    'foam.u2.md.DatePicker'
+    'foam.u2.property.MDDatePicker'
   ],
 
   properties: [
@@ -124,7 +124,7 @@ foam.CLASS({
           this.dialog_     = null;
         }.bind(this)
       });
-      this.dialog_.open();
+      this.add(this.dialog_);
     },
   ],
 
@@ -133,23 +133,22 @@ foam.CLASS({
       align-items: stretch;
       display: flex;
       flex-direction: column;
-      margin: 8px;
-      padding: 32px 8px 8px 8px;
+      padding: 2rem 0 0 0;
       position: relative;
     }
     ^label {
       color: #999;
       flex-grow: 1;
-      font-size: 14px;
+      font-size: inherit;
       font-weight: 500;
       position: absolute;
-      top: 32px;
+//      top: 32px;
       transition: font-size 0.5s, top 0.5s;
       z-index: 0;
     }
     ^label-offset {
-      font-size: 85%;
-      top: 8px;
+//      font-size: 85%;
+//      top: 8px;
     }
     ^no-label {
       padding-top: 8px;
@@ -165,7 +164,7 @@ foam.CLASS({
       font-family: inherit;
       font-size: inherit;
       margin-bottom: -8px;
-      padding: 0 0 7px 0;
+      padding: 1rem 0 0 0;
       resize: none;
       z-index: 1;
     }

@@ -5,8 +5,8 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2.md',
-  name: 'DatePicker',
+  package: 'foam.u2.property',
+  name: 'MDDatePicker',
 
   extends: 'foam.u2.View',
 
@@ -240,13 +240,13 @@ foam.CLASS({
         // TODO: use show()
         body.enableClass(this.myClass('hidden'), this.showYears_$);
 
-        var years = this.E().addClass(this.myCls('years'));
+        var years = this.E().addClass(this.myClass('years'));
         for ( var i = 1900 ; i <= 2100 ; i++ ) {
           years.start('span')
             .setID(this.id + '-year-' + i)
-            .addClass(this.myCls('years-year'))
+            .addClass(this.myClass('years-year'))
             .add('' + i)
-            .enableClass(this.myCls('selected'), this.slot(function(index, viewYear) {
+            .enableClass(this.myClass('selected'), this.slot(function(index, viewYear) {
               return index === viewYear;
             }.bind(this, i), this.viewYear$))
             .on('click', this.pickYear.bind(this, i))
@@ -254,7 +254,7 @@ foam.CLASS({
         }
 
         // TODO: use show()
-        years.enableClass(this.myCls('hidden'), this.showYears_$, true /* negate */);
+        years.enableClass(this.myClass('hidden'), this.showYears_$, true /* negate */);
 
         return [body, years];
       }
