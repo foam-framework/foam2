@@ -11,14 +11,15 @@ foam.CLASS({
   documentation: 'Forgot Password Resend Model',
 
   imports: [
-    'notify',
+    'ctrl',
     'resetPasswordToken',
     'stack'
   ],
 
   requires: [
     'foam.log.LogLevel',
-    'foam.nanos.auth.User'
+    'foam.nanos.auth.User',
+    'foam.u2.dialog.NotificationMessage'
   ],
 
   messages: [
@@ -64,11 +65,19 @@ foam.CLASS({
       code: function(X) {
         const user = this.User.create({ email: this.email });
         this.resetPasswordToken.generateToken(null, user).then((_) => {
-          this.notify(`${this.INSTRUC_ONE} ${this.email}. ${this.INSTRUC_TWO}`, '', this.LogLevel.INFO, true);
+          this.ctrl.add(this.NotificationMessage.create({
+            message: `${this.INSTRUC_ONE} ${this.email}. ${this.INSTRUC_TWO}`,
+            type: this.LogLevel.INFO,
+            transient: true
+          }));
           this.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, this);
         })
         .catch((err) => {
-          this.notify(err.message, '', this.LogLevel.ERROR, true);
+          this.ctrl.add(this.NotificationMessage.create({
+            message: err.message || this.ERROR_MSG,
+            type: this.LogLevel.ERROR,
+            transient: true
+          }));
         });
       }
     }
