@@ -89,7 +89,7 @@ foam.CLASS({
 
             if ( 
               toPutCapablePayload.getObjId() == null || 
-              SafetyUtil.isEmpty((String) toPutCapablePayload.getObjId()) 
+              SafetyUtil.isEmpty(String.valueOf(toPutCapablePayload.getObjId())) 
             ){
               toPutCapablePayload.setObjId(obj.getProperty("id"));
             }

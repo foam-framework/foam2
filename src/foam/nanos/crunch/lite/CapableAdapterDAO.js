@@ -13,7 +13,8 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.dao.MDAO',
-    'java.util.Arrays'
+    'java.util.Arrays',
+    'foam.dao.ArraySink'
   ],
 
   documentation: `
@@ -85,14 +86,11 @@ foam.CLASS({
     {
       name: 'select_',
       javaCode: `
-        DAO mdao = new MDAO(CapablePayload.getOwnClassInfo());
-        X xTmp = x.put("capablePayloadMDAO", mdao);
-        CapablePayload[] payloads = getCapable().getCapablePayloads();
-        for ( int i = 0 ; i < payloads.length ; i++ ) {
-          DAO dao = (DAO) xTmp.get("capablePayloadMDAO");
-          dao.put(payloads[i]);
-        }
-        return mdao.select_(x, sink, skip, limit, order, predicate);
+        ArraySink capablePayloadsToArraySink = new ArraySink.Builder(x)
+          .setArray(Arrays.asList(getCapable().getCapablePayloads()))
+          .build();
+
+        return capablePayloadsToArraySink;
       `
     }
   ]

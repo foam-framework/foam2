@@ -17,6 +17,7 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.X',
     'foam.dao.DAO',
+    'foam.dao.ArraySink',
     'foam.nanos.auth.User',
     'foam.nanos.approval.Approvable',
     'foam.nanos.approval.ApprovalRequest',
@@ -29,7 +30,8 @@ foam.CLASS({
     'foam.util.SafetyUtil',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.lite.Capable',
-    'foam.nanos.crunch.lite.CapablePayload'
+    'foam.nanos.crunch.lite.CapablePayload',
+    'foam.nanos.logger.Logger'
   ],
 
   implements: ['foam.nanos.ruler.RuleAction'],
@@ -58,6 +60,8 @@ foam.CLASS({
       javaCode: `
         User user = ((Subject) x.get("subject")).getUser();
 
+        Logger logger = (Logger) x.get("logger");
+
         List<String> capabilitiesToApprove = getCapabilitiesToApprove();
 
         FObject clonedObj = obj.fclone();
@@ -72,7 +76,7 @@ foam.CLASS({
 
               if ( 
                 capablePayload.getObjId() == null || 
-                SafetyUtil.isEmpty((String) capablePayload.getObjId())
+                SafetyUtil.isEmpty(String.valueOf(capablePayload.getObjId()))
               ){
                 capablePayload.setObjId(obj.getProperty("id"));
               }
@@ -96,6 +100,19 @@ foam.CLASS({
                 .append(":c")
                 .append(capability.getId())
                 .toString();
+
+              List approvablesPending = ((ArraySink) approvableDAO
+                .where(foam.mlang.MLang.AND(
+                  foam.mlang.MLang.EQ(Approvable.LOOKUP_ID, hashedId),
+                  foam.mlang.MLang.EQ(Approvable.STATUS, ApprovalStatus.REQUESTED)
+                )).inX(getX()).select(new ArraySink())).getArray();
+              
+              if ( approvablesPending.size() > 0 ){
+                logger.warning("Approvable already  exists for: " + hashedId);
+                // TODO: throw an error once we add the paymentId checks as this is supposed  to be  unexpected
+                // but because no paymentid check, then we end up in  an infinite loop just need to return
+                return;
+              }
 
               try {
                 FObject objectToDiffAgainst = (FObject) obj.getClassInfo().newInstance();
