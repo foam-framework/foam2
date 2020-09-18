@@ -350,7 +350,6 @@ FOAM_FILES([
   //daos
   { name: "foam/nanos/crunch/UserCapabilityJunctionDAO" },
   { name: "foam/nanos/crunch/connection/CapabilityPayloadDAO" },
-  { name: "foam/nanos/crunch/PreventMultipleSpidDAO" },
   //rules
   { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" },
   { name: "foam/nanos/crunch/IsUserCapabilityJunctionStatusUpdate" },
@@ -358,7 +357,9 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/CrunchService" },
   { name: "foam/nanos/crunch/ClientCrunchService" },
   { name: "foam/nanos/crunch/ReputDependentUCJs" },
-  { name: "foam/nanos/crunch/CreateUserCapabilityJunctionOnSpidSet" },
+  //spid
+  { name: "foam/nanos/auth/CreateUserCapabilityJunctionOnSpidSet" },
+  { name: "foam/nanos/auth/PreventMultipleSpidDAO" },
   //ucjDAO rules
   { name: "foam/nanos/crunch/ruler/CheckUCJOwnershipOnPut" },
   { name: "foam/nanos/crunch/ruler/ValidateUCJDataOnPut" },

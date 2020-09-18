@@ -21,7 +21,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.crunch',
+  package: 'foam.nanos.auth',
   name: 'CreateUserCapabilityJunctionOnSpidSet',
 
   implements: [

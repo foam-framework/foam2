@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.crunch',
+  package: 'foam.nanos.auth',
   name: 'PreventMultipleSpidDAO',
   extends: 'foam.dao.ProxyDAO',
 

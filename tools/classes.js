@@ -655,14 +655,16 @@ var classes = [
   //daos
   'foam.nanos.crunch.connection.CapabilityPayloadDAO',
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
-  'foam.nanos.crunch.PreventMultipleSpidDAO',
   //rules
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
   'foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate',
   'foam.nanos.crunch.RemoveJunctionsOnUserRemoval',
   'foam.nanos.crunch.CrunchService',
   'foam.nanos.crunch.ReputDependentUCJs',
-  'foam.nanos.crunch.CreateUserCapabilityJunctionOnSpidSet',
+
+  // spid
+  'foam.nanos.auth.CreateUserCapabilityJunctionOnSpidSet',
+  'foam.nanos.auth.PreventMultipleSpidDAO',
 
   //ucjdao rules
   'foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut',
