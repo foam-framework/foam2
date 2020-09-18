@@ -15,7 +15,6 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.mlang.predicate.AbstractPredicate',
     'foam.nanos.auth.ServiceProvider',
-    'foam.nanos.auth.ServiceProvider',
     'static foam.mlang.MLang.*'
   ],
 
