@@ -357,6 +357,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/CrunchService" },
   { name: "foam/nanos/crunch/ClientCrunchService" },
   { name: "foam/nanos/crunch/ReputDependentUCJs" },
+  { name: "foam/nanos/crunch/CreateUserCapabilityJunctionOnSpidSet" },
   //ucjDAO rules
   { name: "foam/nanos/crunch/ruler/CheckUCJOwnershipOnPut" },
   { name: "foam/nanos/crunch/ruler/ValidateUCJDataOnPut" },

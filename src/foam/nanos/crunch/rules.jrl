@@ -1,3 +1,22 @@
+
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75afsbdkjfbsk",
+  "name":"CreateUserCapabilityJunctionOnSpidSet",
+  "priority":100,
+  "ruleGroup":"crunch",
+  "documentation":"On user create/update, if spid is set, create UserCapabilityJunction between User/Spid",
+  "daoKey":"localUserDAO",
+  "operation":3,
+  "after":true,
+  "enabled":true,
+  "saveHistory":false,
+  "action":{
+    "class":"foam.nanos.crunch.CreateUserCapabilityJunctionOnSpidSet"
+  },
+  "lifecycleState":1
+})
+
 p({
   "class":"foam.nanos.ruler.Rule",
   "id":"68afcf0c-c718-98f8-0841-75e9-crunch0",
