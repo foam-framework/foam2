@@ -38,7 +38,8 @@ foam.CLASS({
       class: 'String',
       name: 'name',
       javaFactory: `
-        return getId() + "Service Provider Capability";
+        return "*".equals(getId()) ? "Global Service Provider Capability" : 
+          getId().substring(0, 1).toUpperCase() + getId().substring(1) + " Service Provider Capability";
       `
     }
   ]
