@@ -83,16 +83,18 @@ foam.CLASS({
       name: 'data',
       javaGetter:`
         if ( dataIsSet_ ) return data_;
+
         if ( ! SafetyUtil.isEmpty(this.getDataString()) ) {
-          String encodedString = this.getDataString().split(",")[1];
-          BlobService blobStore = new foam.blob.BlobStore();
-          byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
-          InputStream is = new ByteArrayInputStream(decodedBytes);
-          InputStreamBlob blob = new foam.blob.InputStreamBlob(is, decodedBytes.length);
+          String          encodedString = this.getDataString().split(",")[1];
+          BlobService     blobStore     = new foam.blob.BlobStore();
+          byte[]          decodedBytes  = Base64.getDecoder().decode(encodedString);
+          InputStream     is            = new ByteArrayInputStream(decodedBytes);
+          InputStreamBlob blob          = new foam.blob.InputStreamBlob(is, decodedBytes.length);
+
           return blob;
-        } else {
-          return null;
         }
+
+        return null;
       `,
       getter: function() {
         if ( this.dataString ) {
@@ -109,19 +111,16 @@ foam.CLASS({
                 byteNumbers[i] = slice.charCodeAt(i);
               }
 
-              const byteArray = new Uint8Array(byteNumbers);
-              byteArrays.push(byteArray);
+              byteArrays.push(new Uint8Array(byteNumbers));
             }
 
             return new Blob(byteArrays, {type: contentType});
           }
-          return this.BlobBlob.create({
-            blob: b64toBlob(b64Data)
-          });
-        } else {
-          var v = this.instance_.data;
-          return v !== undefined ? v : null ;
+
+          return this.BlobBlob.create({blob: b64toBlob(b64Data)});
         }
+
+        return this.instance_.data || null;
       },
       /**
        * When we export this as the CSV, we are trying to create a new object if this property is undefined.

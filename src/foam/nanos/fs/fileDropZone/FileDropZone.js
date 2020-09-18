@@ -223,7 +223,7 @@ foam.CLASS({
 
     function addFiles(files) {
       var errors = false;
-      for ( var i = 0; i < files.length; i++ ) {
+      for ( var i = 0 ; i < files.length ; i++ ) {
         // skip files that exceed limit
         if ( files[i].size > ( this.maxSize * 1024 * 1024 ) ) {
           if ( ! errors ) errors = true;
@@ -239,7 +239,7 @@ foam.CLASS({
         }
         if ( isIncluded ) continue;
         if ( this.isMultipleFiles ) {
-          this.files.push(this.File.create({
+          var f = this.File.create({
             owner:    this.user.id,
             filename: files[i].name,
             filesize: files[i].size,
@@ -247,7 +247,8 @@ foam.CLASS({
             data:     this.BlobBlob.create({
               blob: files[i]
             })
-          }));
+          });
+          this.files.push(f);
         } else {
           this.files[0] = this.File.create({
             owner:    this.user.id,

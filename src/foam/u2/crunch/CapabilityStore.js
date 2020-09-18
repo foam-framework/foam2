@@ -161,7 +161,6 @@ foam.CLASS({
   methods: [
     function initE() {
       this.SUPER();
-      this.signingOfficerQuestion();
 
       var self = this;
       window.cstore = self;
@@ -316,9 +315,6 @@ foam.CLASS({
         this.EQ(
           this.CapabilityCategoryCapabilityJunction.SOURCE_ID,
           categoryId));
-    },
-    function signingOfficerQuestion() {
-      return this.auth.check(this.ctrl.__subContext__, 'businessHasSigningOfficer');
     }
   ]
 });

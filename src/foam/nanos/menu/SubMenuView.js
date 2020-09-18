@@ -15,14 +15,15 @@ foam.CLASS({
 
   css: `
     ^inner {
-      -webkit-box-shadow: 0px 0px 67px -15px rgba(0,0,0,0.75);
       -moz-box-shadow: 0px 0px 67px -15px rgba(0,0,0,0.75);
-      box-shadow: 0px 0px 67px -15px rgba(0,0,0,0.75);
+      -webkit-box-shadow: 0px 0px 67px -15px rgba(0,0,0,0.75);
       border-bottom-left-radius: 5px;
       border-bottom-right-radius: 5px;
+      box-shadow: 0px 0px 67px -15px rgba(0,0,0,0.75);
+      font-weight: 300;
       position: absolute;
       top: 65px;
-      font-weight: 300;
+      width: 240px;
     }
     ^inner div {
       box-sizing: border-box;

@@ -739,10 +739,12 @@ try ( HashingOutputStream os = new HashingOutputStream(new FileOutputStream(tmp)
 
   String digest = new String(Hex.encodeHexString(os.digest()));
   File dest = x.get(Storage.class).get(getSha256() + File.separator + digest);
-  if ( !tmp.renameTo(dest) ) {
-    throw new IOException("Rename failed!");
+  if ( ! tmp.renameTo(dest) ) {
+    // File already exists, so remove tmp version
+    try {
+      tmp.delete();
+    } catch (Throwable t) {}
   }
-
   IdentifiedBlob result = new IdentifiedBlob();
   result.setId(digest);
   result.setX(getX());
