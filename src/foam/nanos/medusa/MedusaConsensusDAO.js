@@ -65,6 +65,10 @@ foam.CLASS({
       value: 30000
     },
     {
+      name: 'lastPromotedIndex',
+      class: 'Long'
+    },
+    {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
@@ -84,20 +88,20 @@ foam.CLASS({
       MedusaEntry entry = (MedusaEntry) obj;
       Object id = entry.getProperty("id");
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
-      // getLogger().debug("put", getIndex(x), replaying.getReplayIndex(), entry.toSummary(), "from", entry.getNode());
+      // getLogger().debug("put", replaying.getIndex(), replaying.getReplayIndex(), entry.toSummary(), "from", entry.getNode());
       PM pm = null;
       try {
         MedusaEntry existing = (MedusaEntry) getDelegate().find_(x, id);
         if ( existing != null &&
              existing.getPromoted() ) {
-          // getLogger().debug("put", getIndex(x), entry.toSummary(), "from", entry.getNode(), "discarding");
+          // getLogger().debug("put", replaying.getIndex(), entry.toSummary(), "from", entry.getNode(), "discarding");
           return existing;
         }
         synchronized ( id.toString().intern() ) {
           existing = (MedusaEntry) getDelegate().find_(x, id);
           if ( existing != null ) {
             if ( existing.getPromoted() ) {
-              // getLogger().debug("put", getIndex(x), entry.toSummary(), "from", entry.getNode(), "discarding", "in-lock");
+              // getLogger().debug("put", replaying.getIndex(), entry.toSummary(), "from", entry.getNode(), "discarding", "in-lock");
               return existing;
             }
             // getLogger().debug("put", entry.toSummary(), "from", entry.getNode(), "existing");
@@ -122,7 +126,7 @@ foam.CLASS({
 
           ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
           if ( nodes.size() >= support.getNodeQuorum() &&
-               entry.getIndex() == getIndex(x) + 1 ) {
+               entry.getIndex() == replaying.getIndex() + 1 ) {
             if ( entry.isFrozen() ) {
               entry = (MedusaEntry) entry.fclone();
             }
@@ -155,38 +159,7 @@ foam.CLASS({
       `
     },
     {
-      documentation: `The current max consensus index.  On Primary, after Replay, the GlobalIndex is incremented by MedusaAdapter when the next MedusaEntry is created.  Otherwise it's incremented during this Consensus. So on Primary the consensus index is global -1, as we are testing for the MedusaEntry that was just created by the MedusaAdapter.`,
-      name: 'getIndex',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-      ],
-      type: 'Long',
-      javaCode: `
-      PM pm = PM.create(x, this.getClass().getSimpleName(), "index");
-      try {
-        ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
-        if ( replaying.getReplaying() ) {
-          return replaying.getIndex();
-        }
-        ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-        ClusterConfig config = support.getConfig(x, support.getConfigId());
-        DaggerService dagger = (DaggerService) x.get("daggerService");
-        if ( config.getIsPrimary() ) {
-          // NOTE: Dagger GlobalIndex on Primary was update by MedusaAdapter, so
-          // testing for it's MedusaEntry index - which is global -1.
-          return dagger.getGlobalIndex(x) - 1;
-        }
-        return dagger.getGlobalIndex(x);
-      } finally {
-        pm.log(x);
-      }
-      `
-    },
-    {
-      documentation: 'Make an entry available for Dagger hashing.',
+      documentation: `Make an entry available for Dagger hashing.`,
       name: 'promote',
       args: [
         {
@@ -200,15 +173,18 @@ foam.CLASS({
       ],
       type: 'foam.nanos.medusa.MedusaEntry',
       javaCode: `
+      // NOTE: implementation expects caller to lock on entry index
+
       PM pm = PM.create(x, this.getClass().getSimpleName(), "promote");
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
       DaggerService dagger = (DaggerService) x.get("daggerService");
-      // getLogger().debug("promote", entry.getIndex(), getIndex(x));
+      // getLogger().debug("promote", entry.getIndex(), replaying.getIndex());
       try {
         dagger.verify(x, entry);
         dagger.updateLinks(x, entry);
         // test to save a synchronized call
         if ( entry.getIndex() > dagger.getGlobalIndex(x) ) {
+          // Required on Secondaries.
           dagger.setGlobalIndex(x, entry.getIndex());
         }
 
@@ -261,10 +237,11 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       try {
         while ( true ) {
+          ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
           PM pm = PM.create(x, "MedusaConsensusDAO", "promoter");
           MedusaEntry entry = null;
           try {
-            Long nextIndex = getIndex(x) + 1;
+            Long nextIndex = replaying.getIndex() + 1;
             // getLogger().debug("promoter", "next", nextIndex);
             MedusaEntry next = (MedusaEntry) getDelegate().find_(x, nextIndex);
             if ( next != null ) {
@@ -297,7 +274,6 @@ foam.CLASS({
               }
 
               if ( entry == null ) {
-                ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
                 if ( replaying.getNonConsensusIndex() < nextIndex ) {
                   replaying.setNonConsensusIndex(nextIndex);
                   replaying.setLastModified(new java.util.Date());

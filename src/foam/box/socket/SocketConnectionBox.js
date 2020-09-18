@@ -38,6 +38,7 @@ foam.CLASS({
     'java.util.Map',
     'java.util.HashMap',
     'java.util.Collections',
+    'java.util.concurrent.atomic.AtomicInteger',
     'java.util.concurrent.atomic.AtomicLong'
   ],
     
@@ -166,7 +167,7 @@ foam.CLASS({
         message = formatter.builder().toString();
         byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
         synchronized (out_) {
-          getLogger().debug("send", message);
+          // getLogger().debug("send", message);
           out_.writeLong(System.currentTimeMillis());
           out_.writeInt(messageBytes.length);
           out_.write(messageBytes);
@@ -265,7 +266,7 @@ foam.CLASS({
             getLogger().debug(e.getMessage());
             break;
           } catch ( Throwable t ) {
-            // REVIEW: remove this catch when understand all exceptions
+            // REVIEW: remove this catch when all exceptions understand
             getLogger().error(t);
             break;
           }

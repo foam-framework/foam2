@@ -93,8 +93,8 @@ public class SocketRouter
     try {
       new SessionServerBox(requestContext, agent.getSkeletonBox(), agent.getAuthenticate()).send(msg);
     } catch (Exception e) {
-      if ( ! serviceKey.equals("static") ) pm.error(getX(), e);
       logger_.error("Error serving", serviceKey, e);
+      if ( ! serviceKey.equals("static") ) pm.error(getX(), e);
       throw e;
     } finally {
       if ( ! serviceKey.equals("static") ) pm.log(getX());

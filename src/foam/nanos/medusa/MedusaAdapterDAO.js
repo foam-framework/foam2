@@ -133,7 +133,7 @@ foam.CLASS({
         } else {
           MedusaEntry entry = (MedusaEntry) submit(x, data, DOP.PUT);
           if ( cmd != null ) {
-            getLogger().debug("put", "primary", obj.getProperty("id"), "setMedusaEntryId", entry.toSummary(), entry.getId().toString());
+            getLogger().debug("put", "primary", obj.getProperty("id"), "setMedusaEntryId", entry.toSummary());
             cmd.setMedusaEntryId((Long) entry.getId());
             cmd.setData(nu);
           }
@@ -226,7 +226,8 @@ foam.CLASS({
 
         if ( config.getType() == MedusaType.MEDIATOR ) {
           Long id = cmd.getMedusaEntryId();
-          if ( id != null ) {
+          if ( id != null &&
+               id > 0L ) {
             MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
             registry.wait(x, id);
           } else {
