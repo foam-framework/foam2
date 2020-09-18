@@ -14,7 +14,8 @@ foam.CLASS({
   javaImports: [
     'foam.dao.DAO',
     'foam.mlang.predicate.AbstractPredicate',
-    'foam.nanos.auth.ServiceProvider',
+    'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.UserCapabilityJunction',
     'static foam.mlang.MLang.*'
   ],
 

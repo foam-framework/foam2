@@ -12,7 +12,7 @@ p({
   "enabled":true,
   "saveHistory":false,
   "action":{
-    "class":"foam.nanos.crunch.CreateUserCapabilityJunctionOnSpidSet"
+    "class":"foam.nanos.auth.CreateUserCapabilityJunctionOnSpidSet"
   },
   "lifecycleState":1
 })
