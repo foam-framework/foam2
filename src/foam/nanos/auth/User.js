@@ -521,6 +521,8 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.ServiceProvider',
       name: 'spid',
+      tableWidth: 120,	
+      section: 'administrative',	
       documentation: `
         Need to override getter to return "" because its trying to 
         return null (probably as a result of moving order of files
