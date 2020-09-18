@@ -515,10 +515,10 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.ServiceProvider',
       name: 'spid',
-      tableWidth: 120,	
-      section: 'administrative',	
+      tableWidth: 120,
+      section: 'administrative',
       documentation: `
-        Need to override getter to return "" because its trying to 
+        Need to override getter to return "" because its trying to
         return null (probably as a result of moving order of files
         in nanos), which breaks tests
       `,
@@ -615,7 +615,7 @@ foam.CLASS({
         if (
           ! updatingSelf &&
           ! hasUserEditPermission &&
-          ! auth.check(x, "spid.update." + user.getSpid())
+          ! auth.check(x, "capability.update." + user.getSpid())
         ) {
           throw new AuthorizationException("You do not have permission to update this user.");
         }
@@ -648,7 +648,7 @@ foam.CLASS({
         if (
           ! SafetyUtil.equals(this.getId(), user.getId()) &&
           ! auth.check(x, "user.remove." + this.getId()) &&
-          ! auth.check(x, "spid.remove." + this.getSpid())
+          ! auth.check(x, "capability.remove." + this.getSpid())
         ) {
           throw new RuntimeException("You do not have permission to delete that user.");
         }
