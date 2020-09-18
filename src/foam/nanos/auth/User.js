@@ -114,12 +114,6 @@ foam.CLASS({
       includeInDigest: true
     },
     {
-      class: 'Reference',
-      of: 'foam.nanos.auth.ServiceProvider',
-      name: 'spid',
-      documentation: 'Service Provider Id of the user.'
-    },
-    {
       class: 'Boolean',
       name: 'enabled',
       documentation: 'Determines whether the User is permitted certain actions.',
