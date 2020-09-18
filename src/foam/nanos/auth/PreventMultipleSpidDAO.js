@@ -26,9 +26,7 @@ foam.CLASS({
         UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
         Capability targetCapability = (Capability) ucj.findTargetId(x);
 
-        if ( targetCapability == null || ! ( targetCapability instanceof ServiceProvider ) ) super.put_(x, obj);
-
-        ServiceProvider sp = (ServiceProvider) targetCapability;
+        if ( targetCapability == null || ! ( targetCapability instanceof ServiceProvider ) ) return super.put_(x, obj);
 
         AbstractPredicate serviceProviderTargetPredicate = new AbstractPredicate(x) {
           @Override
