@@ -30,6 +30,7 @@ foam.CLASS({
     'java.util.HashMap',
     'java.util.List',
     'java.util.Map',
+    'java.util.TreeMap',
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ',
     'static foam.mlang.MLang.OR'
@@ -76,10 +77,13 @@ foam.CLASS({
                 capabilityDataMap.put(capability.getName(), ucj.getData());
             });
       
+            int index = 0;
             Map<String,FObject> capabilityDataObjects = new HashMap<>();
-      
-            for ( Object item : grantPath ) {
-              // TODO: Verify that MinMaxCapability lists can be ignored here
+            
+            while ( index < grantPath.size() )
+            {
+              Object item = grantPath.get(index++);
+
               if ( item instanceof Capability ) {
                 Capability cap = (Capability) item;
                 FObject capDataObject = null;
@@ -93,6 +97,9 @@ foam.CLASS({
                   }
                 }
                 capabilityDataObjects.put(cap.getName(), capDataObject);
+              }
+              else if ( item instanceof List ) {
+                grantPath.addAll((List) item);
               }
             }
 
@@ -122,7 +129,7 @@ foam.CLASS({
         var capabilityDataObjects = walkGrantPath(crunchService.getGrantPath(x, idToString), x);
 
         CapabilityPayload capabilityPayload = new CapabilityPayload.Builder(x)
-          .setCapabilityDataObjects(new HashMap<String,FObject>(capabilityDataObjects))
+          .setCapabilityDataObjects(new TreeMap<String,FObject>(capabilityDataObjects))
           .setId(idToString).build();
         
         return capabilityPayload;
@@ -153,7 +160,7 @@ foam.CLASS({
           var capabilityDataObjects = walkGrantPath(crunchService.getGrantPath(x, rootCapability.getId()), x);
 
           CapabilityPayload capabilityPayload = new CapabilityPayload.Builder(x)
-            .setCapabilityDataObjects(new HashMap<String,FObject>(capabilityDataObjects))
+            .setCapabilityDataObjects(new TreeMap<String,FObject>(capabilityDataObjects))
             .setId(rootCapability.getId())
             .build();
 
@@ -176,34 +183,36 @@ foam.CLASS({
 
         List grantPath = crunchService.getGrantPath(x, receivingCapPayload.getId());
 
-        Map<String,FObject> capabilityDataObjects = (HashMap<String,FObject>) receivingCapPayload.getCapabilityDataObjects();
+        Map<String,FObject> capabilityDataObjects = (Map<String,FObject>) receivingCapPayload.getCapabilityDataObjects();
 
         // storing the ucjs by looking up the capabilities required from the grantPath and then referencing them in capabilityDataObjects
-        for ( Object item : grantPath ){
+        int index = 0;
+        while ( index < grantPath.size() ) {
+          Object item = grantPath.get(index++);
+
           if ( item instanceof Capability ) {
             Capability cap = (Capability) item;
 
-            if ( ! capabilityDataObjects.containsKey(cap.getName()) ){
-              throw new RuntimeException(
-                "Required capability does not exist in capabilityDataObject: " + cap.getName()
-              );
-            }
+            // Skip missing capabilities and simply report them missing in the response by calling find_
+            if ( ! capabilityDataObjects.containsKey(cap.getName()) )
+              continue;
 
             // Making sure to cast the of to the object before it gets casted to an fobject
             FObject dataObj;
-            if ( cap.getOf() != null ){
+            if ( cap.getOf() != null ) {
               dataObj = (FObject) cap.getOf().getObjClass().cast(capabilityDataObjects.get(cap.getName()));
             } else {
               dataObj = (FObject) capabilityDataObjects.get(cap.getName());
             }
 
-            String targetId = cap.getId();
-
-            crunchService.updateJunction(x, targetId, dataObj);
+            crunchService.updateJunction(x, cap.getId(), dataObj);
+          }
+          else if ( item instanceof List ) {
+            grantPath.addAll((List) item);
           }
         }
 
-        return obj;
+        return find_(x, receivingCapPayload.getId());
       `
     }
   ],

@@ -371,12 +371,16 @@ foam.CLASS({
 
 
         DAO userDAO = (DAO) x.get("userDAO");
+        Subject currentSubject = (Subject) x.get("subject");
 
         Subject subject = new Subject(x);
-        subject.setUser((User) userDAO.find(ucj.getSourceId()));
         if ( ucj instanceof AgentCapabilityJunction ) {
+          subject.setUser((User) userDAO.find(ucj.getSourceId()));
           AgentCapabilityJunction acj = (AgentCapabilityJunction) ucj;
           subject.setUser((User) userDAO.find(acj.getEffectiveUser())); // "user"
+        } else {
+          subject.setUser(currentSubject.getRealUser());
+          subject.setUser((User) userDAO.find(ucj.getSourceId()));
         }
 
         for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
