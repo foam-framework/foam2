@@ -115,9 +115,9 @@ foam.CLASS({
               }
 
               try {
-                FObject objectToDiffAgainst = (FObject) obj.getClassInfo().newInstance();
+                FObject objectToDiffAgainst = (FObject) capablePayload.getClassInfo().newInstance();
               
-                Map propertiesToApprove = objectToDiffAgainst.diff(obj);
+                Map propertiesToApprove = objectToDiffAgainst.diff(capablePayload);
 
                 Approvable approvable = (Approvable) approvableDAO.put_(getX(), new Approvable.Builder(getX())
                   .setLookupId(hashedId)
@@ -126,7 +126,7 @@ foam.CLASS({
                   .setStatus(ApprovalStatus.REQUESTED)
                   .setObjId(capablePayload.getObjId())
                   .setOperation(operation)
-                  .setOf(obj.getClassInfo())
+                  .setOf(capablePayload.getClassInfo())
                   .setIsUsingNestedJournal(true)
                   .setPropertiesToUpdate(propertiesToApprove).build());
 
@@ -136,6 +136,13 @@ foam.CLASS({
                   .setOperation(operation)
                   .setCreatedBy(user.getId())
                   .setGroup("fraud-ops")
+                  .setClassification(
+                    capability.getName() + 
+                    " for " + 
+                    obj.getClassInfo().getObjClass().getSimpleName() + 
+                    " - id:" + 
+                    capablePayload.getObjId()
+                  )
                   .setStatus(ApprovalStatus.REQUESTED).build();
 
                 approvalRequestDAO.put_(getX(), approvalRequest);
