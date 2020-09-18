@@ -37,7 +37,11 @@ foam.CLASS({
             return c instanceof ServiceProvider;
           }
         };
-        super.where(AND(EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()), serviceProviderTargetPredicate)).removeAll();
+        UserCapabilityJunction userSpidJunction = (UserCapabilityJunction) super
+          .find(AND(EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()), serviceProviderTargetPredicate));
+
+        if ( userSpidJunction != null ) throw new RuntimeException("User cannot be granted multiple Service Provider Capabilities"); 
+
         
         return super.put_(x, obj);
       `,
