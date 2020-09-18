@@ -28,6 +28,7 @@ foam.CLASS({
 
   implements: [
     'foam.mlang.Expressions',
+    'foam.nanos.auth.EnabledAware',
     'foam.nanos.auth.LastModifiedAware',
     'foam.nanos.auth.LastModifiedByAware'
   ],
