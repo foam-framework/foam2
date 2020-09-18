@@ -655,6 +655,7 @@ var classes = [
   //daos
   'foam.nanos.crunch.connection.CapabilityPayloadDAO',
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
+  'foam.nanos.crunch.PreventMultipleSpidDAO',
   //rules
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
   'foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate',

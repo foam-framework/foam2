@@ -350,6 +350,7 @@ FOAM_FILES([
   //daos
   { name: "foam/nanos/crunch/UserCapabilityJunctionDAO" },
   { name: "foam/nanos/crunch/connection/CapabilityPayloadDAO" },
+  { name: "foam/nanos/crunch/PreventMultipleSpidDAO" },
   //rules
   { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" },
   { name: "foam/nanos/crunch/IsUserCapabilityJunctionStatusUpdate" },
