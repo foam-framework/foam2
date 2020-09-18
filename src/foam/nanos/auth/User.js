@@ -516,6 +516,22 @@ foam.CLASS({
       name: 'lifecycleState',
       value: foam.nanos.auth.LifecycleState.PENDING,
       writePermissionRequired: true
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
+      name: 'spid',
+      documentation: `
+        Need to override getter to return "" because its trying to 
+        return null (probably as a result of moving order of files
+        in nanos), which breaks tests
+      `,
+      javaGetter: `
+        if ( ! spidIsSet_ ) {
+          return "";
+        }
+        return spid_;
+      `
     }
   ],
 
@@ -724,22 +740,6 @@ foam.RELATIONSHIP({
   sourceProperty: {
     hidden: true,
     transient: true
-  }
-});
-
-foam.RELATIONSHIP({
-  cardinality: '1:*',
-  sourceModel: 'foam.nanos.auth.ServiceProvider',
-  targetModel: 'foam.nanos.auth.User',
-  forwardName: 'spidUsers',
-  inverseName: 'spid',
-  sourceProperty: {
-    hidden: true
-  },
-  targetProperty: {
-    hidden: false,
-    tableWidth: 120,
-    section: 'administrative'
   }
 });
 
