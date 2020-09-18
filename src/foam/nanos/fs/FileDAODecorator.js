@@ -42,7 +42,9 @@ foam.CLASS({
 
         if ( file.size <= this.maxStringDataSize ) {
           file.dataString = await encode(file.data.blob);
-          delete file.instance_.data;
+          file.instance_.data = undefined;
+        } else {
+          file.dataString = undefined;
         }
 
         return self.fileDAO.put(file).then(function (b) {

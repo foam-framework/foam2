@@ -161,8 +161,7 @@ foam.CLASS({
           }
           // The decorator dao may be a proxy chain
           ProxyDAO proxy = (ProxyDAO) getDecorator();
-          while ( proxy.getDelegate() != null &&
-                  proxy.getDelegate() instanceof ProxyDAO )
+          while ( proxy.getDelegate() != null && proxy.getDelegate() instanceof ProxyDAO )
             proxy = (ProxyDAO) proxy.getDelegate();
           proxy.setDelegate(delegate);
           delegate = (ProxyDAO) getDecorator();
