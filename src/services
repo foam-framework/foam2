@@ -571,10 +571,17 @@ p({
       .setAuthorize(false)
       .setOf(foam.nanos.auth.ServiceProvider.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("spids")
+      .setJournalName("capabilities")
       .setValidated(true)
-      .build()
-  """
+      .setInnerDAO((foam.dao.DAO) x.get("localCapabilityDAO"))
+      .setDecorator(
+        new foam.dao.FilteredDAO.Builder(x)
+          .setPredicate(foam.mlang.MLang.INSTANCE_OF(foam.nanos.auth.ServiceProvider.class))
+          .setDelegate(new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.auth.ServiceProvider.getOwnClassInfo()).build())
+        .build())
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.auth.ServiceProvider\"}"
 })
 
 p({
