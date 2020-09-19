@@ -197,7 +197,7 @@ foam.CLASS({
         MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
         registry.notify(x, entry);
 
-        replaying.setIndex(entry.getIndex());
+        replaying.updateIndex(x, entry.getIndex());
         replaying.setNonConsensusIndex(0);
         replaying.setLastModified(new java.util.Date());
         if ( replaying.getReplaying() &&

@@ -141,7 +141,7 @@ foam.CLASS({
             ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
             if ( replaying.getStartTime() == null ) {
               replaying.setStartTime(new java.util.Date());
-              replaying.setIndex(dagger.getGlobalIndex(x));
+              replaying.updateIndex(x, dagger.getGlobalIndex(x));
             }
             if ( details.getMaxIndex() > dagger.getGlobalIndex(x)) {
               dagger.setGlobalIndex(x, details.getMaxIndex());

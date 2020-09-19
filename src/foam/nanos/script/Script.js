@@ -48,7 +48,7 @@ foam.CLASS({
     'server',
     'lastDuration',
     'lastRun',
-    'run'
+    'status'
   ],
 
   searchColumns: [

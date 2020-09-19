@@ -130,7 +130,7 @@ foam.CLASS({
               replaying.setReplaying(false);
               if ( max != null &&
                    max.getValue() != null ) {
-                replaying.setIndex((Long)max.getValue());
+                replaying.updateIndex(x, (Long)max.getValue());
                 replaying.setReplayIndex((Long)max.getValue());
               }
             }

@@ -30,19 +30,6 @@ foam.CLASS({
     'java.util.Map'
   ],
   
-  axioms: [
-    {
-      name: 'javaExtras',
-      buildJavaClass: function(cls) {
-        cls.extras.push(foam.java.Code.create({
-          data: `
-  protected Object indexLock_ = new Object();
-          `
-        }));
-      }
-    }
-  ],
-
   properties: [
     {
       name: 'serviceName',
@@ -95,11 +82,7 @@ foam.CLASS({
       if ( myConfig.getType() == MedusaType.NODE ) {
         entry = (MedusaEntry) submit(x, entry, DOP.PUT);
         ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
-        synchronized ( indexLock_ ) {
-          if ( entry.getIndex() > replaying.getIndex() ) {
-            replaying.setIndex(entry.getIndex());
-          }
-        }
+        replaying.updateIndex(x, entry.getIndex());
       } else if ( myConfig.getType() == MedusaType.MEDIATOR &&
                   myConfig.getStatus() == Status.ONLINE &&
                   entry.getPromoted() ) {

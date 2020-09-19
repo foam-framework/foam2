@@ -30,10 +30,11 @@ foam.CLASS({
 //      of: 'foam.nanos.medusa.ClusterConfig'
     },
     {
+      // TODO: protected access to this. See updateIndex for synchronized access.
       documentation: 'Greatest promoted index.',
       name: 'index',
       class: 'Long',
-      visibility: 'RO',
+      visibility: 'RO'
     },
     {
       documentation: 'Index, when received will mark replay complete.',
@@ -66,8 +67,11 @@ foam.CLASS({
     {
       name: 'uptime',
       class: 'String',
-      expression: function(startTime, endTime) {
-        let delta = new Date().getTime() - startTime.getTime();
+      expression: function(startTime) {
+        var delta = 0;
+        if ( startTime ) {
+          delta = new Date().getTime() - startTime.getTime();
+        }
         let duration = foam.core.Duration.duration(delta);
         return duration;
       }
@@ -77,8 +81,11 @@ foam.CLASS({
       class: 'String',
       label: 'Elapsed',
       expression: function(index, replayIndex, startTime, endTime) {
-        let end = endTime || new Date();
-        let delta = end.getTime() - startTime.getTime();
+        var delta = 0;
+        if ( startTime ) {
+          let end = endTime || new Date();
+          delta = end.getTime() - startTime.getTime();
+        }
         let duration = foam.core.Duration.duration(delta);
         return duration;
       },
@@ -148,6 +155,28 @@ foam.CLASS({
       class: 'DateTime',
       visibility: 'RO',
       includeInDigest: false,
+    }
+  ],
+
+  methods: [
+    {
+      name: 'updateIndex',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'index',
+          type: 'Long'
+        }
+      ],
+      synchronized: true,
+      javaCode: `
+      if ( index > getIndex() ) {
+        setIndex(index);
+      }
+      `
     }
   ]
 });
