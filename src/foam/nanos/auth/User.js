@@ -522,6 +522,13 @@ foam.CLASS({
         return null (probably as a result of moving order of files
         in nanos), which breaks tests
       `,
+      javaSetter: `
+        if ( spidIsSet_ && ! spid_.equals(val) ) {
+          throw new RuntimeException("Service Provider cannot be updated for User");
+        }
+        spid_ = val;
+        spidIsSet_ = true;
+      `,
       javaGetter: `
         if ( ! spidIsSet_ ) {
           return "";
