@@ -379,7 +379,7 @@ foam.CLASS({
           subject.setUser((User) userDAO.find(acj.getEffectiveUser())); // "user"
         } else if ( ucj.getSourceId() == currentSubject.getUser().getId() ) {
           subject.setUser(currentSubject.getRealUser());
-          subject.setUser((User) userDAO.find(ucj.getSourceId()));
+          subject.setUser(currentSubject.getUser());
         } else {
           subject.setUser((User) userDAO.find(ucj.getSourceId()));
         }
