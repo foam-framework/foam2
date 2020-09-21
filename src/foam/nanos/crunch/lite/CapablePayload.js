@@ -14,6 +14,8 @@ foam.CLASS({
   `,
 
   javaImports: [
+    'foam.core.ClassInfo',
+    'foam.core.FObject',
     'foam.core.Validator'
   ],
 
@@ -79,9 +81,23 @@ foam.CLASS({
     {
       name: 'validate',
       javaCode: `
-        // TODO: Unsure about this; somebody should verify
-        Validator validator = (Validator) getData();
-        validator.validate(x, getData());
+        ClassInfo dataClass = getCapability().getOf();
+        if ( dataClass == null ) return;
+        FObject dataObject = getData();
+        if ( dataObject == null ) {
+          throw new IllegalStateException(String.format(
+            "Missing payload data for capability '%s'",
+            getCapability().getId()
+          ));
+        }
+        if ( ! dataClass.isInstance(dataObject) ) {
+          throw new IllegalStateException(String.format(
+            "Invalid payload data class for capability '%s'",
+            getCapability().getId()
+          ));
+        }
+        Validator validator = (Validator) dataObject;
+        validator.validate(x, dataObject);
       `,
     }
   ],

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import foam.nanos.crunch.lite.Capable;
 import foam.nanos.auth.AuthorizationException;
 
-public class CapabilityRuntimeException extends AuthorizationException {
+public class CapabilityRuntimeException extends AuthorizationException implements foam.core.NetworkException {
   private ArrayList<String> capabilities_;
   private ArrayList<Capable> capables_;
 

@@ -13,7 +13,6 @@ foam.INTERFACE({
   `,
 
   javaImports: [
-    'foam.core.FObject',
     'foam.core.Validator',
     'foam.core.X',
     'foam.dao.DAO',
@@ -29,7 +28,9 @@ foam.INTERFACE({
     'java.util.Map',
     'java.util.Set',
 
-    'org.apache.commons.lang.ArrayUtils'
+    'org.apache.commons.lang.ArrayUtils',
+
+    'static foam.nanos.crunch.CapabilityJunctionStatus.*'
   ],
 
   axioms: [
@@ -85,10 +86,9 @@ foam.INTERFACE({
           ],
           body: `
             // Marshal payloads into a hashmap
-            Map<String, FObject> payloads = new HashMap<String, FObject>();
+            Map<String, CapablePayload> payloads = new HashMap<String, CapablePayload>();
             for ( CapablePayload payload : getCapablePayloads() ) {
-              payloads.put(payload.getCapability().getId(),
-                (FObject) payload.getData());
+              payloads.put(payload.getCapability().getId(), payload);
             }
 
             CrunchService crunchService = (CrunchService) x.get("crunchService");
@@ -110,11 +110,16 @@ foam.INTERFACE({
                 ));
               }
 
-              FObject dataObject = payloads.get(cap.getId());
-              if ( dataObject instanceof Validator ) {
-                Validator validator = (Validator) dataObject;
-                validator.validate(x, dataObject);
+              CapablePayload payload = payloads.get(cap.getId());
+              if ( payload.getStatus() != GRANTED ) {
+                throw new IllegalStateException(String.format(
+                  "Object does not have granted status for capability '%s'",
+                  cap.getId()
+                ));
               }
+
+              Validator validator = (Validator) payload;
+              validator.validate(x, payload);
             }
           `
         }));
