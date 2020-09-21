@@ -10,6 +10,7 @@ var classes = [
   'foam.core.Serializable',
   'foam.core.ContextAware',
   'foam.core.Exception',
+  'foam.core.ExceptionInterface',
   'foam.core.Freezable',
   'foam.core.ContextAgent',
   'foam.core.CompoundContextAgency',
@@ -635,6 +636,7 @@ var classes = [
   //models
   'foam.nanos.crunch.Renewable',
   'foam.nanos.crunch.Capability',
+  'foam.nanos.crunch.CapabilityRuntimeException',
   'foam.nanos.crunch.MinMaxCapability',
   'foam.nanos.crunch.lite.Capable',
   'foam.nanos.crunch.lite.CapableDAO',
