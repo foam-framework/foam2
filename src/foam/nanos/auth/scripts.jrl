@@ -2,6 +2,44 @@ p({
   class:"foam.nanos.script.Script",
   id:"AddServiceProviderUserJunctions",
   description:"Create UCJ for ServiceProvider",
-  code:"import foam.nanos.auth.User;\nimport foam.nanos.crunch.UserCapabilityJunction;\nimport foam.mlang.MLang;\nimport foam.mlang.predicate.Predicate;\nimport foam.nanos.logger.Logger;\n\nlogger = x.get(\"logger\");\nucjDAO = x.get(\"userCapabilityJunctionDAO\"); \nuDAO = x.get(\"userDAO\");\n\nlogger.info(new Object[] {\"ServiceProviderUserJunctions\", \"starting\"});\n\nusers = uDAO.select().array;\nfor ( User u : users ) {\n  try {\n    ucj = ucjDAO.find(MLang.AND(\n      new Predicate[] {\n        MLang.EQ(UserCapabilityJunction.SOURCE_ID, u.getId()),\n        MLang.EQ(UserCapabilityJunction.TARGET_ID, u.getSpid())\n      }\n    ));\n    if ( ucj == null ) {\n      ucj = new UserCapabilityJunction.Builder(x)\n        .setSourceId(u.getId())\n        .setTargetId(u.getSpid())\n        .build();\n      print(\"creating ucj for user: \"+u.getId());\n      logger.info(new Object[] {\"creating ucj for user\", u.getId()});\n      ucjDAO.put(ucj);\n    } else {\n      //print(\"found ucj for user: \"+u.getId());\n      //logger.info(new Object[] {\"found ucj for user\", u.getId()});\n    }\n  } catch (Throwable t) {\n    logger.error(new Object[] {\"error creating ucj for user\", u.getId(), u.getSpid(), t.getMessage()});\n  }\n}\n\n",
+  code: """
+import foam.nanos.auth.User;
+import foam.nanos.crunch.UserCapabilityJunction;
+import foam.mlang.MLang;
+import foam.mlang.predicate.Predicate;
+import foam.nanos.logger.Logger;
+
+logger = x.get("logger");
+ucjDAO = x.get("userCapabilityJunctionDAO"); 
+uDAO = x.get("userDAO");
+
+logger.info(new Object[] {"ServiceProviderUserJunctions", "starting"});
+
+users = uDAO.select().array;
+for ( User u : users ) {
+  try {
+    ucj = ucjDAO.find(MLang.AND(
+      new Predicate[] {
+        MLang.EQ(UserCapabilityJunction.SOURCE_ID, u.getId()),
+        MLang.EQ(UserCapabilityJunction.TARGET_ID, u.getSpid())
+      }
+    ));
+    if ( ucj == null ) {
+      ucj = new UserCapabilityJunction.Builder(x)
+        .setSourceId(u.getId())
+        .setTargetId(u.getSpid())
+        .build();
+      print("creating ucj for user: "+u.getId());
+      logger.info(new Object[] {"creating ucj for user", u.getId()});
+      ucjDAO.put(ucj);
+    } else {
+      //print("found ucj for user: "+u.getId());
+      //logger.info(new Object[] {"found ucj for user", u.getId()});
+    }
+  } catch (Throwable t) {
+    logger.error(new Object[] {"error creating ucj for user", u.getId(), u.getSpid(), t.getMessage()});
+  }
+}
+  """
   lastModifiedBy:1348
 })
