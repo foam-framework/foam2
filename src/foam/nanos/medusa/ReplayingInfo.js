@@ -31,7 +31,7 @@ foam.CLASS({
     },
     {
       // TODO: protected access to this. See updateIndex for synchronized access.
-      documentation: 'Greatest promoted index.',
+      documentation: 'Greatest promoted index. See ConsensusDAO.',
       name: 'index',
       class: 'Long',
       visibility: 'RO'
