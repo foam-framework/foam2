@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.fs.fileDropZone',
   name: 'FilePreview',
@@ -11,6 +17,13 @@ foam.CLASS({
       name: 'fileSrc'
     }
   ],
+
+  css: `
+    #file-iframe {
+      height: 100%;
+      width: 100%;
+    }
+  `,
 
   methods: [
     function initE() {
