@@ -174,7 +174,7 @@ foam.CLASS({
           // TODO/REVIEW
           out_.flush();
         }
-      } catch ( Exception e ) {
+      } catch ( Throwable e ) {
         pm.error(getX(), e);
         // TODO: perhaps report last exception on host port via manager.
         getLogger().error("Error sending message", message, e);
@@ -200,13 +200,18 @@ foam.CLASS({
         }
       ],
       javaCode: `
+      String pmKey = this.getClass().getSimpleName()+":"+getHost()+":"+getPort();
+      String pmName = "receive"; 
       try {
         while ( getValid() ) {
+          PM pm = null;
           try {
             long sent = in_.readLong();
-            PM pm = PM.create(getX(), this.getClass().getSimpleName(), getHost()+":"+getPort()+":network");
-            pm.setStartTime(new java.util.Date(sent));
-            pm.log(x);
+            PM p = PM.create(getX(), this.getClass().getSimpleName(), getHost()+":"+getPort()+":network");
+            p.setStartTime(new java.util.Date(sent));
+            p.log(x);
+
+            pm = PM.create(x, pmKey, pmName);
 
             int length = in_.readInt();
             byte[] bytes = new byte[length];
@@ -237,38 +242,43 @@ foam.CLASS({
             }
             String message = data.toString();
             if ( foam.util.SafetyUtil.isEmpty(message) ) {
-              Socket socket = (Socket) x.get("socket");
-              getLogger().error("Received empty message from", socket != null ? socket.getRemoteSocketAddress() : "NA");
               throw new RuntimeException("Received empty message.");
             }
             // getLogger().debug("receive", message);
             Message msg = (Message) x.create(JSONParser.class).parseString(message);
             if ( msg == null ) {
-              getLogger().warning("Failed to parse message", message);
-              throw new RuntimeException("Failed to parse.");
+              throw new RuntimeException("Failed to parse. message: "+message);
             }
             String replyBoxId = (String) msg.getAttributes().get(REPLY_BOX_ID);
-            BoxHolder holder = (BoxHolder) getReplyBoxes().get(replyBoxId);
-            if ( holder != null ) {
-              Box replyBox = holder.getBox();
-              pm = holder.getPm();
-              pm.log(x);
-              getReplyBoxes().remove(replyBoxId);
-              replyBox.send(msg);
+            if ( replyBoxId != null ) {
+              BoxHolder holder = (BoxHolder) getReplyBoxes().get(replyBoxId);
+              if ( holder != null ) {
+                Box replyBox = holder.getBox();
+                pm = holder.getPm();
+                pm.log(x);
+                getReplyBoxes().remove(replyBoxId);
+                replyBox.send(msg);
+              } else {
+                getLogger().error("ReplyBox not found", replyBoxId);
+                throw new RuntimeException("ReplyBox not found. message: "+message);
+              }
             } else {
-              getLogger().error("ReplyBox not found", replyBoxId);
-              throw new RuntimeException("ReplyBox not found.");
+              Object o = msg.getObject();
+              if ( o != null &&
+                   o instanceof foam.box.RPCErrorMessage ) {
+                throw (Throwable) ((foam.box.RPCErrorMessage) o).getData();
+              }
+              throw new RuntimeException("Failed to process reply. message: "+message);
             }
           } catch ( java.net.SocketTimeoutException e ) {
             // getLogger().debug("SocketTimeoutException", e.getMessage());
             continue;
-          } catch ( java.io.IOException e ) {
-            getLogger().debug(e.getMessage());
-            break;
           } catch ( Throwable t ) {
-            // REVIEW: remove this catch when all exceptions understand
             getLogger().error(t);
+            if ( pm != null ) pm.error(x, t);
             break;
+          } finally {
+            if ( pm != null) pm.log(x);
           }
         }
       } finally {

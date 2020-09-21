@@ -111,13 +111,11 @@ public class SocketServerProcessor
           }
           String message = data.toString();
           if ( foam.util.SafetyUtil.isEmpty(message) ) {
-            logger_.error("null message from", socket_.getRemoteSocketAddress());
-            throw new RuntimeException("Received empty message.");
+            throw new RuntimeException("Received empty message. from: "+socket_.getRemoteSocketAddress());
           }
           Message msg = (Message) x.create(JSONParser.class).parseString(message);
           if ( msg == null ) {
-            logger_.warning("Failed to parse", "message", message);
-            throw new RuntimeException("Failed to parse.");
+            throw new IllegalArgumentException("Failed to parse. from: "+socket_.getRemoteSocketAddress()+", message: "+message);
           }
           pm.log(x);
           // { // TODO: remove - debug only
@@ -131,11 +129,32 @@ public class SocketServerProcessor
           logger_.debug(e.getMessage());
           break;
         } catch ( Throwable t ) {
-          // TODO: Alarm
-          // TODO: write error to output stream
-          // REVIEW: remove this catch when understand all exceptions
-          if ( pm != null ) pm.error(x, t);
           logger_.error(t);
+          if ( pm != null ) pm.error(x, t);
+          try {
+            // TODO: abstract this into a SocketWriter as it's duplicated in SocketConnectionBox.js
+            foam.box.RemoteException remote = new foam.box.RemoteException();
+            remote.setId(t.getClass().getName());
+            remote.setMessage(t.getMessage());
+            foam.box.RPCErrorMessage error = new foam.box.RPCErrorMessage();
+            error.setData(remote);
+            foam.box.Message reply = new foam.box.Message();
+            reply.setObject(error);
+
+            foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter();
+            formatter.setX(x);
+            formatter.output(reply);
+            String replyString = formatter.builder().toString();
+            byte[] replyBytes = replyString.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            synchronized ( out_ ) {
+              out_.writeLong(System.currentTimeMillis());
+              out_.writeInt(replyBytes.length);
+              out_.write(replyBytes);
+              out_.flush();
+            }
+          } catch ( Throwable th ) {
+            logger_.error("Failed to reply with error.", th);
+          }
           break;
         }
       }
