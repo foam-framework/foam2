@@ -662,6 +662,10 @@ var classes = [
   'foam.nanos.crunch.CrunchService',
   'foam.nanos.crunch.ReputDependentUCJs',
 
+  // spid
+  'foam.nanos.auth.CreateUserCapabilityJunctionOnSpidSet',
+  'foam.nanos.auth.PreventMultipleSpidDAO',
+
   //ucjdao rules
   'foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut',
   'foam.nanos.crunch.ruler.ValidateUCJDataOnPut',
