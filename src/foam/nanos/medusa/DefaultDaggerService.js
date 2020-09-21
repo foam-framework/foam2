@@ -136,8 +136,9 @@ foam.CLASS({
         return;
       }
 
-      updateLinks(getX(), new MedusaEntry.Builder(getX()).setIndex(BOOTSTRAP_INDEX).setHash(getBootstrapHash(getX())).build());
-      updateLinks(getX(), new MedusaEntry.Builder(getX()).setIndex(BOOTSTRAP_INDEX).setHash(getBootstrapHash(getX())).build());
+      for ( int i = 0; i < getLinks().length; i++ ) {
+        getLinks()[i] = new MedusaEntry.Builder(getX()).setIndex(BOOTSTRAP_INDEX).setHash(getBootstrapHash(getX())).build();
+      }
 
       DAO dao = getDao();
 
@@ -183,8 +184,6 @@ foam.CLASS({
       entry.setHash1(links.getLink1().getHash());
       entry.setIndex2(links.getLink2().getIndex());
       entry.setHash2(links.getLink2().getHash());
-      // getLogger().debug("link", entry.getIndex(), entry.getIndex1(), entry.getHash1(), entry.getIndex2(), entry.getHash2());
-
       return entry;
       `
     },
@@ -222,8 +221,6 @@ foam.CLASS({
       javaCode: `
       PM pm = PM.create(x, DefaultDaggerService.getOwnClassInfo(), "verify");
       try {
-        // getLogger().debug("verify", entry.getIndex(), entry.getIndex1(), entry.getIndex2());
-
         if ( ! getHashingEnabled() ) {
           return;
         }
@@ -260,11 +257,8 @@ foam.CLASS({
           md.update(parent1.getHash().getBytes(StandardCharsets.UTF_8));
           md.update(Long.toString(parent2.getIndex()).getBytes(StandardCharsets.UTF_8));
           md.update(parent2.getHash().getBytes(StandardCharsets.UTF_8));
-          // getLogger().debug("verify", entry.getIndex(), "digest (without data)", byte2Hex(md.digest()));
           String calculatedHash = null;
           if ( entry.getData() != null ) {
-           // getLogger().debug("verify", entry.getIndex(), "digest (with data)", byte2Hex(entry.getData().hash(md)));
-           // getLogger().debug("verify", entry.getIndex(), "data", entry.getData().getClass().getSimpleName());
             md.update(entry.getData().getBytes(StandardCharsets.UTF_8));
             // calculatedHash = byte2Hex(entry.getData().hash(md));
             calculatedHash = byte2Hex(md.digest());
@@ -292,6 +286,7 @@ foam.CLASS({
     },
     {
       name: 'getNextLinks',
+      synchronized: true,
       type: 'foam.nanos.medusa.DaggerLinks',
       javaCode: `
       return new DaggerLinks(
@@ -306,8 +301,13 @@ foam.CLASS({
       name: 'updateLinks',
       synchronized: true,
       javaCode: `
+      DaggerLink other = (DaggerLink) getLinks()[linksIndex_];
+      // ensure links remain different.
+      if ( other != null &&
+           other.getIndex() == link.getIndex() ) {
+        return;
+      }
       linksIndex_ ^= 1;
-      // getLogger().debug("updateLinks", linksIndex_, link.getIndex(), link.getHash());
       getLinks()[linksIndex_] = link;
       `
     },
