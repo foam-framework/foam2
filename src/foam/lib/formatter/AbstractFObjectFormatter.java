@@ -66,7 +66,7 @@ public abstract class AbstractFObjectFormatter
   }
 
   protected synchronized List getProperties(ClassInfo info) {
-    String of = info.getObjClass().getSimpleName().toLowerCase();
+    String of = info.getObjClass().getName();
 
     if ( propertyMap_.containsKey(of) && propertyMap_.get(of).isEmpty() ) {
       propertyMap_.remove(of);
