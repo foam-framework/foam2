@@ -15,12 +15,10 @@ foam.CLASS({
   methods: [
     function initE() {
       this.SUPER();
-      let self = this;
-      this.data$.sub(() => this.showData(self));
-      console.log("main");
+      this.data$.sub(() => this.showData());
     },
 
-    function showData(self) {
+    function showData() {
       var iFrame = document.getElementById('file-iframe');
       if ( !iFrame ){
         this
@@ -30,13 +28,6 @@ foam.CLASS({
                 id: 'file-iframe',
                 name: 'file-iframe',
             })
-         .end()
-         .start('meta')
-           .attrs({
-             'name': 'aa',
-             'http-equiv': 'Content-Security-Policy',
-             'content': "default-src 'self'"
-           })
          .end();
       } else {
         iFrame.src = URL.createObjectURL(this.data[0].data.blob);
