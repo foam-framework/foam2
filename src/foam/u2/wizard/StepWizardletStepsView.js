@@ -108,7 +108,7 @@ foam.CLASS({
 
                 // Render title
                 .start('p').addClass(self.myClass('title'))
-                  .add(wizardlet.capability ? { data: wizardlet.capability, clsInfo: wizardlet.capability.cls_.NAME.name, default: wizardlet.capability.name } : wizardlet.title)
+                  .add(wizardlet.title)
                   .style({
                     'font-weight': isCurrent ? 'bold' : 'normal',
                     'color': isCurrent || ! afterCurrent ? this.theme.primary1 : this.theme.grey2

@@ -9,7 +9,8 @@ foam.CLASS({
   extends: 'foam.u2.wizard.BaseWizardlet',
 
   imports: [
-    'crunchController'
+    'crunchController',
+    'localeDAO'
   ],
 
   properties: [
@@ -50,8 +51,24 @@ foam.CLASS({
       name: 'title',
       class: 'String',
       expression: function(capability) {
-        if ( ! capability || ! capability.name ) return '';
-        return capability.name;
+        var expr = foam.mlang.Expressions.create();
+        return this.localeDAO.where(
+          expr.AND(
+            expr.OR(
+              expr.EQ(foam.i18n.Locale.LOCALE, foam.locale),
+              expr.EQ(foam.i18n.Locale.LOCALE, foam.locale.substring(0,foam.locale.indexOf('-')))),
+            expr.EQ(foam.i18n.Locale.ID, capability.id + '.name')))
+        .select().then(function(a){
+          let arr = a.array;
+          if ( arr.length > 0 ) {
+            let ea = arr[0];
+            return ea.target;
+          }
+          return capability.name;
+        })
+        .catch(function() {
+          return capability.name;
+        });
       }
     }
   ],
