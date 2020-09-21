@@ -45,6 +45,6 @@ for ( User u : users ) {
     logger.error(new Object[] {"error creating ucj for user", u.getId(), u.getSpid(), t.getMessage()});
   }
 }
-  """
+  """,
   lastModifiedBy:1348
 })
