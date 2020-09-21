@@ -178,37 +178,51 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
         CapabilityPayload receivingCapPayload = (CapabilityPayload) obj;
-
+        Map<String,FObject> capabilityDataObjects = (Map<String,FObject>) receivingCapPayload.getCapabilityDataObjects();
         CrunchService crunchService = (CrunchService) x.get("crunchService");
 
-        List grantPath = crunchService.getGrantPath(x, receivingCapPayload.getId());
+        if ( ! (receivingCapPayload instanceof SingleCapabilityPayload) ) {
+          List grantPath = crunchService.getGrantPath(x, receivingCapPayload.getId());
 
-        Map<String,FObject> capabilityDataObjects = (Map<String,FObject>) receivingCapPayload.getCapabilityDataObjects();
+          // storing the ucjs by looking up the capabilities required from the grantPath and then referencing them in capabilityDataObjects
+          int index = 0;
+          while ( index < grantPath.size() ) {
+            Object item = grantPath.get(index++);
 
-        // storing the ucjs by looking up the capabilities required from the grantPath and then referencing them in capabilityDataObjects
-        int index = 0;
-        while ( index < grantPath.size() ) {
-          Object item = grantPath.get(index++);
+            if ( item instanceof Capability ) {
+              Capability cap = (Capability) item;
 
-          if ( item instanceof Capability ) {
-            Capability cap = (Capability) item;
+              // Skip missing capabilities and simply report them missing in the response by calling find_
+              if ( capabilityDataObjects == null || ! capabilityDataObjects.containsKey(cap.getName()) )
+                continue;
 
-            // Skip missing capabilities and simply report them missing in the response by calling find_
-            if ( ! capabilityDataObjects.containsKey(cap.getName()) )
-              continue;
+              // Making sure to cast the of to the object before it gets casted to an fobject
+              FObject dataObj;
+              if ( cap.getOf() != null ) {
+                dataObj = (FObject) cap.getOf().getObjClass().cast(capabilityDataObjects.get(cap.getName()));
+              } else {
+                dataObj = (FObject) capabilityDataObjects.get(cap.getName());
+              }
 
-            // Making sure to cast the of to the object before it gets casted to an fobject
-            FObject dataObj;
-            if ( cap.getOf() != null ) {
-              dataObj = (FObject) cap.getOf().getObjClass().cast(capabilityDataObjects.get(cap.getName()));
-            } else {
-              dataObj = (FObject) capabilityDataObjects.get(cap.getName());
+              crunchService.updateJunction(x, cap.getId(), dataObj);
             }
-
-            crunchService.updateJunction(x, cap.getId(), dataObj);
+            else if ( item instanceof List ) {
+              grantPath.addAll((List) item);
+            }
           }
-          else if ( item instanceof List ) {
-            grantPath.addAll((List) item);
+        } else {
+          SingleCapabilityPayload singleCapabilityPayload = (SingleCapabilityPayload) receivingCapPayload;
+          Capability capability = (Capability) ((DAO) x.get("capabilityDAO")).find(singleCapabilityPayload.getId());
+          if ( capability == null ) {
+            throw new RuntimeException("Cannot find capability: " + singleCapabilityPayload.getId());
+          }
+
+          if ( capabilityDataObjects != null && capabilityDataObjects.containsKey(capability.getName()) ) {
+              // Making sure to cast the of to the object before it gets casted to an fobject
+              FObject dataObj = ( capability.getOf() != null ) ? 
+                (FObject) capability.getOf().getObjClass().cast(capabilityDataObjects.get(capability.getName())) :
+                (FObject) capabilityDataObjects.get(capability.getName());
+              crunchService.updateJunction(x, capability.getId(), dataObj);
           }
         }
 

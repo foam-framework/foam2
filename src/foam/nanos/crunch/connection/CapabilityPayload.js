@@ -8,7 +8,6 @@ foam.CLASS({
   package: 'foam.nanos.crunch.connection',
   name: 'CapabilityPayload',
   documentation: `
-    TODO: Update
     CapabilityPayload is created with an id for a specific requested capability and its
     associated capabilities mapped to required data objects in the specified in its grant path 
   `,

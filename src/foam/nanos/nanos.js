@@ -347,6 +347,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/AssociatedEntity" },
   { name: "foam/nanos/crunch/RenewableData" },
   { name: "foam/nanos/crunch/connection/CapabilityPayload" },
+  { name: "foam/nanos/crunch/connection/SingleCapabilityPayload" },
   //daos
   { name: "foam/nanos/crunch/UserCapabilityJunctionDAO" },
   { name: "foam/nanos/crunch/connection/CapabilityPayloadDAO" },
