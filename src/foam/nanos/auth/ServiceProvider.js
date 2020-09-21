@@ -4,14 +4,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-foam.SCRIPT({
-  package: 'foam.nanos.auth',
-  name: 'ServiceProviderFixer',
-  code: function () {
-    foam.lookup('foam.nanos.crunch.Capability');
-  }
-});
-
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'ServiceProvider',
@@ -38,7 +30,7 @@ foam.CLASS({
       class: 'String',
       name: 'name',
       javaFactory: `
-        return "*".equals(getId()) ? "Global Service Provider Capability" : 
+        return "*".equals(getId()) ? "Global Service Provider Capability" :
           getId().substring(0, 1).toUpperCase() + getId().substring(1) + " Service Provider Capability";
       `
     }
