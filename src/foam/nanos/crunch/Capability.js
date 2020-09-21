@@ -369,7 +369,6 @@ foam.CLASS({
           ((ArraySink) myPrerequisitesDAO.select(new ArraySink()))
           .getArray();
 
-
         DAO userDAO = (DAO) x.get("userDAO");
         Subject currentSubject = (Subject) x.get("subject");
 
@@ -378,8 +377,10 @@ foam.CLASS({
           subject.setUser((User) userDAO.find(ucj.getSourceId()));
           AgentCapabilityJunction acj = (AgentCapabilityJunction) ucj;
           subject.setUser((User) userDAO.find(acj.getEffectiveUser())); // "user"
-        } else {
+        } else if ( ucj.getSourceId() == currentSubject.getUser().getId() ) {
           subject.setUser(currentSubject.getRealUser());
+          subject.setUser((User) userDAO.find(ucj.getSourceId()));
+        } else {
           subject.setUser((User) userDAO.find(ucj.getSourceId()));
         }
 
