@@ -25,10 +25,6 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'permissions',//remove as there will be data?
-      class: 'StringArray'
-    },
-    {
       name: 'search',
       class: 'String',
       view: {
@@ -46,7 +42,7 @@ foam.CLASS({
         var self = this;
         this.permissionDAO.select(this.PROJECTION(this.Permission.ID))
           .then(function(proj) {
-            self.views =  proj.projection.map(a => self.PermissionSelection.create({permission: a[0], isSelected: self.permissions.includes(a[0]), onSelectedFunction: self.onSelectedFunction.bind(self)}));
+            self.views =  proj.projection.map(a => self.PermissionSelection.create({permission: a[0], isSelected: self.data$.value.includes(a[0]), onSelectedFunction: self.onSelectedFunction.bind(self)}));
           });
       }
     }
@@ -60,12 +56,12 @@ foam.CLASS({
         if ( self.search ) {
           self.permissionDAO.where(self.CONTAINS_IC(self.Permission.ID, self.search)).select(self.PROJECTION(self.Permission.ID))
             .then(function(proj) {
-              self.views = proj.projection.map(a => self.PermissionSelection.create({permission: a[0], isSelected: self.permissions.includes(a[0]), onSelectedFunction: self.onSelectedFunction.bind(self)}));
+              self.views = proj.projection.map(a => self.PermissionSelection.create({permission: a[0], isSelected: self.data$.value.includes(a[0]), onSelectedFunction: self.onSelectedFunction.bind(self)}));
             });
         } else {
           self.permissionDAO.select(self.PROJECTION(self.Permission.ID))
             .then(function(proj) {
-              self.views = proj.projection.map(a => self.PermissionSelection.create({permission: a[0], isSelected: self.permissions.includes(a[0]), onSelectedFunction: self.onSelectedFunction.bind(self)}));
+              self.views = proj.projection.map(a => self.PermissionSelection.create({permission: a[0], isSelected: self.data$.value.includes(a[0]), onSelectedFunction: self.onSelectedFunction.bind(self)}));
             });
         }
       });
@@ -90,12 +86,11 @@ foam.CLASS({
       .end();
     },
     function onSelectedFunction(permission, isSelected) {
-      if ( this.permissions.includes(permission) && ! isSelected ) {
-        this.permissions.splice(this.permissions.indexOf(permission), 1);
-        return;
+      if ( this.data$.value.includes(permission) && ! isSelected ) {
+        this.data$.value.splice(this.data$.value.indexOf(permission), 1);
       }
-      if ( ! this.permissions.includes(permission) && isSelected ) {
-        this.permissions.push(permission);
+      if ( ! this.data$.value.includes(permission) && isSelected ) {
+        this.data$.value.push(permission);
       }
     }
   ]
