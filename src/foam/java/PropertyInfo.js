@@ -131,6 +131,8 @@ foam.CLASS({
     {
       name: 'methods',
       factory: function() {
+        var fullName = this.sourceCls.package ? this.sourceCls.package + '.' + this.sourceCls.name : this.sourceCls.name;
+
         var m = [
           {
             name: 'getName',
@@ -143,28 +145,28 @@ foam.CLASS({
             type: this.propType,
             visibility: 'public',
             args: [{ name: 'o', type: 'Object' }],
-            body: 'return ((' + this.sourceCls.name + ') o).' + this.getterName + '();'
+            body: 'return ((' + fullName + ') o).' + this.getterName + '();'
           },
           {
             name: 'set',
             type: 'void',
             visibility: 'public',
             args: [{ name: 'o', type: 'Object' }, { name: 'value', type: 'Object' }],
-            body: '((' + this.sourceCls.name + ') o).' + this.setterName + '(cast(value));'
+            body: '((' + fullName + ') o).' + this.setterName + '(cast(value));'
           },
           {
             name: 'clear',
             type: 'void',
             visibility: 'public',
             args: [{ name: 'o', type: 'Object' }],
-            body: '((' + this.sourceCls.name + ') o).' + this.clearName + '();'
+            body: '((' + fullName + ') o).' + this.clearName + '();'
           },
           {
             name: 'isSet',
             visibility: 'public',
             type: 'boolean',
             args: [{ name: 'o', type: 'Object' }],
-            body: `return ((${this.sourceCls.name}) o).${this.propName}IsSet_;`
+            body: `return ((${fullName}) o).${this.propName}IsSet_;`
           }
         ];
         var primitiveType = ['boolean', 'long', 'byte', 'double','float','short','int'];
