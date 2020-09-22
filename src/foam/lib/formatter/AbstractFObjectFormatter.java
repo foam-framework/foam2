@@ -22,7 +22,7 @@ public abstract class AbstractFObjectFormatter
   protected X                 x_;
   protected StringBuilder     b_                         = new StringBuilder();
   protected PropertyPredicate propertyPredicate_;
-  protected PropertyPredicate optionalPredicate_ = new StorageOptionalPropertyPredicate();
+  protected PropertyPredicate optionalPredicate_         = new StorageOptionalPropertyPredicate();
   protected Map<String, List<PropertyInfo>> propertyMap_ = new HashMap<>();
   protected List<PropertyInfo> delta_;
 
@@ -66,7 +66,7 @@ public abstract class AbstractFObjectFormatter
   }
 
   protected synchronized List getProperties(ClassInfo info) {
-    String of = info.getObjClass().getSimpleName().toLowerCase();
+    String of = info.getObjClass().getName();
 
     if ( propertyMap_.containsKey(of) && propertyMap_.get(of).isEmpty() ) {
       propertyMap_.remove(of);
@@ -84,15 +84,16 @@ public abstract class AbstractFObjectFormatter
       propertyMap_.put(of, filteredAxioms);
       return filteredAxioms;
     }
+
     return propertyMap_.get(of);
   }
 
   protected List getDelta(FObject oldFObject, FObject newFObject) {
-    ClassInfo info           = oldFObject.getClassInfo();
-    String    of             = info.getObjClass().getSimpleName().toLowerCase();
-    List      axioms         = getProperties(info);
-    int       size           = axioms.size();
-    int       optional       = 0;
+    ClassInfo info     = oldFObject.getClassInfo();
+    String    of       = info.getObjClass().getSimpleName().toLowerCase();
+    List      axioms   = getProperties(info);
+    int       size     = axioms.size();
+    int       optional = 0;
 
     delta_ = new ArrayList<PropertyInfo>();
 
@@ -106,8 +107,7 @@ public abstract class AbstractFObjectFormatter
         }
       }
     }
-    if ( optional > 0 &&
-         delta_.size() == optional ) {
+    if ( optional > 0 && delta_.size() == optional ) {
       delta_ = new ArrayList<>();
     }
     return delta_;

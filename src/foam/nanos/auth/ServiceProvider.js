@@ -7,12 +7,9 @@
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'ServiceProvider',
+  extends: 'foam.nanos.crunch.Capability',
 
-  implements: ['foam.nanos.auth.EnabledAware'],
-
-  documentation: 'Service Provider',
-
-  tableColumns: ['id', 'description'],
+  documentation: 'Service Provider Capability',
 
   properties: [
     {
@@ -30,13 +27,12 @@ foam.CLASS({
       ]
     },
     {
-      class: 'Boolean',
-      name: 'enabled'
-    },
-    {
       class: 'String',
-      name: 'description',
-      documentation: 'Service provider description'
+      name: 'name',
+      javaFactory: `
+        return "*".equals(getId()) ? "Global Service Provider Capability" :
+          getId().substring(0, 1).toUpperCase() + getId().substring(1) + " Service Provider Capability";
+      `
     }
   ]
 });
