@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.u2.crunch',
   name: 'PermissionsStringArrayView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Controller',
 
   implements: [
     'foam.mlang.Expressions'
@@ -30,37 +30,21 @@ foam.CLASS({
     },
     {
       name: 'search',
-      class: 'String'
-      // view: {
-      //  class: 'foam.u2.TextField',
-      //  type: 'search',
-      //  onKey: true
-      // }
-    },
-    {
-      name: 'dao',
-      expression: function(search) {
-        if ( search )
-          return this.permissionDAO.where(this.KEYWORD(search));
-        return this.permissionDAO;
-      },
-      factory: function() {
-        return this.permissionDAO;
+      class: 'String',
+      view: {
+        class: 'foam.u2.TextField',
+        type: 'search',
+        placeholder: 'capability name',
+        onKey: true
       }
     },
     {
       name: 'views',
       class: 'Array',
       of: 'foam.mlang.Expressions',
-      expression: function(dao, permissions) {
-        dao.select(this.PROJECTION(this.Permission.ID))
-          .then(function(proj) {
-            return proj.projection.map(a => this.PermissionSelection.create({permission: a[0], isSelected: permissions.includes(a[0]), onSelectedFunction: this.onSelectedFunction}));
-          });
-      },
       factory: function() {
         var self = this;
-        this.dao.select(this.PROJECTION(this.Permission.ID))
+        this.permissionDAO.select(this.PROJECTION(this.Permission.ID))
           .then(function(proj) {
             self.views =  proj.projection.map(a => self.PermissionSelection.create({permission: a[0], isSelected: self.permissions.includes(a[0]), onSelectedFunction: self.onSelectedFunction.bind(self)}));
           });
@@ -70,15 +54,27 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      var self = this;
+
+      this.search$.sub(function() {
+        if ( self.search ) {
+          self.permissionDAO.where(self.CONTAINS_IC(self.Permission.ID, self.search)).select(self.PROJECTION(self.Permission.ID))
+            .then(function(proj) {
+              self.views = proj.projection.map(a => self.PermissionSelection.create({permission: a[0], isSelected: self.permissions.includes(a[0]), onSelectedFunction: self.onSelectedFunction.bind(self)}));
+            });
+        } else {
+          self.permissionDAO.select(self.PROJECTION(self.Permission.ID))
+            .then(function(proj) {
+              self.views = proj.projection.map(a => self.PermissionSelection.create({permission: a[0], isSelected: self.permissions.includes(a[0]), onSelectedFunction: self.onSelectedFunction.bind(self)}));
+            });
+        }
+      });
+        
       this.SUPER();
 
       this.start()
         .start()
-          .add(this.SEARCH.clone().copyFrom({
-            class: 'foam.u2.TextField',
-            type: 'search',
-            onKey: true
-          }))
+          .tag(this.SEARCH)
         .end()
         .start()
           .add(this.slot(function(views) {
