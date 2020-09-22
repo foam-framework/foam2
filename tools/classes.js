@@ -651,7 +651,6 @@ var classes = [
   'foam.nanos.crunch.RenewableData',
 
   'foam.nanos.crunch.connection.CapabilityPayload',
-  'foam.nanos.crunch.connection.SingleCapabilityPayload',
 
   //daos
   'foam.nanos.crunch.connection.CapabilityPayloadDAO',

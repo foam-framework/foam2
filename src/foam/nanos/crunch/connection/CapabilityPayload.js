@@ -31,6 +31,13 @@ foam.CLASS({
       javaFactory: `
         return new HashMap<String,FObject>();
       `
+    },
+    {
+      class: 'Map',
+      name: 'capabilityValidationErrors',
+      javaFactory: `
+        return new HashMap<String,String>();
+      `
     }
   ]
 });
