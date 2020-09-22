@@ -79,12 +79,14 @@ foam.CLASS({
                 SafetyUtil.isEmpty(String.valueOf(capablePayload.getObjId()))
               ){
                 capablePayload.setObjId(obj.getProperty("id"));
+                capablePayload.setHasSafeStatus(true);
               }
 
               Capability capability = capablePayload.getCapability();
 
               if ( ! getCapabilitiesToApprove().contains(capability.getId()) ){
                 capablePayload.setStatus(foam.nanos.crunch.CapabilityJunctionStatus.GRANTED);
+                capablePayload.setHasSafeStatus(true);
                 continue;
               }
 
@@ -152,9 +154,11 @@ foam.CLASS({
             }
 
             // everything at this point  is either PENDING or GRANTED we need to reput
-            DAO daoToReput = (DAO) x.get(getDaoToReput());
+            if ( ! clonedObj.equals(obj) ){
+              DAO daoToReput = (DAO) x.get(getDaoToReput());
 
-            daoToReput.put(clonedObj);
+              daoToReput.put(clonedObj);
+            }
           }
 
         }, "Sent out approval requests for needed payloads and granted the others");
