@@ -74,8 +74,10 @@ foam.CLASS({
         }
         if ( this.RPCErrorMessage.isInstance(msg.object) ) {
           if ( msg.object.data.id === 'foam.nanos.crunch.CapabilityRuntimeException' ) {
-            this.requestCapability(msg.object.data).then(function() {
-              self.clientBox.send(self.msg);
+            this.requestCapability(msg.object.data).then(() => {
+              // TODO: re-send can't be done here. This should
+              //   be moved back to SessionReplyBox or given its
+              //   own box.
             });
           } 
           this.reject_(msg.object.data);

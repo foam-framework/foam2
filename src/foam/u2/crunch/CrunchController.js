@@ -192,22 +192,11 @@ foam.CLASS({
     // CRUNCH Lite Methods
     function launchCapableWizard(capable) {
       var p = Promise.resolve(true);
-      if ( capable.userCapabilityRequirements ) {
-        p = capable.userCapabilityRequirements.reduce(
-          (p, capabilityId) => p.then(userWantsToContinue => {
-            console.log('should be a cap id', capabilityId);
-            if ( ! userWantsToContinue ) return false;
-            return this
-              .createWizardSequence(capabilityId).execute();
-          }),
-          p
-        );
-      }
 
       // TODO: replace with createCapableWizardSequence when it's ready
       var capableWizard = this.createCapableWizard(capable);
       p.then(userWantsToContinue => {
-        ctrl.add(this.Popup.create().tag(capableWizard));
+        this.ctrl.add(this.Popup.create().tag(capableWizard));
       });
     },
 

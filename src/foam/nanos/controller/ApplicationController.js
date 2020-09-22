@@ -563,6 +563,7 @@ foam.CLASS({
     function requestCapability(capabilityInfo) {
       var self = this;
 
+      debugger;
       capabilityInfo.capabilityOptions.forEach((c) => {
         self.capabilityCache.set(c, false);
       });
@@ -576,16 +577,18 @@ foam.CLASS({
 
       // Intercept view for regular user capability options
       if ( capabilityInfo.capabilityOptions.length > 0 ) {
-        p = p.then(() =>
-          self.crunchController.maybeLaunchInterceptView(intercept));
+        p = p.then(() => {
+          return self.crunchController.maybeLaunchInterceptView(intercept);
+        });
       }
 
       // Wizard for Capable objects and required user capabilities
       // (note: no intercept view; this case immediately invokes a wizard)
       if ( capabilityInfo.capableRequirements.length > 0 ) {
         capabilityInfo.capableRequirements.forEach(capable => {
-          p = p.then(() =>
-            self.crunchController.launchCapableWizard(capable));
+          p = p.then(() => {
+            return self.crunchController.launchCapableWizard(capable);
+          });
         })
       }
 
