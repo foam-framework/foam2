@@ -21,23 +21,24 @@ foam.CLASS({
     // Properties specific to CapabilityWizardSection
     {
       name: 'capability',
-      postSet: function(capability) {
+      postSet: function() {
+        var self = this;
         return this.localeDAO.where(
           this.AND(
             this.OR(
               this.EQ(foam.i18n.Locale.LOCALE, foam.locale),
               this.EQ(foam.i18n.Locale.LOCALE, foam.locale.substring(0,foam.locale.indexOf('-')))),
-            this.EQ(foam.i18n.Locale.ID, capability.id + '.name')))
+            this.EQ(foam.i18n.Locale.ID, this.capability.id + '.name')))
         .select().then(function(a){
           let arr = a.array;
           if ( arr.length > 0 ) {
             let ea = arr[0];
-            this.title = ea.target;
-          }
-          this.title = capability.name;
+            self.title = ea.target;
+          } else 
+            self.title = self.capability.name;
         })
         .catch(function() {
-          this.title = capability.name;
+          self.title = self.capability.name;
         });
       }
     },
