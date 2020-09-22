@@ -330,7 +330,7 @@ public class ServerCrunchService implements CrunchService {
           List list = (List) obj;
 
           // Add payload object prerequisites
-          List prereqs = new ArrayList();
+          List<CapablePayload> prereqs = new ArrayList();
           for ( int i = 0 ; i < list.size() - 1 ; i++ ) {
             Capability prereqCap = (Capability) list.get(i);
             list.add(new CapablePayload.Builder(x)
@@ -338,16 +338,12 @@ public class ServerCrunchService implements CrunchService {
               .build());
           }
 
-          // Add payload object
-          /* TODO: Figure out why this is an error when adding
-                    support for MinMaxCapability
           Capability cap = (Capability) list.get(list.size() - 1);
           payloads.add(new CapablePayload.Builder(x)
             .setCapability(cap)
             .setPrerequisites(prereqs.toArray(
               new CapablePayload[list.size()]))
             .build());
-          */
           continue;
         }
 
