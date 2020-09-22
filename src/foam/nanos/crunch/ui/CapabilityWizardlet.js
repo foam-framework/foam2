@@ -8,6 +8,10 @@ foam.CLASS({
   name: 'CapabilityWizardlet',
   extends: 'foam.u2.wizard.BaseWizardlet',
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
   imports: [
     'crunchController',
     'localeDAO'
@@ -16,7 +20,26 @@ foam.CLASS({
   properties: [
     // Properties specific to CapabilityWizardSection
     {
-      name: 'capability'
+      name: 'capability',
+      postSet: function(capability) {
+        return this.localeDAO.where(
+          this.AND(
+            this.OR(
+              this.EQ(foam.i18n.Locale.LOCALE, foam.locale),
+              this.EQ(foam.i18n.Locale.LOCALE, foam.locale.substring(0,foam.locale.indexOf('-')))),
+            this.EQ(foam.i18n.Locale.ID, capability.id + '.name')))
+        .select().then(function(a){
+          let arr = a.array;
+          if ( arr.length > 0 ) {
+            let ea = arr[0];
+            this.title = ea.target;
+          }
+          this.title = capability.name;
+        })
+        .catch(function() {
+          this.title = capability.name;
+        });
+      }
     },
     {
       name: 'ucj'
@@ -50,26 +73,6 @@ foam.CLASS({
     {
       name: 'title',
       class: 'String',
-      expression: function(capability) {
-        var expr = foam.mlang.Expressions.create();
-        return this.localeDAO.where(
-          expr.AND(
-            expr.OR(
-              expr.EQ(foam.i18n.Locale.LOCALE, foam.locale),
-              expr.EQ(foam.i18n.Locale.LOCALE, foam.locale.substring(0,foam.locale.indexOf('-')))),
-            expr.EQ(foam.i18n.Locale.ID, capability.id + '.name')))
-        .select().then(function(a){
-          let arr = a.array;
-          if ( arr.length > 0 ) {
-            let ea = arr[0];
-            return ea.target;
-          }
-          return capability.name;
-        })
-        .catch(function() {
-          return capability.name;
-        });
-      }
     }
   ],
 
