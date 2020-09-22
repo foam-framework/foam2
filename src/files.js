@@ -606,6 +606,7 @@ FOAM_FILES([
   { name: "foam/u2/crunch/CapabilityStore", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityIntercept", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityInterceptView", flags: ['web'] },
+  { name: "foam/u2/crunch/PermissionsStringArrayView", flags: ['web'] },
   { name: "foam/u2/crunch/lab/CapabilityGraphNodeView", flags: ['web'] },
   { name: "foam/u2/crunch/lab/CrunchLab", flags: ['web'] },
   { name: "foam/apploader/ModelRefines" },

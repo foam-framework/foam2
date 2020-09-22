@@ -149,7 +149,11 @@ foam.CLASS({
     {
       name: 'permissionsGranted',
       class: 'StringArray',
-      documentation: `List of permissions granted by this capability`
+      documentation: `List of permissions granted by this capability`,
+      view: {
+        class: 'foam.u2.crunch.PermissionsStringArrayView',
+        permissions: this.permissionsGranted
+      }
     },
     {
       name: 'permissionsIntercepted',
