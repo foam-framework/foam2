@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.u2.crunch',
   name: 'PermissionsStringArrayView',
-  extends: 'foam.u2.Controller',
+  extends: 'foam.u2.View',
 
   implements: [
     'foam.mlang.Expressions'
@@ -43,7 +43,7 @@ foam.CLASS({
         var self = this;
         this.permissionDAO.select(this.PROJECTION(this.Permission.ID))
           .then(function(proj) {
-            self.views =  proj.projection.map(a => self.PermissionSelection.create({permission: a[0], isSelected: self.data$.value.includes(a[0]), onSelectedFunction: self.onSelectedFunction.bind(self)}));
+            self.views =  proj.projection.map(a => self.PermissionSelection.create({permission: a[0], isSelected: self.data.includes(a[0]), onSelectedFunction: self.onSelectedFunction.bind(self)}));
           });
       }
     }
@@ -57,12 +57,12 @@ foam.CLASS({
         if ( self.search ) {
           self.permissionDAO.where(self.CONTAINS_IC(self.Permission.ID, self.search)).select(self.PROJECTION(self.Permission.ID))
             .then(function(proj) {
-              self.views = proj.projection.map(a => self.PermissionSelection.create({permission: a[0], isSelected: self.data$.value.includes(a[0]), onSelectedFunction: self.onSelectedFunction.bind(self)}));
+              self.views = proj.projection.map(a => self.PermissionSelection.create({permission: a[0], isSelected: self.data.includes(a[0]), onSelectedFunction: self.onSelectedFunction.bind(self)}));
             });
         } else {
           self.permissionDAO.select(self.PROJECTION(self.Permission.ID))
             .then(function(proj) {
-              self.views = proj.projection.map(a => self.PermissionSelection.create({permission: a[0], isSelected: self.data$.value.includes(a[0]), onSelectedFunction: self.onSelectedFunction.bind(self)}));
+              self.views = proj.projection.map(a => self.PermissionSelection.create({permission: a[0], isSelected: self.data.includes(a[0]), onSelectedFunction: self.onSelectedFunction.bind(self)}));
             });
         }
       });
@@ -70,6 +70,7 @@ foam.CLASS({
       this.SUPER();
 
       this.start()
+        .startContext({ data: this })
         .start()
           .tag(this.SEARCH)
         .end()
@@ -84,14 +85,15 @@ foam.CLASS({
             }
           }))
         .end()
+        .endContext()
       .end();
     },
     function onSelectedFunction(permission, isSelected) {
-      if ( this.data$.value.includes(permission) && ! isSelected ) {
-        this.data$.value.splice(this.data$.value.indexOf(permission), 1);
+      if ( this.data.includes(permission) && ! isSelected ) {
+        this.data.splice(this.data.indexOf(permission), 1);
       }
-      if ( ! this.data$.value.includes(permission) && isSelected ) {
-        this.data$.value.push(permission);
+      if ( ! this.data.includes(permission) && isSelected ) {
+        this.data.push(permission);
       }
     }
   ]
