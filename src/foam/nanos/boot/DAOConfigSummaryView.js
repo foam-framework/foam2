@@ -26,7 +26,8 @@ foam.CLASS({
               views: [
                 [ {class: 'foam.u2.DetailView'},                 'Detail' ],
                 [ {class: 'foam.u2.detail.TabbedDetailView'},    'Tabbed' ],
-                [ {class: 'foam.u2.detail.SectionedDetailView'}, 'Sectioned' ]
+                [ {class: 'foam.u2.detail.SectionedDetailView'}, 'Sectioned' ],
+                [ {class: 'foam.u2.md.DetailView'},              'Material' ]
               ]
             };
           }
