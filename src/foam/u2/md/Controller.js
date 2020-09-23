@@ -111,7 +111,6 @@ foam.CLASS({
 
       });
       await this.themeInstalled;
-      localStorage.test = 'this is a test';
         this
           .addClass(this.myClass())
           .start()
