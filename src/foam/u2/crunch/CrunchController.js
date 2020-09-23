@@ -192,9 +192,11 @@ foam.CLASS({
     function launchCapableWizard(capable) {
       var p = Promise.resolve(true);
 
-      // TODO: replace with createCapableWizardSequence when it's ready
       var seq = this.createCapableWizardSequence(capable);
-      return seq.execute();
+      return seq.execute().then(x => {
+        // The 'submitted' boolean becomes 'resend' in SessionClientBox
+        return x.submitted;
+      });
     },
   ]
 });

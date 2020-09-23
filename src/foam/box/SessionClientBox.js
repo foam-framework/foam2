@@ -66,8 +66,9 @@ foam.CLASS({
             });
           }
           else if ( msg.object.data.id === 'foam.nanos.crunch.CapabilityRuntimeException' ) {
-            this.requestCapability(msg.object.data).then(function() {
-              self.clientBox.send(self.msg);
+            this.requestCapability(msg.object.data).then(function(resend) {
+              debugger;
+              if ( resend ) self.clientBox.send(self.msg);
             });
           } 
         } else {

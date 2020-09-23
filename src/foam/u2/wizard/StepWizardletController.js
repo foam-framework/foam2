@@ -257,6 +257,10 @@ foam.CLASS({
     {
       name: 'availabilityInvalidate',
       class: 'Int'
+    },
+    {
+      name: 'submitted',
+      class: 'Boolean'
     }
   ],
 
@@ -285,7 +289,10 @@ foam.CLASS({
         var nextScreen = this.nextScreen;
 
         if ( nextScreen == null ) {
-          return this.currentWizardlet.save().then(() => true);
+          return this.currentWizardlet.save().then(() => {
+            this.submitted = true;
+            return true;
+          });
         }
 
         // number of unsaved wizardlets
