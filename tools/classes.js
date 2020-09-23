@@ -664,6 +664,7 @@ var classes = [
 
   // spid
   'foam.nanos.auth.CreateUserCapabilityJunctionOnSpidSet',
+  'foam.nanos.auth.SetUserServiceProviderJunctionRuleAction',
   'foam.nanos.auth.PreventMultipleSpidDAO',
 
   //ucjdao rules
