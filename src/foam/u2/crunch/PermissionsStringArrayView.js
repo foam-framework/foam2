@@ -96,9 +96,9 @@ foam.CLASS({
       this.views = [];
       this.allPermissions = [];
       if ( proj.projection.length > 0 )
-        this.views.push(this.PermissionSelection.create({permission: 'All', isSelected: this.data.length === proj.projection.length, onSelectedFunction: this.onAllSelectedFunction.bind(this)}));
+        this.views.push(this.PermissionSelection.create({permission: 'Select All', isSelected: this.data.length === proj.projection.length, onSelectedFunction: this.onAllSelectedFunction.bind(this)}));
       proj.projection.forEach(a => {
-        this.views.push(this.PermissionSelection.create({permission: a[0], isSelected: this.data.includes(a[0]), onSelectedFunction: this.onSelectedFunction.bind(this), selectedPermissions$: this.data$ }));
+        this.views.push(this.PermissionSelection.create({permission: a[0], isSelected: this.data.includes(a[0]), selectedPermissions$: this.data$ }));
         this.allPermissions.push(a[0]);
       });
     },
@@ -107,18 +107,13 @@ foam.CLASS({
         this.data = [];
       }
       if ( isSelected ) {
+        var newArr = [];
         for ( var p of this.allPermissions ) {
-          if ( ! this.data.includes(p) )
-            this.data.push(p);
+
+          newArr.push(p);
         }
-      }
-    },
-    function onSelectedFunction(permission, isSelected) {
-      if ( this.data.includes(permission) && ! isSelected ) {
-        this.data.splice(this.data.indexOf(permission), 1);
-      }
-      if ( ! this.data.includes(permission) && isSelected ) {
-        this.data.push(permission);
+
+        this.data = newArr;
       }
     }
   ]
@@ -171,13 +166,35 @@ foam.CLASS({
       postSet: function() {
         if ( this.onSelectedFunction)
           this.onSelectedFunction(this.permission, this.isSelected);
+        else {
+          if ( this.isSelected && ! this.selectedPermissions.includes(this.permission)) {
+            this.selectedPermissions.push(this.permission);
+          }
+          if ( ! this.isSelected && this.selectedPermissions.includes(this.permission)) {
+            this.selectedPermissions.splice(this.selectedPermissions.indexOf(this.permission), 1);
+          }
+        }
       }
     },
+    {
+      name: 'selectedPermissions',
+      class: 'StringArray'
+    },
+    'selectionChangeFunction',
     'onSelectedFunction'
   ],
   methods: [
     function initE() {
       this.SUPER();
+      var self = this;
+
+      this.selectedPermissions$.sub(function() {
+        if ( ! self.isSelected && self.selectedPermissions.includes(self.permission)  )
+          self.isSelected = true;
+        if ( self.isSelected && ! self.selectedPermissions.includes(self.permission)) {
+          self.isSelected = false;
+        }
+      });
 
       this
         .addClass(this.myClass())
