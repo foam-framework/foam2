@@ -90,7 +90,7 @@ foam.CLASS({
               throw new RuntimeException("Error setting up UserCapabilityJunction for user: " + user.getId() + " and spid: " + getId());
           }
         } catch (Exception e) {
-          logger.warning(e);
+          logger.error(e);
         }
       `
     },
