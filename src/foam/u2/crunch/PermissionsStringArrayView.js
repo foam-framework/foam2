@@ -46,6 +46,10 @@ foam.CLASS({
             self.preSetViewWithProjection(proj);
           });
       }
+    },
+    {
+      name: 'allPermissions',
+      class: 'StringArray'
     }
   ],
 
@@ -90,16 +94,20 @@ foam.CLASS({
     },
     function preSetViewWithProjection(proj) {
       this.views = [];
+      this.allPermissions = [];
       if ( proj.projection.length > 0 )
         this.views.push(this.PermissionSelection.create({permission: 'All', isSelected: this.data.length === proj.projection.length, onSelectedFunction: this.onAllSelectedFunction.bind(this)}));
-      proj.projection.forEach(a => this.views.push(this.PermissionSelection.create({permission: a[0], isSelected: this.data.includes(a[0]), onSelectedFunction: this.onSelectedFunction.bind(this)})));
+      proj.projection.forEach(a => {
+        this.views.push(this.PermissionSelection.create({permission: a[0], isSelected: this.data.includes(a[0]), onSelectedFunction: this.onSelectedFunction.bind(this), selectedPermissions$: this.data$ }));
+        this.allPermissions.push(a[0]);
+      });
     },
     function onAllSelectedFunction(_, isSelected) {
       if ( ! isSelected ) {
         this.data = [];
       }
       if ( isSelected ) {
-        for ( var p of this.permissions ) {
+        for ( var p of this.allPermissions ) {
           if ( ! this.data.includes(p) )
             this.data.push(p);
         }
