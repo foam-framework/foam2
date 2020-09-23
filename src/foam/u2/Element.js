@@ -124,7 +124,7 @@ foam.CLASS({
 
   methods: [
     function asKey(document, cls) {
-      return this.expands_ ? document.$UID + "." + cls.id : document.$UID;
+      return this.expands_ ? document.$UID + '.' + cls.id : document.$UID;
     },
 
     function installInClass(cls) {
