@@ -30,7 +30,7 @@ foam.CLASS({
       view: {
         class: 'foam.u2.TextField',
         type: 'search',
-        placeholder: 'capability name',
+        placeholder: 'capability search',
         onKey: true
       }
     },
@@ -102,6 +102,32 @@ foam.CLASS({
   package: 'foam.u2.crunch',
   name: 'PermissionSelection',
   extends: 'foam.u2.View',
+  css: `
+    ^ {
+      height: 16px;
+      width: 100%;
+    }
+
+    ^:hover {
+      background: /*%PRIMARY5%*/ #e5f1fc;
+    }
+
+    .foam-u2-crunch-PermissionSelection-left {
+      width: 80%;
+      height: 16px;
+      float: left;
+    }
+
+    .foam-u2-crunch-PermissionSelection-right {
+      width: 20%;
+      height: 16px;
+      float: right;
+    }
+
+    .property-isSelected {
+      margin: 1.5px 0;
+    }
+  `,
   properties: [
     {
       name: 'permission',
@@ -125,12 +151,18 @@ foam.CLASS({
     function initE() {
       this.SUPER();
 
-      this.start()
-        .startContext({data: this})
-          .add(this.permission)
-          .tag(this.IS_SELECTED)
-        .endContext()
-      .end();
+      this
+        .addClass(this.myClass())
+        .startContext({ data: this })
+          .start()
+            .addClass(this.myClass('left'))
+            .add(this.permission)
+          .end()
+          .start()
+            .addClass(this.myClass('right'))
+            .tag(this.IS_SELECTED)
+          .end()
+        .endContext();
     }
   ]
 });
