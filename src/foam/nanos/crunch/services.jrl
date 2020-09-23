@@ -80,8 +80,7 @@ p({
       .setInnerDAO(x.get("bareUserCapabilityJunctionDAO"))
       .setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo())
       .build();
-    preventMultipleSpidDAO = new foam.nanos.auth.PreventMultipleSpidDAO.Builder(x).setDelegate(dao).build();
-    userCap =  new foam.nanos.crunch.UserCapabilityJunctionDAO.Builder(x).setDelegate(preventMultipleSpidDAO).build();
+    userCap =  new foam.nanos.crunch.UserCapabilityJunctionDAO.Builder(x).setDelegate(dao).build();
     return userCap;
   """,
   "client":"{\"of\":\"foam.nanos.crunch.UserCapabilityJunction\", \"remoteListenerSupport\": false}"
@@ -90,7 +89,6 @@ p({
 p({
   "class":"foam.nanos.boot.NSpec",
   "name":"bareUserCapabilityJunctionDAO",
-  "serve":true,
   "serviceScript":"""    
     decorator = new foam.dao.history.HistoryDAO(x, "userCapabilityJunctionHistoryDAO", new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo()).build());
     dao = new foam.dao.EasyDAO.Builder(x)
