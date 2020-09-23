@@ -596,7 +596,7 @@ p({
   "serve":true,
   "serviceScript":
   """
-    return new foam.nanos.auth.AuthorizationDAO(x, (foam.dao.DAO) x.get("localServiceProviderDAO"), new foam.nanos.auth.StandardAuthorizer("serviceprovider"));
+    return new foam.nanos.auth.AuthorizationDAO(x, (foam.dao.DAO) x.get("localServiceProviderDAO"), new foam.nanos.auth.StandardAuthorizer("capability"));
   """,
   "client":"{\"of\":\"foam.nanos.auth.ServiceProvider\"}"
 })

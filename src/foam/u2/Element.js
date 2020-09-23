@@ -124,7 +124,7 @@ foam.CLASS({
 
   methods: [
     function asKey(document, cls) {
-      return this.expands_ ? document.$UID + "." + cls.id : document.$UID;
+      return this.expands_ ? document.$UID + '.' + cls.id : document.$UID;
     },
 
     function installInClass(cls) {
@@ -2280,20 +2280,24 @@ foam.CLASS({
     },
     {
       name: 'visibility',
+      adapt: function(o, n) { return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'Exists for backwards compatability. You should set createVisibility, updateVisibility, or readVisibility instead. If this property is set, it will override the other three.'
     },
     {
       name: 'createVisibility',
+      adapt: function(o, n) { return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'The display mode for this property when the controller mode is CREATE.',
       value: 'RW'
     },
     {
       name: 'readVisibility',
+      adapt: function(o, n) { return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'The display mode for this property when the controller mode is VIEW.',
       value: 'RO'
     },
     {
       name: 'updateVisibility',
+      adapt: function(o, n) { return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'The display mode for this property when the controller mode is EDIT.',
       value: 'RW'
     },

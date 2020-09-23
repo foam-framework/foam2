@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOControllerConfig',
+
   documentation: `
     A customizable model to configure any DAOController
   `,
