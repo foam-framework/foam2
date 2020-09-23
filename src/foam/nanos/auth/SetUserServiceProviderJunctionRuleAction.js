@@ -59,7 +59,7 @@ foam.CLASS({
               admin.getId() != foam.nanos.auth.User.SYSTEM_USER_ID && 
               ! admin.getGroup().equals("admin") && 
               ! admin.getGroup().equals("system") && 
-              ! admin.check(x, "*") )
+              ! auth.check(x, "*") )
             )
               throw new RuntimeException("You are not authorized to perform this update");
 
