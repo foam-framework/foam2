@@ -23,6 +23,7 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'java.util.ArrayList',
     'java.util.List',
+    'java.util.stream.Collectors',
     'static foam.mlang.MLang.*'
   ],
 
@@ -131,17 +132,11 @@ foam.CLASS({
 
         for ( UserCapabilityJunction sp : spidsToRemove ) {
           List<Capability> capabilitiesToRemove = (List<Capability>) crunchService.getCapabilityPath(x, sp.getTargetId(), false);
-          AbstractPredicate removePredicate = new AbstractPredicate(x) {
-            @Override
-            public boolean f(Object obj) {
-              UserCapabilityJunction ucJunction = (UserCapabilityJunction) obj;
-              Capability c = (Capability) ucJunction.findTargetId(x);
-              return capabilitiesToRemove.contains(c);
-            }
-          };
+          List<String> targetIdsToRemove = capabilitiesToRemove.stream().map(c -> c.getId()).collect(Collectors.toList());
+
           userCapabilityJunctionDAO.where(AND(
             EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
-            removePredicate
+            IN(UserCapabilityJunction.TARGET_ID, targetIdsToRemove)
           )).removeAll();
         }
       `
