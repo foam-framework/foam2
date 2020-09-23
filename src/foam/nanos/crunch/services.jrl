@@ -90,7 +90,6 @@ p({
 p({
   "class":"foam.nanos.boot.NSpec",
   "name":"bareUserCapabilityJunctionDAO",
-  "serve":true,
   "serviceScript":"""    
     decorator = new foam.dao.history.HistoryDAO(x, "userCapabilityJunctionHistoryDAO", new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo()).build());
     dao = new foam.dao.EasyDAO.Builder(x)
