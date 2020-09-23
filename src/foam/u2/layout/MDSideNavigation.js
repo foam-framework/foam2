@@ -129,10 +129,8 @@ foam.CLASS({
 
   css: `
     ^ {
-      padding-top: 10rem;
       z-index: 99;
       width: 50rem;
-      height: 100rem;
       position: absolute;
       box-shadow: 0px 0px 50px 0px #000;
       top: 0;
@@ -144,9 +142,14 @@ foam.CLASS({
     }
 
     ^ .side-nav-view {
-      height: 100%;
+      height: 100rem;
       overflow-x: hidden;
+      position: relative;
       background-color: #f5f7fa;
+    }
+
+    ^ .foam-u2-layout-MDToolbarView {
+      position: relative;
     }
 
     ^ .foam-u2-search-TextSearchView {

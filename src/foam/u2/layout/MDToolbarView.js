@@ -38,7 +38,7 @@ foam.CLASS({
   css: `
     ^ {
       top: 0;
-      position: absolute;
+      position: fixed;
       width: 100%;
     }
 

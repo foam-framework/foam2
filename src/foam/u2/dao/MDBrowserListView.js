@@ -34,7 +34,9 @@ foam.CLASS({
 
   css: `
     ^ {
-      overflow: hidden;
+      position: absolute;
+      height: 100%;
+      width: 100%;
     }
 
     ^ .search {
@@ -47,7 +49,7 @@ foam.CLASS({
     }
 
     ^ .menuClosed {
-      left: -52rem;
+      left: -60rem;
       transition: .2s;
     }
 
@@ -60,13 +62,8 @@ foam.CLASS({
       flex: 1;
     }
 
-
-    ^browse-view-container {
-      overflow: scroll;
-    }
-
     ^ .create-btn {
-      position: fixed;
+      position: absolute;
       bottom: 3rem;
       right: 3rem;
       border-radius: 100%;
@@ -78,6 +75,11 @@ foam.CLASS({
       box-shadow: inset 0px 0px 15px 0px white;
     }
 
+    ^ .foam-u2-dao-MDDAOList {
+      padding-top: 10rem;
+      height: 100rem;
+      overflow: scroll;
+    }
     ^ .back-btn {
       background-color: blue;
     padding: 1.5rem;

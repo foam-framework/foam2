@@ -70,8 +70,9 @@ foam.CLASS({
       padding: 3rem;
     }
     ^ .foam-u2-stack-StackView {
-      margin-top: 10rem;
-      height: 100rem;
+      position: relative;
+      height: 100%;
+      overflow: hidden;
     }
     ^ .foam-nanos-menu-SubMenuView-inner > div {
       position: unset;

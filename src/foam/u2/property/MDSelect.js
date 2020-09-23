@@ -56,22 +56,22 @@ foam.CLASS({
 
   methods: [
     function initE() {
-    var self = this;
-    this.addClass(this.myClass())
-    var label = this.prop ? this.prop.label : this.label;
-    if ( label ) {
-      this.start('label')
-        .addClass('label')
-        .addClass(this.slot(function(data) {
-          return (typeof data == 'undefined' || data == '' || data < 0) ? 'label-offset' : '';
-        }, this.data$))
-        .add(label)
-        .end();
-    }
-        this.start('div').addClass('value').add(this.text$).end()
-        .start('div').addClass('down-arrow').addClass('material-icons')
-          .add('expand_more').on('click', this.onClick)
-        .end()
+      var self = this;
+      this.addClass(this.myClass())
+      var label = this.prop ? this.prop.label : this.label;
+      if ( label ) {
+        this.start('label')
+          .addClass('label')
+          .addClass(this.slot(function(data) {
+            return (typeof data == 'undefined' || data == '' || data < 0) ? 'label-offset' : '';
+          }, this.data$))
+          .add(label)
+          .end();
+      }
+      this.start('div').addClass('value').add(this.text$).end()
+      .start('div').addClass('down-arrow').addClass('material-icons')
+        .add('expand_more').on('click', this.onClick)
+      .end()
     }
   ],
 

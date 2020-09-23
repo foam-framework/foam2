@@ -79,7 +79,8 @@ foam.CLASS({
     },
 
     function init() {
-      this.onload.sub(() => this.addClass('open-close'));
+      this.onload.sub(this.addStyleOpenClose);
+      this.onunload.sub(this.removeStyleOpenClose);
     }
   ],
 
@@ -94,6 +95,21 @@ foam.CLASS({
         this.isSearchActive = false;
       }
     }
+  ],
+
+  listeners: [
+    {
+      name: 'addStyleOpenClose',
+      isMerged:true,
+      mergeDelay:10, code: function() { this.enableClass('open-close', true);}
+    },
+    {
+      name: 'removeStyleOpenClose',
+      isMerged:true,
+      mergeDelay:1000,
+      code: function() { this.addClass('test');}
+    }
+
   ],
 
   css: `
@@ -119,16 +135,21 @@ foam.CLASS({
       font-size: 3rem;
       color: white;
       right: 0;
-      width: 100%;
+      width: 0%;
+//      transition: 1s;
       position: absolute;
     }
 
     ^ .container-search {
       flex: 1;
     }
-    .open-close .container-search .general-field {
-//      width: 100% !important;
-      transition: 2s;
+    .open-close .container-search .general-field input {
+      width: 100%;
+      transition: .5s;
+    }
+
+    .test .container-search .general-field input {
+      width: 0% !important;
     }
   `
 });

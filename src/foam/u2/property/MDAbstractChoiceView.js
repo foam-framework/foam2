@@ -213,6 +213,7 @@ foam.CLASS({
     },
     function fromProperty(prop) {
       this.SUPER(prop);
+      this.prop = prop;
       this.label = prop.label || this.label;
       this.choices = this.choices.length ? this.choices : prop.choices;
     }

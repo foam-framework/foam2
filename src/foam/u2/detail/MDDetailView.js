@@ -22,7 +22,8 @@ foam.CLASS({
     'foam.u2.property.MDFloatView',
     'foam.u2.detail.MDDetailView',
     'foam.u2.view.MDCurrencyView',
-    'foam.u2.view.ChoiceView'
+    'foam.u2.view.ChoiceView',
+    'foam.u2.MDCurrencyView'
   ],
 
   exports: [
@@ -31,10 +32,7 @@ foam.CLASS({
 
   css: `
   ^ {
-    margin: auto;
     width: inherit !important;
-    overflow: scroll;
-    height: 100rem;
   }
 
   ^ .property-item .label-container {
@@ -45,7 +43,6 @@ foam.CLASS({
       padding: 4rem;
       font-size: 3rem;
       display: flex;
-      background: white;
       align-items: center;
       border: 1px solid #f2f3ff;
       height: 7rem;
@@ -146,6 +143,8 @@ foam.CLASS({
   methods: [
     function initE() {
 
+      this.__subContext__.register(this.MDSelect, 'foam.u2.view.ChoiceView');
+      this.__subContext__.register(this.MDSelect, 'foam.u2.view.ReferenceView');
       this.__subContext__.register(this.MDSelect, 'foam.u2.tag.Select');
       this.__subContext__.register(this.MDSelect, 'foam.u2.view.RichChoiceView');
       this.__subContext__.register(this.MDDateField, 'foam.u2.DateTimeView');
@@ -153,6 +152,7 @@ foam.CLASS({
       this.__subContext__.register(this.MDTextField, 'foam.u2.TextField');
       this.__subContext__.register(this.MDTextField, 'foam.u2.IntView');
       this.__subContext__.register(this.MDCheckBox, 'foam.u2.CheckBox');
+//      this.__subContext__.register(this.MDCurrencyView, 'foam.u2.view.CurrencyView');
 
       this.add(this.slot(function(of, properties, actions) {
         if ( ! of ) return '';

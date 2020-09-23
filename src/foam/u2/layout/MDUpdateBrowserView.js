@@ -134,15 +134,27 @@ foam.CLASS({
 
   css: `
     ^ .foam-u2-ActionView-delete {
-      background-color: /*%PRIMARY2%*/ #937dff;
-      width: 100%;
-      height: 8rem;
-      color: white;
-      font-weight: 600;
-      font-size: 3rem;
+      width: -webkit-fill-available;
+      height: 6rem;
+      color: #2e2379;
+      font-weight: 400;
+      margin: 4rem;
+      margin-top: unset;
+      font-size: 2.5rem;
       bottom: 0;
+      background-color: unset;
+      border: 2px solid red!important;
+      border-radius: 73px;
+    }
+    ^ {
+      background-color: white;
       position: absolute;
-      z-index: 99;
+      width: 100%;
+      height: 100%;
+      overflow: scroll;
+    }
+    ^ .foam-u2-detail-MDDetailView {
+      padding-top: 10rem;
     }
   `,
 });
