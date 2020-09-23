@@ -53,17 +53,15 @@ foam.CLASS({
             AuthService auth = (AuthService) x.get("auth");
 
             // check that the user is authorized to perform this Service Provider update
-            {
-              User user = ((Subject) x.get("subject")).getUser();
-              if ( 
-                user == null || ( 
-                user.getId() != foam.nanos.auth.User.SYSTEM_USER_ID && 
-                ! user.getGroup().equals("admin") && 
-                ! user.getGroup().equals("system") && 
-                ! auth.check(x, "*") )
-              )
-                throw new RuntimeException("You are not authorized to perform this update");
-            }
+            User admin = ((Subject) x.get("subject")).getUser();
+            if ( 
+              admin == null || ( 
+              admin.getId() != foam.nanos.auth.User.SYSTEM_USER_ID && 
+              ! admin.getGroup().equals("admin") && 
+              ! admin.getGroup().equals("system") && 
+              ! admin.check(x, "*") )
+            )
+              throw new RuntimeException("You are not authorized to perform this update");
 
             // get the
             User user = (User) ucj.findSourceId(x);
