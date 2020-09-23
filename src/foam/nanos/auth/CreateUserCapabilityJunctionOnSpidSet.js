@@ -61,7 +61,7 @@ foam.CLASS({
 
             ServiceProvider sp = (ServiceProvider) user.findSpid(x);
             if ( sp == null ) {
-              logger.warning("Cannot find capability for service provider : ", spid);
+              logger.error("Cannot find capability for service provider : ", spid);
               return;
             }
 
