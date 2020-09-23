@@ -41,6 +41,8 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.PutFinalJunctionsAgent',
     'foam.u2.crunch.wizardflow.TestAgent',
     'foam.u2.crunch.wizardflow.LoadTopConfig',
+    'foam.u2.crunch.wizardflow.CapableDefaultConfigAgent',
+    'foam.u2.crunch.wizardflow.CapableCreateWizardletsAgent',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
     'foam.u2.crunch.CapabilityInterceptView',
@@ -86,17 +88,14 @@ foam.CLASS({
     },
 
     // Excludes UCJ-related logic
-    function createCapableWizardSequence(capabilityOrId) {
+    function createCapableWizardSequence(capable) {
       return this.Sequence.create(null, this.__subContext__.createSubContext({
-        rootCapability: capabilityOrId
+        capable: capable
       }))
         .add(this.ConfigureFlowAgent)
-        .add(this.CapabilityAdaptAgent)
-        .add(this.LoadCapabilitiesAgent)
-        .add(this.CreateWizardletsAgent)
-        .add(this.LoadTopConfig)
+        .add(this.CapableDefaultConfigAgent)
+        .add(this.CapableCreateWizardletsAgent)
         .add(this.StepWizardAgent)
-        // .add(this.TestAgent)
         ;
     },
 
@@ -193,49 +192,11 @@ foam.CLASS({
     function launchCapableWizard(capable) {
       var p = Promise.resolve(true);
 
-      // TODO: replace with createCapableWizardSequence when it's ready
-      var capableWizard = this.createCapableWizard(capable);
-      p.then(userWantsToContinue => {
-        this.ctrl.add(this.Popup.create().tag(capableWizard));
+      var seq = this.createCapableWizardSequence(capable);
+      return seq.execute().then(x => {
+        // The 'submitted' boolean becomes 'resend' in SessionClientBox
+        return x.submitted;
       });
     },
-
-    function getCapableWizard(capable) {
-      var wizardlets = [];
-      for ( let i = 0 ; i < capable.capablePayloads.length ; i++ ) {
-        let capablePayload = capable.capablePayloads[i];
-        let wizardletClass = capablePayload.capability.wizardlet.cls_;
-
-        // Override the default wizardlet class with one that does not
-        //   save to userCapabilityJunction
-        if ( wizardletClass.id == 'foam.nanos.crunch.ui.CapabilityWizardlet' ) {
-          wizardletClass = foam.nanos.crunch.ui.CapableObjectWizardlet;
-        }
-        let wizardlet = wizardletClass.create({
-          capability: capablePayload.capability,
-          targetPayload: capablePayload,
-          data$: capablePayload.data$
-        }, capable);
-        if ( capablePayload.data ) {
-          wizardlet.data = capablePayload.data;
-        }
-
-        wizardlets.push(wizardlet);
-      }
-
-      return wizardlets;
-    },
-
-    function createCapableWizard(capable) {
-      return {
-        class: 'foam.u2.wizard.StepWizardletView',
-        data: foam.u2.wizard.StepWizardletController.create({
-          wizardlets: this.getCapableWizard(capable)
-        }),
-        onClose: (x) => {
-          x.closeDialog();
-        }
-      };
-    }
   ]
 });

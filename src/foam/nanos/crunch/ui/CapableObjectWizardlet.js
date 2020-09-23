@@ -59,7 +59,7 @@ foam.CLASS({
   methods: [
     {
       name: 'save',
-      code: function() {
+      code: async function() {
         //
       }
     }
