@@ -55,6 +55,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      this.SUPER();
       var self = this;
 
       this.search$.sub(function() {
@@ -71,7 +72,6 @@ foam.CLASS({
         }
       });
         
-      this.SUPER();
 
       this.start()
         .startContext({ data: this })
@@ -83,7 +83,7 @@ foam.CLASS({
             if ( views ) {
               return this.E().forEach(views, function(v) {
                 this.start()
-                  .add(v)
+                  .tag(v)
                 .end();
               });
             }
@@ -95,10 +95,11 @@ foam.CLASS({
     function preSetViewWithProjection(proj) {
       this.views = [];
       this.allPermissions = [];
+      var self = this;
       if ( proj.projection.length > 0 )
-        this.views.push(this.PermissionSelection.create({permission: 'Select All', isSelected: this.data.length === proj.projection.length, onSelectedFunction: this.onAllSelectedFunction.bind(this)}));
+        this.views.push(this.PermissionSelection.create({ permission: 'Select All', selectedPermissions$: this.data$, onSelectedFunction: this.onAllSelectedFunction.bind(this), isSelectedPermissionsContainThisPermission: this.isAllPermissionsSelected.bind(this) }));
       proj.projection.forEach(a => {
-        this.views.push(this.PermissionSelection.create({permission: a[0], isSelected: this.data.includes(a[0]), selectedPermissions$: this.data$ }));
+        this.views.push(this.PermissionSelection.create({ permission: a[0], selectedPermissions$: self.data$, isSelectedPermissionsContainThisPermission: self.isPermissionSelected.bind(self) }));
         this.allPermissions.push(a[0]);
       });
     },
@@ -115,6 +116,12 @@ foam.CLASS({
 
         this.data = newArr;
       }
+    },
+    function isPermissionSelected(permission) {
+      return this.data.includes(permission);
+    },
+    function isAllPermissionsSelected() {
+      return this.data.length >=  this.allPermissions.length;
     }
   ]
 
@@ -167,20 +174,23 @@ foam.CLASS({
         if ( this.onSelectedFunction)
           this.onSelectedFunction(this.permission, this.isSelected);
         else {
-          if ( this.isSelected && ! this.selectedPermissions.includes(this.permission)) {
+          if ( this.isSelected && ! this.isSelectedPermissionsContainThisPermission(this.permission) ) {
             this.selectedPermissions.push(this.permission);
           }
-          if ( ! this.isSelected && this.selectedPermissions.includes(this.permission)) {
+          if ( ! this.isSelected && this.isSelectedPermissionsContainThisPermission(this.permission) ) {
             this.selectedPermissions.splice(this.selectedPermissions.indexOf(this.permission), 1);
           }
         }
+      },
+      factory: function() {
+        return this.isSelectedPermissionsContainThisPermission(this.permission);
       }
     },
     {
       name: 'selectedPermissions',
       class: 'StringArray'
     },
-    'selectionChangeFunction',
+    'isSelectedPermissionsContainThisPermission',
     'onSelectedFunction'
   ],
   methods: [
@@ -189,9 +199,9 @@ foam.CLASS({
       var self = this;
 
       this.selectedPermissions$.sub(function() {
-        if ( ! self.isSelected && self.selectedPermissions.includes(self.permission)  )
+        if ( ! self.isSelected && self.isSelectedPermissionsContainThisPermission(self.permission)  )
           self.isSelected = true;
-        if ( self.isSelected && ! self.selectedPermissions.includes(self.permission)) {
+        if ( self.isSelected && ! self.isSelectedPermissionsContainThisPermission(self.permission)) {
           self.isSelected = false;
         }
       });
