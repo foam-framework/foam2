@@ -1,0 +1,50 @@
+p({
+  class:"foam.nanos.script.Script",
+  id:"AddServiceProviderUserJunctions",
+  description:"Create UCJ for ServiceProvider",
+  code: """
+import foam.nanos.auth.User;
+import foam.nanos.crunch.UserCapabilityJunction;
+import foam.mlang.MLang;
+import foam.mlang.predicate.Predicate;
+import foam.nanos.logger.Logger;
+
+logger = x.get("logger");
+ucjDAO = x.get("userCapabilityJunctionDAO");
+uDAO = x.get("userDAO");
+
+logger.info(new Object[] {"ServiceProviderUserJunctions", "starting"});
+
+users = uDAO.select().array;
+for ( User u : users ) {
+  try {
+    ucj = ucjDAO.find(MLang.AND(
+      new Predicate[] {
+        MLang.EQ(UserCapabilityJunction.SOURCE_ID, u.getId()),
+        MLang.EQ(UserCapabilityJunction.TARGET_ID, u.getSpid())
+      }
+    ));
+    if ( ucj == null ) {
+      ucj = new UserCapabilityJunction.Builder(x)
+        .setSourceId(u.getId())
+        .setTargetId(u.getSpid())
+        .setStatus(foam.nanos.crunch.CapabilityJunctionStatus.GRANTED)
+        .build();
+      print("creating ucj for user: "+u.getId());
+      logger.info(new Object[] {"creating ucj for user", u.getId()});
+      ucjDAO.put(ucj);
+    } else if ( ucj.getStatus() == foam.nanos.crunch.CapabilityJunctionStatus.PENDING ) {
+      ucj.setStatus(foam.nanos.crunch.CapabilityJunctionStatus.GRANTED);
+      logger.info(new Object[] {"updating ucj for user", u.getId()});
+      ucjDAO.put(ucj);
+    } else {
+      //print("found ucj for user: "+u.getId());
+      logger.info(new Object[] {"found ucj for user", u.getId()});
+    }
+  } catch (Throwable t) {
+    logger.error(new Object[] {"error creating ucj for user", u.getId(), u.getSpid(), t.getMessage()});
+  }
+}
+  """,
+  lastModifiedBy:1348
+})

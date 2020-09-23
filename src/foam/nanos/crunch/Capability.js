@@ -27,9 +27,7 @@ foam.CLASS({
   ],
 
   implements: [
-    'foam.mlang.Expressions',
-    'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.auth.LastModifiedByAware'
+    'foam.nanos.auth.EnabledAware'
   ],
 
   tableColumns: [
@@ -185,34 +183,6 @@ foam.CLASS({
       documentation: 'Predicate used to omit or include capabilities from capabilityDAO'
     },
     {
-      name: 'lastModified',
-      class: 'DateTime',
-      section: '_defaultSection',
-      createVisibility: 'HIDDEN',
-      updateVisibility: 'RO'
-    },
-    {
-      name: 'lastModifiedBy',
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      section: '_defaultSection',
-      createVisibility: 'HIDDEN',
-      updateVisibility: 'RO',
-      tableCellFormatter: function(value, obj) {
-        obj.userDAO
-          .where(obj.EQ(foam.nanos.auth.User.ID, value))
-          .limit(1)
-          .select(obj.PROJECTION(foam.nanos.auth.User.LEGAL_NAME))
-          .then(function(result) {
-            if ( ! result || result.array.size < 1 || ! result.array[0]) {
-              this.add(value);
-              return;
-            }
-            this.add(result.array[0]);
-          }.bind(this));
-      }
-    },
-    {
       name: 'reviewRequired',
       class: 'Boolean',
       permissionRequired: true
@@ -291,7 +261,7 @@ foam.CLASS({
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         for ( CapabilityCapabilityJunction prereqJunction : prereqs ) {
           Capability capability = (Capability) capabilityDAO.find(prereqJunction.getTargetId());
-          if ( capability.implies(x, permission) ) return true;
+          if ( capability != null && capability.implies(x, permission) ) return true;
         }
         return false;
       `
@@ -306,6 +276,7 @@ foam.CLASS({
       documentation: `check if s1 implies s2 where s1 and s2 are permission or capability strings`,
       javaCode: `
       if ( s1.equals(s2) ) return true;
+      if ( s1.isBlank() || s2.isBlank() ) return false;
       if ( s1.charAt( s1.length() - 1) != '*' || ( s1.length() - 2 > s2.length() ) ) return false;
       if ( s2.length() <= s1.length() - 2 ) return s1.substring( 0, s1.length() -2 ).equals( s2.substring( 0, s1.length() - 2 ) );
       return s1.substring( 0, s1.length() - 1 ).equals( s2.substring( 0, s1.length() -1 ) );
