@@ -17,6 +17,7 @@ foam.CLASS({
     'ctrl',
     'group',
     'loginSuccess',
+    'requestCapability',
     'requestLogin',
     'sessionTimer',
     'window'
@@ -47,21 +48,28 @@ foam.CLASS({
       name: 'send',
       code: function send(msg) {
         var self = this;
-        if ( this.RPCErrorMessage.isInstance(msg.object) && msg.object.data.id === 'foam.nanos.auth.AuthenticationException' ) {
-          // If the user is already logged in when this happens, then we know
-          // that something occurred on the backend to destroy this user's
-          // session. Therefore we reset the client state and ask them to log
-          // in again.
-          if ( this.loginSuccess ) {
-            if ( this.ctrl )  this.ctrl.remove();
-            alert(this.REFRESH_MSG);
-            (this.window || window).location.reload(false);
-            return;
-          }
+        if ( this.RPCErrorMessage.isInstance(msg.object) ) {
+          if ( msg.object.data.id === 'foam.nanos.auth.AuthenticationException' ) {
+            // If the user is already logged in when this happens, then we know
+            // that something occurred on the backend to destroy this user's
+            // session. Therefore we reset the client state and ask them to log
+            // in again.
+            if ( this.loginSuccess ) {
+              if ( this.ctrl )  this.ctrl.remove();
+              alert(this.REFRESH_MSG);
+              (this.window || window).location.reload(false);
+              return;
+            }
 
-          this.requestLogin().then(function() {
-            self.clientBox.send(self.msg);
-          });
+            this.requestLogin().then(function() {
+              self.clientBox.send(self.msg);
+            });
+          }
+          else if ( msg.object.data.id === 'foam.nanos.crunch.CapabilityRuntimeException' ) {
+            this.requestCapability(msg.object.data).then(function() {
+              self.clientBox.send(self.msg);
+            });
+          } 
         } else {
           // fetch the soft session limit from group, and then start the timer
           if ( this.group && this.group.id !== '' && this.group.softSessionLimit !== 0 ) {
