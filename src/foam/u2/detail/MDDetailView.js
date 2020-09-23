@@ -24,9 +24,16 @@ foam.CLASS({
     'foam.core.Property',
     'foam.u2.DetailPropertyView',
     'foam.u2.md.CheckBox',
+    'foam.u2.md.tag.PaperDropdown',
     'foam.u2.property.MDDateField',
     'foam.u2.property.MDTextField',
-    'foam.u2.property.MDIntView'
+    'foam.u2.property.MDIntView',
+    'foam.u2.property.MDSelect',
+    'foam.u2.property.MDCheckBox',
+    'foam.u2.property.MDFloatView',
+    'foam.u2.detail.MDDetailView',
+    'foam.u2.view.MDCurrencyView',
+    'foam.u2.view.ChoiceView'
   ],
 
   exports: [
@@ -40,48 +47,48 @@ foam.CLASS({
     overflow: scroll;
     height: 100rem;
   }
+
+  ^ .property-item .label-container {
+    color: #999;
+  }
    ^ .property-item {
+   justify-content: space-between;
       padding: 4rem;
       font-size: 3rem;
       display: flex;
       background: white;
-      margin-top: 4px;
+      align-items: center;
+      border: 1px solid #f2f3ff;
+      height: 7rem;
     }
-    ^ .foam-u2-property-MDTextField-label {
-      font-size: 2rem;
-      top: 0rem;
+    ^ .property-item > div {
+      width: 100%;
     }
 
-    ^ .foam-u2-property-MDTextField-label-offset {
-        font-size: 3rem;
-        top: 4rem;
-        position: relative;
-    }
     ^ .foam-u2-view-StringView {
       width: 100%;
     }
 
-    ^ .foam-u2-md-CheckBox {
-      width: 3rem;
-      height: 3rem;
+    ^ .label {
+      font-size: 2rem;
+      color: #999;
+      flex-grow: 1;
+      font-weight: 500;
+      transition: font-size 0.5s, top 0.5s;
+      z-index: 0;
+      top: 0;
+      position: relative;
     }
 
-    ^ .foam-u2-md-CheckBox-label {
-      position: unset;
-    }
-
-    ^ .foam-u2-property-MDDatePicker-body {
-      height: 22rem;
-      width: 22rem;
-    }
+    ^ .label-offset {
+        font-size: 3rem;
+        top: 4rem;
+        position: relative;
+      }
 
     ^ .foam-u2-property-MDCalendar-heading {
       font-size: 1.5rem;
       padding-bottom: 1rem;
-    }
-
-    ^ .foam-u2-property-MDCalendar-table {
-      font-size: 1.5rem;
     }
 
     ^ span button {
@@ -97,12 +104,24 @@ foam.CLASS({
     ^ .foam-u2-view-RichChoiceView-selection-view {
       height: 4rem;
       font-size: 2rem;
-      width: fit-content;
+      width: 100%;
+      border: none;
+    }
+
+    ^ .foam-u2-view-RichChoiceView {
+      width: 100%;
     }
 
     ^ .DefaultRowView-row {
       font-size: 2rem;
     }
+
+    ^ .foam-u2-view-ReferencePropertyView {
+      width: 100%;
+    }
+
+    ^ .foam-u2-view-EnumView {
+    width: 100%;}
   `,
   properties: [
     {
@@ -112,24 +131,51 @@ foam.CLASS({
       }
     },
     [ 'showTitle', true ],
-    [ 'nodeName', 'div' ]
+    [ 'nodeName', 'div' ],
+    {
+      name: 'properties',
+      // TODO: Make an FObjectArray when it validates properly
+      preSet: function(_, ps) {
+        foam.assert(ps, 'Properties required.');
+        for ( var i = 0; i < ps.length; i++ ) {
+          foam.assert(
+              foam.core.Property.isInstance(ps[i]),
+              `Non-Property in 'properties' list:`,
+              ps);
+        }
+        return ps;
+      },
+      expression: function(of) {
+        if ( ! of ) return [];
+        return this.of.getAxiomsByClass(foam.core.Property).
+          // TODO: this is a temporary fix, but DisplayMode.HIDDEN should be included and could be switched
+          filter(function(p) {
+            return ! ( p.hidden || p.visibility === foam.u2.DisplayMode.HIDDEN );
+          });
+      }
+    },
   ],
 
   methods: [
     function initE() {
 
-      this.__subContext__.register(this.CheckBox, 'foam.u2.CheckBox');
+      this.__subContext__.register(this.MDSelect, 'foam.u2.tag.Select');
+      this.__subContext__.register(this.MDSelect, 'foam.u2.view.RichChoiceView');
       this.__subContext__.register(this.MDDateField, 'foam.u2.DateTimeView');
+      this.__subContext__.register(this.MDFloatView, 'foam.u2.FloatView');
       this.__subContext__.register(this.MDTextField, 'foam.u2.TextField');
       this.__subContext__.register(this.MDTextField, 'foam.u2.IntView');
+      this.__subContext__.register(this.MDCheckBox, 'foam.u2.CheckBox');
+//      this.__subContext__.register(this.cls_, 'foam.u2.view.FObjectView');
+//      this.__subContext__.register(this.MDCurrencyView, 'foam.u2.CurrencyView');
 
       this.add(this.slot(function(of, properties, actions) {
         if ( ! of ) return '';
           this.
             addClass(this.myClass()).
             forEach(properties, function(p) {
-              if ( p.cls_ != foam.dao.OneToManyRelationshipProperty &&
-                p.cls_ != foam.dao.ManyToManyRelationshipProperty && p.label != "User Feedback") {
+              if ( ! foam.dao.OneToManyRelationshipProperty.isInstance(p) &&
+                ! foam.dao.ManyToManyRelationshipProperty.isInstance(p) ) {
                 this.start().addClass('property-item').add(p).end();
               }
             })

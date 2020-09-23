@@ -91,10 +91,6 @@ foam.CLASS({
     }
   `,
 
-  properties: [
-
-  ],
-
   methods: [
     async function initE() {
 
@@ -111,17 +107,13 @@ foam.CLASS({
         this.__subContext__.register(this.MDBrowserListView, 'foam.comics.BrowserView');
         this.__subContext__.register(this.MDLoginView, 'foam.u2.view.LoginView');
 
-      this.themeInstalled.resolve();
+        this.themeInstalled.resolve();
 
       });
       await this.themeInstalled;
+      localStorage.test = 'this is a test';
         this
           .addClass(this.myClass())
-          .add(this.slot( async function(loginSuccess, topNavigation_) {
-            if ( ! loginSuccess ) return null;
-            await this.themeUpdated;
-            return this.E().tag(topNavigation_);
-          }))
           .start()
             .addClass('stack-wrapper')
             .enableClass('login-stack', this.loginSuccess$.map( ls => ! ls ))

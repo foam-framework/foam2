@@ -52,29 +52,34 @@ foam.CLASS({
           finalPredicate$: this.data$
         });
       }
-    }
+    },
+    'searchtest'
   ],
 
   methods: [
     function initE() {
       var self = this;
       this.addClass(self.myClass())
-      this.start().addClass(self.myClass('container-search'))
+      this.start().addClass('container-search')
         .start(self.TextSearchView, {
-          richSearch: true,
-          of: this.dao.of.id,
-          onKey: true,
-          viewSpec: {
-            class: 'foam.u2.tag.Input',
-            placeholder: 'Search'
-          }
-        }, this.generalSearchField$)
-          .addClass(self.myClass('general-field'))
+             richSearch: true,
+             of: this.dao.of.id,
+             onKey: true,
+             view: {
+               class: 'foam.u2.tag.Input',
+               placeholder: 'Search'
+             }
+           },this.generalSearchField$)
+          .addClass('general-field')
         .end()
       .end()
       .start().addClass('clear-btn')
         .add(this.CLEAR)
       .end()
+    },
+
+    function init() {
+      this.onload.sub(() => this.addClass('open-close'));
     }
   ],
 
@@ -113,6 +118,17 @@ foam.CLASS({
       border-bottom: solid 1px white;
       font-size: 3rem;
       color: white;
+      right: 0;
+      width: 100%;
+      position: absolute;
+    }
+
+    ^ .container-search {
+      flex: 1;
+    }
+    .open-close .container-search .general-field {
+//      width: 100% !important;
+      transition: 2s;
     }
   `
 });

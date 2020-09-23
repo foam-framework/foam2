@@ -141,9 +141,7 @@ foam.CLASS({
     {
       name: 'onClick',
       code: function(e) {
-//         var point = e.pointMap[Object.keys(e.pointMap)[0]];
-//        var element = this.document.elementFromPoint(point.x, point.y);
-var element = e.target;
+        var element = e.target;
         if ( element && element.tagName === 'TD' ) {
           var newDay = element.innerText;
           this.data = new Date(this.year, this.month, newDay, this.hour, this.minute);
@@ -153,14 +151,10 @@ var element = e.target;
   ],
 
   css: `
-    ^ {
-      height: 310px;
-      width: 300px;
-    }
     ^heading {
       align-items: center;
       display: flex;
-      font-size: 14px;
+      font-size: 2rem;
       height: 48px;
       justify-content: center;
     }
@@ -171,7 +165,7 @@ var element = e.target;
     }
 
     ^table {
-      font-size: 12px;
+      font-size: 3rem;
     }
     ^table th {
       color: #999;
@@ -182,6 +176,7 @@ var element = e.target;
       height: 40px;
       text-align: center;
       width: 38px;
+      padding: 0.5rem;
     }
 
     ^ td^selected {

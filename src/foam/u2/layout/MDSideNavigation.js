@@ -18,7 +18,6 @@ foam.CLASS({
     'auth',
     'currentMenu',
     'isMenuOpen',
-    'loginSuccess',
     'menuDAO',
     'menuListener',
     'pushMenu',
@@ -62,7 +61,6 @@ foam.CLASS({
     function initE() {
       var self = this;
       this
-      .show(this.loginSuccess$)
       .addClass(this.myClass())
       .addClass(this.slot(function(isMenuOpen) {
         return isMenuOpen ? 'menuOpen' : 'menuClosed';

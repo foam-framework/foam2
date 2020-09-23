@@ -41,31 +41,6 @@ foam.CLASS({
       float: right;
     }
 
-//    ^ .foam-u2-view-SimpleSearch .foam-u2-search-TextSearchView .foam-u2-tag-Input {
-//      width: 100%;
-//    }
-
-
-//    ^ .foam-u2-search-TextSearchView {
-//      display: grid;
-//      padding: 20px;
-//    }
-
-//    ^ .foam-u2-layout-MDSearchView
-
-//    ^ .foam-u2-layout-MDSideNavigation input[type="search"] {
-//      width: 100%;
-//      height: 6rem;
-//    }
-
-
-//    ^ .foam-u2-layout-MDSideNavigation .side-nav-view {
-//      position: absolute;
-//      width:100%;
-//      background-color: #f5f7fa;
-//      height: 100rem;
-//    }
-
      ^ .menuOpen {
       left: -00px;
       transition: .2s;
@@ -79,20 +54,18 @@ foam.CLASS({
     ^ .right .foam-u2-search-TextSearchView {
       margin: 0;
       height: 4rem;
+      position: relative;
+    }
+    ^ .right {
+      flex: 1;
     }
 
-//    .foam-u2-search-TextSearchView {
-//      margin: unset !important;
-//    }
 
     ^browse-view-container {
 //      margin-top: 10rem;
 //      height: 100rem;
       overflow: scroll;
     }
-//    ^ .foam-u2-layout-MDSideNavigation {
-//      top: 0;
-//    }
 
     ^ .create-btn {
       position: fixed;
@@ -120,26 +93,7 @@ foam.CLASS({
       background-color: unset;
       color: white;
     }
-//    ^ .profile-icon {
-//      width: fit-content;
-//    }
-//    ^ .profile-name {
-//      font-size: 2.5rem;
-//      padding-left: 1rem;
-//    }
-//    ^ .profile-container {
-//      display: flex;
-//          align-items: center;
-//    }
-//    ^ .navigation-header {
-//      background-color: blue;
-//      z-index: 99;
-//      padding-left: 1rem;
-//      display: flex;
-//      height: 10rem;
-//      align-items: center;
-//      color: white;
-//    }
+
     .boxless-for-drag-drop {
       background-color: unset;
       border: unset;
@@ -320,10 +274,6 @@ foam.CLASS({
          })
        .endContext()
       .start('div')
-//        .addClass('side-navigation')
-//        .addClass(this.slot(function(isMenuOpen) {
-//          return isMenuOpen ? 'menuOpen' : 'menuClosed';
-//        }, this.isMenuOpen$))
         .tag({ class: 'foam.u2.layout.MDSideNavigation' })
       .end()
       .start(self.summaryView,{

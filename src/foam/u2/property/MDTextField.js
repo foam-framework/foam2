@@ -14,65 +14,7 @@ foam.CLASS({
     'setTimeout',
   ],
 
-  css: `
-  ^ {
-      display: flex;
-      flex-direction: column;
-      opacity: 1;
-      overflow-x: hidden;
-      overflow-y: auto;
-    }
-    ^label {
-      color: #999;
-      flex-grow: 1;
-      font-weight: 500;
-      transition: font-size 0.5s, top 0.5s;
-      z-index: 0;
-    }
-    ^label-offset {
-      font-size: 85%;
-//      top: 8px;
-    }
-    ^no-label {
-      padding-top: 8px;
-    }
-    ^ input {
-      background: transparent;
-      border-bottom: none;
-      border-left: none;
-      border-top: none;
-      border-right: none;
-      color: #444;
-      flex-grow: 1;
-      font-family: inherit;
-      font-size: inherit;
-      padding-top: 1rem;
-      padding-bottom: 1rem;
-      resize: none;
-      z-index: 1;
-    }
-    ^ input:focus {
-      border-bottom: 2px solid #4285f4;
-      padding: 0 0 6px 0;
-      outline: none;
-    }
-    ^validation-error {
-      color: #db4437;
-    }
-    ^invalid input {
-      border-bottom: 2px solid #db4437;
-      margin-bottom: 4px;
-    }
-    ^invalid input:focus {
-      border-bottom: 2px solid #db4437;
-    }
-    ^inline {
-      top: 32px;
-    }
-  `,
-
   properties: [
-//    ['nodeName', 'div'],
     {
       name: 'showLabel',
       attribute: true,
@@ -92,7 +34,6 @@ foam.CLASS({
       name: 'placeholder',
       documentation: 'Ignored when $$DOC{ref:".showLabel"} is true, but used ' +
           'as an inline placeholder when it\'s false.',
-//      factory: function() { return this.label; }
     },
     {
       type: 'Boolean',
@@ -172,26 +113,27 @@ foam.CLASS({
           'autocomplete view.',
     },
     {
-          class: 'Int',
-          name: 'displayWidth'
-        }
+      class: 'Int',
+      name: 'displayWidth'
+    }
   ],
 
   methods: [
+
     function initE() {
       var self = this;
       this.addClass(this.myClass());
       if (this.label) {
         this.start('label')
-            .addClass(this.myClass('label'))
+            .addClass('label')
             .addClass(this.slot(function(data, focused) {
               return (typeof data == 'undefined' || data == '') &&
-                ! focused ? self.myClass('label-offset') : '';
+                ! focused ? 'label-offset' : '';
             }, this.data$, this.focused_$))
             .add(this.label$)
             .end();
       } else {
-        this.addClass(this.myClass('no-label'));
+        this.addClass('no-label');
       }
 
       this.inputE();
@@ -201,6 +143,7 @@ foam.CLASS({
         this.start().addClass(this.myClass('validation-error')).add(this.validationError_$).end();
       }
     },
+
     function inputE() {
       var self = this;
       var input = this.start('input')
@@ -214,18 +157,20 @@ foam.CLASS({
       this.link();
       input.end();
     },
+
     function fromProperty(prop) {
     this.SUPER(prop);
       this.label = this.label || prop.label;
       this.prop = prop;
     },
+
     function link() {
       // Template method, can be overriden by sub-classes
       this.attrSlot(null, this.onKey ? 'input' : 'change').linkFrom(this.data$);
     },
   ],
 
-  models: [
+  classes: [
     {
       name: 'AutocompletePopup',
       extends: 'foam.u2.Element',
@@ -240,5 +185,53 @@ foam.CLASS({
         },
       ],
     },
-  ]
+  ],
+
+  css: `
+  ^ {
+      display: flex;
+      flex-direction: column;
+      opacity: 1;
+      overflow-x: hidden;
+      overflow-y: auto;
+      height: 10rem;
+    }
+
+    ^no-label {
+      padding-top: 8px;
+    }
+    ^ input {
+      background: transparent;
+      border-bottom: none;
+      border-left: none;
+      border-top: none;
+      border-right: none;
+      color: #444;
+      flex-grow: 1;
+      font-family: inherit;
+      font-size: inherit;
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+      resize: none;
+      z-index: 1;
+    }
+    ^ input:focus {
+      border-bottom: 2px solid #4285f4;
+      padding: 0 0 6px 0;
+      outline: none;
+    }
+    ^validation-error {
+      color: #db4437;
+    }
+    ^invalid input {
+      border-bottom: 2px solid #db4437;
+      margin-bottom: 4px;
+    }
+    ^invalid input:focus {
+      border-bottom: 2px solid #db4437;
+    }
+    ^inline {
+      top: 32px;
+    }
+  `
 });

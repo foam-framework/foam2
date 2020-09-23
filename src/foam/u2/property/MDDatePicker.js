@@ -425,8 +425,9 @@ foam.CLASS({
 
     ^header {
       cursor: pointer;
-      font-size: 16px;
+      font-size: 25px;
       padding: 12px 16px;
+      font-weight: 500;
     }
     ^header div {
       opacity: 0.8;
@@ -445,7 +446,8 @@ foam.CLASS({
     ^body {
       cursor: pointer;
       font-size: 16px;
-      height: 310px;
+      height: 36rem;
+      width: 32rem;
       overflow: hidden;
       position: relative;
       -webkit-user-select: none;
@@ -453,7 +455,6 @@ foam.CLASS({
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
-      width: 300px;
     }
     ^slider {
       position: absolute;

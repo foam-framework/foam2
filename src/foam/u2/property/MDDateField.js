@@ -67,10 +67,10 @@ foam.CLASS({
       this.addClass(this.myClass());
       if ( this.showLabel ) {
         this.start('label')
-          .addClass(this.myClass('label'))
+          .addClass('label')
           .addClass(this.slot(function(data, focused) {
-            return (typeof data !== 'undefined' && data !== '') ||
-                focused ? self.myClass('label-offset') : '';
+            return typeof data === 'undefined' || data === '' ||
+                focused ? 'label-offset' : '';
           }, this.realData$, this.focused$))
           .add(this.label$)
         .end();
@@ -135,20 +135,15 @@ foam.CLASS({
       flex-direction: column;
       padding: 2rem 0 0 0;
       position: relative;
+      z-index: 1;
     }
     ^label {
       color: #999;
       flex-grow: 1;
       font-size: inherit;
       font-weight: 500;
-//      position: absolute;
-//      top: 32px;
       transition: font-size 0.5s, top 0.5s;
       z-index: 0;
-    }
-    ^label-offset {
-//      font-size: 85%;
-//      top: 8px;
     }
     ^no-label {
       padding-top: 8px;

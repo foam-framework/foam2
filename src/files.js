@@ -459,6 +459,7 @@ FOAM_FILES([
   { name: "foam/u2/IntView", flags: ['web'] },
   { name: "foam/u2/FloatView", flags: ['web'] },
   { name: "foam/u2/CurrencyView", flags: ['web'] },
+//  { name: "foam/u2/MDCurrencyView", flags: ['web'] },
   { name: "foam/u2/CheckBox", flags: ['web'] },
   { name: "foam/u2/CitationView", flags: ['web'] },
   { name: "foam/u2/PopupView", flags: ['web'] },
@@ -895,6 +896,12 @@ FOAM_FILES([
   { name: "foam/u2/property/MDCalendar", flags: ['web'] },
   { name: "foam/u2/property/MDDateField", flags: ['web'] },
   { name: "foam/u2/property/MDDatePicker", flags: ['web'] },
+  { name: "foam/u2/property/MDAbstractChoiceView", flags: ['web'] },
+  { name: "foam/u2/property/MDSelect", flags: ['web'] },
+  { name: "foam/u2/property/MDFloatView", flags: ['web'] },
+  { name: "foam/u2/property/MDPopup", flags: ['web'] },
+  { name: "foam/u2/property/MenuElement", flags: ['web'] },
+  { name: "foam/u2/property/MDCheckBox", flags: ['web'] },
   { name: "foam/u2/detail/MDDetailView", flags: ['web'] },
   { name: "foam/u2/layout/MDSearchView", flags: ['web'] },
   { name: "foam/u2/layout/MDSideNavigation", flags: ['web'] },
@@ -907,6 +914,7 @@ FOAM_FILES([
   { name: "foam/u2/md/Controller" },
   { name: "foam/u2/md/OverlayDropdown", flags: ['web'] },
   { name: "foam/u2/layout/MDLoginView", flags: ['web'] },
+  { name: "foam/u2/md/tag/PaperDropdown", flags: ['web'] },
 
   // fs
   { name: 'foam/nanos/fs/fileDropZone/FileDropZone', flags: ['web'] },
