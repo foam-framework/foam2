@@ -130,41 +130,7 @@ foam.CLASS({
           return null;
         }
 
-        CrunchService crunchService = (CrunchService) x.get("crunchService");
-        var capabilityDataObjects = walkGrantPath(crunchService.getGrantPath(x, idToString), x);
-
-        // Validate any of the existing data objects
-        Map<String,String> errorMap = new TreeMap<String,String>();
-        Map<String,FObject> dataMap = new TreeMap<String,FObject>(capabilityDataObjects);
-        Map<String,FObject> nonNullDataMap = new TreeMap<String,FObject>();
-        for ( var key : dataMap.keySet() ) {
-          FObject data = dataMap.get(key);
-          
-          // Only return the non-null data objects
-          if ( data != null ) {
-            nonNullDataMap.put(key, data);
-
-            if ( data instanceof Validatable ) {
-              try { ((Validatable) data).validate(x); }
-              catch (IllegalStateException ise) {
-                errorMap.put(key, ise.getMessage());
-              } catch (IllegalArgumentException iae) {
-                errorMap.put(key, iae.getMessage());
-              } catch (Throwable t) {
-                Logger logger = (Logger) x.get("logger");
-                logger.warning("Unexpected exception validating " + key + ": ", t);
-              }
-            }
-          }
-        }
-
-        CapabilityPayload capabilityPayload = new CapabilityPayload.Builder(x)
-          .setCapabilityDataObjects(nonNullDataMap)
-          .setCapabilityValidationErrors(errorMap)
-          .setId(idToString)
-          .build();
-        
-        return capabilityPayload;
+        return filterCapabilityPayload(x, idToString);
       `
     },
     {
@@ -174,13 +140,8 @@ foam.CLASS({
         // grabbing actual capabilities based on the capabilities given in select
         DAO localCapabilityDAO = (DAO) x.get("localCapabilityDAO");
         List<Capability> rootCapabilities = ((ArraySink) localCapabilityDAO.select_(
-          x,
-          new ArraySink(),
-          skip,
-          limit,
-          order,
-          predicate
-        )).getArray();
+            x, new ArraySink(), skip, limit, order, predicate
+          )).getArray();
 
         CrunchService crunchService = (CrunchService) x.get("crunchService");
 
@@ -189,13 +150,7 @@ foam.CLASS({
       
         // iterate through each capability from the select and calculate separate grant path
         for ( Capability rootCapability : rootCapabilities ){
-          var capabilityDataObjects = walkGrantPath(crunchService.getGrantPath(x, rootCapability.getId()), x);
-
-          CapabilityPayload capabilityPayload = new CapabilityPayload.Builder(x)
-            .setCapabilityDataObjects(new TreeMap<String,FObject>(capabilityDataObjects))
-            .setId(rootCapability.getId())
-            .build();
-
+          CapabilityPayload capabilityPayload = filterCapabilityPayload(x, rootCapability.getId());
           capabilityPayloads.add(capabilityPayload);
         }
 
@@ -205,6 +160,52 @@ foam.CLASS({
         
         return capabilityPayloadsToArraySink;
       `
+    },
+    {
+      name: 'filterCapabilityPayload',
+      type: 'CapabilityPayload',
+        args: [
+          { name: 'x', type: 'Context' },
+          { name: 'id', type: 'String' }
+        ],
+        javaCode: `
+          CrunchService crunchService = (CrunchService) x.get("crunchService");
+          List grantPath = crunchService.getGrantPath(x, id);
+          Map<String,FObject> dataMap = walkGrantPath(grantPath, x);
+
+          // Sorted maps for return data
+          Map<String,FObject> dataObjects = new TreeMap<String,FObject>();
+          Map<String,String> validationErrors = new TreeMap<String,String>();
+          
+          // Validate any of the existing data objects
+          for ( var key : dataMap.keySet() ) {
+            FObject data = dataMap.get(key);
+            
+            // Only return the non-null data objects
+            if ( data != null ) {
+              dataObjects.put(key, data);
+
+              // Check to see if there are validation erros blocking granting these capabilities
+              if ( data instanceof Validatable ) {
+                try { ((Validatable) data).validate(x); }
+                catch (IllegalStateException ise) {
+                  validationErrors.put(key, ise.getMessage());
+                } catch (IllegalArgumentException iae) {
+                  validationErrors.put(key, iae.getMessage());
+                } catch (Throwable t) {
+                  Logger logger = (Logger) x.get("logger");
+                  logger.warning("Unexpected exception validating " + key + ": ", t);
+                }
+              }
+            }
+          }
+
+          return new CapabilityPayload.Builder(x)
+            .setCapabilityDataObjects(dataObjects)
+            .setCapabilityValidationErrors(validationErrors)
+            .setId(id)
+            .build();
+        `
     },
     {
       name: 'put_',
@@ -255,7 +256,10 @@ foam.CLASS({
             crunchService.updateJunction(x, cap.getId(), dataObj);
           }
           else if ( item instanceof List ) {
-            grantPath.addAll((List) item);
+            List list = (List) item;
+
+            // add all the elements of the list
+            grantPath.addAll(list);
           }
         }
 
