@@ -60,6 +60,7 @@ foam.CLASS({
               return;
             }
 
+            sp.removeSpid(x, user);
             sp.setupSpid(x, user);
           }
         }, "Create ucj on user spid set");
