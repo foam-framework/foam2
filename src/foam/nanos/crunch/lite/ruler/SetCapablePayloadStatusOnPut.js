@@ -38,13 +38,9 @@ foam.CLASS({
     
             CapabilityJunctionStatus defaultStatus = PENDING;
     
-            FObject data = payload.getData();
-            if ( data != null ) {
-              data.validate(x);
-              payload.setStatus(defaultStatus);
-            }
-    
-            if ( payload.getStatus() != defaultStatus ) {
+            try {
+              payload.validate(x);
+            } catch ( IllegalStateException e ) {
               return;
             }
     

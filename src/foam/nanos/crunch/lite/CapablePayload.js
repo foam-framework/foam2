@@ -16,11 +16,11 @@ foam.CLASS({
   javaImports: [
     'foam.core.ClassInfo',
     'foam.core.FObject',
-    'foam.core.Validator'
+    'foam.core.Validatable'
   ],
 
   implements: [
-    'foam.core.Validator'
+    'foam.core.Validatable'
   ],
 
   // TODO: Can section off view
@@ -96,8 +96,9 @@ foam.CLASS({
             getCapability().getId()
           ));
         }
-        Validator validator = (Validator) dataObject;
-        validator.validate(x, dataObject);
+        if ( dataObject instanceof Validatable ) {
+          dataObject.validate(x);
+        }
       `,
     }
   ],

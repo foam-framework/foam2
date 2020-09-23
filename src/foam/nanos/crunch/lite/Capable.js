@@ -91,35 +91,21 @@ foam.INTERFACE({
               payloads.put(payload.getCapability().getId(), payload);
             }
 
-            CrunchService crunchService = (CrunchService) x.get("crunchService");
-            List crunchPath = crunchService.getMultipleCapabilityPath(
-              x, capabilityIds, false);
-
-            for ( Object obj : crunchPath ) {
-              if ( ! (obj instanceof Capability) ) {
-                // TODO: Implement logic for sub-lists (MinMaxCapability)
-                throw new RuntimeException("TODO");
-              }
-              Capability cap = (Capability) obj;
-              if ( cap.getOf() == null ) continue;
-
-              if ( ! payloads.containsKey(cap.getId()) ) {
+            for ( String capId : capabilityIds ) {
+              if ( ! payloads.containsKey(capId) ) {
                 throw new IllegalStateException(String.format(
                   "Missing payload object for capability '%s'",
-                  cap.getId()
+                  capId
                 ));
               }
 
-              CapablePayload payload = payloads.get(cap.getId());
+              CapablePayload payload = payloads.get(capId);
               if ( payload.getStatus() != GRANTED ) {
                 throw new IllegalStateException(String.format(
                   "Object does not have granted status for capability '%s'",
-                  cap.getId()
+                  capId
                 ));
               }
-
-              Validator validator = (Validator) payload;
-              validator.validate(x, payload);
             }
           `
         }));
