@@ -1,22 +1,60 @@
-
 p({
   "class":"foam.nanos.ruler.Rule",
-  "id":"68afcf0c-c718-98f8-0841-75afsbdkjfbsk",
-  "name":"CreateUserCapabilityJunctionOnSpidSet",
+  "id":"68afcf0c-c718-98f8-0841-75afsbdkjfbsk-c",
+  "name":"Grant User Spid On User Create",
   "priority":100,
-  "ruleGroup":"crunch",
-  "documentation":"On user create/update, if spid is set, create UserCapabilityJunction between User/Spid",
+  "ruleGroup":"spidCapability",
+  "documentation":"On user CREATE, if spid is set, create UserCapabilityJunction between User/Spid",
   "daoKey":"localUserDAO",
-  "operation":3,
+  "operation":0,
+  "after":true,
+  "enabled":true,
+  "saveHistory":false,
+  "action":{ "class":"foam.nanos.auth.CreateUserCapabilityJunctionOnSpidSet" },
+  "lifecycleState":1
+})
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75afsbdkjfbsk-u",
+  "name":"Grant User Spid On User Update",
+  "priority":100,
+  "ruleGroup":"spidCapability",
+  "documentation":"On user UPDATE, if spid is set, create UserCapabilityJunction between User/Spid",
+  "daoKey":"localUserDAO",
+  "operation":1,
+  "after":true,
+  "enabled":true,
+  "saveHistory":false,
+  "predicate":{
+    "class":"foam.mlang.predicate.And",
+    "args":[
+      {
+        "class":"foam.mlang.predicate.Not",
+        "arg1":{ "class":"foam.nanos.ruler.predicate.PropertyIsSetPredicate","propName":"spid","isNew":false },
+      },
+      { "class":"foam.nanos.ruler.predicate.PropertyIsSetPredicate","propName":"spid","isNew":true }
+    ]
+  },
+  "action":{ "class":"foam.nanos.auth.CreateUserCapabilityJunctionOnSpidSet" },
+  "lifecycleState":1
+})
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-afdsgk-sd212",
+  "name":"Update User Spid On UCJ Update",
+  "priority":100,
+  "ruleGroup":"spidCapability",
+  "documentation":"Re-assign user spid on CREATE of User-ServiceProvider junction",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":0,
   "after":true,
   "enabled":true,
   "saveHistory":false,
   "action":{
-    "class":"foam.nanos.auth.CreateUserCapabilityJunctionOnSpidSet"
+    "class":"foam.nanos.auth.SetUserServiceProviderJunctionRuleAction"
   },
   "lifecycleState":1
 })
-
 p({
   "class":"foam.nanos.ruler.Rule",
   "id":"68afcf0c-c718-98f8-0841-75e9-crunch0",
