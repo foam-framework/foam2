@@ -111,8 +111,6 @@ foam.CLASS({
         DAO userCapabilityJunctionDAO = (DAO) x.get("bareUserCapabilityJunctionDAO");
 
         // find list of old spids to remove from user
-
-        List<UserCapabilityJunction> spidsToRemove = new ArrayList<UserCapabilityJunction>();    
         AbstractPredicate serviceProviderTargetPredicate = new AbstractPredicate(x) {
           @Override
           public boolean f(Object obj) {
@@ -121,7 +119,7 @@ foam.CLASS({
             return c instanceof ServiceProvider;
           }
         };
-        spidsToRemove = (ArrayList<UserCapabilityJunction>) ((ArraySink) userCapabilityJunctionDAO
+        List<UserCapabilityJunction> spidsToRemove = (ArrayList<UserCapabilityJunction>) ((ArraySink) userCapabilityJunctionDAO
           .where(AND(
             EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
             NEQ(UserCapabilityJunction.TARGET_ID, getId()),
