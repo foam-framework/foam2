@@ -61,12 +61,12 @@ foam.CLASS({
 
             ServiceProvider sp = (ServiceProvider) user.findSpid(x);
             if ( sp == null ) {
-              logger.warning("Cannot find capability for service provider : ", sp.getId());
+              logger.warning("Cannot find capability for service provider : ", spid);
               return;
             }
 
             CrunchService crunchService = (CrunchService) x.get("crunchService");
-            List<Capability> grantPath = (List<Capability>) crunchService.getCapabilityPath(x, sp.getId(), true);
+            List<Capability> grantPath = (List<Capability>) crunchService.getCapabilityPath(x, sp.getId(), false);
 
             try {
               DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
