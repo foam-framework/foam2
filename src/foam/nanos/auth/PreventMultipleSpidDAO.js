@@ -14,6 +14,9 @@ foam.CLASS({
   javaImports: [
     'foam.dao.DAO',
     'foam.mlang.predicate.AbstractPredicate',
+    'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.UserCapabilityJunction',
     'static foam.mlang.MLang.*'
@@ -27,6 +30,20 @@ foam.CLASS({
         Capability targetCapability = (Capability) ucj.findTargetId(x);
 
         if ( targetCapability == null || ! ( targetCapability instanceof ServiceProvider ) ) return super.put_(x, obj);
+
+        AuthService auth = (AuthService) x.get("auth");
+        // if the user performing the operation is a super admin, skip the following check
+        {
+          User user = ((Subject) x.get("subject")).getUser();
+          if ( 
+            user != null && ( 
+            user.getId() == User.SYSTEM_USER_ID || 
+            user.getGroup().equals("admin") || 
+            user.getGroup().equals("system") || 
+            auth.check(x, "*") ) 
+          )
+            return super.put_(x, obj);
+        }
 
         AbstractPredicate serviceProviderTargetPredicate = new AbstractPredicate(x) {
           @Override
