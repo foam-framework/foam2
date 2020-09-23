@@ -58,9 +58,6 @@ foam.CLASS({
     {
       name: 'onMouseMove',
       code: function(evt) {
-        // Containment is not sufficient.
-        // It's too eager to close the popup, and we want to keep it open so
-        // long as the mouse is nearby.
         var pos = this.el().getBoundingClientRect();
         var margin = 50;
         if (evt.clientX < pos.left - margin || pos.right + margin < evt.clientX ||
@@ -72,8 +69,6 @@ foam.CLASS({
     {
       name: 'onTouch',
       code: function(evt) {
-        // Make sure the target element is a child of the popup, otherwise close
-        // the popup.
         if (!this.el().contains(evt.target)) {
           this.popup.close();
         }

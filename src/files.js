@@ -180,7 +180,6 @@ FOAM_FILES([
   { name: "lib/input", flags: ['web'] },
   { name: "foam/box/Remote" },
   { name: 'foam/u2/DeleteModal', flags: ['web'] },
-//  { name: 'foam/u2/EasyDialog', flags: ['web'] },
   { name: 'foam/u2/EasyModal', flags: ['web'] },
   { name: 'foam/u2/MemoModal', flags: ['web'] },
   { name: 'foam/u2/ModalHeader', flags: ['web'] },

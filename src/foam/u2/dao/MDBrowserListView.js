@@ -62,8 +62,6 @@ foam.CLASS({
 
 
     ^browse-view-container {
-//      margin-top: 10rem;
-//      height: 100rem;
       overflow: scroll;
     }
 
@@ -87,9 +85,7 @@ foam.CLASS({
 
     ^ .back-btn i {
       font-size: 5rem;
-      /* width: fit-content; */
       float: left;
-      /* height: 8rem; */
       background-color: unset;
       color: white;
     }
@@ -261,7 +257,6 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-//      this.isMenuOpen$.sub(this.onMenuOpenChanged);
       this.isSearchActive$.sub(this.onSearchActiveChanged);
 
       this.addClass(this.myClass())

@@ -33,8 +33,6 @@ foam.CLASS({
     }
 
     ^ .foam-u2-layout-MDToolbarView {
-//      background-color: /*%PRIMARY1%*/;
-//      box-shadow: 0px 0px 50px 0px blue;
       font-size: 3.5rem;
       height: 10rem;
       z-index: 99;
@@ -46,7 +44,6 @@ foam.CLASS({
 
     ^ toolbar .right {
       padding-right: 3rem;
-//      width: -webkit-fill-available;
     }
 
     ^ toolbar .left i {

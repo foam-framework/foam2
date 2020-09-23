@@ -20,7 +20,6 @@ foam.CLASS({
     foam.pattern.Faceted.create()
   ],
 
-
   css: `
     ^ {
       display: flex;
@@ -51,7 +50,6 @@ foam.CLASS({
   methods: [
     function initE() {
     this.SUPER();
-//    this.created = this.data.created.toUTCString();
       this
         .addClass(this.myClass())
         this.add(this.MDProfileImageView.create({ src: this.data.profilePicture || 'images/ic-placeholder.png' }))

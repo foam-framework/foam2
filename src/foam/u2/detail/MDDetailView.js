@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -134,7 +123,6 @@ foam.CLASS({
     [ 'nodeName', 'div' ],
     {
       name: 'properties',
-      // TODO: Make an FObjectArray when it validates properly
       preSet: function(_, ps) {
         foam.assert(ps, 'Properties required.');
         for ( var i = 0; i < ps.length; i++ ) {
@@ -148,7 +136,6 @@ foam.CLASS({
       expression: function(of) {
         if ( ! of ) return [];
         return this.of.getAxiomsByClass(foam.core.Property).
-          // TODO: this is a temporary fix, but DisplayMode.HIDDEN should be included and could be switched
           filter(function(p) {
             return ! ( p.hidden || p.visibility === foam.u2.DisplayMode.HIDDEN );
           });
@@ -166,8 +153,6 @@ foam.CLASS({
       this.__subContext__.register(this.MDTextField, 'foam.u2.TextField');
       this.__subContext__.register(this.MDTextField, 'foam.u2.IntView');
       this.__subContext__.register(this.MDCheckBox, 'foam.u2.CheckBox');
-//      this.__subContext__.register(this.cls_, 'foam.u2.view.FObjectView');
-//      this.__subContext__.register(this.MDCurrencyView, 'foam.u2.CurrencyView');
 
       this.add(this.slot(function(of, properties, actions) {
         if ( ! of ) return '';

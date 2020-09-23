@@ -48,7 +48,6 @@ foam.CLASS({
         var oldValue = this.choice;
         this.data = nu[0];
         this.text = nu[1];
-//        this.propertyChange('choice', oldValue, this.choice);
       }
     },
     {
@@ -67,7 +66,6 @@ foam.CLASS({
           return out;
         }
 
-        // Upgrade single values to [value, value].
         for ( var i = 0 ; i < a.length ; i++ )
           if ( ! Array.isArray(a[i]) )
             a[i] = [a[i], a[i]];
@@ -77,7 +75,6 @@ foam.CLASS({
       postSet: function(old, nu) {
         var value = this.data;
 
-        // Update current choice when choices update.
         if (this.hasOwnProperty('index') && !this.hasOwnProperty('data') &&
                 this.index >= 0 && this.index < nu.length) {
           this.choice = nu[this.index];
@@ -102,13 +99,9 @@ foam.CLASS({
             this.data = nu.length ? nu[0][0] : undefined;
           }
         }
-
-        // TODO(braden): Make sure that updating the labels, with or without
-        // changing the length of choices, updates the DAO properly.
       },
     },
     {
-//      class: 'FObjectArray',
       name: 'sections',
       documentation: `
         support for replacing RichChoiceView
@@ -118,9 +111,6 @@ foam.CLASS({
         nu.forEach(function(section) {
           section.dao.select(obj => {
             self.choices.push([obj.id, obj.toSummary()]);
-//            if ( obj.id == this.data ) this.index = i;
-//            mapChoices.push([i, obj.id]);
-//            i++;
           });
         });
       },
@@ -138,7 +128,6 @@ foam.CLASS({
         return nu;
       },
       postSet: function(old, nu) {
-        // If useSelection is enabled, don't update data or choice.
         if (this.useSelection) return;
         if (this.choices.length && this.data !== this.choices[nu][0])
           this.data = this.choices[nu][0];
@@ -185,10 +174,6 @@ foam.CLASS({
         }
         if ( nu && this.choices.length )
           console.warn('ChoiceView data set to invalid choice: ', nu);
-
-//        if ( this.mapChoices.length !== 0 ) {
-//
-//        }
       }
     },
     {
