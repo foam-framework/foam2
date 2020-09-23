@@ -215,7 +215,7 @@ foam.CLASS({
 
         // Retrieve the current set
         CapabilityPayload currentCapPayload = (CapabilityPayload) find_(x, receivingCapPayload.getId());
-        Map<String,FObject> currentCapabilityDataObjects = (Map<String,FObject>) null; // currentCapPayload.getCapabilityDataObjects();
+        Map<String,FObject> currentCapabilityDataObjects = (Map<String,FObject>) currentCapPayload.getCapabilityDataObjects();
 
         CrunchService crunchService = (CrunchService) x.get("crunchService");
 
