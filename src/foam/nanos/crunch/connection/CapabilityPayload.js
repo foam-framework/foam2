@@ -30,13 +30,21 @@ foam.CLASS({
       name: 'capabilityDataObjects',
       javaFactory: `
         return new HashMap<String,FObject>();
+      `,
+      documentation: `
+        Data necessary for the capabilities.
       `
     },
     {
       class: 'Map',
       name: 'capabilityValidationErrors',
+      readPermissionRequired: false,
+      writePermissionRequired: true,
       javaFactory: `
         return new HashMap<String,String>();
+      `,
+      documentation: `
+        Validation errors for capability data objects.
       `
     }
   ]
