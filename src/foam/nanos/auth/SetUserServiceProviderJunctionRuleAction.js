@@ -15,11 +15,6 @@
  * from nanopay Corporation.
  */
 
-/**
- * @license
- * Copyright 2020 nanopay Inc. All Rights Reserved.
- */
-
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'SetUserServiceProviderJunctionRuleAction',
