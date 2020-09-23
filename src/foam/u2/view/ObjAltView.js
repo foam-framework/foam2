@@ -1,17 +1,15 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
   package: 'foam.u2.view',
-  name: 'AltView',
+  name: 'ObjAltView',
   extends: 'foam.u2.View',
 
-  documentation: "Provides the ability to switch between multiple views for data set" +
-  "Takes a views property which should be the value of an array containing arrays that contain desired views, and label." +
-  "Ex. views: [[ { class: 'foam.u2.view.TableView' }, 'Table' ]]",
+  documentation: "Like AltView, but for Objects instead of DAO's.",
 
   css: `
     ^ { margin: auto; }
@@ -34,7 +32,6 @@ foam.CLASS({
       }
     },
     {
-      class: 'foam.dao.DAOProperty',
       name: 'data'
     }
   ],
@@ -54,7 +51,7 @@ foam.CLASS({
       .endContext()
       .start('div')
         .add(this.selectedView$.map(function(v) {
-          return self.E().tag(v, {data: self.data$proxy});
+          return self.E().tag(v, {data$: self.data$});
         }))
       .end();
     }
