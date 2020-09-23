@@ -14,7 +14,6 @@ foam.CLASS({
   ],
 
   imports: [
-    'capabilities',
     'wizardlets',
     'wizardConfig',
     'pushView',
