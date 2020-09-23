@@ -43,7 +43,7 @@ foam.CLASS({
         var self = this;
         this.permissionDAO.select(this.PROJECTION(this.Permission.ID))
           .then(function(proj) {
-            self.views =  proj.projection.map(a => self.PermissionSelection.create({permission: a[0], isSelected: self.data.includes(a[0]), onSelectedFunction: self.onSelectedFunction.bind(self)}));
+            self.preSetViewWithProjection(proj);
           });
       }
     }
@@ -57,12 +57,12 @@ foam.CLASS({
         if ( self.search ) {
           self.permissionDAO.where(self.CONTAINS_IC(self.Permission.ID, self.search)).select(self.PROJECTION(self.Permission.ID))
             .then(function(proj) {
-              self.views = proj.projection.map(a => self.PermissionSelection.create({permission: a[0], isSelected: self.data.includes(a[0]), onSelectedFunction: self.onSelectedFunction.bind(self)}));
+              self.preSetViewWithProjection(proj);
             });
         } else {
           self.permissionDAO.select(self.PROJECTION(self.Permission.ID))
             .then(function(proj) {
-              self.views = proj.projection.map(a => self.PermissionSelection.create({permission: a[0], isSelected: self.data.includes(a[0]), onSelectedFunction: self.onSelectedFunction.bind(self)}));
+              self.preSetViewWithProjection(proj);
             });
         }
       });
@@ -87,6 +87,23 @@ foam.CLASS({
         .end()
         .endContext()
       .end();
+    },
+    function preSetViewWithProjection(proj) {
+      this.views = [];
+      if ( proj.projection.length > 0 )
+        this.views.push(this.PermissionSelection.create({permission: 'All', isSelected: this.data.length === proj.projection.length, onSelectedFunction: this.onAllSelectedFunction.bind(this)}));
+      proj.projection.forEach(a => this.views.push(this.PermissionSelection.create({permission: a[0], isSelected: this.data.includes(a[0]), onSelectedFunction: this.onSelectedFunction.bind(this)})));
+    },
+    function onAllSelectedFunction(_, isSelected) {
+      if ( ! isSelected ) {
+        this.data = [];
+      }
+      if ( isSelected ) {
+        for ( var p of this.permissions ) {
+          if ( ! this.data.includes(p) )
+            this.data.push(p);
+        }
+      }
     },
     function onSelectedFunction(permission, isSelected) {
       if ( this.data.includes(permission) && ! isSelected ) {
