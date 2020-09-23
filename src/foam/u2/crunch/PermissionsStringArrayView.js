@@ -38,7 +38,7 @@ foam.CLASS({
     {
       name: 'views',
       class: 'Array',
-      of: 'foam.mlang.Expressions',
+      of: 'foam.u2.crunch.PermissionSelection',
       factory: function() {
         var self = this;
         this.permissionDAO.select(this.PROJECTION(this.Permission.ID))
