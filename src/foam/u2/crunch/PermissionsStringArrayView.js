@@ -32,7 +32,8 @@ foam.CLASS({
         type: 'search',
         placeholder: 'capability search',
         onKey: true
-      }
+      },
+      readVisibility: foam.u2.DisplayMode.RW,//would like it to be accessible even in DAOSummaryView to serch for permissions, but is there any legit way to do that?
     },
     {
       name: 'views',
