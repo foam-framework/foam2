@@ -209,7 +209,7 @@ foam.LIB({
         return cls;
       };
       let l = global.localStorage && global.localStorage.getItem('localeLanguage');
-      if ( l !== undefined ) foam.locale = l;
+      foam.locale = l || 'en';
     },
 
     /** Start second phase of bootstrap process. */

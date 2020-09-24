@@ -5,6 +5,7 @@ p({
   "serviceScript":"""
     mdao = new foam.dao.MDAO(foam.nanos.cron.Cron.getOwnClassInfo());
     mdao.addIndex(new foam.core.PropertyInfo[] {foam.nanos.cron.Cron.LAST_RUN});
+    mdao.addIndex(new foam.core.PropertyInfo[] {foam.nanos.cron.Cron.ENABLED});
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.cron.Cron.getOwnClassInfo())
       .setMdao(mdao)
