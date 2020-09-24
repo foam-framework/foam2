@@ -125,39 +125,31 @@ foam.CLASS({
       }
     },
     function onAllSelectedFunction(_, isSelected) {
+      var filteredPermissions = this.views.filter(v => v.show && v.permission !== 'Select All').map(v => v.permission);
+      var newArr = [];
       if ( ! isSelected ) {
-        var filteredPermissions = this.views.filter(v => v.show && v.permission !== 'Select All').map(v => v.permission);
         if ( this.allPermissions.length != filteredPermissions.length ) {
-          var newArr = []; 
           for ( var p of this.data ) {
             if ( ! filteredPermissions.includes(p) ) {
               newArr.push(p);
             }
           }
-          this.data = newArr;
-        } else
-          this.data = [];
-      }
-      if ( isSelected ) {
-        var filteredPermissions = this.views.filter(v => v.show && v.permission !== 'Select All').map(v => v.permission);
+        }
+      } else {
         if ( filteredPermissions.length < this.data.length ) {
-          var isJustFilteredWithoutUnselect = true;
-          for ( var p of filteredPermissions ) {
-            if ( ! this.data.includes(p) ) {
-              isJustFilteredWithoutUnselect = false;
-              break;
-            }
-            return;
+          for ( var p of this.data ) {
+            newArr.push(p);
+          }
+          
+        }
+        for ( var p of filteredPermissions ) {
+          if ( ! newArr.includes(p) ) {
+            newArr.push(p);
           }
         }
-        if ( filteredPermissions.length === this.data.length )
-          return;
-        var newArr = []; 
-        for ( var p of filteredPermissions ) {
-          newArr.push(p);
-        }
-        this.data = newArr;
       }
+      this.data = newArr;
+
     },
     function isPermissionSelected(permission) {
       return this.data.includes(permission);
@@ -169,8 +161,8 @@ foam.CLASS({
           if ( ! this.data.includes(p) ) {
             return false;
           }
-          return true;
         }
+        return true;
       }
       return this.data.length === filteredPermissions.length;
     },
