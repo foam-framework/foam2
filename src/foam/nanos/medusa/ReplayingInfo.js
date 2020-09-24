@@ -129,20 +129,20 @@ foam.CLASS({
         return Math.round(tps);
       }
     },
-    {
-      name: 'tps',
-      class: 'String',
-      expression: function(index, replayIndex, endTime) {
-        var tps = 0;
-        if ( endTime ) {
-          let now = new Date();
-          let end = endTime || new Date();
-          let tm = (now.getTime() - end.getTime()) / 1000;
-          tps = (index - replayIndex) / tm;
-        }
-        return Math.round(tps);
-      }
-    },
+    // {
+    //   name: 'tps',
+    //   class: 'String',
+    //   expression: function(index, replayIndex, endTime) {
+    //     var tps = 0;
+    //     if ( endTime ) {
+    //       let now = new Date();
+    //       let end = endTime || new Date();
+    //       let tm = (now.getTime() - end.getTime()) / 1000;
+    //       tps = (index - replayIndex) / tm;
+    //     }
+    //     return Math.round(tps);
+    //   }
+    // },
     {
       name: 'replayNodes',
       class: 'Map',

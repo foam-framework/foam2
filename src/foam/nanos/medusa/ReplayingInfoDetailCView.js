@@ -41,6 +41,14 @@ foam.CLASS({
     {
       name: 'labelOffset',
       value: 15
+    },
+    {
+      name: 'openTime',
+      class: 'Long'
+    },
+    {
+      name: 'openIndex',
+      class: 'Long'
     }
   ],
 
@@ -51,6 +59,9 @@ foam.CLASS({
       this.borderWidth = 5;
       this.border = 'blue';
       this.color = 'white';
+
+      this.openTime = Date.now();
+      this.openIndex = this.config.replayingInfo.index;
 
 //       var view = foam.graphics.ViewCView.create({
 // //        innerView: this.config.replayingInfo.toE(null, this)
@@ -77,37 +88,63 @@ foam.CLASS({
       label.text$ = this.config$.map(function(c) { return 'Index: '+c.replayingInfo.index; });
       this.add(label);
 
+      if ( this.config.replayingInfo.replaying ) {
+        label = this.makeLabel();
+        label.text$ = this.config$.map(function(c) { return 'Replay: '+c.replayingInfo.replayIndex; });
+        this.add(label);
+
+        label = this.makeLabel();
+        label.text$ = this.config$.map(function(c) {
+          let end = c.replayingInfo.endTime || new Date();
+          let delta = end.getTime() - c.replayingInfo.startTime.getTime();
+          let duration = foam.core.Duration.duration(delta);
+          return 'Elapsed: '+duration;
+        });
+        this.add(label);
+
+        label = this.makeLabel();
+        label.text$ = this.config$.map(function(c) { let f = (c.replayingInfo.percentComplete * 100).toFixed(2); return 'Complete: '+f+'%'; });
+        this.add(label);
+
+        label = this.makeLabel();
+        label.text$ = this.config$.map(function(c) { return 'Remaining: '+c.replayingInfo.timeRemaining; });
+        this.add(label);
+
+        label = this.makeLabel();
+        label.text$ = this.config$.map(function(c) { return 'Replay TPS: '+c.replayingInfo.replayTps; });
+        this.add(label);
+      }
+
       label = this.makeLabel();
-      label.text$ = this.config$.map(function(c) { return 'Replay: '+c.replayingInfo.replayIndex; });
+// label.text$ = this.config$.map(function(c) { return 'TPS: '+c.replayingInfo.tps; });
+      label.text$ = this.config$.map(function(c) {
+        let endTime = Date.now();
+        let tm = (endTime - this.openTime) / 1000;
+        let diff = c.replayingInfo.index - this.openIndex;
+        if ( diff > 0 ) {
+          return 'TPS: '+ (diff / tm).toFixed(0);
+        }
+        return 'TPS: N/A';
+      }.bind(this));
       this.add(label);
 
       label = this.makeLabel();
       label.text$ = this.config$.map(function(c) {
-        let end = c.replayingInfo.endTime || new Date();
-        let delta = end.getTime() - c.replayingInfo.startTime.getTime();
+        let now = Date.now();
+        let delta = now - c.replayingInfo.lastModified.getTime();
         let duration = foam.core.Duration.duration(delta);
-        return 'Elapsed: '+duration;
+        return 'Idle: '+duration;
       });
       this.add(label);
 
       label = this.makeLabel();
-      label.text$ = this.config$.map(function(c) { let f = (c.replayingInfo.percentComplete * 100).toFixed(2); return 'Complete: '+f+'%'; });
-      this.add(label);
-
-      label = this.makeLabel();
-      label.text$ = this.config$.map(function(c) { return 'Remaining: '+c.replayingInfo.timeRemaining; });
-      this.add(label);
-
-      label = this.makeLabel();
-      label.text$ = this.config$.map(function(c) { return 'Replay TPS: '+c.replayingInfo.replayTps; });
-      this.add(label);
-
-      label = this.makeLabel();
-      label.text$ = this.config$.map(function(c) { return 'TPS: '+c.replayingInfo.tps; });
-      this.add(label);
-
-      label = this.makeLabel();
-      label.text$ = this.config$.map(function(c) { return 'Last Error: '+c.errorMessage; });
+      label.text$ = this.config$.map(function(c) {
+        if ( c.errorMessage && c.errorMessage.length > 0 ) {
+          return 'Error: '+c.errorMessage;
+        } else {
+          return '';
+        }
+      });
       this.add(label);
     },
     {

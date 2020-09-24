@@ -86,19 +86,19 @@ foam.CLASS({
       name: 'put_',
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
-      Object id = entry.getProperty("id");
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
       // getLogger().debug("put", replaying.getIndex(), replaying.getReplayIndex(), entry.toSummary(), "from", entry.getNode());
       PM pm = null;
       try {
-        MedusaEntry existing = (MedusaEntry) getDelegate().find_(x, id);
+        MedusaEntry existing = (MedusaEntry) getDelegate().find_(x, entry.getId());
         if ( existing != null &&
              existing.getPromoted() ) {
           // getLogger().debug("put", replaying.getIndex(), entry.toSummary(), "from", entry.getNode(), "discarding");
           return existing;
         }
-        synchronized ( id.toString().intern() ) {
-          existing = (MedusaEntry) getDelegate().find_(x, id);
+
+        synchronized ( entry.getId().toString().intern() ) {
+          existing = (MedusaEntry) getDelegate().find_(x, entry.getId());
           if ( existing != null ) {
             if ( existing.getPromoted() ) {
               // getLogger().debug("put", replaying.getIndex(), entry.toSummary(), "from", entry.getNode(), "discarding", "in-lock");
@@ -106,7 +106,6 @@ foam.CLASS({
             }
             // getLogger().debug("put", entry.toSummary(), "from", entry.getNode(), "existing");
           } else {
-             // getLogger().debug("put", entry.toSummary(), "from", entry.getNode(), "new");
              existing = entry;
           }
           pm = PM.create(x, this.getClass().getSimpleName(), "put");
@@ -132,22 +131,22 @@ foam.CLASS({
             }
             entry.setConsensusCount(nodes.size());
             entry.setConsensusNodes(nodes.keySet().toArray(new String[0]));
-            MedusaEntry.CONSENSUS_HASHES.clear(entry);
-            // entry = (MedusaEntry) getDelegate().put_(x, entry).fclone();
+            entry = (MedusaEntry) getDelegate().put_(x, entry);
             entry = promote(x, entry);
           } else {
             if ( existing.isFrozen() ) {
               existing = (MedusaEntry) existing.fclone();
             }
             existing.setConsensusHashes(hashes);
-           if ( nodes.size() > existing.getConsensusCount() ) {
+            if ( nodes.size() > existing.getConsensusCount() ) {
               existing.setConsensusCount(nodes.size());
               existing.setConsensusNodes(nodes.keySet().toArray(new String[0]));
             }
             existing = (MedusaEntry) getDelegate().put_(x, existing);
           }
         }
-        if ( ! entry.getPromoted() ) {
+
+       if ( ! entry.getPromoted() ) {
           synchronized ( promoterLock_ ) {
             promoterLock_.notify();
           }
@@ -174,12 +173,22 @@ foam.CLASS({
       type: 'foam.nanos.medusa.MedusaEntry',
       javaCode: `
       // NOTE: implementation expects caller to lock on entry index
-
+      // getLogger().debug("promote", entry.getId());
       PM pm = PM.create(x, this.getClass().getSimpleName(), "promote");
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
       DaggerService dagger = (DaggerService) x.get("daggerService");
-      // getLogger().debug("promote", entry.getIndex(), replaying.getIndex());
       try {
+        entry = (MedusaEntry) getDelegate().find_(x, entry.getId());
+        if ( entry.getPromoted() ) {
+          return entry;
+        }
+        if ( entry.isFrozen() ) {
+          entry = (MedusaEntry) entry.fclone();
+        }
+
+        // REVIEW: partial cleanup.
+        MedusaEntry.CONSENSUS_HASHES.clear(entry);
+
         dagger.verify(x, entry);
         dagger.updateLinks(x, entry);
         // test to save a synchronized call
@@ -205,6 +214,10 @@ foam.CLASS({
           getLogger().info("promote", "replayComplete", replaying.getIndex());
           ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
         }
+
+        // TODO: additional cleanup
+        //MedusaEntry.DATA.clear(entry);
+        //entry = (MedusaEntry) getDelegate().put_(x, entry);
       } finally {
         pm.log(x);
       }
@@ -242,7 +255,7 @@ foam.CLASS({
           MedusaEntry entry = null;
           try {
             Long nextIndex = replaying.getIndex() + 1;
-            // getLogger().debug("promoter", "next", nextIndex);
+            getLogger().debug("promoter", "next", nextIndex);
             MedusaEntry next = (MedusaEntry) getDelegate().find_(x, nextIndex);
             if ( next != null ) {
               synchronized ( next.getId().toString().intern() ) {
@@ -257,13 +270,6 @@ foam.CLASS({
                         entry = e;
                         break;
                       }
-                      if ( entry.isFrozen() ) {
-                        entry = (MedusaEntry) entry.fclone();
-                      }
-                      entry.setConsensusCount(nodes.size());
-                      entry.setConsensusNodes(nodes.keySet().toArray(new String[0]));
-                      MedusaEntry.CONSENSUS_HASHES.clear(entry);
-                      // entry = (MedusaEntry) getDelegate().put_(x, entry).fclone();
                       entry = promote(x, entry);
                     } else {
                       getLogger().error("promoter", next, "Multiple consensus detected", next.toSummary(), next.getConsensusCount(), support.getNodeQuorum());

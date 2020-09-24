@@ -69,7 +69,7 @@ foam.CLASS({
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
       MedusaEntry old = (MedusaEntry) getDelegate().find_(x, entry.getId());
-      entry = (MedusaEntry) getDelegate().put_(x, entry);
+      entry = (MedusaEntry) getDelegate().put_(x, entry).fclone();
 
       if ( support.getStandAlone() ) {
         if ( old == null ) {
@@ -77,7 +77,6 @@ foam.CLASS({
         }
         return entry;
       }
-
 
       if ( myConfig.getType() == MedusaType.NODE ) {
         entry = (MedusaEntry) submit(x, entry, DOP.PUT);

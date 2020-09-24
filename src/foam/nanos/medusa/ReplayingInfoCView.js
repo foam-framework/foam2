@@ -74,7 +74,8 @@ foam.CLASS({
                  c.replayingInfo.replayIndex > 0 ) {
               return c.replayingInfo.timeRemaining;
             }
-            return c.replayingInfo && c.replayingInfo.tps > 0 && c.replayingInfo.tps;
+            //return c.replayingInfo && c.replayingInfo.tps > 0 && c.replayingInfo.tps;
+            return '';
           })
         });
       }

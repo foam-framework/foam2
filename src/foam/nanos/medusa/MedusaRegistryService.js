@@ -145,9 +145,9 @@ foam.CLASS({
       }
       PM pm = new PM(this.getClass().getSimpleName(), "wait");
       try {
-        getLogger().debug("wait", id);
+        // getLogger().debug("wait", id);
         latch.await();
-        getLogger().debug("wake", id);
+        // getLogger().debug("wake", id);
         return (FObject) getEntries().get(id);
       } catch (InterruptedException e) {
         // nop
@@ -188,7 +188,7 @@ foam.CLASS({
       if ( e == null ) {
         getEntries().put(id, entry);
       }
-      getLogger().debug("notify", id);
+      // getLogger().debug("notify", id);
       latch.countDown();
       `
     },
