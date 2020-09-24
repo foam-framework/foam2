@@ -626,8 +626,10 @@ foam.CLASS({
     {
       name: 'put',
       code: function(obj, s) {
-        if ( this.cond.f(obj) ) this.a.put(obj, s)
-        else this.b.put(obj, s);
+        if ( this.cond.f(obj) )
+          this.a.put(obj, s)
+        else
+          this.b.put(obj, s);
       }
     }
   ]
@@ -1482,6 +1484,23 @@ foam.CLASS({
       name: 'valueSet_',
       hidden: true
     }
+  ],
+
+  methods: [
+    {
+      name: 'toString',
+      code: function() {
+        return foam.String.constantize(this.cls_.name) + '(' +
+            this.arg1.toString() + ', ' +
+            this.arg2.toString() + ')';
+      },
+      javaCode: `
+        StringBuilder b = new StringBuilder();
+        Object[] a = (Object[]) getArg2().f(null);
+        for ( int i = 0 ; i < a.length ; i++ ) b.append(a[i]);
+        return String.format("%s(%s, %s)", getClass().getSimpleName(), getArg1().toString(), b.toString());
+      `
+    }
   ]
 });
 
@@ -1629,8 +1648,9 @@ return false
         Object[] arr = ((ArrayConstant) getArg2()).getValue();
 
         if ( arr.length == 0 ) {
-          return new False();
-        } else if ( arr.length == 1 ) {
+          return foam.mlang.MLang.FALSE;
+        }
+        if ( arr.length == 1 ) {
           return new Eq.Builder(getX())
             .setArg1(getArg1())
             .setArg2(new Constant(arr[0]))
