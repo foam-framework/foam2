@@ -44,7 +44,9 @@ foam.CLASS({
       factory: function () {
         if ( ! this.of ) return null;
 
-        return this.of.create({}, this);
+        return this.of.getAxiomByName('capability') ?
+          this.of.create({ capability: this.capability }, this) :
+          this.of.create({}, this);
       }
     },
     {
