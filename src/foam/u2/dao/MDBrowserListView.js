@@ -8,20 +8,21 @@ foam.CLASS({
   package: 'foam.u2.dao',
   name: 'MDBrowserListView',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.comics.SearchMode',
     'foam.comics.v2.DAOControllerConfig',
     'foam.log.LogLevel',
     'foam.u2.ActionView',
+    'foam.u2.ToolbarAction',
     'foam.u2.dialog.Popup',
     'foam.u2.layout.Cols',
-    'foam.u2.layout.Rows',
     'foam.u2.layout.MDSearchView',
+    'foam.u2.layout.MDToolbarView',
+    'foam.u2.layout.Rows',
     'foam.u2.view.ScrollTableView',
     'foam.u2.view.SimpleSearch',
-    'foam.u2.view.TabChoiceView',
-    'foam.u2.layout.MDToolbarView',
-    'foam.u2.ToolbarAction'
+    'foam.u2.view.TabChoiceView'
   ],
 
   implements: [
@@ -82,7 +83,7 @@ foam.CLASS({
     }
     ^ .back-btn {
       background-color: blue;
-    padding: 1.5rem;
+      padding: 1.5rem;
     }
 
     ^ .back-btn i {
@@ -92,23 +93,23 @@ foam.CLASS({
       color: white;
     }
 
-    .boxless-for-drag-drop {
+    ^ .boxless-for-drag-drop {
       background-color: unset;
       border: unset;
     }
 
-    .prof-icon {
+    ^ .prof-icon {
       height: 6rem;
       border-radius: 50%;
     }
 
-    .logout {
+    ^ .logout {
       font-size: 2rem;
       color: red;
       padding-left: 8rem;
     }
 
-    .no-records {
+    ^ .no-records {
       font-size: 3rem;
     }
   `,
@@ -206,13 +207,11 @@ foam.CLASS({
     'selection',
     {
       class: 'Boolean',
-      name: 'isMenuOpen',
-      value: false
+      name: 'isMenuOpen'
     },
     {
       class: 'Boolean',
-      name: 'isSearchActive',
-      value: false
+      name: 'isSearchActive'
     }
   ],
   actions: [
@@ -250,7 +249,7 @@ foam.CLASS({
           class: 'foam.u2.layout.MDCreateBrowserView',
           data: this.data.of.create({ mode: 'create'}, this),
           of: this.data.of
-        }, this.__subContext__);
+        }, this);
       }
     }
   ],
@@ -297,7 +296,7 @@ foam.CLASS({
         config: this.config,
         of: this.config.of,
         dao: this.data
-      });
+      }, this);
     },
 
     function resetActions() {

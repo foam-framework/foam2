@@ -16,10 +16,6 @@ foam.CLASS({
     'foam.u2.layout.MDProfileImageView'
   ],
 
-  axioms: [
-    foam.pattern.Faceted.create()
-  ],
-
   css: `
     ^ {
       display: flex;

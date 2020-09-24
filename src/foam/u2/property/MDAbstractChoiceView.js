@@ -202,15 +202,18 @@ foam.CLASS({
         if ( this.choices[i][1].toLowerCase() === name )
           return this.choices[i];
     },
+
     function valueToIndex(value) {
       for ( var i = 0 ; i < this.choices.length ; i++ )
         if ( this.choices[i][0] == value )
           return i;
     },
+
     function commit() {
       if ( this.useSelection && this.choices[this.index] )
         this.choice = this.choices[this.index];
     },
+
     function fromProperty(prop) {
       this.SUPER(prop);
       this.prop = prop;

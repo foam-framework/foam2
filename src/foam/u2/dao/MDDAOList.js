@@ -38,7 +38,7 @@ foam.CLASS({
         select(this.data$proxy, function(obj) {
           return foam.u2.ViewSpec.createView(this.rowView, { data: obj }, this, this.__subSubContext__)
             .on('click', function() {
-              if ( !obj ) {
+              if ( ! obj ) {
                 dao.find(val[0]).then(function(v) {
                 obj = v;
                 self.dblclick && self.dblclick(obj);

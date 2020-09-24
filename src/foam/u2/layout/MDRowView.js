@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'MDRowView',
   extends: 'foam.u2.View',
 
+  documentation: `
+    Container view for CitationView. Defines main layout of a single row in a list
+  `,
+
   requires: [
     'foam.u2.CitationView'
   ],

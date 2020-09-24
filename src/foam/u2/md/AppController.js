@@ -6,17 +6,13 @@
 
 foam.CLASS({
   package: 'foam.u2.md',
-  name: 'Controller',
+  name: 'AppController',
   extends: 'net.nanopay.ui.Controller',
 
   requires: [
-    'foam.u2.dao.MDBrowserListView',
-    'foam.nanos.mobile.ui.AppStyles',
     'foam.core.Latch',
-    'net.nanopay.ui.style.AppStyles',
-    'net.nanopay.sme.ui.SMEStyles',
-    'net.nanopay.invoice.ui.style.InvoiceStyles',
-    'net.nanopay.cico.ui.bankAccount.form.BankPadAuthorization',
+    'foam.nanos.mobile.ui.AppStyles',
+    'foam.u2.dao.MDBrowserListView',
     'foam.u2.layout.MDLoginView'
   ],
 
@@ -99,15 +95,15 @@ foam.CLASS({
       await this.fetchTheme();
 
       this.client.nSpecDAO.find('appConfig').then(config => {
-        this.appConfig.copyFrom(config.service);
+      this.appConfig.copyFrom(config.service);
 
-        this.__subContext__.register(this.MDBrowserListView, 'foam.comics.v2.DAOBrowseControllerView');
-        this.__subContext__.register(this.MDBrowserListView, 'foam.comics.BrowserView');
-        this.__subContext__.register(this.MDLoginView, 'foam.u2.view.LoginView');
+      this.__subContext__.register(this.MDBrowserListView, 'foam.comics.v2.DAOBrowseControllerView');
+      this.__subContext__.register(this.MDBrowserListView, 'foam.comics.BrowserView');
+      this.__subContext__.register(this.MDLoginView, 'foam.u2.view.LoginView');
 
-        this.themeInstalled.resolve();
+      this.themeInstalled.resolve();
+    });
 
-      });
       await this.themeInstalled;
         this
           .addClass(this.myClass())

@@ -42,7 +42,7 @@ foam.CLASS({
       width: 100%;
     }
 
-    toolbar {
+    ^ toolbar {
       display: flex;
       align-items: center;
       height: 100%;

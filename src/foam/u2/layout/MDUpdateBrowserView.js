@@ -49,7 +49,7 @@ foam.CLASS({
     },
     {
       class: 'foam.u2.ViewSpecWithJava',
-      name: 'viewView',
+      name: 'detailView',
       expression: function() {
         return foam.u2.detail.MDDetailView;
       }
@@ -127,7 +127,7 @@ foam.CLASS({
           .endContext();
         this
           .addClass(this.myClass())
-          .tag(this.viewView, { data: this.data })
+          .tag(this.detailView, { data: this.data })
         this.add(this.DELETE);
     }
   ],

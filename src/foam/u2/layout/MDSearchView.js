@@ -52,8 +52,7 @@ foam.CLASS({
           finalPredicate$: this.data$
         });
       }
-    },
-    'searchtest'
+    }
   ],
 
   methods: [

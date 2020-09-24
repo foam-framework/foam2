@@ -109,6 +109,7 @@ foam.CLASS({
     ^ .foam-u2-view-EnumView {
     width: 100%;}
   `,
+
   properties: [
     {
       name: 'title',
@@ -156,15 +157,16 @@ foam.CLASS({
 
       this.add(this.slot(function(of, properties, actions) {
         if ( ! of ) return '';
-          this.
-            addClass(this.myClass()).
-            forEach(properties, function(p) {
-              if ( ! foam.dao.OneToManyRelationshipProperty.isInstance(p) &&
-                ! foam.dao.ManyToManyRelationshipProperty.isInstance(p) ) {
-                this.start().addClass('property-item').add(p).end();
-              }
-            })
-          }));
+        this.
+          addClass(this.myClass()).
+          forEach(properties, function(p) {
+            if ( ! foam.dao.OneToManyRelationshipProperty.isInstance(p) &&
+              ! foam.dao.ManyToManyRelationshipProperty.isInstance(p) ) {
+              this.start().addClass('property-item').add(p).end();
+            }
+          })
+        })
+      );
     }
   ]
 });
