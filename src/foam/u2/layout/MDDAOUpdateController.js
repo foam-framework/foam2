@@ -7,7 +7,7 @@
 
 foam.CLASS({
   package: 'foam.u2.layout',
-  name: 'MDUpdateBrowserView',
+  name: 'MDDAOUpdateController',
   extends: 'foam.u2.View',
 
   documentation: 'MD-styled update browser',

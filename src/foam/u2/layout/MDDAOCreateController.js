@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.u2.layout',
-  name: 'MDCreateBrowserView',
+  name: 'MDDAOCreateController',
   extends: 'foam.u2.View',
 
   documentation: 'MD-styled Create Browser',

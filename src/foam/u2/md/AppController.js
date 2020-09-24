@@ -11,7 +11,7 @@ foam.CLASS({
 
   requires: [
     'foam.core.Latch',
-    'foam.u2.dao.MDBrowserListView',
+    'foam.u2.layout.MDDAOController',
     'foam.u2.layout.MDLoginView'
   ],
 
@@ -108,8 +108,8 @@ foam.CLASS({
       this.client.nSpecDAO.find('appConfig').then(config => {
       this.appConfig.copyFrom(config.service);
 
-      this.__subContext__.register(this.MDBrowserListView, 'foam.comics.v2.DAOBrowseControllerView');
-      this.__subContext__.register(this.MDBrowserListView, 'foam.comics.BrowserView');
+      this.__subContext__.register(this.MDDAOController, 'foam.comics.v2.DAOBrowseControllerView');
+      this.__subContext__.register(this.MDDAOController, 'foam.comics.BrowserView');
       this.__subContext__.register(this.MDLoginView, 'foam.u2.view.LoginView');
 
       this.themeInstalled.resolve();

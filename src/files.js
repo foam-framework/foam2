@@ -888,8 +888,8 @@ FOAM_FILES([
   { name: "foam/nanos/pool/ThreadPoolAgency" },
 
   // md
-  { name: "foam/u2/layout/MDUpdateBrowserView" },
-  { name: "foam/u2/layout/MDCreateBrowserView" },
+  { name: "foam/u2/layout/MDDAOUpdateController" },
+  { name: "foam/u2/layout/MDDAOCreateController" },
   { name: "foam/u2/md/CheckBox", flags: ['web'] },
   { name: "foam/u2/property/MDTextField", flags: ['web'] },
   { name: "foam/u2/property/MDCalendar", flags: ['web'] },
@@ -910,7 +910,7 @@ FOAM_FILES([
   { name: "foam/u2/dao/MDDAOList", flags: ['web'] },
   { name: "foam/u2/mcw/DetailPropertyView", flags: ['web'] },
   { name: 'foam/u2/layout/MDRowView', flags: ['web']},
-  { name: 'foam/u2/dao/MDBrowserListView', flags: ['web']},
+  { name: 'foam/u2/layout/MDDAOController', flags: ['web']},
   { name: "foam/u2/md/AppController" },
   { name: "foam/u2/md/OverlayDropdown", flags: ['web'] },
   { name: "foam/u2/layout/MDLoginView", flags: ['web'] },

@@ -5,8 +5,8 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2.dao',
-  name: 'MDBrowserListView',
+  package: 'foam.u2.layout',
+  name: 'MDDAOController',
   extends: 'foam.u2.View',
 
   requires: [
@@ -246,7 +246,7 @@ foam.CLASS({
       code: function() {
         if ( ! this.stack ) return;
         this.stack.push({
-          class: 'foam.u2.layout.MDCreateBrowserView',
+          class: 'foam.u2.layout.MDDAOCreateController',
           data: this.data.of.create({ mode: 'create'}, this),
           of: this.data.of
         }, this);
@@ -291,7 +291,7 @@ foam.CLASS({
     function dblclick(obj) {
       if ( ! this.stack ) return;
       this.stack.push({
-        class: 'foam.u2.layout.MDUpdateBrowserView',
+        class: 'foam.u2.layout.MDDAOUpdateController',
         data: obj,
         config: this.config,
         of: this.config.of,
@@ -313,7 +313,7 @@ foam.CLASS({
     function onCreate() {
       if ( ! this.stack ) return;
       this.stack.push({
-        class: 'foam.u2.layout.MDCreateBrowserView',
+        class: 'foam.u2.layout.MDDAOCreateController',
         data: this.data.of.create({ mode: 'create'}, this),
         of: this.data.of,
         dao: this.data
