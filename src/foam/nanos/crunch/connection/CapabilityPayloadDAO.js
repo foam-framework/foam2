@@ -50,6 +50,10 @@ foam.CLASS({
     to fetch the filled out data.
   `,
 
+  messages: [
+    { name: 'PENDING_APPROVAL', message: 'Capability pending approval.' }
+  ],
+
   axioms: [
     {
       name: 'javaExtras',
@@ -201,7 +205,7 @@ foam.CLASS({
                   // Check for pending approvals on data that passes validation
                   UserCapabilityJunction ucj = node.getUcj();
                   if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.PENDING ) {
-                    validationErrors.put(key, "Pending approval");
+                    validationErrors.put(key, PENDING_APPROVAL);
                   }
                 }
                 catch (IllegalStateException | IllegalArgumentException ie) {
