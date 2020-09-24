@@ -224,6 +224,7 @@ foam.CLASS({
     .foam-u2-crunch-PermissionSelection-tooltip {
       position: relative;
       visibility: hidden;
+      border-radius: 4px;
       color: white;
       background: #999;
       max-height: 80px;
