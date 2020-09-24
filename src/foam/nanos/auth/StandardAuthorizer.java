@@ -28,7 +28,7 @@ public class StandardAuthorizer implements Authorizer {
   }
 
   public String createPermission(String op, Object id) {
-    return permissionPrefix_ + "." + op + "." + id;
+    return permissionPrefix_ + "." + op + "." + id.toString();
   }
 
   public void authorizeOnCreate(X x, FObject obj) throws AuthorizationException {
