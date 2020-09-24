@@ -25,8 +25,6 @@ foam.CLASS({
     }
 
     img {
-//      width: inherit;
-//      height: inherit;
       max-width: 100%;
       max-height: 100%;
     }
@@ -69,15 +67,18 @@ foam.CLASS({
           image = document.getElementsByClassName('file-image')[0],
           div = document.getElementsByClassName('file-image-div')[0],
           url = '';
-      if ( this.data[0] ) {
-          url = URL.createObjectURL(this.data[0].data.blob);
-      }
 
       iFrame.style.visibility = 'hidden';
       div.style.visibility = 'hidden';
       div.style.display = 'none';
 
-      if (this.data[0].mimeType !== "application/pdf") {
+      if ( ! this.data[0] ) {
+        return;
+      }
+
+      url = URL.createObjectURL(this.data[this.data.length - 1].data.blob);
+
+      if (this.data[this.data.length - 1].mimeType !== "application/pdf") {
         image.src = url;
         div.style.visibility = 'visible';
         div.style.display = 'block';
