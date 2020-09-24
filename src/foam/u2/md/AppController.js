@@ -7,11 +7,10 @@
 foam.CLASS({
   package: 'foam.u2.md',
   name: 'AppController',
-  extends: 'net.nanopay.ui.Controller',
+  extends: 'foam.nanos.controller.ApplicationController',
 
   requires: [
     'foam.core.Latch',
-    'foam.nanos.mobile.ui.AppStyles',
     'foam.u2.dao.MDBrowserListView',
     'foam.u2.layout.MDLoginView'
   ],
@@ -85,6 +84,18 @@ foam.CLASS({
     }
   `,
 
+  properties: [
+    {
+      class: 'foam.core.FObjectProperty',
+      of: 'foam.core.Latch',
+      name: 'themeInstalled',
+      documentation: 'A latch used to wait on theme installation.',
+      factory: function() {
+        return this.Latch.create();
+      }
+    }
+  ],
+
   methods: [
     async function initE() {
 
@@ -104,17 +115,18 @@ foam.CLASS({
       this.themeInstalled.resolve();
     });
 
-      await this.themeInstalled;
-        this
-          .addClass(this.myClass())
-          .start()
-            .addClass('stack-wrapper')
-            .enableClass('login-stack', this.loginSuccess$.map( ls => ! ls ))
-            .tag(this.StackView.create({
-                data: this.stack,
-                showActions: false
-              }))
-          .end()
+    await this.themeInstalled;
+
+    this
+      .addClass(this.myClass())
+      .start()
+        .addClass('stack-wrapper')
+        .enableClass('login-stack', this.loginSuccess$.map( ls => ! ls ))
+        .tag(this.StackView.create({
+            data: this.stack,
+            showActions: false
+          }))
+      .end()
     }
   ]
 });

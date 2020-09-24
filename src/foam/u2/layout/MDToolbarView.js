@@ -26,7 +26,6 @@ foam.CLASS({
     function initE() {
       this.addClass(this.myClass())
       this
-      .show(this.loginSuccess$)
         .start('toolbar')
           .start('div').add(this.leftAction$).addClass('left').end()
           .start('div').show(this.title$).tag(this.title$).addClass('title').end()

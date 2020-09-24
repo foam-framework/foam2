@@ -23,7 +23,6 @@ foam.CLASS({
   documentation: 'Abstract Checkbox View for other views to extend',
 
   css: `
-
     ^label {
       color: #444;
       flex-grow: 1;
