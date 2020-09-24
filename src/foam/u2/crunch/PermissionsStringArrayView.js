@@ -214,6 +214,9 @@ foam.CLASS({
       class: 'String'
     },
     {
+      name: 'description'
+    },
+    {
       name: 'isSelected',
       class: 'Boolean',
       view: {
@@ -221,7 +224,6 @@ foam.CLASS({
         showLabel: false
       },
       postSet: function() {
-        this.isSelectedFromUI = true;
         if ( ( this.isSelected && ! this.isSelectedPermissionsContainThisPermission(this.permission) ) || (  ! this.isSelected && this.isSelectedPermissionsContainThisPermission(this.permission) ) ) {
           this.onSelect(this.permission, this.isSelected);
         }
