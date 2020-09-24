@@ -114,22 +114,19 @@ foam.CLASS({
       });
     },
     function onSelectFunction(permission, isSelected) {
+      var newArr =[];
       if ( isSelected ) {
-        var newArr =[];
         this.data.forEach(p => {
           newArr.push(p);
         });
         newArr.push(permission);
-        this.data = newArr;
-      }
-      if ( ! isSelected ) {
-        var newArr = [];
+      } else {
         this.data.forEach(p => {
           if ( p !== permission )
             newArr.push(p);
         });
-        this.data = newArr;
       }
+      this.data = newArr;
     },
     function onAllSelectedFunction(_, isSelected) {
       var filteredPermissions = this.views.filter(v => v.show && v.permission !== 'Select All').map(v => v.permission);
