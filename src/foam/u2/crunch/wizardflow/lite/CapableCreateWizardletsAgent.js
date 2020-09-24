@@ -43,7 +43,7 @@ foam.CLASS({
         let addWizardletAtEnd = true;
 
         // If this is a MinMax capability, handle its prerequisites differently
-        if ( this.MinMaxCapability.isInstance(wizardlet) ) {
+        if ( this.MinMaxCapability.isInstance(capablePayload.capability) ) {
           handlePrereqsNormally = false;
           addWizardletAtEnd = false;
 

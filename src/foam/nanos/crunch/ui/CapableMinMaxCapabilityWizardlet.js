@@ -14,6 +14,12 @@ foam.CLASS({
     'payload?'
   ],
 
+  requires: [
+    'foam.u2.view.MultiChoiceView',
+    'foam.u2.view.CardSelectView',
+    'foam.nanos.crunch.CapabilityJunctionStatus'
+  ],
+
   properties: [
     {
       class: 'FObjectArray',
@@ -78,6 +84,8 @@ foam.CLASS({
     {
       name: 'adjustCapablePayloads',
       code: function(oldChoices, newChoices) {
+        var choiceWizardlets = this.choiceWizardlets;
+
         var selectedOldChoices = oldChoices.filter(choice => choice[2]);
         var selectedNewChoices = newChoices.filter(choice => choice[2]);
 
@@ -88,7 +96,7 @@ foam.CLASS({
 
           var { targetPayload } =  deselectedWizard;
 
-          this.capable.capablePayloads = this.capable.capablePayloads.filter(capablePayload !== targetPayload);
+          this.capable.capablePayloads = this.capable.capablePayloads.filter(capablePayload => capablePayload !== targetPayload);
 
         } else if (selectedOldChoices < selectedNewChoices ) {
 
