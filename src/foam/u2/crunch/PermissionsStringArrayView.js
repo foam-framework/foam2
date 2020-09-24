@@ -114,7 +114,7 @@ foam.CLASS({
       });
     },
     function onSelectFunction(permission, isSelected) {
-      if ( isSelected) {
+      if ( isSelected ) {
         var newArr =[];
         this.data.forEach(p => {
           newArr.push(p);
@@ -174,7 +174,7 @@ foam.CLASS({
       return this.data.length === filteredPermissions.length;
     },
     function onSearchChanged() {
-      this.show = ! this.search || this.search.length === 0 || this.permission.toLowerCase().includes(this.search.toLowerCase());
+      this.show = ! this.search || this.search.length === 0 || this.permission.toLowerCase().includes(this.search.toLowerCase() );
     },
     function onSearchChangedSelectAll() {
       this.stopOnSelect = true;
@@ -308,9 +308,9 @@ foam.CLASS({
       });
 
       this.selectedPermissions$.sub(function() {
-        if ( ! self.isSelected && self.isSelectedPermissionsContainThisPermission(self.permission)  )
+        if ( ! self.isSelected && self.isSelectedPermissionsContainThisPermission(self.permission) )
           self.isSelected = true;
-        else if ( self.isSelected && ! self.isSelectedPermissionsContainThisPermission(self.permission)) {
+        else if ( self.isSelected && ! self.isSelectedPermissionsContainThisPermission(self.permission) ) {
           self.isSelected = false;
         }
       });
@@ -327,7 +327,7 @@ foam.CLASS({
               .add(this.permission)
             .end()
             .start()
-              .show(this.permission && this.permission.length > 0)
+              .show( this.permission && this.permission.length > 0 )
               .addClass(this.myClass('tooltip'))
               .addClass(this.myClass('tooltiptext'))
               .add(this.permission)
