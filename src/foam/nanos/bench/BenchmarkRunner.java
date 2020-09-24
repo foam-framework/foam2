@@ -9,6 +9,7 @@ package foam.nanos.bench;
 import foam.core.ContextAgent;
 import foam.core.ContextAwareSupport;
 import foam.core.X;
+import foam.nanos.app.AppConfig;
 import foam.nanos.logger.Logger;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -147,8 +148,15 @@ public class BenchmarkRunner
   public void execute(final X x) {
     Logger logger = (Logger) x.get("logger");
     if ( logger != null ) {
-      logger.info(this.getClass().getSimpleName(), "execute", test_.getClass().getSimpleName());
+      logger = new foam.nanos.logger.StdoutLogger();
     }
+
+    AppConfig config = (AppConfig) x.get("appConfig");
+    if ( config.getMode() == foam.nanos.app.Mode.PRODUCTION ) {
+      logger.warning(this.getClass().getSimpleName(), "Script execution disabled in PRODUCTION");
+      return;
+    }
+    logger.info(this.getClass().getSimpleName(), "execute", test_.getClass().getSimpleName());
 
     int availableThreads = Runtime.getRuntime().availableProcessors();
     int run = 1;
