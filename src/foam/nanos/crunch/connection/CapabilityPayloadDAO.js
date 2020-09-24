@@ -23,6 +23,7 @@ foam.CLASS({
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.connection.CapabilityPayload',
     'foam.nanos.crunch.CrunchService',
     'foam.nanos.crunch.UserCapabilityJunction',
@@ -59,14 +60,14 @@ foam.CLASS({
             setDelegate(delegate);
           } 
 
-          private Map<String, FObject> walkGrantPath(List grantPath, X x) {
+          private Map<String, GrantPathNode> walkGrantPath(List grantPath, X x) {
             DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
             var capabilityDAO = (DAO) x.get("capabilityDAO");
             var userId = ((Subject)x.get("subject")).getRealUser().getId();
             var businessId = ((Subject)x.get("subject")).getUser().getId();
 
             // Collect all capabilities that belong to either the user or business
-            var capabilityDataMap = new HashMap<String, FObject>();
+            Map<String, UserCapabilityJunction> capabilityUcjMap = new HashMap<String, UserCapabilityJunction>();
             ((ArraySink) userCapabilityJunctionDAO.where(
               OR(
                 EQ(UserCapabilityJunction.SOURCE_ID, userId),
@@ -76,29 +77,35 @@ foam.CLASS({
               var ucj = (UserCapabilityJunction) item;
               var capability = (Capability) capabilityDAO.find(ucj.getTargetId());
               if ( capability != null )
-                capabilityDataMap.put(capability.getName(), ucj.getData());
+                capabilityUcjMap.put(capability.getName(), ucj);
             });
       
             int index = 0;
-            Map<String,FObject> capabilityDataObjects = new HashMap<>();
+            Map<String,GrantPathNode> capabilityGrantPath = new HashMap<>();
             
             while ( index < grantPath.size() )
             {
               Object item = grantPath.get(index++);
 
               if ( item instanceof Capability ) {
-                Capability cap = (Capability) item;
-                FObject capDataObject = null;
-                if ( cap.getOf() != null ){
+                Capability capability = (Capability) item;
+                UserCapabilityJunction ucj = capabilityUcjMap.get(capability.getName());
+                FObject data = null;
+                if ( capability.getOf() != null ){
                   try {
-                    capDataObject = capabilityDataMap.get(cap.getName());
-                    if ( capDataObject == null )
-                      capDataObject = (FObject) cap.getOf().newInstance();
+                    data = ( ucj != null ) ? ucj.getData() : null;
+                    if ( data == null )
+                      data = (FObject) capability.getOf().newInstance();
                   } catch (Exception e){
                     throw new RuntimeException(e);
                   }
                 }
-                capabilityDataObjects.put(cap.getName(), capDataObject);
+                GrantPathNode node = new GrantPathNode.Builder(x)
+                  .setCapability(capability)
+                  .setUcj(ucj)
+                  .setData(data)
+                  .build();
+                capabilityGrantPath.put(capability.getName(), node);
               }
               else if ( item instanceof List ) {
                 List list = (List) item;
@@ -108,7 +115,7 @@ foam.CLASS({
               }
             }
 
-            return capabilityDataObjects;
+            return capabilityGrantPath;
           }
         `);
       }
@@ -171,7 +178,7 @@ foam.CLASS({
         javaCode: `
           CrunchService crunchService = (CrunchService) x.get("crunchService");
           List grantPath = crunchService.getGrantPath(x, id);
-          Map<String,FObject> dataMap = walkGrantPath(grantPath, x);
+          Map<String,GrantPathNode> dataMap = walkGrantPath(grantPath, x);
 
           // Sorted maps for return data
           Map<String,FObject> dataObjects = new TreeMap<String,FObject>();
@@ -179,7 +186,8 @@ foam.CLASS({
           
           // Validate any of the existing data objects
           for ( var key : dataMap.keySet() ) {
-            FObject data = dataMap.get(key);
+            GrantPathNode node = dataMap.get(key);
+            FObject data = node.getData();
             
             // Only return the non-null data objects
             if ( data != null ) {
@@ -187,11 +195,17 @@ foam.CLASS({
 
               // Check to see if there are validation erros blocking granting these capabilities
               if ( data instanceof Validatable ) {
-                try { ((Validatable) data).validate(x); }
-                catch (IllegalStateException ise) {
-                  validationErrors.put(key, ise.getMessage());
-                } catch (IllegalArgumentException iae) {
-                  validationErrors.put(key, iae.getMessage());
+                try {
+                  ((Validatable) data).validate(x); 
+                  
+                  // Check for pending approvals on data that passes validation
+                  UserCapabilityJunction ucj = node.getUcj();
+                  if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.PENDING ) {
+                    validationErrors.put(key, "Pending approval");
+                  }
+                }
+                catch (IllegalStateException | IllegalArgumentException ie) {
+                  validationErrors.put(key, ie.getMessage());
                 } catch (Throwable t) {
                   Logger logger = (Logger) x.get("logger");
                   logger.warning("Unexpected exception validating " + key + ": ", t);
