@@ -340,7 +340,7 @@ foam.CLASS({
               .add(this.description)
             .end()
             .start()
-              .show(this.description && this.description.length > 0)
+              .show( this.description && this.description.length > 0 )
               .addClass(this.myClass('tooltip'))
               .addClass(this.myClass('center-tooltiptext'))
               .add(this.description)
