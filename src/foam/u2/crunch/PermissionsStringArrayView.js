@@ -134,9 +134,7 @@ foam.CLASS({
         this.data = newArr;
       }
     },
-    function onAllSelectedFunction(_, isSelected, isSelectedFromUI) {
-      if ( ! isSelectedFromUI )
-        return;
+    function onAllSelectedFunction(_, isSelected) {
       if ( ! isSelected ) {
         this.data = [];
       }
@@ -153,7 +151,7 @@ foam.CLASS({
         }
         if ( this.filteredPermissions.length === this.data.length )
           return;
-        var newArr = [];//how to know 
+        var newArr = []; 
         for ( var p of this.filteredPermissions ) {
           newArr.push(p);
         }
@@ -225,7 +223,7 @@ foam.CLASS({
       postSet: function() {
         this.isSelectedFromUI = true;
         if ( ( this.isSelected && ! this.isSelectedPermissionsContainThisPermission(this.permission) ) || (  ! this.isSelected && this.isSelectedPermissionsContainThisPermission(this.permission) ) ) {
-          this.onSelect(this.permission, this.isSelected, this.isSelectedFromUI);
+          this.onSelect(this.permission, this.isSelected);
         }
       },
       factory: function() {
@@ -236,29 +234,19 @@ foam.CLASS({
       name: 'selectedPermissions',
       // class: 'StringArray'
     },
-    {
-      name: 'isSelectedFromUI',
-      class: 'Boolean',
-      value: true
-    },
     'isSelectedPermissionsContainThisPermission',
     'onSelect',
-    'onSelectedPermissionsChangedFunction',
-    'skip'
   ],
   methods: [
     function initE() {
       this.SUPER();
       var self = this;
       this.selectedPermissions$.sub(function() {
-        self.isSelectedFromUI = false;
-        // if ( this.isSelectedFromUI ) {
-          if ( ! self.isSelected && self.isSelectedPermissionsContainThisPermission(self.permission)  )
-            self.isSelected = true;
-          else if ( self.isSelected && ! self.isSelectedPermissionsContainThisPermission(self.permission)) {
-            self.isSelected = false;
-          }
-        // }
+        if ( ! self.isSelected && self.isSelectedPermissionsContainThisPermission(self.permission)  )
+          self.isSelected = true;
+        else if ( self.isSelected && ! self.isSelectedPermissionsContainThisPermission(self.permission)) {
+          self.isSelected = false;
+        }
       });
 
       this
