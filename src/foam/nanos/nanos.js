@@ -361,7 +361,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ReputDependentUCJs" },
   //spid
   { name: "foam/nanos/auth/CreateUserCapabilityJunctionOnSpidSet" },
-  { name: "foam/nanos/auth/PreventMultipleSpidDAO" },
+  { name: "foam/nanos/auth/SetUserServiceProviderJunctionRuleAction" },
   //ucjDAO rules
   { name: "foam/nanos/crunch/ruler/CheckUCJOwnershipOnPut" },
   { name: "foam/nanos/crunch/ruler/ValidateUCJDataOnPut" },
