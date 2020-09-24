@@ -563,7 +563,6 @@ foam.CLASS({
     function requestCapability(capabilityInfo) {
       var self = this;
 
-      debugger;
       capabilityInfo.capabilityOptions.forEach((c) => {
         self.capabilityCache.set(c, false);
       });

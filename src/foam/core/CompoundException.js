@@ -17,35 +17,6 @@ foam.CLASS({
     ],
 
     properties:  [
-        // TODO: cloning this property from ExceptionInterface creates a bug.
-        {
-            name: 'clientRethrowException',
-            class: 'Object',
-            javaType: 'RuntimeException',
-            documentation: `
-                If an exception is intended to go to the client, this
-                returns an exception object; it returns null otherwise.
-
-                Note that the exception returned by this property is the
-                one that should be re-thrown. This is particularly useful
-                for CompoundException where the CompoundException itself
-                is not intended to be re-thrown but any of its child
-                exceptions might be.
-            `,
-            javaGetter: `
-                ArrayList<RuntimeException> exceptions = getExceptions();
-                for ( RuntimeException re : exceptions ) {
-                    if ( re instanceof ExceptionInterface ) {
-                        RuntimeException clientE =
-                            ((ExceptionInterface) re).getClientRethrowException();
-                        if ( clientE != null ) {
-                            return clientE;
-                        }
-                    }
-                }
-                return null;
-            `
-        },
         {
             class: 'Object',
             name: 'exceptions',
@@ -73,6 +44,32 @@ foam.CLASS({
     ],
 
     methods:  [
+        {
+            // TODO: cloning this property from ExceptionInterface creates a bug.
+            name: 'getClientRethrowException',
+            documentation: 
+            `If an exception is intended to go to the client, this
+            returns an exception object; it returns null otherwise.
+
+            Note that the exception returned by this property is the
+            one that should be re-thrown. This is particularly useful
+            for CompoundException where the CompoundException itself
+            is not intended to be re-thrown but any of its child
+            exceptions might be.`,
+            type: 'RuntimeException',
+            visibility: 'public',
+            javaCode: `ArrayList<RuntimeException> exceptions = getExceptions();
+            for ( RuntimeException re : exceptions ) {
+                if ( re instanceof ExceptionInterface ) {
+                    RuntimeException clientE =
+                        ((ExceptionInterface) re).getClientRethrowException();
+                    if ( clientE != null ) {
+                        return clientE;
+                    }
+                }
+            }
+            return null;`
+        },
         {
             name: 'add',
             args: [{ name: 't', javaType: 'Throwable' }],
