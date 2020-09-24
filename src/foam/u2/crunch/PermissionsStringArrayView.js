@@ -153,7 +153,6 @@ foam.CLASS({
         }
       }
       this.data = newArr;
-
     },
     function isPermissionSelected(permission) {
       return this.data.includes(permission);
