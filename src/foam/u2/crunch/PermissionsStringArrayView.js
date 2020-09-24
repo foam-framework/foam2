@@ -23,6 +23,12 @@ foam.CLASS({
     'foam.u2.TextField'
   ],
 
+  css: `
+    .foam-u2-crunch-PermissionsStringArrayView-padding {
+      padding-top: 8px;
+    }
+  `,
+
   properties: [
     {
       name: 'search',
@@ -64,11 +70,12 @@ foam.CLASS({
       });        
 
       this.start()
-        .startContext({ data: this })
-        .start()
+      .startContext({ data: this })
+      .start()
           .tag(this.SEARCH)
         .end()
         .start()
+          .addClass(this.myClass('padding'))
           .add(this.slot(function(views) {
             if ( views ) {
               return this.E().forEach(views, function(v) {
@@ -167,7 +174,7 @@ foam.CLASS({
       return this.data.length === filteredPermissions.length;
     },
     function onSearchChanged() {
-      this.show = ! this.search || this.search.length === 0 || this.permission.includes(this.search);
+      this.show = ! this.search || this.search.length === 0 || this.permission.toLowerCase().includes(this.search.toLowerCase());
     },
     function onSearchChangedSelectAll() {
       this.stopOnSelect = true;
@@ -193,7 +200,7 @@ foam.CLASS({
     }
 
     .foam-u2-crunch-PermissionSelection-left {
-      width: 40%;
+      width: 55%;
       height: 16px;
       float: left;
     }
@@ -205,13 +212,49 @@ foam.CLASS({
     }
 
     .foam-u2-crunch-PermissionSelection-right {
-      width: 20%;
+      margin-right: 5px;
       height: 16px;
       float: right;
     }
 
     .property-isSelected {
       margin: 1.5px 0;
+    }
+
+    .foam-u2-crunch-PermissionSelection-tooltip {
+      position: relative;
+      visibility: hidden;
+      color: white;
+      background: #999;
+      max-height: 80px;
+      width: 140px;
+      overflow-y: scroll;
+      word-break: break-word;
+      padding: 4px;
+    }
+
+    .foam-u2-crunch-PermissionSelection-tooltiptext {
+      bottom: 125%;
+      left: 80%;
+    }
+
+    .foam-u2-crunch-PermissionSelection-center-tooltiptext {
+      bottom: 250%;
+      left: 80%;
+  }
+
+    .foam-u2-crunch-PermissionSelection-left:hover .foam-u2-crunch-PermissionSelection-tooltiptext {
+      visibility: visible;
+    }
+
+    .foam-u2-crunch-PermissionSelection-less-left:hover .foam-u2-crunch-PermissionSelection-center-tooltiptext {
+      visibility: visible;
+    }
+
+    .foam-u2-crunch-PermissionSelection-hide-text {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
   `,
   properties: [
@@ -281,11 +324,27 @@ foam.CLASS({
         .startContext({ data: this })
           .start()
             .addClass(this.myClass('left'))
-            .add(this.permission)
+            .start()
+              .addClass(this.myClass('hide-text'))
+              .add(this.permission)
+            .end()
+            .start()
+              .addClass(this.myClass('tooltip'))
+              .addClass(this.myClass('tooltiptext'))
+              .add(this.permission)
+            .end()
           .end()
           .start()
             .addClass(this.myClass('less-left'))
-            .add(this.description)
+            .start()
+              .addClass(this.myClass('hide-text'))
+              .add(this.description)
+            .end()
+            .start()
+              .addClass(this.myClass('tooltip'))
+              .addClass(this.myClass('center-tooltiptext'))
+              .add(this.description)
+            .end()
           .end()
           .start()
             .addClass(this.myClass('right'))
