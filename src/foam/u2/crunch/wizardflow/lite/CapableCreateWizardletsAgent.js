@@ -14,6 +14,10 @@ foam.CLASS({
     'wizardlets'
   ],
 
+  requires: [
+    'foam.nanos.crunch.MinMaxCapability'
+  ],
+
   properties: [
     {
       name: 'wizardlets',
@@ -24,31 +28,74 @@ foam.CLASS({
 
   methods: [
     async function execute() {
-      var wizardlets = [];
       var capable = this.capable;
+      this.wizardlets = this.createWizardletsFromPayloads(capable.capablePayloads);
+      console.log('CAPABLE', capable);
+      console.log('WIZARDLETS', this.wizardlets);
+    },
+    function createWizardletsFromPayloads(payloads) {
+      debugger;
+      var newWizardlets = [];
+      for ( let i = 0 ; i < payloads.length ; i++ ) {
+        let capablePayload = payloads[i];
+        let wizardlet = this.createWizardletFromPayload(capablePayload);
+        let handlePrereqsNormally = true;
+        let addWizardletAtEnd = true;
 
-      for ( let i = 0 ; i < capable.capablePayloads.length ; i++ ) {
-        let capablePayload = capable.capablePayloads[i];
-        let wizardletClass = capablePayload.capability.wizardlet.cls_;
+        // If this is a MinMax capability, handle its prerequisites differently
+        if ( this.MinMaxCapability.isInstance(wizardlet) ) {
+          handlePrereqsNormally = false;
+          addWizardletAtEnd = false;
 
-        // Override the default wizardlet class with one that does not
-        //   save to userCapabilityJunction
-        if ( wizardletClass.id == 'foam.nanos.crunch.ui.CapabilityWizardlet' ) {
-          wizardletClass = foam.nanos.crunch.ui.CapableObjectWizardlet;
+          // MinMax wizardlets appear before their prerequisites
+          newWizardlets.push(wizardlet);
+          
+          let minMaxPrereqWizardlets =
+            this.createWizardletsFromPayloads(capablePayload.prerequisites);
+          minMaxPrereqWizardlets.forEach(prereqWizardlet => {
+            prereqWizardlet.isAvailable = false;
+            wizardlet.choiceWizardlets.push(prereqWizardlet);
+            newWizardlets.push(prereqWizardlet);
+          })
         }
-        let wizardlet = wizardletClass.create({
-          capability: capablePayload.capability,
-          targetPayload: capablePayload,
-          data$: capablePayload.data$
-        }, capable);
-        if ( capablePayload.data ) {
-          wizardlet.data = capablePayload.data;
+
+        // If this is a prerequisite of a normal capability, bind isAvailable to the
+        // parent.
+        if ( handlePrereqsNormally && capablePayload.prerequisites.length > 0 ) {
+          let prereqWizardlets =
+            this.createWizardletsFromPayloads(capablePayload.prerequisites);
+          prereqWizardlets.forEach(prereqWizardlet => {
+            prereqWizardlet.isAvailable$.follow(wizardlet.isAvailable$);
+            newWizardlets.push(prereqWizardlet);
+          })
         }
 
-        wizardlets.push(wizardlet);
+        // Wizardlets appear after their prerequisites by default
+        if ( addWizardletAtEnd ) {
+          newWizardlets.push(wizardlet);
+        }
+      }
+      return newWizardlets;
+    },
+    function createWizardletFromPayload(capablePayload) {
+      let wizardletClass = capablePayload.capability.wizardlet.cls_;
+
+      // Override the default wizardlet class with one that does not
+      //   save to userCapabilityJunction
+      if ( wizardletClass.id == 'foam.nanos.crunch.ui.CapabilityWizardlet' ) {
+        wizardletClass = foam.nanos.crunch.ui.CapableObjectWizardlet;
+      }
+      if ( wizardletClass.id == 'foam.nanos.crunch.ui.MinMaxCapabilityWizardlet' ) {
+        wizardletClass = foam.nanos.crunch.ui.CapableMinMaxCapabilityWizardlet;
       }
 
-      this.wizardlets = wizardlets;
-    }
+      let wizardlet = wizardletClass.create({
+        capability: capablePayload.capability,
+        targetPayload: capablePayload,
+        data$: capablePayload.data$
+      }, this);
+
+      return wizardlet;
+    },
   ]
 });
