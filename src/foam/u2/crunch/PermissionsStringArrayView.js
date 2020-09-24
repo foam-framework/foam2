@@ -39,7 +39,7 @@ foam.CLASS({
         placeholder: 'capability search',
         onKey: true
       },
-      readVisibility: foam.u2.DisplayMode.RW,//would like it to be accessible even in DAOSummaryView to serch for permissions, but is there any legit way to do that?
+      readVisibility: foam.u2.DisplayMode.RW,
     },
     {
       name: 'views',
@@ -135,7 +135,7 @@ foam.CLASS({
       var filteredPermissions = this.views.filter(v => v.show && v.permission !== 'Select All').map(v => v.permission);
       var newArr = [];
       if ( ! isSelected ) {
-        if ( this.allPermissions.length != filteredPermissions.length ) {
+        if ( this.allPermissions.length !== filteredPermissions.length ) {
           for ( var p of this.data ) {
             if ( ! filteredPermissions.includes(p) ) {
               newArr.push(p);
@@ -231,16 +231,15 @@ foam.CLASS({
       overflow-y: scroll;
       word-break: break-word;
       padding: 4px;
+      left: 80%;
     }
 
     .foam-u2-crunch-PermissionSelection-tooltiptext {
       bottom: 125%;
-      left: 80%;
     }
 
     .foam-u2-crunch-PermissionSelection-center-tooltiptext {
       bottom: 250%;
-      left: 80%;
   }
 
     .foam-u2-crunch-PermissionSelection-left:hover .foam-u2-crunch-PermissionSelection-tooltiptext {
@@ -284,7 +283,6 @@ foam.CLASS({
     },
     {
       name: 'selectedPermissions',
-      // class: 'StringArray'
     },
     'isSelectedPermissionsContainThisPermission',
     'onSelect',
