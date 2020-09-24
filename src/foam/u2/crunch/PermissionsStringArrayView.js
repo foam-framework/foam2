@@ -41,7 +41,7 @@ foam.CLASS({
       of: 'foam.u2.crunch.PermissionSelection',
       factory: function() {
         var self = this;
-        this.permissionDAO.select(this.PROJECTION(this.Permission.ID))
+        this.permissionDAO.select(this.PROJECTION(this.Permission.ID, this.Permission.DESCRIPTION))
           .then(function(proj) {
             self.allPermissions = proj.projection.map(a => a[0]);
             self.filteredPermissions = self.allPermissions;
@@ -71,14 +71,14 @@ foam.CLASS({
       this.search$.sub(function() {
         if ( self.search ) {
           self.permissionDAO.select(self.COUNT()).then(c => {
-            self.permissionDAO.where(self.CONTAINS_IC(self.Permission.ID, self.search)).select(self.PROJECTION(self.Permission.ID))
+            self.permissionDAO.where(self.CONTAINS_IC(self.Permission.ID, self.search)).select(self.PROJECTION(self.Permission.ID, self.Permission.DESCRIPTION))
             .then(function(proj) {
               self.filteredPermissions = proj.projection.map(a => a[0]);
               self.preSetViewWithProjection(proj);
             });
           });
         } else {
-          self.permissionDAO.select(self.PROJECTION(self.Permission.ID))
+          self.permissionDAO.select(self.PROJECTION(self.Permission.ID, self.Permission.DESCRIPTION))
             .then(function(proj) {
               self.allPermissions = proj.projection.map(a => a[0]);
               self.filteredPermissions = self.allPermissions;
@@ -113,7 +113,7 @@ foam.CLASS({
       if ( proj.projection.length > 0 )
         this.views.push(this.PermissionSelection.create({ permission: 'Select All', selectedPermissions$: this.data$, onSelect: this.onAllSelectedFunction.bind(this), isSelectedPermissionsContainThisPermission: this.isAllPermissionsSelected.bind(this) }));
       proj.projection.forEach(a => {
-        this.views.push(this.PermissionSelection.create({ permission: a[0], selectedPermissions$: self.data$, onSelect: self.onSelectFunction.bind(self),  isSelectedPermissionsContainThisPermission: self.isPermissionSelected.bind(self) }));
+        this.views.push(this.PermissionSelection.create({ permission: a[0], description: a[1], selectedPermissions$: self.data$, onSelect: self.onSelectFunction.bind(self),  isSelectedPermissionsContainThisPermission: self.isPermissionSelected.bind(self) }));
       });
     },
     function onSelectFunction(permission, isSelected) {
@@ -193,7 +193,13 @@ foam.CLASS({
     }
 
     .foam-u2-crunch-PermissionSelection-left {
-      width: 80%;
+      width: 40%;
+      height: 16px;
+      float: left;
+    }
+
+    .foam-u2-crunch-PermissionSelection-less-left {
+      width: 40%;
       height: 16px;
       float: left;
     }
@@ -257,6 +263,10 @@ foam.CLASS({
           .start()
             .addClass(this.myClass('left'))
             .add(this.permission)
+          .end()
+          .start()
+            .addClass(this.myClass('less-left'))
+            .add(this.description)
           .end()
           .start()
             .addClass(this.myClass('right'))
