@@ -43,12 +43,18 @@ foam.CLASS({
         var self = this;
         this.permissionDAO.select(this.PROJECTION(this.Permission.ID))
           .then(function(proj) {
+            self.allPermissions = proj.projection.map(a => a[0]);
+            self.filteredPermissions = self.allPermissions;
             self.preSetViewWithProjection(proj);
           });
       }
     },
     {
       name: 'allPermissions',
+      class: 'StringArray'
+    },
+    {
+      name: 'filteredPermissions',
       class: 'StringArray'
     }
   ],
@@ -57,16 +63,25 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
+      
+      this.data$.sub(function() {
+        console.log('data change');
+      });
 
       this.search$.sub(function() {
         if ( self.search ) {
-          self.permissionDAO.where(self.CONTAINS_IC(self.Permission.ID, self.search)).select(self.PROJECTION(self.Permission.ID))
+          self.permissionDAO.select(self.COUNT()).then(c => {
+            self.permissionDAO.where(self.CONTAINS_IC(self.Permission.ID, self.search)).select(self.PROJECTION(self.Permission.ID))
             .then(function(proj) {
+              self.filteredPermissions = proj.projection.map(a => a[0]);
               self.preSetViewWithProjection(proj);
             });
+          });
         } else {
           self.permissionDAO.select(self.PROJECTION(self.Permission.ID))
             .then(function(proj) {
+              self.allPermissions = proj.projection.map(a => a[0]);
+              self.filteredPermissions = self.allPermissions;
               self.preSetViewWithProjection(proj);
             });
         }
@@ -83,7 +98,7 @@ foam.CLASS({
             if ( views ) {
               return this.E().forEach(views, function(v) {
                 this.start()
-                  .tag(v)
+                  .add(v)
                 .end();
               });
             }
@@ -94,23 +109,52 @@ foam.CLASS({
     },
     function preSetViewWithProjection(proj) {
       this.views = [];
-      this.allPermissions = [];
       var self = this;
       if ( proj.projection.length > 0 )
-        this.views.push(this.PermissionSelection.create({ permission: 'Select All', selectedPermissions$: this.data$, onSelectedFunction: this.onAllSelectedFunction.bind(this), isSelectedPermissionsContainThisPermission: this.isAllPermissionsSelected.bind(this) }));
+        this.views.push(this.PermissionSelection.create({ permission: 'Select All', selectedPermissions$: this.data$, onSelect: this.onAllSelectedFunction.bind(this), isSelectedPermissionsContainThisPermission: this.isAllPermissionsSelected.bind(this) }));
       proj.projection.forEach(a => {
-        this.views.push(this.PermissionSelection.create({ permission: a[0], selectedPermissions$: self.data$, isSelectedPermissionsContainThisPermission: self.isPermissionSelected.bind(self) }));
-        this.allPermissions.push(a[0]);
+        this.views.push(this.PermissionSelection.create({ permission: a[0], selectedPermissions$: self.data$, onSelect: self.onSelectFunction.bind(self),  isSelectedPermissionsContainThisPermission: self.isPermissionSelected.bind(self) }));
       });
     },
-    function onAllSelectedFunction(_, isSelected) {
+    function onSelectFunction(permission, isSelected) {
+      if ( isSelected) {
+        var newArr =[];
+        this.data.forEach(p => {
+          newArr.push(p);
+        });
+        newArr.push(permission);
+        this.data = newArr;
+      }
+      if ( ! isSelected ) {
+        var newArr = [];
+        this.data.forEach(p => {
+          if ( p !== permission )
+            newArr.push(p);
+        });
+        this.data = newArr;
+      }
+    },
+    function onAllSelectedFunction(_, isSelected, isSelectedFromUI) {
+      if ( ! isSelectedFromUI )
+        return;
       if ( ! isSelected ) {
         this.data = [];
       }
       if ( isSelected ) {
-        var newArr = [];
-        for ( var p of this.allPermissions ) {
-
+        if ( this.filteredPermissions.length < this.data.length ) {
+          var isJustFilteredWithoutUnselect = true;
+          for ( var p of this.filteredPermissions ) {
+            if ( ! this.data.includes(p) ) {
+              isJustFilteredWithoutUnselect = false;
+              break;
+            }
+            return;
+          }
+        }
+        if ( this.filteredPermissions.length === this.data.length )
+          return;
+        var newArr = [];//how to know 
+        for ( var p of this.filteredPermissions ) {
           newArr.push(p);
         }
 
@@ -121,7 +165,15 @@ foam.CLASS({
       return this.data.includes(permission);
     },
     function isAllPermissionsSelected() {
-      return this.data.length >=  this.allPermissions.length;
+      if ( this.filteredPermissions.length < this.data.length ) {
+        for ( var p of this.filteredPermissions ) {
+          if ( ! this.data.includes(p) ) {
+            return false;
+          }
+          return true;
+        }
+      }
+      return this.data.length ===  this.filteredPermissions.length;
     }
   ]
 
@@ -171,15 +223,9 @@ foam.CLASS({
         showLabel: false
       },
       postSet: function() {
-        if ( this.onSelectedFunction)
-          this.onSelectedFunction(this.permission, this.isSelected);
-        else {
-          if ( this.isSelected && ! this.isSelectedPermissionsContainThisPermission(this.permission) ) {
-            this.selectedPermissions.push(this.permission);
-          }
-          if ( ! this.isSelected && this.isSelectedPermissionsContainThisPermission(this.permission) ) {
-            this.selectedPermissions.splice(this.selectedPermissions.indexOf(this.permission), 1);
-          }
+        this.isSelectedFromUI = true;
+        if ( ( this.isSelected && ! this.isSelectedPermissionsContainThisPermission(this.permission) ) || (  ! this.isSelected && this.isSelectedPermissionsContainThisPermission(this.permission) ) ) {
+          this.onSelect(this.permission, this.isSelected, this.isSelectedFromUI);
         }
       },
       factory: function() {
@@ -188,22 +234,31 @@ foam.CLASS({
     },
     {
       name: 'selectedPermissions',
-      class: 'StringArray'
+      // class: 'StringArray'
+    },
+    {
+      name: 'isSelectedFromUI',
+      class: 'Boolean',
+      value: true
     },
     'isSelectedPermissionsContainThisPermission',
-    'onSelectedFunction'
+    'onSelect',
+    'onSelectedPermissionsChangedFunction',
+    'skip'
   ],
   methods: [
     function initE() {
       this.SUPER();
       var self = this;
-
       this.selectedPermissions$.sub(function() {
-        if ( ! self.isSelected && self.isSelectedPermissionsContainThisPermission(self.permission)  )
-          self.isSelected = true;
-        if ( self.isSelected && ! self.isSelectedPermissionsContainThisPermission(self.permission)) {
-          self.isSelected = false;
-        }
+        self.isSelectedFromUI = false;
+        // if ( this.isSelectedFromUI ) {
+          if ( ! self.isSelected && self.isSelectedPermissionsContainThisPermission(self.permission)  )
+            self.isSelected = true;
+          else if ( self.isSelected && ! self.isSelectedPermissionsContainThisPermission(self.permission)) {
+            self.isSelected = false;
+          }
+        // }
       });
 
       this
