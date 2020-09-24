@@ -217,6 +217,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'ExprArrayProperty',
@@ -1454,6 +1455,11 @@ foam.CLASS({
 
   documentation: 'Binary predicate that accepts an array in "arg2".',
 
+  javaImports: [
+    'foam.mlang.ArrayConstant',
+    'foam.mlang.Constant'
+  ],
+
   properties: [
     {
       name: 'arg2',
@@ -1496,8 +1502,15 @@ foam.CLASS({
       },
       javaCode: `
         StringBuilder b = new StringBuilder();
-        Object[] a = (Object[]) getArg2().f(null);
-        for ( int i = 0 ; i < a.length ; i++ ) b.append(a[i]);
+
+        if ( getArg2() instanceof ArrayConstant || getArg2() instanceof Constant ) {
+          Object[] a = (Object[]) ((ArrayConstant) getArg2()).getValue();
+          b.append("len: " + a.length + ",");
+          for ( int i = 0 ; i < a.length ; i++ ) {
+            b.append(a[i]);
+            if ( i < a.length -1 ) b.append(',');
+          }
+        }
         return String.format("%s(%s, %s)", getClass().getSimpleName(), getArg1().toString(), b.toString());
       `
     }
@@ -1643,9 +1656,9 @@ return false
             this.FALSE : this;
       },
       javaCode: `
-        if ( ! (getArg2() instanceof ArrayConstant) ) return this;
+        if ( ! (getArg2() instanceof ArrayConstant) && ! (getArg2() instanceof Constant) ) return this;
 
-        Object[] arr = ((ArrayConstant) getArg2()).getValue();
+        Object[] arr = (Object[]) getArg2().f(null);
 
         if ( arr.length == 0 ) {
           return foam.mlang.MLang.FALSE;
@@ -1749,6 +1762,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang',
