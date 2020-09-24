@@ -19,31 +19,72 @@ foam.CLASS({
   ],
 
   css: `
-    #file-iframe {
+    .file-iframe {
       height: 100%;
       width: 100%;
+    }
+
+    img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .file-image-div {
+      height: 100%;
+      width: auto;
+      max-height: 244px;
+      max-width: 300px;
     }
   `,
 
   methods: [
     function initE() {
       this.SUPER();
+
+      this
+        .start('div')
+          .addClass('file-image-div')
+          .style({
+            visibility: 'hidden'
+          })
+          .start('img')
+            .addClass('file-image')
+          .end()
+        .end()
+        .start('iframe')
+          .addClass('file-iframe')
+          .style({
+            visibility: 'hidden'
+          })
+        .end();
+
       this.data$.sub(() => this.showData());
     },
 
     function showData() {
-      var iFrame = document.getElementById('file-iframe');
-      if ( !iFrame ){
-        this
-          .start('iframe')
-            .attrs({
-                data: URL.createObjectURL(this.data[0].data.blob),
-                id: 'file-iframe',
-                name: 'file-iframe',
-            })
-         .end();
+      debugger;
+      let iFrame = document.getElementsByClassName('file-iframe')[0],
+          image = document.getElementsByClassName('file-image')[0],
+          div = document.getElementsByClassName('file-image-div')[0],
+          url = '';
+
+      iFrame.style.visibility = 'hidden';
+      div.style.visibility = 'hidden';
+      div.style.display = 'none';
+
+      if ( ! this.data[0] ) {
+        return;
+      }
+
+      url = URL.createObjectURL(this.data[this.data.length - 1].data.blob);
+
+      if (this.data[this.data.length - 1].mimeType !== "application/pdf") {
+        image.src = url;
+        div.style.visibility = 'visible';
+        div.style.display = 'block';
       } else {
-        iFrame.src = URL.createObjectURL(this.data[0].data.blob);
+        iFrame.src = url;
+        iFrame.style.visibility = 'visible';
       }
     }
   ]
