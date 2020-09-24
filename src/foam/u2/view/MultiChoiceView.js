@@ -80,7 +80,7 @@ foam.CLASS({
         return n;
       },
       postSet: function(o,n){
-        this.onSelect(o,n);
+        if ( this.onSelect ) this.onSelect(o,n);
 
         var selectedChoices = n.filter(choice => choice[2] );
 
