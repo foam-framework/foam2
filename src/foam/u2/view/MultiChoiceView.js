@@ -51,6 +51,10 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Function',
+      name: 'onSelect'
+    },
+    {
       name: 'choices',
       documentation: `
         An array of choices which are single choice is denoted as [value, label, isSelected, choiceMode, isFinal], however the user can
@@ -75,7 +79,9 @@ foam.CLASS({
 
         return n;
       },
-      postSet: function(_,n){
+      postSet: function(o,n){
+        this.onSelect(o,n);
+
         var selectedChoices = n.filter(choice => choice[2] );
 
         if ( selectedChoices.length < this.maxSelected ) {

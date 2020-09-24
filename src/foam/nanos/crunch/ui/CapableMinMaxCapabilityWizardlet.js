@@ -74,6 +74,46 @@ foam.CLASS({
         // remove instantly
         this.capable.capablePayloads.push(payload);
       }
+    },
+    {
+      name: 'adjustCapablePayloads',
+      code: function(oldChoices, newChoices) {
+        var selectedOldChoices = oldChoices.filter(choice => choice[2]);
+        var selectedNewChoices = newChoices.filter(choice => choice[2]);
+
+        if ( selectedOldChoices > selectedNewChoices ){
+          var deselectedChoice = selectedOldChoices.filter(choice => selectedNewChoices.indexOf(choice) == -1)
+
+          var deselectedWizard = choiceWizardlets.filter(wizard => wizard.title === deselectedChoice[0]);
+
+          var { targetPayload } =  deselectedWizard;
+
+          this.capable.capablePayloads = this.capable.capablePayloads.filter(capablePayload !== targetPayload);
+
+        } else if (selectedOldChoices < selectedNewChoices ) {
+
+          var selectedChoice = selectedNewChoices.filter(choice => selectedOldChoices.indexOf(choice) == -1)
+
+          var selectedWizard = choiceWizardlets.filter(wizard => wizard.title === selectedChoice[0]);
+
+          var { targetPayload } =  selectedWizard;
+
+          this.capable.capablePayloads = this.capable.capablePayloads.push(targetPayload);
+
+        } else {
+          console.warn('Both selectedOldChoices and selectedNewChoices should  not have the same length');
+        }
+      }
+    },
+    function createView(data) {    
+      return this.MultiChoiceView.create({
+        choices$: this.choices$,
+        booleanView: this.CardSelectView,
+        isValidNumberOfChoices$: this.isValid$,
+        minSelected$: this.min$,
+        maxSelected$: this.max$,
+        onSelect: this.adjustCapablePayloads.bind(this)
+      });
     }
   ]
 });
