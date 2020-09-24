@@ -129,7 +129,7 @@ public class SocketServerProcessor
           logger_.debug(e.getMessage());
           break;
         } catch ( Throwable t ) {
-          logger_.error(t);
+          // logger_.error(t);
           if ( pm != null ) pm.error(x, t);
           try {
             // TODO: abstract this into a SocketWriter as it's duplicated in SocketConnectionBox.js
@@ -152,8 +152,9 @@ public class SocketServerProcessor
               out_.write(replyBytes);
               out_.flush();
             }
+            logger_.error("Reply with error.", t);
           } catch ( Throwable th ) {
-            logger_.error("Failed to reply with error.", th);
+            logger_.error("Failed to reply with error.", t, th);
           }
           break;
         }

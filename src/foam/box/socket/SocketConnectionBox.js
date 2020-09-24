@@ -154,7 +154,7 @@ foam.CLASS({
         SocketClientReplyBox box = new SocketClientReplyBox(replyBoxId);
         if ( replyBox instanceof ReplyBox ) {
           ((ReplyBox)replyBox).setDelegate(box);
-          // getLogger().debug("send", "replyBox.setDelegate");
+          getLogger().debug("send", "replyBox.setDelegate");
         } else {
           msg.getAttributes().put("replyBox", box);
         }
@@ -174,17 +174,18 @@ foam.CLASS({
           // TODO/REVIEW
           out_.flush();
         }
-      } catch ( Throwable e ) {
-        pm.error(getX(), e);
+      } catch ( Throwable t ) {
+        pm.error(getX(), t);
         // TODO: perhaps report last exception on host port via manager.
-        getLogger().error("Error sending message", message, e);
+        getLogger().error("Error sending message", message, t);
         setValid(false);
-        //throw new RuntimeException(e);
         if ( replyBox != null ) {
           Message reply = new Message();
-          reply.setObject(new RPCErrorMessage(e.getMessage()));
+          reply.setObject(new RPCErrorMessage(t.getMessage()));
           replyBox.send(reply);
           getReplyBoxes().remove(replyBoxId);
+        } else {
+          throw new RuntimeException(t);
         }
       } finally {
         pm.log(getX());
