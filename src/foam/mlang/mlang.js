@@ -424,7 +424,7 @@ foam.CLASS({
     {
       name: 'toString',
       code: function toString() { return this.cls_.name; },
-      javaCode: 'return classInfo_.getId();'
+      javaCode: 'return getClass().getName();'
     },
     {
       name: 'createStatement',
@@ -767,6 +767,7 @@ getArg2().prepareStatement(stmt);`
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
@@ -1239,6 +1240,7 @@ return this;`
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Contains',
@@ -1504,7 +1506,7 @@ foam.CLASS({
         StringBuilder b = new StringBuilder();
 
         if ( getArg2() instanceof ArrayConstant || getArg2() instanceof Constant ) {
-          Object[] a = (Object[]) ((ArrayConstant) getArg2()).getValue();
+          Object[] a = (Object[]) getArg2().f(null);
           b.append("len: " + a.length + ",");
           for ( int i = 0 ; i < a.length ; i++ ) {
             b.append(a[i]);
@@ -2173,9 +2175,12 @@ foam.CLASS({
       javaCode: 'return ! getArg1().f(obj);'
     },
 
-    function toString() {
-      return foam.String.constantize(this.cls_.name) +
-          '(' + this.arg1.toString() + ')';
+    {
+      name: 'toString',
+      code: function() {
+        return foam.String.constantize(this.cls_.name) + '(' + this.arg1.toString() + ')';
+      },
+      javaCode: 'return String.format("Not(%s)", getArg1().toString());'
     },
     {
       name: 'partialEval',

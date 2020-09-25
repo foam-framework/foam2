@@ -5,14 +5,14 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2.md',
-  name: 'DatePicker',
+  package: 'foam.u2.property',
+  name: 'MDDatePicker',
 
   extends: 'foam.u2.View',
 
   requires: [
     'foam.input.touch.GestureTarget',
-    'foam.u2.md.Calendar'
+    'foam.u2.property.MDCalendar'
   ],
 
   imports: [
@@ -240,13 +240,13 @@ foam.CLASS({
         // TODO: use show()
         body.enableClass(this.myClass('hidden'), this.showYears_$);
 
-        var years = this.E().addClass(this.myCls('years'));
+        var years = this.E().addClass(this.myClass('years'));
         for ( var i = 1900 ; i <= 2100 ; i++ ) {
           years.start('span')
             .setID(this.id + '-year-' + i)
-            .addClass(this.myCls('years-year'))
+            .addClass(this.myClass('years-year'))
             .add('' + i)
-            .enableClass(this.myCls('selected'), this.slot(function(index, viewYear) {
+            .enableClass(this.myClass('selected'), this.slot(function(index, viewYear) {
               return index === viewYear;
             }.bind(this, i), this.viewYear$))
             .on('click', this.pickYear.bind(this, i))
@@ -254,7 +254,7 @@ foam.CLASS({
         }
 
         // TODO: use show()
-        years.enableClass(this.myCls('hidden'), this.showYears_$, true /* negate */);
+        years.enableClass(this.myClass('hidden'), this.showYears_$, true /* negate */);
 
         return [body, years];
       }
@@ -299,9 +299,9 @@ foam.CLASS({
           'for the currently viewed month, and creates the adjacent months.',
       code: function() {
         var newCals = [
-          this.Calendar.create({ data$: this.softData$, year: this.leftYear, month: this.leftMonth }),
-          this.Calendar.create({ data$: this.softData$, year: this.viewYear, month: this.viewMonth }),
-          this.Calendar.create({ data$: this.softData$, year: this.rightYear, month: this.rightMonth })
+          this.MDCalendar.create({ data$: this.softData$, year: this.leftYear, month: this.leftMonth }),
+          this.MDCalendar.create({ data$: this.softData$, year: this.viewYear, month: this.viewMonth }),
+          this.MDCalendar.create({ data$: this.softData$, year: this.rightYear, month: this.rightMonth })
         ];
         // TODO(braden): Setting this.xPos here should be sufficient, but it
         // causes jank. The postSet on xPos calls adjustX, which is framed like
@@ -425,8 +425,9 @@ foam.CLASS({
 
     ^header {
       cursor: pointer;
-      font-size: 16px;
+      font-size: 25px;
       padding: 12px 16px;
+      font-weight: 500;
     }
     ^header div {
       opacity: 0.8;
@@ -445,7 +446,8 @@ foam.CLASS({
     ^body {
       cursor: pointer;
       font-size: 16px;
-      height: 310px;
+      height: 36rem;
+      width: 32rem;
       overflow: hidden;
       position: relative;
       -webkit-user-select: none;
@@ -453,7 +455,6 @@ foam.CLASS({
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
-      width: 300px;
     }
     ^slider {
       position: absolute;
