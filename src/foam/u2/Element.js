@@ -2042,7 +2042,7 @@ foam.CLASS({
     function output_(out) {
       /** Output the element without transitioning to the OUTPUT state. **/
       out('<', this.nodeName);
-      if ( this.id !== null ) out(' id="', this.id, '"');
+      if ( this.id !== null ) out(' id="', this.id.replace(/"/g, "&quot;"), '"');
 
       var first = true;
       if ( this.hasOwnProperty('classes') ) {
@@ -2383,7 +2383,6 @@ foam.CLASS({
             return value;
           }
 
-debugger;
           throw new Error('Property.visibility must be set to one of the following: (1) a value of DisplayMode, (2) a function that returns a value of DisplayMode, or (3) a slot whose value is a value of DisplayMode. Property ' + this.name + ' was set to ' + value + ' instead.');
         })
       });

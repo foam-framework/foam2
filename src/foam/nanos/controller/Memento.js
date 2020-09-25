@@ -40,7 +40,6 @@ foam.CLASS({
       postSet: function(o, n) {
         if ( this.feedback_ ) return;
         this.feedback_ = true;
-        debugger;
         this.value = this.combine(n, this.tail);
         this.feedback_ = false;
       }
