@@ -651,6 +651,7 @@ var classes = [
   'foam.nanos.crunch.RenewableData',
 
   'foam.nanos.crunch.connection.CapabilityPayload',
+  'foam.nanos.crunch.connection.GrantPathNode',
 
   //daos
   'foam.nanos.crunch.connection.CapabilityPayloadDAO',
@@ -664,7 +665,7 @@ var classes = [
 
   // spid
   'foam.nanos.auth.CreateUserCapabilityJunctionOnSpidSet',
-  'foam.nanos.auth.PreventMultipleSpidDAO',
+  'foam.nanos.auth.SetUserServiceProviderJunctionRuleAction',
 
   //ucjdao rules
   'foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut',

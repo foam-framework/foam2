@@ -206,6 +206,7 @@ p({
       .setOf(foam.nanos.cron.Cron.getOwnClassInfo())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName(\"cronjobs\")
+      .setIndex(new foam.core.PropertyInfo[] {foam.nanos.cron.Cron.ENABLED })
       .setDecorator(new foam.nanos.cron.CronScheduleDAO.Builder(x)
         .setDelegate(new foam.nanos.script.ScriptRunnerDAO(new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.cron.Cron.getOwnClassInfo()).build()))
         .build())
@@ -596,7 +597,7 @@ p({
   "serve":true,
   "serviceScript":
   """
-    return new foam.nanos.auth.AuthorizationDAO(x, (foam.dao.DAO) x.get("localServiceProviderDAO"), new foam.nanos.auth.StandardAuthorizer("serviceprovider"));
+    return new foam.nanos.auth.AuthorizationDAO(x, (foam.dao.DAO) x.get("localServiceProviderDAO"), new foam.nanos.auth.StandardAuthorizer("capability"));
   """,
   "client":"{\"of\":\"foam.nanos.auth.ServiceProvider\"}"
 })

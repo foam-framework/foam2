@@ -59,19 +59,22 @@ foam.CLASS({
         var parent = s[1];
 
         var X;
-        // If parent is a Context (should be a better way to test this)
-        if ( parent && parent.isContext ) {
-          X = parent;
-        } else if ( parent ) {
-          // I'm not sure how this is a good idea, KGR
-          // TODO: find all places we do this and see if we can replace
-          // with case 1 above.
-
-          // Do a bit of a dance with the context, to ensure that exports from
-          // "parent" are available to "view"
-          X = this.__subSubContext__.createSubContext(parent);
-        } else {
+        if ( ! parent ) {
           X = this.__subSubContext__;
+        } else {
+          if ( parent.isContext ) {
+            X = parent;
+          } else if ( parent.__subContext__ ) {
+            X = parent.__subContext__;
+          } else {
+            // I'm not sure how this is a good idea, KGR
+            // TODO: find all places we do this and see if we can replace
+            // with case 1 above.
+
+            // Do a bit of a dance with the context, to ensure that exports from
+            // "parent" are available to "view"
+            X = this.__subSubContext__.createSubContext(parent);
+          }
         }
 
         return foam.u2.ViewSpec.createView(view, null, this, X);
