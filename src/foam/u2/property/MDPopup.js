@@ -8,18 +8,16 @@
 foam.CLASS({
   package: 'foam.u2.property',
   name: 'MDPopup',
-  extends: 'foam.u2.property.MDAbstractChoiceView',
+  extends: 'foam.u2.View',
 
   requires: [
     'foam.u2.property.MenuElement'
   ],
 
   imports: [
-    'E',
     'clearTimeout',
-    'document',
+    'window',
     'setTimeout',
-    'window'
   ],
 
   exports: [
@@ -37,7 +35,10 @@ foam.CLASS({
     ['itemWidth', 100],
     ['isHidden', true],
     ['removeTimeout', 0],
-    ['isClosing', false]
+    ['isClosing', false],
+    'choices',
+    'data',
+    'index'
   ],
 
   methods: [
@@ -155,11 +156,12 @@ foam.CLASS({
       } else {
         this.delegate_ = this.MenuElement.create({
           choices: this.choices,
-          data$: this.data$,
+          data: this.data$,
           autoSetData: this.autoSetData,
           itemHeight: this.itemHeight,
           itemWidth: this.itemWidth,
           hMargin: this.hMargin,
+          index$: this.index$
         });
       }
 

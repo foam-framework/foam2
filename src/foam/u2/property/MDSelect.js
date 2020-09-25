@@ -8,28 +8,22 @@
 foam.CLASS({
   package: 'foam.u2.property',
   name: 'MDSelect',
-  extends: 'foam.u2.property.MDAbstractChoiceView',
+  extends: 'foam.u2.view.ChoiceView',
 
   requires: [
     'foam.u2.property.MDPopup',
   ],
-  imports: [
-    'document',
-  ],
+
 
   properties: [
     {
-      type: 'Boolean',
-      name: 'inline',
-      defaultValue: false,
-      attribute: true,
+      name: 'placeholder',
+      factory: function() { return '--'; }
     },
     {
-      type: 'Boolean',
-      name: 'showLabel',
-      attribute: true,
-      defaultValueFn: function() {
-        return !this.inline;
+      name: 'objToChoice',
+      value: function(obj) {
+        return [ obj.id, obj.toSummary() ];
       }
     }
   ],
@@ -45,33 +39,45 @@ foam.CLASS({
 
         var self = this;
         var popup = this.MDPopup.create({
-          data$: this.data$,
+          data: this.data$,
           choices$: this.choices$,
-          autoSetData: this.autoSetData
+          index$: this.index$
         });
         popup.open(this.index, this.el());
       }
-    },
+    }
   ],
 
   methods: [
     function initE() {
+      if ( this.data == null && ! this.index ) {
+        this.index = 0;
+      }
+
+      this.onDAOUpdate();
       var self = this;
       this.addClass(this.myClass())
-      var label = this.prop ? this.prop.label : this.label;
-      if ( label ) {
-        this.start('label')
-          .addClass('label')
-          .addClass(this.slot(function(data) {
-            return (typeof data == 'undefined' || data == '' || data < 0) ? 'label-offset' : '';
-          }, this.data$))
-          .add(label)
-          .end();
+      this.start('label')
+        .addClass('label')
+        .addClass(this.slot(function(data) {
+          return (typeof data == 'undefined' || data == '' || data < 0) ? 'label-offset' : '';
+        }, this.data$))
+        .add(this.label$)
+        .end();
+      this
+        .start('div').addClass('value').add(this.text$).end()
+        .start('div').addClass('down-arrow').addClass('material-icons')
+          .add('expand_more').on('click', this.onClick)
+        .end()
+
+      this.dao$proxy.on.sub(this.onDAOUpdate);
+    },
+    function fromProperty(prop) {
+      this.SUPER(prop);
+      if ( ! this.dao ) {
+        var dao = this.__context__[prop.targetDAOKey];
+        this.dao = dao;
       }
-      this.start('div').addClass('value').add(this.text$).end()
-      .start('div').addClass('down-arrow').addClass('material-icons')
-        .add('expand_more').on('click', this.onClick)
-      .end()
     }
   ],
 

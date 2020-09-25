@@ -17,6 +17,7 @@ foam.CLASS({
     'foam.u2.property.MDDateField',
     'foam.u2.property.MDTextField',
     'foam.u2.property.MDIntView',
+    'foam.u2.property.MDRichSelect',
     'foam.u2.property.MDSelect',
     'foam.u2.property.MDCheckBox',
     'foam.u2.property.MDFloatView',
@@ -147,7 +148,7 @@ foam.CLASS({
       this.__subContext__.register(this.MDSelect, 'foam.u2.view.ChoiceView');
       this.__subContext__.register(this.MDSelect, 'foam.u2.view.ReferenceView');
       this.__subContext__.register(this.MDSelect, 'foam.u2.tag.Select');
-      this.__subContext__.register(this.MDSelect, 'foam.u2.view.RichChoiceView');
+      this.__subContext__.register(this.MDRichSelect, 'foam.u2.view.RichChoiceView');
       this.__subContext__.register(this.MDDateField, 'foam.u2.DateTimeView');
       this.__subContext__.register(this.MDFloatView, 'foam.u2.FloatView');
       this.__subContext__.register(this.MDTextField, 'foam.u2.TextField');

@@ -8,7 +8,7 @@
 foam.CLASS({
   package: 'foam.u2.property',
   name: 'MenuElement',
-  extends: 'foam.u2.property.MDAbstractChoiceView',
+  extends: 'foam.u2.View',
 
   imports: [
     'document',
@@ -18,7 +18,8 @@ foam.CLASS({
 
   properties: [
     ['nodeName', 'ul'],
-    'itemHeight', 'itemWidth', 'hMargin'
+    'itemHeight', 'itemWidth', 'hMargin',
+    'choices', 'data', 'index'
   ],
 
   methods: [
@@ -32,9 +33,7 @@ foam.CLASS({
       for ( var i = 0 ; i < this.choices.length ; i++ ) {
         this.start('li')
           .addClass('choice')
-          .addClass(this.slot(function(i) {
-            return this.index === i ? 'selected' : '';
-          }.bind(this, i), this.index$))
+          .addClass(this.index === i ? 'selected' : '')
           .on('click', this.onClick.bind(this, i))
           .add(this.choices[i][1])
           .end();
