@@ -362,23 +362,22 @@ foam.CLASS({
       window.addEventListener('resize', this.updateDisplayWidth);
       this.updateDisplayWidth();
 
-      var userNotificationQueryId = this.subject && this.subject.realUser ?
-      this.subject.realUser.id : this.user.id;
 
-      this.__subSubContext__.notificationDAO.where(
-        this.EQ(this.Notification.USER_ID, userNotificationQueryId)
-      ).on.put.sub((sub, on, put, obj) => {
-        if ( obj.toastState == this.ToastState.REQUESTED ) {
-          this.add(this.NotificationMessage.create({
-            message: obj.toastMessage,
-            type: obj.severity,
-            description: obj.toastSubMessage
-          }));
-          var clonedNotification = obj.clone();
-          clonedNotification.toastState = this.ToastState.DISPLAYED;
-          this.__subSubContext__.notificationDAO.put(clonedNotification);
-        }
-      });
+
+//      this.__subSubContext__.notificationDAO.where(
+//        this.EQ(this.Notification.USER_ID, userNotificationQueryId)
+//      ).on.put.sub((sub, on, put, obj) => {
+//        if ( obj.toastState == this.ToastState.REQUESTED ) {
+//          this.add(this.NotificationMessage.create({
+//            message: obj.toastMessage,
+//            type: obj.severity,
+//            description: obj.toastSubMessage
+//          }));
+//          var clonedNotification = obj.clone();
+//          clonedNotification.toastState = this.ToastState.DISPLAYED;
+//          this.__subSubContext__.notificationDAO.put(clonedNotification);
+//        }
+//      });
 
       this.clientPromise.then(() => {
         this.fetchTheme().then(() => {
@@ -608,6 +607,23 @@ foam.CLASS({
        *   - Update the look and feel of the app based on the group or user
        *   - Go to a menu based on either the hash or the group
        */
+       var userNotificationQueryId = this.subject && this.subject.realUser ?
+             this.subject.realUser.id : this.user.id;
+      this.__subSubContext__.notificationDAO.where(
+        this.EQ(this.Notification.USER_ID, userNotificationQueryId)
+      ).on.put.sub((sub, on, put, obj) => {
+        if ( obj.toastState == this.ToastState.REQUESTED ) {
+          this.add(this.NotificationMessage.create({
+            message: obj.toastMessage,
+            type: obj.severity,
+            description: obj.toastSubMessage
+          }));
+          var clonedNotification = obj.clone();
+          clonedNotification.toastState = this.ToastState.DISPLAYED;
+          this.__subSubContext__.notificationDAO.put(clonedNotification);
+        }
+      });
+
       this.fetchTheme();
 
       var hash = this.window.location.hash;
@@ -619,7 +635,7 @@ foam.CLASS({
         this.window.location.hash = this.theme.defaultMenu;
       }
 
-      this.__subContext__.localSettingDAO.put(foam.nanos.session.LocalSetting.create({id: 'homeDenomination', value: localStorage.getItem("homeDenomination")}));
+//      this.__subContext__.localSettingDAO.put(foam.nanos.session.LocalSetting.create({id: 'homeDenomination', value: localStorage.getItem("homeDenomination")}));
     },
 
     function menuListener(m) {
