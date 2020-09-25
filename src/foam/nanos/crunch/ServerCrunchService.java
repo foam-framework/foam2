@@ -16,13 +16,9 @@ import foam.nanos.auth.User;
 import foam.nanos.crunch.lite.Capable;
 import foam.nanos.crunch.lite.CapablePayload;
 import foam.nanos.logger.Logger;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Queue;
+
+import java.util.*;
+
 import static foam.mlang.MLang.*;
 
 public class ServerCrunchService implements CrunchService {
@@ -122,6 +118,24 @@ public class ServerCrunchService implements CrunchService {
 
     Collections.reverse(grantPath);
     return grantPath;
+  }
+
+  class Foo {
+    Foo(String a, int b) {
+
+    }
+  }
+
+  public void foo(Foo f) {
+
+  }
+
+  public String[] getDependantIds(X x, String capabilityId) {
+    return Arrays.stream(((CapabilityCapabilityJunction[]) ((ArraySink) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
+      .where(EQ(CapabilityCapabilityJunction.TARGET_ID, capabilityId))
+      .select(new ArraySink())).getArray()
+      .toArray(new CapabilityCapabilityJunction[0])))
+      .map(CapabilityCapabilityJunction::getSourceId).toArray(String[]::new);
   }
 
   // Return capability path for multiple prerequisites without duplicates.
@@ -309,8 +323,8 @@ public class ServerCrunchService implements CrunchService {
   public boolean shouldReopenUserCapabilityJunction(UserCapabilityJunction ucj) {
     if ( ucj == null ) return true;
     else if ( ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ucj.getIsRenewable() ) return true;
-    else if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED && 
-              ucj.getStatus() != CapabilityJunctionStatus.PENDING && 
+    else if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED &&
+              ucj.getStatus() != CapabilityJunctionStatus.PENDING &&
               ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return true;
     return false;
   }
