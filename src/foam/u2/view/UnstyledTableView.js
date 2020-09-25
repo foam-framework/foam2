@@ -255,7 +255,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'onDAOUpdate',
+      name: 'dataChangedFlag',
       class: 'Boolean'
     }
   ],
@@ -408,7 +408,7 @@ foam.CLASS({
          */
           var view = this;
           this.data.sub('on', function() {
-            view.onDAOUpdate = !view.onDAOUpdate;
+            view.dataChangedFlag = !view.dataChangedFlag;
           });
 
           var modelActions = view.of.getAxiomsByClass(foam.core.Action);
@@ -418,7 +418,7 @@ foam.CLASS({
 
           //with this code error created  slot.get cause promise return
           //FIX ME
-          return this.slot(function(data, data$delegate, onDAOUpdate, order, updateValues) {
+          return this.slot(function(data, data$delegate, dataChangedFlag, order, updateValues) {
             view.props = this.returnPropertiesForColumns(view, view.columns_);
             var propertyNamesToQuery = view.props.filter(p => foam.core.Property.isInstance(p.property)).map(p => p.fullPropertyName);
 
