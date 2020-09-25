@@ -218,11 +218,11 @@ foam.CLASS({
       }
     },
 
-    function dblclick(obj) {
+    function dblclick(obj, id) {
       if ( this.data.dblclick ) {
-        this.data.dblclick(obj);
+        this.data.dblclick(obj, obj && obj.id ? obj.id : id);
       } else {
-        this.onEdit(null, null, obj.id);
+        this.onEdit(null, null, obj && obj.id ? obj.id : id);
       }
     }
   ],
