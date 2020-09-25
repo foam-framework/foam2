@@ -17,6 +17,7 @@ foam.INTERFACE({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.CrunchService',
     'foam.nanos.ruler.RulerDAO',
 
@@ -76,13 +77,26 @@ foam.INTERFACE({
         }));
         cls.methods.push(foam.java.Method.create({
           name: 'verifyRequirements',
-          type: 'boolean',
           visibility: 'default',
           type: 'void',
           javaThrows: [ 'IllegalStateException' ],
           args: [
             { name: 'x', type: 'X' },
             { name: 'capabilityIds', type: 'String[]' }
+          ],
+          body: `
+            checkRequirementsStatus(x, capabilityIds, GRANTED);
+          `
+        }));
+        cls.methods.push(foam.java.Method.create({
+          name: 'checkRequirementsStatus',
+          visibility: 'default',
+          type: 'void',
+          javaThrows: [ 'IllegalStateException' ],
+          args: [
+            { name: 'x', type: 'X' },
+            { name: 'capabilityIds', type: 'String[]' },
+            { name: 'status', type: 'CapabilityJunctionStatus' },
           ],
           body: `
             // Marshal payloads into a hashmap
@@ -100,12 +114,31 @@ foam.INTERFACE({
               }
 
               CapablePayload payload = payloads.get(capId);
-              if ( payload.getStatus() != GRANTED ) {
+              if ( payload.getStatus() != status ) {
                 throw new IllegalStateException(String.format(
-                  "Object does not have granted status for capability '%s'",
+                  "Object does not have %s status for capability '%s'",
+                  status,
                   capId
                 ));
               }
+            }
+          `
+        }));
+        cls.methods.push(foam.java.Method.create({
+          name: 'checkRequirementsStatusNoThrow',
+          visibility: 'default',
+          type: 'boolean',
+          args: [
+            { name: 'x', type: 'X' },
+            { name: 'capabilityIds', type: 'String[]' },
+            { name: 'status', type: 'CapabilityJunctionStatus' },
+          ],
+          body: `
+            try {
+              checkRequirementsStatus(x, capabilityIds, status);
+              return true;
+            } catch(IllegalStateException e) {
+              return false;
             }
           `
         }));

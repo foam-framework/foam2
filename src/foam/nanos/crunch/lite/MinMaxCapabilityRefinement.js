@@ -33,14 +33,18 @@ foam.CLASS({
           CapablePayload prereqPayload = (CapablePayload)
             capablePayloadDAO.find(ccJunction.getTargetId());
           
+          if ( prereqPayload == null ) {
+            continue;
+          }
+          
           switch ( prereqPayload.getStatus() ) {
             case GRANTED:
               numberGranted++;
-              break;
+              continue;
             case PENDING:
             case APPROVED:
               numberPending++;
-              break;
+              continue;
           }
         }
 
