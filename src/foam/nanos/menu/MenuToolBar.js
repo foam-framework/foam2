@@ -36,7 +36,7 @@ foam.CLASS({
     ^options {
       display: flex;
       flex-direction: row;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       padding: 0 36px 32px 36px;
     }
