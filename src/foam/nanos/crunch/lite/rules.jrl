@@ -4,8 +4,8 @@ p({
     "name":"SetCapablePayloadStatusOnPut",
     "priority":100,
     "daoKey":"capablePayloadDAO",
-    "ruleGroup":"crunch",
-    "operation":1,
+    "ruleGroup":"crunchLite",
+    "operation":3,
     "after":false,
     "action":{
         "class":"foam.nanos.crunch.lite.ruler.SetCapablePayloadStatusOnPut"
@@ -20,8 +20,8 @@ p({
     "name":"ReputDependantPayloads",
     "priority":200,
     "daoKey":"capablePayloadDAO",
-    "ruleGroup":"crunch",
-    "operation":1,
+    "ruleGroup":"crunchLite",
+    "operation":3,
     "after":false,
     "action":{
         "class":"foam.nanos.crunch.lite.ruler.ReputDependantPayloads"

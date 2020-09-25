@@ -27,6 +27,10 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.nanos.crunch.lite.Capable',
       name: 'capableRequirements'
+    },
+    {
+      class: 'String',
+      name: 'daoKey'
     }
   ]
 });

@@ -73,23 +73,19 @@ foam.CLASS({
     {
       name: 'save',
       code: async function() {
-        // TODO: add payload to capable
-
-        // isAvailable$
-        // adding instantly
-        // remove instantly
-        this.capable.capablePayloads.push(payload);
+        // Returns a promise
       }
     },
     {
       name: 'adjustCapablePayloads',
       code: function(oldChoices, newChoices) {
+        debugger;
         var choiceWizardlets = this.choiceWizardlets;
 
-        var selectedOldChoices = oldChoices.filter(choice => choice[2]);
-        var selectedNewChoices = newChoices.filter(choice => choice[2]);
+        var selectedOldChoices = oldChoices.filter(choice => typeof choice[2] === 'object' ? choice[2].get() : choice[2]);
+        var selectedNewChoices = newChoices.filter(choice => typeof choice[2] === 'object' ? choice[2].get() : choice[2]);
 
-        if ( selectedOldChoices > selectedNewChoices ){
+        if ( selectedOldChoices.length > selectedNewChoices.length ){
           var deselectedChoice = selectedOldChoices.filter(choice => selectedNewChoices.indexOf(choice) == -1)
 
           var deselectedWizard = choiceWizardlets.filter(wizard => wizard.title === deselectedChoice[0]);
@@ -98,15 +94,15 @@ foam.CLASS({
 
           this.capable.capablePayloads = this.capable.capablePayloads.filter(capablePayload => capablePayload !== targetPayload);
 
-        } else if (selectedOldChoices < selectedNewChoices ) {
+        } else if (selectedOldChoices.length < selectedNewChoices.length ) {
 
           var selectedChoice = selectedNewChoices.filter(choice => selectedOldChoices.indexOf(choice) == -1)
 
-          var selectedWizard = choiceWizardlets.filter(wizard => wizard.title === selectedChoice[0]);
+          var selectedWizard = choiceWizardlets.filter(wizard => wizard.title === selectedChoice[0][0]);
 
-          var { targetPayload } =  selectedWizard;
+          var { targetPayload } =  selectedWizard[0];
 
-          this.capable.capablePayloads = this.capable.capablePayloads.push(targetPayload);
+          this.capable.capablePayloads.push(targetPayload);
 
         } else {
           console.warn('Both selectedOldChoices and selectedNewChoices should  not have the same length');
