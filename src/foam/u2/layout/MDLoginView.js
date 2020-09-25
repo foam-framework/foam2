@@ -21,7 +21,8 @@ foam.CLASS({
     'foam.u2.Element',
     'foam.u2.borders.SplitScreenBorder',
     'foam.nanos.u2.navigation.SignIn',
-    'foam.nanos.u2.navigation.SignUp'
+    'foam.nanos.u2.navigation.SignUp',
+    'foam.u2.property.MDTextField'
   ],
 
   css: `
@@ -52,17 +53,8 @@ foam.CLASS({
   }
 
   ^ .title-top {
-    font-size: 2.5em;
-    padding-bottom: 6rem;
-    font-weight: bold;
-  }
-
-  ^ .content-form {
-    font-size: 2rem;
-    padding-top: 20%;
-    width: 70%;
-    height: 100%;
-    margin: auto;
+    font-size: 1.7em;
+    padding-bottom: 5rem;
     text-align: center;
   }
 
@@ -115,8 +107,12 @@ foam.CLASS({
   }
   ^ .foam-u2-ActionView-login {
       margin: auto;
-      padding: 1.5rem;
+      padding: 2rem;
       font-size: 2.5rem;
+      position: relative;
+      bottom: -2rem;
+      width: 9  0%;
+      border-radius: 50px;
   }
 
   ^ .foam-u2-detail-SectionedDetailPropertyView m3 {
@@ -127,6 +123,28 @@ foam.CLASS({
       height: 4rem;
       font-size: 2rem;
     }
+
+  ^ .content-form {
+    font-size: 2rem;
+    width: 75%;
+    padding: 3rem;
+    top: -10rem;
+    position: relative;
+    background: /*%GREY5%*/ #f5f7fa;
+    margin: auto;
+    box-shadow: 0px 0px 30px 0px #b7b7b7;
+    border-radius: 30px;
+    color: /*%GREY1%*/ #5e6061;
+  }
+
+  ^ .background-container {
+    background-color: blue;
+    height: 30%;
+  }
+
+  ^ .foam-u2-layout-Cols {
+    height: 0px;
+  }
   `,
 
   properties: [
@@ -204,35 +222,35 @@ foam.CLASS({
 
     function initE() {
       this.SUPER();
+//      this.__subContext__.register(this.MDTextField, 'foam.u2.TextField');
       this.document.addEventListener('keyup', this.onKeyPressed);
       this.onDetach(() => {
         this.document.removeEventListener('keyup', this.onKeyPressed);
       });
       this.addClass(this.myClass());
+      this.start('div').addClass('background-container').end();
       this.start('div').addClass('login-container')
-        .start().addClass('title-top').add(this.model.TITLE).end()
+        .start().addClass('title-top').add('Login').end()
         .startContext({ data: this })
           .addClass('content-form').tag(this.MODEL).br()
         .endContext()
-      .br()
-      .start().addClass('center-footer')
-          .start('span').addClass('bold-text-with-pad').add(this.model.FOOTER_TXT).end()
-          .start('span').addClass('link')
-            .add(this.model.FOOTER_LINK)
-            .on('click', () => {
-              this.model.footerLink(this.topBarShow_, this.param);
-            })
-          .end()
-        .br().br()
-          .start('span').addClass('bold-text-with-pad').add(this.model.SUB_FOOTER_TXT).end()
-          .start('span').addClass('link')
-            .add(this.model.SUB_FOOTER_LINK)
-            .on('click', () => {
-              this.model.subfooterLink();
-            })
-          .end()
+      .end();
+      this.start().addClass('center-footer')
+        .start('span').addClass('bold-text-with-pad').add(this.model.FOOTER_TXT).end()
+        .start('span').addClass('link')
+          .add(this.model.FOOTER_LINK)
+          .on('click', () => {
+            this.model.footerLink(this.topBarShow_, this.param);
+          })
         .end()
-        .end();
+        .start('span').addClass('bold-text-with-pad').add(this.model.SUB_FOOTER_TXT).end()
+        .start('span').addClass('link')
+          .add(this.model.SUB_FOOTER_LINK)
+          .on('click', () => {
+            this.model.subfooterLink();
+          })
+        .end()
+      .end();
     }
   ],
 
