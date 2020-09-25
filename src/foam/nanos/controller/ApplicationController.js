@@ -586,7 +586,7 @@ foam.CLASS({
       if ( capabilityInfo.capableRequirements.length > 0 ) {
         capabilityInfo.capableRequirements.forEach(capable => {
           p = p.then(() => {
-            return self.crunchController.launchCapableWizard(capable);
+            return self.crunchController.launchCapableWizard(capable, capabilityInfo.daoKey);
           });
         })
       }

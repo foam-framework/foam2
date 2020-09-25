@@ -43,6 +43,7 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.LoadTopConfig',
     'foam.u2.crunch.wizardflow.CapableDefaultConfigAgent',
     'foam.u2.crunch.wizardflow.CapableCreateWizardletsAgent',
+    'foam.u2.crunch.wizardflow.MaybeDAOPutAgent',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
     'foam.u2.crunch.CapabilityInterceptView',
@@ -88,7 +89,7 @@ foam.CLASS({
     },
 
     // Excludes UCJ-related logic
-    function createCapableWizardSequence(capable) {
+    function createCapableWizardSequence(capable, daoKey) {
       return this.Sequence.create(null, this.__subContext__.createSubContext({
         capable: capable
       }))
@@ -96,6 +97,9 @@ foam.CLASS({
         .add(this.CapableDefaultConfigAgent)
         .add(this.CapableCreateWizardletsAgent)
         .add(this.StepWizardAgent)
+        .add(this.MaybeDAOPutAgent, {
+          daoKey: daoKey
+        })
         ;
     },
 
@@ -189,10 +193,10 @@ foam.CLASS({
     },
 
     // CRUNCH Lite Methods
-    function launchCapableWizard(capable) {
+    function launchCapableWizard(capable, daoKey) {
       var p = Promise.resolve(true);
 
-      var seq = this.createCapableWizardSequence(capable);
+      var seq = this.createCapableWizardSequence(capable, daoKey);
       return seq.execute().then(x => {
         // The 'submitted' boolean becomes 'resend' in SessionClientBox
         return x.submitted;
