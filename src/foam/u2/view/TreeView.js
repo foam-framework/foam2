@@ -225,6 +225,7 @@ foam.CLASS({
               addClass(self.myClass('label')).
               call(this.formatter, [self.data]).
               start('span').
+              addClass('toggle-icon').
               show(this.hasChildren$).
               style({
                 'visibility':     'visible',
@@ -249,7 +250,7 @@ foam.CLASS({
                 query:            controlledSearchSlot,
                 onClickAddOn:     self.onClickAddOn,
                 level:            self.level + 1
-              }, self));
+              }, self)).addClass('child-menu');
             });
           })).
         end();

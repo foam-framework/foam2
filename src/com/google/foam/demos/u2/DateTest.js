@@ -15,7 +15,7 @@ foam.CLASS({
     {
       class: 'Date',
       name: 'datePicker',
-      view: 'foam.u2.md.DateField'
+      view: 'foam.u2.property.MDDateField'
     }
   ]
 });
