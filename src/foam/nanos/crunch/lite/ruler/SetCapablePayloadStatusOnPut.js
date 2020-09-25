@@ -14,13 +14,20 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.ContextAwareAgent',
-    'foam.core.X',
-    'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.lite.Capable',
-    'foam.nanos.crunch.lite.CapablePayload',
-    'foam.nanos.crunch.lite.CapableAdapterDAO',
-    'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.core.FObject',
+    'foam.core.X',
+    'foam.dao.ArraySink',
+    'foam.dao.DAO',
+    'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.crunch.CrunchService',
+    'foam.nanos.crunch.lite.Capable',
+    'foam.nanos.crunch.lite.CapableAdapterDAO',
+    'foam.nanos.crunch.lite.CapablePayload',
+
+    'java.util.List',
+
+    'static foam.mlang.MLang.*',
     'static foam.nanos.crunch.CapabilityJunctionStatus.*'
   ],
 
@@ -28,25 +35,38 @@ foam.CLASS({
     {
       name: 'applyAction',
       javaCode: `
-        agency.submit(x, new ContextAwareAgent() {
-          @Override
-          public void execute(X x) {
-            CapableAdapterDAO payloadDAO = (CapableAdapterDAO) x.get("capablePayloadDAO");
-            Capable capableTarget = payloadDAO.getCapable();
-            
-            CapablePayload payload = (CapablePayload) obj;
-    
-            CapabilityJunctionStatus defaultStatus = PENDING;
-    
-            try {
-              payload.validate(x);
-            } catch ( IllegalStateException e ) {
-              return;
+        agency.submit(x, (agencyX) -> {
+          CapableAdapterDAO tempPayloadDAO = (CapableAdapterDAO) agencyX.get("capablePayloadDAO");
+          Capable capableTarget = tempPayloadDAO.getCapable();
+          var payloadDAO = (DAO) capableTarget.getCapablePayloadDAO(agencyX);
+
+          CapablePayload payload = (CapablePayload) obj;
+
+          CapabilityJunctionStatus defaultStatus = PENDING;
+
+          try {
+            payload.validate(agencyX);
+          } catch ( IllegalStateException e ) {
+            return;
+          }
+
+          Capability cap = payload.getCapability();
+          var oldStatus = payload.getStatus();
+          var newStatus = cap.getCapableChainedStatus(agencyX, payloadDAO, payload);
+
+          if ( oldStatus != newStatus )  {
+            payload.setStatus(newStatus);
+            // TODO Maybe use projection MLang
+            var crunchService = (CrunchService) agencyX.get("crunchService");
+            var depIds = crunchService.getDependantIds(agencyX, payload.getCapability().getId());
+
+            List<CapablePayload> payloads =
+              ((ArraySink) payloadDAO
+                .where(IN(DOT(CapablePayload.CAPABILITY, Capability.ID), depIds))
+                .select(new ArraySink())).getArray();
+            for ( CapablePayload currentPayload : payloads ) {
+              payloadDAO.put(currentPayload);
             }
-    
-            Capability cap = payload.getCapability();
-            payload.setStatus(cap.getCapableChainedStatus(
-              x, payloadDAO, payload));
           }
         }, "Set capable payload status on put");
       `,

@@ -60,6 +60,20 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'getDependantIds',
+      type: 'String[]',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        }
+      ]
+    },
+    {
       name: 'getMultipleCapabilityPath',
       documentation: `
         getGrantPath provides an array of capability objects representing
