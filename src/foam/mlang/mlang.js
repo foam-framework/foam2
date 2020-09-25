@@ -424,7 +424,7 @@ foam.CLASS({
     {
       name: 'toString',
       code: function toString() { return this.cls_.name; },
-      javaCode: 'return "AbstractPredicate: " + getClass().getName() + " " + getClass();'
+      javaCode: 'return getClass().getName();'
     },
     {
       name: 'createStatement',
@@ -2180,7 +2180,7 @@ foam.CLASS({
       code: function() {
         return foam.String.constantize(this.cls_.name) + '(' + this.arg1.toString() + ')';
       },
-      javaCode: 'return String.format("Nottt(%s,%s)", getArg1().getClass(), getArg1().toString());'
+      javaCode: 'return String.format("Not(%s)", getArg1().toString());'
     },
     {
       name: 'partialEval',
