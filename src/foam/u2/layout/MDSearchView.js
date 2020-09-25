@@ -87,7 +87,7 @@ foam.CLASS({
     {
       name: 'clear',
       iconFontName: 'close',
-      displayLabel: false,
+      label: '',
       code: function() {
         this.filterController.clearAll();
         this.generalSearchField.view.data = '';

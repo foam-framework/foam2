@@ -111,7 +111,7 @@ foam.CLASS({
     {
       name: 'closeMenu',
       iconFontName: 'arrow_back',
-      displayLabel: false,
+      label: '',
       code: function() {
         this.isMenuOpen = ! this.isMenuOpen;
       }

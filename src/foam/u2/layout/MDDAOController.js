@@ -218,7 +218,7 @@ foam.CLASS({
     {
       name: 'openMenu',
       iconFontName: 'menu',
-      displayLabel: false,
+      label: '',
       code: function() {
         this.isMenuOpen = true;;
       }
@@ -226,7 +226,7 @@ foam.CLASS({
     {
       name: 'closeMenu',
       iconFontName: 'arrow_back',
-      displayLabel: false,
+      label: '',
       code: function() {
         this.isMenuOpen = false;
       }
@@ -234,7 +234,7 @@ foam.CLASS({
     {
       name: 'search',
       iconFontName: 'search',
-      displayLabel: false,
+      label: '',
       code: function() {
         this.isSearchActive = ! this.isSearchActive;
       }
@@ -242,7 +242,7 @@ foam.CLASS({
     {
       name: 'create',
       iconFontName: 'add',
-      displayLabel: false,
+      label: '',
       code: function() {
         if ( ! this.stack ) return;
         this.stack.push({

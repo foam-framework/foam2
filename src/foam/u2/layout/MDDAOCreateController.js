@@ -75,7 +75,7 @@ foam.CLASS({
     {
       name: 'save',
       iconFontName: 'check',
-      displayLabel: false,
+      label: '',
       code: function() {
         var self = this;
         this.dao.put(this.obj.clone()).then(function() {
@@ -89,7 +89,7 @@ foam.CLASS({
     {
       name: 'back',
       iconFontName: 'arrow_back',
-      displayLabel: false,
+      label: '',
       code: function(x) {
         x.stack.back();
       }

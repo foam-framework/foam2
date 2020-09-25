@@ -42,12 +42,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'label',
-      expression: function(name) { return this.displayLabel ? foam.String.labelize(name) : ''; }
-    },
-    {
-      class: 'Boolean',
-      name: 'displayLabel',
-      value: true
+      expression: function(name) { return foam.String.labelize(name); }
     },
     {
       class: 'String',
