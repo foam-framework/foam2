@@ -58,8 +58,7 @@ foam.CLASS({
     {
       documentation: 'Cron jobs shall be enabled as a deployment step.',
       class: 'Boolean',
-      name: 'enabled',
-      value: false,
+      name: 'enabled'
     },
     {
       name: 'server',

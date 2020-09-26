@@ -1632,7 +1632,7 @@ foam.CLASS({
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
         } else {
-          if ( foam.locale !== null && typeof c === 'object' && c.data !== undefined && c.data.id !== undefined ) {
+          if ( false && foam.locale !== null && typeof c === 'object' && c.data !== undefined && c.data.id !== undefined ) {
             var self = this;
             var expr = foam.mlang.Expressions.create();
             let d =  this.__subContext__.localeDAO;
@@ -1643,7 +1643,7 @@ foam.CLASS({
                     expr.OR(
                       expr.EQ(foam.i18n.Locale.LOCALE, foam.locale),
                       expr.EQ(foam.i18n.Locale.LOCALE, foam.locale.substring(0,foam.locale.indexOf('-')))),
-                    expr.EQ(foam.i18n.Locale.ID, c.data.id+'.'+c.clsInfo)))
+                    expr.EQ(foam.i18n.Locale.ID, c.data.id + '.' + c.clsInfo)))
                 .select().then(function(a){
                   let arr = a.array;
                   if ( arr.length > 0 ) {
