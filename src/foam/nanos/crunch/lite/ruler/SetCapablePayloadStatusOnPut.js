@@ -26,6 +26,7 @@ foam.CLASS({
     'foam.nanos.crunch.lite.CapablePayload',
 
     'java.util.List',
+    'java.util.Arrays',
 
     'static foam.mlang.MLang.*',
     'static foam.nanos.crunch.CapabilityJunctionStatus.*'
@@ -60,13 +61,11 @@ foam.CLASS({
             var crunchService = (CrunchService) agencyX.get("crunchService");
             var depIds = crunchService.getDependantIds(agencyX, payload.getCapability().getId());
 
-            List<CapablePayload> payloads =
-              ((ArraySink) payloadDAO
-                .where(IN(DOT(CapablePayload.CAPABILITY, Capability.ID), depIds))
-                .select(new ArraySink())).getArray();
-            for ( CapablePayload currentPayload : payloads ) {
-              payloadDAO.put(currentPayload);
-            }
+            ((ArraySink) payloadDAO.select(new ArraySink())).getArray().stream()
+            .filter(cp -> Arrays.stream(depIds).anyMatch(((CapablePayload) cp).getCapability().getId()::equals))
+            .forEach(cp -> {
+              payloadDAO.put((CapablePayload) cp);
+            });
           }
         }, "Set capable payload status on put");
       `,
