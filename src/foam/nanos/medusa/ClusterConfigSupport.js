@@ -289,7 +289,10 @@ configuration for contacting the primary node.`,
         .where(
           AND(
             EQ(ClusterConfig.ZONE, zone),
-            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+            OR(
+              EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+              EQ(ClusterConfig.TYPE, MedusaType.NERF)
+            ),
             //EQ(ClusterConfig.STATUS, Status.ONLINE),
             EQ(ClusterConfig.ENABLED, true),
             EQ(ClusterConfig.REGION, myConfig.getRegion()),
@@ -320,7 +323,10 @@ configuration for contacting the primary node.`,
               EQ(ClusterConfig.REALM, config.getRealm()),
               EQ(ClusterConfig.REGION_STATUS, RegionStatus.ACTIVE),
               EQ(ClusterConfig.STATUS, Status.ONLINE),
-              EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+              OR(
+                EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+                EQ(ClusterConfig.TYPE, MedusaType.NERF)
+              ),
               EQ(ClusterConfig.ZONE, zone)
             ));
         if ( zone == 0 ) {
@@ -387,7 +393,10 @@ configuration for contacting the primary node.`,
           AND(
             EQ(ClusterConfig.REGION_STATUS, RegionStatus.ACTIVE),
             EQ(ClusterConfig.REALM, config.getRealm()),
-            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+            OR(
+              EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+              EQ(ClusterConfig.TYPE, MedusaType.NERF)
+            ),
             EQ(ClusterConfig.STATUS, Status.ONLINE),
             EQ(ClusterConfig.ENABLED, true)
           ))

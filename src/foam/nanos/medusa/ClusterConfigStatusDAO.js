@@ -58,39 +58,46 @@ foam.CLASS({
       Boolean hadQuorum = support.hasQuorum(x);
       nu = (ClusterConfig) getDelegate().put_(x, nu);
 
-      if ( old != null &&
+      if ( old == null ||
+           ( old.getStatus() == nu.getStatus() &&
+             old.getAccessMode() == nu.getAccessMode() ) ) {
+        return nu;
+      }
+
+      if ( nu.getId() == support.getConfigId() ) {
+        support.setStatus(nu.getStatus());
+      }
+
+      if ( myConfig.getType() != MedusaType.MEDIATOR ) {
+        return nu;
+      }
+
+      getLogger().info(nu.getName(), old.getStatus().getLabel(), "->", nu.getStatus().getLabel().toUpperCase());
+
+      if ( nu.getType() == MedusaType.MEDIATOR &&
            old.getStatus() != nu.getStatus() ) {
-
-        getLogger().info(nu.getName(), old.getStatus().getLabel(), "->", nu.getStatus().getLabel().toUpperCase());
-
-        if ( nu.getId() == support.getConfigId() ) {
-          support.setStatus(nu.getStatus());
-        }
-
-        if ( nu.getType() == MedusaType.MEDIATOR ) {
-
-          ElectoralService electoralService = (ElectoralService) x.get("electoralService");
-          if ( electoralService != null ) {
-            ClusterConfig config = support.getConfig(x, support.getConfigId());
-            if ( support.canVote(x, nu) &&
-                 support.canVote(x, config) ) {
-              Boolean hasQuorum = support.hasQuorum(x);
-              if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ||
-                   electoralService.getState() == ElectoralServiceState.ADJOURNED) {
-                if ( hadQuorum && ! hasQuorum) {
-                  getLogger().warning(this.getClass().getSimpleName(), "mediator quorum lost");
-                } else if ( ! hadQuorum && hasQuorum) {
-                  getLogger().warning(this.getClass().getSimpleName(), "mediator quorum acquired");
-                } else {
-                  getLogger().info(this.getClass().getSimpleName(), "mediator quorum membership change");
-                }
-                electoralService.dissolve(x);
+        ElectoralService electoralService = (ElectoralService) x.get("electoralService");
+        if ( electoralService != null ) {
+          ClusterConfig config = support.getConfig(x, support.getConfigId());
+          if ( support.canVote(x, nu) &&
+               support.canVote(x, config) ) {
+            Boolean hasQuorum = support.hasQuorum(x);
+            if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ||
+                 electoralService.getState() == ElectoralServiceState.ADJOURNED) {
+              if ( hadQuorum && ! hasQuorum) {
+                getLogger().warning(this.getClass().getSimpleName(), "mediator quorum lost");
+              } else if ( ! hadQuorum && hasQuorum) {
+                getLogger().warning(this.getClass().getSimpleName(), "mediator quorum acquired");
+              } else {
+                getLogger().info(this.getClass().getSimpleName(), "mediator quorum membership change");
               }
+              electoralService.dissolve(x);
             }
           }
-        } else if ( nu.getType() == MedusaType.NODE ) {
-          bucketNodes(x);
         }
+      } else if ( nu.getType() == MedusaType.NODE ) {
+          getLogger().info(nu.getName(), old.getStatus().getLabel(), "->", nu.getStatus().getLabel().toUpperCase());
+          bucketNodes(x);
       }
       return nu;
       `

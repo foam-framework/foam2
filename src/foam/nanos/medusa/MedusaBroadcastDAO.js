@@ -82,11 +82,12 @@ foam.CLASS({
         entry = (MedusaEntry) submit(x, entry, DOP.PUT);
         ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
         replaying.updateIndex(x, entry.getIndex());
-      } else if ( myConfig.getType() == MedusaType.MEDIATOR &&
+      } else if ( ( myConfig.getType() == MedusaType.MEDIATOR ||
+                    myConfig.getType() == MedusaType.NERF ) &&
                   myConfig.getStatus() == Status.ONLINE &&
                   entry.getPromoted() ) {
 
-        // Broadcast promoted entries to other MEDIATORS
+        // Broadcast promoted entries to other MEDIATORS, NERF
         // REVIEW: mediators may miss data between replayComplete and status change to ONLINE.
 
         entry = (MedusaEntry) submit(x, entry, DOP.PUT);
