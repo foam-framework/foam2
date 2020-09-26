@@ -21,6 +21,7 @@ foam.CLASS({
     'foam.graphics.Circle',
     'foam.graphics.Label',
     'foam.graphics.Point',
+    'foam.nanos.medusa.AccessMode',
     'foam.nanos.medusa.ClusterConfig',
     'foam.nanos.medusa.MedusaType',
     'foam.nanos.medusa.Status',
@@ -49,7 +50,8 @@ foam.CLASS({
       name: 'width',
       expression: function(zoneRingWidth) {
         var w = this.zoneRingWidth * 0.9;
-        if ( this.config.type == this.MedusaType.MEDIATOR ) {
+        if ( this.config.type == this.MedusaType.MEDIATOR ||
+             this.config.type == this.MedusaType.NERF ) {
           w *= this.mediatorScale;
         } else {
           w *= this.nodeScale;
@@ -87,13 +89,20 @@ foam.CLASS({
           }
         } else if ( c.status == this.Status.ONLINE ) {
           if ( c.type == this.MedusaType.NERF ) {
-            return 'blue';
+            return 'purple';
           }
           if ( c.type == this.MedusaType.ARCHIVE ) {
-            return 'brown';
+            return 'grey';
           }
           if ( c.type == this.MedusaType.OTHER ) {
-            return 'purple';
+            return 'brown';
+          }
+          if ( c.type == this.MedusaType.NODE ) {
+            if ( c.accessMode == this.AccessMode.RO ) {
+               this.color = '#F5F5F5';
+               return 'gray';
+            }
+            return 'blue';
           }
           return 'green';
         }

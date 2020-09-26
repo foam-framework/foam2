@@ -15,27 +15,32 @@ foam.ENUM({
     {
       name: 'MEDIATOR',
       label: 'Mediator',
-      ordinal: 0
+      ordinal: 0,
+      color: 'green'
     },
     {
       name: 'NODE',
       label: 'Node',
-      ordinal: 1
+      ordinal: 1,
+      color: 'blue'
     },
     {
       name: 'NERF',
       label: 'NERF',
-      ordinal: 2
+      ordinal: 2,
+      color: 'purple'
     },
     {
       name: 'ARCHIVE',
       label: 'Archive',
-      ordinal: 3
+      ordinal: 3,
+      color: 'gray'
     },
     {
       name: 'OTHER',
       label: 'Other',
-      ordinal: 4
+      ordinal: 4,
+      color: 'brown'
     }
   ]
 });

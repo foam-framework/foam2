@@ -14,16 +14,19 @@ foam.ENUM({
   values: [
     {
       name: 'RO',
-      label: 'Read-Only'
+      label: 'Read-Only',
+      color: 'gray'
     },
     {
       name: 'RW',
-      label: 'Read-Write'
+      label: 'Read-Write',
+      color: 'green'
     },
     {
+      documentation: 'Example: External customer SQL databases.',
       name: 'WO',
       label: 'Write-Only',
-      documentation: 'Example: External customer SQL databases.'
+      color: 'orange'
     }
   ]
 });

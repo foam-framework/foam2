@@ -17,12 +17,14 @@ foam.ENUM({
       name: 'STANDBY',
       label: 'Standby',
       ordinal: 0,
+      color: 'orange',
       documentation: 'Standby/Passive Region/Data-Center.'
     },
     {
       name: 'ACTIVE',
       label: 'Active',
       ordinal: 1,
+      color: 'green',
       documentation: 'Active Region/Data-Center.'
     }
   ]
