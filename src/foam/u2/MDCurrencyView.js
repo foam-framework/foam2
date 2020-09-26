@@ -9,7 +9,6 @@ foam.CLASS({
  package: 'foam.u2',
  name: 'MDCurrencyView',
  code: function() {
- debugger;
     var m = foam.json.objectify(foam.u2.CurrencyView.model_);
     m.name = 'MDCurrencyView';
     m.extends = 'foam.u2.property.MDFloatView';
