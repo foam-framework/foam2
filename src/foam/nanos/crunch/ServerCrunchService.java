@@ -344,13 +344,25 @@ public class ServerCrunchService implements CrunchService {
 
     Capability rootCapability = (Capability) capabilities.get(capabilities.size() - 1);
 
-    boolean isOr = capabilities.get(capabilities.size() - 1) instanceof  MinMaxCapability;
+    boolean isOr = capabilities.get(capabilities.size() - 1) instanceof MinMaxCapability;
 
     for ( int i = 0 ; i < capabilities.size() - 1 ; i++ ){
       Object currentObject = capabilities.get(i);
 
       if ( currentObject instanceof List ){
-        flattenedPayloads.addAll(getCapableObjectPayloads(x, (List) currentObject));
+        List<CapablePayload> recursedPayloads = getCapableObjectPayloads(x, (List) currentObject);
+
+        if ( isOr && recursedPayloads.size() > 1 ){
+          CapablePayload recursedPayloadRoot = recursedPayloads.get(recursedPayloads.size() - 1);
+
+          List<CapablePayload> recursedPayloadChildren = recursedPayloads.subList(0, recursedPayloads.size() - 1);
+
+          recursedPayloadRoot.setPrerequisites(recursedPayloadChildren.toArray(new CapablePayload[0]));
+
+          flattenedPayloads.add(recursedPayloadRoot);
+        } else {
+          flattenedPayloads.addAll(recursedPayloads);
+        }
         continue;
       }
 
