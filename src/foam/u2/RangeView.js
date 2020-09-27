@@ -21,11 +21,11 @@ foam.CLASS({
   extends: 'foam.u2.tag.Input',
 
   properties: [
-    [ 'type', 'range' ],
-    [ 'step', 0 ],
+    [ 'type',     'range' ],
+    [ 'step',     0 ],
     [ 'minValue', 0 ],
     [ 'maxValue', 100 ],
-    [ 'onKey', true ]
+    [ 'onKey',    true ]
   ],
 
   methods: [
