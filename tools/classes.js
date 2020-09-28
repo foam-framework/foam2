@@ -181,6 +181,7 @@ var classes = [
   'foam.dao.PipelinePMDAO',
   'foam.dao.PMDAO',
   'foam.nanos.pm.PMInfo',
+  'foam.nanos.pm.PMFactory',
   'foam.dao.PutOnlyDAO',
   'foam.dao.ORBRequest',
   'foam.dao.ORBitalDAO',

@@ -10,7 +10,7 @@ import foam.core.X;
 import foam.nanos.bench.Benchmark;
 import foam.nanos.bench.BenchmarkRunner;
 import foam.nanos.bench.BenchmarkRunner.Builder;
-import foam.nanos.pm.PM;
+import foam.nanos.pm.*;
 import java.util.Map;
 
 public class PMBenchmark
@@ -19,6 +19,7 @@ public class PMBenchmark
 
   @Override
   public void setup(X x) {
+    System.err.println("*************************************** setup: " + x.get("pmLogger"));
   }
 
   @Override
@@ -27,7 +28,12 @@ public class PMBenchmark
 
   @Override
   public void execute(X x) {
-    PM pm = new PM(Object.class,"def");
-    pm.log(x);
+    PMLogger pmLogger = (PMLogger) x.get("pmLogger");
+    PM pm = new PM(Object.class, "def");
+//    pm.log(x);
+pmLogger.log(pm);
+    PM pm2 = new PM(foam.nanos.bench.Benchmark.class, "def");
+    pmLogger.log(pm2);
+//    pm2.log(x);
   }
 }
