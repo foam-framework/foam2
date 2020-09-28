@@ -260,7 +260,7 @@ foam.CLASS({
               init_();
             }
 
-            private static String combine(Object... args) {
+            public static String combine(Object... args) {
               if ( args == null ) return "";
               if ( args.length == 0 || args[0] == null ) return "";
               if ( args.length == 1 ) return args[0].toString();

@@ -27,9 +27,7 @@ public class NSpecFactory
     spec_ = spec;
   }
 
-  public synchronized Object create(X x) {
-    if ( ns_ != null ) return ns_;
-
+  void buildService(X x) {
     Logger logger = null;
     if ( ! "logger".equals(spec_.getName()) && ! "PM".equals(spec_.getName()) ) {
       logger = (Logger) x.get("logger");
@@ -41,7 +39,7 @@ public class NSpecFactory
     // Avoid infinite recursions when creating services
     if ( creatingThread_ == Thread.currentThread() ) {
       logger.warning("Recursive Service Factory", spec_.getName());
-      return ns_;
+      return;
     }
     creatingThread_ = Thread.currentThread();
 
