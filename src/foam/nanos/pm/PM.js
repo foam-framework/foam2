@@ -84,7 +84,9 @@ foam.CLASS({
       javaCode: `
     if ( x == null ) return;
     if ( getIsError() ) return;
-    setEndTime(new java.util.Date());
+    if ( getEndTime() == null ) {
+      setEndTime(new java.util.Date());
+    }
     PMLogger pmLogger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
     if ( pmLogger != null ) {
       pmLogger.log(this);
@@ -207,12 +209,12 @@ foam.CLASS({
               return pm;
             }
 
-            public static PM create(X x, String key, String... args) {
+            public static PM create(X x, Object key, Object... args) {
               PM pm = (PM) x.get("PM");
 
               if ( pm == null ) return new PM(key, args);
 
-              pm.setKey(key);
+              pm.setKey(key.toString());
               pm.setName(combine((Object[]) args));
               pm.init_();
 
@@ -258,7 +260,7 @@ foam.CLASS({
               init_();
             }
 
-            private static String combine(Object... args) {
+            public static String combine(Object... args) {
               if ( args == null ) return "";
               if ( args.length == 0 || args[0] == null ) return "";
               if ( args.length == 1 ) return args[0].toString();

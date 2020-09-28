@@ -219,6 +219,8 @@ FOAM_FILES([
   { name: "foam/nanos/pm/PM" },
   { name: "foam/nanos/pm/PMInfo" },
   { name: "foam/nanos/pm/PMTableView", flags:['web'] },
+  { name: "foam/nanos/pm/PMLogger" },
+  { name: "foam/nanos/pm/NullPMLogger" },
   { name: "foam/nanos/pm/TemperatureCView" },
   { name: "foam/nanos/pm/PMFactory" },
   { name: "foam/nanos/pool/ThreadPoolAgency" },
