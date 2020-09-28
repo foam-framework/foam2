@@ -21,6 +21,7 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.log.LogLevel',
     'foam.u2.ControllerMode',
     'foam.u2.ToolbarAction',
     'foam.u2.layout.MDToolbarView'
@@ -28,7 +29,8 @@ foam.CLASS({
 
   imports: [
     'auth',
-    'stack'
+    'stack',
+    'ctrl'
   ],
 
   exports: [
@@ -49,7 +51,7 @@ foam.CLASS({
     },
     {
       class: 'foam.u2.ViewSpecWithJava',
-      name: 'viewView',
+      name: 'detailView',
       expression: function() {
         return foam.u2.detail.MDDetailView;
       }
@@ -77,6 +79,10 @@ foam.CLASS({
       iconFontName: 'check',
       label: '',
       code: function() {
+        if ( this.data.errors_ ) {
+          this.ctrl.notify('Some fields are not valid', '', this.LogLevel.ERROR, true);
+          return;
+        }
         var self = this;
         this.dao.put(this.obj.clone()).then(function() {
           self.stack.back();
@@ -128,13 +134,27 @@ foam.CLASS({
 
         this
           .addClass(this.myClass())
-          .add(self.slot(function(data, viewView) {
+          .add(self.slot(function(data, detailView) {
             return self.E()
               .start()
-                .start(viewView, { data }).end()
+                .start(detailView, { data }).end()
               .end();
           }));
       });
     }
-  ]
+  ],
+
+  css: `
+    ^ {
+      background-color: white;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: scroll;
+    }
+
+    ^ .foam-u2-detail-MDDetailView {
+      padding-top: 10rem;
+    }
+  `
 });

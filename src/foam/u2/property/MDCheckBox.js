@@ -19,7 +19,7 @@ foam.CLASS({
     ^ {
       -webkit-appearance: none;
       border: solid 2px #5a5a5a;
-      order: 1;
+      float: right;
       width: 3rem;
       height: 3rem;
       transition: background-color 140ms, border-color 140ms;
@@ -45,7 +45,7 @@ foam.CLASS({
          }.bind(this));
 
       this.start('div')
-        .addClass('label-container')
+        .addClass('label-offset')
         .add(this.label$)
       .end();
     },

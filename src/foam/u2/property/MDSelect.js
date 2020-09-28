@@ -25,7 +25,8 @@ foam.CLASS({
       value: function(obj) {
         return [ obj.id, obj.toSummary() ];
       }
-    }
+    },
+    'popup'
   ],
 
   listeners: [
@@ -34,16 +35,20 @@ foam.CLASS({
       isFramed: true,
       code: function() {
         if ( this.mode === foam.u2.DisplayMode.RO ) return;
-        var active = this.document.activeElement;
-        if (active) active.blur();
+        if ( this.popup && ! this.popup.isHidden ) {
+          this.popup.close();
+          return;
+        }
 
-        var self = this;
-        var popup = this.MDPopup.create({
-          data: this.data$,
-          choices$: this.choices$,
-          index$: this.index$
-        });
-        popup.open(this.index, this.el());
+        if ( ! this.popup || this.popup.isHidden ) {
+          var self = this;
+          this.popup = this.MDPopup.create({
+            data: this.data$,
+            choices$: this.choices$,
+            index$: this.index$
+          });
+          this.popup.open(this.index, this.el());
+        }
       }
     }
   ],
@@ -67,11 +72,15 @@ foam.CLASS({
       this
         .start('div').addClass('value').add(this.text$).end()
         .start('div').addClass('down-arrow').addClass('material-icons')
-          .add('expand_more').on('click', this.onClick)
+          .add(this.slot(function(isHidden) {
+            return self.popup && ! isHidden ? 'expand_less' : 'expand_more';
+          }, this.popup$.dot('isHidden')))
+          .on('click', this.onClick)
         .end()
 
       this.dao$proxy.on.sub(this.onDAOUpdate);
     },
+
     function fromProperty(prop) {
       this.SUPER(prop);
       if ( ! this.dao ) {

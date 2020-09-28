@@ -15,9 +15,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'clearTimeout',
     'window',
-    'setTimeout',
+    'setTimeout'
   ],
 
   exports: [
@@ -75,21 +74,21 @@ foam.CLASS({
       // start rect by this many slots. Negative offset means move up.
       var selectedOffset = 0;
 
-      if (menuCount < this.choices.length) { // Scrolling required.
+      if ( menuCount < this.choices.length ) { // Scrolling required.
         // Check if there are enough slots to center the selected item.
-        if (itemsBelow >= halfMenuCount && itemsAbove >= halfMenuCount &&
-            slotsAbove >= halfMenuCount && slotsBelow >= halfMenuCount) {
+        if ( itemsBelow >= halfMenuCount && itemsAbove >= halfMenuCount &&
+            slotsAbove >= halfMenuCount && slotsBelow >= halfMenuCount ) {
           slotsAbove = halfMenuCount;
           slotsBelow = menuCount - slotsAbove - 1;
           selectedOffset = 0;
           itemForFirstSlot = index - slotsAbove;
-        } else if (itemsAbove <= slotsAbove && itemsAbove < menuCount) {
+        } else if ( itemsAbove <= slotsAbove && itemsAbove < menuCount ) {
           // Not enough items above, so we truncate and scroll to the top.
           slotsAbove = Math.min(slotsAbove, Math.max(itemsAbove, menuCount - slotsBelow - 1));
           selectedOfset = itemsAbove - slotsAbove;
           itemForFirstSlot = 0; // Scroll to top.
           slotsBelow = Math.min(slotsBelow, menuCount - slotsAbove - 1);
-        } else if (itemsBelow <= slotsBelow && itemsBelow < menuCount) {
+        } else if ( itemsBelow <= slotsBelow && itemsBelow < menuCount ) {
           // Not enough items below, so truncate and scroll to the bottom.
           slotsBelow = Math.min(slotsBelow, Math.max(itemsBelow, menuCount - slotsAbove - 1));
           selectedOffset = -(itemsBelow - slotsBelow);
@@ -98,9 +97,9 @@ foam.CLASS({
         } else {
           // Use all slots, scroll to put the selected index exactly where it
           // should be. Make sure we never try to use too many slots.
-          if (slotsAbove < halfMenuCount) {
+          if ( slotsAbove < halfMenuCount ) {
             slotsBelow = Math.min(slotsBelow, menuCount - slotsAbove - 1);
-          } else if (slotsBelow < halfMenuCount) {
+          } else if ( slotsBelow < halfMenuCount ) {
             slotsAbove = Math.min(slotsAbove, menuCount - slotsBelow - 1);
           } else {
             slotsAbove = Math.min(slotsAbove, halfMenuCount);
@@ -113,10 +112,10 @@ foam.CLASS({
       } else {
         // No scrolling. The list wants to be centered on the selected index,
         // but may have to move up or down to fit in slotsAbove/Below.
-        if (itemsAbove > slotsAbove) {
+        if ( itemsAbove > slotsAbove ) {
           selectedOffset = itemsAbove - slotsAbove;
           slotsBelow = menuCount - slotsAbove - 1;
-        } else if (itemsBelow > slotsBelow) {
+        } else if ( itemsBelow > slotsBelow ) {
           selectedOffset = -(itemsBelow - slotsBelow);
           slotsAbove = menuCount - slotsBelow - 1;
         } else {
@@ -136,7 +135,7 @@ foam.CLASS({
       // If we couldn't fit so that our selected item is in the right place,
       // animate it up or down into the place it will appear in the list.
       // TODO: Or add empty entries to leave open space?
-      if (selectedOffset !== 0) {
+      if ( selectedOffset !== 0 ) {
         // TODO: Animate this.
       }
 
@@ -150,20 +149,15 @@ foam.CLASS({
         width: startingClientRect.width + this.hMargin * 2 + 4
       };
 
-      if (this.delegate_) {
-        this.delegate_.unload();
-        this.delegate_.removeAllChildren();
-      } else {
-        this.delegate_ = this.MenuElement.create({
-          choices: this.choices,
-          data: this.data$,
-          autoSetData: this.autoSetData,
-          itemHeight: this.itemHeight,
-          itemWidth: this.itemWidth,
-          hMargin: this.hMargin,
-          index$: this.index$
-        });
-      }
+      this.delegate_ = this.MenuElement.create({
+        choices: this.choices,
+        data: this.data$,
+        autoSetData: this.autoSetData,
+        itemHeight: this.itemHeight,
+        itemWidth: this.itemWidth,
+        hMargin: this.hMargin,
+        index$: this.index$
+      });
 
       sourceElement.insertAdjacentHTML('beforeend', this.delegate_.outerHTML);
       this.delegate_.load();
@@ -181,19 +175,18 @@ foam.CLASS({
       this.delegate_.style({
         padding: '0px 0px ' + this.vMargin * 2 + 'px 0px',
         height: finalRect.height + 'px',
-        bottom: -finalRect.height - 20 + 'px',
+        bottom: -finalRect.height - 40 + 'px',
         width: '100%',
         'z-index': 10,
         transition: 'all 0.5s ease-in-out',
-//        transform: 'scaleY(0)'
+        transform: 'scaleY(0)'
       });
     },
 
     function animateToExpanded() {
       this.delegate_.style({
-//        transition: 'transform 2s cubic-bezier(0.0, 0.0, 0.2, 1) 0s',
-        transform: 'translateY(100%)',
-        transition: 'transform 0.5s ease-in-out',
+        transition: 'transform cubic-bezier(0.0, 0.0, 0.2, 1) .1s',
+        transform: 'scaleY(1)',
         '-webkit-transform': 'scaleY(1)',
       });
       this.isHidden = false;
@@ -202,9 +195,9 @@ foam.CLASS({
     function animateToHidden() {
       this.isHidden = true;
       this.delegate_.style({
-//        transition: 'transform 2s cubic-bezier(0.4, 0.0, 1, 1) 0s',
-        transform: 'translateY(0)',
-//          '-webkit-transform': 'scaleY(1)',
+        transition: 'opacity cubic-bezier(0.4, 0.0, 1, 1) .1s',
+        opacity: '0',
+        'pointer-events': 'none'
       });
     },
 
@@ -218,22 +211,12 @@ foam.CLASS({
       }.bind(this), 500);
     },
 
-    function unload() {
-      if ( this.removeTimeout ) this.clearTimeout(this.removeTimeout);
-      if ( this.delegate_ ) {
-        if ( this.delegate_.state === this.delegate_.LOADED )
-          this.delegate_.unload();
-        this.delegate_ = null;
-      }
-      this.SUPER();
-    },
-
     function scrollToIndex(index) {
       // Three cases: in view, need to scroll up, need to scroll down.
       // Determine the parent's scrolling bounds first:
       var e = this.delegate_.children[index];
       // TODO(braden): This sucks and needs fixing.
-      if (!e) return;
+      if ( !e ) return;
 
       this.delegate_.el().scrollTop = e.el().offsetTop - this.vMargin;
     },
