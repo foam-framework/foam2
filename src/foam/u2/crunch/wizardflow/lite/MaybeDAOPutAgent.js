@@ -32,7 +32,7 @@ foam.CLASS({
     function execute() {
       var p = Promise.resolve();
       this.submitted = this.submittedOld;
-      if ( this.daoKey ) {
+      if ( this.daoKey && this.submitted ) {
         p = p.then(() =>
           this.__subContext__[this.daoKey].put(this.capable));
         this.submitted = false;

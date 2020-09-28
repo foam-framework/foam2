@@ -29,13 +29,15 @@ foam.CLASS({
   methods: [
     async function execute() {
       var capable = this.capable;
-      this.wizardlets = this.createWizardletsFromPayloads(capable.capablePayloads);
+      var wizardletsTuple = this.createWizardletsFromPayloads(capable.capablePayloads);
+      this.wizardlets = wizardletsTuple.allDescendantWizardlets;
       console.log('CAPABLE', capable);
       console.log('WIZARDLETS', this.wizardlets);
     },
     function createWizardletsFromPayloads(payloads) {
       debugger;
       var newWizardlets = [];
+      var childWizardlets = [];
       for ( let i = 0 ; i < payloads.length ; i++ ) {
         let capablePayload = payloads[i];
         let wizardlet = this.createWizardletFromPayload(capablePayload);
@@ -49,14 +51,19 @@ foam.CLASS({
 
           // MinMax wizardlets appear before their prerequisites
           newWizardlets.push(wizardlet);
+          childWizardlets.push(wizardlet);
           
           let minMaxPrereqWizardlets =
             this.createWizardletsFromPayloads(capablePayload.prerequisites);
-          minMaxPrereqWizardlets.forEach(prereqWizardlet => {
+          minMaxPrereqWizardlets.directChildrenWizardlets.forEach(prereqWizardlet => {
             prereqWizardlet.isAvailable = false;
             wizardlet.choiceWizardlets.push(prereqWizardlet);
-            newWizardlets.push(prereqWizardlet);
           })
+
+          newWizardlets = [
+            ...newWizardlets,
+            ...minMaxPrereqWizardlets.allDescendantWizardlets
+          ]
         }
 
         // If this is a prerequisite of a normal capability, bind isAvailable to the
@@ -64,18 +71,27 @@ foam.CLASS({
         if ( handlePrereqsNormally && capablePayload.prerequisites.length > 0 ) {
           let prereqWizardlets =
             this.createWizardletsFromPayloads(capablePayload.prerequisites);
-          prereqWizardlets.forEach(prereqWizardlet => {
+          prereqWizardlets.directChildrenWizardlets.forEach(prereqWizardlet => {
             prereqWizardlet.isAvailable$.follow(wizardlet.isAvailable$);
-            newWizardlets.push(prereqWizardlet);
           })
+
+          newWizardlets = [
+            ...newWizardlets,
+            ...prereqWizardlets.allDescendantWizardlets
+          ]
         }
 
         // Wizardlets appear after their prerequisites by default
         if ( addWizardletAtEnd ) {
           newWizardlets.push(wizardlet);
+          childWizardlets.push(wizardlet);
         }
       }
-      return newWizardlets;
+
+      return {
+        allDescendantWizardlets: newWizardlets,
+        directChildrenWizardlets: childWizardlets
+      };
     },
     function createWizardletFromPayload(capablePayload) {
       let wizardletClass = capablePayload.capability.wizardlet.cls_;

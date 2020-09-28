@@ -73,6 +73,7 @@ foam.CLASS({
     {
       name: 'save',
       code: async function() {
+        debugger;
         // Returns a promise
       }
     },

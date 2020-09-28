@@ -266,6 +266,9 @@ foam.CLASS({
 
   methods: [
     function init() {
+      console.log('stepWizardlet', this);
+      window.sargnarg = this;
+      console.log
       return this.wizardlets.forEach(wizardlet => {
         wizardlet.isAvailable$.sub(() => {
           this.availabilityInvalidate++;
