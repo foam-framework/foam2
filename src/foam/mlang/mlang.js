@@ -424,7 +424,7 @@ foam.CLASS({
     {
       name: 'toString',
       code: function toString() { return this.cls_.name; },
-      javaCode: 'return "AbstractPredicate: " + getClass().getName() + " " + getClass();'
+      javaCode: 'return getClass().getName();'
     },
     {
       name: 'createStatement',
@@ -1459,7 +1459,8 @@ foam.CLASS({
 
   javaImports: [
     'foam.mlang.ArrayConstant',
-    'foam.mlang.Constant'
+    'foam.mlang.Constant',
+    'java.util.Collection'
   ],
 
   properties: [
@@ -1505,8 +1506,14 @@ foam.CLASS({
       javaCode: `
         StringBuilder b = new StringBuilder();
 
-        if ( getArg2() instanceof ArrayConstant || getArg2() instanceof Constant ) {
-          Object[] a = (Object[]) getArg2().f(null);
+        Object[] a = null;
+        if ( getArg2() instanceof ArrayConstant ) {
+          a = (Object[]) getArg2().f(null);
+        } else if ( getArg2() instanceof Constant ) {
+          a = ((Collection) getArg2().f(null)).toArray();
+        }
+
+        if ( a != null ) {
           b.append("len: " + a.length + ",");
           for ( int i = 0 ; i < a.length ; i++ ) {
             b.append(a[i]);
@@ -1534,9 +1541,10 @@ foam.CLASS({
   requires: [ 'foam.mlang.Constant' ],
 
   javaImports: [
-    'java.util.List',
     'foam.mlang.ArrayConstant',
-    'foam.mlang.Constant'
+    'foam.mlang.Constant',
+    'java.util.Collection',
+    'java.util.List',
   ],
 
   properties: [
@@ -1658,9 +1666,14 @@ return false
             this.FALSE : this;
       },
       javaCode: `
-        if ( ! (getArg2() instanceof ArrayConstant) && ! (getArg2() instanceof Constant) ) return this;
+        Object[] arr = null;
+        if ( getArg2() instanceof ArrayConstant ) {
+          arr = (Object[]) getArg2().f(null);
+        } else if ( getArg2() instanceof Constant ) {
+          arr = ((Collection) getArg2().f(null)).toArray();
+        }
 
-        Object[] arr = (Object[]) getArg2().f(null);
+        if ( arr == null ) return this;
 
         if ( arr.length == 0 ) {
           return foam.mlang.MLang.FALSE;
@@ -2180,7 +2193,7 @@ foam.CLASS({
       code: function() {
         return foam.String.constantize(this.cls_.name) + '(' + this.arg1.toString() + ')';
       },
-      javaCode: 'return String.format("Nottt(%s,%s)", getArg1().getClass(), getArg1().toString());'
+      javaCode: 'return String.format("Not(%s)", getArg1().toString());'
     },
     {
       name: 'partialEval',

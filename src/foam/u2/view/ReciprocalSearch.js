@@ -150,6 +150,10 @@ foam.CLASS({
       var self = this;
 
       this.dao.on.sub(this.updateTotalCount);
+      this.dao.on.sub(function() {
+        self.updateSelectedCount(0, 0, 0, self.searchManager.filteredDAO$);
+      });
+
       this.updateTotalCount();
 
       this.

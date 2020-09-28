@@ -55,7 +55,6 @@ foam.CLASS({
 
   methods: [
     function initE() {
-
       if ( this.data == null && ! this.index ) {
         this.index = 0;
       }

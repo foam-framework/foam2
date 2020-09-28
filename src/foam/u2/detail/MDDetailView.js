@@ -160,19 +160,12 @@ foam.CLASS({
 
       this.add(this.slot(function(of, properties, actions) {
         if ( ! of ) return '';
-
         this.
           addClass(this.myClass()).
           forEach(properties, function(p) {
-//          var errorSlot = p.validateObj && p.validationTextVisible ?
-//            this.__context__.data.slot(p.validateObj) : foam.core.ConstantSlot.create({ value: null });
-
             if ( ! foam.dao.OneToManyRelationshipProperty.isInstance(p) &&
               ! foam.dao.ManyToManyRelationshipProperty.isInstance(p) ) {
               this.start().addClass('property-item').add(p).end();
-//              this.add(errorSlot.map((s) => {
-//                  return self.E().add(s);
-//                }))
             }
           })
         })

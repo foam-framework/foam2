@@ -201,8 +201,6 @@ foam.CLASS({
       display: flex;
       flex-direction: column;
       opacity: 1;
-//      overflow-x: hidden;
-//      overflow-y: auto;
       height: 10rem;
     }
 
