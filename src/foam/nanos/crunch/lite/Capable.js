@@ -70,9 +70,9 @@ foam.INTERFACE({
           var oldCapabilityPayloads = getCapablePayloads();
           
           if (
-            ! Arrays.stream(oldCapabilityPayloads)
-                .map((cap) -> cap.getCapability().getId() )
-                .anyMatch((cap) -> cap.equals(capabilityId))
+            Arrays.stream(oldCapabilityPayloads)
+                .map((cap) -> cap.getCapability().getId())
+                .noneMatch(capabilityId::equals)
           ) {
             var newCapabilityPayload = crunchService.getCapableObjectPayloads(x, new String[] { capabilityId });
             setCapablePayloads((CapablePayload[]) ArrayUtils.addAll(oldCapabilityPayloads, newCapabilityPayload));
