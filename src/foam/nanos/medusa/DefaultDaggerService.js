@@ -129,9 +129,17 @@ foam.CLASS({
       setHashingEnabled(support.getHashingEnabled());
 
       ClusterConfig config = support.getConfig(getX(), support.getConfigId());
+      // VERSION A - NERF replay from Mediators - are supplied index 0, 1
+      // if ( config == null ||
+      //      config.getType() == MedusaType.NODE ||
+      //      ( config.getType() == MedusaType.MEDIATOR &&
+      //        config.getZone() > 0L ) ) {
+
+      // VERSION B - NERF/MEDIATOR replay from nodes - must calculate indedx 0, 1
       if ( config == null ||
            config.getType() == MedusaType.NODE ||
-           config.getZone() > 0L ) {
+           ( config.getType() != MedusaType.MEDIATOR &&
+             config.getType() != MedusaType.NERF ) ) {
         getLogger().debug("start", "exit");
         return;
       }

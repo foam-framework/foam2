@@ -87,11 +87,11 @@ foam.CLASS({
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
-      // getLogger().debug("put", replaying.getIndex(), replaying.getReplayIndex(), entry.toSummary(), "from", entry.getNode());
+      getLogger().debug("put", replaying.getIndex(), replaying.getReplayIndex(), entry.toSummary(), "from", entry.getNode());
       PM pm = null;
       try {
         if ( replaying.getIndex() > entry.getIndex() ) {
-          // getLogger().debug("put", replaying.getIndex(), entry.toSummary(), "from", entry.getNode(), "discarding");
+          getLogger().info("put", replaying.getIndex(), entry.toSummary(), "from", entry.getNode(), "discarding");
           return entry;
         }
         MedusaEntry existing = (MedusaEntry) getDelegate().find_(x, entry.getId());
@@ -103,7 +103,7 @@ foam.CLASS({
 
         synchronized ( entry.getId().toString().intern() ) {
           if ( replaying.getIndex() > entry.getIndex() ) {
-            // getLogger().debug("put", replaying.getIndex(), entry.toSummary(), "from", entry.getNode(), "discarding", "in-lock");
+            getLogger().debug("put", replaying.getIndex(), entry.toSummary(), "from", entry.getNode(), "discarding", "in-lock");
             return entry;
           }
           existing = (MedusaEntry) getDelegate().find_(x, entry.getId());
@@ -195,7 +195,7 @@ foam.CLASS({
         }
 
         // REVIEW: partial cleanup.
-        // MedusaEntry.CONSENSUS_HASHES.clear(entry);
+        MedusaEntry.CONSENSUS_HASHES.clear(entry);
 
         dagger.verify(x, entry);
         dagger.updateLinks(x, entry);
@@ -226,7 +226,7 @@ foam.CLASS({
         // TODO: additional cleanup
         //MedusaEntry.DATA.clear(entry);
         //entry = (MedusaEntry) getDelegate().put_(x, entry);
-        // getDelegate().remove_(x, entry);
+        //getDelegate().remove_(x, entry);
       } finally {
         pm.log(x);
       }
@@ -237,7 +237,7 @@ foam.CLASS({
       documentation: 'NanoService implementation.',
       name: 'start',
       javaCode: `
-      getLogger().debug("start");
+      getLogger().info("start");
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       Timer timer = new Timer(this.getClass().getSimpleName());
       timer.schedule(

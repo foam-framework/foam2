@@ -50,32 +50,25 @@ foam.CLASS({
       }
 
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
-      if ( myConfig.getZone() > 0 ) {
-        return getDelegate().put_(x, nu);
-      }
+      // if ( myConfig.getZone() > 0 ) {
+      //   return getDelegate().put_(x, nu);
+      // }
 
       ClusterConfig old = (ClusterConfig) find_(x, nu.getId());
       Boolean hadQuorum = support.hasQuorum(x);
       nu = (ClusterConfig) getDelegate().put_(x, nu);
 
-      if ( old == null ||
-           ( old.getStatus() == nu.getStatus() &&
-             old.getAccessMode() == nu.getAccessMode() ) ) {
-        return nu;
-      }
-
-      if ( nu.getId() == support.getConfigId() ) {
+      if ( nu.getId() == myConfig.getId() ) {
         support.setStatus(nu.getStatus());
       }
 
-      if ( myConfig.getType() != MedusaType.MEDIATOR ) {
-        return nu;
-      }
-
-      getLogger().info(nu.getName(), old.getStatus().getLabel(), "->", nu.getStatus().getLabel().toUpperCase());
-
-      if ( nu.getType() == MedusaType.MEDIATOR &&
+      if ( myConfig.getType() == MedusaType.MEDIATOR &&
+           myConfig.getZone() == 0 &&
+           nu.getType() == MedusaType.MEDIATOR &&
+           old != null &&
            old.getStatus() != nu.getStatus() ) {
+        getLogger().info(nu.getName(), old.getStatus().getLabel(), "->", nu.getStatus().getLabel().toUpperCase());
+
         ElectoralService electoralService = (ElectoralService) x.get("electoralService");
         if ( electoralService != null ) {
           ClusterConfig config = support.getConfig(x, support.getConfigId());
@@ -95,10 +88,24 @@ foam.CLASS({
             }
           }
         }
-      } else if ( nu.getType() == MedusaType.NODE ) {
-          getLogger().info(nu.getName(), old.getStatus().getLabel(), "->", nu.getStatus().getLabel().toUpperCase());
-          bucketNodes(x);
       }
+
+      if ( ( myConfig.getType() == MedusaType.MEDIATOR /*||
+             myConfig.getType() == MedusaType.NERF*/ ) &&
+          myConfig.getZone() == 0 &&
+          nu.getType() == MedusaType.NODE ) {
+        bucketNodes(x);
+      }
+
+      // Changing Primary - stop/start cron scheduler.
+      if ( myConfig.getType() == MedusaType.MEDIATOR &&
+           nu.getId() == myConfig.getId() &&
+           nu.getIsPrimary() != old.getIsPrimary() ) {
+        foam.nanos.cron.CronScheduler scheduler = (foam.nanos.cron.CronScheduler) x.get("cronScheduler");
+        scheduler.setEnabled(nu.getIsPrimary());
+        getLogger().info("cronScheduler,enabled", scheduler.getEnabled());
+      }
+
       return nu;
       `
     },

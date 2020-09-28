@@ -98,20 +98,14 @@ foam.CLASS({
             replaying.setReplaying(false);
             replaying.setEndTime(new java.util.Date());
           }
-        } else if ( ( myConfig.getType() == MedusaType.MEDIATOR ||
-               myConfig.getType() == MedusaType.NERF ) &&
-               ( ( myConfig.getZone() == 0L &&
-                   config.getType() == MedusaType.NODE &&
-                   config.getZone() == 0L ) ||
-                 ( config.getType() == MedusaType.MEDIATOR &&
-                   config.getZone() == myConfig.getZone() - 1L ) ) &&
-               config.getRegion() == myConfig.getRegion() &&
-               config.getRealm() == myConfig.getRealm() ) {
+        } else if ( config.getType() == MedusaType.NODE &&
+                    config.getRegion() == myConfig.getRegion() &&
+                    config.getRealm() == myConfig.getRealm() &&
+                    ( myConfig.getType() == MedusaType.MEDIATOR ||
+                      myConfig.getType() == MedusaType.NERF ) &&
+                    myConfig.getZone() - config.getZone() <= 1 ) {
 
           String serviceName = "medusaNodeDAO";
-          if ( config.getType() == MedusaType.MEDIATOR ) {
-            serviceName = "medusaEntryDAO";
-          }
           DAO clientDAO = support.getClientDAO(x, serviceName, myConfig, config);
           clientDAO = new RetryClientSinkDAO.Builder(x)
             .setName(serviceName)

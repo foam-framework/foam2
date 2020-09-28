@@ -145,6 +145,7 @@ foam.CLASS({
              // TODO/REVIEW: disable monitor? is it needed
           }
         } else if ( config.getType() != MedusaType.MEDIATOR &&
+                    config.getType() != MedusaType.NERF &&
                     config.getStatus() == Status.OFFLINE ) {
           config = (ClusterConfig) config.fclone();
           config.setStatus(Status.ONLINE);
