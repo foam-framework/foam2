@@ -1507,10 +1507,11 @@ foam.CLASS({
         StringBuilder b = new StringBuilder();
 
         Object[] a = null;
-        if ( getArg2() instanceof ArrayConstant ) {
-          a = (Object[]) getArg2().f(null);
+        Object arg2 = getArg2().f(null);
+        if ( getArg2() instanceof ArrayConstant || arg2 instanceof String[]) {
+          a = (Object[]) arg2;
         } else if ( getArg2() instanceof Constant ) {
-          a = ((Collection) getArg2().f(null)).toArray();
+          a = ((Collection) arg2).toArray();
         }
 
         if ( a != null ) {
@@ -1667,10 +1668,11 @@ return false
       },
       javaCode: `
         Object[] arr = null;
-        if ( getArg2() instanceof ArrayConstant ) {
-          arr = (Object[]) getArg2().f(null);
+        Object arg2 = getArg2().f(null);
+        if ( getArg2() instanceof ArrayConstant || arg2 instanceof String[] ) {
+          arr = (Object[]) arg2;
         } else if ( getArg2() instanceof Constant ) {
-          arr = ((Collection) getArg2().f(null)).toArray();
+          arr = ((Collection) arg2).toArray();
         }
 
         if ( arr == null ) return this;
