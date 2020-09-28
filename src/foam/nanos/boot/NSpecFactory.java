@@ -51,10 +51,7 @@ public class NSpecFactory
       Object ns = ns_;
       while ( ns != null ) {
         if ( ns instanceof ContextAware ) {
-          // REVIEW: System is presently dependent on this blind setX call. - Joel
-          // if ( ((ContextAware) ns).getX() == null ) {
           ((ContextAware) ns).setX(x_.getX());
-          // }
         }
         if ( ns instanceof NSpecAware ) {
           if ( ((NSpecAware) ns).getNSpec() == null ) {
