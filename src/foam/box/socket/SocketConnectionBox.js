@@ -24,7 +24,6 @@ foam.CLASS({
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
-    'java.net.Socket',
     'java.io.BufferedOutputStream',
     'java.io.DataInputStream',
     'java.io.DataOutputStream',
@@ -33,6 +32,8 @@ foam.CLASS({
     'java.io.IOException',
     'java.io.OutputStream',
     'java.io.OutputStreamWriter',
+    'java.net.Socket',
+    'java.net.SocketException',
     'java.nio.ByteBuffer',
     'java.nio.charset.StandardCharsets',
     'java.util.Map',
@@ -166,6 +167,11 @@ foam.CLASS({
         formatter.output(msg);
         message = formatter.builder().toString();
         byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
+        Socket socket = (Socket) getSocket();
+        if ( socket.isClosed() ||
+             ! socket.isConnected() ) {
+          throw new SocketException("Socket not connected.");
+        }
         synchronized (out_) {
           // getLogger().debug("send", message);
           out_.writeLong(System.currentTimeMillis());

@@ -151,6 +151,8 @@ foam.CLASS({
         try {
           Socket socket = new Socket();
           socket.setSoTimeout(getSoTimeout());
+          socket.setKeepAlive(true);
+          socket.setReuseAddress(true);
           SocketAddress address = new InetSocketAddress(host, port);
           socket.connect(address, getConnectTimeout());
           box = new SocketConnectionBox(x, key, socket, host, port);
