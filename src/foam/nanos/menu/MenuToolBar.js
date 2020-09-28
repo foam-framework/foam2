@@ -103,12 +103,26 @@ foam.CLASS({
           )
           .orderBy(this.Menu.ORDER);
       }
+    },
+    {
+      class: 'Int',
+      name: 'availableMenuCount',
+      expression: async function(dao) {
+        let count = await dao.select(this.Count.create());
+        return count.value;
+      }
     }
   ],
 
   methods: [
-    function initE() {
+    async function initE() {
       var self = this;
+      if ( await this.availableMenuCount === 1 ) {
+        this.dao.select().then( (res) => {
+          self.pushMenu(res.array[0].id);
+        });
+        return;
+      }
       this
         .addClass(this.myClass())
         .start()

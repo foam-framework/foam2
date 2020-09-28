@@ -260,10 +260,10 @@ foam.CLASS({
               init_();
             }
 
-            public static String combine(Object... args) {
-              if ( args == null ) {
-                return "";
-              }
+            private static String combine(Object... args) {
+              if ( args == null ) return "";
+              if ( args.length == 0 || args[0] == null ) return "";
+              if ( args.length == 1 ) return args[0].toString();
               StringBuilder sb = new StringBuilder();
               for ( Object o: args) {
                 sb.append(o).append(":");

@@ -145,7 +145,7 @@ foam.CLASS({
     {
       name: 'text',
       postSet: function(o, n) {
-//        if ( o !== n ) this.choice = this.findChoiceByText(n);
+        if ( o !== n ) this.choice = this.findChoiceByText(n);
       }
     },
     {
@@ -211,7 +211,6 @@ foam.CLASS({
       this.add(this.slot(function(mode) {
         if ( mode !== foam.u2.DisplayMode.RO ) {
           return self.E()
-//          .add(self.text$);
             .start(self.selectSpec, {
               data$:            self.index$,
               label$:           self.label$,

@@ -12,7 +12,6 @@ foam.CLASS({
 
   imports: [
     'document',
-    'dynamic',
     'popup'
   ],
 
@@ -27,7 +26,10 @@ foam.CLASS({
       this.addClass(this.myClass());
 
       if ( this.choices.length == 0 ) {
-        this.add('Nothing to select :(');
+        this.start('li')
+          .addClass('choice')
+          .add('Nothing to select :(')
+          .end();
         return;
       }
       for ( var i = 0 ; i < this.choices.length ; i++ ) {
@@ -50,7 +52,7 @@ foam.CLASS({
       this.SUPER();
       this.document.body.removeEventListener('touchstart', this.onTouch);
       this.document.body.removeEventListener('mousemove', this.onMouseMove);
-    },
+    }
   ],
 
   listeners: [
@@ -85,27 +87,24 @@ foam.CLASS({
   css: `
     ^ {
       background: white;
-      border: 2px solid grey;
-      display: table-footer-group;
-      flex-direction: column;
-      list-style-type: none;
+      box-shadow: 0px 0px 30px 0px #b7b7b7;
       margin: 0;
       overflow-y: auto;
-      padding: 0;
       position: absolute;
     }
     ^ .choice {
       align-content: flex-start;
       align-items: flex-end;
       cursor: pointer;
-      display: inline-flex;
       margin: 0px;
-      overflow: hidden;
-      padding: 1rem;
-      width: 100%;
+      font-size: 80%;
+      color: /*%GREY1%*/ #5e6061;
+      padding: 2.5rem;
     }
     ^ .choice.selected {
       font-weight: bold;
+      border-left: 1rem solid /*%PRIMARY3%*/ #406dea;
+      background-color: /*%PRIMARY5%*/ #e5f1fc;
     }
   `
 });

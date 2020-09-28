@@ -811,7 +811,7 @@ foam.CLASS({
       ]
     </pre>
     */
-    { class: 'String',  name: 'name', required: true },
+    { class: 'String', name: 'name', required: true },
     {
       class: 'String',
       name: 'label',

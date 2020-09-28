@@ -31,7 +31,7 @@ public class NSpecFactory
     if ( ns_ != null ) return ns_;
 
     Logger logger = null;
-    if ( ! "logger".equals(spec_.getName()) ) {
+    if ( ! "logger".equals(spec_.getName()) && ! "PM".equals(spec_.getName()) ) {
       logger = (Logger) x.get("logger");
     }
     if ( logger == null ) {
@@ -80,8 +80,15 @@ public class NSpecFactory
       pm.log(x_.getX());
       creatingThread_ = null;
     }
+  }
+
+  public synchronized Object create(X x) {
+    if ( ns_ == null ) buildService(x);
+
+    if ( ns_ instanceof XFactory ) return ((XFactory) ns_).create(x);
 
     return ns_;
+
   }
 
   public synchronized void invalidate(NSpec spec) {
