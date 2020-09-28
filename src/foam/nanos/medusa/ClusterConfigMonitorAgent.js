@@ -132,7 +132,7 @@ foam.CLASS({
             ClusterConfig cfg = (ClusterConfig) client.find_(x, config.getId());
             pm.log(x);
             if ( cfg != null ) {
-              cfg.setPingTime(pm.getEndTime().getTime() - pm.getStartTime().getTime());
+              cfg.setPingTime(pm.getEndTime() - pm.getStartTime());
               getDao().put_(x, cfg);
             } else {
               getLogger().warning("client,find", cfg.getId(), "null");

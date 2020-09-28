@@ -115,7 +115,7 @@ foam.CLASS({
         // set destination on previous hop
         ClusterCommandHop hop = existing[existing.length -1];
         PM pm = hop.getPm();
-        pm.setEndTime(new java.util.Date());
+        pm.setEndTime(System.currentTimeMillis());
         pm.setName(PM.combine(pm.getName(), support.getConfigId()));
         // start next hop
         ClusterCommandHop[] hops = new ClusterCommandHop[existing.length + 1];

@@ -78,7 +78,7 @@ public class SocketServerProcessor
         try {
           long sent = in_.readLong();
           PM p = PM.create(x, pmKey, pmName+":network");
-          p.setStartTime(new java.util.Date(sent));
+          p.setStartTime(sent);
           p.log(x);
 
           pm = PM.create(x, pmKey, pmName+":execute");

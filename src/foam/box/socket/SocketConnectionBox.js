@@ -215,7 +215,7 @@ foam.CLASS({
           try {
             long sent = in_.readLong();
             PM p = PM.create(getX(), this.getClass().getSimpleName(), getHost()+":"+getPort()+":network");
-            p.setStartTime(new java.util.Date(sent));
+            p.setStartTime(sent);
             p.log(x);
 
             pm = PM.create(x, pmKey, pmName);
