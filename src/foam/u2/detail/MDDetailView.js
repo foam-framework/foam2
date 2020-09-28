@@ -10,10 +10,6 @@ foam.CLASS({
   extends: 'foam.u2.DetailView',
 
   requires: [
-    'foam.core.Property',
-    'foam.u2.DetailPropertyView',
-    'foam.u2.md.CheckBox',
-    'foam.u2.md.tag.PaperDropdown',
     'foam.u2.property.MDDateField',
     'foam.u2.property.MDTextField',
     'foam.u2.property.MDIntView',
@@ -21,9 +17,6 @@ foam.CLASS({
     'foam.u2.property.MDSelect',
     'foam.u2.property.MDCheckBox',
     'foam.u2.property.MDFloatView',
-    'foam.u2.detail.MDDetailView',
-    'foam.u2.view.MDCurrencyView',
-    'foam.u2.view.ChoiceView',
     'foam.u2.MDCurrencyView'
   ],
 
@@ -40,20 +33,10 @@ foam.CLASS({
     color: #999;
   }
    ^ .property-item {
-//   justify-content: space-between;
       padding: 4rem;
       font-size: 3rem;
-//      display: flex;
       align-items: center;
       border: 1px solid #f2f3ff;
-//      height: 7rem;
-    }
-//    ^ .property-item > div {
-//      width: 100%;
-//    }
-
-    ^ .foam-u2-view-StringView {
-//      width: 100%;
     }
 
     ^ .label {
@@ -71,7 +54,6 @@ foam.CLASS({
         font-size: 3rem;
         top: 4rem;
         color: #999;
-//        position: relative;
       }
 
     ^ .foam-u2-property-MDCalendar-heading {
