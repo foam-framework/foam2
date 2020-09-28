@@ -25,5 +25,7 @@ p({
   "class":"foam.nanos.boot.NSpec",
   "name":"cronScheduler",
   "lazy":false,
-  "serviceClass":"foam.nanos.cron.CronScheduler"
+  "serviceScript":"""
+    return new foam.nanos.cron.CronScheduler();
+  """
 })

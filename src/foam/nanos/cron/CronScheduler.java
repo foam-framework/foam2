@@ -15,6 +15,7 @@ import foam.dao.DAO;
 import foam.dao.MapDAO;
 import foam.mlang.MLang;
 import foam.mlang.sink.Min;
+import foam.nanos.auth.EnabledAware;
 import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
 import foam.nanos.pm.PM;
@@ -22,9 +23,11 @@ import java.util.Date;
 
 public class CronScheduler
   extends    ContextAwareSupport
-  implements NanoService, Runnable
+  implements NanoService, Runnable, EnabledAware
 {
   protected DAO cronDAO_;
+
+  protected boolean enabled_ = true;
 
   /**
    * Gets the minimum scheduled cron job
@@ -43,6 +46,14 @@ public class CronScheduler
     return (Date) min.getValue();
   }
 
+  public void setEnabled(boolean enabled) {
+    enabled_ = enabled;
+  }
+
+  public boolean getEnabled() {
+    return enabled_;
+  }
+
   public void start() {
     cronDAO_ = (DAO) getX().get("cronDAO");
 
@@ -55,30 +66,31 @@ public class CronScheduler
 
     try {
       while ( true ) {
-        Date now = new Date();
+        if ( getEnabled() ) {
+          Date now = new Date();
 
-        cronDAO_.where(
-          MLang.AND(
-            MLang.LTE(Cron.SCHEDULED_TIME, now),
-            MLang.EQ(Cron.ENABLED, true)
-          )
-        ).select(new AbstractSink() {
-          @Override
-          public void put(Object obj, Detachable sub) {
-            Cron cron = (Cron) ((FObject) obj).fclone();
+          cronDAO_.where(
+                         MLang.AND(
+                                   MLang.LTE(Cron.SCHEDULED_TIME, now),
+                                   MLang.EQ(Cron.ENABLED, true)
+                                   )
+                         ).select(new AbstractSink() {
+                             @Override
+                             public void put(Object obj, Detachable sub) {
+                               Cron cron = (Cron) ((FObject) obj).fclone();
 
-            PM pm = new PM(CronScheduler.class, "cron:" + cron.getId());
-            try {
-              cron.runScript(CronScheduler.this.getX());
-            } catch (Throwable t) {
-              logger.error(this.getClass(), "Error running Cron Job", cron.getId(), t.getMessage(), t);
-            } finally {
-              pm.log(getX());
-            }
-            cronDAO_.put((FObject) cron);
-          }
-        });
-
+                               PM pm = new PM(CronScheduler.class, "cron:" + cron.getId());
+                               try {
+                                 cron.runScript(CronScheduler.this.getX());
+                               } catch (Throwable t) {
+                                 logger.error(this.getClass(), "Error running Cron Job", cron.getId(), t.getMessage(), t);
+                               } finally {
+                                 pm.log(getX());
+                               }
+                               cronDAO_.put((FObject) cron);
+                             }
+                           });
+        }
         Date minScheduledTime = getMinScheduledTime();
         // Check for new cronjobs every 5 seconds if no current jobs
         // or if their next scheduled execution time is > 5s away
@@ -89,9 +101,13 @@ public class CronScheduler
           if ( delay > 5000 ) {
             delay = 5000;
           } else if ( delay < 0 ) {
-            // Delay at least a little bit to avoid blocking in case of a
-            // script error.
-            delay = 500;
+            if ( getEnabled() ) {
+              // Delay at least a little bit to avoid blocking in case of a
+              // script error.
+              delay = 500;
+            } else {
+              delay = 5000;
+            }
           }
           Thread.sleep(delay);
         }
