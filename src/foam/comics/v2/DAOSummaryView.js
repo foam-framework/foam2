@@ -93,7 +93,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpecWithJava',
       name: 'viewView',
-      expression: function() {
+      factory: function() {
         return foam.u2.detail.SectionedDetailView;
       }
     },

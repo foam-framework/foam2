@@ -181,7 +181,10 @@ var classes = [
   'foam.dao.StorageOptionalDAO',
   'foam.dao.PipelinePMDAO',
   'foam.dao.PMDAO',
+  'foam.nanos.pm.PMFactory',
   'foam.nanos.pm.PMInfo',
+  'foam.nanos.pm.PMLogger',
+  'foam.nanos.pm.NullPMLogger',
   'foam.dao.PutOnlyDAO',
   'foam.dao.ORBRequest',
   'foam.dao.ORBitalDAO',
@@ -662,6 +665,7 @@ var classes = [
   'foam.nanos.crunch.RenewableData',
 
   'foam.nanos.crunch.connection.CapabilityPayload',
+  'foam.nanos.crunch.connection.GrantPathNode',
 
   //daos
   'foam.nanos.crunch.connection.CapabilityPayloadDAO',
@@ -675,7 +679,7 @@ var classes = [
 
   // spid
   'foam.nanos.auth.CreateUserCapabilityJunctionOnSpidSet',
-  'foam.nanos.auth.PreventMultipleSpidDAO',
+  'foam.nanos.auth.SetUserServiceProviderJunctionRuleAction',
 
   //ucjdao rules
   'foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut',

@@ -60,7 +60,7 @@ foam.CLASS({
       class: 'Long',
       name: 'totalTime',
       label: 'Total',
-      tableCellFormatter: { class: 'foam.nanos.pm.PMTemperatureCellFormatter' }
+      xxxtableCellFormatter: { class: 'foam.nanos.pm.PMTemperatureCellFormatter' }
     },
     {
       class: 'Boolean',

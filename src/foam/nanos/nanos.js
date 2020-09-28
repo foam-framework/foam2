@@ -23,6 +23,7 @@ FOAM_FILES([
   { name: 'foam/nanos/fs/FileArray' },
   { name: 'foam/nanos/fs/FileArrayDAODecorator' },
   { name: 'foam/nanos/fs/fileDropZone/FileDropZone', flags: ['web'] },
+  { name: 'foam/nanos/fs/fileDropZone/FilePreview', flags: ['web'] },
   { name: 'foam/nanos/fs/fileDropZone/FileCard', flags: ['web'] },
   { name: "foam/nanos/crunch/AssociatedEntity" },
   { name: "foam/nanos/crunch/Capability" },
@@ -218,7 +219,10 @@ FOAM_FILES([
   { name: "foam/nanos/pm/PM" },
   { name: "foam/nanos/pm/PMInfo" },
   { name: "foam/nanos/pm/PMTableView", flags:['web'] },
+  { name: "foam/nanos/pm/PMLogger" },
+  { name: "foam/nanos/pm/NullPMLogger" },
   { name: "foam/nanos/pm/TemperatureCView" },
+  { name: "foam/nanos/pm/PMFactory" },
   { name: "foam/nanos/pool/ThreadPoolAgency" },
   { name: "foam/nanos/auth/PMAuthService" },
   { name: 'foam/nanos/notification/email/EmailMessage' },
@@ -360,6 +364,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/CapabilityCategoryCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/RenewableData" },
   { name: "foam/nanos/crunch/connection/CapabilityPayload" },
+  { name: "foam/nanos/crunch/connection/GrantPathNode" },
   //daos
   { name: "foam/nanos/crunch/UserCapabilityJunctionDAO" },
   { name: "foam/nanos/crunch/connection/CapabilityPayloadDAO" },
@@ -372,7 +377,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ReputDependentUCJs" },
   //spid
   { name: "foam/nanos/auth/CreateUserCapabilityJunctionOnSpidSet" },
-  { name: "foam/nanos/auth/PreventMultipleSpidDAO" },
+  { name: "foam/nanos/auth/SetUserServiceProviderJunctionRuleAction" },
   //ucjDAO rules
   { name: "foam/nanos/crunch/ruler/CheckUCJOwnershipOnPut" },
   { name: "foam/nanos/crunch/ruler/ValidateUCJDataOnPut" },

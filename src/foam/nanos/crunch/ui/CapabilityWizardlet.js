@@ -8,14 +8,39 @@ foam.CLASS({
   name: 'CapabilityWizardlet',
   extends: 'foam.u2.wizard.BaseWizardlet',
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
   imports: [
-    'crunchController'
+    'crunchController',
+    'localeDAO'
   ],
 
   properties: [
     // Properties specific to CapabilityWizardSection
     {
-      name: 'capability'
+      name: 'capability',
+      postSet: function() {
+        var self = this;
+        return this.localeDAO.where(
+          this.AND(
+            this.OR(
+              this.EQ(foam.i18n.Locale.LOCALE, foam.locale),
+              this.EQ(foam.i18n.Locale.LOCALE, foam.locale.substring(0,foam.locale.indexOf('-')))),
+            this.EQ(foam.i18n.Locale.ID, this.capability.id + '.name')))
+        .select().then(function(a){
+          let arr = a.array;
+          if ( arr.length > 0 ) {
+            let ea = arr[0];
+            self.title = ea.target;
+          } else 
+            self.title = self.capability.name;
+        })
+        .catch(function() {
+          self.title = self.capability.name;
+        });
+      }
     },
     {
       name: 'ucj'
@@ -49,10 +74,6 @@ foam.CLASS({
     {
       name: 'title',
       class: 'String',
-      expression: function(capability) {
-        if ( ! capability || ! capability.name ) return '';
-        return capability.name;
-      }
     }
   ],
 

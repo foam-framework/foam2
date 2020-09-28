@@ -149,7 +149,8 @@ foam.CLASS({
     {
       name: 'permissionsGranted',
       class: 'StringArray',
-      documentation: `List of permissions granted by this capability`
+      documentation: `List of permissions granted by this capability`,
+      view: 'foam.u2.crunch.PermissionsStringArrayView'
     },
     {
       name: 'permissionsIntercepted',
@@ -261,7 +262,7 @@ foam.CLASS({
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         for ( CapabilityCapabilityJunction prereqJunction : prereqs ) {
           Capability capability = (Capability) capabilityDAO.find(prereqJunction.getTargetId());
-          if ( capability.implies(x, permission) ) return true;
+          if ( capability != null && capability.implies(x, permission) ) return true;
         }
         return false;
       `
@@ -276,6 +277,7 @@ foam.CLASS({
       documentation: `check if s1 implies s2 where s1 and s2 are permission or capability strings`,
       javaCode: `
       if ( s1.equals(s2) ) return true;
+      if ( s1.isBlank() || s2.isBlank() ) return false;
       if ( s1.charAt( s1.length() - 1) != '*' || ( s1.length() - 2 > s2.length() ) ) return false;
       if ( s2.length() <= s1.length() - 2 ) return s1.substring( 0, s1.length() -2 ).equals( s2.substring( 0, s1.length() - 2 ) );
       return s1.substring( 0, s1.length() - 1 ).equals( s2.substring( 0, s1.length() -1 ) );
@@ -339,14 +341,19 @@ foam.CLASS({
           ((ArraySink) myPrerequisitesDAO.select(new ArraySink()))
           .getArray();
 
-
         DAO userDAO = (DAO) x.get("userDAO");
+        Subject currentSubject = (Subject) x.get("subject");
 
         Subject subject = new Subject(x);
-        subject.setUser((User) userDAO.find(ucj.getSourceId()));
         if ( ucj instanceof AgentCapabilityJunction ) {
+          subject.setUser((User) userDAO.find(ucj.getSourceId()));
           AgentCapabilityJunction acj = (AgentCapabilityJunction) ucj;
           subject.setUser((User) userDAO.find(acj.getEffectiveUser())); // "user"
+        } else if ( ucj.getSourceId() == currentSubject.getUser().getId() ) {
+          subject.setUser(currentSubject.getRealUser());
+          subject.setUser(currentSubject.getUser());
+        } else {
+          subject.setUser((User) userDAO.find(ucj.getSourceId()));
         }
 
         for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {

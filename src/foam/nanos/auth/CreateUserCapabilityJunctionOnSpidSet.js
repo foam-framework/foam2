@@ -33,13 +33,8 @@ foam.CLASS({
   javaImports: [
     'foam.core.ContextAgent',
     'foam.core.X',
-    'foam.dao.DAO',
     'foam.nanos.auth.User',
-    'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.CrunchService',
-    'foam.nanos.crunch.UserCapabilityJunction',
-    'foam.nanos.logger.Logger',
-    'java.util.List'
+    'foam.nanos.logger.Logger'
   ],
 
   methods: [
@@ -61,25 +56,12 @@ foam.CLASS({
 
             ServiceProvider sp = (ServiceProvider) user.findSpid(x);
             if ( sp == null ) {
-              logger.warning("Cannot find capability for service provider : ", sp.getId());
+              logger.error("Cannot find capability for service provider : ", spid);
               return;
             }
 
-            CrunchService crunchService = (CrunchService) x.get("crunchService");
-            List<Capability> grantPath = (List<Capability>) crunchService.getCapabilityPath(x, sp.getId(), true);
-
-            try {
-              DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-              UserCapabilityJunction ucj;
-              for ( Capability capability : grantPath ) {
-                ucj = new UserCapabilityJunction.Builder(x).setSourceId(user.getId()).setTargetId(capability.getId()).build();
-                ucj = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(systemX, ucj);
-                if ( ucj == null || ucj.getStatus() != foam.nanos.crunch.CapabilityJunctionStatus.GRANTED )
-                  throw new RuntimeException("Error setting up UserCapabilityJunction for user: " + user.getId() + " and spid: " + spid);
-              }
-            } catch (Exception e) {
-              logger.warning(e);
-            }
+            sp.removeSpid(x, user);
+            sp.setupSpid(x, user);
           }
         }, "Create ucj on user spid set");
       `

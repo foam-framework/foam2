@@ -265,6 +265,7 @@ foam.CLASS({
       this.SUPER(p);
       this.prop_ = p;
       this.defaultValue = p.value;
+      this.label = p.label || this.label || p.name;
     }
   ],
 

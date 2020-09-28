@@ -217,6 +217,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'ExprArrayProperty',
@@ -423,7 +424,7 @@ foam.CLASS({
     {
       name: 'toString',
       code: function toString() { return this.cls_.name; },
-      javaCode: 'return classInfo_.getId();'
+      javaCode: 'return getClass().getName();'
     },
     {
       name: 'createStatement',
@@ -626,8 +627,10 @@ foam.CLASS({
     {
       name: 'put',
       code: function(obj, s) {
-        if ( this.cond.f(obj) ) this.a.put(obj, s)
-        else this.b.put(obj, s);
+        if ( this.cond.f(obj) )
+          this.a.put(obj, s)
+        else
+          this.b.put(obj, s);
       }
     }
   ]
@@ -764,6 +767,7 @@ getArg2().prepareStatement(stmt);`
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
@@ -1236,6 +1240,7 @@ return this;`
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Contains',
@@ -1452,6 +1457,12 @@ foam.CLASS({
 
   documentation: 'Binary predicate that accepts an array in "arg2".',
 
+  javaImports: [
+    'foam.mlang.ArrayConstant',
+    'foam.mlang.Constant',
+    'java.util.Collection'
+  ],
+
   properties: [
     {
       name: 'arg2',
@@ -1482,6 +1493,37 @@ foam.CLASS({
       name: 'valueSet_',
       hidden: true
     }
+  ],
+
+  methods: [
+    {
+      name: 'toString',
+      code: function() {
+        return foam.String.constantize(this.cls_.name) + '(' +
+            this.arg1.toString() + ', ' +
+            this.arg2.toString() + ')';
+      },
+      javaCode: `
+        StringBuilder b = new StringBuilder();
+
+        Object[] a = null;
+        Object arg2 = getArg2().f(null);
+        if ( getArg2() instanceof ArrayConstant || arg2 instanceof String[]) {
+          a = (Object[]) arg2;
+        } else if ( getArg2() instanceof Constant ) {
+          a = ((Collection) arg2).toArray();
+        }
+
+        if ( a != null ) {
+          b.append("len: " + a.length + ",");
+          for ( int i = 0 ; i < a.length ; i++ ) {
+            b.append(a[i]);
+            if ( i < a.length -1 ) b.append(',');
+          }
+        }
+        return String.format("%s(%s, %s)", getClass().getSimpleName(), getArg1().toString(), b.toString());
+      `
+    }
   ]
 });
 
@@ -1500,9 +1542,10 @@ foam.CLASS({
   requires: [ 'foam.mlang.Constant' ],
 
   javaImports: [
-    'java.util.List',
     'foam.mlang.ArrayConstant',
-    'foam.mlang.Constant'
+    'foam.mlang.Constant',
+    'java.util.Collection',
+    'java.util.List',
   ],
 
   properties: [
@@ -1624,13 +1667,20 @@ return false
             this.FALSE : this;
       },
       javaCode: `
-        if ( ! (getArg2() instanceof ArrayConstant) ) return this;
+        Object[] arr = null;
+        Object arg2 = getArg2().f(null);
+        if ( getArg2() instanceof ArrayConstant || arg2 instanceof String[] ) {
+          arr = (Object[]) arg2;
+        } else if ( getArg2() instanceof Constant ) {
+          arr = ((Collection) arg2).toArray();
+        }
 
-        Object[] arr = ((ArrayConstant) getArg2()).getValue();
+        if ( arr == null ) return this;
 
         if ( arr.length == 0 ) {
-          return new False();
-        } else if ( arr.length == 1 ) {
+          return foam.mlang.MLang.FALSE;
+        }
+        if ( arr.length == 1 ) {
           return new Eq.Builder(getX())
             .setArg1(getArg1())
             .setArg2(new Constant(arr[0]))
@@ -1729,6 +1779,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang',
@@ -2139,9 +2190,12 @@ foam.CLASS({
       javaCode: 'return ! getArg1().f(obj);'
     },
 
-    function toString() {
-      return foam.String.constantize(this.cls_.name) +
-          '(' + this.arg1.toString() + ')';
+    {
+      name: 'toString',
+      code: function() {
+        return foam.String.constantize(this.cls_.name) + '(' + this.arg1.toString() + ')';
+      },
+      javaCode: 'return String.format("Not(%s)", getArg1().toString());'
     },
     {
       name: 'partialEval',

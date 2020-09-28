@@ -39,10 +39,11 @@ public class DAOPMLogger
       ! pm.getKey().equals("foam.dao.PipelinePMDAO") &&
       ! pm.getKey().equals("foam.nanos.auth.PMAuthService")
     ) {
-      if ( pm.getKey().indexOf("PM") != -1 ) return;
-      if ( pm.getName().indexOf("PM")              != -1 ) return;
-      if ( pm.getKey().indexOf("pm") != -1 ) return;
-      if ( pm.getName().indexOf("pm")              != -1 ) return;
+      if ( pm.getKey().indexOf("PM")  != -1 ) return;
+      if ( pm.getName().indexOf("PM") != -1 ) return;
+      if ( pm.getKey().indexOf("pm")  != -1 ) return;
+      if ( pm.getName().indexOf("pm") != -1 ) return;
+      if ( pm.getName().indexOf("LogMessage") != -1 ) return;
     }
 
     // Candlestick, too slow

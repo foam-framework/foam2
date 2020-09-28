@@ -30,6 +30,12 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'maxTotalTime'
+    },
+    {
+      name: 'contextMenuActions',
+      factory: function() {
+        return [ this.CLEAR ];
+      }
     }
   ],
 
