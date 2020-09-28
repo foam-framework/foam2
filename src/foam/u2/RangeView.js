@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'RangeView',
   extends: 'foam.u2.tag.Input',
 
-  css: '^ { padding: 12px 0; }',
+  css: '^ { padding: 12px 0; width: 300px; }',
 
   properties: [
     [ 'type',     'range' ],
