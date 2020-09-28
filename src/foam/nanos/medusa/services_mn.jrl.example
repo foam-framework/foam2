@@ -1,48 +1,25 @@
 p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "clusterConfigMonitor",
-  "lazy": false,
-  "service": {"class":"foam.nanos.medusa.ClusterConfigMonitor"}
-})
-
-// NOTE: exists to satisfy common logic between Mediators and Nodes, Nodes do not explicitly use this.
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "internalMedusaEntryDAO",
-  "serviceScript": `
-    dao = new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.medusa.MedusaEntry.getOwnClassInfo())
-      .setNullify(true)
-      .setRuler(false)
-      .setCluster(false)
-      .build();
-  `
-})
-
-p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"medusaEntryDAO",
+  "name":"medusaNodeDAO",
   "serve":true,
   "serviceScript":`
+    mdao = new foam.dao.MDAO(foam.nanos.medusa.MedusaEntry.getOwnClassInfo());
     dao = new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.medusa.MedusaEntry.getOwnClassInfo())
-      .setInnerDAO(new net.nanopay.security.HashingJDAO(x, "SHA-256", true, false,
-        new foam.dao.MDAO(foam.nanos.medusa.MedusaEntry.getOwnClassInfo()), "ledger"))
+      .setMdao(mdao)
+      .setInnerDAO(new net.nanopay.security.HashingJDAO(x, mdao, "ledger"))
       .setRuler(false)
       .setCluster(false)
-      .setOrder(new foam.mlang.order.Comparator[] {
-        new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.medusa.MedusaEntry.INDEX).build()
-      })
+      .setPm(true)
+      .setPipelinePm(true)
       .setDecorator(new foam.nanos.medusa.ReplayDAO.Builder(x)
-      .setDelegate(new foam.nanos.medusa.MedusaEntryUniqueDAO.Builder(x)
-      .setDelegate(new foam.nanos.medusa.MedusaEntryAgencyDAO.Builder(x)
-      .setDelegate(new foam.nanos.medusa.MedusaEntryIdDAO.Builder(x)
-      .setDelegate(new foam.nanos.medusa.MedusaEntryHashingDAO.Builder(x)
-      .setDelegate(new foam.nanos.medusa.MedusaEntrySigningDAO.Builder(x)
-      .setDelegate(new foam.nanos.medusa.MedusaEntryBroadcastDAO.Builder(x)
-      .setDelegate(new foam.dao.NullDAO(x, foam.nanos.medusa.MedusaEntry.getOwnClassInfo()))
-      .build())
-      .build())
+      .setDelegate(new foam.nanos.medusa.MedusaUniqueDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.MedusaSetNodeDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.MedusaHashingDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.MedusaSigningDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.MedusaBroadcastDAO.Builder(x)
+        .setDelegate(new foam.dao.NullDAO(x, foam.nanos.medusa.MedusaEntry.getOwnClassInfo()))
+        .build())
       .build())
       .build())
       .build())
@@ -58,4 +35,32 @@ p({
     return dao;
   `,
   "client":"{\"of\":\"foam.nanos.medusa.MedusaEntry\", \"remoteListenerSupport\": false}"
+})
+
+// Menus entry point
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "medusaEntryDAO",
+  "serve": true,
+  "serviceScript": `
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.medusa.MedusaEntry.getOwnClassInfo())
+      .setInnerDAO(x.get("medusaNodeDAO"))
+      .setCluster(false)
+      .setRuler(false)
+      .setEnableInterfaceDecorators(false)
+      .build();
+  `,
+  "client": "{\"of\":\"foam.nanos.medusa.MedusaEntry\"}"
+})
+
+// disable cron scheduler
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"cronScheduler",
+  "lazy":false,
+  "enabled":false,
+  "serviceScript":"""
+    return new foam.nanos.cron.CronScheduler();
+  """
 })
