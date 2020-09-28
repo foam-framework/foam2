@@ -40,20 +40,20 @@ foam.CLASS({
     color: #999;
   }
    ^ .property-item {
-   justify-content: space-between;
+//   justify-content: space-between;
       padding: 4rem;
       font-size: 3rem;
-      display: flex;
+//      display: flex;
       align-items: center;
       border: 1px solid #f2f3ff;
-      height: 7rem;
+//      height: 7rem;
     }
-    ^ .property-item > div {
-      width: 100%;
-    }
+//    ^ .property-item > div {
+//      width: 100%;
+//    }
 
     ^ .foam-u2-view-StringView {
-      width: 100%;
+//      width: 100%;
     }
 
     ^ .label {
@@ -70,7 +70,8 @@ foam.CLASS({
     ^ .label-offset {
         font-size: 3rem;
         top: 4rem;
-        position: relative;
+        color: #999;
+//        position: relative;
       }
 
     ^ .foam-u2-property-MDCalendar-heading {
@@ -145,6 +146,7 @@ foam.CLASS({
   methods: [
     function initE() {
 
+      var self = this;
       this.__subContext__.register(this.MDSelect, 'foam.u2.view.ChoiceView');
       this.__subContext__.register(this.MDSelect, 'foam.u2.view.ReferenceView');
       this.__subContext__.register(this.MDSelect, 'foam.u2.tag.Select');
@@ -158,12 +160,19 @@ foam.CLASS({
 
       this.add(this.slot(function(of, properties, actions) {
         if ( ! of ) return '';
+
         this.
           addClass(this.myClass()).
           forEach(properties, function(p) {
+//          var errorSlot = p.validateObj && p.validationTextVisible ?
+//            this.__context__.data.slot(p.validateObj) : foam.core.ConstantSlot.create({ value: null });
+
             if ( ! foam.dao.OneToManyRelationshipProperty.isInstance(p) &&
               ! foam.dao.ManyToManyRelationshipProperty.isInstance(p) ) {
               this.start().addClass('property-item').add(p).end();
+//              this.add(errorSlot.map((s) => {
+//                  return self.E().add(s);
+//                }))
             }
           })
         })

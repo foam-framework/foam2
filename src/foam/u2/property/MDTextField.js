@@ -122,6 +122,8 @@ foam.CLASS({
 
     function initE() {
       var self = this;
+      if ( ! this.prop ) return;
+
       this.addClass(this.myClass());
       if (this.label) {
         this.start('label')
@@ -138,10 +140,17 @@ foam.CLASS({
 
       this.inputE();
 
-      if ( this.showValidation ) {
-        this.enableClass(this.myClass('invalid'), this.validationError_$);
-        this.start().addClass(this.myClass('validation-error')).add(this.validationError_$).end();
-      }
+      var errorSlot = this.prop.validateObj && this.prop.validationTextVisible ?
+        this.__context__.data.slot(this.prop.validateObj) :
+        foam.core.ConstantSlot.create({ value: null });
+
+        this
+          .start().addClass(this.myClass('invalid')).addClass(this.myClass('validation-error'))
+            .add(errorSlot.map((s) => {
+              return self.E().add(s);
+            }))
+          .end();
+//      }
     },
 
     function inputE() {
@@ -192,8 +201,8 @@ foam.CLASS({
       display: flex;
       flex-direction: column;
       opacity: 1;
-      overflow-x: hidden;
-      overflow-y: auto;
+//      overflow-x: hidden;
+//      overflow-y: auto;
       height: 10rem;
     }
 
@@ -222,6 +231,7 @@ foam.CLASS({
     }
     ^validation-error {
       color: #db4437;
+      font-size: smaller;
     }
     ^invalid input {
       border-bottom: 2px solid #db4437;
