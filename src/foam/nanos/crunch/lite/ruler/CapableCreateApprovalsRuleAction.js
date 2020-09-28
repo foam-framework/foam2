@@ -90,6 +90,9 @@ foam.CLASS({
                 continue;
               }
 
+              capablePayload.setStatus(foam.nanos.crunch.CapabilityJunctionStatus.PENDING);
+              capablePayload.setHasSafeStatus(true);
+
               DAO approvalRequestDAO = (DAO) getX().get("approvalRequestDAO");
               DAO approvableDAO = (DAO) getX().get("approvableDAO");
 
