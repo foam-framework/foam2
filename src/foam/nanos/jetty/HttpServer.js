@@ -129,7 +129,7 @@ foam.CLASS({
         threadPool.setDaemon(true);
         threadPool.setMaxThreads(jettyThreadPoolConfig.getMaxThreads());
         threadPool.setMinThreads(jettyThreadPoolConfig.getMinThreads());
-        threadPool.	setIdleTimeout(jettyThreadPoolConfig.getIdleTimeout());
+        threadPool.setIdleTimeout(jettyThreadPoolConfig.getIdleTimeout());
 
         ConnectorStatistics stats = new ConnectorStatistics();
         org.eclipse.jetty.server.Server server =
