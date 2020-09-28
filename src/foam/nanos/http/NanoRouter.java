@@ -73,7 +73,6 @@ public class NanoRouter
     String   serviceKey = urlParams[2];
     Object   service    = getX().get(serviceKey);
     NSpec    spec       = (NSpec) nSpecDAO_.find(serviceKey);
-    WebAgent agent     = getWebAgent(spec, service);
 
     foam.core.ClassInfoImpl clsInfo = new foam.core.ClassInfoImpl();
     clsInfo.setObjClass(this.getClass());
@@ -94,6 +93,12 @@ public class NanoRouter
     resp.setHeader("X-Frame-Options", "deny");
 
     try {
+      if ( ! spec.getEnabled() ) {
+        System.err.println("Service disabled: " + serviceKey);
+        resp.sendError(resp.SC_NOT_FOUND, "No service found for: "+serviceKey);
+      }
+
+      WebAgent agent     = getWebAgent(spec, service);
       if ( agent == null ) {
         System.err.println("No service found for: " + serviceKey);
         resp.sendError(resp.SC_NOT_FOUND, "No service found for: "+serviceKey);
