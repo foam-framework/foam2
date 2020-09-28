@@ -98,6 +98,7 @@ foam.CLASS({
       flex-direction: row;
       justify-content: space-between;
       position: relative;
+      width: 100%;
     }
     ^ .show-label {
       margin-top: 24px;

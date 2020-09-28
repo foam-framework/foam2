@@ -7,7 +7,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.auth',
-  name: 'UserCitationView',
+  name: 'UserMDCitationView',
   extends: 'foam.u2.View',
 
   documentation: 'A single row in a list of users.',
@@ -22,7 +22,7 @@ foam.CLASS({
     }
 
     ^ .name {
-      font-size: 3rem;
+//      font-size: 3rem;
       font-weight: 500;
     }
     ^ .img-container img {

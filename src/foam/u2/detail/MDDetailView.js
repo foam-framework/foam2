@@ -137,6 +137,7 @@ foam.CLASS({
       this.__subContext__.register(this.MDFloatView, 'foam.u2.FloatView');
       this.__subContext__.register(this.MDTextField, 'foam.u2.TextField');
       this.__subContext__.register(this.MDTextField, 'foam.u2.IntView');
+      this.__subContext__.register(this.MDTextField, 'foam.u2.view.DualView');
       this.__subContext__.register(this.MDCheckBox, 'foam.u2.CheckBox');
 //      this.__subContext__.register(this.MDCurrencyView, 'foam.u2.view.CurrencyView');
 
@@ -146,7 +147,10 @@ foam.CLASS({
           addClass(this.myClass()).
           forEach(properties, function(p) {
             if ( ! foam.dao.OneToManyRelationshipProperty.isInstance(p) &&
-              ! foam.dao.ManyToManyRelationshipProperty.isInstance(p) ) {
+              ! foam.dao.ManyToManyRelationshipProperty.isInstance(p) &&
+              ! foam.core.FObjectProperty.isInstance(p)
+              && ! foam.core.FObjectArray.isInstance(p)
+              ) {
               this.start().addClass('property-item').add(p).end();
             }
           })

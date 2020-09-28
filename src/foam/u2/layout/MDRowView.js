@@ -14,7 +14,7 @@ foam.CLASS({
   `,
 
   requires: [
-    'foam.u2.CitationView'
+    'foam.u2.layout.MDCitationView'
   ],
 
   exports: [
@@ -25,7 +25,7 @@ foam.CLASS({
     function initE() {
       this.addClass(this.myClass())
         .start().addClass('md-row')
-          .tag(this.CitationView, {
+          .tag(this.MDCitationView, {
             of: this.data.cls_,
             data: this.data
           })
@@ -43,6 +43,7 @@ foam.CLASS({
     ^ .md-row {
       display: flex;
       flex-direction: row;
+      color: /*%GREY1%*/ #5e6061;
     }
   `
 });
