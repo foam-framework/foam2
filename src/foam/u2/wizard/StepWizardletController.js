@@ -165,6 +165,9 @@ foam.CLASS({
           if ( subSi == 0 ) {
             if ( subWi == 0 ) return null;
             subWi--;
+            // Skip past steps with no sections
+            while ( sectionAvailableSlots[subWi].length < 1 ) subWi--;
+            if ( subWi < 1 ) return null;
             subSi = sectionAvailableSlots[subWi].length - 1;
           } else {
             subSi--;
