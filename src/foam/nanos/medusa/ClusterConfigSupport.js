@@ -280,20 +280,26 @@ configuration for contacting the primary node.`,
       of: 'foam.nanos.medusa.ClusterConfig',
       javaFactory: `
       ClusterConfig myConfig = getConfig(getX(), getConfigId());
-      long zone = myConfig.getZone() + 1;
-      if ( myConfig.getType() == MedusaType.NODE ) {
-        zone = myConfig.getZone();
-      }
-      getLogger().debug("broadcastMediators", "zone", zone);
+      // Version A - Mediators replay to Nerfs
+      // long zone = myConfig.getZone() + 1;
+      // if ( myConfig.getType() == MedusaType.NODE ) {
+      //   zone = myConfig.getZone();
+      // }
+      // getLogger().debug("broadcastMediators", "zone", zone);
       List<ClusterConfig> arr = (ArrayList) ((ArraySink) ((DAO) getX().get("localClusterConfigDAO"))
         .where(
           AND(
-            EQ(ClusterConfig.ZONE, zone),
+            // Version A - Mediators replay to Nerfs
+            // EQ(ClusterConfig.ZONE, zone),
+            // Version B - Only nodes replay to zone, zone +1
+            OR(
+              EQ(ClusterConfig.ZONE, myConfig.getZone()),
+              EQ(ClusterConfig.ZONE, myConfig.getZone() + 1)
+            ),
             OR(
               EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
               EQ(ClusterConfig.TYPE, MedusaType.NERF)
             ),
-            //EQ(ClusterConfig.STATUS, Status.ONLINE),
             EQ(ClusterConfig.ENABLED, true),
             EQ(ClusterConfig.REGION, myConfig.getRegion()),
             EQ(ClusterConfig.REALM, myConfig.getRealm())
@@ -817,7 +823,6 @@ configuration for contacting the primary node.`,
         },
       ],
       javaCode: `
-      PM pm = PM.create(x, this.getClass().getSimpleName(), "cronEnabled");
       try {
         ClusterConfig config = getConfig(x, getConfigId());
         if ( config == null ) {
@@ -843,8 +848,6 @@ configuration for contacting the primary node.`,
         }
       } catch (Throwable t) {
         // ignore, thrown when no config found.
-      } finally {
-        pm.log(x);
       }
       return true;
      `

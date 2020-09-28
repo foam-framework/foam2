@@ -11,6 +11,10 @@ foam.CLASS({
 
   documentation: `Return ReplayingInfo for this instance`,
 
+  javaImports: [
+    'java.lang.Runtime'
+  ],
+
   methods: [
     {
       name: 'find_',
@@ -20,6 +24,10 @@ foam.CLASS({
       if ( replaying != null ) {
         config = (ClusterConfig) config.fclone();
         config.setReplayingInfo(replaying);
+
+        Runtime runtime = Runtime.getRuntime();
+        config.setMemoryMax(runtime.maxMemory());
+        config.setMemoryFree(runtime.freeMemory());
       }
       return config;
       `

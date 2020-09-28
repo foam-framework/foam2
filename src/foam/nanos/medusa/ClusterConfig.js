@@ -135,6 +135,18 @@ foam.CLASS({
       storageTransient: true
     },
     {
+      name: 'memoryMax',
+      class: 'Long',
+      visibility: 'RO',
+      storageTransient: true
+    },
+    {
+      name: 'memoryFree',
+      class: 'Long',
+      visibility: 'RO',
+      storageTransient: true
+    },
+    {
       name: 'errorMessage',
       class: 'String',
       visibility: 'RO',

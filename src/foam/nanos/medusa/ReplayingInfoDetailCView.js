@@ -131,9 +131,27 @@ foam.CLASS({
       label = this.makeLabel();
       label.text$ = this.config$.map(function(c) {
         let now = Date.now();
-        let delta = now - c.replayingInfo.lastModified.getTime();
+        let delta = now - (c.replayingInfo.lastModified && c.replayingInfo.lastModified.getTime() || now);
         let duration = foam.core.Duration.duration(delta);
         return 'Idle: '+duration;
+      });
+      this.add(label);
+
+      label = this.makeLabel();
+      label.text$ = this.config$.map(function(c) {
+        var used = 0;
+        if ( c.memoryMax > 0 ) {
+          used = ((c.memoryMax - c.memoryFree) / c.memoryMax) * 100;
+        }
+        if ( used < 70 ) {
+          label.color = 'green';
+        } else if ( used < 80 ) {
+          label.color = 'orange';
+        } else {
+          label.color = 'red';
+        }
+        let max = c.memoryMax / (1024*1024*1024);
+        return 'Memory: '+used.toFixed(0)+'% '+max.toFixed(1)+'gb';
       });
       this.add(label);
 
