@@ -39,15 +39,15 @@ foam.CLASS({
     },
     {
       name: 'startTime',
-      class: 'DateTime',
+      class: 'Long',
       factory: function() {
-        return new Date();
+        return Date.now();
       },
-      javaFactory: `return new java.util.Date();`
+      javaFactory: `return System.currentTimeMillis();`
     },
     {
       name: 'endTime',
-      class: 'DateTime'
+      class: 'Long'
     },
     {
       name: 'isError',
@@ -84,8 +84,8 @@ foam.CLASS({
       javaCode: `
     if ( x == null ) return;
     if ( getIsError() ) return;
-    if ( getEndTime() == null ) {
-      setEndTime(new java.util.Date());
+    if ( getEndTime() == 0L ) {
+      setEndTime(System.currentTimeMillis());
     }
     PMLogger pmLogger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
     if ( pmLogger != null ) {
@@ -97,13 +97,13 @@ foam.CLASS({
       name: 'getTime',
       type: 'Long',
       javaCode: `
-    return getEndTime().getTime() - getStartTime().getTime();
+    return getEndTime() - getStartTime();
       `
     },
     {
       name: 'doFolds',
       javaCode: `
-    fm.foldForState(getKey()+":"+getName(), getStartTime(), getTime());
+    fm.foldForState(getKey()+":"+getName(), new java.util.Date(getStartTime()), getTime());
       `
     },
     {
@@ -114,7 +114,7 @@ foam.CLASS({
       ],
       javaCode: `
         setIsError(true);
-        setEndTime(new java.util.Date());
+        setEndTime(System.currentTimeMillis());
         StringBuilder sb = new StringBuilder();
         for (Object obj: args) {
           if ( obj instanceof Exception ) {
