@@ -222,6 +222,7 @@ FOAM_FILES([
   { name: "foam/nanos/pm/PMLogger" },
   { name: "foam/nanos/pm/NullPMLogger" },
   { name: "foam/nanos/pm/TemperatureCView" },
+  { name: "foam/nanos/pm/PMFactory" },
   { name: "foam/nanos/pool/ThreadPoolAgency" },
   { name: "foam/nanos/auth/PMAuthService" },
   { name: 'foam/nanos/notification/email/EmailMessage' },

@@ -26,22 +26,18 @@ public class NSpecFactory
     spec_ = spec;
   }
 
-  public synchronized Object create(X x) {
-    if ( ns_ != null ) return ns_;
-
+  void buildService(X x) {
     // Avoid infinite recursions when creating services
     if ( creatingThread_ == Thread.currentThread() ) {
-      if ( ! "logger".equals(spec_.getName()) ) {
+      if ( ! "logger".equals(spec_.getName()) && ! "PM".equals(spec_.getName()) ) {
         Logger logger = (Logger) x.get("logger");
         if ( logger != null ) logger.warning("Recursive Service Factory", spec_.getName());
       }
-
-      return null;
     }
     creatingThread_ = Thread.currentThread();
 
     PM     pm     = new PM(this.getClass(), spec_.getName());
-    Logger logger = (Logger) x.get("logger");
+    Logger logger = null; //(Logger) x.get("logger");
 
     try {
       if ( logger != null ) logger.info("Creating Service", spec_.getName());
@@ -57,8 +53,9 @@ public class NSpecFactory
           ns = null;
         }
       }
-      if ( logger != null )
+      if ( logger != null ) {
         logger.info("Created Service", spec_.getName(), ns_ != null ? ns_.getClass().getSimpleName() : '-');
+      }
     } catch (Throwable t) {
       if ( logger != null ) {
         logger.error("Error Creating Service", spec_.getName(), t);
@@ -70,8 +67,15 @@ public class NSpecFactory
       pm.log(x_.getX());
       creatingThread_ = null;
     }
+  }
+
+  public synchronized Object create(X x) {
+    if ( ns_ == null ) buildService(x);
+
+    if ( ns_ instanceof XFactory ) return ((XFactory) ns_).create(x);
 
     return ns_;
+
   }
 
   public synchronized void invalidate(NSpec spec) {
