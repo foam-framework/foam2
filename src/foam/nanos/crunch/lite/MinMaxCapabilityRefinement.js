@@ -13,6 +13,12 @@ foam.CLASS({
     'foam.nanos.crunch.lite.CapableCompatibleCapability'
   ],
 
+  javaImports: [
+    'foam.nanos.crunch.lite.CapablePayload',
+
+    'static foam.nanos.crunch.CapabilityJunctionStatus.*'
+  ],
+
   methods: [
     {
       name: 'getCapableChainedStatus',
