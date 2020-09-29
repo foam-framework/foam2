@@ -1460,7 +1460,7 @@ foam.CLASS({
   javaImports: [
     'foam.mlang.ArrayConstant',
     'foam.mlang.Constant',
-    'java.util.Collection'
+    'java.util.List'
   ],
 
   properties: [
@@ -1508,10 +1508,13 @@ foam.CLASS({
 
         Object[] a = null;
         Object arg2 = getArg2().f(null);
-        if ( getArg2() instanceof ArrayConstant || arg2 instanceof String[]) {
+
+        if ( arg2 instanceof List ) {
+          a = ((List) arg2).toArray();
+        } else if ( arg2 instanceof Object[] ) {
           a = (Object[]) arg2;
-        } else if ( getArg2() instanceof Constant ) {
-          a = ((Collection) arg2).toArray();
+        } else if ( arg2 != null ) {
+          b.append(arg2.toString());
         }
 
         if ( a != null ) {
@@ -1544,7 +1547,6 @@ foam.CLASS({
   javaImports: [
     'foam.mlang.ArrayConstant',
     'foam.mlang.Constant',
-    'java.util.Collection',
     'java.util.List',
   ],
 
@@ -1669,13 +1671,14 @@ return false
       javaCode: `
         Object[] arr = null;
         Object arg2 = getArg2().f(null);
-        if ( getArg2() instanceof ArrayConstant || arg2 instanceof String[] ) {
-          arr = (Object[]) arg2;
-        } else if ( getArg2() instanceof Constant ) {
-          arr = ((Collection) arg2).toArray();
-        }
 
-        if ( arr == null ) return this;
+        if ( arg2 instanceof List ) {
+          arr = ((List) arg2).toArray();
+        } else if ( arg2 instanceof Object[] ) {
+          arr = (Object[]) arg2;
+        } else {
+          return this;
+        }
 
         if ( arr.length == 0 ) {
           return foam.mlang.MLang.FALSE;
