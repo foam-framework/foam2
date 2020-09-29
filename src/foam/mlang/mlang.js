@@ -1508,6 +1508,8 @@ foam.CLASS({
 
         Object[] a = null;
         Object arg2 = getArg2() != null ? getArg2().f(null) : null;
+
+        if ( arg2 == null ) return String.format("%s(%s, null)", getClass().getSimpleName(), getArg1().toString());
         if ( getArg2() instanceof ArrayConstant || arg2 instanceof String[]) {
           a = (Object[]) arg2;
         } else if ( getArg2() instanceof Constant ) {
@@ -1669,6 +1671,8 @@ return false
       javaCode: `
         Object[] arr = null;
         Object arg2 = getArg2() != null ? getArg2().f(null) : null;
+        
+        if ( arg2 == null ) return foam.mlang.MLang.FALSE;
         if ( getArg2() instanceof ArrayConstant || arg2 instanceof String[] ) {
           arr = (Object[]) arg2;
         } else if ( getArg2() instanceof Constant ) {
