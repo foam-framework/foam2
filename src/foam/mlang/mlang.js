@@ -1513,6 +1513,8 @@ foam.CLASS({
           a = ((List) arg2).toArray();
         } else if ( arg2 instanceof Object[] ) {
           a = (Object[]) arg2;
+        } else if ( arg2 != null ) {
+          b.append(arg2.toString());
         }
 
         if ( a != null ) {
