@@ -38,7 +38,6 @@ foam.CLASS({
     ^ .wrapper-outer {
       overflow: auto;
       height: 100%;
-      // height: calc(100% - 15vh);
     }
 `,
 
