@@ -80,6 +80,7 @@
       name: 'daoCount'
     },
     'selection',
+    'disableUserSelection',
     {
       class: 'Boolean',
       name: 'editColumnsEnabled',
@@ -165,6 +166,20 @@
       factory: function() {
         return this.DAOControllerConfig.create({ dao: this.data });
       }
+    },
+    {
+      name: 'dblClickListenerAction',
+      factory: () => {
+        return function(obj, id) {
+          if ( ! this.stack ) return;
+          this.stack.push({
+            class: 'foam.comics.v2.DAOSummaryView',
+            data: obj,
+            config: this.config,
+            id: id
+          }, this);
+        }
+      }
     }
   ],
 
@@ -190,6 +205,7 @@
           contextMenuActions: this.contextMenuActions,
           selection$: this.selection$,
           editColumnsEnabled: this.editColumnsEnabled,
+          disableUserSelection: this.disableUserSelection,
           multiSelectEnabled: this.multiSelectEnabled,
           selectedObjects$: this.selectedObjects$
         }, this.table_$).
@@ -290,13 +306,7 @@
       }
     },
     function dblclick(obj, id) {
-      if ( ! this.stack ) return;
-      this.stack.push({
-        class: 'foam.comics.v2.DAOSummaryView',
-        data: obj,
-        config: this.config,
-        id: id
-      }, this);
-    },
+      this.dblClickListenerAction(obj, id);
+    }
   ]
 });

@@ -22,6 +22,8 @@ foam.CLASS({
     'foam.nanos.boot.NSpec'
   ],
 
+  imports: [ 'error' ],
+
   properties: [
     {
       name: 'nSpecDAO',
@@ -101,6 +103,10 @@ foam.CLASS({
                   factory: function() {
                     if ( ! json.class ) json.class = 'foam.dao.EasyDAO';
                     var cls = foam.lookup(json.class);
+                    if ( cls == null ) {
+                      self.error('Uknown Client class:', json.class, 'for service:', spec.name);
+                      return null;
+                    }
                     var defaults = {
                       serviceName: 'service/' + spec.name,
                       retryBoxMaxAttempts: 0

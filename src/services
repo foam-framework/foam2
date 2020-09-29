@@ -761,6 +761,7 @@ p({
     dao = new foam.dao.EasyDAO.Builder(x)
       .setEnableInterfaceDecorators(false)
       .setServiceProviderAware(true)
+      .setIndex(new foam.core.PropertyInfo[] {foam.nanos.ruler.Rule.DAO_KEY, foam.nanos.ruler.Rule.PRIORITY })
       .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
       .setInnerDAO(x.get("localRuleDAO"))
       .setRuler(false)
