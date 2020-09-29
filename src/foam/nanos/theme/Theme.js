@@ -120,6 +120,12 @@ foam.CLASS({
       },
     },
     {
+      name: 'admissionCapability',
+      class: 'Reference',
+      of: 'foam.nanos.crunch.Capability',
+      documentation: 'Specifies the top-level capability that must be granted before we admit a user to the system.'
+    },
+    {
       class: 'Array',
       name: 'domains',
       of: 'String',
