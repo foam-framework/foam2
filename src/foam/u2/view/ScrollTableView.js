@@ -80,6 +80,7 @@
       name: 'daoCount'
     },
     'selection',
+    'disableUserSelection',
     {
       class: 'Boolean',
       name: 'editColumnsEnabled',
@@ -190,6 +191,7 @@
           contextMenuActions: this.contextMenuActions,
           selection$: this.selection$,
           editColumnsEnabled: this.editColumnsEnabled,
+          disableUserSelection: this.disableUserSelection,
           multiSelectEnabled: this.multiSelectEnabled,
           selectedObjects$: this.selectedObjects$
         }, this.table_$).
@@ -297,6 +299,6 @@
         config: this.config,
         id: id
       }, this);
-    },
+    }
   ]
 });
