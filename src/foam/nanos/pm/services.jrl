@@ -14,7 +14,6 @@ p({
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("PMHourly")
       .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
-      .setCluster(false)
       .build();
     """,
   "client":"{\"of\":\"foam.nanos.analytics.Candlestick\"}"
@@ -34,7 +33,6 @@ p({
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("PMDaily")
       .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
-      .setCluster(false)
       .build();
     """,
   "client":"{\"of\":\"foam.nanos.analytics.Candlestick\"}"
