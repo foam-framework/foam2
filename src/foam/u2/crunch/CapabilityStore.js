@@ -127,7 +127,7 @@ foam.CLASS({
       `,
       factory: function() {
         return this.visibleCapabilityDAO
-          .where(this.IN('featured', this.Capability.KEYWORDS));
+          .where(this.CONTAINS(this.Capability.KEYWORDS, 'featured'));
       }
     },
     {
