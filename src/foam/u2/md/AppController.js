@@ -12,7 +12,12 @@ foam.CLASS({
   requires: [
     'foam.core.Latch',
     'foam.u2.layout.MDDAOController',
-    'foam.u2.layout.MDLoginView'
+    'foam.u2.layout.MDLoginView',
+    'foam.u2.stack.StackView'
+  ],
+
+  exports: [
+    'isMenuOpen'
   ],
 
   css: `
@@ -82,6 +87,18 @@ foam.CLASS({
       height: 100%;
       width: 100%;
     }
+
+    ^ .menuOpen {
+      left: -00px;
+      transition: .2s;
+    }
+
+    ^ .menuClosed {
+      left: -60rem;
+      transition: .2s;
+//      width: 0;
+//      display: none;
+    }
   `,
 
   properties: [
@@ -93,6 +110,10 @@ foam.CLASS({
       factory: function() {
         return this.Latch.create();
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'isMenuOpen'
     }
   ],
 
@@ -120,8 +141,10 @@ foam.CLASS({
     this
       .addClass(this.myClass())
       .start()
-        .addClass('stack-wrapper')
         .enableClass('login-stack', this.loginSuccess$.map( ls => ! ls ))
+        .start('div')
+          .tag({ class: 'foam.u2.layout.MDSideNavigation' })
+        .end()
         .tag(this.StackView.create({
             data: this.stack,
             showActions: false

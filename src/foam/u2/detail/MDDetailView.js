@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.u2.detail',
   name: 'MDDetailView',
-  extends: 'foam.u2.DetailView',
+  extends: 'foam.u2.View',
 
   requires: [
     'foam.u2.property.MDDateField',
@@ -27,6 +27,8 @@ foam.CLASS({
   css: `
   ^ {
     width: inherit !important;
+    overflow: scroll;
+    height: 100em;
   }
 
   ^ .property-item .label-container {
@@ -51,10 +53,10 @@ foam.CLASS({
     }
 
     ^ .label-offset {
-        font-size: 3rem;
-        top: 4rem;
-        color: #999;
-      }
+      font-size: 3rem;
+      top: 4rem;
+      color: #999;
+    }
 
     ^ .foam-u2-property-MDCalendar-heading {
       font-size: 1.5rem;
@@ -91,20 +93,31 @@ foam.CLASS({
     }
 
     ^ .foam-u2-view-EnumView {
-    width: 100%;}
+      width: 100%;
+    }
   `,
 
   properties: [
     {
-      name: 'title',
-      expression: function(of) {
-        return of.model_.label;
+      name: 'data',
+      attribute: true,
+      preSet: function(_, data) {
+        var of = data && data.cls_;
+        if ( of !== this.of ) this.of = of;
+
+        return data;
+      },
+      factory: function() {
+        return this.of && this.of.create(null, this);
       }
     },
-    [ 'showTitle', true ],
-    [ 'nodeName', 'div' ],
+    {
+      class: 'Class',
+      name: 'of'
+    },
     {
       name: 'properties',
+      // TODO: Make an FObjectArray when it validates properly
       preSet: function(_, ps) {
         foam.assert(ps, 'Properties required.');
         for ( var i = 0; i < ps.length; i++ ) {
@@ -118,11 +131,12 @@ foam.CLASS({
       expression: function(of) {
         if ( ! of ) return [];
         return this.of.getAxiomsByClass(foam.core.Property).
+          // TODO: this is a temporary fix, but DisplayMode.HIDDEN should be included and could be switched
           filter(function(p) {
             return ! ( p.hidden || p.visibility === foam.u2.DisplayMode.HIDDEN );
           });
       }
-    },
+    }
   ],
 
   methods: [
@@ -141,7 +155,7 @@ foam.CLASS({
       this.__subContext__.register(this.MDCheckBox, 'foam.u2.CheckBox');
 //      this.__subContext__.register(this.MDCurrencyView, 'foam.u2.view.CurrencyView');
 
-      this.add(this.slot(function(of, properties, actions) {
+      this.add(this.slot(function(of, properties) {
         if ( ! of ) return '';
         this.
           addClass(this.myClass()).

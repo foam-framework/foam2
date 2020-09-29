@@ -48,5 +48,12 @@ foam.CLASS({
             })
         });
     }
-  ]
+  ],
+
+  css: `
+  ^ {
+    height: 100%;
+    overflow: scroll;
+  }
+  `
 });

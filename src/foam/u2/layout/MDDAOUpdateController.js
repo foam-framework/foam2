@@ -116,7 +116,7 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.SUPER();
-        this
+      this.addClass(this.myClass())
           .startContext({data: this})
             .tag({
               class: 'foam.u2.layout.MDToolbarView',
@@ -125,10 +125,10 @@ foam.CLASS({
               rightAction: self.SAVE
             })
           .endContext();
-        this
-          .addClass(this.myClass())
+        this.start('div')
           .tag(this.detailView, { data: this.data })
-        this.add(this.DELETE);
+          .add(this.DELETE)
+        .end()
     }
   ],
 
@@ -145,16 +145,6 @@ foam.CLASS({
       background-color: unset;
       border: 2px solid red!important;
       border-radius: 73px;
-    }
-    ^ {
-      background-color: white;
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      overflow: scroll;
-    }
-    ^ .foam-u2-detail-MDDetailView {
-      padding-top: 10rem;
     }
   `,
 });

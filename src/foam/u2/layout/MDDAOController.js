@@ -34,24 +34,9 @@ foam.CLASS({
   `,
 
   css: `
-    ^ {
-      position: absolute;
-      height: 100%;
-      width: 100%;
-    }
 
     ^ .search {
       float: right;
-    }
-
-     ^ .menuOpen {
-      left: -00px;
-      transition: .2s;
-    }
-
-    ^ .menuClosed {
-      left: -60rem;
-      transition: .2s;
     }
 
     ^ .right .foam-u2-search-TextSearchView {
@@ -76,11 +61,6 @@ foam.CLASS({
       box-shadow: inset 0px 0px 15px 0px white;
     }
 
-    ^ .foam-u2-dao-MDDAOList {
-      padding-top: 10rem;
-      height: 100rem;
-      overflow: scroll;
-    }
     ^ .back-btn {
       background-color: blue;
       padding: 1.5rem;
@@ -117,15 +97,15 @@ foam.CLASS({
   imports: [
     'stack',
     'ctrl',
-    'user'
+    'user',
+    'isMenuOpen'
   ],
 
   exports: [
     'dblclick',
     'filteredTableColumns',
     'selection',
-    'isSearchActive',
-    'isMenuOpen'
+    'isSearchActive'
   ],
 
   properties: [
@@ -207,10 +187,6 @@ foam.CLASS({
     'selection',
     {
       class: 'Boolean',
-      name: 'isMenuOpen'
-    },
-    {
-      class: 'Boolean',
       name: 'isSearchActive'
     }
   ],
@@ -257,6 +233,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
+      this.isMenuOpen = false;
 
       this.isSearchActive$.sub(this.onSearchActiveChanged);
 
@@ -269,9 +246,9 @@ foam.CLASS({
            rightAction: self.rightAction$
          })
        .endContext()
-      .start('div')
-        .tag({ class: 'foam.u2.layout.MDSideNavigation' })
-      .end()
+//      .start('div')
+//        .tag({ class: 'foam.u2.layout.MDSideNavigation' })
+//      .end()
       .start(self.summaryView,{
         data: self.predicatedDAO$proxy
       }).addClass(self.myClass('browse-view-container')).end();
