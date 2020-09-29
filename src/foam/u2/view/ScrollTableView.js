@@ -166,6 +166,20 @@
       factory: function() {
         return this.DAOControllerConfig.create({ dao: this.data });
       }
+    },
+    {
+      name: 'dblClickListenerAction',
+      factory: () => {
+        return function(obj, id) {
+          if ( ! this.stack ) return;
+          this.stack.push({
+            class: 'foam.comics.v2.DAOSummaryView',
+            data: obj,
+            config: this.config,
+            id: id
+          }, this);
+        }
+      }
     }
   ],
 
@@ -292,13 +306,7 @@
       }
     },
     function dblclick(obj, id) {
-      if ( ! this.stack ) return;
-      this.stack.push({
-        class: 'foam.comics.v2.DAOSummaryView',
-        data: obj,
-        config: this.config,
-        id: id
-      }, this);
+      this.dblClickListenerAction(obj, id);
     }
   ]
 });
