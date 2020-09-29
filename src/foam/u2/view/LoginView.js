@@ -88,7 +88,6 @@ foam.CLASS({
   /* ON MODEL */
   ^ .content-form {
     width: 32vw;
-    padding-top: 6.5em;
   }
 
   /* ON ALL FOOTER TEXT */
@@ -142,7 +141,7 @@ foam.CLASS({
   }
   ^ .image-one {
     width: 38vw;
-    margin-top: -90vh;
+    margin-top: -83vh;
     margin-left: 10vw;
   }
   `,
