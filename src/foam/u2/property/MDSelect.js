@@ -65,7 +65,7 @@ foam.CLASS({
       this.start('label')
         .addClass('label')
         .addClass(this.slot(function(data) {
-          return (typeof data == 'undefined' || data == '' || data < 0) ? 'label-offset' : '';
+          return typeof data !== 'undefined' &&  data !== '' ? 'label-up' : '';
         }, this.data$))
         .add(this.label$)
         .end();
@@ -91,26 +91,26 @@ foam.CLASS({
   ],
 
   css: `
-  ^ {
+    ^ {
       align-items: flex-end;
-      border-bottom: 3px solid #e0e0e0;
+      border-bottom: 2px solid #000;
       display: flex;
-      flex-direction: row;
-      justify-content: space-between;
       position: relative;
-      width: 100%;
     }
-    ^ .show-label {
-      margin-top: 24px;
-    }
+
     ^ .label {
-      flex-grow: 1;
       position: absolute;
       top: -8px;
+      font-size: larger;
+      font-weight: 500;
     }
-    ^ .show-label .label {
-      display: block;
+
+    ^ .label-up {
+      top: 0;
+      font-size: smaller;
+      font-weight: unset;
     }
+
     ^ .value {
       flex-grow: 1;
       padding-top: 2rem;

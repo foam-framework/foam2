@@ -26,74 +26,32 @@ foam.CLASS({
 
   css: `
   ^ {
-    width: inherit !important;
     overflow: scroll;
     height: 100em;
   }
 
-  ^ .property-item .label-container {
-    color: #999;
-  }
    ^ .property-item {
       padding: 4rem;
-      font-size: 3rem;
-      align-items: center;
-      border: 1px solid #f2f3ff;
+      font-size: 3em;
+      border: 1px solid #e9ebff;
     }
 
     ^ .label {
-      font-size: 2rem;
-      color: #999;
-      flex-grow: 1;
+      font-size: larger;
       font-weight: 500;
-      transition: font-size 0.5s, top 0.5s;
-      z-index: 0;
-      top: 0;
-      position: relative;
+      color: #5a5a5a;
     }
 
-    ^ .label-offset {
-      font-size: 3rem;
-      top: 4rem;
-      color: #999;
-    }
-
+//    TODO: move to calendar
     ^ .foam-u2-property-MDCalendar-heading {
       font-size: 1.5rem;
       padding-bottom: 1rem;
     }
-
     ^ span button {
       font-size: 2rem;
     }
-
-    ^ .foam-u2-tag-Select {
-      font-size: 2rem;
-      height: 4rem;
-      width: fit-content;
-    }
-
-    ^ .foam-u2-view-RichChoiceView-selection-view {
-      height: 4rem;
-      font-size: 2rem;
-      width: 100%;
-      border: none;
-    }
-
-    ^ .foam-u2-view-RichChoiceView {
-      width: 100%;
-    }
-
-    ^ .DefaultRowView-row {
-      font-size: 2rem;
-    }
-
-    ^ .foam-u2-view-ReferencePropertyView {
-      width: 100%;
-    }
-
-    ^ .foam-u2-view-EnumView {
-      width: 100%;
+    ^ .foam-u2-Dialog {
+      background-color: unset;
     }
   `,
 
@@ -163,7 +121,7 @@ foam.CLASS({
             if ( ! foam.dao.OneToManyRelationshipProperty.isInstance(p) &&
               ! foam.dao.ManyToManyRelationshipProperty.isInstance(p) &&
               ! foam.core.FObjectProperty.isInstance(p)
-              && ! foam.core.FObjectArray.isInstance(p)
+              && ! foam.core.FObjectArray.isInstance(p) && p.name !== 'desiredPassword'
               ) {
               this.start().addClass('property-item').add(p).end();
             }

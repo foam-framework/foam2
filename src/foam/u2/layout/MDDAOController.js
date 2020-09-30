@@ -10,19 +10,9 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
-    'foam.comics.SearchMode',
     'foam.comics.v2.DAOControllerConfig',
-    'foam.log.LogLevel',
-    'foam.u2.ActionView',
-    'foam.u2.ToolbarAction',
-    'foam.u2.dialog.Popup',
-    'foam.u2.layout.Cols',
     'foam.u2.layout.MDSearchView',
-    'foam.u2.layout.MDToolbarView',
-    'foam.u2.layout.Rows',
-    'foam.u2.view.ScrollTableView',
-    'foam.u2.view.SimpleSearch',
-    'foam.u2.view.TabChoiceView'
+    'foam.u2.layout.MDToolbarView'
   ],
 
   implements: [
@@ -30,82 +20,19 @@ foam.CLASS({
   ],
 
   documentation: `
-    List controller with toolbar on top.
-  `,
-
-  css: `
-
-    ^ .search {
-      float: right;
-    }
-
-    ^ .right .foam-u2-search-TextSearchView {
-      margin: 0;
-      height: 4rem;
-      position: relative;
-    }
-    ^ .right {
-      flex: 1;
-    }
-
-    ^ .create-btn {
-      position: absolute;
-      bottom: 3rem;
-      right: 3rem;
-      border-radius: 100%;
-      padding: 3rem;
-      color: white;
-      font-weight: 900;
-      font-size: 4rem;
-      background-color: /*%PRIMARY2%*/ #937dff;
-      box-shadow: inset 0px 0px 15px 0px white;
-    }
-
-    ^ .back-btn {
-      background-color: blue;
-      padding: 1.5rem;
-    }
-
-    ^ .back-btn i {
-      font-size: 5rem;
-      float: left;
-      background-color: unset;
-      color: white;
-    }
-
-    ^ .boxless-for-drag-drop {
-      background-color: unset;
-      border: unset;
-    }
-
-    ^ .prof-icon {
-      height: 6rem;
-      border-radius: 50%;
-    }
-
-    ^ .logout {
-      font-size: 2rem;
-      color: red;
-      padding-left: 8rem;
-    }
-
-    ^ .no-records {
-      font-size: 3rem;
-    }
+    MD DAO controller with toolbar on top.
   `,
 
   imports: [
-    'stack',
-    'ctrl',
-    'user',
-    'isMenuOpen'
+    'isMenuOpen',
+    'stack'
   ],
 
   exports: [
     'dblclick',
     'filteredTableColumns',
-    'selection',
-    'isSearchActive'
+    'isSearchActive',
+    'selection'
   ],
 
   properties: [
@@ -178,33 +105,20 @@ foam.CLASS({
         return this.SEARCH;
       }
     },
-    {
-      name: 'leftAction',
-      expression: function() {
-        return this.OPEN_MENU;
-      }
-    },
     'selection',
     {
       class: 'Boolean',
       name: 'isSearchActive'
     }
   ],
+
   actions: [
     {
       name: 'openMenu',
       iconFontName: 'menu',
       label: '',
       code: function() {
-        this.isMenuOpen = true;;
-      }
-    },
-    {
-      name: 'closeMenu',
-      iconFontName: 'arrow_back',
-      label: '',
-      code: function() {
-        this.isMenuOpen = false;
+        this.isMenuOpen = true;
       }
     },
     {
@@ -229,6 +143,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function initE() {
       this.SUPER();
@@ -242,13 +157,10 @@ foam.CLASS({
          .tag({
            class: 'foam.u2.layout.MDToolbarView',
            title$: self.title$,
-           leftAction: self.leftAction$,
+           leftAction: self.OPEN_MENU,
            rightAction: self.rightAction$
          })
        .endContext()
-//      .start('div')
-//        .tag({ class: 'foam.u2.layout.MDSideNavigation' })
-//      .end()
       .start(self.summaryView,{
         data: self.predicatedDAO$proxy
       }).addClass(self.myClass('browse-view-container')).end();
@@ -279,14 +191,10 @@ foam.CLASS({
     function resetActions() {
       this.title = this.data.of.model_.plural;
       this.rightAction = this.SEARCH;
-      this.leftAction = this.OPEN_MENU;
-    },
-
+    }
   ],
 
   listeners: [
-    function onMenuOpenChanged() {
-    },
     function onCreate() {
       if ( ! this.stack ) return;
       this.stack.push({
@@ -301,10 +209,32 @@ foam.CLASS({
       if ( this.isSearchActive ) {
         this.rightAction = this.MDSearchView.create({dao$: this.searchFilterDAO$,data$: this.searchPredicate$});
         this.title = '';
-      }
-      else {
+      } else {
         this.resetActions();
       }
     }
-  ]
+  ],
+
+  css: `
+    ^ .right .foam-u2-search-TextSearchView {
+      position: relative;
+    }
+
+    ^ .right {
+      flex: 1;
+    }
+
+    ^ .create-btn {
+      position: absolute;
+      bottom: 3rem;
+      right: 3rem;
+      border-radius: 100%;
+      padding: 3rem;
+      color: white;
+      font-weight: 900;
+      font-size: 4rem;
+      background-color: /*%PRIMARY2%*/ #937dff;
+      box-shadow: inset 0px 0px 15px 0px white;
+    }
+  `
 });

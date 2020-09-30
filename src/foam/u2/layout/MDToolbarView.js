@@ -14,10 +14,6 @@ foam.CLASS({
     'foam.u2.ActionView'
   ],
 
-  imports: [
-    'loginSuccess'
-  ],
-
   properties: [
     'title', 'leftAction', 'rightAction'
   ],
@@ -37,7 +33,7 @@ foam.CLASS({
   css: `
     ^ {
       top: 0;
-//      position: fixed;
+      height: 10%;
       width: 100%;
     }
 

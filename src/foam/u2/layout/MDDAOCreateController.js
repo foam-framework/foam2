@@ -22,13 +22,10 @@ foam.CLASS({
 
   requires: [
     'foam.log.LogLevel',
-    'foam.u2.ControllerMode',
-    'foam.u2.ToolbarAction',
-    'foam.u2.layout.MDToolbarView'
+    'foam.u2.ControllerMode'
   ],
 
   imports: [
-    'auth',
     'stack',
     'ctrl'
   ],
@@ -99,18 +96,6 @@ foam.CLASS({
       code: function(x) {
         x.stack.back();
       }
-    },
-    {
-      name: 'delete',
-      code: function() {
-        var self = this;
-        this.dao.remove(this.obj).then(function() {
-          self.finished.pub();
-        }, function(e) {
-          self.exception = e;
-          self.throwError.pub();
-        });
-      }
     }
   ],
 
@@ -118,7 +103,6 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.SUPER();
-      var toolbar = this.MDToolbarView.create({ title: this.title, rightAction: this.SAVE, leftAction: this.BACK });
       this
         .startContext({data: this})
           .tag({
@@ -142,19 +126,5 @@ foam.CLASS({
           }));
       });
     }
-  ],
-
-  css: `
-    ^ {
-      background-color: white;
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      overflow: scroll;
-    }
-
-    ^ .foam-u2-detail-MDDetailView {
-      padding-top: 10rem;
-    }
-  `
+  ]
 });

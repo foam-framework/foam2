@@ -25,7 +25,6 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.dao.ArraySink',
     'foam.nanos.menu.Menu',
     'foam.u2.layout.MDProfileImageView'
   ],
@@ -129,14 +128,13 @@ foam.CLASS({
 
   css: `
     ^ {
-      z-index: 99;
+      z-index: 1;
       width: 50rem;
       position: absolute;
       box-shadow: 0px 0px 50px 0px #000;
-      top: 0;
+      height: 100%;
     }
     ^ input[type="search"] {
-      width: 90%;
       height: 7rem;
       font-size: 3rem;
     }
@@ -150,10 +148,11 @@ foam.CLASS({
 
     ^ .foam-u2-layout-MDToolbarView {
       position: relative;
+      z-index: 1;
     }
 
     ^ .foam-u2-search-TextSearchView {
-      padding-top: 4rem;
+      padding-top: 2rem;
       width: 100%;
       display: flex;
       justify-content: center;

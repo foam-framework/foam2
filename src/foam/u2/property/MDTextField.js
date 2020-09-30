@@ -44,11 +44,6 @@ foam.CLASS({
     },
     {
       type: 'Boolean',
-      name: 'showValidation',
-      value: true
-    },
-    {
-      type: 'Boolean',
       name: 'focused_',
       value: false,
       postSet: function(old, nu) {
@@ -112,10 +107,7 @@ foam.CLASS({
       documentation: 'Internal cache of the popup containing the ' +
           'autocomplete view.',
     },
-    {
-      class: 'Int',
-      name: 'displayWidth'
-    }
+    'isInvalid'
   ],
 
   methods: [
@@ -129,8 +121,8 @@ foam.CLASS({
         this.start('label')
             .addClass('label')
             .addClass(this.slot(function(data, focused) {
-              return (typeof data == 'undefined' || data == '') &&
-                ! focused ? 'label-offset' : '';
+              return (typeof data != 'undefined' && data !== '') ||
+                focused ? 'label-up' : '';
             }, this.data$, this.focused_$))
             .add(this.label$)
             .end();
@@ -146,11 +138,12 @@ foam.CLASS({
 
         this
           .start().addClass(this.myClass('invalid')).addClass(this.myClass('validation-error'))
+            .addClass(this.slot(function(isInvalid) { return isInvalid ? 'error-msg' : ''; }))
             .add(errorSlot.map((s) => {
+              self.isInvalid = s !== null;
               return self.E().add(s);
             }))
           .end();
-//      }
     },
 
     function inputE() {
@@ -161,8 +154,6 @@ foam.CLASS({
         .on('blur',  function() { self.focused_ = false; }).on('change', function(e) {
         self.data = e.target.value; })
 
-      if (!this.showLabel && this.placeholder$)
-        input.attrs({ placeholder: this.placeholder$ });
       this.link();
       input.end();
     },
@@ -200,12 +191,22 @@ foam.CLASS({
   ^ {
       display: flex;
       flex-direction: column;
-      opacity: 1;
-      height: 10rem;
+      height: 10%;
+      position: relative;
     }
 
-    ^no-label {
-      padding-top: 8px;
+    ^ .label {
+      transition: font-size 0.5s, top 0.5s;
+      top: 25%;
+      position: relative;
+      font-size: larger;
+      font-weight: 500;
+    }
+
+    ^ .label-up {
+      font-size: smaller;
+      font-weight: unset;
+      top: 0;
     }
     ^ input {
       background: transparent;
@@ -213,33 +214,28 @@ foam.CLASS({
       border-left: none;
       border-top: none;
       border-right: none;
-      color: #444;
-      flex-grow: 1;
+      color: #000;
       font-family: inherit;
       font-size: inherit;
-      padding-top: 1rem;
-      padding-bottom: 1rem;
       resize: none;
+      width: 100%;
+      bottom: 35%;
+      position: absolute;
       z-index: 1;
     }
     ^ input:focus {
       border-bottom: 2px solid #4285f4;
-      padding: 0 0 6px 0;
-      outline: none;
     }
     ^validation-error {
       color: #db4437;
-      font-size: smaller;
+      opacity: 0;
+      position: absolute;
+      bottom: 0;
+      transition: opacity 1s;
     }
-    ^invalid input {
-      border-bottom: 2px solid #db4437;
-      margin-bottom: 4px;
-    }
-    ^invalid input:focus {
-      border-bottom: 2px solid #db4437;
-    }
-    ^inline {
-      top: 32px;
+    ^ .error-msg {
+      opacity: 1;
+      transition: opacity 1s;
     }
   `
 });

@@ -11,11 +11,6 @@ foam.CLASS({
   extends: 'foam.u2.property.AbstractCheckBox',
 
   css: `
-    ^ .label-container {
-      margin-top: 9px;
-      color: #999;
-    }
-
     ^ {
       -webkit-appearance: none;
       border: solid 2px #5a5a5a;
@@ -29,10 +24,13 @@ foam.CLASS({
       background-color: /*%BLACK%*/ #1e1f21;
     }
 
-    ^:focus {
-      outline:0;
+    ^ .label {
+      // WHY DOESN"T WORK?
+      font-size: larger;
+      font-weight: 500;
+      color: red;
     }
-   `,
+ `,
 
    methods: [
     function initE() {
@@ -44,8 +42,8 @@ foam.CLASS({
            this.data = ! this.data;
          }.bind(this));
 
-      this.start('div')
-        .addClass('label-offset')
+      this.start()
+        .addClass('label')
         .add(this.label$)
       .end();
     },
