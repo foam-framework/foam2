@@ -14,7 +14,7 @@ foam.CLASS({
   `,
 
   requires: [
-    'foam.u2.CitationView'
+    'foam.u2.layout.MDCitationView'
   ],
 
   exports: [
@@ -25,7 +25,7 @@ foam.CLASS({
     function initE() {
       this.addClass(this.myClass())
         .start().addClass('md-row')
-          .tag(this.CitationView, {
+          .tag(this.MDCitationView, {
             of: this.data.cls_,
             data: this.data
           })
@@ -35,14 +35,17 @@ foam.CLASS({
 
   css: `
     ^ {
-     font-size: 2.5rem;
-     font-weight: 300;
-     border-bottom: 1px solid /*%GREY3%*/;
+    height: 200px;
+      padding: 20px;
+      font-size: 2.5rem;
+      font-weight: 300;
+      border-bottom: 1px solid /*%GREY3%*/;
     }
 
     ^ .md-row {
       display: flex;
-      flex-direction: row;
+//      flex-direction: row;
+      color: /*%GREY1%*/ #5e6061;
     }
   `
 });
