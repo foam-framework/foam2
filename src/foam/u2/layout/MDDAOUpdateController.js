@@ -24,11 +24,13 @@ foam.CLASS({
   requires: [
     'foam.u2.ControllerMode',
     'foam.u2.ToolbarAction',
-    'foam.u2.layout.MDToolbarView'
+    'foam.u2.layout.MDToolbarView',
+    'foam.log.LogLevel'
   ],
 
   imports: [
-    'stack'
+    'stack',
+    'ctrl'
   ],
 
   exports: [
@@ -81,12 +83,18 @@ foam.CLASS({
       iconFontName: 'check',
       label: '',
       code: function() {
+        if ( this.data.errors_ ) {
+          this.ctrl.notify('Some fields are not valid', '', this.LogLevel.ERROR, true);
+          return;
+        }
         var self = this;
         this.dao.put(this.data.clone()).then(function() {
+          this.ctrl.notify('Successfully Created', '', self.LogLevel.INFO, true);
           self.stack.back();
         }, function(e) {
           self.exception = e;
           self.throwError.pub();
+          this.ctrl.notify(e.message, '', self.LogLevel.ERROR, true);
         });
       }
     },

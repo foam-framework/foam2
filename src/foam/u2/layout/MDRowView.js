@@ -35,7 +35,8 @@ foam.CLASS({
 
   css: `
     ^ {
-      padding: 3rem;
+    height: 200px;
+      padding: 20px;
       font-size: 2.5rem;
       font-weight: 300;
       border-bottom: 1px solid /*%GREY3%*/;
@@ -43,7 +44,7 @@ foam.CLASS({
 
     ^ .md-row {
       display: flex;
-      flex-direction: row;
+//      flex-direction: row;
       color: /*%GREY1%*/ #5e6061;
     }
   `

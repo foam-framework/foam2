@@ -82,10 +82,12 @@ foam.CLASS({
         }
         var self = this;
         this.dao.put(this.obj.clone()).then(function() {
+          this.ctrl.notify('Successfully Created', '', self.LogLevel.INFO, true);
           self.stack.back();
         }, function(e) {
           self.exception = e;
           self.throwError.pub();
+          this.ctrl.notify(e.message, '', self.LogLevel.ERROR, true);
         });
       }
     },
