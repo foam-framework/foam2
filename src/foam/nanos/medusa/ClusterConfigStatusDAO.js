@@ -62,11 +62,11 @@ foam.CLASS({
         support.setStatus(nu.getStatus());
       }
 
-      if ( myConfig.getType() == MedusaType.MEDIATOR &&
+      if ( old != null &&
+           old.getStatus() != nu.getStatus() &&
+           myConfig.getType() == MedusaType.MEDIATOR &&
            myConfig.getZone() == 0 &&
-           nu.getType() == MedusaType.MEDIATOR &&
-           old != null &&
-           old.getStatus() != nu.getStatus() ) {
+           nu.getType() == MedusaType.MEDIATOR ) {
         getLogger().info(nu.getName(), old.getStatus().getLabel(), "->", nu.getStatus().getLabel().toUpperCase());
 
         ElectoralService electoralService = (ElectoralService) x.get("electoralService");
@@ -90,10 +90,13 @@ foam.CLASS({
         }
       }
 
-      if ( ( myConfig.getType() == MedusaType.MEDIATOR /*||
-             myConfig.getType() == MedusaType.NERF*/ ) &&
-          myConfig.getZone() == 0 &&
-          nu.getType() == MedusaType.NODE ) {
+      if ( old != null &&
+           old.getStatus() != nu.getStatus() &&
+           ( ( myConfig.getType() == MedusaType.MEDIATOR &&
+               myConfig.getZone() == 0 ) ||
+             ( myConfig.getType() == MedusaType.NERF &&
+               myConfig.getZone() == 1 ) ) &&
+           nu.getType() == MedusaType.NODE ) {
         bucketNodes(x);
       }
 

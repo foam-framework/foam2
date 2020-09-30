@@ -116,7 +116,6 @@ foam.CLASS({
       }
 
       label = this.makeLabel();
-// label.text$ = this.config$.map(function(c) { return 'TPS: '+c.replayingInfo.tps; });
       label.text$ = this.config$.map(function(c) {
         let endTime = Date.now();
         let tm = (endTime - this.openTime) / 1000;

@@ -110,11 +110,13 @@ foam.CLASS({
       class: 'String',
       label: 'Remaining',
       expression: function(index, replayIndex, startTime, endTime) {
-        let end = endTime || new Date();
-        let tm = end.getTime() - startTime.getTime();
-        let tpm = replayIndex / tm;
-        let m = (replayIndex - index) / tpm;
-        let duration = foam.core.Duration.duration(m);
+        var timeElapsed = 1;
+        if ( startTime ) {
+          let end = endTime || new Date();
+          timeElapsed = end.getTime() - startTime.getTime();
+        }
+        let remaining = ( timeElapsed / index ) * replayIndex - timeElapsed;
+        let duration = foam.core.Duration.duration(remaining);
         return duration;
       },
       visibility: 'RO'
@@ -125,24 +127,10 @@ foam.CLASS({
       expression: function(index, replayIndex, startTime, endTime) {
         let end = endTime || new Date();
         let tm = (end.getTime() - startTime.getTime()) / 1000;
-        let tps = replayIndex / tm;
+        let tps = index / tm;
         return Math.round(tps);
       }
     },
-    // {
-    //   name: 'tps',
-    //   class: 'String',
-    //   expression: function(index, replayIndex, endTime) {
-    //     var tps = 0;
-    //     if ( endTime ) {
-    //       let now = new Date();
-    //       let end = endTime || new Date();
-    //       let tm = (now.getTime() - end.getTime()) / 1000;
-    //       tps = (index - replayIndex) / tm;
-    //     }
-    //     return Math.round(tps);
-    //   }
-    // },
     {
       name: 'replayNodes',
       class: 'Map',

@@ -91,7 +91,7 @@ foam.CLASS({
       PM pm = null;
       try {
         if ( replaying.getIndex() > entry.getIndex() ) {
-          getLogger().info("put", replaying.getIndex(), entry.toSummary(), "from", entry.getNode(), "discarding");
+          // getLogger().info("put", replaying.getIndex(), entry.toSummary(), "from", entry.getNode(), "discarding");
           return entry;
         }
         MedusaEntry existing = (MedusaEntry) getDelegate().find_(x, entry.getId());
@@ -222,11 +222,6 @@ foam.CLASS({
           getLogger().info("promote", "replayComplete", replaying.getIndex());
           ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
         }
-
-        // TODO: additional cleanup
-        //MedusaEntry.DATA.clear(entry);
-        //entry = (MedusaEntry) getDelegate().put_(x, entry);
-        //getDelegate().remove_(x, entry);
       } finally {
         pm.log(x);
       }

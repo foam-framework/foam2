@@ -280,22 +280,15 @@ configuration for contacting the primary node.`,
       of: 'foam.nanos.medusa.ClusterConfig',
       javaFactory: `
       ClusterConfig myConfig = getConfig(getX(), getConfigId());
-      // Version A - Mediators replay to Nerfs
-      // long zone = myConfig.getZone() + 1;
-      // if ( myConfig.getType() == MedusaType.NODE ) {
-      //   zone = myConfig.getZone();
-      // }
+      long zone = myConfig.getZone() + 1;
+      if ( myConfig.getType() == MedusaType.NODE ) {
+        zone = myConfig.getZone();
+      }
       // getLogger().debug("broadcastMediators", "zone", zone);
       List<ClusterConfig> arr = (ArrayList) ((ArraySink) ((DAO) getX().get("localClusterConfigDAO"))
         .where(
           AND(
-            // Version A - Mediators replay to Nerfs
-            // EQ(ClusterConfig.ZONE, zone),
-            // Version B - Only nodes replay to zone, zone +1
-            OR(
-              EQ(ClusterConfig.ZONE, myConfig.getZone()),
-              EQ(ClusterConfig.ZONE, myConfig.getZone() + 1)
-            ),
+            EQ(ClusterConfig.ZONE, zone),
             OR(
               EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
               EQ(ClusterConfig.TYPE, MedusaType.NERF)
