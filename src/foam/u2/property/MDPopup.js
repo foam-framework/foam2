@@ -216,7 +216,7 @@ foam.CLASS({
       // Determine the parent's scrolling bounds first:
       var e = this.delegate_.children[index];
       // TODO(braden): This sucks and needs fixing.
-      if ( !e ) return;
+      if ( ! e ) return;
 
       this.delegate_.el().scrollTop = e.el().offsetTop - this.vMargin;
     },
