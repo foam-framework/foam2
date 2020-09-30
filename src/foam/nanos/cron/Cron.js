@@ -109,15 +109,17 @@ Notification cronStartNotify = new Notification();
 cronStartNotify.setBody("Cron STARTED - " + this.getId() + " " + this.getDescription());
 notification.put(cronStartNotify);
 */
-super.runScript(x);
-
+    try {
+      super.runScript(x);
+    } finally {
+      setScheduledTime(getNextScheduledTime());
+    }
 /*
 Notification cronEndNotify = new Notification();
 cronEndNotify.setBody("Cron ENDED - " + this.getId() + " " + this.getDescription());
 notification.put(cronEndNotify);
 */
-
-setScheduledTime(getNextScheduledTime());`
+    `
     },
     {
       name: 'getNextScheduledTime',
