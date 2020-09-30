@@ -13,7 +13,8 @@ foam.CLASS({
     'foam.core.Latch',
     'foam.u2.layout.MDDAOController',
     'foam.u2.layout.MDLoginView',
-    'foam.u2.stack.StackView'
+    'foam.u2.layout.MDNotificationMessage',
+    'foam.u2.layout.MDStackView'
   ],
 
   exports: [
@@ -21,9 +22,6 @@ foam.CLASS({
   ],
 
   css: `
-    body {
-      overflow: hidden;
-    }
 
     ^ .foam-u2-ActionView {
       border: none !important;
@@ -32,60 +30,10 @@ foam.CLASS({
       background-color: unset !important;
     }
 
-    ^ .foam-u2-layout-MDToolbarView {
-      font-size: 3.5rem;
-      height: 10rem;
-      z-index: 99;
-    }
-
-    ^toolbar {
-      flex-grow: 1;
-    }
-
-    ^ toolbar .right {
-      padding-right: 3rem;
-    }
-
-    ^ toolbar .left i {
-      padding-left: 3rem;
-    }
-
-    ^ toolbar .title {
-      padding-left: 4rem;
-      font-weight: 500;
-      font-size: 3.5rem;
-      width: 100%;
-    }
-
-    ^ toolbar .right span {
-      width: 100%;
-    }
-
-    ^ toolbar .foam-u2-ActionView {
-      background-color: unset;
-      font-size: 4rem;
-    }
-
-    ^ .foam-u2-layout-MDRowView {
-      padding: 3rem;
-    }
-    ^ .foam-u2-stack-StackView {
+    ^ .foam-u2-layout-MDStackView {
       position: relative;
       height: 100%;
       overflow: hidden;
-    }
-    ^ .foam-nanos-menu-SubMenuView-inner > div {
-      position: unset;
-    }
-
-
-    ^ .net-nanopay-ui-TopSideNavigation {
-      display: none;
-    }
-
-    ^ .foam-u2-layout-MDLoginView {
-      height: 100%;
-      width: 100%;
     }
 
     ^ .menuOpen {
@@ -96,9 +44,25 @@ foam.CLASS({
     ^ .menuClosed {
       left: -60rem;
       transition: .2s;
-//      width: 0;
-//      display: none;
     }
+
+    ^ toolbar .right {
+      padding-right: 3rem;
+    }
+    ^ toolbar .left i {
+      padding-left: 3rem;
+    }
+    ^ toolbar .title {
+      padding-left: 4rem;
+      font-weight: 500;
+      font-size: 3.5rem;
+      width: 100%;
+    }
+    ^ toolbar .foam-u2-ActionView {
+      background-color: unset;
+      font-size: 4rem;
+    }
+    //    TODO: move to toolbar ^
   `,
 
   properties: [
@@ -132,6 +96,7 @@ foam.CLASS({
       this.__subContext__.register(this.MDDAOController, 'foam.comics.v2.DAOBrowseControllerView');
       this.__subContext__.register(this.MDDAOController, 'foam.comics.BrowserView');
       this.__subContext__.register(this.MDLoginView, 'foam.u2.view.LoginView');
+      this.__subContext__.register(this.MDNotificationMessage, 'foam.u2.dialog.NotificationMessage');
 
       this.themeInstalled.resolve();
     });
@@ -145,7 +110,7 @@ foam.CLASS({
         .start('div')
           .tag({ class: 'foam.u2.layout.MDSideNavigation' })
         .end()
-        .tag(this.StackView.create({
+        .tag(this.MDStackView.create({
             data: this.stack,
             showActions: false
           }))

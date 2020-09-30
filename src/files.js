@@ -891,6 +891,7 @@ FOAM_FILES([
 
   // md
   { name: "foam/u2/layout/MDDAOUpdateController" },
+  { name: "foam/u2/layout/MDStackView" },
   { name: "foam/u2/layout/MDDAOCreateController" },
   { name: "foam/u2/md/CheckBox", flags: ['web'] },
   { name: "foam/u2/property/MDTextField", flags: ['web'] },
@@ -917,6 +918,7 @@ FOAM_FILES([
   { name: "foam/u2/md/AppController" },
   { name: "foam/u2/md/OverlayDropdown", flags: ['web'] },
   { name: "foam/u2/layout/MDLoginView", flags: ['web'] },
+  { name: "foam/u2/layout/MDNotificationMessage", flags: ['web'] },
   { name: "foam/u2/md/tag/PaperDropdown", flags: ['web'] },
 
   // fs
