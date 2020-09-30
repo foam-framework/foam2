@@ -77,6 +77,10 @@ public class SocketRouter
     String serviceKey = (String) msg.getAttributes().get("serviceKey");
     Object service = getX().get(serviceKey);
     NSpec spec = (NSpec) nSpecDAO_.find(serviceKey);
+    if ( spec == null ) {
+      logger_.error(this.getClass().getSimpleName(), "Service not found", serviceKey);
+      throw new IOException("Service not found: "+serviceKey);
+    }
 
     PM pm = PM.create(getX(), this.getClass().getSimpleName(), serviceKey);
 
@@ -88,6 +92,7 @@ public class SocketRouter
       .put(NSpec.class, spec);
     SocketWebAgent agent = (SocketWebAgent) getWebAgent(spec, service);
     if ( agent == null ) {
+      logger_.error(this.getClass().getSimpleName(), "Agent not found", serviceKey);
       throw new IOException("Service not found: "+serviceKey);
     }
     try {

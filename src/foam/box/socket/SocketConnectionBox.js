@@ -273,7 +273,8 @@ foam.CLASS({
               Object o = msg.getObject();
               if ( o != null &&
                    o instanceof foam.box.RPCErrorMessage ) {
-                throw (Throwable) ((foam.box.RPCErrorMessage) o).getData();
+                foam.box.RemoteException re = (foam.box.RemoteException) ((foam.box.RPCErrorMessage) o).getData();
+                throw new RuntimeException(re.toString());
               }
               throw new RuntimeException("Failed to process reply. message: "+message);
             }
