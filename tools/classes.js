@@ -645,6 +645,7 @@ var classes = [
   'foam.nanos.crunch.lite.CapableDAO',
   'foam.nanos.crunch.lite.CapableAdapterDAO',
   'foam.nanos.crunch.lite.CapablePayload',
+  'foam.nanos.crunch.lite.CapablePayloadStatusDAO',
   'foam.nanos.crunch.lite.CapableCompatibleCapability',
   
   'foam.nanos.crunch.lite.ruler.CapableCreateApprovalsRuleAction',

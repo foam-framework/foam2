@@ -151,19 +151,23 @@ foam.INTERFACE({
           type: 'foam.dao.DAO',
           visibility: 'default',
           args: [
-            { name: 'x', type: 'X' }
+            { name: 'x', type: 'X' },
           ],
-          body: `
+          body: `            
             DAO capablePayloadDAO = new CapableAdapterDAO.Builder(x)
               .setCapable(this)
               .setOf(CapablePayload.getOwnClassInfo())
               .build();
-              
+
             x = x.put("capablePayloadDAO", capablePayloadDAO);
 
-            RulerDAO rulerDAO = new RulerDAO(
-              x, capablePayloadDAO, "capablePayloadDAO");
-            return rulerDAO;
+            // TODO: Look into why rulerdao acts sketchy here and if it can replace CapablePayloadStatusDAO
+            DAO CapablePayloadStatusDAO = new CapablePayloadStatusDAO.Builder(x)
+              .setDelegate(capablePayloadDAO)
+              .setOf(CapablePayload.getOwnClassInfo())
+              .build();
+              
+            return CapablePayloadStatusDAO;
           `
         }));
       }
