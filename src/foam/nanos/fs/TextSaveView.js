@@ -17,7 +17,10 @@ foam.CLASS({
   ],
 
   properties: [
-    'data'
+    'data',
+    {
+      name: 'fileName'
+    }
   ],
 
   methods: [
@@ -30,9 +33,7 @@ foam.CLASS({
           .add('File Name')
         .end()
         .start('input')
-          .attrs({
-            name: 'fileName'
-          })
+          .on('blur', this.setName)
         .end()
         .br()
         .br()
@@ -51,15 +52,18 @@ foam.CLASS({
       let blob = new Blob([text], {
           type: 'text/plain'
       });
-      let name = document.getElementsByName('fileName');
       this.data = this.File.create({
-        filename: name,
+        filename: this.fileName,
         filesize: blob.size,
         mimeType: 'text',
         data: this.BlobBlob.create({
           blob: blob
         })
       });
+    },
+
+    function setName(e) {
+      this.fileName = e.target.value;
     }
   ]
 })
