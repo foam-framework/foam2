@@ -793,6 +793,9 @@ var classes = [
   // Translation Support
   'foam.i18n.XLIFFTranslationValue',
   'foam.i18n.Locale',
+  'foam.i18n.TranslationService',
+  'foam.i18n.ProxyTranslationService',
+  'foam.i18n.LocaleTranslationService'
 ];
 
 var abstractClasses = [
@@ -821,7 +824,8 @@ var skeletons = [
   'foam.nanos.auth.UserQueryService',
   'foam.nanos.medusa.ElectoralService',
   'foam.nanos.export.GoogleSheetsExport',
-  'foam.nanos.crunch.CrunchService'
+  'foam.nanos.crunch.CrunchService',
+  'foam.i18n.TranslationService'
 ];
 
 var proxies = [
@@ -839,7 +843,8 @@ var proxies = [
   'foam.nanos.http.WebAgent',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.push.PushService',
-  'foam.strategy.StrategizerService'
+  'foam.strategy.StrategizerService',
+  'foam.i18n.TranslationService'
 ];
 
 var blacklist = [

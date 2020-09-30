@@ -893,6 +893,9 @@ FOAM_FILES([
   // Translation Support
   { name: 'foam/i18n/XLIFFTranslationValue' },
   { name: 'foam/i18n/Locale' },
+  { name: 'foam/i18n/TranslationService' },
+  { name: 'foam/i18n/ClientTranslationService' },
+  { name: 'foam/i18n/ProxyTranslationService' },
 
   { name: "foam/nanos/pool/AbstractFixedThreadPool" },
   { name: "foam/nanos/pool/ThreadPoolAgency" },
