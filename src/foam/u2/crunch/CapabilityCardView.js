@@ -22,6 +22,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'auth',
     'crunchService',
     'ctrl',
     'subject',
@@ -132,13 +133,20 @@ foam.CLASS({
           )
         ).then(ucj => {
           if ( ucj ) {
-            this.cjStatus = ucj.status === this.CapabilityJunctionStatus.APPROVED ? 
+            this.cjStatus = ucj.status === this.CapabilityJunctionStatus.APPROVED ?
               this.CapabilityJunctionStatus.PENDING : ucj.status;
           }
-          if ( this.cjStatus === this.CapabilityJunctionStatus.GRANTED ){
+          if ( this.cjStatus === this.CapabilityJunctionStatus.GRANTED ) {
             this.crunchService.isRenewable(this.ctrl.__subContext__, ucj.targetId).then(
               isRenewable => this.isRenewable = isRenewable
             );
+          }
+          if ( this.cjStatus === this.CapabilityJunctionStatus.ACTION_REQUIRED ) {
+            this.auth.check(this.ctrl.__subContext__, 'certifydatareviewed.rw.reviewed').then(result => {
+              if ( ! result ) {
+                this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
+              }
+            });
           }
         });
       }
