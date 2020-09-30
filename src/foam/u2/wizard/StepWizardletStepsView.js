@@ -17,6 +17,7 @@ foam.CLASS({
       display: inline-block;
       margin-right: 24px;
       vertical-align: middle;
+      line-height: 26px !important;
     }
     ^sub-item {
       padding-left: calc(24px + 24px + 4px);
