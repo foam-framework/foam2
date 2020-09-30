@@ -299,7 +299,7 @@ FOAM_FILES([
   { name: 'foam/nanos/auth/UserPropertyAvailabilityService' },
   { name: 'foam/nanos/auth/UserPropertyAvailabilityServiceInterface' },
   { name: 'foam/nanos/auth/ClientUserPropertyAvailabilityService' },
-  { name: 'foam/nanos/auth/UserCitationView' },
+  { name: 'foam/nanos/auth/UserMDCitationView' },
   { name: "foam/nanos/logger/Logger" },
   { name: "foam/nanos/logger/DAOLogger" },
   { name: "foam/nanos/logger/LoggingDAO" },
@@ -902,6 +902,7 @@ FOAM_FILES([
 
   // md
   { name: "foam/u2/layout/MDDAOUpdateController" },
+  { name: "foam/u2/layout/MDStackView" },
   { name: "foam/u2/layout/MDDAOCreateController" },
   { name: "foam/u2/md/CheckBox", flags: ['web'] },
   { name: "foam/u2/property/MDTextField", flags: ['web'] },
@@ -923,10 +924,12 @@ FOAM_FILES([
   { name: "foam/u2/dao/MDDAOList", flags: ['web'] },
   { name: "foam/u2/mcw/DetailPropertyView", flags: ['web'] },
   { name: 'foam/u2/layout/MDRowView', flags: ['web']},
+  { name: 'foam/u2/layout/MDCitationView', flags: ['web']},
   { name: 'foam/u2/layout/MDDAOController', flags: ['web']},
   { name: "foam/u2/md/AppController" },
   { name: "foam/u2/md/OverlayDropdown", flags: ['web'] },
   { name: "foam/u2/layout/MDLoginView", flags: ['web'] },
+  { name: "foam/u2/layout/MDNotificationMessage", flags: ['web'] },
   { name: "foam/u2/md/tag/PaperDropdown", flags: ['web'] },
 
   // fs
