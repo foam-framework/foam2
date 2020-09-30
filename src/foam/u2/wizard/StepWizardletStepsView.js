@@ -11,21 +11,22 @@ foam.CLASS({
 
   css: `
     ^item {
-      margin-bottom: 15px;
+      margin-bottom: 24px;
     }
     ^item > .circle {
       display: inline-block;
-      margin-right: 15px;
+      margin-right: 24px;
       vertical-align: middle;
     }
     ^sub-item {
-      padding-left: calc(24px + 15px + 4px);
-      padding-top: 8px;
-      font-style: italic;
+      padding-left: calc(24px + 24px + 4px);
+      padding-top: 2px;
+      padding-bottom: 8px;
+      color: /*%GREY2%*/ #9ba1a6;
     }
     ^sub-item:hover {
       cursor: pointer;
-      font-weight: bold;
+      color: /*%GREY1%*/ #5e6061 !important;
     }
     ^sub-item:first-child {
       padding-top: 16px;
@@ -34,6 +35,7 @@ foam.CLASS({
       display: inline-block;
       margin: 0;
       vertical-align: middle;
+      text-transform: uppercase;
     }
   `,
 
@@ -89,18 +91,19 @@ foam.CLASS({
                 .start(this.CircleIndicator, {
                   ...baseCircleIndicator,
                   ...(isCurrent ? {
-                    borderColor: this.theme.primary1
-                  } : afterCurrent ? {
-                    borderColor: this.theme.grey2,
-                  } : wizardlet.validate() ? {
+                    borderColor: this.theme.black,
+                    borderColorHover: this.theme.black
+                  } : !afterCurrent && wizardlet.validate() ? {
                     borderColor: this.theme.approval3,
                     backgroundColor: this.theme.approval3,
+                    borderColorHover: this.theme.approval3,
                     icon: this.theme.glyphs.checkmark.getDataUrl({
                       fill: this.theme.white
                     }),
                     label: ''
                   } : {
-                    borderColor: this.theme.warning2
+                    borderColor: this.theme.grey2,
+                    borderColorHover: this.theme.grey2
                   })
                 })
                   .addClass('circle')
@@ -110,8 +113,7 @@ foam.CLASS({
                 .start('p').addClass(self.myClass('title'))
                   .add(wizardlet.title)
                   .style({
-                    'font-weight': isCurrent ? 'bold' : 'normal',
-                    'color': isCurrent || ! afterCurrent ? this.theme.primary1 : this.theme.grey2
+                    'color': isCurrent ? this.theme.black : this.theme.grey2
                   })
                 .end();
 
@@ -138,9 +140,7 @@ foam.CLASS({
                 return isAvailable ? self.renderSectionLabel(
                   self.E().addClass(self.myClass('sub-item')),
                   section, s+1,
-                  isCurrentSection,
-                  isBeforeCurrentSection,
-                  allowedToSkip
+                  isCurrentSection
                 ).on('click', () => {
                   if ( isCurrentSection ) return;
                   if ( allowedToSkip ) {
@@ -161,21 +161,16 @@ foam.CLASS({
           return elem;
         }))
     },
-    function renderSectionLabel(elem, section, index, isCurrent, isBeforeCurrentSection, isClickable) {
+    function renderSectionLabel(elem, section, index, isCurrent) {
       let title = section.title;
       if ( ! title || ! title.trim() ) title = "Part " + index;
-      return elem
-        .start()
-          .style({
-            'color': isCurrent || isBeforeCurrentSection
-              ? this.theme.primary1
-              : isClickable
-                ? this.theme.grey2
-                : this.theme.grey3,
-            'font-weight': isCurrent ? 'bold' : 'inherit'
-          })
-          .add(title)
-        .end();
+      return elem       
+        .style({
+          'color': isCurrent 
+            ? this.theme.black
+            : this.theme.grey2
+        })
+        .add(title);
     }
   ]
 });
