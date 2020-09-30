@@ -219,6 +219,6 @@ foam.CLASS({
       if ( ! e ) return;
 
       this.delegate_.el().scrollTop = e.el().offsetTop - this.vMargin;
-    },
-  ],
-  });
+    }
+  ]
+});

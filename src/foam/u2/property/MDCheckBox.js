@@ -19,11 +19,9 @@ foam.CLASS({
       height: 3rem;
       transition: background-color 140ms, border-color 140ms;
     }
-
     ^:checked {
       background-color: /*%BLACK%*/ #1e1f21;
     }
-
     ^ .label {
       // WHY DOESN"T WORK?
       font-size: larger;

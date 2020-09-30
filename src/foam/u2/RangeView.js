@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'RangeView',
   extends: 'foam.u2.tag.Input',
 
+  css: '^ { padding: 12px 0; width: 300px; }',
+
   properties: [
     [ 'type',     'range' ],
     [ 'step',     0 ],
@@ -33,6 +35,10 @@ foam.CLASS({
       this.SUPER();
       if ( this.step ) this.attrs({step: this.step});
       this.attrs({min: this.minValue, max: this.maxValue$});
+    },
+    function updateMode_(mode) {
+      if ( mode === foam.u2.DisplayMode.RO || mode === foam.u2.DisplayMode.DISABLED ) this.setAttribute('disabled', true);
+      this.show(mode !== foam.u2.DisplayMode.HIDDEN);
     }
   ]
 });

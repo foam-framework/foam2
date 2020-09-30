@@ -194,7 +194,6 @@ foam.CLASS({
       height: 10%;
       position: relative;
     }
-
     ^ .label {
       transition: font-size 0.5s, top 0.5s;
       top: 25%;
@@ -202,7 +201,6 @@ foam.CLASS({
       font-size: larger;
       font-weight: 500;
     }
-
     ^ .label-up {
       font-size: smaller;
       font-weight: unset;
