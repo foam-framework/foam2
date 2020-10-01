@@ -66,7 +66,14 @@ foam.CLASS({
         message retry for multiple permissioned calls made
         asynchronously.
       `
-    }
+    },
+    {
+      class: 'Map',
+      name: 'capabilityCache',
+      factory: function() {
+        return new Map();
+      }
+    },
   ],
 
   methods: [
@@ -89,18 +96,60 @@ foam.CLASS({
     },
 
     // Excludes UCJ-related logic
-    function createCapableWizardSequence(capable, daoKey) {
+    function createCapableWizardSequence(intercept, capable) {
       return this.Sequence.create(null, this.__subContext__.createSubContext({
+        intercept: intercept,
         capable: capable
       }))
         .add(this.ConfigureFlowAgent)
         .add(this.CapableDefaultConfigAgent)
         .add(this.CapableCreateWizardletsAgent)
         .add(this.StepWizardAgent)
-        .add(this.MaybeDAOPutAgent, {
-          daoKey: daoKey
-        })
+        .add(this.MaybeDAOPutAgent)
         ;
+    },
+
+    function handleIntercept(intercept) {
+      var self = this;
+
+      intercept.capabilityOptions.forEach((c) => {
+        self.capabilityCache.set(c, false);
+      });
+
+      // Allow zero or more promises to block this method
+      let p = Promise.resolve();
+
+      // Intercept view for regular user capability options
+      if ( intercept.capabilityOptions.length > 0 ) {
+        p = p.then(() => {
+          return self.maybeLaunchInterceptView(intercept);
+        });
+      }
+
+      let isCapable = intercept.capableRequirements.length > 0;
+
+      // Wizard for Capable objects and required user capabilities
+      // (note: no intercept view; this case immediately invokes a wizard)
+      if ( isCapable ) {
+        p = p.then(() => self.launchCapableWizard(intercept));
+      }
+
+      p = p.then(isCompleted => {
+        if ( isCapable ) {
+          var unambiguousCapable =
+            intercept.capableRequirements.length == 1;
+          if ( ! isCompleted ) {
+            intercept.resolve(new Error('user cancelled'));
+            return;
+          }
+          intercept.resolve(unambiguousCapable
+            ? intercept.capableRequirements[0] : null)
+          return;
+        }
+        intercept.resend();
+      })
+
+      return p;
     },
 
     function maybeLaunchInterceptView(intercept) {
@@ -127,15 +176,21 @@ foam.CLASS({
       }
       // Register intercept for later occurances of the check above
       this.activeIntercepts.push(intercept);
+
       // Pop up the popup
-      this.ctrl.add(this.Popup.create({ closeable: false })
-        .start(this.MarginBorder)
-          .tag(this.CapabilityInterceptView, {
-            data: intercept
-          })
-        .end()
-      );
-      return intercept.promise;
+      return new Promise((resolve, _) => {
+        this.ctrl.add(this.Popup.create({ closeable: false })
+          .start(this.MarginBorder)
+            .tag(this.CapabilityInterceptView, {
+              data: intercept,
+              onClose: (x) => {
+                x.closeDialog();
+                resolve();
+              }
+            })
+          .end()
+        );
+      });
     },
 
     function save(wizardlet) {
@@ -193,14 +248,19 @@ foam.CLASS({
     },
 
     // CRUNCH Lite Methods
-    function launchCapableWizard(capable, daoKey) {
+    function launchCapableWizard(intercept) {
       var p = Promise.resolve(true);
 
-      var seq = this.createCapableWizardSequence(capable, daoKey);
-      return seq.execute().then(x => {
-        // The 'submitted' boolean becomes 'resend' in SessionClientBox
-        return x.submitted;
-      });
+      intercept.capableRequirements.forEach(capable => {
+        var seq = this.createCapableWizardSequence(intercept, capable);
+        p = p.then(() => {
+          return seq.execute().then(x => {
+            return x.submitted;
+          });
+        });
+      })
+
+      return p;
     },
   ]
 });

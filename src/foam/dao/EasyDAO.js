@@ -70,6 +70,7 @@ foam.CLASS({
     'foam.dao.JournalType',
     'foam.nanos.auth.ServiceProviderAware',
     'foam.nanos.auth.ServiceProviderAwareDAO',
+    'foam.nanos.crunch.box.CrunchClientBox',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.LoggingDAO'
   ],
@@ -547,6 +548,11 @@ foam.CLASS({
       generateJava: false,
     },
     {
+      name: 'crunchBoxEnabled',
+      generateJava: false,
+      value: true
+    },
+    {
       documentation: 'Destination address for server',
       name: 'serverBox',
       generateJava: false,
@@ -562,6 +568,9 @@ foam.CLASS({
             maxAttempts: this.retryBoxMaxAttempts,
             delegate: box,
           })
+        }
+        if ( this.crunchBoxEnabled ) {
+          box = this.CrunchClientBox.create({ delegate: box });
         }
         return this.SessionClientBox.create({ delegate: box });
       }
