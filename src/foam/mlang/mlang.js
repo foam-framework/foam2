@@ -3832,6 +3832,9 @@ foam.CLASS({
   package: 'foam.mlang',
   name: 'IsValid',
   extends: 'foam.mlang.AbstractExpr',
+  javaImports: [
+    'foam.core.XLocator'
+  ],
   properties: [
     {
       class: 'foam.mlang.ExprProperty',
@@ -3846,7 +3849,7 @@ foam.CLASS({
       },
       javaCode: `
 try {
-  ((foam.core.FObject) getArg1().f(obj)).validate(getX());
+  ((foam.core.FObject) getArg1().f(obj)).validate(XLocator.get());
 } catch(Exception e) {
   return false;
 }
