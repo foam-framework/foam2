@@ -136,14 +136,11 @@ foam.CLASS({
 
       p = p.then(isCompleted => {
         if ( isCapable ) {
-          var unambiguousCapable =
-            intercept.capableRequirements.length == 1;
           if ( ! isCompleted ) {
             intercept.resolve(new Error('user cancelled'));
             return;
           }
-          intercept.resolve(unambiguousCapable
-            ? intercept.capableRequirements[0] : null)
+          intercept.resolve(intercept.returnCapable)
           return;
         }
         intercept.resend();

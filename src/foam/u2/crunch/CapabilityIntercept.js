@@ -30,6 +30,11 @@ foam.CLASS({
       of: 'foam.nanos.crunch.lite.Capable'
     },
     {
+      name: 'returnCapable',
+      class: 'FObjectProperty',
+      of: 'foam.core.FObject'
+    },
+    {
       name: 'daoKey',
       class: 'String'
     },
