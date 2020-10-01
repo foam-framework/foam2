@@ -332,18 +332,7 @@ foam.CLASS({
       javaCode: `
         // CrunchService used to get capability junctions
         CrunchService crunchService = (CrunchService) x.get("crunchService");
-
-        boolean allGranted = true;
         DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-        DAO myPrerequisitesDAO = ((DAO)
-          x.get("prerequisiteCapabilityJunctionDAO"))
-            .where(
-              EQ(CapabilityCapabilityJunction.SOURCE_ID, getId()));
-
-        List<CapabilityCapabilityJunction> ccJunctions =
-          ((ArraySink) myPrerequisitesDAO.select(new ArraySink()))
-          .getArray();
-
         DAO userDAO = (DAO) x.get("userDAO");
         Subject currentSubject = (Subject) x.get("subject");
 
@@ -359,10 +348,10 @@ foam.CLASS({
           subject.setUser((User) userDAO.find(ucj.getSourceId()));
         }
 
-        for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
-          Capability cap = (Capability) ccJunction.findSourceId(x);
-          if ( ! cap.getEnabled() ) continue;
-          UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(x, ccJunction.getTargetId(), subject);
+        var prereqs = crunchService.getPrereqs(getId());
+        for ( var capId : prereqs ) {
+          if ( ! this.getEnabled() ) continue;
+          UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(x, capId, subject);
 
           if ( ucJunction != null && ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED )
             continue;
@@ -374,9 +363,11 @@ foam.CLASS({
                && ucJunction.getStatus() != CapabilityJunctionStatus.PENDING ) {
             return CapabilityJunctionStatus.ACTION_REQUIRED;
           }
-          if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING ) allGranted = false;
+          if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING ) {
+            return CapabilityJunctionStatus.PENDING;
+          }
         }
-        return allGranted ? CapabilityJunctionStatus.GRANTED : CapabilityJunctionStatus.PENDING;
+        return CapabilityJunctionStatus.GRANTED;
       `,
     }
   ]
