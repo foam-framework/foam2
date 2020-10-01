@@ -351,6 +351,7 @@ foam.CLASS({
         var prereqs = crunchService.getPrereqs(getId());
         if ( prereqs != null ) {
           for ( var capId : prereqs ) {
+            // QUESTION if the capability is disabled what would be the status of the prereqs chain?
             if ( ! this.getEnabled() ) continue;
             UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(x, capId, subject);
 
