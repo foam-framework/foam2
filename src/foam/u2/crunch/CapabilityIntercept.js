@@ -14,7 +14,6 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.box.CapabilityRequiredRemoteException',
       postSet: function (_, nu) {
-        debugger;
         this.capabilityOptions = nu.capabilityOptions;
         this.capableRequirements = nu.capableRequirements;
         this.daoKey = nu.daoKey;

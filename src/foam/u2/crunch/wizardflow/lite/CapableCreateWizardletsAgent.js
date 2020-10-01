@@ -35,7 +35,6 @@ foam.CLASS({
       console.log('WIZARDLETS', this.wizardlets);
     },
     function createWizardletsFromPayloads(payloads) {
-      debugger;
       var newWizardlets = [];
       var childWizardlets = [];
       for ( let i = 0 ; i < payloads.length ; i++ ) {

@@ -52,7 +52,6 @@ foam.CLASS({
           this.RPCErrorMessage.isInstance(msg.object) &&
           msg.object.data.id === 'foam.nanos.crunch.CapabilityRuntimeException'
         ) {
-          debugger;
           let intercept = self.CapabilityIntercept.create({
             exception: msg.object.data,
             resolve: function (value) {
