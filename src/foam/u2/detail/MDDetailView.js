@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.u2.detail',
   name: 'MDDetailView',
-  extends: 'foam.u2.DetailView',
+  extends: 'foam.u2.View',
 
   requires: [
     'foam.u2.property.MDDateField',
@@ -26,85 +26,53 @@ foam.CLASS({
 
   css: `
   ^ {
-    width: inherit !important;
-  }
-
-  ^ .property-item .label-container {
-    color: #999;
+    overflow: scroll;
+    height: 100em;
   }
    ^ .property-item {
       padding: 4rem;
-      font-size: 3rem;
-      align-items: center;
-      border: 1px solid #f2f3ff;
+      font-size: 3em;
+      border: 1px solid #e9ebff;
     }
-
     ^ .label {
-      font-size: 2rem;
-      color: #999;
-      flex-grow: 1;
+      font-size: larger;
       font-weight: 500;
-      transition: font-size 0.5s, top 0.5s;
-      z-index: 0;
-      top: 0;
-      position: relative;
+      color: #5a5a5a;
     }
-
-    ^ .label-offset {
-        font-size: 3rem;
-        top: 4rem;
-        color: #999;
-      }
-
+//    TODO: move to calendar
     ^ .foam-u2-property-MDCalendar-heading {
       font-size: 1.5rem;
       padding-bottom: 1rem;
     }
-
     ^ span button {
       font-size: 2rem;
     }
-
-    ^ .foam-u2-tag-Select {
-      font-size: 2rem;
-      height: 4rem;
-      width: fit-content;
+    ^ .foam-u2-Dialog {
+      background-color: unset;
     }
-
-    ^ .foam-u2-view-RichChoiceView-selection-view {
-      height: 4rem;
-      font-size: 2rem;
-      width: 100%;
-      border: none;
-    }
-
-    ^ .foam-u2-view-RichChoiceView {
-      width: 100%;
-    }
-
-    ^ .DefaultRowView-row {
-      font-size: 2rem;
-    }
-
-    ^ .foam-u2-view-ReferencePropertyView {
-      width: 100%;
-    }
-
-    ^ .foam-u2-view-EnumView {
-    width: 100%;}
   `,
 
   properties: [
     {
-      name: 'title',
-      expression: function(of) {
-        return of.model_.label;
+      name: 'data',
+      attribute: true,
+      preSet: function(_, data) {
+        var of = data && data.cls_;
+        if ( of !== this.of ) this.of = of;
+
+        return data;
+      },
+      factory: function() {
+        return this.of && this.of.create(null, this);
       }
     },
-    [ 'showTitle', true ],
-    [ 'nodeName', 'div' ],
+    {
+      class: 'Class',
+      name: 'of'
+    },
     {
       name: 'properties',
+      // TODO: Make an FObjectArray when it validates properly
       preSet: function(_, ps) {
         foam.assert(ps, 'Properties required.');
         for ( var i = 0; i < ps.length; i++ ) {
@@ -118,11 +86,12 @@ foam.CLASS({
       expression: function(of) {
         if ( ! of ) return [];
         return this.of.getAxiomsByClass(foam.core.Property).
+          // TODO: this is a temporary fix, but DisplayMode.HIDDEN should be included and could be switched
           filter(function(p) {
             return ! ( p.hidden || p.visibility === foam.u2.DisplayMode.HIDDEN );
           });
       }
-    },
+    }
   ],
 
   methods: [
@@ -137,16 +106,20 @@ foam.CLASS({
       this.__subContext__.register(this.MDFloatView, 'foam.u2.FloatView');
       this.__subContext__.register(this.MDTextField, 'foam.u2.TextField');
       this.__subContext__.register(this.MDTextField, 'foam.u2.IntView');
+      this.__subContext__.register(this.MDTextField, 'foam.u2.view.DualView');
       this.__subContext__.register(this.MDCheckBox, 'foam.u2.CheckBox');
 //      this.__subContext__.register(this.MDCurrencyView, 'foam.u2.view.CurrencyView');
 
-      this.add(this.slot(function(of, properties, actions) {
+      this.add(this.slot(function(of, properties) {
         if ( ! of ) return '';
         this.
           addClass(this.myClass()).
           forEach(properties, function(p) {
             if ( ! foam.dao.OneToManyRelationshipProperty.isInstance(p) &&
-              ! foam.dao.ManyToManyRelationshipProperty.isInstance(p) ) {
+              ! foam.dao.ManyToManyRelationshipProperty.isInstance(p) &&
+              ! foam.core.FObjectProperty.isInstance(p)
+              && ! foam.core.FObjectArray.isInstance(p) && p.name !== 'desiredPassword'
+              ) {
               this.start().addClass('property-item').add(p).end();
             }
           })

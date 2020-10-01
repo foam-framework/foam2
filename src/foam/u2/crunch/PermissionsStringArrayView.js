@@ -39,7 +39,7 @@ foam.CLASS({
         placeholder: 'capability search',
         onKey: true
       },
-      readVisibility: foam.u2.DisplayMode.RW,
+      readVisibility: foam.u2.DisplayMode.RW
     },
     {
       name: 'views',
@@ -64,31 +64,32 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
-      
+
       this.data$.sub(function() {
         console.log('data change');
-      });        
+      });
 
       this.start()
-      .startContext({ data: this })
-      .start()
-          .tag(this.SEARCH)
-        .end()
-        .start()
-          .addClass(this.myClass('padding'))
-          .add(this.slot(function(views) {
-            if ( views ) {
-              return this.E().forEach(views, function(v) {
-                this.start()
-                  .add(v)
-                .end();
-              });
-            }
-          }))
-        .end()
+        .startContext({ data: this })
+          .start()
+            .tag(this.SEARCH)
+          .end()
+          .start()
+            .addClass(this.myClass('padding'))
+            .add(this.slot(function(views) {
+              if ( views ) {
+                return this.E().forEach(views, function(v) {
+                  this.start()
+                    .add(v)
+                  .end();
+                });
+              }
+            }))
+          .end()
         .endContext()
       .end();
     },
+
     function preSetViewWithProjection(proj) {
       this.views = [];
       var self = this;
@@ -113,6 +114,7 @@ foam.CLASS({
         }));
       });
     },
+
     function onSelectFunction(permission, isSelected) {
       var newArr =[];
       if ( isSelected ) {
@@ -128,6 +130,7 @@ foam.CLASS({
       }
       this.data = newArr;
     },
+
     function onAllSelectedFunction(_, isSelected) {
       var filteredPermissions = this.views.filter(v => v.show && v.permission !== 'Select All').map(v => v.permission);
       var newArr = [];
@@ -144,7 +147,6 @@ foam.CLASS({
           for ( var p of this.data ) {
             newArr.push(p);
           }
-          
         }
         for ( var p of filteredPermissions ) {
           if ( ! newArr.includes(p) ) {
@@ -154,9 +156,11 @@ foam.CLASS({
       }
       this.data = newArr;
     },
+
     function isPermissionSelected(permission) {
       return this.data.includes(permission);
     },
+
     function isAllPermissionsSelected() {
       var filteredPermissions = this.views.filter(v => v.show && v.permission !== 'Select All').map(v => v.permission);
       if ( filteredPermissions.length < this.data.length ) {
@@ -169,15 +173,16 @@ foam.CLASS({
       }
       return this.data.length === filteredPermissions.length;
     },
+
     function onSearchChanged() {
       this.show = ! this.search || this.search.length === 0 || this.permission.toLowerCase().includes(this.search.toLowerCase() );
     },
+
     function onSearchChangedSelectAll() {
       this.stopOnSelect = true;
       this.isSelected = this.isSelectedPermissionsContainThisPermission(this.permission);
     }
   ]
-
 });
 
 
@@ -253,6 +258,7 @@ foam.CLASS({
       text-overflow: ellipsis;
     }
   `,
+
   properties: [
     {
       name: 'permission',
@@ -291,10 +297,11 @@ foam.CLASS({
     },
     {
       name: 'stopOnSelect',
-      class: 'Boolean',
+      class: 'Boolean'
     },
     'onSearchChange'
   ],
+
   methods: [
     function initE() {
       this.SUPER();
