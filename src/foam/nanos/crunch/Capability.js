@@ -325,11 +325,14 @@ foam.CLASS({
       ],
       documentation: `
         Check statuses of all prerequisite capabilities - returning:
+        GRANTED: If the capability is disabled
         GRANTED: If all pre-reqs are in granted status
         PENDING: At least one pre-req is still in pending status
         ACTION_REQUIRED: If not any of the above
       `,
       javaCode: `
+        if ( ! this.getEnabled() ) CapabilityJunctionStatus.GRANTED;
+
         // CrunchService used to get capability junctions
         CrunchService crunchService = (CrunchService) x.get("crunchService");
         DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
@@ -351,8 +354,6 @@ foam.CLASS({
         var prereqs = crunchService.getPrereqs(getId());
         if ( prereqs != null ) {
           for ( var capId : prereqs ) {
-            // QUESTION if the capability is disabled what would be the status of the prereqs chain?
-            if ( ! this.getEnabled() ) continue;
             UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(x, capId, subject);
 
             if ( ucJunction != null && ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED )
