@@ -31,6 +31,7 @@ public class ServerCrunchService implements CrunchService {
 
   public List getCapabilityPath(X x, String rootId, boolean filterGrantedUCJ) {
     Logger logger = (Logger) x.get("logger");
+    foam.nanos.pm.PM pm = foam.nanos.pm.PM.create(x, this.getClass().getSimpleName(), "getCapabilityPath");
 
     DAO prerequisiteDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
     DAO capabilityDAO = (DAO) x.get("capabilityDAO");
@@ -125,6 +126,7 @@ public class ServerCrunchService implements CrunchService {
     }
 
     Collections.reverse(grantPath);
+    pm.log(x);
     return grantPath;
   }
 
