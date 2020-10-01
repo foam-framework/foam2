@@ -28,8 +28,7 @@ foam.CLASS({
     'foam.u2.detail.VerticalDetailView',
     'foam.u2.layout.Grid',
     'foam.u2.layout.GUnit',
-    'foam.u2.wizard.StepWizardletStepsView',
-    'foam.u2.tag.CircleIndicator'
+    'foam.u2.wizard.StepWizardletStepsView'
   ],
 
   implements: [
@@ -163,23 +162,6 @@ foam.CLASS({
           .end()
           .start(this.GUnit, { columns: 8 })
             .addClass(this.myClass('rightside'))
-            .add(this.slot(function(hideX) {
-              if ( hideX ) {
-                return this.E().addClass(this.myClass('top-padding'));
-              }
-              return this.E().addClass(this.myClass('top-buttons'))
-                .start(this.CircleIndicator, {
-                  label: 'X',
-                  borderThickness: 2,
-                  borderColor: this.theme.grey2,
-                  borderColorHover: this.theme.primary1,
-                  clickable: true
-                })
-                  .on('click', function () {
-                    self.showExitPrompt();
-                  })
-                .end();
-            }))
             .start()
               .addClass(this.myClass('entry'))
               .start()
