@@ -19,14 +19,13 @@ import foam.nanos.crunch.lite.CapablePayload;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 
-import java.lang.Exception;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static foam.mlang.MLang.*;
 
 public class ServerCrunchService extends ContextAwareSupport implements CrunchService, NanoService {
-  private Map<String, List> prereqsCache_ = null;
+  private Map<String, List<String>> prereqsCache_ = null;
 
   @Override
   public void start() throws Exception {
@@ -34,16 +33,16 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     var updateSink = new AbstractSink() {
       public void put(Object obj, Detachable sub) {
         var junction = (CapabilityCapabilityJunction) obj;
-        if ( ! getPrereqsCache().containsKey(junction.getSourceId()) ) {
-          getPrereqsCache().put(junction.getSourceId(), new ArrayList());
+        if ( getPrereqs(junction.getSourceId()) == null ) {
+          prereqsCache_.put(junction.getSourceId(), new ArrayList());
         }
-        getPrereqsCache().get(junction.getSourceId()).add(junction.getTargetId());
+        getPrereqs(junction.getSourceId()).add(junction.getTargetId());
       }
 
       public void remove(Object obj, Detachable sub) {
         var junction = (CapabilityCapabilityJunction) obj;
-        if ( getPrereqsCache().containsKey(junction.getSourceId()) ) {
-          getPrereqsCache().get(junction.getSourceId()).remove(junction.getTargetId());
+        if ( getPrereqs(junction.getSourceId()) != null ) {
+          getPrereqs(junction.getSourceId()).remove(junction.getTargetId());
         }
       }
 
@@ -60,7 +59,6 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     Logger logger = (Logger) x.get("logger");
     PM pm = PM.create(x, this.getClass().getSimpleName(), "getCapabilityPath");
 
-    var cache = getPrereqsCache();
     DAO capabilityDAO = (DAO) x.get("capabilityDAO");
 
     // Lookup for indices of previously observed capabilities
@@ -99,23 +97,22 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       if ( cap == null ) {
         continue;
       }
-
       alreadyListed.add(sourceCapabilityId);
+      var prereqs = getPrereqs(sourceCapabilityId) == null ? new String[0] :
+        getPrereqs(sourceCapabilityId).stream()
+          .filter(c -> ! alreadyListed.contains(c))
+          .toArray(String[]::new);
 
       if ( cap instanceof MinMaxCapability && ! rootId.equals(sourceCapabilityId) ) {
         List minMaxArray = new ArrayList<>();
 
         // Manually grab the direct  prereqs to the  MinMaxCapability
-        if ( cache.containsKey(sourceCapabilityId) ) {
-          List prereqs = cache.get(sourceCapabilityId);
-          prereqs.removeAll(alreadyListed);
-          for ( int i = prereqs.size() - 1 ; i >= 0 ; i-- ) {
-            var prereqGrantPath = this.getGrantPath(x,  prereqs.get(i).toString());
+        for ( int i = prereqs.length - 1 ; i >= 0 ; i-- ) {
+          var prereqGrantPath = this.getGrantPath(x, prereqs[i]);
 
-            // Essentially we reserve arrays to denote  ANDs and ORs, must be at least 2  elements
-            if ( prereqGrantPath.size() > 1 ) minMaxArray.add(prereqGrantPath);
-            else minMaxArray.add(prereqGrantPath.get(0));
-          }
+          // Essentially we reserve arrays to denote  ANDs and ORs, must be at least 2  elements
+          if ( prereqGrantPath.size() > 1 ) minMaxArray.add(prereqGrantPath);
+          else minMaxArray.add(prereqGrantPath.get(0));
         }
 
         /**
@@ -135,12 +132,8 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       grantPath.add(cap);
 
       // Enqueue prerequisites for adding to grant path
-      if ( cache.containsKey(sourceCapabilityId) ) {
-        List prereqs = new ArrayList(cache.get(sourceCapabilityId));
-        prereqs.removeAll(alreadyListed);
-        for ( int i = prereqs.size() - 1 ; i >= 0 ; i-- ) {
-          nextSources.add(prereqs.get(i).toString());
-        }
+      for ( int i = prereqs.length - 1 ; i >= 0 ; i-- ) {
+        nextSources.add(prereqs[i]);
       }
     }
 
@@ -149,7 +142,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return grantPath;
   }
 
-  public synchronized Map<String, List> getPrereqsCache() {
+  public synchronized List<String> getPrereqs(String capId) {
     if ( prereqsCache_ == null ) {
       prereqsCache_ = new ConcurrentHashMap<>();
       var dao = (DAO) getX().get("prerequisiteCapabilityJunctionDAO");
@@ -168,7 +161,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
           sink.getGroups().get(key)).getDelegate()).getArray());
       }
     }
-    return prereqsCache_;
+    return prereqsCache_.get(capId);
   }
 
   // Return capability path for multiple prerequisites without duplicates.
@@ -321,7 +314,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     UserCapabilityJunction ucj = crunchService.getJunction(x, capabilityId);
       if ( ! capability.getEnabled() ) return false;
 
-    var prereqs = getPrereqsCache().get(capabilityId);
+    var prereqs = getPrereqs(capabilityId);
     boolean topLevelRenewable = ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ucj.getIsRenewable();
 
     if ( prereqs == null || prereqs.size() == 0 || topLevelRenewable ) return topLevelRenewable;
@@ -340,7 +333,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     UserCapabilityJunction ucj = crunchService.getJunction(x, capabilityId);
       if ( ! capability.getEnabled() ) return false;
 
-    var prereqs = getPrereqsCache().get(capabilityId);
+    var prereqs = getPrereqs(capabilityId);
     boolean shouldReopenTopLevel = shouldReopenUserCapabilityJunction(ucj);
 
     if ( prereqs == null || prereqs.size() == 0 || shouldReopenTopLevel ) return shouldReopenTopLevel;

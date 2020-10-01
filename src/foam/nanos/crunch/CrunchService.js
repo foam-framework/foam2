@@ -13,15 +13,16 @@ foam.INTERFACE({
   `,
 
   javaImports: [
-    'foam.nanos.crunch.lite.CapablePayload',
-    'java.util.Map',
-    'java.util.List'
+    'foam.nanos.crunch.lite.CapablePayload'
   ],
 
   methods: [
     {
-      name: 'getPrereqsCache',
-      type: 'Map<String, List>',
+      name: 'getPrereqs',
+      type: 'java.util.List<String>',
+      args: [
+        { name: 'capId', type: 'String' }
+      ],
       flags: ['java']
     },
     {
