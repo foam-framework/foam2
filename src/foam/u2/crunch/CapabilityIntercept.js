@@ -12,22 +12,22 @@ foam.CLASS({
     {
       name: 'exception',
       class: 'FObjectProperty',
-      of: 'foam.box.CapabilityRequiredRemoteException'
+      of: 'foam.box.CapabilityRequiredRemoteException',
+      postSet: function (_, nu) {
+        debugger;
+        this.capabilityOptions = nu.capabilityOptions;
+        this.capableRequirements = nu.capableRequirements;
+        this.daoKey = nu.daoKey;
+      }
     },
     {
       name: 'capabilityOptions',
-      class: 'StringArray',
-      expression: function (exception) {
-        return exception.capabilityOptions;
-      }
+      class: 'StringArray'
     },
     {
       name: 'capableRequirements',
       class: 'FObjectArray',
-      of: 'foam.nanos.crunch.lite.Capable',
-      expression: function (exception) {
-        return exception.capableRequirements;
-      }
+      of: 'foam.nanos.crunch.lite.Capable'
     },
     {
       name: 'daoKey',

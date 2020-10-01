@@ -105,9 +105,7 @@ foam.CLASS({
         .add(this.CapableDefaultConfigAgent)
         .add(this.CapableCreateWizardletsAgent)
         .add(this.StepWizardAgent)
-        .add(this.MaybeDAOPutAgent, {
-          daoKey: daoKey
-        })
+        .add(this.MaybeDAOPutAgent)
         ;
     },
 
@@ -133,7 +131,7 @@ foam.CLASS({
       // Wizard for Capable objects and required user capabilities
       // (note: no intercept view; this case immediately invokes a wizard)
       if ( isCapable ) {
-        p = p.then(() => self.launchCapableWizard());
+        p = p.then(() => self.launchCapableWizard(intercept));
       }
 
       p = p.then(isCompleted => {
@@ -148,7 +146,6 @@ foam.CLASS({
             ? intercept.capableRequirements[0] : null)
           return;
         }
-        debugger;
         intercept.resend();
       })
 
@@ -179,15 +176,21 @@ foam.CLASS({
       }
       // Register intercept for later occurances of the check above
       this.activeIntercepts.push(intercept);
+
       // Pop up the popup
-      this.ctrl.add(this.Popup.create({ closeable: false })
-        .start(this.MarginBorder)
-          .tag(this.CapabilityInterceptView, {
-            data: intercept
-          })
-        .end()
-      );
-      return intercept.promise;
+      return new Promise((resolve, _) => {
+        this.ctrl.add(this.Popup.create({ closeable: false })
+          .start(this.MarginBorder)
+            .tag(this.CapabilityInterceptView, {
+              data: intercept,
+              onClose: (x) => {
+                x.closeDialog();
+                resolve();
+              }
+            })
+          .end()
+        );
+      });
     },
 
     function save(wizardlet) {

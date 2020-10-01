@@ -15,6 +15,7 @@ foam.CLASS({
 
   requires: [
     'foam.box.RPCErrorMessage',
+    'foam.box.RPCReturnMessage',
     'foam.u2.crunch.CapabilityIntercept'
   ],
 
@@ -55,10 +56,13 @@ foam.CLASS({
           let intercept = self.CapabilityIntercept.create({
             exception: msg.object.data,
             resolve: function (value) {
-              self.delegate.send(value);
+              var newMsg = msg.clone();
+              newMsg.object = self.RPCReturnMessage.create({
+                data: value
+              });
+              self.delegate.send(newMsg);
             },
             resend: function () {
-              debugger;
               self.clientBox.send(self.msg);
             }
           });
