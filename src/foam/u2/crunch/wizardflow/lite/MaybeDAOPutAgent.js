@@ -8,6 +8,7 @@ foam.CLASS({
 
   imports: [
     'intercept',
+    'submitted',
     'capable',
   ],
 
@@ -16,7 +17,11 @@ foam.CLASS({
       var p = Promise.resolve();
       if ( this.intercept.daoKey && this.submitted ) {
         p = p.then(() =>
-          this.__subContext__[this.intercept.daoKey].put(this.capable));
+          this.__subContext__[this.intercept.daoKey].put(this.capable)
+          .then(returnCapable => {
+            this.intercept.returnCapable = returnCapable;
+          })
+        );
       }
       return p;
     }

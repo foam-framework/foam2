@@ -85,7 +85,6 @@ foam.CLASS({
     {
       name: 'adjustCapablePayloads',
       code: function(oldChoices, newChoices) {
-        debugger;
         var choiceWizardlets = this.choiceWizardlets;
 
         var selectedOldChoices = oldChoices.filter(choice => typeof choice[2] === 'object' ? choice[2].get() : choice[2]);
