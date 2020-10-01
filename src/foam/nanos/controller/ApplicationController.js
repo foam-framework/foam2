@@ -80,8 +80,6 @@ foam.CLASS({
     'menuListener',
     'notify',
     'pushMenu',
-    'requestCapability',
-    'capabilityCache',
     'requestLogin',
     'signUpEnabled',
     'loginVariables',
@@ -276,13 +274,6 @@ foam.CLASS({
       name: 'crunchController',
       factory: function() {
         return this.CrunchController.create();
-      }
-    },
-    {
-      class: 'Map',
-      name: 'capabilityCache',
-      factory: function() {
-        return new Map();
       }
     },
     {
@@ -557,40 +548,6 @@ foam.CLASS({
         self.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, self);
         self.loginSuccess$.sub(resolve);
       });
-    },
-
-    function requestCapability(capabilityInfo) {
-      var self = this;
-
-      capabilityInfo.capabilityOptions.forEach((c) => {
-        self.capabilityCache.set(c, false);
-      });
-
-      let intercept = self.CapabilityIntercept.create({
-        capabilityOptions: capabilityInfo.capabilityOptions
-      });
-
-      // Allow zero or more promises to block this method
-      let p = Promise.resolve();
-
-      // Intercept view for regular user capability options
-      if ( capabilityInfo.capabilityOptions.length > 0 ) {
-        p = p.then(() => {
-          return self.crunchController.maybeLaunchInterceptView(intercept);
-        });
-      }
-
-      // Wizard for Capable objects and required user capabilities
-      // (note: no intercept view; this case immediately invokes a wizard)
-      if ( capabilityInfo.capableRequirements.length > 0 ) {
-        capabilityInfo.capableRequirements.forEach(capable => {
-          p = p.then(() => {
-            return self.crunchController.launchCapableWizard(capable, capabilityInfo.daoKey);
-          });
-        })
-      }
-
-      return p;
     },
 
     function notify(toastMessage, toastSubMessage, severity, transient) {

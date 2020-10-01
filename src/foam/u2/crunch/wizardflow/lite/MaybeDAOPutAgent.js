@@ -7,6 +7,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'intercept',
     'capable',
     'submitted as submittedOld'
   ],
@@ -32,9 +33,9 @@ foam.CLASS({
     function execute() {
       var p = Promise.resolve();
       this.submitted = this.submittedOld;
-      if ( this.daoKey && this.submitted ) {
+      if ( this.intercept.daoKey && this.submitted ) {
         p = p.then(() =>
-          this.__subContext__[this.daoKey].put(this.capable));
+          this.__subContext__[this.intercept.daoKey].put(this.capable));
         this.submitted = false;
       }
       return p;

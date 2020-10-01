@@ -388,6 +388,9 @@ FOAM_FILES([
   //views
   { name: "foam/nanos/crunch/ui/CapableView" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
+  //boxes
+  { name: "foam/nanos/crunch/box/CrunchClientBox" },
+  { name: "foam/nanos/crunch/box/CrunchClientReplyBox" },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },

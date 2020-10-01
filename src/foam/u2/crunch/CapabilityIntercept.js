@@ -10,8 +10,36 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'exception',
+      class: 'FObjectProperty',
+      of: 'foam.box.CapabilityRequiredRemoteException'
+    },
+    {
       name: 'capabilityOptions',
-      class: 'StringArray'
+      class: 'StringArray',
+      expression: function (exception) {
+        return exception.capabilityOptions;
+      }
+    },
+    {
+      name: 'capableRequirements',
+      class: 'FObjectArray',
+      of: 'foam.nanos.crunch.lite.Capable',
+      expression: function (exception) {
+        return exception.capableRequirements;
+      }
+    },
+    {
+      name: 'daoKey',
+      class: 'String'
+    },
+    {
+      name: 'resolve',
+      class: 'Function'
+    },
+    {
+      name: 'resend',
+      class: 'Function'
     },
     {
       name: 'aquired',
