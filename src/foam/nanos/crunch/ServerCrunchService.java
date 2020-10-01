@@ -19,6 +19,7 @@ import foam.nanos.crunch.lite.CapablePayload;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 
+import java.lang.Exception;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
