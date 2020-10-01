@@ -13,10 +13,17 @@ foam.INTERFACE({
   `,
 
   javaImports: [
-    'foam.nanos.crunch.lite.CapablePayload'
+    'foam.nanos.crunch.lite.CapablePayload',
+    'java.util.Map',
+    'java.util.List'
   ],
 
   methods: [
+    {
+      name: 'getPrereqsCache',
+      type: 'Map<String, List>',
+      flags: ['java']
+    },
     {
       name: 'getGrantPath',
       documentation: `
