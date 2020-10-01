@@ -349,22 +349,24 @@ foam.CLASS({
         }
 
         var prereqs = crunchService.getPrereqs(getId());
-        for ( var capId : prereqs ) {
-          if ( ! this.getEnabled() ) continue;
-          UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(x, capId, subject);
+        if ( prereqs != null ) {
+          for ( var capId : prereqs ) {
+            if ( ! this.getEnabled() ) continue;
+            UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(x, capId, subject);
 
-          if ( ucJunction != null && ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED )
-            continue;
+            if ( ucJunction != null && ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED )
+              continue;
 
-          if ( ucJunction == null ) {
-            return CapabilityJunctionStatus.ACTION_REQUIRED;
-          }
-          if ( ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED
-               && ucJunction.getStatus() != CapabilityJunctionStatus.PENDING ) {
-            return CapabilityJunctionStatus.ACTION_REQUIRED;
-          }
-          if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING ) {
-            return CapabilityJunctionStatus.PENDING;
+            if ( ucJunction == null ) {
+              return CapabilityJunctionStatus.ACTION_REQUIRED;
+            }
+            if ( ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED
+                 && ucJunction.getStatus() != CapabilityJunctionStatus.PENDING ) {
+              return CapabilityJunctionStatus.ACTION_REQUIRED;
+            }
+            if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING ) {
+              return CapabilityJunctionStatus.PENDING;
+            }
           }
         }
         return CapabilityJunctionStatus.GRANTED;

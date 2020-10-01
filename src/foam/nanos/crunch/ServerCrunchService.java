@@ -35,7 +35,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       public void put(Object obj, Detachable sub) {
         var junction = (CapabilityCapabilityJunction) obj;
         if ( getPrereqs(junction.getSourceId()) == null ) {
-          prereqsCache_.put(junction.getSourceId(), new ArrayList());
+          prereqsCache_.put(junction.getSourceId(), new ArrayList<>());
         }
         getPrereqs(junction.getSourceId()).add(junction.getTargetId());
       }
