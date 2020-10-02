@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.fs',
   name: 'TextSaveView',
-  extends: 'foam.u2.Element',
+  extends: 'foam.u2.Controller',
 
   documentation: 'view to save plain text as file',
 
@@ -20,29 +20,40 @@ foam.CLASS({
     'data',
     {
       name: 'fileName'
+    },
+    {
+      name: 'text',
+      postSet: function(_, n) {
+         let blob = new Blob([n], {
+             type: 'text/plain'
+         });
+         this.data = this.File.create({
+           filename: this.fileName,
+           filesize: blob.size,
+           mimeType: 'text',
+           data: this.BlobBlob.create({
+             blob: blob
+           })
+         });
+      }
     }
   ],
 
   methods: [
     function initE() {
       this.SUPER();
-      var name = "";
 
       this
         .start('p')
           .add('File Name')
         .end()
-        .start('input')
-          .on('blur', this.setName)
-        .end()
+        .add(this.FILE_NAME)
         .br()
         .br()
         .start('p')
           .add('Text')
         .end()
-        .start('input')
-          .on('blur', this.onBlur)
-        .end();
+        .add(this.TEXT)
     }
   ],
 
@@ -60,10 +71,6 @@ foam.CLASS({
           blob: blob
         })
       });
-    },
-
-    function setName(e) {
-      this.fileName = e.target.value;
     }
   ]
 })
