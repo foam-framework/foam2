@@ -326,8 +326,8 @@ foam.CLASS({
       documentation: `
         Check statuses of all prerequisite capabilities - returning:
         GRANTED        : If all pre-reqs are in granted status
-        PENDING        : At least one pre-req is still in pending/approved status
-        ACTION_REQUIRED: If not any of the above
+        PENDING        : If at least one pre-req is in pending/approved status and the rest are granted
+        ACTION_REQUIRED: If at least one pre-req is not in pending/approved/granted status
       `,
       javaCode: `
         // CrunchService used to get capability junctions
