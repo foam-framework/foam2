@@ -16,6 +16,10 @@ foam.CLASS({
     'capabilities'
   ],
 
+  requires: [
+    'foam.u2.wizard.StepWizardConfig'
+  ],
+
   exports: [
     'config as wizardConfig'
   ],
@@ -30,6 +34,10 @@ foam.CLASS({
 
   methods: [
     async function execute() {
+      this.config = this.StepWizardConfig.create({
+        allowSkipping: false,
+        allowBacktracking: false,
+      });
     }
   ]
 });

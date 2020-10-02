@@ -167,7 +167,7 @@ foam.CLASS({
             subWi--;
             // Skip past steps with no sections
             while ( sectionAvailableSlots[subWi].length < 1 ) subWi--;
-            if ( subWi < 1 ) return null;
+            if ( subWi < 0 ) return null;
             subSi = sectionAvailableSlots[subWi].length - 1;
           } else {
             subSi--;
@@ -179,7 +179,7 @@ foam.CLASS({
         };
 
         for ( let p = decr(wizardPosition) ; p != null ; p = decr(p) ) {
-          if ( ! this.wizardlets[p.wizardletIndex].isAvailable ) {
+          if ( ! this.wizardlets[p.wizardletIndex].isVisible ) {
             continue;
           }
 
@@ -217,7 +217,7 @@ foam.CLASS({
 
         for ( let p = incr(wizardPosition) ; p != null ; p = incr(p) ) {
           // Skip unavailable wizardlets
-          if ( ! this.wizardlets[p.wizardletIndex].isAvailable ) {
+          if ( ! this.wizardlets[p.wizardletIndex].isVisible ) {
             continue;
           }
 
