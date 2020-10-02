@@ -50,6 +50,18 @@ foam.CLASS({
           errorMessage: 'REVIEW_ERROR'
         }
       ]
+    },
+    {
+      name: 'dataConfiguredExpiry',
+      class: 'Boolean',
+      hidden: true,
+      readPermissionRequired: true,
+      writePermissionRequired: true
+    },
+    {
+      name: 'expiry',
+      class: 'Date',
+      hidden: true
     }
   ],
 
