@@ -51,6 +51,11 @@ foam.CLASS({
       class: 'String',
       name: 'daoToReput',
       required: true
+    },
+    {
+      class: 'String',
+      name: 'groupToNotify',
+      value: 'fraud-ops'
     }
   ],
 
@@ -140,7 +145,7 @@ foam.CLASS({
                   .setObjId(approvable.getId())
                   .setOperation(operation)
                   .setCreatedBy(user.getId())
-                  .setGroup("fraud-ops")
+                  .setGroup(getGroupToNotify())
                   .setClassification(
                     capability.getName() + 
                     " for " + 
