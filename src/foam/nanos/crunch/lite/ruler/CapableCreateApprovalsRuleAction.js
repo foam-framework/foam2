@@ -22,6 +22,9 @@ foam.CLASS({
     'foam.nanos.approval.Approvable',
     'foam.nanos.approval.ApprovalRequest',
     'foam.nanos.approval.ApprovalStatus',
+    'foam.comics.v2.userfeedback.UserFeedback',
+    'foam.comics.v2.userfeedback.UserFeedbackException',
+    'foam.comics.v2.userfeedback.UserFeedbackStatus',
     'foam.nanos.ruler.Operations',
     'foam.nanos.auth.Subject',
     'java.util.Map',
@@ -57,6 +60,10 @@ foam.CLASS({
       name: 'groupToNotify',
       value: 'fraud-ops'
     }
+  ],
+
+    messages: [
+    { name: 'REQUEST_SEND_MSG', message: 'An approval request has been sent out.' }
   ],
 
   methods: [
@@ -169,6 +176,14 @@ foam.CLASS({
               DAO daoToReput = (DAO) x.get(getDaoToReput());
 
               daoToReput.put(clonedObj);
+
+              // TODO: for some reason the UpdateTransactionOnInvoiceValidationRule fires after throwing
+              throw new UserFeedbackException.Builder(x)
+                .setUserFeedback(new UserFeedback.Builder(x)
+                  .setStatus(UserFeedbackStatus.SUCCESS)
+                  .setMessage(REQUEST_SEND_MSG)
+                  .build()
+                ).build();
             }
           }
 
