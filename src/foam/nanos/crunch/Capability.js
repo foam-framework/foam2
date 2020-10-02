@@ -65,6 +65,7 @@ foam.CLASS({
     {
       name: 'id',
       class: 'String',
+      displayWidth: 40,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       section: 'basicInfo'
@@ -72,6 +73,7 @@ foam.CLASS({
     {
       name: 'name',
       class: 'String',
+      displayWidth: 70,
       section: 'basicInfo'
     },
     {
@@ -144,6 +146,7 @@ foam.CLASS({
     {
       name: 'of',
       class: 'Class',
+      displayWidth: 70,
       documentation: `Model used to store information required by this credential`
     },
     {
