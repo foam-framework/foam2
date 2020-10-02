@@ -76,6 +76,14 @@ foam.CLASS({
       `,
       transient: true
     },
+    {
+      class: 'Boolean',
+      name: 'needsApproval',
+      documentation: `
+        TODO: Review with Eric
+      `,
+      transient: true
+    }
   ],
 
   methods: [

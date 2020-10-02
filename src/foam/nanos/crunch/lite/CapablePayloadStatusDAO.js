@@ -56,13 +56,10 @@ foam.CLASS({
         var oldStatus = payload.getStatus();
         var newStatus = cap.getCapableChainedStatus(x, payloadDAO, payload);
 
-        // TODO: Need to figure out how to deal with the reputs of the parents
+        // TODO: Review with Eric
         if (
           payload.getHasSafeStatus() &&
-          oldStatus == CapabilityJunctionStatus.PENDING && (
-            newStatus == CapabilityJunctionStatus.PENDING ||
-            newStatus == CapabilityJunctionStatus.GRANTED
-          )
+          payload.getNeedsApproval()
         ){
           return getDelegate().put_(x, obj);
         }
@@ -76,7 +73,9 @@ foam.CLASS({
           ((ArraySink) payloadDAO.select(new ArraySink())).getArray().stream()
           .filter(cp -> Arrays.stream(depIds).anyMatch(((CapablePayload) cp).getCapability().getId()::equals))
           .forEach(cp -> {
-            payloadDAO.put((CapablePayload) cp);
+            CapablePayload capableCp = (CapablePayload) cp;
+            capableCp.setHasSafeStatus(true);
+            payloadDAO.put(capableCp);
           });
         }
 

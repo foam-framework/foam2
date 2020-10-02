@@ -64,12 +64,12 @@ foam.CLASS({
 
                 // then reput the actual capable object into it's dao
                 dao.put(objectToReput);
-
               } catch ( Exception e ){
                 throw new RuntimeException(e);
               }
+            } else {
+              throw new RuntimeException("Unsupported approvable operation.");
             }
-            throw new RuntimeException("Unsupported approvable operation.");
           }
         }, "Updated the payload based on a approved approvable");
       `
