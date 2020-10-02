@@ -237,7 +237,7 @@ foam.CLASS({
       expression: function(validationPredicates) {
         return validationPredicates
           .map((vp) => {
-            exception = vp.errorMessage ?
+            var exception = vp.errorMessage ?
               `throw new IllegalStateException(((${this.forClass_}) obj).${vp.errorMessage});` :
               `throw new IllegalStateException(${foam.java.asJavaValue(vp.errorString)});`
             return `if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
