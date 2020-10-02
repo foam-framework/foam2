@@ -56,6 +56,7 @@ foam.CLASS({
         var oldStatus = payload.getStatus();
         var newStatus = cap.getCapableChainedStatus(x, payloadDAO, payload);
 
+        // TODO: Need to figure out how to deal with the reputs of the parents
         if (
           payload.getHasSafeStatus() &&
           oldStatus == CapabilityJunctionStatus.PENDING && (
