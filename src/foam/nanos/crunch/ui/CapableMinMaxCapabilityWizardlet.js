@@ -90,20 +90,27 @@ foam.CLASS({
         var selectedOldChoices = oldChoices.filter(choice => typeof choice[2] === 'object' ? choice[2].get() : choice[2]);
         var selectedNewChoices = newChoices.filter(choice => typeof choice[2] === 'object' ? choice[2].get() : choice[2]);
 
+        var selectedOldChoicesNames = selectedOldChoices.map(choice => choice[0]);
+        var selectedNewChoicesNames = selectedNewChoices.map(choice => choice[0]);
+
         if ( selectedOldChoices.length > selectedNewChoices.length ){
-          var deselectedChoice = selectedOldChoices.filter(choice => selectedNewChoices.indexOf(choice) == -1)
+          var deselectedChoiceName = selectedOldChoicesNames.filter(choice => selectedNewChoicesNames.indexOf(choice) == -1)[0]
+
+          var deselectedChoice = selectedOldChoices.filter(choice => choice[0] === deselectedChoiceName)[0];
 
           var deselectedWizard = choiceWizardlets.filter(wizard => wizard.title === deselectedChoice[0]);
 
-          var { targetPayload } =  deselectedWizard;
+          var { targetPayload } =  deselectedWizard[0];
 
           this.capable.capablePayloads = this.capable.capablePayloads.filter(capablePayload => capablePayload !== targetPayload);
 
         } else if (selectedOldChoices.length < selectedNewChoices.length ) {
 
-          var selectedChoice = selectedNewChoices.filter(choice => selectedOldChoices.indexOf(choice) == -1)
+          var selectedChoiceName = selectedNewChoicesNames.filter(choice => selectedOldChoicesNames.indexOf(choice) == -1)[0]
 
-          var selectedWizard = choiceWizardlets.filter(wizard => wizard.title === selectedChoice[0][0]);
+          var selectedChoice = selectedNewChoices.filter(choice => choice[0] === selectedChoiceName)[0];
+          
+          var selectedWizard = choiceWizardlets.filter(wizard => wizard.title === selectedChoice[0]);
 
           var { targetPayload } =  selectedWizard[0];
 
