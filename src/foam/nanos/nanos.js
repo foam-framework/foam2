@@ -396,5 +396,6 @@ FOAM_FILES([
   // google
   { name: "foam/nanos/geocode/GoogleMapsCredentials" },
 
-  { name: "com/google/foam/demos/u2/AllViews" }
+  { name: "com/google/foam/demos/u2/AllViews" },
+  { name: "com/google/foam/demos/u2/MDAllViews" }
 ]);

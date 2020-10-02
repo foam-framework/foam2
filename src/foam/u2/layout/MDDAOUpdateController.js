@@ -89,7 +89,7 @@ foam.CLASS({
         }
         var self = this;
         this.dao.put(this.data.clone()).then(function() {
-          this.ctrl.notify('Successfully Created', '', self.LogLevel.INFO, true);
+          this.ctrl.notify('Successfully Updated', '', self.LogLevel.INFO, true);
           self.stack.back();
         }, function(e) {
           self.exception = e;
@@ -133,10 +133,11 @@ foam.CLASS({
               rightAction: self.SAVE
             })
           .endContext();
-        this.start('div')
+//        this.start('div')
+this
           .tag(this.detailView, { data: this.data })
           .add(this.DELETE)
-        .end()
+//        .end()
     }
   ],
 
@@ -154,5 +155,10 @@ foam.CLASS({
       border: 2px solid red!important;
       border-radius: 73px;
     }
+    ^ {
+        padding-top: 20%;
+        overflow: scroll;
+        height: 90%;
+      }
   `,
 });

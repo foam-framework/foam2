@@ -33,8 +33,10 @@ foam.CLASS({
   css: `
     ^ {
       top: 0;
+      position: fixed;
       height: 10%;
       width: 100%;
+      z-index: 10;
     }
 
     ^ toolbar {
