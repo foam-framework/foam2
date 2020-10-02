@@ -28,6 +28,7 @@ foam.CLASS({
     'foam.u2.detail.VerticalDetailView',
     'foam.u2.layout.Grid',
     'foam.u2.layout.GUnit',
+    'foam.u2.LoadingSpinner',
     'foam.u2.wizard.StepWizardletStepsView',
     'foam.u2.tag.CircleIndicator'
   ],
@@ -100,6 +101,20 @@ foam.CLASS({
       padding: 25px 50px;
       text-align: right;
     }
+    ^buttons {
+      display: flex;
+      justify-content: flex-end;
+    }
+    ^loading-spinner {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 160px;
+    }
+    ^loading-spinner img {
+      width: 40px;
+      height: 40px;
+    }
     ^top-padding {
       padding-top: 99px;
     }
@@ -138,6 +153,18 @@ foam.CLASS({
       name: 'backDisabled',
       class: 'Boolean',
       value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'isLoading_',
+      documentation: `Condition to synchronize code execution and user response.`,
+      value: false
+    },
+    {
+      name: 'loadingSpinner',
+      factory: function() {
+        return this.LoadingSpinner.create();
+      }
     }
   ],
 
@@ -204,7 +231,7 @@ foam.CLASS({
             .end()
             .start()
               .addClass(this.myClass('bottom-buttons'))
-              .add(this.slot(function (data$isLastScreen) {
+              .add(this.slot(function (data$isLastScreen, isLoading_) {
                 return this.E()
                   .startContext({ data: self })
                   .addClass(self.myClass('buttons'))
@@ -214,6 +241,11 @@ foam.CLASS({
                       ? { ...btn, label: this.ACTION_LABEL }
                       : btn
                   )
+                  .start()
+                    .addClass(self.myClass('loading-spinner'))
+                    .show(isLoading_)
+                    .add(this.loadingSpinner)
+                  .end()
                   .endContext();
               }))
             .end()
@@ -290,7 +322,11 @@ foam.CLASS({
       isEnabled: function (data$canGoNext) {
         return data$canGoNext;
       },
+      isAvailable: function (isLoading_) {
+        return ! isLoading_;
+      },
       code: function(x) {
+        this.isLoading_ = true;
         this.data.next().then((isFinished) => {
           if ( isFinished ) {
             this.onClose(x, true);
@@ -298,6 +334,9 @@ foam.CLASS({
         }).catch(e => {
           console.error(e);
           x.ctrl.notify(this.ERROR_MSG, '', this.LogLevel.ERROR, true);
+        })
+        .finally(() => {
+          this.isLoading_ = false;
         });
       }
     }
