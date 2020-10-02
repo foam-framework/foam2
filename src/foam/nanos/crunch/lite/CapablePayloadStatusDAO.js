@@ -56,6 +56,16 @@ foam.CLASS({
         var oldStatus = payload.getStatus();
         var newStatus = cap.getCapableChainedStatus(x, payloadDAO, payload);
 
+        if (
+          payload.getHasSafeStatus() &&
+          oldStatus == CapabilityJunctionStatus.PENDING && (
+            newStatus == CapabilityJunctionStatus.PENDING ||
+            newStatus == CapabilityJunctionStatus.GRANTED
+          )
+        ){
+          return getDelegate().put_(x, obj);
+        }
+
         if ( oldStatus != newStatus )  {
           payload.setStatus(newStatus);
           // TODO Maybe use projection MLang
