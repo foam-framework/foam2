@@ -576,7 +576,7 @@ foam.CLASS({
                     var stringValue;
                     var elmt = this.E().addClass(view.myClass('td')).style({flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0'});
 
-                    if (foam.core.Action.isInstance(prop)) {
+                    if ( foam.core.Action.isInstance(prop) ) {
                       elmt.add('');// will be fixed on Projection update
                     } else {
                       if ( foam.core.UnitValue.isInstance(prop) ) {
@@ -585,7 +585,7 @@ foam.CLASS({
                       } else if ( tableCellFormatter ) {
                         try {
                           if ( tableCellFormatter )
-                            tableCellFormatter.format(elmt, value, null);
+                            tableCellFormatter.format(elmt, value, null, val);
                         } catch(e) {
                           stringValue = view.outputter.returnStringValueForProperty(view.__context__, prop, value);
                         }
@@ -620,7 +620,7 @@ foam.CLASS({
         }
       },
       function returnRecords(of, dao, propertyNamesToQuery) {
-        var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(of, propertyNamesToQuery);
+        var expr = foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create().buildProjectionForPropertyNamesArray(of, propertyNamesToQuery);
         return dao.select(expr);
       },
       function doesAllColumnsContainsColumnName(context, col) {

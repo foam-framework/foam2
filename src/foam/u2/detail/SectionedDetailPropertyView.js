@@ -24,6 +24,7 @@ foam.CLASS({
     }
 
     ^helper-icon {
+      padding-left: 12px;
       width: 20px;
       height: 20px;
     }

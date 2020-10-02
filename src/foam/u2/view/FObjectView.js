@@ -40,6 +40,7 @@ foam.CLASS({
       view: function(args, X) {
         return {
           class: X.data.allowCustom ? 'foam.u2.TextField' : 'foam.u2.view.ChoiceView',
+          displayWidth: 60,
           choices$: X.data.choices$
         };
       }

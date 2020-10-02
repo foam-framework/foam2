@@ -1637,7 +1637,7 @@ foam.CLASS({
           throw new Error('Unsupported');
         } else {
           if ( foam.locale !== null && typeof c === 'object' && c.data !== undefined && c.data.id !== undefined ) {
-            if ( c.default ) { this.add(c.default); return; }
+            if ( foam.local == 'en' && c.default ) { this.add(c.default); return; }
             var self = this;
             var expr = foam.mlang.Expressions.create();
             let d =  this.__subContext__.localeDAO;

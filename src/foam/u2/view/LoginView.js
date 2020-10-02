@@ -141,7 +141,7 @@ foam.CLASS({
   }
   ^ .image-one {
     width: 38vw;
-    margin-top: -83vh;
+    margin-top: -75vh;
     margin-left: 10vw;
   }
   `,
