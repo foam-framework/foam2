@@ -17,7 +17,6 @@ foam.CLASS({
     'ctrl',
     'group',
     'loginSuccess',
-    'requestCapability',
     'requestLogin',
     'sessionTimer',
     'window'
