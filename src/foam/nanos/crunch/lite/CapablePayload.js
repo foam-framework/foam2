@@ -59,7 +59,8 @@ foam.CLASS({
       `,
       javaFactory: `
         return null;
-      `
+      `,
+      permissionRequired: true
     },
     {
       name: 'status',
@@ -100,6 +101,12 @@ foam.CLASS({
           dataObject.validate(x);
         }
       `,
+    },
+    {
+      name: 'toSummary',
+      code: function(){
+        return `${this.daoKey}:${this.objId} - ${this.capability.name}`
+      }
     }
   ],
 });
