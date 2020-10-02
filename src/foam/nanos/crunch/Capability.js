@@ -325,14 +325,16 @@ foam.CLASS({
       ],
       documentation: `
         Check statuses of all prerequisite capabilities - returning:
-        GRANTED: If all pre-reqs are in granted status
-        PENDING: At least one pre-req is still in pending status
+        GRANTED        : If all pre-reqs are in granted status
+        PENDING        : At least one pre-req is still in pending/approved status
         ACTION_REQUIRED: If not any of the above
       `,
       javaCode: `
         // CrunchService used to get capability junctions
-        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         CrunchService crunchService = (CrunchService) x.get("crunchService");
+
+        boolean allGranted = true;
+        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
         DAO userDAO = (DAO) x.get("userDAO");
         Subject currentSubject = (Subject) x.get("subject");
@@ -356,23 +358,24 @@ foam.CLASS({
             if ( cap == null || ! cap.getEnabled() ) continue;
 
             UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(x, capId, subject);
-
-            if ( ucJunction != null && ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED )
-              continue;
-
             if ( ucJunction == null ) {
               return CapabilityJunctionStatus.ACTION_REQUIRED;
             }
-            if ( ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED
-                 && ucJunction.getStatus() != CapabilityJunctionStatus.PENDING ) {
-              return CapabilityJunctionStatus.ACTION_REQUIRED;
+
+            if ( ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) {
+              continue;
             }
-            if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING ) {
-              return CapabilityJunctionStatus.PENDING;
+
+            if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING
+              || ucJunction.getStatus() == CapabilityJunctionStatus.APPROVED
+            ) {
+              allGranted = false;
+            } else {
+              return CapabilityJunctionStatus.ACTION_REQUIRED;
             }
           }
         }
-        return CapabilityJunctionStatus.GRANTED;
+        return allGranted ? CapabilityJunctionStatus.GRANTED : CapabilityJunctionStatus.PENDING;
       `,
     }
   ]
