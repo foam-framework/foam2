@@ -73,6 +73,14 @@ foam.CLASS({
       view: { class: 'foam.u2.view.ScrollTableView', editColumnsEnabled: false, pageSize: 10 }
     },
     {
+      class: 'foam.dao.DAOProperty',
+      name: 'filteredPermissions',
+      expression: function(search, permissions) {
+        return permissions.where(this.CONTAINS(this.Permission.ID, search));
+      },
+      view: { class: 'foam.u2.view.ScrollTableView', editColumnsEnabled: false, pageSize: 10 }
+    },
+    {
       class: 'String',
       name: 'search',
       view: {
@@ -118,7 +126,7 @@ foam.CLASS({
             .add(this.SEARCH, ' ', this.CUSTOM_PERMISSION, ' ', this.ADD_CUSTOM)
           .end()
           .start()
-            .add(this.PERMISSIONS)
+            .add(this.FILTERED_PERMISSIONS)
           .end()
         .endContext()
       .end();
