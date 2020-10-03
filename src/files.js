@@ -194,6 +194,7 @@ FOAM_FILES([
   { name: "foam/u2/Tooltip", flags: ['web'] },
   { name: "foam/u2/MNRowFormatter", flags: ['web'] },
   { name: "foam/u2/ProgressView", flags: ['web'] },
+  { name: "foam/u2/LoadingSpinner", flags: ['web'] },
   { name: "foam/u2/ListCreateController", flags: ['web'] },
   { name: 'foam/u2/view/SearchViewWrapper', flags: ['web'] },
   { name: 'foam/u2/view/StringArrayRowView', flags: ['web'] },
