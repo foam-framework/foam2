@@ -55,7 +55,8 @@ p({
   "client":
   """
   {
-      "class":"foam.i18n.ClientTranslationService"
+      "class":"foam.i18n.ClientCacheTranslationService",
+      "delegate":"foam.i18n.ClientTranslationService"
   }
   """
 })
