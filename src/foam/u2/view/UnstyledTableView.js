@@ -456,7 +456,7 @@ foam.CLASS({
                   }).
                   callIf(view.dblclick && ! view.disableUserSelection, function() {
                     tableRowElement.on('dblclick', function() {
-                      view.dblclick && view.dblclick(thisObjValue, val[0]);
+                      view.dblclick && view.dblclick(null, val[0]);
                     });
                   }).
                   callIf( ! view.disableUserSelection, function() {
