@@ -28,6 +28,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/AssociatedEntity" },
   { name: "foam/nanos/crunch/Capability" },
   { name: "foam/nanos/auth/ServiceProvider" },
+  { name: 'foam/nanos/fs/TextSaveView', flags: ['web'] },
   { name: "foam/nanos/app/AppConfig" },
   { name: "foam/nanos/app/ContextLookupAppConfigService"},
   { name: "foam/nanos/app/AppConfigService" },

@@ -9,6 +9,33 @@ foam.CLASS({
   name: 'PermissionsStringArrayView',
   extends: 'foam.u2.View',
 
+  classes: [
+    {
+      name: 'PermissionRow',
+      extends: 'foam.nanos.auth.Permission',
+
+      properties: [
+        {
+          class: 'Boolean',
+          name: 'granted',
+          tableWidth: 70,
+          tableCellFormatter: function(value, _, projection) {
+            var id = projection[0];
+            var slot = foam.core.SimpleSlot.create({value: value});
+            slot.sub(() => {
+              if ( slot.get() ) {
+                this.__context__.addPermission(id);
+              } else {
+                this.__context__.removePermission(id);
+              }
+            });
+            this.add(foam.u2.CheckBox.create({data$: slot}));
+          }
+        }
+      ]
+    }
+  ],
+
   implements: [
     'foam.mlang.Expressions'
   ],
@@ -17,7 +44,13 @@ foam.CLASS({
     'permissionDAO'
   ],
 
+  exports: [
+    'addPermission',
+    'removePermission'
+  ],
+
   requires: [
+    'foam.dao.MDAO',
     'foam.nanos.auth.Permission',
     'foam.u2.crunch.PermissionSelection',
     'foam.u2.TextField'
@@ -27,12 +60,29 @@ foam.CLASS({
     .foam-u2-crunch-PermissionsStringArrayView-padding {
       padding-top: 8px;
     }
+    .property-permissionGranted > .foam-u2-view-ScrollTableView {
+      height: 400px;
+    }
   `,
 
   properties: [
     {
-      name: 'search',
+      class: 'foam.dao.DAOProperty',
+      name: 'permissions',
+      factory: function() { return this.MDAO.create({of: this.PermissionRow}); },
+      view: { class: 'foam.u2.view.ScrollTableView', editColumnsEnabled: false, pageSize: 10 }
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'filteredPermissions',
+      expression: function(search, permissions) {
+        return permissions.where(this.CONTAINS(this.Permission.ID, search));
+      },
+      view: { class: 'foam.u2.view.ScrollTableView', editColumnsEnabled: false, pageSize: 10 }
+    },
+    {
       class: 'String',
+      name: 'search',
       view: {
         class: 'foam.u2.TextField',
         type: 'search',
@@ -42,21 +92,17 @@ foam.CLASS({
       readVisibility: foam.u2.DisplayMode.RW
     },
     {
-      name: 'views',
-      class: 'Array',
-      of: 'foam.u2.crunch.PermissionSelection',
-      factory: function() {
-        var self = this;
-        this.permissionDAO.select(this.PROJECTION(this.Permission.ID, this.Permission.DESCRIPTION))
-          .then(function(proj) {
-            self.allPermissions = proj.projection.map(a => a[0]);
-            self.preSetViewWithProjection(proj);
-          });
+      class: 'String',
+      name: 'customPermission',
+      view: {
+        class: 'foam.u2.TextField',
+        placeholder: 'custom permission',
+        onKey: true
       }
     },
     {
-      name: 'allPermissions',
-      class: 'StringArray'
+      name: 'pMap',
+      factory: function() { return {}; }
     }
   ],
 
@@ -65,113 +111,65 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      this.data$.sub(function() {
-        console.log('data change');
+      this.data.forEach(p => {
+        this.pMap[p] = true;
+        this.permissions.put(this.PermissionRow.create({id: p, description: 'custom permission', granted: true}));
+      });
+
+      this.permissionDAO.select(p => {
+        this.permissions.put(this.PermissionRow.create(p).copyFrom({granted: this.pMap[p]}));
       });
 
       this.start()
         .startContext({ data: this })
           .start()
-            .tag(this.SEARCH)
+            .add(this.SEARCH, ' ', this.CUSTOM_PERMISSION, ' ', this.ADD_CUSTOM)
           .end()
           .start()
-            .addClass(this.myClass('padding'))
-            .add(this.slot(function(views) {
-              if ( views ) {
-                return this.E().forEach(views, function(v) {
-                  this.start()
-                    .add(v)
-                  .end();
-                });
-              }
-            }))
+            .add(this.FILTERED_PERMISSIONS)
           .end()
         .endContext()
       .end();
     },
 
-    function preSetViewWithProjection(proj) {
-      this.views = [];
-      var self = this;
-      if ( proj.projection.length > 0 )
-        this.views.push(this.PermissionSelection.create({
-          permission: 'Select All',
-          search$: this.search$,
-          selectedPermissions$: this.data$,
-          onSelect: this.onAllSelectedFunction.bind(this),
-          isSelectedPermissionsContainThisPermission: this.isAllPermissionsSelected.bind(this),
-          onSearchChange: this.onSearchChangedSelectAll
-        }));
-      proj.projection.forEach(a => {
-        this.views.push(this.PermissionSelection.create({
-          permission: a[0],
-          search$: this.search$,
-          description: a[1],
-          selectedPermissions$: self.data$,
-          onSelect: self.onSelectFunction.bind(self),
-          isSelectedPermissionsContainThisPermission: self.isPermissionSelected.bind(self),
-          onSearchChange: this.onSearchChanged
-        }));
-      });
-    },
-
     function onSelectFunction(permission, isSelected) {
       var newArr =[];
       if ( isSelected ) {
-        this.data.forEach(p => {
-          newArr.push(p);
-        });
+        this.data.forEach(p => newArr.push(p));
         newArr.push(permission);
       } else {
-        this.data.forEach(p => {
-          if ( p !== permission )
-            newArr.push(p);
-        });
+        this.data.forEach(p => { if ( p !== permission ) newArr.push(p); });
       }
       this.data = newArr;
     },
 
-    function onAllSelectedFunction(_, isSelected) {
-      var filteredPermissions = this.views.filter(v => v.show && v.permission !== 'Select All').map(v => v.permission);
-      var newArr = [];
-      if ( ! isSelected ) {
-        if ( this.allPermissions.length !== filteredPermissions.length ) {
-          for ( var p of this.data ) {
-            if ( ! filteredPermissions.includes(p) ) {
-              newArr.push(p);
-            }
-          }
-        }
-      } else {
-        if ( filteredPermissions.length < this.data.length ) {
-          for ( var p of this.data ) {
-            newArr.push(p);
-          }
-        }
-        for ( var p of filteredPermissions ) {
-          if ( ! newArr.includes(p) ) {
-            newArr.push(p);
-          }
-        }
+    function addPermission(id) {
+      if ( ! this.data.includes(id) ) {
+        var data = foam.util.clone(this.data);
+        data.push(id);
+        data.sort();
+        this.data = data;
       }
-      this.data = newArr;
+      this.permissions.find(id).then(row => {
+        if ( row ) {
+          row.granted = true;
+          this.permissions.put(row);
+          this.permissions.on.put.pub();
+        } else {
+          this.permissions.put(this.PermissionRow.create({id: id, description: 'custom permission', granted: true}));
+        }
+      });
     },
 
-    function isPermissionSelected(permission) {
-      return this.data.includes(permission);
-    },
-
-    function isAllPermissionsSelected() {
-      var filteredPermissions = this.views.filter(v => v.show && v.permission !== 'Select All').map(v => v.permission);
-      if ( filteredPermissions.length < this.data.length ) {
-        for ( var p of filteredPermissions ) {
-          if ( ! this.data.includes(p) ) {
-            return false;
-          }
+    function removePermission(id) {
+      this.data = this.data.filter(p => p != id);
+      this.permissions.find(id).then(row => {
+        if ( row ) {
+          row.granted = false;
+          this.permissions.put(row);
+          this.permissions.on.put.pub();
         }
-        return true;
-      }
-      return this.data.length === filteredPermissions.length;
+      });
     },
 
     function onSearchChanged() {
@@ -182,6 +180,18 @@ foam.CLASS({
       this.stopOnSelect = true;
       this.isSelected = this.isSelectedPermissionsContainThisPermission(this.permission);
     }
+  ],
+
+  actions: [
+    {
+      name: 'addCustom',
+      label: 'Add',
+      isEnabled: function(customPermission) { return customPermission.trim(); },
+      code: function() {
+        this.addPermission(this.customPermission);
+        this.customPermission = '';
+      }
+    }
   ]
 });
 
@@ -190,6 +200,7 @@ foam.CLASS({
   package: 'foam.u2.crunch',
   name: 'PermissionSelection',
   extends: 'foam.u2.View',
+
   css: `
     ^ {
       height: 16px;
@@ -242,7 +253,7 @@ foam.CLASS({
 
     .foam-u2-crunch-PermissionSelection-center-tooltiptext {
       bottom: 250%;
-  }
+    }
 
     .foam-u2-crunch-PermissionSelection-left:hover .foam-u2-crunch-PermissionSelection-tooltiptext {
       visibility: visible;
@@ -261,15 +272,15 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'permission',
-      class: 'String'
+      class: 'String',
+      name: 'permission'
     },
     {
       name: 'description'
     },
     {
-      name: 'isSelected',
       class: 'Boolean',
+      name: 'isSelected',
       view: {
         class: 'foam.u2.CheckBox',
         showLabel: false
@@ -285,19 +296,19 @@ foam.CLASS({
       }
     },
     {
-      name: 'selectedPermissions',
+      name: 'selectedPermissions'
     },
     'isSelectedPermissionsContainThisPermission',
     'onSelect',
     'search',
     {
-      name: 'show',
       class: 'Boolean',
+      name: 'show',
       value: true
     },
     {
-      name: 'stopOnSelect',
-      class: 'Boolean'
+      class: 'Boolean',
+      name: 'stopOnSelect'
     },
     'onSearchChange'
   ],

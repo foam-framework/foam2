@@ -3,7 +3,6 @@
  * Copyright 2017,2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-
 foam.INTERFACE({
   package: 'foam.lib.csv',
   name: 'FromCSVSetter',
@@ -233,11 +232,12 @@ foam.CLASS({
       expression: function(validationPredicates) {
         return validationPredicates
           .map((vp) => {
-            return `
-              if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
-                throw new IllegalStateException(${foam.java.asJavaValue(vp.errorString)});
-              }
-            `;
+            var exception = vp.errorMessage ?
+              `throw new IllegalStateException(((${this.forClass_}) obj).${vp.errorMessage});` :
+              `throw new IllegalStateException(${foam.java.asJavaValue(vp.errorString)});`
+            return `if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
+              ${exception}
+            }`;
           })
           .join('');
       }
