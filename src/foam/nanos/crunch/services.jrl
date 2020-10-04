@@ -17,7 +17,7 @@ p({
   "class":"foam.nanos.boot.NSpec",
   "name":"localCapabilityDAO",
   "lazy":true,
-  "serve":true,
+  "serve":false,
   "serviceScript":"""
     dao = new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(false)
@@ -29,8 +29,7 @@ p({
     dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.crunch.Capability.NAME });
 
     return dao;
-  """,
-  "client":"{\"of\":\"foam.nanos.crunch.Capability\"}"
+  """
 })
 
 p({
@@ -41,7 +40,6 @@ p({
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
       .setInnerDAO(x.get("localCapabilityDAO"))
-      .setDecorator(new foam.nanos.crunch.CapabilityAvailabilityDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.Capability.getOwnClassInfo())))
       .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
       .build();
   """,
@@ -52,6 +50,7 @@ p({
     }
   """
 })
+//      .setDecorator(new foam.nanos.crunch.CapabilityAvailabilityDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.Capability.getOwnClassInfo())))
 
 p({
   "class": "foam.nanos.boot.NSpec",
