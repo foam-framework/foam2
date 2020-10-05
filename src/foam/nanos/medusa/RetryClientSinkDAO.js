@@ -136,6 +136,10 @@ foam.CLASS({
             } else {
               throw new UnsupportedOperationException("Unknown operation: "+dop);
             }
+          } catch ( RuntimeException e ) {
+            getLogger().debug("submit", e.getMessage());
+            pm.error(x, e);
+            throw e;
           } catch ( Throwable t ) {
             // getLogger().error(t.getMessage(), t);
             getLogger().error(t.getMessage());
@@ -145,7 +149,7 @@ foam.CLASS({
               getLogger().warning("retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
 
               // TODO: Alarm
-              pm.error(x, "Retry limit reached.");
+              pm.error(x, "Retry limit reached.", t);
               throw new RuntimeException("Rejected, retry limit reached.", t);
               //break;
             }
@@ -161,14 +165,15 @@ foam.CLASS({
               Thread.sleep(retryDelay);
             } catch(InterruptedException e) {
               Thread.currentThread().interrupt();
-              break;
+              pm.error(x, t);
+              throw t;
+              // break;
             }
           }
         }
       } finally {
         pm.log(x);
       }
-      return obj;
       `
     },
     // Sink
