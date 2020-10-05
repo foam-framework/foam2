@@ -656,7 +656,8 @@ foam.CLASS({
     'document',
     'elementValidator',
     'framed',
-    'getElementById'
+    'getElementById',
+    'translationService?'
   ],
 
   implements: [
@@ -1631,7 +1632,14 @@ foam.CLASS({
           this.add(this.PromiseSlot.create({ promise: c }));
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
-        } else {
+        } else if ( this.translationService && c && c.data && c.data.id ) {
+          var key = c.data.id + '.' + c.clsInfo;
+          this.add(this.PromiseSlot.create({
+            promise: this.translationService.getTranslation(foam.locale, key)
+              .then(txt => { return txt || c.default || 'no value'; })
+          }));
+          /*
+
           if ( foam.locale !== null && typeof c === 'object' && c.data !== undefined && c.data.id !== undefined ) {
             if ( foam.local == 'en' && c.default ) { this.add(c.default); return; }
             var self = this;
@@ -1654,8 +1662,9 @@ foam.CLASS({
                   return c.default || 'no value';
                 })
             }))
-          } else
-            es.push(c);
+            */
+        } else {
+          es.push(c);
         }
       }
 
