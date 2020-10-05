@@ -60,7 +60,7 @@ foam.CLASS({
         if (
           payload.getHasSafeStatus() &&
           payload.getNeedsApproval()
-        ){
+        ) {
           return getDelegate().put_(x, obj);
         }
 

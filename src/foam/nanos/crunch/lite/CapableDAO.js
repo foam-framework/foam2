@@ -83,7 +83,7 @@ foam.CLASS({
             if ( 
               toPutCapablePayload.getDaoKey() == null || 
               SafetyUtil.isEmpty(toPutCapablePayload.getDaoKey()) 
-            ){
+            ) {
               toPutCapablePayload.setDaoKey(getDaoKey());
             }
 
