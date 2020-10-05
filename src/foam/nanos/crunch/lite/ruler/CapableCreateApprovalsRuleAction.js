@@ -40,16 +40,6 @@ foam.CLASS({
   implements: ['foam.nanos.ruler.RuleAction'],
 
   properties: [
-    { 
-      name: 'capabilitiesToApprove',
-      class: 'List',
-      of: 'String',
-      javaType: 'java.util.List<String>',
-      factory: function() {
-        return [];
-      },
-      javaFactory: 'return new java.util.ArrayList();'
-    },
     {
       class: 'String',
       name: 'daoToReput',
@@ -73,8 +63,6 @@ foam.CLASS({
         User user = ((Subject) x.get("subject")).getUser();
 
         Logger logger = (Logger) x.get("logger");
-
-        List<String> capabilitiesToApprove = getCapabilitiesToApprove();
 
         FObject clonedObj = obj.fclone();
 
