@@ -40,11 +40,12 @@ foam.CLASS({
 
         if ( ! file ) return a();
 
-        if ( file.size <= this.maxStringDataSize ) {
-          file.dataString = await encode(file.data.blob);
-          delete file.instance_.data;
+        if ( file.filesize <= self.maxStringDataSize ) {
+          file.dataString = await self.encode(file.data.blob);
+          file.instance_.data = undefined;
+        } else {
+          file.dataString = undefined;
         }
-
         return self.fileDAO.put(file).then(function (b) {
           prop.set(obj, b);
           return a();

@@ -97,6 +97,24 @@ foam.CLASS({
         if ( result != null ) checkOwnership(x, (UserCapabilityJunction) result);
         return result;
       `
+    },
+    {
+      name: 'put_',
+      javaCode: `
+        UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
+        UserCapabilityJunction old = (UserCapabilityJunction) super.find_(x, ucj.getId());
+
+        // do not allow updates to sourceId/targetId properties
+        if ( old != null && ucj.getSourceId() != old.getSourceId() ) throw new RuntimeException("User's capability cannot be reassigned.");
+        if ( old != null && ucj.getTargetId() != old.getTargetId() ) throw new RuntimeException("Capability cannot be changed.");
+        
+        // if ucj data is set but does not match expected data, do not put
+        Capability capability = (Capability) ucj.findTargetId(x);
+        if ( capability.getOf() != null && ucj.getData() != null && ! ( ucj.getData().getClassInfo().equals(capability.getOf()) ) )
+          throw new RuntimeException("Capability data provided is not of the correct type.");
+        
+        return super.put_(x, obj);
+      `
     }
   ]
 });

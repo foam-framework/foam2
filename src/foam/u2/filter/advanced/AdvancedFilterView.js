@@ -43,7 +43,7 @@ foam.CLASS({
     }
 
     ^ .foam-u2-ModalHeader-title {
-      font-family: /*%FONT1%*/, Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-spacing: 0;
     }
 

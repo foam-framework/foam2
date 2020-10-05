@@ -253,6 +253,10 @@ foam.CLASS({
           return foam.nanos.column.ColumnConfigToPropertyConverter.create();
         return this.__context__.columnConfigToPropertyConverter;
       }
+    },
+    {
+      name: 'dataChangedFlag',
+      class: 'Boolean'
     }
   ],
 
@@ -403,6 +407,9 @@ foam.CLASS({
          * writing.
          */
           var view = this;
+          this.data.sub('on', function() {
+            view.dataChangedFlag = !view.dataChangedFlag;
+          });
 
           var modelActions = view.of.getAxiomsByClass(foam.core.Action);
           var actions = Array.isArray(view.contextMenuActions)
@@ -411,7 +418,7 @@ foam.CLASS({
 
           //with this code error created  slot.get cause promise return
           //FIX ME
-          return this.slot(function(data, data$delegate, order, updateValues) {
+          return this.slot(function(data, data$delegate, dataChangedFlag, order, updateValues) {
             // Make sure the DAO set here responds to ordering when a user clicks
             // on a table column header to sort by that column.
             if ( this.order ) dao = dao.orderBy(this.order);
@@ -585,7 +592,7 @@ foam.CLASS({
         }
       },
       function returnRecords(of, dao, propertyNamesToQuery) {
-        var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(of, propertyNamesToQuery);
+        var expr = foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create().buildProjectionForPropertyNamesArray(of, propertyNamesToQuery);
         return dao.select(expr);
       },
       function doesAllColumnsContainsColumnName(obj, col) {

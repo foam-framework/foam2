@@ -186,6 +186,8 @@ foam.CLASS({
             ) {
             return p;
           }
+
+          if ( p.sectionIndex < -1 ) return null;
         }
 
         return null;

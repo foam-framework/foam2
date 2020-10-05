@@ -20,10 +20,21 @@ foam.CLASS({
   documentation: 'FOAM class that models a Cron script',
 
   tableColumns: [
-    'id', 'enabled', 'description', 'lastDuration', 'status', 'scheduledTime', 'run'
+    'description',
+    'enabled',
+    'lastDuration',
+    'lastRun',
+    'status',
+    'scheduledTime',
+    'run'
   ],
 
-  searchColumns: ['id', 'description'],
+  searchColumns: [
+    'id',
+    'description',
+    'enabled',
+    'status'
+  ],
 
   sections: [
     {
@@ -32,12 +43,23 @@ foam.CLASS({
       order: 2
     },
     {
+      name: 'scriptEvents',
+      title: 'Events',
+      order: 3
+    },
+    {
       name: '_defaultSection',
+      title: 'Info',
       order: 1
     }
   ],
 
   properties: [
+    {
+      documentation: 'Cron jobs shall be enabled as a deployment step.',
+      class: 'Boolean',
+      name: 'enabled'
+    },
     {
       name: 'server',
       hidden: true,
@@ -60,12 +82,8 @@ foam.CLASS({
       documentation: 'Scheduled time to run Cron script.',
       section: 'scheduling',
       visibility: 'RO',
-      javaFactory: 'return getNextScheduledTime();'
-    },
-    {
-      class: 'Boolean',
-      name: 'enabled',
-      value: false
+      javaFactory: 'return getNextScheduledTime();',
+      storageTransient: true
     }
   ],
 
@@ -91,15 +109,17 @@ Notification cronStartNotify = new Notification();
 cronStartNotify.setBody("Cron STARTED - " + this.getId() + " " + this.getDescription());
 notification.put(cronStartNotify);
 */
-super.runScript(x);
-
+    try {
+      super.runScript(x);
+    } finally {
+      setScheduledTime(getNextScheduledTime());
+    }
 /*
 Notification cronEndNotify = new Notification();
 cronEndNotify.setBody("Cron ENDED - " + this.getId() + " " + this.getDescription());
 notification.put(cronEndNotify);
 */
-
-setScheduledTime(getNextScheduledTime());`
+    `
     },
     {
       name: 'getNextScheduledTime',

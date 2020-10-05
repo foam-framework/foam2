@@ -217,6 +217,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'ExprArrayProperty',
@@ -423,7 +424,7 @@ foam.CLASS({
     {
       name: 'toString',
       code: function toString() { return this.cls_.name; },
-      javaCode: 'return classInfo_.getId();'
+      javaCode: 'return getClass().getName();'
     },
     {
       name: 'createStatement',
@@ -626,8 +627,10 @@ foam.CLASS({
     {
       name: 'put',
       code: function(obj, s) {
-        if ( this.cond.f(obj) ) this.a.put(obj, s)
-        else this.b.put(obj, s);
+        if ( this.cond.f(obj) )
+          this.a.put(obj, s)
+        else
+          this.b.put(obj, s);
       }
     }
   ]
@@ -764,6 +767,7 @@ getArg2().prepareStatement(stmt);`
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
@@ -1236,6 +1240,7 @@ return this;`
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Contains',
@@ -1452,6 +1457,12 @@ foam.CLASS({
 
   documentation: 'Binary predicate that accepts an array in "arg2".',
 
+  javaImports: [
+    'foam.mlang.ArrayConstant',
+    'foam.mlang.Constant',
+    'java.util.List'
+  ],
+
   properties: [
     {
       name: 'arg2',
@@ -1482,6 +1493,43 @@ foam.CLASS({
       name: 'valueSet_',
       hidden: true
     }
+  ],
+
+  methods: [
+    {
+      name: 'toString',
+      code: function() {
+        return foam.String.constantize(this.cls_.name) + '(' +
+            this.arg1.toString() + ', ' +
+            this.arg2.toString() + ')';
+      },
+      javaCode: `
+        StringBuilder b = new StringBuilder();
+        if ( getArg2() instanceof ArrayBinary || getArg2() instanceof Constant ) {
+          Object[] a = null;
+          Object arg2 = getArg2().f(null);
+
+          if ( arg2 instanceof List ) {
+            a = ((List) arg2).toArray();
+          } else if ( arg2 instanceof Object[] ) {
+            a = (Object[]) arg2;
+          } else if ( arg2 != null ) {
+            b.append(arg2.toString());
+          }
+
+          if ( a != null ) {
+            b.append("len: " + a.length + ",");
+            for ( int i = 0 ; i < a.length ; i++ ) {
+              b.append(a[i]);
+              if ( i < a.length -1 ) b.append(',');
+            }
+          }
+        } else {
+          b.append(getArg2().toString());
+        }
+        return String.format("%s(%s, %s)", getClass().getSimpleName(), getArg1().toString(), b.toString());
+      `
+    }
   ]
 });
 
@@ -1500,9 +1548,9 @@ foam.CLASS({
   requires: [ 'foam.mlang.Constant' ],
 
   javaImports: [
-    'java.util.List',
     'foam.mlang.ArrayConstant',
-    'foam.mlang.Constant'
+    'foam.mlang.Constant',
+    'java.util.List',
   ],
 
   properties: [
@@ -1624,19 +1672,28 @@ return false
             this.FALSE : this;
       },
       javaCode: `
-        if ( ! (getArg2() instanceof ArrayConstant) ) return this;
+        if ( getArg2() instanceof ArrayBinary || getArg2() instanceof Constant ) {
+          Object[] arr = null;
+          Object arg2 = getArg2().f(null);
 
-        Object[] arr = ((ArrayConstant) getArg2()).getValue();
+          if ( arg2 instanceof List ) {
+            arr = ((List) arg2).toArray();
+          } else if ( arg2 instanceof Object[] ) {
+            arr = (Object[]) arg2;
+          } else {
+            return this;
+          }
 
-        if ( arr.length == 0 ) {
-          return new False();
-        } else if ( arr.length == 1 ) {
-          return new Eq.Builder(getX())
-            .setArg1(getArg1())
-            .setArg2(new Constant(arr[0]))
-            .build();
+          if ( arr.length == 0 ) {
+            return foam.mlang.MLang.FALSE;
+          }
+          if ( arr.length == 1 ) {
+            return new Eq.Builder(getX())
+              .setArg1(getArg1())
+              .setArg2(new Constant(arr[0]))
+              .build();
+          }
         }
-
         return this;
       `
     }
@@ -1729,6 +1786,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang',
@@ -2139,9 +2197,12 @@ foam.CLASS({
       javaCode: 'return ! getArg1().f(obj);'
     },
 
-    function toString() {
-      return foam.String.constantize(this.cls_.name) +
-          '(' + this.arg1.toString() + ')';
+    {
+      name: 'toString',
+      code: function() {
+        return foam.String.constantize(this.cls_.name) + '(' + this.arg1.toString() + ')';
+      },
+      javaCode: 'return String.format("Not(%s)", getArg1().toString());'
     },
     {
       name: 'partialEval',
@@ -3280,6 +3341,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Average',
@@ -3699,6 +3761,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'OlderThan',
@@ -3728,6 +3791,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'CurrentTime',
@@ -3753,6 +3817,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'StringLength',
@@ -3772,6 +3837,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'IdentityExpr',
@@ -3788,10 +3854,14 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'IsValid',
   extends: 'foam.mlang.AbstractExpr',
+  javaImports: [
+    'foam.core.XLocator'
+  ],
   properties: [
     {
       class: 'foam.mlang.ExprProperty',
@@ -3806,7 +3876,7 @@ foam.CLASS({
       },
       javaCode: `
 try {
-  ((foam.core.FObject) getArg1().f(obj)).validate(getX());
+  ((foam.core.FObject) getArg1().f(obj)).validate(XLocator.get());
 } catch(Exception e) {
   return false;
 }
@@ -3815,6 +3885,7 @@ return true;
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
@@ -3871,6 +3942,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'isAuthorizedToDelete',
@@ -3925,6 +3997,7 @@ foam.CLASS({
     },
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang',
@@ -4035,6 +4108,7 @@ foam.CLASS({
   ]
 })
 
+
 foam.CLASS({
   package: 'foam.mlang.expr',
   name: 'Add',
@@ -4050,6 +4124,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.expr',
@@ -4067,6 +4142,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.expr',
   name: 'Multiply',
@@ -4082,6 +4158,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.expr',
@@ -4099,6 +4176,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.expr',
   name: 'MinFunc',
@@ -4114,6 +4192,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.expr',

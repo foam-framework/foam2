@@ -46,8 +46,7 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(_, a, p) {
-        if ( foam.Object.isInstance(a) )
-        {
+        if ( foam.Object.isInstance(a) ) {
           if ( a[foam.locale] !== undefined )
             return a[foam.locale];
           if ( a[foam.locale.substring(0, foam.locale.indexOf('-'))] !== undefined )
@@ -812,7 +811,7 @@ foam.CLASS({
       ]
     </pre>
     */
-    { class: 'String',  name: 'name', required: true },
+    { class: 'String', name: 'name', required: true },
     {
       class: 'String',
       name: 'label',

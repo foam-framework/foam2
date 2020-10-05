@@ -27,9 +27,7 @@ foam.CLASS({
   ],
 
   implements: [
-    'foam.mlang.Expressions',
-    'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.auth.LastModifiedByAware'
+    'foam.nanos.auth.EnabledAware'
   ],
 
   tableColumns: [
@@ -67,6 +65,7 @@ foam.CLASS({
     {
       name: 'id',
       class: 'String',
+      displayWidth: 40,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       section: 'basicInfo'
@@ -74,6 +73,7 @@ foam.CLASS({
     {
       name: 'name',
       class: 'String',
+      displayWidth: 70,
       section: 'basicInfo'
     },
     {
@@ -139,19 +139,21 @@ foam.CLASS({
       value: 0,
       documentation: `To be used in the case where expiry is duration based, represents the number of DAYS the user can keep permissions
       granted by this capability after the duration runs out.
-      If the gracePeriod is greater than 0, the UserCapabilityJunction will set isInGracePeriod property to true 
+      If the gracePeriod is greater than 0, the UserCapabilityJunction will set isInGracePeriod property to true
       and set gracePeriod property to be equals to this. Otherwise, the UserCapabilityJunction will
       go into EXPIRED status.`
     },
     {
       name: 'of',
       class: 'Class',
+      displayWidth: 70,
       documentation: `Model used to store information required by this credential`
     },
     {
       name: 'permissionsGranted',
       class: 'StringArray',
-      documentation: `List of permissions granted by this capability`
+      documentation: `List of permissions granted by this capability`,
+      view: 'foam.u2.crunch.PermissionsStringArrayView'
     },
     {
       name: 'permissionsIntercepted',
@@ -174,47 +176,15 @@ foam.CLASS({
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'interceptIf',
       networkTransient: true,
-      javaFactory: `
-      return foam.mlang.MLang.TRUE;
-      `,
+      javaFactory: 'return foam.mlang.MLang.TRUE;',
       documentation: 'condition under which the permissions that may be intercepted by this capability will be intercepted.'
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'availabilityPredicate',
       networkTransient: true,
-      javaFactory: `
-      return foam.mlang.MLang.TRUE;
-      `,
+      javaFactory: 'return foam.mlang.MLang.TRUE;',
       documentation: 'Predicate used to omit or include capabilities from capabilityDAO'
-    },
-    {
-      name: 'lastModified',
-      class: 'DateTime',
-      section: '_defaultSection',
-      createVisibility: 'HIDDEN',
-      updateVisibility: 'RO'
-    },
-    {
-      name: 'lastModifiedBy',
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      section: '_defaultSection',
-      createVisibility: 'HIDDEN',
-      updateVisibility: 'RO',
-      tableCellFormatter: function(value, obj) {
-        obj.userDAO
-          .where(obj.EQ(foam.nanos.auth.User.ID, value))
-          .limit(1)
-          .select(obj.PROJECTION(foam.nanos.auth.User.LEGAL_NAME))
-          .then(function(result) {
-            if ( ! result || result.array.size < 1 || ! result.array[0]) {
-              this.add(value);
-              return;
-            }
-            this.add(result.array[0]);
-          }.bind(this));
-      }
     },
     {
       name: 'reviewRequired',
@@ -290,12 +260,15 @@ foam.CLASS({
           if ( this.stringImplies(permissionName, permission) ) return true;
         }
 
-        List<CapabilityCapabilityJunction> prereqs = ((ArraySink) this.getPrerequisites(x).getJunctionDAO().where(EQ(CapabilityCapabilityJunction.SOURCE_ID, (String) this.getId())).select(new ArraySink())).getArray();
+        CrunchService crunchService = (CrunchService) x.get("crunchService");
+        var prereqs = crunchService.getPrereqs(getId());
 
-        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-        for ( CapabilityCapabilityJunction prereqJunction : prereqs ) {
-          Capability capability = (Capability) capabilityDAO.find(prereqJunction.getTargetId());
-          if ( capability.implies(x, permission) ) return true;
+        if ( prereqs != null && prereqs.size() > 0 ) {
+          DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+          for ( var capId : prereqs ) {
+            Capability capability = (Capability) capabilityDAO.find(capId);
+            if ( capability != null && capability.implies(x, permission) ) return true;
+          }
         }
         return false;
       `
@@ -310,6 +283,7 @@ foam.CLASS({
       documentation: `check if s1 implies s2 where s1 and s2 are permission or capability strings`,
       javaCode: `
       if ( s1.equals(s2) ) return true;
+      if ( s1.isBlank() || s2.isBlank() ) return false;
       if ( s1.charAt( s1.length() - 1) != '*' || ( s1.length() - 2 > s2.length() ) ) return false;
       if ( s2.length() <= s1.length() - 2 ) return s1.substring( 0, s1.length() -2 ).equals( s2.substring( 0, s1.length() - 2 ) );
       return s1.substring( 0, s1.length() - 1 ).equals( s2.substring( 0, s1.length() -1 ) );
@@ -354,57 +328,62 @@ foam.CLASS({
       ],
       documentation: `
         Check statuses of all prerequisite capabilities - returning:
-        GRANTED: If all pre-reqs are in granted status
-        PENDING: At least one pre-req is still in pending status
-        ACTION_REQUIRED: If not any of the above
+        GRANTED        : If all pre-reqs are in granted status
+        PENDING        : If at least one pre-req is in pending/approved status and the rest are granted
+        ACTION_REQUIRED: If at least one pre-req is not in pending/approved/granted status
       `,
       javaCode: `
         // CrunchService used to get capability junctions
         CrunchService crunchService = (CrunchService) x.get("crunchService");
 
         boolean allGranted = true;
+        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-        DAO myPrerequisitesDAO = ((DAO)
-          x.get("prerequisiteCapabilityJunctionDAO"))
-            .where(
-              EQ(CapabilityCapabilityJunction.SOURCE_ID, getId()));
-
-        List<CapabilityCapabilityJunction> ccJunctions =
-          ((ArraySink) myPrerequisitesDAO.select(new ArraySink()))
-          .getArray();
-        
-
         DAO userDAO = (DAO) x.get("userDAO");
+        Subject currentSubject = (Subject) x.get("subject");
 
         Subject subject = new Subject(x);
-        subject.setUser((User) userDAO.find(ucj.getSourceId()));
         if ( ucj instanceof AgentCapabilityJunction ) {
+          subject.setUser((User) userDAO.find(ucj.getSourceId()));
           AgentCapabilityJunction acj = (AgentCapabilityJunction) ucj;
           subject.setUser((User) userDAO.find(acj.getEffectiveUser())); // "user"
+        } else if ( ucj.getSourceId() == currentSubject.getUser().getId() ) {
+          subject.setUser(currentSubject.getRealUser());
+          subject.setUser(currentSubject.getUser());
+        } else {
+          subject.setUser((User) userDAO.find(ucj.getSourceId()));
         }
 
-        for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
-          Capability cap = (Capability) ccJunction.findSourceId(x);
-          if ( ! cap.getEnabled() ) continue;
-          UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(x, ccJunction.getTargetId(), subject);
+        var prereqs = crunchService.getPrereqs(getId());
+        if ( prereqs != null ) {
+          for ( var capId : prereqs ) {
+            var cap = (Capability) capabilityDAO.find(capId);
+            if ( cap == null || ! cap.getEnabled() ) continue;
 
-          if ( ucJunction != null && ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) 
-            continue;
+            UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(x, capId, subject);
+            if ( ucJunction == null ) {
+              return CapabilityJunctionStatus.ACTION_REQUIRED;
+            }
 
-          if ( ucJunction == null ) {
-            return CapabilityJunctionStatus.ACTION_REQUIRED;
+            if ( ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) {
+              continue;
+            }
+
+            if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING
+              || ucJunction.getStatus() == CapabilityJunctionStatus.APPROVED
+            ) {
+              allGranted = false;
+            } else {
+              return CapabilityJunctionStatus.ACTION_REQUIRED;
+            }
           }
-          if ( ucJunction.getStatus() != CapabilityJunctionStatus.GRANTED
-               && ucJunction.getStatus() != CapabilityJunctionStatus.PENDING ) {
-            return CapabilityJunctionStatus.ACTION_REQUIRED;
-          }
-          if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING ) allGranted = false; 
         }
         return allGranted ? CapabilityJunctionStatus.GRANTED : CapabilityJunctionStatus.PENDING;
       `,
     }
   ]
 });
+
 
 foam.RELATIONSHIP({
   package: 'foam.nanos.crunch',
@@ -420,12 +399,14 @@ foam.RELATIONSHIP({
   }
 });
 
+
 foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'CRUNCHUserRefinement',
   refines: 'foam.nanos.auth.User',
   sections: [{ name: 'capabilities' }]
 });
+
 
 foam.CLASS({
   package: 'foam.nanos.crunch',
@@ -440,9 +421,10 @@ foam.CLASS({
       // class: 'Reference',
       of: 'foam.nanos.crunch.Capability',
       documentation: 'Specifies the top-level capability that must be granted before we admit a user to the system.'
-    },
+    }
   ],
 });
+
 
 foam.RELATIONSHIP({
   sourceModel: 'foam.nanos.crunch.Capability',
@@ -458,6 +440,7 @@ foam.RELATIONSHIP({
     section: 'capabilityRelationships'
   }
 });
+
 
 foam.RELATIONSHIP({
   sourceModel: 'foam.nanos.crunch.Capability',

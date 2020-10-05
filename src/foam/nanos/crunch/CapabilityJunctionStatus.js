@@ -45,5 +45,11 @@ foam.ENUM({
       background: '#bfae32',
       ordinal: 6
     },
+    {
+      name: 'PENDING_REVIEW',
+      label: { en: 'pending review', pt: 'revisão pendente' },
+      documentation: `This is for capabilities that are waiting a privileged user review.`,
+      background: '#bfae32'
+    }
   ]
 });

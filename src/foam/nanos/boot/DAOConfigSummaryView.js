@@ -13,6 +13,52 @@ foam.CLASS({
 
   classes: [
     {
+      name: 'CustomDAOUpdateView',
+      extends: 'foam.comics.v2.DAOUpdateView',
+
+      properties: [
+        {
+          class: 'foam.u2.ViewSpecWithJava',
+          name: 'viewView',
+          factory: function() {
+            return {
+              class: 'foam.u2.view.ObjAltView',
+              views: [
+                [ {class: 'foam.u2.DetailView'},                 'Detail' ],
+                [ {class: 'foam.u2.detail.TabbedDetailView'},    'Tabbed' ],
+                [ {class: 'foam.u2.detail.SectionedDetailView'}, 'Sectioned' ],
+                [ {class: 'foam.u2.md.DetailView'},              'Material' ]
+              ]
+            };
+          }
+        }
+      ]
+    },
+
+    // TODO: replace with UpdateView
+    {
+      name: 'CustomDAOSummaryView',
+      extends: 'foam.comics.v2.DAOSummaryView',
+
+      properties: [
+        {
+          class: 'foam.u2.ViewSpecWithJava',
+          name: 'viewView',
+          factory: function() {
+            return {
+              class: 'foam.u2.view.ObjAltView',
+              views: [
+                [ {class: 'foam.u2.DetailView'},                 'Detail' ],
+                [ {class: 'foam.u2.detail.TabbedDetailView'},    'Tabbed' ],
+                [ {class: 'foam.u2.detail.SectionedDetailView'}, 'Sectioned' ]
+              ]
+            };
+          }
+        }
+      ]
+    },
+
+    {
       name: 'DAOUpdateControllerView',
       extends: 'foam.comics.DAOUpdateControllerView',
 
@@ -98,9 +144,17 @@ foam.CLASS({
       color: white;
       font-weight: 800;
     }
+    /* TODO: scope this better so it doesn't affect nested AltViews also */
+    .foam-u2-view-AltView .property-selectedView {
+      margin-left: 24px;
+    }
   `,
 
-  requires: [ 'foam.comics.BrowserView', 'foam.nanos.boot.NSpec' ],
+  requires: [
+    'foam.comics.BrowserView',
+    'foam.nanos.boot.NSpec',
+    'foam.comics.v2.DAOBrowserView'
+  ],
 
   implements: [ 'foam.mlang.Expressions' ],
 
@@ -251,14 +305,32 @@ foam.CLASS({
 
       var x = this.__subContext__.createSubContext();
       x.register(this.DAOUpdateControllerView, 'foam.comics.DAOUpdateControllerView');
+      x.register(this.CustomDAOSummaryView,    'foam.comics.v2.DAOSummaryView');
+      x.register(this.CustomDAOUpdateView,     'foam.comics.v2.DAOUpdateView');
+      x.register(foam.u2.DetailView,           'foam.u2.DetailView');
 
       this.stack.push({
         class: this.BackBorder,
         title: m,
         inner: {
-          class: this.BrowserView,
-          data:  this.__context__[m],
-          stack: this.stack
+          class: 'foam.u2.view.AltView',
+          data: this.__context__[m],
+          views: [
+            [
+              {
+                class: this.BrowserView,
+                stack: this.stack
+              },
+              'Controller 1'
+            ],
+            [
+              {
+                class: this.DAOBrowserView,
+                stack: this.stack
+              },
+              'Controller 2'
+            ]
+          ]
         }
       }, x);
     }

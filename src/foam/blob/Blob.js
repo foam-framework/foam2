@@ -739,10 +739,12 @@ try ( HashingOutputStream os = new HashingOutputStream(new FileOutputStream(tmp)
 
   String digest = new String(Hex.encodeHexString(os.digest()));
   File dest = x.get(Storage.class).get(getSha256() + File.separator + digest);
-  if ( !tmp.renameTo(dest) ) {
-    throw new IOException("Rename failed!");
+  if ( ! tmp.renameTo(dest) ) {
+    // File already exists, so remove tmp version
+    try {
+      tmp.delete();
+    } catch (Throwable t) {}
   }
-
   IdentifiedBlob result = new IdentifiedBlob();
   result.setId(digest);
   result.setX(getX());
@@ -986,14 +988,15 @@ foam.CLASS({
 
     function find_(x, id) {
       return Promise.resolve(this.blobs[id] ?
-                             this.BlobBlob.create({ blob: this.blobs[id] }) :
-                             null);
+        this.BlobBlob.create({ blob: this.blobs[id] }) :
+        null);
     },
 
     function urlFor_(x, blob) {
       if ( this.IdentifiedBlob.isInstance(blob) ) {
         return URL.createObjectURL(this.blobs[blob.id]);
-      } else if ( this.BlobBlob.isInstance(blob) ) {
+      }
+      if ( this.BlobBlob.isInstance(blob) ) {
         return URL.createObjectURL(blob.blob);
       }
 

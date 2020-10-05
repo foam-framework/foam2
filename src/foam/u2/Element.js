@@ -124,7 +124,7 @@ foam.CLASS({
 
   methods: [
     function asKey(document, cls) {
-      return this.expands_ ? document.$UID + "." + cls.id : document.$UID;
+      return this.expands_ ? document.$UID + '.' + cls.id : document.$UID;
     },
 
     function installInClass(cls) {
@@ -1632,7 +1632,8 @@ foam.CLASS({
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
         } else {
-          if ( typeof c === 'object' && c.data !== undefined && c.data.id !== undefined ) {
+          if ( foam.locale !== null && typeof c === 'object' && c.data !== undefined && c.data.id !== undefined ) {
+            if ( foam.local == 'en' && c.default ) { this.add(c.default); return; }
             var self = this;
             var expr = foam.mlang.Expressions.create();
             let d =  this.__subContext__.localeDAO;
@@ -1643,7 +1644,7 @@ foam.CLASS({
                     expr.OR(
                       expr.EQ(foam.i18n.Locale.LOCALE, foam.locale),
                       expr.EQ(foam.i18n.Locale.LOCALE, foam.locale.substring(0,foam.locale.indexOf('-')))),
-                    expr.EQ(foam.i18n.Locale.ID, c.data.id+'.'+c.clsInfo)))
+                    expr.EQ(foam.i18n.Locale.ID, c.data.id + '.' + c.clsInfo)))
                 .select().then(function(a){
                   let arr = a.array;
                   if ( arr.length > 0 ) {
@@ -2042,7 +2043,7 @@ foam.CLASS({
     function output_(out) {
       /** Output the element without transitioning to the OUTPUT state. **/
       out('<', this.nodeName);
-      if ( this.id !== null ) out(' id="', this.id, '"');
+      if ( this.id !== null ) out(' id="', this.id.replace(/"/g, "&quot;"), '"');
 
       var first = true;
       if ( this.hasOwnProperty('classes') ) {
@@ -2280,20 +2281,24 @@ foam.CLASS({
     },
     {
       name: 'visibility',
+      adapt: function(o, n) { if ( foam.Object.isInstance(n) ) return foam.u2.DisplayMode.create(n); return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'Exists for backwards compatability. You should set createVisibility, updateVisibility, or readVisibility instead. If this property is set, it will override the other three.'
     },
     {
       name: 'createVisibility',
+      adapt: function(o, n) { if ( foam.Object.isInstance(n) ) return foam.u2.DisplayMode.create(n); return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'The display mode for this property when the controller mode is CREATE.',
       value: 'RW'
     },
     {
       name: 'readVisibility',
+      adapt: function(o, n) { if ( foam.Object.isInstance(n) ) return foam.u2.DisplayMode.create(n); return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'The display mode for this property when the controller mode is VIEW.',
       value: 'RO'
     },
     {
       name: 'updateVisibility',
+      adapt: function(o, n) { if ( foam.Object.isInstance(n) ) return foam.u2.DisplayMode.create(n); return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'The display mode for this property when the controller mode is EDIT.',
       value: 'RW'
     },

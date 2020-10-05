@@ -47,7 +47,7 @@ foam.CLASS({
               )
             )
           },
-          errorMessage: 'DATA_ERROR'
+          errorMessage: 'REVIEW_ERROR'
         }
       ]
     }
