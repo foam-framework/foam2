@@ -107,7 +107,7 @@ foam.CLASS({
                 .add(isRenewable ? "Capability is renewable" : "")
               .end()
               .add(cjStatus.label).addClass(style.myClass('badge'))
-              .style({ 'background-color': cjStatus.background })
+              .style({ 'background-color': cjStatus.background });
           }))
         .end()
         .start()
