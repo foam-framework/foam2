@@ -22,6 +22,15 @@ foam.CLASS({
         itself and all of its implied capabilities or permissions can grant the
         requested action.
       `
+    },
+    {
+      class: 'FObjectArray',
+      of: 'foam.nanos.crunch.lite.Capable',
+      name: 'capableRequirements'
+    },
+    {
+      class: 'String',
+      name: 'daoKey'
     }
   ]
 });

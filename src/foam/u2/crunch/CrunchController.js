@@ -41,6 +41,9 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.PutFinalJunctionsAgent',
     'foam.u2.crunch.wizardflow.TestAgent',
     'foam.u2.crunch.wizardflow.LoadTopConfig',
+    'foam.u2.crunch.wizardflow.CapableDefaultConfigAgent',
+    'foam.u2.crunch.wizardflow.CapableCreateWizardletsAgent',
+    'foam.u2.crunch.wizardflow.MaybeDAOPutAgent',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
     'foam.u2.crunch.CapabilityInterceptView',
@@ -63,7 +66,14 @@ foam.CLASS({
         message retry for multiple permissioned calls made
         asynchronously.
       `
-    }
+    },
+    {
+      class: 'Map',
+      name: 'capabilityCache',
+      factory: function() {
+        return new Map();
+      }
+    },
   ],
 
   methods: [
@@ -86,18 +96,57 @@ foam.CLASS({
     },
 
     // Excludes UCJ-related logic
-    function createLiteWizardSequence(capabilityOrId) {
+    function createCapableWizardSequence(intercept, capable) {
       return this.Sequence.create(null, this.__subContext__.createSubContext({
-        rootCapability: capabilityOrId
+        intercept: intercept,
+        capable: capable
       }))
         .add(this.ConfigureFlowAgent)
-        .add(this.CapabilityAdaptAgent)
-        .add(this.LoadCapabilitiesAgent)
-        .add(this.CreateWizardletsAgent)
-        .add(this.LoadTopConfig)
+        .add(this.CapableDefaultConfigAgent)
+        .add(this.CapableCreateWizardletsAgent)
         .add(this.StepWizardAgent)
-        // .add(this.TestAgent)
+        .add(this.MaybeDAOPutAgent)
         ;
+    },
+
+    function handleIntercept(intercept) {
+      var self = this;
+
+      intercept.capabilityOptions.forEach((c) => {
+        self.capabilityCache.set(c, false);
+      });
+
+      // Allow zero or more promises to block this method
+      let p = Promise.resolve();
+
+      // Intercept view for regular user capability options
+      if ( intercept.capabilityOptions.length > 0 ) {
+        p = p.then(() => {
+          return self.maybeLaunchInterceptView(intercept);
+        });
+      }
+
+      let isCapable = intercept.capableRequirements.length > 0;
+
+      // Wizard for Capable objects and required user capabilities
+      // (note: no intercept view; this case immediately invokes a wizard)
+      if ( isCapable ) {
+        p = p.then(() => self.launchCapableWizard(intercept));
+      }
+
+      p = p.then(isCompleted => {
+        if ( isCapable ) {
+          if ( ! isCompleted ) {
+            intercept.resolve(new Error('user cancelled'));
+            return;
+          }
+          intercept.resolve(intercept.returnCapable)
+          return;
+        }
+        intercept.resend();
+      })
+
+      return p;
     },
 
     function maybeLaunchInterceptView(intercept) {
@@ -124,15 +173,21 @@ foam.CLASS({
       }
       // Register intercept for later occurances of the check above
       this.activeIntercepts.push(intercept);
+
       // Pop up the popup
-      this.ctrl.add(this.Popup.create({ closeable: false })
-        .start(this.MarginBorder)
-          .tag(this.CapabilityInterceptView, {
-            data: intercept
-          })
-        .end()
-      );
-      return intercept.promise;
+      return new Promise((resolve, _) => {
+        this.ctrl.add(this.Popup.create({ closeable: false })
+          .start(this.MarginBorder)
+            .tag(this.CapabilityInterceptView, {
+              data: intercept,
+              onClose: (x) => {
+                x.closeDialog();
+                resolve();
+              }
+            })
+          .end()
+        );
+      });
     },
 
     function save(wizardlet) {
@@ -190,61 +245,19 @@ foam.CLASS({
     },
 
     // CRUNCH Lite Methods
-    function launchCapableWizard(capable) {
+    function launchCapableWizard(intercept) {
       var p = Promise.resolve(true);
-      if ( capable.userCapabilityRequirements ) {
-        p = capable.userCapabilityRequirements.reduce(
-          (p, capabilityId) => p.then(userWantsToContinue => {
-            console.log('should be a cap id', capabilityId);
-            if ( ! userWantsToContinue ) return false;
-            return this
-              .createLiteWizardSequence(capabilityId).execute();
-          }),
-          p
-        );
-      }
-      var capableWizard = this.createCapableWizard(capable);
-      p.then(userWantsToContinue => {
-        ctrl.add(this.Popup.create().tag(capableWizard));
-      });
+
+      intercept.capableRequirements.forEach(capable => {
+        var seq = this.createCapableWizardSequence(intercept, capable);
+        p = p.then(() => {
+          return seq.execute().then(x => {
+            return x.submitted;
+          });
+        });
+      })
+
+      return p;
     },
-
-    function getCapableWizard(capable) {
-      var wizardlets = [];
-      for ( let i = 0 ; i < capable.capablePayloads.length ; i++ ) {
-        let capablePayload = capable.capablePayloads[i];
-        let wizardletClass = capablePayload.capability.wizardlet.cls_;
-
-        // Override the default wizardlet class with one that does not
-        //   save to userCapabilityJunction
-        if ( wizardletClass.id == 'foam.nanos.crunch.ui.CapabilityWizardlet' ) {
-          wizardletClass = foam.nanos.crunch.ui.CapableObjectWizardlet;
-        }
-        let wizardlet = wizardletClass.create({
-          capability: capablePayload.capability,
-          targetPayload: capablePayload,
-          data$: capablePayload.data$
-        }, capable);
-        if ( capablePayload.data ) {
-          wizardlet.data = capablePayload.data;
-        }
-
-        wizardlets.push(wizardlet);
-      }
-
-      return wizardlets;
-    },
-
-    function createCapableWizard(capable) {
-      return {
-        class: 'foam.u2.wizard.StepWizardletView',
-        data: foam.u2.wizard.StepWizardletController.create({
-          wizardlets: this.getCapableWizard(capable)
-        }),
-        onClose: (x) => {
-          x.closeDialog();
-        }
-      };
-    }
   ]
 });

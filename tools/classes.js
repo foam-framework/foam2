@@ -10,6 +10,7 @@ var classes = [
   'foam.core.Serializable',
   'foam.core.ContextAware',
   'foam.core.Exception',
+  'foam.core.ExceptionInterface',
   'foam.core.Freezable',
   'foam.core.ContextAgent',
   'foam.core.CompoundContextAgency',
@@ -635,13 +636,24 @@ var classes = [
 
   // Crunch
   'foam.nanos.crunch.crunchtest.FakeTestObject',
+  'foam.nanos.crunch.crunchtest.TestCapable',
   //models
   'foam.nanos.crunch.Renewable',
   'foam.nanos.crunch.Capability',
+  'foam.nanos.crunch.CapabilityRuntimeException',
   'foam.nanos.crunch.MinMaxCapability',
   'foam.nanos.crunch.lite.Capable',
+  'foam.nanos.crunch.lite.CapableDAO',
   'foam.nanos.crunch.lite.CapableAdapterDAO',
   'foam.nanos.crunch.lite.CapablePayload',
+  'foam.nanos.crunch.lite.CapablePayloadStatusDAO',
+  'foam.nanos.crunch.lite.CapableCompatibleCapability',
+  
+  'foam.nanos.crunch.lite.ruler.CapableCreateApprovalsRuleAction',
+  'foam.nanos.crunch.lite.ruler.ReputDependantPayloads',
+  'foam.nanos.crunch.lite.ruler.SetCapablePayloadStatusOnPut',
+  'foam.nanos.crunch.lite.ruler.CapablePayloadApprovableRuleAction',
+
   'foam.nanos.crunch.CapabilityCategory',
   'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
   'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -705,6 +717,7 @@ var classes = [
   'foam.nanos.approval.ApprovableApprovalRequestsPredicate',
   'foam.nanos.approval.ApprovableApprovalRequestsRule',
   'foam.nanos.approval.FulfilledApprovablePredicate',
+  'foam.nanos.approval.FulfilledNestedJournalApprovablePredicate',
   'foam.nanos.approval.FulfilledApprovableRule',
   'foam.nanos.approval.ApprovalDAO',
   'foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer',

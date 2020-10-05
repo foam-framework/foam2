@@ -19,7 +19,8 @@ foam.CLASS({
     'foam.dao.EasyDAO',
     'foam.dao.RequestResponseClientDAO',
     'foam.nanos.app.ClientAppConfigService',
-    'foam.nanos.boot.NSpec'
+    'foam.nanos.boot.NSpec',
+    'foam.nanos.crunch.box.CrunchClientBox'
   ],
 
   imports: [ 'error' ],
@@ -33,11 +34,13 @@ foam.CLASS({
         return this.RequestResponseClientDAO.create({
           of: this.NSpec,
           delegate: this.SessionClientBox.create({
-            delegate: this.RetryBox.create({
-              maxAttempts: -1,
-              delegate: this.HTTPBox.create({
-                method: 'POST',
-                url: 'service/nSpecDAO'
+            delegate: this.CrunchClientBox.create({
+              delegate: this.RetryBox.create({
+                maxAttempts: -1,
+                delegate: this.HTTPBox.create({
+                  method: 'POST',
+                  url: 'service/nSpecDAO'
+                })
               })
             })
           })

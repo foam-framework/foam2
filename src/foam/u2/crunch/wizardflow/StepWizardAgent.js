@@ -14,11 +14,14 @@ foam.CLASS({
   ],
 
   imports: [
-    'capabilities',
     'wizardlets',
     'wizardConfig',
     'pushView',
     'popView'
+  ],
+
+  exports: [
+    'submitted'
   ],
 
   requires: [
@@ -38,6 +41,10 @@ foam.CLASS({
       value: {
         class: 'foam.u2.wizard.StepWizardletView',
       }
+    },
+    {
+      name: 'submitted',
+      class: 'Boolean'
     }
   ],
 
@@ -48,7 +55,8 @@ foam.CLASS({
           ...this.view,
           data: this.StepWizardletController.create({
             wizardlets: this.wizardlets,
-            config: this.wizardConfig
+            config: this.wizardConfig,
+            submitted$: this.submitted$,
           }),
           onClose: (x) => {
             this.popView(x)

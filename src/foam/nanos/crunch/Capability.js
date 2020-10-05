@@ -44,7 +44,8 @@ foam.CLASS({
   sections: [
     {
       name: '_defaultSection',
-      title: 'Administrative'
+      title: 'Administrative',
+      permissionRequired: true
     },
     {
       name: 'basicInfo',
@@ -53,11 +54,13 @@ foam.CLASS({
     {
       name: 'uiSettings',
       title: 'UI Settings',
-      help: 'These properties are used to control how this capability appears in the GUI.'
+      help: 'These properties are used to control how this capability appears in the GUI.',
+      permissionRequired: true
     },
     {
       name: 'capabilityRelationships',
-      title: 'Capability Relationships'
+      title: 'Capability Relationships',
+      permissionRequired: true
     }
   ],
 
