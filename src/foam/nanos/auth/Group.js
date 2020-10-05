@@ -270,7 +270,13 @@ foam.CLASS({
     },
     {
       name: 'authorizeOnRead',
-      javaCode: '// NOOP'
+      javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
+        String permissionId = String.format("group.read.%s", getId());
+        if ( ! auth.check(x, permissionId) ) {
+          throw new AuthorizationException("You do not have permission to read this group.");
+        }
+      `
     },
     {
       name: 'authorizeOnUpdate',
