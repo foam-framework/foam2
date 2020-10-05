@@ -12,6 +12,7 @@ import foam.lib.json.Outputter;
 import foam.util.SecurityUtil;
 import java.security.*;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -424,12 +425,18 @@ public interface FObject
   }
 
   default void validate(foam.core.X x) {
-
     List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    List<String> exceptions = new ArrayList<String>();
     for ( PropertyInfo prop : props ) {
-      prop.validateObj(x, this);
+      try {
+        prop.validateObj(x, this);
+      } catch (IllegalStateException e) {
+        exceptions.add(prop.getName() + ": " + e.getMessage());
+      }
+      if ( exceptions.size() > 0 ) {
+        throw new IllegalStateException(exceptions.toString());
+      }
     }
-
   }
 
   default boolean verify(byte[] signature, java.security.Signature verifier) throws java.security.SignatureException {
