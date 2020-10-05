@@ -49,6 +49,21 @@ foam.CLASS({
       name: 'delegates',
       class: 'Array'
     },
+    {
+      class: 'Int',
+      name: 'currentIndex',
+      value: 0,
+      preSet: function(old, nu) {
+        if ( nu > this.numOfParts - 1 ) return this.numOfParts - 1;
+        if ( nu < 1 ) return 0;
+        return nu;
+      }
+    },
+    {
+      class: 'Int',
+      name: 'numOfParts',
+      value: 0
+    }
   ],
 
   methods: [
@@ -67,14 +82,32 @@ foam.CLASS({
           continue;
         }
         var u2Elem = this.start(e)
+        u2Elem.on('focus', () => {
+          this.currentIndex = i;
+        })
         slots.push(u2Elem.data$)
       }
 
       this.data$ = this.ArraySlot.create({ slots }).map(arr => {
         return '' + arr.join('');
       });
+      this.data$.sub(this.onDataUpdate);
+      this.numOfParts = this.delegates.length;
 
       return this;
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'onDataUpdate',
+      code: function() {
+        var currentElement = this.childNodes[this.currentIndex];
+        if ( currentElement.getAttribute('maxlength') <= currentElement.data.length ) {
+          this.currentIndex = this.currentIndex + 2;
+          this.childNodes[this.currentIndex].focus();
+        }
+      }
     }
   ]
 });
