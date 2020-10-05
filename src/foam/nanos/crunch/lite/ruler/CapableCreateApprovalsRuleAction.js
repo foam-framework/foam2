@@ -102,6 +102,9 @@ foam.CLASS({
                 continue;
               }
 
+              // TODO: Might have to figure  out instead if we put the changed payload  into capablePayloadDA
+              // so that its updated here and reput that
+
               capablePayload.setStatus(foam.nanos.crunch.CapabilityJunctionStatus.PENDING);
               capablePayload.setHasSafeStatus(true);
 
