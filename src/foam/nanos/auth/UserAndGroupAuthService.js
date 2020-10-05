@@ -123,8 +123,9 @@ foam.CLASS({
           throw new AuthenticationException("Login disabled");
         }
 
-        // check if group enabled
-        Group group = user.findGroup(x);
+        // check if group enabled        
+        X userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
+        Group group = user.findGroup(userX);
         if ( group != null && ! group.getEnabled() ) {
           throw new AuthenticationException("Group disabled");
         }
