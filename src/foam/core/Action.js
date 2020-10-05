@@ -294,3 +294,24 @@ foam.CLASS({
     }
   ]
 });
+
+
+/** Add Context Action support to Model. */
+foam.CLASS({
+  refines: 'foam.core.Model',
+  package: 'foam.core',
+  name: 'ModelContextActionRefine',
+
+  properties: [
+    {
+      class: 'AxiomArray',
+      of: 'Action',
+      name: 'contextActions',
+      adaptArrayElement: function(o, prop) {
+        return typeof o === 'function' ?
+            foam.core.Action.create({name: o.name, code: o}) :
+            this.__context__.lookup(prop.of).create(o) ;
+      }
+    }
+  ]
+});

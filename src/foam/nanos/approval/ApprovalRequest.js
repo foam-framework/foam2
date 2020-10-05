@@ -538,7 +538,7 @@
     },
     {
       name: 'approveWithMemo',
-      code: function(memo) {
+      code: function(memo, stackBackIgnore) {
         var approvedApprovalRequest = this.clone();
         approvedApprovalRequest.status = this.ApprovalStatus.APPROVED;
         approvedApprovalRequest.memo = memo;
@@ -549,7 +549,10 @@
           this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
 
           if ( this.stack.top.length > 0 ) {
-            this.stack.back();
+            if ( ! stackBackIgnore )
+              this.stack.back();
+            else
+              this.stack.push(this.stack.top[0]);
           }
         }, (e) => {
           this.throwError.pub(e);
@@ -559,7 +562,7 @@
     },
     {
       name: 'rejectWithMemo',
-      code: function(memo) {
+      code: function(memo, stackBackIgnore) {
         var rejectedApprovalRequest = this.clone();
         rejectedApprovalRequest.status = this.ApprovalStatus.REJECTED;
         rejectedApprovalRequest.memo = memo;
@@ -570,12 +573,27 @@
           this.notify(this.SUCCESS_REJECTED, '', this.LogLevel.INFO, true);
 
           if ( this.stack.top.length > 0 ) {
-            this.stack.back();
+            if ( ! stackBackIgnore )
+              this.stack.back();
+            else
+              this.stack.push(this.stack.top[0]);
           }
         }, (e) => {
           this.throwError.pub(e);
           this.notify(e.message, '', this.LogLevel.ERROR, true);
         });
+      }
+    },
+    {
+      name: 'rejectWithMemoAndDoNotGoBack',
+      code: function(memo) {
+        this.rejectWithMemo(memo, true);
+      }
+    },
+    {
+      name: 'approveWithMemoAndDoNotGoBack',
+      code: function(memo) {
+        this.approveWithMemo(memo, true);
       }
     }
   ],
@@ -794,6 +812,53 @@
           });
       },
       tableWidth: 100
+    }
+  ],
+  contextActions: [
+    {
+      name: 'approve',
+      section: 'requestDetails',
+      isAvailable: (isTrackingRequest, status) => {
+        if (
+          status === foam.nanos.approval.ApprovalStatus.REJECTED ||
+          status === foam.nanos.approval.ApprovalStatus.APPROVED ||
+          status === foam.nanos.approval.ApprovalStatus.CANCELLED
+        ) {
+          return false;
+        }
+        return ! isTrackingRequest;
+      },
+      code: function(X) {
+        var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
+
+        objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+          class: "foam.u2.MemoModal",
+          onExecute: this.approveWithMemoAndDoNotGoBack.bind(this)
+        }));
+      }
+    },
+    {
+      name: 'reject',
+      section: 'requestDetails',
+      isAvailable: (isTrackingRequest, status) => {
+        if (
+          status === foam.nanos.approval.ApprovalStatus.REJECTED ||
+          status === foam.nanos.approval.ApprovalStatus.APPROVED ||
+          status === foam.nanos.approval.ApprovalStatus.CANCELLED
+        ) {
+          return false;
+        }
+        return ! isTrackingRequest;
+      },
+      code: function(X) {
+        var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
+
+        objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+          class: "foam.u2.MemoModal",
+          onExecute: this.rejectWithMemoAndDoNotGoBack.bind(this),
+          isMemoRequired: true
+        }));
+      }
     }
   ]
 });
