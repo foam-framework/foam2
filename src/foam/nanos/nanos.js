@@ -202,6 +202,7 @@ FOAM_FILES([
   { name: "foam/nanos/export/XMLDriver"},
   { name: "foam/nanos/export/report/Template" },
   { name: "foam/nanos/export/PDFGoogleSheetsExportDriver" },
+  { name: "foam/nanos/export/TableExportDriver"},
   { name: "foam/nanos/google/api/auth/GoogleApiAuthService" },
   { name: "foam/nanos/google/api/auth/GoogleApiCredentials" },
   { name: "foam/nanos/google/api/drive/GoogleDriveService" },
