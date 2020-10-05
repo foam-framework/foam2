@@ -10,7 +10,11 @@ foam.CLASS({
   extends: 'foam.dao.AbstractDAO',
 
   javaImports: [
-    'java.util.Arrays'
+    'foam.core.X',
+    'foam.dao.DAO',
+    'foam.dao.MDAO',
+    'java.util.Arrays',
+    'foam.dao.ArraySink'
   ],
 
   documentation: `
@@ -62,14 +66,31 @@ foam.CLASS({
     {
       name: 'find_',
       javaCode: `
-        return null; // TODO
+        String idString = null;
+        if ( id instanceof CapablePayload ) {
+          idString = ((CapablePayload) id).getCapability().getId();
+        } else {
+          idString = (String) id;
+        }
+        CapablePayload[] payloads = getCapable().getCapablePayloads();
+        for ( int i = 0 ; i < payloads.length ; i++ ) {
+          if (
+            payloads[i].getCapability().getId().equals(idString)
+          ) {
+            return payloads[i];
+          }
+        }
+        return null;
       `
     },
     {
       name: 'select_',
       javaCode: `
-        // TODO
-        throw new RuntimeException("TODO");
+        ArraySink capablePayloadsToArraySink = new ArraySink.Builder(x)
+          .setArray(Arrays.asList(getCapable().getCapablePayloads()))
+          .build();
+
+        return capablePayloadsToArraySink;
       `
     }
   ]

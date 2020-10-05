@@ -70,6 +70,7 @@ foam.CLASS({
     'foam.dao.JournalType',
     'foam.nanos.auth.ServiceProviderAware',
     'foam.nanos.auth.ServiceProviderAwareDAO',
+    'foam.nanos.crunch.box.CrunchClientBox',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.LoggingDAO'
   ],
@@ -239,6 +240,9 @@ foam.CLASS({
 
         if ( getLastModifiedByAware() )
           delegate = new foam.nanos.auth.LastModifiedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
+
+        if ( getCapable() )
+          delegate = new foam.nanos.crunch.lite.CapableDAO.Builder(getX()).setDaoKey(getName()).setDelegate(delegate).build();
 
         if ( getContextualize() ) {
           delegate = new foam.dao.ContextualizingDAO.Builder(getX()).
@@ -544,6 +548,11 @@ foam.CLASS({
       generateJava: false,
     },
     {
+      name: 'crunchBoxEnabled',
+      generateJava: false,
+      value: true
+    },
+    {
       documentation: 'Destination address for server',
       name: 'serverBox',
       generateJava: false,
@@ -559,6 +568,9 @@ foam.CLASS({
             maxAttempts: this.retryBoxMaxAttempts,
             delegate: box,
           })
+        }
+        if ( this.crunchBoxEnabled ) {
+          box = this.CrunchClientBox.create({ delegate: box });
         }
         return this.SessionClientBox.create({ delegate: box });
       }
@@ -632,6 +644,11 @@ model from which to test ServiceProvider ID (spid)`,
       name: 'lastModifiedByAware',
       class: 'Boolean',
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.LastModifiedByAware.class.isAssignableFrom(getOf().getObjClass());'
+    },
+    {
+      name: 'capable',
+      class: 'Boolean',
+      javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.crunch.lite.Capable.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
       name: 'fixedSize',

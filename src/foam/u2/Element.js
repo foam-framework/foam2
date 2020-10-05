@@ -1177,6 +1177,10 @@ foam.CLASS({
       return f(opt_extra);
     },
 
+    function instanceClass(opt_extra) {
+      return this.myClass(this.id + '-' + opt_extra);
+    },
+
     function visitChildren(methodName) {
       /*
         Call the named method on all children.
@@ -1633,7 +1637,7 @@ foam.CLASS({
           throw new Error('Unsupported');
         } else {
           if ( foam.locale !== null && typeof c === 'object' && c.data !== undefined && c.data.id !== undefined ) {
-            if ( c.default ) { this.add(c.default); return; }
+            if ( foam.local == 'en' && c.default ) { this.add(c.default); return; }
             var self = this;
             var expr = foam.mlang.Expressions.create();
             let d =  this.__subContext__.localeDAO;

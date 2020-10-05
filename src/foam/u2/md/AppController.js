@@ -12,13 +12,16 @@ foam.CLASS({
   requires: [
     'foam.core.Latch',
     'foam.u2.layout.MDDAOController',
-    'foam.u2.layout.MDLoginView'
+    'foam.u2.layout.MDLoginView',
+    'foam.u2.layout.MDNotificationMessage',
+    'foam.u2.layout.MDStackView'
+  ],
+
+  exports: [
+    'isMenuOpen'
   ],
 
   css: `
-    body {
-      overflow: hidden;
-    }
 
     ^ .foam-u2-ActionView {
       border: none !important;
@@ -27,61 +30,39 @@ foam.CLASS({
       background-color: unset !important;
     }
 
-    ^ .foam-u2-layout-MDToolbarView {
-      font-size: 3.5rem;
-      height: 10rem;
-      z-index: 99;
+    ^ .foam-u2-layout-MDStackView {
+      position: relative;
+      height: 100%;
+      overflow: hidden;
     }
 
-    ^toolbar {
-      flex-grow: 1;
+    ^ .menuOpen {
+      left: -00px;
+      transition: .2s;
+    }
+
+    ^ .menuClosed {
+      left: -60rem;
+      transition: .2s;
     }
 
     ^ toolbar .right {
       padding-right: 3rem;
     }
-
     ^ toolbar .left i {
       padding-left: 3rem;
     }
-
     ^ toolbar .title {
       padding-left: 4rem;
       font-weight: 500;
       font-size: 3.5rem;
       width: 100%;
     }
-
-    ^ toolbar .right span {
-      width: 100%;
-    }
-
     ^ toolbar .foam-u2-ActionView {
       background-color: unset;
       font-size: 4rem;
     }
-
-    ^ .foam-u2-layout-MDRowView {
-      padding: 3rem;
-    }
-    ^ .foam-u2-stack-StackView {
-      position: relative;
-      height: 100%;
-      overflow: hidden;
-    }
-    ^ .foam-nanos-menu-SubMenuView-inner > div {
-      position: unset;
-    }
-
-
-    ^ .net-nanopay-ui-TopSideNavigation {
-      display: none;
-    }
-
-    ^ .foam-u2-layout-MDLoginView {
-      height: 100%;
-      width: 100%;
-    }
+    //    TODO: move to toolbar ^
   `,
 
   properties: [
@@ -93,6 +74,10 @@ foam.CLASS({
       factory: function() {
         return this.Latch.create();
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'isMenuOpen'
     }
   ],
 
@@ -111,6 +96,7 @@ foam.CLASS({
       this.__subContext__.register(this.MDDAOController, 'foam.comics.v2.DAOBrowseControllerView');
       this.__subContext__.register(this.MDDAOController, 'foam.comics.BrowserView');
       this.__subContext__.register(this.MDLoginView, 'foam.u2.view.LoginView');
+      this.__subContext__.register(this.MDNotificationMessage, 'foam.u2.dialog.NotificationMessage');
 
       this.themeInstalled.resolve();
     });
@@ -120,9 +106,11 @@ foam.CLASS({
     this
       .addClass(this.myClass())
       .start()
-        .addClass('stack-wrapper')
         .enableClass('login-stack', this.loginSuccess$.map( ls => ! ls ))
-        .tag(this.StackView.create({
+        .start('div')
+          .tag({ class: 'foam.u2.layout.MDSideNavigation' })
+        .end()
+        .tag(this.MDStackView.create({
             data: this.stack,
             showActions: false
           }))

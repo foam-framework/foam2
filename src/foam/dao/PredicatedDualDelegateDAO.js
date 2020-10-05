@@ -19,6 +19,10 @@ foam.CLASS({
     To use, add PredicatedDualDelegateDAO as the delegate of the proxyDAO you want to start branching from.
 
     Currently only supports put_ and remove_.
+
+    // ! Important
+    The delegate & predicatedDelegate have to be an instance of ProxyDAO if this dao is going
+    to be used as the decorator in setDecorator for EasyDAO
   `,
 
   javaImports: [
@@ -28,22 +32,8 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Proxy',
-      of: 'foam.dao.DAO',
-      name: 'predicatedDelegate',
-      forwards: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_', 'cmd_', 'listen_' ],
-      topics: [ 'on' ], // TODO: Remove this when all users of it are updated.
-      factory: function() { return this.NullDAO.create() },
-      postSet: function(old, nu) {
-        if ( old ) this.on.reset.pub();
-      },
-      swiftFactory: 'return NullDAO_create()',
-      swiftPostSet: `
-        if let oldValue = oldValue as? foam_dao_AbstractDAO {
-          _ = oldValue.on["reset"].pub()
-        }
-      `
-      ,
+      class: 'foam.dao.DAOProperty',
+      name: 'predicatedDelegate'
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',

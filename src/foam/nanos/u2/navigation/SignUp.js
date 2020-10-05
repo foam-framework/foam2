@@ -165,19 +165,20 @@ foam.CLASS({
     },
     {
       name: 'updateUser',
-      code: function(x) {
-        this.finalRedirectionCall();
+      code: async function(x) {
+        await this.finalRedirectionCall(x);
       }
     },
     {
       name: 'finalRedirectionCall',
-      code: function() {
+      code: async function(x) {
         if ( this.user.emailVerified ) {
           // When a link was sent to user to SignUp, they will have already verified thier email,
           // thus thier user.emailVerified should be true and they can simply login from here.
           window.history.replaceState(null, null, window.location.origin);
           location.reload();
         } else {
+          await this.auth.login(x, this.email, this.desiredPassword);
           this.stack.push({
             class: 'foam.nanos.auth.ResendVerificationEmail'
           });
@@ -203,9 +204,9 @@ foam.CLASS({
             signUpToken: this.token_,
             group: this.group_
           }))
-          .then((user) => {
+          .then(async (user) => {
             this.user.copyFrom(user);
-            this.updateUser(x);
+            await this.updateUser(x);
           }).catch((err) => {
             this.ctrl.add(this.NotificationMessage.create({
               message: err.message || this.ERROR_MSG,

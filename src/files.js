@@ -73,6 +73,7 @@ FOAM_FILES([
   { name: "foam/core/Enum" },
   { name: "foam/core/JSON" },
   { name: "foam/core/XML" },
+  { name: "foam/core/ExceptionInterface" },
   { name: "foam/core/CompoundException" },
   { name: "foam/lib/csv/CSVParser" },
   { name: "foam/lib/csv/CSVOutputter" },
@@ -194,6 +195,7 @@ FOAM_FILES([
   { name: "foam/u2/Tooltip", flags: ['web'] },
   { name: "foam/u2/MNRowFormatter", flags: ['web'] },
   { name: "foam/u2/ProgressView", flags: ['web'] },
+  { name: "foam/u2/LoadingSpinner", flags: ['web'] },
   { name: "foam/u2/ListCreateController", flags: ['web'] },
   { name: 'foam/u2/view/SearchViewWrapper', flags: ['web'] },
   { name: 'foam/u2/view/StringArrayRowView', flags: ['web'] },
@@ -296,7 +298,7 @@ FOAM_FILES([
   { name: 'foam/nanos/auth/UserPropertyAvailabilityService' },
   { name: 'foam/nanos/auth/UserPropertyAvailabilityServiceInterface' },
   { name: 'foam/nanos/auth/ClientUserPropertyAvailabilityService' },
-  { name: 'foam/nanos/auth/UserCitationView' },
+  { name: 'foam/nanos/auth/UserMDCitationView' },
   { name: "foam/nanos/logger/Logger" },
   { name: "foam/nanos/logger/DAOLogger" },
   { name: "foam/nanos/logger/LoggingDAO" },
@@ -601,9 +603,12 @@ FOAM_FILES([
   { name: "foam/u2/crunch/wizardflow/FilterWizardletsAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/RequirementsPreviewAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/StepWizardAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/lite/MaybeDAOPutAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/PutFinalJunctionsAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/TestAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/LoadTopConfig", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/lite/CapableCreateWizardletsAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/lite/CapableDefaultConfigAgent", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityRequirementView", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityCardView", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityFeatureView", flags: ['web'] },
@@ -852,6 +857,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
   { name: "foam/nanos/crunch/ui/CapableObjectWizardlet" },
   { name: "foam/nanos/crunch/ui/MinMaxCapabilityWizardlet" },
+  { name: "foam/nanos/crunch/ui/CapableMinMaxCapabilityWizardlet" },
 
   { name: "foam/graphics/ZoomMapView" },
   { name: "foam/core/CoreTypesValidationTest" },
@@ -886,6 +892,7 @@ FOAM_FILES([
   { name: 'foam/i18n/XLIFFTranslationValue' },
   { name: 'foam/i18n/Locale' },
   { name: 'foam/i18n/TranslationService' },
+  { name: 'foam/i18n/ClientCacheTranslationService' },
   { name: 'foam/i18n/ClientTranslationService' },
   { name: 'foam/i18n/ProxyTranslationService' },
 
@@ -894,6 +901,7 @@ FOAM_FILES([
 
   // md
   { name: "foam/u2/layout/MDDAOUpdateController" },
+  { name: "foam/u2/layout/MDStackView" },
   { name: "foam/u2/layout/MDDAOCreateController" },
   { name: "foam/u2/md/CheckBox", flags: ['web'] },
   { name: "foam/u2/property/MDTextField", flags: ['web'] },
@@ -915,15 +923,18 @@ FOAM_FILES([
   { name: "foam/u2/dao/MDDAOList", flags: ['web'] },
   { name: "foam/u2/mcw/DetailPropertyView", flags: ['web'] },
   { name: 'foam/u2/layout/MDRowView', flags: ['web']},
+  { name: 'foam/u2/layout/MDCitationView', flags: ['web']},
   { name: 'foam/u2/layout/MDDAOController', flags: ['web']},
   { name: "foam/u2/md/AppController" },
   { name: "foam/u2/md/OverlayDropdown", flags: ['web'] },
   { name: "foam/u2/layout/MDLoginView", flags: ['web'] },
+  { name: "foam/u2/layout/MDNotificationMessage", flags: ['web'] },
   { name: "foam/u2/md/tag/PaperDropdown", flags: ['web'] },
 
   // fs
   { name: 'foam/nanos/fs/fileDropZone/FileDropZone', flags: ['web'] },
+  { name: 'foam/nanos/fs/fileDropZone/FileCard', flags: ['web'] },
   { name: 'foam/nanos/fs/fileDropZone/FilePreview', flags: ['web'] },
+  { name: 'foam/nanos/fs/TextSaveView' }
 
-  { name: 'foam/nanos/fs/fileDropZone/FileCard', flags: ['web'] }
-]);
+])
