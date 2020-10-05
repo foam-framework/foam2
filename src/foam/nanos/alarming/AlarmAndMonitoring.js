@@ -94,7 +94,7 @@ foam.CLASS({
               report.setStartCount(0);
               report.setEndCount(0);
               report.setTimeoutCount(0);
-              alarm.setReason(AlarmReason.NONE);
+              alarm.setReason(AlarmReason.UNSPECIFIED);
               alarm.setIsActive(false);
             }
           }
@@ -138,7 +138,7 @@ foam.CLASS({
           report.setStartCount(0);
           report.setEndCount(0);
           report.setTimeoutCount(0);
-          alarm.setReason(AlarmReason.NONE);
+          alarm.setReason(AlarmReason.UNSPECIFIED);
           alarm.setIsActive(false);
         }
       }
