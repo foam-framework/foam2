@@ -304,8 +304,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'AxiomArray',
-      of: 'Action',
+      class: 'Array',
       name: 'contextActions',
       adaptArrayElement: function(o, prop) {
         return typeof o === 'function' ?
