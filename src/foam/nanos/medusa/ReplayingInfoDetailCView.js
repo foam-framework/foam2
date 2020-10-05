@@ -117,8 +117,9 @@ foam.CLASS({
 
       label = this.makeLabel();
       label.text$ = this.config$.map(function(c) {
-        let endTime = Date.now();
-        let tm = (endTime - this.openTime) / 1000;
+        let now = Date.now();
+        let idle = now - (c.replayingInfo.lastModified && c.replayingInfo.lastModified.getTime() || now);
+        let tm = (now - this.openTime - idle) / 1000;
         let diff = c.replayingInfo.index - this.openIndex;
         if ( diff > 0 ) {
           return 'TPS: '+ (diff / tm).toFixed(0);
