@@ -23,6 +23,7 @@ foam.CLASS({
     'foam.lib.json.JSONParser',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'foam.nanos.om.OMLogger',
     'foam.nanos.pm.PM',
     'java.io.BufferedOutputStream',
     'java.io.DataInputStream',
@@ -69,6 +70,11 @@ foam.CLASS({
       name: 'socket',
       class: 'Object',
       visibility: 'HIDDEN'
+    },
+    {
+      name: 'id',
+      class: 'String',
+      javaFactory: `return getHost()+":"+getPort();`
     },
     {
       documentation: 'Set to false when send exits, triggering execute to exit',
@@ -146,7 +152,7 @@ foam.CLASS({
     {
       name: 'send',
       javaCode: `
-      PM pm = PM.create(getX(), this.getClass().getSimpleName(), getHost()+":"+getPort()+":send");
+      PM pm = PM.create(getX(), this.getClass().getSimpleName(), getId()+":send");
       Box replyBox = (Box) msg.getAttributes().get("replyBox");
       String replyBoxId = null;
       if ( replyBox != null ) {
@@ -162,6 +168,7 @@ foam.CLASS({
       }
       String message = null;
       try {
+        OMLogger omLogger = (OMLogger) getX().get("OMLogger");
         foam.lib.formatter.FObjectFormatter formatter = formatter_.get();
         formatter.setX(getX());
         formatter.output(msg);
@@ -172,6 +179,7 @@ foam.CLASS({
              ! socket.isConnected() ) {
           throw new SocketException("Socket not connected.");
         }
+        omLogger.log(this.getClass().getSimpleName(), getId(), "pending");
         synchronized (out_) {
           // getLogger().debug("send", message);
           out_.writeLong(System.currentTimeMillis());
@@ -179,6 +187,7 @@ foam.CLASS({
           out_.write(messageBytes);
           // TODO/REVIEW
           out_.flush();
+          omLogger.log(this.getClass().getSimpleName(), getId(), "sent");
         }
       } catch ( Throwable t ) {
         pm.error(getX(), t);
@@ -209,6 +218,7 @@ foam.CLASS({
       javaCode: `
       String pmKey = this.getClass().getSimpleName()+":"+getHost()+":"+getPort();
       String pmName = "receive"; 
+      OMLogger omLogger = (OMLogger) x.get("OMLogger");
       try {
         while ( getValid() ) {
           PM pm = null;
@@ -247,6 +257,7 @@ foam.CLASS({
                 break;
               }
             }
+            omLogger.log(this.getClass().getSimpleName(), getId(), "received");
             String message = data.toString();
             if ( foam.util.SafetyUtil.isEmpty(message) ) {
               throw new RuntimeException("Received empty message.");
