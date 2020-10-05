@@ -189,7 +189,19 @@ public class BenchmarkRunner
               @Override
               public void run() {
                 for ( int j = 0 ; j < invocationCount_ ; j++ ) {
-                  test_.execute(x);
+                  try {
+                    test_.execute(x);
+                  } catch (Throwable t) {
+                    t.printStackTrace();
+                    Logger log = (Logger) x.get("logger");
+                    if ( log != null ) {
+                      log = new foam.nanos.logger.StdoutLogger();
+                    }
+                    if ( log != null ) {
+                      log.error(t);
+                    }
+                    break;
+                  }
                 }
                 // count down the latch when finished
                 latch.countDown();
