@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
  *     http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -48,6 +48,7 @@ foam.CLASS({
         try {
           payload.validate(x);
         } catch ( IllegalStateException e ) {
+          // this shouldn't happen because a CRE was thrown earlier; here for a fail safe
           logger.warning(e);
           return obj;
         }

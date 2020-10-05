@@ -23,13 +23,6 @@ foam.CLASS({
     'crunchController'
   ],
 
-  messages: [
-    {
-      name: 'REFRESH_MSG',
-      message: 'Your session has expired. The page will now be refreshed so that you can log in again.',
-    }
-  ],
-
   properties: [
     {
       class: 'FObjectProperty',
