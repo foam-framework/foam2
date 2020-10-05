@@ -291,40 +291,6 @@ p({
 })
 
 p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"localSessionDAO",
-  "serviceScript":"""
-    return new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.session.Session.getOwnClassInfo())
-      .setGuid(true)
-      .setCreatedAware(true)
-      .setCreatedByAware(true)
-      .setJournalName("sessions")
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setAuthorize(false)
-      .setDecorator(new foam.dao.ValidatingDAO(x, new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.session.Session.getOwnClassInfo()).build()))
-      .build();
-  """
-})
-
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "sessionDAO",
-  "serve": true,
-  "serviceScript": """
-    return new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.session.Session.getOwnClassInfo())
-      .setPm(true)
-      .setAuthorize(false)
-      .setInnerDAO(((foam.dao.DAO) x.get("localSessionDAO")))
-      .setOrder(new foam.mlang.order.Comparator[] { new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.session.Session.LAST_USED).build() })
-      .build();
-  """,
-  "client": "{\"of\":\"foam.nanos.session.Session\"}",
-  "authNotes": "Users must have the 'service.sessionDAO' permission to access this service. Due to the highly sensitive nature of sessions, only superadmins should have permission to access this service."
-})
-
-p({
   "class": "foam.nanos.boot.NSpec",
   "name": "classes",
   "serviceClass": "foam.nanos.http.ClassesWebAgent"
@@ -896,13 +862,6 @@ p({
 
 p({
   "class": "foam.nanos.boot.NSpec",
-  "name": "sessionService",
-  "serve": true,
-  "serviceClass": "foam.nanos.session.SimpleSessionService"
-})
-
-p({
-  "class": "foam.nanos.boot.NSpec",
   "name": "localCurrencyDAO",
   "serve": false,
   "serviceScript":
@@ -1048,23 +1007,6 @@ p({
       "of":"foam.nanos.google.api.auth.GoogleApiCredentials"
     }
   """
-})
-
-p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"localSettingDAO",
-  "lazy":false,
-  "serve":true,
-  "authenticate": true,
-  "serviceScript":"""
-    import foam.dao.DAO;
-    return new foam.dao.EasyDAO.Builder(x)
-      .setDecorator(new foam.nanos.session.LocalSettingSessionDAO(x, new foam.dao.NullDAO(x, foam.nanos.session.LocalSetting.getOwnClassInfo())))
-      .setAuthorize(true)
-      .setOf(foam.nanos.session.LocalSetting.getOwnClassInfo())
-      .build();
-  """,
-  "client":"{\"of\":\"foam.nanos.session.LocalSetting\", \"remoteListenerSupport\": false}"
 })
 
 p({
