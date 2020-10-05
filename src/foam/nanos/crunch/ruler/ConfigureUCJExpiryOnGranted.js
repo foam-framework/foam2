@@ -59,7 +59,13 @@ foam.CLASS({
               return;
             }
 
-            Date junctionExpiry = capability.getExpiry();
+            // if the data is Renewable and expiry is user-configured, get the expiry from the RenewableData,
+            // otherwise, get the expiry from the capability
+            FObject data = ucj.getData();
+            
+            Date junctionExpiry = data instanceof RenewableData && ((RenewableData) data).getDataConfiguredExpiry() ?
+              ((RenewableData) data).getExpiry() :
+              capability.getExpiry(); 
 
             ucj.resetRenewalStatus();
     
@@ -76,7 +82,6 @@ foam.CLASS({
               }
             }
             ucj.setExpiry(junctionExpiry);
-            FObject data = ucj.getData();
             if ( junctionExpiry != null && ( data instanceof RenewableData ) ) {
               ((RenewableData) data).setRenewable(false);
               ((RenewableData) data).setReviewed(false);

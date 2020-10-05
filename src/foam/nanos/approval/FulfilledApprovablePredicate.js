@@ -24,7 +24,10 @@
       name: 'f',
       javaCode: `
         return
-          EQ(DOT(NEW_OBJ, Approvable.STATUS), ApprovalStatus.APPROVED)
+          AND(
+            EQ(DOT(NEW_OBJ, Approvable.STATUS), ApprovalStatus.APPROVED),
+            EQ(DOT(NEW_OBJ, Approvable.IS_USING_NESTED_JOURNAL), false)
+          )
         .f(obj);
       `
     } 

@@ -165,6 +165,9 @@ foam.CLASS({
           if ( subSi == 0 ) {
             if ( subWi == 0 ) return null;
             subWi--;
+            // Skip past steps with no sections
+            while ( sectionAvailableSlots[subWi].length < 1 ) subWi--;
+            if ( subWi < 0 ) return null;
             subSi = sectionAvailableSlots[subWi].length - 1;
           } else {
             subSi--;
@@ -176,7 +179,7 @@ foam.CLASS({
         };
 
         for ( let p = decr(wizardPosition) ; p != null ; p = decr(p) ) {
-          if ( ! this.wizardlets[p.wizardletIndex].isAvailable ) {
+          if ( ! this.wizardlets[p.wizardletIndex].isVisible ) {
             continue;
           }
 
@@ -214,7 +217,7 @@ foam.CLASS({
 
         for ( let p = incr(wizardPosition) ; p != null ; p = incr(p) ) {
           // Skip unavailable wizardlets
-          if ( ! this.wizardlets[p.wizardletIndex].isAvailable ) {
+          if ( ! this.wizardlets[p.wizardletIndex].isVisible ) {
             continue;
           }
 
@@ -257,11 +260,18 @@ foam.CLASS({
     {
       name: 'availabilityInvalidate',
       class: 'Int'
+    },
+    {
+      name: 'submitted',
+      class: 'Boolean'
     }
   ],
 
   methods: [
     function init() {
+      console.log('stepWizardlet', this);
+      window.sargnarg = this;
+      console.log
       return this.wizardlets.forEach(wizardlet => {
         wizardlet.isAvailable$.sub(() => {
           this.availabilityInvalidate++;
@@ -285,7 +295,10 @@ foam.CLASS({
         var nextScreen = this.nextScreen;
 
         if ( nextScreen == null ) {
-          return this.currentWizardlet.save().then(() => true);
+          return this.currentWizardlet.save().then(() => {
+            this.submitted = true;
+            return true;
+          });
         }
 
         // number of unsaved wizardlets

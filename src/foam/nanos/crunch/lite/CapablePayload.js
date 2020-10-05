@@ -14,14 +14,27 @@ foam.CLASS({
   `,
 
   javaImports: [
-    'foam.core.Validator'
+    'foam.core.ClassInfo',
+    'foam.core.FObject',
+    'foam.core.Validatable'
   ],
 
   implements: [
-    'foam.core.Validator'
+    'foam.core.Validatable'
   ],
 
+  // TODO: Can section off view
+
   properties: [
+    {
+      class: 'String',
+      name: 'daoKey'
+    },
+    {
+      class: 'Object',
+      javaType: 'Object',
+      name: 'objId',
+    },
     {
       name: 'capability',
       class: 'FObjectProperty',
@@ -46,7 +59,8 @@ foam.CLASS({
       `,
       javaFactory: `
         return null;
-      `
+      `,
+      permissionRequired: true
     },
     {
       name: 'status',
@@ -54,16 +68,53 @@ foam.CLASS({
       of: 'foam.nanos.crunch.CapabilityJunctionStatus',
       value: foam.nanos.crunch.CapabilityJunctionStatus.ACTION_REQUIRED
     },
+    {
+      class: 'Boolean',
+      name: 'hasSafeStatus',
+      documentation: `
+        TODO: 
+      `,
+      transient: true
+    },
+    {
+      class: 'Boolean',
+      name: 'needsApproval',
+      documentation: `
+        TODO: Review with Eric
+      `,
+      transient: true
+    }
   ],
 
   methods: [
     {
       name: 'validate',
       javaCode: `
-        // TODO: Unsure about this; somebody should verify
-        Validator validator = (Validator) getData();
-        validator.validate(x, getData());
+        ClassInfo dataClass = getCapability().getOf();
+        if ( dataClass == null ) return;
+        FObject dataObject = getData();
+        if ( dataObject == null ) {
+          throw new IllegalStateException(String.format(
+            "Missing payload data for capability '%s'",
+            getCapability().getId()
+          ));
+        }
+        if ( ! dataClass.isInstance(dataObject) ) {
+          throw new IllegalStateException(String.format(
+            "Invalid payload data class for capability '%s'",
+            getCapability().getId()
+          ));
+        }
+        if ( dataObject instanceof Validatable ) {
+          dataObject.validate(x);
+        }
       `,
+    },
+    {
+      name: 'toSummary',
+      code: function(){
+        return `${this.daoKey}:${this.objId} - ${this.capability.name}`
+      }
     }
   ],
 });

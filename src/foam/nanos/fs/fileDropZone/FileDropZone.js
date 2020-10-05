@@ -179,7 +179,9 @@ foam.CLASS({
         }, this.files$))
         .on('drop', this.onDrop)
         .callIf(this.isMultipleFiles, function() {
-          this.start('input').addClass(this.myClass('input'))
+          this.start('input')
+            .addClass(this.myClass('input'))
+            .addClass(this.instanceClass(`input`))
             .attrs({
               type: 'file',
               accept: this.getSupportedTypes(),
@@ -189,7 +191,9 @@ foam.CLASS({
           .end();
         })
         .callIf(! this.isMultipleFiles, function() {
-          this.start('input').addClass(this.myClass('input'))
+          this.start('input')
+            .addClass(this.myClass('input'))
+            .addClass(this.instanceClass(`input`))
             .attrs({
               type: 'file',
               accept: this.getSupportedTypes()
@@ -272,7 +276,7 @@ foam.CLASS({
       var files = Array.from(this.files);
       files.splice(atIndex, 1);
       this.files = files;
-      this.document.querySelector('.' + this.myClass('input')).value = null;
+      this.document.querySelector('.' + this.instanceClass(`input`)).value = null;
     }
   ],
 
@@ -280,12 +284,12 @@ foam.CLASS({
     function onAddAttachmentClicked(e) {
       if ( typeof e.target != 'undefined' ) {
         if ( e.target.tagName == 'P' && e.target.tagName != 'A' ) {
-          this.document.querySelector('.' + this.myClass('input')).click();
+          this.document.querySelector('.' + this.instanceClass(`input`)).click();
         }
       } else {
         // For IE browser
         if ( e.srcElement.tagName == 'P' && e.srcElement.tagName != 'A' ) {
-          this.document.querySelector('.' + this.myClass('input')).click();
+          this.document.querySelector('.' + this.instanceClass(`input`)).click();
         }
       }
     },
@@ -327,7 +331,7 @@ foam.CLASS({
       var files = e.target.files;
       this.addFiles(files);
       // Remove all temporary files in the element.target.files
-      this.document.querySelector('.' + this.myClass('input')).value = null;
+      this.document.querySelector('.' + this.instanceClass(`input`)).value = null;
     }
   ]
 });

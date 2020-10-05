@@ -109,11 +109,15 @@ foam.CLASS({
       display: inline-flex;
       justify-content: center;
       align-items: center;
-      width: 160px;
+      height: 100%;
+      width: 100%;
+    }
+    ^loading-spinner .foam-u2-LoadingSpinner {
+      margin-bottom: 50px;
     }
     ^loading-spinner img {
-      width: 40px;
-      height: 40px;
+      width: 100px;
+      height: 100px;
     }
     ^top-padding {
       padding-top: 99px;
@@ -190,27 +194,15 @@ foam.CLASS({
           .end()
           .start(this.GUnit, { columns: 8 })
             .addClass(this.myClass('rightside'))
-            .add(this.slot(function(hideX) {
-              if ( hideX ) {
-                return this.E().addClass(this.myClass('top-padding'));
-              }
-              return this.E().addClass(this.myClass('top-buttons'))
-                .start(this.CircleIndicator, {
-                  label: 'X',
-                  borderThickness: 2,
-                  borderColor: this.theme.grey2,
-                  borderColorHover: this.theme.primary1,
-                  clickable: true
-                })
-                  .on('click', function () {
-                    self.showExitPrompt();
-                  })
-                .end();
-            }))
             .start()
               .addClass(this.myClass('entry'))
               .start()
-                .add(this.slot(function (data, data$currentWizardlet, data$currentSection) {
+                .add(this.slot(function (data, data$currentWizardlet, data$currentSection, isLoading_) {
+                  if ( isLoading_ ) {
+                    return this.E().start().addClass(self.myClass('loading-spinner'))
+                      .add(this.loadingSpinner)
+                      .end();
+                  }
                   var createView = data$currentWizardlet.createView(data);
         
                   if ( createView !== null && foam.u2.View.isInstance(createView) ) {
@@ -241,11 +233,6 @@ foam.CLASS({
                       ? { ...btn, label: this.ACTION_LABEL }
                       : btn
                   )
-                  .start()
-                    .addClass(self.myClass('loading-spinner'))
-                    .show(isLoading_)
-                    .add(this.loadingSpinner)
-                  .end()
                   .endContext();
               }))
             .end()
@@ -309,8 +296,8 @@ foam.CLASS({
       isEnabled: function (data$canGoBack) {
         return data$canGoBack;
       },
-      isAvailable: function (backDisabled) {
-        return ! backDisabled;
+      isAvailable: function (backDisabled, isLoading_) {
+        return ! backDisabled && ! isLoading_;
       },
       code: function() {
         this.data.back();
@@ -319,8 +306,8 @@ foam.CLASS({
     {
       name: 'goNext',
       label: 'Next',
-      isEnabled: function (data$canGoNext) {
-        return data$canGoNext;
+      isEnabled: function (data$canGoNext, isLoading_) {
+        return data$canGoNext && ! isLoading_;
       },
       isAvailable: function (isLoading_) {
         return ! isLoading_;

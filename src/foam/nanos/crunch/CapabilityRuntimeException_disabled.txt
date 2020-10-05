@@ -1,0 +1,46 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+package foam.nanos.crunch;
+
+import java.util.ArrayList;
+import foam.nanos.crunch.lite.Capable;
+import foam.nanos.auth.AuthorizationException;
+
+public class CapabilityRuntimeException extends AuthorizationException implements foam.core.NetworkException {
+  private ArrayList<String> capabilities_;
+  private ArrayList<Capable> capables_;
+
+  private void init() {
+    capabilities_ = new ArrayList<String>();
+    capables_ = new ArrayList<Capable>();
+  }
+
+  public CapabilityRuntimeException() {
+    super();
+    init();
+  }
+
+  public CapabilityRuntimeException(String message) {
+    super(message);
+    init();
+  }
+
+  public String[] getCapabilities() {
+    return capabilities_.toArray(new String[capabilities_.size()]);
+  }
+
+  public void addCapabilityId(String capabilityId) {
+    capabilities_.add(capabilityId);
+  }
+
+  public Capable[] getCapables() {
+    return capables_.toArray(new Capable[capables_.size()]);
+  }
+
+  public void addCapable(Capable capable) {
+    capables_.add(capable);
+  }
+}

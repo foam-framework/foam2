@@ -1178,6 +1178,10 @@ foam.CLASS({
       return f(opt_extra);
     },
 
+    function instanceClass(opt_extra) {
+      return this.myClass(this.id + '-' + opt_extra);
+    },
+
     function visitChildren(methodName) {
       /*
         Call the named method on all children.
