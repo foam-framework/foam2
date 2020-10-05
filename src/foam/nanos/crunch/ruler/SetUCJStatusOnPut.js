@@ -80,7 +80,6 @@ foam.CLASS({
         ACTION_REQUIRED: If not any of the above
       `,
       javaCode: `
-        boolean allGranted = true;
         DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         Capability cap = (Capability) capabilityDAO.find(ucj.getTargetId());

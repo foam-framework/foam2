@@ -86,10 +86,8 @@ foam.CLASS({
         .add(this.slot(function(cjStatus, isRenewable) {
           return this.E('span')
             .style({ 'float' : 'right' })
-            .start(self.ReadOnlyEnumView, { data : cjStatus, clsInfo : cjStatus.cls_.LABEL.name, default : cjStatus.label })
-              .addClass(style.myClass('badge'))
-              .style({ 'background-color': cjStatus.background })
-            .end()
+            .add(cjStatus.label).addClass(style.myClass('badge'))
+            .style({ 'background-color': cjStatus.background })
             .start()
               .addClass(style.myClass('renewable-description'))
               .add(isRenewable ? "Capability is renewable" : "")

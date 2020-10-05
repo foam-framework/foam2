@@ -293,7 +293,12 @@ foam.CLASS({
       name: 'sortable',
       value: true
     },
-    'unitPropValueToString'
+    'unitPropValueToString',
+    {
+      name: 'dependsOnPropertiesWithNames',
+      documentation: 'this axiom contains names of properties which are needed to be set when using projection as they are used for some other axioms of current property (eg tableCellFormatter can use another property\'s value for specific styling)',
+      value: []
+    }
   ],
 
   methods: [

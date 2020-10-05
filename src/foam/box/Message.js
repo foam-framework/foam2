@@ -74,6 +74,10 @@ foam.CLASS({
           wrapperCapability.setMessage(t.getMessage());
           wrapperCapability.setCapabilityOptions(
             tCapability.getCapabilities());
+          wrapperCapability.setCapableRequirements(
+            tCapability.getCapables());
+          wrapperCapability.setDaoKey(
+            tCapability.getDaoKey());
           wrapper = wrapperCapability;
         }
 
