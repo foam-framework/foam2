@@ -56,13 +56,14 @@ foam.CLASS({
         Capability cap = payload.getCapability();
         var oldStatus = payload.getStatus();
         var newStatus = cap.getCapableChainedStatus(x, payloadDAO, payload);
-
-        // TODO: Review with Eric
-        if (
-          payload.getHasSafeStatus() &&
-          payload.getNeedsApproval()
-        ) {
-          return getDelegate().put_(x, obj);
+        
+        if ( payload.getCapability().getReviewRequired() ) {
+          if ( oldStatus == PENDING ) {
+            return getDelegate().put_(x, obj);
+          }
+          if ( oldStatus == ACTION_REQUIRED ) {
+            newStatus = PENDING;
+          }
         }
 
         if ( oldStatus != newStatus )  {

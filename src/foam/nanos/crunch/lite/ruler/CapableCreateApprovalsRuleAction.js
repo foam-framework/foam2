@@ -96,20 +96,9 @@ foam.CLASS({
 
               Capability capability = capablePayload.getCapability();
 
-              if ( ! getCapabilitiesToApprove().contains(capability.getId()) ){
-                capablePayload.setStatus(foam.nanos.crunch.CapabilityJunctionStatus.GRANTED);
-                capablePayload.setHasSafeStatus(true);
+              if ( ! capability.getReviewRequired() ) {
                 continue;
               }
-
-              // TODO: Might have to figure  out instead if we put the changed payload  into capablePayloadDA
-              // so that its updated here and reput that
-
-              capablePayload.setStatus(foam.nanos.crunch.CapabilityJunctionStatus.PENDING);
-              capablePayload.setHasSafeStatus(true);
-
-              // TODO: Review with Eric
-              capablePayload.setNeedsApproval(true);
 
               DAO approvalRequestDAO = (DAO) getX().get("approvalRequestDAO");
               DAO approvableDAO = (DAO) getX().get("approvableDAO");
@@ -179,14 +168,6 @@ foam.CLASS({
               DAO daoToReput = (DAO) x.get(getDaoToReput());
 
               daoToReput.put(clonedObj);
-
-              // TODO: for some reason the UpdateTransactionOnInvoiceValidationRule fires after throwing
-              throw new UserFeedbackException.Builder(x)
-                .setUserFeedback(new UserFeedback.Builder(x)
-                  .setStatus(UserFeedbackStatus.SUCCESS)
-                  .setMessage(REQUEST_SEND_MSG)
-                  .build()
-                ).build();
             }
           }
 
