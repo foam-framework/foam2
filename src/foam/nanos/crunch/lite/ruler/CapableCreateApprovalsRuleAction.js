@@ -40,16 +40,6 @@ foam.CLASS({
   implements: ['foam.nanos.ruler.RuleAction'],
 
   properties: [
-    { 
-      name: 'capabilitiesToApprove',
-      class: 'List',
-      of: 'String',
-      javaType: 'java.util.List<String>',
-      factory: function() {
-        return [];
-      },
-      javaFactory: 'return new java.util.ArrayList();'
-    },
     {
       class: 'String',
       name: 'daoToReput',
@@ -74,8 +64,6 @@ foam.CLASS({
 
         Logger logger = (Logger) x.get("logger");
 
-        List<String> capabilitiesToApprove = getCapabilitiesToApprove();
-
         FObject clonedObj = obj.fclone();
 
         Capable capableObj = (Capable) clonedObj;
@@ -96,20 +84,9 @@ foam.CLASS({
 
               Capability capability = capablePayload.getCapability();
 
-              if ( ! getCapabilitiesToApprove().contains(capability.getId()) ){
-                capablePayload.setStatus(foam.nanos.crunch.CapabilityJunctionStatus.GRANTED);
-                capablePayload.setHasSafeStatus(true);
+              if ( ! capability.getReviewRequired() ) {
                 continue;
               }
-
-              // TODO: Might have to figure  out instead if we put the changed payload  into capablePayloadDA
-              // so that its updated here and reput that
-
-              capablePayload.setStatus(foam.nanos.crunch.CapabilityJunctionStatus.PENDING);
-              capablePayload.setHasSafeStatus(true);
-
-              // TODO: Review with Eric
-              capablePayload.setNeedsApproval(true);
 
               DAO approvalRequestDAO = (DAO) getX().get("approvalRequestDAO");
               DAO approvableDAO = (DAO) getX().get("approvableDAO");
@@ -179,14 +156,6 @@ foam.CLASS({
               DAO daoToReput = (DAO) x.get(getDaoToReput());
 
               daoToReput.put(clonedObj);
-
-              // TODO: for some reason the UpdateTransactionOnInvoiceValidationRule fires after throwing
-              throw new UserFeedbackException.Builder(x)
-                .setUserFeedback(new UserFeedback.Builder(x)
-                  .setStatus(UserFeedbackStatus.SUCCESS)
-                  .setMessage(REQUEST_SEND_MSG)
-                  .build()
-                ).build();
             }
           }
 

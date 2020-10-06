@@ -33,19 +33,19 @@ foam.CLASS({
       class: 'foam.dao.DAOProperty',
       name: 'localeCache',
       factory: function() {
-        return this.MDAO.create({of: this.Locale}).addPropertyIndex(this.Locale.SOURCE);
+        return this.MDAO.create({of: this.Locale})/*.addPropertyIndex(this.Locale.SOURCE)*/;
       },
     },
     {
       name: 'locale',
       factory: function() {
-        return (foam.language || "en").substring(0,2);
+        return (foam.locale || "en").substring(0,2);
       }
     },
     {
       name: 'variant',
       factory: function() {
-        return (foam.language || "").substring(3);
+        return (foam.locale || "").substring(3);
       }
     }
   ],
@@ -56,7 +56,7 @@ foam.CLASS({
       // TODO: this should be moved to the server's getTranslations() method
       this.loadLanguageLocales().then(() => {
         if ( this.hasVariant() ) {
-          this.loadVariantLocales().then(this.initLatch);
+          this.loadVariantLocales().then(() => this.initLatch.resolve());
         } else {
           this.initLatch.resolve();
         }
@@ -64,22 +64,26 @@ foam.CLASS({
     },
 
     function loadLanguageLocales() {
-      console.log('************************ loading language locales');
       return this.localeDAO.where(
         this.AND(
           this.EQ(this.Locale.LOCALE,  this.locale),
-          this.EQ(this.Locale.VARIANT, ''))).select(this.localeCache);
+          this.EQ(this.Locale.VARIANT, ''))).select(this.addLocale.bind(this));
     },
 
     function loadVariantLocales() {
-      console.log('************************ loading variant locales');
       return this.localeDAO.where(
         this.AND(
           this.EQ(this.Locale.LOCALE,  this.locale),
-          this.EQ(this.Locale.VARIANT, this.variant))).select(
-            l => this.localeCache.put(this.Locale.create({
-              id: l.id, locale: l.locale, source: l.source, target: l.target
-            })));
+          this.EQ(this.Locale.VARIANT, this.variant))).select(this.addLocale.bind(this));
+    },
+
+    function addLocale(l) {
+      this.localeCache.put(this.Locale.create({
+        id: l.source,
+        // locale: l.locale,
+        // source: l.source,
+        target: l.target
+      }));
     },
 
     function hasVariant() { return !! this.variant; },
@@ -97,9 +101,8 @@ foam.CLASS({
       args: [ 'String locale', 'String source' ],
       type: 'String',
       code: function(locale, source) {
-        console.log('************************ getTranslation', source);
         return this.initLatch.then(() => {
-          this.localeCache.find(this.EQ(this.Locale.SOURCE, source)).then(l => {
+          this.localeCache.find(source).then(l => {
             console.log('    -> ', l && l.target);
             return l && l.target;
           });
