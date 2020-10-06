@@ -9,6 +9,7 @@ foam.CLASS({
   extends: 'foam.u2.wizard.BaseWizardlet',
 
   imports: [
+    'capable',
     'crunchController'
   ],
 
@@ -55,6 +56,15 @@ foam.CLASS({
         if ( ! capability || ! capability.name ) return '';
         return capability.name;
       }
+    },
+    {
+      name: 'isAvailable',
+      class: 'Boolean',
+      value: true,
+      postSet: function (ol, nu) {
+        if ( nu ) this.save();
+        else this.cancel();
+      }
     }
   ],
 
@@ -62,7 +72,21 @@ foam.CLASS({
     {
       name: 'save',
       code: async function() {
-        // return this.crunchController && this.crunchController.save(this);
+        return this.capable.getCapablePayloadDAO().put(
+          this.targetPayload).then(() => {
+            console.log('SAVED ' +
+              this.targetPayload.capability.name);
+          });
+      }
+    },
+    {
+      name: 'cancel',
+      code: async function() {
+        return this.capable.getCapablePayloadDAO().remove(
+          this.targetPayload).then(() => {
+            console.log('CANCELLED ' +
+              this.targetPayload.capability.name);
+          });
       }
     }
   ]

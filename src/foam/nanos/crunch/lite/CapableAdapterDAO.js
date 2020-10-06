@@ -55,13 +55,27 @@ foam.CLASS({
         payloads[payloads.length - 1] = payload;
         getCapable().setCapablePayloads(payloads);
         return obj;
-      `
+      `,
+      code: async function (x, obj) {
+        return this.ifFoundElseIfNotFound_(
+          obj,
+          (payloads, i) => { payloads[i] = obj; return obj; },
+          (payloads) => { payloads.push(obj); }
+        );
+      }
     },
     {
       name: 'remove_',
       javaCode: `
         return obj; // TODO
-      `
+      `,
+      code: async function (x, obj) {
+        return this.ifFoundElseIfNotFound_(
+          obj,
+          (payloads, i) => { payloads.splice(i, 1); return obj },
+          (payloads) => obj
+        );
+      }
     },
     {
       name: 'find_',
@@ -92,6 +106,25 @@ foam.CLASS({
 
         return capablePayloadsToArraySink;
       `
+    },
+    {
+      name: 'ifFoundElseIfNotFound_',
+      flags: ['web'],
+      code: function (payload, ifFound, ifNotFound) {
+        var found = false;
+        var foundReturn = null;
+        payloads = this.capable.capablePayloads;
+        for ( var i = 0 ; i < payloads.length ; i++ ) {
+          if ( payload.capability.id == payloads[i].capability.id ) {
+            foundReturn = ifFound(payloads, i);
+            found = true;
+          }
+        }
+
+        if ( found ) return foundReturn;
+        // payloads.push(obj);
+        return ifNotFound(payloads);
+      }
     }
   ]
 });
