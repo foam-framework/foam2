@@ -601,6 +601,7 @@
   actions: [
     {
       name: 'approve',
+      isContextMenuEnabled: false,
       section: 'requestDetails',
       isAvailable: (isTrackingRequest, status) => {
         if (
@@ -623,6 +624,7 @@
     },
     {
       name: 'reject',
+      isContextMenuEnabled: false,
       section: 'requestDetails',
       isAvailable: (isTrackingRequest, status) => {
         if (
@@ -812,11 +814,11 @@
           });
       },
       tableWidth: 100
-    }
-  ],
-  contextActions: [
+    },
     {
-      name: 'approve',
+      name: 'contextMenuApprove',
+      isDetailViewEnabled: false,
+      label: 'approve',
       section: 'requestDetails',
       isAvailable: (isTrackingRequest, status) => {
         if (
@@ -838,7 +840,9 @@
       }
     },
     {
-      name: 'reject',
+      name: 'contextMenuReject',
+      isDetailViewEnabled: false,
+      label: 'reject',
       section: 'requestDetails',
       isAvailable: (isTrackingRequest, status) => {
         if (

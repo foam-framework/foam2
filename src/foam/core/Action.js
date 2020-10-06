@@ -141,6 +141,16 @@ If empty than no permissions are required.`,
       hidden: true,
       transient: true,
       documentation: 'A weak Map to track the running state of action on a per object basis.'
+    },
+    {
+      class: 'Boolean',
+      name: 'isContextMenuEnabled',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'isDetailViewEnabled',
+      value: true
     }
   ],
 
@@ -286,26 +296,6 @@ foam.CLASS({
       class: 'AxiomArray',
       of: 'Action',
       name: 'actions',
-      adaptArrayElement: function(o, prop) {
-        return typeof o === 'function' ?
-            foam.core.Action.create({name: o.name, code: o}) :
-            this.__context__.lookup(prop.of).create(o) ;
-      }
-    }
-  ]
-});
-
-
-/** Add Context Action support to Model. */
-foam.CLASS({
-  refines: 'foam.core.Model',
-  package: 'foam.core',
-  name: 'ModelContextActionRefine',
-
-  properties: [
-    {
-      class: 'Array',
-      name: 'contextActions',
       adaptArrayElement: function(o, prop) {
         return typeof o === 'function' ?
             foam.core.Action.create({name: o.name, code: o}) :
