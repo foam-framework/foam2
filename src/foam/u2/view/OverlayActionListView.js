@@ -88,7 +88,6 @@ foam.CLASS({
       class: 'Boolean',
       name: 'overlayInitialized_'
     },
-    'objId',
     'dao'
   ],
 
@@ -154,10 +153,6 @@ foam.CLASS({
 
     async function initializeOverlay() {
       var self = this;
-
-      if ( ! this.obj ) {
-        this.obj = await this.dao.inX(ctrl.__subContext__).find(this.objId);
-      }
 
       this.onDetach(this.disabled_$.follow(this.ExpressionSlot.create({
         args: this.data.map((action) => action.createIsAvailable$(this.__context__, this.obj)),

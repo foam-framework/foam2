@@ -47,7 +47,10 @@ foam.CLASS({
       name: 'send',
       code: function send(msg) {
         var self = this;
-        if ( this.RPCErrorMessage.isInstance(msg.object) && msg.object.data.id === 'foam.nanos.auth.AuthenticationException' ) {
+        if (
+          this.RPCErrorMessage.isInstance(msg.object) &&
+          msg.object.data.id === 'foam.nanos.auth.AuthenticationException'
+        ) {
           // If the user is already logged in when this happens, then we know
           // that something occurred on the backend to destroy this user's
           // session. Therefore we reset the client state and ask them to log

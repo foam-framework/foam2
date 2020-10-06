@@ -61,11 +61,18 @@
     },
     {
       name: 'arrayOfValuesToArrayOfStrings',
-      code: async function(x, props, values) {
+      code: async function(x, props, values, lengthOfPrimaryPropsRequested) {
         var stringValues = [];
         for ( var value of values ) {
           var stringArrayForValue = [];
-          for ( var i = 0 ; i < value.length ; i++ ) {
+          for ( var i = 0 ; i < lengthOfPrimaryPropsRequested ; i++ ) {
+            if ( foam.core.UnitValue.isInstance(props[i]) ) {
+              var indexOfUnitProp = props.findIndex(p => p.name === props[i].unitPropName);
+              if ( indexOfUnitProp !== -1 ) {
+                stringArrayForValue.push(await this.returnStringValueForProperty(x, props[i], value[i], value[indexOfUnitProp]));
+                continue;
+              }
+            }
             stringArrayForValue.push(await this.returnStringValueForProperty(x, props[i], value[i]));
           }
           stringValues.push(stringArrayForValue);
@@ -83,20 +90,18 @@
     },
     {
       name: 'objectToTable',
-      code: async function(x, of, propNames, obj) {
-        var columnConfig = x.columnConfigToPropertyConverter;
-        var filteredPropNames = columnConfig.filterExportedProps(obj.cls_, propNames);
-        var values = await this.objToArrayOfStringValues(x, of, filteredPropNames, obj);
-        return this.returnTable(x, of, filteredPropNames, values);
+      code: async function(x, of, propNames, obj, lengthOfPrimaryPropsRequested) {
+        var values = await this.objToArrayOfStringValues(x, of, propNames, obj);
+        return this.returnTable(x, of, propNames, values, lengthOfPrimaryPropsRequested);
       }
     },
     {
       name: 'returnTable',
-      code: async function(x, of, propNames, values) {
+      code: async function(x, of, propNames, values, lengthOfPrimaryPropsRequested) {
         var columnConfig = x.columnConfigToPropertyConverter;
         var props = columnConfig.returnProperties(of, propNames);
-        var table =  [ this.getColumnHeaders(x, of, propNames) ];
-        var values = await this.arrayOfValuesToArrayOfStrings(x, props, values);
+        var table =  [ this.getColumnHeaders(x, of, propNames.slice(0, lengthOfPrimaryPropsRequested)) ];
+        var values = await this.arrayOfValuesToArrayOfStrings(x, props, values, lengthOfPrimaryPropsRequested);
         table = table.concat(values);
         return table;
       }

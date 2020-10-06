@@ -266,6 +266,7 @@ FOAM_FILES([
   { name: "foam/nanos/export/XMLDriver"},
   { name: "foam/nanos/export/report/Template" },
   { name: "foam/nanos/export/PDFGoogleSheetsExportDriver" },
+  { name: "foam/nanos/export/TableExportDriver"},
   { name: "foam/nanos/google/api/auth/GoogleApiAuthService" },
   { name: "foam/nanos/google/api/auth/GoogleApiCredentials" },
   { name: "foam/nanos/google/api/drive/GoogleDriveService" },
@@ -408,9 +409,22 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/MinMaxCapability" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
   { name: "foam/nanos/crunch/lite/CapablePayload" },
+  { name: "foam/nanos/crunch/lite/CapablePayloadStatusDAO" },
   { name: "foam/nanos/crunch/lite/Capable" },
+  { name: "foam/nanos/crunch/lite/CapableDAO" },
   { name: "foam/nanos/crunch/lite/CapableAdapterDAO" },
   { name: "foam/nanos/crunch/lite/CapableObjectData" },
+  { name: "foam/nanos/crunch/lite/CapableCompatibleCapability" },
+  { name: "foam/nanos/crunch/lite/CapabilityRefinement" },
+  { name: "foam/nanos/crunch/lite/MinMaxCapabilityRefinement" },
+  { name: "foam/nanos/crunch/crunchtest/TestCapable" },
+
+  // crunch lite rulers
+  { name: "foam/nanos/crunch/lite/ruler/CapablePayloadApprovableRuleAction" },
+  { name: "foam/nanos/crunch/lite/ruler/CapableCreateApprovalsRuleAction" },
+  { name: "foam/nanos/crunch/lite/ruler/SetCapablePayloadStatusOnPut" },
+  { name: "foam/nanos/crunch/lite/ruler/ReputDependantPayloads" },
+
   { name: "foam/nanos/crunch/CapabilityCategory" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/CapabilityCapabilityJunctionRefine" },
@@ -440,6 +454,9 @@ FOAM_FILES([
   //views
   { name: "foam/nanos/crunch/ui/CapableView" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
+  //boxes
+  { name: "foam/nanos/crunch/box/CrunchClientBox" },
+  { name: "foam/nanos/crunch/box/CrunchClientReplyBox" },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },
@@ -453,6 +470,7 @@ FOAM_FILES([
   { name: 'foam/nanos/approval/ApprovableApprovalRequestsPredicate' },
   { name: 'foam/nanos/approval/ApprovableApprovalRequestsRule' },
   { name: 'foam/nanos/approval/FulfilledApprovablePredicate' },
+  { name: 'foam/nanos/approval/FulfilledNestedJournalApprovablePredicate' },
   { name: 'foam/nanos/approval/FulfilledApprovableRule' },
   { name: 'foam/nanos/approval/PopulateApprovalRequestsDAO' },
 

@@ -11,7 +11,7 @@ foam.CLASS({
 
   css: `
     ^ {
-      padding: 8px;
+      padding: 8px 12px 8px 12px;
       width: 216px;
       height: 211px;
       border: 1px solid rgba(255,255,255,0);
@@ -62,7 +62,6 @@ foam.CLASS({
       font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 11px;
       font-weight: normal;
-      font-style: italic;
       font-stretch: normal;
       line-height: 1.27;
       letter-spacing: normal;
@@ -103,17 +102,6 @@ foam.CLASS({
     ^mode-card.state-hover {
       background-color: rgba(255,255,255,0.5);
       border: solid 1px #e7eaec;
-    }
-
-    ^.state-hover ^card-description {
-      border-radius: 3px;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
-      border: solid 1px #e7eaec;
-      background-color: rgba(255,255,255,0.7);
-      text-align: center;
-
-      white-space: normal;
-      text-overflow: initial;
     }
 
     ^mode-card.state-hover ^card-description {
