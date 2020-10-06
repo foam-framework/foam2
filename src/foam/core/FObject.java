@@ -433,9 +433,9 @@ public interface FObject
       } catch (IllegalStateException e) {
         exceptions.add(prop.getName() + ": " + e.getMessage());
       }
-      if ( exceptions.size() > 0 ) {
-        throw new IllegalStateException(exceptions.toString());
-      }
+    }
+    if ( exceptions.size() > 0 ) {
+      throw new IllegalStateException(exceptions.toString());
     }
   }
 
