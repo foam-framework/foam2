@@ -2056,7 +2056,7 @@ foam.CLASS({
     function output_(out) {
       /** Output the element without transitioning to the OUTPUT state. **/
       out('<', this.nodeName);
-      if ( this.id !== null ) out(' id="', this.id.replace(/"/g, "&quot;"), '"');
+      if ( this.id !== null ) out(' id="', this.id.replace ? this.id.replace(/"/g, "&quot;") : this.id, '"');
 
       var first = true;
       if ( this.hasOwnProperty('classes') ) {
