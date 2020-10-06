@@ -26,7 +26,24 @@ foam.SCRIPT({
 
 foam.CLASS({
   package: 'foam.i18n',
+  name: 'ThemeMessage',
+
+  imports: [
+    'theme'
+  ],
+
+  code: function() {
+    foam.appName = 'whitelabel';//TODO should be this.theme.appName
+  }
+});
+
+foam.CLASS({
+  package: 'foam.i18n',
   name: 'MessageAxiom',
+
+  imports: [
+    'theme'
+  ],
 
   properties: [
     {
@@ -47,8 +64,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'message',
-      getter: function() { return this.message_ || this.messageMap[foam.locale]; },
-      setter: function(m) { this.message_ = this.messageMap[foam.locale] = m; }
+      getter: function() {
+        return typeof this.message_ === 'object'? this.message_[foam.appName+'-'+foam.locale] ? this.message_[foam.appName+'-'+foam.locale]: this.message_[foam.appName] ? this.message_[foam.appName] : this.messageMap[foam.locale] : this.messageMap[foam.appName];
+      },
+      setter: function(m) {
+        this.message_ = this.messageMap[foam.appName] = this.messageMap[foam.appName+'-'+foam.locale]= m;
+      }
     },
     {
       class: 'Simple',
