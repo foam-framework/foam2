@@ -32,7 +32,11 @@ foam.CLASS({
       } else {
         config = new AlarmConfig();
         config.setName(alarm.getName());
-        configDAO.put(config);
+        try {
+          configDAO.put(config);
+        } catch ( Exception e ) {
+          ((Logger) x.get("logger")).error(e);
+        }
       }
       alarm.setSeverity(config.getSeverity());
       return getDelegate().put_(x, alarm);
