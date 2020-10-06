@@ -179,7 +179,7 @@ foam.CLASS({
              ! socket.isConnected() ) {
           throw new SocketException("Socket not connected.");
         }
-        omLogger.log(this.getClass().getSimpleName(), getId(), "pending");
+        // omLogger.log(this.getClass().getSimpleName(), getId(), "pending");
         synchronized (out_) {
           // getLogger().debug("send", message);
           out_.writeLong(System.currentTimeMillis());
@@ -187,7 +187,7 @@ foam.CLASS({
           out_.write(messageBytes);
           // TODO/REVIEW
           out_.flush();
-          omLogger.log(this.getClass().getSimpleName(), getId(), "sent");
+          // omLogger.log(this.getClass().getSimpleName(), getId(), "sent");
         }
       } catch ( Throwable t ) {
         pm.error(getX(), t);
@@ -257,7 +257,7 @@ foam.CLASS({
                 break;
               }
             }
-            omLogger.log(this.getClass().getSimpleName(), getId(), "received");
+            // omLogger.log(this.getClass().getSimpleName(), getId(), "received");
             String message = data.toString();
             if ( foam.util.SafetyUtil.isEmpty(message) ) {
               throw new RuntimeException("Received empty message.");
