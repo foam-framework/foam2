@@ -24,7 +24,6 @@ foam.CLASS({
   ],
 
   imports: [
-    'capabilityCache',
     'capabilityDAO',
     'crunchController',
     'crunchService',
@@ -92,7 +91,10 @@ foam.CLASS({
   methods: [
     function initE() {
       this.data.capabilityOptions.forEach(c => {
-        if ( this.capabilityCache.has(c) && this.capabilityCache.get(c) ) {
+        if (
+          this.crunchController.capabilityCache.has(c) &&
+          this.crunchController.capabilityCache.get(c)
+        ) {
           this.aquire();
         }
       });
@@ -153,7 +155,7 @@ foam.CLASS({
       x = x || this.__subSubContext__;
       this.data.aquired = true;
       this.data.capabilityOptions.forEach(c => {
-        this.capabilityCache.set(c, true);
+        this.crunchController.capabilityCache.set(c, true);
       });
       this.onClose(x);
     },
@@ -162,7 +164,7 @@ foam.CLASS({
       x = x || this.__subSubContext__;
       this.data.cancelled = true;
       this.data.capabilityOptions.forEach(c => {
-        this.capabilityCache.set(c, true);
+        this.crunchController.capabilityCache.set(c, true);
       });
       this.onClose(x);
     }

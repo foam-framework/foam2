@@ -68,10 +68,9 @@ foam.CLASS({
     ^left-arrow {
       width: 3%;
       float: left;
-      transform: scaleX(-1);
       display: flex;
+      cursor: pointer;
       padding-top: 70px;
-      /* HOVER OFF */
       -webkit-transition: padding 2s;
     }
 
@@ -79,24 +78,12 @@ foam.CLASS({
       width: 3%;
       float: right;
       display: flex;
+      cursor: pointer;
       padding-top: 70px;
       margin-left: -20px;
       z-index: 10000;
       position: relative;
-      /* HOVER OFF */
       -webkit-transition: padding 2s;
-    }
-
-    ^right-arrow:hover {
-      transform: scale(1.2);
-      /* HOVER ON */
-      -webkit-transition: border-radius 2s;
-    }
-
-    ^left-arrow:hover {
-      transform: scaleX(-1) scale(1.2);
-      /* HOVER ON */
-      -webkit-transition: border-radius 2s;
     }
 
     ^container {
@@ -214,7 +201,7 @@ foam.CLASS({
                 .end());
             }
             spot.start('span').start('img').addClass(self.myClass('left-arrow'))
-                .attr('src', 'images/carouselArrow.svg')
+                .attr('src', 'images/arrow-back-24px.svg')
                 .on('click', function() {
                   self.carouselCounter--;
                 })
@@ -230,7 +217,7 @@ foam.CLASS({
                 return ele;
               }));
             spot.start('span').start('img').addClass(self.myClass('right-arrow'))
-              .attr('src', 'images/carouselArrow.svg')
+              .attr('src', 'images/arrow-forward-24px.svg')
               .on('click', function() {
                 self.carouselCounter++;
               })
