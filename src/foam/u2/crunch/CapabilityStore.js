@@ -70,6 +70,7 @@ foam.CLASS({
       float: left;
       transform: scaleX(-1);
       display: flex;
+      cursor: pointer;
       padding-top: 70px;
       /* HOVER OFF */
       -webkit-transition: padding 2s;
@@ -79,24 +80,13 @@ foam.CLASS({
       width: 3%;
       float: right;
       display: flex;
+      cursor: pointer;
       padding-top: 70px;
       margin-left: -20px;
       z-index: 10000;
       position: relative;
       /* HOVER OFF */
       -webkit-transition: padding 2s;
-    }
-
-    ^right-arrow:hover {
-      transform: scale(1.2);
-      /* HOVER ON */
-      -webkit-transition: border-radius 2s;
-    }
-
-    ^left-arrow:hover {
-      transform: scaleX(-1) scale(1.2);
-      /* HOVER ON */
-      -webkit-transition: border-radius 2s;
     }
 
     ^container {
