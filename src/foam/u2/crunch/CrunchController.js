@@ -135,15 +135,20 @@ foam.CLASS({
       }
 
       p = p.then(isCompleted => {
+        debugger;
         if ( isCapable ) {
           if ( ! isCompleted ) {
-            intercept.resolve(new Error('user cancelled'));
+            intercept.reject('user cancelled');
             return;
           }
           intercept.resolve(intercept.returnCapable)
           return;
         }
         intercept.resend();
+      })
+
+      p.catch(err => {
+        console.error(err, 'from wizard flow');
       })
 
       return p;

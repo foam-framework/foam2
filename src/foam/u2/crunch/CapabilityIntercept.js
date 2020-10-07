@@ -42,6 +42,10 @@ foam.CLASS({
       class: 'Function'
     },
     {
+      name: 'reject',
+      class: 'Function'
+    },
+    {
       name: 'resend',
       class: 'Function'
     },
