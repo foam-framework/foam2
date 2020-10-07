@@ -13,7 +13,7 @@ foam.CLASS({
     ^ {
       padding: 8px 12px 8px 12px;
       width: 216px;
-      height: 211px;
+      height: auto;
       border: 1px solid rgba(255,255,255,0);
 
       /* width is calculated width from ^cardpart plus 4 pixels */
@@ -46,6 +46,7 @@ foam.CLASS({
     }
 
     ^card-title {
+      margin: 8px 0;
       min-height: 20px;
       font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 16px;
@@ -58,6 +59,7 @@ foam.CLASS({
     }
 
     ^card-subtitle {
+      margin: 0;
       height: 14px;
       font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 11px;
@@ -128,19 +130,35 @@ foam.CLASS({
     }
 
     ^mode-circle {
-      display: inline-block;
-      height: 80px;
-      width: calc(100% - 16px);
+      display: flex;
+      align-items: center;
+
+      padding: 16px;
+
+      width: 100%;
+      height: 100%;
+
+      background-color: white;
+
+      border: 2px solid #f3f3f3;
+      border-radius: 5px;
+      box-sizing: border-box;
+
+      transition: all 0.3s ease-out;
     }
     ^mode-circle::not(:first-of-type) {
       margin-left: 14px;
+    }
+    ^mode-circle:hover {
+      -webkit-box-shadow: 0 10px 6px -6px #e0e0e0;
+      -moz-box-shadow: 0 10px 6px -6px #e0e0e0;
+      box-shadow: 0 10px 6px -6px #e0e0e0;
+      border-color: white;
     }
 
     ^badge {
       height: 24px;
       border-radius: 12px;
-      margin-top: 12px;
-      margin-right: 7px;
       width: 71px;
 
       padding: 0 8px;

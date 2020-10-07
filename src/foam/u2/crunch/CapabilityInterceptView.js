@@ -41,50 +41,62 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'TITLE', message: 'Welcome to Capability unlock options' },
-    { name: 'CAP_TITLE', message: 'Capabilities Available' },
-    { name: 'SUBTITLE_1', message: 'You do not have access to undertake your previous selected action.' },
-    { name: 'SUBTITLE_2', message: 'Please select one of the following capabilities, to unlock full feature.' }
+    { name: 'TITLE', message: 'Permission Required' },
+    { name: 'LABEL_CAP_LIST', message: 'YOUR CAPABILITIES' },
+    { name: 'SUBTITLE_1', message: 'You currently do not possess the permissions to perform this action.' },
+    { name: 'SUBTITLE_2', message: 'Please refer to the following list on how to obtain these permissions.' }
   ],
 
   css: `
-    ^{  
+    ^{
       width: 55vw;
+    }
+    ^container-title {
       text-align: center;
     }
     ^detail-container {
       overflow-y: scroll;
-      width: 45%;
+      width: 100%;
     }
-    ^mainSection {
+    ^main-section {
       display: flex;
-      justify-content: space-between;
-      padding: 24px;
+      flex-direction: column;
+      align-items: flex-start;
+
+      margin: 80px;
+
+      max-height: 60%;
+      overflow-y: scroll;
     }
-    ^capList-css {
-      overflow: scroll;
-      height: 53vh;
-    }
-    ^legendSize {
-      width: 47%;
-    }
-    ^ .foam-u2-layout-Rows {
-      display: initial;
-      border-style: solid;
-      border-width: thin;
-    }
-    h1 {
-      margin-bottom: 5px;
-    }
-    h3 {
-      text-decoration: underline;
-    }
-    h4 {
-      margin-block-start: 0;
+    ^label-title {
       margin: 0;
-      padding: 0;
-      margin-block-end: 0;
-      margin-bottom: 0;
+
+      font-size: 32px;
+      font-weight: bold;
+      letter-spacing: 1;
+    }
+    ^label-subtitle {
+      margin: 0;
+      margin-top: 8px;
+
+      font-size: 16px;
+      color: #5e6061;
+    }
+    ^label-subtitle:last-child {
+      margin-top: 0;
+    }
+    ^label-cap {
+      margin: 0;
+      font-weight: bold;
+      font-size: 12px;
+    }
+    ^detail-container .foam-u2-crunch-Style-mode-circle {
+      width: 100%;
+      margin: 8px 0;
+    }
+
+    ^detail-container .foam-u2-crunch-Style-mode-circle:hover {
+      border-color: #f3f3f3;
     }
   `,
 
@@ -102,13 +114,17 @@ foam.CLASS({
       var self = this;
       this
         .addClass(this.myClass())
-        .start('h1').add(this.TITLE).end()
-        .start('h4').add(this.SUBTITLE_1).end()
-        .start('h4').add(this.SUBTITLE_2).end()
-        .start().addClass(this.myClass('mainSection'))
+        .start().addClass(this.myClass('container-title'))
+          .start('p').addClass(this.myClass('label-title')).add(this.TITLE).end()
+          .start()
+            .start('p').addClass(this.myClass('label-subtitle')).add(this.SUBTITLE_1).end()
+            .start('p').addClass(this.myClass('label-subtitle')).add(this.SUBTITLE_2).end()
+          .end()
+        .end()
+        .start().addClass(this.myClass('main-section'))
+          .start('p').addClass(this.myClass('label-cap')).add(this.LABEL_CAP_LIST).end()
           .start(this.Rows)
             .addClass(this.myClass('detail-container'))
-            .start('h3').add(this.CAP_TITLE).end()
             .add(this.slot(function(data$capabilityOptions) {
               return this.E().select(this.capabilityDAO.where(
                 self.IN(self.Capability.ID, data$capabilityOptions)
@@ -120,10 +136,10 @@ foam.CLASS({
                     self.crunchController
                       .createWizardSequence(cap.id).execute();
                   });
-              }).addClass(this.myClass('capList-css'));
+              });
             }))
           .end()
-          .start().addClass(this.myClass('legendSize')).tag(foam.u2.view.EnumLegendView, { of: foam.nanos.crunch.CapabilityJunctionStatus, enumValueToHide: ['APPROVED'] }).end()
+          // .start().addClass(this.myClass('legendSize')).tag(foam.u2.view.EnumLegendView, { of: foam.nanos.crunch.CapabilityJunctionStatus, enumValueToHide: ['APPROVED'] }).end()
         .end()
         .startContext({ data: this })
           .tag(this.CANCEL, { buttonStyle: 'SECONDARY' })
