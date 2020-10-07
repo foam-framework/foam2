@@ -36,6 +36,15 @@ foam.CLASS({
         ).then(result => {
           this.capablePayloads = result;
         });
+      },
+    },
+    {
+      name: 'getCapablePayloadDAO',
+      flags: ['web'],
+      code: function () {
+        return this.CapableAdapterDAO.create({
+          capable: this
+        });
       }
     }
   ]

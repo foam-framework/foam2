@@ -12,6 +12,10 @@ foam.INTERFACE({
     than associating them with a user.
   `,
 
+  requires: [
+    'foam.nanos.crunch.lite.CapableAdapterDAO'
+  ],
+
   javaImports: [
     'foam.core.Validator',
     'foam.core.X',
