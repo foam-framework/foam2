@@ -50,7 +50,7 @@ foam.CLASS({
 
   methods: [
     function execute() {
-      return new Promise((resolve, _) => {
+      return new Promise((resolve, reject) => {
         this.pushView({
           ...this.view,
           data: this.StepWizardletController.create({
@@ -62,6 +62,8 @@ foam.CLASS({
             this.popView(x)
             resolve();
           }
+        }, () => {
+          resolve();
         });
       });
     }

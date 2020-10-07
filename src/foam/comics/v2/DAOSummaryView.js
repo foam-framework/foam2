@@ -103,10 +103,20 @@ foam.CLASS({
       expression: function(config$browseTitle) {
         return 'All ' + config$browseTitle;
       }
+    },
+    {
+      name: 'onBack',
+      factory: () => { 
+        return () => this.stack.back();
+      }
     }
   ],
 
   actions: [
+    {
+      name: 'back',
+      code: (data) => data.onBack()
+    },
     {
       name: 'edit',
       isEnabled: function(config, data) {
@@ -226,8 +236,8 @@ foam.CLASS({
               .start(self.Rows)
                 .start(self.Rows)
                   // we will handle this in the StackView instead
-                  .startContext({ data: self.stack })
-                    .tag(self.stack.BACK, {
+                  .startContext({ onBack: self.onBack })
+                    .tag(self.BACK, {
                       buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                       icon: 'images/back-icon.svg',
                       label: self.backLabel

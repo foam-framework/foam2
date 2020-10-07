@@ -54,6 +54,11 @@ foam.CLASS({
               });
               self.delegate.send(newMsg);
             },
+            reject: function (value) {
+              var newMsg = msg.clone();
+              newMsg.object = new Error(value);
+              self.delegate.send(newMsg);
+            },
             resend: function () {
               self.clientBox.send(self.msg);
             }
