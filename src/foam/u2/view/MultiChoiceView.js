@@ -104,10 +104,8 @@ foam.CLASS({
               ? choice[4].get()
               : choice[4]
 
-            if ( ! isSelected  && ! isFinal ){
-              choice[3] = foam.core.Slot.isInstance(choice[3])
-              ? choice[3].set(this.mode)
-              : this.mode;
+            if ( ! isSelected  && ! isFinal && foam.core.Slot.isInstance(choice[3])){
+              choice[3].set(foam.u2.DisplayMode.RW)
             }
           })
         } else {
@@ -120,10 +118,8 @@ foam.CLASS({
               ? choice[4].get()
               : choice[4]
 
-            if ( ! isSelected && ! isFinal ){
-              choice[3] = foam.core.Slot.isInstance(choice[3])
-                ? choice[3].set(foam.u2.DisplayMode.DISABLED)
-                : foam.u2.DisplayMode.DISABLED;
+            if ( ! isSelected && ! isFinal && foam.core.Slot.isInstance(choice[3])){
+              choice[3].set(foam.u2.DisplayMode.DISABLED)
             }
           })
         }
@@ -381,7 +377,6 @@ foam.CLASS({
             for ( let i = 0; i < choices.length; i++ ) {
               choices[i][1] = resolvedChoiceLabels[i];
             }
-            this.choices = choices;
             this.isDaoFetched = true
           });
         });
