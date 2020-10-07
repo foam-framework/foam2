@@ -377,6 +377,7 @@ foam.CLASS({
             for ( let i = 0; i < choices.length; i++ ) {
               choices[i][1] = resolvedChoiceLabels[i];
             }
+            this.choices = choices;
             this.isDaoFetched = true
           });
         });
