@@ -21,6 +21,7 @@ var classes = [
   'foam.core.CoreTypesValidationTestModel',
   'foam.core.Validator',
   'foam.core.CompoundException',
+  'foam.core.ValidationException',
   'foam.glang.EndOfTimeSpan',
   'foam.glang.EndOfDay',
   'foam.glang.EndOfWeek',

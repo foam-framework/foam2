@@ -71,18 +71,6 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'save',
-      code: async function() {
-        // TODO: Need to also account for unsave
-
-        var filteredCapablePayloads  =  this.capable.capablePayloads.filter(cp => {
-          return cp.capability.name === this.targetPayload.capability.name
-        });
-
-        if (  filteredCapablePayloads.length === 0 ) this.capable.capablePayloads.push(this.targetPayload);
-      }
-    },
-    {
       name: 'adjustCapablePayloads',
       code: function(oldChoices, newChoices) {
         var choiceWizardlets = this.choiceWizardlets;
