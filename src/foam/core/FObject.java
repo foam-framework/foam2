@@ -6,6 +6,7 @@
 
 package foam.core;
 
+import foam.box.ValidationException;
 import foam.crypto.hash.Hashable;
 import foam.crypto.sign.Signable;
 import foam.lib.json.Outputter;
@@ -14,6 +15,7 @@ import java.security.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 public interface FObject
   extends Appendable, ContextAware, Comparable, Freezable, Hashable, Signable, Validatable
@@ -424,12 +426,24 @@ public interface FObject
   }
 
   default void validate(foam.core.X x) {
-
     List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    ArrayList<ValidationException> exceptions = new ArrayList<ValidationException>();
     for ( PropertyInfo prop : props ) {
-      prop.validateObj(x, this);
+      try {
+        prop.validateObj(x, this);
+      } catch (IllegalStateException e) {
+        ValidationException exception = new ValidationException();
+        exception.setPropertyInfo(prop);
+        exception.setPropName(prop.getName());
+        exception.setErrorMessage(e.getMessage());
+        exceptions.add(exception);
+      }
     }
-
+    if ( exceptions.size() > 0 ) {
+      CompoundException compoundException = new CompoundException();
+      compoundException.setExceptions(exceptions);
+      throw compoundException;
+    }
   }
 
   default boolean verify(byte[] signature, java.security.Signature verifier) throws java.security.SignatureException {

@@ -107,6 +107,7 @@ var classes = [
   'com.google.foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
   'foam.box.RemoteException',
+  'foam.box.ValidationException',
   'foam.box.CapabilityRequiredRemoteException',
   'foam.box.RPCMessage',
   'foam.box.RPCReturnBox',
