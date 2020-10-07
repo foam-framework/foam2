@@ -6,7 +6,6 @@
 
 package foam.core;
 
-import foam.box.ValidationException;
 import foam.crypto.hash.Hashable;
 import foam.crypto.sign.Signable;
 import foam.lib.json.Outputter;

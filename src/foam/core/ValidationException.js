@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 foam.CLASS({
-  package: 'foam.box',
+  package: 'foam.core',
   name: 'ValidationException',
   implements: ['foam.core.Exception'],
 
