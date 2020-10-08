@@ -203,12 +203,8 @@ foam.CLASS({
                       .add(this.loadingSpinner)
                       .end();
                   }
-                  var createView = data$currentWizardlet.createView(data);
-        
-                  if ( createView !== null && foam.u2.View.isInstance(createView) ) {
-                    return createView;
-                  }
 
+                  return data$currentSection.createView();
                   var ctx = this.__subContext__.createSubContext();
                   ctx.register(
                     this.VerticalDetailView,

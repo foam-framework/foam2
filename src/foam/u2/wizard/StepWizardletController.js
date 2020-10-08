@@ -58,12 +58,7 @@ foam.CLASS({
         to foam.layout.Section object.
       `,
       expression: function(wizardlets) {
-        return wizardlets.map(wizardlet => {
-          // TODO: If no of and if createView DNE null, then we need to spoof a section
-          return this.AbstractSectionedDetailView.create({
-            of: wizardlet.of,
-          }).sections;
-        });
+        return wizardlets.map(w => w.sections);
       }
     },
     {
@@ -97,11 +92,9 @@ foam.CLASS({
         Array format is similar to sections.
       `,
       expression: function(sections) {
-        var availableSlots = [...sections.keys()].map(w => sections[w].map(
-          section => section.createIsAvailableFor(
-            this.wizardlets[w].data$
-          )
-        ));
+        var availableSlots = [...sections.keys()]
+          .map(w => sections[w].map(section => section.isAvailable$));
+
         availableSlots.forEach((sections, wizardletIndex) => {
           sections.forEach((availableSlot, sectionIndex) => {
             availableSlot.sub(() => {

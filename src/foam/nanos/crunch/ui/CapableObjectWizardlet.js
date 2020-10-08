@@ -72,11 +72,13 @@ foam.CLASS({
     {
       name: 'save',
       code: async function() {
-        return this.capable.getCapablePayloadDAO().put(
-          this.targetPayload).then(() => {
-            console.log('SAVED ' +
-              this.targetPayload.capability.name);
-          });
+        if ( this.isAvailable ){
+          return this.capable.getCapablePayloadDAO().put(
+            this.targetPayload).then(() => {
+              console.log('SAVED ' +
+                this.targetPayload.capability.name);
+            });
+        }
       }
     },
     {

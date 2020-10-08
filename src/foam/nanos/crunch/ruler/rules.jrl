@@ -8,7 +8,6 @@ p({
   "operation":3,
   "after":false,
   "enabled":true,
-  "saveHistory":true,
   "action":{"class":"foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut"},
   "lifecycleState":1
 })
@@ -23,7 +22,6 @@ p({
   "operation":0,
   "after":false,
   "enabled":true,
-  "saveHistory":true,
   "action":{"class":"foam.nanos.crunch.ruler.ValidateUCJDataOnPut"},
   "lifecycleState":1,
 })
@@ -38,7 +36,6 @@ p({
   "operation":1,
   "after":false,
   "enabled":true,
-  "saveHistory":true,
   "action":{"class":"foam.nanos.crunch.ruler.ValidateUCJDataOnPut"},
   "lifecycleState":1,
   "predicate":{
@@ -115,7 +112,6 @@ p({
   "operation":3,
   "after":false,
   "enabled":true,
-  "saveHistory":true,
   "action":{"class":"foam.nanos.crunch.ruler.SetUCJStatusOnPut"},
   "lifecycleState":1,
   "predicate":{
@@ -141,7 +137,6 @@ p({
   "operation":0,
   "after":false,
   "enabled":true,
-  "saveHistory":true,
   "action":{"class":"foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted"},
   "lifecycleState":1
 })
@@ -156,7 +151,6 @@ p({
   "operation":1,
   "after":false,
   "enabled":true,
-  "saveHistory":true,
   "action":{"class":"foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted"},
   "predicate":{
     "class":"foam.mlang.predicate.Or", 
@@ -188,7 +182,6 @@ p({
   "operation":0,
   "after":false,
   "enabled":true,
-  "saveHistory":true,
   "action":{"class":"foam.nanos.crunch.ruler.SaveUCJDataOnGranted"},
   "lifecycleState":1
 })
@@ -203,7 +196,6 @@ p({
   "operation":1,
   "after":false,
   "enabled":true,
-  "saveHistory":true,
   "action":{"class":"foam.nanos.crunch.ruler.SaveUCJDataOnGranted"},
   "predicate":{
     "class":"foam.mlang.predicate.Or", 

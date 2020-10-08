@@ -79,29 +79,6 @@ foam.CLASS({
 
         return n;
       },
-      postSet: function(o,n){
-        if ( this.onSelect ) this.onSelect(o,n);
-
-        var selectedChoices = n.filter(this.choiceTrue);
-
-        if ( selectedChoices.length < this.maxSelected ) {
-          n.forEach((choice) => {
-            if ( ! choice[2]  && ! choice[4] ){
-              choice[3] = this.mode
-            }
-          })
-        } else {
-          n.forEach((choice) => {
-            if ( ! choice[2] && ! choice[4] ){
-              choice[3] = foam.u2.DisplayMode.DISABLED
-            }
-          })
-        }
-
-        if (this.isValidNumberOfChoices && this.dao ){
-          this.data = this.outputSelectedChoicesInDAO()
-        }
-      }
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -113,12 +90,45 @@ foam.CLASS({
     },
     {
       name: 'selectedChoices',
-      value: []
+      value: [],
+      postSet: function(o,n){
+        if ( this.onSelect ) this.onSelect(o,n);
+
+        if ( this.selectedChoices.length < this.maxSelected ) {
+          this.choices.forEach((choice) => {
+            var isSelected = foam.core.Slot.isInstance(choice[2])
+              ? choice[2].get()
+              : choice[2];
+
+            var isFinal = foam.core.Slot.isInstance(choice[4])
+              ? choice[4].get()
+              : choice[4]
+
+            if ( ! isSelected  && ! isFinal && foam.core.Slot.isInstance(choice[3])){
+              choice[3].set(foam.u2.DisplayMode.RW)
+            }
+          })
+        } else {
+          this.choices.forEach((choice) => {
+            var isSelected = foam.core.Slot.isInstance(choice[2])
+              ? choice[2].get()
+              : choice[2];
+  
+            var isFinal = foam.core.Slot.isInstance(choice[4])
+              ? choice[4].get()
+              : choice[4]
+
+            if ( ! isSelected && ! isFinal && foam.core.Slot.isInstance(choice[3])){
+              choice[3].set(foam.u2.DisplayMode.DISABLED)
+            }
+          })
+        }
+      }
     },
     {
       class: 'Boolean',
       name: 'isValidNumberOfChoices',
-      expression: function(choices, selectedChoices, minSelected, maxSelected){
+      expression: function(selectedChoices, minSelected, maxSelected){
         if ( selectedChoices.length >= minSelected && selectedChoices.length <= maxSelected ){
           return true;
         }
@@ -138,7 +148,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'minSelected',
-      expression: function(choices, selectedChoices) {
+      expression: function(choices) {
         return choices.length > 0 ? 1 : 0
       }
     },
@@ -171,6 +181,7 @@ foam.CLASS({
     },
     {
       name: 'objToChoice',
+      class: 'Function',
       value: function(obj) {
         return [ obj.id, obj.toSummary() ];
       }
@@ -198,8 +209,6 @@ foam.CLASS({
       var self = this;
 
       this.onDAOUpdate();
-
-      console.log('MultiChoiceView', this);
 
       this
         .start()
@@ -250,7 +259,15 @@ foam.CLASS({
                 slots: newChoices.map(choice => {
                   return this.mustSlot(choice[2]);
                 })
-              }).map(v => v.filter(w => w));
+              }).map(v => {
+                var selectedChoices = [];
+                v.forEach((w,i) => {
+                  if ( w ){
+                    selectedChoices.push(this.choices[i]);
+                  }
+                })
+                return selectedChoices;
+              });
 
               this.choices = newChoices;
               return toRender;
