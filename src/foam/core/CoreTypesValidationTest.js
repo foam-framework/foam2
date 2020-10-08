@@ -57,7 +57,7 @@ foam.CLASS({
 
       try {
         v.put(testModelInvalidHigh);
-      } catch (IllegalStateException e) {
+      } catch (CompoundException e) {
         throwsIllegalState = true;
       }
       test(throwsIllegalState,
@@ -67,7 +67,7 @@ foam.CLASS({
 
       try {
         v.put(testModelInvalidLow);
-      } catch (IllegalStateException e) {
+      } catch (CompoundException e) {
         throwsIllegalState = true;
       }
       test(throwsIllegalState,
@@ -77,7 +77,7 @@ foam.CLASS({
 
       try {
         v.put(testModelValidHigh);
-      } catch (IllegalStateException e) {
+      } catch (CompoundException e) {
         throwsIllegalState = true;
       }
       test(( ! throwsIllegalState ),
@@ -87,7 +87,7 @@ foam.CLASS({
 
       try {
         v.put(testModelValidLow);
-      } catch (IllegalStateException e) {
+      } catch (CompoundException e) {
         throwsIllegalState = true;
       }
       test(( ! throwsIllegalState ),
