@@ -203,6 +203,67 @@ foam.CLASS({
     ^category:not(:last-child) {
       margin-right: 8px;
     }
+
+    ^tooltip {
+      position: relative;
+    }
+    ^tooltip ^tooltiptext {
+      visibility: hidden;
+      width: max-content;
+      max-width: 300%;
+      background-color: #555;
+      color: #f3f3f3;
+      text-align: left;
+      border-radius: 5px;
+
+      padding: 16px;
+      font-size: 12px;
+
+      position: absolute;
+      z-index: 1;
+      bottom: -167%;
+      right: calc(100% + 16px);
+
+      opacity: 0;
+      transition: opacity 0.3s;
+
+      -webkit-box-shadow: 0 10px 6px -6px #e0e0e0;
+      -moz-box-shadow: 0 10px 6px -6px #e0e0e0;
+      box-shadow: 0 10px 6px -6px #e0e0e0;
+    }
+    ^tooltip ^tooltiptext::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 100%;
+      margin-top: -8px;
+      border-width: 8px;
+      border-style: solid;
+      border-color: transparent transparent transparent #555;
+    }
+
+    ^tooltiptext^tooltip-bottom {
+      max-width: 200%;
+      top: calc(100% + 16px);
+      bottom: auto;
+      right: 0;
+    }
+    ^tooltip ^tooltiptext^tooltip-bottom::after {
+      top: 0;
+      right: 17%;
+      left: auto;
+      margin-top: -16px;
+      border-color: transparent transparent #555 transparent;
+    }
+
+    ^tooltip:hover ^tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    ^tooltiptext^tooltipDisabled {
+      visibility: hidden !important;
+    }
   `,
 
   methods: [

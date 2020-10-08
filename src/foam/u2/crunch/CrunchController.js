@@ -177,7 +177,6 @@ foam.CLASS({
       // Pop up the popup
       return new Promise((resolve, _) => {
         this.ctrl.add(this.Popup.create({ closeable: false })
-          .start(this.MarginBorder)
             .tag(this.CapabilityInterceptView, {
               data: intercept,
               onClose: (x) => {
@@ -185,21 +184,20 @@ foam.CLASS({
                 resolve();
               }
             })
-          .end()
         );
       });
     },
 
     function save(wizardlet) {
-      if ( ! wizardlet.isAvailable ) return Promise.resolve(); 
+      if ( ! wizardlet.isAvailable ) return Promise.resolve();
       var isAssociation = wizardlet.capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.ACTING_USER;
-      var associatedEntity = isAssociation ? this.subject.realUser : 
+      var associatedEntity = isAssociation ? this.subject.realUser :
       wizardlet.capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
 
       return this.updateUCJ(wizardlet, associatedEntity).then(() => {
         var ucj = wizardlet.ucj;
         if ( ucj === null ) {
-          ucj = isAssociation ? 
+          ucj = isAssociation ?
           this.AgentCapabilityJunction.create({
               sourceId: associatedEntity.id,
               targetId: wizardlet.capability.id,
@@ -213,7 +211,7 @@ foam.CLASS({
         if ( wizardlet.of ) ucj.data = wizardlet.data;
         return this.userCapabilityJunctionDAO.put(ucj);
       });
-    }, 
+    },
     async function updateUCJ(wizardlet, associatedEntity) {
       return this.userCapabilityJunctionDAO.find(
         this.AND(

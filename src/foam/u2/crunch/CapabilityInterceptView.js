@@ -49,10 +49,26 @@ foam.CLASS({
 
   css: `
     ^{
+      display: flex;
+      flex-direction: column;
       width: 55vw;
+      padding: 24px;
+      max-height: 75%;
+    }
+    ^container-close {
+      display: flex;
+      justify-content: flex-end;
+    }
+    ^container-close button {
+      padding: 0;
+    }
+    ^container-close img {
+      margin-right: 0;
+      width: 16px;
     }
     ^container-title {
       text-align: center;
+      margin-top: 16px;
     }
     ^detail-container {
       overflow-y: scroll;
@@ -63,7 +79,7 @@ foam.CLASS({
       flex-direction: column;
       align-items: flex-start;
 
-      margin: 80px;
+      padding: 80px;
 
       max-height: 60%;
       overflow-y: scroll;
@@ -114,6 +130,11 @@ foam.CLASS({
       var self = this;
       this
         .addClass(this.myClass())
+        .start().addClass(this.myClass('container-close'))
+          .startContext({ data: this })
+            .tag(this.CANCEL, { buttonStyle: 'TERTIARY' })
+          .endContext()
+        .end()
         .start().addClass(this.myClass('container-title'))
           .start('p').addClass(this.myClass('label-title')).add(this.TITLE).end()
           .start()
@@ -139,11 +160,7 @@ foam.CLASS({
               });
             }))
           .end()
-          // .start().addClass(this.myClass('legendSize')).tag(foam.u2.view.EnumLegendView, { of: foam.nanos.crunch.CapabilityJunctionStatus, enumValueToHide: ['APPROVED'] }).end()
-        .end()
-        .startContext({ data: this })
-          .tag(this.CANCEL, { buttonStyle: 'SECONDARY' })
-        .endContext();
+        .end();
     },
 
     // TODO - add feature to capture wizard close for a capability:
@@ -189,7 +206,8 @@ foam.CLASS({
   actions: [
     {
       name: 'cancel',
-      label: 'Close',
+      icon: 'images/ic-cancelgray.svg',
+      label: '',
       code: function(x) {
         this.reject(x);
       }

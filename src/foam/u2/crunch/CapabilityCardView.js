@@ -65,6 +65,11 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isRenewable'
+    },
+    {
+      class: 'Boolean',
+      name: 'tooltipEnabled',
+      value: true
     }
   ],
 
@@ -102,12 +107,16 @@ foam.CLASS({
             .add({ data : self.data, clsInfo : self.data.cls_.DESCRIPTION.name, default : self.data.description })
           .end()
         .end()
-        .start()
+        .start()//Tooltip here
           .add(this.slot(function(cjStatus, isRenewable) {
-            return this.E('span')
-              .style({ 'float' : 'right' })
+            return this.E().addClass(style.myClass('tooltip'))
               .add(cjStatus.label).addClass(style.myClass('badge'))
               .style({ 'background-color': cjStatus.background })
+              .start('span')
+                .addClass(style.myClass('tooltiptext'))
+                .enableClass(style.myClass('tooltipDisabled'), self.tooltipEnabled, true)
+                .add(cjStatus.documentation)
+              .end()
               .start()
                 .addClass(style.myClass('renewable-description'))
                 .add(isRenewable ? "Capability is renewable" : "")
