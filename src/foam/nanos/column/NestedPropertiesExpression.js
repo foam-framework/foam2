@@ -314,10 +314,15 @@ foam.CLASS({
         {
           name: 'propNames',
           class: 'StringArray'
+        },
+        {
+          name: 'buildObjectsFromProjectionWithClass',
+          class: 'Boolean',
+          flags: ['js']
         }
       ],
       code: function(of, propNames) {
-        return foam.mlang.sink.Projection.create({ exprs: this.returnArrayOfExprForArrayOfProperties(of, propNames), buildObjectsFromProjectionWithClass: ! of.model_.queryObjectOnProjection });
+        return foam.mlang.sink.Projection.create({ exprs: this.returnArrayOfExprForArrayOfProperties(of, propNames), buildObjectsFromProjectionWithClass: buildObjectsFromProjectionWithClass });
       },
       javaCode: `
         Expr[] exprs = returnArrayOfExprForArrayOfProperties(x, of, propNames);

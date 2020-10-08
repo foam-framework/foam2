@@ -425,9 +425,17 @@ foam.CLASS({
             var proxy = view.ProxyDAO.create({ delegate: dao });
 
             view.props = this.returnPropertiesForColumns(view, view.columns_);
+            var doPropertiesHaveCustomTableCellFormatter = false;
+
+            for ( var p of view.props ) {
+              if ( p.property.tableCellFormatter ) {
+                doPropertiesHaveCustomTableCellFormatter = true;
+                break;
+              }
+            }
 
             var propertyNamesToQuery = view.columnHandler.returnPropNamesToQuery(view.props);
-            var valPromises = view.returnRecords(view.of, proxy, propertyNamesToQuery);
+            var valPromises = view.returnRecords(view.of, proxy, propertyNamesToQuery, ! doPropertiesHaveCustomTableCellFormatter);
             var nastedPropertyNamesAndItsIndexes = view.columnHandler.buildArrayOfNestedPropertyNamesAndCorrespondingIndexesInArray(propertyNamesToQuery);
 
             var tbodyElement = this.
@@ -591,8 +599,8 @@ foam.CLASS({
             });
         }
       },
-      function returnRecords(of, dao, propertyNamesToQuery) {
-        var expr = foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create().buildProjectionForPropertyNamesArray(of, propertyNamesToQuery);
+      function returnRecords(of, dao, propertyNamesToQuery, buildObjectsFromProjectionWithClass) {
+        var expr = foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create().buildProjectionForPropertyNamesArray(of, propertyNamesToQuery, buildObjectsFromProjectionWithClass);
         return dao.select(expr);
       },
       function doesAllColumnsContainsColumnName(obj, col) {

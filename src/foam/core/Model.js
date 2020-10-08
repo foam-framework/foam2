@@ -85,14 +85,6 @@ foam.CLASS({
       // Is upgraded to an AxiomArray later.
       of: 'Method',
       name: 'methods'
-    },
-    {
-      class: 'Boolean',
-      name: 'queryObjectOnProjection',
-      documentation: `set to true if we cannot build object of the class's subclasses from projection results. 
-        e.g. the class's subclasses inherit properties, which require subclasses properties value for "calculation".
-        for example FixedFee 'formula' property requires 'fixedFee' property to calculate its result but 'fixedFee' property is not inherited from Fee class,
-        when using projection we cannot query fixedFee property of an object but we need it for 'formula' calculation when display Fee records from DAO`
     }
   ],
 
