@@ -21,6 +21,17 @@ foam.CLASS({
     'foam.u2.view.ReadOnlyEnumView'
   ],
 
+  css: `
+    ^icon.foam-u2-crunch-Style-icon-circle {
+      width: 65px;
+      height: 65px;
+      margin-right: 24px;
+      background-size: cover;
+      background-position: 50% 50%;
+      flex-shrink: 0;
+    }
+  `,
+
   imports: [
     'auth',
     'crunchService',
@@ -75,12 +86,10 @@ foam.CLASS({
         .addClass(style.myClass())
         .addClass(style.myClass('mode-circle'))
         .start()
+          .addClass(this.myClass('icon'))
           .addClass(style.myClass('icon-circle'))
           .style({
             'background-image': "url('" + self.data.icon + "')",
-            'background-size': 'cover',
-            'background-position': '50% 50%',
-            'flex-shrink': '0'
           })
         .end()
         .start().style({ 'flex': 1 })

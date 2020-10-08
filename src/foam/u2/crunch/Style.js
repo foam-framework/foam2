@@ -118,7 +118,6 @@ foam.CLASS({
 
     ^icon-circle {
       display: inline-block;
-      margin-right: 15px;
       width: 80px;
       height: 80px;
       border-radius: 40px;
@@ -133,7 +132,7 @@ foam.CLASS({
       display: flex;
       align-items: center;
 
-      padding: 16px;
+      padding: 24px;
 
       width: 100%;
       height: 100%;
