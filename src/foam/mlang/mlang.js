@@ -2848,7 +2848,7 @@ foam.CLASS({
       },
 // TODO:      swiftCode: 'array.append(obj)',
       javaCode: `
-        if ( ! getBuildObjectsFromProjectionWithClass() ) {//change to opposite
+        if ( ! getBuildObjectsFromProjectionWithClass() ) {
           getArray().add(obj);
         }
         Object[] a = new Object[getExprs().length+1];
