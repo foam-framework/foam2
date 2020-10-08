@@ -9,6 +9,7 @@ foam.CLASS({
   extends: 'foam.u2.wizard.BaseWizardlet',
 
   imports: [
+    'capable',
     'crunchController'
   ],
 
@@ -44,7 +45,9 @@ foam.CLASS({
       factory: function () {
         if ( ! this.of ) return null;
 
-        return this.of.create({}, this);
+        return this.of.getAxiomByName('capability') ?
+          this.of.create({ capability: this.capability }, this) :
+          this.of.create({}, this);
       }
     },
     {
@@ -53,14 +56,39 @@ foam.CLASS({
         if ( ! capability || ! capability.name ) return '';
         return capability.name;
       }
+    },
+    {
+      name: 'isAvailable',
+      class: 'Boolean',
+      value: true,
+      postSet: function (ol, nu) {
+        if ( nu ) this.save();
+        else this.cancel();
+      }
     }
   ],
 
   methods: [
     {
       name: 'save',
-      code: function() {
-        //
+      code: async function() {
+        if ( this.isAvailable ){
+          return this.capable.getCapablePayloadDAO().put(
+            this.targetPayload).then(() => {
+              console.log('SAVED ' +
+                this.targetPayload.capability.name);
+            });
+        }
+      }
+    },
+    {
+      name: 'cancel',
+      code: async function() {
+        return this.capable.getCapablePayloadDAO().remove(
+          this.targetPayload).then(() => {
+            console.log('CANCELLED ' +
+              this.targetPayload.capability.name);
+          });
       }
     }
   ]

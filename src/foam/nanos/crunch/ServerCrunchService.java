@@ -15,6 +15,7 @@ import foam.mlang.sink.GroupBy;
 import foam.nanos.NanoService;
 import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
+import foam.nanos.crunch.lite.Capable;
 import foam.nanos.crunch.lite.CapablePayload;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
@@ -141,6 +142,14 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     Collections.reverse(grantPath);
     pm.log(x);
     return grantPath;
+  }
+  
+  public String[] getDependantIds(X x, String capabilityId) {
+    return Arrays.stream(((CapabilityCapabilityJunction[]) ((ArraySink) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
+      .where(EQ(CapabilityCapabilityJunction.TARGET_ID, capabilityId))
+      .select(new ArraySink())).getArray()
+      .toArray(new CapabilityCapabilityJunction[0])))
+      .map(CapabilityCapabilityJunction::getSourceId).toArray(String[]::new);
   }
 
   public synchronized List<String> getPrereqs(String capId) {
@@ -348,59 +357,80 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
   public boolean shouldReopenUserCapabilityJunction(UserCapabilityJunction ucj) {
     if ( ucj == null ) return true;
     else if ( ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ucj.getIsRenewable() ) return true;
-    else if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED && 
-              ucj.getStatus() != CapabilityJunctionStatus.PENDING && 
+    else if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED &&
+              ucj.getStatus() != CapabilityJunctionStatus.PENDING &&
               ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return true;
     return false;
   }
 
   public CapablePayload[] getCapableObjectPayloads(X x, String[] capabilityIds) {
-    List<CapablePayload> payloads = new ArrayList<>();
-
     CrunchService crunchService = (CrunchService) x.get("crunchService");
     List crunchPath = crunchService.getMultipleCapabilityPath(
       x, capabilityIds, false);
 
-    for ( Object obj : crunchPath ) {
-      if ( ! (obj instanceof Capability) ) {
-        // Lists correspond to capabilityIds with their own prerequisite
-        // logic, such as MinMaxCapability. Clients will need to be
-        // made aware of these capabilities separately.
-        if ( obj instanceof List ) {
-          List list = (List) obj;
+    List<CapablePayload> payloads = getCapableObjectPayloads(x, crunchPath);
 
-          // Add payload object prerequisites
-          List prereqs = new ArrayList();
-          for ( int i = 0 ; i < list.size() - 1 ; i++ ) {
-            Capability prereqCap = (Capability) list.get(i);
-            list.add(new CapablePayload.Builder(x)
-              .setCapability(prereqCap)
-              .build());
-          }
-
-          // Add payload object
-          /* TODO: Figure out why this is an error when adding
-                    support for MinMaxCapability
-          Capability cap = (Capability) list.get(list.size() - 1);
-          payloads.add(new CapablePayload.Builder(x)
-            .setCapability(cap)
-            .setPrerequisites(prereqs.toArray(
-              new CapablePayload[list.size()]))
-            .build());
-          */
-          continue;
-        }
-
-        throw new RuntimeException(
-          "Expected capability or list");
-      }
-      Capability cap = (Capability) obj;
-      payloads.add(new CapablePayload.Builder(x)
-        .setCapability(cap)
-        .build());
-    }
-    
-    // Re-FObjectArray
     return payloads.toArray(new CapablePayload[payloads.size()]);
+  }
+
+  private List<CapablePayload> getCapableObjectPayloads(X x, List capabilities){
+    List<CapablePayload> flattenedPayloads = new ArrayList<>();
+
+    Capability rootCapability = (Capability) capabilities.get(capabilities.size() - 1);
+
+    boolean isOr = capabilities.get(capabilities.size() - 1) instanceof MinMaxCapability;
+
+    for ( int i = 0 ; i < capabilities.size() - 1 ; i++ ){
+      Object currentObject = capabilities.get(i);
+
+      if ( currentObject instanceof List ){
+        List<CapablePayload> recursedPayloads = getCapableObjectPayloads(x, (List) currentObject);
+
+        if ( isOr && recursedPayloads.size() > 1 ){
+          CapablePayload recursedPayloadRoot = recursedPayloads.get(recursedPayloads.size() - 1);
+
+          List<CapablePayload> recursedPayloadChildren = recursedPayloads.subList(0, recursedPayloads.size() - 1);
+
+          recursedPayloadRoot.setPrerequisites(recursedPayloadChildren.toArray(new CapablePayload[0]));
+
+          flattenedPayloads.add(recursedPayloadRoot);
+        } else {
+          flattenedPayloads.addAll(recursedPayloads);
+        }
+        continue;
+      }
+
+      if ( ! (currentObject instanceof Capability) ){
+        throw new RuntimeException(
+          "Expected capability or list"
+        );
+      }
+
+      Capability payloadCapability = (Capability) capabilities.get(i);
+
+      CapablePayload currentPayload = new CapablePayload.Builder(x)
+        .setCapability(payloadCapability)
+        .build();
+
+      flattenedPayloads.add(currentPayload);
+    }
+
+    List<CapablePayload> outputPayloads;
+    CapablePayload rootPayload = new CapablePayload.Builder(x)
+      .setCapability(rootCapability)
+      .build();
+
+    if ( isOr ){
+      outputPayloads = new ArrayList<>();
+
+      rootPayload.setPrerequisites(flattenedPayloads.toArray(new CapablePayload[0]));
+
+    } else {
+      outputPayloads = flattenedPayloads;
+    }
+
+    outputPayloads.add(rootPayload);
+
+    return outputPayloads;
   }
 }

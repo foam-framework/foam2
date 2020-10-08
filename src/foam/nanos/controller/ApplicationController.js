@@ -80,8 +80,6 @@ foam.CLASS({
     'menuListener',
     'notify',
     'pushMenu',
-    'requestCapability',
-    'capabilityCache',
     'requestLogin',
     'signUpEnabled',
     'loginVariables',
@@ -279,13 +277,6 @@ foam.CLASS({
       }
     },
     {
-      class: 'Map',
-      name: 'capabilityCache',
-      factory: function() {
-        return new Map();
-      }
-    },
-    {
       class: 'FObjectProperty',
       of: 'foam.nanos.theme.Theme',
       name: 'theme'
@@ -422,26 +413,16 @@ foam.CLASS({
               )
             ).select().then(e => {
               let arr = e.array;
-              arr.forEach(ea =>
-                {
-                  let s = null;
-                  try {
-                    let i, obj;
-                    do {
-                      i = ea.source.indexOf('.',++i);
-                      if (i != -1) {
-                        s = eval(ea.source.substring(0,i))
-                      }
-                    } while (i > 0 && !!s);
-                  }
-                  catch(err) {
-                    console.log(ea.source)
-                    console.log(err)
-                  }
-                  if (!!s) {
-                    s[ea.source.substring(ea.source.lastIndexOf('.')+1)] = ea.target;
-                  }
-                })
+              arr.forEach(ea => {
+                var node = global;
+                var path = ea.source.split('.');
+
+                for ( var i = 0 ; node && i < path.length-1 ; i++ )
+                  node = node[path[i]];
+
+                if ( node )
+                  node[path[path.length-1]] = ea.target;
+              });
             })
           })
         }
@@ -557,20 +538,6 @@ foam.CLASS({
         self.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, self);
         self.loginSuccess$.sub(resolve);
       });
-    },
-
-    function requestCapability(capabilityInfo) {
-      var self = this;
-
-      capabilityInfo.capabilityOptions.forEach((c) => {
-        self.capabilityCache.set(c, false);
-      });
-
-      let intercept = self.CapabilityIntercept.create({
-        capabilityOptions: capabilityInfo.capabilityOptions
-      });
-
-      return self.crunchController.maybeLaunchInterceptView(intercept);
     },
 
     function notify(toastMessage, toastSubMessage, severity, transient) {

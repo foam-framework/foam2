@@ -51,6 +51,13 @@ foam.CLASS({
         available iff at least one section is available. If false, wizardlet
         does not display even if some sections are available.
       `,
+    },
+    {
+      name: 'isVisible',
+      class: 'Boolean',
+      expression: function (of, isAvailable) {
+        return isAvailable && of;
+      }
     }
   ],
 
