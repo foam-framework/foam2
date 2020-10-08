@@ -135,7 +135,6 @@ foam.CLASS({
       }
 
       p = p.then(isCompleted => {
-        debugger;
         if ( isCapable ) {
           if ( ! isCompleted ) {
             intercept.reject('user cancelled');
