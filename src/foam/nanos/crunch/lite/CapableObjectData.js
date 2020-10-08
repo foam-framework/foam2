@@ -18,6 +18,11 @@ foam.CLASS({
     {
       name: 'userCapabilityRequirements',
       class: 'StringArray',
+    },
+    {
+      name: 'isWizardCompleted',
+      class: 'Boolean',
+      networkTransient: true
     }
   ],
 

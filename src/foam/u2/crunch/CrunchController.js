@@ -133,14 +133,16 @@ foam.CLASS({
       if ( isCapable ) {
         p = p.then(() => self.launchCapableWizard(intercept));
       }
-
+      
       p = p.then(isCompleted => {
+        intercept.capableRequirements[0].isWizardCompleted = isCompleted;
+
         if ( isCapable ) {
           if ( ! isCompleted ) {
-            intercept.reject('user cancelled');
+            intercept.resolve(intercept.capableRequirements[0]);
             return;
           }
-          intercept.resolve(intercept.returnCapable)
+          intercept.resolve(intercept.returnCapable);
           return;
         }
         intercept.resend();
