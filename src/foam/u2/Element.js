@@ -55,7 +55,8 @@ foam.ENUM({
     { name: 'RW',       label: 'Read-Write' },
     { name: 'DISABLED', label: 'Disabled'   },
     { name: 'RO',       label: 'Read-Only'  },
-    { name: 'HIDDEN',   label: 'Hidden'     }
+    { name: 'HIDDEN',   label: 'Hidden'     },
+    { name: 'SUMMARY',   label: 'Summary'     }
   ]
 });
 
