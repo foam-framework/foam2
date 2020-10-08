@@ -79,29 +79,6 @@ foam.CLASS({
 
         return n;
       },
-      postSet: function(o,n){
-        if ( this.onSelect ) this.onSelect(o,n);
-
-        var selectedChoices = n.filter(choice => choice[2] );
-
-        if ( selectedChoices.length < this.maxSelected ) {
-          n.forEach((choice) => {
-            if ( ! choice[2]  && ! choice[4] ){
-              choice[3] = this.mode
-            }
-          })
-        } else {
-          n.forEach((choice) => {
-            if ( ! choice[2] && ! choice[4] ){
-              choice[3] = foam.u2.DisplayMode.DISABLED
-            }
-          })
-        }
-
-        if (this.isValidNumberOfChoices && this.dao ){
-          this.data = this.outputSelectedChoicesInDAO()
-        }
-      }
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -112,11 +89,46 @@ foam.CLASS({
       `
     },
     {
+      name: 'selectedChoices',
+      value: [],
+      postSet: function(o,n){
+        if ( this.onSelect ) this.onSelect(o,n);
+
+        if ( this.selectedChoices.length < this.maxSelected ) {
+          this.choices.forEach((choice) => {
+            var isSelected = foam.core.Slot.isInstance(choice[2])
+              ? choice[2].get()
+              : choice[2];
+
+            var isFinal = foam.core.Slot.isInstance(choice[4])
+              ? choice[4].get()
+              : choice[4]
+
+            if ( ! isSelected  && ! isFinal && foam.core.Slot.isInstance(choice[3])){
+              choice[3].set(foam.u2.DisplayMode.RW)
+            }
+          })
+        } else {
+          this.choices.forEach((choice) => {
+            var isSelected = foam.core.Slot.isInstance(choice[2])
+              ? choice[2].get()
+              : choice[2];
+  
+            var isFinal = foam.core.Slot.isInstance(choice[4])
+              ? choice[4].get()
+              : choice[4]
+
+            if ( ! isSelected && ! isFinal && foam.core.Slot.isInstance(choice[3])){
+              choice[3].set(foam.u2.DisplayMode.DISABLED)
+            }
+          })
+        }
+      }
+    },
+    {
       class: 'Boolean',
       name: 'isValidNumberOfChoices',
-      expression: function(choices, minSelected, maxSelected){
-        var selectedChoices = choices.filter(choice => choice[2] );
-
+      expression: function(selectedChoices, minSelected, maxSelected){
         if ( selectedChoices.length >= minSelected && selectedChoices.length <= maxSelected ){
           return true;
         }
@@ -216,26 +228,19 @@ foam.CLASS({
           .add(
             self.isDaoFetched$.map(isDaoFetched => {
 
-              var arraySlotForChoices = foam.core.ArraySlot.create({
-                slots: []
-              });
+              var newChoices = [];
 
               var toRender = self.choices.map(function (choice) {
-                var simpSlot0 = foam.core.SimpleSlot.create({ value: choice[0] });
-                var simpSlot1 = foam.core.SimpleSlot.create({ value: choice[1] });
-                var simpSlot2 = foam.core.Slot.isInstance(choice[2])
-                  ? choice[2]
-                  : foam.core.SimpleSlot.create({ value: choice[2] });
-                var simpSlot3 = foam.core.SimpleSlot.create({ value: choice[3] });
-                var simpSlot4 = foam.core.Slot.isInstance(choice[4])
-                  ? choice[4]
-                  : foam.core.SimpleSlot.create({ value: choice[4] });
+                var simpSlot0 = self.mustSlot(choice[0]);
+                var simpSlot1 = self.mustSlot(choice[1]);
+                var simpSlot2 = self.mustSlot(choice[2]);
+                var simpSlot3 = self.mustSlot(choice[3]);
+                var simpSlot4 = self.mustSlot(choice[4]);
 
-                var arraySlotForChoice = foam.core.ArraySlot.create({
-                  slots: [ simpSlot0, simpSlot1, simpSlot2, simpSlot3, simpSlot4 ]
-                })
-
-                arraySlotForChoices.slots.push(arraySlotForChoice);
+                newChoices = [
+                  ...newChoices,
+                  [choice[0], simpSlot1, simpSlot2, simpSlot3, simpSlot4]
+                ];
 
                 return self.E()
                   .addClass(self.myClass('innerFlexer'))
@@ -249,7 +254,21 @@ foam.CLASS({
                     })
               })
 
-              this.choices$ = arraySlotForChoices;
+              self.selectedChoices$ = foam.core.ArraySlot.create({
+                slots: newChoices.map(choice => {
+                  return this.mustSlot(choice[2]);
+                })
+              }).map(v => {
+                var selectedChoices = [];
+                v.forEach((w,i) => {
+                  if ( w ){
+                    selectedChoices.push(this.choices[i]);
+                  }
+                })
+                return selectedChoices;
+              });
+
+              this.choices = newChoices;
               return toRender;
             })
           )
@@ -287,7 +306,7 @@ foam.CLASS({
         return [];
       }
 
-      var filteredChoices = this.choices.filter(choice => choice[2]);
+      var filteredChoices = this.choices.filter(this.choiceTrue);
 
       return filteredChoices.map(choice => [choice[0], choice[1]]);
     },
@@ -303,6 +322,20 @@ foam.CLASS({
       var filteredChoices = this.choices.filter(choice => choice[2]);
 
       return this.dao.where(this.IN(of.ID, filteredChoices.map(choice => choice[0])));
+    },
+
+    function choiceTrue(choice) {
+      return foam.core.Slot.isInstance(choice[2])
+        ? choice[2].get()
+        : choice[2]
+        ;
+    },
+
+    function mustSlot(v) {
+      return foam.core.Slot.isInstance(v)
+        ? v
+        : foam.core.SimpleSlot.create({ value: v })
+        ;
     }
   ],
 
