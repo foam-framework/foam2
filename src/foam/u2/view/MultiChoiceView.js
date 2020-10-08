@@ -181,6 +181,7 @@ foam.CLASS({
     },
     {
       name: 'objToChoice',
+      class: 'Function',
       value: function(obj) {
         return [ obj.id, obj.toSummary() ];
       }
