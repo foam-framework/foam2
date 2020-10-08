@@ -66,6 +66,30 @@ foam.CLASS({
       class: 'Boolean',
       name: 'isValid',
       value: false
+    },
+    {
+      name: 'sections',
+      flags: ['web'],
+      transient: true,
+      class: 'FObjectArray',
+      of: 'foam.u2.wizard.WizardletSection',
+      factory: function () {
+        return [
+          this.WizardletSection.create({
+            isAvailable: true,
+            title: this.targetPayload.capability.name,
+            customView: {
+              class: 'foam.u2.view.MultiChoiceView',
+              choices$: this.choices$,
+              booleanView: this.CardSelectView,
+              isValidNumberOfChoices$: this.isValid$,
+              minSelected$: this.min$,
+              maxSelected$: this.max$,
+              onSelect: this.adjustCapablePayloads.bind(this)
+            }
+          })
+        ];
+      }
     }
   ],
 

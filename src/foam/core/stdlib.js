@@ -1028,6 +1028,7 @@ foam.LIB({
         if ( ! opt_defaultMethod ) {
           foam.assert(type, 'Unknown type: ', arg1,
             'and no default method provided');
+          if ( ! type[uid] ) debugger;
           foam.assert(
             type[uid],
             'Missing ' + name + ' multi-method for type ', arg1, ' map: ', map,
