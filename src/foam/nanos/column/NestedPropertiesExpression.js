@@ -317,7 +317,7 @@ foam.CLASS({
         }
       ],
       code: function(of, propNames) {
-        return foam.mlang.sink.Projection.create({ exprs: this.returnArrayOfExprForArrayOfProperties(of, propNames) });
+        return foam.mlang.sink.Projection.create({ exprs: this.returnArrayOfExprForArrayOfProperties(of, propNames), buildObjectsFromProjectionWithClass: ! of.model_.queryObjectOnProjection });
       },
       javaCode: `
         Expr[] exprs = returnArrayOfExprForArrayOfProperties(x, of, propNames);

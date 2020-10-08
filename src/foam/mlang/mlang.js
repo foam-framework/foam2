@@ -2758,6 +2758,12 @@ foam.CLASS({
       documentation: 'The expressions to be evaluated and returned in the projection. Typically are Properties.',
     },
     {
+      class: 'Boolean',
+      name: 'buildObjectsFromProjectionWithClass',
+      documentation: 'if objects should be build from projectionWithClass (and they will not be retrieved with select)',
+      value: true
+    },
+    {
       class: 'List',
       name: 'projectionWithClass',
       documentation: 'The projection but with the class in position 0 with all other values offset by 1.',
@@ -2784,7 +2790,7 @@ foam.CLASS({
     {
       class: 'List',
       name: 'array',
-      transient: true,
+      // transient: true,
       documentation: 'An array of full objects created from the projection. Only properties included in exprs/the-projection will be set.',
       factory: function() {
         return this.projectionWithClass.map(p => {
@@ -2799,29 +2805,34 @@ foam.CLASS({
         });
       },
       javaFactory: `
-        var a  = new java.util.ArrayList();
-        var es = getExprs();
-        var p  = getProjectionWithClass();
-        for ( int i = 0 ; i < p.size() ; i++ ) {
-          try {
-            Object[]  arr = (Object[]) p.get(i);
-            ClassInfo ci  = (ClassInfo) arr[0];
-            Object    o   = ci.newInstance();
-
-            for ( int j = 0 ; j < es.length ; j++ ) {
-              if ( es[j] instanceof PropertyInfo ) {
-                PropertyInfo e = (PropertyInfo) es[j];
-                e.set(o, arr[i]);
-              } else if ( es[j] instanceof foam.nanos.column.NestedPropertiesExpression ) {
-                foam.nanos.column.NestedPropertiesExpression e = (foam.nanos.column.NestedPropertiesExpression) es[j];
-                e.set(o, arr[i]);
+        if ( ! getBuildObjectsFromProjectionWithClass() ) {
+          return new java.util.ArrayList();
+        } else {
+          var a  = new java.util.ArrayList();
+          var es = getExprs();
+          var p  = getProjectionWithClass();
+          for ( int i = 0 ; i < p.size() ; i++ ) {
+            try {
+              Object[]  arr = (Object[]) p.get(i);
+              ClassInfo ci  = (ClassInfo) arr[0];
+              Object    o   = ci.newInstance();
+  
+              for ( int j = 0 ; j < es.length ; j++ ) {
+                if ( es[j] instanceof PropertyInfo ) {
+                  PropertyInfo e = (PropertyInfo) es[j];
+                  e.set(o, arr[i]);
+                } else if ( es[j] instanceof foam.nanos.column.NestedPropertiesExpression ) {
+                  foam.nanos.column.NestedPropertiesExpression e = (foam.nanos.column.NestedPropertiesExpression) es[j];
+                  e.set(o, arr[i]);
+                }
               }
-            }
-
-            a.set(i, o);
-          } catch (Throwable t) {}
+  
+              a.set(i, o);
+            } catch (Throwable t) {}
+          }
+          return a;
         }
-        return a;
+        
       `
     }
   ],
@@ -2837,6 +2848,9 @@ foam.CLASS({
       },
 // TODO:      swiftCode: 'array.append(obj)',
       javaCode: `
+        if ( ! getBuildObjectsFromProjectionWithClass() ) {//change to opposite
+          getArray().add(obj);
+        }
         Object[] a = new Object[getExprs().length+1];
 
         a[0] = ((FObject) obj).getClassInfo();
