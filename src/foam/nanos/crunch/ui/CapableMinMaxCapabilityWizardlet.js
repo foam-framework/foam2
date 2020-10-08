@@ -68,6 +68,11 @@ foam.CLASS({
       value: false
     },
     {
+      class: 'Boolean',
+      name: 'isVisible',
+      value: true // always true for a MinMax
+    },
+    {
       name: 'sections',
       flags: ['web'],
       transient: true,
