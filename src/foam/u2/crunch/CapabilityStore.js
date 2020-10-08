@@ -49,6 +49,11 @@ foam.CLASS({
       box-sizing: border-box;
     }
 
+    ^category {
+      margin-bottom: 48px;
+      padding: 0px 12px;
+    }
+
     ^feature-column-grid {
       display: inline-flex;
       width: 94%;
@@ -237,7 +242,7 @@ foam.CLASS({
             .start('h3')
               .add({ data : category, clsInfo : category.cls_.NAME.name, default : category.name })
             .end()
-            .add(sectionElement);
+            .add(sectionElement).addClass(self.myClass('category'));
           var previewIdsPromise = self.getCategoryDAO_(category.id).limit(6)
             .select().then(arraySink => arraySink.array.map(x => x.targetId) );
 
