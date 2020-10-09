@@ -57,7 +57,7 @@ foam.CLASS({
         var oldStatus = payload.getStatus();
         var newStatus = cap.getCapableChainedStatus(x, payloadDAO, payload);
 
-        if ( oldStatus == APPROVED && newStatus == PENDING ){
+        if ( oldStatus == APPROVED && newStatus == PENDING ) {
           newStatus = APPROVED;
         }
         
