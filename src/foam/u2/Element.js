@@ -40,7 +40,8 @@ foam.ENUM({
   values: [
     { name: 'CREATE', label: 'Create', modePropertyName: 'createVisibility' },
     { name: 'VIEW',   label: 'View',   modePropertyName: 'readVisibility'   },
-    { name: 'EDIT',   label: 'Edit',   modePropertyName: 'updateVisibility' }
+    { name: 'EDIT',   label: 'Edit',   modePropertyName: 'updateVisibility' },
+    { name: 'SUMMARY',  label: 'Summary',  modePropertyName: 'readVisibility'      }
   ]
 });
 
@@ -55,8 +56,7 @@ foam.ENUM({
     { name: 'RW',       label: 'Read-Write' },
     { name: 'DISABLED', label: 'Disabled'   },
     { name: 'RO',       label: 'Read-Only'  },
-    { name: 'HIDDEN',   label: 'Hidden'     },
-    { name: 'SUMMARY',   label: 'Summary'     }
+    { name: 'HIDDEN',   label: 'Hidden'     }
   ]
 });
 

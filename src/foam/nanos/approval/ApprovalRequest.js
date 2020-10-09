@@ -616,10 +616,17 @@
       code: function(X) {
         var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
 
-        objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
-          class: "foam.u2.MemoModal",
-          onExecute: this.approveWithMemo.bind(this)
-        }));
+        if ( X.controllerMode.equals(foam.u2.ControllerMode.SUMMARY) ) {
+          objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+            class: "foam.u2.MemoModal",
+            onExecute: this.approveWithMemo.bind(this)
+          }));
+        } else {
+          objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+            class: "foam.u2.MemoModal",
+            onExecute: this.approveWithMemoAndDoNotGoBack.bind(this)
+          }));
+        }
       }
     },
     {
@@ -639,11 +646,19 @@
       code: function(X) {
         var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
 
-        objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
-          class: "foam.u2.MemoModal",
-          onExecute: this.rejectWithMemo.bind(this),
-          isMemoRequired: true
-        }));
+        if ( X.controllerMode.equals(foam.u2.ControllerMode.SUMMARY) ) {
+          objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+            class: "foam.u2.MemoModal",
+            onExecute: this.rejectWithMemo.bind(this),
+            isMemoRequired: true
+          }));
+        } else {
+          objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+            class: "foam.u2.MemoModal",
+            onExecute: this.rejectWithMemoAndDoNotGoBack.bind(this),
+            isMemoRequired: true
+          }));
+        }
       }
     },
     {
@@ -814,55 +829,6 @@
           });
       },
       tableWidth: 100
-    },
-    {
-      name: 'contextMenuApprove',
-      isDetailViewEnabled: false,
-      label: 'approve',
-      section: 'requestDetails',
-      isAvailable: (isTrackingRequest, status) => {
-        if (
-          status === foam.nanos.approval.ApprovalStatus.REJECTED ||
-          status === foam.nanos.approval.ApprovalStatus.APPROVED ||
-          status === foam.nanos.approval.ApprovalStatus.CANCELLED
-        ) {
-          return false;
-        }
-        return ! isTrackingRequest;
-      },
-      code: function(X) {
-        var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
-
-        objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
-          class: "foam.u2.MemoModal",
-          onExecute: this.approveWithMemoAndDoNotGoBack.bind(this)
-        }));
-      }
-    },
-    {
-      name: 'contextMenuReject',
-      isDetailViewEnabled: false,
-      label: 'reject',
-      section: 'requestDetails',
-      isAvailable: (isTrackingRequest, status) => {
-        if (
-          status === foam.nanos.approval.ApprovalStatus.REJECTED ||
-          status === foam.nanos.approval.ApprovalStatus.APPROVED ||
-          status === foam.nanos.approval.ApprovalStatus.CANCELLED
-        ) {
-          return false;
-        }
-        return ! isTrackingRequest;
-      },
-      code: function(X) {
-        var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
-
-        objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
-          class: "foam.u2.MemoModal",
-          onExecute: this.rejectWithMemoAndDoNotGoBack.bind(this),
-          isMemoRequired: true
-        }));
-      }
     }
   ]
 });
