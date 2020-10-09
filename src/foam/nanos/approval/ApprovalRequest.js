@@ -551,8 +551,6 @@
           if ( this.stack.top.length > 0 ) {
             if ( ! stackBackIgnore )
               this.stack.back();
-            // else
-            //   this.stack.push(this.stack.top[0]);
           }
         }, (e) => {
           this.throwError.pub(e);
@@ -575,8 +573,6 @@
           if ( this.stack.top.length > 0 ) {
             if ( ! stackBackIgnore )
               this.stack.back();
-            // else
-            //   this.stack.push(this.stack.top[0]);
           }
         }, (e) => {
           this.throwError.pub(e);
