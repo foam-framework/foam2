@@ -107,7 +107,7 @@ foam.CLASS({
             .add({ data : self.data, clsInfo : self.data.cls_.DESCRIPTION.name, default : self.data.description })
           .end()
         .end()
-        .start()//Tooltip here
+        .start()
           .add(this.slot(function(cjStatus, isRenewable) {
             return this.E().addClass(style.myClass('tooltip'))
               .add(cjStatus.label).addClass(style.myClass('badge'))

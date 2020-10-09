@@ -41,10 +41,10 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'TITLE', message: 'Permission Required' },
-    { name: 'LABEL_CAP_LIST', message: 'YOUR CAPABILITIES' },
-    { name: 'SUBTITLE_1', message: 'You currently do not possess the permissions to perform this action.' },
-    { name: 'SUBTITLE_2', message: 'Please refer to the following list on how to obtain these permissions.' }
+    { name: 'TITLE', message: 'Missing Capability' },
+    { name: 'LABEL_CAP_LIST', message: 'CAPABILITIES' },
+    { name: 'SUBTITLE_1', message: 'You are currently incapable of performing this action.' },
+    { name: 'SUBTITLE_2', message: 'Please refer to the following list on how to obtain the capability.' }
   ],
 
   css: `
