@@ -265,7 +265,8 @@ foam.CLASS({
       return p;
     },
 
-    function getCapableWizard(capable) {
+    // This function is only called by CapableView
+    function getWizardletsFromCapable(capable) {
       return this.Sequence.create(null, this.__subContext__.createSubContext({
         capable: capable
       })).add(this.CapableCreateWizardletsAgent).execute().then(x => x.wizardlets);

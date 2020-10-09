@@ -84,7 +84,7 @@ foam.CLASS({
 
       // set wizardlets based on the capableObj
       if ( this.capableObj != undefined ) {
-        this.wizardlets = await this.crunchController.getCapableWizard(this.capableObj);
+        this.wizardlets = await this.crunchController.getWizardletsFromCapable(this.capableObj);
       } else {
         this.wizardlets = [];
       }
