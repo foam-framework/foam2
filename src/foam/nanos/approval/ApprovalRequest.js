@@ -601,7 +601,6 @@
   actions: [
     {
       name: 'approve',
-      isContextMenuEnabled: false,
       section: 'requestDetails',
       isAvailable: (isTrackingRequest, status) => {
         if (
@@ -616,7 +615,7 @@
       code: function(X) {
         var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
 
-        if ( X.controllerMode.equals(foam.u2.ControllerMode.SUMMARY) ) {
+        if ( X.controllerMode && X.controllerMode.equals(foam.u2.ControllerMode.SUMMARY) ) {
           objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
             class: "foam.u2.MemoModal",
             onExecute: this.approveWithMemo.bind(this)
@@ -631,7 +630,6 @@
     },
     {
       name: 'reject',
-      isContextMenuEnabled: false,
       section: 'requestDetails',
       isAvailable: (isTrackingRequest, status) => {
         if (
@@ -646,7 +644,7 @@
       code: function(X) {
         var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
 
-        if ( X.controllerMode.equals(foam.u2.ControllerMode.SUMMARY) ) {
+        if ( X.controllerMode && X.controllerMode.equals(foam.u2.ControllerMode.SUMMARY) ) {
           objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
             class: "foam.u2.MemoModal",
             onExecute: this.rejectWithMemo.bind(this),

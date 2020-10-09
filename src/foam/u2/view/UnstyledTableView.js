@@ -411,7 +411,7 @@ foam.CLASS({
             view.dataChangedFlag = !view.dataChangedFlag;
           });
 
-          var modelActions = view.of.getAxiomsByClass(foam.core.Action).filter(a => a.isContextMenuEnabled);
+          var modelActions = view.of.getAxiomsByClass(foam.core.Action);
           var actions = Array.isArray(view.contextMenuActions)
             ? view.contextMenuActions.concat(modelActions)
             : modelActions;

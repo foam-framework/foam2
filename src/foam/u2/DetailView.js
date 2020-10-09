@@ -85,7 +85,7 @@ foam.CLASS({
       name: 'actions',
       expression: function(of) {
         if ( ! of ) return [];
-        return this.of.getAxiomsByClass(foam.core.Action).filter(a => a.isDetailViewEnabled);
+        return this.of.getAxiomsByClass(foam.core.Action);
       }
     },
     {

@@ -141,16 +141,6 @@ If empty than no permissions are required.`,
       hidden: true,
       transient: true,
       documentation: 'A weak Map to track the running state of action on a per object basis.'
-    },
-    {
-      class: 'Boolean',
-      name: 'isContextMenuEnabled',
-      value: true
-    },
-    {
-      class: 'Boolean',
-      name: 'isDetailViewEnabled',
-      value: true
     }
   ],
 
