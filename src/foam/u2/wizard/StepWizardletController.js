@@ -209,7 +209,7 @@ foam.CLASS({
         };
 
         for ( let p = incr(wizardPosition) ; p != null ; p = incr(p) ) {
-          // Skip unavailable wizardlets
+          // Skip invisible wizardlets
           if ( ! this.wizardlets[p.wizardletIndex].isVisible ) {
             continue;
           }
