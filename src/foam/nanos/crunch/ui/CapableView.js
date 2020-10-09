@@ -25,6 +25,13 @@ foam.CLASS({
     'foam.u2.detail.SectionView'
   ],
 
+  css: `
+    ^ .foam-u2-detail-SectionedDetailPropertyView .foam-u2-CheckBox-label {
+      top: 0px;
+      position: relative;
+    }
+  `,
+
   properties: [
     {
       name: 'capableObj',
@@ -35,10 +42,6 @@ foam.CLASS({
       of: 'foam.u2.wizard.BaseWizardlet',
       name: 'wizardlets',
       documentation: 'wizardlets for capable payloads',
-      factory: function() {
-        if ( this.capableObj === undefined ) return [];
-        return this.crunchController.getCapableWizard(this.capableObj);
-      },
       postSet: function() {
         this.addListeners();
       }
@@ -77,6 +80,13 @@ foam.CLASS({
           } catch (e) {
             this.notify(e.message, '', this.LogLevel.ERROR, true);
           }
+      }
+
+      // set wizardlets based on the capableObj
+      if ( this.capableObj != undefined ) {
+        this.wizardlets = await this.crunchController.getWizardletsFromCapable(this.capableObj);
+      } else {
+        this.wizardlets = [];
       }
 
       this.start().addClass(this.myClass())
