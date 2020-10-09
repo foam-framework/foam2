@@ -142,6 +142,7 @@ foam.CLASS({
             intercept.resolve(intercept.capableRequirements[0]);
             return;
           }
+          intercept.returnCapable.isWizardCompleted = isCompleted;
           intercept.resolve(intercept.returnCapable);
           return;
         }
