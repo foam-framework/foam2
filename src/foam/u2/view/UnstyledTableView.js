@@ -428,7 +428,7 @@ foam.CLASS({
             var doPropertiesHaveCustomTableCellFormatter = false;
 
             for ( var p of view.props ) {
-              if ( p.property.tableCellFormatter ) {
+              if ( p.property.tableCellFormatter && ! p.property.cls_.TABLE_CELL_FORMATTER.isDefaultValue() ) {
                 doPropertiesHaveCustomTableCellFormatter = true;
                 break;
               }
