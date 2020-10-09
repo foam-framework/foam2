@@ -444,6 +444,10 @@ foam.CLASS({
               addClass(view.myClass('tbody'));
               valPromises.then(function(values) {
 
+                if ( doPropertiesHaveCustomTableCellFormatter ) {
+                  values.array = values.projectionWithClass.map(a => a[0]);
+                }
+
                 for ( var i = 0 ; i < values.projection.length ; i++ ) {
                   const obj = values.array[i];
                   var nestedPropertyValues = view.columnHandler.filterOutValuesForNotNestedProperties(values.projection[i], nastedPropertyNamesAndItsIndexes[1]);
