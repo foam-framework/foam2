@@ -106,7 +106,7 @@ foam.CLASS({
     },
     {
       name: 'onBack',
-      factory: function() { 
+      factory: () => { 
         return () => this.stack.back();
       }
     },
@@ -278,7 +278,7 @@ foam.CLASS({
                   .end()
                 .end()
                 .start(config$viewBorder)
-                  .start(viewView, { data: data }).addClass(self.myClass('view-container')).end()
+                  .start(viewView, { data }).addClass(self.myClass('view-container')).end()
                 .end()
               .end();
           }));
