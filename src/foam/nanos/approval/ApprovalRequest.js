@@ -610,18 +610,17 @@
       },
       code: function(X) {
         var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
+        var onExecuteFunc;
 
-        if ( X.controllerMode && X.controllerMode.equals(foam.u2.ControllerMode.SUMMARY) ) {
-          objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
-            class: "foam.u2.MemoModal",
-            onExecute: this.approveWithMemo.bind(this)
-          }));
-        } else {
-          objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
-            class: "foam.u2.MemoModal",
-            onExecute: this.approveWithMemoAndDoNotGoBack.bind(this)
-          }));
-        }
+        if ( X.controllerMode && X.controllerMode.equals(foam.u2.ControllerMode.SUMMARY) )
+          onExecuteFunc =  this.approveWithMemo.bind(this);
+        else
+          onExecuteFunc = this.approveWithMemoAndDoNotGoBack.bind(this);
+
+        objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+          class: "foam.u2.MemoModal",
+          onExecute: onExecuteFunc
+        }));
       }
     },
     {
@@ -640,19 +639,17 @@
       code: function(X) {
         var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
 
-        if ( X.controllerMode && X.controllerMode.equals(foam.u2.ControllerMode.SUMMARY) ) {
-          objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
-            class: "foam.u2.MemoModal",
-            onExecute: this.rejectWithMemo.bind(this),
-            isMemoRequired: true
-          }));
-        } else {
-          objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
-            class: "foam.u2.MemoModal",
-            onExecute: this.rejectWithMemoAndDoNotGoBack.bind(this),
-            isMemoRequired: true
-          }));
-        }
+        var onExecuteFunc;
+        if ( X.controllerMode && X.controllerMode.equals(foam.u2.ControllerMode.SUMMARY) )
+          onExecuteFunc = this.rejectWithMemo.bind(this);
+        else
+          onExecuteFunc = this.rejectWithMemoAndDoNotGoBack.bind(this);
+
+        objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+          class: "foam.u2.MemoModal",
+          onExecute: onExecuteFunc,
+          isMemoRequired: true
+        }));
       }
     },
     {
