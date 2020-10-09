@@ -407,7 +407,8 @@ foam.CLASS({
          * writing.
          */
           var view = this;
-          this.data.sub('on', function() {
+
+          this.data.on.sub(function() {
             view.dataChangedFlag = !view.dataChangedFlag;
           });
 
