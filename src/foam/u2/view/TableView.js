@@ -36,7 +36,8 @@ foam.CLASS({
       border-radius: 5px;
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
       overflow: hidden;
-      position: fixed;
+      position: sticky;
+      top: 0;
       overflow-x: scroll;
     }
 
