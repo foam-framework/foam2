@@ -24,8 +24,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'variant',
-      documentation: 'Locale variation (CA for en-CA, CA for fr-CA, AT for de_AT …etc)',
-      value: 'CA'
+      documentation: 'Locale variation (CA for en-CA, CA for fr-CA, AT for de_AT …etc)'
     },
     {
       class: 'String',
