@@ -180,10 +180,6 @@
           }, this);
         }
       }
-    },
-    {
-      class: 'Int',
-      name: 'tableWidth'
     }
   ],
 
@@ -200,7 +196,6 @@
     },
 
     function initE() {
-      var self = this;
       this.
         addClass(this.myClass()).
         on('scroll', this.onScroll).
@@ -212,8 +207,7 @@
           editColumnsEnabled: this.editColumnsEnabled,
           disableUserSelection: this.disableUserSelection,
           multiSelectEnabled: this.multiSelectEnabled,
-          selectedObjects$: this.selectedObjects$,
-          tableWidth$: this.tableWidth$
+          selectedObjects$: this.selectedObjects$
         }, this.table_$).
           addClass(this.myClass('table')).
           style({
@@ -221,14 +215,6 @@
           }).
         end();
 
-        window.addEventListener('resize', this.updateTableWidth);
-        this.onload.sub(function() {
-          self.tableWidth = document.getElementById(self.id).offsetWidth - 34;//as 32 is padding
-        });
-
-        this.onDetach(() => {
-          window.removeEventListener('resize', this.updateTableWidth);
-        });
       /*
         to be used in cases where we don't want the whole table to
         take the whole page (i.e. we need multiple tables)
@@ -317,12 +303,6 @@
         remainingSpace -= 44;
 
         this.style({ height: `${remainingSpace}px` });
-      }
-    },
-    {
-      name: 'updateTableWidth',
-      code: function() {
-        this.tableWidth = document.getElementById(this.id).offsetWidth - 34;
       }
     },
     function dblclick(obj, id) {
