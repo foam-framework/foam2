@@ -155,6 +155,7 @@ var classes = [
   'foam.dao.NullJournal',
   'foam.dao.ReadOnlyF3FileJournal',
   'foam.dao.FileJournal',
+  'foam.dao.NullJournal',
   'foam.dao.ReadOnlyFileJournal',
   'foam.dao.ReadOnlyF3FileJournal',
   'foam.dao.RoutingJournal',

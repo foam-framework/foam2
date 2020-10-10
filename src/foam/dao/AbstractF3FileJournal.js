@@ -272,7 +272,7 @@ try {
       args: [ 'Context x', 'String prefix', 'DAO dao', 'foam.core.FObject obj' ],
       javaCode: `
       final Object id = obj.getProperty("id");
-      JSONFObjectFormatter fmt = formatter.get();
+      JSONFObjectFormatter fmt = getFormatter(x);
       getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
 
         public Object[] requestLocks() {

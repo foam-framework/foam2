@@ -296,13 +296,11 @@ foam.CLASS({
 
     /** Needed? **/
     function getPrev() {
-      debugger;
       return this.oldValue;
     },
 
     /** Needed? **/
     function setPrev(value) {
-      debugger;
       return this.oldValue = value;
     },
 
