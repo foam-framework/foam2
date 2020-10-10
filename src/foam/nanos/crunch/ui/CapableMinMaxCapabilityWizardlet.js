@@ -70,7 +70,9 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isVisible',
-      value: true // always true for a MinMax
+      expression: function (isAvailable) {
+        return isAvailable;
+      }
     },
     {
       name: 'isAvailable',

@@ -22,7 +22,7 @@ foam.CLASS({
     {
       name: 'isWizardCompleted',
       class: 'Boolean',
-      networkTransient: true
+      transient: true
     }
   ],
 
