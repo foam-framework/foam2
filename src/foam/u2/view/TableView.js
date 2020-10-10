@@ -17,9 +17,6 @@ foam.CLASS({
       justify-content: space-between;
     }
 
-    ^tbody {
-    }
-
     ^tbody > ^tr {
       border-left: 1px solid /*%GREY4%*/ #e7eaec;
       border-right: 1px solid /*%GREY4%*/ #e7eaec;
