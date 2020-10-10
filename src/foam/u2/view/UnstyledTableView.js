@@ -54,9 +54,6 @@ foam.CLASS({
   ],
 
   css: `
-    ^{
-      overflow-y: scroll;
-    }
   `,
 
   properties: [
@@ -257,6 +254,10 @@ foam.CLASS({
     {
       name: 'dataChangedFlag',
       class: 'Boolean'
+    },
+    {
+      name: 'tableWidth',
+      class: 'Int'
     }
   ],
 
@@ -291,7 +292,7 @@ foam.CLASS({
         addClass(this.myClass(this.of.id.replace(/\./g, '-'))).
         start().
           addClass(this.myClass('thead')).
-          style({ 'min-width': this.tableWidth_$ }).
+          style({ width: view.tableWidth$.map(w => w + 'px') }).
           show(this.showHeader$).
           add(this.slot(function(columns_) {
             view.props = this.returnPropertiesForColumns(view, columns_);

@@ -17,6 +17,9 @@ foam.CLASS({
       justify-content: space-between;
     }
 
+    ^tbody {
+    }
+
     ^tbody > ^tr {
       border-left: 1px solid /*%GREY4%*/ #e7eaec;
       border-right: 1px solid /*%GREY4%*/ #e7eaec;
@@ -33,8 +36,8 @@ foam.CLASS({
       border-radius: 5px;
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
       overflow: hidden;
-      position: sticky;
-      top: 0;
+      position: fixed;
+      overflow-x: scroll;
     }
 
     ^td,
