@@ -405,6 +405,7 @@ var classes = [
   'foam.nanos.notification.ResendNotificationServiceInterface',
   'foam.nanos.notification.ClientResendNotificationService',
   'foam.nanos.script.Script',
+  'foam.nanos.script.ScriptEvent',
   'foam.nanos.script.TestRunnerConfig',
   'foam.nanos.script.TestRunnerScript',
   'foam.nanos.test.Test',

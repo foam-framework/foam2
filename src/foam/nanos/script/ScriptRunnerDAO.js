@@ -12,6 +12,7 @@ foam.CLASS({
   javaImports: [
     'foam.core.*',
     'foam.dao.*',
+    'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'java.util.concurrent.CountDownLatch',
     'java.util.concurrent.TimeUnit'
@@ -41,17 +42,30 @@ foam.CLASS({
     }
   ],
 
+  properties: [
+        {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      javaFactory: `
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, (Logger) getX().get("logger"));
+      `
+    }
+  ],
+  
   methods: [
     {
       name: 'put_',
       javaCode: `
-        Script script = (Script) obj;
-
+        Script script = (Script) getDelegate().put_(x, obj);
+        getLogger().debug("script", script.getId(), script.getStatus());
         if ( script.getStatus() == ScriptStatus.SCHEDULED ) {
           obj = this.runScript(x, script);
         }
-    
-        return getDelegate().put_(x, obj);
+        return obj;
       `
     },
     {
@@ -80,11 +94,11 @@ foam.CLASS({
         { type: 'foam.nanos.script.Script', name: 'newScript' }
       ],
       javaCode: `
-        Logger log = (Logger) x.get("logger");
         Script script = fixScriptClass(newScript);
         long   estimatedTime = this.estimateWaitTime(script);
-        final CountDownLatch latch = new CountDownLatch(1);
-    
+        final CountDownLatch latch = new CountDownLatch(1); 
+
+        getLogger().debug("script", script.getId(), "estimatedTime", estimatedTime);
         try {
           ((Agency) x.get("threadPool")).submit(x, new ContextAgent() {
             @Override
@@ -92,24 +106,29 @@ foam.CLASS({
               try {
                 script.setStatus(ScriptStatus.RUNNING);
                 getDelegate().put_(x, script);
+                getLogger().debug("agency", "script", script.getId(), "latch", "countdown");
+                latch.countDown();
+                getLogger().debug("agency", "script", script.getId(), "start");
                 script.runScript(x);
+                getLogger().debug("agency", "script", script.getId(), "end");
                 script.setStatus(ScriptStatus.UNSCHEDULED);
               } catch(Throwable t) {
                 script.setStatus(ScriptStatus.ERROR);
                 t.printStackTrace();
-                log.error("Script.run", script.getId(), t);
+                getLogger().error("Script.run", script.getId(), t);
               }
               // save the state
+              getLogger().debug("agency", "script", script.getId(), "put");
               getDelegate().put_(x, script);
-    
-              latch.countDown();
             }
           }, "Run script. Script id: " + script.getId());
-    
+
+          getLogger().debug("script", script.getId(), "latch", "wait");
           latch.await(estimatedTime, TimeUnit.MILLISECONDS);
+          getLogger().debug("script", script.getId(), "latch", "wake");
         } catch(InterruptedException e) {
           e.printStackTrace();
-          log.error("Script.submit", script.getId(), e);
+          getLogger().error("Script.submit", script.getId(), e);
         }
     
         return script;
