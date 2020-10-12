@@ -9,7 +9,7 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.cron.Cron.getOwnClassInfo())
       .setMdao(mdao)
-      .setInnerDAO(new foam.dao.JDAO(x, mdao, "cronjobs"))
+      .setInnerDAO(new foam.dao.java.JDAO(x, mdao, "cronjobs"))
       .setGuid(true)
       .setDecorator(new foam.nanos.cron.CronScheduleDAO.Builder(x)
         .setDelegate(new foam.nanos.script.ScriptRunnerDAO(null))

@@ -395,7 +395,7 @@ var classes = [
   'foam.nanos.notification.MyNotificationDAO',
   'foam.nanos.notification.NotificationExpansionDAO',
   'foam.nanos.notification.NotificationTemplateDAO',
-  'foam.nanos.notification.notifications.ScriptRunNotification',
+  'foam.nanos.notification.ScriptRunNotification',
   'foam.nanos.notification.EmailSetting',
   'foam.nanos.notification.NotificationSetting',
   'foam.nanos.notification.NotificationHostnameRuleAction',

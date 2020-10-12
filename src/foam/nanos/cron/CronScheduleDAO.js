@@ -25,7 +25,7 @@ foam.CLASS({
         if ( oldCron == null
           || ! SafetyUtil.equals(oldCron.getSchedule(), newCron.getSchedule())
         ) {
-          newCron.setScheduledTime(newCron.getNextScheduledTime());
+          newCron.setScheduledTime(newCron.getNextScheduledTime(x));
         }
         return getDelegate().put_(x, obj);
       `
