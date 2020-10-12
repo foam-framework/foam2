@@ -142,22 +142,16 @@ foam.CLASS({
             pxy.setDelegate(fixedSizeDAO);
           }
           else {
-            logger.error(this.getClass().getSimpleName(), "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_, "FixedSizeDAO did not find instanceof MDAO");
+            logger.error(this.getClass().getSimpleName(), "NSpec.name", getName(), "FixedSizeDAO did not find instanceof MDAO");
             System.exit(1);
           }
-        }
-
-        if ( getStorageOptionalEnabled() ) {
-          delegate = new foam.dao.StorageOptionalDAO.Builder(getX())
-            .setDelegate(delegate)
-            .build();
         }
 
         delegate = getOuterDAO(delegate);
 
         if ( getDecorator() != null ) {
           if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
-            logger.error(this.getClass().getSimpleName(), "delegate", "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
+            logger.error(this.getClass().getSimpleName(), "delegate", "NSpec.name", getName(), "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
             System.exit(1);
           }
           // The decorator dao may be a proxy chain
@@ -264,7 +258,7 @@ foam.CLASS({
         }
 
         if ( getNSpec() != null && getNSpec().getServe() && ! getAuthorize() && ! getReadOnly() )
-          logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authorized, or ReadOnly");
+          logger.warning("EasyDAO", getName(), "Served DAO should be Authorized, or ReadOnly");
 
         if ( getPermissioned() && ( getNSpec() != null && getNSpec().getServe() ) )
           delegate = new foam.nanos.auth.PermissionedPropertyDAO.Builder(getX()).setDelegate(delegate).build();
@@ -694,18 +688,6 @@ model from which to test ServiceProvider ID (spid)`,
       name: 'approvableAwareRelationshipName',
       class: 'String',
       documentation: 'If the DAO is approvable aware, this sets the ApprovableAwareDAO RelationshipName field'
-    },
-    {
-      name: 'storageOptionalEnabled',
-      class: 'Boolean',
-      documentation: 'Discard DAO updates which result in only storageOptional properties changing, like LastModified, for example.',
-      javaFactory: `
-        java.util.List<foam.core.PropertyInfo> props = getOf().getAxiomsByClass(foam.core.PropertyInfo.class);
-        for ( foam.core.PropertyInfo prop : props ) {
-          if ( prop.getStorageOptional() ) return true;
-        }
-        return false;
-      `
     }
   ],
 
