@@ -12,6 +12,7 @@ foam.CLASS({
   imports: [ 'cronDAO as scriptDAO' ],
 
   javaImports: [
+    'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.notification.Notification',
     'java.util.Date'
@@ -80,53 +81,25 @@ foam.CLASS({
       class: 'DateTime',
       name: 'scheduledTime',
       documentation: 'Scheduled time to run Cron script.',
-      section: 'scheduling',
       visibility: 'RO',
-      javaFactory: 'return getNextScheduledTime();',
+      javaFactory: `return getNextScheduledTime(getX());`,
       storageTransient: true
     }
   ],
 
   methods: [
     {
-      name: 'runScript',
+      name: 'getNextScheduledTime',
       args: [
         {
           name: 'x',
-          type: 'Context'
+          type: 'X'
         }
       ],
-      type: 'Void',
-      javaCode:
-`/*
-  I don't know why we're doing this because we aren't specifying a user or
-  group to be notified and we aren't including the script output either.
-  Also, if we were to notify, we should use a ScriptRunNotification rather
-  than a generic notification. Maybe there should be properties to say which
-  users or groups to notify, or if notifications should be sent or not (and
-  their expiry).
-Notification cronStartNotify = new Notification();
-cronStartNotify.setBody("Cron STARTED - " + this.getId() + " " + this.getDescription());
-notification.put(cronStartNotify);
-*/
-    try {
-      super.runScript(x);
-    } finally {
-      setScheduledTime(getNextScheduledTime());
-    }
-/*
-Notification cronEndNotify = new Notification();
-cronEndNotify.setBody("Cron ENDED - " + this.getId() + " " + this.getDescription());
-notification.put(cronEndNotify);
-*/
-    `
-    },
-    {
-      name: 'getNextScheduledTime',
       type: 'Date',
       javaCode:
 `
-return getSchedule().getNextScheduledTime(
+return getSchedule().getNextScheduledTime(x,
   new Date(System.currentTimeMillis())
 );
 `

@@ -337,6 +337,8 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/SlackSetting' },
   { name: 'foam/nanos/notification/ToastNotificationDAO' },
   { name: 'foam/nanos/notification/ToastState' },
+  { name: 'foam/nanos/notification/ScriptRunNotification'},
+  { name: 'foam/nanos/notification/ScriptRunNotificationNotificationCitationView'},
   { name: 'foam/nanos/dashboard/Demo' },
 
   // Ticket

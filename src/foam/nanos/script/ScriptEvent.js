@@ -77,7 +77,7 @@ foam.CLASS({
       name: 'clusterable',
       class: 'Boolean',
       value: true,
-      includeInDigest: false,
+      includeInDigest: false
     }
   ]
 });

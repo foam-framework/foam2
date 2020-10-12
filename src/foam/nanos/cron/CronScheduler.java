@@ -18,6 +18,7 @@ import foam.mlang.sink.Min;
 import foam.nanos.auth.EnabledAware;
 import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
+import foam.nanos.script.ScriptStatus;
 import foam.nanos.pm.PM;
 import java.util.Date;
 
@@ -72,22 +73,25 @@ public class CronScheduler
           cronDAO_.where(
                          MLang.AND(
                                    MLang.LTE(Cron.SCHEDULED_TIME, now),
-                                   MLang.EQ(Cron.ENABLED, true)
+                                   MLang.EQ(Cron.ENABLED, true),
+                                   MLang.OR(
+                                            MLang.EQ(Cron.STATUS, ScriptStatus.UNSCHEDULED),
+                                            MLang.EQ(Cron.STATUS, ScriptStatus.ERROR)
+                                            )
                                    )
                          ).select(new AbstractSink() {
                              @Override
                              public void put(Object obj, Detachable sub) {
                                Cron cron = (Cron) ((FObject) obj).fclone();
-
                                PM pm = new PM(CronScheduler.class, "cron:" + cron.getId());
                                try {
-                                 cron.runScript(CronScheduler.this.getX());
+                                 cron.setStatus(ScriptStatus.SCHEDULED);
+                                 cronDAO_.put(cron);
                                } catch (Throwable t) {
                                  logger.error(this.getClass(), "Error running Cron Job", cron.getId(), t.getMessage(), t);
                                } finally {
                                  pm.log(getX());
                                }
-                               cronDAO_.put((FObject) cron);
                              }
                            });
         }

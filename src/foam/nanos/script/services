@@ -8,7 +8,7 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.script.Script.getOwnClassInfo())
       .setMdao(mdao)
-      .setInnerDAO(new foam.dao.JDAO(x, mdao, "scripts"))
+      .setInnerDAO(new foam.dao.java.JDAO(x, mdao, "scripts"))
       .setGuid(true)
       .setPm(true)
       .setDecorator(new foam.nanos.script.ScriptRunnerDAO(new foam.dao.NullDAO(x, foam.nanos.script.Script.getOwnClassInfo())))
