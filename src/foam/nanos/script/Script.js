@@ -108,17 +108,7 @@ foam.CLASS({
       name: 'description',
       includeInDigest: false,
       documentation: 'Description of the script.',
-      tableWidth: 300,
-      // tableCellFormatter: function(value, obj) {
-      //   var v = value;
-      //   if ( obj ) {
-      //     v = obj.description ? obj.id : obj.description;
-      //   }
-
-      //   this.start()
-      //     .add( v )
-      //     .end();
-      // }
+      tableWidth: 300
     },
     {
       class: 'Int',

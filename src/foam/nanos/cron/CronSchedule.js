@@ -13,8 +13,6 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.X',
-    'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.logger.Logger',
     'java.util.Calendar'
   ],
 
