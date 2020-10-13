@@ -32,7 +32,6 @@ p({
       .setCluster(false)
       .setRuler(false)
       .setPm(true)
-      .setStorageOptionalEnabled(false)
       .build();
     dao.addPropertyIndex(new foam.core.PropertyInfo[] {
       foam.nanos.medusa.MedusaEntry.INDEX

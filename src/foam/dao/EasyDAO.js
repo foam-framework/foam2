@@ -149,6 +149,14 @@ foam.CLASS({
               setMdao(new foam.dao.MDAO(getOf()));
             }
             delegate = getMdao();
+            if ( getIndex() != null && getIndex().length > 0 ) {
+              ((foam.dao.MDAO) getMdao()).addIndex(getIndex());
+            }
+            if ( getFixedSize() != null ) {
+              foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
+              fixedSizeDAO.setDelegate(getMdao());
+              setMdao(fixedSizeDAO);
+            }
             if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
               if ( getWriteOnly() ) {
                 delegate = new foam.dao.WriteOnlyJDAO(getX(), getMdao(), getOf(), getJournalName());
@@ -159,38 +167,13 @@ foam.CLASS({
           }
         }
 
-        if ( getIndex() != null && getIndex().length > 0 ) {
+        if ( getCluster() ) {
           if ( getMdao() != null ) {
-            ((foam.dao.MDAO) getMdao()).addIndex(getIndex());
-          } else {
-            getLogger().warning("NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_, "addIndex not compatible with innerDAO, indexes not added.");
-          }
-        }
-
-        if ( getFixedSize() != null ) {
-          if ( getMdao() != null ) {
-            foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
-            fixedSizeDAO.setDelegate(head);
-            pxy.setDelegate(fixedSizeDAO);
-          }
-          else {
-            logger.error(this.getClass().getSimpleName(), "NSpec.name", getName(), "FixedSizeDAO did not find instanceof MDAO");
-            System.exit(1);
-          }
-        }
-
-        if ( getCluster() &&
-             getMdao() != null ) {
-          getLogger().debug(getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
-          delegate = new foam.nanos.medusa.MedusaAdapterDAO.Builder(getX())
-            .setNSpec(getNSpec())
-            .setDelegate(delegate)
-            .build();
-        } else {
-          if ( getStorageOptionalEnabled() ) {
-            delegate = new foam.dao.StorageOptionalDAO.Builder(getX())
+            getLogger().debug(getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
+            delegate = new foam.nanos.medusa.MedusaAdapterDAO.Builder(getX())
+              .setNSpec(getNSpec())
               .setDelegate(delegate)
-             .build();
+              .build();
           }
         }
 
@@ -198,7 +181,7 @@ foam.CLASS({
 
         if ( getDecorator() != null ) {
           if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
-            logger.error(this.getClass().getSimpleName(), "delegate", "NSpec.name", getName(), "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
+            getLogger().error(getName(), "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
             System.exit(1);
           }
           // The decorator dao may be a proxy chain

@@ -20,7 +20,6 @@ p({
       .setRuler(false)
       .setAuthorize(false)
       .setPm(true)
-      .setStorageOptionalEnabled(false)
       .setDecorator(new foam.nanos.medusa.ClusterConfigReplayDAO.Builder(x)
       .setDelegate(new foam.nanos.medusa.ClusterConfigStatusDAO.Builder(x)
       .setDelegate(new foam.nanos.medusa.ClusterConfigSupportDAO.Builder(x)
