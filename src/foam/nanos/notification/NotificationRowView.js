@@ -94,7 +94,8 @@
                 this.HIDE_NOTIFICATION_TYPE,
                 this.REMOVE_NOTIFICATION
               ],
-              obj: this.data
+              obj: this.data,
+              dao: this.notificationDAO
             })
           .end();
       }
