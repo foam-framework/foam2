@@ -101,17 +101,14 @@ public class CronScheduler
         }
         // Check for new cronjobs every 5 seconds if no current jobs
         // or if their next scheduled execution time is > 5s away
+        // Delay at least a little bit to avoid blocking in case of a script error.
         long delay = CRON_DELAY;
         Date minScheduledTime = getMinScheduledTime();
         if( minScheduledTime != null &&
             getEnabled() ) {
           delay = Math.abs(minScheduledTime.getTime() - System.currentTimeMillis());
-          if ( delay > CRON_DELAY ) {
-            delay = CRON_DELAY;
-          } else {
-            // Delay at least a little bit to avoid blocking in case of a script error.
-            delay = Math.max(500, delay);
-          }
+          delay = Math.min(CRON_DELAY, delay);
+          delay = Math.max(500, delay);
         }
         Thread.sleep(delay);
       }
