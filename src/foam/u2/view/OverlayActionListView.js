@@ -109,6 +109,8 @@ foam.CLASS({
       background-size: 24px;
       width: 24px;
       height: 24px;
+      position: absolute;
+      right: 20;
     }
 
     ^icon:hover {
@@ -154,7 +156,7 @@ foam.CLASS({
     async function initializeOverlay() {
       var self = this;
 
-      if ( this.obj )
+      if ( this.obj && this.dao )
         this.obj = await this.dao.inX(ctrl.__subContext__).find(this.obj.id);
 
       this.onDetach(this.disabled_$.follow(this.ExpressionSlot.create({
