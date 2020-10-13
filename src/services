@@ -476,7 +476,6 @@ p({
   "class": "foam.nanos.boot.NSpec",
   "name" :"menuDAO",
   "serve" :true,
-  "authenticate": false,
   "serviceScript":
   """
     return new foam.dao.EasyDAO.Builder(x)
