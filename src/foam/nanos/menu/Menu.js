@@ -111,11 +111,6 @@
     {
       class: 'StringArray',
       name: 'keywords'
-    },
-    {
-      class: 'Boolean',
-      name: 'authenticate',
-      value: true
     }
   ],
 
@@ -177,7 +172,6 @@
     {
       name: 'authorizeOnRead',
       javaCode: `
-        if ( ! getAuthenticate() ) return;
         AuthService auth = (AuthService) x.get("auth");
         if ( ! ( f(x) &&
                  auth.check(x, "menu.read." + getId()) ) ) {
