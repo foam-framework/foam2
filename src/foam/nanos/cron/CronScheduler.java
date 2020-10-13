@@ -108,9 +108,9 @@ public class CronScheduler
           delay = Math.abs(minScheduledTime.getTime() - System.currentTimeMillis());
           if ( delay > CRON_DELAY ) {
             delay = CRON_DELAY;
-          } else if ( delay == 0 ) {
+          } else {
             // Delay at least a little bit to avoid blocking in case of a script error.
-            delay = 500;
+            delay = Math.max(500, delay);
           }
         }
         Thread.sleep(delay);
