@@ -101,7 +101,6 @@ public class CronScheduler
         }
         // Check for new cronjobs every 5 seconds if no current jobs
         // or if their next scheduled execution time is > 5s away
-        // TODO: replace with CronDAO Decorator which resets delay on put.
         long delay = CRON_DELAY;
         Date minScheduledTime = getMinScheduledTime();
         if( minScheduledTime != null &&
@@ -109,6 +108,9 @@ public class CronScheduler
           delay = Math.abs(minScheduledTime.getTime() - System.currentTimeMillis());
           if ( delay > CRON_DELAY ) {
             delay = CRON_DELAY;
+          } else if ( delay == 0 ) {
+            // Delay at least a little bit to avoid blocking in case of a script error.
+            delay = 500;
           }
         }
         Thread.sleep(delay);
