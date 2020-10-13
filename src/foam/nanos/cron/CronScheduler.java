@@ -26,6 +26,8 @@ public class CronScheduler
   extends    ContextAwareSupport
   implements NanoService, Runnable, EnabledAware
 {
+  protected static long CRON_DELAY = 5000L;
+
   protected DAO cronDAO_;
 
   protected boolean enabled_ = true;
@@ -74,12 +76,14 @@ public class CronScheduler
                          MLang.AND(
                                    MLang.LTE(Cron.SCHEDULED_TIME, now),
                                    MLang.EQ(Cron.ENABLED, true),
-                                   MLang.OR(
-                                            MLang.EQ(Cron.STATUS, ScriptStatus.UNSCHEDULED),
-                                            MLang.EQ(Cron.STATUS, ScriptStatus.ERROR)
-                                            )
+                                   MLang.IN(Cron.STATUS, new ScriptStatus[] {
+                                                          ScriptStatus.UNSCHEDULED,
+                                                          ScriptStatus.ERROR,
+                                     })
                                    )
-                         ).select(new AbstractSink() {
+                         )
+            .orderBy(Cron.SCHEDULED_TIME)
+            .select(new AbstractSink() {
                              @Override
                              public void put(Object obj, Detachable sub) {
                                Cron cron = (Cron) ((FObject) obj).fclone();
@@ -95,26 +99,19 @@ public class CronScheduler
                              }
                            });
         }
-        Date minScheduledTime = getMinScheduledTime();
         // Check for new cronjobs every 5 seconds if no current jobs
         // or if their next scheduled execution time is > 5s away
-        if( minScheduledTime == null ) {
-          Thread.sleep(5000);
-        } else {
-          long delay = minScheduledTime.getTime() - System.currentTimeMillis();
-          if ( delay > 5000 ) {
-            delay = 5000;
-          } else if ( delay < 0 ) {
-            if ( getEnabled() ) {
-              // Delay at least a little bit to avoid blocking in case of a
-              // script error.
-              delay = 500;
-            } else {
-              delay = 5000;
-            }
+        // TODO: replace with CronDAO Decorator which resets delay on put.
+        long delay = CRON_DELAY;
+        Date minScheduledTime = getMinScheduledTime();
+        if( minScheduledTime != null &&
+            getEnabled() ) {
+          delay = Math.abs(minScheduledTime.getTime() - System.currentTimeMillis());
+          if ( delay > CRON_DELAY ) {
+            delay = CRON_DELAY;
           }
-          Thread.sleep(delay);
         }
+        Thread.sleep(delay);
       }
     } catch (Throwable t) {
       logger.error(this.getClass(), t.getMessage());
