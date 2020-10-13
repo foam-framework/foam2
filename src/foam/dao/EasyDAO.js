@@ -78,6 +78,7 @@ foam.CLASS({
   imports: [ 'document', 'log' ],
 
   javaImports: [
+    'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger'
   ],
 
@@ -107,8 +108,10 @@ foam.CLASS({
       javaFactory: `
       if ( getNSpec() != null ) {
         return getNSpec().getName();
+      } else if ( this.getOf() != null ) {
+        return this.getOf().getId();
       }
-      return this.getOf().getId();
+      return "";
      `
     },
     {
@@ -117,33 +120,49 @@ foam.CLASS({
       type: 'foam.nanos.boot.NSpec'
     },
     {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      javaFactory: `
+        Logger logger = (Logger) getX().get("logger");
+        if ( logger == null ) {
+          logger = new foam.nanos.logger.StdoutLogger();
+        }
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, logger);
+      `
+    },
+    {
       /** This is set automatically when you create an EasyDAO.
         @private */
       name: 'delegate',
       javaFactory: `
-        Logger logger = (Logger) getX().get("logger");
-
         foam.dao.DAO delegate = getInnerDAO();
-        foam.dao.DAO head = delegate;
-        foam.dao.ProxyDAO pxy = null;
-        while( head instanceof foam.dao.ProxyDAO ) {
-          pxy = (foam.dao.ProxyDAO) head;
-          head = ( (ProxyDAO) head).getDelegate();
-        }
-        if ( head instanceof foam.dao.MDAO ) {
-          setMdao((foam.dao.MDAO)head);
-          if ( getIndex() != null && getIndex().length > 0 )
-            getMdao().addIndex(getIndex());
-        }
-        if ( getFixedSize() != null ) {
-          if ( head instanceof foam.dao.MDAO && pxy != null ) {
-            foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
-            fixedSizeDAO.setDelegate(head);
-            pxy.setDelegate(fixedSizeDAO);
-          }
-          else {
-            logger.error(this.getClass().getSimpleName(), "NSpec.name", getName(), "FixedSizeDAO did not find instanceof MDAO");
-            System.exit(1);
+        if ( delegate == null ) {
+          if ( getNullify() ) {
+            delegate = new foam.dao.NullDAO(getX(), getOf());
+          } else {
+            if ( getMdao() == null ) {
+              setMdao(new foam.dao.MDAO(getOf()));
+            }
+            delegate = getMdao();
+            if ( getIndex() != null && getIndex().length > 0 ) {
+              ((foam.dao.MDAO) getMdao()).addIndex(getIndex());
+            }
+            if ( getFixedSize() != null ) {
+              foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
+              fixedSizeDAO.setDelegate(getMdao());
+              setMdao(fixedSizeDAO);
+            }
+            if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
+              if ( getWriteOnly() ) {
+                delegate = new foam.dao.WriteOnlyJDAO(getX(), getMdao(), getOf(), getJournalName());
+              } else {
+                delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName());
+              }
+            }
           }
         }
 
@@ -151,7 +170,7 @@ foam.CLASS({
 
         if ( getDecorator() != null ) {
           if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
-            logger.error(this.getClass().getSimpleName(), "delegate", "NSpec.name", getName(), "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
+            getLogger().error(getName(), "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
             System.exit(1);
           }
           // The decorator dao may be a proxy chain
@@ -174,7 +193,7 @@ foam.CLASS({
           delegate = delegateBuilder.build();
 
           if ( getApprovableAwareEnabled() ) {
-            logger.warning("DEPRECATED: EasyDAO", getName(), "'approvableAwareEnabled' is deprecated. Please remove it from the nspec.");
+            getLogger().warning("DEPRECATED: EasyDAO", getName(), "'approvableAwareEnabled' is deprecated. Please remove it from the nspec.");
           }
         }
 
@@ -257,10 +276,14 @@ foam.CLASS({
             .build();
         }
 
-        if ( getNSpec() != null && getNSpec().getServe() && ! getAuthorize() && ! getReadOnly() )
-          logger.warning("EasyDAO", getName(), "Served DAO should be Authorized, or ReadOnly");
+        if ( getNSpec() != null &&
+             getNSpec().getServe() &&
+             ! getAuthorize() &&
+             ! getReadOnly() )
+          getLogger().warning("EasyDAO", getName(), "Served DAO should be Authorized, or ReadOnly");
 
-        if ( getPermissioned() && ( getNSpec() != null && getNSpec().getServe() ) )
+        if ( getPermissioned() &&
+            ( getNSpec() != null && getNSpec().getServe() ) )
           delegate = new foam.nanos.auth.PermissionedPropertyDAO.Builder(getX()).setDelegate(delegate).build();
 
         if ( getReadOnly() )
@@ -492,8 +515,7 @@ foam.CLASS({
       value: 'foam.dao.IDBDAO'
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.dao.MDAO',
+      class: 'foam.dao.DAOProperty',
       name: 'mdao'
     },
     {
@@ -696,9 +718,8 @@ model from which to test ServiceProvider ID (spid)`,
       name: 'init_',
       javaCode: `
        if ( of_ == null ) {
-         foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
-         if ( logger != null ) {
-           logger.error("EasyDAO", getName(), "'of' not set.", new Exception("of not set"));
+         if ( getLogger() != null ) {
+           getLogger().error("EasyDAO", getName(), "'of' not set.", new Exception("of not set"));
          } else {
            System.err.println("EasyDAO "+getName()+" 'of' not set.");
          }
@@ -951,7 +972,7 @@ model from which to test ServiceProvider ID (spid)`,
       },
       javaCode: `
         if ( getMdao() != null ) {
-          getMdao().addIndex(props);
+          ((foam.dao.MDAO) getMdao()).addIndex(props);
         }
         return this;
       `
@@ -974,7 +995,7 @@ model from which to test ServiceProvider ID (spid)`,
       },
       javaCode: `
         if ( getMdao() != null )
-          getMdao().addIndex(index);
+          ((foam.dao.MDAO) getMdao()).addIndex(index);
         return this;
       `
     },
