@@ -41,7 +41,7 @@ public class Boot {
     XLocator.set(root_);
 
     Logger logger = new ProxyLogger(new StdoutLogger());
-    root_ = root_.put("logger", logger);
+    root_.put("logger", logger);
 
     if ( SafetyUtil.isEmpty(datadir) ) {
       datadir = System.getProperty("JOURNAL_HOME");
@@ -83,20 +83,20 @@ public class Boot {
     }, null);
 
     // Use an XFactory so that the root context can contain itself.
-    root_ = root_.putFactory(ROOT, new XFactory() {
+    root_.putFactory(ROOT, new XFactory() {
       public Object create(X x) {
         return Boot.this.getX();
       }
     });
 
-    root_ = root_.putFactory("user", new XFactory() {
+    root_.putFactory("user", new XFactory() {
       public Object create(X x) {
         logger.warning(new Exception("Deprecated use of x.get(\"user\")"));
         return ((Subject) x.get("subject")).getUser();
       }
     });
 
-    root_ = root_.putFactory("agent", new XFactory() {
+    root_.putFactory("agent", new XFactory() {
       public Object create(X x) {
         logger.warning(new Exception("Deprecated use of x.get(\"agent\")"));
         return ((Subject) x.get("subject")).getRealUser();
