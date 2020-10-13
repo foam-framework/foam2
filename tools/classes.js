@@ -650,18 +650,19 @@ var classes = [
   'foam.nanos.crunch.lite.CapablePayload',
   'foam.nanos.crunch.lite.CapablePayloadStatusDAO',
   'foam.nanos.crunch.lite.CapableCompatibleCapability',
-  
+
   'foam.nanos.crunch.lite.ruler.CapableCreateApprovalsRuleAction',
   'foam.nanos.crunch.lite.ruler.ReputDependantPayloads',
   'foam.nanos.crunch.lite.ruler.SetCapablePayloadStatusOnPut',
   'foam.nanos.crunch.lite.ruler.CapablePayloadApprovableRuleAction',
 
+  'foam.u2.wizard.BaseWizardlet',
   'foam.nanos.crunch.CapabilityCategory',
   'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
   'foam.nanos.crunch.CapabilityJunctionStatus',
   'foam.nanos.crunch.UserCapabilityJunction',
   'foam.nanos.crunch.ui.CapabilityWizardlet',
-  'foam.u2.wizard.BaseWizardlet',
+  'foam.nanos.crunch.ui.MinMaxCapabilityWizardlet',
   'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
   'foam.nanos.crunch.AssociatedEntity',

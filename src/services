@@ -40,10 +40,10 @@ p({
   "serve":true,
   "serviceScript":"""
     return new foam.dao.PMDAO(x,
-      new foam.nanos.auth.AuthorizationDAO(x,
-        x.get("nSpecDAO"),
-        new foam.nanos.auth.StandardAuthorizer("service")
-      )
+      new foam.nanos.auth.AuthorizationDAO.Builder(x)
+        .setDelegate(x.get("nSpecDAO"))
+        .setAuthorizer(new foam.nanos.auth.StandardAuthorizer("service"))
+        .build()
     );
   """,
   "client":"""
@@ -551,7 +551,10 @@ p({
   "serve":true,
   "serviceScript":
   """
-    return new foam.nanos.auth.AuthorizationDAO(x, (foam.dao.DAO) x.get("localServiceProviderDAO"), new foam.nanos.auth.StandardAuthorizer("capability"));
+    return new foam.nanos.auth.AuthorizationDAO.Builder(x)
+      .setDelegate((foam.dao.DAO) x.get("localServiceProviderDAO"))
+      .setAuthorizer(new foam.nanos.auth.StandardAuthorizer("capability"))
+      .build();
   """,
   "client":"{\"of\":\"foam.nanos.auth.ServiceProvider\"}"
 })

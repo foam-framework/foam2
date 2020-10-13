@@ -438,7 +438,7 @@ public class JSONFObjectFormatter
   }
 
   public void output(ClassInfo info) {
-    outputKey(info.getId());
+    output(info.getId());
 //    append('{');
 //    if ( quoteKeys_ ) append(beforeKey_());
 //    append("class");

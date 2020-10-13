@@ -28,6 +28,7 @@
   css: `
     ^ {
       overflow: scroll;
+      padding-bottom: 20px;
     }
     ^table {
       position: relative;
