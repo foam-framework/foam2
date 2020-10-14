@@ -126,12 +126,6 @@ foam.CLASS({
       user-select: none;
     }
 
-    ^button-container-base{
-      background-color: white!important;
-      border-color: white!important;
-      box-shadow: none!important;
-    }
-
     ^disabled-button-container>button {
       background-color: white!important;
       color: grey;
@@ -146,7 +140,11 @@ foam.CLASS({
       box-shadow: none!important;
     }
 
-    ^button-container-base>button:hover {
+    ^button-container>button:hover {
+      border-color: white!important;
+    }
+
+    ^disabled-button-container>button:hover {
       border-color: white!important;
     }
   `,
