@@ -28,5 +28,17 @@ foam.CLASS({
       of: 'foam.nanos.auth.AuthService',
       name: 'delegate'
     }
+  ],
+
+  methods: [
+    {
+      name: 'require',
+      javaCode: `
+        if ( ! check(x, permission) ) {
+          if ( exception != null ) throw exception;
+          throw new AuthorizationException();
+        }
+      `
+    }
   ]
 });

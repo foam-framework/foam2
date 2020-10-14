@@ -35,9 +35,7 @@ public class StandardAuthorizer implements Authorizer {
 
     String permission = createPermission("create");
     AuthService authService = (AuthService) x.get("auth");
-    if ( ! authService.check(x, permission) ) {
-      throw new AuthorizationException();
-    }
+    authService.require(x, permission, null);
   }
 
   public void authorizeOnRead(X x, FObject obj) throws AuthorizationException {
@@ -45,9 +43,7 @@ public class StandardAuthorizer implements Authorizer {
     String permission = createPermission("read", obj.getProperty("id"));
     AuthService authService = (AuthService) x.get("auth");
 
-    if ( ! authService.check(x, permission) ) {
-      throw new AuthorizationException();
-    }
+    authService.require(x, permission, null);
   }
 
   public void authorizeOnUpdate(X x, FObject oldObj, FObject obj) throws AuthorizationException {
@@ -55,9 +51,7 @@ public class StandardAuthorizer implements Authorizer {
     String permission = createPermission("update", obj.getProperty("id"));
     AuthService authService = (AuthService) x.get("auth");
 
-    if ( ! authService.check(x, permission) ) {
-      throw new AuthorizationException();
-    }
+    authService.require(x, permission, null);
   }
 
   public void authorizeOnDelete(X x, FObject obj) throws AuthorizationException {
@@ -65,9 +59,7 @@ public class StandardAuthorizer implements Authorizer {
     String permission  = createPermission("remove", obj.getProperty("id"));
     AuthService authService = (AuthService) x.get("auth");
 
-    if ( ! authService.check(x, permission) ) {
-      throw new AuthorizationException();
-    }
+    authService.require(x, permission, null);
   }
 
   public boolean checkGlobalRead(X x, Predicate predicate) {

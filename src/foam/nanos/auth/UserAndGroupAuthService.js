@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'UserAndGroupAuthService',
+  extends: 'foam.nanos.auth.AbstractAuthService',
   flags: ['java'],
 
   implements: [
