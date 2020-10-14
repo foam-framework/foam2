@@ -128,7 +128,7 @@ foam.CLASS({
 
     ^button-contriner > button {
       background-color: white!important;
-      color: grey;
+      color: /*%BLACK%*/ #1e1f21;
       border-color: white!important;
       box-shadow: none!important;
     }
@@ -180,10 +180,10 @@ foam.CLASS({
         self.overlay_.close();
       });
 
-      this.overlay_.forEach(self.data, function(action) {
+      this.overlay_.startContext({ data: self.obj })
+      .forEach(self.data, function(action) {
         this
           .start()
-          .startContext({ data: self.obj })
               .start()
                 .addClass(self.myClass('button-contriner'))
                 .add(action).
@@ -192,9 +192,9 @@ foam.CLASS({
                     return e ? false : 'disabled';
                   })
                 })
-              .end()
-            .endContext();
-        });
+              .end();
+        })
+        .endContext();
 
       // Add the overlay to the controller so if the table is inside a container
       // with `overflow: hidden` then this overlay won't be cut off.
