@@ -66,6 +66,66 @@ foam.CLASS({
       class: 'Boolean',
       name: 'isValid',
       value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'isVisible',
+      expression: function (isAvailable) {
+        return isAvailable;
+      }
+    },
+    {
+      name: 'isAvailable',
+      class: 'Boolean',
+      value: true,
+      documentation: `
+        Specify the availability of this wizardlet. If true, wizardlet is
+        available iff at least one section is available. If false, wizardlet
+        does not display even if some sections are available.
+      `,
+      postSet: function(_,n){
+        if ( !n ){
+          this.choiceWizardlets.forEach(cw => {
+            cw.isAvailable = false
+            
+            this.capable.getCapablePayloadDAO().remove(
+              cw.targetPayload).then(() => {
+                console.log('CANCELLED ' +
+                  cw.targetPayload.capability.name
+                );
+              }
+            );
+          });
+
+          this.cancel();
+        } else {
+          this.save();
+        }
+      }
+    },
+    {
+      name: 'sections',
+      flags: ['web'],
+      transient: true,
+      class: 'FObjectArray',
+      of: 'foam.u2.wizard.WizardletSection',
+      factory: function () {
+        return [
+          this.WizardletSection.create({
+            isAvailable: true,
+            title: this.targetPayload.capability.name,
+            customView: {
+              class: 'foam.u2.view.MultiChoiceView',
+              choices$: this.choices$,
+              booleanView: this.CardSelectView,
+              isValidNumberOfChoices$: this.isValid$,
+              minSelected$: this.min$,
+              maxSelected$: this.max$,
+              onSelect: this.adjustCapablePayloads.bind(this)
+            }
+          })
+        ];
+      }
     }
   ],
 
@@ -75,34 +135,42 @@ foam.CLASS({
       code: function(oldChoices, newChoices) {
         var choiceWizardlets = this.choiceWizardlets;
 
-        var selectedOldChoices = oldChoices.filter(choice => typeof choice[2] === 'object' ? choice[2].get() : choice[2]);
-        var selectedNewChoices = newChoices.filter(choice => typeof choice[2] === 'object' ? choice[2].get() : choice[2]);
+        var selectedOldChoicesNames = oldChoices.map(choice => choice[0]);
+        var selectedNewChoicesNames = newChoices.map(choice => choice[0]);
 
-        var selectedOldChoicesNames = selectedOldChoices.map(choice => choice[0]);
-        var selectedNewChoicesNames = selectedNewChoices.map(choice => choice[0]);
-
-        if ( selectedOldChoices.length > selectedNewChoices.length ){
+        if ( selectedOldChoicesNames.length > selectedNewChoicesNames.length ){
           var deselectedChoiceName = selectedOldChoicesNames.filter(choice => selectedNewChoicesNames.indexOf(choice) == -1)[0]
 
-          var deselectedChoice = selectedOldChoices.filter(choice => choice[0] === deselectedChoiceName)[0];
+          var deselectedChoice = oldChoices.filter(choice => choice[0] === deselectedChoiceName)[0];
 
           var deselectedWizard = choiceWizardlets.filter(wizard => wizard.title === deselectedChoice[0]);
 
           var { targetPayload } =  deselectedWizard[0];
 
-          this.capable.capablePayloads = this.capable.capablePayloads.filter(capablePayload => capablePayload !== targetPayload);
+          this.capable.getCapablePayloadDAO().remove(
+            targetPayload).then(() => {
+              console.log('CANCELLED ' +
+                targetPayload.capability.name
+              );
+            }
+          );
 
-        } else if (selectedOldChoices.length < selectedNewChoices.length ) {
+        } else if (selectedOldChoicesNames.length < selectedNewChoicesNames.length ) {
 
           var selectedChoiceName = selectedNewChoicesNames.filter(choice => selectedOldChoicesNames.indexOf(choice) == -1)[0]
 
-          var selectedChoice = selectedNewChoices.filter(choice => choice[0] === selectedChoiceName)[0];
+          var selectedChoice = newChoices.filter(choice => choice[0] === selectedChoiceName)[0];
           
           var selectedWizard = choiceWizardlets.filter(wizard => wizard.title === selectedChoice[0]);
 
           var { targetPayload } =  selectedWizard[0];
 
-          this.capable.capablePayloads.push(targetPayload);
+          this.capable.getCapablePayloadDAO().put(
+            targetPayload).then(() => {
+              console.log('SAVED ' +
+                targetPayload.capability.name
+              );
+            });
 
         } else {
           console.warn('Both selectedOldChoices and selectedNewChoices should  not have the same length');

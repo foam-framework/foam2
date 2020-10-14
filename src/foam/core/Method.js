@@ -102,7 +102,6 @@ foam.CLASS({
       if ( ! method ) {
         if ( this.name == 'toDisjunctiveNormalForm' ) {
           console.warn('Method code missing for', this.name);
-          debugger;
         }
         return;
       }

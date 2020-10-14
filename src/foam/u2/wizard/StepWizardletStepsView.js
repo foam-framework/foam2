@@ -135,9 +135,7 @@ foam.CLASS({
               let isBeforeCurrentSection = w < wi || isCurrent && s < si;
 
               let allowedToSkip = self.data.canSkipTo(pos);
-              let slot = section.createIsAvailableFor(
-                wizardlet.data$
-              ).map(function (isAvailable) {
+              let slot = section.isAvailable$.map(function (isAvailable) {
                 return isAvailable ? self.renderSectionLabel(
                   self.E().addClass(self.myClass('sub-item')),
                   section, s+1,

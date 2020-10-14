@@ -52,7 +52,6 @@ foam.CLASS({
 
   methods: [
     function init() {
-
       // TODO: this should be moved to the server's getTranslations() method
       this.loadLanguageLocales().then(() => {
         if ( this.hasVariant() ) {
@@ -78,6 +77,7 @@ foam.CLASS({
     },
 
     function addLocale(l) {
+//      console.log('************** addLocale2', l.source, '->',l.target);
       this.localeCache.put(this.Locale.create({
         id: l.source,
         // locale: l.locale,
@@ -101,10 +101,12 @@ foam.CLASS({
       args: [ 'String locale', 'String source' ],
       type: 'String',
       code: function(locale, source) {
-        return this.initLatch.then(() => {
-          this.localeCache.find(source).then(l => {
-            console.log('    -> ', l && l.target);
-            return l && l.target;
+        return new Promise(resolve => {
+          this.initLatch.then(() => {
+            this.localeCache.find(source).then(l => {
+//              console.log('****** getTranslation', locale, source, l && l.target);
+              resolve(l && l.target);
+            });
           });
         });
       }

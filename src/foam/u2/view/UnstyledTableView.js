@@ -53,12 +53,6 @@ foam.CLASS({
     }
   ],
 
-  css: `
-    ^{
-      overflow-y: scroll;
-    }
-  `,
-
   properties: [
     {
       class: 'Class',

@@ -15,7 +15,8 @@ foam.CLASS({
   properties: [
     {
       class: 'Boolean',
-      name: 'feedback_'
+      name: 'feedback_',
+      documentation: 'Internal flag to prevent feedback loops'
     },
     {
       name: 'value',
