@@ -48,7 +48,7 @@ foam.ENUM({
     {
       name: 'PENDING_REVIEW',
       label: { en: 'pending review', pt: 'revisão pendente' },
-      documentation: `This is for capabilities that are waiting a privileged user review.`,
+      documentation: `This is for capabilities that are still open to changes but also waiting a privileged user review.`,
       background: '#bfae32'
     }
   ]
