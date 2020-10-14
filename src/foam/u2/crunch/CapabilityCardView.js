@@ -30,6 +30,10 @@ foam.CLASS({
       background-position: 50% 50%;
       flex-shrink: 0;
     }
+
+    ^ .foam-u2-crunch-Style-card-title {
+      margin-bottom: 4px;
+    }
   `,
 
   imports: [
@@ -88,6 +92,7 @@ foam.CLASS({
       style.addBinds(self);
 
       self
+        .addClass(this.myClass())
         .addClass(style.myClass())
         .addClass(style.myClass('mode-circle'))
         .start()
