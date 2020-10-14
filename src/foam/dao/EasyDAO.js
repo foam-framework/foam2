@@ -210,7 +210,7 @@ foam.CLASS({
           delegate = delegateBuilder.build();
 
           if ( getApprovableAwareEnabled() ) {
-            getLogger().warning("DEPRECATED", getName(), "'approvableAwareEnabled' is deprecated. Please remove it from the nspec.");
+            getLogger().warning("DEPRECATED: EasyDAO", getName(), "'approvableAwareEnabled' is deprecated. Please remove it from the nspec.");
           }
         }
 

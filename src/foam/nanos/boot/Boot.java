@@ -83,20 +83,20 @@ public class Boot {
     }, null);
 
     // Use an XFactory so that the root context can contain itself.
-    root_ = root_.putFactory(ROOT, new XFactory() {
+    root_.putFactory(ROOT, new XFactory() {
       public Object create(X x) {
         return Boot.this.getX();
       }
     });
 
-    root_ = root_.putFactory("user", new XFactory() {
+    root_.putFactory("user", new XFactory() {
       public Object create(X x) {
         logger.warning(new Exception("Deprecated use of x.get(\"user\")"));
         return ((Subject) x.get("subject")).getUser();
       }
     });
 
-    root_ = root_.putFactory("agent", new XFactory() {
+    root_.putFactory("agent", new XFactory() {
       public Object create(X x) {
         logger.warning(new Exception("Deprecated use of x.get(\"agent\")"));
         return ((Subject) x.get("subject")).getRealUser();
@@ -135,18 +135,7 @@ public class Boot {
       Script script    = (Script) scriptDAO.find(startScript);
       if ( script != null ) {
         logger.info("Boot,script", startScript);
-        script = (Script) script.fclone();
-        // REVIEW: want main to run in ReadOnlyContext, but tests to run normally
-        if ( "main".equals(startScript) ) {
-          try {
-            // NOTE: is read-only and will throw exception when it updates rundate.
-            script.runScript(new foam.core.ReadOnlyDAOContext(root_));
-          } catch (UnsupportedOperationException e) {
-            // ignore
-          }
-        } else {
-          script.runScript(root_);
-        }
+        ((Script) script.fclone()).runScript(root_);
       } else {
         logger.warning("Boot, Script not found", startScript);
       }
