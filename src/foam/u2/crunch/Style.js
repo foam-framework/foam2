@@ -46,7 +46,7 @@ foam.CLASS({
     }
 
     ^card-title {
-      margin: 8px 0;
+      margin: 0;
       min-height: 20px;
       font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 16px;
@@ -60,7 +60,6 @@ foam.CLASS({
 
     ^card-subtitle {
       margin: 0;
-      height: 14px;
       font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 11px;
       font-weight: normal;
@@ -221,7 +220,7 @@ foam.CLASS({
 
       position: absolute;
       z-index: 1;
-      bottom: -167%;
+      bottom: -115%;
       right: calc(100% + 16px);
 
       opacity: 0;
