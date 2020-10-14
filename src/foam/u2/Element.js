@@ -672,7 +672,7 @@ foam.CLASS({
   constants: [
     {
       name: 'CSS_CLASSNAME_PATTERN',
-      factory: function() { return /^[a-z_-][ a-z\d_-]*$/i; }
+      factory: function() { return /^[a-z_-][a-z\d_-]*$/i; }
     },
     {
       documentation: `
@@ -1940,6 +1940,8 @@ foam.CLASS({
       if ( oldClass ) this.removeClass(oldClass);
       if ( newClass ) {
         if ( ! this.CSS_CLASSNAME_PATTERN.test(newClass) ) {
+          if ( newClass.includes(' ') )
+            console.log("error");
           console.log('!!!!!!!!!!!!!!!!!!! Invalid CSS ClassName: ', newClass);
           throw "Invalid CSS classname";
         }
