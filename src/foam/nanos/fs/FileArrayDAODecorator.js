@@ -36,6 +36,11 @@ foam.CLASS({
       var promises = props.map((prop) => {
         let files = prop.f(obj);
         return Promise.all(files.map(async f => {
+
+          // We do not allow file update, so there is no point to send file again
+          // if it is already stored and has id
+          if ( f.id ) return f;
+
           if ( f.filesize <= this.maxStringDataSize ) {
             f.dataString = await this.encode(f.data.blob);
             f.data = undefined;
