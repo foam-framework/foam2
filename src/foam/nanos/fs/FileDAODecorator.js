@@ -21,7 +21,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'maxStringDataSize',
-      value: 1024 * 1024 * 3
+      value: 1024 * 3
     }
   ],
 
@@ -37,6 +37,10 @@ foam.CLASS({
         if ( ! prop ) return obj;
 
         var file = prop.f(obj);
+
+        // We do not allow file update, so there is no point to send file again
+        // if it is already stored and has id
+        if ( f.id ) return f;
 
         if ( ! file ) return a();
 
