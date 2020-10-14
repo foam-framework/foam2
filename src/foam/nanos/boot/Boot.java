@@ -135,18 +135,7 @@ public class Boot {
       Script script    = (Script) scriptDAO.find(startScript);
       if ( script != null ) {
         logger.info("Boot,script", startScript);
-        script = (Script) script.fclone();
-        // REVIEW: want main to run in ReadOnlyContext, but tests to run normally
-        if ( "main".equals(startScript) ) {
-          try {
-            // NOTE: is read-only and will throw exception when it updates rundate.
-            script.runScript(new foam.core.ReadOnlyDAOContext(root_));
-          } catch (UnsupportedOperationException e) {
-            // ignore
-          }
-        } else {
-          script.runScript(root_);
-        }
+        ((Script) script.fclone()).runScript(root_);
       } else {
         logger.warning("Boot, Script not found", startScript);
       }
