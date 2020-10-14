@@ -103,13 +103,10 @@ p({
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "clusterConfigSupport",
-  "serve": true,
-  "serviceScript":
-  """
+  "serviceScript":"""
     return new foam.nanos.medusa.ClusterConfigSupport.Builder(x)
       .build();
-  """,
-  "client": "{\"of\":\"foam.nanos.medusa.ClusterConfigSupport\"}"
+  """
 })
 
 p({
