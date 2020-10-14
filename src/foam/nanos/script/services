@@ -11,7 +11,7 @@ p({
       .setGuid(true)
       .setPm(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("scriptEvents")
+      .setJournalName("scripts")
       .setDecorator(new foam.nanos.script.ScriptRunnerDAO(new foam.dao.NullDAO(x, foam.nanos.script.Script.getOwnClassInfo())))
       .setOrder(new foam.mlang.order.Comparator[] { new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.script.Script.LAST_RUN).build() })
       .build();
