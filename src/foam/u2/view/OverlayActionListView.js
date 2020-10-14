@@ -126,14 +126,27 @@ foam.CLASS({
       user-select: none;
     }
 
-    ^button-contriner > button {
+    ^button-container-base{
+      background-color: white!important;
+      border-color: white!important;
+      box-shadow: none!important;
+    }
+
+    ^disabled-button-container>button {
+      background-color: white!important;
+      color: grey;
+      border-color: white!important;
+      box-shadow: none!important;
+    }
+
+    ^button-container>button {
       background-color: white!important;
       color: /*%BLACK%*/ #1e1f21;
       border-color: white!important;
       box-shadow: none!important;
     }
 
-    ^button-contriner > button:hover {
+    ^button-container-base>button:hover {
       border-color: white!important;
     }
   `,
@@ -183,16 +196,16 @@ foam.CLASS({
       this.overlay_.startContext({ data: self.obj })
       .forEach(self.data, function(action) {
         this
-          .start()
-              .start()
-                .addClass(self.myClass('button-contriner'))
-                .add(action).
-                attrs({
-                  disabled: action.createIsEnabled$(self.__context__, self.obj).map(function(e) {
-                    return e ? false : 'disabled';
-                  })
+            .start()
+              .addClass(action.createIsEnabled$(self.__context__, self.obj).map( e => e ? self.myClass('button-container') : self.myClass('disabled-button-container')))
+              .addClass('button-container-base')
+              .add(action)
+              .attrs({
+                disabled: action.createIsEnabled$(self.__context__, self.obj).map(function(e) {
+                  return e ? false : true;
                 })
-              .end();
+              })
+            .end();
         })
         .endContext();
 
