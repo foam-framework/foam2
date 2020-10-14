@@ -33,14 +33,14 @@ foam.CLASS({
         .build();
 
       // TEST: start time should be the first scheduled time
-      next.setTime(testInterval.getNextScheduledTime(now.getTime()));
+      next.setTime(testInterval.getNextScheduledTime(x, now.getTime()));
       test(now.getTime().equals(next.getTime()),
         "First scheduled time for IntervalSchedule is start time"
       );
 
       // TEST: next time should be 3 seconds later
       now.add(Calendar.SECOND, 1);
-      next.setTime(testInterval.getNextScheduledTime(now.getTime()));
+      next.setTime(testInterval.getNextScheduledTime(x, now.getTime()));
       now.add(Calendar.SECOND, 2);
       test(now.getTime().equals(next.getTime()),
         "Next interval minus duration equals current time"
@@ -48,7 +48,7 @@ foam.CLASS({
 
       // TEST: it should work tomorrow
       now.add(Calendar.DATE, 1);
-      next.setTime(testInterval.getNextScheduledTime(now.getTime()));
+      next.setTime(testInterval.getNextScheduledTime(x, now.getTime()));
       test(now.getTime().equals(next.getTime()),
         "Next interval minus duration equals current time"
       );
