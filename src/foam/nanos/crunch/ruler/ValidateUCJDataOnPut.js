@@ -13,6 +13,7 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.CompoundException',
     'foam.core.ContextAgent',
     'foam.core.FObject',
     'foam.core.X',
@@ -69,6 +70,8 @@ foam.CLASS({
               } catch (IllegalStateException e) {
                 Logger logger = (Logger) x.get("logger");
                 logger.error("ERROR IN UCJ DATA VALIDATION : ", e);
+                CompoundException ce = (CompoundException) x.get(CompoundException.class);
+                if ( ce != null ) ce.add(e);
                 return;
               }
             }
