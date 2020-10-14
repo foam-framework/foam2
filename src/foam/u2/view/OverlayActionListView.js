@@ -201,7 +201,7 @@ foam.CLASS({
               .add(action)
               .attrs({
                 disabled: action.createIsEnabled$(self.__context__, self.obj).map(function(e) {
-                  return e ? false : true;
+                  return ! e;
                 })
               })
             .end();
