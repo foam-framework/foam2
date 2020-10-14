@@ -150,7 +150,7 @@ foam.CLASS({
       })
 
       p.catch(err => {
-        console.error(err, 'from wizard flow');
+        intercept.reject(err.data);
       })
 
       return p;
