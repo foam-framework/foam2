@@ -219,7 +219,7 @@ foam.CLASS({
       font-size: 12px;
 
       position: absolute;
-      z-index: 1;
+      z-index: 101;
       bottom: -115%;
       right: calc(100% + 16px);
 
