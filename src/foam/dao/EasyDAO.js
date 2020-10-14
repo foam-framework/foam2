@@ -306,19 +306,6 @@ foam.CLASS({
       class: 'Object',
       type: 'foam.dao.DAO',
       name: 'innerDAO',
-      javaFactory: `
-      if ( getNullify() ) {
-        return new foam.dao.NullDAO.Builder(getX())
-        .setOf(getOf())
-        .build();
-      }
-      if ( getWriteOnly() ) {
-        return new foam.dao.WriteOnlyJDAO(getX(), new foam.dao.MDAO(getOf()), getOf(), getJournalName());
-      }
-      if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) )
-        return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
-      return new foam.dao.MDAO(getOf());
-      `
     },
     {
       class: 'Object',
