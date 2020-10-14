@@ -133,17 +133,11 @@ foam.CLASS({
     }
 
     ^disabled-button-container>button {
-      background-color: white!important;
       color: grey;
-      border-color: white!important;
-      box-shadow: none!important;
     }
 
     ^button-container>button {
-      background-color: white!important;
       color: /*%BLACK%*/ #1e1f21;
-      border-color: white!important;
-      box-shadow: none!important;
     }
 
     ^button-container-base>button:hover {
@@ -198,7 +192,7 @@ foam.CLASS({
         this
             .start()
               .addClass(action.createIsEnabled$(self.__context__, self.obj).map( e => e ? self.myClass('button-container') : self.myClass('disabled-button-container')))
-              .addClass('button-container-base')
+              .addClass(self.myClass('button-container-base'))
               .add(action)
               .attrs({
                 disabled: action.createIsEnabled$(self.__context__, self.obj).map(function(e) {
