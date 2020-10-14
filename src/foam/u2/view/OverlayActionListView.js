@@ -125,6 +125,17 @@ foam.CLASS({
       -ms-user-select: none;
       user-select: none;
     }
+
+    ^button-contriner > button {
+      background-color: white!important;
+      color: grey;
+      border-color: white!important;
+      box-shadow: none!important;
+    }
+
+    ^button-contriner > button:hover {
+      border-color: white!important;
+    }
   `,
 
   methods: [
@@ -164,25 +175,26 @@ foam.CLASS({
         code: (...rest) => ! rest.reduce((l, r) => l || r, false)
       })));
 
-      this.overlay_.add(this.slot(function() {
-        return this.E().forEach(this.data, function(action) {
-          this.
-            start().
-              show(action.createIsAvailable$(self.__context__, self.obj)).
-              addClass(self.myClass('action')).
-              add(action.label).
-              on('click', function(evt) {
-                self.overlay_.close();
-                action.maybeCall(self.__subContext__, self.obj);
-              }).
-              attrs({
-                disabled: action.createIsEnabled$(self.__context__, self.obj).map(function(e) {
-                  return e ? false : 'disabled';
+
+      self.obj.sub(function() {
+        self.overlay_.close();
+      });
+
+      this.overlay_.forEach(self.data, function(action) {
+        this
+          .start()
+          .startContext({ data: self.obj })
+              .start()
+                .addClass(self.myClass('button-contriner'))
+                .add(action).
+                attrs({
+                  disabled: action.createIsEnabled$(self.__context__, self.obj).map(function(e) {
+                    return e ? false : 'disabled';
+                  })
                 })
-              }).
-            end();
+              .end()
+            .endContext();
         });
-      }));
 
       // Add the overlay to the controller so if the table is inside a container
       // with `overflow: hidden` then this overlay won't be cut off.

@@ -672,7 +672,7 @@ foam.CLASS({
   constants: [
     {
       name: 'CSS_CLASSNAME_PATTERN',
-      factory: function() { return /^[a-z_-][a-z\d_-]*$/i; }
+      factory: function() { return /^[a-z_-][ a-z\d_-]*$/i; }
     },
     {
       documentation: `
