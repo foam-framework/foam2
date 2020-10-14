@@ -1940,8 +1940,6 @@ foam.CLASS({
       if ( oldClass ) this.removeClass(oldClass);
       if ( newClass ) {
         if ( ! this.CSS_CLASSNAME_PATTERN.test(newClass) ) {
-          if ( newClass.includes(' ') )
-            console.log("error");
           console.log('!!!!!!!!!!!!!!!!!!! Invalid CSS ClassName: ', newClass);
           throw "Invalid CSS classname";
         }
