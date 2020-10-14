@@ -208,7 +208,7 @@ configuration for contacting the primary node.`,
         return this.nodeCount / (nodeQuorum + nodeRedundancy);
       },
       javaFactory: `
-      return Math.max(1, getNodeCount() / (getNodeQuorum() + getNodeRedundancy()));
+      return Math.max(1, getNodeCount() / (getNodeQuorum() + Math.max(1, getNodeRedundancy())));
       `
     },
     {

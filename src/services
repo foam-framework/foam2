@@ -91,21 +91,6 @@ p({
   "client": "{\"class\":\"foam.nanos.auth.CachedAuthServiceProxy\",\"delegate\":{\"class\":\"foam.nanos.auth.ClientLoginAuthService\"}}"
 })
 
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "ping",
-  "lazy": false,
-  "authenticate": false,
-  "serviceClass": "foam.nanos.http.PingService"
-})
-
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "uptime",
-  "lazy": false,
-  "authenticate": false,
-  "serviceClass": "foam.nanos.http.UptimeWebAgent"
-})
 
 p({
   "class":"foam.nanos.boot.NSpec",
@@ -118,30 +103,8 @@ p({
 
 p({
   "class": "foam.nanos.boot.NSpec",
-  "name": "static",
-  "authenticate": false,
-  "serviceClass": "foam.nanos.http.FileWebAgent"
-})
-
-p({
-  "class": "foam.nanos.boot.NSpec",
   "name": "export",
   "serviceClass": "foam.nanos.export.ExportService"
-})
-
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "trace",
-  "authenticate": false,
-  "parameters": true,
-  "enabled": false,
-  "serviceClass": "foam.nanos.http.TraceWebAgent"
-})
-
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "services",
-  "serviceClass": "foam.nanos.http.ServicesWebAgent"
 })
 
 p({
@@ -247,32 +210,6 @@ p({
   "client":"{\"of\":\"foam.nanos.auth.Group\"}"
 })
 
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "classes",
-  "serviceClass": "foam.nanos.http.ClassesWebAgent"
-})
-
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "threads",
-  "serviceClass": "foam.nanos.http.ThreadsWebAgent"
-})
-
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "login",
-  "serviceClass": "foam.nanos.http.ShowSessionWebAgent"
-})
-
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "memory",
-  "serviceScript": """
-    memoryWebAgent = new foam.nanos.http.MemoryWebAgent();
-    return new foam.nanos.http.RefreshWebAgent(memoryWebAgent);
-  """
-})
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "localCountryDAO",
@@ -430,6 +367,13 @@ p({
     \"ttlSelectPurgeTime\": 0,
     \"ttlPurgeTime\": 0,
     \"cache\":true}"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "static",
+  "authenticate": false,
+  "serviceClass": "foam.nanos.http.FileWebAgent"
 })
 
 p({
