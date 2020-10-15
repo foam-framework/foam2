@@ -568,7 +568,7 @@
       code: function(X) {
         var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
 
-        if ( X.controllerMode && X.controllerMode.equals(foam.u2.ControllerMode.SUMMARY) )
+        if ( X.controllerMode && X.controllerMode == foam.u2.ControllerMode.SUMMARY )
           this.subStack.back = function() { this.delegate.back(); };
         else
           this.subStack.back = function() {};
@@ -594,7 +594,7 @@
       code: function(X) {
         var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
 
-        if ( X.controllerMode && X.controllerMode.equals(foam.u2.ControllerMode.SUMMARY) )
+        if ( X.controllerMode && X.controllerMode == foam.u2.ControllerMode.SUMMARY )
           this.subStack.back = function() { this.delegate.back(); };
         else
           this.subStack.back = function() {};
