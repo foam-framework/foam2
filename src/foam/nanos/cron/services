@@ -1,0 +1,31 @@
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"cronDAO",
+  "serve":true,
+  "serviceScript":"""
+    mdao = new foam.dao.MDAO(foam.nanos.cron.Cron.getOwnClassInfo());
+    mdao.addIndex(new foam.core.PropertyInfo[] {foam.nanos.cron.Cron.LAST_RUN});
+    mdao.addIndex(new foam.core.PropertyInfo[] {foam.nanos.cron.Cron.ENABLED});
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.cron.Cron.getOwnClassInfo())
+      .setMdao(mdao)
+      .setInnerDAO(new foam.dao.java.JDAO(x, mdao, "cronjobs"))
+      .setGuid(true)
+      .setDecorator(new foam.nanos.cron.CronScheduleDAO.Builder(x)
+        .setDelegate(new foam.nanos.script.ScriptRunnerDAO(null))
+        .build())
+      .setPm(true)
+      .setOrder(new foam.mlang.order.Comparator[] { new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.cron.Cron.LAST_RUN).build() })
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.cron.Cron\"}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"cronScheduler",
+  "lazy":false,
+  "serviceScript":"""
+    return new foam.nanos.cron.CronScheduler();
+  """
+})

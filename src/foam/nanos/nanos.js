@@ -166,6 +166,8 @@ FOAM_FILES([
   { name: "foam/nanos/script/Language" },
   { name: "foam/nanos/script/ScriptStatus" },
   { name: "foam/nanos/script/Script" },
+  { name: "foam/nanos/script/ScriptEvent" },
+  { name: "foam/nanos/script/Relationships" },
   { name: "foam/nanos/script/TestRunnerConfig" },
   { name: "foam/nanos/script/TestRunnerScript" },
   { name: "foam/nanos/jetty/HttpServer" },
@@ -259,7 +261,6 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/Notification'},
   { name: 'foam/nanos/notification/MyNotificationDAO'},
   { name: "foam/nanos/notification/ResendNotificationServiceInterface"},
-  { name: 'foam/nanos/notification/notifications/ScriptRunNotification'},
   { name: 'foam/nanos/notification/NotificationView'},
   { name: 'foam/nanos/notification/NotificationExpansionDAO'},
   { name: 'foam/nanos/notification/NotificationRowView'},
@@ -271,8 +272,8 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/SlackSetting' },
   { name: 'foam/nanos/notification/ToastNotificationDAO' },
   { name: 'foam/nanos/notification/ToastState' },
-  { name: 'foam/nanos/notification/notifications/ScriptRunNotification'},
-  { name: 'foam/nanos/notification/notifications/ScriptRunNotificationNotificationCitationView'},
+  { name: 'foam/nanos/notification/ScriptRunNotification'},
+  { name: 'foam/nanos/notification/ScriptRunNotificationNotificationCitationView'},
   { name: 'foam/nanos/dashboard/Demo' },
 
   // Ticket
