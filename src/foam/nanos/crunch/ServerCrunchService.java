@@ -325,7 +325,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       if ( ! capability.getEnabled() ) return false;
 
     var prereqs = getPrereqs(capabilityId);
-    boolean topLevelRenewable = ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ucj.getIsRenewable();
+    boolean topLevelRenewable = ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ucj.getIsRenewable();
 
     if ( prereqs == null || prereqs.size() == 0 || topLevelRenewable ) return topLevelRenewable;
 
