@@ -39,11 +39,7 @@
     'foam.dao.AbstractDAO',
     'foam.u2.dialog.Popup',
     'foam.log.LogLevel',
-    'foam.nanos.approval.ApprovalStatus',
-    {
-      path: 'foam.u2.stack.Stack',
-      flags: ['js']
-    }
+    'foam.nanos.approval.ApprovalStatus'
   ],
 
   imports: [
