@@ -548,48 +548,6 @@
       javaCode: `
         return foam.util.SafetyUtil.isEmpty(getClassification()) ? "" : "(" + getClassification() + ")" + getOperation().toString();
       `
-    },
-    {
-      name: 'approveWithMemo',
-      code: function(memo) {
-        var approvedApprovalRequest = this.clone();
-        approvedApprovalRequest.status = this.ApprovalStatus.APPROVED;
-        approvedApprovalRequest.memo = memo;
-
-        this.approvalRequestDAO.put(approvedApprovalRequest).then((req) => {
-          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
-          this.finished.pub();
-          this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
-
-          if ( this.subStack.top.length > 0 ) {
-            this.subStack.back();
-          }
-        }, (e) => {
-          this.throwError.pub(e);
-          this.notify(e.message, '', this.LogLevel.ERROR, true);
-        });
-      }
-    },
-    {
-      name: 'rejectWithMemo',
-      code: function(memo) {
-        var rejectedApprovalRequest = this.clone();
-        rejectedApprovalRequest.status = this.ApprovalStatus.REJECTED;
-        rejectedApprovalRequest.memo = memo;
-
-        this.approvalRequestDAO.put(rejectedApprovalRequest).then((o) => {
-          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
-          this.finished.pub();
-          this.notify(this.SUCCESS_REJECTED, '', this.LogLevel.INFO, true);
-
-          if ( this.subStack.top.length > 0 ) {
-            this.subStack.back();
-          }
-        }, (e) => {
-          this.throwError.pub(e);
-          this.notify(e.message, '', this.LogLevel.ERROR, true);
-        });
-      }
     }
   ],
 
@@ -616,7 +574,7 @@
           this.subStack.back = function() {};
         objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: "foam.u2.MemoModal",
-          onExecute: this.approveWithMemo.bind(this)
+          onExecute: this.approveWithMemo
         }));
       }
     },
@@ -643,7 +601,7 @@
 
         objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: "foam.u2.MemoModal",
-          onExecute: this.rejectWithMemo.bind(this),
+          onExecute: this.rejectWithMemo,
           isMemoRequired: true
         }));
       }
@@ -816,6 +774,50 @@
           });
       },
       tableWidth: 100
+    }
+  ],
+  listeners: [
+    {
+      name: 'approveWithMemo',
+      code: function(memo) {
+        var approvedApprovalRequest = this.clone();
+        approvedApprovalRequest.status = this.ApprovalStatus.APPROVED;
+        approvedApprovalRequest.memo = memo;
+
+        this.approvalRequestDAO.put(approvedApprovalRequest).then((req) => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
+
+          if ( this.subStack.top.length > 0 ) {
+            this.subStack.back();
+          }
+        }, (e) => {
+          this.throwError.pub(e);
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
+        });
+      }
+    },
+    {
+      name: 'rejectWithMemo',
+      code: function(memo) {
+        var rejectedApprovalRequest = this.clone();
+        rejectedApprovalRequest.status = this.ApprovalStatus.REJECTED;
+        rejectedApprovalRequest.memo = memo;
+
+        this.approvalRequestDAO.put(rejectedApprovalRequest).then((o) => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.notify(this.SUCCESS_REJECTED, '', this.LogLevel.INFO, true);
+
+          if ( this.subStack.top.length > 0 ) {
+            this.subStack.back();
+          }
+        }, (e) => {
+          this.throwError.pub(e);
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
+        });
+      }
     }
   ]
 });
