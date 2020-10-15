@@ -83,9 +83,7 @@ foam.CLASS({
   messages: [
     {
       name: 'INTRO_TEXT',
-      message: `Before you get started,
-      here is a list of helpful items to have on hand that will assist you
-      in answering the questions in the following step`
+      message: `In this section, we ask you to enter some details relating to your business.`
     }
   ],
 
@@ -136,25 +134,10 @@ foam.CLASS({
           // title
           .start().addClass('makeBold').add(mainCapability[0].name).end()
           // subTitle
-          .start().addClass('subTitle').add(this.INTRO_TEXT).end()
+          .start().addClass('subTitle')
+            .add(mainCapability[0].requirementViewTitle ? mainCapability[0].requirementViewTitle : this.INTRO_TEXT)
+          .end()
         .end()
-        .start()
-          .add(this.slot(
-            arrayRequirement => {
-              return this.E().forEach(arrayRequirement,
-                helpString => {
-                  return this.start().addClass('list-position')
-                    .start('img').addClass('img-position').attrs({ src: 'images/checkmark-small-green.svg' }).end()
-                    .start()
-                      .addClass('table-content')
-                      .add(helpString)
-                    .end()
-                  .end();
-                }
-              );
-            }
-          ))
-      .end()
       .start().addClass('actionPosition')
         .startContext({ data: this })
           .start(this.GET_STARTED).end()
