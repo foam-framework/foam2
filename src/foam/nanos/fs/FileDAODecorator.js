@@ -44,6 +44,10 @@ foam.CLASS({
 
         if ( ! file ) return a();
 
+        // We do not allow file update, so there is no point to send file again
+        // if it is already stored and has id
+        if ( file.id ) return file;
+
         if ( file.filesize <= self.maxStringDataSize ) {
           file.dataString = await self.encode(file.data.blob);
           file.instance_.data = undefined;
