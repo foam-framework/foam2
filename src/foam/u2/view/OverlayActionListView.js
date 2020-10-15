@@ -92,6 +92,11 @@ foam.CLASS({
   ],
 
   css: `
+    ^action-container {
+      display: flex;
+      flex-direction: column;
+    }
+
     ^action {
       padding: 10px;
     }
@@ -106,11 +111,8 @@ foam.CLASS({
     }
 
     ^icon {
-      background-size: 24px;
       width: 24px;
       height: 24px;
-      position: absolute;
-      right: 20;
     }
 
     ^icon:hover {
@@ -186,6 +188,7 @@ foam.CLASS({
         code: (...rest) => ! rest.reduce((l, r) => l || r, false)
       })));
 
+<<<<<<< Updated upstream
 
       self.obj.sub(function() {
         self.overlay_.close();
@@ -198,6 +201,20 @@ foam.CLASS({
               .addClass(action.createIsEnabled$(self.__context__, self.obj).map( e => e ? self.myClass('button-container') : self.myClass('disabled-button-container')))
               .add(action)
               .attrs({
+=======
+      this.overlay_.add(this.slot(function() {
+        return this.E().addClass(this.myClass('action-container')).forEach(this.data, function(action) {
+          this.
+            start().
+              show(action.createIsAvailable$(self.__context__, self.obj)).
+              addClass(self.myClass('action')).
+              add(action.label).
+              on('click', function(evt) {
+                self.overlay_.close();
+                action.maybeCall(self.__subContext__, self.obj);
+              }).
+              attrs({
+>>>>>>> Stashed changes
                 disabled: action.createIsEnabled$(self.__context__, self.obj).map(function(e) {
                   return ! e;
                 })
