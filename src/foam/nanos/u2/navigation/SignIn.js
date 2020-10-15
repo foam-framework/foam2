@@ -131,7 +131,7 @@ foam.CLASS({
                     this.nextStep();
                   }).catch(err => {
                     this.ctrl.add(this.NotificationMessage.create({
-                      message: err.data.message || this.ERROR_MSG,
+                      message: err.message || this.ERROR_MSG,
                       type: this.LogLevel.ERROR
                     }));
                   });
@@ -143,7 +143,7 @@ foam.CLASS({
           ).catch(
             err => {
               this.ctrl.add(this.NotificationMessage.create({
-                message: err.data.message || this.ERROR_MSG,
+                message: err.message || this.ERROR_MSG,
                 type: this.LogLevel.ERROR
               }));
           });
