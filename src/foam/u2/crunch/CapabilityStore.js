@@ -107,8 +107,7 @@ foam.CLASS({
         DAO with only visible capabilities.
       `,
       factory: function() {
-        return this.capabilityDAO
-          .where(this.EQ(this.Capability.VISIBLE, true));
+        return this.capabilityDAO;
       }
     },
     {
@@ -188,8 +187,13 @@ foam.CLASS({
       return this.E().start()// .style({ 'height': 'fit-content', 'overflow-y': 'visible' })
         .addClass(this.myClass('container'))
         .add(this.slot(function(featuredCapabilities) {
-          featuredCapabilities.select().then(result => {
+          featuredCapabilities.select().then(function(result) {
             var arr = result.array;
+            debugger;
+            var c = arr[0];
+            var p = c.availabilityPredicate;
+            var res = p.f(self.__subContext__);
+            console.log(res);
             self.totalNumCards = arr.length;
             self.featureCardArray = [];
             for ( let i = 0 ; i < self.totalNumCards ; i++ ) { // build featured cards as elements
