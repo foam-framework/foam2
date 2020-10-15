@@ -8,9 +8,6 @@ foam.CLASS({
     function push(v, parent, opt_id) {
       this.delegate.push(v, parent, opt_id);
     },
-    function back() {},
-    function top() {
-      
-    }
+    function back() {}
   ]
 });
