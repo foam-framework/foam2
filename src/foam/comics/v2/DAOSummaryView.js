@@ -109,12 +109,6 @@ foam.CLASS({
       factory: function() { 
         return () => this.stack.back();
       }
-    },
-    {
-      class: 'Enum',
-      of: 'foam.u2.ControllerMode',
-      name: 'controllerMode',
-      value: foam.u2.ControllerMode.SUMMARY
     }
   ],
 
