@@ -39,7 +39,11 @@
     'foam.dao.AbstractDAO',
     'foam.u2.dialog.Popup',
     'foam.log.LogLevel',
-    'foam.nanos.approval.ApprovalStatus'
+    'foam.nanos.approval.ApprovalStatus',
+    {
+      path: 'foam.u2.stack.Stack',
+      flags: ['js']
+    }
   ],
 
   imports: [
@@ -474,6 +478,15 @@
       class: 'String',
       name: 'approvableHashKey',
       hidden: true
+    },
+    {
+      name: 'subStack',
+      transient: true,
+      flags: ['js'],
+      factory: function() {
+        return foam.nanos.approval.NoBackStackProxy.create({delegate: this.stack});
+      },
+      cloneProperty: function() {}
     }
   ],
 
@@ -538,7 +551,7 @@
     },
     {
       name: 'approveWithMemo',
-      code: function(memo, stackBackIgnore) {
+      code: function(memo) {
         var approvedApprovalRequest = this.clone();
         approvedApprovalRequest.status = this.ApprovalStatus.APPROVED;
         approvedApprovalRequest.memo = memo;
@@ -548,9 +561,8 @@
           this.finished.pub();
           this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
 
-          if ( this.stack.top.length > 0 ) {
-            if ( ! stackBackIgnore )
-              this.stack.back();
+          if ( this.subStack.top.length > 0 ) {
+            this.subStack.back();
           }
         }, (e) => {
           this.throwError.pub(e);
@@ -560,7 +572,7 @@
     },
     {
       name: 'rejectWithMemo',
-      code: function(memo, stackBackIgnore) {
+      code: function(memo) {
         var rejectedApprovalRequest = this.clone();
         rejectedApprovalRequest.status = this.ApprovalStatus.REJECTED;
         rejectedApprovalRequest.memo = memo;
@@ -570,26 +582,13 @@
           this.finished.pub();
           this.notify(this.SUCCESS_REJECTED, '', this.LogLevel.INFO, true);
 
-          if ( this.stack.top.length > 0 ) {
-            if ( ! stackBackIgnore )
-              this.stack.back();
+          if ( this.subStack.top.length > 0 ) {
+            this.subStack.back();
           }
         }, (e) => {
           this.throwError.pub(e);
           this.notify(e.message, '', this.LogLevel.ERROR, true);
         });
-      }
-    },
-    {
-      name: 'rejectWithMemoAndDoNotGoBack',
-      code: function(memo) {
-        this.rejectWithMemo(memo, true);
-      }
-    },
-    {
-      name: 'approveWithMemoAndDoNotGoBack',
-      code: function(memo) {
-        this.approveWithMemo(memo, true);
       }
     }
   ],
@@ -610,16 +609,14 @@
       },
       code: function(X) {
         var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
-        var onExecuteFunc;
 
         if ( X.controllerMode && X.controllerMode.equals(foam.u2.ControllerMode.SUMMARY) )
-          onExecuteFunc =  this.approveWithMemo.bind(this);
+          this.subStack.back = function() { this.delegate.back(); };
         else
-          onExecuteFunc = this.approveWithMemoAndDoNotGoBack.bind(this);
-
+          this.subStack.back = function() {};
         objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: "foam.u2.MemoModal",
-          onExecute: onExecuteFunc
+          onExecute: this.approveWithMemo.bind(this)
         }));
       }
     },
@@ -639,15 +636,14 @@
       code: function(X) {
         var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
 
-        var onExecuteFunc;
         if ( X.controllerMode && X.controllerMode.equals(foam.u2.ControllerMode.SUMMARY) )
-          onExecuteFunc = this.rejectWithMemo.bind(this);
+          this.subStack.back = function() { this.delegate.back(); };
         else
-          onExecuteFunc = this.rejectWithMemoAndDoNotGoBack.bind(this);
+          this.subStack.back = function() {};
 
         objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: "foam.u2.MemoModal",
-          onExecute: onExecuteFunc,
+          onExecute: this.rejectWithMemo.bind(this),
           isMemoRequired: true
         }));
       }
@@ -820,6 +816,24 @@
           });
       },
       tableWidth: 100
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.nanos.approval',
+  name: 'NoBackStackProxy',
+  properties: [
+    'delegate',
+    {
+      name: 'top',
+      expression: function(delegate) {
+        return delegate.top;
+      }
+    },
+    {
+      class: 'Function',
+      name: 'back'
     }
   ]
 });
