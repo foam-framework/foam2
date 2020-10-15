@@ -40,8 +40,7 @@ foam.ENUM({
   values: [
     { name: 'CREATE',  label: 'Create',  modePropertyName: 'createVisibility' },
     { name: 'VIEW',    label: 'View',    modePropertyName: 'readVisibility'   },
-    { name: 'EDIT',    label: 'Edit',    modePropertyName: 'updateVisibility' },
-    { name: 'SUMMARY', label: 'Summary', modePropertyName: 'readVisibility'   }
+    { name: 'EDIT',    label: 'Edit',    modePropertyName: 'updateVisibility' }
   ]
 });
 

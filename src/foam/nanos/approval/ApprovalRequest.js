@@ -770,9 +770,7 @@
           this.finished.pub();
           this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
 
-          if ( this.stack.top.length > 0 ) {
-            this.stack.back();
-          }
+          this.stack.back();
         }, (e) => {
           this.throwError.pub(e);
           this.notify(e.message, '', this.LogLevel.ERROR, true);
@@ -791,9 +789,7 @@
           this.finished.pub();
           this.notify(this.SUCCESS_REJECTED, '', this.LogLevel.INFO, true);
 
-          if ( this.subStack.top.length > 0 ) {
-            this.subStack.back();
-          }
+          this.subStack.back();
         }, (e) => {
           this.throwError.pub(e);
           this.notify(e.message, '', this.LogLevel.ERROR, true);
