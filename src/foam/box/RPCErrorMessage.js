@@ -27,8 +27,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'message',
-      expression: function(data) {
-        return data && data.message;
+      transient: true,
+      getter: function() {
+        return this.data && this.data.message;
       }
     }
   ]
