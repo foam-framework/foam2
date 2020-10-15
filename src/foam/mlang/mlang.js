@@ -2750,6 +2750,19 @@ foam.CLASS({
     'java.util.StringJoiner'
   ],
 
+  constants: [
+    {
+      name: 'CLS_OR_OBJ_INDEX',
+      type: 'Integer',
+      value: 0
+    },
+    {
+      name: 'PROJECTION_VALUES_OFFSET',
+      type: 'Integer',
+      value: 1
+    }
+  ],
+
   properties: [
     {
       class: 'Array',
@@ -2775,12 +2788,12 @@ foam.CLASS({
       documentation: 'The projection with the class removed and all values in the same position as in "exprs".',
       name: 'projection',
       transient: true,
-      getter: function() { return this.projectionWithClass.map(p => p.slice(1)); },
+      getter: function() { return this.projectionWithClass.map(p => p.slice(this.PROJECTION_VALUES_OFFSET)); },
       javaFactory: `
         List result = new ArrayList();
         if ( getProjectionWithClass() != null ) {
           for ( Object list: (ArrayList)getProjectionWithClass() ) {
-            Object[] obj1 = Arrays.copyOfRange((Object[])list, 1, ((Object[])list).length);
+            Object[] obj1 = Arrays.copyOfRange((Object[])list, PROJECTION_VALUES_OFFSET, ((Object[])list).length);
             result.add(obj1);
           }
         }
@@ -2795,16 +2808,16 @@ foam.CLASS({
       factory: function() {
         return this.projectionWithClass.map(p => {
           if ( buildObjectsFromProjectionWithClass ) {
-            var o = foam.lookup(p[0]).create(null, this);
+            var o = foam.lookup(p[this.CLS_OR_OBJ_INDEX]).create(null, this);
             for ( var i = 0 ; i < this.exprs.length ; i++ ) {
               try {
-                this.exprs[i].set(o, p[i+1]);
+                this.exprs[i].set(o, p[i+this.PROJECTION_VALUES_OFFSET]);
               } catch (x) {
               }
             }
             return o;
           }
-          return p[0];
+          return p[this.CLS_OR_OBJ_INDEX];
         });
       },
       javaFactory: `
@@ -2815,7 +2828,7 @@ foam.CLASS({
           if ( getBuildObjectsFromProjectionWithClass() )  {
             try {
               Object[]  arr = (Object[]) p.get(i);
-              ClassInfo ci  = (ClassInfo) arr[0];
+              ClassInfo ci  = (ClassInfo) arr[CLS_OR_OBJ_INDEX];
               Object    o   = ci.newInstance();
   
               for ( int j = 0 ; j < es.length ; j++ ) {
@@ -2845,19 +2858,19 @@ foam.CLASS({
       code: function put(o, sub) {
         var a = [o.cls_.id];
         for ( var i = 0 ; i < this.exprs.length ; i++ )
-          a[i+1] = this.exprs[i].f(o);
+          a[i+this.PROJECTION_VALUES_OFFSET] = this.exprs[i].f(o);
         this.projectionWithClass.push(a);
       },
 // TODO:      swiftCode: 'array.append(obj)',
       javaCode: `
-        Object[] a = new Object[getExprs().length+1];
+        Object[] a = new Object[getExprs().length+PROJECTION_VALUES_OFFSET];
         if ( ! getBuildObjectsFromProjectionWithClass() ) {
-          a[0] = obj;
+          a[CLS_OR_OBJ_INDEX] = obj;
         } else {
-          a[0] = ((FObject) obj).getClassInfo();
+          a[CLS_OR_OBJ_INDEX] = ((FObject) obj).getClassInfo();
         }
         for ( int i = 0 ; i < getExprs().length ; i++ )
-          a[i+1] = getExprs()[i].f(obj);
+          a[i+this.PROJECTION_VALUES_OFFSET] = getExprs()[i].f(obj);
 
         getProjectionWithClass().add(a);
       `
