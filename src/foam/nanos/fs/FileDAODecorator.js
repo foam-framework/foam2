@@ -38,10 +38,6 @@ foam.CLASS({
 
         var file = prop.f(obj);
 
-        // We do not allow file update, so there is no point to send file again
-        // if it is already stored and has id
-        if ( f.id ) return f;
-
         if ( ! file ) return a();
 
         // We do not allow file update, so there is no point to send file again
