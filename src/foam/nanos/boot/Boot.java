@@ -41,7 +41,7 @@ public class Boot {
     XLocator.set(root_);
 
     Logger logger = new ProxyLogger(new StdoutLogger());
-    root_ = root_.put("logger", logger);
+    root_.put("logger", logger);
 
     if ( SafetyUtil.isEmpty(datadir) ) {
       datadir = System.getProperty("JOURNAL_HOME");
