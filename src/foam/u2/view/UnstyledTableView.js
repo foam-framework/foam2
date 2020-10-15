@@ -258,7 +258,7 @@ foam.CLASS({
       transient: true,
       flags: ['js'],
       factory: function() {
-        return foam.nanos.approval.NoBackStackProxy.create({delegate: this.stack});
+        return foam.nanos.approval.NoBackStack.create({delegate: this.stack});
       },
       cloneProperty: function() {}
     }

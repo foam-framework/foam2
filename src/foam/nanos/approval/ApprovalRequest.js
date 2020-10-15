@@ -560,7 +560,7 @@
         var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
         objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: "foam.u2.MemoModal",
-          onExecute: this.approveWithMemo
+          onExecute: this.approveWithMemo.bind(this, X)
         }));
       }
     },
@@ -582,7 +582,7 @@
 
         objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: "foam.u2.MemoModal",
-          onExecute: this.rejectWithMemo,
+          onExecute: this.rejectWithMemo.bind(this, X),
           isMemoRequired: true
         }));
       }
@@ -760,7 +760,7 @@
   listeners: [
     {
       name: 'approveWithMemo',
-      code: function(memo) {
+      code: function(X, memo) {
         var approvedApprovalRequest = this.clone();
         approvedApprovalRequest.status = this.ApprovalStatus.APPROVED;
         approvedApprovalRequest.memo = memo;
@@ -770,7 +770,7 @@
           this.finished.pub();
           this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
 
-          this.stack.back();
+          X.stack.back();
         }, (e) => {
           this.throwError.pub(e);
           this.notify(e.message, '', this.LogLevel.ERROR, true);
@@ -779,7 +779,7 @@
     },
     {
       name: 'rejectWithMemo',
-      code: function(memo) {
+      code: function(X, memo) {
         var rejectedApprovalRequest = this.clone();
         rejectedApprovalRequest.status = this.ApprovalStatus.REJECTED;
         rejectedApprovalRequest.memo = memo;
@@ -789,7 +789,7 @@
           this.finished.pub();
           this.notify(this.SUCCESS_REJECTED, '', this.LogLevel.INFO, true);
 
-          this.stack.back();
+          X.stack.back();
         }, (e) => {
           this.throwError.pub(e);
           this.notify(e.message, '', this.LogLevel.ERROR, true);
