@@ -255,12 +255,9 @@ foam.CLASS({
     },
     {
       name: 'subStack',
-      transient: true,
-      flags: ['js'],
       factory: function() {
         return foam.nanos.approval.NoBackStack.create({delegate: this.stack});
       },
-      cloneProperty: function() {}
     }
   ],
 
