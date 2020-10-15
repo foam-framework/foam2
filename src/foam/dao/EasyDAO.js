@@ -121,7 +121,7 @@ foam.CLASS({
     },
     {
       /**
-       * TODO: More investigation needed
+       * TODO: More investigation needed at https://github.com/foam-framework/foam2/pull/4085
        * Even though this property doesn't get called
        * If you uncomment the javaFactory it will break debuggers
        * To reproduce:
@@ -141,7 +141,13 @@ foam.CLASS({
       /*
       javaFactory: `
         Logger logger = (Logger) getX().get("logger");
-        return logger;
+        if ( logger == null ) {
+          logger = new foam.nanos.logger.StdoutLogger();
+        }
+
+        logger = new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, logger);
       `
       */
     },
@@ -726,7 +732,7 @@ model from which to test ServiceProvider ID (spid)`,
       name: 'init_',
       javaCode: `
        if ( of_ == null ) {
-         
+
         // TODO: replace logger instantiation once javaFactory issue above is fixed
         Logger logger = (Logger) getX().get("logger");
         if ( logger == null ) {
