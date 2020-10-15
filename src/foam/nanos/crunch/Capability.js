@@ -223,6 +223,12 @@ foam.CLASS({
       factory: function() {
         return foam.u2.wizard.StepWizardConfig.create({}, this);
       }
+    },
+    {
+      name: 'requirementViewTitle',
+      class: 'String',
+      documentation: `A short introduction displayed as subtitle in CapabilityRequirementView`,
+      section: 'uiSettings'
     }
   ],
 

@@ -38,7 +38,9 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'TAB_ALL', message: 'All' }
+    { name: 'TAB_ALL', message: 'All' },
+    { name: 'TITLE', message: 'Capabilities' },
+    { name: 'SUBTITLE', message: 'To fully enable our platform, we require a bit more information about you and your company.' }
   ],
 
   css: `
@@ -49,8 +51,22 @@ foam.CLASS({
       box-sizing: border-box;
     }
 
+    ^label-title {
+      font-weight: 900;
+      font-size: 32px;
+      margin: 24px 16px;
+      margin-bottom: 8px;
+    }
+
+    ^label-subtitle {
+      margin: 16px;
+      margin-top: 0;
+      color: #9ba1a6;
+      font-size: 18px;
+    }
+
     ^category {
-      margin-bottom: 48px;
+      margin-top: 48px;
       padding: 0px 12px;
     }
 
@@ -96,6 +112,7 @@ foam.CLASS({
       width: 100%;
       height: fit-content;
       overflow-y: visible;
+      margin-top: 24px;
     }
   `,
 
@@ -158,6 +175,12 @@ foam.CLASS({
 
       self
         .addClass(self.myClass())
+        .start('p').addClass(this.myClass('label-title'))
+          .add(this.TITLE)
+        .end()
+        .start('p').addClass(this.myClass('label-subtitle'))
+          .add(this.SUBTITLE)
+        .end()
         .add(self.renderFeatured())
         .add(self.accountAndAccountingCard())
         // NOTE: TEMPORARILY REMOVED
