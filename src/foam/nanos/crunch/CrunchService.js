@@ -230,6 +230,17 @@ foam.INTERFACE({
           type: 'String[]'
         },
       ]
+    },
+    {
+      name: 'getAllJunctionsForUser',
+      async: true,
+      type: 'UserCapabilityJunction[]',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ]
     }
   ]
 });
