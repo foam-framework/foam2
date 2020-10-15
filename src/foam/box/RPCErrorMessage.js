@@ -23,6 +23,13 @@ foam.CLASS({
     {
       class: 'Object',
       name: 'data'
+    },
+    {
+      class: 'String',
+      name: 'message',
+      expression: function(data) {
+        return data && data.message;
+      }
     }
   ]
 });
