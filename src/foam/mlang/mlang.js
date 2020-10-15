@@ -2766,7 +2766,7 @@ foam.CLASS({
     {
       class: 'List',
       name: 'projectionWithClass',
-      documentation: 'The projection but with the class in position 1 and full object if requested at position 0 with all other values offset by 2.',
+      documentation: 'The projection but with the class or full object in position 0 with all other values offset by 1.',
       factory: function() { return []; },
       javaFactory: `return new java.util.ArrayList();`
     },
@@ -2780,7 +2780,7 @@ foam.CLASS({
         List result = new ArrayList();
         if ( getProjectionWithClass() != null ) {
           for ( Object list: (ArrayList)getProjectionWithClass() ) {
-            Object[] obj1 = Arrays.copyOfRange((Object[])list, 2, ((Object[])list).length);
+            Object[] obj1 = Arrays.copyOfRange((Object[])list, 1, ((Object[])list).length);
             result.add(obj1);
           }
         }
@@ -2794,14 +2794,17 @@ foam.CLASS({
       documentation: 'An array of full objects created from the projection. Only properties included in exprs/the-projection will be set.',
       factory: function() {
         return this.projectionWithClass.map(p => {
-          var o = foam.lookup(p[1]).create(null, this);
-          for ( var i = 0 ; i < this.exprs.length ; i++ ) {
-            try {
-              this.exprs[i].set(o, p[i+2]);
-            } catch (x) {
+          if ( buildObjectsFromProjectionWithClass ) {
+            var o = foam.lookup(p[0]).create(null, this);
+            for ( var i = 0 ; i < this.exprs.length ; i++ ) {
+              try {
+                this.exprs[i].set(o, p[i+1]);
+              } catch (x) {
+              }
             }
+            return o;
           }
-          return o;
+          return p[0];
         });
       },
       javaFactory: `
@@ -2809,23 +2812,27 @@ foam.CLASS({
         var es = getExprs();
         var p  = getProjectionWithClass();
         for ( int i = 0 ; i < p.size() ; i++ ) {
-          try {
-            Object[]  arr = (Object[]) p.get(i);
-            ClassInfo ci  = (ClassInfo) arr[0];
-            Object    o   = ci.newInstance();
-
-            for ( int j = 0 ; j < es.length ; j++ ) {
-              if ( es[j] instanceof PropertyInfo ) {
-                PropertyInfo e = (PropertyInfo) es[j];
-                e.set(o, arr[i]);
-              } else if ( es[j] instanceof foam.nanos.column.NestedPropertiesExpression ) {
-                foam.nanos.column.NestedPropertiesExpression e = (foam.nanos.column.NestedPropertiesExpression) es[j];
-                e.set(o, arr[i]);
+          if ( getBuildObjectsFromProjectionWithClass() )  {
+            try {
+              Object[]  arr = (Object[]) p.get(i);
+              ClassInfo ci  = (ClassInfo) arr[0];
+              Object    o   = ci.newInstance();
+  
+              for ( int j = 0 ; j < es.length ; j++ ) {
+                if ( es[j] instanceof PropertyInfo ) {
+                  PropertyInfo e = (PropertyInfo) es[j];
+                  e.set(o, arr[i]);
+                } else if ( es[j] instanceof foam.nanos.column.NestedPropertiesExpression ) {
+                  foam.nanos.column.NestedPropertiesExpression e = (foam.nanos.column.NestedPropertiesExpression) es[j];
+                  e.set(o, arr[i]);
+                }
               }
-            }
-
-            a.set(i, o);
-          } catch (Throwable t) {}
+  
+              a.set(i, o);
+            } catch (Throwable t) {}
+          } else {
+            a.set(i, p.get(0));
+          }
         }
         return a;
       `
@@ -2836,22 +2843,21 @@ foam.CLASS({
     {
       name: 'put',
       code: function put(o, sub) {
-        var a = [null, o.cls_.id];
+        var a = [o.cls_.id];
         for ( var i = 0 ; i < this.exprs.length ; i++ )
-          a[i+2] = this.exprs[i].f(o);
+          a[i+1] = this.exprs[i].f(o);
         this.projectionWithClass.push(a);
       },
 // TODO:      swiftCode: 'array.append(obj)',
       javaCode: `
-        Object[] a = new Object[getExprs().length+2];
+        Object[] a = new Object[getExprs().length+1];
         if ( ! getBuildObjectsFromProjectionWithClass() ) {
           a[0] = obj;
         } else {
-          a[0] = null;
+          a[0] = ((FObject) obj).getClassInfo();
         }
-        a[1] = ((FObject) obj).getClassInfo();
         for ( int i = 0 ; i < getExprs().length ; i++ )
-          a[i+2] = getExprs()[i].f(obj);
+          a[i+1] = getExprs()[i].f(obj);
 
         getProjectionWithClass().add(a);
       `
