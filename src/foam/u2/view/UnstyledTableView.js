@@ -29,7 +29,8 @@ foam.CLASS({
   exports: [
     'columns',
     'hoverSelection',
-    'selection'
+    'selection',
+    'subStack as stack'
   ],
 
   imports: [
@@ -251,6 +252,15 @@ foam.CLASS({
     {
       name: 'dataChangedFlag',
       class: 'Boolean'
+    },
+    {
+      name: 'subStack',
+      transient: true,
+      flags: ['js'],
+      factory: function() {
+        return foam.nanos.approval.NoBackStackProxy.create({delegate: this.stack});
+      },
+      cloneProperty: function() {}
     }
   ],
 

@@ -478,15 +478,6 @@
       class: 'String',
       name: 'approvableHashKey',
       hidden: true
-    },
-    {
-      name: 'subStack',
-      transient: true,
-      flags: ['js'],
-      factory: function() {
-        return foam.nanos.approval.NoBackStackProxy.create({delegate: this.stack});
-      },
-      cloneProperty: function() {}
     }
   ],
 
@@ -567,11 +558,6 @@
       },
       code: function(X) {
         var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
-
-        if ( X.controllerMode && X.controllerMode == foam.u2.ControllerMode.SUMMARY )
-          this.subStack.back = function() { this.delegate.back(); };
-        else
-          this.subStack.back = function() {};
         objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: "foam.u2.MemoModal",
           onExecute: this.approveWithMemo
@@ -593,11 +579,6 @@
       },
       code: function(X) {
         var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
-
-        if ( X.controllerMode && X.controllerMode == foam.u2.ControllerMode.SUMMARY )
-          this.subStack.back = function() { this.delegate.back(); };
-        else
-          this.subStack.back = function() {};
 
         objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: "foam.u2.MemoModal",
@@ -789,8 +770,8 @@
           this.finished.pub();
           this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
 
-          if ( this.subStack.top.length > 0 ) {
-            this.subStack.back();
+          if ( this.stack.top.length > 0 ) {
+            this.stack.back();
           }
         }, (e) => {
           this.throwError.pub(e);
@@ -818,24 +799,6 @@
           this.notify(e.message, '', this.LogLevel.ERROR, true);
         });
       }
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.nanos.approval',
-  name: 'NoBackStackProxy',
-  properties: [
-    'delegate',
-    {
-      name: 'top',
-      expression: function(delegate) {
-        return delegate.top;
-      }
-    },
-    {
-      class: 'Function',
-      name: 'back'
     }
   ]
 });
