@@ -789,7 +789,7 @@
           this.finished.pub();
           this.notify(this.SUCCESS_REJECTED, '', this.LogLevel.INFO, true);
 
-          this.subStack.back();
+          this.stack.back();
         }, (e) => {
           this.throwError.pub(e);
           this.notify(e.message, '', this.LogLevel.ERROR, true);

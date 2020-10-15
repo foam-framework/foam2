@@ -2,16 +2,15 @@ foam.CLASS({
   package: 'foam.nanos.approval',
   name: 'NoBackStack',
   properties: [
-    'delegate',
-    {
-      name: 'top',
-      expression: function(delegate) {
-        return delegate.top;
-      }
+    'delegate'
+  ],
+  methods: [
+    function push(v, parent, opt_id) {
+      this.delegate.push(v, parent, opt_id);
     },
-    {
-      class: 'Function',
-      name: 'back'
+    function back() {},
+    function top() {
+      
     }
   ]
 });
