@@ -2807,7 +2807,7 @@ foam.CLASS({
       documentation: 'An array of full objects created from the projection. Only properties included in exprs/the-projection will be set.',
       factory: function() {
         return this.projectionWithClass.map(p => {
-          if ( buildObjectsFromProjectionWithClass ) {
+          if ( this.buildObjectsFromProjectionWithClass ) {
             var o = foam.lookup(p[this.CLS_OR_OBJ_INDEX]).create(null, this);
             for ( var i = 0 ; i < this.exprs.length ; i++ ) {
               try {
