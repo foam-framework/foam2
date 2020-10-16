@@ -153,7 +153,8 @@ foam.CLASS({
   requires: [
     'foam.comics.BrowserView',
     'foam.nanos.boot.NSpec',
-    'foam.comics.v2.DAOBrowserView'
+    'foam.comics.v2.DAOBrowserView',
+    'foam.nanos.controller.Memento'
   ],
 
   implements: [ 'foam.mlang.Expressions' ],
@@ -196,6 +197,8 @@ foam.CLASS({
       var self          = this;
       var currentLetter = '';
       var section;
+
+      // var mementoTail
 
       this.addClass(this.myClass()).
       start().
@@ -262,7 +265,7 @@ foam.CLASS({
               .addClass(self.myClass('dao'))
               .add(label)
               .attrs({title: spec.description})
-              .on('click', function() { self.memento = spec.id; });
+              .on('click', function() { self.memento = self.Memento.create({head: spec.id}); });
 
               self.search$.sub(function() {
                 var contains = false;
@@ -295,7 +298,7 @@ foam.CLASS({
     function mementoChange() {
       var m = this.memento;
 
-      if ( ! m ) {
+      if ( ! m || ! m.head ) {
         if ( this.currentMemento_ ) this.stack.back();
         this.currentMemento_ = '';
         return;
@@ -311,10 +314,10 @@ foam.CLASS({
 
       this.stack.push({
         class: this.BackBorder,
-        title: m,
+        title: m.head,
         inner: {
           class: 'foam.u2.view.AltView',
-          data: this.__context__[m],
+          data: this.__context__[m.head],
           views: [
             [
               {
