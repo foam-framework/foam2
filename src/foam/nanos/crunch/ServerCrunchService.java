@@ -205,36 +205,23 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return this.getJunctionForSubject(x, capabilityId, subject);
   }
 
+  public UserCapabilityJunction[] getAllJunctionsForUser(X x) {
+    Predicate associationPredicate = getAssociationPredicate_(x);
+    DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+    ArraySink arraySink = (ArraySink) userCapabilityJunctionDAO
+      .where(associationPredicate)
+      .select(new ArraySink());
+    return (UserCapabilityJunction[]) arraySink.getArray().toArray(new UserCapabilityJunction[0]);
+  }
+
   public UserCapabilityJunction getJunctionForSubject(
     X x, String capabilityId,  Subject subject
   ) {
-    User user = subject.getUser();
-    User realUser = subject.getRealUser();
-
-    Predicate acjPredicate = INSTANCE_OF(AgentCapabilityJunction.class);
     Predicate targetPredicate = EQ(UserCapabilityJunction.TARGET_ID, capabilityId);
     try {
       DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
-      Predicate associationPredicate = OR(
-        AND(
-          NOT(acjPredicate),
-          ( user != realUser )
-            // Check if a ucj implies the subject.user has this permission
-            ? OR(
-                EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId()),
-                EQ(UserCapabilityJunction.SOURCE_ID, user.getId())
-              )
-            // Check if a ucj implies the subject.realUser has this permission
-            : EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId())
-        ),
-        AND(
-          acjPredicate,
-          // Check if a ucj implies the subject.realUser has this permission in relation to the user
-          EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId()),
-          EQ(AgentCapabilityJunction.EFFECTIVE_USER, user.getId())
-        )
-      );
+      Predicate associationPredicate = getAssociationPredicate_(x);
 
       // Check if a ucj implies the subject.realUser has this permission in relation to the user
       UserCapabilityJunction ucj = (UserCapabilityJunction)
@@ -432,5 +419,34 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     outputPayloads.add(rootPayload);
 
     return outputPayloads;
+  }
+
+  private Predicate getAssociationPredicate_(X x) {
+    Subject subject = (Subject) x.get("subject");
+
+    User user = subject.getUser();
+    User realUser = subject.getRealUser();
+
+    Predicate acjPredicate = INSTANCE_OF(AgentCapabilityJunction.class);
+
+    return OR(
+      AND(
+        NOT(acjPredicate),
+        ( user != realUser )
+          // Check if a ucj implies the subject.user has this permission
+          ? OR(
+              EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId()),
+              EQ(UserCapabilityJunction.SOURCE_ID, user.getId())
+            )
+          // Check if a ucj implies the subject.realUser has this permission
+          : EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId())
+      ),
+      AND(
+        acjPredicate,
+        // Check if a ucj implies the subject.realUser has this permission in relation to the user
+        EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId()),
+        EQ(AgentCapabilityJunction.EFFECTIVE_USER, user.getId())
+      )
+    );
   }
 }

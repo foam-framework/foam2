@@ -145,7 +145,7 @@ foam.CLASS({
           logger = new foam.nanos.logger.StdoutLogger();
         }
 
-        logger = new PrefixLogger(new Object[] {
+        return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
         }, logger);
       `

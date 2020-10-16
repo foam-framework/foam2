@@ -35,7 +35,7 @@ foam.CLASS({
       super(message);
     }
 
-    public ValidationException(String message, Exception cause) {
+    public ValidationException(String message, java.lang.Exception cause) {
       super(message, cause);
     }
             `
