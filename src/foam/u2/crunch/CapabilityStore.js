@@ -17,8 +17,6 @@ foam.CLASS({
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCategory',
     'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
-    'foam.nanos.crunch.CapabilityJunctionStatus',
-    'foam.nanos.crunch.UserCapabilityJunction',
     'foam.u2.crunch.CapabilityCardView',
     'foam.u2.crunch.CapabilityFeatureView',
     'foam.u2.Element',
@@ -36,7 +34,6 @@ foam.CLASS({
     'capabilityCategoryDAO',
     'capabilityDAO',
     'crunchController',
-    'crunchService',
     'registerElement'
   ],
 
@@ -121,28 +118,14 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'hideGrantedCapabilities',
-      class: 'Boolean'
-    },
-    {
-      name: 'grantedCapabilities',
-      class: 'StringArray'
-    },
-    {
       name: 'visibleCapabilityDAO',
       class: 'foam.dao.DAOProperty',
       documentation: `
         DAO with only visible capabilities.
       `,
-      expression: function(hideGrantedCapabilities, grantedCapabilities) {
-        var predicate = this.EQ(this.Capability.VISIBLE, true);
-        if ( hideGrantedCapabilities )
-          predicate = this.AND(
-            predicate,
-            this.NOT(this.IN(this.Capability.ID, grantedCapabilities))
-          );
+      factory: function() {
         return this.capabilityDAO
-          .where(predicate);
+          .where(this.EQ(this.Capability.VISIBLE, true));
       }
     },
     {
@@ -185,16 +168,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function init() {
-      this.crunchService.getAllJunctionsForUser().then(juncs => {
-        this.grantedCapabilities = juncs
-          .filter(
-            junc => junc.status == this.CapabilityJunctionStatus.GRANTED
-          )
-          .map(junc => junc.targetId);
-        this.daoUpdate();
-      })
-    },
     function initE() {
       this.SUPER();
 
@@ -357,34 +330,6 @@ foam.CLASS({
         this.EQ(
           this.CapabilityCategoryCapabilityJunction.SOURCE_ID,
           categoryId));
-    },
-    function daoUpdate() {
-      Promise.resolve()
-        // Get visible categories
-        .then(() => this.visibleCategoryDAO.select())
-        .then(categorySink => categorySink.array.map(cat => cat.id))
-        // Get capabilities within visible categories
-        .then(categories => {
-          return this.capabilityCategoryCapabilityJunctionDAO
-            .where(this.IN(
-              this.CapabilityCategoryCapabilityJunction.SOURCE_ID,
-              categories)).select();
-        })
-        .then(cccjSink => Object.keys(
-          cccjSink.array.map(cccj => cccj.targetId)
-          .reduce((set, capabilityId) => ({ ...set, [capabilityId]: true }), {})))
-        // Get visible capabilities within visible categories
-        .then(visibleList => this.visibleCapabilityDAO
-          .where(this.OR(
-            this.IN(this.Capability.ID, visibleList),
-            this.IN('featured', this.Capability.KEYWORDS)
-          )).select())
-        .then(sink => {
-          if ( sink.array.length == 1 ) {
-            this.crunchController
-              .createWizardSequence(sink.array[0]).execute();
-          }
-        })
     }
   ]
 });
