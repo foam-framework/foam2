@@ -9,6 +9,10 @@ foam.CLASS({
   javaExtends: 'RuntimeException',
   implements: ['foam.core.Exception'],
 
+  javaImports:[
+    'java.lang.Exception'
+  ],
+
   properties: [
     {
       class: 'Object',
