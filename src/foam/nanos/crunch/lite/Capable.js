@@ -73,14 +73,26 @@ foam.INTERFACE({
 
           var oldCapabilityPayloads = getCapablePayloads();
           
-          if (
-            Arrays.stream(oldCapabilityPayloads)
-                .map((cap) -> cap.getCapability().getId())
-                .noneMatch(capabilityId::equals)
-          ) {
+          if ( !hasRequirement(x, capabilityId) ) {
             var newCapabilityPayload = crunchService.getCapableObjectPayloads(x, new String[] { capabilityId });
             setCapablePayloads((CapablePayload[]) ArrayUtils.addAll(oldCapabilityPayloads, newCapabilityPayload));
           }
+          `
+        }));
+        cls.methods.push(foam.java.Method.create({
+          name: 'hasRequirement',
+          type: 'Boolean',
+          visibility: 'default',
+          args: [
+            { name: 'x', type: 'X' },
+            { name: 'capabilityId', type: 'String' }
+          ],
+          body: `
+          var oldCapabilityPayloads = getCapablePayloads();
+          
+          return Arrays.stream(oldCapabilityPayloads)
+            .map((cap) -> cap.getCapability().getId())
+            .anyMatch(capabilityId::equals);
           `
         }));
         cls.methods.push(foam.java.Method.create({
