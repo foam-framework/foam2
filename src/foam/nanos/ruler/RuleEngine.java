@@ -13,6 +13,7 @@ import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.Exception;
 import java.time.Duration;
 import java.time.Instant;
@@ -29,7 +30,7 @@ public class RuleEngine extends ContextAwareSupport {
   private X userX_;
 
   public RuleEngine(X x, X systemX, DAO delegate) {
-    setX(systemX);
+    setX(systemX.put(HttpServletRequest.class, x.get(HttpServletRequest.class)));
     setDelegate(delegate);
     ruleHistoryDAO_ = (DAO) x.get("ruleHistoryDAO");
     userX_ = x;
