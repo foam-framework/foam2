@@ -196,7 +196,7 @@ foam.CLASS({
         setValid(false);
         if ( replyBox != null ) {
           Message reply = new Message();
-          reply.setObject(new RPCErrorMessage(t.getMessage()));
+          reply.setObject(new RPCErrorMessage(getX(), t.getMessage(), null));
           replyBox.send(reply);
           getReplyBoxes().remove(replyBoxId);
         } else {
