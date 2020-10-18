@@ -121,25 +121,52 @@ foam.CLASS({
       type: 'foam.nanos.boot.NSpec'
     },
     {
+      /**
+       * TODO: More investigation needed at https://github.com/foam-framework/foam2/pull/4085
+       * Even though this property doesn't get called
+       * If you uncomment the javaFactory it will break debuggers
+       * To reproduce:
+       * 1. Uncomment the javaFactory below
+       * 2. Using intellij, set a breakpoint in a try block within an agency.submit
+       * 3. Trigger the breakpoint
+       * 4. Step over the line
+       * 5. Server should be hanging no threads available to stop the server using Ctrl+C
+       * 6. Intellij should be stuck on "Waiting until last debugger command completes"
+       * 7. Java core dumps should appear as well
+       * 8. Need to resort to using kill -9 on both the server & debugger
+       */
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
       visibility: 'HIDDEN',
+      /*
       javaFactory: `
         Logger logger = (Logger) getX().get("logger");
         if ( logger == null ) {
           logger = new foam.nanos.logger.StdoutLogger();
         }
+
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
         }, logger);
       `
+      */
     },
     {
       /** This is set automatically when you create an EasyDAO.
         @private */
       name: 'delegate',
       javaFactory: `
+        // TODO: replace logger instantiation once javaFactory issue above is fixed
+        Logger logger = (Logger) getX().get("logger");
+        if ( logger == null ) {
+          logger = new foam.nanos.logger.StdoutLogger();
+        }
+
+        logger = new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, logger);
+
         foam.dao.DAO delegate = getInnerDAO();
         if ( delegate == null ) {
           if ( getNullify() ) {
@@ -169,7 +196,7 @@ foam.CLASS({
 
         if ( getCluster() ) {
           if ( getMdao() != null ) {
-            getLogger().debug(getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
+            logger.debug(getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
             delegate = new foam.nanos.medusa.MedusaAdapterDAO.Builder(getX())
               .setNSpec(getNSpec())
               .setDelegate(delegate)
@@ -181,7 +208,7 @@ foam.CLASS({
 
         if ( getDecorator() != null ) {
           if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
-            getLogger().error(getName(), "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
+            logger.error(getName(), "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
             System.exit(1);
           }
           // The decorator dao may be a proxy chain
@@ -210,7 +237,7 @@ foam.CLASS({
           delegate = delegateBuilder.build();
 
           if ( getApprovableAwareEnabled() ) {
-            getLogger().warning("DEPRECATED: EasyDAO", getName(), "'approvableAwareEnabled' is deprecated. Please remove it from the nspec.");
+            logger.warning("DEPRECATED: EasyDAO", getName(), "'approvableAwareEnabled' is deprecated. Please remove it from the nspec.");
           }
         }
 
@@ -294,10 +321,10 @@ foam.CLASS({
         }
 
         if ( getNSpec() != null &&
-            getNSpec().getServe() &&
-            ! getAuthorize() &&
-            ! getReadOnly() )
-          getLogger().warning("EasyDAO", getName(), "Served DAO should be Authorized, or ReadOnly");
+             getNSpec().getServe() &&
+             ! getAuthorize() &&
+             ! getReadOnly() )
+          logger.warning("EasyDAO", getName(), "Served DAO should be Authorized, or ReadOnly");
 
         if ( getPermissioned() &&
             ( getNSpec() != null && getNSpec().getServe() ) )
@@ -720,8 +747,19 @@ model from which to test ServiceProvider ID (spid)`,
       name: 'init_',
       javaCode: `
        if ( of_ == null ) {
-         if ( getLogger() != null ) {
-           getLogger().error("EasyDAO", getName(), "'of' not set.", new Exception("of not set"));
+
+        // TODO: replace logger instantiation once javaFactory issue above is fixed
+        Logger logger = (Logger) getX().get("logger");
+        if ( logger == null ) {
+          logger = new foam.nanos.logger.StdoutLogger();
+        }
+        
+        logger = new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, logger);
+
+         if ( logger != null ) {
+           logger.error("EasyDAO", getName(), "'of' not set.", new Exception("of not set"));
          } else {
            System.err.println("EasyDAO "+getName()+" 'of' not set.");
          }
@@ -1088,11 +1126,9 @@ model from which to test ServiceProvider ID (spid)`,
         return this.delegate.cmd_(x, obj);
       },
       javaCode: `
-      // getLogger().debug("cmd", getDecorators());
       if ( foam.dao.MDAO.GET_MDAO_CMD.equals(obj) ) {
         DAO dao = getMdao();
         if ( dao != null ) {
-          getLogger().debug("cmd", "mdao", getName());
           return dao;
         }
       }

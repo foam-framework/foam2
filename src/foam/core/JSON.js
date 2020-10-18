@@ -733,8 +733,8 @@ foam.LIB({
     {
       name: 'parse',
       args: [
-        { type: 'Any', name: 'o' },
-        { type: 'Class', name: 'opt_class' },
+        { type: 'Any',     name: 'o' },
+        { type: 'Class',   name: 'opt_class' },
         { type: 'Context', name: 'opt_ctx' },
       ],
       code: foam.mmethod({
@@ -821,12 +821,12 @@ foam.LIB({
               })
               continue;
             }
-            if ( ( key === 'of' ||
-                   key === 'class' ||
-                   key === 'view' ||
+            if ( ( key === 'of'          ||
+                   key === 'class'       ||
+                   key === 'view'        ||
                    key === 'sourceModel' ||
                    key === 'targetModel' ||
-                   key === 'refines' ) &&
+                   key === 'refines' )   &&
                  foam.String.isInstance(o[key]) ) {
               r.push(x.classloader.maybeLoad(o[key]));
               continue;
