@@ -124,7 +124,7 @@ foam.CLASS({
         DAO with only visible capabilities.
       `,
       factory: function() {
-        return this.capabilityDAO;
+        return this.capabilityDAO.where(this.CAPABILITY_IS_AVAILABLE());
       }
     },
     {

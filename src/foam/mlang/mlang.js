@@ -3607,6 +3607,7 @@ foam.CLASS({
     'foam.mlang.predicate.StartsWithIC',
     'foam.mlang.predicate.EndsWith',
     'foam.mlang.predicate.True',
+    'foam.mlang.predicate.CapabilityIsAvailable',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Explain',
     'foam.mlang.sink.GroupBy',
@@ -3711,7 +3712,8 @@ foam.CLASS({
     function THEN_BY(a, b) { return this.ThenBy.create({head: a, tail: b}); },
 
     function INSTANCE_OF(cls) { return this.IsInstanceOf.create({ targetClass: cls }); },
-    function CLASS_OF(cls) { return this.IsClassOf.create({ targetClass: cls }); }
+    function CLASS_OF(cls) { return this.IsClassOf.create({ targetClass: cls }); },
+    function CAPABILITY_IS_AVAILABLE(subject) { return this.CapabilityIsAvailable.create({ subject: subject }) }
   ]
 });
 
@@ -4213,3 +4215,37 @@ foam.CLASS({
 // TODO(braden): We removed Expr.pipe(). That may still be useful to bring back,
 // probably with a different name. It doesn't mean the same as DAO.pipe().
 // remove eof()
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'CapabilityIsAvailable',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
+  implements: [ 'foam.core.Serializable' ],
+
+  javaImports: [
+    'foam.core.FObject',
+    'foam.core.XLocator',
+    'foam.core.X',
+    'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CrunchService'
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      code: () => { return true; },
+      javaCode: `
+        if ( ! ( obj instanceof Capability) ) return false;
+        X x = XLocator.get();
+        Capability capability = (Capability) obj;
+        return capability.getAvailabilityPredicate() != null 
+          && capability.getAvailabilityPredicate().f(x);
+      `
+    },
+    {
+      name: 'toString',
+      code: function toString() { return this.cls_.name; },
+      javaCode: 'return getClass().getName();'
+    }
+  ]
+});

@@ -433,8 +433,4 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
     return outputPayloads;
   }
-  
-  public boolean isAvailable(X x, Capability capability) {
-    return capability != null && capability.getAvailabilityPredicate() != null && capability.getAvailabilityPredicate().f(x);
-  }
 }

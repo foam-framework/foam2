@@ -230,21 +230,6 @@ foam.INTERFACE({
           type: 'String[]'
         },
       ]
-    },
-    {
-      name: 'isAvailable',
-      async: true,
-      type: 'Boolean',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'capability',
-          type: 'foam.nanos.crunch.Capability'
-        }
-      ]
     }
   ]
 });
