@@ -397,7 +397,7 @@ public class CapabilityTest extends Test {
     c1.setNotes("noted");
     c1.setVersion("0.0.0.0");
     c1.setEnabled(true);
-    c1.setVisible(false);
+    c1.setAvailabilityPredicate(foam.mlang.MLang.FALSE);
     c1.setPermissionsGranted( new String[] {p1} );
     c1.setExpiry(((new GregorianCalendar(2867, Calendar.JULY, 1)).getTime()));
     c1 = (Capability) capabilityDAO.put(c1);
