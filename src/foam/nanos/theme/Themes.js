@@ -98,7 +98,8 @@ Later themes:
       javaCode: `
       Theme theme = null;
       User user = ((Subject) x.get("subject")).getUser();
-      String domain = user != null ? user.getSpid() + ".localhost" : "localhost";
+      String domain = user != null && ! SafetyUtil.isEmpty(user.getSpid())
+                        ? user.getSpid() : "localhost";
       HttpServletRequest req = x.get(HttpServletRequest.class);
       if ( req != null ) {
         domain = req.getServerName();
