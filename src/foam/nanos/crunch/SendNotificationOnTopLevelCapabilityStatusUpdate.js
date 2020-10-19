@@ -20,7 +20,8 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.auth.User',
     'foam.nanos.notification.Notification',
-    'java.util.Date'
+    'java.util.Date',
+    'java.util.HashMap'
   ],
 
   methods: [
@@ -44,6 +45,10 @@ foam.CLASS({
           .append(junction.getStatus())
           .append(".");
 
+          HashMap<String, Object> args = new HashMap<>();
+            args.put("capName", cap.getName());
+            args.put("junctionStatus", junction.getStatus());
+
           Notification notification = new Notification();
 
           // if the UserCapabilityJunction belongs to an actual user, send the notification to the user.
@@ -54,6 +59,8 @@ foam.CLASS({
           notification.setNotificationType("Capability Status Update");
           notification.setCreated(new Date());
           notification.setBody(sb.toString());
+          notification.setEmailName("top-level-capability-status-update");
+          notification.setEmailArgs(args);
           user.doNotify(x, notification);
         }
       }, "Send Notification On Top Level Capability Status Update");
