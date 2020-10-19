@@ -179,6 +179,7 @@ foam.CLASS({
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'availabilityPredicate',
       section: 'uiSettings',
+      networkTransient: true,
       factory: () => { return foam.mlang.predicate.False.create(); },
       javaFactory: 'return foam.mlang.MLang.FALSE;',
       documentation: 'Predicate used to omit or include capabilities from capabilityDAO'
