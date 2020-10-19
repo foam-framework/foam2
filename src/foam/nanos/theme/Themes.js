@@ -97,7 +97,8 @@ Later themes:
       },
       javaCode: `
       Theme theme = null;
-      String domain = "localhost";
+      User user = ((Subject) x.get("subject")).getUser();
+      String domain = user != null ? user.getSpid() + ".localhost" : "localhost";
       HttpServletRequest req = x.get(HttpServletRequest.class);
       if ( req != null ) {
         domain = req.getServerName();
@@ -116,11 +117,12 @@ Later themes:
       }
       if ( theme == null ) {
         ((foam.nanos.logger.Logger) x.get("logger")).warning("Theme not found.", req != null ? req.getServerName() : "");
+        theme = new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
       }
 
-      DAO groupDAO = (DAO) x.get("groupDAO");
-      User user = ((Subject) x.get("subject")).getUser();
+      // Augment the theme with group and user themes
       if ( user != null ) {
+        DAO groupDAO = (DAO) x.get("groupDAO");
         Group group = user.findGroup(x);
         while ( group != null ) {
           Theme groupTheme = group.findTheme(x);
@@ -137,11 +139,8 @@ Later themes:
           theme = (Theme) theme.fclone().copyFrom(userTheme);
         }
       }
-      if ( theme != null ) {
-        return theme;
-      }
 
-      return new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
+      return theme;
       `
     }
   ]
