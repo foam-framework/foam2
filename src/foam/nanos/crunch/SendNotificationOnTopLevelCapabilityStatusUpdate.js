@@ -34,7 +34,7 @@ foam.CLASS({
           UserCapabilityJunction junction = (UserCapabilityJunction) obj;
           Capability cap = (Capability) junction.findTargetId(x);
           User user = (User) junction.findSourceId(x);
-          
+
           if ( cap == null || ! cap.getAvailabilityPredicate().f(x) ) return;
 
           DAO notificationDAO = (DAO) x.get("notificationDAO");
