@@ -88,7 +88,6 @@ var classes = [
   'foam.mlang.predicate.OlderThan',
   'foam.mlang.predicate.isAuthorizedToRead',
   'foam.mlang.predicate.isAuthorizedToDelete',
-  'foam.mlang.predicate.CapabilityIsAvailable',
   'foam.box.Box',
   'foam.box.Skeleton',
   'foam.box.AbstractSkeleton',
@@ -652,6 +651,7 @@ var classes = [
   'foam.nanos.crunch.lite.CapablePayload',
   'foam.nanos.crunch.lite.CapablePayloadStatusDAO',
   'foam.nanos.crunch.lite.CapableCompatibleCapability',
+  'foam.nanos.crunch.CapabilityIsAvailable',
 
   'foam.nanos.crunch.lite.ruler.CapableCreateApprovalsRuleAction',
   'foam.nanos.crunch.lite.ruler.ReputDependantPayloads',
