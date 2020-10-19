@@ -73,7 +73,7 @@ foam.INTERFACE({
 
           var oldCapabilityPayloads = getCapablePayloads();
           
-          if ( !hasRequirement(x, capabilityId) ) {
+          if ( ! hasRequirement(x, capabilityId) ) {
             var newCapabilityPayload = crunchService.getCapableObjectPayloads(x, new String[] { capabilityId });
             setCapablePayloads((CapablePayload[]) ArrayUtils.addAll(oldCapabilityPayloads, newCapabilityPayload));
           }
@@ -81,6 +81,7 @@ foam.INTERFACE({
         }));
         cls.methods.push(foam.java.Method.create({
           name: 'hasRequirement',
+          documentation: 'Checks if the capble opbject has a capability, does not verify it',
           type: 'Boolean',
           visibility: 'default',
           args: [
