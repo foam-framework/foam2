@@ -27,10 +27,10 @@ foam.CLASS({
         var i = n.indexOf(this.SEPARATOR);
         if ( i == -1 ) {
           this.head = n;
-          this.tail = '';
+          this.tail = null;
         } else {
           this.head = n.substring(0, i);
-          this.tail = n.substring(i+1);
+          this.tail = this.cls_.create({ head: n.substring(i+1) });
         }
         this.feedback_ = false;
       }
@@ -41,27 +41,26 @@ foam.CLASS({
       postSet: function(o, n) {
         if ( this.feedback_ ) return;
         this.feedback_ = true;
-        this.value = this.combine(n, this.tail);
+        this.value = this.combine();
         this.feedback_ = false;
       }
     },
     {
       name: 'tail',
-      value: '',
       postSet: function(o, n) {
         if ( this.feedback_ ) return;
         this.feedback_ = true;
-        this.value = this.combine(this.head, n);
+        this.value = this.combine();
         this.feedback_ = false;
       }
     }
   ],
-
+   
   methods: [
-    function combine(head, tail) {
-      return tail ?
-        head + this.SEPARATOR + tail :
-        head ;
+    function combine() {
+      return this.tail ?
+        this.head + this.SEPARATOR + this.tail.combine() :
+        this.head ;
     }
   ]
 });

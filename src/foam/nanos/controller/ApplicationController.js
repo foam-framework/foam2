@@ -176,7 +176,7 @@ foam.CLASS({
     {
       name: 'mementoTail',
       expression: function(memento) {
-        return this.Memento.create({value: this.memento.tail});
+        return this.memento.tail;
       }
     },
     {
@@ -316,9 +316,16 @@ foam.CLASS({
 
       // Start Memento Support
       var hash = this.WindowHash.create();
-      this.memento.value$ = hash.value$
+      this.memento.value$ = hash.value$;
 
       this.memento.head$.sub(this.mementoChange);
+      this.mementoTail$.sub(this.mementoChange);
+
+      self.mementoTail$.sub(function() {
+        self.memento.tail = self.mementoTail;
+        console.log('mementoTail change ApplicationController');
+      });
+
       this.mementoChange();
       // End Memento Support
 
