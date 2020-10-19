@@ -32,7 +32,8 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.util.SafetyUtil',
     'javax.servlet.http.HttpServletRequest',
-    'org.eclipse.jetty.server.Request'
+    'org.eclipse.jetty.server.Request',
+    'static foam.mlang.MLang.EQ'
   ],
 
   methods: [
@@ -104,10 +105,15 @@ Later themes:
       if ( req != null ) {
         domain = req.getServerName();
       }
-      ThemeDomain td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find(domain);
+
+      DAO themeDomainDAO = (DAO) x.get("themeDomainDAO");
+      ThemeDomain td = (ThemeDomain) themeDomainDAO.find(domain);
       if ( td == null &&
            ! "localhost".equals(domain) ) {
-        td = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find("localhost");
+        td = (ThemeDomain) themeDomainDAO.find(EQ(ThemeDomain.SPID, domain));
+        if ( td == null ) {
+          td = (ThemeDomain) themeDomainDAO.find("localhost");
+        }
       }
       if ( td != null ) {
         theme = (Theme) ((DAO) x.get("themeDAO")).find(
