@@ -238,7 +238,7 @@ foam.CLASS({
       return this.E().start()// .style({ 'height': 'fit-content', 'overflow-y': 'visible' })
         .addClass(this.myClass('container'))
         .add(this.slot(function(featuredCapabilities) {
-          featuredCapabilities.select().then(function(result) {
+          featuredCapabilities.select().then((result) => {
             var arr = result.array;
             self.totalNumCards = arr.length;
             self.featureCardArray = [];
