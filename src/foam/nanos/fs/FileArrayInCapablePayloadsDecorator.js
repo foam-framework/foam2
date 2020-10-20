@@ -17,13 +17,6 @@ foam.CLASS({
     'foam.nanos.fs.File'
   ],
 
-  properties: [
-    {
-      class: 'foam.nanos.fs.FileArray',
-      name: 'arrayOfFiles'
-    }
-  ],
-
   methods: [
     function write(X, dao, obj, existing) {
       var self = this;
