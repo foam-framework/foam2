@@ -75,7 +75,7 @@ foam.CLASS({
     'lastMenuLaunched',
     'lastMenuLaunchedListener',
     'loginSuccess',
-    'mementoTail as memento',
+    'memento',
     'theme',
     'menuListener',
     'notify',
@@ -171,12 +171,6 @@ foam.CLASS({
       name: 'memento',
       factory: function() {
         return this.Memento.create();//{tail$: this.mementoTail$}
-      }
-    },
-    {
-      name: 'mementoTail',
-      expression: function(memento) {
-        return this.memento.tail;
       }
     },
     {
@@ -318,12 +312,10 @@ foam.CLASS({
       var hash = this.WindowHash.create();
       this.memento.value$ = hash.value$;
 
-      this.memento.head$.sub(this.mementoChange);
-      this.mementoTail$.sub(this.mementoChange);
-
-      self.mementoTail$.sub(function() {
-        self.memento.tail = self.mementoTail;
-        console.log('mementoTail change ApplicationController');
+      this.memento.changeIndicator$.sub(function () {
+        console.log('changeIndicator ApplicationController');
+        hash.value = self.memento.combine();
+        // self.mementoChange();
       });
 
       this.mementoChange();

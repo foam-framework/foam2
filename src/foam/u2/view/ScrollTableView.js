@@ -10,19 +10,22 @@
   extends: 'foam.u2.Element',
 
   imports: [
-    'stack'
+    'stack',
+    'memento'
   ],
 
   exports: [
     'as summaryView',
-    'dblclick'
+    'dblclick',
+    'memento'
   ],
 
   requires: [
     'foam.dao.FnSink',
     'foam.mlang.sink.Count',
     'foam.u2.view.TableView',
-    'foam.comics.v2.DAOControllerConfig'
+    'foam.comics.v2.DAOControllerConfig',
+    'foam.nanos.controller.Memento'
   ],
 
   css: `
@@ -172,6 +175,9 @@
       factory: () => {
         return function(obj, id) {
           if ( ! this.stack ) return;
+          this.memento.tail = this.Memento.create({ head: id });
+          this.memento.tail.parent$ = this.memento$;
+          // this.currentMemento$ = this.memento.tail$;
           this.stack.push({
             class: 'foam.comics.v2.DAOSummaryView',
             data: obj,
@@ -180,7 +186,8 @@
           }, this);
         }
       }
-    }
+    },
+    'currentMemento'
   ],
 
   reactions: [
@@ -192,7 +199,7 @@
   methods: [
     function init() {
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.updateCount })));
-      this.updateCount();
+      this.updateCount();//check memento
     },
 
     function initE() {

@@ -30,7 +30,7 @@ foam.CLASS({
           this.tail = null;
         } else {
           this.head = n.substring(0, i);
-          this.tail = this.cls_.create({ head: n.substring(i+1) });
+          this.tail = this.cls_.create({ value: n.substring(i+1), parent: this });
         }
         this.feedback_ = false;
       }
@@ -48,10 +48,31 @@ foam.CLASS({
     {
       name: 'tail',
       postSet: function(o, n) {
-        if ( this.feedback_ ) return;
+        // if ( this.tail )
+        //   this.tail.parent = this;
+
+        if ( this.feedback_ ) {
+          return;
+        }
+        this.changeIndicator = ! this.changeIndicator;
         this.feedback_ = true;
         this.value = this.combine();
         this.feedback_ = false;
+      }
+    },
+    {
+      name: 'parent',
+      postSet: function() {
+        console.log('parent change');
+        // console.log('not equal: ' + this.parent.tail == this);
+      }
+    },
+    {
+      name: 'changeIndicator',
+      postSet: function() {
+        if ( this.parent ) {
+          this.parent.changeIndicator = ! this.parent.changeIndicator;
+        }
       }
     }
   ],

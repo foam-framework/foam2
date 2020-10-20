@@ -11,6 +11,10 @@ foam.CLASS({
 
   documentation: 'Data Management UI for browsing all DAOs.',
 
+  exports: [
+    'currentMemento_ as memento'
+  ],
+
   classes: [
     {
       name: 'CustomDAOUpdateView',
@@ -107,7 +111,7 @@ foam.CLASS({
             start().
               addClass(this.myClass('title')).
               start('a').
-                add('Data Management').on('click', () => { this.memento = ''; }).
+                add('Data Management').on('click', () => { this.memento.tail = null; }).
               end().
               add(' / ', this.title).
             end().
@@ -198,6 +202,12 @@ foam.CLASS({
       var currentLetter = '';
       var section;
 
+      self.memento$.sub(function() {
+        console.log('memento change DAOConfigSummaryView');
+      });
+
+      this.currentMemento_ = self.memento.tail;
+
       // var mementoTail
 
       this.addClass(this.myClass()).
@@ -265,7 +275,10 @@ foam.CLASS({
               .addClass(self.myClass('dao'))
               .add(label)
               .attrs({title: spec.description})
-              .on('click', function() { self.memento = self.Memento.create({head: spec.id}); });
+              .on('click', function() { 
+                self.memento.tail = self.Memento.create({ head: spec.id });
+                self.memento.tail.parent$ = self.memento$;
+              });
 
               self.search$.sub(function() {
                 var contains = false;
@@ -289,7 +302,7 @@ foam.CLASS({
       });
 
 //      this.onDetach(this.memento$.sub(this.mementoChange));
-      this.memento$.sub(this.mementoChange);
+      this.memento.tail$.sub(this.mementoChange);
       this.mementoChange();
     }
   ],
@@ -298,13 +311,13 @@ foam.CLASS({
     function mementoChange() {
       var m = this.memento;
 
-      if ( ! m || ! m.head ) {
+      if ( ! m || ! m.tail ) {
         if ( this.currentMemento_ ) this.stack.back();
-        this.currentMemento_ = '';
+        // this.currentMemento_ = null;
         return;
       }
 
-      this.currentMemento_ = m;
+      // this.currentMemento_$ = m.tail$;
 
       var x = this.__subContext__.createSubContext();
       x.register(this.DAOUpdateControllerView, 'foam.comics.DAOUpdateControllerView');
@@ -314,10 +327,10 @@ foam.CLASS({
 
       this.stack.push({
         class: this.BackBorder,
-        title: m.head,
+        title: m.tail.head,
         inner: {
           class: 'foam.u2.view.AltView',
-          data: this.__context__[m.head],
+          data: this.__context__[m.tail.head],
           views: [
             [
               {

@@ -54,7 +54,8 @@ foam.CLASS({
 
   imports: [
     'auth',
-    'stack'
+    'stack',
+    'memento'
   ],
 
   exports: [
@@ -115,7 +116,10 @@ foam.CLASS({
   actions: [
     {
       name: 'back',
-      code: (data) => data.onBack()
+      code: function(X, data) {
+        X.memento.tail$.set(null);
+        X.onBack();
+      }
     },
     {
       name: 'edit',
@@ -228,6 +232,7 @@ foam.CLASS({
       // to this view from the edit view on the stack.
       promise.then(d => {
         if ( d ) self.data = d;
+        //id for memento
 
         this
           .addClass(this.myClass())
