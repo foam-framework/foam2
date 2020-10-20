@@ -2856,9 +2856,13 @@ foam.CLASS({
     {
       name: 'put',
       code: function put(o, sub) {
-        var a = [o.cls_.id];
-        for ( var i = 0 ; i < this.exprs.length ; i++ )
-          a[i+this.PROJECTION_VALUES_OFFSET] = this.exprs[i].f(o);
+        var a;
+        if ( this.useProjection ) {
+          a = [o.cls_.id];
+          for ( var i = 0 ; i < this.exprs.length ; i++ )
+            a[i+this.PROJECTION_VALUES_OFFSET] = this.exprs[i].f(o);
+        } else
+          a = [o];
         this.projectionWithClass.push(a);
       },
 // TODO:      swiftCode: 'array.append(obj)',
