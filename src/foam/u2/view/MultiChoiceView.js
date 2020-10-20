@@ -143,7 +143,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'showValidNumberOfChoicesHelper',
-      value: false
+      value: true
     },
     {
       class: 'Int',
