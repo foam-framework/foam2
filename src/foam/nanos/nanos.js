@@ -22,6 +22,7 @@ FOAM_FILES([
   { name: 'foam/nanos/fs/FileDAODecorator' },
   { name: 'foam/nanos/fs/FileArray' },
   { name: 'foam/nanos/fs/FileArrayDAODecorator' },
+  { name: 'foam/nanos/fs/FileArrayInCapablePayloadsDecorator' },
   { name: 'foam/nanos/fs/fileDropZone/FileDropZone', flags: ['web'] },
   { name: 'foam/nanos/fs/fileDropZone/FilePreview', flags: ['web'] },
   { name: 'foam/nanos/fs/fileDropZone/FileCard', flags: ['web'] },
