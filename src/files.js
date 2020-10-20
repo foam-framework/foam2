@@ -184,6 +184,7 @@ FOAM_FILES([
   { name: 'foam/u2/DeleteModal', flags: ['web'] },
   { name: 'foam/u2/EasyModal', flags: ['web'] },
   { name: 'foam/u2/MemoModal', flags: ['web'] },
+  { name: 'foam/u2/PropertyModal', flags: ['web'] },
   { name: 'foam/u2/ModalHeader', flags: ['web'] },
   { name: 'foam/u2/ExportModal', flags: ['web'] },
   { name: 'foam/u2/MultiView' },
