@@ -33,6 +33,7 @@ foam.CLASS({
     'foam.util.SafetyUtil',
     'javax.servlet.http.HttpServletRequest',
     'org.eclipse.jetty.server.Request',
+    'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ'
   ],
 
@@ -97,33 +98,43 @@ Later themes:
         return foam.nanos.theme.Theme.create({ 'name': 'foam', 'appName': 'FOAM' });
       },
       javaCode: `
+      DAO themeDAO = ((DAO) x.get("themeDAO"));
       Theme theme = null;
-      User user = ((Subject) x.get("subject")).getUser();
-      String domain = user != null && ! SafetyUtil.isEmpty(user.getSpid())
-                        ? user.getSpid() : "localhost";
+      String domain = null;
       HttpServletRequest req = x.get(HttpServletRequest.class);
       if ( req != null ) {
         domain = req.getServerName();
       }
 
-      DAO themeDomainDAO = (DAO) x.get("themeDomainDAO");
-      ThemeDomain td = (ThemeDomain) themeDomainDAO.find(domain);
-      if ( td == null &&
-           ! "localhost".equals(domain) ) {
-        td = (ThemeDomain) themeDomainDAO.find(EQ(ThemeDomain.SPID, domain));
-        if ( td == null ) {
+      // Find theme from themeDomain via domain
+      if ( domain != null ) {
+        DAO themeDomainDAO = (DAO) x.get("themeDomainDAO");
+        ThemeDomain td = (ThemeDomain) themeDomainDAO.find(domain);
+        if ( td == null &&
+             ! "localhost".equals(domain) ) {
           td = (ThemeDomain) themeDomainDAO.find("localhost");
         }
+        if ( td != null ) {
+          theme = (Theme) themeDAO.find(
+            AND(
+              EQ(Theme.ID, td.getTheme()),
+              EQ(Theme.ENABLED, true)
+            ));
+        }
       }
-      if ( td != null ) {
-        theme = (Theme) ((DAO) x.get("themeDAO")).find(
-          foam.mlang.MLang.AND(
-            foam.mlang.MLang.EQ(Theme.ID, td.getTheme()),
-            foam.mlang.MLang.EQ(Theme.ENABLED, true)
-          ));
+
+      // Find theme from user via SPID
+      // TODO: consider hierarchical SPID
+      User user = ((Subject) x.get("subject")).getUser();
+      if ( user != null && theme == null ) {
+        String spid = ! SafetyUtil.isEmpty(user.getSpid()) ? user.getSpid() : "*";
+        theme = (Theme) themeDAO.find(EQ(Theme.SPID, spid));
       }
+
       if ( theme == null ) {
-        ((foam.nanos.logger.Logger) x.get("logger")).warning("Theme not found.", req != null ? req.getServerName() : "");
+        ((foam.nanos.logger.Logger) x.get("logger")).warning("Theme not found.",
+          "domain:" + (req != null ? req.getServerName() : ""),
+          "user:" + user.getId());
         theme = new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
       }
 

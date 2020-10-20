@@ -10,10 +10,6 @@ foam.CLASS({
 
   documentation: 'mapping of domain to Theme. Note: is managed by the ThemeDomainDAO',
 
-  implements: [
-    'foam.nanos.auth.ServiceProviderAware'
-  ],
-
   tableColumns: [
     'id',
     'theme.name'
@@ -40,12 +36,6 @@ foam.CLASS({
             this.add(value);
           });
       },
-    },
-    {
-      name: 'spid',
-      class: 'Reference',
-      of: 'foam.nanos.auth.ServiceProvider',
-      value: foam.nanos.auth.ServiceProviderAware.GLOBAL_SPID
     }
   ]
 });

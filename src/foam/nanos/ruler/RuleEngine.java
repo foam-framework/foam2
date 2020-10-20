@@ -29,7 +29,7 @@ public class RuleEngine extends ContextAwareSupport {
   private X userX_;
 
   public RuleEngine(X x, X systemX, DAO delegate) {
-    setX(systemX.put("theme", x.get("theme")));
+    setX(systemX);
     setDelegate(delegate);
     ruleHistoryDAO_ = (DAO) x.get("ruleHistoryDAO");
     userX_ = x;
