@@ -121,14 +121,14 @@ foam.CLASS({
       let p = Promise.resolve();
 
       // TODO: investigate why this is sometimes inconsistent
-      if (
-        intercept.capabilityOptions.length == 0 &&
-        intercept.capableRequirements.length > 0 &&
-        intercept.capableRequirements[0].userCapabilityRequirements.length > 0
-      ) {
-        intercept.capabilityOptions =
-          intercept.capableRequirements[0].userCapabilityRequirements;
-      }
+      // if (
+      //   intercept.capabilityOptions.length == 0 &&
+      //   intercept.capableRequirements.length > 0 &&
+      //   intercept.capableRequirements[0].userCapabilityRequirements.length > 0
+      // ) {
+      //   intercept.capabilityOptions =
+      //     intercept.capableRequirements[0].userCapabilityRequirements;
+      // }
 
       // Intercept view for regular user capability options
       console.log('intercept', intercept)
