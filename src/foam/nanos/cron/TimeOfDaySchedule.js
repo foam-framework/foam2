@@ -20,6 +20,7 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.X',
     'java.util.Calendar'
   ],
 
@@ -39,6 +40,10 @@ foam.CLASS({
       name: 'getNextScheduledTime',
       type: 'DateTime',
       args: [
+        {
+          name: 'x',
+          type: 'X'
+        },
         {
           name: 'from',
           type: 'java.util.Date'

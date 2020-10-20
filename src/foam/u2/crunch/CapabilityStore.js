@@ -17,6 +17,9 @@ foam.CLASS({
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCategory',
     'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
+    'foam.nanos.crunch.CapabilityIsAvailable',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.crunch.UserCapabilityJunction',
     'foam.u2.crunch.CapabilityCardView',
     'foam.u2.crunch.CapabilityFeatureView',
     'foam.u2.Element',
@@ -34,11 +37,14 @@ foam.CLASS({
     'capabilityCategoryDAO',
     'capabilityDAO',
     'crunchController',
+    'crunchService',
     'registerElement'
   ],
 
   messages: [
-    { name: 'TAB_ALL', message: 'All' }
+    { name: 'TAB_ALL', message: 'All' },
+    { name: 'TITLE', message: 'Capabilities' },
+    { name: 'SUBTITLE', message: 'To fully enable our platform, we require a bit more information about you and your company.' }
   ],
 
   css: `
@@ -49,8 +55,22 @@ foam.CLASS({
       box-sizing: border-box;
     }
 
+    ^label-title {
+      font-weight: 900;
+      font-size: 32px;
+      margin: 24px 16px;
+      margin-bottom: 8px;
+    }
+
+    ^label-subtitle {
+      margin: 16px;
+      margin-top: 0;
+      color: #9ba1a6;
+      font-size: 18px;
+    }
+
     ^category {
-      margin-bottom: 48px;
+      margin-top: 48px;
       padding: 0px 12px;
     }
 
@@ -96,19 +116,34 @@ foam.CLASS({
       width: 100%;
       height: fit-content;
       overflow-y: visible;
+      margin-top: 24px;
     }
   `,
 
   properties: [
+    {
+      name: 'hideGrantedCapabilities',
+      class: 'Boolean'
+    },
+    {
+      name: 'grantedCapabilities',
+      class: 'StringArray'
+    },
     {
       name: 'visibleCapabilityDAO',
       class: 'foam.dao.DAOProperty',
       documentation: `
         DAO with only visible capabilities.
       `,
-      factory: function() {
+      expression: function(hideGrantedCapabilities, grantedCapabilities) {
+        var predicate = this.CapabilityIsAvailable.create();
+        if ( hideGrantedCapabilities )
+          predicate = this.AND(
+            predicate,
+            this.NOT(this.IN(this.Capability.ID, grantedCapabilities))
+          );
         return this.capabilityDAO
-          .where(this.EQ(this.Capability.VISIBLE, true));
+          .where(predicate);
       }
     },
     {
@@ -151,6 +186,16 @@ foam.CLASS({
   ],
 
   methods: [
+    function init() {
+      this.crunchService.getAllJunctionsForUser().then(juncs => {
+        this.grantedCapabilities = juncs
+          .filter(
+            junc => junc.status == this.CapabilityJunctionStatus.GRANTED
+          )
+          .map(junc => junc.targetId);
+        this.daoUpdate();
+      })
+    },
     function initE() {
       this.SUPER();
 
@@ -159,6 +204,12 @@ foam.CLASS({
 
       self
         .addClass(self.myClass())
+        .start('p').addClass(this.myClass('label-title'))
+          .add(this.TITLE)
+        .end()
+        .start('p').addClass(this.myClass('label-subtitle'))
+          .add(this.SUBTITLE)
+        .end()
         .add(self.renderFeatured())
         .add(self.accountAndAccountingCard())
         // NOTE: TEMPORARILY REMOVED
@@ -307,6 +358,34 @@ foam.CLASS({
         this.EQ(
           this.CapabilityCategoryCapabilityJunction.SOURCE_ID,
           categoryId));
+    },
+    function daoUpdate() {
+      Promise.resolve()
+        // Get visible categories
+        .then(() => this.visibleCategoryDAO.select())
+        .then(categorySink => categorySink.array.map(cat => cat.id))
+        // Get capabilities within visible categories
+        .then(categories => {
+          return this.capabilityCategoryCapabilityJunctionDAO
+            .where(this.IN(
+              this.CapabilityCategoryCapabilityJunction.SOURCE_ID,
+              categories)).select();
+        })
+        .then(cccjSink => Object.keys(
+          cccjSink.array.map(cccj => cccj.targetId)
+          .reduce((set, capabilityId) => ({ ...set, [capabilityId]: true }), {})))
+        // Get visible capabilities within visible categories
+        .then(visibleList => this.visibleCapabilityDAO
+          .where(this.OR(
+            this.IN(this.Capability.ID, visibleList),
+            this.IN('featured', this.Capability.KEYWORDS)
+          )).select())
+        .then(sink => {
+          if ( sink.array.length == 1 ) {
+            this.crunchController
+              .createWizardSequence(sink.array[0]).execute();
+          }
+        })
     }
   ]
 });

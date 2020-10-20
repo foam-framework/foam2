@@ -23,6 +23,14 @@ foam.CLASS({
     {
       class: 'Object',
       name: 'data'
+    },
+    {
+      class: 'String',
+      name: 'message',
+      transient: true,
+      getter: function() {
+        return this.data && this.data.message;
+      }
     }
   ]
 });

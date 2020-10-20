@@ -29,7 +29,8 @@ foam.CLASS({
   exports: [
     'columns',
     'hoverSelection',
-    'selection'
+    'selection',
+    'subStack as stack'
   ],
 
   imports: [
@@ -251,6 +252,12 @@ foam.CLASS({
     {
       name: 'dataChangedFlag',
       class: 'Boolean'
+    },
+    {
+      name: 'subStack',
+      factory: function() {
+        return foam.nanos.approval.NoBackStack.create({delegate: this.stack});
+      },
     }
   ],
 
@@ -401,9 +408,8 @@ foam.CLASS({
          * writing.
          */
           var view = this;
-          this.data.sub('on', function() {
-            view.dataChangedFlag = !view.dataChangedFlag;
-          });
+
+          dao.on.sub(view.changeFlag);
 
           var modelActions = view.of.getAxiomsByClass(foam.core.Action);
           var actions = Array.isArray(view.contextMenuActions)
@@ -599,6 +605,14 @@ foam.CLASS({
         var propertyNamesToQuery = columns_.length === 0 ? columns_ : [ 'id' ].concat(obj.filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(obj, columns_).filter(c => ! foam.core.Action.isInstance(obj.of.getAxiomByName(obj.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c)))).map(c => obj.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c)));
         return obj.columnConfigToPropertyConverter.returnPropertyColumnMappings(obj.of, propertyNamesToQuery);
       }
+  ],
+  listeners: [
+    {
+      name: 'changeFlag',
+      code: function() {
+        this.dataChangedFlag = !this.dataChangedFlag;
+      }
+    },
   ]
 });
 

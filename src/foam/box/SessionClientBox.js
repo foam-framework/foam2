@@ -110,29 +110,8 @@ foam.CLASS({
       value: 'defaultSession'
     },
     {
-      class: 'String',
-      name: 'sessionID',
-      factory: function() {
-        return localStorage[this.sessionName] ||
-            ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
-      },
-      swiftExpressionArgs: [ 'sessionName' ],
-      swiftExpression: `
-let defaults = UserDefaults.standard // TODO allow us to configure?
-if let id = defaults.string(forKey: sessionName) {
-  return id
-}
-let id = UUID().uuidString
-defaults.set(id, forKey: sessionName)
-return id
-      `,
-      javaFactory:
-`String uuid = (String) getX().get(getSessionName());
-if ( "".equals(uuid) ) {
-  uuid = java.util.UUID.randomUUID().toString();
-  getX().put(getSessionName(), uuid);
-}
-return uuid;`
+      class: 'foam.box.SessionIDProperty',
+      name: 'sessionID'
     }
   ],
 
