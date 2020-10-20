@@ -31,9 +31,12 @@ foam.CLASS({
       if ( obj.instance_.capablePayloads ) {
         payloadsWithData = obj.instance_.capablePayloads
           .filter(f => f.data && f.data.documents);
-            return Promise.all(payloadsWithData.map(async f => {
+            let promises = Promise.all(payloadsWithData.map(async f => {
               return self.SUPER(X, dao, f.data, existing);
           }));
+          return Promise.all(promises).then((values) => {
+            return obj;
+          })
       } else {
         return Promise.resolve(obj);
       }
