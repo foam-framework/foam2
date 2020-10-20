@@ -2772,7 +2772,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'buildObjectsFromProjectionWithClass',
+      name: 'useProjection',
       documentation: 'if objects should be build from projectionWithClass (and they will not be retrieved with select)',
       value: true
     },
@@ -2807,7 +2807,7 @@ foam.CLASS({
       documentation: 'An array of full objects created from the projection. Only properties included in exprs/the-projection will be set.',
       factory: function() {
         return this.projectionWithClass.map(p => {
-          if ( this.buildObjectsFromProjectionWithClass ) {
+          if ( this.useProjection ) {
             var o = foam.lookup(p[this.CLS_OR_OBJ_INDEX]).create(null, this);
             for ( var i = 0 ; i < this.exprs.length ; i++ ) {
               try {
@@ -2825,7 +2825,7 @@ foam.CLASS({
         var es = getExprs();
         var p  = getProjectionWithClass();
         for ( int i = 0 ; i < p.size() ; i++ ) {
-          if ( getBuildObjectsFromProjectionWithClass() )  {
+          if ( getUseProjection() )  {
             try {
               Object[]  arr = (Object[]) p.get(i);
               ClassInfo ci  = (ClassInfo) arr[CLS_OR_OBJ_INDEX];
@@ -2864,7 +2864,7 @@ foam.CLASS({
 // TODO:      swiftCode: 'array.append(obj)',
       javaCode: `
         Object[] a = new Object[getExprs().length+PROJECTION_VALUES_OFFSET];
-        if ( ! getBuildObjectsFromProjectionWithClass() ) {
+        if ( ! getUseProjection() ) {
           a[CLS_OR_OBJ_INDEX] = obj;
         } else {
           a[CLS_OR_OBJ_INDEX] = ((FObject) obj).getClassInfo();
