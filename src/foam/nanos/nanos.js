@@ -356,6 +356,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/lite/CapabilityRefinement" },
   { name: "foam/nanos/crunch/lite/MinMaxCapabilityRefinement" },
   { name: "foam/nanos/crunch/crunchtest/TestCapable" },
+  { name: "foam/nanos/crunch/CapabilityIsAvailable" },
 
   // crunch lite rulers
   { name: "foam/nanos/crunch/lite/ruler/CapablePayloadApprovableRuleAction" },

@@ -36,7 +36,6 @@ foam.CLASS({
     'description',
     'version',
     'enabled',
-    'visible',
     'expiry',
     'daoKey'
   ],
@@ -120,12 +119,6 @@ foam.CLASS({
       user will lose permissions implied by this capability and upper level capabilities will ignore this prerequisite`
     },
     {
-      name: 'visible',
-      class: 'Boolean',
-      documentation: `Hide sub-capabilities which aren't top-level and individually selectable. when true, capability is visible to the user`,
-      section: 'uiSettings'
-    },
-    {
       name: 'expiry',
       class: 'DateTime',
       documentation: `Datetime of when capability is no longer valid`
@@ -185,8 +178,10 @@ foam.CLASS({
     {
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'availabilityPredicate',
+      section: 'uiSettings',
       networkTransient: true,
-      javaFactory: 'return foam.mlang.MLang.TRUE;',
+      factory: () => { return foam.mlang.predicate.False.create(); },
+      javaFactory: 'return foam.mlang.MLang.FALSE;',
       documentation: 'Predicate used to omit or include capabilities from capabilityDAO'
     },
     {
@@ -229,6 +224,12 @@ foam.CLASS({
       factory: function() {
         return foam.u2.wizard.StepWizardConfig.create({}, this);
       }
+    },
+    {
+      name: 'requirementViewTitle',
+      class: 'String',
+      documentation: `A short introduction displayed as subtitle in CapabilityRequirementView`,
+      section: 'uiSettings'
     }
   ],
 

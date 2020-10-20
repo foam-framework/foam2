@@ -6,6 +6,7 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'ValidationException',
+  javaExtends: 'RuntimeException',
   implements: ['foam.core.Exception'],
 
   properties: [
@@ -22,5 +23,24 @@ foam.CLASS({
       class: 'String',
       name: 'errorMessage'
     }
-  ]
+  ],
+
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+        data: `
+    public ValidationException(String message) {
+      super(message);
+    }
+
+    public ValidationException(String message, java.lang.Exception cause) {
+      super(message, cause);
+    }
+            `
+          }));
+        }
+      }
+    ]
 });
