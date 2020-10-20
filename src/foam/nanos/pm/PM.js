@@ -147,33 +147,7 @@ foam.CLASS({
               if ( ! pm.getIsError() ) {
                 return;
               }
-              DAO configDAO = (DAO) x.get("alarmConfigDAO");
-
-              AlarmConfig config = (AlarmConfig) configDAO.find(EQ(AlarmConfig.NAME, pm.getKey()));
-              String name = pm.getKey();
-              if ( config != null ) {
-                if ( ! config.getEnabled() ) {
-                  return;
-                }
-                name = config.getName();
-              }
-              DAO alarmDAO = (DAO) x.get("alarmDAO");
-              Alarm alarm = (Alarm) alarmDAO.find(EQ(Alarm.NAME, name));
-              if ( alarm != null &&
-                   alarm.getIsActive() ) {
-                return;
-              }
-              alarm = new Alarm.Builder(x)
-                .setName(name)
-                .setIsActive(true)
-                .build();
-              alarmDAO.put(alarm);
-
-              AlarmConfig alarmConfig = new AlarmConfig.Builder(x)
-                .setName(pm.getKey())
-                .setSendEmail(false)
-                .build();
-              configDAO.put(alarmConfig);
+              ((DAO) x.get("alarmDAO")).put(new Alarm(pm.getKey(), true));
             }
           }, "PM alarm");
      `

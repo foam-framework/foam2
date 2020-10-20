@@ -21,6 +21,21 @@ foam.CLASS({
     'foam.u2.view.ReadOnlyEnumView'
   ],
 
+  css: `
+    ^icon.foam-u2-crunch-Style-icon-circle {
+      width: 65px;
+      height: 65px;
+      margin-right: 24px;
+      background-size: cover;
+      background-position: 50% 50%;
+      flex-shrink: 0;
+    }
+
+    ^ .foam-u2-crunch-Style-card-title {
+      margin-bottom: 4px;
+    }
+  `,
+
   imports: [
     'auth',
     'crunchService',
@@ -53,7 +68,12 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'isRenewable'     
+      name: 'isRenewable'
+    },
+    {
+      class: 'Boolean',
+      name: 'tooltipEnabled',
+      value: true
     }
   ],
 
@@ -72,44 +92,45 @@ foam.CLASS({
       style.addBinds(self);
 
       self
+        .addClass(this.myClass())
         .addClass(style.myClass())
         .addClass(style.myClass('mode-circle'))
         .start()
+          .addClass(this.myClass('icon'))
           .addClass(style.myClass('icon-circle'))
           .style({
             'background-image': "url('" + self.data.icon + "')",
-            'background-size': 'cover',
-            'background-position': '50% 50%',
-            'float': 'left'
           })
         .end()
-        .add(this.slot(function(cjStatus, isRenewable) {
-          return this.E('span')
-            .style({ 'float' : 'right' })
-            .add(cjStatus.label).addClass(style.myClass('badge'))
-            .style({ 'background-color': cjStatus.background })
-            .start()
-              .addClass(style.myClass('renewable-description'))
-              .add(isRenewable ? "Capability is renewable" : "")
-            .end();
-        }))
-        .start()
-          .addClass(style.myClass('card-title'))
-          .add(( self.data.name != '') ? { data : self.data, clsInfo : self.data.cls_.NAME.name, default : self.data.name } : self.data.id)
+        .start().style({ 'flex': 1 })
+          .start('p')
+            .addClass(style.myClass('card-title'))
+            .add(( self.data.name != '') ? { data : self.data, clsInfo : self.data.cls_.NAME.name, default : self.data.name } : self.data.id)
+          .end()
+          .start('p')
+            .addClass(style.myClass('card-subtitle'))
+            .add({ data : self.data, clsInfo : self.data.cls_.DESCRIPTION.name, default : self.data.description })
+          .end()
         .end()
         .start()
-          .addClass(style.myClass('card-subtitle'))
-          .select(self.data.categories.dao
-            .where(this.EQ(foam.nanos.crunch.CapabilityCategory.VISIBLE, true)), function (category) {
-              return this.E('span')
-                .addClass(style.myClass('category'))
-                .add({ data : category, clsInfo : category.cls_.NAME.name, default : category.name });
-          })
+          .add(this.slot(function(cjStatus, isRenewable) {
+            return this.E().addClass(style.myClass('tooltip'))
+              .add(cjStatus.label).addClass(style.myClass('badge'))
+              .style({ 'background-color': cjStatus.background })
+              .start('span')
+                .addClass(style.myClass('tooltiptext'))
+                .enableClass(style.myClass('tooltipDisabled'), self.tooltipEnabled, true)
+                .add(cjStatus.documentation)
+              .end()
+              .start()
+                .addClass(style.myClass('renewable-description'))
+                .add(isRenewable ? "Capability is renewable" : "")
+              .end();
+          }))
         .end()
-        .start()
-          .addClass(style.myClass('card-description'))
-          .add({ data : self.data, clsInfo : self.data.cls_.DESCRIPTION.name, default : self.data.description })
-        .end();
+
+
+        ;
     }
   ],
 

@@ -133,22 +133,24 @@ foam.CLASS({
       if ( isCapable ) {
         p = p.then(() => self.launchCapableWizard(intercept));
       }
-
+      
       p = p.then(isCompleted => {
-        debugger;
+        intercept.capableRequirements[0].isWizardCompleted = isCompleted;
+
         if ( isCapable ) {
           if ( ! isCompleted ) {
-            intercept.reject('user cancelled');
+            intercept.resolve(intercept.capableRequirements[0]);
             return;
           }
-          intercept.resolve(intercept.returnCapable)
+          intercept.returnCapable.isWizardCompleted = isCompleted;
+          intercept.resolve(intercept.returnCapable);
           return;
         }
         intercept.resend();
       })
 
       p.catch(err => {
-        console.error(err, 'from wizard flow');
+        intercept.reject(err.data);
       })
 
       return p;
@@ -182,7 +184,6 @@ foam.CLASS({
       // Pop up the popup
       return new Promise((resolve, _) => {
         this.ctrl.add(this.Popup.create({ closeable: false })
-          .start(this.MarginBorder)
             .tag(this.CapabilityInterceptView, {
               data: intercept,
               onClose: (x) => {
@@ -190,21 +191,20 @@ foam.CLASS({
                 resolve();
               }
             })
-          .end()
         );
       });
     },
 
     function save(wizardlet) {
-      if ( ! wizardlet.isAvailable ) return Promise.resolve(); 
+      if ( ! wizardlet.isAvailable ) return Promise.resolve();
       var isAssociation = wizardlet.capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.ACTING_USER;
-      var associatedEntity = isAssociation ? this.subject.realUser : 
+      var associatedEntity = isAssociation ? this.subject.realUser :
       wizardlet.capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
 
       return this.updateUCJ(wizardlet, associatedEntity).then(() => {
         var ucj = wizardlet.ucj;
         if ( ucj === null ) {
-          ucj = isAssociation ? 
+          ucj = isAssociation ?
           this.AgentCapabilityJunction.create({
               sourceId: associatedEntity.id,
               targetId: wizardlet.capability.id,
@@ -218,7 +218,7 @@ foam.CLASS({
         if ( wizardlet.of ) ucj.data = wizardlet.data;
         return this.userCapabilityJunctionDAO.put(ucj);
       });
-    }, 
+    },
     async function updateUCJ(wizardlet, associatedEntity) {
       return this.userCapabilityJunctionDAO.find(
         this.AND(
@@ -264,5 +264,12 @@ foam.CLASS({
 
       return p;
     },
+
+    // This function is only called by CapableView
+    function getWizardletsFromCapable(capable) {
+      return this.Sequence.create(null, this.__subContext__.createSubContext({
+        capable: capable
+      })).add(this.CapableCreateWizardletsAgent).execute().then(x => x.wizardlets);
+    }
   ]
 });
