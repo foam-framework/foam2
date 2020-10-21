@@ -148,6 +148,8 @@ foam.INTERFACE({
     },
     {
       name: 'updateJunction',
+      async: true,
+      type: 'UserCapabilityJunction',
       args: [
         {
           name: 'x',

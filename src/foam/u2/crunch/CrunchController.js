@@ -158,7 +158,7 @@ foam.CLASS({
       }
       
       p = p.then(x => {
-        var isCompleted = x.submitted;
+        var isCompleted = x.submitted || x.cancelled;
 
         if ( isCapable ) {
           intercept.capableRequirements[0].isWizardCompleted = isCompleted;
