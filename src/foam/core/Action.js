@@ -112,7 +112,7 @@ foam.CLASS({
     },
     {
       class: 'Function',
-      name: 'view',
+      name: 'confirmationView',
       value: null
     },
     {
