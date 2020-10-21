@@ -34,7 +34,7 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.util.SafetyUtil',
     'javax.servlet.http.HttpServletRequest',
-    'org.eclipse.jetty.server.Request',
+    'org.eclipse.jetty.server.Request'
   ],
 
   methods: [

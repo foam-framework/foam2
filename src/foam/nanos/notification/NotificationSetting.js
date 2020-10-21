@@ -64,7 +64,7 @@ foam.CLASS({
       ],
       javaCode: `
         // Proxy to sendNotificaiton method
-        sendNotification(x , user, notification);
+        sendNotification(x, user, notification);
       `
     },
     {
