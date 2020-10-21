@@ -133,11 +133,11 @@ foam.CLASS({
               rightAction: self.SAVE
             })
           .endContext();
-//        this.start('div')
-this
-          .tag(this.detailView, { data: this.data })
-          .add(this.DELETE)
-//        .end()
+        this
+          .start().addClass('main-container')
+            .tag(this.detailView, { data: this.data })
+            .add(this.DELETE)
+          .end()
     }
   ],
 
@@ -147,18 +147,17 @@ this
       height: 6rem;
       color: #2e2379;
       font-weight: 400;
-      margin: 4rem;
-      margin-top: unset;
+      margin: 2rem 4rem;
       font-size: 2.5rem;
       bottom: 0;
       background-color: unset;
       border: 2px solid red!important;
       border-radius: 73px;
     }
-    ^ {
-        padding-top: 20%;
-        overflow: scroll;
-        height: 90%;
-      }
+    ^ .main-container {
+      overflow: scroll;
+      height: 90%;
+      margin-top: 15px;
+    }
   `,
 });

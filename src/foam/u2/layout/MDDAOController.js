@@ -216,9 +216,6 @@ foam.CLASS({
   ],
 
   css: `
-  ^ {
-    padding-top: 20%;
-  }
     ^ .right .foam-u2-search-TextSearchView {
       position: relative;
     }

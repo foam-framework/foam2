@@ -140,7 +140,7 @@ foam.CLASS({
     }
 
     ^ .side-nav-view {
-      height: 100rem;
+      height: 109em;
       overflow-x: hidden;
       position: relative;
       background-color: #f5f7fa;
