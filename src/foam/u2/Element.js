@@ -1589,7 +1589,7 @@ foam.CLASS({
 
     function translate(source, opt_default) {
       /* Add the translation of the supplied source to the Element as a String */
-      this this.add(this.PromiseSlot.create({
+      return this.add(this.PromiseSlot.create({
         promise: this.translationService.getTranslation(foam.locale, source)
           .then(txt => { return txt || opt_default || 'no value'; })
       }));
