@@ -236,10 +236,6 @@
       name: 'refresh',
       isFramed: true,
       code: function() {
-        Object.keys(this.renderedPages_).forEach(i => {
-          this.renderedPages_[i].remove();
-          delete this.renderedPages_[i];
-        });
         this.updateRenderedPages_();
         if ( this.el() ) this.el().scrollTop = 0;
       }
