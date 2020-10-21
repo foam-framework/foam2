@@ -71,6 +71,7 @@ foam.CLASS({
       name: 'changeIndicator',
       postSet: function() {
         if ( this.parent ) {
+          this.parent.feedback_ = true;
           this.parent.changeIndicator = ! this.parent.changeIndicator;
         }
       }
