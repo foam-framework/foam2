@@ -28,7 +28,6 @@ foam.CLASS({
   javaImports: [
     'foam.dao.DAO',
     'foam.mlang.MLang',
-    'foam.mlang.predicate.StartsWith',
     'foam.nanos.auth.Group',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
@@ -54,9 +53,11 @@ Later themes:
       ],
       code: async function(x) {
         var theme;
+        var themeDomain;
         var domain = window && window.location.hostname || 'localhost';
+        var user = x.subject.user;
         if ( domain ) {
-          var themeDomain = await this.themeDomainDAO.find(domain);
+          themeDomain = await this.themeDomainDAO.find(domain);
           if ( ! themeDomain &&
                'localhost' != domain ) {
             themeDomain = await this.themeDomainDAO.find('localhost');
@@ -69,11 +70,32 @@ Later themes:
             theme = await this.themeDAO.find(predicate);
           }
         }
-        if ( ! theme ) {
-          console && console.warn('Theme not found: '+domain);
+
+        if ( user && ( ! theme || 'localhost' === themeDomain.id ) ) {
+          var spid = user.spid;
+          while ( spid ) {
+            theme = await this.themeDAO.find(
+              this.AND(
+                this.EQ(foam.nanos.theme.Theme.SPID, spid),
+                this.EQ(foam.nanos.theme.Theme.ENABLED, true)));
+            if ( theme ) break;
+
+            var pos = spid.lastIndexOf('.');
+            spid = spid.substring(0, pos > 0 ? pos : 0);
+          }
+
+          if ( ! theme ) {
+            theme = await this.themeDAO.find(
+              this.AND(
+                this.EQ(foam.nanos.theme.Theme.SPID, '*'),
+                this.EQ(foam.nanos.theme.Theme.ENABLED, true)));
+          }
         }
 
-        var user = x.user;
+        if ( ! theme ) {
+          console && console.warn('Theme not found: '+ domain);
+        }
+
         var group = x.group;
         if ( user && group ) { // non-null when logged in.
           var group = await user.group$find;
