@@ -279,7 +279,6 @@
       try {
         switch (prop.getValueClass().getName()) {
           case "long":
-            if ( columnHeaderToPropertyMapping.getUnitProperty() != null ) {
               String unitValue = valueString;
               Matcher numMatcher = twoDecimalPointsNumberRegex.matcher(unitValue);
 
@@ -290,11 +289,10 @@
               prop.set(obj, Math.round( Double.parseDouble(number) * 100));//may not be the case for all of the unitValues
               Matcher alphabeticalCharsMatcher = alphabeticalCharsRegex.matcher(unitValue);
 
-              if ( alphabeticalCharsMatcher.find() ) {
+              if ( alphabeticalCharsMatcher.find() && columnHeaderToPropertyMapping.getUnitProperty() != null ) {
                 String unit = unitValue.substring(alphabeticalCharsMatcher.start(), alphabeticalCharsMatcher.end());
                 ((PropertyInfo)columnHeaderToPropertyMapping.getUnitProperty()).set(obj, unit);
               }
-            } else prop.set(obj, Long.parseLong(valueString));
             break;
           case "double":
             prop.set(obj, Double.parseDouble(valueString));
