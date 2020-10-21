@@ -147,7 +147,12 @@ Later themes:
         }
 
         if ( theme == null ) {
-          theme = (Theme) themeDAO.find(MLang.EQ(Theme.SPID, "*"));
+          theme = (Theme) themeDAO.find(
+            MLang.AND(
+              MLang.EQ(Theme.SPID, "*"),
+              MLang.EQ(Theme.ENABLED, true)
+            )
+          );
         }
       }
 
