@@ -71,7 +71,7 @@ Later themes:
           }
         }
 
-        if ( user && ( ! theme || 'localhost' === themeDomain.id ) ) {
+        if ( user && ( ! theme || domain !== themeDomain.id ) ) {
           var spid = user.spid;
           while ( spid ) {
             theme = await this.themeDAO.find(
@@ -149,7 +149,7 @@ Later themes:
 
       // Find theme from user via SPID
       if ( user != null
-        && ( theme == null || "localhost".equals(td.getId()) )
+        && ( theme == null || ! domain.equals(td.getId()) )
       ) {
         var spid = user.getSpid();
         while ( ! SafetyUtil.isEmpty(spid) ) {
