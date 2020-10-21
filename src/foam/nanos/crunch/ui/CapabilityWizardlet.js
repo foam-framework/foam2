@@ -25,6 +25,12 @@ foam.CLASS({
     {
       name: 'ucj'
     },
+    {
+      name: 'id',
+      expression: function (capability) {
+        return 'capability,' + capability.id;
+      }
+    },
 
     // Properties for WizardSection interface
     {
