@@ -165,7 +165,7 @@ foam.CLASS({
     }
 
     ^table {
-      font-size: 3rem;
+      font-size: 4rem;
     }
     ^table th {
       color: #999;

@@ -105,7 +105,7 @@ foam.CLASS({
     {
       name: 'removeStyleOpenClose',
       isMerged:true,
-      mergeDelay:1000,
+      mergeDelay:10,
       code: function() { this.addClass('test');}
     }
 

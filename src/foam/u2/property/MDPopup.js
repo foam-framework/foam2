@@ -143,7 +143,7 @@ foam.CLASS({
       var finalRect = {
         top:    -bodyRect.top + startingClientRect.top - (slotsAbove * this.itemHeight) - 2,
         bottom: -bodyRect.top + startingClientRect.top + startingClientRect.height + (slotsBelow * this.itemHeight) + 2 + this.vMargin * 2,
-        height: ( menuCount + 2 ) * this.itemHeight + 4 + this.vMargin * 2,
+        height: ( menuCount + 2 ) * this.itemHeight + this.vMargin * 2,
         left: -bodyRect.left + startingClientRect.left - 2 - this.hMargin,
         right: -bodyRect.left + startingClientRect.left + startingClientRect.width + 2,
         width: startingClientRect.width + this.hMargin * 2 + 4
