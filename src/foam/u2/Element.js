@@ -2892,7 +2892,8 @@ foam.CLASS({
   methods: [
     function toE(args, X) {
       var view = foam.u2.ViewSpec.createView(
-        { class: 'foam.u2.ActionView', action: this }, args, this, X);
+        { class: 'foam.u2.ActionView', action: this }, args, this, X
+      );
 
       if ( X.data$ && ! ( args && ( args.data || args.data$ ) ) ) {
         view.data$ = X.data$;
