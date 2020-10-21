@@ -93,8 +93,8 @@ foam.CLASS({
       section: 'infoSection',
     },
     {
-      name: 'enabled',
       class: 'Boolean',
+      name: 'enabled',
       value: true,
       includeInDigest: true,
       section: 'administration'
@@ -120,8 +120,8 @@ foam.CLASS({
       },
     },
     {
-      name: 'domains',
       class: 'Array',
+      name: 'domains',
       of: 'String',
       factory: function(){
         return  ['localhost'];
@@ -422,8 +422,8 @@ foam.CLASS({
       section: 'inputs'
     },
     {
-      name: 'appConfig',
       class: 'foam.core.FObjectProperty',
+      name: 'appConfig',
       of: 'foam.nanos.app.AppConfig',
       section: 'applicationSection',
       factory: function() { return foam.nanos.app.AppConfig.create({}); }

@@ -14,13 +14,13 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'allowSkipping',
       class: 'Boolean',
+      name: 'allowSkipping',
       value: true
     },
     {
-      name: 'allowBacktracking',
       class: 'Boolean',
+      name: 'allowBacktracking',
       value: true
     }
   ],

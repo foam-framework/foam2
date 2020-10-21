@@ -19,13 +19,12 @@ foam.CLASS({
       documentation: 'Determines locale type (en, fr, es …etc)',
       factory: function() {
         foam.locale = foam.locale || 'en';
-      }  
+      }
     },
     {
       class: 'String',
       name: 'variant',
-      documentation: 'Locale variation (CA for en-CA, CA for fr-CA, AT for de_AT …etc)',
-      value: 'CA'
+      documentation: 'Locale variation (CA for en-CA, CA for fr-CA, AT for de_AT …etc)'
     },
     {
       class: 'String',
@@ -49,7 +48,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'source',//path+property+propertyproperty
-      documentation: `Reference to model or view property to be translated. 
+      documentation: `Reference to model or view property to be translated.
         Ex. (‘FIRST_NAME’, ‘LAST_NAME’, ‘ORGANIZATION’ …etc)`
     },
     {

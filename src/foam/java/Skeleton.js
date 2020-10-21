@@ -125,6 +125,13 @@ foam.CLASS({
         default: throw new RuntimeException("Method not found.");
       }
     } catch (Throwable t) {
+      if ( t instanceof foam.core.ExceptionInterface ) {
+        RuntimeException clientE = (RuntimeException)
+          ((foam.core.ExceptionInterface) t).getClientRethrowException();
+        if ( clientE != null ) {
+          throw clientE;
+        }
+      }
       ((foam.nanos.logger.Logger) getMessageX(message).get("logger")).debug("returning skeleton exception", t);
       message.replyWithException(t);
 

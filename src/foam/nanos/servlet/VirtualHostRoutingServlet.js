@@ -144,8 +144,8 @@ foam.CLASS({
           out.print(appConfig.getVersion());
           out.println(".js\\"></script>");
           out.println("<script async defer language=\\"javascript\\" src=\\"/html2canvas.min.js\\"></script>");
-          out.println("<script async defer language=\\"javascript\\" src=\\"/jspdf.min.js\\"></script>");
-          out.println("<script language=\\"javascript\\" src=\\"/jspdf.plugin.autotable.min.js\\"></script>");
+          out.println("<script defer language=\\"javascript\\" src=\\"/jspdf.min.js\\"></script>");
+          out.println("<script defer language=\\"javascript\\" src=\\"/jspdf.plugin.autotable.min.js\\"></script>");
           out.println("<script async defer language=\\"JavaScript\\" src=\\"https://cdn.plaid.com/link/v2/stable/link-initialize.js\\"></script>");
         }
         // development

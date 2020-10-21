@@ -21,7 +21,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'maxStringDataSize',
-      value: 1024 * 1024 * 3
+      value: 1024 * 3
     }
   ],
 
@@ -40,11 +40,16 @@ foam.CLASS({
 
         if ( ! file ) return a();
 
-        if ( file.size <= this.maxStringDataSize ) {
-          file.dataString = await encode(file.data.blob);
-          delete file.instance_.data;
-        }
+        // We do not allow file update, so there is no point to send file again
+        // if it is already stored and has id
+        if ( file.id ) return file;
 
+        if ( file.filesize <= self.maxStringDataSize ) {
+          file.dataString = await self.encode(file.data.blob);
+          file.instance_.data = undefined;
+        } else {
+          file.dataString = undefined;
+        }
         return self.fileDAO.put(file).then(function (b) {
           prop.set(obj, b);
           return a();

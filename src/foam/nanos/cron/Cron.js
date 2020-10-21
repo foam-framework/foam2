@@ -12,6 +12,7 @@ foam.CLASS({
   imports: [ 'cronDAO as scriptDAO' ],
 
   javaImports: [
+    'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.notification.Notification',
     'java.util.Date'
@@ -20,10 +21,21 @@ foam.CLASS({
   documentation: 'FOAM class that models a Cron script',
 
   tableColumns: [
-    'id', 'enabled', 'description', 'lastDuration', 'status', 'scheduledTime', 'run'
+    'description',
+    'enabled',
+    'lastDuration',
+    'lastRun',
+    'status',
+    'scheduledTime',
+    'run'
   ],
 
-  searchColumns: ['id', 'description'],
+  searchColumns: [
+    'id',
+    'description',
+    'enabled',
+    'status'
+  ],
 
   sections: [
     {
@@ -32,12 +44,23 @@ foam.CLASS({
       order: 2
     },
     {
+      name: 'scriptEvents',
+      title: 'Events',
+      order: 3
+    },
+    {
       name: '_defaultSection',
+      title: 'Info',
       order: 1
     }
   ],
 
   properties: [
+    {
+      documentation: 'Cron jobs shall be enabled as a deployment step.',
+      class: 'Boolean',
+      name: 'enabled'
+    },
     {
       name: 'server',
       hidden: true,
@@ -58,55 +81,25 @@ foam.CLASS({
       class: 'DateTime',
       name: 'scheduledTime',
       documentation: 'Scheduled time to run Cron script.',
-      section: 'scheduling',
       visibility: 'RO',
-      javaFactory: 'return getNextScheduledTime();'
-    },
-    {
-      class: 'Boolean',
-      name: 'enabled',
-      value: false
+      javaFactory: `return getNextScheduledTime(getX());`,
+      storageTransient: true
     }
   ],
 
   methods: [
     {
-      name: 'runScript',
+      name: 'getNextScheduledTime',
       args: [
         {
           name: 'x',
-          type: 'Context'
+          type: 'X'
         }
       ],
-      type: 'Void',
-      javaCode:
-`/*
-  I don't know why we're doing this because we aren't specifying a user or
-  group to be notified and we aren't including the script output either.
-  Also, if we were to notify, we should use a ScriptRunNotification rather
-  than a generic notification. Maybe there should be properties to say which
-  users or groups to notify, or if notifications should be sent or not (and
-  their expiry).
-Notification cronStartNotify = new Notification();
-cronStartNotify.setBody("Cron STARTED - " + this.getId() + " " + this.getDescription());
-notification.put(cronStartNotify);
-*/
-super.runScript(x);
-
-/*
-Notification cronEndNotify = new Notification();
-cronEndNotify.setBody("Cron ENDED - " + this.getId() + " " + this.getDescription());
-notification.put(cronEndNotify);
-*/
-
-setScheduledTime(getNextScheduledTime());`
-    },
-    {
-      name: 'getNextScheduledTime',
       type: 'Date',
       javaCode:
 `
-return getSchedule().getNextScheduledTime(
+return getSchedule().getNextScheduledTime(x,
   new Date(System.currentTimeMillis())
 );
 `

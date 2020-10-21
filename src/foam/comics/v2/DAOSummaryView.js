@@ -93,7 +93,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpecWithJava',
       name: 'viewView',
-      expression: function() {
+      factory: function() {
         return foam.u2.detail.SectionedDetailView;
       }
     },
@@ -103,10 +103,20 @@ foam.CLASS({
       expression: function(config$browseTitle) {
         return 'All ' + config$browseTitle;
       }
+    },
+    {
+      name: 'onBack',
+      factory: function() { 
+        return () => this.stack.back();
+      }
     }
   ],
 
   actions: [
+    {
+      name: 'back',
+      code: (data) => data.onBack()
+    },
     {
       name: 'edit',
       isEnabled: function(config, data) {
@@ -212,7 +222,7 @@ foam.CLASS({
       var self = this;
       this.SUPER();
 
-      var promise = this.data ? Promise.resolve(this.data) : this.config.dao.find(this.id);
+      var promise = this.data ? Promise.resolve(this.data) : this.config.dao.inX(this.__subContext__).find(this.id);
 
       // Get a fresh copy of the data, especially when we've been returned
       // to this view from the edit view on the stack.
@@ -226,8 +236,8 @@ foam.CLASS({
               .start(self.Rows)
                 .start(self.Rows)
                   // we will handle this in the StackView instead
-                  .startContext({ data: self.stack })
-                    .tag(self.stack.BACK, {
+                  .startContext({ onBack: self.onBack })
+                    .tag(self.BACK, {
                       buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                       icon: 'images/back-icon.svg',
                       label: self.backLabel

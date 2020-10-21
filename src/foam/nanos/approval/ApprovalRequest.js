@@ -405,17 +405,30 @@
       writePermissionRequired: true
     },
     {
-      class: 'String',
-      name: 'refObj',
-      transient: true,
-      expression: function(daoKey, objId) {
-        return daoKey + ':' + objId;
-      },
-      javaGetter: `
-        return getDaoKey() + ": " + getObjId();
-      `,
+      class: 'Object',
+      name: 'refObjId',
+      hidden: true,
       readPermissionRequired: true,
-      writePermissionRequired: true
+      writePermissionRequired: true,
+      documentation: `
+        ID of obj displayed in view reference
+        To be used in view reference action when the approvalrequest
+        needs to specify its own reference, for example in the case of 
+        UserCapabilityJunctions where data is null.
+      `
+    },
+    {
+      class: 'String',
+      name: 'refDaoKey',
+      hidden: true,
+      readPermissionRequired: true,
+      writePermissionRequired: true,
+      documentation: `
+        Daokey of obj displayed in view reference.
+        To be used in view reference action when the approvalrequest
+        needs to specify its own reference, for example in the case of 
+        UserCapabilityJunctions where data is null.
+      `
     },
     {
       class: 'String',
@@ -522,48 +535,6 @@
       javaCode: `
         return foam.util.SafetyUtil.isEmpty(getClassification()) ? "" : "(" + getClassification() + ")" + getOperation().toString();
       `
-    },
-    {
-      name: 'approveWithMemo',
-      code: function(memo) {
-        var approvedApprovalRequest = this.clone();
-        approvedApprovalRequest.status = this.ApprovalStatus.APPROVED;
-        approvedApprovalRequest.memo = memo;
-
-        this.approvalRequestDAO.put(approvedApprovalRequest).then((req) => {
-          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
-          this.finished.pub();
-          this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
-
-          if ( this.stack.top.length > 0 ) {
-            this.stack.back();
-          }
-        }, (e) => {
-          this.throwError.pub(e);
-          this.notify(e.message, '', this.LogLevel.ERROR, true);
-        });
-      }
-    },
-    {
-      name: 'rejectWithMemo',
-      code: function(memo) {
-        var rejectedApprovalRequest = this.clone();
-        rejectedApprovalRequest.status = this.ApprovalStatus.REJECTED;
-        rejectedApprovalRequest.memo = memo;
-
-        this.approvalRequestDAO.put(rejectedApprovalRequest).then((o) => {
-          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
-          this.finished.pub();
-          this.notify(this.SUCCESS_REJECTED, '', this.LogLevel.INFO, true);
-
-          if ( this.stack.top.length > 0 ) {
-            this.stack.back();
-          }
-        }, (e) => {
-          this.throwError.pub(e);
-          this.notify(e.message, '', this.LogLevel.ERROR, true);
-        });
-      }
     }
   ],
 
@@ -583,10 +554,9 @@
       },
       code: function(X) {
         var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
-
         objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: "foam.u2.MemoModal",
-          onExecute: this.approveWithMemo.bind(this)
+          onExecute: this.approveWithMemo.bind(this, X)
         }));
       }
     },
@@ -608,7 +578,7 @@
 
         objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: "foam.u2.MemoModal",
-          onExecute: this.rejectWithMemo.bind(this),
+          onExecute: this.rejectWithMemo.bind(this, X),
           isMemoRequired: true
         }));
       }
@@ -664,14 +634,24 @@
           var objId = property.adapt.call(property, self.objId, self.objId, property);
           return self.__subContext__[this.daoKey_]
             .find(objId)
-            .then((obj) => {
-              return !! obj;
-            })
+            .then(obj => !! obj)
             .catch((err) => {
               console.warn(err.message || err);
-              return false;
+              if ( self.refObjId && self.refDaoKey && self.__subContext__[self.refDaoKey_] ) {
+                property = self.__subContext__[self.refDaoKey].of.ID;
+                objId = property.adapt.call(property, self.refObjId, self.refObjId, property);
+                return self.__subContext__[self.refDaoKey]
+                  .find(objId)
+                  .then(obj => !! obj)
+                  .catch((err) => {
+                    console.warn(err.message || err);
+                    return false;
+                  });
+              } else {
+                return false;
+              }
             });
-          }
+        }
       },
       code: function(X) {
         var self = this;
@@ -683,9 +663,18 @@
              return;
         }
 
-        var objId = X[self.daoKey_].of.ID.type === 'Long' ? parseInt(this.objId) : this.objId;
-
-        return X[this.daoKey_]
+        var objId, daoKey, property;
+        if ( self.refObjId && self.refDaoKey ) {
+          daoKey = self.refDaoKey
+          property = X[daoKey].of.ID;
+          objId = property.adapt.call(property, self.refObjId, self.refObjId, property);
+        } else {
+          daoKey = self.daoKey_;
+          property = X[daoKey].of.ID;
+          objId = property.adapt.call(property, self.objId, self.objId, property);
+        }
+        
+        return X[daoKey]
           .find(objId)
           .then((obj) => {
             var of = obj.cls_;
@@ -749,7 +738,7 @@
               data: obj,
               of: of,
               config: foam.comics.v2.DAOControllerConfig.create({
-                daoKey: this.daoKey_,
+                daoKey: daoKey,
                 of: of,
                 editPredicate: foam.mlang.predicate.False.create(),
                 createPredicate: foam.mlang.predicate.False.create(),
@@ -762,6 +751,46 @@
           });
       },
       tableWidth: 100
+    }
+  ],
+  listeners: [
+    {
+      name: 'approveWithMemo',
+      code: function(X, memo) {
+        var approvedApprovalRequest = this.clone();
+        approvedApprovalRequest.status = this.ApprovalStatus.APPROVED;
+        approvedApprovalRequest.memo = memo;
+
+        this.approvalRequestDAO.put(approvedApprovalRequest).then((req) => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
+
+          X.stack.back();
+        }, (e) => {
+          this.throwError.pub(e);
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
+        });
+      }
+    },
+    {
+      name: 'rejectWithMemo',
+      code: function(X, memo) {
+        var rejectedApprovalRequest = this.clone();
+        rejectedApprovalRequest.status = this.ApprovalStatus.REJECTED;
+        rejectedApprovalRequest.memo = memo;
+
+        this.approvalRequestDAO.put(rejectedApprovalRequest).then((o) => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.notify(this.SUCCESS_REJECTED, '', this.LogLevel.INFO, true);
+
+          X.stack.back();
+        }, (e) => {
+          this.throwError.pub(e);
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
+        });
+      }
     }
   ]
 });

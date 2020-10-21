@@ -39,7 +39,7 @@ foam.CLASS({
         .build();
 
       // TEST: next time should be current day at 1:02:03 PM
-      next.setTime(testTOD.getNextScheduledTime(now.getTime()));
+      next.setTime(testTOD.getNextScheduledTime(x, now.getTime()));
       now.add(Calendar.HOUR_OF_DAY, 13);
       now.add(Calendar.MINUTE, 2);
       now.add(Calendar.SECOND, 3);
@@ -51,7 +51,7 @@ foam.CLASS({
 
       // TEST: at 2:02:03 PM the scheduled time should be tomorrow
       now.add(Calendar.HOUR_OF_DAY, 1);
-      next.setTime(testTOD.getNextScheduledTime(now.getTime()));
+      next.setTime(testTOD.getNextScheduledTime(x, now.getTime()));
 
       now.set(Calendar.HOUR_OF_DAY, 13);
       now.add(Calendar.DATE, 1);

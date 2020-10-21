@@ -14,6 +14,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'auth',
     'crunchService',
     'ctrl',
     'subject',
@@ -71,6 +72,11 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isRenewable'
+    },
+    {
+      class: 'Boolean',
+      name: 'tooltipEnabled',
+      value: true
     }
   ],
 
@@ -89,7 +95,7 @@ foam.CLASS({
       // Methods of Style all return the first argument for chaining
       var style = self.Style.create();
       style.addBinds(self);
-      
+
       self
         .addClass(style.myClass())
         .addClass(style.myClass(), 'mode-card')
@@ -99,16 +105,19 @@ foam.CLASS({
             'background-image': "url('" + self.data.icon + "')"
           })
           .add(this.slot(function(cjStatus, isRenewable) {
-            return this.E('span')
-              .style({ 'float' : 'right' })
+            return this.E().addClass(style.myClass('tooltip'))
+              .start('span')
+                .addClass(style.myClass('tooltiptext'))
+                .addClass(style.myClass('tooltip-bottom'))
+                .enableClass(style.myClass('tooltipDisabled'), self.tooltipEnabled, true)
+                .add(cjStatus.documentation)
+              .end()
               .start()
                 .addClass(style.myClass('renewable-description'))
                 .add(isRenewable ? "Capability is renewable" : "")
               .end()
-              .start(self.ReadOnlyEnumView, { data : cjStatus, clsInfo : cjStatus.cls_.LABEL.name, default : cjStatus.label })
-                .addClass(style.myClass('badge'))
-                .style({ 'background-color': cjStatus.background })
-              .end();
+              .add(cjStatus.label).addClass(style.myClass('badge'))
+              .style({ 'background-color': cjStatus.background });
           }))
         .end()
         .start()
@@ -149,13 +158,20 @@ foam.CLASS({
           )
         ).then(ucj => {
           if ( ucj ) {
-            this.cjStatus = ucj.status === this.CapabilityJunctionStatus.APPROVED ? 
+            this.cjStatus = ucj.status === this.CapabilityJunctionStatus.APPROVED ?
               this.CapabilityJunctionStatus.PENDING : ucj.status;
           }
-          if ( this.cjStatus === this.CapabilityJunctionStatus.GRANTED ){
+          if ( this.cjStatus === this.CapabilityJunctionStatus.GRANTED ) {
             this.crunchService.isRenewable(this.ctrl.__subContext__, ucj.targetId).then(
               isRenewable => this.isRenewable = isRenewable
             );
+          }
+          if ( this.cjStatus === this.CapabilityJunctionStatus.ACTION_REQUIRED ) {
+            this.auth.check(this.ctrl.__subContext__, 'certifydatareviewed.rw.reviewed').then(result => {
+              if ( ! result ) {
+                this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
+              }
+            });
           }
         });
       }

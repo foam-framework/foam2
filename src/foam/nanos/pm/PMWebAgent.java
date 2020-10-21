@@ -10,6 +10,7 @@ import foam.core.X;
 import foam.nanos.http.ProxyWebAgent;
 import foam.nanos.http.WebAgent;
 
+/** WebAgent decorator which PMs the execution of its delegate. **/
 public class PMWebAgent
   extends ProxyWebAgent
 {

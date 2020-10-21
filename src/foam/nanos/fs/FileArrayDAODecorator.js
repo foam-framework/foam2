@@ -24,24 +24,31 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'maxStringDataSize',
-      value: 1024 * 1024 * 3
+      value: 1024 * 3
     }
   ],
 
   methods: [
     function write(X, dao, obj, existing) {
-      var self = this;
+      var self  = this;
       var props = obj.cls_.getAxiomsByClass(foam.nanos.fs.FileArray);
 
       var promises = props.map((prop) => {
-        var files = prop.f(obj);
+        let files = prop.f(obj);
         return Promise.all(files.map(async f => {
+
+          // We do not allow file update, so there is no point to send file again
+          // if it is already stored and has id
+          if ( f.id ) return f;
+
           if ( f.filesize <= this.maxStringDataSize ) {
             f.dataString = await this.encode(f.data.blob);
-            delete f.instance_.data;
+            f.data = undefined;
+          } else {
+            f.dataString = undefined;
           }
           return self.fileDAO.put(f);
-        }))
+        }));
       });
 
       return Promise.all(promises).then((values) => {
@@ -54,10 +61,10 @@ foam.CLASS({
 
     async function encode(file) {
       const toBase64 = file => new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = error => reject(error);
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload  = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
       });
       return await toBase64(file);
     }

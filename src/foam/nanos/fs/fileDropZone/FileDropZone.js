@@ -86,12 +86,12 @@ foam.CLASS({
 
   messages: [
     { name: 'LABEL_DEFAULT_TITLE', message: 'DRAG & DROP YOUR FILE HERE' },
-    { name: 'LABEL_OR', message: 'or' },
-    { name: 'LABEL_BROWSE', message: 'browse' },
-    { name: 'LABEL_SUPPORTED', message: 'Supported file types:' },
-    { name: 'LABEL_MAX_SIZE', message: 'Max Size:' },
-    { name: 'ERROR_FILE_TYPE', message: 'Invalid file type' },
-    { name: 'ERROR_FILE_SIZE', message: 'File size exceeds 15MB' }
+    { name: 'LABEL_OR',            message: 'or' },
+    { name: 'LABEL_BROWSE',        message: 'browse' },
+    { name: 'LABEL_SUPPORTED',     message: 'Supported file types:' },
+    { name: 'LABEL_MAX_SIZE',      message: 'Max Size:' },
+    { name: 'ERROR_FILE_TYPE',     message: 'Invalid file type' },
+    { name: 'ERROR_FILE_SIZE',     message: 'File size exceeds 15MB' }
   ],
 
   properties: [
@@ -179,7 +179,9 @@ foam.CLASS({
         }, this.files$))
         .on('drop', this.onDrop)
         .callIf(this.isMultipleFiles, function() {
-          this.start('input').addClass(this.myClass('input'))
+          this.start('input')
+            .addClass(this.myClass('input'))
+            .addClass(this.instanceClass(`input`))
             .attrs({
               type: 'file',
               accept: this.getSupportedTypes(),
@@ -189,7 +191,9 @@ foam.CLASS({
           .end();
         })
         .callIf(! this.isMultipleFiles, function() {
-          this.start('input').addClass(this.myClass('input'))
+          this.start('input')
+            .addClass(this.myClass('input'))
+            .addClass(this.instanceClass(`input`))
             .attrs({
               type: 'file',
               accept: this.getSupportedTypes()
@@ -223,7 +227,7 @@ foam.CLASS({
 
     function addFiles(files) {
       var errors = false;
-      for ( var i = 0; i < files.length; i++ ) {
+      for ( var i = 0 ; i < files.length ; i++ ) {
         // skip files that exceed limit
         if ( files[i].size > ( this.maxSize * 1024 * 1024 ) ) {
           if ( ! errors ) errors = true;
@@ -239,22 +243,23 @@ foam.CLASS({
         }
         if ( isIncluded ) continue;
         if ( this.isMultipleFiles ) {
-          this.files.push(this.File.create({
-            owner: this.user.id,
+          var f = this.File.create({
+            owner:    this.user.id,
             filename: files[i].name,
             filesize: files[i].size,
             mimeType: files[i].type,
-            data: this.BlobBlob.create({
+            data:     this.BlobBlob.create({
               blob: files[i]
             })
-          }));
+          });
+          this.files.push(f);
         } else {
           this.files[0] = this.File.create({
-            owner: this.user.id,
+            owner:    this.user.id,
             filename: files[i].name,
             filesize: files[i].size,
             mimeType: files[i].type,
-            data: this.BlobBlob.create({
+            data:     this.BlobBlob.create({
               blob: files[i]
             })
           });
@@ -271,7 +276,7 @@ foam.CLASS({
       var files = Array.from(this.files);
       files.splice(atIndex, 1);
       this.files = files;
-      this.document.querySelector('.' + this.myClass('input')).value = null;
+      this.document.querySelector('.' + this.instanceClass(`input`)).value = null;
     }
   ],
 
@@ -279,12 +284,12 @@ foam.CLASS({
     function onAddAttachmentClicked(e) {
       if ( typeof e.target != 'undefined' ) {
         if ( e.target.tagName == 'P' && e.target.tagName != 'A' ) {
-          this.document.querySelector('.' + this.myClass('input')).click();
+          this.document.querySelector('.' + this.instanceClass(`input`)).click();
         }
       } else {
         // For IE browser
         if ( e.srcElement.tagName == 'P' && e.srcElement.tagName != 'A' ) {
-          this.document.querySelector('.' + this.myClass('input')).click();
+          this.document.querySelector('.' + this.instanceClass(`input`)).click();
         }
       }
     },
@@ -296,7 +301,7 @@ foam.CLASS({
       if ( e.dataTransfer.items ) {
         inputFile = e.dataTransfer.items;
         if ( inputFile ) {
-          for ( var i = 0; i < inputFile.length; i++ ) {
+          for ( var i = 0 ; i < inputFile.length ; i++ ) {
             // If dropped items aren't files, reject them
             if ( inputFile[i].kind === 'file' ) {
               var file = inputFile[i].getAsFile();
@@ -310,10 +315,11 @@ foam.CLASS({
         }
       } else if ( e.dataTransfer.files ) {
         inputFile = e.dataTransfer.files;
-        for ( var i = 0; i < inputFile.length; i++ ) {
+        for ( var i = 0 ; i < inputFile.length ; i++ ) {
           var file = inputFile[i];
-          if ( this.isFileType(file) ) files.push(file);
-          else {
+          if ( this.isFileType(file) ) {
+            files.push(file);
+          } else {
             ctrl.notify(this.ERROR_FILE_TYPE, '', this.LogLevel.ERROR, true);
           }
         }
@@ -325,7 +331,7 @@ foam.CLASS({
       var files = e.target.files;
       this.addFiles(files);
       // Remove all temporary files in the element.target.files
-      this.document.querySelector('.' + this.myClass('input')).value = null;
+      this.document.querySelector('.' + this.instanceClass(`input`)).value = null;
     }
   ]
 });

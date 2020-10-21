@@ -9,13 +9,14 @@ foam.CLASS({
   name: 'Memento',
 
   constants: {
-    SEPARATOR: '#'
+    SEPARATOR: ':'
   },
 
   properties: [
     {
       class: 'Boolean',
-      name: 'feedback_'
+      name: 'feedback_',
+      documentation: 'Internal flag to prevent feedback loops'
     },
     {
       name: 'value',
@@ -40,7 +41,6 @@ foam.CLASS({
       postSet: function(o, n) {
         if ( this.feedback_ ) return;
         this.feedback_ = true;
-        debugger;
         this.value = this.combine(n, this.tail);
         this.feedback_ = false;
       }

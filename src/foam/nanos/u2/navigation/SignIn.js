@@ -121,15 +121,15 @@ foam.CLASS({
       code: async function(X) {
         if ( this.identifier.length > 0 ) {
           this.auth.login(X, this.identifier, this.password).then(
-            (logedInUser) => {
+            logedInUser => {
               if ( ! logedInUser ) return;
               if ( this.token_ ) {
                 logedInUser.signUpToken = this.token_;
                 this.dao_.put(logedInUser)
-                  .then((updatedUser) => {
+                  .then(updatedUser => {
                     this.user.copyFrom(updatedUser);
                     this.nextStep();
-                  }).catch((err) => {
+                  }).catch(err => {
                     this.ctrl.add(this.NotificationMessage.create({
                       message: err.message || this.ERROR_MSG,
                       type: this.LogLevel.ERROR
@@ -141,7 +141,7 @@ foam.CLASS({
               }
             }
           ).catch(
-            (err) => {
+            err => {
               this.ctrl.add(this.NotificationMessage.create({
                 message: err.message || this.ERROR_MSG,
                 type: this.LogLevel.ERROR

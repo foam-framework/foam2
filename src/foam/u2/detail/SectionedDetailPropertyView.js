@@ -24,6 +24,7 @@ foam.CLASS({
     }
 
     ^helper-icon {
+      padding-left: 12px;
       width: 20px;
       height: 20px;
     }
@@ -176,6 +177,8 @@ foam.CLASS({
     }
 
     ^ .foam-u2-CheckBox-label {
+      position: absolute;
+      top: 7;
       margin-left: 12px;
       vertical-align: middle;
       white-space: pre-wrap;

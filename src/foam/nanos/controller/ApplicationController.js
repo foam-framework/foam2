@@ -66,32 +66,30 @@ foam.CLASS({
   ],
 
   exports: [
-    'displayWidth',
     'agent',
     'appConfig',
     'as ctrl',
+    'crunchController',
     'currentMenu',
+    'displayWidth',
     'group',
     'lastMenuLaunched',
     'lastMenuLaunchedListener',
     'loginSuccess',
+    'loginVariables',
     'mementoTail as memento',
-    'theme',
     'menuListener',
     'notify',
     'pushMenu',
-    'requestCapability',
-    'capabilityCache',
     'requestLogin',
+    'sessionTimer',
     'signUpEnabled',
-    'loginVariables',
     'stack',
     'subject',
+    'theme',
     'user',
     'webApp',
-    'wrapCSS as installCSS',
-    'sessionTimer',
-    'crunchController'
+    'wrapCSS as installCSS'
   ],
 
   constants: {
@@ -147,7 +145,7 @@ foam.CLASS({
     body {
       background: /*%GREY5%*/ #f5f7fa;
       color: #373a3c;
-      font-family: /*%FONT1%*/, Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       letter-spacing: 0.2px;
       margin: 0;
@@ -279,13 +277,6 @@ foam.CLASS({
       }
     },
     {
-      class: 'Map',
-      name: 'capabilityCache',
-      factory: function() {
-        return new Map();
-      }
-    },
-    {
       class: 'FObjectProperty',
       of: 'foam.nanos.theme.Theme',
       name: 'theme'
@@ -319,8 +310,7 @@ foam.CLASS({
       var self = this;
 
       // Start Memento Support
-      var hash = this.WindowHash.create();
-      this.memento.value$ = hash.value$
+      this.WindowHash.create({value$: this.memento.value$});
 
       this.memento.head$.sub(this.mementoChange);
       this.mementoChange();
@@ -362,23 +352,22 @@ foam.CLASS({
       window.addEventListener('resize', this.updateDisplayWidth);
       this.updateDisplayWidth();
 
-      var userNotificationQueryId = this.subject && this.subject.realUser ?
-      this.subject.realUser.id : this.user.id;
 
-      this.__subSubContext__.notificationDAO.where(
-        this.EQ(this.Notification.USER_ID, userNotificationQueryId)
-      ).on.put.sub((sub, on, put, obj) => {
-        if ( obj.toastState == this.ToastState.REQUESTED ) {
-          this.add(this.NotificationMessage.create({
-            message: obj.toastMessage,
-            type: obj.severity,
-            description: obj.toastSubMessage
-          }));
-          var clonedNotification = obj.clone();
-          clonedNotification.toastState = this.ToastState.DISPLAYED;
-          this.__subSubContext__.notificationDAO.put(clonedNotification);
-        }
-      });
+
+//      this.__subSubContext__.notificationDAO.where(
+//        this.EQ(this.Notification.USER_ID, userNotificationQueryId)
+//      ).on.put.sub((sub, on, put, obj) => {
+//        if ( obj.toastState == this.ToastState.REQUESTED ) {
+//          this.add(this.NotificationMessage.create({
+//            message: obj.toastMessage,
+//            type: obj.severity,
+//            description: obj.toastSubMessage
+//          }));
+//          var clonedNotification = obj.clone();
+//          clonedNotification.toastState = this.ToastState.DISPLAYED;
+//          this.__subSubContext__.notificationDAO.put(clonedNotification);
+//        }
+//      });
 
       this.clientPromise.then(() => {
         this.fetchTheme().then(() => {
@@ -423,26 +412,16 @@ foam.CLASS({
               )
             ).select().then(e => {
               let arr = e.array;
-              arr.forEach(ea =>
-                {
-                  let s = null;
-                  try {
-                    let i, obj;
-                    do {
-                      i = ea.source.indexOf('.',++i);
-                      if (i != -1) {
-                        s = eval(ea.source.substring(0,i))
-                      }
-                    } while (i > 0 && !!s);
-                  }
-                  catch(err) {
-                    console.log(ea.source)
-                    console.log(err)
-                  }
-                  if (!!s) {
-                    s[ea.source.substring(ea.source.lastIndexOf('.')+1)] = ea.target;
-                  }
-                })
+              arr.forEach(ea => {
+                var node = global;
+                var path = ea.source.split('.');
+
+                for ( var i = 0 ; node && i < path.length-1 ; i++ )
+                  node = node[path[i]];
+
+                if ( node )
+                  node[path[path.length-1]] = ea.target;
+              });
             })
           })
         }
@@ -560,20 +539,6 @@ foam.CLASS({
       });
     },
 
-    function requestCapability(capabilityInfo) {
-      var self = this;
-
-      capabilityInfo.capabilityOptions.forEach((c) => {
-        self.capabilityCache.set(c, false);
-      });
-
-      let intercept = self.CapabilityIntercept.create({
-        capabilityOptions: capabilityInfo.capabilityOptions
-      });
-
-      return self.crunchController.maybeLaunchInterceptView(intercept);
-    },
-
     function notify(toastMessage, toastSubMessage, severity, transient) {
       var notification = this.Notification.create();
       notification.userId = this.subject && this.subject.realUser ?
@@ -608,6 +573,23 @@ foam.CLASS({
        *   - Update the look and feel of the app based on the group or user
        *   - Go to a menu based on either the hash or the group
        */
+       var userNotificationQueryId = this.subject && this.subject.realUser ?
+             this.subject.realUser.id : this.user.id;
+      this.__subSubContext__.notificationDAO.where(
+        this.EQ(this.Notification.USER_ID, userNotificationQueryId)
+      ).on.put.sub((sub, on, put, obj) => {
+        if ( obj.toastState == this.ToastState.REQUESTED ) {
+          this.add(this.NotificationMessage.create({
+            message: obj.toastMessage,
+            type: obj.severity,
+            description: obj.toastSubMessage
+          }));
+          var clonedNotification = obj.clone();
+          clonedNotification.toastState = this.ToastState.DISPLAYED;
+          this.__subSubContext__.notificationDAO.put(clonedNotification);
+        }
+      });
+
       this.fetchTheme();
 
       var hash = this.window.location.hash;
@@ -619,7 +601,7 @@ foam.CLASS({
         this.window.location.hash = this.theme.defaultMenu;
       }
 
-      this.__subContext__.localSettingDAO.put(foam.nanos.session.LocalSetting.create({id: 'homeDenomination', value: localStorage.getItem("homeDenomination")}));
+//      this.__subContext__.localSettingDAO.put(foam.nanos.session.LocalSetting.create({id: 'homeDenomination', value: localStorage.getItem("homeDenomination")}));
     },
 
     function menuListener(m) {

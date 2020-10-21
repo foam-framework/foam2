@@ -13,7 +13,7 @@ foam.CLASS({
     Is then()-able.
     ex:
       properties: [
-        { name: 'latch', factory: () => return this.Latch.create() },
+        { name: 'latch', factory: function() { return this.Latch.create(); },
       ...
       ]
 

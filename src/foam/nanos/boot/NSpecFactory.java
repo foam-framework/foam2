@@ -10,6 +10,7 @@ import foam.core.*;
 import foam.dao.ProxyDAO;
 import foam.nanos.*;
 import foam.nanos.logger.Logger;
+import foam.nanos.logger.StdoutLogger;
 import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
 
@@ -26,52 +27,63 @@ public class NSpecFactory
     spec_ = spec;
   }
 
-  public synchronized Object create(X x) {
-    if ( ns_ != null ) return ns_;
+  void buildService(X x) {
+    Logger logger = null;
+    if ( ! "logger".equals(spec_.getName()) && ! "PM".equals(spec_.getName()) ) {
+      logger = (Logger) x.get("logger");
+    }
+    if ( logger == null ) {
+      logger = new StdoutLogger();
+    }
 
     // Avoid infinite recursions when creating services
     if ( creatingThread_ == Thread.currentThread() ) {
-      if ( ! "logger".equals(spec_.getName()) ) {
-        Logger logger = (Logger) x.get("logger");
-        if ( logger != null ) logger.warning("Recursive Service Factory", spec_.getName());
-      }
-
-      return null;
+      logger.warning("Recursive Service Factory", spec_.getName());
+      return;
     }
     creatingThread_ = Thread.currentThread();
 
     PM     pm     = new PM(this.getClass(), spec_.getName());
-    Logger logger = (Logger) x.get("logger");
 
     try {
-      if ( logger != null ) logger.info("Creating Service", spec_.getName());
+      logger.info("Creating Service", spec_.getName());
       ns_ = spec_.createService(x_.getX().put(NSpec.class, spec_));
       Object ns = ns_;
       while ( ns != null ) {
-        if ( ns instanceof ContextAware ) ((ContextAware) ns).setX(x_.getX());
-        if ( ns instanceof NSpecAware )   ((NSpecAware) ns).setNSpec(spec_);
-        if ( ns instanceof NanoService )  ((NanoService) ns).start();
+        if ( ns instanceof ContextAware ) {
+          ((ContextAware) ns).setX(x_.getX());
+        }
+        if ( ns instanceof NSpecAware ) {
+          if ( ((NSpecAware) ns).getNSpec() == null ) {
+            ((NSpecAware) ns).setNSpec(spec_);
+          }
+        }
+        if ( ns instanceof NanoService )  {
+          logger.info("Starting Service", spec_.getName());
+          ((NanoService) ns).start();
+        }
         if ( ns instanceof ProxyDAO ) {
           ns = ((ProxyDAO) ns).getDelegate();
         } else {
           ns = null;
         }
       }
-      if ( logger != null )
-        logger.info("Created Service", spec_.getName(), ns_ != null ? ns_.getClass().getSimpleName() : '-');
+      logger.info("Created Service", spec_.getName(), ns_ != null ? ns_.getClass().getSimpleName() : "null");
     } catch (Throwable t) {
-      if ( logger != null ) {
-        logger.error("Error Creating Service", spec_.getName(), t);
-      } else {
-        System.err.println("Error Creating Service: " + spec_.getName());
-        t.printStackTrace();
-      }
+      logger.error("Error Creating Service", spec_.getName(), t);
     } finally {
       pm.log(x_.getX());
       creatingThread_ = null;
     }
+  }
+
+  public synchronized Object create(X x) {
+    if ( ns_ == null ) buildService(x);
+
+    if ( ns_ instanceof XFactory ) return ((XFactory) ns_).create(x);
 
     return ns_;
+
   }
 
   public synchronized void invalidate(NSpec spec) {

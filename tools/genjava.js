@@ -159,6 +159,7 @@ function ensurePath(p) {
   }
 }
 
+var loading = {};
 function loadClass(c) {
   var path = srcPath;
 
@@ -166,6 +167,11 @@ function loadClass(c) {
     path = path + c[0];
     c = c[1];
   }
+  if ( loading[c] ) {
+    console.log('******************************** call/loadClass:cls', c);
+  }
+  loading[c] = true;
+
   if ( ! foam.lookup(c, true) ) {
     console.warn("Using fallback model loading; " +
       "may cause errors for files with multiple definitions.");
