@@ -58,6 +58,22 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'decorateApprovalRequest',
+      documentation: `
+        For further tweaks needed to be done to the approval request, the default is to not add anything
+      `,
+      type: 'ApprovalRequest',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'request', type: 'ApprovalRequest' },
+        { name: 'capableObj', type: 'Capable' },
+        { name: 'capablePayloadObj', type: 'CapablePayload' }
+      ],
+      javaCode: `
+        return request;
+      `
+    },
+    {
       name: 'applyAction',
       javaCode: `
         User user = ((Subject) x.get("subject")).getUser();
@@ -144,6 +160,8 @@ foam.CLASS({
                     capablePayload.getObjId()
                   )
                   .setStatus(ApprovalStatus.REQUESTED).build();
+                
+                approvalRequest = decorateApprovalRequest(x, approvalRequest, capableObj, capablePayload);
 
                 approvalRequestDAO.put_(getX(), approvalRequest);
               } catch (Exception e){
