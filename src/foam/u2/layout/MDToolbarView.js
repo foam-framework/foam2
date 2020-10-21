@@ -33,7 +33,6 @@ foam.CLASS({
   css: `
     ^ {
       top: 0;
-//      position: fixed;
       height: 10em;
       width: 100%;
       z-index: 10;

@@ -9,14 +9,17 @@ foam.CLASS({
   name: 'MDInput',
   extends: 'foam.u2.View',
 
+  imports: [
+    'warn'
+  ],
+
   properties: [
-//    [ 'nodeName', 'input' ],
     {
       name: 'data',
       preSet: function(o, d) {
         var f = ! d || typeof d === 'string' || typeof d === 'number' || typeof d === 'boolean' || foam.Date.isInstance(d);
         if ( ! f ) {
-          this.__context__.warn('Set Input data to non-primitive:' + d);
+          this.warn('Set Input data to non-primitive:' + d);
           return o;
         }
         return d;
