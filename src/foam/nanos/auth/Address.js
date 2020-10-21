@@ -22,7 +22,15 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'INVALID_POSTAL_CODE_ERR_MSG', message: 'Invalid postal code' }
+    { name: 'INVALID_POSTAL_CODE_ERR_MSG', message: 'Invalid postal code' },
+    { name: 'INVALID_ADDRESS_1', message: 'Invalid value for address 1.' },
+    { name: 'PROVINCE_REQUIRED', message: 'Province required.' },
+    { name: 'STATE_REQUIRED', message: 'State required.' },
+    { name: 'REGION_REQUIRED', message: 'Region required.' },
+    { name: 'INVALID_STREET_NAME', message: 'Invalid street name.' },
+    { name: 'INVALID_STREET_NUMBER', message: 'Invalid street number.' },
+    { name: 'COUNTRY_REQUIRED', message: 'Country required.' },
+
   ],
 
   properties: [
@@ -30,8 +38,8 @@ foam.CLASS({
       class: 'Boolean',
       name: 'structured',
       value: true,
-      documentation: `Determines whether the address is shown in the following structure: 
-        Street Number, Street Name, Suite Number. For an unstructured address field, 
+      documentation: `Determines whether the address is shown in the following structure:
+        Street Number, Street Name, Suite Number. For an unstructured address field,
         use address1 and/or address2.
       `,
       hidden: true
@@ -56,7 +64,7 @@ foam.CLASS({
               }), 1)
             );
           },
-          errorString: 'Invalid value for address 1.'
+          errorString: 'INVALID_ADDRESS_1'
         }
       ],
       hidden: true
@@ -80,7 +88,7 @@ foam.CLASS({
       gridColumns: 6,
       validateObj: function(countryId) {
         if ( typeof countryId !== 'string' || countryId.length === 0 ) {
-          return 'Country required.';
+          return 'COUNTRY_REQUIRED';
         }
       },
       postSet: function(oldValue, newValue) {
@@ -128,11 +136,11 @@ foam.CLASS({
         if ( typeof regionId !== 'string' || regionId.length === 0 ) {
           switch ( countryId ) {
             case 'CA':
-              return 'Province required.';
+              return this.PROVINCE_REQUIRED;
             case 'US':
-              return 'State required.';
+              return this.STATE_REQUIRED;
             default:
-              return 'Region required.';
+              return this.REGION_REQUIRED;
           }
         }
       }
@@ -164,7 +172,7 @@ foam.CLASS({
               }), 1)
             );
           },
-          errorString: 'Invalid street number.'
+          errorString: 'INVALID_STREET_NUMBER'
         }
       ]
     },
@@ -183,7 +191,7 @@ foam.CLASS({
               e.REG_EXP(foam.nanos.auth.Address.STREET_NAME, /^\s*.+\s*$/)
             );
           },
-          errorString: 'Invalid street name.'
+          errorString: 'INVALID_STREET_NAME'
         }
       ]
     },
