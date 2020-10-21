@@ -60,6 +60,10 @@ foam.CLASS({
     {
       name: 'title',
       class: 'String',
+      expression: function(capability) {
+        if ( ! capability || ! capability.name ) return '';
+        return capability.name;
+      }
     }
   ],
 
