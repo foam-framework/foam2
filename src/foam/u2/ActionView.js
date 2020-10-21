@@ -321,7 +321,8 @@ foam.CLASS({
     {
       name: 'hasConfirmationModal',
       factory: function() { 
-        return this.action && this.action.view ? true : false; }
+        return this.action && this.action.view ? true : false;
+      }
     },
     'action',
     [ 'nodeName', 'button' ],
