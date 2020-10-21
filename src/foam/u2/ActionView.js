@@ -31,7 +31,8 @@ foam.CLASS({
 
   requires: [
     'foam.u2.ButtonSize',
-    'foam.u2.ButtonStyle'
+    'foam.u2.ButtonStyle',
+    'foam.u2.dialog.Popup'
   ],
 
   css: `
@@ -260,6 +261,10 @@ foam.CLASS({
     }
   `,
 
+  imports: [
+    'ctrl'
+  ],
+
   enums: [
     {
       name: 'ButtonState',
@@ -312,6 +317,11 @@ foam.CLASS({
         // Reset state
         this.buttonState = undefined;
       }
+    },
+    {
+      name: 'hasModal',
+      factory: function() { 
+        return this.action && this.action.view ? true : false; }
     },
     'action',
     [ 'nodeName', 'button' ],
@@ -402,7 +412,12 @@ foam.CLASS({
   listeners: [
     function click(e) {
       try {
-        if ( this.buttonState == this.ButtonState.NO_CONFIRM ) {
+        if ( this.hasModal && this.buttonState == this.ButtonState.NO_CONFIRM ) {
+          this.ctrl.add(this.Popup.create().tag(this.action.view, {
+            action: this.action,
+            data: this.data
+          }));
+        } else if ( this.buttonState == this.ButtonState.NO_CONFIRM ) {
           this.action && this.action.maybeCall(this.__subContext__, this.data);
         } else if ( this.buttonState == this.ButtonState.CONFIRM ) {
           this.buttonState = this.ButtonState.DEBOUNCE;
