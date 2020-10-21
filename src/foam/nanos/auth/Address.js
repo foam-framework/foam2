@@ -537,6 +537,20 @@ foam.CLASS({
             );
           },
           errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+        },
+        // Sweden
+        {
+          args: ['postalCode', 'countryId'],
+          predicateFactory: function(e) {
+            return e.OR(
+              e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'SE'),
+              e.REG_EXP(
+                foam.nanos.auth.Address.POSTAL_CODE,
+                /^(s-|S-){0,1}[0-9]{3}\s?[0-9]{2}$/
+              )
+            );
+          },
+          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
         }
       ],
       javaSetter: `

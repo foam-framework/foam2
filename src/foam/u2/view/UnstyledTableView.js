@@ -425,9 +425,21 @@ foam.CLASS({
             var proxy = view.ProxyDAO.create({ delegate: dao });
 
             view.props = this.returnPropertiesForColumns(view, view.columns_);
+            var canObjBeBuildFromProjection = true;
+
+            for ( var p of view.props ) {
+              if ( p.property.tableCellFormatter && ! p.property.cls_.TABLE_CELL_FORMATTER.hasOwnProperty() ) {
+                canObjBeBuildFromProjection = false;
+                break;
+              }
+              if ( ! foam.lookup(p.property.cls_.id) ) {
+                canObjBeBuildFromProjection = false;
+                break;
+              }
+            }
 
             var propertyNamesToQuery = view.columnHandler.returnPropNamesToQuery(view.props);
-            var valPromises = view.returnRecords(view.of, proxy, propertyNamesToQuery);
+            var valPromises = view.returnRecords(view.of, proxy, propertyNamesToQuery, canObjBeBuildFromProjection);
             var nastedPropertyNamesAndItsIndexes = view.columnHandler.buildArrayOfNestedPropertyNamesAndCorrespondingIndexesInArray(propertyNamesToQuery);
 
             var tbodyElement = this.
@@ -449,7 +461,7 @@ foam.CLASS({
                   }).
                   callIf(view.dblclick && ! view.disableUserSelection, function() {
                     tableRowElement.on('dblclick', function() {
-                      view.dblclick && view.dblclick(null, obj.id);
+                      view.dblclick && view.dblclick(canObjBeBuildFromProjection ? obj : null, obj.id);
                     });
                   }).
                   callIf( ! view.disableUserSelection, function() {
@@ -591,8 +603,8 @@ foam.CLASS({
             });
         }
       },
-      function returnRecords(of, dao, propertyNamesToQuery) {
-        var expr = foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create().buildProjectionForPropertyNamesArray(of, propertyNamesToQuery);
+      function returnRecords(of, dao, propertyNamesToQuery, useProjection) {
+        var expr = foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create().buildProjectionForPropertyNamesArray(of, propertyNamesToQuery, useProjection);
         return dao.select(expr);
       },
       function doesAllColumnsContainsColumnName(obj, col) {

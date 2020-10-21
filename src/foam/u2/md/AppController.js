@@ -93,9 +93,9 @@ foam.CLASS({
       this.client.nSpecDAO.find('appConfig').then(config => {
       this.appConfig.copyFrom(config.service);
 
-      this.__subContext__.register(this.MDDAOController, 'foam.comics.v2.DAOBrowseControllerView');
-      this.__subContext__.register(this.MDDAOController, 'foam.comics.BrowserView');
-      this.__subContext__.register(this.MDLoginView, 'foam.u2.view.LoginView');
+      this.__subContext__.register(this.MDDAOController,       'foam.comics.v2.DAOBrowseControllerView');
+      this.__subContext__.register(this.MDDAOController,       'foam.comics.BrowserView');
+      this.__subContext__.register(this.MDLoginView,           'foam.u2.view.LoginView');
       this.__subContext__.register(this.MDNotificationMessage, 'foam.u2.dialog.NotificationMessage');
 
       this.themeInstalled.resolve();
