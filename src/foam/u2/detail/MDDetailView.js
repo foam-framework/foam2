@@ -27,8 +27,6 @@ foam.CLASS({
 
   css: `
   ^ {
-//    overflow: scroll;
-//    height: 100%;
         display: grid;
   }
    ^ .property-item {
@@ -37,11 +35,6 @@ foam.CLASS({
       border: 1px solid #e9ebff;
       height: fit-content;
     }
-//    ^ .label {
-//      font-size: larger;
-//      font-weight: 500;
-//      color: #5a5a5a;
-//    }
 //    TODO: move to calendar
     ^ .foam-u2-property-MDCalendar-heading {
       font-size: 1.5rem;
