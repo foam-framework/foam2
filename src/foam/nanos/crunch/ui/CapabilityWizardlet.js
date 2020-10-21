@@ -27,7 +27,7 @@ foam.CLASS({
           this.AND(
             this.OR(
               this.EQ(foam.i18n.Locale.LOCALE, foam.locale),
-              this.EQ(foam.i18n.Locale.LOCALE, foam.locale ? foam.locale.substring(0,foam.locale.indexOf('-')) : '')),
+              this.EQ(foam.i18n.Locale.LOCALE, foam.locale ? foam.locale.substring(0,foam.locale.indexOf('-')) : 'en')),
             this.EQ(foam.i18n.Locale.ID, this.capability.id + '.name')))
         .select().then(function(a){
           let arr = a.array;
