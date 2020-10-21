@@ -100,7 +100,9 @@ Later themes:
       javaCode: `
       DAO themeDAO = ((DAO) x.get("themeDAO"));
       Theme theme = null;
+      ThemeDomain td = null;
       String domain = null;
+      User user = ((Subject) x.get("subject")).getUser();
       HttpServletRequest req = x.get(HttpServletRequest.class);
       if ( req != null ) {
         domain = req.getServerName();
@@ -109,7 +111,7 @@ Later themes:
       // Find theme from themeDomain via domain
       if ( domain != null ) {
         var themeDomainDAO = (DAO) x.get("themeDomainDAO");
-        var td = (ThemeDomain) themeDomainDAO.find(domain);
+        td = (ThemeDomain) themeDomainDAO.find(domain);
         if ( td == null &&
              ! "localhost".equals(domain) ) {
           td = (ThemeDomain) themeDomainDAO.find("localhost");
@@ -124,16 +126,21 @@ Later themes:
       }
 
       // Find theme from user via SPID
-      User user = ((Subject) x.get("subject")).getUser();
-      if ( user != null && theme == null ) {
+      if ( user != null
+        && ( theme == null || "localhost".equals(td.getId()) )
+      ) {
         var spid = user.getSpid();
-        while ( ! SafetyUtil.isEmpty(spid) && theme == null ) {
+        while ( ! SafetyUtil.isEmpty(spid) ) {
           theme = (Theme) themeDAO.find(
-            new StartsWith.Builder(x)
-              .setArg1(MLang.prepare(Theme.SPID))
-              .setArg2(MLang.prepare(spid))
-              .build()
+            MLang.AND(
+              new StartsWith.Builder(x)
+                .setArg1(MLang.prepare(Theme.SPID))
+                .setArg2(MLang.prepare(spid))
+                .build(),
+              MLang.EQ(Theme.ENABLED, true)
+            )
           );
+          if ( theme != null ) break;
 
           var pos = spid.lastIndexOf(".");
           spid = spid.substring(0, pos > 0 ? pos : 0);
