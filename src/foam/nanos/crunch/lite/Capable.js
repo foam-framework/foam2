@@ -12,12 +12,16 @@ foam.INTERFACE({
     than associating them with a user.
   `,
 
+  requires: [
+    'foam.nanos.crunch.lite.CapableAdapterDAO'
+  ],
+
   javaImports: [
-    'foam.core.FObject',
     'foam.core.Validator',
     'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.CrunchService',
     'foam.nanos.ruler.RulerDAO',
 
@@ -29,7 +33,9 @@ foam.INTERFACE({
     'java.util.Map',
     'java.util.Set',
 
-    'org.apache.commons.lang.ArrayUtils'
+    'org.apache.commons.lang.ArrayUtils',
+
+    'static foam.nanos.crunch.CapabilityJunctionStatus.*'
   ],
 
   axioms: [
@@ -67,15 +73,31 @@ foam.INTERFACE({
 
           var oldCapabilityPayloads = getCapablePayloads();
           
-          if ( ! Arrays.stream(oldCapabilityPayloads).map((cap) -> cap.getCapability().getId() ).anyMatch((cap) -> cap == capabilityId)) {
+          if ( ! hasRequirement(x, capabilityId) ) {
             var newCapabilityPayload = crunchService.getCapableObjectPayloads(x, new String[] { capabilityId });
             setCapablePayloads((CapablePayload[]) ArrayUtils.addAll(oldCapabilityPayloads, newCapabilityPayload));
           }
           `
         }));
         cls.methods.push(foam.java.Method.create({
+          name: 'hasRequirement',
+          documentation: 'Checks if the capble opbject has a capability, does not verify it',
+          type: 'Boolean',
+          visibility: 'default',
+          args: [
+            { name: 'x', type: 'X' },
+            { name: 'capabilityId', type: 'String' }
+          ],
+          body: `
+          var oldCapabilityPayloads = getCapablePayloads();
+          
+          return Arrays.stream(oldCapabilityPayloads)
+            .map((cap) -> cap.getCapability().getId())
+            .anyMatch(capabilityId::equals);
+          `
+        }));
+        cls.methods.push(foam.java.Method.create({
           name: 'verifyRequirements',
-          type: 'boolean',
           visibility: 'default',
           type: 'void',
           javaThrows: [ 'IllegalStateException' ],
@@ -84,37 +106,60 @@ foam.INTERFACE({
             { name: 'capabilityIds', type: 'String[]' }
           ],
           body: `
+            checkRequirementsStatus(x, capabilityIds, GRANTED);
+          `
+        }));
+        cls.methods.push(foam.java.Method.create({
+          name: 'checkRequirementsStatus',
+          visibility: 'default',
+          type: 'void',
+          javaThrows: [ 'IllegalStateException' ],
+          args: [
+            { name: 'x', type: 'X' },
+            { name: 'capabilityIds', type: 'String[]' },
+            { name: 'status', type: 'CapabilityJunctionStatus' },
+          ],
+          body: `
             // Marshal payloads into a hashmap
-            Map<String, FObject> payloads = new HashMap<String, FObject>();
+            Map<String, CapablePayload> payloads = new HashMap<String, CapablePayload>();
             for ( CapablePayload payload : getCapablePayloads() ) {
-              payloads.put(payload.getCapability().getId(),
-                (FObject) payload.getData());
+              payloads.put(payload.getCapability().getId(), payload);
             }
 
-            CrunchService crunchService = (CrunchService) x.get("crunchService");
-            List crunchPath = crunchService.getMultipleCapabilityPath(
-              x, capabilityIds, false);
-
-            for ( Object obj : crunchPath ) {
-              if ( ! (obj instanceof Capability) ) {
-                // TODO: Implement logic for sub-lists (MinMaxCapability)
-                throw new RuntimeException("TODO");
-              }
-              Capability cap = (Capability) obj;
-              if ( cap.getOf() == null ) continue;
-
-              if ( ! payloads.containsKey(cap.getId()) ) {
+            for ( String capId : capabilityIds ) {
+              if ( ! payloads.containsKey(capId) ) {
                 throw new IllegalStateException(String.format(
                   "Missing payload object for capability '%s'",
-                  cap.getId()
+                  capId
                 ));
               }
 
-              FObject dataObject = payloads.get(cap.getId());
-              if ( dataObject instanceof Validator ) {
-                Validator validator = (Validator) dataObject;
-                validator.validate(x, dataObject);
+              CapablePayload payload = payloads.get(capId);
+              if ( payload.getStatus() != status ) {
+                throw new IllegalStateException(String.format(
+                  "Object does not have %s status for capability '%s'",
+                  status,
+                  capId
+                ));
               }
+            }
+          `
+        }));
+        cls.methods.push(foam.java.Method.create({
+          name: 'checkRequirementsStatusNoThrow',
+          visibility: 'default',
+          type: 'boolean',
+          args: [
+            { name: 'x', type: 'X' },
+            { name: 'capabilityIds', type: 'String[]' },
+            { name: 'status', type: 'CapabilityJunctionStatus' },
+          ],
+          body: `
+            try {
+              checkRequirementsStatus(x, capabilityIds, status);
+              return true;
+            } catch(IllegalStateException e) {
+              return false;
             }
           `
         }));
@@ -123,17 +168,23 @@ foam.INTERFACE({
           type: 'foam.dao.DAO',
           visibility: 'default',
           args: [
-            { name: 'x', type: 'X' }
+            { name: 'x', type: 'X' },
           ],
-          body: `
-            DAO capableDAO = new CapableAdapterDAO.Builder(x)
+          body: `            
+            DAO capablePayloadDAO = new CapableAdapterDAO.Builder(x)
               .setCapable(this)
               .setOf(CapablePayload.getOwnClassInfo())
               .build();
-            x = x.put("capableDAO", capableDAO);
-            RulerDAO rulerDAO = new RulerDAO(
-              x, capableDAO, "capableObjectDAO");
-            return rulerDAO;
+
+            x = x.put("capablePayloadDAO", capablePayloadDAO);
+
+            // TODO: Look into why rulerdao acts sketchy here and if it can replace CapablePayloadStatusDAO
+            DAO CapablePayloadStatusDAO = new CapablePayloadStatusDAO.Builder(x)
+              .setDelegate(capablePayloadDAO)
+              .setOf(CapablePayload.getOwnClassInfo())
+              .build();
+              
+            return CapablePayloadStatusDAO;
           `
         }));
       }

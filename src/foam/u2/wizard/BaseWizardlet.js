@@ -12,6 +12,11 @@ foam.CLASS({
     'foam.u2.wizard.Wizardlet'
   ],
 
+  requires: [
+    'foam.u2.detail.AbstractSectionedDetailView',
+    'foam.u2.wizard.WizardletSection',
+  ],
+
   properties: [
     {
       name: 'of',
@@ -31,14 +36,21 @@ foam.CLASS({
       class: 'Boolean',
       expression: function (of, data, currentSection, data$errors_) {
         let sectionErrors = [];
-        if ( currentSection && data$errors_ ) {
+        if ( currentSection && currentSection.section && data$errors_ ) {
           sectionErrors = data$errors_.filter(error =>
-            currentSection.properties.includes(error[0])
+            currentSection.section.properties.includes(error[0])
           );
         }
 
         if ( ! this.of ) return true;
-        if ( ( ! data ) || currentSection ? sectionErrors.length > 0 : data$errors_) return false;
+        if (
+          ( ! data ) ||
+          ( currentSection && currentSection.section )
+            ? sectionErrors.length > 0
+            : data$errors_
+        ) {
+          return false;
+        }
         return true;
       }
     },
@@ -51,6 +63,31 @@ foam.CLASS({
         available iff at least one section is available. If false, wizardlet
         does not display even if some sections are available.
       `,
+    },
+    {
+      name: 'isVisible',
+      class: 'Boolean',
+      expression: function (of, isAvailable) {
+        return isAvailable && of;
+      }
+    },
+    {
+      name: 'sections',
+      flags: ['web'],
+      transient: true,
+      class: 'FObjectArray',
+      of: 'foam.u2.wizard.WizardletSection',
+      factory: function () {
+        return foam.u2.detail.AbstractSectionedDetailView.create({
+          of: this.of,
+        }, this).sections.map(section => this.WizardletSection.create({
+          section: section,
+          data$: this.data$,
+          isAvailable$: section.createIsAvailableFor(
+            this.data$,
+          )
+        }));
+      }
     }
   ],
 

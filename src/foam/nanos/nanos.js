@@ -22,12 +22,14 @@ FOAM_FILES([
   { name: 'foam/nanos/fs/FileDAODecorator' },
   { name: 'foam/nanos/fs/FileArray' },
   { name: 'foam/nanos/fs/FileArrayDAODecorator' },
+  { name: 'foam/nanos/fs/FileArrayInCapablePayloadsDecorator' },
   { name: 'foam/nanos/fs/fileDropZone/FileDropZone', flags: ['web'] },
   { name: 'foam/nanos/fs/fileDropZone/FilePreview', flags: ['web'] },
   { name: 'foam/nanos/fs/fileDropZone/FileCard', flags: ['web'] },
   { name: "foam/nanos/crunch/AssociatedEntity" },
   { name: "foam/nanos/crunch/Capability" },
   { name: "foam/nanos/auth/ServiceProvider" },
+  { name: 'foam/nanos/fs/TextSaveView', flags: ['web'] },
   { name: "foam/nanos/app/AppConfig" },
   { name: "foam/nanos/app/ContextLookupAppConfigService"},
   { name: "foam/nanos/app/AppConfigService" },
@@ -165,6 +167,8 @@ FOAM_FILES([
   { name: "foam/nanos/script/Language" },
   { name: "foam/nanos/script/ScriptStatus" },
   { name: "foam/nanos/script/Script" },
+  { name: "foam/nanos/script/ScriptEvent" },
+  { name: "foam/nanos/script/Relationships" },
   { name: "foam/nanos/script/TestRunnerConfig" },
   { name: "foam/nanos/script/TestRunnerScript" },
   { name: "foam/nanos/jetty/HttpServer" },
@@ -201,6 +205,7 @@ FOAM_FILES([
   { name: "foam/nanos/export/XMLDriver"},
   { name: "foam/nanos/export/report/Template" },
   { name: "foam/nanos/export/PDFGoogleSheetsExportDriver" },
+  { name: "foam/nanos/export/TableExportDriver"},
   { name: "foam/nanos/google/api/auth/GoogleApiAuthService" },
   { name: "foam/nanos/google/api/auth/GoogleApiCredentials" },
   { name: "foam/nanos/google/api/drive/GoogleDriveService" },
@@ -257,7 +262,6 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/Notification'},
   { name: 'foam/nanos/notification/MyNotificationDAO'},
   { name: "foam/nanos/notification/ResendNotificationServiceInterface"},
-  { name: 'foam/nanos/notification/notifications/ScriptRunNotification'},
   { name: 'foam/nanos/notification/NotificationView'},
   { name: 'foam/nanos/notification/NotificationExpansionDAO'},
   { name: 'foam/nanos/notification/NotificationRowView'},
@@ -269,8 +273,8 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/SlackSetting' },
   { name: 'foam/nanos/notification/ToastNotificationDAO' },
   { name: 'foam/nanos/notification/ToastState' },
-  { name: 'foam/nanos/notification/notifications/ScriptRunNotification'},
-  { name: 'foam/nanos/notification/notifications/ScriptRunNotificationNotificationCitationView'},
+  { name: 'foam/nanos/notification/ScriptRunNotification'},
+  { name: 'foam/nanos/notification/ScriptRunNotificationNotificationCitationView'},
   { name: 'foam/nanos/dashboard/Demo' },
 
   // Ticket
@@ -343,9 +347,23 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/MinMaxCapability" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
   { name: "foam/nanos/crunch/lite/CapablePayload" },
+  { name: "foam/nanos/crunch/lite/CapablePayloadStatusDAO" },
   { name: "foam/nanos/crunch/lite/Capable" },
+  { name: "foam/nanos/crunch/lite/CapableDAO" },
   { name: "foam/nanos/crunch/lite/CapableAdapterDAO" },
   { name: "foam/nanos/crunch/lite/CapableObjectData" },
+  { name: "foam/nanos/crunch/lite/CapableCompatibleCapability" },
+  { name: "foam/nanos/crunch/lite/CapabilityRefinement" },
+  { name: "foam/nanos/crunch/lite/MinMaxCapabilityRefinement" },
+  { name: "foam/nanos/crunch/crunchtest/TestCapable" },
+  { name: "foam/nanos/crunch/CapabilityIsAvailable" },
+
+  // crunch lite rulers
+  { name: "foam/nanos/crunch/lite/ruler/CapablePayloadApprovableRuleAction" },
+  { name: "foam/nanos/crunch/lite/ruler/CapableCreateApprovalsRuleAction" },
+  { name: "foam/nanos/crunch/lite/ruler/SetCapablePayloadStatusOnPut" },
+  { name: "foam/nanos/crunch/lite/ruler/ReputDependantPayloads" },
+
   { name: "foam/nanos/crunch/CapabilityCategory" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/CapabilityCapabilityJunctionRefine" },
@@ -375,6 +393,9 @@ FOAM_FILES([
   //views
   { name: "foam/nanos/crunch/ui/CapableView" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
+  //boxes
+  { name: "foam/nanos/crunch/box/CrunchClientBox" },
+  { name: "foam/nanos/crunch/box/CrunchClientReplyBox" },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },
@@ -388,6 +409,7 @@ FOAM_FILES([
   { name: 'foam/nanos/approval/ApprovableApprovalRequestsPredicate' },
   { name: 'foam/nanos/approval/ApprovableApprovalRequestsRule' },
   { name: 'foam/nanos/approval/FulfilledApprovablePredicate' },
+  { name: 'foam/nanos/approval/FulfilledNestedJournalApprovablePredicate' },
   { name: 'foam/nanos/approval/FulfilledApprovableRule' },
   { name: 'foam/nanos/approval/PopulateApprovalRequestsDAO' },
 

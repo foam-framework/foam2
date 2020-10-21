@@ -10,17 +10,19 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.auth.EnabledAware',
+    'foam.nanos.auth.LastModifiedAware',
     'foam.nanos.auth.LastModifiedByAware'
   ],
 
   requires: [
     'foam.nanos.script.ScriptStatus',
-    'foam.nanos.notification.notifications.ScriptRunNotification'
+    'foam.nanos.notification.ScriptRunNotification'
   ],
 
   imports: [
     'notificationDAO',
     'scriptDAO',
+    'scriptEventDAO',
     'user'
   ],
 
@@ -29,20 +31,31 @@ foam.CLASS({
     'bsh.Interpreter',
     'foam.core.*',
     'foam.dao.*',
+    'static foam.mlang.MLang.*',
+    'foam.nanos.auth.*',
+    'foam.nanos.logger.PrefixLogger',
     'foam.nanos.auth.*',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
     'java.io.ByteArrayOutputStream',
     'java.io.PrintStream',
     'java.util.Date',
-    'static foam.mlang.MLang.*',
   ],
 
   tableColumns: [
-    'id', 'server', 'description', 'lastDuration', 'status', 'run'
+    'id',
+    'description',
+    'server',
+    'lastDuration',
+    'lastRun',
+    'status'
   ],
 
-  searchColumns: ['id', 'description'],
+  searchColumns: [
+    'id',
+    'description',
+    'server'
+  ],
 
   constants: [
     {
@@ -57,15 +70,30 @@ foam.CLASS({
     }
   ],
 
+  sections: [
+    {
+      name: 'scriptEvents',
+      title: 'Events',
+      order: 2
+    },
+    {
+      name: '_defaultSection',
+      title: 'Info',
+      order: 1
+    }
+  ],
+
   properties: [
     {
       class: 'String',
       name: 'id',
-      tableWidth: 220
+      includeInDigest: true,
+      tableWidth: 300
     },
     {
       class: 'Boolean',
       name: 'enabled',
+      includeInDigest: true,
       documentation: 'Enables script.',
       tableCellFormatter: function(value) {
         this.start()
@@ -79,14 +107,16 @@ foam.CLASS({
     {
       class: 'String',
       name: 'description',
+      includeInDigest: false,
       documentation: 'Description of the script.',
-      tableWidth: 200
+      tableWidth: 300
     },
     {
       class: 'Int',
       name: 'priority',
       value: 5,
       javaValue: 5,
+      includeInDigest: false,
       view: {
         class: 'foam.u2.view.ChoiceView',
         choices: [
@@ -102,7 +132,8 @@ foam.CLASS({
       documentation: 'Date and time the script ran last.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      tableWidth: 140
+      tableWidth: 140,
+      storageTransient: true
     },
     {
       class: 'Duration',
@@ -110,7 +141,8 @@ foam.CLASS({
       documentation: 'Date and time the script took to complete.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      tableWidth: 125
+      tableWidth: 125,
+      storageTransient: true
     },
     /*
     {
@@ -125,6 +157,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'server',
+      includeInDigest: false,
       documentation: 'Runs on server side if enabled.',
       tableCellFormatter: function(value) {
         this.start()
@@ -149,11 +182,13 @@ foam.CLASS({
     {
       class: 'Code',
       name: 'code',
+      includeInDigest: true,
       writePermissionRequired: true
     },
     {
       class: 'String',
       name: 'output',
+      includeInDigest: false,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       view: {
@@ -174,18 +209,28 @@ foam.CLASS({
       }
       output_ = val;
       outputIsSet_ = true;
-      `
+      `,
+      storageTransient: true
     },
     {
       class: 'String',
       name: 'notes',
+      includeInDigest: false,
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 144 }
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
+      includeInDigest: true,
       documentation: 'User who last modified script'
+    },
+    {
+      class: 'DateTime',
+      name: 'lastModified',
+      includeInDigest: false,
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO'
     },
     {
       class: 'String',
@@ -193,8 +238,27 @@ foam.CLASS({
       value: 'scriptDAO',
       transient: true,
       visibility: 'HIDDEN',
-      documentation: `Name of dao which journal will be used to store script run logs. To set from inheritor
-      just change property value`
+      documentation: `Name of dao to store script itself. To set from inheritor just change property value`
+    },
+    {
+      class: 'String',
+      name: 'eventDaoKey',
+      value: 'scriptEventDAO',
+      transient: true,
+      visibility: 'HIDDEN',
+      documentation: `Name of dao to store script run/event report. To set from inheritor just change property value`
+    },
+    {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      transient: true,
+      javaFactory: `
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, (Logger) getX().get("logger"));
+      `
     }
   ],
 
@@ -211,7 +275,7 @@ foam.CLASS({
         try {
           shell.set("currentScript", this);
           shell.set("x", x);
-          shell.eval("runScript(String name) { script = x.get(\\"scriptDAO\\").find(name); if ( script != null ) eval(script.code); }");
+          shell.eval("runScript(String name) { script = x.get("+getDaoKey()+").find(name); if ( script != null ) eval(script.code); }");
           shell.eval("foam.core.X sudo(String user) { return foam.util.Auth.sudo(x, (String) user); }");
           shell.eval("foam.core.X sudo(Object id) { return foam.util.Auth.sudo(x, id); }");
         } catch (EvalError e) {}
@@ -239,23 +303,30 @@ foam.CLASS({
         }
       ],
       javaCode: `
+        String startScript = System.getProperty("foam.main", "main");
+        // Run on all instances if:
+        // - startup "main" script
+
         Thread.currentThread().setPriority(getPriority());
         try {
           ByteArrayOutputStream baos  = new ByteArrayOutputStream();
           PrintStream           ps    = new PrintStream(baos);
           Interpreter           shell = createInterpreter(x);
           PM                    pm    = new PM.Builder(x).setKey(Script.getOwnClassInfo().getId()).setName(getId()).build();
+          RuntimeException    thrown = null;
 
           // TODO: import common packages like foam.core.*, foam.dao.*, etc.
           try {
             setOutput("");
             shell.setOut(ps);
             shell.eval(getCode());
-          } catch (Throwable e) {
+          } catch (Throwable t) {
+            thrown = new RuntimeException(t);
             ps.println();
-            e.printStackTrace(ps);
+            t.printStackTrace(ps);
             Logger logger = (Logger) x.get("logger");
-            logger.error(e);
+            logger.error(t);
+            pm.error(x, t);
           } finally {
             pm.log(x);
           }
@@ -264,6 +335,20 @@ foam.CLASS({
           setLastDuration(pm.getTime());
           ps.flush();
           setOutput(baos.toString());
+
+          ScriptEvent event = new ScriptEvent(x);
+          event.setLastRun(this.getLastRun());
+          event.setLastDuration(this.getLastDuration());
+          event.setOutput(this.getOutput());
+          event.setScriptType(this.getClass().getSimpleName());
+          event.setOwner(this.getId());
+          event.setScriptId(this.getId());
+          event.setHostname(System.getProperty("hostname", "localhost"));
+          ((DAO) x.get(getEventDaoKey())).put(event);
+
+          if ( thrown != null) {
+            throw thrown;
+          }
         } finally {
           Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
         }
@@ -274,27 +359,27 @@ foam.CLASS({
       code: function() {
         var self = this;
         var interval = setInterval(function() {
-            self.scriptDAO.find(self.id).then(function(script) {
-              if ( script.status !== self.ScriptStatus.RUNNING ) {
-                self.copyFrom(script);
-                clearInterval(interval);
+          self.__context__[self.daoKey].find(self.id).then(function(script) {
+            if ( script.status !== self.ScriptStatus.RUNNING ) {
+              self.copyFrom(script);
+              clearInterval(interval);
 
-                // create notification
-                var notification = self.ScriptRunNotification.create({
-                  userId: self.user.id,
-                  scriptId: script.id,
-                  notificationType: 'Script Execution',
-                  body: `Status: ${script.status}
+              // create notification
+              var notification = self.ScriptRunNotification.create({
+                userId: self.user.id,
+                scriptId: script.id,
+                notificationType: 'Script Execution',
+                body: `Status: ${script.status}
                     Script Output: ${script.length > self.MAX_NOTIFICATION_OUTPUT_CHARS ?
                       script.output.substring(0, self.MAX_NOTIFICATION_OUTPUT_CHARS) + '...' :
                       script.output }
                     LastDuration: ${script.lastDuration}`
-                });
-                self.notificationDAO.put(notification);
-              }
-            }).catch(function() {
-              clearInterval(interval);
-            });
+              });
+              self.notificationDAO.put(notification);
+            }
+          }).catch(function() {
+            clearInterval(interval);
+          });
         }, 2000);
       }
     }

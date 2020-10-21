@@ -7,6 +7,8 @@
 foam.CLASS({
   package: 'foam.nanos.column',
   name: 'CSVTableOutputter',
+  extends: 'foam.nanos.column.TableColumnOutputter',
+
   methods: [
     function arrayToCSV(arrayOfValues) {
       var output = [];

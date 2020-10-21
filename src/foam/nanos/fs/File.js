@@ -86,7 +86,6 @@ foam.CLASS({
 
         if ( ! SafetyUtil.isEmpty(this.getDataString()) ) {
           String          encodedString = this.getDataString().split(",")[1];
-          BlobService     blobStore     = new foam.blob.BlobStore();
           byte[]          decodedBytes  = Base64.getDecoder().decode(encodedString);
           InputStream     is            = new ByteArrayInputStream(decodedBytes);
           InputStreamBlob blob          = new foam.blob.InputStreamBlob(is, decodedBytes.length);
@@ -163,6 +162,22 @@ foam.CLASS({
           throw new AuthorizationException();
         }
       `
+    },
+    {
+      name: 'getText',
+      code: function() {
+        return new Promise((resolve, reject) => {
+          let reader = new FileReader();
+
+          reader.onload = () => {
+            resolve(reader.result);
+          };
+
+          reader.onerror = reject;
+
+          reader.readAsText(this.data.blob)
+        });
+      }
     }
   ]
 });

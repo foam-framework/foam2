@@ -1,0 +1,71 @@
+p({
+    "class":"foam.nanos.ruler.Rule",
+    "id":"2c53640d-cc3f-46d3-bff1-6d50715265cd",
+    "name":"SetCapablePayloadStatusOnPut",
+    "priority":100,
+    "daoKey":"capablePayloadDAO",
+    "ruleGroup":"crunchLite",
+    "operation":3,
+    "after":false,
+    "action":{
+        "class":"foam.nanos.crunch.lite.ruler.SetCapablePayloadStatusOnPut"
+    },
+    "enabled":true,
+    "saveHistory":false,
+    "lifecycleState":1
+})
+p({
+    "class":"foam.nanos.ruler.Rule",
+    "id":"bf858643-105f-4e61-b5a6-d5bbc4a14f54",
+    "name":"ReputDependantPayloads",
+    "priority":200,
+    "daoKey":"capablePayloadDAO",
+    "ruleGroup":"crunchLite",
+    "operation":3,
+    "after":false,
+    "action":{
+        "class":"foam.nanos.crunch.lite.ruler.ReputDependantPayloads"
+    },
+    "enabled":false,
+    "saveHistory":false,
+    "lifecycleState":1
+})
+p({
+    "class":"foam.nanos.ruler.Rule",
+    "id":"58280fe2-f3a8-11ea-adc1-0242ac120002",
+    "name":"Capable Payload Approvable Rule Action",
+    "priority":100,
+    "daoKey":"approvableDAO",
+    "ruleGroup":"approvables",
+    "operation":1,
+    "after":false,
+    "predicate":{
+        "class":"foam.nanos.approval.FulfilledNestedJournalApprovablePredicate",
+    },
+    "action":{
+        "class":"foam.nanos.crunch.lite.ruler.CapablePayloadApprovableRuleAction"
+    },
+    "enabled":true,
+    "saveHistory":false,
+    "lifecycleState":1
+})
+
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e97a3ad16d174","name":"approvalRequestDAO Approve or Reject on Update",
+  "priority":110,
+  "ruleGroup":"approvables",
+  "documentation":"Handle an approved or rejected approval request that relates to the approvableDAO",
+  "daoKey":"approvalRequestDAO",
+  "operation":1,
+  "after":true,
+  "predicate":{
+    "class":"foam.nanos.approval.ApprovableApprovalRequestsPredicate"
+  },
+  "action":{
+    "class":"foam.nanos.approval.ApprovableApprovalRequestsRule"
+  },
+  "enabled":true,
+  "saveHistory":true,
+  "lifecycleState":1
+})

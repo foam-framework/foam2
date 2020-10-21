@@ -24,7 +24,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'maxStringDataSize',
-      value: 1024 * 1024 * 3
+      value: 1024 * 3
     }
   ],
 
@@ -36,6 +36,11 @@ foam.CLASS({
       var promises = props.map((prop) => {
         let files = prop.f(obj);
         return Promise.all(files.map(async f => {
+
+          // We do not allow file update, so there is no point to send file again
+          // if it is already stored and has id
+          if ( f.id ) return f;
+
           if ( f.filesize <= this.maxStringDataSize ) {
             f.dataString = await this.encode(f.data.blob);
             f.data = undefined;
@@ -43,7 +48,7 @@ foam.CLASS({
             f.dataString = undefined;
           }
           return self.fileDAO.put(f);
-        }))
+        }));
       });
 
       return Promise.all(promises).then((values) => {

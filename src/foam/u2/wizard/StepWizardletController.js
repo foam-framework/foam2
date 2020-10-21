@@ -58,12 +58,7 @@ foam.CLASS({
         to foam.layout.Section object.
       `,
       expression: function(wizardlets) {
-        return wizardlets.map(wizardlet => {
-          // TODO: If no of and if createView DNE null, then we need to spoof a section
-          return this.AbstractSectionedDetailView.create({
-            of: wizardlet.of,
-          }).sections;
-        });
+        return wizardlets.map(w => w.sections);
       }
     },
     {
@@ -97,11 +92,9 @@ foam.CLASS({
         Array format is similar to sections.
       `,
       expression: function(sections) {
-        var availableSlots = [...sections.keys()].map(w => sections[w].map(
-          section => section.createIsAvailableFor(
-            this.wizardlets[w].data$
-          )
-        ));
+        var availableSlots = [...sections.keys()]
+          .map(w => sections[w].map(section => section.isAvailable$));
+
         availableSlots.forEach((sections, wizardletIndex) => {
           sections.forEach((availableSlot, sectionIndex) => {
             availableSlot.sub(() => {
@@ -165,6 +158,9 @@ foam.CLASS({
           if ( subSi == 0 ) {
             if ( subWi == 0 ) return null;
             subWi--;
+            // Skip past steps with no sections
+            while ( sectionAvailableSlots[subWi].length < 1 ) subWi--;
+            if ( subWi < 0 ) return null;
             subSi = sectionAvailableSlots[subWi].length - 1;
           } else {
             subSi--;
@@ -176,7 +172,7 @@ foam.CLASS({
         };
 
         for ( let p = decr(wizardPosition) ; p != null ; p = decr(p) ) {
-          if ( ! this.wizardlets[p.wizardletIndex].isAvailable ) {
+          if ( ! this.wizardlets[p.wizardletIndex].isVisible ) {
             continue;
           }
 
@@ -213,8 +209,8 @@ foam.CLASS({
         };
 
         for ( let p = incr(wizardPosition) ; p != null ; p = incr(p) ) {
-          // Skip unavailable wizardlets
-          if ( ! this.wizardlets[p.wizardletIndex].isAvailable ) {
+          // Skip invisible wizardlets
+          if ( ! this.wizardlets[p.wizardletIndex].isVisible ) {
             continue;
           }
 
@@ -257,11 +253,18 @@ foam.CLASS({
     {
       name: 'availabilityInvalidate',
       class: 'Int'
+    },
+    {
+      name: 'submitted',
+      class: 'Boolean'
     }
   ],
 
   methods: [
     function init() {
+      console.log('stepWizardlet', this);
+      window.sargnarg = this;
+      console.log
       return this.wizardlets.forEach(wizardlet => {
         wizardlet.isAvailable$.sub(() => {
           this.availabilityInvalidate++;
@@ -285,7 +288,10 @@ foam.CLASS({
         var nextScreen = this.nextScreen;
 
         if ( nextScreen == null ) {
-          return this.currentWizardlet.save().then(() => true);
+          return this.currentWizardlet.save().then(() => {
+            this.submitted = true;
+            return true;
+          });
         }
 
         // number of unsaved wizardlets

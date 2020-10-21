@@ -270,7 +270,23 @@ foam.CLASS({
     },
     {
       name: 'authorizeOnRead',
-      javaCode: '// NOOP'
+      javaCode: `
+        // if the group is the group of the user, or an ancestor of the group of the user,
+        // then user should be authorized to read
+        DAO localGroupDAO = (DAO) x.get("localGroupDAO");
+        User user = (User) ((Subject) x.get("subject")).getUser();
+        Group userGroup = (Group) localGroupDAO.find(user.getGroup());
+        while ( userGroup != null ) { 
+          if ( getId() == userGroup.getId() ) return;
+          userGroup = getAncestor(x, userGroup);  
+        }
+
+        AuthService auth = (AuthService) x.get("auth");
+        String permissionId = String.format("group.read.%s", getId());
+        if ( ! auth.check(x, permissionId) ) {
+          throw new AuthorizationException("You do not have permission to read this group.");
+        }
+      `
     },
     {
       name: 'authorizeOnUpdate',

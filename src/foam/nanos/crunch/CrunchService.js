@@ -18,6 +18,14 @@ foam.INTERFACE({
 
   methods: [
     {
+      name: 'getPrereqs',
+      type: 'java.util.List<String>',
+      args: [
+        { name: 'capId', type: 'String' }
+      ],
+      flags: ['java']
+    },
+    {
       name: 'getGrantPath',
       documentation: `
         getGrantPath provides an array of capability objects representing
@@ -56,6 +64,20 @@ foam.INTERFACE({
         {
           name: 'filterGrantedUCJ',
           type: 'boolean'
+        }
+      ]
+    },
+    {
+      name: 'getDependantIds',
+      type: 'String[]',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
         }
       ]
     },
@@ -207,6 +229,17 @@ foam.INTERFACE({
           name: 'capabilityIds',
           type: 'String[]'
         },
+      ]
+    },
+    {
+      name: 'getAllJunctionsForUser',
+      async: true,
+      type: 'UserCapabilityJunction[]',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
       ]
     }
   ]

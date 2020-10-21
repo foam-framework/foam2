@@ -10,8 +10,6 @@ foam.CLASS({
   extends: 'foam.nanos.crunch.ui.CapabilityWizardlet',
 
   requires: [
-    'foam.u2.view.MultiChoiceView',
-    'foam.u2.view.CardSelectView',
     'foam.nanos.crunch.CapabilityJunctionStatus'
   ],
 
@@ -64,10 +62,10 @@ foam.CLASS({
   ],
 
   methods: [
-    function createView(data) {    
-      return this.MultiChoiceView.create({
+    function createView(data) {
+      return foam.u2.view.MultiChoiceView.create({
         choices$: this.choices$,
-        booleanView: this.CardSelectView,
+        booleanView: foam.u2.view.CardSelectView,
         isValidNumberOfChoices$: this.isValid$,
         minSelected$: this.min$,
         maxSelected$: this.max$

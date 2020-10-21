@@ -102,7 +102,7 @@ if ( typeof global.FOAMLINK_DATA !== 'undefined' ) {
 foam.assert = function assert(cond) {
   if ( ! cond ) {
     console.assert(false, Array.from(arguments).slice(1).join(' '));
-    console.trace();
+    //console.trace();
   }
 
   return cond;

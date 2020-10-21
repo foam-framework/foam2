@@ -40,10 +40,10 @@ p({
   "serve":true,
   "serviceScript":"""
     return new foam.dao.PMDAO(x,
-      new foam.nanos.auth.AuthorizationDAO(x,
-        x.get("nSpecDAO"),
-        new foam.nanos.auth.StandardAuthorizer("service")
-      )
+      new foam.nanos.auth.AuthorizationDAO.Builder(x)
+        .setDelegate(x.get("nSpecDAO"))
+        .setAuthorizer(new foam.nanos.auth.StandardAuthorizer("service"))
+        .build()
     );
   """,
   "client":"""
@@ -150,23 +150,6 @@ p({
 })
 
 p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "testDAO",
-  "serve": true,
-  "serviceScript": """
-    return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setGuid(true)
-      .setOf(foam.nanos.test.Test.getOwnClassInfo())
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"tests\")
-      .setDecorator(new foam.nanos.script.ScriptRunnerDAO(new foam.dao.NullDAO(x, foam.nanos.test.Test.getOwnClassInfo())))
-      .build();
-  """,
-  "client": "{\"of\":\"foam.nanos.test.Test\"}"
-})
-
-p({
   "class":"foam.nanos.boot.NSpec",
   "name":"pmInfoDAO",
   "serve":true,
@@ -174,52 +157,6 @@ p({
     return new foam.nanos.pm.PMInfoMDAO().orderBy(foam.mlang.MLang.DESC(foam.nanos.pm.PMInfo.TOTAL_TIME));
   `,
   "client":"{\"of\":\"foam.nanos.pm.PMInfo\", \"remoteListenerSupport\": false}"
-})
-
-p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"scriptDAO",
-  "serve":true,
-  "serviceScript":"""
-    return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setGuid(true)
-      .setOf(foam.nanos.script.Script.getOwnClassInfo())
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"scripts\")
-      .setDecorator(new foam.nanos.script.ScriptRunnerDAO(new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.script.Script.getOwnClassInfo()).build()))
-      .setOrder(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ID})
-      .setIndex(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ID})
-      .build();
-  """,
-  "client":"{\"of\":\"foam.nanos.script.Script\"}"
-})
-
-p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"cronDAO",
-  "serve":true,
-  "serviceScript":"""
-    return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setGuid(true)
-      .setOf(foam.nanos.cron.Cron.getOwnClassInfo())
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"cronjobs\")
-      .setIndex(new foam.core.PropertyInfo[] {foam.nanos.cron.Cron.ENABLED })
-      .setDecorator(new foam.nanos.cron.CronScheduleDAO.Builder(x)
-        .setDelegate(new foam.nanos.script.ScriptRunnerDAO(new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.cron.Cron.getOwnClassInfo()).build()))
-        .build())
-      .build();
-  """,
-  "client":"{\"of\":\"foam.nanos.cron.Cron\"}"
-})
-
-p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"cronScheduler",
-  "lazy":false,
-  "serviceClass":"foam.nanos.cron.CronScheduler"
 })
 
 p({
@@ -597,7 +534,10 @@ p({
   "serve":true,
   "serviceScript":
   """
-    return new foam.nanos.auth.AuthorizationDAO(x, (foam.dao.DAO) x.get("localServiceProviderDAO"), new foam.nanos.auth.StandardAuthorizer("capability"));
+    return new foam.nanos.auth.AuthorizationDAO.Builder(x)
+      .setDelegate((foam.dao.DAO) x.get("localServiceProviderDAO"))
+      .setAuthorizer(new foam.nanos.auth.StandardAuthorizer("capability"))
+      .build();
   """,
   "client":"{\"of\":\"foam.nanos.auth.ServiceProvider\"}"
 })

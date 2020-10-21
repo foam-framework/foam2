@@ -73,6 +73,7 @@ FOAM_FILES([
   { name: "foam/core/Enum" },
   { name: "foam/core/JSON" },
   { name: "foam/core/XML" },
+  { name: "foam/core/ExceptionInterface" },
   { name: "foam/core/CompoundException" },
   { name: "foam/lib/csv/CSVParser" },
   { name: "foam/lib/csv/CSVOutputter" },
@@ -82,6 +83,8 @@ FOAM_FILES([
   { name: "foam/lib/csv/DynamicHeaderCSVParser" },
   { name: "foam/parse/StringPStream" },
   { name: "foam/core/Validator" },
+  { name: "foam/core/ValidationException" },
+  { name: "foam/core/ClientRuntimeException" },
   { name: "foam/parse/ErrorReportingPStream" },
   { name: "foam/parse/TrapPStream" },
   { name: "foam/parse/InvalidPStream" },
@@ -182,6 +185,7 @@ FOAM_FILES([
   { name: 'foam/u2/DeleteModal', flags: ['web'] },
   { name: 'foam/u2/EasyModal', flags: ['web'] },
   { name: 'foam/u2/MemoModal', flags: ['web'] },
+  { name: 'foam/u2/PropertyModal', flags: ['web'] },
   { name: 'foam/u2/ModalHeader', flags: ['web'] },
   { name: 'foam/u2/ExportModal', flags: ['web'] },
   { name: 'foam/u2/MultiView' },
@@ -194,6 +198,7 @@ FOAM_FILES([
   { name: "foam/u2/Tooltip", flags: ['web'] },
   { name: "foam/u2/MNRowFormatter", flags: ['web'] },
   { name: "foam/u2/ProgressView", flags: ['web'] },
+  { name: "foam/u2/LoadingSpinner", flags: ['web'] },
   { name: "foam/u2/ListCreateController", flags: ['web'] },
   { name: 'foam/u2/view/SearchViewWrapper', flags: ['web'] },
   { name: 'foam/u2/view/StringArrayRowView', flags: ['web'] },
@@ -205,6 +210,7 @@ FOAM_FILES([
   { name: "foam/version/VersionTrait" },
   { name: "foam/version/VersionedClass" },
   { name: "foam/version/VersionedClassFactory" },
+  { name: "foam/dao/NullJournal" },
   { name: "foam/dao/Sink" },
   { name: "foam/dao/DAO" },
   { name: "foam/dao/PredicatedDualDelegateDAO" },
@@ -362,6 +368,7 @@ FOAM_FILES([
   { name: "foam/box/ProxyBox" },
   { name: "foam/box/Message" },
   { name: "foam/box/SubBoxMessage" },
+  { name: "foam/box/SessionIDProperty" },
   { name: "foam/box/HelloMessage" },
   { name: "foam/box/TimeoutBox" },
   { name: "foam/box/RetryBox" },
@@ -554,6 +561,7 @@ FOAM_FILES([
   { name: "foam/u2/view/ExprView", flags: ['web'] },
   { name: "foam/u2/view/MultiChoiceView", flags: ['web'] },
   { name: "foam/u2/view/CardSelectView", flags: ['web'] },
+  { name: "foam/u2/view/NoBackStack", flags: ['web'] },
   { name: "foam/u2/EnumView", flags: ['web'] },
   { name: "foam/u2/ClassView", flags: ['web'] },
   { name: "foam/u2/view/ReferenceView", flags: ['web'] },
@@ -601,9 +609,12 @@ FOAM_FILES([
   { name: "foam/u2/crunch/wizardflow/FilterWizardletsAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/RequirementsPreviewAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/StepWizardAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/lite/MaybeDAOPutAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/PutFinalJunctionsAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/TestAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/LoadTopConfig", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/lite/CapableCreateWizardletsAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/lite/CapableDefaultConfigAgent", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityRequirementView", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityCardView", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityFeatureView", flags: ['web'] },
@@ -841,6 +852,7 @@ FOAM_FILES([
   { name: "foam/u2/tag/CircleIndicator" },
   { name: "foam/u2/wizard/WizardPosition" },
   { name: "foam/u2/wizard/Wizardlet" },
+  { name: "foam/u2/wizard/WizardletSection" },
   { name: "foam/u2/wizard/BaseWizardlet" },
   { name: "foam/u2/wizard/WizardletView" },
   { name: "foam/u2/wizard/StepWizardConfig" },
@@ -852,6 +864,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
   { name: "foam/nanos/crunch/ui/CapableObjectWizardlet" },
   { name: "foam/nanos/crunch/ui/MinMaxCapabilityWizardlet" },
+  { name: "foam/nanos/crunch/ui/CapableMinMaxCapabilityWizardlet" },
 
   { name: "foam/graphics/ZoomMapView" },
   { name: "foam/core/CoreTypesValidationTest" },
@@ -886,6 +899,7 @@ FOAM_FILES([
   { name: 'foam/i18n/XLIFFTranslationValue' },
   { name: 'foam/i18n/Locale' },
   { name: 'foam/i18n/TranslationService' },
+  { name: 'foam/i18n/ClientCacheTranslationService' },
   { name: 'foam/i18n/ClientTranslationService' },
   { name: 'foam/i18n/ProxyTranslationService' },
 
@@ -928,7 +942,8 @@ FOAM_FILES([
 
   // fs
   { name: 'foam/nanos/fs/fileDropZone/FileDropZone', flags: ['web'] },
+  { name: 'foam/nanos/fs/fileDropZone/FileCard', flags: ['web'] },
   { name: 'foam/nanos/fs/fileDropZone/FilePreview', flags: ['web'] },
+  { name: 'foam/nanos/fs/TextSaveView' }
 
-  { name: 'foam/nanos/fs/fileDropZone/FileCard', flags: ['web'] }
-]);
+])

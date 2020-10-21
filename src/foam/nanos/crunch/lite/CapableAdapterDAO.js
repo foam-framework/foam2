@@ -10,7 +10,11 @@ foam.CLASS({
   extends: 'foam.dao.AbstractDAO',
 
   javaImports: [
-    'java.util.Arrays'
+    'foam.core.X',
+    'foam.dao.DAO',
+    'foam.dao.MDAO',
+    'java.util.Arrays',
+    'foam.dao.ArraySink'
   ],
 
   documentation: `
@@ -51,26 +55,76 @@ foam.CLASS({
         payloads[payloads.length - 1] = payload;
         getCapable().setCapablePayloads(payloads);
         return obj;
-      `
+      `,
+      code: async function (x, obj) {
+        return this.ifFoundElseIfNotFound_(
+          obj,
+          (payloads, i) => { payloads[i] = obj; return obj; },
+          (payloads) => { payloads.push(obj); }
+        );
+      }
     },
     {
       name: 'remove_',
       javaCode: `
         return obj; // TODO
-      `
+      `,
+      code: async function (x, obj) {
+        return this.ifFoundElseIfNotFound_(
+          obj,
+          (payloads, i) => { payloads.splice(i, 1); return obj },
+          (payloads) => obj
+        );
+      }
     },
     {
       name: 'find_',
       javaCode: `
-        return null; // TODO
+        String idString = null;
+        if ( id instanceof CapablePayload ) {
+          idString = ((CapablePayload) id).getCapability().getId();
+        } else {
+          idString = (String) id;
+        }
+        CapablePayload[] payloads = getCapable().getCapablePayloads();
+        for ( int i = 0 ; i < payloads.length ; i++ ) {
+          if (
+            payloads[i].getCapability().getId().equals(idString)
+          ) {
+            return payloads[i];
+          }
+        }
+        return null;
       `
     },
     {
       name: 'select_',
       javaCode: `
-        // TODO
-        throw new RuntimeException("TODO");
+        ArraySink capablePayloadsToArraySink = new ArraySink.Builder(x)
+          .setArray(Arrays.asList(getCapable().getCapablePayloads()))
+          .build();
+
+        return capablePayloadsToArraySink;
       `
+    },
+    {
+      name: 'ifFoundElseIfNotFound_',
+      flags: ['web'],
+      code: function (payload, ifFound, ifNotFound) {
+        var found = false;
+        var foundReturn = null;
+        payloads = this.capable.capablePayloads;
+        for ( var i = 0 ; i < payloads.length ; i++ ) {
+          if ( payload.capability.id == payloads[i].capability.id ) {
+            foundReturn = ifFound(payloads, i);
+            found = true;
+          }
+        }
+
+        if ( found ) return foundReturn;
+        // payloads.push(obj);
+        return ifNotFound(payloads);
+      }
     }
   ]
 });

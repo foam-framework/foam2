@@ -18,6 +18,11 @@ foam.CLASS({
     {
       name: 'userCapabilityRequirements',
       class: 'StringArray',
+    },
+    {
+      name: 'isWizardCompleted',
+      class: 'Boolean',
+      transient: true
     }
   ],
 
@@ -35,6 +40,15 @@ foam.CLASS({
           null, capabilityIds
         ).then(result => {
           this.capablePayloads = result;
+        });
+      },
+    },
+    {
+      name: 'getCapablePayloadDAO',
+      flags: ['web'],
+      code: function () {
+        return this.CapableAdapterDAO.create({
+          capable: this
         });
       }
     }

@@ -81,6 +81,17 @@ public class RuleEngine extends ContextAwareSupport {
     try {
       compoundAgency.execute(x_);
     } catch (Exception e) {
+      // Allow network exceptions to pass through
+      // TODO: use foam.core.Exception when interface properties
+      //       are supported in Java generation
+      if ( e instanceof foam.core.ExceptionInterface ) {
+        RuntimeException clientE = (RuntimeException)
+          ((ExceptionInterface) e).getClientRethrowException();
+        if ( clientE != null ) {
+          throw clientE;
+        }
+      }
+
       // This should never happen.
       // It means there's a bug in a Rule agent and it should be fixed.
       var message = "CRITICAL UNEXPECTED EXCEPTION EXECUTING RULE";

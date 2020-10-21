@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.notification.notifications',
+  package: 'foam.nanos.notification',
   name: 'ScriptRunNotification',
   extends: 'foam.nanos.notification.Notification',
 
