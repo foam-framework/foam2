@@ -47,8 +47,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'message',
-      getter: function() { return this.message_ || this.messageMap[foam.locale]; },
-      setter: function(m) { this.message_ = this.messageMap[foam.locale] = m; }
+      getter: function() {
+        var i = foam.locale.indexOf('-');
+        var lang = ( i == -1 ) ? foam.locale : foam.locale.substring(0, 2);
+        return this.message_ || this.messageMap[foam.locale] || this.messageMap[foam.lang] || this.messageMap.en;
+      },
+      setter: function(m) {
+        this.message_ = this.messageMap[foam.locale] = m;
+      }
     },
     {
       class: 'Simple',
