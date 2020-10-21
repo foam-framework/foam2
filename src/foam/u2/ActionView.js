@@ -319,7 +319,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'hasModal',
+      name: 'hasConfirmationModal',
       factory: function() { 
         return this.action && this.action.view ? true : false; }
     },
@@ -412,7 +412,7 @@ foam.CLASS({
   listeners: [
     function click(e) {
       try {
-        if ( this.hasModal && this.buttonState == this.ButtonState.NO_CONFIRM ) {
+        if ( this.hasConfirmationModal && this.buttonState == this.ButtonState.NO_CONFIRM ) {
           this.ctrl.add(this.Popup.create().tag(this.action.view, {
             action: this.action,
             data: this.data
