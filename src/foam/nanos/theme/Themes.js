@@ -27,14 +27,14 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
+    'foam.mlang.MLang',
+    'foam.mlang.predicate.StartsWith',
     'foam.nanos.auth.Group',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.util.SafetyUtil',
     'javax.servlet.http.HttpServletRequest',
     'org.eclipse.jetty.server.Request',
-    'static foam.mlang.MLang.AND',
-    'static foam.mlang.MLang.EQ'
   ],
 
   methods: [
@@ -108,27 +108,40 @@ Later themes:
 
       // Find theme from themeDomain via domain
       if ( domain != null ) {
-        DAO themeDomainDAO = (DAO) x.get("themeDomainDAO");
-        ThemeDomain td = (ThemeDomain) themeDomainDAO.find(domain);
+        var themeDomainDAO = (DAO) x.get("themeDomainDAO");
+        var td = (ThemeDomain) themeDomainDAO.find(domain);
         if ( td == null &&
              ! "localhost".equals(domain) ) {
           td = (ThemeDomain) themeDomainDAO.find("localhost");
         }
         if ( td != null ) {
           theme = (Theme) themeDAO.find(
-            AND(
-              EQ(Theme.ID, td.getTheme()),
-              EQ(Theme.ENABLED, true)
+            MLang.AND(
+              MLang.EQ(Theme.ID, td.getTheme()),
+              MLang.EQ(Theme.ENABLED, true)
             ));
         }
       }
 
       // Find theme from user via SPID
-      // TODO: consider hierarchical SPID
       User user = ((Subject) x.get("subject")).getUser();
       if ( user != null && theme == null ) {
-        String spid = ! SafetyUtil.isEmpty(user.getSpid()) ? user.getSpid() : "*";
-        theme = (Theme) themeDAO.find(EQ(Theme.SPID, spid));
+        var spid = user.getSpid();
+        while ( ! SafetyUtil.isEmpty(spid) && theme == null ) {
+          theme = (Theme) themeDAO.find(
+            new StartsWith.Builder(x)
+              .setArg1(MLang.prepare(Theme.SPID))
+              .setArg2(MLang.prepare(spid))
+              .build()
+          );
+
+          var pos = spid.lastIndexOf(".");
+          spid = spid.substring(0, pos > 0 ? pos : 0);
+        }
+
+        if ( theme == null ) {
+          theme = (Theme) themeDAO.find(MLang.EQ(Theme.SPID, "*"));
+        }
       }
 
       if ( theme == null ) {
