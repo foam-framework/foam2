@@ -133,10 +133,7 @@ Later themes:
         while ( ! SafetyUtil.isEmpty(spid) ) {
           theme = (Theme) themeDAO.find(
             MLang.AND(
-              new StartsWith.Builder(x)
-                .setArg1(MLang.prepare(Theme.SPID))
-                .setArg2(MLang.prepare(spid))
-                .build(),
+              MLang.EQ(Theme.SPID, spid),
               MLang.EQ(Theme.ENABLED, true)
             )
           );
