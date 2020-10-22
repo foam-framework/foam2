@@ -89,6 +89,7 @@ foam.CLASS({
       -webkit-mask-image: -webkit-gradient(linear, left 15, left top, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
       overflow-y: auto;
       padding: 0 50px;
+      padding-top: 24px;
     }
     ^rightside ^top-buttons {
       text-align: right;
