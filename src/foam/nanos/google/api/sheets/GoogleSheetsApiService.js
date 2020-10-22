@@ -370,6 +370,7 @@ foam.CLASS({
         List<Integer> indexesOfUnitPropertyName = new ArrayList<Integer>();
         for ( int i = 0 ; i < metadata.length ; i++ ) {
           propertyNames.add(metadata[i].getPropName());
+          metadata[i].setIndexOfTheValueInProjection(propertyNames.size() - 1);
           if ( metadata[i].getCellType().equals("CURRENCY") ) {
             propertyNames.add(metadata[i].getUnitPropName());
             indexesOfUnitValuePropertyName.add(propertyNames.size() - 2);
