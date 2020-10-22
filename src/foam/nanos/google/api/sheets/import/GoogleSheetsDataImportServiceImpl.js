@@ -291,7 +291,7 @@
               else
                 prop.set(obj, Math.round(Double.parseDouble(number)));
 
-                Matcher alphabeticalCharsMatcher = alphabeticalCharsRegex.matcher(unitValue);
+              Matcher alphabeticalCharsMatcher = alphabeticalCharsRegex.matcher(unitValue);
 
               if ( alphabeticalCharsMatcher.find() && columnHeaderToPropertyMapping.getUnitProperty() != null ) {
                 String unit = unitValue.substring(alphabeticalCharsMatcher.start(), alphabeticalCharsMatcher.end());
