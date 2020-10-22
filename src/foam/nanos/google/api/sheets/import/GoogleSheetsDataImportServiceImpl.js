@@ -286,8 +286,12 @@
                 return false;
 
               String number = unitValue.substring(numMatcher.start(), numMatcher.end());
-              prop.set(obj, Math.round( Double.parseDouble(number) * 100));//may not be the case for all of the unitValues
-              Matcher alphabeticalCharsMatcher = alphabeticalCharsRegex.matcher(unitValue);
+              if ( columnHeaderToPropertyMapping.getIsUnitProperty() )
+                prop.set(obj, Math.round( Double.parseDouble(number) * 100 ));//may not be the case for all of the unitValues
+              else
+                prop.set(obj, Math.round(Double.parseDouble(number)));
+
+                Matcher alphabeticalCharsMatcher = alphabeticalCharsRegex.matcher(unitValue);
 
               if ( alphabeticalCharsMatcher.find() && columnHeaderToPropertyMapping.getUnitProperty() != null ) {
                 String unit = unitValue.substring(alphabeticalCharsMatcher.start(), alphabeticalCharsMatcher.end());

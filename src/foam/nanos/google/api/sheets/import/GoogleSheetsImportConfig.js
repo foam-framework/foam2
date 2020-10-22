@@ -94,6 +94,11 @@ foam.CLASS({
       class: 'foam.mlang.ExprProperty',
       hidden: true,
       javaJSONParser: 'foam.lib.json.ExprParser.instance()',
+    },
+    {
+      name: 'isUnitProperty',
+      class: 'Boolean',
+      hidden: true
     }
   ]
 });
