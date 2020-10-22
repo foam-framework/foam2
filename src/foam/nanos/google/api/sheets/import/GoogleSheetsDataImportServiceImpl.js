@@ -45,10 +45,11 @@
         cls.extras.push(foam.java.Code.create({
           data: `
             public static Pattern alphabeticalCharsRegex = Pattern.compile("[a-zA-Z]{1,}");
-            public static String dateTimeFormat = "EEE MMM d yyyy HH/mm/ss zZ (zzzz)";
-            public static String dateFormat  = "yyyy-MM-dd";
             public static Pattern digitAppearenceRegex = Pattern.compile("(\\\\d){1}");
             public static Pattern twoDecimalPointsNumberRegex = Pattern.compile("\\\\d+(\\\\.\\\\d{1,2})?");
+            public static String dateFormat  = "yyyy-MM-dd";
+            public static String dateTimeFormat = "EEE MMM d yyyy HH/mm/ss zZ (zzzz)";
+            public static String nameOfIdProperty  = "id";
           `
         }));
       }
@@ -216,7 +217,7 @@
           if ( isColumnHeaderMappedToProperty )
             continue;
 
-          boolean isOutputProperty = importConfig.getColumnHeaderPropertyMappings()[j].getProp().getSheetsOutput();
+          boolean isOutputProperty = importConfig.getColumnHeaderPropertyMappings()[j].getProp().getSheetsOutput() || importConfig.getColumnHeaderPropertyMappings()[j].getProp().getName().equals(nameOfIdProperty);
           if ( isOutputProperty )
             continue;
 
