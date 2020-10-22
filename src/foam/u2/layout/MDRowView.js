@@ -23,29 +23,10 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.addClass(this.myClass())
-        .start().addClass('md-row')
-          .tag(this.MDCitationView, {
+          this.tag(this.MDCitationView, {
             of: this.data.cls_,
             data: this.data
           })
-        .end();
     }
-  ],
-
-  css: `
-    ^ {
-    height: 200px;
-      padding: 20px;
-      font-size: 2.5rem;
-      font-weight: 300;
-      border-bottom: 1px solid /*%GREY3%*/;
-    }
-
-    ^ .md-row {
-      display: flex;
-//      flex-direction: row;
-      color: /*%GREY1%*/ #5e6061;
-    }
-  `
+  ]
 });

@@ -227,6 +227,11 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
+  public boolean getSheetsOutput(){
+    return false;
+  }
+
+  @Override
   public void authorize(X x) {
     // Since MLangs don't write values, we only need to check if the property
     // requires a read permission here.

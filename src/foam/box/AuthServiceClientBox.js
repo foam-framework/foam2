@@ -25,12 +25,8 @@ foam.CLASS({
       value: 'defaultSession'
     },
     {
-      class: 'String',
-      name: 'sessionID',
-      factory: function() {
-        return localStorage[this.sessionName] ||
-            ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
-      }
+      class: 'foam.box.SessionIDProperty',
+      name: 'sessionID'
     }
   ],
 

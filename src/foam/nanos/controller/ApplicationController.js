@@ -66,30 +66,30 @@ foam.CLASS({
   ],
 
   exports: [
-    'displayWidth',
     'agent',
     'appConfig',
     'as ctrl',
+    'crunchController',
     'currentMenu',
+    'displayWidth',
     'group',
     'lastMenuLaunched',
     'lastMenuLaunchedListener',
     'loginSuccess',
+    'loginVariables',
     'mementoTail as memento',
-    'theme',
     'menuListener',
     'notify',
     'pushMenu',
     'requestLogin',
+    'sessionTimer',
     'signUpEnabled',
-    'loginVariables',
     'stack',
     'subject',
+    'theme',
     'user',
     'webApp',
-    'wrapCSS as installCSS',
-    'sessionTimer',
-    'crunchController'
+    'wrapCSS as installCSS'
   ],
 
   constants: {
@@ -310,8 +310,7 @@ foam.CLASS({
       var self = this;
 
       // Start Memento Support
-      var hash = this.WindowHash.create();
-      this.memento.value$ = hash.value$
+      this.WindowHash.create({value$: this.memento.value$});
 
       this.memento.head$.sub(this.mementoChange);
       this.mementoChange();

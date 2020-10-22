@@ -525,7 +525,13 @@ var classes = [
   'foam.nanos.google.api.auth.GoogleApiAuthService',
   'foam.nanos.google.api.auth.GoogleApiCredentials',
   'foam.nanos.google.api.drive.GoogleDriveService',
+  'foam.nanos.google.api.sheets.ColumnHeaderToPropertyMapping',
   'foam.nanos.google.api.sheets.GoogleSheetsApiService',
+  'foam.nanos.google.api.sheets.GoogleSheetsDataImportService',
+  'foam.nanos.google.api.sheets.GoogleSheetsDataImportServiceImpl',
+  'foam.nanos.google.api.sheets.GoogleSheetsImportConfig',
+  'foam.nanos.google.api.sheets.GoogleSheetsTransactionsDataImportServiceImpl',
+  'foam.nanos.google.api.sheets.ImportDataMessage',
   'foam.dao.jdbc.ConnectionPool',
   'foam.lib.Outputter',
   'foam.lib.PropertyPredicate',
@@ -730,6 +736,7 @@ var classes = [
   'foam.nanos.crunch.lite.CapablePayload',
   'foam.nanos.crunch.lite.CapablePayloadStatusDAO',
   'foam.nanos.crunch.lite.CapableCompatibleCapability',
+  'foam.nanos.crunch.CapabilityAvailabilityDAO',
 
   'foam.nanos.crunch.lite.ruler.CapableCreateApprovalsRuleAction',
   'foam.nanos.crunch.lite.ruler.ReputDependantPayloads',
@@ -746,7 +753,6 @@ var classes = [
   'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
   'foam.nanos.crunch.AssociatedEntity',
-  'foam.nanos.crunch.CapabilityAvailabilityDAO',
   'foam.nanos.crunch.RenewableData',
 
   'foam.nanos.crunch.connection.CapabilityPayload',
@@ -842,6 +848,7 @@ var skeletons = [
   'foam.nanos.auth.UserQueryService',
   'foam.nanos.medusa.ElectoralService',
   'foam.nanos.export.GoogleSheetsExport',
+  'foam.nanos.google.api.sheets.GoogleSheetsDataImportService',
   'foam.nanos.crunch.CrunchService',
   'foam.i18n.TranslationService'
 ];

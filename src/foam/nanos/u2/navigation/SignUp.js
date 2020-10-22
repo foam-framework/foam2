@@ -89,7 +89,8 @@ foam.CLASS({
           isAvailable$: X.data.emailAvailable$,
           targetProperty: foam.nanos.auth.User.EMAIL,
           inputValidation: /\S+@\S+\.\S+/,
-          restrictedCharacters: /^[^\s]$/
+          restrictedCharacters: /^[^\s]$/,
+          displayMode: X.data.disableEmail_ ? foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW
         };
       },
       validateObj: function(email, emailAvailable) {
@@ -99,10 +100,6 @@ foam.CLASS({
         if ( ! /\S+@\S+\.\S+/.test(email) ) return this.EMAIL_SYNTAX_ERR;
         // Availability Check
         if ( ! emailAvailable ) return this.EMAIL_AVAILABILITY_ERR;
-      },
-      visibility: function(disableEmail_) {
-        return disableEmail_ ?
-          foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW;
       },
       required: true
     },

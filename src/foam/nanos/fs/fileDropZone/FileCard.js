@@ -138,7 +138,7 @@ foam.CLASS({
         if ( this.BlobBlob.isInstance(blob) ) {
           window.open(URL.createObjectURL(blob.blob));
         } else {
-          var url = '/service/httpFileService/' + this.data.id;
+          var url = this.data.address;
           window.open(url);
         }
       }
