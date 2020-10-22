@@ -3,6 +3,7 @@ foam.CLASS({
   name: 'GameController',
 
   requires: [
+    'foam.core.Action',
     'foam.demos.tetrominos.Grid',
     'foam.demos.tetrominos.GridLayer',
     'foam.demos.tetrominos.GridSquare',
@@ -10,6 +11,8 @@ foam.CLASS({
     'foam.demos.tetrominos.TetrominoLayerFactory',
     'foam.demos.tetrominos.TetrominoFactory',
     'foam.util.Timer',
+    'foam.u2.dialog.Popup',
+    'foam.u2.dialog.SimpleActionDialog',
     'foam.audio.Beep',
   ],
 
@@ -115,7 +118,25 @@ foam.CLASS({
     {
       name: 'rowLayers',
       // class: 'FObjectArray',
+    },
+    {
+      name: 'state',
+      factory: function () {
+        return this.State.INTRO;
+      }
     }
+  ],
+
+  enums: [
+    {
+      name: 'State',
+      values: [
+        'INTRO',
+        'PLAY',
+        'PAUSED',
+        'GAMEOVER',
+      ],
+    },
   ],
 
   methods: [
@@ -138,6 +159,9 @@ foam.CLASS({
         this.view.reallyInvalidate();
         this.downBeep.play();
       })
+      setTimeout(() => {
+        this.showInit();
+      }, 500);
     },
     function start() {
       this.timer.start();
@@ -153,6 +177,7 @@ foam.CLASS({
       //  a tetromino controller could "resist" it by moving upward)
       var layer = tetromino.layer;
       this.tick$.sub((sub) => {
+        if ( this.state != this.State.PLAY ) return;
         let end = () => {
           sub.detach();
           this.mergeLayerIntoRows(layer);
@@ -167,6 +192,7 @@ foam.CLASS({
           });
           if ( this.data.checkCollision(testLayer, [layer]) ) {
             end()
+            if ( layer.location.y == 0 ) this.gameOver();
           } else {
             layer.location = testLayer.location;
             this.view.reallyInvalidate();
@@ -184,7 +210,7 @@ foam.CLASS({
       var t = this.tetrominoFactory.randomTetromino();
       t.layer.location = this.GridLocation.create({
         x: 2,
-        y: 2,
+        y: 0,
       })
       this.data.layers =
         this.data.layers.concat(t.layer);
@@ -192,6 +218,44 @@ foam.CLASS({
       this.view.reallyInvalidate();
       console.log(t);
       this.control(t);
+    },
+    function showInit() {
+      var prompt = this.Popup.create().tag(this.SimpleActionDialog, {
+        title: 'Welcome to FOAM Tetrominos!',
+        actions: [
+          this.Action.create({
+            name: 'start',
+            label: 'Start Game',
+            code: () => {
+              prompt.close();
+              setTimeout(() => {
+                this.state = this.State.PLAY;
+              }, 1000)
+            }
+          }),
+        ]
+      });
+      ctrl.add(prompt);
+    },
+    function gameOver() {
+      this.state = this.State.GAMEOVER;
+      var prompt = this.Popup.create().tag(this.SimpleActionDialog, {
+        title: 'Game Over',
+        actions: [
+          this.Action.create({
+            name: 'start',
+            label: 'Play Again',
+            code: () => {
+              prompt.close();
+              setTimeout(() => {
+                this.data.clear();
+                this.state = this.State.PLAY;
+              }, 1000)
+            }
+          }),
+        ]
+      });
+      ctrl.add(prompt);
     },
     {
       name: 'mergeLayerIntoRows',

@@ -121,6 +121,9 @@ foam.CLASS({
       this.layers.push(layer);
       this.layers = this.layers;
     },
+    function clear() {
+      this.layers = [];
+    },
     function checkCollision(layer, ignoreList) {
       // "reference location"
       var ref = layer.location;
