@@ -52,7 +52,7 @@ foam.CLASS({
       position: relative;
       height: auto;
       background-color: %GREY5%;
-      max-height: 95vh;
+      max-height: 85vh;
       height: 100%;
     }
     ^fullscreen {
