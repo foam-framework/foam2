@@ -22,6 +22,7 @@ FOAM_FILES([
   { name: 'foam/nanos/fs/FileDAODecorator' },
   { name: 'foam/nanos/fs/FileArray' },
   { name: 'foam/nanos/fs/FileArrayDAODecorator' },
+  { name: 'foam/nanos/fs/FileArrayInCapablePayloadsDecorator' },
   { name: 'foam/nanos/fs/fileDropZone/FileDropZone', flags: ['web'] },
   { name: 'foam/nanos/fs/fileDropZone/FilePreview', flags: ['web'] },
   { name: 'foam/nanos/fs/fileDropZone/FileCard', flags: ['web'] },
@@ -208,6 +209,15 @@ FOAM_FILES([
   { name: "foam/nanos/google/api/auth/GoogleApiAuthService" },
   { name: "foam/nanos/google/api/auth/GoogleApiCredentials" },
   { name: "foam/nanos/google/api/drive/GoogleDriveService" },
+  { name: "foam/nanos/google/api/sheets/import/ClientGoogleSheetsDataImportService" },
+  { name: "foam/nanos/google/api/sheets/import/GoogleSheetsImportConfig" },
+  { name: "foam/nanos/google/api/sheets/import/GoogleSheetsDataImportService" },
+  { name: "foam/nanos/google/api/sheets/import/GoogleSheetsDataImportServiceImpl" },
+  { name: "foam/nanos/google/api/sheets/import/GoogleSheetsTransactionsDataImportServiceImpl" },
+  { name: "foam/nanos/google/api/sheets/import/ImportDataMessage"},
+  { name: "foam/nanos/google/api/sheets/import/views/modal/ColumnsToPropertiesMappingModal" },
+  { name: "foam/nanos/google/api/sheets/import/views/modal/GoogleSheetImportModal" },
+  { name: "foam/nanos/google/api/sheets/import/views/modal/ImportFromGoogleSheetsForm"},
   { name: "foam/nanos/auth/Relationships" },
   { name: "foam/nanos/NanoService" },
   { name: "foam/nanos/auth/twofactor/OTPKey" },
@@ -355,7 +365,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/lite/CapabilityRefinement" },
   { name: "foam/nanos/crunch/lite/MinMaxCapabilityRefinement" },
   { name: "foam/nanos/crunch/crunchtest/TestCapable" },
-  { name: "foam/nanos/crunch/CapabilityIsAvailable" },
+  { name: "foam/nanos/crunch/CapabilityAvailabilityDAO" },
 
   // crunch lite rulers
   { name: "foam/nanos/crunch/lite/ruler/CapablePayloadApprovableRuleAction" },
@@ -417,5 +427,6 @@ FOAM_FILES([
   // google
   { name: "foam/nanos/geocode/GoogleMapsCredentials" },
 
-  { name: "com/google/foam/demos/u2/AllViews" }
+  { name: "com/google/foam/demos/u2/AllViews" },
+  { name: "com/google/foam/demos/u2/MDAllViews" }
 ]);

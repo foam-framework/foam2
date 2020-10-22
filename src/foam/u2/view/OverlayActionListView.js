@@ -109,7 +109,6 @@ foam.CLASS({
       background-size: 24px;
       width: 24px;
       height: 24px;
-      position: absolute;
       right: 20;
     }
 

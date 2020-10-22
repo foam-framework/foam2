@@ -17,7 +17,6 @@ foam.CLASS({
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCategory',
     'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
-    'foam.nanos.crunch.CapabilityIsAvailable',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.u2.crunch.CapabilityCardView',
@@ -136,7 +135,7 @@ foam.CLASS({
         DAO with only visible capabilities.
       `,
       expression: function(hideGrantedCapabilities, grantedCapabilities) {
-        var predicate = this.CapabilityIsAvailable.create();
+        var predicate = this.EQ(this.Capability.VISIBLE, true);
         if ( hideGrantedCapabilities )
           predicate = this.AND(
             predicate,
@@ -211,8 +210,8 @@ foam.CLASS({
           .add(this.SUBTITLE)
         .end()
         .add(self.renderFeatured())
-        .add(self.accountAndAccountingCard())
         // NOTE: TEMPORARILY REMOVED
+        // .add(self.accountAndAccountingCard())
         // .start(self.Tabs)
         //   .start(self.Tab, { label: this.TAB_ALL, selected: true })
         //     .add(self.renderFeatured())

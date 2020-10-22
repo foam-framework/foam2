@@ -1587,6 +1587,14 @@ foam.CLASS({
       return this.parentNode;
     },
 
+    function translate(source, opt_default) {
+      /* Add the translation of the supplied source to the Element as a String */
+      return this.add(this.PromiseSlot.create({
+        promise: this.translationService.getTranslation(foam.locale, source)
+          .then(txt => { return txt || opt_default || 'no value'; })
+      }));
+    },
+
     function add() {
       if ( this.content ) {
         this.content.add_(arguments, this);
@@ -1642,31 +1650,6 @@ foam.CLASS({
             promise: this.translationService.getTranslation(foam.locale, key)
               .then(txt => { return txt || c.default || 'no value'; })
           }));
-          /*
-
-          if ( foam.locale !== null && typeof c === 'object' && c.data !== undefined && c.data.id !== undefined ) {
-            if ( foam.local == 'en' && c.default ) { this.add(c.default); return; }
-            var self = this;
-            var expr = foam.mlang.Expressions.create();
-            let d =  this.__subContext__.localeDAO;
-            this.add(this.PromiseSlot.create({
-              promise://TODO support more that one language (add language to the id)
-                d.where(
-                  expr.AND(
-                    expr.OR(
-                      expr.EQ(foam.i18n.Locale.LOCALE, foam.locale),
-                      expr.EQ(foam.i18n.Locale.LOCALE, foam.locale.substring(0,foam.locale.indexOf('-')))),
-                    expr.EQ(foam.i18n.Locale.ID, c.data.id + '.' + c.clsInfo)))
-                .select().then(function(a){
-                  let arr = a.array;
-                  if ( arr.length > 0 ) {
-                    let ea = arr[0];
-                    return ea.target;
-                  }
-                  return c.default || 'no value';
-                })
-            }))
-            */
         } else {
           es.push(c);
         }

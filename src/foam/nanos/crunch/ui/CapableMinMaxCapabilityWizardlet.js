@@ -119,6 +119,7 @@ foam.CLASS({
               choices$: this.choices$,
               booleanView: this.CardSelectView,
               isValidNumberOfChoices$: this.isValid$,
+              showValidNumberOfChoicesHelper: false,
               minSelected$: this.min$,
               maxSelected$: this.max$,
               onSelect: this.adjustCapablePayloads.bind(this)
