@@ -6,7 +6,8 @@ foam.CLASS({
   topics: ['left', 'right', 'up', 'down'],
 
   requires: [
-    'foam.demos.tetrominos.GridView'
+    'foam.demos.tetrominos.GridView',
+    'foam.u2.DetailView',
   ],
 
   properties: [
@@ -22,14 +23,19 @@ foam.CLASS({
     function initE() {
       this.SUPER();
 
-      var myAudio = new Audio('tetris.wav'); 
+      var myAudio = new Audio('tetrominos.mp3'); 
+
       myAudio.addEventListener('ended', function() {
           this.currentTime = 0;
           var p = this.play();
           if ( p ) p.catch(err => { console.error(err) });
       }, false);
-      var p = myAudio.play();
-      if ( p ) p.catch(err => { console.error(err) });
+      this.on('click', () => {
+        var p = null;
+        if ( myAudio.paused ) p = myAudio.play()
+        else myAudio.pause();
+        if ( p ) p.catch(err => { console.error(err) });
+      });
 
 let startPiece = null;
 let pkg = foam.demos.tetrominos;
@@ -85,6 +91,7 @@ game.view = view;
 this.add(game.view);
 game.ready();
 game.start();
+// this.tag(this.DetailView, { data: game });
 // game.control(pkg.TetrominoController.create({
 //   layer: startPiece
 // }));

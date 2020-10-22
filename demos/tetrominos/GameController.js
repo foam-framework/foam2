@@ -28,8 +28,8 @@ foam.CLASS({
       required: true,
       hidden: true,
       factory: function() {
-        var t = this.Timer.create();
-        this.tick$ = t.time$.map(function(t) { return Math.floor(t / 800); });
+        var t = this.Timer.create({ interval: 20 });
+        this.tick$ = t.time$.map(function(t) { return Math.floor(t / 200); });
         return t;
       },
     },
@@ -42,7 +42,8 @@ foam.CLASS({
       }
     },
     {
-      name: 'view'
+      name: 'view',
+      visibility: 'HIDDEN'
     },
     {
       name: 'tickBeep',
@@ -104,6 +105,7 @@ foam.CLASS({
     },
     {
       name: 'element',
+      visibility: 'HIDDEN',
       class: 'FObjectProperty',
       of: 'foam.demos.tetrominos.ControllerE'
     },
@@ -111,16 +113,19 @@ foam.CLASS({
       name: 'tetrominoFactory',
       class: 'FObjectProperty',
       of: 'foam.demos.tetrominos.TetrominoFactory',
+      visibility: 'HIDDEN',
       factory: function () {
         return foam.demos.tetrominos.TetrominoFactory.create();
       }
     },
     {
       name: 'rowLayers',
-      // class: 'FObjectArray',
+      class: 'FObjectArray',
+      of: 'foam.demos.tetrominos.GridLayer',
     },
     {
       name: 'state',
+      visibility: 'HIDDEN',
       factory: function () {
         return this.State.INTRO;
       }
@@ -269,7 +274,56 @@ foam.CLASS({
         Also, the original tetromino layer is removed from the grid.
       `,
       code: function (layer) {
-        //
+
+        // Apply squares to row layers
+        layer.squares.forEach(square => {
+          var row = this.data.height
+            - ( layer.location.y + square.location.y )
+            - 1
+            ;
+          while ( this.rowLayers.length <= row ) {
+            var rowLayer = this.GridLayer.create({
+              location: this.GridLocation.create({
+                x: 0,
+                y: this.data.height - this.rowLayers.length - 1
+              })
+            });
+            this.rowLayers$push(rowLayer);
+            this.data.layers$push(rowLayer);
+          }
+          var rowLayer = this.rowLayers[row];
+          rowLayer.squares$push(this.GridSquare.create({
+            hue: square.hue,
+            location: this.GridLocation.create({
+              x: layer.location.x + square.location.x,
+              y: 0
+            })
+          }))
+        })
+
+        // Remove tetromino layer from board
+        var i = this.data.layers.indexOf(layer);
+        this.data.layers.splice(i, 1);
+
+        // Clear row
+        for ( let i = 0 ; i < this.rowLayers.length ; i++ ) {
+          if ( this.rowLayers[i].squares.length >= this.data.width ) {
+            var iGlobal = this.data.layers.indexOf(this.rowLayers[i]);
+            this.data.layers.splice(iGlobal, 1);
+            this.rowLayers.splice(i, 1);
+            for ( let j = i ; j < this.rowLayers.length ; j++ ) {
+              this.rowLayers[j].location.y++;
+            }
+            i--;
+          }
+        }
+
+        /*
+          ROW 3 :  OO     <-- row = 3 ; y = height - 4
+          ROW 2 :   O
+          ROW 1 : ##O####
+          ROW 0 : #######
+        */
       }
     }
   ],
