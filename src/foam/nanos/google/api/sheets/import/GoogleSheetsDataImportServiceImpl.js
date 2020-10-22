@@ -286,7 +286,7 @@
                 return false;
 
               String number = unitValue.substring(numMatcher.start(), numMatcher.end());
-              if ( columnHeaderToPropertyMapping.getIsUnitProperty() )
+              if ( columnHeaderToPropertyMapping.getIsUnitValueProperty() )
                 prop.set(obj, Math.round( Double.parseDouble(number) * 100 ));//may not be the case for all of the unitValues
               else
                 prop.set(obj, Math.round(Double.parseDouble(number)));
