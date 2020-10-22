@@ -114,7 +114,7 @@ foam.CLASS({
     },
     {
       name: 'rowLayers',
-      class: 'FObjectArray',
+      // class: 'FObjectArray',
     }
   ],
 
