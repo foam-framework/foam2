@@ -128,8 +128,6 @@ foam.CLASS({
       // "reference location"
       var ref = layer.location;
 
-      console.log(ref);
-
       // Check for wall collisions
       let wallCollision = false;
       layer.squares.forEach(square => {

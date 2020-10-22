@@ -52,13 +52,10 @@ foam.CLASS({
         );
       }
 
-      console.log('uhh');
       grid.layers.forEach(layer => {
-        console.log('layer', layer);
         let x0 = layer.location.x;
         let y0 = layer.location.y;
 
-        console.log([layer.width, layer.height]);
 
         /* debug: render layer size
         for (let j=0;j<layer.width;j++)

@@ -219,9 +219,7 @@ foam.CLASS({
       })
       this.data.layers =
         this.data.layers.concat(t.layer);
-      console.log('layers?', this.data.layers);
       this.view.reallyInvalidate();
-      console.log(t);
       this.control(t);
     },
     function showInit() {
