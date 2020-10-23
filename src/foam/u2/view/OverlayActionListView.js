@@ -177,8 +177,9 @@ foam.CLASS({
     async function initializeOverlay() {
       var self = this;
 
-      if ( this.obj )
-        this.obj = await this.dao.inX(ctrl.__subContext__).find(this.obj.id);
+      if ( this.obj ) {
+        this.obj = await this.dao.inX(this.__context__).find(this.obj.id);
+      }
 
       this.onDetach(this.disabled_$.follow(this.ExpressionSlot.create({
         args: this.data.map((action) => action.createIsAvailable$(this.__context__, this.obj)),
