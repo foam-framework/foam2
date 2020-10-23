@@ -231,7 +231,7 @@ foam.CLASS({
         .add(this.slot(function(mode, prop, prop$label) {
 
           var isCheckBox = false;
-          if ( typeof prop.view === "function" ) {
+          if ( foam.Function.isInstance(prop.view) ) {
             var view = prop.view(null, this);
             isCheckBox = view.class === 'foam.u2.CheckBox' || ( view.cls_ && view.cls_.id === 'foam.u2.CheckBox' );
           }
