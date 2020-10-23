@@ -8,9 +8,13 @@ foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'ServiceProviderAware',
 
-  constants: {
-    GLOBAL_SPID: '*'
-  },
+  constants: [
+    {
+      name: 'GLOBAL_SPID',
+      value: '*',
+      type: 'String'
+    }
+  ],
 
   properties: [
     {
