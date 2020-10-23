@@ -14,6 +14,11 @@ foam.CLASS({
   `,
 
   css: `
+    ^ {
+      /* Add for fixing UI issue in Safari */
+      display: grid;
+    }
+
     ^ m3 {
       font-size: 16px;
       font-weight: bold;
