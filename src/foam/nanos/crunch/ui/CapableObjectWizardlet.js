@@ -26,6 +26,12 @@ foam.CLASS({
       name: 'capability'
     },
     {
+      name: 'id',
+      expression: function (capability) {
+        return 'capability,' + capability.id;
+      }
+    },
+    {
       name: 'targetPayload',
       class: 'FObjectProperty',
       of: 'foam.nanos.crunch.lite.CapablePayload'

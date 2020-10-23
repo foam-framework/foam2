@@ -52,8 +52,10 @@ foam.CLASS({
                 new foam.lib.PropertyPredicate[] {
                   new foam.lib.ExternalPropertyPredicate(),
                   new foam.lib.NetworkPropertyPredicate(), 
-                  new foam.lib.PermissionedPropertyPredicate()}));
+                  new foam.lib.PermissionedPropertyPredicate()}),
+              true);
               
+              sink.setX(x);
               sink.put(obj, null);
           }
         }, "DUG Rule (url: " + getUrl() + " )");
