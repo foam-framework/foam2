@@ -230,7 +230,6 @@ foam.CLASS({
 
       this
         .addClass(this.myClass())
-        .start()
         .addClass(`sectioned-detail-property-${this.prop.name}`)
         .add(this.slot(function(mode, prop, prop$label) {
 
@@ -305,7 +304,7 @@ foam.CLASS({
                   .end();
               })
             .end();
-        })).end();
+        }));
     }
   ]
 });
