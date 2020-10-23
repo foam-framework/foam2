@@ -7,7 +7,6 @@
 foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'RenewableData',
-  implements: [ 'foam.core.Validatable' ],
 
   documentation: `
     Capability data that may expire and require renewal by a user should extend this class.
@@ -62,22 +61,6 @@ foam.CLASS({
       name: 'expiry',
       class: 'Date',
       hidden: true
-    }
-  ],
-
-  methods: [
-    {
-      name: 'validate',
-      javaCode: `
-        java.util.List<foam.core.PropertyInfo> props = getClassInfo().getAxiomsByClass(foam.core.PropertyInfo.class);
-        for ( foam.core.PropertyInfo prop : props ) {
-          try {
-            prop.validateObj(x, this);
-          } catch ( IllegalStateException e ) {
-            throw e;
-          }
-        }
-      `,
     }
   ]
 });
