@@ -181,6 +181,10 @@
           }, this);
         }
       }
+    },
+    {
+      name: 'dataChangedFlag',
+      class: 'Boolean'
     }
   ],
 
@@ -192,8 +196,12 @@
 
   methods: [
     function init() {
+      var self = this;
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.updateCount })));
       this.updateCount();
+      this.data$.sub(function() {
+        self.data$proxy.on.sub(self.changeFlag);
+      });
     },
 
     function initE() {
@@ -308,6 +316,12 @@
     },
     function dblclick(obj, id) {
       this.dblClickListenerAction(obj, id);
+    },
+    {
+      name: 'changeFlag',
+      code: function() {
+        this.dataChangedFlag = !this.dataChangedFlag;
+      }
     }
   ]
 });
