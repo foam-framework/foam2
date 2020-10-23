@@ -161,7 +161,7 @@
         for ( int i = 0 ; i < arrOfObjectValues.size() ; i++ ) {
           java.util.List<Object> row = new ArrayList<>();
           for ( int j = 0 ; j < metadata.length ; j++ ) {
-            row.add(returnStringValueForMetadata(x, metadata[j], arrOfObjectValues.get(i)[j], null));
+            row.add(returnStringValueForMetadata(x, metadata[j], arrOfObjectValues.get(i)[metadata[j].getProjectionIndex()], null));
           }
           result.add(row);
         }
