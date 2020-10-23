@@ -74,7 +74,7 @@ foam.CLASS({
       return sheetId;
     },
     async function exportDAOAndReturnSheetId(X, dao) {
-      this.serviceName = X.serviceName.split('/')[1];
+      this.serviceName = X.serviceName.includes('/') ? X.serviceName.split('/')[1] : X.serviceName;
       var self = this;
       this.exportClsInfo = dao.of;
 
