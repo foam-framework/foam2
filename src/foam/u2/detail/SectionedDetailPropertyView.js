@@ -14,6 +14,11 @@ foam.CLASS({
   `,
 
   css: `
+    ^ {
+      /* Add for fixing UI issue in Safari */
+      display: grid;
+    }
+
     ^ m3 {
       font-size: 16px;
       font-weight: bold;
@@ -225,6 +230,7 @@ foam.CLASS({
 
       this
         .addClass(this.myClass())
+        .start()
         .addClass(`sectioned-detail-property-${this.prop.name}`)
         .add(this.slot(function(mode, prop, prop$label) {
 
@@ -299,7 +305,7 @@ foam.CLASS({
                   .end();
               })
             .end();
-        }));
+        })).end();
     }
   ]
 });
