@@ -319,10 +319,14 @@ foam.CLASS({
 
       this.memento.changeIndicator$.sub(function () {
         console.log('changeIndicator ApplicationController');
+        // self.memento.feedback_ = true;
+
         // self.WindowHash.create({value$: self.memento.value$});
-        self.memento.feedback_ = true;
-        hash.value = self.memento.combine();
-        // self.mementoChange();
+
+        self.memento.value = self.memento.combine();
+
+        if ( ! self.memento.feedback_ )
+          self.mementoChange();
       });
 
       this.mementoChange();

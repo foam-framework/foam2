@@ -73,6 +73,7 @@ foam.CLASS({
         if ( this.parent ) {
           this.parent.feedback_ = true;
           this.parent.changeIndicator = ! this.parent.changeIndicator;
+          this.parent.feedback_ = false;
         }
       }
     }

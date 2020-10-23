@@ -278,10 +278,9 @@ foam.CLASS({
               .addClass(self.myClass('dao'))
               .add(label)
               .attrs({title: spec.description})
-              .on('click', function() { 
-                var m = self.Memento.create({ head: spec.id, parent$: self.memento$ });
-                self.memento.tail = m;
-                // self.memento.tail.parent$ = self.memento$;
+              .on('click', function() {
+                self.memento.tail = self.Memento.create({ head: spec.id });
+                self.memento.tail.parent = self.memento;
               });
 
               self.search$.sub(function() {
