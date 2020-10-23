@@ -47,7 +47,7 @@
       class: 'String'
     },
     {
-      name: 'indexOfTheValueInProjection',
+      name: 'projectionIndex',
       class: 'Int'
     }
   ]
