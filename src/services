@@ -954,6 +954,8 @@ p({
     }
   """
 })
+
+p({
   "class":"foam.nanos.boot.NSpec",
   "name":"reportTemplateDAO",
   "lazy":false,

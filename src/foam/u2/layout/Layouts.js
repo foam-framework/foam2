@@ -10,7 +10,7 @@ foam.CLASS({
   extends: 'foam.u2.Element',
   css: `
     ^ {
-      display: flex: 0 0 100%;
+      display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: stretch;
@@ -30,7 +30,7 @@ foam.CLASS({
   extends: 'foam.u2.Element',
   css: `
     ^ {
-      display: flex: 0 0 100%;
+      display: flex;
       justify-content: space-between;
       align-items: stretch;
     }
