@@ -54,8 +54,8 @@ foam.CLASS({
         if ( this.feedback_ ) {
           return;
         }
-        this.changeIndicator = ! this.changeIndicator;
         this.feedback_ = true;
+        this.changeIndicator = ! this.changeIndicator;
         this.value = this.combine();
         this.feedback_ = false;
       }
