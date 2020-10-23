@@ -164,15 +164,6 @@ Later themes:
           var pos = spid.lastIndexOf(".");
           spid = spid.substring(0, pos > 0 ? pos : 0);
         }
-
-        if ( theme == null ) {
-          theme = (Theme) themeDAO.find(
-            MLang.AND(
-              MLang.EQ(Theme.SPID, "*"),
-              MLang.EQ(Theme.ENABLED, true)
-            )
-          );
-        }
       }
 
       if ( theme == null ) {

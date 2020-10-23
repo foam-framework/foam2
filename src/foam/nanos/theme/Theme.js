@@ -519,18 +519,7 @@ foam.CLASS({
       name: 'spid',
       class: 'Reference',
       of: 'foam.nanos.auth.ServiceProvider',
-      documentation: `
-        Only set spid on the main theme so that it can be looked up via spid
-        when could not find theme via domain.
-
-        By default, theme.spid is empty to denote an auxiliary theme which is
-        used for augmenting the theme for specific users and groups.
-
-        There should be only one theme associated with a service provider. For
-        users in the same service provider to have a different styling the users
-        or group that the users belong to should be configured with an auxiliary
-        theme.
-      `,
+      value: foam.nanos.auth.ServiceProviderAware.GLOBAL_SPID
     }
   ],
 
