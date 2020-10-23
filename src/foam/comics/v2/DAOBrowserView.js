@@ -173,6 +173,16 @@ foam.CLASS({
       factory: function() {
         return this.data.serviceName;
       }
+    },
+    {
+      name: 'importModal',
+      factory: function() {
+        return {
+          class: 'foam.nanos.google.api.sheets.ImportFromGoogleSheetsForm',
+          of: this.config.of,
+          dao: this.config.daoKey
+        };
+      }
     }
   ],
 
@@ -207,11 +217,7 @@ foam.CLASS({
       toolTip: 'Import From Google Sheet',
       // icon: 'images/export-arrow-icon.svg',//need find out where we're getting the icons
       code: function() {
-        this.add(this.Popup.create().tag({
-          class: 'foam.nanos.google.api.sheets.ImportFromGoogleSheetsForm',
-          of: this.config.of,
-          dao: this.config.daoKey
-        }));
+        this.add(this.Popup.create().tag(this.importModal));
       }
     },
   ],
