@@ -105,6 +105,8 @@ foam.CLASS({
           }
         }
 
+        if ( nu.length == 1 ) this.data = nu[0][0];
+
         if ( this.dynamicSize ) this.size = Math.min(nu.length, this.maxSize);
         return nu;
       }

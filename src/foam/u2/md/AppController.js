@@ -22,7 +22,10 @@ foam.CLASS({
   ],
 
   css: `
-
+    ^ body {
+      height: 100%;
+      overflow: hidden;
+    }
     ^ .foam-u2-ActionView {
       border: none !important;
     }

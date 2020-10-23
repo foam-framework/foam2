@@ -128,5 +128,13 @@ foam.CLASS({
           }));
       });
     }
-  ]
+  ],
+
+  css: `
+  ^ {
+    padding-top: 20%;
+    overflow: scroll;
+    height: 90%;
+  }
+  `
 });

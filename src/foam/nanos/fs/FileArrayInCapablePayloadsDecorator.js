@@ -27,7 +27,7 @@ foam.CLASS({
         let promises = Promise.all(payloadsWithData.map(async f => {
           return self.SUPER(X, dao, f.data, existing);
         }));
-        return Promise.all(promises).then((values) => {
+        return promises.then((values) => {
           return obj;
         });
       }
