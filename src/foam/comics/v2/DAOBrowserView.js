@@ -180,7 +180,7 @@ foam.CLASS({
         return {
           class: 'foam.nanos.google.api.sheets.ImportFromGoogleSheetsForm',
           of: this.config.of,
-          dao: this.config.daoKey
+          dao: this.config.daoKey || this.serviceName
         };
       }
     }
