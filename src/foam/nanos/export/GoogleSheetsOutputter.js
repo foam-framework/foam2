@@ -80,6 +80,8 @@ foam.CLASS({
             cellType = 'BOOLEAN';
           } else if ( foam.core.String.isInstance(prop) ) {
             cellType = 'STRING';
+          } else if ( foam.core.StringArray.isInstance(prop) ) {
+            cellType = 'STRING_ARRAY';
           }
 
           return this.GoogleSheetsPropertyMetadata.create({

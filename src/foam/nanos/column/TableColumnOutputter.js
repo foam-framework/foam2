@@ -9,7 +9,8 @@
   name: 'TableColumnOutputter',
 
   javaImports: [
-    'java.util.ArrayList'
+    'java.util.ArrayList',
+    'java.util.List'
   ], 
 
   documentation: 'Class for returning 2d-array ( ie table ) for array of values ',
@@ -209,6 +210,11 @@
           return obj.toString().substring(0, 8);
         case "ENUM":
           return obj.toString();
+        case "STRING_ARRAY":
+          List<Object> list = new ArrayList<>();
+          String[] arr = (String[])obj;
+          String str = String.join(",", arr);
+          return str;
         default:
           return ((foam.core.FObject)obj).toSummary();
       }

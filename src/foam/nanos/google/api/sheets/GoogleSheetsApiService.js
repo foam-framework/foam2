@@ -196,7 +196,7 @@ foam.CLASS({
             .setProperties(new DimensionProperties().setPixelSize(metadata[i].getColumnWidth()))
             .setFields("pixelSize")));
 
-          if ( metadata[i].getCellType().equals("") || metadata[i].getCellType().equals("STRING") || metadata[i].getCellType().equals("ENUM") || metadata[i].getCellType().equals("BOOLEAN") )
+          if ( metadata[i].getCellType().equals("") || metadata[i].getCellType().equals("STRING") || metadata[i].getCellType().equals("STRING_ARRAY") || metadata[i].getCellType().equals("ENUM") || metadata[i].getCellType().equals("BOOLEAN") )
             continue;
 
           RepeatCellRequest req = new RepeatCellRequest().setRange(new GridRange().setStartRowIndex(COLUMN_TITLES_ROW_INDEX).setStartColumnIndex(i).setEndColumnIndex(i+1))
