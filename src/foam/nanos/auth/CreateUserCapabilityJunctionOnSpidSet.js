@@ -42,7 +42,6 @@ foam.CLASS({
       name: 'applyAction',
       javaCode: `
         agency.submit(x, new ContextAgent() {
-          X systemX = ruler.getX();
           @Override
           public void execute(X x) {
             Logger logger = (Logger) x.get("logger");
@@ -54,7 +53,7 @@ foam.CLASS({
 
             if ( spid == null || spid.isEmpty() || spid.equals(oldSpid) ) return;
 
-            ServiceProvider sp = (ServiceProvider) user.findSpid(systemX);
+            ServiceProvider sp = (ServiceProvider) user.findSpid(x);
             if ( sp == null ) {
               logger.error("Cannot find capability for service provider : ", spid);
               return;
