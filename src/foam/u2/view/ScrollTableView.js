@@ -192,6 +192,7 @@
     ['', 'propertyChange.currentTopPage_', 'updateRenderedPages_'],
     ['', 'propertyChange.table_', 'updateRenderedPages_'],
     ['', 'propertyChange.daoCount', 'refresh'],
+    ['', 'propertyChange.dataChangedFlag', 'refresh'],
   ],
 
   methods: [
@@ -199,9 +200,6 @@
       var self = this;
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.updateCount })));
       this.updateCount();
-      this.data$.sub(function() {
-        self.data$proxy.on.sub(self.changeFlag);
-      });
     },
 
     function initE() {
@@ -266,6 +264,8 @@
       isFramed: true,
       code: function() {
         if ( ! this.table_ ) return;
+
+        this.data$proxy.on.sub(this.changeFlag);
 
         // Remove any pages that are no longer on screen to save on
         // the amount of DOM we add to the page.
