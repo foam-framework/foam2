@@ -29,7 +29,8 @@ foam.CLASS({
     'controller as data',
     'summaryView',
     'createControllerView',
-    'updateView'
+    'updateView',
+    'serviceName'
   ],
 
   properties: [
@@ -155,6 +156,13 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'detailView'
+    },
+    {
+      name: 'serviceName',
+      class: 'String',
+      factory: function() {
+        return this.data && this.data.serviceName ? this.data.serviceName : this.config.daoKey;
+      }
     }
   ],
 

@@ -171,7 +171,7 @@ foam.CLASS({
       name: 'serviceName',
       class: 'String',
       factory: function() {
-        return this.data.serviceName;
+        return this.data && this.data.serviceName ? this.data.serviceName : this.config.daoKey;
       }
     },
     {
@@ -180,7 +180,7 @@ foam.CLASS({
         return {
           class: 'foam.nanos.google.api.sheets.ImportFromGoogleSheetsForm',
           of: this.config.of,
-          dao: this.config.daoKey || this.serviceName
+          dao: this.serviceName
         };
       }
     }
