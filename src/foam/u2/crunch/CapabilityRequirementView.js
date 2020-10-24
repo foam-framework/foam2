@@ -60,6 +60,7 @@ foam.CLASS({
     }
 
     ^ .circle-center {
+      padding-top: 3vh;
       padding-bottom: 2vh;
       text-align: center;
       height: 80px;
