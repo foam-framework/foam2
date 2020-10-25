@@ -11,9 +11,9 @@
   javaImports: [
     'java.util.ArrayList',
     'java.util.List',
-    'org.apache.commons.lang3.StringUtils',
+    'java.util.StringJoiner',
     'org.apache.commons.lang.ArrayUtils',
-    'java.util.StringJoiner'
+    'org.apache.commons.lang3.StringUtils'
   ], 
 
   documentation: 'Class for returning 2d-array ( ie table ) for array of values ',
