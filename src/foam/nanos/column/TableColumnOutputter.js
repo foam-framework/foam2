@@ -10,7 +10,10 @@
 
   javaImports: [
     'java.util.ArrayList',
-    'java.util.List'
+    'java.util.List',
+    'org.apache.commons.lang3.StringUtils',
+    'org.apache.commons.lang.ArrayUtils',
+    'java.util.StringJoiner'
   ], 
 
   documentation: 'Class for returning 2d-array ( ie table ) for array of values ',
@@ -210,11 +213,17 @@
           return obj.toString().substring(0, 8);
         case "ENUM":
           return obj.toString();
-        case "STRING_ARRAY":
-          List<Object> list = new ArrayList<>();
-          String[] arr = (String[])obj;
-          String str = String.join(",", arr);
-          return str;
+        case "ARRAY":
+          StringJoiner strJ = new StringJoiner(", ");
+          Object[] arr = (Object[])obj;
+          for ( int i = 0; i < arr.length; i++ ) {
+            if ( arr[i] == null ) {
+              strJ.add("");
+              continue;
+            }
+            strJ.add(arr[i].toString());
+          }
+          return strJ.toString();
         default:
           return ((foam.core.FObject)obj).toSummary();
       }

@@ -161,7 +161,7 @@ foam.CLASS({
       name: 'serviceName',
       class: 'String',
       factory: function() {
-        return this.data && this.data.serviceName ? this.data.serviceName : this.config.daoKey;
+        return this.config.daoKey || this.returnServiceName(this.data) ;
       }
     }
   ],
@@ -172,6 +172,15 @@ foam.CLASS({
         .addClass(this.myClass())
         .addClass(this.myClass(this.data.of.id.replace(/\./g, '-')))
         .tag(this.DAOControllerView);
-    }
+    },
+    function returnServiceName(data) {
+      if ( ! data )
+        return;
+      if ( data.serviceName )
+        return data.serviceName;
+      if ( ! data.delegate )
+        return null;
+      return this.returnServiceName(data.delegate);
+    } 
   ]
 });
