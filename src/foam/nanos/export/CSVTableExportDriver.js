@@ -26,6 +26,7 @@ foam.CLASS({
     },
     {
       name: 'columnHandler',
+      hidden: true,
       class: 'FObjectProperty',
       of: 'foam.nanos.column.CommonColumnHandler',
       factory: function() {
@@ -34,6 +35,7 @@ foam.CLASS({
     },
     {
       name: 'columnConfigToPropertyConverter',
+      hidden: true,
       factory: function() {
         if ( ! this.__context__.columnConfigToPropertyConverter )
           return foam.nanos.column.ColumnConfigToPropertyConverter.create();

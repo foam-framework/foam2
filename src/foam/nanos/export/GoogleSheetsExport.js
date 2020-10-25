@@ -64,6 +64,57 @@ foam.INTERFACE({
         }
       ],
       javaThrows: [ 'java.io.IOException', 'java.security.GeneralSecurityException' ]
+    },
+    {
+      name: 'createSheetAndPopulateWithFrontEndData',
+      type: 'String',
+      javaThrows: [ 'java.lang.Exception' ],
+      async: true,
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'obj',
+          javaType: 'Object'
+        },
+        {
+          name: 'metadataObj',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
+          javaType: 'Object'
+        },
+        {
+          name: 'extraConfig',
+          type: 'Object',
+          javaType: 'foam.nanos.export.GoogleSheetsServiceConfig'
+        }
+      ]
+    },
+    {
+      name: 'createSheetByCopyingTemplateAndFronEndData',
+      javaType: 'String',
+      javaThrows: [ 'java.lang.Exception' ],
+      async: true,
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'obj',
+          javaType: 'Object'
+        },
+        {
+          name: 'metadataObj',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
+          javaType: 'Object'
+        },
+        {
+          name: 'extraConfig',
+          type: 'foam.nanos.export.GoogleSheetsServiceConfig'
+        }
+      ]
     }
   ]
 });
