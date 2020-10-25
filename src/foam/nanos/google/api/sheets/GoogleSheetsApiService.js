@@ -479,6 +479,110 @@ foam.CLASS({
           .execute();
         return true;
       `
-    }
+    },
+    {
+      name: 'createSheetAndPopulateWithFrontEndData',
+      type: 'String',
+      javaThrows: [ 'java.lang.Exception' ],
+      async: true,
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'obj',
+          javaType: 'Object'
+        },
+        {
+          name: 'metadataObj',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
+          javaType: 'Object'
+        },
+        {
+          name: 'extraConfig',
+          type: 'Object',
+          javaType: 'foam.nanos.export.GoogleSheetsServiceConfig'
+        }
+      ],
+      javaCode: `
+        try {
+          List<List<Object>> data = new ArrayList<>();
+          Object[] metadataArr = (Object[])metadataObj;
+    
+          GoogleSheetsPropertyMetadata[] metadata = new GoogleSheetsPropertyMetadata[metadataArr.length];
+          for ( int i = 0 ; i < metadata.length ; i++ ) {
+            metadata[i] = (GoogleSheetsPropertyMetadata)metadataArr[i];
+          }
+    
+          Object[] arr = (Object[]) obj;
+          for ( Object v : arr ) {
+            data.add(Arrays.asList((Object[])v));
+          }
+
+          GoogleDriveService googleDriveService = (GoogleDriveService) getX().get("googleDriveService");
+          String folderId = googleDriveService.createFolderIfNotExists(x, "Nanopay Export");
+          String fileName = extraConfig == null || SafetyUtil.isEmpty(extraConfig.getTitle()) ? ("NanopayExport" + new Date()) : extraConfig.getTitle();
+          String fileId = googleDriveService.createFile(x, folderId, fileName);
+    
+          return populateWithDataSheetWithId(x, fileId, data, metadata, extraConfig);
+        } catch ( Throwable t ) {
+          Logger l = (Logger) getX().get("logger");
+          l.error(t);
+          return "";
+        }
+      `
+    },
+    {
+      name: 'createSheetByCopyingTemplateAndFronEndData',
+      javaType: 'String',
+      javaThrows: [ 'java.lang.Exception' ],
+      async: true,
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'obj',
+          javaType: 'Object'
+        },
+        {
+          name: 'metadataObj',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
+          javaType: 'Object'
+        },
+        {
+          name: 'extraConfig',
+          type: 'foam.nanos.export.GoogleSheetsServiceConfig'
+        }
+      ],
+      javaCode: `
+      try {
+        List<List<Object>> data = new ArrayList<>();
+        Object[] metadataArr = (Object[])metadataObj;
+        GoogleSheetsPropertyMetadata[] metadata = new GoogleSheetsPropertyMetadata[metadataArr.length];
+  
+        for ( int i = 0 ; i < metadata.length ; i++ ) {
+          metadata[i] = (GoogleSheetsPropertyMetadata)metadataArr[i];
+        }
+  
+        Object[] arr = (Object[]) obj;
+        for ( Object v : arr ) {
+          data.add(Arrays.asList((Object[])v));
+        }
+
+        GoogleDriveService googleDriveService = (GoogleDriveService) getX().get("googleDriveService");
+        String folderId = googleDriveService.createFolderIfNotExists(x, "Nanopay Export");
+        String fileName = extraConfig == null || SafetyUtil.isEmpty(extraConfig.getTitle()) ? ("NanopayExport" + new Date()) : extraConfig.getTitle();
+        String fileId = googleDriveService.createAndCopyFromFile(x, folderId, fileName, extraConfig.getTemplate());
+        return populateWithDataSheetWithId(x, fileId, data, metadata, extraConfig);
+      } catch ( Throwable t ) {
+        Logger l = (Logger) getX().get("logger");
+        l.error(t);
+        return "";
+      }
+      `
+    },
   ]
 });

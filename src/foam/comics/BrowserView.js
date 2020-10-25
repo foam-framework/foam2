@@ -161,7 +161,7 @@ foam.CLASS({
       name: 'serviceName',
       class: 'String',
       factory: function() {
-        return this.config.daoKey || this.returnServiceName(this.data) ;
+        return this.config && this.config.daoKey ?  this.config.daoKey : this.returnServiceName(this.data) ;
       }
     }
   ],
