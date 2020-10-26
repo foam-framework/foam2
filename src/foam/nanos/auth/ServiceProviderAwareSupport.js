@@ -252,7 +252,7 @@ store the result for subsequent lookups. `,
         { name: 'spid', type: 'String' }
       ],
       javaCode: `
-        return "capability.read." + (SafetyUtil.isEmpty(spid) ? "*" : spid);
+        return "serviceprovider.read." + (SafetyUtil.isEmpty(spid) ? "*" : spid);
       `
     }
   ],

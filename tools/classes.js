@@ -749,6 +749,7 @@ var classes = [
   'foam.nanos.crunch.CapabilityJunctionStatus',
   'foam.nanos.crunch.UserCapabilityJunction',
   'foam.nanos.crunch.ui.CapabilityWizardlet',
+  'foam.nanos.crunch.ui.ReviewCapabilityWizardlet',
   'foam.nanos.crunch.ui.MinMaxCapabilityWizardlet',
   'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
@@ -778,6 +779,11 @@ var classes = [
   'foam.nanos.crunch.ruler.SetUCJStatusOnPut',
   'foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted',
   'foam.nanos.crunch.ruler.SaveUCJDataOnGranted',
+
+  //crunch extras
+  'foam.nanos.crunch.extra.ReviewCapability',
+  'foam.nanos.crunch.extra.ReviewCapabilityData',
+
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
   // userQueryService
