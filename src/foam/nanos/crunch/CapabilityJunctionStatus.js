@@ -10,31 +10,31 @@ foam.ENUM({
     {
       name: 'PENDING',
       label: { en: 'pending', pt: 'pendente'},
-      documentation: `Our team is currently reviewing. Approvals may take up to 24 hours`,
+      documentation: 'Our team is currently reviewing. Approvals may take up to 24 hours',
       background: '#bfae32'
     },
     {
       name: 'GRANTED',
       label: { en: 'granted', pt: 'concedida'},
-      documentation: `The information you provided has been approved`,
+      documentation: 'The information you provided has been approved',
       background: '#32bf5e'
     },
     {
       name: 'EXPIRED',
       label: { en: 'expired', pt: 'expirada'},
-      documentation: `The information required has changed, or your inputs are no longer valid`,
+      documentation: 'The information required has changed, or your inputs are no longer valid',
       background: '#bf3232'
     },
     {
       name: 'ACTION_REQUIRED',
       label: { en: 'action required', pt: 'ação requerida'},
-      documentation: `Information is missing for required fields`,
+      documentation: 'Information is missing for required fields',
       background: '#cf6f0a'
     },
     {
       name: 'AVAILABLE',
       label: { en: 'available', pt: 'acessível'},
-      documentation: `You are ready to get started`,
+      documentation: 'You are ready to get started',
       background: '#604aff'
     },
     {
@@ -48,7 +48,7 @@ foam.ENUM({
     {
       name: 'PENDING_REVIEW',
       label: { en: 'pending review', pt: 'revisão pendente' },
-      documentation: `The information you provided is pending signing officer review`,
+      documentation: 'The information you provided is pending signing officer review',
       background: '#bfae32'
     }
   ]
