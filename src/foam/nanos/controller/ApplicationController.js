@@ -400,6 +400,7 @@ foam.CLASS({
         let l = localStorage.getItem('localeLanguage');
         if ( l !== undefined ) foam.locale = l;
         //TODO manage more complicated language. 'en-CA'
+        foam.locale =  foam.locale ? foam.locale: 'en-US';
         if ( foam.locale !== 'en' && foam.locale !== 'en-US' ) {
           let ctx = this.__subContext__;
           let d = await  this.__subContext__.localeDAO;
