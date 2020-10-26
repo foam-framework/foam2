@@ -71,7 +71,6 @@ foam.CLASS({
 
     ^card-description {
       margin-top: 9px;
-      height: 20px;
       font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       font-weight: normal;
