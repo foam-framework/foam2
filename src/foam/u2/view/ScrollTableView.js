@@ -200,6 +200,15 @@
     function init() {
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.updateCount })));
       this.updateCount();//check memento
+      
+      if ( this.memento.tail ) {
+        this.stack.push({
+          class: 'foam.comics.v2.DAOSummaryView',
+          data: null,
+          config: this.config,
+          id: this.memento.tail.head
+        }, this);
+      }
     },
 
     function initE() {
