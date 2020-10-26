@@ -101,7 +101,7 @@ returning true if the spid or context users spid matches the current object.`,
       if ( obj != null &&
            obj instanceof ServiceProviderAware ) {
         ServiceProviderAware sp = (ServiceProviderAware) obj;
-        return sp.getSpid().startsWith(spid) ||
+        return sp.getSpid().equals("*") || sp.getSpid().startsWith(spid) ||
                  isUserSpid && auth.check(x, getSpidReadPermission(sp.getSpid()));
       }
 
@@ -123,7 +123,7 @@ returning true if the spid or context users spid matches the current object.`,
             if ( result != null &&
                  result instanceof ServiceProviderAware ) {
               ServiceProviderAware sp = (ServiceProviderAware) result;
-              return sp.getSpid().startsWith(spid) ||
+              return sp.getSpid().equals("*") || sp.getSpid().startsWith(spid) ||
                        isUserSpid && auth.check(x, getSpidReadPermission(sp.getSpid()));
             } else {
               break;
