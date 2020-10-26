@@ -19,13 +19,91 @@ foam.CLASS({
     to the user.
   `,
 
+  imports: [
+    'capabilityDAO',
+    'crunchService',
+    'crunchController',
+  ],
+
+  requires: [
+    // CRUNCH agents
+    'foam.u2.crunch.wizardflow.ConfigureFlowAgent',
+    'foam.u2.crunch.wizardflow.CapabilityAdaptAgent',
+    'foam.u2.crunch.wizardflow.LoadCapabilitiesAgent',
+    'foam.u2.crunch.wizardflow.CreateWizardletsAgent',
+    'foam.u2.crunch.wizardflow.LoadTopConfig',
+    'foam.u2.crunch.wizardflow.StepWizardAgent',
+    'foam.u2.crunch.wizardflow.PutFinalJunctionsAgent',
+
+    'foam.u2.detail.SectionedDetailView',
+    'foam.util.async.Sequence',
+  ],
+
+  properties: [
+    {
+      name: 'ucjData',
+      class: 'FObjectProperty',
+      of: 'FObject',
+    }
+  ],
+
   methods: [
     function initE() {
+      this.update();
       this.SUPER();
+      this
+        .startContext({
+          controllerMode: foam.u2.ControllerMode.VIEW
+        })
+          .tag(this.SectionedDetailView, {
+            data$: this.ucjData$,
+          })
+        .endContext()
+        .startContext({
+          data: this,
+        })
+          .add(this.EDIT)
+        .endContext()
+        ;
+    },
+    function update() {
+      this.capabilityDAO.find(this.data).then(cap => {
+        var defaultData = cap.of.create({}, this);
+        this.crunchService.getJunction(null, this.data).then(ucj => {
+          if ( ucj ) {
+            this.ucjData = ucj.data;
+            return;
+          }
+          this.ucjData = defaultData;
+        })
+      });
     }
-  ]
+  ],
 
-  // TODO: fetch UCJ
-  // TODO: create UCJEditView for popup
-  // TODO: add edit action (creates popup)
+  actions: [
+    function edit() {
+      console.log('actionThis', this);
+      var crunchContext = this.__subContext__.createSubContext({
+        rootCapability: this.data
+      });
+      // Invoke custom wizard flow which excludes pending check and preview
+      this.Sequence.create(null, crunchContext)
+        .add(this.ConfigureFlowAgent)
+        .add(this.CapabilityAdaptAgent)
+        .add(this.LoadCapabilitiesAgent)
+        .add(this.CreateWizardletsAgent)
+        .add(this.LoadTopConfig)
+        .add(this.StepWizardAgent)
+        .add(this.PutFinalJunctionsAgent)
+        .execute()
+        .then(() => {
+          this.update();
+        })
+        .catch(err => {
+          debugger;
+          console.error(err);
+        })
+        ;
+    }
+  ],
 });

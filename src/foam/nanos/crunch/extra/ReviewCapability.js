@@ -7,12 +7,23 @@
 foam.CLASS({
   package: 'foam.nanos.crunch.extra',
   name: 'ReviewCapability',
+  extends: 'foam.nanos.crunch.Capability',
   documentation: `
-    This capability displays a portal to another capability with
-    review options.
+    This capability displays a portal to another capability as well
+    as its own data. This is useful for implementing a review process.
   `,
 
   properties: [
+    {
+      class: 'Object',
+      name: 'wizardlet',
+      documentation: `
+        Defines a wizardlet used when displaying this capability on related client crunch wizards.
+      `,
+      factory: function() {
+        return foam.nanos.crunch.ui.ReviewCapabilityWizardlet.create({}, this);
+      }
+    },
     {
       name: 'capabilityToReview',
       class: 'Reference',
@@ -20,10 +31,12 @@ foam.CLASS({
       view: 'foam.nanos.crunch.ui.UCJView'
     },
     {
-      name: 'reviewed',
-      class: 'Boolean'
+      name: 'of',
+      class: 'Class',
+      factory: function() {
+        return 'foam.nanos.crunch.extra.ReviewCapabilityData';
+      },
+      javaFactory: 'return ReviewCapabilityData.getOwnClassInfo();'
     }
   ],
-
-  // TODO: validate; reviewed must be true
 });
