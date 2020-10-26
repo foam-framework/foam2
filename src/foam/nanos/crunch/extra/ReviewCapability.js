@@ -13,6 +13,10 @@ foam.CLASS({
     as its own data. This is useful for implementing a review process.
   `,
 
+  requires: [
+    'foam.nanos.crunch.ui.ReviewCapabilityWizardlet'
+  ],
+
   properties: [
     {
       class: 'Object',
@@ -21,7 +25,7 @@ foam.CLASS({
         Defines a wizardlet used when displaying this capability on related client crunch wizards.
       `,
       factory: function() {
-        return foam.nanos.crunch.ui.ReviewCapabilityWizardlet.create({}, this);
+        return this.ReviewCapabilityWizardlet.create({}, this);
       }
     },
     {

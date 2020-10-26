@@ -82,7 +82,6 @@ foam.CLASS({
 
   actions: [
     function edit() {
-      console.log('actionThis', this);
       var crunchContext = this.__subContext__.createSubContext({
         rootCapability: this.data
       });
@@ -100,7 +99,6 @@ foam.CLASS({
           this.update();
         })
         .catch(err => {
-          debugger;
           console.error(err);
         })
         ;
