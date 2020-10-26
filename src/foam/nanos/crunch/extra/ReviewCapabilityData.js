@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'ReviewCapabilityData',
 
   messages: [
-    { name: 'REVIEW_REQUIRED_ERROR', message: 'All data must be reviewed by a signing officer.' }
+    { name: 'REVIEW_REQUIRED_ERROR', message: 'All data must be reviewed by a privileged user.' }
   ],
 
   properties: [
