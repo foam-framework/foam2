@@ -25,7 +25,7 @@ foam.CLASS({
         Defines a wizardlet used when displaying this capability on related client crunch wizards.
       `,
       factory: function() {
-        return this.ReviewCapabilityWizardlet.create({}, this);
+        return this.ReviewCapabilityWizardlet.create();
       }
     },
     {
