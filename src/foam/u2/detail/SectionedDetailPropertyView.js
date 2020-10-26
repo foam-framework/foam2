@@ -14,6 +14,11 @@ foam.CLASS({
   `,
 
   css: `
+    ^ {
+      /* Add for fixing UI issue in Safari */
+      display: grid;
+    }
+
     ^ m3 {
       font-size: 16px;
       font-weight: bold;
@@ -79,6 +84,10 @@ foam.CLASS({
       background: #ffffff url('images/dropdown-icon.svg') no-repeat 99% 50%;
       -webkit-appearance: none;
       cursor: pointer;
+    }
+
+    ^flex {
+      display: flex;
     }
 
     ^error .foam-u2-tag-TextArea,
@@ -177,11 +186,9 @@ foam.CLASS({
     }
 
     ^ .foam-u2-CheckBox-label {
-      position: absolute;
-      top: 7;
-      margin-left: 12px;
-      vertical-align: middle;
-      white-space: pre-wrap;
+      word-break: break-word;
+      white-space: normal;
+      margin-top: 6px;
     }
 
     ^ .foam-u2-view-RadioView .foam-u2-view-RadioView {
@@ -228,13 +235,22 @@ foam.CLASS({
         .addClass(`sectioned-detail-property-${this.prop.name}`)
         .add(this.slot(function(mode, prop, prop$label) {
 
+          var isCheckBox = false;
+          if ( foam.Function.isInstance(prop.view) ) {
+            var view = prop.view(null, this.__subSubContext__);
+            isCheckBox = view.class === 'foam.u2.CheckBox' || ( view.cls_ && view.cls_.id === 'foam.u2.CheckBox' );
+          }
+          else {
+            isCheckBox = prop.view.class === 'foam.u2.CheckBox';
+          }
+
           var errorSlot = prop.validateObj && prop.validationTextVisible ?
             this.data.slot(prop.validateObj) :
             foam.core.ConstantSlot.create({ value: null });
 
           return self.E()
             .start(self.Rows)
-              .callIf(prop$label && prop.view.class != 'foam.u2.CheckBox', function() {
+              .callIf(prop$label && ! isCheckBox, function() {
                 this.start('m3')
                   .add(prop$label)
                   .style({ 'line-height': '2' })
@@ -244,6 +260,7 @@ foam.CLASS({
                 .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                 .start()
                   .style({ 'flex-grow': 1, 'max-width': '100%' })
+                  .enableClass(self.myClass('flex'), isCheckBox)
                   .tag(prop, { mode$: self.mode$ })
                   .callIf(prop.validationStyleEnabled, function() {
                     this.enableClass(self.myClass('error'), errorSlot);
