@@ -150,6 +150,7 @@ foam.CLASS({
   actions: [
     {
       name: 'getStarted',
+      label: 'Get started',
       code: function(x) {
         x.closeDialog();
         this.onClose(x, true);

@@ -22,7 +22,15 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'INVALID_POSTAL_CODE_ERR_MSG', message: 'Invalid postal code' }
+    { name: 'CITY_REQUIRED', message: 'City required' },
+    { name: 'COUNTRY_REQUIRED', message: 'Country required' },
+    { name: 'INVALID_ADDRESS_1', message: 'Invalid value for address 1' },
+    { name: 'INVALID_POSTAL_CODE_ERR_MSG', message: 'Valid Postal Code or ZIP Code required' },
+    { name: 'PROVINCE_REQUIRED', message: 'Province required' },
+    { name: 'REGION_REQUIRED', message: 'Region required' },
+    { name: 'STATE_REQUIRED', message: 'State required' },
+    { name: 'STREET_NAME_REQUIRED', message: 'Street name required' },
+    { name: 'STREET_NUMBER_REQUIRED', message: 'Street number required' }
   ],
 
   properties: [
@@ -56,7 +64,7 @@ foam.CLASS({
               }), 1)
             );
           },
-          errorString: 'Invalid value for address 1.'
+          errorMessage: 'INVALID_ADDRESS_1'
         }
       ],
       hidden: true
@@ -80,7 +88,7 @@ foam.CLASS({
       gridColumns: 6,
       validateObj: function(countryId) {
         if ( typeof countryId !== 'string' || countryId.length === 0 ) {
-          return 'Country required.';
+          return this.COUNTRY_REQUIRED;
         }
       },
       postSet: function(oldValue, newValue) {
@@ -128,11 +136,11 @@ foam.CLASS({
         if ( typeof regionId !== 'string' || regionId.length === 0 ) {
           switch ( countryId ) {
             case 'CA':
-              return 'Province required.';
+              return this.PROVINCE_REQUIRED;
             case 'US':
-              return 'State required.';
+              return this.STATE_REQUIRED;
             default:
-              return 'Region required.';
+              return this.REGION_REQUIRED;
           }
         }
       }
@@ -149,7 +157,7 @@ foam.CLASS({
       // and not baked into the model.
       class: 'String',
       name: 'streetNumber',
-      label: 'Street No.',
+      label: 'Street number',
       width: 16,
       documentation: 'The structured field for the street number of the postal address.',
       gridColumns: 3,
@@ -164,13 +172,14 @@ foam.CLASS({
               }), 1)
             );
           },
-          errorString: 'Invalid street number.'
+          errorMessage: 'STREET_NUMBER_REQUIRED'
         }
       ]
     },
     {
       class: 'String',
       name: 'streetName',
+      label: 'Street name',
       width: 70,
       documentation: 'The structured field for the street name of the postal address.',
       gridColumns: 6,
@@ -183,7 +192,7 @@ foam.CLASS({
               e.REG_EXP(foam.nanos.auth.Address.STREET_NAME, /^\s*.+\s*$/)
             );
           },
-          errorString: 'Invalid street name.'
+          errorMessage: 'STREET_NAME_REQUIRED'
         }
       ]
     },
@@ -192,8 +201,12 @@ foam.CLASS({
       name: 'city',
       documentation: 'The city of the postal address.',
       required: true,
-      minLength: 1,
       gridColumns: 6,
+      validateObj: function(city) {
+        if ( city.length === 0 ) {
+          return this.CITY_REQUIRED;
+        }
+      }
     },
     {
       class: 'String',
