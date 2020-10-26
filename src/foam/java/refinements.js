@@ -2294,3 +2294,24 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'TemplateAxiomJavaRefinement',
+  refines: 'foam.templates.TemplateAxiom',
+  flags: ['java'],
+
+  methods: [
+    function buildJavaClass(cls) {
+        cls.method({
+          name: 'buildTemplate',
+          type: 'void',
+          args: [
+            { type: 'java.lang.StringBuilder', name: 'builder' },
+          ],
+          body: `builder.append(\"${this.template}\");`
+        });
+        return;
+    }
+  ]
+});
