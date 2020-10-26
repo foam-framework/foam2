@@ -80,12 +80,7 @@ foam.CLASS({
       line-height: 1.43;
       letter-spacing: normal;
       color: #5e6061;
-
       cursor: pointer;
-
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
 
       /* normalize for transitions */
       border: solid 1px rgba(255,255,255,0);
