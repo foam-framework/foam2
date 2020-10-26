@@ -181,9 +181,9 @@ foam.CLASS({
       },
       javaCode: `
         if ( ! SafetyUtil.isEmpty(this.getDataString()) ) {
-          String          encodedString = this.getDataString().split(",")[1];
-          byte[]          decodedBytes  = Base64.getDecoder().decode(encodedString);
-          String          decodedString = new String(decodedBytes);
+          String encodedString = this.getDataString().split(",")[1];
+          byte[] decodedBytes  = Base64.getDecoder().decode(encodedString);
+          String decodedString = new String(decodedBytes);
           return decodedString;
         }
         return "";
