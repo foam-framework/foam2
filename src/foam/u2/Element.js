@@ -1604,9 +1604,7 @@ foam.CLASS({
       return this;
     },
 
-    function toE() {
-      return this;
-    },
+    function toE() { return this; },
 
     function add_(cs, parentNode) {
       /* Add Children to this Element. */

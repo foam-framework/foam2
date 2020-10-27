@@ -20,7 +20,7 @@ p({"class":"foam.nanos.auth.Region", "code":"BE-WLG", "name":"Liège", "countryI
 p({"class":"foam.nanos.auth.Region", "code":"BE-WLX", "name":"Luxembourg", "countryId":"BE"})
 p({"class":"foam.nanos.auth.Region", "code":"BE-WNA", "name":"Namur", "countryId":"BE"})
 p({"class":"foam.nanos.auth.Region", "code":"BE-WBR", "name":"Walloon Brabant", "countryId":"BE"})
-p({"class":"foam.nanos.auth.Region", "code":"BE-BBR", "name":"Brussels Capital Region", "countryId":"BE"})
+p({"class":"foam.nanos.auth.Region", "code":"BE-BRU", "name":"Brussels Capital Region", "countryId":"BE"})
 
 // Brazil
 p({"class":"foam.nanos.auth.Region", "code":"BR-AC", "name": "Acre", "countryId":"BR"})

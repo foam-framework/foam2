@@ -64,7 +64,7 @@ ServiceProviderAware`,
     if ( isCreate ) {
       if ( SafetyUtil.isEmpty(sp.getSpid()) ||
            ( ! SafetyUtil.isEmpty(sp.getSpid()) &&
-             ! auth.check(x, "spid.create." + sp.getSpid()) ) ) {
+             ! auth.check(x, "serviceprovider.create." + sp.getSpid()) ) ) {
         User user = ((Subject) x.get("subject")).getUser();
         if ( user != null &&
              ! SafetyUtil.isEmpty(user.getSpid()) ) {
@@ -74,8 +74,8 @@ ServiceProviderAware`,
         }
       }
     } else if ( ! sp.getSpid().equals(oldSp.getSpid()) &&
-                ! (auth.check(x, "spid.update." + oldSp.getSpid()) &&
-                   auth.check(x, "spid.update." + sp.getSpid())) ) {
+                ! (auth.check(x, "serviceprovider.update." + oldSp.getSpid()) &&
+                   auth.check(x, "serviceprovider.update." + sp.getSpid())) ) {
       throw new AuthorizationException("You do not have permission to update ServiceProvider (spid) property.");
     }
 

@@ -101,7 +101,7 @@ returning true if the spid or context users spid matches the current object.`,
       if ( obj != null &&
            obj instanceof ServiceProviderAware ) {
         ServiceProviderAware sp = (ServiceProviderAware) obj;
-        return sp.getSpid().startsWith(spid) ||
+        return sp.getSpid().startsWith(spid) || sp.getSpid().equals("*") ||
                  isUserSpid && auth.check(x, getSpidReadPermission(sp.getSpid()));
       }
 
@@ -123,7 +123,7 @@ returning true if the spid or context users spid matches the current object.`,
             if ( result != null &&
                  result instanceof ServiceProviderAware ) {
               ServiceProviderAware sp = (ServiceProviderAware) result;
-              return sp.getSpid().startsWith(spid) ||
+              return sp.getSpid().startsWith(spid) || sp.getSpid().equals("*") ||
                        isUserSpid && auth.check(x, getSpidReadPermission(sp.getSpid()));
             } else {
               break;
@@ -252,7 +252,7 @@ store the result for subsequent lookups. `,
         { name: 'spid', type: 'String' }
       ],
       javaCode: `
-        return "capability.read." + (SafetyUtil.isEmpty(spid) ? "*" : spid);
+        return "serviceprovider.read." + (SafetyUtil.isEmpty(spid) ? "*" : spid);
       `
     }
   ],

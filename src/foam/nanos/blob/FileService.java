@@ -11,6 +11,7 @@ import foam.blob.BlobService;
 import foam.blob.IdentifiedBlob;
 import foam.core.X;
 import foam.dao.DAO;
+import foam.nanos.app.AppConfig;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.User;
 import foam.nanos.fs.File;
@@ -20,6 +21,7 @@ import org.apache.commons.io.IOUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
+import java.util.Base64;
 
 public class FileService
     extends HttpBlobService
@@ -41,7 +43,8 @@ public class FileService
     OutputStream os = null;
     HttpServletRequest  req  = x.get(HttpServletRequest.class);
     HttpServletResponse resp = x.get(HttpServletResponse.class);
-    AuthService auth       = (AuthService) x.get("auth");
+    AuthService auth         = (AuthService) x.get("auth");
+    AppConfig appConfig      = (AppConfig) x.get("appConfig");
 
     try {
       String path = req.getRequestURI();
@@ -53,6 +56,15 @@ public class FileService
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         return;
       }
+
+      //Replace @version@ with actual foam version
+      if ( "text/html".equals(file.getMimeType() ) {
+        String fileText = file.getText();
+        fileText = fileText.replace("@VERSION@", appConfig.getVersion());
+        String encodedString = Base64.getEncoder().encodeToString(fileText.getBytes());
+        file.setDataString("data:text/html;base64," + encodedString);
+      }
+
 
       // TODO: Add better ACL support for files.  In the meantime,
       // fileDAO has been decorated to disallow enumeration and File
