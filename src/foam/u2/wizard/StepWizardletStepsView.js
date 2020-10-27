@@ -168,7 +168,7 @@ foam.CLASS({
         }))
     },
     function renderSectionLabel(elem, section, index, isCurrent) {
-      let title = section.wizardTitle;
+      let title = section.navTitle;
       if ( ! title || ! title.trim() ) title = "Part " + index;
       return elem       
         .style({

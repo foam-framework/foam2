@@ -46,10 +46,10 @@ foam.CLASS({
       class: 'foam.u2.ViewSpec'
     },
     {
-      name: 'wizardTitle',
+      name: 'navTitle',
       class: 'String',
       expression: function(section) {
-        return section.wizardTitle || section.title;
+        return section.navTitle;
       }
     }
   ],

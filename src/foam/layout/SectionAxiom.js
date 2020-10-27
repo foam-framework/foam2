@@ -24,7 +24,7 @@ foam.CLASS({
       name: 'subTitle'
     },
     {
-      name: 'wizardTitle'
+      name: 'navTitle'
     },
     {
       name: 'help'
