@@ -15,7 +15,8 @@ foam.CLASS({
     'foam.comics.DAOUpdateControllerView',
     'foam.u2.view.ScrollTableView',
     'foam.nanos.u2.navigation.IFrameTopNavigation',
-    'foam.u2.dialog.Popup'
+    'foam.u2.dialog.Popup',
+    'foam.nanos.controller.Memento'
   ],
 
   imports: [
@@ -24,7 +25,8 @@ foam.CLASS({
     'stack',
     'summaryView? as importedSummaryView',
     'updateView? as importedUpdateView',
-    'window'
+    'window',
+    'memento'
   ],
 
   exports: [
@@ -33,7 +35,8 @@ foam.CLASS({
     'data.data as dao',
     'data.filteredTableColumns as filteredTableColumns',
     'data.searchColumns as searchColumns',
-    'dblclick'
+    'dblclick',
+    'memento'//currentMemento as 
   ],
 
   css: `
@@ -127,7 +130,8 @@ foam.CLASS({
           class: 'foam.comics.DAOUpdateControllerView'
         };
       }
-    }
+    },
+    'currentMemento'
   ],
 
   reactions: [
@@ -236,6 +240,10 @@ foam.CLASS({
     },
 
     function onEdit(s, edit, id) {
+
+      this.memento.tail = this.Memento.create({ head: id });
+      this.memento.tail.parent = this.memento;
+
       this.stack.push({
         class: this.updateView.class,
         detailView: this.data.detailView,

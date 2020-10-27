@@ -20,6 +20,7 @@ foam.CLASS({
     'foam.u2.view.ScrollTableView',
     'foam.u2.view.SimpleSearch',
     'foam.u2.view.TabChoiceView',
+    'foam.nanos.controller.Memento'
   ],
 
   implements: [
@@ -95,13 +96,15 @@ foam.CLASS({
 
   imports: [
     'stack?',
-    'ctrl'
+    'ctrl',
+    'memento'
   ],
 
   exports: [
     'dblclick',
     'filteredTableColumns',
-    'serviceName'
+    'serviceName',
+    'currentMemento as memento'
   ],
 
   properties: [
@@ -183,7 +186,8 @@ foam.CLASS({
           dao: this.serviceName
         };
       }
-    }
+    },
+    'currentMemento'
   ],
 
   actions: [
@@ -228,9 +232,16 @@ foam.CLASS({
       this.onDetach(this.cannedPredicate$.sub(() => {
         this.searchPredicate = foam.mlang.predicate.True.create();
       }));
+
+      this.currentMemento$ = this.memento.tail$;
     },
     function dblclick(obj, id) {
       if ( ! this.stack ) return;
+
+      // this.memento.feedback_ = true;
+      this.memento.tail = this.Memento.create({ head: id });
+      this.memento.tail.parent = this.memento;
+
       this.stack.push({
         class: 'foam.comics.v2.DAOSummaryView',
         data: obj,

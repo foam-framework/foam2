@@ -250,7 +250,7 @@ foam.CLASS({
                   .endContext()
                   .start(self.Cols).style({ 'align-items': 'center' })
                     .start()
-                      .add(data.toSummary())
+                      .add(data && data.toSummary() ? data.toSummary() : "")
                       .addClass(self.myClass('account-name'))
                       .addClass('truncate-ellipsis')
                     .end()

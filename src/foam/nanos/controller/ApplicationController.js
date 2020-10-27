@@ -297,7 +297,6 @@ foam.CLASS({
     'currentMenu',
     'lastMenuLaunched',
     'webApp',
-    'currentMemento'
   ],
 
   methods: [
@@ -310,9 +309,9 @@ foam.CLASS({
       var self = this;
 
       // Start Memento Support
-      //old code here
-      var hash = this.WindowHash.create();
-      hash.value$ = this.memento.value$;
+      // old code here
+      // var hash = this.WindowHash.create();
+      // hash.value$ = this.memento.value$;
 
       //new code
       this.WindowHash.create({value$: this.memento.value$});

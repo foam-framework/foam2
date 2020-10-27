@@ -17,7 +17,7 @@
   exports: [
     'as summaryView',
     'dblclick',
-    'memento'
+    'currentMemento as memento'
   ],
 
   requires: [
@@ -200,13 +200,19 @@
     function init() {
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.updateCount })));
       this.updateCount();//check memento
+
+      this.currentMemento_$ = this.memento.tail$;
       
       if ( this.memento.tail ) {
+        var id = parseInt(this.memento.tail.head);
+        if ( ! id ) {
+          id = this.memento.tail.head;
+        }
         this.stack.push({
           class: 'foam.comics.v2.DAOSummaryView',
           data: null,
           config: this.config,
-          id: this.memento.tail.head
+          id: id
         }, this);
       }
     },

@@ -24,19 +24,21 @@ foam.CLASS({
     'foam.comics.DAOUpdateController',
     'foam.log.LogLevel',
     'foam.u2.ControllerMode',
-    'foam.u2.DisplayMode'
-    
+    'foam.u2.DisplayMode',
+    'foam.nanos.controller.Memento'
   ],
 
   imports: [
     'stack',
     'notify',
-    'dao? as importedDAO'
+    'dao? as importedDAO',
+    'memento'
   ],
 
   exports: [
     'controllerMode',
-    'data'
+    'data',
+    'currentMemento as memento'
   ],
 
   css: `
@@ -109,7 +111,8 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.u2.Element',
       name: 'detailViewElement_'
-    }
+    },
+    'currentMemento'
   ],
 
   reactions: [
@@ -119,6 +122,9 @@ foam.CLASS({
 
   methods: [
     function initE() {
+
+      this.currentMemento$ = this.memento.tail$;
+
       /* Doesn't work because obj isn't known yet.
       this.startContext({data: this.data.obj})
         .add(this.data.dao.of.getAxiomsByClass(foam.core.Action))
@@ -169,15 +175,18 @@ foam.CLASS({
     {
       name: 'cancel',
       code: function() {
+        this.currentMemento = null;
         this.stack.back();
       }
     },
     {
       name: 'edit',
       isAvailable: function(controllerMode, editEnabled) {
+        this.currentMemento.tail = this.Memento.create({ head: 'Edit' });
         return editEnabled && controllerMode === this.ControllerMode.VIEW;
       },
       code: function() {
+        //initalize me
         this.controllerMode = this.ControllerMode.EDIT;
         var newE = this.container_.createChild_(this.detailView, {
           of: this.dao.of,
