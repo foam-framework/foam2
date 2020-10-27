@@ -16,15 +16,14 @@ import foam.nanos.auth.AuthService;
 import foam.nanos.auth.User;
 import foam.nanos.fs.File;
 import foam.util.SafetyUtil;
-import org.apache.commons.io.IOUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.util.Base64;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.IOUtils;
 
 public class FileService
-    extends HttpBlobService
+  extends HttpBlobService
 {
   protected DAO fileDAO_;
 
@@ -39,16 +38,16 @@ public class FileService
 
   @Override
   protected void download(X x) {
-    Blob blob = null;
-    OutputStream os = null;
-    HttpServletRequest  req  = x.get(HttpServletRequest.class);
-    HttpServletResponse resp = x.get(HttpServletResponse.class);
-    AuthService auth         = (AuthService) x.get("auth");
-    AppConfig appConfig      = (AppConfig) x.get("appConfig");
+    Blob                blob      = null;
+    OutputStream        os        = null;
+    HttpServletRequest  req       = x.get(HttpServletRequest.class);
+    HttpServletResponse resp      = x.get(HttpServletResponse.class);
+    AuthService         auth      = (AuthService) x.get("auth");
+    AppConfig           appConfig = (AppConfig) x.get("appConfig");
 
     try {
       String path = req.getRequestURI();
-      String id = path.replaceFirst("/service/" + name_ + "/", "");
+      String id   = path.replaceFirst("/service/" + name_ + "/", "");
 
       // find file from file dao
       File file = (File) fileDAO_.find_(x, id);
@@ -65,7 +64,6 @@ public class FileService
         file.setDataString("data:text/html;base64," + encodedString);
       }
 
-
       // TODO: Add better ACL support for files.  In the meantime,
       // fileDAO has been decorated to disallow enumeration and File
       // IDs are unguessable cryptographically strong UUIDs, so no
@@ -80,6 +78,7 @@ public class FileService
       } else {
         blob = file.getData();
       }
+
       long size = blob.getSize();
 
       // set response status, content type, content length
