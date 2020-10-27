@@ -52,7 +52,9 @@ public class EmailsUtility {
     if ( theme == null ) {
       Subject subject = new Subject.Builder(x).setUser(user).build();
       theme = ((Themes) x.get("themes")).findTheme(x.put("subject", subject));
-      appConfig = theme.getAppConfig();
+      if ( theme.getAppConfig() != null ) {
+        appConfig.copyFrom(theme.getAppConfig());
+      }
     }
 
     // Add template name to templateArgs, to avoid extra parameter passing

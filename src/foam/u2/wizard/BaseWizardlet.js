@@ -19,6 +19,13 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'id',
+      class: 'String',
+      factory: function () {
+        return foam.uuid.randomGUID();
+      }
+    },
+    {
       name: 'of',
       class: 'Class'
     },

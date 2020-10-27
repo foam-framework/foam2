@@ -51,7 +51,7 @@ foam.CLASS({
   `,
 
   messages: [
-    { name: 'PENDING_APPROVAL', message: 'Capability pending approval.' }
+    { name: 'PENDING_APPROVAL', message: 'Capability pending approval' }
   ],
 
   axioms: [

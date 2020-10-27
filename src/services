@@ -517,7 +517,7 @@ p({
   """
     return new foam.nanos.auth.AuthorizationDAO.Builder(x)
       .setDelegate((foam.dao.DAO) x.get("localServiceProviderDAO"))
-      .setAuthorizer(new foam.nanos.auth.StandardAuthorizer("capability"))
+      .setAuthorizer(new foam.nanos.auth.StandardAuthorizer("serviceprovider"))
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.auth.ServiceProvider\"}"
@@ -1027,6 +1027,8 @@ p({
     }
   """
 })
+
+p({
   "class":"foam.nanos.boot.NSpec",
   "name":"localSettingDAO",
   "lazy":false,

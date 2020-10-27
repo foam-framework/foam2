@@ -94,6 +94,12 @@ foam.CLASS({
       class: 'foam.mlang.ExprProperty',
       hidden: true,
       javaJSONParser: 'foam.lib.json.ExprParser.instance()',
+    },
+    {
+      name: 'isUnitValueProperty',
+      class: 'Boolean',
+      hidden: true,
+      documentation: 'set to true if the prop is an instance of Unit Value property'
     }
   ]
 });

@@ -250,10 +250,6 @@ foam.CLASS({
       }
     },
     {
-      name: 'dataChangedFlag',
-      class: 'Boolean'
-    },
-    {
       name: 'subStack',
       factory: function() {
         return foam.nanos.approval.NoBackStack.create({delegate: this.stack});
@@ -409,8 +405,6 @@ foam.CLASS({
          */
           var view = this;
 
-          dao.on.sub(view.changeFlag);
-
           var modelActions = view.of.getAxiomsByClass(foam.core.Action);
           var actions = Array.isArray(view.contextMenuActions)
             ? view.contextMenuActions.concat(modelActions)
@@ -418,7 +412,7 @@ foam.CLASS({
 
           //with this code error created  slot.get cause promise return
           //FIX ME
-          return this.slot(function(data, data$delegate, dataChangedFlag, order, updateValues) {
+          return this.slot(function(data, data$delegate, order, updateValues) {
             // Make sure the DAO set here responds to ordering when a user clicks
             // on a table column header to sort by that column.
             if ( this.order ) dao = dao.orderBy(this.order);
@@ -617,14 +611,6 @@ foam.CLASS({
         var propertyNamesToQuery = columns_.length === 0 ? columns_ : [ 'id' ].concat(obj.filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(obj, columns_).filter(c => ! foam.core.Action.isInstance(obj.of.getAxiomByName(obj.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c)))).map(c => obj.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c)));
         return obj.columnConfigToPropertyConverter.returnPropertyColumnMappings(obj.of, propertyNamesToQuery);
       }
-  ],
-  listeners: [
-    {
-      name: 'changeFlag',
-      code: function() {
-        this.dataChangedFlag = !this.dataChangedFlag;
-      }
-    },
   ]
 });
 

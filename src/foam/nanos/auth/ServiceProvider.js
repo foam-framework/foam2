@@ -49,6 +49,19 @@ foam.CLASS({
         return "*".equals(getId()) ? "Global Service Provider Capability" :
           getId().substring(0, 1).toUpperCase() + getId().substring(1) + " Service Provider Capability";
       `
+    },
+    {
+      name: 'permissionsGranted',
+      transient: true,
+      javaGetter: `
+        String[] perms = new String[permissionsGranted_.length + 1];
+        for ( int i = 0 ; i < permissionsGranted_.length ; i++ ) {
+          perms[i] = permissionsGranted_[i];
+        }
+        perms[permissionsGranted_.length] = "serviceprovider.read." + getId();
+        return perms;
+      `,
+      hidden: true
     }
   ],
 
