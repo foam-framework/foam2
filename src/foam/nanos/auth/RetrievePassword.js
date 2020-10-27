@@ -37,6 +37,10 @@ foam.CLASS({
     }
   ],
 
+  css: `
+
+  `,
+
   properties: [
     {
       class: 'EMail',
@@ -80,6 +84,13 @@ foam.CLASS({
           }));
         });
       }
+    }
+  ],
+
+  methods: [
+    function initE() {
+      this.add(this.EMAIL)
+        .start('p').add('vasyan').end();
     }
   ]
 });

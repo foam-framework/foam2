@@ -369,7 +369,7 @@ foam.CLASS({
                 e.REG_EXP(self, /\S+@\S+\.\S+/)
               );
             },
-            errorString: 'Please enter valid email address'
+            errorString: 'Valid email required'
           }
         ];
         if ( this.required ) {
@@ -379,7 +379,7 @@ foam.CLASS({
               predicateFactory: function(e) {
                 return e.NEQ(self, '');
               },
-              errorString: 'Please enter email address'
+              errorString: 'Enter email address'
             }
           );
         }
