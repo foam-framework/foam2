@@ -184,7 +184,7 @@ foam.CLASS({
   actions: [
     {
       name: 'login',
-      label: 'Get Started',
+      label: 'Get started',
       isEnabled: function(errors_, isLoading_) {
         return ! errors_ && ! isLoading_;
       },
