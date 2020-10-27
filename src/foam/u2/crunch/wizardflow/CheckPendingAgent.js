@@ -24,6 +24,10 @@ foam.CLASS({
     'userCapabilityJunctionDAO'
   ],
 
+  exports: [
+    'cancelled'
+  ],
+
   requires: [
     'foam.log.LogLevel',
     'foam.nanos.crunch.AgentCapabilityJunction',
@@ -31,10 +35,17 @@ foam.CLASS({
     'foam.nanos.crunch.UserCapabilityJunction'
   ],
 
+  properties: [
+    {
+      name: 'cancelled',
+      class: 'Boolean'
+    }
+  ],
+
   messages: [
-    { name: 'CANNOT_OPEN_GRANTED', message: 'This capability has already been granted to you.' },
-    { name: 'CANNOT_OPEN_PENDING', message: 'This capability is awaiting approval, updates are not permitted at this time.' },
-    { name: 'CANNOT_OPEN_ACTION_PENDING', message: 'This capability is awaiting review, updates are not permitted at this time.' }
+    { name: 'CANNOT_OPEN_GRANTED', message: 'This capability has already been granted to you' },
+    { name: 'CANNOT_OPEN_PENDING', message: 'This capability is awaiting approval, updates are not permitted at this time' },
+    { name: 'CANNOT_OPEN_ACTION_PENDING', message: 'This capability is awaiting review, updates are not permitted at this time' }
   ],
 
   methods: [
@@ -66,6 +77,7 @@ foam.CLASS({
         if ( ! shouldReopen ) {
           var message = statusPending ? this.CANNOT_OPEN_PENDING : this.CANNOT_OPEN_GRANTED;
           this.ctrl.notify(message, '', this.LogLevel.INFO, true);
+          this.cancelled = true;
           this.endSequence();
           return;
         }
@@ -73,6 +85,7 @@ foam.CLASS({
       if ( shouldReopen && this.capabilities.length < 1 ) {
         // This is here because of a CertifyDataReviewed capability.
         this.ctrl.notify(this.CANNOT_OPEN_ACTION_PENDING);
+        this.cancelled = true;
         this.endSequence();
       }
     }

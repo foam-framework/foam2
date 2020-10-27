@@ -210,8 +210,8 @@ foam.CLASS({
           .add(this.SUBTITLE)
         .end()
         .add(self.renderFeatured())
-        .add(self.accountAndAccountingCard())
         // NOTE: TEMPORARILY REMOVED
+        // .add(self.accountAndAccountingCard())
         // .start(self.Tabs)
         //   .start(self.Tab, { label: this.TAB_ALL, selected: true })
         //     .add(self.renderFeatured())

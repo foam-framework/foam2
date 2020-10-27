@@ -14,6 +14,7 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.Sink',
@@ -120,10 +121,10 @@ foam.CLASS({
       user will lose permissions implied by this capability and upper level capabilities will ignore this prerequisite`
     },
     {
-      name: 'visible',
-      class: 'Boolean',
-      documentation: `Hide sub-capabilities which aren't top-level and individually selectable. when true, capability is visible to the user`,
-      section: 'uiSettings'
+      name: 'visible',	
+      class: 'Boolean',	
+      documentation: `Hide sub-capabilities which aren't top-level and individually selectable. when true, capability is visible to the user`,	
+      section: 'uiSettings'	
     },
     {
       name: 'expiry',
@@ -368,8 +369,9 @@ foam.CLASS({
           for ( var capId : prereqs ) {
             var cap = (Capability) capabilityDAO.find(capId);
             if ( cap == null || ! cap.getEnabled() ) continue;
-
-            UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(x, capId, subject);
+            
+            X subjectContext = x.put("subject", subject);
+            UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(subjectContext, capId, subject);
             if ( ucJunction == null ) {
               return CapabilityJunctionStatus.ACTION_REQUIRED;
             }

@@ -20,7 +20,7 @@ p({"class":"foam.nanos.auth.Region", "code":"BE-WLG", "name":"Liège", "countryI
 p({"class":"foam.nanos.auth.Region", "code":"BE-WLX", "name":"Luxembourg", "countryId":"BE"})
 p({"class":"foam.nanos.auth.Region", "code":"BE-WNA", "name":"Namur", "countryId":"BE"})
 p({"class":"foam.nanos.auth.Region", "code":"BE-WBR", "name":"Walloon Brabant", "countryId":"BE"})
-p({"class":"foam.nanos.auth.Region", "code":"BE-BBR", "name":"Brussels Capital Region", "countryId":"BE"})
+p({"class":"foam.nanos.auth.Region", "code":"BE-BRU", "name":"Brussels Capital Region", "countryId":"BE"})
 
 // Brazil
 p({"class":"foam.nanos.auth.Region", "code":"BR-AC", "name": "Acre", "countryId":"BR"})
@@ -490,6 +490,29 @@ p({"class":"foam.nanos.auth.Region", "code":"ES-MD", "name":"Madrid", "countryId
 p({"class":"foam.nanos.auth.Region", "code":"ES-MC", "name":"Murcia", "countryId":"ES"})
 p({"class":"foam.nanos.auth.Region", "code":"ES-NC", "name":"Navarra", "countryId":"ES"})
 p({"class":"foam.nanos.auth.Region", "code":"ES-VC", "name":"Valencia", "countryId":"ES"})
+
+// Sweden
+p({"class":"foam.nanos.auth.Region", "code":"SE-BL", "name":"Blekinge", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-GV", "name":"Gävleborg", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-KO", "name":"Dalarna", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-GT", "name":"Gotland", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-HA", "name":"Halland", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-JA", "name":"Jämtland", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-JO", "name":"Jönköping", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-KA", "name":"Kalmar", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-KR", "name":"Kronoberg", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-NB", "name":"Norrbotten", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-OR", "name":"Örebro", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-OG", "name":"Östergötland", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-SN", "name":"Skåne", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-SD", "name":"Södermanland", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-ST", "name":"Stockholm", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-UP", "name":"Uppsala", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-VR", "name":"Värmland", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-VB", "name":"Västerbotten", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-VN", "name":"Västernorrland", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-VM", "name":"Västmanland", "countryId":"SE"})
+p({"class":"foam.nanos.auth.Region", "code":"SE-VG", "name":"Västra Götaland", "countryId":"SE"})
 
 // USA
 p({"class":"foam.nanos.auth.Region", "code":"US-AL", "name": "Alabama", "countryId":"US"})

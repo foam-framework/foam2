@@ -39,9 +39,14 @@ foam.CLASS({
       javaValue: `JacksonFactory.getDefaultInstance()`
     },
     {
-      name: 'SCOPES',
+      name: 'DRIVE_FILE',
       javaType: 'List<String>',
       javaValue: `Collections.singletonList(SheetsScopes.DRIVE_FILE)`
+    },
+    {
+      name: 'READ_AND_EDIT_ALL_SCOPES',
+      javaType: 'List<String>',
+      javaValue: `Collections.singletonList(SheetsScopes.DRIVE)`
     },
     {
       name: 'COLUMN_TITLES_ROW_INDEX',
@@ -134,7 +139,7 @@ foam.CLASS({
       javaCode: `
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
-        Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, SCOPES))
+        Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, READ_AND_EDIT_ALL_SCOPES))
           .setApplicationName("nanopay")
           .build();
       
@@ -191,7 +196,7 @@ foam.CLASS({
             .setProperties(new DimensionProperties().setPixelSize(metadata[i].getColumnWidth()))
             .setFields("pixelSize")));
 
-          if ( metadata[i].getCellType().equals("") || metadata[i].getCellType().equals("STRING") || metadata[i].getCellType().equals("ENUM") || metadata[i].getCellType().equals("BOOLEAN") )
+          if ( metadata[i].getCellType().equals("") || metadata[i].getCellType().equals("STRING") || metadata[i].getCellType().equals("ARRAY") || metadata[i].getCellType().equals("ENUM") || metadata[i].getCellType().equals("BOOLEAN") )
             continue;
 
           RepeatCellRequest req = new RepeatCellRequest().setRange(new GridRange().setStartRowIndex(COLUMN_TITLES_ROW_INDEX).setStartColumnIndex(i).setEndColumnIndex(i+1))
@@ -365,6 +370,7 @@ foam.CLASS({
         List<Integer> indexesOfUnitPropertyName = new ArrayList<Integer>();
         for ( int i = 0 ; i < metadata.length ; i++ ) {
           propertyNames.add(metadata[i].getPropName());
+          metadata[i].setProjectionIndex(propertyNames.size() - 1);
           if ( metadata[i].getCellType().equals("CURRENCY") ) {
             propertyNames.add(metadata[i].getUnitPropName());
             indexesOfUnitValuePropertyName.add(propertyNames.size() - 2);
@@ -392,6 +398,191 @@ foam.CLASS({
         TableColumnOutputter outputter = new TableColumnOutputter();
         return outputter.returnTableForMetadata(x, metadata, values);
       `
-    }
+    },
+    {
+      name: 'getFormatedValues',
+      type: 'Object',
+      javaType: 'ValueRange',
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'spreadsheetId',
+          type: 'String'
+        },
+        {
+          name: 'range',
+          type: 'String'
+        }
+      ],
+      javaThrows: [ 'java.io.IOException', 'java.security.GeneralSecurityException' ],
+      javaCode: `
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
+        Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, READ_AND_EDIT_ALL_SCOPES))
+          .setApplicationName("nanopay")
+          .build();
+        Sheets.Spreadsheets.Values.Get request = service.spreadsheets().values()
+          .get(spreadsheetId, range)
+          .setValueRenderOption("FORMATTED_VALUE")
+          .setDateTimeRenderOption("FORMATTED_STRING");
+
+        ValueRange response = request.execute();
+
+        return response;
+      `
+    },
+    {
+      name: 'createAndExecuteBatchUpdateWithListOfValuesForCellsRange',
+      javaType: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'sheetId',
+          javaType: 'String'
+        },
+        {
+          name: 'values',
+          javaType: 'List<List<List<Object>>>'
+        },
+        {
+          name: 'cellsRanges',
+          javaType: 'List<String>'
+        }
+      ],
+      javaThrows: [ 'java.io.IOException', 'java.security.GeneralSecurityException' ],
+      javaCode: `
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        GoogleApiAuthService googleApiAuthService = (GoogleApiAuthService)getX().get("googleApiAuthService");
+        Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleApiAuthService.getCredentials(x, HTTP_TRANSPORT, READ_AND_EDIT_ALL_SCOPES))
+          .setApplicationName("nanopay")
+          .build();
+
+        List<ValueRange> data = new ArrayList<>();
+        for ( int i = 0 ; i < cellsRanges.size() ; i++ ) {
+          data.add(new ValueRange()
+            .setRange(cellsRanges.get(i))
+            .setValues(values.get(i)));
+        }
+        
+        BatchUpdateValuesRequest batchBody = new BatchUpdateValuesRequest()
+          .setValueInputOption("USER_ENTERED")
+          .setData(data);
+  
+        BatchUpdateValuesResponse batchResult = service.spreadsheets().values()
+          .batchUpdate(sheetId, batchBody)
+          .execute();
+        return true;
+      `
+    },
+    {
+      name: 'createSheetAndPopulateWithFrontEndData',
+      type: 'String',
+      javaThrows: [ 'java.lang.Exception' ],
+      async: true,
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'obj',
+          javaType: 'Object'
+        },
+        {
+          name: 'metadataObj',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
+          javaType: 'Object'
+        },
+        {
+          name: 'extraConfig',
+          type: 'Object',
+          javaType: 'foam.nanos.export.GoogleSheetsServiceConfig'
+        }
+      ],
+      javaCode: `
+        try {
+          List<List<Object>> data = new ArrayList<>();
+          Object[] metadataArr = (Object[])metadataObj;
+    
+          GoogleSheetsPropertyMetadata[] metadata = new GoogleSheetsPropertyMetadata[metadataArr.length];
+          for ( int i = 0 ; i < metadata.length ; i++ ) {
+            metadata[i] = (GoogleSheetsPropertyMetadata)metadataArr[i];
+          }
+    
+          Object[] arr = (Object[]) obj;
+          for ( Object v : arr ) {
+            data.add(Arrays.asList((Object[])v));
+          }
+
+          GoogleDriveService googleDriveService = (GoogleDriveService) getX().get("googleDriveService");
+          String folderId = googleDriveService.createFolderIfNotExists(x, "Nanopay Export");
+          String fileName = extraConfig == null || SafetyUtil.isEmpty(extraConfig.getTitle()) ? ("NanopayExport" + new Date()) : extraConfig.getTitle();
+          String fileId = googleDriveService.createFile(x, folderId, fileName);
+    
+          return populateWithDataSheetWithId(x, fileId, data, metadata, extraConfig);
+        } catch ( Throwable t ) {
+          Logger l = (Logger) getX().get("logger");
+          l.error(t);
+          return "";
+        }
+      `
+    },
+    {
+      name: 'createSheetByCopyingTemplateAndFronEndData',
+      javaType: 'String',
+      javaThrows: [ 'java.lang.Exception' ],
+      async: true,
+      args: [
+        {
+          name: 'x',
+          type: 'Context',
+        },
+        {
+          name: 'obj',
+          javaType: 'Object'
+        },
+        {
+          name: 'metadataObj',
+          type: 'foam.nanos.export.GoogleSheetsPropertyMetadata[]',
+          javaType: 'Object'
+        },
+        {
+          name: 'extraConfig',
+          type: 'foam.nanos.export.GoogleSheetsServiceConfig'
+        }
+      ],
+      javaCode: `
+      try {
+        List<List<Object>> data = new ArrayList<>();
+        Object[] metadataArr = (Object[])metadataObj;
+        GoogleSheetsPropertyMetadata[] metadata = new GoogleSheetsPropertyMetadata[metadataArr.length];
+  
+        for ( int i = 0 ; i < metadata.length ; i++ ) {
+          metadata[i] = (GoogleSheetsPropertyMetadata)metadataArr[i];
+        }
+  
+        Object[] arr = (Object[]) obj;
+        for ( Object v : arr ) {
+          data.add(Arrays.asList((Object[])v));
+        }
+
+        GoogleDriveService googleDriveService = (GoogleDriveService) getX().get("googleDriveService");
+        String folderId = googleDriveService.createFolderIfNotExists(x, "Nanopay Export");
+        String fileName = extraConfig == null || SafetyUtil.isEmpty(extraConfig.getTitle()) ? ("NanopayExport" + new Date()) : extraConfig.getTitle();
+        String fileId = googleDriveService.createAndCopyFromFile(x, folderId, fileName, extraConfig.getTemplate());
+        return populateWithDataSheetWithId(x, fileId, data, metadata, extraConfig);
+      } catch ( Throwable t ) {
+        Logger l = (Logger) getX().get("logger");
+        l.error(t);
+        return "";
+      }
+      `
+    },
   ]
 });

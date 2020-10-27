@@ -447,7 +447,13 @@ var classes = [
   'foam.nanos.google.api.auth.GoogleApiAuthService',
   'foam.nanos.google.api.auth.GoogleApiCredentials',
   'foam.nanos.google.api.drive.GoogleDriveService',
+  'foam.nanos.google.api.sheets.ColumnHeaderToPropertyMapping',
   'foam.nanos.google.api.sheets.GoogleSheetsApiService',
+  'foam.nanos.google.api.sheets.GoogleSheetsDataImportService',
+  'foam.nanos.google.api.sheets.GoogleSheetsDataImportServiceImpl',
+  'foam.nanos.google.api.sheets.GoogleSheetsImportConfig',
+  'foam.nanos.google.api.sheets.GoogleSheetsTransactionsDataImportServiceImpl',
+  'foam.nanos.google.api.sheets.ImportDataMessage',
   'foam.dao.jdbc.ConnectionPool',
   'foam.lib.Outputter',
   'foam.lib.PropertyPredicate',
@@ -651,6 +657,7 @@ var classes = [
   'foam.nanos.crunch.lite.CapablePayload',
   'foam.nanos.crunch.lite.CapablePayloadStatusDAO',
   'foam.nanos.crunch.lite.CapableCompatibleCapability',
+  'foam.nanos.crunch.CapabilityAvailabilityDAO',
 
   'foam.nanos.crunch.lite.ruler.CapableCreateApprovalsRuleAction',
   'foam.nanos.crunch.lite.ruler.ReputDependantPayloads',
@@ -663,11 +670,11 @@ var classes = [
   'foam.nanos.crunch.CapabilityJunctionStatus',
   'foam.nanos.crunch.UserCapabilityJunction',
   'foam.nanos.crunch.ui.CapabilityWizardlet',
+  'foam.nanos.crunch.ui.ReviewCapabilityWizardlet',
   'foam.nanos.crunch.ui.MinMaxCapabilityWizardlet',
   'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
   'foam.nanos.crunch.AssociatedEntity',
-  'foam.nanos.crunch.CapabilityAvailabilityDAO',
   'foam.nanos.crunch.RenewableData',
 
   'foam.nanos.crunch.connection.CapabilityPayload',
@@ -693,6 +700,11 @@ var classes = [
   'foam.nanos.crunch.ruler.SetUCJStatusOnPut',
   'foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted',
   'foam.nanos.crunch.ruler.SaveUCJDataOnGranted',
+
+  //crunch extras
+  'foam.nanos.crunch.extra.ReviewCapability',
+  'foam.nanos.crunch.extra.ReviewCapabilityData',
+
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
   // userQueryService
@@ -762,6 +774,7 @@ var skeletons = [
   'foam.strategy.StrategizerService',
   'foam.nanos.auth.UserQueryService',
   'foam.nanos.export.GoogleSheetsExport',
+  'foam.nanos.google.api.sheets.GoogleSheetsDataImportService',
   'foam.nanos.crunch.CrunchService',
   'foam.i18n.TranslationService'
 ];

@@ -186,8 +186,7 @@
 
   reactions: [
     ['', 'propertyChange.currentTopPage_', 'updateRenderedPages_'],
-    ['', 'propertyChange.table_', 'updateRenderedPages_'],
-    ['', 'propertyChange.daoCount', 'refresh'],
+    ['', 'propertyChange.table_',          'updateRenderedPages_']
   ],
 
   methods: [
@@ -221,7 +220,7 @@
         take the whole page (i.e. we need multiple tables)
         and enableDynamicTableHeight can be switched off
       */
-      if (this.enableDynamicTableHeight) {
+      if ( this.enableDynamicTableHeight ) {
         this.onDetach(this.onload.sub(this.updateTableHeight));
         window.addEventListener('resize', this.updateTableHeight);
         this.onDetach(() => {
@@ -250,6 +249,7 @@
       code: function() {
         return this.data$proxy.select(this.Count.create()).then((s) => {
           this.daoCount = s.value;
+          this.refresh();
         });
       }
     },

@@ -66,30 +66,30 @@ foam.CLASS({
   ],
 
   exports: [
-    'displayWidth',
     'agent',
     'appConfig',
     'as ctrl',
+    'crunchController',
     'currentMenu',
+    'displayWidth',
     'group',
     'lastMenuLaunched',
     'lastMenuLaunchedListener',
     'loginSuccess',
+    'loginVariables',
     'mementoTail as memento',
-    'theme',
     'menuListener',
     'notify',
     'pushMenu',
     'requestLogin',
+    'sessionTimer',
     'signUpEnabled',
-    'loginVariables',
     'stack',
     'subject',
+    'theme',
     'user',
     'webApp',
-    'wrapCSS as installCSS',
-    'sessionTimer',
-    'crunchController'
+    'wrapCSS as installCSS'
   ],
 
   constants: {
@@ -137,7 +137,7 @@ foam.CLASS({
   messages: [
     { name: 'GROUP_FETCH_ERR', message: 'Error fetching group' },
     { name: 'GROUP_NULL_ERR', message: 'Group was null' },
-    { name: 'LOOK_AND_FEEL_NOT_FOUND', message: 'Could not fetch look and feel object.' },
+    { name: 'LOOK_AND_FEEL_NOT_FOUND', message: 'Could not fetch look and feel object' },
     { name: 'LANGUAGE_FETCH_ERR', message: 'Error fetching language' },
   ],
 
@@ -310,8 +310,7 @@ foam.CLASS({
       var self = this;
 
       // Start Memento Support
-      var hash = this.WindowHash.create();
-      this.memento.value$ = hash.value$
+      this.WindowHash.create({value$: this.memento.value$});
 
       this.memento.head$.sub(this.mementoChange);
       this.mementoChange();
@@ -398,8 +397,6 @@ foam.CLASS({
 
     async function fetchLanguage() {
       try {
-        let l = localStorage.getItem('localeLanguage');
-        if ( l !== undefined ) foam.locale = l;
         //TODO manage more complicated language. 'en-CA'
         if ( foam.locale !== 'en' && foam.locale !== 'en-US' ) {
           let ctx = this.__subContext__;

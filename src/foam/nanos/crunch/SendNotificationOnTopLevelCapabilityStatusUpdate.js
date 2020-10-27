@@ -35,7 +35,9 @@ foam.CLASS({
           Capability cap = (Capability) junction.findTargetId(x);
           User user = (User) junction.findSourceId(x);
 
-          if ( cap == null || ! cap.getVisible() ) return;
+          // visible checks if the capability is a top-level capability
+          // and availabilitypredicate checks if the user has access to the capability
+          if ( cap == null || ! ( cap.getVisible() && cap.getAvailabilityPredicate().f(x) ) ) return;
 
           DAO notificationDAO = (DAO) x.get("notificationDAO");
 

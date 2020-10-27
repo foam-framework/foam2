@@ -77,8 +77,9 @@ foam.CLASS({
   ],
 
   methods: [
-    function createWizardSequence(capabilityOrId) {
-      return this.Sequence.create(null, this.__subContext__.createSubContext({
+    function createWizardSequence(capabilityOrId, x) {
+      if ( ! x ) x = this.__subContext__;
+      return this.Sequence.create(null, x.createSubContext({
         rootCapability: capabilityOrId
       }))
         .add(this.ConfigureFlowAgent)
@@ -120,9 +121,16 @@ foam.CLASS({
       let p = Promise.resolve();
 
       // Intercept view for regular user capability options
-      if ( intercept.capabilityOptions.length > 0 ) {
+      console.log('intercept', intercept)
+      if ( intercept.capabilityOptions.length > 1 ) {
         p = p.then(() => {
           return self.maybeLaunchInterceptView(intercept);
+        });
+      }
+      else if ( intercept.capabilityOptions.length > 0 ) {
+        p = p.then(() => {
+          return self.createWizardSequence(intercept.capabilityOptions[0])
+            .execute();
         });
       }
 
@@ -131,13 +139,19 @@ foam.CLASS({
       // Wizard for Capable objects and required user capabilities
       // (note: no intercept view; this case immediately invokes a wizard)
       if ( isCapable ) {
-        p = p.then(() => self.launchCapableWizard(intercept));
+        p = p.then(x => {
+          if ( ! x || x.submitted ) {
+            return self.launchCapableWizard(intercept);
+          }
+          return x;
+        });
       }
       
-      p = p.then(isCompleted => {
-        intercept.capableRequirements[0].isWizardCompleted = isCompleted;
+      p = p.then(x => {
+        var isCompleted = x.submitted || x.cancelled;
 
         if ( isCapable ) {
+          intercept.capableRequirements[0].isWizardCompleted = isCompleted;
           if ( ! isCompleted ) {
             intercept.resolve(intercept.capableRequirements[0]);
             return;
@@ -188,7 +202,7 @@ foam.CLASS({
               data: intercept,
               onClose: (x) => {
                 x.closeDialog();
-                resolve();
+                resolve(x);
               }
             })
         );
@@ -257,7 +271,7 @@ foam.CLASS({
         var seq = this.createCapableWizardSequence(intercept, capable);
         p = p.then(() => {
           return seq.execute().then(x => {
-            return x.submitted;
+            return x;
           });
         });
       })

@@ -171,7 +171,17 @@ foam.CLASS({
       name: 'serviceName',
       class: 'String',
       factory: function() {
-        return this.data.serviceName;
+        return this.data && this.data.serviceName ? this.data.serviceName : this.config.daoKey;
+      }
+    },
+    {
+      name: 'importModal',
+      factory: function() {
+        return {
+          class: 'foam.nanos.google.api.sheets.ImportFromGoogleSheetsForm',
+          of: this.config.of,
+          dao: this.serviceName
+        };
       }
     }
   ],
@@ -200,7 +210,16 @@ foam.CLASS({
         this.config.dao.cmd_(X, foam.dao.AbstractDAO.RESET_CMD);
         this.ctrl.notify(this.REFRESH_MSG, '', this.LogLevel.INFO, true);
       }
-    }
+    },
+    {
+      name: 'import',
+      label: '',
+      toolTip: 'Import From Google Sheet',
+      // icon: 'images/export-arrow-icon.svg',//need find out where we're getting the icons
+      code: function() {
+        this.add(this.Popup.create().tag(this.importModal));
+      }
+    },
   ],
 
   methods: [
@@ -266,6 +285,9 @@ foam.CLASS({
                     .endContext()
                     .startContext({ data: self })
                       .start(self.EXPORT, { buttonStyle: 'SECONDARY' })
+                        .addClass(self.myClass('export'))
+                      .end()
+                      .start(self.IMPORT, { buttonStyle: 'SECONDARY', icon: 'images/export-arrow-icon.svg', css: {'transform': 'rotate(180deg)'} })
                         .addClass(self.myClass('export'))
                       .end()
                       .start(self.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })

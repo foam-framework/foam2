@@ -8,7 +8,7 @@
 foam.CLASS({
   package: 'foam.u2.property',
   name: 'MDFloatView',
-  extends: 'foam.u2.property.MDTextField',
+  extends: 'foam.u2.property.MDInput',
 
   documentation: 'View for editing Float Properties.',
 

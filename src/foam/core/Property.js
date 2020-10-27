@@ -293,6 +293,11 @@ foam.CLASS({
       name: 'sortable',
       value: true
     },
+    {
+      class: 'Boolean',
+      name: 'sheetsOutput'
+    },
+    'valueToString',
     'unitPropValueToString',
     {
       name: 'dependsOnPropertiesWithNames',
