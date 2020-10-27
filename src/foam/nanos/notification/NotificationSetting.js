@@ -26,19 +26,19 @@ foam.CLASS({
   messages: [
     {
       name: 'LACKS_CREATE_PERMISSION',
-      message: 'You don\'t have permission to create this notification setting.'
+      message: 'You don\'t have permission to create this notification setting'
     },
     {
       name: 'LACKS_UPDATE_PERMISSION',
-      message: 'You don\'t have permission to update notification settings you do not own.'
+      message: 'You don\'t have permission to update notification settings you do not own'
     },
     {
       name: 'LACKS_DELETE_PERMISSION',
-      message: 'You don\'t have permission to delete notification settings you do not own.'
+      message: 'You don\'t have permission to delete notification settings you do not own'
     },
     {
       name: 'LACKS_READ_PERMISSION',
-      message: 'You don\'t have permission to read notification settings you do not own.'
+      message: 'You don\'t have permission to read notification settings you do not own'
     }
   ],
 

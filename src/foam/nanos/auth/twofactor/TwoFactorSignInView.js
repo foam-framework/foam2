@@ -75,7 +75,7 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'TWO_FACTOR_NO_TOKEN', message: 'Please enter a verification code.' },
+    { name: 'TWO_FACTOR_NO_TOKEN', message: 'Please enter a verification code' },
     { name: 'TWO_FACTOR_LABEL', message: 'Enter verification code' },
     { name: 'TWO_FACTOR_ERROR', message: 'Incorrect code. Please try again.' },
     { name: 'TWO_FACTOR_TITLE', message: 'Two-factor authentication' },
