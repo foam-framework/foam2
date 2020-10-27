@@ -82,19 +82,22 @@ foam.CLASS({
           type: this.type,
           data$: this.data$,
           onKey: true,
-
         }, this.inputElement$)
-        .on('focus', () => this.opacity = 1)
-        .on('blur', () => this.opacity = 0.3)
-        .addClass('full-width-input-password').end()
-        .start('img').show(this.passwordIcon$).addClass('input-image')
+          .addClass('full-width-input-password')
+          .on('focus', () => this.opacity = 1)
+          .on('blur', () => this.opacity = 0.3)
+        .end()
+
+        .start('img')
+          .show(this.passwordIcon$)
+          .addClass('input-image')
           .attr('src', this.visibilityIcon$)
           .style({ 'opacity': this.opacity$ })
-          .on('click', (e) => {
+          .on('mousedown', (e) => e.preventDefault())
+          .on('click', () => {
             this.inputElement.focus();
             this.visible();
           })
-          .on('mousedown', (e) => e.preventDefault())
         .end()
       .end();
     },
