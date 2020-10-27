@@ -28,6 +28,7 @@ foam.CLASS({
     ^ .input-image {
       --fieldSize: /*%INPUTHEIGHT%*/ 32px;
       position: absolute;
+      width: 16px;
       height: calc( var(--fieldSize) / 1.2);
       top: calc( var(--fieldSize) / 15);
       right: 1vh;
@@ -68,24 +69,34 @@ foam.CLASS({
       name: 'type',
       value: 'password'
     },
-    'inputElement'
+    'inputElement',
+    [ 'opacity', 0.3 ]
   ],
 
   methods: [
     function initE() {
       this.SUPER();
 
-      this.addClass(this.myClass()).start().
-        start(this.TextField, {
+      this.addClass(this.myClass()).start()
+        .start(this.TextField, {
           type: this.type,
           data$: this.data$,
-          onKey: true
-        }, this.inputElement$).
-        addClass('full-width-input-password').end().
-        start('img').show(this.passwordIcon$).addClass('input-image').
-          attr('src', this.visibilityIcon$).on('click', this.visible).
-        end().
-      end();
+          onKey: true,
+
+        }, this.inputElement$)
+        .on('focus', () => this.opacity = 1)
+        .on('blur', () => this.opacity = 0.3)
+        .addClass('full-width-input-password').end()
+        .start('img').show(this.passwordIcon$).addClass('input-image')
+          .attr('src', this.visibilityIcon$)
+          .style({ 'opacity': this.opacity$ })
+          .on('click', (e) => {
+            this.inputElement.focus();
+            this.visible();
+          })
+          .on('mousedown', (e) => e.preventDefault())
+        .end()
+      .end();
     },
 
     function visibleIcon(visibilityIcon, type) {
