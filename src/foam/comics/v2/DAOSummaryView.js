@@ -60,7 +60,8 @@ foam.CLASS({
 
   exports: [
     'controllerMode',
-    'as objectSummaryView'
+    'as objectSummaryView',
+    'currentMemento as memento'
   ],
 
   properties: [
@@ -110,14 +111,15 @@ foam.CLASS({
       factory: function() { 
         return () => this.stack.back();
       }
-    }
+    },
+    'currentMemento'
   ],
 
   actions: [
     {
       name: 'back',
       code: function(X, data) {
-        X.memento = null;
+        X.memento$.set(null);
         X.onBack();
       }
     },
@@ -225,6 +227,8 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.SUPER();
+
+      this.currentMemento$ = this.memento.tail$;
 
       var promise = this.data ? Promise.resolve(this.data) : this.config.dao.inX(this.__subContext__).find(this.id);
 

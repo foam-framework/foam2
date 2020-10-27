@@ -58,7 +58,8 @@ foam.CLASS({
         this.changeIndicator = ! this.changeIndicator;
         this.value = this.combine();
         this.feedback_ = false;
-      }
+      },
+      value: null
     },
     {
       name: 'parent',

@@ -17,7 +17,7 @@
   exports: [
     'as summaryView',
     'dblclick',
-    'currentMemento as memento'//
+    'memento'//currentMemento as 
   ],
 
   requires: [
@@ -202,7 +202,10 @@
       this.updateCount();//check memento
 
       this.currentMemento$ = this.memento.tail$;
-      
+    },
+
+    function initE() {
+
       if ( this.memento.tail ) {
         var id = parseInt(this.memento.tail.head);
         if ( ! id ) {
@@ -216,9 +219,7 @@
           id: id
         }, this);
       }
-    },
 
-    function initE() {
       this.
         addClass(this.myClass()).
         on('scroll', this.onScroll).
