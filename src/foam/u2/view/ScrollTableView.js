@@ -176,7 +176,7 @@
       factory: () => {
         return function(obj, id) {
           if ( ! this.stack ) return;
-          this.memento.tail = this.Memento.create({ head: id });
+          this.memento.tail$.set(this.Memento.create({ head: id }));
           this.memento.tail.parent = this.memento;
 
           this.stack.push({
@@ -207,9 +207,9 @@
     function initE() {
 
       if ( this.memento.tail ) {
-        var id = parseInt(this.memento.tail.head);
-        if ( ! id ) {
-          id = this.memento.tail.head;
+        var id = this.memento.tail.head;
+        if ( ! isNaN(id) ) {
+          id = parseInt(this.memento.tail.head);
         }
 
         this.stack.push({
