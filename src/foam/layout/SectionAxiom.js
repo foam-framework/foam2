@@ -24,6 +24,9 @@ foam.CLASS({
       name: 'subTitle'
     },
     {
+      name: 'wizardTitle'
+    },
+    {
       name: 'help'
     },
     {

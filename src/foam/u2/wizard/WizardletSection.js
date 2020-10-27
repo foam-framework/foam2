@@ -44,6 +44,13 @@ foam.CLASS({
     {
       name: 'customView',
       class: 'foam.u2.ViewSpec'
+    },
+    {
+      name: 'wizardTitle',
+      class: 'String',
+      expression: function(section) {
+        return section.wizardTitle || section.title;
+      }
     }
   ],
 
