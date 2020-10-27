@@ -38,7 +38,7 @@ foam.CLASS({
   exports: [
     'controllerMode',
     'data',
-    'currentMemento as memento'
+    'memento'//currentMemento as 
   ],
 
   css: `

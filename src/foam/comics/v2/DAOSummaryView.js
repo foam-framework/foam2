@@ -117,7 +117,7 @@ foam.CLASS({
     {
       name: 'back',
       code: function(X, data) {
-        X.memento.tail$.set(null);
+        X.memento = null;
         X.onBack();
       }
     },

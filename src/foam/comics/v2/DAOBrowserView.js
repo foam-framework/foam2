@@ -104,7 +104,7 @@ foam.CLASS({
     'dblclick',
     'filteredTableColumns',
     'serviceName',
-    'currentMemento as memento'
+    'memento'//currentMemento as 
   ],
 
   properties: [
