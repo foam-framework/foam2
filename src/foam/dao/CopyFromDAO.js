@@ -49,15 +49,17 @@ foam.CLASS({
                 @Override
                 public void put(Object obj, foam.core.Detachable sub)
                 {
+                  FObject innerObject;
+                  FObject outerObject;
                   try {
-                    FObject innerObject = (FObject) obj;
-                    FObject outerObject = (FObject) getOuterClass().newInstance();
-
+                    innerObject = (FObject) obj;
+                    outerObject = (FObject) getOuterClass().newInstance();
                     outerObject = outerObject.copyFrom(innerObject);
-                    getDelegate().put(outerObject, sub);
                   } catch ( Exception ex ) {
                     throw new RuntimeException("Cannot create new instance: " + ex.getMessage(), ex);
                   }
+
+                  getDelegate().put(outerObject, sub);
                 }
             }
           `
@@ -76,11 +78,16 @@ foam.CLASS({
                 innerId = innerId.copyFrom((FObject) id);
                 id = innerId;
             }
-            FObject innerObject = getDelegate().find_(x, id);
+          } catch ( Exception ex ) {
+            throw new RuntimeException("Cannot create new instance: " + ex.getMessage(), ex);  
+          }
           
-            // Do not attempt to convert if the object is null
-            if ( innerObject == null ) return null;
+          FObject innerObject = getDelegate().find_(x, id);
+          
+          // Do not attempt to convert if the object is null
+          if ( innerObject == null ) return null;
 
+          try {
             FObject outerObject = (FObject) getOuterClass().newInstance();
             outerObject = outerObject.copyFrom(innerObject);
             return outerObject;
@@ -100,14 +107,21 @@ foam.CLASS({
       {
         name: 'put_',
         javaCode: `
+          FObject innerObject;  
+          FObject outerObject;
           try {
-            FObject outerObject = (FObject) obj;
-            FObject innerObject = (FObject) getInnerClass().newInstance();
+            outerObject = (FObject) obj;
+            innerObject = (FObject) getInnerClass().newInstance();
             
             // Save the object as the inner object
             innerObject = innerObject.copyFrom(outerObject);
-            innerObject = getDelegate().put_(x, innerObject);
+          } catch ( Exception ex ) {
+            throw new RuntimeException("Cannot create new instance: " + ex.getMessage(), ex);  
+          }
+          
+          innerObject = getDelegate().put_(x, innerObject);
 
+          try {
             // Return the outer object
             outerObject = (FObject) getOuterClass().newInstance();
             outerObject = outerObject.copyFrom(innerObject);
