@@ -2304,7 +2304,7 @@ foam.CLASS({
   methods: [
     function buildJavaClass(cls) {
         cls.method({
-          name: 'buildTemplate',
+          name: 'build' + this.name,
           type: 'void',
           args: [
             { type: 'java.lang.StringBuilder', name: 'builder' },
