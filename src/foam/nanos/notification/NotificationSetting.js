@@ -58,8 +58,8 @@ foam.CLASS({
     {
       name: 'doNotify',
       args: [
-        { name: 'x', type: 'Context' },
-        { name: 'user', type: 'foam.nanos.auth.User' },
+        { name: 'x',            type: 'Context' },
+        { name: 'user',         type: 'foam.nanos.auth.User' },
         { name: 'notification', type: 'foam.nanos.notification.Notification' }
       ],
       javaCode: `
@@ -70,8 +70,8 @@ foam.CLASS({
     {
       name: 'sendNotification',
       args: [
-        { name: 'x', type: 'Context' },
-        { name: 'user', type: 'foam.nanos.auth.User' },
+        { name: 'x',            type: 'Context' },
+        { name: 'user',         type: 'foam.nanos.auth.User' },
         { name: 'notification', type: 'foam.nanos.notification.Notification' }
       ],
       javaCode: `
@@ -84,8 +84,7 @@ foam.CLASS({
         // We cannot permanently disable in-app notifications, so mark them read automatically
         if ( ! getEnabled() ) {
           notification.setRead(true);
-        }
-        else if ( user.getDisabledTopicSet() != null ) {
+        } else if ( user.getDisabledTopicSet() != null ) {
           HashSet<String> disabledTopicsSet = (HashSet<String>) user.getDisabledTopicSet();
           if ( disabledTopicsSet.contains(notification.getNotificationType()) ) {
             notification.setRead(true);
@@ -98,7 +97,7 @@ foam.CLASS({
         } catch (Throwable t) {
           Logger logger = (Logger) x.get("logger");
           logger.error("Failed to send notification: " + t, t);
-        };
+        }
       `
     },
     {
