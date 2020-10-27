@@ -25,7 +25,7 @@ foam.CLASS({
       value: 'defaultSession'
     },
     {
-      class: 'foam.box.SessionIDProperty',
+      class: 'foam.core.SessionIDProperty',
       name: 'sessionID'
     }
   ],
