@@ -32,6 +32,13 @@ foam.CLASS({
       height: calc( var(--fieldSize) / 1.2);
       top: calc( var(--fieldSize) / 15);
       right: 1vh;
+      opacity: 0.3;
+    }
+    ^ .full-width-input-password:focus + .input-image {
+      opacity: 1;
+    }
+    ^ .full-width-input-password:focusout + .input-image {
+      opacity: 0.3;
     }
   `,
 
@@ -69,8 +76,7 @@ foam.CLASS({
       name: 'type',
       value: 'password'
     },
-    'inputElement',
-    [ 'opacity', 0.3 ]
+    'inputElement'
   ],
 
   methods: [
@@ -84,20 +90,14 @@ foam.CLASS({
           onKey: true,
         }, this.inputElement$)
           .addClass('full-width-input-password')
-          .on('focus', () => this.opacity = 1)
-          .on('blur', () => this.opacity = 0.3)
         .end()
 
         .start('img')
           .show(this.passwordIcon$)
           .addClass('input-image')
           .attr('src', this.visibilityIcon$)
-          .style({ 'opacity': this.opacity$ })
           .on('mousedown', (e) => e.preventDefault())
-          .on('click', () => {
-            this.inputElement.focus();
-            this.visible();
-          })
+          .on('click', () => this.visible())
         .end()
       .end();
     },
