@@ -58,7 +58,7 @@ public class FileService
       }
 
       //Replace @version@ with actual foam version
-      if ( "text/html".equals(file.getMimeType() ) {
+      if ( "text/html".equals(file.getMimeType()) ) {
         String fileText = file.getText();
         fileText = fileText.replace("@VERSION@", appConfig.getVersion());
         String encodedString = Base64.getEncoder().encodeToString(fileText.getBytes());
