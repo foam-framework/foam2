@@ -49,7 +49,7 @@ foam.CLASS({
       name: 'navTitle',
       class: 'String',
       expression: function(section) {
-        return section && section.title;
+        return section && section.navTitle;
       }
     }
   ],
