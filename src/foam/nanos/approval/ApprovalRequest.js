@@ -480,15 +480,15 @@
   messages: [
     {
       name: 'SUCCESS_APPROVED',
-      message: 'You have successfully approved this request.'
+      message: 'You have successfully approved this request'
     },
     {
       name: 'SUCCESS_REJECTED',
-      message: 'You have successfully rejected this request.'
+      message: 'You have successfully rejected this request'
     },
     {
       name: 'SUCCESS_CANCELLED',
-      message: 'You have successfully cancelled this request.'
+      message: 'You have successfully cancelled this request'
     },
     {
       name: 'PENDING',

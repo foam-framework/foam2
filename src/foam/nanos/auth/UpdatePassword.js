@@ -22,7 +22,7 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'SUCCESS_MSG', message: 'Your password was successfully updated.' }
+    { name: 'SUCCESS_MSG', message: 'Your password was successfully updated' }
   ],
 
   sections: [

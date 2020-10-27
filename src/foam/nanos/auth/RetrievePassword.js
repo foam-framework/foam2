@@ -24,7 +24,7 @@ foam.CLASS({
 
   messages: [
     { name: 'INSTRUC_ONE', message: 'Password reset instructions were sent to' },
-    { name: 'INSTRUC_TWO', message: 'Please check your inbox to continue.' },
+    { name: 'INSTRUC_TWO', message: 'Please check your inbox to continue' },
     { name: 'REDIRECTION_TO', message: 'Back to Sign in' }
   ],
 
