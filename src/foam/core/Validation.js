@@ -152,7 +152,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.GTE(foam.mlang.StringLength.create({ arg1: self }), self.minLength);
             },
-            errorString: `Please enter ${this.label.toLowerCase()} with at least ${this.minLength} character${this.minLength>1?'s':''}`
+            errorString: `${this.label} should be at least ${this.minLength} character${this.minLength>1?'s':''}`
           });
         }
 
@@ -162,7 +162,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.LTE(foam.mlang.StringLength.create({ arg1: self }), self.maxLength);
             },
-            errorString: `Please enter ${this.label.toLowerCase()} with at most ${this.maxLength} character${this.maxLength>1?'s':''}`
+            errorString: `${this.label} should be at most ${this.maxLength} character${this.maxLength>1?'s':''}`
           });
         }
 
@@ -172,7 +172,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.GTE(foam.mlang.StringLength.create({ arg1: self }), 1);
             },
-            errorString: `Please enter ${this.label.toLowerCase()}`
+            errorString: `${this.label} required`
           });
         }
         return a;
@@ -410,14 +410,14 @@ foam.CLASS({
                 predicateFactory: function(e) {
                   return e.HAS(self);
                 },
-                errorString: 'Phone number required.'
+                errorString: 'Phone number required'
               },
               {
                 args: [this.name],
                 predicateFactory: function(e) {
                   return e.REG_EXP(self, PHONE_NUMBER_REGEX);
                 },
-                errorString: 'Invalid phone number.'
+                errorString: 'Invalid phone number'
               }
             ]
           : [
