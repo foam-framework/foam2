@@ -30,7 +30,7 @@ foam.CLASS({
     { name: 'FOOTER_TXT', message: 'Not a user yet?' },
     { name: 'FOOTER_LINK', message: 'Create an account' },
     { name: 'SUB_FOOTER_LINK', message: 'Forgot password?' },
-    { name: 'ERROR_MSG', message: 'There was an issue with logging in.' },
+    { name: 'ERROR_MSG', message: 'There was an issue logging in' },
     { name: 'ERROR_MSG2', message: 'Please enter email or username' }
   ],
 
