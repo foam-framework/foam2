@@ -136,10 +136,7 @@ foam.CLASS({
           .start().addClass('makeBold').translate(mainCapability[0].id+'.name', mainCapability[0].name).end()
           // subTitle
           .start().addClass('subTitle')
-            .callIf( mainCapability[0].requirementViewTitle,
-                     function(){this.translate(mainCapability[0].id + '.requirementViewTitle',mainCapability[0].requirementViewTitle)},
-                     function(){this.translate(this.INTRO_TEXT) },
-            )
+            .translate(mainCapability[0].id + '.requirementViewTitle' , mainCapability[0].requirementViewTitle || this.INTRO_TEXT)
           .end()
         .end()
       .start().addClass('actionPosition')
