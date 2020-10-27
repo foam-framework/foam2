@@ -28,7 +28,9 @@ foam.CLASS({
       name: 'title',
       class: 'String',
       expression: function(section) {
-        return section.title;
+        if (section) {
+          return section.title;
+        }
       }
     },
     {
@@ -49,7 +51,9 @@ foam.CLASS({
       name: 'navTitle',
       class: 'String',
       expression: function(section) {
-        return section.navTitle;
+        if (section) {
+          return section.navTitle;
+        }
       }
     }
   ],
