@@ -22,7 +22,8 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'INVALID_POSTAL_CODE_ERR_MSG', message: 'Invalid postal code' }
+    { name: 'INVALID_POSTAL_CODE_ERR_MSG', message: 'Invalid postal code' },
+    { name: 'COUNTRY_REQUIRED', message: 'Country required.' }
   ],
 
   properties: [
@@ -80,7 +81,7 @@ foam.CLASS({
       gridColumns: 6,
       validateObj: function(countryId) {
         if ( typeof countryId !== 'string' || countryId.length === 0 ) {
-          return 'Country required.';
+          return this.COUNTRY_REQUIRED;
         }
       },
       postSet: function(oldValue, newValue) {
