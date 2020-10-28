@@ -271,7 +271,7 @@ foam.CLASS({
               dataObj = currentDataObj;
             } 
             
-            crunchService.updateJunction(x, cap.getId(), dataObj);
+            crunchService.updateJunction(x, cap.getId(), dataObj, null);
           }
           else if ( item instanceof List ) {
             List list = (List) item;
