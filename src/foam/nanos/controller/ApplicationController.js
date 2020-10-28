@@ -328,6 +328,14 @@ foam.CLASS({
           self.mementoChange();
       });
 
+      this.memento.value$.sub(function () {
+        //for some reason this subscriber is executed earlier then postSet
+        self.memento.parseValue();
+
+        if ( ! self.memento.feedback_ )
+          self.mementoChange();
+      });
+
       this.mementoChange();
       // End Memento Support
 

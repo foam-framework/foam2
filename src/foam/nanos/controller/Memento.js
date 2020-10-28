@@ -22,17 +22,7 @@ foam.CLASS({
       name: 'value',
       value: '',
       postSet: function(o, n) {
-        if ( this.feedback_ ) return;
-        this.feedback_ = true;
-        var i = n.indexOf(this.SEPARATOR);
-        if ( i == -1 ) {
-          this.head = n;
-          this.tail = null;
-        } else {
-          this.head = n.substring(0, i);
-          this.tail = this.cls_.create({ value: n.substring(i+1), parent: this });
-        }
-        this.feedback_ = false;
+        this.parseValue();
       }
     },
     {
@@ -85,6 +75,20 @@ foam.CLASS({
       return this.tail ?
         this.head + this.SEPARATOR + this.tail.combine() :
         this.head ;
+    },
+    function parseValue() {
+      //added as value's subscribers methods are executed earlier then post set
+      if ( this.feedback_ ) return;
+      this.feedback_ = true;
+      var i = this.value.indexOf(this.SEPARATOR);
+      if ( i == -1 ) {
+        this.head = this.value;
+        this.tail = null;
+      } else {
+        this.head = this.value.substring(0, i);
+        this.tail = this.cls_.create({ value: this.value.substring(i+1), parent: this });
+      }
+      this.feedback_ = false;
     }
   ]
 });
