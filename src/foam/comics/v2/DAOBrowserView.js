@@ -8,15 +8,16 @@ foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOBrowserView',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.comics.SearchMode',
     'foam.comics.v2.DAOControllerConfig',
     'foam.log.LogLevel',
     'foam.u2.ActionView',
     'foam.u2.dialog.Popup',
+    'foam.u2.filter.FilterView',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
-    'foam.u2.filter.FilterView',
     'foam.u2.view.ScrollTableView',
     'foam.u2.view.SimpleSearch',
     'foam.u2.view.TabChoiceView',
@@ -219,7 +220,7 @@ foam.CLASS({
       code: function() {
         this.add(this.Popup.create().tag(this.importModal));
       }
-    },
+    }
   ],
 
   methods: [
