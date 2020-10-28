@@ -602,7 +602,6 @@ p({
       .setServiceProviderAware(true)
       .setIndex(new foam.core.PropertyInfo[] {foam.nanos.ruler.Rule.DAO_KEY, foam.nanos.ruler.Rule.PRIORITY })
       .setOf(foam.nanos.ruler.Rule.getOwnClassInfo())
-      .setCluster(false)
       .setInnerDAO(x.get("localRuleDAO"))
       .setRuler(false)
       .build();
@@ -635,7 +634,6 @@ p({
       .setValidated(true)
       .setRuler(true)
       .setRulerDaoKey("localRuleDAO")
-      .setCluster(false)
       .setAuthorize(false)
       .build();
 
@@ -658,7 +656,6 @@ p({
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("ruleGroups")
       .setRuler(false)
-      .setCluster(false)
       .setPm(true)
       .build();
     return new foam.dao.ValidatingDAO(x, ed);
