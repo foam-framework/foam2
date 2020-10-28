@@ -131,16 +131,6 @@ p({
 })
 
 p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"pmInfoDAO",
-  "serve":true,
-  "serviceScript":`
-    return new foam.nanos.pm.PMInfoMDAO().orderBy(foam.mlang.MLang.DESC(foam.nanos.pm.PMInfo.TOTAL_TIME));
-  `,
-  "client":"{\"of\":\"foam.nanos.pm.PMInfo\", \"remoteListenerSupport\": false}"
-})
-
-p({
   "class": "foam.nanos.boot.NSpec",
   "name": "localUserDAO",
   "serviceScript": """

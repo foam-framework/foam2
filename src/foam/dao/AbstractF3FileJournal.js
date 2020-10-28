@@ -91,8 +91,8 @@ foam.CLASS({
               return new JSONParser();
             }
             @Override
-            public JSONParser get() {
-              JSONParser parser = super.get();
+            public foam.lib.json.JSONParser get() {
+              foam.lib.json.JSONParser parser = super.get();
               return parser;
             }
           };
@@ -157,7 +157,7 @@ foam.CLASS({
 try {
   InputStream is = getX().get(foam.nanos.fs.Storage.class).getInputStream(getFilename());
   if ( is == null ) {
-    getLogger().error("File not found - journal: " + getFilename());
+    getLogger().warning("File not found", getFilename());
   }
   return (is == null) ? null : new BufferedReader(new InputStreamReader(is));
 } catch ( Throwable t ) {
@@ -175,7 +175,7 @@ try {
 try {
   OutputStream os = getX().get(foam.nanos.fs.Storage.class).getOutputStream(getFilename());
   if ( os == null ) {
-    getLogger().error("File not found - journal: " + getFilename());
+    getLogger().warning("File not found", getFilename());
   }
   return (os == null) ? null : new BufferedWriter(new OutputStreamWriter(os));
 } catch ( Throwable t ) {
