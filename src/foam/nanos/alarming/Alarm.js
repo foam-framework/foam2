@@ -11,9 +11,10 @@ foam.CLASS({
   documentation: 'A config for OM on when an alarm should be raised',
 
   implements: [
-    'foam.nanos.auth.CreatedAware',
     'foam.mlang.Expressions',
+    'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.medusa.Clusterable'
   ],
 
   tableColumns: [
@@ -110,6 +111,11 @@ foam.CLASS({
       class: 'String',
       name: 'note',
       view: { class: 'foam.u2.tag.TextArea' }
+    },
+    {
+      class: 'Boolean',
+      name: 'clusterable',
+      value: false
     }
   ],
 

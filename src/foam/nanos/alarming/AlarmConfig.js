@@ -5,7 +5,8 @@ foam.CLASS({
   documentation: 'A config for OM on when an alarm should be raised',
 
   implements: [
-    'foam.nanos.auth.EnabledAware'
+    'foam.nanos.auth.EnabledAware',
+    'foam.nanos.medusa.Clusterable'
   ],
 
   imports: [
@@ -117,6 +118,11 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'manual',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'clusterable',
       value: false
     }
   ]

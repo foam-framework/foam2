@@ -32,6 +32,7 @@ foam.CLASS({
       } else {
         config = new AlarmConfig();
         config.setName(alarm.getName());
+        config.setClusterable(alarm.getClusterable());
         try {
           configDAO.put(config);
         } catch ( Exception e ) {
