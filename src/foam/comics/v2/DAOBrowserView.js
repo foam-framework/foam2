@@ -215,6 +215,7 @@ foam.CLASS({
     {
       name: 'import',
       label: '',
+      availablePermissions: [ "data.import.googleSheets" ],
       toolTip: 'Import From Google Sheet',
       // icon: 'images/export-arrow-icon.svg',//need find out where we're getting the icons
       code: function() {
