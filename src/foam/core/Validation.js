@@ -118,12 +118,12 @@ foam.CLASS({
             for ( var i = 0 ; i < validationPredicates.length ; i++ ) {
               var vp = validationPredicates[i];
               var self = this;
-              if ( vp.jsFunc.bind(self)() ) return vp.jsErr.bind(self)(self);
+              if ( vp.jsFunc ) return vp.jsFunc.call(self, self);
             }
             return null;
           }];
         }
-        return !required ? null : [[name],
+        return ! required ? null : [[name],
           function() {
             const axiom = this.cls_.getAxiomByName(name);
             return axiom.isDefaultValue(this[name]) && (`${this.PLEASE_ENTER} ${label.toLowerCase()}`);
@@ -405,7 +405,7 @@ foam.CLASS({
 
   messages: [
     { name: 'PHONE_NUMBER_REQUIRED', message: 'Phone number required' },
-    { name: 'INVALID_PHONE_NUMBER', message: 'Invalid phone number' }
+    { name: 'INVALID_PHONE_NUMBER',  message: 'Invalid phone number' }
   ],
 
   properties: [
