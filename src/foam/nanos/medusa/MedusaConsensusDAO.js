@@ -25,9 +25,12 @@ foam.CLASS({
     'foam.dao.DOP',
     'foam.lib.json.JSONParser',
     'static foam.mlang.MLang.COUNT',
+    'static foam.mlang.MLang.EQ',
     'static foam.mlang.MLang.MAX',
+    'static foam.mlang.MLang.OR',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Max',
+    'foam.nanos.alarming.Alarm',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
@@ -252,6 +255,8 @@ foam.CLASS({
       javaCode: `
       getLogger().debug("promoter", "execute");
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      Long nextIndexSince = System.currentTimeMillis();
+      Alarm alarm = new Alarm.Builder(x).setName("Medusa Consensus").build();
       try {
         while ( true ) {
           ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
@@ -263,23 +268,16 @@ foam.CLASS({
             MedusaEntry next = (MedusaEntry) getDelegate().find_(x, nextIndex);
             if ( next != null ) {
               synchronized ( next.getId().toString().intern() ) {
+                nextIndexSince = System.currentTimeMillis();
+
                 if ( next.getPromoted() ) {
                   continue;
                 }
-                Map<Object, Map> hashes = next.getConsensusHashes();
-                for ( Map<String, MedusaEntry> nodes : hashes.values() ) {
-                  if ( nodes.size() >= support.getNodeQuorum() ) {
-                    if ( entry == null ) {
-                      for ( MedusaEntry e : nodes.values() ) {
-                        entry = e;
-                        break;
-                      }
-                      entry = promote(x, entry);
-                    } else {
-                      getLogger().error("promoter", next, "Multiple consensus detected", next.toSummary(), next.getConsensusCount(), support.getNodeQuorum());
-                      throw new RuntimeException("Multiple consensus detected. "+next.toSummary());
-                    }
-                  }
+
+                entry = getConsensusEntry(x, next);
+
+                if ( entry != null ) {
+                  entry = promote(x, entry);
                 }
               }
 
@@ -288,14 +286,42 @@ foam.CLASS({
                   replaying.setNonConsensusIndex(nextIndex);
                   replaying.setLastModified(new java.util.Date());
                 }
-                // TODO: alarming configuration.
+                // TODO: more thought on alarming, and configuration for alarm times. This is really messy.
                 if ( replaying.getReplaying() ) {
                   if ( System.currentTimeMillis() - replaying.getLastModified().getTime() > 60000 ) {
                     getLogger().warning("promoter", "no consensus", next.getConsensusCount(), support.getNodeQuorum(), "since", replaying.getLastModified(), "on", next.toSummary());
+                    alarm.setIsActive(true);
+                    alarm.setNote("No Consensus: "+next.toSummary());
+                    alarm = (Alarm) ((DAO) x.get("alarmDAO")).put(alarm);
+                  } else {
+                    if ( alarm.getIsActive() ) {
+                      alarm.setIsActive(false);
+                      alarm = (Alarm) ((DAO) x.get("alarmDAO")).put(alarm);
+                    }
                   }
                 } else if ( System.currentTimeMillis() - replaying.getLastModified().getTime() > 5000 ) {
                   getLogger().warning("promoter", "no consensus", next.getConsensusCount(), support.getNodeQuorum(), "since", replaying.getLastModified(), "on", next.toSummary());
+                  alarm.setIsActive(true);
+                  alarm.setNote("No Consensus: "+next.toSummary());
+                  alarm = (Alarm) ((DAO) x.get("alarmDAO")).put(alarm);
+                } else {
+                  if ( alarm.getIsActive() ) {
+                    alarm.setIsActive(false);
+                    alarm = (Alarm) ((DAO) x.get("alarmDAO")).put(alarm);
+                  }
                 }
+              } else {
+                if ( alarm.getIsActive() ) {
+                  alarm.setIsActive(false);
+                  alarm = (Alarm) ((DAO) x.get("alarmDAO")).put(alarm);
+                }
+              }
+            } else {
+              // If stalled on nextIndex and nextIndex + 1 exists and has conenssus, test if nextIndex exists in nodes, if not, skip.
+              if ( nextIndex == replaying.getIndex() + 1 &&
+                   ( System.currentTimeMillis() - nextIndexSince ) > 60000 ) {
+                gap(x, nextIndex);
+                nextIndexSince = System.currentTimeMillis();
               }
             }
           } finally {
@@ -318,7 +344,10 @@ foam.CLASS({
         config.setErrorMessage(e.getMessage());
         config.setStatus(Status.OFFLINE);
         d.put(config);
-        // TODO: Alarm
+
+        alarm.setIsActive(true);
+        alarm.setNote(e.getMessage());
+        ((DAO) x.get("alarmDAO")).put(alarm);
       } finally {
         getLogger().warning("promoter", "exit");
       }
@@ -384,6 +413,128 @@ foam.CLASS({
         }
 
         return entry;
+      } catch (Throwable t) {
+        pm.error(x, t);
+        getLogger().error(t);
+        throw t;
+      } finally {
+        pm.log(x);
+      }
+      `
+    },
+    {
+      documentation: 'Make an entry available for Dagger hashing.',
+      name: 'getConsensusEntry',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'next',
+          type: 'foam.nanos.medusa.MedusaEntry'
+        }
+      ],
+      type: 'foam.nanos.medusa.MedusaEntry',
+      javaCode: `
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "getConsensusEntry");
+      MedusaEntry entry = null;
+      try {
+        ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+        Map<Object, Map> hashes = next.getConsensusHashes();
+        for ( Map<String, MedusaEntry> nodes : hashes.values() ) {
+          if ( nodes.size() >= support.getNodeQuorum() ) {
+            if ( entry == null ) {
+              for ( MedusaEntry e : nodes.values() ) {
+                entry = e;
+                break;
+              }
+            } else {
+              getLogger().error("getConsensusEntry", next, "Multiple consensus detected", next.toSummary(), next.getConsensusCount(), support.getNodeQuorum());
+              throw new MedusaException("Multiple consensus detected. "+next.toSummary());
+            }
+          }
+        }
+      } finally {
+        pm.log(x);
+      }
+      return entry;
+      `
+    },
+    {
+      documentation: 'Test for gap, investigate, attempt recovery.',
+      name: 'gap',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'index',
+          type: 'Long'
+        }
+      ],
+      javaCode: `
+// TODO: another scenario - broadcast from primary - but primary dies before broadcasting to quorum of Nodes.  So only x of y nodes have copy.  The entry will not be promoted, and the system will effectively halt.   It is possible to recover from this scenario by deleting the x node entries.
+
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "gap");
+
+      try {
+        ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+        ClusterConfig config = support.getConfig(x, support.getConfigId());
+        getLogger().debug("gap", "testing", index);
+        MedusaEntry entry = (MedusaEntry) getDelegate().find_(x, index + 1);
+        if ( entry != null ) {
+          try {
+            entry = getConsensusEntry(x, entry);
+          } catch ( MedusaException e ) {
+            // ignore
+          }
+          if ( entry != null ) {
+            getLogger().warning("gap", "investigating", index);
+            long nodeCount = support.countEntryOnNodes(x, index);
+            if ( nodeCount == 0L ) {
+              getLogger().warning("gap", "found", index);
+              Alarm alarm = new Alarm();
+              alarm.setName("Medusa Gap");
+              alarm.setIsActive(true);
+              alarm.setNote("Index: "+index+"\\n"+"Dependecies: UNKNOWN");
+              alarm = (Alarm) ((DAO) x.get("alarmDAO")).put(alarm);
+
+              // Test for gap index dependencies - of course can only look
+              // ahead as far as we have entries locally.
+              Count count = (Count) ((DAO) getX().get("localMedusaEntryDAO"))
+                .where(
+                  OR(
+                    EQ(MedusaEntry.INDEX1, index),
+                    EQ(MedusaEntry.INDEX2, index)
+                  ))
+                .select(COUNT());
+              if ( ((Long)count.getValue()).intValue() == 0 ) {
+                // Recovery - set global index to the gap index. Then
+                // the promoter will look for the entry after the gap.
+                getLogger().info("gap", "recovery", index);
+                ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
+                replaying.updateIndex(x, index);
+
+                alarm.setIsActive(false);
+                alarm.setNote("Index: "+index+"\\n"+"Dependecies: NO");
+                ((DAO) x.get("alarmDAO")).put(alarm);
+                // TODO: set ClusterConfig.errorMessage
+              } else {
+                getLogger().error("gap", "dependencies", index);
+                alarm.setNote("Index: "+index+"\\n"+"Dependecies: YES");
+                alarm.setSeverity(foam.log.LogLevel.ERROR);
+                ((DAO) x.get("alarmDAO")).put(alarm);
+                throw new MedusaException("gap with dependencies detected");
+              }
+            } else {
+              getLogger().info("gap", "not-found", index);
+            }
+          } else {
+            getLogger().info("gap", "not-found", index);
+          }
+        }
       } catch (Throwable t) {
         pm.error(x, t);
         getLogger().error(t);

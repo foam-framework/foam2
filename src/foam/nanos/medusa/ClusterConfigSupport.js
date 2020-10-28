@@ -126,6 +126,16 @@ configuration for contacting the primary node.`,
       value: 1000
     },
     {
+      name: 'httpConnectTimeout',
+      class: 'Int',
+      value: 5000
+    },
+    {
+      name: 'httpReadTimeout',
+      class: 'Int',
+      value: 10000
+    },
+    {
       name: 'clients',
       class: 'Map',
       visibility: 'HIDDEN',
@@ -197,9 +207,9 @@ configuration for contacting the primary node.`,
       documentation: 'Additional node redundancy in each bucket.',
       name: 'nodeRedundancy',
       class: 'Int',
-      // STANDALONE, SINGLE
-      value: 1
-      // value: 0 // STANDALONE
+      // STANDALONE, SINGLE - also normal - missing cerberus
+      // value: 1
+      value: 0 // STANDALONE
     },
     {
       name: 'nodeGroups',
@@ -760,6 +770,8 @@ configuration for contacting the primary node.`,
             .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
             .setSessionID(sendClusterConfig.getSessionId())
             .setUrl(support.buildURL(x, serviceName, null, null, receiveClusterConfig))
+            .setConnectTimeout(getHttpConnectTimeout())
+            .setReadTimeout(getHttpReadTimeout())
             .build())
           .build())
         .build();
@@ -830,10 +842,10 @@ configuration for contacting the primary node.`,
                config.getZone() == 0L ) {
             return true;
           }
-          if ( config.getStatus() == Status.ONLINE &&
-               config.getZone() > 0L ) {
-            return true;
-          }
+          // if ( config.getStatus() == Status.ONLINE &&
+          //      config.getZone() > 0L ) {
+          //   return true;
+          // }
           return false;
         }
         if ( config.getType() == MedusaType.NODE ) {
@@ -946,6 +958,53 @@ configuration for contacting the primary node.`,
         }
       }
       `
-    }
+    },
+    {
+      documentation: 'Determine the number of nodes which contain and entry.',
+      name: 'countEntryOnNodes',
+      args: [
+        {
+          name: 'x',
+          type: 'X'
+        },
+        {
+          name: 'index',
+          type: 'Long'
+        }
+      ],
+      javaType: 'Long',
+      javaCode: `
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "countEntryOnNodes");
+
+      Long count = 0L;
+      try {
+        List<ClusterConfig> configs = ((ArraySink) ((DAO) x.get("clusterConfigDAO"))
+            .where(
+                AND(
+                    EQ(ClusterConfig.TYPE, MedusaType.NODE),
+                    EQ(ClusterConfig.ZONE, 0L),
+                    EQ(ClusterConfig.ENABLED, true)
+                )
+            )
+            .select(new ArraySink())).getArray();
+        for ( ClusterConfig config : configs ) {
+          DAO client = getClientDAO(x, "medusaEntryDAO", config, config);
+          MedusaEntry found = (MedusaEntry) client.find(index);
+          if ( found != null ) {
+            count++;
+            getLogger().debug("countEntryOnNodes", config.getId(), index);
+          }
+        }
+      } catch (Throwable t) {
+        pm.error(x, t);
+        getLogger().error(t);
+        throw t;
+      } finally {
+        pm.log(x);
+      }
+      getLogger().info("countEntryOnNodes", "index", index, "count", count);
+      return count;
+      `
+    },
   ]
 });
