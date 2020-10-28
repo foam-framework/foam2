@@ -19,12 +19,26 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'AdapterDAO',
   extends: 'foam.dao.ProxyDAO',
+  implements: [ 'foam.dao.Adapter' ],
 
   documentation: `DAO for adapting between "of" input type and "to" delegate
       type. I.e., accept put(<instance-of-"of">), and
       this.delegate.of === this.to.`,
 
   requires: [ 'foam.dao.ArraySink' ],
+
+  javaImports: [
+    'foam.core.FObject',
+    'foam.core.PropertyInfo',
+    'foam.core.X',
+    'foam.dao.Adapter',
+    'foam.dao.DAO',
+    'foam.dao.Sink',
+    'foam.dao.ArraySink',
+    'foam.mlang.order.Desc',
+    'foam.mlang.order.ThenBy',
+    'foam.mlang.predicate.Predicate'
+  ],
 
   classes: [
     {
@@ -38,15 +52,37 @@ foam.CLASS({
           documentation: `"adapt(o)" adapts input to type expected by
               "delegate" sink.`,
           required: true
+        },
+        {
+          class: 'FObjectProperty',
+          of: 'foam.dao.Adapter',
+          name: 'adapter',
+          required: true
         }
       ],
 
       methods: [
-        function put(o, sub) {
-          this.delegate.put(this.adapt(o), sub);
+        {
+          name: 'put',
+          code: function put(o, sub) {
+            this.delegate.put(this.adapt(o), sub);
+          },
+          javaCode: `
+            FObject innerObject = (FObject) obj;
+            FObject outerObject = getAdapter().adaptFromDelegate(getX(), innerObject);
+            getDelegate().put(outerObject, sub);
+          `
         },
-        function remove(o, sub) {
-          this.delegate.remove(this.adapt(o), sub);
+        {
+          name: 'remove',
+          code: function remove(o, sub) {
+            this.delegate.remove(this.adapt(o), sub);
+          },
+          javaCode: `
+            FObject innerObject = (FObject) obj;
+            FObject outerObject = getAdapter().adaptFromDelegate(getX(), innerObject);
+            getDelegate().remove(outerObject, sub);
+          `
         }
       ]
     }
@@ -66,76 +102,215 @@ foam.CLASS({
       class: 'Class',
       name: 'to',
       documentation: '"of" of delegate.'
-    },
-    {
-      name: 'Function',
-      name: 'adaptToDelegate',
-      documentation: `Adapt this's "of" type to "delegate"'s "of" type.`,
-      value: function(ctx, obj) {
-        if ( ! obj ) return obj;
-        if ( ! this.of.isInstance(obj) ) return obj;
-        return this.to.create(obj, ctx || this.__subContext__);
-      }
-    },
-    {
-      name: 'Function',
-      name: 'adaptFromDelegate',
-      documentation: `Adapt "delegate"'s "of" type this's "of" type.`,
-      value: function(ctx, obj) {
-        if ( ! obj ) return obj;
-        if ( ! this.to.isInstance(obj) ) return obj;
-        return this.of.create(obj, ctx || this.__subContext__);
-      }
-    },
-    {
-      name: 'Function',
-      name: 'adaptOrder',
-      documentation: 'Adapt select() order to order understood by "delegate".',
-      // TODO(markdittmer): Smarter default?
-      value: function(order) { return order; }
-    },
-    {
-      name: 'Function',
-      name: 'adaptPredicate',
-      documentation: `Adapt select() predicate to predicate understood by
-          "delegate".`,
-      // TODO(markdittmer): Smarter default?
-      value: function(predicate) { return predicate; }
     }
   ],
 
   methods: [
-    function put_(ctx, obj) {
-      return this.delegate.put_(ctx, this.adaptToDelegate(ctx, obj)).
-        then(this.adaptFromDelegate.bind(this, ctx));
+    {
+      name: 'adaptToDelegate',
+      type: 'FObject',
+      args: [
+        {
+          name: 'ctx',
+          type: 'X'
+        },
+        {
+          name: 'obj',
+          type: 'FObject'
+        }
+      ],
+      code: function(ctx, obj) {
+        if ( ! obj ) return obj;
+        if ( ! this.of.isInstance(obj) ) return obj;
+        return this.to.create(obj, ctx || this.__subContext__);
+      },
+      javaCode: `
+        FObject delegateObject;
+        FObject ofObject;
+        try {
+          ofObject = (FObject) obj;
+          delegateObject = (FObject) getTo().newInstance();
+          delegateObject = delegateObject.copyFrom(ofObject);
+        } catch ( Exception ex ) {
+          throw new RuntimeException("Cannot adapt to delegate: " + ex.getMessage(), ex);
+        }
+        return delegateObject;
+      `
     },
-
-    function remove_(ctx, obj) {
-      return this.delegate.remove_(ctx, this.adaptToDelegate(ctx, obj)).
-        then(this.adaptFromDelegate.bind(this, ctx));
+    {
+      name: 'adaptFromDelegate',
+      type: 'FObject',
+      args: [
+        {
+          name: 'ctx',
+          type: 'X'
+        },
+        {
+          name: 'obj',
+          type: 'FObject'
+        },
+      ],
+      code: function(ctx, obj) {
+        if ( ! obj ) return obj;
+        if ( ! this.to.isInstance(obj) ) return obj;
+        return this.of.create(obj, ctx || this.__subContext__);
+      },
+      javaCode: `
+        FObject delegateObject;
+        FObject ofObject;
+        try {
+          delegateObject = (FObject) obj;
+          ofObject = (FObject) getOf().newInstance();
+          ofObject = ofObject.copyFrom(delegateObject);
+        } catch ( Exception ex ) {
+          throw new RuntimeException("Cannot adapt from delegate: " + ex.getMessage(), ex);
+        }
+        return ofObject;
+      `
     },
+    {
+      name: 'adaptOrder',
+      type: 'foam.mlang.order.Comparator',
+      args: [
+        {
+          name: 'order',
+          type: 'foam.mlang.order.Comparator',
+        }
+      ],
+      code: function(order) { return order; },
+      javaCode: `
+        if ( order == null )
+          return order;
 
-    function find_(ctx, objOrId) {
-      return this.delegate.find_(ctx, this.adaptToDelegate(ctx, objOrId)).
-        then(this.adaptFromDelegate.bind(this, ctx));
+        if ( order instanceof PropertyInfo ) {
+          PropertyInfo outerOrder = (PropertyInfo) order;
+          PropertyInfo innerOrder = (PropertyInfo) getTo().getAxiomByName(outerOrder.getName());
+          order = innerOrder;
+        } else if ( order instanceof Desc ) {
+          Desc desc = (Desc) order;
+          desc.setArg1(adaptOrder(desc.getArg1()));
+        } else if ( order instanceof ThenBy ) {
+          ThenBy thenBy = (ThenBy) order;
+          thenBy.setHead(adaptOrder(thenBy.getHead()));
+          thenBy.setTail(adaptOrder(thenBy.getTail()));
+        }
+
+        return order;
+      `
     },
+    { 
+      name: 'adaptPredicate',
+      type: 'foam.mlang.predicate.Predicate',
+      args: [
+        {
+          name: 'predicate',
+          type: 'foam.mlang.predicate.Predicate'
+        }
+      ],
+      code: function(predicate) { return predicate; },
+      javaCode: `
+        if ( predicate == null || !( predicate instanceof FObject ))
+          return predicate;
 
-    function select_(ctx, sink, skip, limit, order, predicate) {
-      sink = sink || this.ArraySink.create();
-      var adapterSink = this.AdapterSink.create({
-        delegate: sink,
-        adapt: this.adaptFromDelegate.bind(this, ctx)
-      });
-      return this.delegate.select_(
-              ctx, adapterSink, skip, limit,
-              this.adaptOrder(order), this.adaptPredicate(predicate)).
-          then(function() { return sink; });
+        FObject obj = (FObject) predicate;
+        String[] propertiesToCheck = new String[] { "args", "arg1", "arg2" };
+        for ( var propertyToCheck : propertiesToCheck ) {
+          if ( obj.isPropertySet(propertyToCheck)) {
+            Object arg = obj.getProperty(propertyToCheck);
+            if ( arg != null ) {
+              if ( arg instanceof Predicate ) {
+                arg = adaptPredicate((Predicate) arg);
+              } else if ( arg instanceof PropertyInfo ) {
+                PropertyInfo outerProperty = (PropertyInfo) arg;
+                PropertyInfo innerProperty = (PropertyInfo) getTo().getAxiomByName(outerProperty.getName());
+                arg = (Object) (( innerProperty != null ) ? innerProperty : outerProperty);
+              } else if ( arg instanceof Predicate[] ) {
+                Predicate[] array = (Predicate[]) arg;
+                for ( int i = 0; i < array.length; i++ ) {
+                  array[i] = adaptPredicate(array[i]);
+                }
+              }
+              obj.setProperty(propertyToCheck, arg);
+            }
+          }
+        }
+
+        return predicate;
+      `
     },
+    {
+      name: 'put_',
+      code: function put_(ctx, obj) {
+        return this.delegate.put_(ctx, this.adaptToDelegate(ctx, obj)).
+          then(this.adaptFromDelegate.bind(this, ctx));
+      },
+      javaCode: `
+          FObject innerObject = adaptToDelegate(x, (FObject) obj);
+          innerObject = getDelegate().put_(x, innerObject);
+          return adaptFromDelegate(x, innerObject);
+        `
+    },
+    {
+      name: 'remove_',
+      code: function remove_(ctx, obj) {
+        return this.delegate.remove_(ctx, this.adaptToDelegate(ctx, obj)).
+          then(this.adaptFromDelegate.bind(this, ctx));
+      },
+      javaCode: `
+        if ( getOf().isInstance(obj) ) {
+          obj = adaptToDelegate(x, (FObject) obj);
+        }
+        return getDelegate().remove_(x, obj);
+      `
+    },
+    {
+      name: 'find_',
+      code: function find_(ctx, objOrId) {
+        return this.delegate.find_(ctx, this.adaptToDelegate(ctx, objOrId)).
+          then(this.adaptFromDelegate.bind(this, ctx));
+      },
+      javaCode: `
+          if ( getOf().isInstance(id) ) {
+            id = adaptToDelegate(x, (FObject) id);
+          }
+          
+          FObject innerObject = getDelegate().find_(x, id);
+          
+          // Do not attempt to convert if the object is null
+          if ( innerObject == null ) return null;
 
-    function removeAll_(ctx, skip, limit, order, predicate) {
-      return this.delegate.removeAll_(
-          ctx, skip, limit,
-          this.adaptOrder(order), this.adaptPredicate(predicate));
+          return adaptFromDelegate(x, innerObject);
+        `
+    },
+    {
+      name: 'select_',
+      code: function select_(ctx, sink, skip, limit, order, predicate) {
+        sink = sink || this.ArraySink.create();
+        var adapterSink = this.AdapterSink.create({
+          delegate: sink,
+          adapt: this.adaptFromDelegate.bind(this, ctx)
+        });
+        return this.delegate.select_(
+                ctx, adapterSink, skip, limit,
+                this.adaptOrder(order), this.adaptPredicate(predicate)).
+            then(function() { return sink; });
+      },
+      javaCode: `
+            Sink decoratedSink = new AdapterSink.Builder(x)
+              .setDelegate(sink != null ? sink : new ArraySink())
+              .setAdapter(this)
+              .build();
+            getDelegate().select_(x, decoratedSink, skip, limit, adaptOrder(order), adaptPredicate(predicate));
+            return sink;
+        `
+    },
+    {
+      name: 'removeAll_',
+      code: function removeAll_(ctx, skip, limit, order, predicate) {
+        return this.delegate.removeAll_(
+            ctx, skip, limit,
+            this.adaptOrder(order), this.adaptPredicate(predicate));
+      }
     }
   ]
 });

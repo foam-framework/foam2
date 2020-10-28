@@ -133,6 +133,8 @@ var classes = [
   'foam.lib.csv.ProxyCSVOutputter',
   'foam.lib.csv.FromCSVSetter',
   'foam.dao.java.JDAO',
+  'foam.dao.Adapter',
+  'foam.dao.AdapterDAO',
   'foam.dao.CopyFromDAO',
   'foam.dao.FilteredDAO',
   'foam.dao.Journal',
