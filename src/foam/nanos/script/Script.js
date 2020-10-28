@@ -321,8 +321,9 @@ foam.CLASS({
              getClusterable() ) {
           foam.nanos.medusa.ClusterConfigSupport support = (foam.nanos.medusa.ClusterConfigSupport) x.get("clusterConfigSupport");
           if ( support != null &&
+               this instanceof foam.nanos.cron.Cron &&
                ! support.cronEnabled(x) ) {
-            ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Script execution disabled", getId(), getDescription());
+            ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Cron execution disabled", getId(), getDescription());
             return;
           }
         }
