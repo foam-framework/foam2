@@ -185,7 +185,6 @@ FOAM_FILES([
   { name: "foam/dao/ArraySink" },
   { name: "foam/dao/DAOInterceptor" },
   { name: "foam/dao/AbstractDAO" },
-  { name: "foam/dao/CopyFromDAO" },
   { name: "foam/dao/FilteredDAO" },
   { name: "foam/dao/DAOProperty" },
   { name: "foam/dao/SQLStatement" },

@@ -135,7 +135,6 @@ var classes = [
   'foam.dao.java.JDAO',
   'foam.dao.Adapter',
   'foam.dao.AdapterDAO',
-  'foam.dao.CopyFromDAO',
   'foam.dao.FilteredDAO',
   'foam.dao.Journal',
   'foam.dao.RemoveChildrenOnRemoveDAO',
