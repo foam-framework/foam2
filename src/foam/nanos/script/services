@@ -35,7 +35,7 @@ p({
       .setJournalName("scriptEvents")
       .setWriteOnly(true)
       .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
-        .setComparator(new foam.mlang.order.Comparator[] { foam.mlang.MLang.DESC(foam.nanos.script.ScriptEvent.LAST_RUN) })
+        .setComparator(foam.mlang.MLang.DESC(foam.nanos.script.ScriptEvent.LAST_RUN))
         .setSize(10000)
         .build())
       .setOrder(new foam.mlang.order.Comparator[] { new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.script.ScriptEvent.LAST_RUN).build() })

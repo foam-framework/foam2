@@ -11,7 +11,7 @@ p({
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("smsMessages")
       .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
-        .setComparator(new foam.mlang.order.Comparator[] { foam.mlang.MLang.DESC(foam.nanos.notification.sms.SMSMessage.CREATED) })
+        .setComparator(foam.mlang.MLang.DESC(foam.nanos.notification.sms.SMSMessage.CREATED))
         .setPredicate(foam.mlang.MLang.EQ(foam.nanos.notification.sms.SMSMessage.STATUS, foam.nanos.notification.sms.SMSStatus.SENT))
         .setSize(1000)
         .build())
