@@ -43,9 +43,9 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'CANNOT_OPEN_GRANTED', message: 'This capability has already been granted to you.' },
-    { name: 'CANNOT_OPEN_PENDING', message: 'This capability is awaiting approval, updates are not permitted at this time.' },
-    { name: 'CANNOT_OPEN_ACTION_PENDING', message: 'This capability is awaiting review, updates are not permitted at this time.' }
+    { name: 'CANNOT_OPEN_GRANTED', message: 'This capability has already been granted to you' },
+    { name: 'CANNOT_OPEN_PENDING', message: 'This capability is awaiting approval, updates are not permitted at this time' },
+    { name: 'CANNOT_OPEN_ACTION_PENDING', message: 'This capability is awaiting review, updates are not permitted at this time' }
   ],
 
   methods: [

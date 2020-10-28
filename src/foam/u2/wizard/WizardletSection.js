@@ -28,7 +28,7 @@ foam.CLASS({
       name: 'title',
       class: 'String',
       expression: function(section) {
-        return section.title;
+        return section && section.title;
       }
     },
     {
@@ -44,6 +44,13 @@ foam.CLASS({
     {
       name: 'customView',
       class: 'foam.u2.ViewSpec'
+    },
+    {
+      name: 'navTitle',
+      class: 'String',
+      expression: function(section) {
+        return section && section.navTitle;
+      }
     }
   ],
 

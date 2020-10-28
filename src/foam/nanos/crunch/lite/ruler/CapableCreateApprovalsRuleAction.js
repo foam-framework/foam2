@@ -53,7 +53,7 @@ foam.CLASS({
   ],
 
     messages: [
-    { name: 'REQUEST_SEND_MSG', message: 'An approval request has been sent out.' }
+    { name: 'REQUEST_SEND_MSG', message: 'An approval request has been sent out' }
   ],
 
   methods: [

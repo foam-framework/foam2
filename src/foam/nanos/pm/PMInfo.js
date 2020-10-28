@@ -36,7 +36,7 @@ foam.CLASS({
       class: 'Int',
       name: 'count',
       label: 'Count',
-      tableWidth: 60
+      tableWidth: 70
     },
     {
       class: 'Duration',
