@@ -47,6 +47,13 @@ foam.CLASS({
       factory: function() {
         return (foam.locale || "").substring(3);
       }
+    },
+    {
+      class: 'Map',
+      name: 'localeEntries',
+      factory: function() {
+        return {};
+      }
     }
   ],
 
@@ -84,6 +91,10 @@ foam.CLASS({
         // source: l.source,
         target: l.target
       }));
+      // populate map entries
+      if ( ! this.localeEntries[l.source] ) {
+        this.localeEntries[l.source] = l.target;
+      }
     },
 
     function hasVariant() { return !! this.variant; },
@@ -97,18 +108,10 @@ foam.CLASS({
     */
     {
       name: 'getTranslation',
-      async: true,
       args: [ 'String locale', 'String source' ],
       type: 'String',
       code: function(locale, source) {
-        return new Promise(resolve => {
-          this.initLatch.then(() => {
-            this.localeCache.find(source).then(l => {
-//              console.log('****** getTranslation', locale, source, l && l.target);
-              resolve(l && l.target);
-            });
-          });
-        });
+        return this.localeEntries[source];
       }
     }
   ]
