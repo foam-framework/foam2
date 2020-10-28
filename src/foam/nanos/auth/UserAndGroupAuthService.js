@@ -106,6 +106,7 @@ foam.CLASS({
       ],
       javaThrows: ['foam.nanos.auth.AuthenticationException'],
       javaCode: `
+      try {
         if ( user == null ) {
           throw new AuthenticationException("User not found");
         }
@@ -140,10 +141,22 @@ foam.CLASS({
 
         Session session = x.get(Session.class);
         session.setUserId(user.getId());
+
+        if ( Group.ADMIN_GROUP.equalsIgnoreCase(user.getGroup()) ) {
+          session.setClusterable(false);
+          ((foam.nanos.logger.Logger) x.get("logger")).warning(Group.ADMIN_GROUP + " login succeeded on", System.getProperty("hostname", "localhost"));
+        }
+
         ((DAO) getLocalSessionDAO()).inX(x).put(session);
         session.setContext(session.applyTo(session.getContext()));
-
         return user;
+      } catch ( AuthenticationException e ) {
+        if ( user != null &&
+             Group.ADMIN_GROUP.equalsIgnoreCase(user.getGroup()) ) {
+          ((foam.nanos.logger.Logger) x.get("logger")).warning(Group.ADMIN_GROUP + " login failed", System.getProperty("hostname", "localhost"));
+        }
+        throw e;
+      }
       `
     },
     {

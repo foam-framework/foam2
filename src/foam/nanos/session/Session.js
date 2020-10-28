@@ -17,6 +17,7 @@ foam.CLASS({
   javaImports: [
     'foam.core.X',
     'foam.dao.DAO',
+    'static foam.mlang.MLang.*',
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.*',
     'foam.nanos.auth.Subject',
@@ -28,9 +29,10 @@ foam.CLASS({
     'foam.nanos.theme.Themes',
     'foam.util.SafetyUtil',
     'java.util.Date',
+    'java.util.Random',
+    'java.util.UUID',
     'javax.servlet.http.HttpServletRequest',
-    'org.eclipse.jetty.server.Request',
-    'static foam.mlang.MLang.*'
+    'org.eclipse.jetty.server.Request'
   ],
 
   tableColumns: [
@@ -49,14 +51,6 @@ foam.CLASS({
       name: 'id',
       includeInDigest: true,
       visibility: 'RO'
-    },
-    {
-      class: 'Boolean',
-      name: 'clusterable',
-      value: true,
-      visibility: 'HIDDEN',
-      storageTransient: true,
-      clusterTransient: true
     },
     {
       class: 'Long',
@@ -155,6 +149,14 @@ foam.CLASS({
       visibility: 'HIDDEN',
       transient: true,
       networkTransient: true,
+      clusterTransient: true
+    },
+    {
+      class: 'Boolean',
+      name: 'clusterable',
+      value: true,
+      visibility: 'HIDDEN',
+      storageTransient: true,
       clusterTransient: true
     }
   ],

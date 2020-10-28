@@ -25,6 +25,14 @@ foam.CLASS({
 
   searchColumns: [ 'id', 'description' ],
 
+  constants: [
+    {
+      name: 'ADMIN_GROUP',
+      value: 'admin',
+      type: 'String'
+    }
+  ],
+  
   properties: [
     {
       class: 'String',

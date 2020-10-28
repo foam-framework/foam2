@@ -119,8 +119,24 @@ public class SessionServerBox
         if ( req != null ) {
           session.setRemoteHost(req.getRemoteHost());
         }
-
-        session = (Session) sessionDAO.put(session);
+        try {
+          // set clusterable false so only saved locally until user known.
+          boolean savedClusterable = session.getClusterable();
+          session.setClusterable(false);
+          session = (Session) sessionDAO.put(session).fclone();
+          session.setClusterable(savedClusterable);
+        } catch ( RuntimeException e ) {
+          // Allow admin to login in locally during startup
+          if ( session.getUserId() > 0 ) {
+            User user = (User) ((DAO) getX().get("localUserDAO")).find_(getX(), session.getUserId());
+            if ( user != null &&
+                 ( user.getGroup() == "system" ||
+                   user.getGroup() == "admin" ) ) {
+              session.setClusterable(false);
+              session = (Session) sessionDAO.put(session);
+            }
+          }
+        }
       } else if ( req != null ) {
         // if req == null it means that we're being accessed via webSockets
         if ( ! session.validRemoteHost(req.getRemoteHost()) ) {
