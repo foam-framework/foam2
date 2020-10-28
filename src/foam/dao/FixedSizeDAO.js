@@ -17,12 +17,13 @@ foam.CLASS({
     place.`,
 
   javaImports: [
+    'foam.dao.DAO',
     'foam.mlang.sink.Count'
   ],
 
   properties: [
     {
-      class: 'FObjectProperty',
+      class: 'FObjectArray',
       of: 'foam.mlang.order.Comparator',
       name: 'comparator'
     },
@@ -51,11 +52,17 @@ foam.CLASS({
         Count count = new Count();
         count = (Count) this.getDelegate().select(count);
         if ( count.getValue() > getSize() + getSize() * getPurgePercent() / 100 ) {
-          this.getDelegate()
+          DAO delegate = this.getDelegate()
             .where(getPredicate())
-            .orderBy(getComparator())
-            .skip(getSize())
-            .removeAll();
+            .skip(getSize());
+
+          if ( getComparator() != null ) {
+            for ( foam.mlang.order.Comparator comp : getComparator() ) {
+              delegate = delegate.orderBy(comp);
+            }
+          }
+
+          delegate.removeAll();
         }
         return obj;
       `
