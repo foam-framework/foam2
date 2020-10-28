@@ -77,6 +77,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
       visibility: 'HIDDEN',
+      transient: true,
       javaFactory: `
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName(),
@@ -92,13 +93,33 @@ foam.CLASS({
       name: 'start',
       javaCode: `
       getLogger().info("start", "interval", getTimerInterval());
-      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      schedule(getX());
+      // ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      // Timer timer = new Timer(this.getClass().getSimpleName(), true);
+      // setTimer(timer);
+      // timer.scheduleAtFixedRate(
+      //   new AgencyTimerTask(getX(), support.getThreadPoolName(), this),
+      //   getInitialTimerDelay(),
+      //   getTimerInterval());
+      `
+    },
+    {
+      name: 'schedule',
+      args: [
+        {
+          name: 'x',
+          type: 'X'
+        },
+      ],
+      javaCode: `
+      long interval = getTimerInterval();
+      // getLogger().info("schedule", "interval", interval);
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       Timer timer = new Timer(this.getClass().getSimpleName(), true);
       setTimer(timer);
-      timer.scheduleAtFixedRate(
-        new AgencyTimerTask(getX(), support.getThreadPoolName(), this),
-        getInitialTimerDelay(),
-        getTimerInterval());
+      timer.schedule(
+        new AgencyTimerTask(x, support.getThreadPoolName(), this),
+        interval);
       `
     },
     {
@@ -110,46 +131,39 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      synchronized ( getTimer() ) {
-       if ( getIsRunning() ) {
-          getLogger().debug("execute,already running");
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
+      ClusterConfig config = support.getConfig(x, getId());
+      try {
+        if ( ! config.getEnabled() ) {
+          // getLogger().debug("execute, disabled");
           return;
         }
-        setIsRunning(true);
-      }
-
-      try {
-          ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-          ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
-          ClusterConfig config = support.getConfig(x, getId());
-          if ( ! config.getEnabled() ) {
-            getLogger().debug("execute, disabled");
-            return;
+        // getLogger().debug("execute");
+        DAO client = support.getHTTPClientDAO(x, "clusterConfigDAO", myConfig, config);
+        PM pm = new PM(this.getClass().getSimpleName(), config.getId());
+        try {
+          ClusterConfig cfg = (ClusterConfig) client.find_(x, config.getId());
+          pm.log(x);
+          if ( cfg != null ) {
+            cfg.setPingTime(pm.getEndTime() - pm.getStartTime());
+            getDao().put_(x, cfg);
+          } else {
+            getLogger().warning("client,find", cfg.getId(), "null");
           }
-          DAO client = support.getHTTPClientDAO(x, "clusterConfigDAO", myConfig, config);
-          PM pm = new PM(this.getClass().getSimpleName(), config.getId());
-          try {
-            ClusterConfig cfg = (ClusterConfig) client.find_(x, config.getId());
-            pm.log(x);
-            if ( cfg != null ) {
-              cfg.setPingTime(pm.getEndTime() - pm.getStartTime());
-              getDao().put_(x, cfg);
-            } else {
-              getLogger().warning("client,find", cfg.getId(), "null");
-            }
-          } catch ( Throwable t ) {
-            pm.error(x, t);
-            getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage());
-            if ( config.getStatus() != Status.OFFLINE ) {
-              ClusterConfig cfg = (ClusterConfig) config.fclone();
-              cfg.setStatus(Status.OFFLINE);
-              getDao().put_(x, cfg);
-            }
+        } catch ( Throwable t ) {
+          pm.error(x, t);
+          getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage());
+          if ( config.getStatus() != Status.OFFLINE ) {
+            ClusterConfig cfg = (ClusterConfig) config.fclone();
+            cfg.setStatus(Status.OFFLINE);
+            getDao().put_(x, cfg);
           }
-      } finally {
-        synchronized ( getTimer() ) {
-          setIsRunning(false);
         }
+      } catch ( Throwable t ) {
+        getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage());
+      } finally {
+        schedule(x);
       }
       `
     }
