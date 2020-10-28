@@ -199,7 +199,7 @@ foam.CLASS({
           return [
             [`${name}$errors_`],
             function(errs) {
-              return errs ? `Please enter valid ${label.toLowerCase()}` : null;
+              return errs ? (label? `Please enter valid ${label.toLowerCase()}` : `Please enter valid ${name.toLowerCase()}`) : null;
             }
           ];
         }
