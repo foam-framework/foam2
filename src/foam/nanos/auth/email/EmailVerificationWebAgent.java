@@ -66,7 +66,7 @@ public class EmailVerificationWebAgent
       String msg = t.getMessage();
       ((Logger) x.get("logger")).error(msg);
       t.printStackTrace();
-      message = "Problem verifying your email<br>" + msg;
+      message = "There was a problem verifying your email.<br>" + msg;
     } finally {
       if ( config_ == null ) {
         config_ = EnvironmentConfigurationBuilder
