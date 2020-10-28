@@ -21,6 +21,8 @@ foam.CLASS({
     'foam.nanos.approval.Approvable',
     'foam.nanos.crunch.lite.Capable',
     'foam.nanos.crunch.lite.CapablePayload',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.approval.ApprovalStatus',
     'foam.nanos.ruler.Operations',
     'foam.nanos.auth.Subject',
     'java.util.Map'
@@ -56,7 +58,11 @@ foam.CLASS({
                   capablePayloadToUpdate.setProperty(propNameString,propsToUpdate.get(propNameString));
                 }
 
-                capablePayloadToUpdate.setStatus(foam.nanos.crunch.CapabilityJunctionStatus.APPROVED);
+                CapabilityJunctionStatus statusToSet = approvable.getStatus() == ApprovalStatus.APPROVED 
+                  ? CapabilityJunctionStatus.APPROVED
+                  : CapabilityJunctionStatus.REJECTED;
+
+                capablePayloadToUpdate.setStatus(statusToSet);
                 capablePayloadToUpdate.setHasSafeStatus(true);
 
                 // first update the object's capable payloads

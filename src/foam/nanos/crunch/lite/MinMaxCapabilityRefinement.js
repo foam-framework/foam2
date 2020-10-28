@@ -34,6 +34,7 @@ foam.CLASS({
         
         int numberGranted = 0;
         int numberPending = 0;
+        int numberRejected = 0;
 
         for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
           CapablePayload prereqPayload = (CapablePayload)
@@ -51,13 +52,21 @@ foam.CLASS({
             case APPROVED:
               numberPending++;
               continue;
+            case REJECTED:
+              numberRejected++;
+              continue;
           }
         }
 
+        int numGrantedOrPending = ccJunctions.size() - numberRejected;
+
+        if ( getMin() > numGrantedOrPending ){
+          return CapabilityJunctionStatus.REJECTED;
+        }
         if ( numberGranted >= getMin() ) {
           return CapabilityJunctionStatus.GRANTED;
         }
-        if ( numberGranted + numberPending >= getMin() ) {
+        if ( numberGranted + numberPending + numberRejected >= getMin() ) {
           return CapabilityJunctionStatus.PENDING;
         }
         return CapabilityJunctionStatus.ACTION_REQUIRED;

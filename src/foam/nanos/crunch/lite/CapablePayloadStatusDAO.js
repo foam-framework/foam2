@@ -60,6 +60,10 @@ foam.CLASS({
         if ( oldStatus == APPROVED && newStatus == PENDING ) {
           newStatus = APPROVED;
         }
+
+        if ( oldStatus == REJECTED  ) {
+          newStatus = REJECTED;
+        }
         
         if ( payload.getCapability().getReviewRequired() ) {
           if ( oldStatus == PENDING ) {
