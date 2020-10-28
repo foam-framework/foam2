@@ -192,7 +192,7 @@ foam.CLASS({
   refines: 'foam.core.FObjectProperty',
 
   messages: [
-    { name: 'PLEASE_ENTER_VALID', value: 'Please enter valid' },
+    { name: 'PLEASE_ENTER_VALID', message: 'Please enter valid' },
   ],
 
   properties: [
@@ -204,10 +204,11 @@ foam.CLASS({
       name: 'validateObj',
       expression: function(name, label, required, validationPredicates, autoValidate) {
         if ( autoValidate ) {
+          var self = this;
           return [
             [`${name}$errors_`],
             function(errs) {
-              return errs ? `${this.PLEASE_ENTER_VALID} ${label.toLowerCase()}` : null;
+              return errs ? `${self.PLEASE_ENTER_VALID} ${(label || name).toLowerCase()}` : null;
             }
           ];
         }
