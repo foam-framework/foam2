@@ -405,7 +405,7 @@ foam.CLASS({
 
   messages: [
     { name: 'PHONE_NUMBER_REQUIRED', message: 'Phone number required' },
-    { name: 'INVALID_PHONE_NUMBER', message: 'Invalid phone number.' }
+    { name: 'INVALID_PHONE_NUMBER', message: 'Invalid phone number' }
   ],
 
   properties: [
