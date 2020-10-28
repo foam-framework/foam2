@@ -339,6 +339,7 @@ foam.CLASS({
       `
     },
     {
+      documentation: 'Called by the party runing the election, requesting us to vote. A vote is simply a random number. Highest number wins. The caller also sends when they started the election. If we are also in ELECTION state, but the other party started earlier then we abandon our election.',
       name: 'vote',
       synchronized: true,
       javaCode: `

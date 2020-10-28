@@ -6,40 +6,12 @@ p({
   "scheduled":false,
   "clusterable":false,
   "code":"""
-import foam.nanos.medusa.MedusaEntry;
-import foam.nanos.medusa.MedusaType;
-import foam.nanos.medusa.ClusterConfig;
-import foam.mlang.MLang;
-import foam.mlang.predicate.Predicate;
-import foam.dao.ArraySink;
-
 // find entry with index
 index = 158L;
 
 support = x.get("clusterConfigSupport");
-configs = x.get("clusterConfigDAO")
-    .where(
-        MLang.AND(new Predicate[] {
-            MLang.EQ(ClusterConfig.TYPE, MedusaType.NODE),
-            MLang.EQ(ClusterConfig.ZONE, 0L),
-            MLang.EQ(ClusterConfig.ENABLED, true)
-        })
-    )
-    .select(new ArraySink()).array;
-for ( config : configs ) {
-    d = support.getClientDAO(x, "medusaEntryDAO", config, config);
-    print("querying: "+config.getId());
-    try {
-      m = d.find(MLang.EQ(MedusaEntry.INDEX, index));
-      if ( m != null ) {
-        print(index + ": "+config.id);
-      }
-    } catch (Throwable t) {
-      print(t.getMessage());
-    }
-}
+count = support.countEntryOnNodes(x, index);
+print("index: "+index+", count: "+count);
 print("done");
-  """,
-  "output":"",
-  "notes":""
+  """
 })

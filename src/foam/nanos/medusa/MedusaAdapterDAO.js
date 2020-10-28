@@ -107,7 +107,7 @@ foam.CLASS({
       getLogger().debug("put");
       if ( obj instanceof Clusterable &&
            ! ((Clusterable) obj).getClusterable() ) {
-        getLogger().debug("put", "not clusterable", obj.getProperty("id"));
+        getLogger().debug("put", "not clusterable", obj.getClass().getSimpleName(), obj.getProperty("id").toString());
         return getDelegate().put_(x, obj);
       }
 
