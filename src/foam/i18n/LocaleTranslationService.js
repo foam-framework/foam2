@@ -33,9 +33,11 @@ foam.CLASS({
 
         DAO localeDAO = (DAO) getX().get("localeDAO");
 
+        // following language-VARIANT format
         boolean hasVariant = locale.contains("-");
         String language = hasVariant ? locale.substring(0,2).toLowerCase() : locale.toLowerCase();
         String variant = hasVariant ? locale.substring(3).toUpperCase() : "";
+        locale = hasVariant ? language + "-" + variant : locale;
 
         Locale localeEntry = (Locale) localeDAO.find(
           AND(
