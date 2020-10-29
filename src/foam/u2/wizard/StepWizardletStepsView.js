@@ -79,7 +79,6 @@ foam.CLASS({
               this.data.countAvailableSections(w) < 1
               || ! wizardlet.isAvailable
             ) {
-              console.log('skip');
               wSkipped++;
               continue;
             }
@@ -169,14 +168,21 @@ foam.CLASS({
     },
     function renderSectionLabel(elem, section, index, isCurrent) {
       let title = section.title;
-      if ( ! title || ! title.trim() ) title = "Part " + index;
-      return elem       
+      if ( ! title ) title = "Part " + index;
+
+      var slot$ = foam.Function.isInstance(title) ?
+      foam.core.ExpressionSlot.create({
+        obj$: section.data$,
+        code: title
+      }) : title;
+
+      return elem
         .style({
           'color': isCurrent 
             ? this.theme.black
             : this.theme.grey2
         })
-        .add(title);
+        .add(slot$);
     }
   ]
 });
