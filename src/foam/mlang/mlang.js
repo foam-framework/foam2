@@ -2421,13 +2421,7 @@ foam.CLASS({
             } else {
               s = prop.f(obj);
 
-              if ( ! foam.String.isInstance(s) ) {
-                if ( s.toSummary ) {
-                  s = s.toSummary();
-                } else {
-                  continue;
-                }
-              }
+              s = String(s);
             }
           } catch (err) {}
           if ( s.toLowerCase().includes(arg) ) return true;

@@ -77,9 +77,6 @@ foam.CLASS({
     function toSwiftType(optional) {
       return this.swift + (optional ? '?' : '')
     },
-    function toSummary() {
-      return this.toString();
-    }
   ]
 });
 
