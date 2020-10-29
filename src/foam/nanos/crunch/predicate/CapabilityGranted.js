@@ -35,6 +35,7 @@ foam.CLASS({
         var crunchService = (CrunchService) x.get("crunchService");
 
         var ucj = crunchService.getJunction(x, getCapabilityId());
+        if ( ucj == null ) return false;
         return ucj.getStatus() == GRANTED;
       `
     }
