@@ -29,23 +29,22 @@ foam.CLASS({
     {
       name: 'getTranslation',
       javaCode: `
-        if ( locale.equals("en") ) return originalText;
-
         DAO localeDAO = (DAO) x.get("localeDAO");
 
-        List<Locale> translationInArray = (ArrayList<Locale>) ((ArraySink) localeDAO.where(
-          AND(
-            EQ(Locale.SOURCE, source),
-            OR(
-              EQ(Locale.LOCALE, locale),
-              EQ(Locale.VARIANT, locale),
-              EQ(Locale.LOCALE_VARIANT, locale)
-            )
-          )
-        ).limit(1).select(new ArraySink())).getArray();
-        
-        String translation = translationInArray.size() > 0 ? translationInArray.get(0).getTarget() : originalText;
+        Locale localeEntry = (Locale) localeDAO.find(AND(
+          EQ(Locale.SOURCE, source),
+          EQ(Locale.LOCALE, locale)
+        ));
 
+        if ( localeEntry == null ) {
+          localeEntry = (Locale) localeDAO.find(AND(
+            EQ(Locale.SOURCE, source),
+            EQ(Locale.VARIANT, locale)
+          ));
+        }
+
+        String translation = localeEntry != null ? localeEntry.getTarget() : defaultText;
+        
         return translation;
       `
     }
