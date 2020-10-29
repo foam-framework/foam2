@@ -30,7 +30,14 @@ foam.CLASS({
   `,
 
   properties: [
-    ['type', 'number'],
+    {
+      name: 'type',
+      expression: function(mode) {
+        return mode === foam.u2.DisplayMode.RO ? 'text' : 'number';
+      },
+      documentation: `Determines how we can show the value. Number does not allow
+        formatting of the value in a human readable way`
+    },
     { class: 'Float', name: 'data' },
     'precision',
     'min',
@@ -101,14 +108,14 @@ foam.CLASS({
 
     function formatNumber(val) {
       if ( ! val ) val = 0;
-      val = val.toFixed(this.precision);
-      return val;
+      var decimal = this.precision ? this.precision : 0;
+      return this.mode === foam.u2.DisplayMode.RO ?
+        val.toLocaleString(undefined, {minimumFractionDigits: decimal}) :
+        val.toFixed(decimal);
     },
 
     function dataToText(val) {
-      return this.precision !== undefined ?
-          this.formatNumber(val) :
-          '' + val;
+      return this.formatNumber(val);
     },
 
     function textToData(text) {

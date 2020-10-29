@@ -27,7 +27,9 @@ foam.CLASS({
     },
 
     function formatNumber(val) {
-      return val.toFixed(2);
+      if ( ! val ) val = 0;
+      val = Math.floor(val);
+      return this.SUPER(val);
     },
 
     function link() {
