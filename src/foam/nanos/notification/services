@@ -15,6 +15,13 @@ p({
           .build())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("notifications")
+      .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
+        .setComparator(foam.mlang.MLang.COMPOUND(new foam.mlang.order.Comparator[] {
+          foam.mlang.MLang.DESC(foam.nanos.notification.Notification.CREATED),
+          foam.nanos.notification.Notification.READ
+        }))
+        .setSize(100000)
+        .build())
       .build();
     dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.GROUP_ID,foam.nanos.notification.Notification.READ });
     dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.BROADCASTED,foam.nanos.notification.Notification.READ });
