@@ -17,6 +17,7 @@ foam.CLASS({
     place.`,
 
   javaImports: [
+    'foam.dao.DAO',
     'foam.mlang.sink.Count'
   ],
 
@@ -27,7 +28,6 @@ foam.CLASS({
       name: 'comparator'
     },
     {
-      //class: 'foam.mlang.predicate.PredicateProperty',
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'predicate'
@@ -51,11 +51,15 @@ foam.CLASS({
         Count count = new Count();
         count = (Count) this.getDelegate().select(count);
         if ( count.getValue() > getSize() + getSize() * getPurgePercent() / 100 ) {
-          this.getDelegate()
+          DAO delegate = this.getDelegate()
             .where(getPredicate())
-            .orderBy(getComparator())
-            .skip(getSize())
-            .removeAll();
+            .skip(getSize());
+
+          if ( getComparator() != null ) {
+            delegate = delegate.orderBy(getComparator());
+          }
+
+          delegate.removeAll();
         }
         return obj;
       `
