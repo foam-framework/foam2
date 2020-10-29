@@ -56,7 +56,7 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'PART_LABEL', message: 'Part' }
+    { name: 'PART_LABEL', message: 'Part ' }
   ],
 
   methods: [
@@ -172,7 +172,7 @@ foam.CLASS({
     },
     function renderSectionLabel(elem, section, index, isCurrent) {
       let title = section.title;
-      if ( ! title || ! foam.Function.isInstance(title) && ! title.trim() ) title = "Part " + index;
+      if ( ! title || ! foam.Function.isInstance(title) && ! title.trim() ) title = this.PART_LABEL + index;
 
       title = foam.Function.isInstance(title) ?
       foam.core.ExpressionSlot.create({
