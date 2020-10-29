@@ -43,8 +43,8 @@ foam.CLASS({
             )
           )
         ).limit(1).select(new ArraySink())).getArray();
-
-        String translation = translationInArray.size() > 0 ? translationInArray.get(0).getTarget() : "";
+        
+        String translation = translationInArray.size() > 0 ? translationInArray.get(0).getTarget() : originalText;
 
         return translation;
       `
