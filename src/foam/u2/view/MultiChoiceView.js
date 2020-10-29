@@ -113,7 +113,7 @@ foam.CLASS({
             var isSelected = foam.core.Slot.isInstance(choice[2])
               ? choice[2].get()
               : choice[2];
-  
+
             var isFinal = foam.core.Slot.isInstance(choice[4])
               ? choice[4].get()
               : choice[4]
@@ -129,10 +129,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'isValidNumberOfChoices',
       expression: function(selectedChoices, minSelected, maxSelected){
-        if ( selectedChoices.length >= minSelected && selectedChoices.length <= maxSelected ){
-          return true;
-        }
-        return false;
+        return selectedChoices.length >= minSelected && selectedChoices.length <= maxSelected;
       }
     },
     {
@@ -155,9 +152,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'maxSelected',
-      factory: function () {
-        return 2;
-      }
+      value: 2
     },
     {
       class: 'foam.u2.ViewSpecWithJava',
@@ -297,8 +292,7 @@ foam.CLASS({
               })
             })
           )
-        .end()
-
+        .end();
     },
 
     function outputSelectedChoicesInValueLabelFormat() {
@@ -333,10 +327,9 @@ foam.CLASS({
     },
 
     function mustSlot(v) {
-      return foam.core.Slot.isInstance(v)
-        ? v
-        : foam.core.SimpleSlot.create({ value: v })
-        ;
+      return foam.core.Slot.isInstance(v) ?
+        v :
+        foam.core.SimpleSlot.create({ value: v }) ;
     }
   ],
 
@@ -354,19 +347,18 @@ foam.CLASS({
             this.isDaoFetched = true
           });
           return;
-        } else {
-          console.warn('Inefficient ChoiceView. Consider creating transient _choiceText_ property on ' + of.id + ' DAO, prop: ' + this.prop_);
-
-          /* Ex.:
-          {
-            class: 'String',
-            name: '_choiceText_',
-            transient: true,
-            javaGetter: 'return getName();',
-            getter: function() { return this.name; }
-          }
-          */
         }
+        console.warn('Inefficient ChoiceView. Consider creating transient _choiceText_ property on ' + of.id + ' DAO, prop: ' + this.prop_);
+
+        /* Ex.:
+        {
+          class: 'String',
+          name: '_choiceText_',
+          transient: true,
+          javaGetter: 'return getName();',
+          getter: function() { return this.name; }
+        }
+        */
         var p = this.mode === foam.u2.DisplayMode.RW ?
           this.dao.select().then(s => s.array) :
           this.dao.find(this.data).then(o => o ? [o] : []);

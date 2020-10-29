@@ -246,3 +246,8 @@ p({class:"foam.i18n.Locale",id:"foam.nanos.u2.navigation.SignIn.LOGIN.label",loc
 p({class:"foam.i18n.Locale",id:"foam.nanos.u2.navigation.NotificationMenuItem.INVALID_MENU",locale:"pt",source:"foam.nanos.u2.navigation.NotificationMenuItem.INVALID_MENU",target:"Nenhum menu no menuDAO com id: \"notificações\"."})
 p({class:"foam.i18n.Locale",id:"foam.nanos.u2.navigation.NotificationMenuItem.COUNT_UNREAD.label",locale:"pt",source:"foam.nanos.u2.navigation.NotificationMenuItem.COUNT_UNREAD.label",target:"contar não lidas"})
 p({class:"foam.i18n.Locale",id:"foam.nanos.u2.navigation.NotificationMenuItem.SHOW_COUNT_UNREAD.label",locale:"pt",source:"foam.nanos.u2.navigation.NotificationMenuItem.SHOW_COUNT_UNREAD.label",target:"mostrar contagem não lida"})
+
+p({class:"foam.i18n.Locale",id:"foam.core.PhoneNumber.PHONE_NUMBER_REQUIRED",locale:"pt",source:"foam.core.PhoneNumber.PHONE_NUMBER_REQUIRED",target:"Número de telefone obrigatório"})
+p({class:"foam.i18n.Locale",id:"foam.core.PhoneNumber.INVALID_PHONE_NUMBER",locale:"pt",source:"foam.core.PhoneNumber.INVALID_PHONE_NUMBER",target:"Número de telefone inválido"})
+p({class:"foam.i18n.Locale",id:"foam.core.FObjectProperty.PLEASE_ENTER_VALID",locale:"pt",source:"foam.core.FObjectProperty.PLEASE_ENTER_VALID",target:"Por favor insira um válido"})
+p({class:"foam.i18n.Locale",id:"foam.core.Property.PLEASE_ENTER",locale:"pt",source:"foam.core.Property.PLEASE_ENTER",target:"Por favor, insira"})

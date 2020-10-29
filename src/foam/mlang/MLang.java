@@ -10,8 +10,7 @@ import foam.core.ClassInfo;
 import foam.core.X;
 import foam.dao.Sink;
 import foam.mlang.expr.*;
-import foam.mlang.order.Comparator;
-import foam.mlang.order.Desc;
+import foam.mlang.order.*;
 import foam.mlang.predicate.*;
 import foam.mlang.sink.*;
 import foam.nanos.auth.Authorizer;
@@ -34,6 +33,19 @@ public class MLang
 
   public static Comparator DESC(Comparator c) {
     return new Desc(c);
+  }
+
+  public static Comparator COMPOUND(Comparator... cs) {
+    Comparator c = cs[0];
+    for ( int i = 1 ; i < cs.length ; i++ ) c = THEN_BY(c, cs[i]);
+    return c;
+  }
+
+  public static Comparator THEN_BY(Comparator head, Comparator tail) {
+    ThenBy tb = new ThenBy();
+    tb.setHead(head);
+    tb.setTail(tail);
+    return tb;
   }
 
   public static Expr prepare(Object o) {
