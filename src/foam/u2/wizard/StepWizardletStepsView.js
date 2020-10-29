@@ -55,6 +55,10 @@ foam.CLASS({
     'foam.u2.wizard.WizardPosition'
   ],
 
+  messages: [
+    { name: 'PART_LABEL', message: 'Part' }
+  ],
+
   methods: [
     function initE() {
       var self = this;
@@ -170,7 +174,7 @@ foam.CLASS({
       let title = section.title;
       if ( ! title || ! foam.Function.isInstance(title) && ! title.trim() ) title = "Part " + index;
 
-      var slot$ = foam.Function.isInstance(title) ?
+      title = foam.Function.isInstance(title) ?
       foam.core.ExpressionSlot.create({
         obj$: section.data$,
         code: title
@@ -182,7 +186,7 @@ foam.CLASS({
             ? this.theme.black
             : this.theme.grey2
         })
-        .add(slot$);
+        .add(title);
     }
   ]
 });
