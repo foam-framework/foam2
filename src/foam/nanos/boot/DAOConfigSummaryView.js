@@ -111,7 +111,7 @@ foam.CLASS({
             start().
               addClass(this.myClass('title')).
               start('a').
-                add('Data Management').on('click', () => { /**it's null for some reason**/ this.memento = null; }).
+                add('Data Management').on('click', () => { /**it's null for some reason**/ this.memento$.set(null); }).
               end().
               add(' / ', this.title).
             end().
@@ -191,7 +191,7 @@ foam.CLASS({
        onKey: true
       }
     },
-    'currentMemento_'
+    'currentMemento_'//cannot import tail!!! cause on
   ],
 
   methods: [
