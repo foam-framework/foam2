@@ -19,7 +19,6 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'AdapterDAO',
   extends: 'foam.dao.ProxyDAO',
-  implements: [ 'foam.dao.Adapter' ],
 
   documentation: `DAO for adapting between "of" input type and "to" delegate
       type. I.e., accept put(<instance-of-"of">), and
@@ -31,7 +30,6 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.X',
-    'foam.dao.Adapter',
     'foam.dao.DAO',
     'foam.dao.Sink',
     'foam.dao.ArraySink',
@@ -47,21 +45,43 @@ foam.CLASS({
 
       properties: [
         {
-          class: 'Function',
-          name: 'adapt',
-          documentation: `"adapt(o)" adapts input to type expected by
-              "delegate" sink.`,
-          required: true
-        },
-        {
-          class: 'FObjectProperty',
-          of: 'foam.dao.Adapter',
-          name: 'adapter',
-          required: true
+          class: 'Class',
+          name: 'of'
         }
       ],
 
       methods: [
+        {
+          name: 'adapt',
+          type: 'FObject',
+          args: [
+            {
+              name: 'ctx',
+              type: 'X'
+            },
+            {
+              name: 'obj',
+              type: 'FObject'
+            }
+          ],
+          code: function(ctx, obj) {
+            if ( ! obj ) return obj;
+            if ( ! this.of.isInstance(obj) ) return obj;
+            return this.to.create(obj, ctx || this.__subContext__);
+          },
+          javaCode: `
+            FObject innerObject;
+            FObject outerObject;
+            try {
+              innerObject = (FObject) obj;
+              outerObject = (FObject) getOf().newInstance();
+              outerObject = outerObject.copyFrom(innerObject);
+            } catch ( Exception ex ) {
+              throw new RuntimeException("Cannot adapt: " + ex.getMessage(), ex);
+            }
+            return outerObject;
+          `
+        },
         {
           name: 'put',
           code: function put(o, sub) {
@@ -69,7 +89,7 @@ foam.CLASS({
           },
           javaCode: `
             FObject innerObject = (FObject) obj;
-            FObject outerObject = getAdapter().adaptFromDelegate(getX(), innerObject);
+            FObject outerObject = adapt(getX(), innerObject);
             getDelegate().put(outerObject, sub);
           `
         },
@@ -80,7 +100,7 @@ foam.CLASS({
           },
           javaCode: `
             FObject innerObject = (FObject) obj;
-            FObject outerObject = getAdapter().adaptFromDelegate(getX(), innerObject);
+            FObject outerObject = adapt(getX(), innerObject);
             getDelegate().remove(outerObject, sub);
           `
         }
@@ -298,7 +318,7 @@ foam.CLASS({
       javaCode: `
             Sink decoratedSink = new AdapterSink.Builder(x)
               .setDelegate(sink != null ? sink : new ArraySink())
-              .setAdapter(this)
+              .setOf(this.getOf())
               .build();
             getDelegate().select_(x, decoratedSink, skip, limit, adaptOrder(order), adaptPredicate(predicate));
             return sink;
@@ -310,7 +330,10 @@ foam.CLASS({
         return this.delegate.removeAll_(
             ctx, skip, limit,
             this.adaptOrder(order), this.adaptPredicate(predicate));
-      }
+      },
+      javaCode: `
+        getDelegate().removeAll_(x, skip, limit, adaptOrder(order), adaptPredicate(predicate));
+      `
     }
   ]
 });
