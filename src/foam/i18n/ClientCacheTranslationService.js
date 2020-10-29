@@ -98,7 +98,7 @@ foam.CLASS({
         { name: 'defaultText', type: 'String' }
       ],
       type: 'String',
-      code: function(locale, source) {
+      code: function(x, locale, source, defaultText) {
         return this.localeEntries[source] || defaultText;
       }
     }
