@@ -145,7 +145,10 @@ foam.CLASS({
     function initE() {
       var self = this;
 
-      this.currentMemento$ = this.memento.tail$;
+      if ( this.memento.tail )
+        this.currentMemento$ = this.memento.tail$;
+      else
+        this.currentMemento$ = this.memento$;
 
       this.data.border.add(
         this.E()
