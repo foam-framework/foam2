@@ -319,6 +319,7 @@ foam.CLASS({
       this.clientPromise.then(async function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
 
+        await client.translationService.initLatch;
         await self.fetchSubject();
 
         // add user and agent for backward compatibility
