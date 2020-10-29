@@ -125,6 +125,12 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'inheritModelActions',
+      value: true,
+      documentation: 'Set this to true to have the context menu actions inherit data model actions.'
+    },
+    {
+      class: 'Boolean',
       name: 'editColumnsEnabled',
       value: true,
       documentation: 'Set this to true to let the user select columns.'
@@ -407,7 +413,9 @@ foam.CLASS({
 
           var modelActions = view.of.getAxiomsByClass(foam.core.Action);
           var actions = Array.isArray(view.contextMenuActions)
+            ? view.inheritModelActions
             ? view.contextMenuActions.concat(modelActions)
+            : view.contextMenuActions
             : modelActions;
 
           //with this code error created  slot.get cause promise return
