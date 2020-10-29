@@ -1589,7 +1589,7 @@ foam.CLASS({
 
     function translate(source, opt_default) {
       /* Add the translation of the supplied source to the Element as a String */
-      var translation = this.translationService.getTranslation(null, foam.locale, source, opt_default);
+      var translation = this.translationService.getTranslation(foam.locale, source, opt_default);
       return this.add(translation);
     },
 
@@ -1642,7 +1642,7 @@ foam.CLASS({
           throw new Error('Unsupported');
         } else if ( this.translationService && c && c.data && c.data.id ) {
           var key = c.data.id + '.' + c.clsInfo;
-          var translation = this.translationService.getTranslation(null, foam.locale, key, c.default);
+          var translation = this.translationService.getTranslation(foam.locale, key, c.default);
           return this.add(translation);
         } else {
           es.push(c);

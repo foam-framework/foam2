@@ -92,13 +92,12 @@ foam.CLASS({
     {
       name: 'getTranslation',
       args: [
-        { name: 'x', type: 'X' },
         { name: 'locale', type: 'String' },
         { name: 'source', type: 'String' },
         { name: 'defaultText', type: 'String' }
       ],
       type: 'String',
-      code: function(x, locale, source, defaultText) {
+      code: function(locale, source, defaultText) {
         return this.localeEntries[source] || defaultText;
       }
     }

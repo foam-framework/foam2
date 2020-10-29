@@ -20,10 +20,6 @@ foam.INTERFACE({
       async: true,
       args: [
         {
-          name: 'x',
-          type: 'Context'
-        },
-        {
           name: 'locale',
           type: 'String'
         },
