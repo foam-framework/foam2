@@ -412,6 +412,7 @@ FOAM_FILES([
   //extras
   { name: 'foam/nanos/crunch/extra/ReviewCapability' },
   { name: 'foam/nanos/crunch/extra/ReviewCapabilityData' },
+  { name: 'foam/nanos/crunch/extra/ReviewWizard' },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },

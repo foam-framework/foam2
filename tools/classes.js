@@ -704,6 +704,7 @@ var classes = [
   //crunch extras
   'foam.nanos.crunch.extra.ReviewCapability',
   'foam.nanos.crunch.extra.ReviewCapabilityData',
+  'foam.nanos.crunch.extra.ReviewWizard',
 
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
