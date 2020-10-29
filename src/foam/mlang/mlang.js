@@ -2421,11 +2421,9 @@ foam.CLASS({
             } else {
               s = prop.f(obj);
 
-              if ( ! ( typeof s === "string" ) ) {
+              if ( ! foam.String.isInstance(s) ) {
                 if ( s.toSummary ) {
                   s = s.toSummary();
-                } else if ( s.toString ) {
-                  s = s.toString();
                 } else {
                   continue;
                 }
