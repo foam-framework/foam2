@@ -30,13 +30,6 @@ foam.CLASS({
       factory: function() { return this.Latch.create(); }
     },
     {
-      class: 'foam.dao.DAOProperty',
-      name: 'localeCache',
-      factory: function() {
-        return this.MDAO.create({of: this.Locale})/*.addPropertyIndex(this.Locale.SOURCE)*/;
-      },
-    },
-    {
       name: 'locale',
       factory: function() {
         return (foam.locale || "en").substring(0,2);
@@ -84,17 +77,7 @@ foam.CLASS({
     },
 
     function addLocale(l) {
-//      console.log('************** addLocale2', l.source, '->',l.target);
-      this.localeCache.put(this.Locale.create({
-        id: l.source,
-        // locale: l.locale,
-        // source: l.source,
-        target: l.target
-      }));
-      // populate map entries
-      if ( ! this.localeEntries[l.source] ) {
-        this.localeEntries[l.source] = l.target;
-      }
+      this.localeEntries[l.source] = l.target;
     },
 
     function hasVariant() { return !! this.variant; },

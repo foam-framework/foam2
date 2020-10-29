@@ -62,7 +62,6 @@ foam.CLASS({
     'installCSS',
     'notificationDAO',
     'sessionSuccess',
-    'translationService',
     'window'
   ],
 
