@@ -2418,10 +2418,18 @@ foam.CLASS({
               s = prop.f(obj).toString().toLowerCase();
             } else if ( this.Date.isInstance(prop) ) {
               s = prop.f(obj).toISOString().toLowerCase();
-            } else if ( ! this.String.isInstance(prop) ) {
-              continue;
             } else {
-              s = prop.f(obj).toLowerCase();
+              s = prop.f(obj);
+
+              if ( ! ( typeof s === "string" ) ) {
+                if ( s.toSummary ) {
+                  s = s.toSummary();
+                } else if ( s.toString ) {
+                  s = s.toString();
+                } else {
+                  continue;
+                }
+              }
             }
           } catch (err) {}
           if ( s.toLowerCase().includes(arg) ) return true;
