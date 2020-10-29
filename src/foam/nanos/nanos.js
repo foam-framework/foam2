@@ -373,6 +373,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/lite/ruler/SetCapablePayloadStatusOnPut" },
   { name: "foam/nanos/crunch/lite/ruler/ReputDependantPayloads" },
 
+  // crunch capability categories
   { name: "foam/nanos/crunch/CapabilityCategory" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/CapabilityCapabilityJunctionRefine" },
@@ -390,6 +391,8 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/CrunchService" },
   { name: "foam/nanos/crunch/ClientCrunchService" },
   { name: "foam/nanos/crunch/ReputDependentUCJs" },
+  //predicates
+  { name: 'foam/nanos/crunch/predicate/CapabilityGranted' },
   //spid
   { name: "foam/nanos/auth/CreateUserCapabilityJunctionOnSpidSet" },
   { name: "foam/nanos/auth/SetUserServiceProviderJunctionRuleAction" },
@@ -402,9 +405,16 @@ FOAM_FILES([
   //views
   { name: "foam/nanos/crunch/ui/CapableView" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
+  { name: "foam/nanos/crunch/ui/ReviewCapabilityWizardlet" },
+  { name: "foam/nanos/crunch/ui/ReviewCapabilityView" },
+  { name: 'foam/nanos/crunch/ui/UCJView' },
   //boxes
   { name: "foam/nanos/crunch/box/CrunchClientBox" },
   { name: "foam/nanos/crunch/box/CrunchClientReplyBox" },
+  //extras
+  { name: 'foam/nanos/crunch/extra/ReviewCapability' },
+  { name: 'foam/nanos/crunch/extra/ReviewCapabilityData' },
+  { name: 'foam/nanos/crunch/extra/ReviewWizard' },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },

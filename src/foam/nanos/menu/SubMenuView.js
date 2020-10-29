@@ -64,7 +64,7 @@ foam.CLASS({
                 self.close();
                 menu.launch_(X, e);
               })
-              .add(menu.label);
+              .translate(menu.id+'.label',menu.label);
             })
           .end();
         },

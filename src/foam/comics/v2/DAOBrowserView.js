@@ -8,15 +8,16 @@ foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOBrowserView',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.comics.SearchMode',
     'foam.comics.v2.DAOControllerConfig',
     'foam.log.LogLevel',
     'foam.u2.ActionView',
     'foam.u2.dialog.Popup',
+    'foam.u2.filter.FilterView',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
-    'foam.u2.filter.FilterView',
     'foam.u2.view.ScrollTableView',
     'foam.u2.view.SimpleSearch',
     'foam.u2.view.TabChoiceView',
@@ -171,7 +172,17 @@ foam.CLASS({
       name: 'serviceName',
       class: 'String',
       factory: function() {
-        return this.data.serviceName;
+        return this.data && this.data.serviceName ? this.data.serviceName : this.config.daoKey;
+      }
+    },
+    {
+      name: 'importModal',
+      factory: function() {
+        return {
+          class: 'foam.nanos.google.api.sheets.ImportFromGoogleSheetsForm',
+          of: this.config.of,
+          dao: this.serviceName
+        };
       }
     }
   ],
@@ -204,16 +215,13 @@ foam.CLASS({
     {
       name: 'import',
       label: '',
+      availablePermissions: [ "data.import.googleSheets" ],
       toolTip: 'Import From Google Sheet',
       // icon: 'images/export-arrow-icon.svg',//need find out where we're getting the icons
       code: function() {
-        this.add(this.Popup.create().tag({
-          class: 'foam.nanos.google.api.sheets.ImportFromGoogleSheetsForm',
-          of: this.config.of,
-          dao: this.config.daoKey
-        }));
+        this.add(this.Popup.create().tag(this.importModal));
       }
-    },
+    }
   ],
 
   methods: [

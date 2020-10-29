@@ -117,7 +117,7 @@ foam.CLASS({
 
                   // Render title
                   .start('p').addClass(self.myClass('title'))
-                    .translate(wizardlet.capability.id+'.name')
+                    .translate(wizardlet.capability.id+'.name', wizardlet.capability.name)
                     .style({
                       'color': isCurrent ? this.theme.black : this.theme.grey2
                     })
@@ -168,7 +168,7 @@ foam.CLASS({
     },
     function renderSectionLabel(elem, section, index, isCurrent) {
       let title = section.title;
-      if ( ! title ) title = "Part " + index;
+      if ( ! title || ! foam.Function.isInstance(title) && ! title.trim() ) title = "Part " + index;
 
       var slot$ = foam.Function.isInstance(title) ?
       foam.core.ExpressionSlot.create({

@@ -34,7 +34,7 @@ public class EmailVerificationWebAgent
 
   @Override
   public void execute(X x) {
-    String             message          = "Your email has now been verified.";
+    String             message          = "Your email has now been verified";
     PrintWriter        out              = x.get(PrintWriter.class);
 
     DAO                userDAO          = (DAO) x.get("localUserDAO");
@@ -54,11 +54,11 @@ public class EmailVerificationWebAgent
       }
 
       if ( "".equals(userId) || !StringUtils.isNumeric(userId) ) {
-        throw new Exception("User not found.");
+        throw new Exception("User not found");
       }
 
       if ( user.getEmailVerified() ) {
-        throw new Exception("Email already verified.");
+        throw new Exception("Email already verified");
       }
       user = (User) user.fclone();
       emailToken.processToken(x, user, token);
@@ -66,7 +66,7 @@ public class EmailVerificationWebAgent
       String msg = t.getMessage();
       ((Logger) x.get("logger")).error(msg);
       t.printStackTrace();
-      message = "Problem verifying your email.<br>" + msg;
+      message = "There was a problem verifying your email.<br>" + msg;
     } finally {
       if ( config_ == null ) {
         config_ = EnvironmentConfigurationBuilder
