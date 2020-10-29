@@ -29,17 +29,31 @@ foam.CLASS({
     {
       name: 'getTranslation',
       javaCode: `
-        DAO localeDAO = (DAO) x.get("localeDAO");
+        if ( locale == "" || source == "" ) return defaultText;
 
-        Locale localeEntry = (Locale) localeDAO.find(AND(
-          EQ(Locale.SOURCE, source),
-          EQ(Locale.LOCALE, locale)
-        ));
+        DAO localeDAO = (DAO) getX().get("localeDAO");
+
+        boolean hasVariant = locale.contains("-");
+        String language = hasVariant ? locale.substring(0,2).toLowerCase() : locale.toLowerCase();
+        String variant = hasVariant ? locale.substring(3).toUpperCase() : "";
+
+        Locale localeEntry = (Locale) localeDAO.find(
+          AND(
+            EQ(Locale.SOURCE, source),
+            OR(
+              AND(
+                EQ(Locale.LOCALE, language),
+                EQ(Locale.VARIANT, variant)
+              ),
+              EQ(Locale.LOCALE_VARIANT, locale)
+            )
+          )
+        );
 
         if ( localeEntry == null ) {
           localeEntry = (Locale) localeDAO.find(AND(
             EQ(Locale.SOURCE, source),
-            EQ(Locale.VARIANT, locale)
+            EQ(Locale.LOCALE, language)
           ));
         }
 
