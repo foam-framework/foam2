@@ -70,7 +70,7 @@ foam.CLASS({
       this.capabilityDAO.find(this.data).then(cap => {
         var defaultData = cap.of.create({}, this);
         this.crunchService.getJunction(null, this.data).then(ucj => {
-          if ( ucj ) {
+          if ( ucj && ucj.data ) {
             this.ucjData = ucj.data;
             return;
           }
