@@ -9,6 +9,15 @@ foam.CLASS({
   name: 'LocaleTranslationService',
   implements: [ 'foam.i18n.TranslationService' ],
 
+  javaImports: [
+    'foam.dao.ArraySink',
+    'foam.dao.DAO',
+    'foam.i18n.Locale',
+    'java.util.List',
+    'java.util.ArrayList',
+    'static foam.mlang.MLang.*'
+  ],
+
   methods: [
     {
       name: 'getTranslations',
@@ -20,8 +29,24 @@ foam.CLASS({
     {
       name: 'getTranslation',
       javaCode: `
-      System.err.println("*********************************** getTranslation");
-      return "foobar";
+        if ( locale.equals("en") ) return originalText;
+
+        DAO localeDAO = (DAO) x.get("localeDAO");
+
+        List<Locale> translationInArray = (ArrayList<Locale>) ((ArraySink) localeDAO.where(
+          AND(
+            EQ(Locale.SOURCE, source),
+            OR(
+              EQ(Locale.LOCALE, locale),
+              EQ(Locale.VARIANT, locale),
+              EQ(Locale.LOCALE_VARIANT, locale)
+            )
+          )
+        ).limit(1).select(new ArraySink())).getArray();
+
+        String translation = translationInArray.size() > 0 ? translationInArray.get(0).getTarget() : "";
+
+        return translation;
       `
     }
   ]
