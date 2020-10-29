@@ -11,10 +11,6 @@ foam.CLASS({
 
   documentation: 'Data Management UI for browsing all DAOs.',
 
-  exports: [
-    'currentMemento_ as memento'
-  ],
-
   classes: [
     {
       name: 'CustomDAOUpdateView',
@@ -111,7 +107,7 @@ foam.CLASS({
             start().
               addClass(this.myClass('title')).
               start('a').
-                add('Data Management').on('click', () => { /**it's null for some reason**/ this.memento$.set(null); }).
+                add('Data Management').on('click', () => { /**it's null for some reason**/ this.memento.tail$.set(null); }).
               end().
               add(' / ', this.title).
             end().
@@ -164,6 +160,11 @@ foam.CLASS({
   implements: [ 'foam.mlang.Expressions' ],
 
   imports: [ 'memento', 'nSpecDAO', 'stack' ],
+
+
+  exports: [
+    'memento'//currentMemento_ as BackBorder will not work
+  ],
 
   properties: [
     {
