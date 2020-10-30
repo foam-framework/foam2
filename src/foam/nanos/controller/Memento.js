@@ -9,7 +9,11 @@ foam.CLASS({
   name: 'Memento',
 
   constants: {
-    SEPARATOR: ':'
+    SEPARATOR: ':',
+    PARAMS_BEGIN: '{',
+    PARAMS_END: '}',
+    PARAMS_SEPARATOR: ',',
+    EQUILITY_SIGN: '='
   },
 
   properties: [
@@ -67,13 +71,52 @@ foam.CLASS({
           this.parent.feedback_ = false;
         }
       }
+    },
+    {
+      name: 'params',
+    },
+    {
+      name: 'paramsArr',
+      expression: function(params) {
+        var arr = [];
+        var i = 0;//a=q,q,q,b=sd,z=sdf
+        while( i > 0 ) {
+          var beginWith = 0;
+          var equalitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, beginWith);
+          var nextEqualitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, equalitySumbolIndex + 1);
+          var nextParamNameIndex;
+          var thisParameterValueToParse;
+          if ( nextEqualitySumbolIndex == -1 ) {
+            thisParameterValueToParse = params.substring(equalitySumbolIndex);
+          } else {
+            var beginWith1 = equalitySumbolIndex;
+            while ( true ) {
+              var indexOfComa = params.indexOf(',', beginWith1 + 1);
+              if (indexOfComa > nextEqualitySumbolIndex ) {
+                break;
+              }
+              beginWith1 = indexOfComa + 1;
+            }
+            thisParameterValueToParse = params.substring(equalitySumbolIndex, beginWith1 - 1);
+            nextParamNameIndex = beginWith1;
+            beginWith = nextParamNameIndex;
+          }
+          while(true) {
+            arr.push( params.substring(beginWith, nextParamNameIndex), params.substring(equalitySumbolIndex + 1, nextParamNameIndex).split(','));
+          }
+        }
+      }
     }
   ],
    
   methods: [
     function combine() {
       return this.tail ?
-        this.head + this.SEPARATOR + this.tail.combine() :
+        this.head + this.SEPARATOR 
+        + this.PARAMS_BEGIN
+        + this.params
+        + this.PARAMS_END
+        + this.tail.combine() :
         this.head ;
     },
     function parseValue() {
@@ -86,7 +129,18 @@ foam.CLASS({
         this.tail = null;
       } else {
         this.head = this.value.substring(0, i);
-        this.tail = this.cls_.create({ value: this.value.substring(i+1), parent: this });
+        var tailStr = this.value.substring(i+1);
+        var j = this.value.indexOf(this.SEPARATOR, i + 1);
+        if ( tailStr.includes(this.PARAMS_BEGIN) && tailStr.includes(this.PARAMS_END) ) {
+          this.params = this.value.substring(i+1, j);
+          if ( j == -1 ) {
+            this.tail = null;
+          } else {
+            this.tail = this.cls_.create({ value: this.value.substring(j+1), parent: this });
+          }
+        } else {
+          this.tail = this.cls_.create({ value: this.value.substring(i+1), parent: this });
+        }
       }
       this.feedback_ = false;
     }
