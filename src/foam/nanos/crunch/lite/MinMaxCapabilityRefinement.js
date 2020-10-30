@@ -58,17 +58,25 @@ foam.CLASS({
           }
         }
 
-        int numGrantedOrPending = ccJunctions.size() - numberRejected;
+        int numberTotal = numberGranted + numberPending + numberRejected;
 
-        if ( getMin() > numGrantedOrPending ){
+        int numberGrantedOrPending = numberGranted + numberPending;
+
+        // TODO: right now this represents the capablePayloads haven't been processed for preqreqs yet
+        if ( numberTotal == 0 ){
+          return CapabilityJunctionStatus.ACTION_REQUIRED;
+        }
+
+        if ( getMin() > numberGrantedOrPending ){
           return CapabilityJunctionStatus.REJECTED;
         }
         if ( numberGranted >= getMin() ) {
           return CapabilityJunctionStatus.GRANTED;
         }
-        if ( numberGranted + numberPending + numberRejected >= getMin() ) {
+        if ( numberTotal >= getMin() ) {
           return CapabilityJunctionStatus.PENDING;
         }
+
         return CapabilityJunctionStatus.ACTION_REQUIRED;
       `
     }

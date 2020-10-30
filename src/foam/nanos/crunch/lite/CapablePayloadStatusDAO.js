@@ -62,11 +62,31 @@ foam.CLASS({
         }
 
         if ( oldStatus == REJECTED  ) {
+          // TODO: if rejected, need to change the status of all children (prereqs) as well to rejected
+          if ( newStatus == PENDING ){
+            var crunchService = (CrunchService) x.get("crunchService");
+            payload.setStatus(REJECTED);
+            List<String> prereqIdsList = crunchService.getPrereqs(payload.getCapability().getId());
+
+            if ( prereqIdsList != null && prereqIdsList.size() > 0 ){
+              String[] prereqIds = prereqIdsList.toArray(new String[prereqIdsList.size()]);
+
+              ((ArraySink) payloadDAO.select(new ArraySink())).getArray().stream()
+              .filter(cp -> Arrays.stream(prereqIds).anyMatch(((CapablePayload) cp).getCapability().getId()::equals))
+              .forEach(cp -> {
+                CapablePayload capableCp = (CapablePayload) cp;
+                capableCp.setStatus(REJECTED);
+                capableCp.setHasSafeStatus(true);
+                payloadDAO.put(capableCp);
+              });
+            }            
+          }
+
           newStatus = REJECTED;
         }
         
         if ( payload.getCapability().getReviewRequired() ) {
-          if ( oldStatus == PENDING ) {
+          if ( oldStatus == PENDING && newStatus != REJECTED ) {
             return getDelegate().put_(x, obj);
           }
           if ( oldStatus == ACTION_REQUIRED ) {
