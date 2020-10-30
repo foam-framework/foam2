@@ -33,30 +33,52 @@ foam.CLASS({
 
         DAO localeDAO = (DAO) getX().get("localeDAO");
 
-        // following language-VARIANT format
+        // localeVariant - complete culture code ('en-CA', ‘fr-CA’, ‘de_AT’ …etc) 
+        // locale - determines locale type (en, fr, es …etc)        
+        // variant - Locale variation (CA for en-CA, CA for fr-CA, AT for de_AT …etc)
+        String variant = "";
+        String localeVariant = "";
+        Locale localeEntry = null;
+
+        // note: 'locale' passed to the function may be in locale format or in local variant format
+        // so we need to check which format is used and parse it if necessary.
         boolean hasVariant = locale.contains("-");
-        String language = hasVariant ? locale.substring(0,2).toLowerCase() : locale.toLowerCase();
-        String variant = hasVariant ? locale.substring(3).toUpperCase() : "";
-        locale = hasVariant ? language + "-" + variant : locale;
+        if ( hasVariant ) {
+          variant = locale.substring(3).toUpperCase();
+          locale = locale.substring(0,2).toLowerCase();
+          localeVariant = locale + "-" + variant;
 
-        Locale localeEntry = (Locale) localeDAO.find(
-          AND(
-            EQ(Locale.SOURCE, source),
-            OR(
-              AND(
-                EQ(Locale.LOCALE, language),
-                EQ(Locale.VARIANT, variant)
-              ),
-              EQ(Locale.LOCALE_VARIANT, locale)
+          // search for locale and variant
+          localeEntry = (Locale) localeDAO.find(
+            AND(
+              EQ(Locale.SOURCE, source),        
+              EQ(Locale.LOCALE, locale),
+              EQ(Locale.VARIANT, variant)
             )
-          )
-        );
+          );
 
+          // search for locale variant
+          if ( localeEntry == null ) {
+            localeEntry = (Locale) localeDAO.find(
+              AND(
+                EQ(Locale.SOURCE, source),
+                EQ(Locale.LOCALE_VARIANT, localeVariant)
+              )
+            );
+          }
+        } else {
+          locale = locale.toLowerCase();
+        }
+
+        // search for locale with no variant
         if ( localeEntry == null ) {
-          localeEntry = (Locale) localeDAO.find(AND(
-            EQ(Locale.SOURCE, source),
-            EQ(Locale.LOCALE, language)
-          ));
+          localeEntry = (Locale) localeDAO.find(
+            AND(
+              EQ(Locale.SOURCE, source),
+              EQ(Locale.LOCALE, locale),
+              EQ(Locale.VARIANT, "")
+            )
+          );
         }
 
         String translation = localeEntry != null ? localeEntry.getTarget() : defaultText;
