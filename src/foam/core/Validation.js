@@ -118,7 +118,14 @@ foam.CLASS({
             for ( var i = 0 ; i < validationPredicates.length ; i++ ) {
               var vp = validationPredicates[i];
               var self = this;
+<<<<<<< HEAD
               if ( vp.jsFunc.call(this) ) return vp.jsErr.call(self, self);
+=======
+              if ( vp.jsFunc ) {
+                var result = vp.jsFunc.call(self, self);
+                if ( result ) return result;
+              }
+>>>>>>> fb6180011af5be8721f15e8638e024d0db04e6a4
             }
             return null;
           }];
