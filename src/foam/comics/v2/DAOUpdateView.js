@@ -53,7 +53,6 @@ foam.CLASS({
     'foam.u2.layout.Rows',
     'foam.u2.ControllerMode',
     'foam.u2.dialog.NotificationMessage',
-    'foam.nanos.controller.Memento'
   ],
 
   imports: [
@@ -154,8 +153,6 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.SUPER();
-
-      this.memento.tail = this.Memento.create({ head: 'Edit' });
 
       this
         .addClass(this.myClass())
