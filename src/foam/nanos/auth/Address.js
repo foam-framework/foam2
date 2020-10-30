@@ -21,8 +21,17 @@ foam.CLASS({
     'foam.nanos.auth.Region'
   ],
 
+  imports: [
+    'translationService'
+  ],
+
   messages: [
-    { name: 'INVALID_POSTAL_CODE_ERR_MSG', message: 'Invalid postal code' }
+    { name: 'CITY_REQUIRED', message: 'City required' },
+    { name: 'COUNTRY_REQUIRED', message: 'Country required' },
+    { name: 'INVALID_ADDRESS_1', message: 'Invalid value for address 1' },
+    { name: 'INVALID_POSTAL_CODE_ERR_MSG', message: 'Valid Postal Code or ZIP Code required' },
+    { name: 'STREET_NAME_REQUIRED', message: 'Street name required' },
+    { name: 'STREET_NUMBER_REQUIRED', message: 'Street number required' }
   ],
 
   properties: [
@@ -56,7 +65,7 @@ foam.CLASS({
               }), 1)
             );
           },
-          errorString: 'Invalid value for address 1.'
+          errorMessage: 'INVALID_ADDRESS_1'
         }
       ],
       hidden: true
@@ -80,7 +89,7 @@ foam.CLASS({
       gridColumns: 6,
       validateObj: function(countryId) {
         if ( typeof countryId !== 'string' || countryId.length === 0 ) {
-          return 'Country required.';
+          return this.COUNTRY_REQUIRED;
         }
       },
       postSet: function(oldValue, newValue) {
@@ -126,14 +135,11 @@ foam.CLASS({
         // If the country hasn't been selected yet, don't show this error.
         if ( countryId == null ) return;
         if ( typeof regionId !== 'string' || regionId.length === 0 ) {
-          switch ( countryId ) {
-            case 'CA':
-              return 'Province required.';
-            case 'US':
-              return 'State required.';
-            default:
-              return 'Region required.';
+          let regionError = this.translationService.getTranslation(foam.locale, `${countryId.toLowerCase()}.region.error`);
+          if ( ! regionError ) {
+            regionError = this.translationService.getTranslation(foam.locale, `${foam.locale}.region.error`);
           }
+          return regionError;
         }
       }
     },
@@ -149,7 +155,7 @@ foam.CLASS({
       // and not baked into the model.
       class: 'String',
       name: 'streetNumber',
-      label: 'Street No.',
+      label: 'Street number',
       width: 16,
       documentation: 'The structured field for the street number of the postal address.',
       gridColumns: 3,
@@ -164,13 +170,14 @@ foam.CLASS({
               }), 1)
             );
           },
-          errorString: 'Invalid street number.'
+          errorMessage: 'STREET_NUMBER_REQUIRED'
         }
       ]
     },
     {
       class: 'String',
       name: 'streetName',
+      label: 'Street name',
       width: 70,
       documentation: 'The structured field for the street name of the postal address.',
       gridColumns: 6,
@@ -183,7 +190,7 @@ foam.CLASS({
               e.REG_EXP(foam.nanos.auth.Address.STREET_NAME, /^\s*.+\s*$/)
             );
           },
-          errorString: 'Invalid street name.'
+          errorMessage: 'STREET_NAME_REQUIRED'
         }
       ]
     },
@@ -192,8 +199,12 @@ foam.CLASS({
       name: 'city',
       documentation: 'The city of the postal address.',
       required: true,
-      minLength: 1,
       gridColumns: 6,
+      validateObj: function(city) {
+        if ( city.length === 0 ) {
+          return this.CITY_REQUIRED;
+        }
+      }
     },
     {
       class: 'String',
@@ -214,7 +225,13 @@ foam.CLASS({
                 /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i)
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         {
           args: ['postalCode', 'countryId'],
@@ -226,7 +243,13 @@ foam.CLASS({
                 /^\d{5}(?:[-\s]\d{4})?$/i)
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Austria
         {
@@ -240,7 +263,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Belgium
         {
@@ -254,7 +283,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Brazil
         {
@@ -268,7 +303,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // China
         // Note: The postal services in Macau or Hong Kong Special Administrative Regions remain separate from
@@ -284,7 +325,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Cyprus
         {
@@ -298,7 +345,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Estonia
         {
@@ -312,7 +365,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Finland
         {
@@ -326,7 +385,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // France
         {
@@ -340,7 +405,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Germany
         {
@@ -354,7 +425,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Great Britain
         {
@@ -368,7 +445,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Greece
         {
@@ -382,7 +465,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // India
         {
@@ -396,7 +485,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Italy
         {
@@ -410,7 +505,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Latvia
         {
@@ -424,7 +525,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Lithuania
         {
@@ -438,7 +545,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Luxembourg
         {
@@ -452,7 +565,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Malta
         {
@@ -466,7 +585,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // the Netherlands
         {
@@ -480,7 +605,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Portugal
         {
@@ -494,7 +625,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Slovakia
         {
@@ -508,7 +645,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Slovenia
         {
@@ -522,7 +665,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Spain
         {
@@ -536,7 +685,13 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         },
         // Sweden
         {
@@ -550,13 +705,27 @@ foam.CLASS({
               )
             );
           },
-          errorMessage: 'INVALID_POSTAL_CODE_ERR_MSG'
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         }
       ],
       javaSetter: `
         postalCode_ = val.toUpperCase();
         postalCodeIsSet_ = true;
       `
+    },
+    {
+      class: 'String',
+      name: 'postalCodeLabel',
+      expression: function(countryId) {
+        let translatedPostalCodeLabel = this.translationService.getTranslation(foam.locale, `${countryId.toLowerCase()}.postalCode.label`);
+        return translatedPostalCodeLabel ? translatedPostalCodeLabel : this.translationService.getTranslation(foam.locale, 'postalCode.label');
+      }
     },
     {
       class: 'Double',

@@ -74,9 +74,9 @@ foam.CLASS({
     { name: 'APPROVER_MSG2_PART_ONE', message: 'The only approver of ' },
     { name: 'APPROVER_MSG2_PART_TWO', message: ' is the maker of this request!' },
     { name: 'SYSTEM_UPDATE_MSG', message: 'SYSTEM UPDATE - Not automatically setting LifecycleState from PENDING to ACTIVE for ' },
-    { name: 'ERROR_MSG_MULTI', message: 'Something went wrong! There shouldnt be multiple approvables' },
-    { name: 'ERROR_MSG2', message: 'Something went wrong cannot have multiple approved/rejected requests for the same request!' },
-    { name: 'REQUEST_SEND_MSG', message: 'An approval request has been sent out.' }
+    { name: 'ERROR_MSG_MULTI', message: `Something went wrong. There shouldn't be multiple approvables.` },
+    { name: 'ERROR_MSG2', message: 'Something went wrong. Cannot have multiple approved/rejected requests for the same request.' },
+    { name: 'REQUEST_SEND_MSG', message: 'An approval request has been sent out' }
   ],
 
   methods: [

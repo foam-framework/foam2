@@ -24,7 +24,7 @@ foam.CLASS({
 
   messages: [
     { name: 'INSTRUC_ONE', message: 'Password reset instructions were sent to' },
-    { name: 'INSTRUC_TWO', message: 'Please check your inbox to continue.' },
+    { name: 'INSTRUC_TWO', message: 'Please check your inbox to continue' },
     { name: 'REDIRECTION_TO', message: 'Back to Sign in' }
   ],
 
@@ -38,7 +38,13 @@ foam.CLASS({
   ],
 
   css: `
+    ^ .foam-u2-layout-Grid{
+      width: 100px;
+    }
 
+    ^ .foam-u2-layout-Cols {
+      width: 50%;
+    }
   `,
 
   properties: [
@@ -46,7 +52,8 @@ foam.CLASS({
       class: 'EMail',
       name: 'email',
       section: 'emailPasswordSection',
-      required: true
+      required: true,
+      label: ""
     },
     {
       class: 'Boolean',
@@ -84,13 +91,6 @@ foam.CLASS({
           }));
         });
       }
-    }
-  ],
-
-  methods: [
-    function initE() {
-      this.add(this.EMAIL)
-        .start('p').add('vasyan').end();
     }
   ]
 });

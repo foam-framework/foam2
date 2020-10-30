@@ -33,7 +33,7 @@ foam.CLASS({
     { name: 'TITLE', message: 'Create an account' },
     { name: 'FOOTER_TXT', message: 'Already have an account?' },
     { name: 'FOOTER_LINK', message: 'Sign in' },
-    { name: 'ERROR_MSG', message: 'There was a problem creating your account.' },
+    { name: 'ERROR_MSG', message: 'There was a problem creating your account' },
     { name: 'EMAIL_ERR', message: 'Valid email required' },
     { name: 'EMAIL_AVAILABILITY_ERR', message: 'This email is taken. Please try another.' },
     { name: 'USERNAME_EMPTY_ERR', message: 'Username required' },

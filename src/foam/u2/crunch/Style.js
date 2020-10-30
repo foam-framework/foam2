@@ -71,7 +71,6 @@ foam.CLASS({
 
     ^card-description {
       margin-top: 9px;
-      height: 20px;
       font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       font-weight: normal;
@@ -80,12 +79,7 @@ foam.CLASS({
       line-height: 1.43;
       letter-spacing: normal;
       color: #5e6061;
-
       cursor: pointer;
-
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
 
       /* normalize for transitions */
       border: solid 1px rgba(255,255,255,0);
