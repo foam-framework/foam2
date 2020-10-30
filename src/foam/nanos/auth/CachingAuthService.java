@@ -60,11 +60,11 @@ public class CachingAuthService
   public static String CACHE_KEY = "CachingAuthService.PermissionCache";
 
   protected static Map<String,Boolean> getPermissionMap(final X x) {
-    Session             session = x.get(Session.class);
-    Subject subject   = (Subject) x.get("subject");
-    User user         = subject.getUser();
+    Session session = x.get(Session.class);
+    Subject subject = (Subject) x.get("subject");
+    User    user    = subject.getUser();
 
-    // If the user in the context does not match the session user, do not use the 
+    // If the user in the context does not match the session user, do not use the
     // cache permission map, which belong to session user
     Long contextUserId = user.getId();
     Long sessionUserId = session.getUserId();
@@ -93,10 +93,10 @@ public class CachingAuthService
         }
       };
 
-      DAO userDAO       = (DAO) x.get("localUserDAO");
-      DAO groupDAO      = (DAO) x.get("localGroupDAO");
-      DAO groupPermissionJunctionDAO = (DAO) x.get("groupPermissionJunctionDAO");
-      User agent        = subject.getRealUser();
+      DAO       userDAO   = (DAO) x.get("localUserDAO");
+      DAO       groupDAO  = (DAO) x.get("localGroupDAO");
+      DAO       groupPermissionJunctionDAO = (DAO) x.get("groupPermissionJunctionDAO");
+      User      agent     = subject.getRealUser();
       Predicate predicate = EQ(User.ID, user.getId());
 
       if ( agent != user ) {

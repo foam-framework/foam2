@@ -1589,10 +1589,8 @@ foam.CLASS({
 
     function translate(source, opt_default) {
       /* Add the translation of the supplied source to the Element as a String */
-      return this.add(this.PromiseSlot.create({
-        promise: this.translationService.getTranslation(foam.locale, source)
-          .then(txt => { return txt || opt_default || 'no value'; })
-      }));
+      var translation = this.translationService.getTranslation(foam.locale, source);
+      return this.add(translation || opt_default || 'no value');
     },
 
     function add() {
@@ -1644,10 +1642,8 @@ foam.CLASS({
           throw new Error('Unsupported');
         } else if ( this.translationService && c && c.data && c.data.id ) {
           var key = c.data.id + '.' + c.clsInfo;
-          this.add(this.PromiseSlot.create({
-            promise: this.translationService.getTranslation(foam.locale, key)
-              .then(txt => { return txt || c.default || 'no value'; })
-          }));
+          var translation = this.translationService.getTranslation(foam.locale, key);
+          return this.add(translation || c.default || 'no value');
         } else {
           es.push(c);
         }

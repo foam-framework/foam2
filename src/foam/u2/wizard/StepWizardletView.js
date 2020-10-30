@@ -42,9 +42,9 @@ foam.CLASS({
     { name: 'CANCEL_LABEL', message: 'Cancel' },
     { name: 'SAVE_IN_PROGRESS', message: 'Saving...' },
     { name: 'ERROR_MSG', message: 'Information was not successfully submitted, please try again later' },
-    { name: 'ERROR_MSG_DRAFT', message: 'An error occured while saving your progress.' },
-    { name: 'SUCCESS_MSG', message: 'Information successfully submitted.' },
-    { name: 'SUCCESS_MSG_DRAFT', message: 'Your progress has been saved.' },
+    { name: 'ERROR_MSG_DRAFT', message: 'An error occured while saving your progress' },
+    { name: 'SUCCESS_MSG', message: 'Information successfully submitted' },
+    { name: 'SUCCESS_MSG_DRAFT', message: 'Your progress has been saved' },
   ],
 
   css: `

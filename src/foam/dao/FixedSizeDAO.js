@@ -28,7 +28,6 @@ foam.CLASS({
       name: 'comparator'
     },
     {
-      //class: 'foam.mlang.predicate.PredicateProperty',
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'predicate'
@@ -57,9 +56,7 @@ foam.CLASS({
             .skip(getSize());
 
           if ( getComparator() != null ) {
-            for ( foam.mlang.order.Comparator comp : getComparator() ) {
-              delegate = delegate.orderBy(comp);
-            }
+            delegate = delegate.orderBy(getComparator());
           }
 
           delegate.removeAll();

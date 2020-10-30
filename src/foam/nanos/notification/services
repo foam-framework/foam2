@@ -16,10 +16,10 @@ p({
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("notifications")
       .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
-        .setComparator(new foam.mlang.order.Comparator[] {
+        .setComparator(foam.mlang.MLang.COMPOUND(new foam.mlang.order.Comparator[] {
           foam.mlang.MLang.DESC(foam.nanos.notification.Notification.CREATED),
           foam.nanos.notification.Notification.READ
-        })
+        }))
         .setSize(100000)
         .build())
       .build();

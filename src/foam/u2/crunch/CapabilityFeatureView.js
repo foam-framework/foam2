@@ -123,19 +123,6 @@ foam.CLASS({
         .start()
           .addClass(style.myClass('card-title'))
           .add(( self.data.name != '') ?  { data : self.data, clsInfo : self.data.cls_.NAME.name, default : self.data.name }  : self.data.id)
-        .end()
-        .start()
-          .addClass(style.myClass('card-subtitle'))
-          .select(self.data.categories.dao
-            .where(this.EQ(foam.nanos.crunch.CapabilityCategory.VISIBLE, true)), function (category) {
-              return this.E('span')
-                .addClass(style.myClass('category'))
-                .add({ data : category, clsInfo : category.cls_.NAME.name, default : category.name });
-          })
-        .end()
-        .start()
-          .addClass(style.myClass('card-description'))
-          .add({ data : self.data, clsInfo : self.data.cls_.DESCRIPTION.name, default : self.data.description } || 'no description')
         .end();
     }
   ],
@@ -172,6 +159,10 @@ foam.CLASS({
                 this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
               }
             });
+
+            if ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-20' ) {
+              this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
+            }
           }
         });
       }

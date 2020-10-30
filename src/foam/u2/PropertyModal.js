@@ -49,7 +49,7 @@ foam.CLASS({
 
   messages: [
     { name: 'CONFIRM_DELETE_1', message: 'Are you sure you want to delete' },
-    { name: 'SUCCESS_MSG', message: ' deleted.' },
+    { name: 'SUCCESS_MSG', message: ' deleted' },
     { name: 'FAIL_MSG', message: 'Failed to delete' }
   ],
 

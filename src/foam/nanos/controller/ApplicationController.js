@@ -137,7 +137,7 @@ foam.CLASS({
   messages: [
     { name: 'GROUP_FETCH_ERR', message: 'Error fetching group' },
     { name: 'GROUP_NULL_ERR', message: 'Group was null' },
-    { name: 'LOOK_AND_FEEL_NOT_FOUND', message: 'Could not fetch look and feel object.' },
+    { name: 'LOOK_AND_FEEL_NOT_FOUND', message: 'Could not fetch look and feel object' },
     { name: 'LANGUAGE_FETCH_ERR', message: 'Error fetching language' },
   ],
 
@@ -319,6 +319,7 @@ foam.CLASS({
       this.clientPromise.then(async function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
 
+        await client.translationService.initLatch;
         await self.fetchSubject();
 
         // add user and agent for backward compatibility
@@ -397,8 +398,6 @@ foam.CLASS({
 
     async function fetchLanguage() {
       try {
-        let l = localStorage.getItem('localeLanguage');
-        if ( l !== undefined ) foam.locale = l;
         //TODO manage more complicated language. 'en-CA'
         if ( foam.locale !== 'en' && foam.locale !== 'en-US' ) {
           let ctx = this.__subContext__;

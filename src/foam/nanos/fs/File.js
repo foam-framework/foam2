@@ -164,6 +164,7 @@ foam.CLASS({
       `
     },
     {
+      type: 'String',
       name: 'getText',
       code: function() {
         return new Promise((resolve, reject) => {
@@ -177,7 +178,16 @@ foam.CLASS({
 
           reader.readAsText(this.data.blob)
         });
-      }
+      },
+      javaCode: `
+        if ( ! SafetyUtil.isEmpty(this.getDataString()) ) {
+          String encodedString = this.getDataString().split(",")[1];
+          byte[] decodedBytes  = Base64.getDecoder().decode(encodedString);
+          String decodedString = new String(decodedBytes);
+          return decodedString;
+        }
+        return "";
+      `
     }
   ]
 });

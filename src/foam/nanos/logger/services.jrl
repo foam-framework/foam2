@@ -14,7 +14,7 @@ p({
       .setJournalName("../logs/logs")
       .setWriteOnly(true)
       .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
-        .setComparator(new foam.mlang.order.Comparator[] { foam.mlang.MLang.DESC(foam.nanos.logger.LogMessage.CREATED) })
+        .setComparator(foam.mlang.MLang.DESC(foam.nanos.logger.LogMessage.CREATED))
         .setSize(100000)
         .build())
       .setIndex(new foam.core.PropertyInfo[] {foam.nanos.logger.LogMessage.CREATED})

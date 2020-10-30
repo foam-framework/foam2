@@ -171,6 +171,10 @@ foam.CLASS({
                 this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
               }
             });
+
+            if ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-20' ) {
+              this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
+            }
           }
         });
       }

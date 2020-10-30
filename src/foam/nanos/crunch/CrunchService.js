@@ -162,6 +162,10 @@ foam.INTERFACE({
         {
           name: 'data',
           type: 'foam.core.FObject'
+        },
+        {
+          name: 'status',
+          type: 'foam.nanos.crunch.CapabilityJunctionStatus'
         }
       ],
     },

@@ -30,14 +30,13 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'TITLE', message: 'Create a free account' },
+    { name: 'TITLE', message: 'Create an account' },
     { name: 'FOOTER_TXT', message: 'Already have an account?' },
     { name: 'FOOTER_LINK', message: 'Sign in' },
-    { name: 'ERROR_MSG', message: 'There was a problem creating your account.' },
-    { name: 'EMAIL_EMPTY_ERR', message: 'Please enter email' },
-    { name: 'EMAIL_SYNTAX_ERR', message: 'Please enter valid email' },
+    { name: 'ERROR_MSG', message: 'There was a problem creating your account' },
+    { name: 'EMAIL_ERR', message: 'Valid email required' },
     { name: 'EMAIL_AVAILABILITY_ERR', message: 'This email is taken. Please try another.' },
-    { name: 'USERNAME_EMPTY_ERR', message: 'Please enter username' },
+    { name: 'USERNAME_EMPTY_ERR', message: 'Username required' },
     { name: 'USERNAME_AVAILABILITY_ERR', message: 'This username is taken. Please try another.' }
   ],
 
@@ -95,9 +94,7 @@ foam.CLASS({
       },
       validateObj: function(email, emailAvailable) {
         // Empty Check
-        if ( email.length === 0 ) return this.EMAIL_EMPTY_ERR;
-        // Syntax Check
-        if ( ! /\S+@\S+\.\S+/.test(email) ) return this.EMAIL_SYNTAX_ERR;
+        if ( email.length === 0 || ! /\S+@\S+\.\S+/.test(email) ) return this.EMAIL_ERR;
         // Availability Check
         if ( ! emailAvailable ) return this.EMAIL_AVAILABILITY_ERR;
       },
@@ -187,7 +184,7 @@ foam.CLASS({
   actions: [
     {
       name: 'login',
-      label: 'Get Started',
+      label: 'Get started',
       isEnabled: function(errors_, isLoading_) {
         return ! errors_ && ! isLoading_;
       },

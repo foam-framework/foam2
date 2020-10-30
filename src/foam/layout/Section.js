@@ -55,6 +55,12 @@ foam.CLASS({
       name: 'subTitle'
     },
     {
+      name: 'navTitle',
+      expression: function (title) {
+        return title;
+      }
+    },
+    {
       documentation: 'function and string',
       name: 'help'
     },
