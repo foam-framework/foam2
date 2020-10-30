@@ -56,10 +56,14 @@ foam.CLASS({
       name: 'unfilteredDAO',
       hidden: true,
       expression: function(dao) {
-        if ( dao && foam.dao.FilteredDAO.isInstance(dao) ) {
-          return dao.delegate;
+        var result = dao;
+        while ( dao && foam.dao.ProxyDAO.isInstance(dao) ) {
+          if ( foam.dao.FilteredDAO.isInstance(dao) ) {
+            result = dao.delegate;
+          }
+          dao = dao.delegate;
         }
-        return dao;
+        return result;
       }
     },
     {
