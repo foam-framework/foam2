@@ -59,6 +59,7 @@ foam.CLASS({
         if ( dao && foam.dao.FilteredDAO.isInstance(dao) ) {
           return dao.delegate;
         }
+        return dao;
       }
     },
     {
