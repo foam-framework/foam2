@@ -92,7 +92,7 @@ foam.INTERFACE({
           var oldCapabilityPayloads = getCapablePayloads();
           
           return Arrays.stream(oldCapabilityPayloads)
-            .map((cap) -> cap.getCapability().getId())
+            .map((cap) -> cap.getCapability())
             .anyMatch(capabilityId::equals);
           `
         }));
@@ -123,7 +123,7 @@ foam.INTERFACE({
             // Marshal payloads into a hashmap
             Map<String, CapablePayload> payloads = new HashMap<String, CapablePayload>();
             for ( CapablePayload payload : getCapablePayloads() ) {
-              payloads.put(payload.getCapability().getId(), payload);
+              payloads.put(payload.getCapability(), payload);
             }
 
             for ( String capId : capabilityIds ) {
