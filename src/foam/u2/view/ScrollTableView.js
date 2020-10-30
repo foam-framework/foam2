@@ -201,15 +201,18 @@
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.updateCount })));
       this.updateCount();//check memento
 
-      this.currentMemento$ = this.memento.tail$;
+      if ( this.memento )
+        this.currentMemento$ = this.memento.tail$;
+      else
+        this.currentMemento$ = this.memento$;
     },
 
     function initE() {
 
-      if ( this.memento.tail ) {
-        var id = this.memento.tail.head;
+      if ( this.currentMemento ) {
+        var id = this.currentMemento.head;
         if ( ! isNaN(id) ) {
-          id = parseInt(this.memento.tail.head);
+          id = parseInt(this.currentMemento.head);
         }
 
         this.stack.push({

@@ -52,12 +52,14 @@ foam.CLASS({
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.ControllerMode',
-    'foam.u2.dialog.NotificationMessage'
+    'foam.u2.dialog.NotificationMessage',
+    'foam.nanos.controller.Memento'
   ],
 
   imports: [
     'ctrl',
-    'stack'
+    'stack',
+    'memento'
   ],
 
   exports: [
@@ -65,7 +67,6 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'BACK', message: 'Back' }
   ],
 
   properties: [
@@ -107,6 +108,8 @@ foam.CLASS({
         return ! workingData$errors_;
       },
       code: function() {
+        this.memento.tail = null;
+
         this.config.dao.put(this.workingData).then((o) => {
           if ( ! this.data.equals(o) ) {
             this.data = o;
@@ -139,11 +142,20 @@ foam.CLASS({
         });
       }
     },
+    {
+      name: 'back',
+      code: function(X) {
+        X.memento.tail = null;
+        X.stack.back();
+      }
+    }
   ],
   methods: [
     function initE() {
       var self = this;
       this.SUPER();
+
+      this.memento.tail = this.Memento.create({ head: 'Edit' });
 
       this
         .addClass(this.myClass())
@@ -153,10 +165,9 @@ foam.CLASS({
               .start(self.Rows)
                 // we will handle this in the StackView instead
                 .startContext({ data: self.stack })
-                  .tag(self.stack.BACK, {
+                  .tag(self.BACK, {
                     buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                     icon: 'images/back-icon.svg',
-                    label: this.BACK
                   })
                 .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })
