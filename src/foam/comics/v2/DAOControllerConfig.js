@@ -52,6 +52,16 @@ foam.CLASS({
       }
     },
     {
+      class: 'foam.dao.DAOProperty',
+      name: 'unfilteredDAO',
+      hidden: true,
+      expression: function(dao) {
+        if ( dao && foam.dao.FilteredDAO.isInstance(dao) ) {
+          return dao.delegate;
+        }
+      }
+    },
+    {
       class: 'Class',
       name: 'of',
       expression: function(dao$of) { return dao$of; }
