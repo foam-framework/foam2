@@ -78,13 +78,12 @@ foam.CLASS({
     {
       name: 'paramsArr',
       expression: function(params) {
-        var arr = [];
+        var dict = {};
         var i = 0;//a=q,q,q,b=sd,z=sdf
-        while( i > 0 ) {
-          var beginWith = 0;
-          var equalitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, beginWith);
+        while( i >= 0 ) {
+          var beginWith = i;
+          var equalitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, i);
           var nextEqualitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, equalitySumbolIndex + 1);
-          var nextParamNameIndex;
           var thisParameterValueToParse;
           if ( nextEqualitySumbolIndex == -1 ) {
             thisParameterValueToParse = params.substring(equalitySumbolIndex);
@@ -95,16 +94,14 @@ foam.CLASS({
               if (indexOfComa > nextEqualitySumbolIndex ) {
                 break;
               }
-              beginWith1 = indexOfComa + 1;
+              beginWith1 = indexOfComa;
             }
-            thisParameterValueToParse = params.substring(equalitySumbolIndex, beginWith1 - 1);
-            nextParamNameIndex = beginWith1;
-            beginWith = nextParamNameIndex;
+            thisParameterValueToParse = params.substring(equalitySumbolIndex + 1, beginWith1);
+            i = beginWith1;
           }
-          while(true) {
-            arr.push( params.substring(beginWith, nextParamNameIndex), params.substring(equalitySumbolIndex + 1, nextParamNameIndex).split(','));
-          }
+          dict[params.substring(beginWith, equalitySumbolIndex)] = params.substring(equalitySumbolIndex + 1, i > 0 ? i : params.length).split(',');
         }
+        return dict;
       }
     }
   ],
@@ -124,7 +121,7 @@ foam.CLASS({
       if ( this.feedback_ ) return;
       this.feedback_ = true;
       var i = this.value.indexOf(this.SEPARATOR);
-      if ( i == -1 ) {
+      if ( i === -1 ) {
         this.head = this.value;
         this.tail = null;
       } else {
@@ -132,7 +129,7 @@ foam.CLASS({
         var tailStr = this.value.substring(i+1);
         var j = this.value.indexOf(this.SEPARATOR, i + 1);
         if ( tailStr.includes(this.PARAMS_BEGIN) && tailStr.includes(this.PARAMS_END) ) {
-          this.params = this.value.substring(i+1, j);
+          this.params = this.value.substring(i+1, j > 0 ? j : this.value.length);
           if ( j == -1 ) {
             this.tail = null;
           } else {
