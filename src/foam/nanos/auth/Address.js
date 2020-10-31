@@ -712,6 +712,19 @@ foam.CLASS({
             }
             return postalCodeError;
           }
+        },
+        {
+          args: ['countryId'],
+          predicateFactory: function(e) {
+            return e.HAS(foam.nanos.auth.Address.COUNTRY_ID);
+          },
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
         }
       ],
       javaSetter: `
