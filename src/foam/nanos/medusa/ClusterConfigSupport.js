@@ -175,7 +175,7 @@ configuration for contacting the primary node.`,
       `
     },
     {
-      documentation: 'Are at least half+1 of the expected nodes online?',
+      documentation: 'Are at least half+1 of the expected mediators in zone 0 online?',
       name: 'hasMediatorQuorum',
       class: 'Boolean',
       visibility: 'RO',
@@ -184,7 +184,7 @@ configuration for contacting the primary node.`,
       Count count = (Count) ((DAO) getX().get("localClusterConfigDAO"))
         .where(
           AND(
-            EQ(ClusterConfig.ZONE, 0L), //Math.max(0, config.getZone() -1)),
+            EQ(ClusterConfig.ZONE, 0L),
             EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
             EQ(ClusterConfig.ENABLED, true),
             EQ(ClusterConfig.STATUS, Status.ONLINE),
@@ -728,6 +728,7 @@ configuration for contacting the primary node.`,
       PM pm = PM.create(x, this.getClass().getSimpleName(), "getClientDAO");
       try {
       return new ClientDAO.Builder(x)
+        .setOf(MedusaEntry.getOwnClassInfo())
         .setDelegate(new SessionClientBox.Builder(x)
           .setSessionID(sendClusterConfig.getSessionId())
           .setDelegate(getSocketClientBox(x, serviceName, sendClusterConfig, receiveClusterConfig))
@@ -764,6 +765,7 @@ configuration for contacting the primary node.`,
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       try {
         return new foam.dao.ClientDAO.Builder(x)
+          .setOf(MedusaEntry.getOwnClassInfo())
           .setDelegate(new foam.box.SessionClientBox.Builder(x)
           .setSessionID(sendClusterConfig.getSessionId())
           .setDelegate(new foam.box.HTTPBox.Builder(x)
@@ -806,6 +808,7 @@ configuration for contacting the primary node.`,
       PM pm = PM.create(x, this.getClass().getSimpleName(), "getBroadcastClientDAO");
       try {
       return new NotificationClientDAO.Builder(x)
+        .setOf(MedusaEntry.getOwnClassInfo())
         .setDelegate(new SessionClientBox.Builder(x)
           .setSessionID(sendClusterConfig.getSessionId())
           .setDelegate(getSocketClientBox(x, serviceName, sendClusterConfig, receiveClusterConfig))
@@ -884,59 +887,59 @@ configuration for contacting the primary node.`,
         // getLogger().debug("mdao", "cache", serviceName);
         return dao;
       }
+      String key = serviceName;
       PM pm = PM.create(x, this.getClass().getSimpleName(), "getMdao");
       try {
-      if ( obj != null &&
-           ! ( obj instanceof DAO ) ) {
-        getLogger().error("getMdao" ,serviceName, "not instance of dao", obj.getClass().getSimpleName());
-      }
-      dao = (DAO) x.get(serviceName);
-      // look for 'local' version
-      String key = serviceName;
-      if ( ! key.startsWith("local") ) {
-        key = "local" + serviceName.substring(0,1).toUpperCase()+serviceName.substring(1);
-        if ( x.get(key) != null ) {
-          dao = (DAO) x.get(key);
-          getLogger().debug("mdao", "local", serviceName, key);
+        if ( obj != null &&
+             ! ( obj instanceof DAO ) ) {
+          getLogger().error("getMdao" ,serviceName, "not instance of dao", obj.getClass().getSimpleName());
         }
-      }
-      try {
-      Object result = dao.cmd(MDAO.GET_MDAO_CMD);
-      if ( result != null &&
-           result instanceof DAO ) {
-        getLogger().debug("mdao", "cmd", serviceName, dao.getClass().getSimpleName(), dao.getOf().getId());
-        dao = (DAO) result;
-      } else {
-        while ( dao != null ) {
-          getLogger().debug("mdao", "while", serviceName, dao.getClass().getSimpleName(), dao.getOf().getId());
-          if ( dao instanceof MDAO ) {
-            break;
+        dao = (DAO) x.get(serviceName);
+        // look for 'local' version
+        if ( ! key.startsWith("local") ) {
+          key = "local" + serviceName.substring(0,1).toUpperCase()+serviceName.substring(1);
+          if ( x.get(key) != null ) {
+            dao = (DAO) x.get(key);
+            getLogger().debug("mdao", "local", serviceName, key);
           }
-          if ( dao instanceof EasyDAO ) {
-            dao = ((EasyDAO) dao).getMdao();
-            if ( dao != null ) {
-              break;
+        }
+        if ( dao != null ) {
+          Object result = dao.cmd(MDAO.GET_MDAO_CMD);
+          if ( result != null &&
+               result instanceof DAO ) {
+            getLogger().debug("mdao", "cmd", serviceName, dao.getClass().getSimpleName(), dao.getOf().getId());
+            dao = (DAO) result;
+          } else {
+            while ( dao != null ) {
+              getLogger().debug("mdao", "while", serviceName, dao.getClass().getSimpleName(), dao.getOf().getId());
+              if ( dao instanceof MDAO ) {
+                break;
+              }
+              if ( dao instanceof EasyDAO ) {
+                dao = ((EasyDAO) dao).getMdao();
+                if ( dao != null ) {
+                  break;
+                }
+              }
+              if ( dao instanceof ProxyDAO ) {
+                dao = ((ProxyDAO) dao).getDelegate();
+              } else {
+                dao = null;
+              }
             }
           }
-          if ( dao instanceof ProxyDAO ) {
-            dao = ((ProxyDAO) dao).getDelegate();
-          } else {
-            dao = null;
+          if ( dao != null ) {
+            getMdaos().put(serviceName, dao);
+            getLogger().debug("mdao", "found", serviceName, dao.getClass().getSimpleName(), dao.getOf().getId());
+            return dao;
           }
         }
-      }
-      if ( dao != null ) {
-        getMdaos().put(serviceName, dao);
-        getLogger().debug("mdao", "found", serviceName, dao.getClass().getSimpleName(), dao.getOf().getId());
-        return dao;
-      }
       } catch (Throwable t) {
         getLogger().error("mdao", serviceName, key, t.getMessage(), t);
-      }
-      throw new IllegalArgumentException("MDAO not found: "+serviceName);
       } finally {
         pm.log(x);
       }
+      throw new IllegalArgumentException("MDAO not found: "+serviceName);
       `
     },
     {

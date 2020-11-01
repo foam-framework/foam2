@@ -71,6 +71,23 @@ foam.CLASS({
 
   methods: [
     {
+      documentation: 'Implement nop find to support this DAO being used from HashingJournal by ReplayDAO.',
+      name: 'find_',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'Object'
+        }
+      ],
+      javaCode: `
+      return null;
+      `
+    },
+    {
       name: 'put_',
       args: [
         {

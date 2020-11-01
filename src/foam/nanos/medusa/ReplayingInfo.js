@@ -55,6 +55,21 @@ foam.CLASS({
       visibility: 'RO'
     },
     {
+      name: 'minIndex',
+      class: 'Long',
+      visibility: 'RO'
+    },
+    {
+      name: 'maxIndex',
+      class: 'Long',
+      visibility: 'RO'
+    },
+    {
+      name: 'count',
+      class: 'Long',
+      visibility: 'RO'
+    },
+    {
       name: 'startTime',
       class: 'Date',
       visibility: 'HIDDEN'

@@ -6,10 +6,10 @@
 
 foam.CLASS({
   package: 'foam.nanos.medusa',
-  name: 'ReplayDAO',
+  name: 'ReplayMediatorDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: `Response to ReplayCmd`,
+  documentation: `Response to ReplayCmd on Mediators`,
 
   javaImports: [
     'foam.core.FObject',
@@ -35,6 +35,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
       visibility: 'HIDDEN',
+      transient: true,
       javaFactory: `
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
@@ -65,6 +66,7 @@ foam.CLASS({
           details.setMaxIndex((Long)max.getValue());
           details.setCount((Long) count.getValue());
         }
+
         getLogger().info("ReplayDetailsCmd", "requester", details.getRequester(), "min", details.getMinIndex(), "count", details.getCount());
         return details;
       }
@@ -84,6 +86,7 @@ foam.CLASS({
         )
         .orderBy(MedusaEntry.INDEX)
         .select(new RetryClientSinkDAO(x, clientDAO));
+
         return cmd;
       }
 

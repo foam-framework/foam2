@@ -78,18 +78,14 @@ foam.CLASS({
         return entry;
       }
 
-      if ( myConfig.getType() == MedusaType.NODE ) {
+      if ( myConfig.getType() == MedusaType.NODE &&
+           myConfig.getStatus() == Status.ONLINE ) {
         entry = (MedusaEntry) submit(x, entry, DOP.PUT);
         ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
         replaying.updateIndex(x, entry.getIndex());
-      } else if ( ( myConfig.getType() == MedusaType.MEDIATOR /* ||
-                    myConfig.getType() == MedusaType.NERF */ ) &&
-                  myConfig.getStatus() == Status.ONLINE &&
+      } else if ( myConfig.getType() == MedusaType.MEDIATOR &&
+                  myConfig.getStatus() == Status.ONLINE && 
                   entry.getPromoted() ) {
-
-        // Broadcast promoted entries to other MEDIATORS, NERF
-        // REVIEW: mediators may miss data between replayComplete and status change to ONLINE.
-
         entry = (MedusaEntry) submit(x, entry, DOP.PUT);
       }
       return entry;

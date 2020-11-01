@@ -89,9 +89,11 @@ foam.CLASS({
           align: 'center',
           y: +5,
           text$: this.config$.map(function(c) {
-            if ( c.replayingInfo &&
-                 c.replayingInfo.index > 0 ) {
-              return c.replayingInfo.index;
+            if ( c.replayingInfo ) {
+              var index = Math.max(c.replayingInfo.index, c.replayingInfo.maxIndex);
+              if ( index > 0 ) {
+                return index;
+              }
             }
             return '';
           })

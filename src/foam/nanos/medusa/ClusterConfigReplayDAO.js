@@ -61,10 +61,8 @@ foam.CLASS({
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
         ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
-        // If a Node comming online, begin replay from it.
         if ( support.getStandAlone() &&
              nu.getType() == MedusaType.NODE ) {
-          // see ClusterConfigMonitor
           getLogger().debug("standalone");
           ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
           replaying.setStartTime(new java.util.Date());
@@ -100,14 +98,20 @@ foam.CLASS({
           }
         } else if ( config.getRegion() == myConfig.getRegion() &&
                     config.getRealm() == myConfig.getRealm() &&
-                    // Mediator replay from node, NERF from Mediator
-                    ( ( config.getType() == MedusaType.NODE &&
-                        myConfig.getType() == MedusaType.MEDIATOR &&
-                        myConfig.getZone() == 0L ) ||
-                      ( config.getType() == MedusaType.MEDIATOR &&
-                        ( myConfig.getType() == MedusaType.MEDIATOR ||
-                          myConfig.getType() == MedusaType.NERF ) &&
-                        myConfig.getZone() - config.getZone() ==  1L ) ) ) {
+
+                      // replay from NODE to zone and zone + 1
+                    ( config.getType() == MedusaType.NODE &&
+                      ( ( myConfig.getType() == MedusaType.MEDIATOR &&
+                          config.getZone() == myConfig.getZone() ) ||
+                        ( myConfig.getType() == MedusaType.NERF &&
+                          ( config.getZone() == myConfig.getZone() ||
+                            config.getZone() == myConfig.getZone() -1 ) ) ) ) ||
+
+                      // replay from MEDIATOR to get Bootstrap indexes
+                    ( config.getType() == MedusaType.MEDIATOR &&
+                      myConfig.getType() == MedusaType.NERF &&
+                      config.getZone() == myConfig.getZone() -1 )
+                  ) {
           String serviceName = "medusaNodeDAO";
           if ( config.getType() == MedusaType.MEDIATOR ||
                config.getType() == MedusaType.NERF ) {
@@ -156,7 +160,10 @@ foam.CLASS({
             getLogger().debug(myConfig.getId(), "replaying", replaying.getReplaying(), "index", replaying.getIndex(), "replayIndex", replaying.getReplayIndex(), "node quorum", support.getHasNodeQuorum());
 
             if ( replaying.getIndex() >= replaying.getReplayIndex() &&
-                 support.getHasNodeQuorum() ) {
+                 ( myConfig.getType() == MedusaType.MEDIATOR &&
+                   support.getHasNodeQuorum() ) ||
+                 ( myConfig.getType() == MedusaType.NERF &&
+                   support.getHasMediatorQuorum() ) ) {
               // special intial case - no data, or baseline
               // FIXME/REVIEW - not working - on fresh start, zone 1 mediators never go online.
               ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
