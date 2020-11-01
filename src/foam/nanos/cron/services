@@ -37,7 +37,7 @@ p({
       .setJournalName("cronEvents")
       .setWriteOnly(true)
       .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
-        .setComparator(new foam.mlang.order.Comparator[] { foam.mlang.MLang.DESC(foam.nanos.script.ScriptEvent.LAST_RUN) })
+        .setComparator(foam.mlang.MLang.DESC(foam.nanos.script.ScriptEvent.LAST_RUN))
         .setSize(10000)
         .build())
       .setCluster(false)

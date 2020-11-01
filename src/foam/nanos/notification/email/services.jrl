@@ -30,7 +30,7 @@ p({
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("emailMessages")
       .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
-        .setComparator(new foam.mlang.order.Comparator[] { foam.mlang.MLang.DESC(foam.nanos.notification.email.EmailMessage.CREATED) })
+        .setComparator(foam.mlang.MLang.DESC(foam.nanos.notification.email.EmailMessage.CREATED) )
         .setSize(10000)
         .build())
       .setCluster(false)
