@@ -207,7 +207,7 @@ FOAM_FILES([
   { name: "foam/dao/MDAO" },
   { name: "foam/dao/ArrayDAO" },
   { name: "foam/dao/TimestampDAO" },
-  { name: "foam/dao/AdapterDAO" },
+  { name: "foam/dao/CopyFromDAO" },
   { name: "foam/dao/GUIDDAO" },
   { name: "foam/dao/ReadOnlyDAO" },
   { name: "foam/dao/StoreAndForwardDAO" },

@@ -26,7 +26,7 @@ foam.CLASS({
     'org.jtwig.resource.loader.TypedResourceLoader'
   ],
 
-  tableColumns: ['name', 'group'],
+  tableColumns: ['id', 'name', 'group'],
 
   properties: [
     {
