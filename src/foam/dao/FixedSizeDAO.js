@@ -23,7 +23,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'FObjectArray',
+      class: 'FObjectProperty',
       of: 'foam.mlang.order.Comparator',
       name: 'comparator'
     },
