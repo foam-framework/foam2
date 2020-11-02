@@ -69,7 +69,9 @@ foam.CLASS({
             CapablePayload toPutCapablePayload = (CapablePayload) toPutCapablePayloadArray[i];
 
             if ( ! toPutCapablePayload.getHasSafeStatus() ){
-              Capability capability = (Capability) toPutCapablePayload.getCapability();
+
+              DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+              Capability capability = (Capability) capabilityDAO.find(toPutCapablePayload.getCapability());
 
               CapablePayload storedCapablePayload = (CapablePayload) storedCapablePayloadDAO.find(capability.getId());
 
