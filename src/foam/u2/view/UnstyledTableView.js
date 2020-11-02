@@ -406,15 +406,12 @@ foam.CLASS({
           var view = this;
 
           var actions = {};
-          var actionMapper = function(ret, action) {
-            ret[action.name] = action;
-            return ret;
-          };
+          var actionsMerger = action => { actions[action.name] = action; };
 
           // Model actions
-          view.of.getAxiomsByClass(foam.core.Action).reduce(actionMapper, actions);
+          view.of.getAxiomsByClass(foam.core.Action).forEach(actionsMerger);
           // Context menu actions
-          view.contextMenuActions.reduce(actionMapper, actions);
+          view.contextMenuActions.forEach(actionsMerger);
 
           //with this code error created  slot.get cause promise return
           //FIX ME
@@ -585,7 +582,7 @@ foam.CLASS({
                   }
 
                   // Object actions
-                  obj.cls_.getOwnAxiomsByClass(foam.core.Action).reduce(actionMapper, actions);
+                  obj.cls_.getOwnAxiomsByClass(foam.core.Action).forEach(actionsMerger);
                   tableRowElement
                     .start()
                       .addClass(view.myClass('td')).
