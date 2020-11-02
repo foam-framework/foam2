@@ -98,7 +98,8 @@ foam.CLASS({
                 capablePayload.setHasSafeStatus(true);
               }
 
-              Capability capability = capablePayload.getCapability();
+              DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+              Capability capability = (Capability) capabilityDAO.find(capablePayload.getCapability());
 
               if ( ! capability.getReviewRequired() ) {
                 continue;

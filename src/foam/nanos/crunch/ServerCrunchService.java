@@ -402,7 +402,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       Capability payloadCapability = (Capability) capabilities.get(i);
 
       CapablePayload currentPayload = new CapablePayload.Builder(x)
-        .setCapability(payloadCapability)
+        .setCapability(payloadCapability.getId())
         .build();
 
       flattenedPayloads.add(currentPayload);
@@ -410,7 +410,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
     List<CapablePayload> outputPayloads;
     CapablePayload rootPayload = new CapablePayload.Builder(x)
-      .setCapability(rootCapability)
+      .setCapability(rootCapability.getId())
       .build();
 
     if ( isOr ){

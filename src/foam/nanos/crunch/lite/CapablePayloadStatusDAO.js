@@ -53,7 +53,8 @@ foam.CLASS({
           return obj;
         }
 
-        Capability cap = payload.getCapability();
+        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+        Capability cap = (Capability) capabilityDAO.find(payload.getCapability());
         var oldStatus = payload.getStatus();
         var newStatus = cap.getCapableChainedStatus(x, payloadDAO, payload);
 
@@ -61,7 +62,7 @@ foam.CLASS({
           newStatus = APPROVED;
         }
         
-        if ( payload.getCapability().getReviewRequired() ) {
+        if ( cap.getReviewRequired() ) {
           if ( oldStatus == PENDING ) {
             return getDelegate().put_(x, obj);
           }
@@ -74,10 +75,10 @@ foam.CLASS({
           payload.setStatus(newStatus);
           // TODO Maybe use projection MLang
           var crunchService = (CrunchService) x.get("crunchService");
-          var depIds = crunchService.getDependantIds(x, payload.getCapability().getId());
+          var depIds = crunchService.getDependantIds(x, payload.getCapability());
 
           ((ArraySink) payloadDAO.select(new ArraySink())).getArray().stream()
-          .filter(cp -> Arrays.stream(depIds).anyMatch(((CapablePayload) cp).getCapability().getId()::equals))
+          .filter(cp -> Arrays.stream(depIds).anyMatch(((CapablePayload) cp).getCapability()::equals))
           .forEach(cp -> {
             CapablePayload capableCp = (CapablePayload) cp;
             capableCp.setHasSafeStatus(true);
