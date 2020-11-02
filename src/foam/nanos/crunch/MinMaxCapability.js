@@ -54,6 +54,7 @@ foam.CLASS({
         // Prepare to count statuses
         int numberGranted = 0;
         int numberPending = 0;
+        int numberPendingReview = 0;
 
         // Create ccJunctions list
         DAO myPrerequisitesDAO = ((DAO)
@@ -81,6 +82,9 @@ foam.CLASS({
             case APPROVED:
               numberPending++;
               break;
+            case PENDING_REVIEW:
+              numberPendingReview++;
+              break;
           }
         }
 
@@ -89,6 +93,9 @@ foam.CLASS({
         }
         if ( numberGranted + numberPending >= getMin() ) {
           return CapabilityJunctionStatus.PENDING;
+        }
+        if ( numberGranted + numberPending + numberPendingReview >= getMin() ) {
+          return CapabilityJunctionStatus.PENDING_REVIEW;
         }
         return CapabilityJunctionStatus.ACTION_REQUIRED;
       `
