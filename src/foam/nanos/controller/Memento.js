@@ -13,7 +13,8 @@ foam.CLASS({
     PARAMS_BEGIN: '{',
     PARAMS_END: '}',
     PARAMS_SEPARATOR: ',',
-    EQUILITY_SIGN: '='
+    EQUILITY_SIGN: '=',
+    NEXT_INDEX: 1
   },
 
   properties: [
@@ -85,24 +86,24 @@ foam.CLASS({
         while( i >= 0 ) {
           var beginWith = i;
           var equalitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, i);
-          var nextEqualitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, equalitySumbolIndex + 1);
+          var nextEqualitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, equalitySumbolIndex + this.NEXT_INDEX);
           var thisParameterValueToParse;
           if ( nextEqualitySumbolIndex === -1 ) {
-            thisParameterValueToParse = params.substring(equalitySumbolIndex + 1);
+            thisParameterValueToParse = params.substring(equalitySumbolIndex + this.NEXT_INDEX);
             i = -1;
           } else {
             var beginWith1 = equalitySumbolIndex;
             while ( true ) {
-              var indexOfComa = params.indexOf(',', beginWith1 + 1);
+              var indexOfComa = params.indexOf(this.PARAMS_SEPARATOR, beginWith1 + this.NEXT_INDEX);
               if (indexOfComa > nextEqualitySumbolIndex ) {
                 break;
               }
               beginWith1 = indexOfComa;
             }
             thisParameterValueToParse = params.substring(equalitySumbolIndex + 1, beginWith1);
-            i = beginWith1 + 1;
+            i = beginWith1 + this.NEXT_INDEX;
           }
-          dict[params.substring(beginWith, equalitySumbolIndex)] = params.substring(equalitySumbolIndex + 1, i > 0 ? i - 1 : params.length - 1).split(',');
+          dict[params.substring(beginWith, equalitySumbolIndex)] = params.substring(equalitySumbolIndex + this.NEXT_INDEX, i > 0 ? i - 1 : params.length - 1).split(this.PARAMS_SEPARATOR);
         }
         return dict;
       }
