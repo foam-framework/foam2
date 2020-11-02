@@ -75,36 +75,57 @@ foam.CLASS({
     },
     {
       name: 'params',
+      postSet: function() {
+        if ( this.feedback_ ) {
+          return;
+        }
+        this.feedback_ = true;
+        var dict = {};
+        if ( this.params ) {
+          var params = decodeURI(this.params);
+          var i = 1;//a=q,q,q,b=sd,z=sdf
+          while( i >= 0 && i < params.length - 1 ) {
+            var beginWith = i;
+            var equalitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, i);
+            var nextEqualitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, equalitySumbolIndex + this.NEXT_INDEX);
+            nextEqualitySumbolIndex = nextEqualitySumbolIndex > -1 ? nextEqualitySumbolIndex : params.length - 1;
+            var thisParameterValueToParse;
+            var beginWith1 = equalitySumbolIndex;
+            while (  indexOfComa !== -1  ) {
+              var indexOfComa = params.indexOf(this.PARAMS_SEPARATOR, beginWith1 + this.NEXT_INDEX);
+              if ( indexOfComa > nextEqualitySumbolIndex ) {
+                break;
+              }
+              beginWith1 = indexOfComa;
+            }
+            thisParameterValueToParse = params.substring(equalitySumbolIndex + 1, nextEqualitySumbolIndex);
+            i = beginWith1 + this.NEXT_INDEX;
+  
+            dict[decodeURI(params.substring(beginWith, equalitySumbolIndex))] = params.substring(equalitySumbolIndex + this.NEXT_INDEX, i > 0 ? i - 1 : params.length - 1).split(this.PARAMS_SEPARATOR);
+            if ( beginWith1 == -1 )
+              break; 
+          }
+        }
+        this.paramsDict = dict;
+        this.feedback_ = false;
+      }
     },
     {
       name: 'paramsDict',
-      expression: function(params) {
-        var dict = {};
-        if ( !params )
-          return dict;
-        var i = 1;//a=q,q,q,b=sd,z=sdf
-        while( i >= 0 && i < params.length - 1 ) {
-          var beginWith = i;
-          var equalitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, i);
-          var nextEqualitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, equalitySumbolIndex + this.NEXT_INDEX);
-          nextEqualitySumbolIndex = nextEqualitySumbolIndex > -1 ? nextEqualitySumbolIndex : params.length - 1;
-          var thisParameterValueToParse;
-          var beginWith1 = equalitySumbolIndex;
-          while (  indexOfComa !== -1  ) {
-            var indexOfComa = params.indexOf(this.PARAMS_SEPARATOR, beginWith1 + this.NEXT_INDEX);
-            if ( indexOfComa > nextEqualitySumbolIndex ) {
-              break;
-            }
-            beginWith1 = indexOfComa;
-          }
-          thisParameterValueToParse = params.substring(equalitySumbolIndex + 1, nextEqualitySumbolIndex);
-          i = beginWith1 + this.NEXT_INDEX;
-
-          dict[params.substring(beginWith, equalitySumbolIndex)] = params.substring(equalitySumbolIndex + this.NEXT_INDEX, i > 0 ? i - 1 : params.length - 1).split(this.PARAMS_SEPARATOR);
-          if ( beginWith1 == -1 )
-            break; 
+      postSet: function() {
+        if ( this.feedback_ ) {
+          return;
         }
-        return dict;
+        this.feedback_ = true;
+        this.params = this.PARAMS_BEGIN;
+        for ( var key in this.paramsDict ) {
+          this.params += encodeURI(key);
+          this.params += this.EQUILITY_SIGN;
+          this.params += this.paramsDict[key].join(',');
+        }
+        this.params += this.PARAMS_END;
+        this.params = encodeURI(this.params);
+        this.feedback_ = false;
       }
     }
   ],
@@ -114,7 +135,7 @@ foam.CLASS({
       return this.tail ?
         this.head + this.SEPARATOR
         + this.params ?
-        this.PARAMS_BEGIN//encode me by creating expression with feedback != true
+        this.PARAMS_BEGIN
         + this.params
         + this.PARAMS_END
         : ""
