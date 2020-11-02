@@ -405,10 +405,16 @@ foam.CLASS({
          */
           var view = this;
 
-          var modelActions = view.of.getAxiomsByClass(foam.core.Action);
-          var actions = Array.isArray(view.contextMenuActions)
-            ? view.contextMenuActions.concat(modelActions)
-            : modelActions;
+          var actions = {};
+          var actionMapper = function(ret, action) {
+            ret[action.name] = action;
+            return ret;
+          };
+
+          // Model actions
+          view.of.getAxiomsByClass(foam.core.Action).reduce(actionMapper, actions);
+          // Context menu actions
+          view.contextMenuActions.reduce(actionMapper, actions);
 
           //with this code error created  slot.get cause promise return
           //FIX ME
@@ -578,13 +584,15 @@ foam.CLASS({
                     tableRowElement.add(elmt);
                   }
 
+                  // Object actions
+                  obj.cls_.getOwnAxiomsByClass(foam.core.Action).reduce(actionMapper, actions);
                   tableRowElement
                     .start()
                       .addClass(view.myClass('td')).
                       attrs({ name: 'contextMenuCell' }).
                       style({ flex: `0 0 ${view.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
                       tag(view.OverlayActionListView, {
-                        data: actions,
+                        data: Object.values(actions),
                         obj: obj,
                         dao: dao
                       }).
