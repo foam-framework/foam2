@@ -39,7 +39,7 @@ foam.CLASS({
 
         If 2 of those 3 CapablePayloads get rejected. Then there will be 1 numberGrantedOrPending which would be impossible to satisfy the 
         MinMaxCapability.min requirement of 2 even if that 1 CapablePayload is GRANTED.
-      `
+      `,
       javaCode: `
         // These two statements duplicate getPrereqsChainedStatus
         DAO myPrerequisitesDAO = ((DAO)
