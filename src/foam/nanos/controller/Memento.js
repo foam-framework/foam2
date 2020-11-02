@@ -117,14 +117,15 @@ foam.CLASS({
           return;
         }
         this.feedback_ = true;
-        this.params = this.PARAMS_BEGIN;
+        var params = this.PARAMS_BEGIN;
         for ( var key in this.paramsDict ) {
-          this.params += encodeURI(key);
-          this.params += this.EQUILITY_SIGN;
-          this.params += this.paramsDict[key].join(',');
+          params += encodeURI(key);
+          params += this.EQUILITY_SIGN;
+          params += this.paramsDict[key].join(',');
         }
-        this.params += this.PARAMS_END;
-        this.params = encodeURI(this.params);
+        params += this.PARAMS_END;
+        params = encodeURI(params);
+        this.params = params;
         this.feedback_ = false;
       }
     }
