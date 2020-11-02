@@ -75,7 +75,7 @@ foam.CLASS({
     {
       name: 'jsGrammar',
       factory: function() {
-        var g = this.getAbstractGrammar();
+        var g = this.createAbstractGrammar();
 
         var self = this;
 
@@ -119,7 +119,7 @@ foam.CLASS({
     {
       name: 'javaGrammar',
       factory: function() {
-        var g = this.getAbstractGrammar();
+        var g = this.createAbstractGrammar();
 
         var self = this;
 
@@ -148,7 +148,7 @@ foam.CLASS({
           },
           'raw values tag': function (v) {
             var value = v[1].join('').replace(/\s/g, '');
-            var argExist = self.args.map(ar => ar.name).includes(value);
+            var argExist = self.argsSet.includes(value);
             if ( ! argExist )
               value = 'get' + value.charAt(0).toUpperCase() + value.slice(1) + '()';
             self.push('builder.append(' + value + ');\n');
@@ -177,11 +177,11 @@ foam.CLASS({
       name: 'simple',
       value: true
     },
-    'args'
+    'argsSet'
   ],
 
   methods: [
-    function getAbstractGrammar() {
+    function createAbstractGrammar() {
       return this.Grammar.create({
        symbols: function(repeat0, simpleAlt, sym, seq1, seq, repeat, notChars, anyChar, not, optional, literal) {
           return {
@@ -252,11 +252,11 @@ foam.CLASS({
     },
 
     function compileJava(t, name, args) {
-      this.args = args;
+      this.argsSet = args.map(ar => ar.name);
       var result = this.javaGrammar.parseString(t);
       if ( ! result ) throw "Error parsing template " + name;
 
-      var code =( result[0] ? t : result[1] );
+      var code = result[1];
 
       return code;
         },
