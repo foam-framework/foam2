@@ -2234,15 +2234,15 @@ foam.CLASS({
       name: 'javaCode',
       getter: function() {
         return `
-try {
-  synchronized ( getDelegate() ) {
-    while ( ! getDelegate().isPropertySet("${this.property}") ) getDelegate().wait();
-  }
-} catch (Exception e) {
-  throw new RuntimeException(e);
-}
-${this.javaType != 'void' ? 'return ' : ''}getDelegate()
-    .${this.name}(${this.args.map(a => a.name).join(', ')});
+          try {
+            synchronized ( getDelegate() ) {
+              while ( ! getDelegate().isPropertySet("${this.property}") ) getDelegate().wait();
+            }
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+          ${this.javaType != 'void' ? 'return ' : ''}getDelegate()
+              .${this.name}(${this.args.map(a => a.name).join(', ')});
         `;
       }
     }
@@ -2301,17 +2301,27 @@ foam.CLASS({
   refines: 'foam.templates.TemplateAxiom',
   flags: ['java'],
 
+  requires: [
+    'foam.parse.Grammar',
+    'foam.templates.TemplateUtil'
+  ],
+
   methods: [
+
     function buildJavaClass(cls) {
-        cls.method({
-          name: 'build' + this.name,
-          type: 'void',
-          args: [
-            { type: 'java.lang.StringBuilder', name: 'builder' },
-          ],
-          body: `builder.append(\"${this.template}\");`
-        });
-        return;
+    var result = this.TemplateUtil.create().compileJava(this.template, this.name, this.args || []);
+      var args = [{ type: 'java.lang.StringBuilder', name: 'builder' }];
+      args.push()
+      this.args.forEach(a => args.push({type: a.type, name: a.name}));
+      cls.method({
+        name: 'build' + this.name,
+        type: 'void',
+        args: args,
+        body: `
+          ${result};
+        `
+      });
+      return;
     }
   ]
 });

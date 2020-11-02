@@ -10,13 +10,28 @@ foam.CLASS({
 
   templates: [
     {
-      template: `Hello. My name is ${{ name }}. Blame me for this test failure`,
-      name: `testTemplate`
-    }
+      template: `Hello, my name is <%= name %>`,
+      name: `simpleVarTemplate`
+    },
+    {
+      template: `This <% System.out.print("is java templating");%> test`,
+      name: `javaTemplate`
+    },
+    {
+      template: `<% if ( passed ) %> This is my legacy <% else %> Please find somebody to blame`,
+      name: `ifElseTemplate`,
+      args: [ { name: 'passed', type: 'Boolean' } ],
+    },
+    {
+      name: 'hello',
+      args: [ { name: 'name', type: 'String' } ],
+      template: 'Hello, my name is <%= name %>.'
+    },
   ],
 
   properties: [
     {
+    class: 'String',
       name: 'name',
       value: 'Kristina Smirnova'
     }
@@ -39,9 +54,9 @@ foam.CLASS({
         String finalStr = "Hello. My name is Kristina Smirnova. Blame me for this test failure";
         ParseTemplateTestModel testModel = new ParseTemplateTestModel();
         StringBuilder sb = new StringBuilder();
-        testModel.buildTemplate(sb);
+//        testModel.buildsimpleVarTemplate(sb);
 
-        test(! threw, "Admin user can add plaidAccountDetail");
+//        test(! threw, "Admin user can add plaidAccountDetail");
       `
     }
   ]

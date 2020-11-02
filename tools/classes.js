@@ -741,6 +741,10 @@ var classes = [
 
   'foam.core.NumberSet',
 
+  // template
+  'foam.java.ParseTemplateTest',
+  'foam.java.ParseTemplateTestModel',
+
   // Translation Support
   'foam.i18n.XLIFFTranslationValue',
   'foam.i18n.Locale',
