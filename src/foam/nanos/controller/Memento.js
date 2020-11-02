@@ -76,17 +76,20 @@ foam.CLASS({
       name: 'params',
     },
     {
-      name: 'paramsArr',
+      name: 'paramsDict',
       expression: function(params) {
         var dict = {};
-        var i = 0;//a=q,q,q,b=sd,z=sdf
+        if ( !params )
+          return dict;
+        var i = 1;//a=q,q,q,b=sd,z=sdf
         while( i >= 0 ) {
           var beginWith = i;
           var equalitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, i);
           var nextEqualitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, equalitySumbolIndex + 1);
           var thisParameterValueToParse;
-          if ( nextEqualitySumbolIndex == -1 ) {
-            thisParameterValueToParse = params.substring(equalitySumbolIndex);
+          if ( nextEqualitySumbolIndex === -1 ) {
+            thisParameterValueToParse = params.substring(equalitySumbolIndex + 1);
+            i = -1;
           } else {
             var beginWith1 = equalitySumbolIndex;
             while ( true ) {
@@ -97,9 +100,9 @@ foam.CLASS({
               beginWith1 = indexOfComa;
             }
             thisParameterValueToParse = params.substring(equalitySumbolIndex + 1, beginWith1);
-            i = beginWith1;
+            i = beginWith1 + 1;
           }
-          dict[params.substring(beginWith, equalitySumbolIndex)] = params.substring(equalitySumbolIndex + 1, i > 0 ? i : params.length).split(',');
+          dict[params.substring(beginWith, equalitySumbolIndex)] = params.substring(equalitySumbolIndex + 1, i > 0 ? i - 1 : params.length - 1).split(',');
         }
         return dict;
       }
