@@ -90,7 +90,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'onKey'
-    }
+    },
+    'searchValue'
   ],
 
   methods: [
@@ -105,6 +106,9 @@ foam.CLASS({
         }, this.view$);
 
       this.view.data$.sub(this.updateValue);
+      if ( this.searchValue ) {
+        this.view.data = this.searchValue;
+      }
       this.updateValue();
     },
 

@@ -83,27 +83,26 @@ foam.CLASS({
         if ( !params )
           return dict;
         var i = 1;//a=q,q,q,b=sd,z=sdf
-        while( i >= 0 ) {
+        while( i >= 0 && i < params.length - 1 ) {
           var beginWith = i;
           var equalitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, i);
           var nextEqualitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, equalitySumbolIndex + this.NEXT_INDEX);
+          nextEqualitySumbolIndex = nextEqualitySumbolIndex > -1 ? nextEqualitySumbolIndex : params.length - 1;
           var thisParameterValueToParse;
-          if ( nextEqualitySumbolIndex === -1 ) {
-            thisParameterValueToParse = params.substring(equalitySumbolIndex + this.NEXT_INDEX);
-            i = -1;
-          } else {
-            var beginWith1 = equalitySumbolIndex;
-            while ( true ) {
-              var indexOfComa = params.indexOf(this.PARAMS_SEPARATOR, beginWith1 + this.NEXT_INDEX);
-              if (indexOfComa > nextEqualitySumbolIndex ) {
-                break;
-              }
-              beginWith1 = indexOfComa;
+          var beginWith1 = equalitySumbolIndex;
+          while (  indexOfComa !== -1  ) {
+            var indexOfComa = params.indexOf(this.PARAMS_SEPARATOR, beginWith1 + this.NEXT_INDEX);
+            if ( indexOfComa > nextEqualitySumbolIndex ) {
+              break;
             }
-            thisParameterValueToParse = params.substring(equalitySumbolIndex + 1, beginWith1);
-            i = beginWith1 + this.NEXT_INDEX;
+            beginWith1 = indexOfComa;
           }
+          thisParameterValueToParse = params.substring(equalitySumbolIndex + 1, nextEqualitySumbolIndex);
+          i = beginWith1 + this.NEXT_INDEX;
+
           dict[params.substring(beginWith, equalitySumbolIndex)] = params.substring(equalitySumbolIndex + this.NEXT_INDEX, i > 0 ? i - 1 : params.length - 1).split(this.PARAMS_SEPARATOR);
+          if ( beginWith1 == -1 )
+            break; 
         }
         return dict;
       }
@@ -113,10 +112,12 @@ foam.CLASS({
   methods: [
     function combine() {
       return this.tail ?
-        this.head + this.SEPARATOR 
-        + this.PARAMS_BEGIN
+        this.head + this.SEPARATOR
+        + this.params ?
+        this.PARAMS_BEGIN
         + this.params
         + this.PARAMS_END
+        : ""
         + this.tail.combine() :
         this.head ;
     },
@@ -131,14 +132,16 @@ foam.CLASS({
       } else {
         this.head = this.value.substring(0, i);
         var tailStr = this.value.substring(i+1);
-        var j = this.value.indexOf(this.SEPARATOR, i + 1);
         if ( tailStr.includes(this.PARAMS_BEGIN) && tailStr.includes(this.PARAMS_END) ) {
-          this.params = this.value.substring(i+1, j > 0 ? j : this.value.length);
-          if ( j == -1 ) {
-            this.tail = null;
+          if ( this.value.indexOf(this.PARAMS_BEGIN) === i + 1 ) {
+            this.params = this.value.substring(i+1, this.value.indexOf(this.PARAMS_END) + 1);
+            if ( this.value.indexOf(this.PARAMS_END) != this.value.length - 1 ) {
+              this.tail = this.value.substring(this.value.indexOf(this.PARAMS_END) + 2);//2 is for excluding } and : 
+            }
           } else {
-            this.tail = this.cls_.create({ value: this.value.substring(j+1), parent: this });
+            this.tail = this.cls_.create({ value: this.value.substring(i+1), parent: this });
           }
+          
         } else {
           this.tail = this.cls_.create({ value: this.value.substring(i+1), parent: this });
         }

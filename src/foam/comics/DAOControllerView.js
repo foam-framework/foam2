@@ -182,7 +182,10 @@ foam.CLASS({
                 .hide(self.data.searchHidden$)
                 .addClass(self.myClass('full-search-container'))
                 .add(self.cls.PREDICATE.clone().copyFrom({
-                  view: { class: 'foam.u2.view.ReciprocalSearch' }
+                  view: {
+                    class: 'foam.u2.view.ReciprocalSearch',
+                    searchValue: self.currentMemento && self.currentMemento.paramsDict && self.currentMemento.paramsDict['search'] && self.currentMemento.paramsDict['search'].length > 0 ? self.currentMemento.paramsDict['search'][0] : null
+                  }
                 }))
               .end();
             })
@@ -193,7 +196,10 @@ foam.CLASS({
                   this
                     .start()
                       .add(self.cls.PREDICATE.clone().copyFrom({
-                        view: { class: 'foam.u2.view.SimpleSearch' }
+                        view: { 
+                          class: 'foam.u2.view.SimpleSearch',
+                          searchValue: self.currentMemento && self.currentMemento.paramsDict && self.currentMemento.paramsDict['search'] && self.currentMemento.paramsDict['search'].length > 0 ? self.currentMemento.paramsDict['search'][0] : null
+                        }
                       }))
                     .end();
                 })

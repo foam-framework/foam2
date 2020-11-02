@@ -286,7 +286,8 @@ foam.CLASS({
                       .callIf(self.config.searchMode === self.SearchMode.SIMPLE, function() {
                         this.tag(self.SimpleSearch, {
                           showCount: false,
-                          data$: self.searchPredicate$
+                          data$: self.searchPredicate$,
+                          searchValue: this.memento && this.memento.paramsDict && this.memento.paramsDict['search'] && self.currentMemento.paramsDict['search'].length > 0? this.memento.paramsDict['search'][0] : null
                         });
                       })
                       .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
