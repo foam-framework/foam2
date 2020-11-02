@@ -114,7 +114,7 @@ foam.CLASS({
       return this.tail ?
         this.head + this.SEPARATOR
         + this.params ?
-        this.PARAMS_BEGIN
+        this.PARAMS_BEGIN//encode me by creating expression with feedback != true
         + this.params
         + this.PARAMS_END
         : ""
