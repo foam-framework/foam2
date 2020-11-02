@@ -101,14 +101,15 @@ foam.CLASS({
             thisParameterValueToParse = params.substring(equalitySumbolIndex + 1, nextEqualitySumbolIndex);
             i = beginWith1 + this.NEXT_INDEX;
   
-            dict[decodeURI(params.substring(beginWith, equalitySumbolIndex))] = params.substring(equalitySumbolIndex + this.NEXT_INDEX, i > 0 ? i - 1 : params.length - 1).split(this.PARAMS_SEPARATOR);
+            dict[params.substring(beginWith, equalitySumbolIndex)] = params.substring(equalitySumbolIndex + this.NEXT_INDEX, i > 0 ? i - 1 : params.length - 1).split(this.PARAMS_SEPARATOR);
             if ( beginWith1 == -1 )
               break; 
           }
         }
         this.paramsDict = dict;
         this.feedback_ = false;
-      }
+      },
+      value: ''
     },
     {
       name: 'paramsDict',
@@ -134,12 +135,12 @@ foam.CLASS({
   methods: [
     function combine() {
       return this.tail ?
-        this.head + this.SEPARATOR
-        + this.params ?
-        this.PARAMS_BEGIN
+        this.head
+        + this.params ? 
+        this.SEPARATOR
         + this.params
-        + this.PARAMS_END
-        : ""
+        + this.SEPARATOR
+        : + ''
         + this.tail.combine() :
         this.head ;
     },
@@ -156,7 +157,9 @@ foam.CLASS({
         var tailStr = this.value.substring(i+1);
         if ( tailStr.includes(this.PARAMS_BEGIN) && tailStr.includes(this.PARAMS_END) ) {
           if ( this.value.indexOf(this.PARAMS_BEGIN) === i + 1 ) {
+            this.feedback_ = false;
             this.params = this.value.substring(i+1, this.value.indexOf(this.PARAMS_END) + 1);
+            this.feedback_ = true;
             if ( this.value.indexOf(this.PARAMS_END) != this.value.length - 1 ) {
               this.tail = this.value.substring(this.value.indexOf(this.PARAMS_END) + 2);//2 is for excluding } and : 
             }
