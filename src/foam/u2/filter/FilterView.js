@@ -248,7 +248,8 @@ foam.CLASS({
       expression: function(filterController$isAdvanced) {
         return filterController$isAdvanced ? this.LINK_SIMPLE : this.LINK_ADVANCED;
       }
-    }
+    },
+    'searchValue'
   ],
 
   methods: [
@@ -266,6 +267,7 @@ foam.CLASS({
               richSearch: true,
               of: self.dao.of.id,
               onKey: true,
+              searchValue: self.searchValue,
               viewSpec: {
                 class: 'foam.u2.tag.Input',
                 placeholder: 'Search'

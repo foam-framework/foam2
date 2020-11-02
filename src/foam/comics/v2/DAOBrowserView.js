@@ -287,15 +287,16 @@ foam.CLASS({
                         this.tag(self.SimpleSearch, {
                           showCount: false,
                           data$: self.searchPredicate$,
-                          searchValue: this.memento && this.memento.paramsDict && this.memento.paramsDict['search'] && self.currentMemento.paramsDict['search'].length > 0? this.memento.paramsDict['search'][0] : null
+                          searchValue: self.memento && self.memento.paramsDict && self.memento.paramsDict['search'] && self.memento.paramsDict['search'].length > 0 ? self.memento.paramsDict['search'][0] : null
                         });
                       })
                       .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
                         this.tag(self.FilterView, {
                           dao$: self.searchFilterDAO$,
-                          data$: self.searchPredicate$
+                          data$: self.searchPredicate$,
+                          searchValue: self.memento && self.memento.paramsDict && self.memento.paramsDict['search'] && self.memento.paramsDict['search'].length > 0 ? self.memento.paramsDict['search'][0] : null
                         });
-                      })
+                    })
                     .endContext()
                     .startContext({ data: self })
                       .start(self.EXPORT, { buttonStyle: 'SECONDARY' })
