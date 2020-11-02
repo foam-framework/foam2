@@ -664,6 +664,7 @@ var classes = [
   'foam.nanos.crunch.lite.ruler.ReputDependantPayloads',
   'foam.nanos.crunch.lite.ruler.SetCapablePayloadStatusOnPut',
   'foam.nanos.crunch.lite.ruler.CapablePayloadApprovableRuleAction',
+  'foam.nanos.crunch.lite.ruler.CapableStatusChangeAdjustApprovalsRuleAction',
 
   'foam.u2.wizard.BaseWizardlet',
   'foam.nanos.crunch.CapabilityCategory',
