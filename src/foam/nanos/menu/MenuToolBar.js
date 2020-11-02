@@ -100,8 +100,7 @@ foam.CLASS({
               this.EQ(this.Menu.PARENT, this.parent),
               this.NEQ(this.Menu.ID, `${this.classification}.toolbar`)
             )
-          )
-          .orderBy(this.Menu.ORDER);
+          );
       }
     },
     {

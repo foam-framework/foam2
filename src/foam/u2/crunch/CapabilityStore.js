@@ -42,8 +42,8 @@ foam.CLASS({
 
   messages: [
     { name: 'TAB_ALL', message: 'All' },
-    { name: 'TITLE', message: 'Capabilities' },
-    { name: 'SUBTITLE', message: 'To fully enable our platform, we require a bit more information about you and your company.' }
+    { name: 'TITLE', message: 'Registration' },
+    { name: 'SUBTITLE', message: 'To complete the registration, follow the steps below' }
   ],
 
   css: `

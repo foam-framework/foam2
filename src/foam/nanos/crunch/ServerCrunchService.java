@@ -237,7 +237,10 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
     return null;
   }
-  public UserCapabilityJunction updateJunction(X x, String capabilityId, FObject data) {
+  public UserCapabilityJunction updateJunction(
+    X x, String capabilityId, FObject data,
+    CapabilityJunctionStatus status
+  ) {
     Subject subject = (Subject) x.get("subject");
     UserCapabilityJunction ucj = this.getJunction(x, capabilityId);
     if ( ucj == null ) {
@@ -269,6 +272,9 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     }
     if ( data != null ) {
       ucj.setData(data);
+    }
+    if ( status != null ) {
+      ucj.setStatus(status);
     }
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
     return (UserCapabilityJunction) userCapabilityJunctionDAO.inX(x).put(ucj);

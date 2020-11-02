@@ -52,13 +52,14 @@ foam.CLASS({
     },
     {
       name: 'permissionsGranted',
-      transient: true,
+      networkTransient: true,
       javaGetter: `
-        String[] perms = new String[permissionsGranted_.length + 1];
-        for ( int i = 0 ; i < permissionsGranted_.length ; i++ ) {
+        int c = permissionsGranted_ != null ? permissionsGranted_.length : 0;
+        String[] perms = new String[c + 1];
+        for ( int i = 0 ; i < c ; i++ ) {
           perms[i] = permissionsGranted_[i];
         }
-        perms[permissionsGranted_.length] = "serviceprovider.read." + getId();
+        perms[c] = "serviceprovider.read." + getId();
         return perms;
       `,
       hidden: true

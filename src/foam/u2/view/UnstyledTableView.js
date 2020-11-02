@@ -422,7 +422,7 @@ foam.CLASS({
             var canObjBeBuildFromProjection = true;
 
             for ( var p of view.props ) {
-              if ( p.property.tableCellFormatter && ! p.property.cls_.TABLE_CELL_FORMATTER.hasOwnProperty() ) {
+              if ( p.property.tableCellFormatter && ! p.property.cls_.hasOwnProperty('tableCellFormatter') ) {
                 canObjBeBuildFromProjection = false;
                 break;
               }
@@ -455,7 +455,7 @@ foam.CLASS({
                   }).
                   callIf(view.dblclick && ! view.disableUserSelection, function() {
                     tableRowElement.on('dblclick', function() {
-                      view.dblclick && view.dblclick(canObjBeBuildFromProjection ? obj : null, obj.id);
+                      view.dblclick && view.dblclick(null, obj.id);
                     });
                   }).
                   callIf( ! view.disableUserSelection, function() {
