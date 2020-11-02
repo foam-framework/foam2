@@ -11,29 +11,25 @@ foam.CLASS({
   templates: [
     {
       template: `Hello, my name is <%= name %>`,
-      name: `simpleVarTemplate`
+      name: `testRawValue`
     },
     {
-      template: `This <% System.out.print("is java templating");%> test`,
-      name: `javaTemplate`
-    },
-    {
-      template: `<% if ( passed ) %> This is my legacy <% else %> Please find somebody to blame`,
-      name: `ifElseTemplate`,
-      args: [ { name: 'passed', type: 'Boolean' } ],
-    },
-    {
-      name: 'hello',
+      name: 'testRawValueWithArg',
       args: [ { name: 'name', type: 'String' } ],
-      template: 'Hello, my name is <%= name %>.'
+      template: 'argument name value: <%= name %>'
     },
+    {
+      template: `<% if ( testsPassed ) %>This is my legacy<% else %>Please find somebody to blame`,
+      name: `testCode`,
+      args: [ { name: 'testsPassed', type: 'Boolean' } ],
+    }
   ],
 
   properties: [
     {
     class: 'String',
       name: 'name',
-      value: 'Kristina Smirnova'
+      value: 'Kristina'
     }
   ]
 });
@@ -51,12 +47,22 @@ foam.CLASS({
     {
       name: 'runTest',
       javaCode: `
-        String finalStr = "Hello. My name is Kristina Smirnova. Blame me for this test failure";
         ParseTemplateTestModel testModel = new ParseTemplateTestModel();
         StringBuilder sb = new StringBuilder();
-//        testModel.buildsimpleVarTemplate(sb);
+        testModel.buildTestRawValue(sb);
+        boolean passed1 = sb.toString().equals("Hello, my name is Kristina");
+        test(passed1, "Raw value template give the correct output");
 
-//        test(! threw, "Admin user can add plaidAccountDetail");
+        sb = new StringBuilder();
+        testModel.buildTestRawValueWithArg(sb, "random");
+        boolean passed2 = sb.toString().equals("argument name value: random");
+        test(passed2, "Raw value with arguments gives the correct output");
+
+        sb = new StringBuilder();
+        boolean testPassed = passed1 && passed2;
+        testModel.buildTestCode(sb, testPassed);
+        boolean passed3 = testPassed ? sb.toString().equals("This is my legacy") : sb.toString().equals("Please find somebody to blame");
+        test(passed3, "Code block gives the correct output");
       `
     }
   ]

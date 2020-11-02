@@ -177,10 +177,6 @@ foam.CLASS({
       name: 'simple',
       value: true
     },
-    {
-      name: 'simpleLen',
-      value: 0
-    },
     'args'
   ],
 
@@ -257,12 +253,12 @@ foam.CLASS({
 
     function compileJava(t, name, args) {
       this.args = args;
-          var result = this.javaGrammar.parseString(t);
-          if ( ! result ) throw "Error parsing template " + name;
+      var result = this.javaGrammar.parseString(t);
+      if ( ! result ) throw "Error parsing template " + name;
 
-          var code =( result[0] ? t : result[1] );
+      var code =( result[0] ? t : result[1] );
 
-          return code;
+      return code;
         },
 
     function lazyCompile(t, name, args) {

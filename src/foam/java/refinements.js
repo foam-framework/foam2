@@ -2314,7 +2314,7 @@ foam.CLASS({
       args.push()
       this.args.forEach(a => args.push({type: a.type, name: a.name}));
       cls.method({
-        name: 'build' + this.name,
+        name: 'build' + this.name.charAt(0).toUpperCase() + this.name.slice(1),
         type: 'void',
         args: args,
         body: `
