@@ -892,7 +892,6 @@ foam.CLASS({
         body: this.javaCode ? this.javaCode : ''
       });
 
-
       var initializerString = this.buildMethodInfoInitializer(cls);
 
       // Create MethodInfo field
