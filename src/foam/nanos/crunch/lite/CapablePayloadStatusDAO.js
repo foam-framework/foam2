@@ -53,7 +53,8 @@ foam.CLASS({
           return obj;
         }
 
-        Capability cap = payload.getCapability();
+        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+        Capability cap = (Capability) capabilityDAO.find(payload.getCapability());
         var oldStatus = payload.getStatus();
         var newStatus = cap.getCapableChainedStatus(x, payloadDAO, payload);
 
@@ -62,17 +63,16 @@ foam.CLASS({
         }
 
         if ( oldStatus == REJECTED  ) {
-          // TODO: if rejected, need to change the status of all children (prereqs) as well to rejected
           if ( newStatus == PENDING ){
             var crunchService = (CrunchService) x.get("crunchService");
             payload.setStatus(REJECTED);
-            List<String> prereqIdsList = crunchService.getPrereqs(payload.getCapability().getId());
+            List<String> prereqIdsList = crunchService.getPrereqs(payload.getCapability());
 
             if ( prereqIdsList != null && prereqIdsList.size() > 0 ){
               String[] prereqIds = prereqIdsList.toArray(new String[prereqIdsList.size()]);
 
               ((ArraySink) payloadDAO.select(new ArraySink())).getArray().stream()
-              .filter(cp -> Arrays.stream(prereqIds).anyMatch(((CapablePayload) cp).getCapability().getId()::equals))
+              .filter(cp -> Arrays.stream(prereqIds).anyMatch(((CapablePayload) cp).getCapability()::equals))
               .forEach(cp -> {
                 CapablePayload capableCp = (CapablePayload) cp;
                 capableCp.setStatus(REJECTED);
@@ -85,7 +85,7 @@ foam.CLASS({
           newStatus = REJECTED;
         }
         
-        if ( payload.getCapability().getReviewRequired() ) {
+        if ( cap.getReviewRequired() ) {
           if ( oldStatus == PENDING && newStatus != REJECTED ) {
             return getDelegate().put_(x, obj);
           }
@@ -98,10 +98,10 @@ foam.CLASS({
           payload.setStatus(newStatus);
           // TODO Maybe use projection MLang
           var crunchService = (CrunchService) x.get("crunchService");
-          var depIds = crunchService.getDependantIds(x, payload.getCapability().getId());
+          var depIds = crunchService.getDependantIds(x, payload.getCapability());
 
           ((ArraySink) payloadDAO.select(new ArraySink())).getArray().stream()
-          .filter(cp -> Arrays.stream(depIds).anyMatch(((CapablePayload) cp).getCapability().getId()::equals))
+          .filter(cp -> Arrays.stream(depIds).anyMatch(((CapablePayload) cp).getCapability()::equals))
           .forEach(cp -> {
             CapablePayload capableCp = (CapablePayload) cp;
             capableCp.setHasSafeStatus(true);

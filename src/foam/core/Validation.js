@@ -118,12 +118,12 @@ foam.CLASS({
             for ( var i = 0 ; i < validationPredicates.length ; i++ ) {
               var vp = validationPredicates[i];
               var self = this;
-              if ( vp.jsFunc.bind(self)() ) return vp.jsErr.bind(self)(self);
+              if ( vp.jsFunc.call(this) ) return vp.jsErr.call(self, self);
             }
             return null;
           }];
         }
-        return !required ? null : [[name],
+        return ! required ? null : [[name],
           function() {
             const axiom = this.cls_.getAxiomByName(name);
             return axiom.isDefaultValue(this[name]) && (`${this.PLEASE_ENTER} ${label.toLowerCase()}`);
@@ -192,7 +192,7 @@ foam.CLASS({
   refines: 'foam.core.FObjectProperty',
 
   messages: [
-    { name: 'PLEASE_ENTER_VALID', value: 'Please enter valid' },
+    { name: 'PLEASE_ENTER_VALID', message: 'Please enter valid' },
   ],
 
   properties: [
@@ -204,10 +204,11 @@ foam.CLASS({
       name: 'validateObj',
       expression: function(name, label, required, validationPredicates, autoValidate) {
         if ( autoValidate ) {
+          var self = this;
           return [
             [`${name}$errors_`],
             function(errs) {
-              return errs ? `${this.PLEASE_ENTER_VALID} ${label.toLowerCase()}` : null;
+              return errs ? `${self.PLEASE_ENTER_VALID} ${(label || name).toLowerCase()}` : null;
             }
           ];
         }
@@ -377,7 +378,7 @@ foam.CLASS({
                 e.REG_EXP(self, /\S+@\S+\.\S+/)
               );
             },
-            errorString: 'Please enter valid email address'
+            errorString: 'Valid email required'
           }
         ];
         if ( this.required ) {
@@ -387,7 +388,7 @@ foam.CLASS({
               predicateFactory: function(e) {
                 return e.NEQ(self, '');
               },
-              errorString: 'Please enter email address'
+              errorString: 'Email required'
             }
           );
         }
@@ -405,7 +406,7 @@ foam.CLASS({
 
   messages: [
     { name: 'PHONE_NUMBER_REQUIRED', message: 'Phone number required' },
-    { name: 'INVALID_PHONE_NUMBER', message: 'Invalid phone number' }
+    { name: 'INVALID_PHONE_NUMBER',  message: 'Valid phone number required' }
   ],
 
   properties: [

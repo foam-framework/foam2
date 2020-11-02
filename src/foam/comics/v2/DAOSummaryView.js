@@ -222,7 +222,7 @@ foam.CLASS({
       var self = this;
       this.SUPER();
 
-      var promise = this.data ? Promise.resolve(this.data) : this.config.dao.inX(this.__subContext__).find(this.id);
+      var promise = this.data ? Promise.resolve(this.data) : this.config.unfilteredDAO.inX(this.__subContext__).find(this.id);
 
       // Get a fresh copy of the data, especially when we've been returned
       // to this view from the edit view on the stack.

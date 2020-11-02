@@ -53,7 +53,7 @@ foam.CLASS({
       var menu = this.menu;
       var X    = this.__subContext__;
 
-      menu.children.orderBy(this.Menu.ORDER, this.Menu.LABEL).select({
+      menu.children.select({
         put: function(menu) {
           if ( ! menu.handler ) return;
           self.start('div').call(function() {
@@ -64,7 +64,7 @@ foam.CLASS({
                 self.close();
                 menu.launch_(X, e);
               })
-              .add(menu.label);
+              .translate(menu.id+'.label',menu.label);
             })
           .end();
         },

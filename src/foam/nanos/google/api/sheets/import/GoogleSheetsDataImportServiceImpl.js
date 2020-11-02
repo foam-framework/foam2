@@ -118,6 +118,10 @@
             result.setResult(0);
             result.setSuccess(false);
           }
+
+          for ( int i = 0 ; i < parsedObjs.size() ; i++ ) {
+            parsedObjs.get(i).validate(x);
+          }
           
           int recordsAdded = addRecordsToDAO(x, importConfig.getDAO(), parsedObjs);
           result.setResult(recordsAdded);

@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'CapableStatusChangeAdjustApprovalsRuleAction',
 
   documentation: `
-    TODO:
+    To remove ApprovalRequests upon CapablePayload.status changes
   `,
 
   javaImports: [
@@ -66,15 +66,13 @@ foam.CLASS({
 
         for ( int i = 0; i < oldCapablePayloads.length; i++ ){
           CapablePayload oldCapablePayload = oldCapablePayloads[i];
-          // TODO: need to change this as capability is a reference now
-          capabilityIdToStatus.put(oldCapablePayload.getCapability().getId(),oldCapablePayload.getStatus());
+          capabilityIdToStatus.put(oldCapablePayload.getCapability(),oldCapablePayload.getStatus());
         }
 
         for ( int i = 0; i < newCapablePayloads.length; i++ ){
           CapablePayload newCapablePayload = newCapablePayloads[i];
 
-          // TODO: need to change this as capability is a reference now
-          CapabilityJunctionStatus oldStatus = capabilityIdToStatus.get(newCapablePayload.getCapability().getId());
+          CapabilityJunctionStatus oldStatus = capabilityIdToStatus.get(newCapablePayload.getCapability());
 
           if ( oldStatus == null ){
             logger.error("capableNewObj contains a payload that capableOldObj does not have");
@@ -82,8 +80,7 @@ foam.CLASS({
           }
 
           if ( ! SafetyUtil.equals(oldStatus, newCapablePayload.getStatus()) ){
-            // TODO: need to change this as capability is a reference now
-            Capability capability = (Capability) capabilityDAO.find(newCapablePayload.getCapability().getId());
+            Capability capability = (Capability) capabilityDAO.find(newCapablePayload.getCapability());
 
             if ( capability.getReviewRequired() ){
               updatedApprovalPayloads.add(newCapablePayload);
@@ -98,7 +95,7 @@ foam.CLASS({
             DAO approvableDAO = (DAO) getX().get("approvableDAO");
 
             for ( CapablePayload capablePayload : updatedApprovalPayloads ){
-              Capability capability = (Capability) capabilityDAO.find(capablePayload.getCapability().getId());
+              Capability capability = (Capability) capabilityDAO.find(capablePayload.getCapability());
 
               String hashedId = new StringBuilder("d")
                 .append(capablePayload.getDaoKey())

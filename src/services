@@ -395,11 +395,26 @@ p({
       .setOrder(new foam.core.PropertyInfo[] {foam.nanos.menu.Menu.ORDER, foam.nanos.menu.Menu.LABEL})
       .build();
   """,
-  "client": "{
-    \"of\":\"foam.nanos.menu.Menu\",
-    \"ttlSelectPurgeTime\": 0,
-    \"ttlPurgeTime\": 0,
-    \"cache\":true}"
+  "client": """
+    {
+      "of": "foam.nanos.menu.Menu",
+      "order": [
+        {
+          "class": "__Property__",
+          "forClass_": "foam.nanos.menu.Menu",
+          "name": "order"
+        },
+        {
+          "class": "__Property__",
+          "forClass_": "foam.nanos.menu.Menu",
+          "name": "label"
+        }
+      ],
+      "ttlSelectPurgeTime": 0,
+      "ttlPurgeTime": 0,
+      "cache": true
+    }
+  """
 })
 
 p({

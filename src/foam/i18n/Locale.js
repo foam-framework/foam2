@@ -26,14 +26,6 @@ foam.CLASS({
       name: 'variant',
       documentation: 'Locale variation (CA for en-CA, CA for fr-CA, AT for de_AT …etc)'
     },
-    {
-      class: 'String',
-      name: 'locale_variant',
-      documentation: 'complete culture code, return locale and variant. (`en-CA`, ‘fr-CA’, ‘de_AT’ …etc)',
-      //factory: function() { return this.locale + '-' + this.variant ; },
-      //value: 'en-CA'
-      value: foam.language
-    },
 //     {
 //       class: 'Map',
 //       name: 'translationValues',
