@@ -18,9 +18,22 @@ foam.INTERFACE({
     {
       name: 'getTranslation',
       async: true,
-      args: [ 'String locale', 'String source' ],
-//      javaType: 'foam.i18n.Locale'
-type: 'String'
+      args: [
+        {
+          name: 'locale',
+          type: 'String'
+        },
+        {
+          name: 'source',
+          type: 'String'
+        },
+        {
+          name: 'defaultText',
+          type: 'String',
+          documentation: 'text to be translated'
+        }
+      ],
+      type: 'String'
     }
   ]
 });

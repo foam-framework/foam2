@@ -45,7 +45,7 @@ foam.CLASS({
 
         // NOTE: explicitly calling PM constructor as create only creates
         // a percentage of PMs, but we want all replay statistics
-        PM pm = new PM(((foam.dao.AbstractDAO)dao).getOf(), "replay."+getFilename());
+        PM pm = new PM(dao.getOf(), "replay."+getFilename());
         AssemblyLine assemblyLine = x.get("threadPool") == null ?
           new foam.util.concurrent.SyncAssemblyLine()   :
           new foam.util.concurrent.AsyncAssemblyLine(x) ;
@@ -65,8 +65,7 @@ foam.CLASS({
                 FObject obj;
 
                 public void executeJob() {
-                  JSONParser parser = jsonParser.get();
-                  parser.setX(x);
+                  JSONParser parser = getParser(x);
                   obj = parser.parseString(strEntry, dao.getOf().getObjClass());
                 }
 

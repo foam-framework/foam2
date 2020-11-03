@@ -42,8 +42,8 @@ foam.CLASS({
         CapablePayload[] payloads = getCapable().getCapablePayloads();
         for ( int i = 0 ; i < payloads.length ; i++ ) {
           if (
-            payload.getCapability().getId().equals(
-              payloads[i].getCapability().getId()
+            payload.getCapability().equals(
+              payloads[i].getCapability()
             )
           ) {
             payloads[i] = payload;
@@ -82,14 +82,14 @@ foam.CLASS({
       javaCode: `
         String idString = null;
         if ( id instanceof CapablePayload ) {
-          idString = ((CapablePayload) id).getCapability().getId();
+          idString = ((CapablePayload) id).getCapability();
         } else {
           idString = (String) id;
         }
         CapablePayload[] payloads = getCapable().getCapablePayloads();
         for ( int i = 0 ; i < payloads.length ; i++ ) {
           if (
-            payloads[i].getCapability().getId().equals(idString)
+            payloads[i].getCapability().equals(idString)
           ) {
             return payloads[i];
           }
@@ -115,7 +115,7 @@ foam.CLASS({
         var foundReturn = null;
         payloads = this.capable.capablePayloads;
         for ( var i = 0 ; i < payloads.length ; i++ ) {
-          if ( payload.capability.id == payloads[i].capability.id ) {
+          if ( payload.capability == payloads[i].capability ) {
             foundReturn = ifFound(payloads, i);
             found = true;
           }

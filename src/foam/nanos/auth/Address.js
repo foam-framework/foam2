@@ -225,7 +225,7 @@ foam.CLASS({
                 /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i)
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -243,7 +243,7 @@ foam.CLASS({
                 /^\d{5}(?:[-\s]\d{4})?$/i)
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -263,7 +263,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -283,7 +283,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -303,7 +303,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -325,7 +325,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -345,7 +345,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -365,7 +365,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -385,7 +385,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -405,7 +405,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -425,7 +425,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -445,7 +445,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -465,7 +465,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -485,7 +485,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -505,7 +505,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -525,7 +525,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -545,7 +545,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -565,7 +565,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -585,7 +585,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -605,7 +605,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -625,7 +625,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -645,7 +645,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -665,7 +665,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -685,7 +685,7 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
@@ -705,7 +705,20 @@ foam.CLASS({
               )
             );
           },
-          jsFunc: function(X) {
+          jsErr: function(X) {
+            let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
+            if ( ! postalCodeError ) {
+              postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
+            }
+            return postalCodeError;
+          }
+        },
+        {
+          args: ['countryId'],
+          predicateFactory: function(e) {
+            return e.HAS(foam.nanos.auth.Address.COUNTRY_ID);
+          },
+          jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);

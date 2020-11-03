@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'com.google.foam.demos.sevenguis',
   name: 'FlightBooker',
-  extends: 'foam.u2.Element',
+//  extends: 'foam.u2.Controller',
 
   requires: [
     'foam.u2.DateView',
@@ -26,14 +26,13 @@ foam.CLASS({
   ],
 
   imports: [ 'window' ],
-  exports: [ 'as data' ],
 
   css: `
     ^ { padding: 10px; }
     ^ .error { border: 2px solid red; }
     ^title { font-size: 18px; }
     ^title, ^ button, ^ input, ^ select {
-      width: 160px; height: 24px; margin: 8px 0; display: block;
+      width: 160px; height: 28px; margin: 8px 0; display: flex;
     }
   `,
 
@@ -53,8 +52,6 @@ foam.CLASS({
     {
       class: 'Date',
       name: 'departDate',
-      readPermissionRequired: true,
-      writePermissionRequired: true,
       factory: function() { return new Date(Date.now()+3600000*24); },
       validateObj: function(departDate) {
         var today = new Date();
@@ -67,6 +64,7 @@ foam.CLASS({
       name: 'returnDate',
       factory: function() { return new Date(Date.now()+2*3600000*24); },
       visibility: function(isReturn) {
+        debugger;
         return isReturn ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       },
       validateObj: function(isReturn, returnDate, departDate) {
@@ -78,10 +76,10 @@ foam.CLASS({
   methods: [
     function initE() {
       this.SUPER();
-      this.nodeName = 'div';
       this.
+        setNodeName('div').
         addClass(this.myClass()).
-        // start('div').addClass(this.myClass('title')).add('Book Flight').end().
+        start('div').addClass(this.myClass('title')).add('Book Flight').end().
         add(this.IS_RETURN).
         add(this.DEPART_DATE).
         add(this.RETURN_DATE).

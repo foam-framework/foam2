@@ -368,6 +368,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/CapabilityAvailabilityDAO" },
 
   // crunch lite rulers
+  { name: "foam/nanos/crunch/lite/ruler/CapableStatusChangeAdjustApprovalsRuleAction" },
   { name: "foam/nanos/crunch/lite/ruler/CapablePayloadApprovableRuleAction" },
   { name: "foam/nanos/crunch/lite/ruler/CapableCreateApprovalsRuleAction" },
   { name: "foam/nanos/crunch/lite/ruler/SetCapablePayloadStatusOnPut" },

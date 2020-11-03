@@ -133,6 +133,7 @@ var classes = [
   'foam.lib.csv.ProxyCSVOutputter',
   'foam.lib.csv.FromCSVSetter',
   'foam.dao.java.JDAO',
+  'foam.dao.CopyFromDAO',
   'foam.dao.FilteredDAO',
   'foam.dao.Journal',
   'foam.dao.RemoveChildrenOnRemoveDAO',
@@ -663,6 +664,7 @@ var classes = [
   'foam.nanos.crunch.lite.ruler.ReputDependantPayloads',
   'foam.nanos.crunch.lite.ruler.SetCapablePayloadStatusOnPut',
   'foam.nanos.crunch.lite.ruler.CapablePayloadApprovableRuleAction',
+  'foam.nanos.crunch.lite.ruler.CapableStatusChangeAdjustApprovalsRuleAction',
 
   'foam.u2.wizard.BaseWizardlet',
   'foam.nanos.crunch.CapabilityCategory',
@@ -744,6 +746,10 @@ var classes = [
   'foam.nanos.approval.PopulateApprovalRequestsDAO',
 
   'foam.core.NumberSet',
+
+  // template
+  'foam.java.ParseTemplateTest',
+  'foam.java.ParseTemplateTestModel',
 
   // Translation Support
   'foam.i18n.XLIFFTranslationValue',
