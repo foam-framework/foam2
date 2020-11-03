@@ -62,7 +62,7 @@ foam.CLASS({
   exports: [
     'controllerMode',
     'as objectSummaryView',
-    'memento'
+    'currentMemento as memento'
   ],
 
   properties: [
@@ -120,7 +120,7 @@ foam.CLASS({
     {
       name: 'back',
       code: function(X, data) {
-        X.memento$.set(null);
+        X.memento.tail$.set(null);
         X.onBack();
       }
     },
@@ -224,7 +224,8 @@ foam.CLASS({
           data: this.data
         }));
       }
-    }
+    },
+    'currentMemento'
   ],
 
   methods: [

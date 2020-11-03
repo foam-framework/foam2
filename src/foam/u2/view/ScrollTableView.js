@@ -17,7 +17,7 @@
   exports: [
     'as summaryView',
     'dblclick',
-    'currentMemento as memento'//
+    'memento'//currentMemento as 
   ],
 
   requires: [
