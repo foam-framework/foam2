@@ -48,7 +48,7 @@ foam.CLASS({
         if ( ! this.of ) return null;
 
         var ret = this.of.create({}, this);
-        if ( this.ucj && this.ucj.data ) ret.copyFrom(this.ucj.data);
+        if ( this.ucj && this.ucj.data ) ret = Object.assign(ret, this.ucj.data);
 
         var prop = this.of.getAxiomByName('capability');
         if ( prop ) prop.set(ret, this.capability);
