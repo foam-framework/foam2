@@ -12,7 +12,6 @@ import foam.dao.DAO;
 import foam.dao.Sink;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.auth.User;
-import foam.nanos.crunch.CrunchService;
 import foam.nanos.session.Session;
 import java.security.Permission;
 import java.util.concurrent.ConcurrentHashMap;
@@ -97,9 +96,6 @@ public class CachingAuthService
       DAO       userDAO   = (DAO) x.get("localUserDAO");
       DAO       groupDAO  = (DAO) x.get("localGroupDAO");
       DAO       groupPermissionJunctionDAO = (DAO) x.get("groupPermissionJunctionDAO");
-      DAO       userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-      Predicate ucjPredicate = ((CrunchService) x.get("crunchService"))
-        .getAssociationPredicate(x);
       User      agent     = subject.getRealUser();
       Predicate predicate = EQ(User.ID, user.getId());
 
@@ -110,7 +106,6 @@ public class CachingAuthService
       groupDAO.listen(purgeSink, TRUE);
       userDAO.listen(purgeSink, predicate);
       groupPermissionJunctionDAO.listen(purgeSink, TRUE);
-      userCapabilityJunctionDAO.listen(purgeSink, ucjPredicate);
 
       String[] extraDAOsToListenTo = (String[]) x.get("extraDAOsToListenTo");
 

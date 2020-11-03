@@ -31,6 +31,7 @@ foam.CLASS({
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityRuntimeException',
     'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.crunch.CrunchService',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.logger.Logger',
     'foam.nanos.session.Session',
@@ -40,6 +41,18 @@ foam.CLASS({
     'java.util.Map',
     'java.util.concurrent.ConcurrentHashMap',
     'static foam.mlang.MLang.*'
+  ],
+
+  constants: [
+    {
+      name: 'CACHE_INIT_KEY',
+      value: 'CapabilityAuthService.PermissionCache',
+      documentation: `
+        Key in user session containing a boolean to inform
+        CapabilityAuthService whether or not a session already has
+        a listener bound to it.
+      `
+    }
   ],
 
   properties: [
@@ -106,6 +119,7 @@ foam.CLASS({
       `,
       javaCode: `
         User user = ((Subject) x.get("subject")).getUser();
+        maybeBindSessionPermissionCachePurge(x);
 
         boolean hasViaCrunch = capabilityCheck(x, user, permission);
         return ( user != null && hasViaCrunch ) || getDelegate().check(x, permission);
@@ -271,6 +285,65 @@ foam.CLASS({
         }
 
         if ( ex.getCapabilities().length > 0 ) throw ex;
+      `
+    },
+    {
+      name: 'maybeBindSessionPermissionCachePurge',
+      documentation: `
+        This method attaches a listener to a predicated UCJ DAO to clear
+        the permission cache of CachingAuthService when a user's CRUNCH
+        state changes.
+      `,
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+      ],
+      javaCode: `
+        var userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+        var session = (Session) x.get(Session.class);
+        if ( session.getContext().getBoolean(CACHE_INIT_KEY) ) {
+          return;
+        }
+        session.setContext(session.getContext().put(
+          CACHE_INIT_KEY,
+          true
+        ));
+        Sink purgeSink = new Sink() {
+          public void put(Object obj, Detachable sub) {
+            purgeSessionCache(x);
+          }
+          public void remove(Object obj, Detachable sub) {
+            purgeSessionCache(x);
+          }
+          public void eof() {
+          }
+          public void reset(Detachable sub) {
+            purgeSessionCache(x);
+          }
+        };
+        Predicate ucjPredicate = ((CrunchService) x.get("crunchService"))
+          .getAssociationPredicate(x);
+        userCapabilityJunctionDAO.listen(purgeSink, ucjPredicate);
+      `
+    },
+    {
+      name: 'purgeSessionCache',
+      documentation: `
+        This method clears the session cache created by CachingAuthService.
+      `,
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+      ],
+      javaCode: `
+        Session session = x.get(Session.class);
+        Map<String, Boolean> map = (Map)
+          session.getContext().get(CachingAuthService.CACHE_KEY);
+        map.clear();
       `
     }
   ]
