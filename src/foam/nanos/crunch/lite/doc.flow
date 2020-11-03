@@ -15,7 +15,7 @@ submit to do something with a specific object.
 For example, an object representing a choice of icecream may require the user
 to choose at least one flavour. Because we know the configuration of icecream
 can be complicated, we choose to make Icecream implement Capable, which adds
-CRUNCH Lite features to our Icecram model.
+CRUNCH Lite features to our Icecream model.
 
 <h2>How-To</h2>
 
