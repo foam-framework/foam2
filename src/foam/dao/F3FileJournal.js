@@ -40,20 +40,21 @@ foam.CLASS({
         { name: 'dao', type: 'foam.dao.DAO' }
       ],
       javaCode: `
+        JSONParser parser = (JSONParser) getParser(x);
+
         // count number of entries successfully read
         AtomicInteger successReading = new AtomicInteger();
+        AtomicInteger failedReading = new AtomicInteger();
 
         // NOTE: explicitly calling PM constructor as create only creates
         // a percentage of PMs, but we want all replay statistics
-        PM pm = new PM(dao.getOf(), "replay."+getFilename());
-        AssemblyLine assemblyLine = x.get("threadPool") == null ?
-          new foam.util.concurrent.SyncAssemblyLine()   :
-          new foam.util.concurrent.AsyncAssemblyLine(x) ;
+        PM pm = new PM(this.getClass().getSimpleName(), ((foam.dao.AbstractDAO)dao).getOf().getId(), "replay", getFilename());
 
         try ( BufferedReader reader = getReader() ) {
           if ( reader == null ) {
             return;
           }
+          Class defaultClass = dao.getOf().getObjClass();
           for (  CharSequence entry ; ( entry = getEntry(reader) ) != null ; ) {
             int length = entry.length();
             if ( length == 0 ) continue;
@@ -61,42 +62,39 @@ foam.CLASS({
             try {
               final char operation = entry.charAt(0);
               final String strEntry = entry.subSequence(2, length - 1).toString();
-              assemblyLine.enqueue(new foam.util.concurrent.AbstractAssembly() {
-                FObject obj;
+              FObject obj = parser.parseString(strEntry, defaultClass);
+              if ( obj == null ) {
+                getLogger().error("Parse error", getParsingErrorMessage(strEntry), "entry:", strEntry);
+                return;
+              }
+              switch ( operation ) {
+                case 'p':
+                  foam.core.FObject old = dao.find(obj.getProperty("id"));
+                  dao.put(old != null ? mergeFObject(old.fclone(), obj) : obj);
+                  break;
 
-                public void executeJob() {
-                  JSONParser parser = getParser(x);
-                  obj = parser.parseString(strEntry, dao.getOf().getObjClass());
-                }
-
-                public void endJob(boolean isLast) {
-                  if ( obj == null ) {
-                    getLogger().error("Parse error", getParsingErrorMessage(strEntry), "entry:", strEntry);
-                    return;
-                  }
-                  switch ( operation ) {
-                    case 'p':
-                      foam.core.FObject old = dao.find(obj.getProperty("id"));
-                      dao.put(old != null ? mergeFObject(old.fclone(), obj) : obj);
-                      break;
-
-                    case 'r':
-                      dao.remove(obj);
-                      break;
-                  }
-                  successReading.incrementAndGet();
-                }
-              });
+                case 'r':
+                  dao.remove(obj);
+                  break;
+              }
+              successReading.incrementAndGet();
             } catch ( Throwable t ) {
               getLogger().error("Error replaying journal entry:", entry, t);
+              failedReading.incrementAndGet();
             }
           }
         } catch ( Throwable t) {
+          pm.error(x, t);
           getLogger().error("Failed to read from journal", t);
+          throw new RuntimeException(t);
         } finally {
-          assemblyLine.shutdown();
-          pm.log(x);
-          getLogger().log("Successfully read " + successReading.get() + " entries from file: " + getFilename() + " in: " + pm.getTime() + "(ms)");
+          if ( failedReading.get() > 0 ) {
+            getLogger().warning("Failed to read " + failedReading.get() + " entries from file: " + getFilename());
+            pm.error(x, "Failed to read " + failedReading.get() + " entries");
+          } else {
+            pm.log(x);
+          }
+          getLogger().info("Successfully read " + successReading.get() + " entries from file: " + getFilename() + " in: " + pm.getTime() + "(ms)");
         }
       `
     }
