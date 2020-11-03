@@ -72,7 +72,7 @@ foam.CLASS({
 
           UserCapabilityJunction ucJunction =
             crunchService.getJunction(x, ccJunction.getTargetId());
-          if ( ucJunction == null ) continue;
+          if ( ucJunction.getStatus() == AVAILABLE ) continue;
 
           switch ( ucJunction.getStatus() ) {
             case GRANTED:
