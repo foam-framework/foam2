@@ -228,7 +228,6 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
         userCapabilityJunctionDAO.find(AND(associationPredicate,targetPredicate));
       if ( ucj == null ) {
         ucj = buildAssociatedUCJ(x, capabilityId, subject);
-        ucj.setStatus(CapabilityJunctionStatus.AVAILABLE);
       }
 
       return ucj;
@@ -238,7 +237,6 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
       // On failure, report that the capability is available
       var ucj = buildAssociatedUCJ(x, capabilityId, subject);
-      ucj.setStatus(CapabilityJunctionStatus.AVAILABLE);
       return ucj;
     }
   }
@@ -278,7 +276,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       ? subject.getUser()
       : subject.getRealUser()
       ;
-    return isAssociation
+    var ucj = isAssociation
       ? new AgentCapabilityJunction.Builder(x)
         .setSourceId(associatedUser.getId())
         .setTargetId(capabilityId)
@@ -289,6 +287,8 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
         .setTargetId(capabilityId)
         .build()
       ;
+    ucj.setStatus(CapabilityJunctionStatus.AVAILABLE);
+    return ucj;
   }
 
   public void maybeIntercept(X x, String[] capabilityOptions) {
