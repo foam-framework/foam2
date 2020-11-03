@@ -134,15 +134,11 @@ foam.CLASS({
    
   methods: [
     function combine() {
-      return this.tail ?
-        this.head
-        + this.params ? 
-        this.SEPARATOR
-        + this.params
-        + this.SEPARATOR
-        : + ''
-        + this.tail.combine() :
-        this.head ;
+      var params =  this.params ?  this.SEPARATOR + this.params : '';
+      var tail = this.tail ? this.SEPARATOR + this.tail.combine() : '';
+      return this.head
+        + params
+        + tail;
     },
     function parseValue() {
       //added as value's subscribers methods are executed earlier then post set
