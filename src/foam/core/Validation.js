@@ -139,6 +139,10 @@ foam.CLASS({
   name: 'StringPropertyValidationRefinement',
   refines: 'foam.core.String',
 
+  messages: [
+    { name: 'REQUIRED', message: 'required' },
+  ],
+
   properties: [
     'minLength',
     'maxLength',
@@ -176,7 +180,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.GTE(foam.mlang.StringLength.create({ arg1: self }), 1);
             },
-            errorString: `${this.label} required`
+            errorString: `${this.label} ${foam.core.String.REQUIRED}`
           });
         }
         return a;
