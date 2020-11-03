@@ -115,18 +115,12 @@ foam.CLASS({
             .map(vp => vp.args)
             .flat());
           return [args, function() {
-            var err;
-
             for ( var i = 0 ; i < validationPredicates.length ; i++ ) {
               var vp = validationPredicates[i];
               var self = this;
-              if ( vp.jsFunc.call(this) ) {
-                err = vp.jsFunc.call(self, self);
-              }
-              if ( err )
-                break;
+              if ( vp.jsFunc.call(this) ) return vp.jsErr.call(self, self);
             }
-            return err;
+            return null;
           }];
         }
         return ! required ? null : [[name],
