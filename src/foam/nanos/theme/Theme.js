@@ -24,10 +24,6 @@ foam.CLASS({
 //    'foam.nanos.auth.LastModifiedByAware'
   ],
 
-  imports: [
-    'translationService'
-  ],
-
   requires: [
     'foam.nanos.theme.ThemeGlyphs'
   ],
