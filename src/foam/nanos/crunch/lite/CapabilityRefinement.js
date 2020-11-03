@@ -33,6 +33,7 @@ foam.CLASS({
           .getArray();
         
         boolean isPending = false;
+        boolean isRejected = false;
 
         for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
           CapablePayload prereqPayload = (CapablePayload)
@@ -45,14 +46,20 @@ foam.CLASS({
           switch ( prereqPayload.getStatus() ) {
             case PENDING:
               isPending = true;
+              continue;
             case GRANTED:
               continue;
+            case REJECTED:
+              isRejected = true;
+              break;
             default:
               return ACTION_REQUIRED;
           }
         }
 
-        return isPending ? PENDING : GRANTED;
+        return isRejected 
+                ? REJECTED 
+                : isPending ? PENDING : GRANTED;
       `
     }
   ]

@@ -118,7 +118,7 @@ foam.CLASS({
 
                   // Render title
                   .start('p').addClass(self.myClass('title'))
-                    .translate(wizardlet.capability+'.name', wizardlet.capability.name)
+                    .translate(wizardlet.capability.id+'.name', wizardlet.capability.name)
                     .style({
                       'color': isCurrent ? this.theme.black : this.theme.grey2
                     })

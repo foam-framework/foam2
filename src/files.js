@@ -760,6 +760,7 @@ FOAM_FILES([
   { name: "foam/flow/MarkupEditor" },
   { name: "foam/flow/DocumentationFolderDAO" },
   { name: "foam/flow/widgets/PropertyShortSummary" },
+  { name: "foam/flow/widgets/ModelSummary" },
   { name: "foam/flow/widgets/EnumSummary" },
   { name: "foam/flow/widgets/DocumentationIncomplete" },
 

@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'FulfilledNestedJournalApprovablePredicate',
 
   documentation: `
-    Returns true if from the approvableDAO and the Approvable is APPROVED 
+    Returns true if from the approvableDAO and the Approvable is APPROVED or REJECTED
     & nested journal is true',
   `,
 
@@ -28,7 +28,10 @@ foam.CLASS({
       javaCode: `
         return
           AND(
-            EQ(DOT(NEW_OBJ, Approvable.STATUS), ApprovalStatus.APPROVED),
+            OR(
+              EQ(DOT(NEW_OBJ, Approvable.STATUS), ApprovalStatus.APPROVED),
+              EQ(DOT(NEW_OBJ, Approvable.STATUS), ApprovalStatus.REJECTED)
+            ),
             EQ(DOT(NEW_OBJ, Approvable.IS_USING_NESTED_JOURNAL), true)
           )
         .f(obj);

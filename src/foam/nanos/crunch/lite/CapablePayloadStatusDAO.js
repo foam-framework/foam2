@@ -61,9 +61,32 @@ foam.CLASS({
         if ( oldStatus == APPROVED && newStatus == PENDING ) {
           newStatus = APPROVED;
         }
+
+        if ( oldStatus == REJECTED  ) {
+          if ( newStatus == PENDING ){
+            var crunchService = (CrunchService) x.get("crunchService");
+            payload.setStatus(REJECTED);
+            List<String> prereqIdsList = crunchService.getPrereqs(payload.getCapability());
+
+            if ( prereqIdsList != null && prereqIdsList.size() > 0 ){
+              String[] prereqIds = prereqIdsList.toArray(new String[prereqIdsList.size()]);
+
+              ((ArraySink) payloadDAO.select(new ArraySink())).getArray().stream()
+              .filter(cp -> Arrays.stream(prereqIds).anyMatch(((CapablePayload) cp).getCapability()::equals))
+              .forEach(cp -> {
+                CapablePayload capableCp = (CapablePayload) cp;
+                capableCp.setStatus(REJECTED);
+                capableCp.setHasSafeStatus(true);
+                payloadDAO.put(capableCp);
+              });
+            }            
+          }
+
+          newStatus = REJECTED;
+        }
         
         if ( cap.getReviewRequired() ) {
-          if ( oldStatus == PENDING ) {
+          if ( oldStatus == PENDING && newStatus != REJECTED ) {
             return getDelegate().put_(x, obj);
           }
           if ( oldStatus == ACTION_REQUIRED ) {
