@@ -19,20 +19,24 @@ foam.CLASS({
     'foam.nanos.pm.PM'
   ],
 
-  // properties: [
-  //   {
-  //     name: 'logger',
-  //     class: 'FObjectProperty',
-  //     of: 'foam.nanos.logger.Logger',
-  //     visibility: 'HIDDEN',
-  //     transient: true,
-  //     javaFactory: `
-  //       return new PrefixLogger(new Object[] {
-  //         this.getClass().getSimpleName()
-  //       }, (Logger) getX().get("logger"));
-  //     `
-  //   }
-  // ],
+  properties: [
+    {
+      name: 'updateIndex',
+      class: 'Boolean'
+    },
+    {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      transient: true,
+      javaFactory: `
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, (Logger) getX().get("logger"));
+      `
+    }
+  ],
 
   methods: [
     {
@@ -58,6 +62,9 @@ foam.CLASS({
           } 
           info.setMaxIndex(Math.max(info.getMaxIndex(), entry.getIndex()));
           info.setCount(info.getCount() + 1);
+          if ( getUpdateIndex() ) {
+            info.updateIndex(x, entry.getIndex());
+          }
         }
         return getDelegate().put_(x, obj);
       } finally {

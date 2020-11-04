@@ -854,6 +854,9 @@ configuration for contacting the primary node.`,
         if ( config.getType() == MedusaType.NODE ) {
           return false;
         }
+        if ( config.getType() == MedusaType.NERF ) {
+          return false;
+        }
       } catch (Throwable t) {
         // ignore, thrown when no config found.
       }

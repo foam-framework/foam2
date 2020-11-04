@@ -442,17 +442,38 @@ foam.CLASS({
       try {
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
         Map<Object, Map> hashes = next.getConsensusHashes();
-        for ( Map<String, MedusaEntry> nodes : hashes.values() ) {
-          if ( nodes.size() >= support.getNodeQuorum() ) {
-            if ( entry == null ) {
-              for ( MedusaEntry e : nodes.values() ) {
-                entry = e;
-                break;
+        Map<String, MedusaEntry> lastNodes = null;
+        try {
+          for ( Map<String, MedusaEntry> nodes : hashes.values() ) {
+            if ( nodes.size() >= support.getNodeQuorum() ) {
+              if ( entry == null ) {
+                for ( MedusaEntry e : nodes.values() ) {
+                  entry = e;
+                  break;
+                }
+              } else {
+                getLogger().error("getConsensusEntry", next, "Multiple consensus detected", hashes.size(), next.toSummary(), next.getConsensusCount(), support.getNodeQuorum());
+                throw new MedusaException("Multiple consensus detected. "+next.toSummary());
               }
-            } else {
-              getLogger().error("getConsensusEntry", next, "Multiple consensus detected", next.toSummary(), next.getConsensusCount(), support.getNodeQuorum());
-              throw new MedusaException("Multiple consensus detected. "+next.toSummary());
             }
+            lastNodes = nodes;
+          }
+        } catch (Throwable t) {
+          for ( Map<String, MedusaEntry> nodes : hashes.values() ) {
+            for ( Map.Entry me : nodes.entrySet() ) {
+              MedusaEntry e = (MedusaEntry) me.getValue();
+              getLogger().info(e.getIndex(), e.getHash(), me.getKey());
+            }
+              // getLogger().info(entry.getIndex(), entry.getHash(), Arrays.toString(lastNodes.keySet().toArray(new String[lastNodes.keySet().size()])));
+
+              // for ( MedusaEntry e : nodes.values() ) {
+              //   getLogger().info(e.getIndex(), e.getHash(), Arrays.toString(nodes.keySet().toArray(new String[nodes.keySet().size()])));
+              //   break;
+              // }
+              // // for ( Map<String, MedusaEntry> dups : hashes.values() ) {
+              // //   getLogger().info(entry.getIndex(), entry.getHash(), Arrays.toString(dups.keySet().toArray(new String[dups.keySet().size()])));
+              // // }
+            throw t;
           }
         }
       } finally {

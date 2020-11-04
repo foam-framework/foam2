@@ -98,17 +98,51 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'put_',
+      javaCode: `
+      return update(x, obj, DOP.PUT);
+      `
+    },
+    {
+      name: 'remove_',
+      javaCode: `
+      return update(x, obj, DOP.REMOVE);
+      `
+    },
+    {
       documentation: `
       1. If primary mediator, then delegate to medusaAdapter, accept result.
       2. If secondary mediator, proxy to next 'server', find result.
       3. If not mediator, proxy to the next 'server', put result.`,
-      name: 'put_',
+      name: 'update',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'foam.core.FObject'
+        },
+        {
+          name: 'dop',
+          type: 'foam.dao.DOP'
+        }
+      ],
+      javaType: 'foam.core.FObject',
       javaCode: `
-      getLogger().debug("put");
+      getLogger().debug("update");
+      if ( ! ( DOP.PUT == dop ||
+               DOP.REMOVE == dop ) ) {
+        getLogger().warning("Unsupported operation", dop.getLabel());
+        throw new UnsupportedOperationException(dop.getLabel());
+      }
+
       if ( obj instanceof Clusterable &&
            ! ((Clusterable) obj).getClusterable() ) {
-        getLogger().debug("put", "not clusterable", obj.getClass().getSimpleName(), obj.getProperty("id").toString());
-        return getDelegate().put_(x, obj);
+        getLogger().debug("update", dop.getLabel(), "not clusterable", obj.getClass().getSimpleName(), obj.getProperty("id").toString());
+        if ( DOP.PUT == dop ) return getDelegate().put_(x, obj);
+        if ( DOP.REMOVE == dop ) return getDelegate().remove_(x, obj);
       }
 
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
@@ -124,18 +158,29 @@ foam.CLASS({
           obj = cmd.getData();
         }
 
-        getLogger().debug("put", "primary", obj.getClass().getSimpleName());
+        getLogger().debug("update", dop.getLabel(), "primary", obj.getClass().getSimpleName());
         FObject old = getDelegate().find_(x, obj.getProperty("id"));
-        FObject nu = getDelegate().put_(x, obj);
-        String data = data(x, nu, old, DOP.PUT);
+        FObject nu = null;
+        String data = null;
+        if ( DOP.PUT == dop ) {
+          nu = getDelegate().put_(x, obj);
+          data = data(x, nu, old, dop);
+        } else if ( DOP.REMOVE == dop ) {
+          getDelegate().remove_(x, obj);
+          data = data(x, obj, null, dop);
+        }
         if ( SafetyUtil.isEmpty(data) ) {
-          getLogger().debug("put", "primary", obj.getProperty("id"), "data", "no delta");
+          getLogger().debug("update", "primary", obj.getProperty("id"), "data", "no delta");
         } else {
-          MedusaEntry entry = (MedusaEntry) submit(x, data, DOP.PUT);
+          MedusaEntry entry = (MedusaEntry) submit(x, data, dop);
           if ( cmd != null ) {
-            getLogger().debug("put", "primary", obj.getProperty("id"), "setMedusaEntryId", entry.toSummary());
+            getLogger().debug("update", "primary", obj.getProperty("id"), "setMedusaEntryId", entry.toSummary());
             cmd.setMedusaEntryId((Long) entry.getId());
-            cmd.setData(nu);
+            if ( DOP.PUT == dop ) {
+              cmd.setData(nu);
+            } else if ( DOP.REMOVE == dop ) {
+              cmd.setData(null);
+            }
           }
         }
         if ( cmd != null ) {
@@ -144,58 +189,40 @@ foam.CLASS({
         return nu;
       }
 
-      ClusterCommand cmd = new ClusterCommand(x, getNSpec().getName(), DOP.PUT, obj);
-      getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "send");
+      ClusterCommand cmd = new ClusterCommand(x, getNSpec().getName(), dop, obj);
+      getLogger().debug("update", dop.getLabel(), "client", "cmd", obj.getProperty("id"), "send");
       // PM pm = PM.create(x, this.getClass().getSimpleName(), "cmd");
       PM pm = new PM(this.getClass().getSimpleName(), "cmd");
       cmd = (ClusterCommand) getClientDAO().cmd_(x, cmd);
       pm.log(x);
       cmd.logHops(x);
-      getLogger().debug("put", "client", "cmd", obj.getProperty("id"), "receive", cmd.getMedusaEntryId());
-      FObject result = cmd.getData();
-      if ( result != null ) {
-        getLogger().debug("put", "delegate", result.getProperty("id"));
-        FObject nu = getDelegate().put_(x, result);
-        if ( nu == null ) {
-          getLogger().debug("put", "delegate", "returned null");
-        } else {
-          FObject f = getDelegate().find_(x, nu.getProperty("id"));
-          if ( f == null ) {
-            getLogger().debug("put", "delegate", "find null");
-            getLogger().debug("put", "delegate", "dao", getDelegate().getClass().getSimpleName());
+      getLogger().debug("update", dop.getLabel(), "client", "cmd", obj.getProperty("id"), "receive", cmd.getMedusaEntryId());
+      if ( DOP.PUT == dop ) {
+        FObject result = cmd.getData();
+        if ( result != null ) {
+          FObject nu = getDelegate().put_(x, result);
+          if ( nu == null ) {
+            getLogger().debug("update", dop.getLabel(), "delegate", "put", result.getProperty("id"), "null");
+          } else {
+            FObject f = getDelegate().find_(x, nu.getProperty("id"));
+            if ( f == null ) {
+              getLogger().warning("update", dop.getLabel(), "delegate", "find", result.getProperty("id"), "null");
+            }
           }
+          return nu;
         }
-        return nu;
-      }
-      getLogger().warning("put", obj.getProperty("id"), "result,null");
-      return result;
-      `
-    },
-    {
-      name: 'remove_',
-      javaCode: `
-      // INCOMPLETE.
-      if ( obj instanceof Clusterable &&
-           ! ((Clusterable) obj).getClusterable() ) {
-        return getDelegate().remove_(x, obj);
-      }
-
-      if ( obj instanceof ClusterCommand ) {
-        obj = ((ClusterCommand) obj).getData();
-      }
-
-      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      ClusterConfig config = support.getConfig(x, support.getConfigId());
-      if ( config.getIsPrimary() ) {
-        getDelegate().remove_(x, obj);
-        return submit(x, data(x, obj, null, DOP.REMOVE), DOP.REMOVE);
-      }
-
-      FObject result = getClientDAO().remove_(x, obj);
-      if ( config.getType() == MedusaType.MEDIATOR ) {
+        // TODO/REVIEW
+        getLogger().warning("update", dop.getLabel(), obj.getProperty("id"), "result,null");
         return result;
+      } else { // if ( DOP.REMOVE == dop ) {
+        FObject r = getDelegate().remove_(x, obj);
+        FObject f = getDelegate().find_(x, obj.getProperty("id"));
+        if ( f != null ) {
+          // TODO/REVIEW
+          getLogger().warning("update", dop.getLabel(), "delegate", "find", obj.getProperty("id"), "not null");
+        }
+        return r;
       }
-      return getDelegate().remove_(x, result);
       `
     },
     {
@@ -215,6 +242,8 @@ foam.CLASS({
           getLogger().debug("cmd", "ClusterCommand", "primary");
           if ( DOP.PUT == cmd.getDop() ) {
             return put_(x, cmd);
+          } else if ( DOP.REMOVE == cmd.getDop() ) {
+            return remove_(x, cmd);
           } else {
             getLogger().warning("Unsupported operation", cmd.getDop().getLabel());
             throw new UnsupportedOperationException(cmd.getDop().getLabel());
