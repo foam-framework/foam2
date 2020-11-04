@@ -20,6 +20,10 @@ foam.CLASS({
     'foam.core.Latch'
   ],
 
+  messages:[
+    { name: 'PLACEHOLDER', message: 'please select...'}
+  ],
+
   properties: [
     {
       class: 'foam.core.FObjectProperty',
@@ -38,9 +42,11 @@ foam.CLASS({
         return foam.u2.DisplayMode.RW;
       },
       view: function(args, X) {
+        placeholder = X.data.allowCustom ? '' : X.data.PLACEHOLDER
         return {
           class: X.data.allowCustom ? 'foam.u2.TextField' : 'foam.u2.view.ChoiceView',
           displayWidth: 60,
+          placeholder: placeholder,
           choices$: X.data.choices$
         };
       }
@@ -203,7 +209,6 @@ foam.CLASS({
       );
 
       if ( this.data ) { this.objectClass = dataToClass(this.data); }
-      if ( ! this.data && ! this.objectClass && this.choices.length ) this.objectClass = this.choices[0][0];
 
       this.
         start(this.OBJECT_CLASS).
