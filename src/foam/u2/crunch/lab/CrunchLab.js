@@ -23,6 +23,7 @@ foam.CLASS({
   `,
 
   imports: [
+    'memento',
     'userCapabilityJunctionDAO'
   ],
 
@@ -57,6 +58,9 @@ foam.CLASS({
             }
           ]
         };
+      },
+      postSet: function(_, n) {
+        this.memento = n;
       }
     },
     {
@@ -105,6 +109,8 @@ foam.CLASS({
           .end()
         .end()
         ;
+      this.memento$.sub(this.mementoChange);
+      this.mementoChange();
     },
     function getGraphSlot(replaceWithUCJ) {
       var self = this;
@@ -164,4 +170,11 @@ foam.CLASS({
       });
     }
   ],
+
+  listeners: [
+    function mementoChange() {
+      var m = this.memento;
+      if ( m && this.rootCapability != m ) this.rootCapability = m;
+    }
+  ]
 });

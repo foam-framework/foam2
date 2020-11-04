@@ -553,6 +553,23 @@
         return ! isTrackingRequest;
       },
       code: function(X) {
+        this.approve.bind(this);
+      }
+    },
+    {
+      name: 'approveWithMemo',
+      section: 'requestDetails',
+      isAvailable: (isTrackingRequest, status) => {
+        if (
+          status === foam.nanos.approval.ApprovalStatus.REJECTED ||
+          status === foam.nanos.approval.ApprovalStatus.APPROVED ||
+          status === foam.nanos.approval.ApprovalStatus.CANCELLED
+        ) {
+          return false;
+        }
+        return ! isTrackingRequest;
+      },
+      code: function(X) {
         var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
         objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: "foam.u2.MemoModal",
@@ -754,6 +771,23 @@
     }
   ],
   listeners: [
+    {
+      name: 'approve',
+      code: function(X) {
+        var approvedApprovalRequest = this.clone();
+        approvedApprovalRequest.status = this.ApprovalStatus.APPROVED;
+
+        this.approvalRequestDAO.put(approvedApprovalRequest).then((req) => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
+          X.stack.back();
+        }, (e) => {
+          this.throwError.pub(e);
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
+        });
+      }
+    },
     {
       name: 'approveWithMemo',
       code: function(X, memo) {

@@ -372,9 +372,6 @@ foam.CLASS({
             
             X subjectContext = x.put("subject", subject);
             UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(subjectContext, capId, subject);
-            if ( ucJunction == null ) {
-              return CapabilityJunctionStatus.ACTION_REQUIRED;
-            }
 
             if ( ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) {
               continue;

@@ -21,8 +21,8 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   documentation: `DAO for adapting between "of" input type and "to" delegate
-      type. I.e., accept put(<instance-of-"of">), and
-      this.delegate.of === this.to.`,
+      type. I.e., accept put(<instance-of-"of">), and this.delegate.of === this.to.
+      note: though this class is not used explicitly, keep it for backward compatability`,
 
   requires: [ 'foam.dao.ArraySink' ],
 

@@ -4,24 +4,22 @@ p({
   "name":"localLogMessageDAO",
   "lazy":false,
   "serviceScript":"""
-    foam.nanos.app.AppConfig app = (foam.nanos.app.AppConfig) x.get("appConfig");
-    new foam.dao.EasyDAO.Builder(x)
+    return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.logger.LogMessage.getOwnClassInfo())
       .setAuthorize(false)
       .setSeqNo(true)
-      .setPm(true)
       .setRuler(false)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("../logs/logs")
       .setWriteOnly(true)
       .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
         .setComparator(foam.mlang.MLang.DESC(foam.nanos.logger.LogMessage.CREATED))
-        .setSize(5000)
+        .setSize(100000)
         .build())
       .setIndex(new foam.core.PropertyInfo[] {foam.nanos.logger.LogMessage.CREATED})
       .setOrder(new foam.mlang.order.Comparator[] {foam.mlang.MLang.DESC(foam.nanos.logger.LogMessage.CREATED)})
       .setDecorator(new foam.nanos.logger.StdoutLoggerDAO.Builder(x)
-        .setMode(app.getMode())
+        .setMode(((foam.nanos.app.AppConfig) x.get("appConfig")).getMode())
         .setDelegate(new foam.nanos.logger.LogMessageDAO.Builder(x)
           .setDelegate(new foam.nanos.logger.RepeatLogMessageDAO.Builder(x)
             .setDelegate(new foam.nanos.logger.NotificationLogMessageDAO.Builder(x)
