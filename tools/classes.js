@@ -199,6 +199,7 @@ var classes = [
   'foam.dao.SequenceNumberDAOTest',
   'foam.dao.PipelinePMDAO',
   'foam.dao.PMDAO',
+  'foam.dao.UniqueConstraintException',
   'foam.nanos.pm.PMFactory',
   'foam.nanos.pm.PMInfo',
   'foam.nanos.pm.PMLogger',
