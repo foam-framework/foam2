@@ -16,7 +16,9 @@ foam.CLASS({
   javaImports: [
     'foam.core.ClassInfo',
     'foam.core.FObject',
-    'foam.core.Validatable'
+    'foam.core.Validatable',
+    'foam.dao.DAO',
+    'foam.nanos.crunch.Capability'
   ],
 
   implements: [
@@ -36,8 +38,8 @@ foam.CLASS({
       name: 'objId',
     },
     {
+      class: 'Reference',
       name: 'capability',
-      class: 'FObjectProperty',
       of: 'foam.nanos.crunch.Capability'
     },
     {
@@ -90,19 +92,21 @@ foam.CLASS({
     {
       name: 'validate',
       javaCode: `
-        ClassInfo dataClass = getCapability().getOf();
+        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+        Capability capability = (Capability) capabilityDAO.find(getCapability());
+        ClassInfo dataClass = capability.getOf();
         if ( dataClass == null ) return;
         FObject dataObject = getData();
         if ( dataObject == null ) {
           throw new IllegalStateException(String.format(
             "Missing payload data for capability '%s'",
-            getCapability().getId()
+            capability.getId()
           ));
         }
         if ( ! dataClass.isInstance(dataObject) ) {
           throw new IllegalStateException(String.format(
             "Invalid payload data class for capability '%s'",
-            getCapability().getId()
+            capability.getId()
           ));
         }
         if ( dataObject instanceof Validatable ) {
@@ -113,7 +117,7 @@ foam.CLASS({
     {
       name: 'toSummary',
       code: function(){
-        return `${this.daoKey}:${this.objId} - ${this.capability.name}`
+        return `${this.daoKey}:${this.objId} - ${this.capability}`
       }
     }
   ],

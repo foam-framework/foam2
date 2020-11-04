@@ -82,7 +82,7 @@ foam.CLASS({
           return this.capable.getCapablePayloadDAO().put(
             this.targetPayload).then(() => {
               console.log('SAVED ' +
-                this.targetPayload.capability.name);
+                this.targetPayload.capability);
             });
         }
       }
@@ -93,7 +93,7 @@ foam.CLASS({
         return this.capable.getCapablePayloadDAO().remove(
           this.targetPayload).then(() => {
             console.log('CANCELLED ' +
-              this.targetPayload.capability.name);
+              this.targetPayload.capability);
           });
       }
     }
