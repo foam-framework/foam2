@@ -530,6 +530,10 @@ var classes = [
   'foam.lib.query.FooEnum',
 
   'foam.parse.QueryParserUserTest',
+  'foam.parse.PSymbol',
+  'foam.java.Grammar',
+  'foam.java.GrammarAction',
+  'foam.java.GrammarParser',
   'foam.util.EmailTest',
   'foam.util.PasswordTest',
   'foam.util.SecurityUtilTest',
