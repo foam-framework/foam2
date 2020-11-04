@@ -170,7 +170,7 @@ foam.CLASS({
             this.params = this.value.substring(i+1, this.value.indexOf(this.PARAMS_END) + 1);
             this.feedback_ = true;
             if ( this.value.indexOf(this.PARAMS_END) != this.value.length - 1 ) {
-              this.tail = this.value.substring(this.value.indexOf(this.PARAMS_END) + 2);//2 is for excluding } and : 
+              this.tail = this.cls_.create({ value: this.value.substring(this.value.indexOf(this.PARAMS_END) + 2), parent: this });//2 is for excluding } and : 
             }
           } else {
             this.tail = this.cls_.create({ value: this.value.substring(i+1), parent: this });

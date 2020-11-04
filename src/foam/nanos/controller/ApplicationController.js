@@ -563,8 +563,6 @@ foam.CLASS({
           menu && menu.launch(this);
         });
       }
-
-      console.log(this.memento.paramsDict);
     },
 
     function onUserAgentAndGroupLoaded() {
