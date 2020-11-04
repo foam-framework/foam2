@@ -16,6 +16,7 @@ import foam.nanos.logger.PrefixLogger;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.TimeUnit;
 
 public class BenchmarkRunner
   extends    ContextAwareSupport
@@ -168,15 +169,12 @@ public class BenchmarkRunner
     int availableThreads = Math.min(Runtime.getRuntime().availableProcessors(), getThreadCount());
     int run = 1;
     int threads = 1;
-    if ( ! getRunPerThread() ) {
-      availableThreads = 1;
-    } else if ( reverseThreads_ ) {
+    if ( reverseThreads_ ) {
         threads = availableThreads;
     }
 
     try {
       while ( true ) {
-        // create CountDownLatch and thread group equal
         final CountDownLatch latch = new CountDownLatch(threads);
         final AtomicLong pass = new AtomicLong();
         final AtomicLong fail = new AtomicLong();
@@ -245,7 +243,7 @@ public class BenchmarkRunner
         test_.teardown(x, stats);
         results_.add(stats);
 
-        if ( runPerThread_ ) {
+        if ( getRunPerThread() ) {
           String results = formatResults();
           System.out.println(results);
           logger.info(results);
