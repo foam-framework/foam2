@@ -68,7 +68,7 @@ foam.CLASS({
             throw new Exception(this.TOKEN_NOT_FOUND);
           }
     
-          if ( "".equals(userId) || !StringUtils.isNumeric(userId) ) {
+          if ( "".equals(userId) || ! StringUtils.isNumeric(userId) ) {
             throw new Exception(this.USER_NOT_FOUND);
           }
     
@@ -97,7 +97,7 @@ foam.CLASS({
           JtwigTemplate template = JtwigTemplate.inlineTemplate(emailTemplate.getBody(), getConfig());
           JtwigModel model = JtwigModel.newModel(Collections.<String, Object>singletonMap("msg", message));
           out.write(template.render(model));
-          if (!redirect.equals("null")){
+          if ( ! redirect.equals("null") ){
             try {
               response.addHeader("REFRESH","2;URL="+redirect);
             } catch (Exception e) {
