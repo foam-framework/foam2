@@ -31,7 +31,22 @@ p({"class":"foam.nanos.menu.Menu","id":"admin.emailtemplates","label":"Email Tem
 p({"class":"foam.nanos.menu.Menu","id":"admin.export","label":"Export Drivers","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"exportDriverRegistryDAO"}},"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.groups","label":"Groups","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"groupDAO"}},"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"admin.lang","label":"Languages","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"languageDAO"}},"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.logs","label":"Logs","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"logMessageDAO"}},"parent":"admin"})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.logs",
+  "label":"Logs",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"logMessageDAO",
+      "createPredicate":{"class":"foam.mlang.predicate.False"},
+      "editPredicate":{"class":"foam.mlang.predicate.False"},
+      "deletePredicate":{"class":"foam.mlang.predicate.False"}
+    }
+  },
+  "parent":"admin"
+})
 p({"class":"foam.nanos.menu.Menu","id":"admin.menus","label":"Menus","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"menuDAO","summaryView":{"class":"foam.nanos.menu.TreeAltView"}},"parent":"admin"})
 //p({"class":"foam.nanos.menu.Menu","id":"admin.menus","label":"Menus","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"menuDAO"}},"parent":"admin"})
 p({
