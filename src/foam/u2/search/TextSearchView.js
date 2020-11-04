@@ -113,6 +113,7 @@ foam.CLASS({
       if ( this.searchValue ) {
         this.view.data = this.searchValue;
       }
+      this.view.data = '';
       this.updateValue();
     },
 
