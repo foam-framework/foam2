@@ -86,7 +86,6 @@ foam.CLASS({
         } catch ( Throwable t) {
           pm.error(x, t);
           getLogger().error("Failed to read from journal", t);
-          throw new RuntimeException(t);
         } finally {
           if ( failedReading.get() > 0 ) {
             getLogger().warning("Failed to read " + failedReading.get() + " entries from file: " + getFilename());
