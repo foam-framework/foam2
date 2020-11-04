@@ -41,17 +41,20 @@ foam.CLASS({
     .foam-nanos-auth-ChangePasswordView .foam-u2-layout-Grid {
       width: 75%;
       display: inline-block;
+      vertical-align: bottom;
     }
 
     .foam-nanos-auth-ChangePasswordView .foam-u2-layout-Cols {
       width: auto;
-      margin-top: 0px !important;
       display: inline-block;
       margin-left: 5%;
+      vertical-align: bottom;
+      margin-bottom: 2px;
     }
 
     .foam-nanos-auth-ChangePasswordView .foam-u2-layout-Rows {
       display: block;
+
     }
   `,
 
@@ -60,8 +63,7 @@ foam.CLASS({
       class: 'EMail',
       name: 'email',
       section: 'emailPasswordSection',
-      required: true,
-      label: ""
+      required: true
     },
     {
       class: 'Boolean',
