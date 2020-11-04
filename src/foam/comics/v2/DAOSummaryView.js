@@ -225,7 +225,6 @@ foam.CLASS({
         }));
       }
     },
-    'currentMemento'
   ],
 
   methods: [
