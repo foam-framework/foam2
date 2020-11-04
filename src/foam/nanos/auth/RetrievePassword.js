@@ -38,12 +38,20 @@ foam.CLASS({
   ],
 
   css: `
-    ^ .foam-u2-layout-Grid{
-      width: 100px;
+    .foam-nanos-auth-ChangePasswordView .foam-u2-layout-Grid {
+      width: 75%;
+      display: inline-block;
     }
 
-    ^ .foam-u2-layout-Cols {
-      width: 50%;
+    .foam-nanos-auth-ChangePasswordView .foam-u2-layout-Cols {
+      width: auto;
+      margin-top: 0px !important;
+      display: inline-block;
+      margin-left: 5%;
+    }
+
+    .foam-nanos-auth-ChangePasswordView .foam-u2-layout-Rows {
+      display: block;
     }
   `,
 
