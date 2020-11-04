@@ -14,7 +14,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'dao'
+    'dao',
+    'memento'
   ],
 
   exports: [

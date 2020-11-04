@@ -18,7 +18,8 @@ foam.CLASS({
 
   imports: [
     'dao',
-    'searchColumns'
+    'searchColumns',
+    'memento'
   ],
 
   exports: [

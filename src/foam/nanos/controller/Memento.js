@@ -118,16 +118,29 @@ foam.CLASS({
           return;
         }
         this.feedback_ = true;
-        var params = this.PARAMS_BEGIN;
-        for ( var key in this.paramsDict ) {
-          params += encodeURI(key);
-          params += this.EQUILITY_SIGN;
-          params += this.paramsDict[key].join(',');
+
+        var params;
+        if (Object.keys(this.paramsDict).length !== 0) {
+          params = '';
+          for ( var key in this.paramsDict ) {
+            if ( params ) {
+              params += ',';
+            }
+            params += key;
+            params += this.EQUILITY_SIGN;
+            params += this.paramsDict[key].join ? this.paramsDict[key].join(',') : this.paramsDict[key];
+          }
+          params = this.PARAMS_BEGIN + encodeURI(params) + this.PARAMS_END;
+        } else {
+          params = null;
         }
-        params += this.PARAMS_END;
-        params = encodeURI(params);
         this.params = params;
+        this.changeIndicator = ! this.changeIndicator;
+        this.value = this.combine();
         this.feedback_ = false;
+      },
+      factory: function() {
+        return {};
       }
     }
   ],

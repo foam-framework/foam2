@@ -27,7 +27,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'searchColumns'
+    'searchColumns',
+    'memento'
   ],
 
   exports: [

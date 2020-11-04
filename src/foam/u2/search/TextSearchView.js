@@ -20,6 +20,10 @@ foam.CLASS({
   name: 'TextSearchView',
   extends: 'foam.u2.View',
 
+  imports: [
+    'memento'
+  ],
+
   requires: [
     'foam.parse.QueryParser',
     'foam.u2.tag.Input'
@@ -125,6 +129,10 @@ foam.CLASS({
       mergeDelay: 500,
       code: function() {
         var value = this.view.data;
+        if ( value ) {
+          this.memento.paramsDict['search'] = value;
+          this.memento.paramsDict = Object.assign({}, this.memento.paramsDict);
+        }
         this.predicate = ! value ?
           this.True.create() :
           this.richSearch ?
