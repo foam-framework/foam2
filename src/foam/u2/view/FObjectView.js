@@ -21,7 +21,7 @@ foam.CLASS({
   ],
 
   messages:[
-    { name: 'PLACEHOLDER', message: 'please select...'}
+    { name: 'PLACEHOLDER', message: 'Please select...'}
   ],
 
   properties: [
