@@ -306,8 +306,11 @@ public class RuleEngine extends ContextAwareSupport {
     }
 
     // Return the original object as the reloaded object if nu == old or nu == obj.
-    if ( nu.equals(old) || nu.equals(cloned) ) {
-      return obj;
+    if ( nu.equals(old) ) {
+      return old;
+    }
+    if ( nu.equals(cloned) ) {
+      return cloned;
     }
 
     // For greedy mode, return the reloaded object `nu` as is. Otherwise,
