@@ -344,7 +344,6 @@ foam.CLASS({
       name: 'language',
       documentation: 'The default language preferred by the User.',
       of: 'foam.nanos.auth.Language',
-      //value: 'en',
       createVisibility: 'HIDDEN',
       section: 'personal',
       factory: function() {

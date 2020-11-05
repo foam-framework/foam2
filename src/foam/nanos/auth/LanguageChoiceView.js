@@ -203,7 +203,6 @@ foam.CLASS({
                   .on('click', async function() {
                     let user = self.subject.realUser
                     user.language = c.id
-                    console.log(user.language)
                     await self.userDAO.put(user)
 
                     location.reload();
