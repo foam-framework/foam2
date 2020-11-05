@@ -110,10 +110,11 @@ foam.CLASS({
         }, this.view$);
 
       this.view.data$.sub(this.updateValue);
+      this.view.data = '';
+
       if ( this.searchValue ) {
         this.view.data = this.searchValue;
       }
-      this.view.data = '';
       this.updateValue();
     },
 
@@ -130,11 +131,13 @@ foam.CLASS({
       mergeDelay: 500,
       code: function() {
         var value = this.view.data;
-        if ( value ) {
-          this.memento.paramsDict['search'] = value;
-          this.memento.paramsDict = Object.assign({}, this.memento.paramsDict);
-        } else {
-          this.memento.paramsDict = {};
+        if (  this.memento ) {//export empty memento to not set wrong TextSearch
+          if ( value ) {
+            this.memento.paramsDict['search'] = value;
+            this.memento.paramsDict = Object.assign({}, this.memento.paramsDict);
+          } else {
+            delete this.memento.paramsDict['search'];
+          }
         }
         this.predicate = ! value ?
           this.True.create() :

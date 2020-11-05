@@ -91,17 +91,24 @@ foam.CLASS({
             var beginWith = i;
             var equalitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, i);
             var nextEqualitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, equalitySumbolIndex + this.NEXT_INDEX);
+            var isThereAnotherParam = nextEqualitySumbolIndex !== -1;
             nextEqualitySumbolIndex = nextEqualitySumbolIndex > -1 ? nextEqualitySumbolIndex : params.length - 1;
             var thisParameterValueToParse;
             var beginWith1 = equalitySumbolIndex;
+            var indexOfComa = 0;
             while ( indexOfComa !== -1 ) {
-              var indexOfComa = params.indexOf(this.PARAMS_SEPARATOR, beginWith1 + this.NEXT_INDEX);
-              if ( indexOfComa > nextEqualitySumbolIndex ) {
+              var isComaLast = indexOfComa > nextEqualitySumbolIndex;
+              if ( isThereAnotherParam ) {
+                var indexOfNextComa = params.indexOf(this.PARAMS_SEPARATOR, indexOfComa + this.NEXT_INDEX);
+                isComaLast = indexOfNextComa > nextEqualitySumbolIndex || indexOfNextComa == -1;
+              }
+              if ( isComaLast ) {
                 break;
               }
+              indexOfComa = params.indexOf(this.PARAMS_SEPARATOR, beginWith1 + this.NEXT_INDEX);
               beginWith1 = indexOfComa;
             }
-            thisParameterValueToParse = params.substring(equalitySumbolIndex + 1, nextEqualitySumbolIndex);
+            thisParameterValueToParse = params.substring(equalitySumbolIndex + 1, beginWith1 > 0 ? beginWith1 : nextEqualitySumbolIndex);
             i = beginWith1 + this.NEXT_INDEX;//instead of NEXT_INDEX may be better to find next alphabetic character
   
             dict[params.substring(beginWith, equalitySumbolIndex)] = params.substring(equalitySumbolIndex + this.NEXT_INDEX, i > 0 ? i - 1 : params.length - 1).split(this.PARAMS_SEPARATOR);
