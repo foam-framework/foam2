@@ -84,6 +84,9 @@ foam.CLASS({
         if ( this.params ) {
           var params = decodeURI(this.params);
           var i = 1;//a=q,q,q,b=sd,z=sdf
+          //also i think will need to parse objs
+          //like {collumns={name=Code,order=D},{name=Alternative Names,orderBy=A}}
+          //to dict too
           while( i >= 0 && i < params.length - 1 ) {
             var beginWith = i;
             var equalitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, i);
@@ -99,7 +102,7 @@ foam.CLASS({
               beginWith1 = indexOfComa;
             }
             thisParameterValueToParse = params.substring(equalitySumbolIndex + 1, nextEqualitySumbolIndex);
-            i = beginWith1 + this.NEXT_INDEX;
+            i = beginWith1 + this.NEXT_INDEX;//instead of NEXT_INDEX may be better to find next alphabetic character
   
             dict[params.substring(beginWith, equalitySumbolIndex)] = params.substring(equalitySumbolIndex + this.NEXT_INDEX, i > 0 ? i - 1 : params.length - 1).split(this.PARAMS_SEPARATOR);
             if ( beginWith1 == -1 )
