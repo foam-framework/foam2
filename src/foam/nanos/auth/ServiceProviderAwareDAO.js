@@ -77,6 +77,9 @@ ServiceProviderAware`,
                 ! (auth.check(x, "serviceprovider.update." + oldSp.getSpid()) &&
                    auth.check(x, "serviceprovider.update." + sp.getSpid())) ) {
       throw new AuthorizationException("You do not have permission to update ServiceProvider (spid) property.");
+    } else if ( sp.getSpid().equals(oldSp.getSpid()) &&
+                ! auth.check(x, "serviceprovider.read." + sp.getSpid()) ) {
+      throw new AuthorizationException("You do not have permission to update data on other ServiceProvider.");
     }
 
     return super.put_(x, obj);
