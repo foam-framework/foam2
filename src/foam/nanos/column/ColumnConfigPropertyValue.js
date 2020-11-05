@@ -86,7 +86,7 @@ foam.CLASS({
             }
           }
         }
-        return columnHeader.join('/');
+        return columnHeader.join(' / ');
       }
     },
     {
