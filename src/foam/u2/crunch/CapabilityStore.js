@@ -182,7 +182,7 @@ foam.CLASS({
       value: [],
       documentation: 'stores the styling of each featureCapability'
     },
-    'cardClicked'
+    'wizardOpened'
   ],
 
   methods: [
@@ -251,7 +251,7 @@ foam.CLASS({
                     .addClass(self.myClass('featureSection'))
                   .end()
                   .on('click', () => {
-                    self.onCardClick(arr[i].id);
+                    self.openWizard(arr[i].id);
                   })
                 .end());
             }
@@ -308,7 +308,7 @@ foam.CLASS({
                   .start(self.GUnit, { columns: 4 })
                     .tag(self.CapabilityCardView, { data: cap })
                     .on('click', () => {
-                  self.onCardClick(cap);
+                      self.openWizard(cap);
                     })
                   .end();
               }
@@ -341,7 +341,7 @@ foam.CLASS({
               .start(self.GUnit, { columns: 4 })
                 .tag(self.CapabilityCardView, { data: cap })
                 .on('click', () => {
-                  self.onCardClick(cap);
+                  self.openWizard(cap);
                 })
               .end();
           }
@@ -379,17 +379,16 @@ foam.CLASS({
           )).select())
         .then(sink => {
           if ( sink.array.length == 1 ) {
-            this.crunchController
-              .createWizardSequence(sink.array[0]).execute();
+            this.openWizard(sink.array[0]);
           }
         })
     },
-    function onCardClick(cap) {
-      if ( this.cardClicked ) return;
-      this.cardClicked = true;
+    function openWizard(cap) {
+      if ( this.wizardOpened ) return;
+      this.wizardOpened = true;
       this.crunchController
         .createWizardSequence(cap).execute().then(() => {
-          this.cardClicked = false;
+          this.wizardOpened = false;
         });
       
     }
