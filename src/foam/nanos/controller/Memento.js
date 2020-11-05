@@ -112,7 +112,7 @@ foam.CLASS({
             i = beginWith1 + this.NEXT_INDEX;//instead of NEXT_INDEX may be better to find next alphabetic character
   
             dict[params.substring(beginWith, equalitySumbolIndex)] = params.substring(equalitySumbolIndex + this.NEXT_INDEX, i > 0 ? i - 1 : params.length - 1).split(this.PARAMS_SEPARATOR);
-            if ( beginWith1 == -1 )
+            if ( beginWith1 === -1 )
               break; 
           }
         }
