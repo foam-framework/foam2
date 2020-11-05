@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -8,6 +8,8 @@ foam.CLASS({
   package: 'foam.nanos.auth.email',
   name: 'EmailVerificationWebAgent',
   implements: [ 'foam.nanos.http.WebAgent' ],
+
+  documentation: 'Service to process user email verification and redirect user to URL provided',
 
   javaImports: [
     'foam.dao.DAO',
