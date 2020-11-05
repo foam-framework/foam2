@@ -339,8 +339,7 @@ public class JSONFObjectFormatter
     }
     addInnerNewline();
     PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
-    outputProperty(newFObject, id);
-
+    if ( ! id.getStorageTransient() ) outputProperty(newFObject, id);
 
     for ( int i = 0 ; i < size ; i++ ) {
       append(',');
