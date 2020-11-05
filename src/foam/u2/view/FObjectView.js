@@ -38,11 +38,10 @@ foam.CLASS({
         return foam.u2.DisplayMode.RW;
       },
       view: function(args, X) {
-        placeholder = X.data.placeholder
         return {
           class: X.data.allowCustom ? 'foam.u2.TextField' : 'foam.u2.view.ChoiceView',
           displayWidth: 60,
-          placeholder: placeholder,
+          placeholder: X.data.placeholder,
           choices$: X.data.choices$
         };
       }
