@@ -23,13 +23,13 @@ foam.CLASS({
 
   tableColumns: [
     'nSpecName',
+    'dop',
     'index',
     'index1',
     'index2',
-    'consensusCount',
     'promoted',
-    'consensusNodes',
-    'lastModified'
+    'consensusCount',
+    'consensusNodes'
   ],
 
   properties: [
@@ -38,30 +38,32 @@ foam.CLASS({
       name: 'nSpecName',
       label: 'NSpec Name',
       visibility: 'RO',
-      tableWidth: 200
+      tableWidth: 225
     },
     {
       class: 'Enum',
       of: 'foam.dao.DOP',
       name: 'dop',
-      visibility: 'RO'
+      visibility: 'RO',
+      tableWidth: 50
     },
     {
       name: 'index',
       class: 'Long',
       visibility: 'RO',
-      tableWidth: 150
+      tableWidth: 100
     },
     {
       name: 'hash',
       class: 'String',
-      visibility: 'RO'
+      visibility: 'RO',
+      tableWidth: 100
     },
     {
       class: 'Long',
       name: 'index1',
       visibility: 'RO',
-      tableWidth: 150
+      tableWidth: 100
     },
     {
       class: 'String',
@@ -73,7 +75,7 @@ foam.CLASS({
       class: 'Long',
       name: 'index2',
       visibility: 'RO',
-      tableWidth: 150
+      tableWidth: 100
     },
     {
       class: 'String',
@@ -100,15 +102,17 @@ foam.CLASS({
     {
       documentation: `Count of nodes contributing to a particular hash.  Until consensus is reached, count of the hash with the most nodes.`,
       name: 'consensusCount',
+      label: 'Count',
       class: 'Int',
       visibility: 'RO',
       storageTransient: true,
       clusterTransient: true,
-      tableWidth: 150
+      tableWidth: 100
     },
     {
       documentation: `Record which nodes contributed to consensus of a particular hash. Until consensus is reached, list is the hash with most nodes.`,
       name: 'consensusNodes',
+      label: 'Nodes',
       class: 'StringArray',
       visibility: 'RO',
       factory: function() { return []; },
@@ -175,18 +179,12 @@ foam.CLASS({
       label: 'Stored',
       class: 'DateTime',
       visibility: 'RO',
+      tableWidth: 150,
       includeInDigest: false,
     }
   ],
 
   methods: [
-    // {
-    //   name: 'freeze',
-    //   type: 'FObject',
-    //   javaCode: `
-    //   return this;
-    //   `
-    // },
     {
       name: 'fclone',
       type: 'FObject',
