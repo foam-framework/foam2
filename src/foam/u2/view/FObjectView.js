@@ -20,10 +20,6 @@ foam.CLASS({
     'foam.core.Latch'
   ],
 
-  messages:[
-    { name: 'PLACEHOLDER', message: 'Please select...'}
-  ],
-
   properties: [
     {
       class: 'foam.core.FObjectProperty',
@@ -42,7 +38,7 @@ foam.CLASS({
         return foam.u2.DisplayMode.RW;
       },
       view: function(args, X) {
-        placeholder = X.data.allowCustom ? '' : X.data.PLACEHOLDER
+        placeholder = X.data.placeholder
         return {
           class: X.data.allowCustom ? 'foam.u2.TextField' : 'foam.u2.view.ChoiceView',
           displayWidth: 60,
@@ -104,10 +100,9 @@ foam.CLASS({
       documentation: 'Set to true if data was initially provided. Used to implement classIsFinal.'
     },
     {
-      class: 'Boolean',
-      name: 'selectByDefault',
-      documentation: 'If true, the choiceView will select the first element',
-      value: 'true'
+      class: 'String',
+      name: 'placeholder',
+      documentation: 'If no placeholder, the choiceView will select the first element',
     },
     {
       class: 'Array',
@@ -215,7 +210,7 @@ foam.CLASS({
       );
 
       if ( this.data ) { this.objectClass = dataToClass(this.data); }
-      if ( ! this.data && ! this.objectClass && this.choices.length && this.selectByDefault ) this.objectClass = this.choices[0][0];
+      if ( ! this.data && ! this.objectClass && this.choices.length && !this.placeholder ) this.objectClass = this.choices[0][0];
 
       this.
         start(this.OBJECT_CLASS).
