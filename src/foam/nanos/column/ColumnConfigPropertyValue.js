@@ -260,8 +260,18 @@ foam.CLASS({
       }
       return result;
     },
-    function objToArrayOfStrings(obj, prop) {
-
+    function returnPropertyNameForLabel(of, label) {
+      var labels = label.split('/');
+      var names = [];
+      var of = of;
+      for ( var i = 0; i < labels.length; i++ ) {
+        var prop = of.getAxioms().find(a => a.label && a.label == labels[i]);
+        if ( !prop )
+          return '';
+        names.push(prop.name);
+        of = prop.of;
+      }
+      return names.join('.');
     }
   ]
 });

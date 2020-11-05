@@ -94,7 +94,7 @@ foam.CLASS({
             nextEqualitySumbolIndex = nextEqualitySumbolIndex > -1 ? nextEqualitySumbolIndex : params.length - 1;
             var thisParameterValueToParse;
             var beginWith1 = equalitySumbolIndex;
-            while (  indexOfComa !== -1  ) {
+            while ( indexOfComa !== -1 ) {
               var indexOfComa = params.indexOf(this.PARAMS_SEPARATOR, beginWith1 + this.NEXT_INDEX);
               if ( indexOfComa > nextEqualitySumbolIndex ) {
                 break;

@@ -38,7 +38,8 @@ foam.CLASS({
     'editRecord?',
     'filteredTableColumns?',
     'selection? as importSelection',
-    'stack?'
+    'stack?',
+    'memento'
   ],
 
   constants: [
@@ -95,8 +96,9 @@ foam.CLASS({
     },
     {
       name: 'selectedColumnNames',
-      expression: function(columns, of) {
-        var ls = JSON.parse(localStorage.getItem(of.id));
+      expression: function(columns, of, memento) {
+        //memento.paramsDict['columns'] collumn labels
+        var ls =  memento.paramsDict['columns'] ? memento.paramsDict['columns'].map(c => this.columnConfigToPropertyConverter.returnPropertyNameForLabel(of, c)) : JSON.parse(localStorage.getItem(of.id));
         return ls || columns;
       }
     },
