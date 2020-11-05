@@ -192,7 +192,7 @@ foam.CLASS({
         this.isLoading_ = true;
         this.dao_
           .put(this.User.create({
-            userName: this.userName,
+            userName: this.userName.toLowerCase(),
             email: this.email,
             desiredPassword: this.desiredPassword,
             signUpToken: this.token_,

@@ -157,7 +157,7 @@ foam.CLASS({
             AND(
               OR(
                 EQ(User.EMAIL, identifier.toLowerCase()),
-                EQ(User.USER_NAME, identifier)
+                EQ(User.USER_NAME, identifier.toLowerCase())
               ),
               CLASS_OF(User.class)
             )

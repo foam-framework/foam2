@@ -140,7 +140,7 @@ foam.CLASS({
 
       var pred = foam.mlang.predicate.Eq.create({
         arg1: this.targetProperty,
-        arg2: this.data
+        arg2: this.data.toLowerCase()
       });
 
       this.userPropertyAvailabilityService.checkAvailability(this, pred)
