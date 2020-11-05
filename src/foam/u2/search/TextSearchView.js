@@ -133,6 +133,8 @@ foam.CLASS({
         if ( value ) {
           this.memento.paramsDict['search'] = value;
           this.memento.paramsDict = Object.assign({}, this.memento.paramsDict);
+        } else {
+          this.memento.paramsDict = {};
         }
         this.predicate = ! value ?
           this.True.create() :

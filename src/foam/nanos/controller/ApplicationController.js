@@ -514,7 +514,9 @@ foam.CLASS({
       /** Use to load a specific menu. **/
       // Do it this way so as to not reset mementoTail if set
       if ( this.memento.head.length === 0 || this.memento.head !== menu || opt_forceReload ) {
+        this.memento.feedback_ = true;
         this.memento.value = menu;
+        this.memento.feedback_ = false;
       }
     },
 
