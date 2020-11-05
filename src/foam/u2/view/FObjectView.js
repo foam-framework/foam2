@@ -104,6 +104,12 @@ foam.CLASS({
       documentation: 'Set to true if data was initially provided. Used to implement classIsFinal.'
     },
     {
+      class: 'Boolean',
+      name: 'selectByDefault',
+      documentation: 'If true, the choiceView will select the first element',
+      value: 'true'
+    },
+    {
       class: 'Array',
       name: 'choices',
       documentation: `
@@ -209,6 +215,7 @@ foam.CLASS({
       );
 
       if ( this.data ) { this.objectClass = dataToClass(this.data); }
+      if ( ! this.data && ! this.objectClass && this.choices.length && this.selectByDefault ) this.objectClass = this.choices[0][0];
 
       this.
         start(this.OBJECT_CLASS).
