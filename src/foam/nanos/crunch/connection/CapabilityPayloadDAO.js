@@ -235,15 +235,22 @@ foam.CLASS({
         CapabilityPayload currentCapPayload = (CapabilityPayload) find_(x, receivingCapPayload.getId());
         Map<String,FObject> currentCapabilityDataObjects = (Map<String,FObject>) currentCapPayload.getCapabilityDataObjects();
 
-        CrunchService crunchService = (CrunchService) x.get("crunchService");
+        List grantPath = ((CrunchService) x.get("crunchService")).getGrantPath(x, receivingCapPayload.getId());
+        processCapabilityList(x, grantPath, capabilityDataObjects, currentCapabilityDataObjects);
 
-        List grantPath = crunchService.getGrantPath(x, receivingCapPayload.getId());
-
-        // storing the ucjs by looking up the capabilities required from the grantPath and then referencing them in capabilityDataObjects
-        int index = 0;
-        while ( index < grantPath.size() ) {
-          Object item = grantPath.get(index++);
-
+        return find_(x, receivingCapPayload.getId());
+      `
+    },
+    {
+      name: 'processCapabilityList',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'list', type: 'List' },
+        { name: 'capabilityDataObjects', type: 'Map' },
+        { name: 'currentCapabilityDataObjects', type: 'Map' }
+      ],
+      javaCode: `
+        for (Object item : list) {
           if ( item instanceof Capability ) {
             Capability cap = (Capability) item;
 
@@ -271,17 +278,14 @@ foam.CLASS({
               dataObj = currentDataObj;
             } 
             
-            crunchService.updateJunction(x, cap.getId(), dataObj, null);
-          }
-          else if ( item instanceof List ) {
-            List list = (List) item;
-
-            // add all the elements of the list
-            grantPath.addAll(list);
+            ((CrunchService) x.get("crunchService")).updateJunction(x, cap.getId(), dataObj, null);
+          } else if ( item instanceof List ) {
+            processCapabilityList(x, (List) item, capabilityDataObjects, currentCapabilityDataObjects);
+          } else {
+            Logger logger = (Logger) x.get("logger");
+            logger.warning("Ignoring unexpected item in grant path " + item);
           }
         }
-
-        return find_(x, receivingCapPayload.getId());
       `
     }
   ],
