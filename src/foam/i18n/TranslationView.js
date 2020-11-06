@@ -39,13 +39,18 @@ foam.CLASS({
         {
           class: 'String',
           name: 'source',
-          displayWidth: 80
+          displayWidth: 50
         },
         {
           class: 'String',
           name: 'text',
-          displayWidth: 80
-        }
+          displayWidth: 50
+        },
+        {
+          class: 'String',
+          name: 'defaultText',
+          displayWidth: 50
+        },
       ],
 
       methods: [
@@ -60,7 +65,7 @@ foam.CLASS({
             show(this.search$.map(
               function(s) { var str = ( self.source + ' ' + self.text).toLowerCase(); return str.indexOf(s.toLowerCase()) != -1; }
             )).
-            add('Source: ', this.SOURCE, ' Translation: ', this.TEXT, ' ', this.UPDATE).
+            add('Source: ', this.SOURCE, ' Translation: ', this.TEXT, ' ', this.DEFAULT_TEXT, ' ', this.UPDATE).
             br();
         }
       ],
@@ -124,11 +129,12 @@ foam.CLASS({
   ],
 
   listeners: [
-    function onTranslation(src, _, locale, source, txt) {
+    function onTranslation(src, _, locale, source, txt, defaultText) {
       this.add(this.RowView.create({
-        locale: locale,
-        source: source,
-        text:   txt
+        locale:      locale,
+        source:      source,
+        text:        txt,
+        defaultText: defaultText
       }));
       this.rows++;
     }
