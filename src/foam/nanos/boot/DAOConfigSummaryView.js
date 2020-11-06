@@ -330,7 +330,8 @@ foam.CLASS({
               },
               'Controller 2'
             ]
-          ]
+          ],
+          selectedView: 'Controller 2'
         }
       }, x);
     }

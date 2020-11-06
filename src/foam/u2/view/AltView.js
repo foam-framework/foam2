@@ -31,6 +31,21 @@ foam.CLASS({
       name: 'selectedView',
       view: function(_, X) {
         return foam.u2.view.ChoiceView.create({choices: X.data.views});
+      },
+      factory: function() {
+        return this.views[0][0];
+      },
+      adapt: function(_, nu) {
+        if ( typeof nu === 'string' ) {
+          for ( var i = 0; i < this.views.length; i++ ) {
+            if ( this.views[i][1] === nu ) {
+              return this.views[i][0];
+            }
+          }
+        } else if ( typeof nu === 'number' ) {
+          return this.views[nu][0];
+        }
+        return nu;
       }
     },
     {
@@ -43,8 +58,6 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
-
-     this.selectedView = this.views[0][0];
 
       this.addClass(this.myClass())
       this.startContext({data: this})
