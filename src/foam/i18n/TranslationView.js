@@ -63,7 +63,10 @@ foam.CLASS({
 
           this.
             show(this.search$.map(
-              function(s) { var str = ( self.source + ' ' + self.text).toLowerCase(); return str.indexOf(s.toLowerCase()) != -1; }
+              function(s) {
+                var str = ( self.source + ' ' + self.text + ' ' + self.defaultText ).toLowerCase();
+                return str.indexOf(s.toLowerCase()) != -1;
+              }
             )).
             add('Source: ', this.SOURCE, ' Translation: ', this.TEXT, ' ', this.DEFAULT_TEXT, ' ', this.UPDATE).
             br();
