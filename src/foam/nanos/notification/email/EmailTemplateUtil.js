@@ -24,18 +24,29 @@ foam.CLASS({
       name: 'grammar',
       javaFactory: `
         Grammar grammar = new Grammar();
-              Map symbols = new HashMap();
-              symbols.put("SIMPLE_VAL", new Seq1(1, Literal.create("{{"), new Repeat0(new AnyKeyParser()), Literal.create("}}")));
+        Map symbols = new HashMap();
+        symbols.put("START", grammar.sym("markup"));
+        symbols.put("markup", new Repeat0(new Alt(grammar.sym("simple_val"), grammar.sym("any_key"))));
+        symbols.put("simple_val", new Seq1(1, Literal.create("{{"), new Repeat0(new AnyKeyParser()), Literal.create("}}")));
         GrammarAction action = new GrammarAction() {
           @Override
           public Object execute(Object value, ParserContext x) {
-            System.out.println(value);
+            System.out.println("****SIMPLE VALUE****" + value);
+            return value;
+          }
+        };
+        symbols.put("any_key", new AnyKeyParser());
+        GrammarAction anyAction = new GrammarAction() {
+          @Override
+          public Object execute(Object value, ParserContext x) {
+            System.out.println("***ANY KEY***" + value);
             return value;
           }
         };
         grammar.setSymbols(new HashMap());
         grammar.setSymbols(symbols);
-        grammar.addAction("test", action);
+        grammar.addAction("simple_val", action);
+        grammar.addAction("any_key", anyAction);
         return grammar;
       `
     }
@@ -50,7 +61,9 @@ foam.CLASS({
       ],
       type: 'String',
       javaCode: `
-        return body;
+      ParserContext x = new ParserContextImpl();
+      PStream ret = getGrammar().parseString(body, "", x);
+      return (String) ret.value();
       `
     }
   ]

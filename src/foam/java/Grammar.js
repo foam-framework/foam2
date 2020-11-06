@@ -50,6 +50,14 @@ return ps.apply(start, x);
       `
     },
     {
+      name: 'sym',
+      args: [ { name: 'name', type: 'String' } ],
+      type: 'foam.lib.parse.Parser',
+      javaCode: `
+      return (Parser) getSymbols().get(name);
+      `
+    },
+    {
       name:'addActions',
       args: [
         { name: 'name', type: 'String'},
