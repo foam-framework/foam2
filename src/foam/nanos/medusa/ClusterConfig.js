@@ -205,6 +205,7 @@ foam.CLASS({
       name: 'lastModified',
       class: 'DateTime',
       visibility: 'RO',
+      tableWidth: 150,
       storageOptional: true
     },
     {
