@@ -83,38 +83,7 @@ foam.CLASS({
         var dict = {};
         if ( this.params ) {
           var params = decodeURI(this.params);
-          var i = 1;//a=q,q,q,b=sd,z=sdf
-          //also i think will need to parse objs
-          //like {collumns={name=Code,order=D},{name=Alternative Names,orderBy=A}}
-          //to dict too
-          while( i >= 0 && i < params.length - 1 ) {
-            var beginWith = i;
-            var equalitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, i);
-            var nextEqualitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, equalitySumbolIndex + this.NEXT_INDEX);
-            var isThereAnotherParam = nextEqualitySumbolIndex !== -1;
-            nextEqualitySumbolIndex = nextEqualitySumbolIndex > -1 ? nextEqualitySumbolIndex : params.length - 1;
-            var thisParameterValueToParse;
-            var beginWith1 = equalitySumbolIndex;
-            var indexOfComa = 0;
-            while ( indexOfComa !== -1 ) {
-              var isComaLast = indexOfComa > nextEqualitySumbolIndex;
-              if ( isThereAnotherParam ) {
-                var indexOfNextComa = params.indexOf(this.PARAMS_SEPARATOR, indexOfComa + this.NEXT_INDEX);
-                isComaLast = indexOfNextComa > nextEqualitySumbolIndex || indexOfNextComa == -1;
-              }
-              if ( isComaLast ) {
-                break;
-              }
-              indexOfComa = params.indexOf(this.PARAMS_SEPARATOR, beginWith1 + this.NEXT_INDEX);
-              beginWith1 = indexOfComa;
-            }
-            thisParameterValueToParse = params.substring(equalitySumbolIndex + 1, beginWith1 > 0 ? beginWith1 : nextEqualitySumbolIndex);
-            i = beginWith1 + this.NEXT_INDEX;//instead of NEXT_INDEX may be better to find next alphabetic character
-  
-            dict[params.substring(beginWith, equalitySumbolIndex)] = params.substring(equalitySumbolIndex + this.NEXT_INDEX, i > 0 ? i - 1 : params.length - 1).split(this.PARAMS_SEPARATOR);
-            if ( beginWith1 === -1 )
-              break; 
-          }
+          this.parseParam(dict, params);
         }
         this.paramsDict = dict;
         this.feedback_ = false;
@@ -174,23 +143,62 @@ foam.CLASS({
       } else {
         this.head = this.value.substring(0, i);
         var tailStr = this.value.substring(i+1);
-        if ( tailStr.includes(this.PARAMS_BEGIN) && tailStr.includes(this.PARAMS_END) ) {
+        var tailIndex = this.value.indexOf(this.SEPARATOR, i+1); 
+        if ( tailStr.includes(this.PARAMS_BEGIN) && tailStr.includes(this.PARAMS_END) && ( tailIndex === -1 || this.value.indexOf(this.PARAMS_BEGIN, i+1) < tailIndex ) ) {
           if ( this.value.indexOf(this.PARAMS_BEGIN) === i + 1 ) {
             this.feedback_ = false;
-            this.params = this.value.substring(i+1, this.value.indexOf(this.PARAMS_END) + 1);
+            this.params = this.value.substring(i+1, tailIndex > 0 ? tailIndex : this.value.length);
             this.feedback_ = true;
-            if ( this.value.indexOf(this.PARAMS_END) != this.value.length - 1 ) {
-              this.tail = this.cls_.create({ value: this.value.substring(this.value.indexOf(this.PARAMS_END) + 2), parent: this });//2 is for excluding } and : 
+            if ( tailIndex !== -1 ) {
+              this.tail = this.cls_.create({ value: this.value.substring(tailIndex+1), parent: this });//2 is for excluding } and : 
             }
           } else {
-            this.tail = this.cls_.create({ value: this.value.substring(i+1), parent: this });
+            this.tail = this.cls_.create({ value: tailStr, parent: this });
           }
-          
         } else {
-          this.tail = this.cls_.create({ value: this.value.substring(i+1), parent: this });
+          this.tail = this.cls_.create({ value: tailStr, parent: this });
         }
       }
       this.feedback_ = false;
+    },
+    function parseParam(dict, params) {
+      var i = 1;//a=q,q,q,b=sd,z=sdf
+      //also i think will need to parse objs
+      //like {collumns={name=Code,order=D},{name=Alternative Names,orderBy=A}}
+      //to dict too
+      while( i >= 0 && i < params.length - 1 ) {
+        var beginWith = i;
+        var equalitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, i);
+        var nextEqualitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, equalitySumbolIndex + this.NEXT_INDEX);
+        var isThereAnotherParam = nextEqualitySumbolIndex !== -1;
+        var nextParamIndex = nextEqualitySumbolIndex > -1 ? nextEqualitySumbolIndex : params.length - 1;
+        var thisParameterValueToParse;
+        var beginWith1 = equalitySumbolIndex;
+        var indexOfComa = 0;
+        while ( indexOfComa !== -1 ) {//refactor with recurssion
+          var isComaLast = indexOfComa > nextParamIndex;
+          if ( isThereAnotherParam ) {
+            var indexOfNextComa = params.indexOf(this.PARAMS_SEPARATOR, indexOfComa + this.NEXT_INDEX);
+            isComaLast = indexOfNextComa > nextParamIndex || indexOfNextComa === -1;
+          }
+          if ( isComaLast ) {
+            break;
+          }
+          indexOfComa = params.indexOf(this.PARAMS_SEPARATOR, beginWith1 + this.NEXT_INDEX);
+          beginWith1 = indexOfComa;
+        }
+        thisParameterValueToParse = params.substring(equalitySumbolIndex + 1, beginWith1 > 0 ? beginWith1 : nextParamIndex);
+        i = beginWith1 + this.NEXT_INDEX;//instead of NEXT_INDEX may be better to find next alphabetic character
+
+        if ( thisParameterValueToParse.includes(this.PARAMS_BEGIN) && thisParameterValueToParse.includes(this.PARAMS_END) ) {
+          dict[params.substring(beginWith, equalitySumbolIndex)] = {};
+          this.paparseParam(dict[params.substring(beginWith, equalitySumbolIndex)], thisParameterValueToParse);
+        } else 
+          dict[params.substring(beginWith, equalitySumbolIndex)] = thisParameterValueToParse.split(this.PARAMS_SEPARATOR);
+        if ( beginWith1 === -1 )
+          break; 
+      }
+      // return dict;
     }
   ]
 });

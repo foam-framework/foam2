@@ -111,11 +111,11 @@ foam.CLASS({
 
       this.view.data$.sub(this.updateValue);
       this.view.data = '';
+      this.updateValue();
 
       if ( this.searchValue ) {
         this.view.data = this.searchValue;
       }
-      this.updateValue();
     },
 
     function clear() {
@@ -133,7 +133,7 @@ foam.CLASS({
         var value = this.view.data;
         if (  this.memento ) {//export empty memento to not set wrong TextSearch
           if ( value ) {
-            this.memento.paramsDict['search'] = value;
+            this.memento.paramsDict['search'] = [ value ];
             this.memento.paramsDict = Object.assign({}, this.memento.paramsDict);
           } else {
             delete this.memento.paramsDict['search'];
