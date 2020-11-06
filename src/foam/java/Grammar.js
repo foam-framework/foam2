@@ -94,7 +94,11 @@ foam.INTERFACE({
   methods: [
     {
       name: 'execute',
-      args: [ { name: 'value', type: 'String' }]
+      args: [
+        { name: 'value', type: 'Object' },
+        { name: 'x', type: 'foam.lib.parse.ParserContext' }
+      ],
+      type: 'Object'
     }
   ]
 });
@@ -132,7 +136,11 @@ foam.CLASS({
           javaType: 'foam.lib.parse.ParserContext'
         },
       ],
-      javaCode: `return getParser().parse(ps, x);`
+      javaCode: `
+ps = getParser().parse(ps, x);
+if ( ps != null ) ps.setValue(getAction().execute(ps.value(), x));
+return ps;
+      `
     }
   ]
 });
