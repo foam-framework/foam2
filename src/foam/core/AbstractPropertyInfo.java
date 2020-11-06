@@ -201,9 +201,8 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public boolean includeInDigest() {
-    return false;
-    // return ! ( getStorageTransient() ||
-    //            getClusterTransient() );
+    return ! ( getStorageTransient() ||
+               getClusterTransient() );
   }
 
   @Override
