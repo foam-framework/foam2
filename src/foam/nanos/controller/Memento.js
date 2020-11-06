@@ -108,6 +108,8 @@ foam.CLASS({
             params += key;
             params += this.EQUILITY_SIGN;
             params += this.paramsDict[key].join ? this.paramsDict[key].join(',') : this.paramsDict[key];
+            //foam.Array.isInstance(this.paramsDict[key]): false
+            //fix encoding foam.Array.isInstance(this.paramsDict['search']): true
           }
           params = this.PARAMS_BEGIN + encodeURI(params) + this.PARAMS_END;
         } else {
@@ -168,37 +170,50 @@ foam.CLASS({
       //to dict too
       while( i >= 0 && i < params.length - 1 ) {
         var beginWith = i;
-        var equalitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, i);
-        var nextEqualitySumbolIndex = params.indexOf(this.EQUILITY_SIGN, equalitySumbolIndex + this.NEXT_INDEX);
-        var isThereAnotherParam = nextEqualitySumbolIndex !== -1;
-        var nextParamIndex = nextEqualitySumbolIndex > -1 ? nextEqualitySumbolIndex : params.length - 1;
+        var equalitySymbolIndex = params.indexOf(this.EQUILITY_SIGN, i);
+        var nextParametersAssignmentIndex = equalitySymbolIndex !== -1 ? params.indexOf(this.EQUILITY_SIGN, equalitySymbolIndex + this.NEXT_INDEX) : -1;
+        
+        var paramBeginIndex = params.indexOf(this.PARAMS_BEGIN, equalitySymbolIndex + this.NEXT_INDEX);
+        var paramEndIndex = params.indexOf(this.PARAMS_END, equalitySymbolIndex + this.NEXT_INDEX);
+        
+        if ( nextParametersAssignmentIndex !== -1 && paramBeginIndex !== -1 && nextParametersAssignmentIndex < paramEndIndex) {
+          nextParametersAssignmentIndex = params.indexOf(this.EQUILITY_SIGN, paramEndIndex + this.NEXT_INDEX);
+        }
+        var isThereAnotherParam = nextParametersAssignmentIndex !== -1;
+        var nextParamIndex = nextParametersAssignmentIndex > -1 ? nextParametersAssignmentIndex : params.length-1;
         var thisParameterValueToParse;
-        var beginWith1 = equalitySumbolIndex;
-        var indexOfComa = 0;
-        while ( indexOfComa !== -1 ) {//refactor with recurssion
+
+        var beginWith1 = -1;
+        var indexOfComa = params.indexOf(this.PARAMS_SEPARATOR, i + this.NEXT_INDEX);
+        while ( indexOfComa !== -1 ) {
           var isComaLast = indexOfComa > nextParamIndex;
           if ( isThereAnotherParam ) {
             var indexOfNextComa = params.indexOf(this.PARAMS_SEPARATOR, indexOfComa + this.NEXT_INDEX);
             isComaLast = indexOfNextComa > nextParamIndex || indexOfNextComa === -1;
           }
+
+          beginWith1 = indexOfComa;
+
           if ( isComaLast ) {
             break;
           }
+          
           indexOfComa = params.indexOf(this.PARAMS_SEPARATOR, beginWith1 + this.NEXT_INDEX);
-          beginWith1 = indexOfComa;
         }
-        thisParameterValueToParse = params.substring(equalitySumbolIndex + 1, beginWith1 > 0 ? beginWith1 : nextParamIndex);
-        i = beginWith1 + this.NEXT_INDEX;//instead of NEXT_INDEX may be better to find next alphabetic character
 
-        if ( thisParameterValueToParse.includes(this.PARAMS_BEGIN) && thisParameterValueToParse.includes(this.PARAMS_END) ) {
-          dict[params.substring(beginWith, equalitySumbolIndex)] = {};
-          this.paparseParam(dict[params.substring(beginWith, equalitySumbolIndex)], thisParameterValueToParse);
+        thisParameterValueToParse = params.substring(equalitySymbolIndex == -1 ? nextParametersAssignmentIndex + 1 : equalitySymbolIndex + 1, beginWith1 > 0 ? beginWith1 :  params.length-1);
+
+        i = beginWith1 > 0 ? beginWith1 + this.NEXT_INDEX : -1;//instead of NEXT_INDEX may be better to find next alphabetic character
+
+        if ( thisParameterValueToParse.includes(this.PARAMS_BEGIN) ) {
+          thisParameterValueToParse = params.substring(equalitySymbolIndex + 1, params.indexOf(this.PARAMS_END, equalitySymbolIndex)+1);
+          dict[params.substring(beginWith, equalitySymbolIndex)] = {};
+          this.parseParam(dict[params.substring(beginWith, equalitySymbolIndex)], thisParameterValueToParse);
         } else 
-          dict[params.substring(beginWith, equalitySumbolIndex)] = thisParameterValueToParse.split(this.PARAMS_SEPARATOR);
+          dict[params.substring(beginWith, equalitySymbolIndex)] = thisParameterValueToParse.split(this.PARAMS_SEPARATOR);
         if ( beginWith1 === -1 )
           break; 
       }
-      // return dict;
     }
   ]
 });
