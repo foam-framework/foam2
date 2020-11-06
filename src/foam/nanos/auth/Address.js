@@ -28,8 +28,9 @@ foam.CLASS({
   messages: [
     { name: 'CITY_REQUIRED', message: 'City required' },
     { name: 'COUNTRY_REQUIRED', message: 'Country required' },
+    { name: 'REGION_REQUIRED', message: 'Region required' },
     { name: 'INVALID_ADDRESS_1', message: 'Invalid value for address 1' },
-    { name: 'INVALID_POSTAL_CODE_ERR_MSG', message: 'Valid Postal Code or ZIP Code required' },
+    { name: 'INVALID_POSTAL_CODE', message: 'Valid Postal Code or ZIP Code required' },
     { name: 'STREET_NAME_REQUIRED', message: 'Street name required' },
     { name: 'STREET_NUMBER_REQUIRED', message: 'Street number required' }
   ],
@@ -139,7 +140,7 @@ foam.CLASS({
           if ( ! regionError ) {
             regionError = this.translationService.getTranslation(foam.locale, `${foam.locale}.region.error`);
           }
-          return regionError;
+          return regionError ? regionError : this.REGION_REQUIRED;
         }
       }
     },
@@ -230,7 +231,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         {
@@ -248,7 +249,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Austria
@@ -268,7 +269,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Belgium
@@ -288,7 +289,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Brazil
@@ -304,11 +305,12 @@ foam.CLASS({
             );
           },
           jsErr: function(X) {
+            debugger;
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.postalCode.error`);
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // China
@@ -330,7 +332,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Cyprus
@@ -350,7 +352,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Estonia
@@ -370,7 +372,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Finland
@@ -390,7 +392,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // France
@@ -410,7 +412,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Germany
@@ -430,7 +432,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Great Britain
@@ -450,7 +452,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Greece
@@ -470,7 +472,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // India
@@ -490,7 +492,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Italy
@@ -510,7 +512,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Latvia
@@ -530,7 +532,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Lithuania
@@ -550,7 +552,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Luxembourg
@@ -570,7 +572,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Malta
@@ -590,7 +592,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // the Netherlands
@@ -610,7 +612,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Portugal
@@ -630,7 +632,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Slovakia
@@ -650,7 +652,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Slovenia
@@ -670,7 +672,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Spain
@@ -690,7 +692,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         // Sweden
@@ -710,7 +712,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
         {
@@ -723,7 +725,7 @@ foam.CLASS({
             if ( ! postalCodeError ) {
               postalCodeError = X.translationService.getTranslation(foam.locale, `${foam.locale}.postalCode.error`);
             }
-            return postalCodeError;
+            return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         }
       ],

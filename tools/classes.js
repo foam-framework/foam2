@@ -592,6 +592,7 @@ var classes = [
   'foam.nanos.approval.ApprovalDAO',
   'foam.nanos.audit.AuditDAO',
   'foam.nanos.auth.email.EmailVerificationDAO',
+  'foam.nanos.auth.email.EmailVerificationWebAgent',
   'foam.dao.FreezingDAO',
   'foam.nanos.geocode.GoogleMapsGeocodingDAO',
   'foam.dao.history.HistoryDAO',

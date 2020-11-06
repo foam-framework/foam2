@@ -507,7 +507,7 @@ foam.CLASS({
       of: 'foam.nanos.auth.Address',
       name: 'supportAddress',
       factory: function() {
-        return foam.nanos.auth.Address.create({});
+        return foam.nanos.auth.Address.create({}, this);
       }
     },
     {
