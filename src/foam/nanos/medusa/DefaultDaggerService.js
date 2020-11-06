@@ -57,27 +57,21 @@ foam.CLASS({
     }
   ],
 
-  constants: [
-    {
-      name: 'BOOTSTRAP_INDEX',
-      value: 0,
-      type: 'Long'
-    },
-    {
-      name: 'NUM_BOOTSTRAP_ENTRIES',
-      value: 2,
-      type: 'Long'
-    }
-  ],
-
   properties: [
     {
-      name: 'index',
-      label: 'Global Index',
+      documentation: 'Starting index.',
+      name: 'bootstrapIndex',
       class: 'Long',
-      visibility: 'RO'
+      value: 0
     },
     {
+      documentation: 'Number of manually created entries to prime the system.',
+      name: 'numBootstrapEntries',
+      class: 'Long',
+      value: 2
+    },
+    {
+      documentation: `When false don't use a MessageDigest to calculate a hash. Provided for testing purposes only.`,
       name: 'hashingEnabled',
       class: 'Boolean',
       value: true
@@ -86,6 +80,13 @@ foam.CLASS({
       name: 'algorithm',
       class: 'String',
       value: 'SHA-256'
+    },
+    {
+      documentation: 'Current max promoted index',
+      name: 'index',
+      label: 'Global Index',
+      class: 'Long',
+      visibility: 'RO'
     },
     {
       documentation: `Current links[] index to use. linksIndex flips back forth between 0 and 1.`,
@@ -111,12 +112,14 @@ foam.CLASS({
       class: 'foam.dao.DAOProperty',
       javaFactory: `
       return (DAO) getX().get("internalMedusaDAO");
-      `
+      `,
+      visibility: 'HIDDEN'
     },
     {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
+      transient: true,
       visibility: 'HIDDEN',
       javaFactory: `
       return new PrefixLogger(new Object[] {
@@ -142,32 +145,28 @@ foam.CLASS({
       }
 
       for ( int i = 0; i < getLinks().length; i++ ) {
-        getLinks()[i] = new MedusaEntry.Builder(getX()).setIndex(BOOTSTRAP_INDEX).setHash(getBootstrapHash(getX())).build();
+        getLinks()[i] = new MedusaEntry.Builder(getX()).setIndex(getBootstrapIndex()).setHash(getBootstrapHash(getX())).build();
       }
 
       DAO dao = getDao();
 
-      MedusaEntry entry = new MedusaEntry();
-      entry = link(getX(), entry);
-      entry = hash(getX(), entry);
-      entry.setNSpecName("daggerService");
-      entry.setNode(support.getConfigId());
-      entry.setPromoted(true);
-      entry = (MedusaEntry) dao.put_(getX(), entry);
-      updateLinks(getX(), entry);
-
-      entry = new MedusaEntry();
-      entry = link(getX(), entry);
-      entry = hash(getX(), entry);
-      entry.setNSpecName("daggerService");
-      entry.setNode(support.getConfigId());
-      entry.setPromoted(true);
-      entry = (MedusaEntry) dao.put_(getX(), entry);
-      updateLinks(getX(), entry);
+      for ( int i = 0; i < getNumBootstrapEntries(); i++ ) {
+        MedusaEntry entry = new MedusaEntry();
+        entry = link(getX(), entry);
+        entry = hash(getX(), entry);
+        entry.setNSpecName("daggerService");
+        entry.setNode(support.getConfigId());
+        entry.setPromoted(true);
+        entry = (MedusaEntry) dao.put_(getX(), entry);
+        updateLinks(getX(), entry);
+      }
      `
     },
     {
-      documentation: `// TODO: get initial hash from HSM for new deployment`,
+      documentation: `Initial hash to prime the system. Provide via:
+    - JAVA_OPTS property:  -DBOOTSTRAP_HASH=
+    - Explicitly set in DaggerService NSpec
+    - // TODO: HSM`,
       name: 'getBootstrapHash',
       args: [
         {
@@ -177,7 +176,10 @@ foam.CLASS({
       ],
       type: 'String',
       javaCode: `
-      return "466c58623cd600209e95a981bad03e5d899ea6d6905cebee5ea0746bf16e1534";
+      return System.getProperty(
+                "BOOTSTRAP_HASH",
+                "466c58623cd600209e95a981bad03e5d899ea6d6905cebee5ea0746bf16e1534"
+             );
       `
     },
     {
