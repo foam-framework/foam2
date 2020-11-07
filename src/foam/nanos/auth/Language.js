@@ -22,10 +22,7 @@ foam.CLASS({
     },
     {
       class: "String",
-      name: "name",
-      factory: function() {
-        return this.variant === "" ? this.code : this.code + "-" + this.variant
-      }
+      name: "name"
     },
     {
       class: "Boolean",
@@ -39,9 +36,6 @@ foam.CLASS({
     }
   ],
   methods: [
-    function toSummary() {
-      return this.toString() + ' - ' + this.natureCode;
-    },
     {
       name: 'toString',
       code: function() {

@@ -4,6 +4,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+const { find } = require("underscore");
+
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'LanguageChoiceView',
@@ -22,7 +24,8 @@ foam.CLASS({
     'stack',
     'languageDAO',
     'subject',
-    'userDAO'
+    'userDAO',
+    'countryDAO'
   ],
 
   exports: [ 'as data' ],
@@ -125,9 +128,9 @@ foam.CLASS({
       of: 'foam.nanos.auth.Language',
       name: 'lastLanguage',
       factory: function() {
-        let language = this.supportedLanguages.find( e => e.name === foam.locale )
+        let language = this.supportedLanguages.find( e => e.toString() === foam.locale )
         language = language === undefined ? this.defaultLanguage : language
-        localStorage.setItem('localeLanguage', language.name);
+        localStorage.setItem('localeLanguage', language.toString());
         return language
       }
     }
@@ -146,37 +149,47 @@ foam.CLASS({
                         })).select()).array;
 
       this.supportedLanguages = languages
-      if ( this.subject.realUser ) {
+      if ( this.subject && this.subject.realUser ) {
         let userPreferLanguage = this.supportedLanguages.find( e => e.id.compareTo(self.subject.realUser.language) === 0 )
         if ( ! userPreferLanguage ) {
-            foam.locale = this.defaultLanguage.name
+            foam.locale = this.defaultLanguage.toString()
             let user = self.subject.realUser
             user.language = this.defaultLanguage.id
-            localStorage.setItem('localeLanguage', this.defaultLanguage.name);
+            localStorage.setItem('localeLanguage', this.defaultLanguage.toString());
             await self.userDAO.put(user)
         } else {
-          if ( foam.locale != userPreferLanguage.name ) {
-            foam.locale = userPreferLanguage.name
-            localStorage.setItem('localeLanguage', userPreferLanguage.name);
+          if ( foam.locale != userPreferLanguage.toString() ) {
+            foam.locale = userPreferLanguage.toString()
+            localStorage.setItem('localeLanguage', userPreferLanguage.toString());
             location.reload();
           }
         }
+      }
+
+      let country = await this.countryDAO.find(this.lastLanguage.variant)
+      let label = this.lastLanguage.variant != "" ? `${this.lastLanguage.name}(${this.lastLanguage.variant})` : `${this.lastLanguage.name}`
+      if ( country && country.name != null ) {
+        label = `${this.lastLanguage.name}(${country.name})`
       }
 
       this
         .addClass(this.myClass())
         .tag('span', null, this.optionsBtn_$)
         .start(this.LANGUAGE_CHOICE, {
-          label$: this.lastLanguage$.map(function(v) { return self.formatDropdownLabel(v) })
+          label: label
         })
         .start('div')
           .addClass(this.myClass('carrot'))
         .end()
       .end();
     },
-    function formatDropdownLabel(language) {
-      if ( language.variant === "" ) return language.code;
-      return language.code + "-" + language.variant
+    async function formatLabel(language) {
+      let country = await this.countryDAO.find(language.variant)
+      let label = language.variant != "" ? `${language.name}(${language.variant})` : `${language.name}`
+      if ( country && country.name != null ) {
+        label = `${language.name}(${country.name})`
+      }
+      return label
     }
   ],
 
@@ -199,7 +212,7 @@ foam.CLASS({
             this.supportedLanguages.map( c => {
               return self.E()
                 .start('div')
-                  .add(self.formatDropdownLabel(c))
+                  .add(self.formatLabel(c))
                   .on('click', async function() {
                     let user = self.subject.realUser
                     user.language = c.id
@@ -208,7 +221,7 @@ foam.CLASS({
                     location.reload();
 
                     // TODO: Figure out a better way to store user preferences
-                    localStorage.setItem('localeLanguage', c.name);
+                    localStorage.setItem('localeLanguage', c.toString());
                   });
             }))
           .end();
