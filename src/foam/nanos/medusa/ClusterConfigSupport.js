@@ -199,17 +199,52 @@ configuration for contacting the primary node.`,
       documentation: 'Enabled and Online nodes in each bucket to achieve quorum',
       name: 'nodeQuorum',
       class: 'Int',
-      // STANDALONE, SINGLE
-      value: 2
-      // value: 1 // STANDALONE
+      javaFactory: `
+      ClusterConfig config = getConfig(getX(), getConfigId());
+      Count count = (Count) ((DAO) getX().get("localClusterConfigDAO"))
+        .where(
+          AND(
+            EQ(ClusterConfig.ZONE, 0L),
+            EQ(ClusterConfig.REALM, config.getRealm()),
+            EQ(ClusterConfig.REGION, config.getRegion()),
+            EQ(ClusterConfig.TYPE, MedusaType.NODE),
+            EQ(ClusterConfig.ENABLED, true),
+            EQ(ClusterConfig.ACCESS_MODE, AccessMode.RW)
+          ))
+        .select(COUNT());
+      long c = count.getValue();
+      if ( c < 6 ) {
+        return 1;
+      }
+      if ( c < 12 ) {
+        return 2;
+      }
+      return 3;
+      `
     },
     {
       documentation: 'Additional node redundancy in each bucket.',
       name: 'nodeRedundancy',
       class: 'Int',
-      // STANDALONE, SINGLE - also normal - missing cerberus
-      // value: 1
-      value: 0 // STANDALONE
+      javaFactory: `
+      ClusterConfig config = getConfig(getX(), getConfigId());
+      Count count = (Count) ((DAO) getX().get("localClusterConfigDAO"))
+        .where(
+          AND(
+            EQ(ClusterConfig.ZONE, 0L),
+            EQ(ClusterConfig.REALM, config.getRealm()),
+            EQ(ClusterConfig.REGION, config.getRegion()),
+            EQ(ClusterConfig.TYPE, MedusaType.NODE),
+            EQ(ClusterConfig.ENABLED, true),
+            EQ(ClusterConfig.ACCESS_MODE, AccessMode.RW)
+          ))
+        .select(COUNT());
+      long c = count.getValue();
+      if ( c < 2 ) {
+        return 0;
+      }
+      return 1;
+      `
     },
     {
       name: 'nodeGroups',
@@ -218,7 +253,7 @@ configuration for contacting the primary node.`,
         return this.nodeCount / (nodeQuorum + nodeRedundancy);
       },
       javaFactory: `
-      return Math.max(1, getNodeCount() / (getNodeQuorum() + Math.max(1, getNodeRedundancy())));
+      return (int) Math.max(1, Math.floor(getNodeCount() / (getNodeQuorum() + Math.max(1, getNodeRedundancy()))));
       `
     },
     {

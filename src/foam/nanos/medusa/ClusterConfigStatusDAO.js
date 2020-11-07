@@ -93,10 +93,10 @@ foam.CLASS({
       if ( old != null &&
            old.getStatus() != nu.getStatus() &&
            ( ( myConfig.getType() == MedusaType.MEDIATOR &&
-               myConfig.getZone() == 0 ) ||
+               myConfig.getZone() == 0 ) /*||
              ( myConfig.getType() == MedusaType.NERF &&
-               myConfig.getZone() > 0 ) ) &&
-           nu.getType() == MedusaType.NODE ) {
+               myConfig.getZone() > 0 ) ) */ &&
+           nu.getType() == MedusaType.NODE ) ) {
         bucketNodes(x);
       }
 
