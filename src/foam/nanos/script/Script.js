@@ -397,7 +397,7 @@ foam.CLASS({
         if ( this.server ) {
           this.__context__[this.daoKey].put(this).then(function(script) {
             self.copyFrom(script);
-            if ( script.status === self.ScriptStatus.RUNNING ) {
+            if ( script.status === self.ScriptStatus.SCHEDULED ) {
               self.poll();
             }
           });
