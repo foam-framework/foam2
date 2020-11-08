@@ -360,7 +360,9 @@ foam.CLASS({
         var self = this;
         var interval = setInterval(function() {
           self.__context__[self.daoKey].find(self.id).then(function(script) {
-            if ( script.status !== self.ScriptStatus.RUNNING ) {
+            if ( script.status === self.ScriptStatus.UNSCHEDULED
+              || script.status === self.ScriptStatus.ERROR
+            ) {
               self.copyFrom(script);
               clearInterval(interval);
 
