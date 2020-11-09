@@ -10,10 +10,13 @@ foam.CLASS({
   implements: ['foam.nanos.ruler.RuleAction'],
 
   javaImports: [
+    'foam.core.ContextAgent',
+    'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CrunchService',
+    'foam.nanos.crunch.UserCapabilityJunction',
     'java.util.List',
     'static foam.mlang.MLang.*'
   ],
@@ -22,28 +25,33 @@ foam.CLASS({
     {
       name: 'applyAction',
       javaCode: `
-        // In case this rule action is misconfigured
-        if ( ! (obj instanceof Capability) ) {
-          throw new RuntimeException(
-            "ImplyReviewedAction can only be triggered on Capability objects");
+      agency.submit(x, new ContextAgent() {
+        @Override
+        public void execute(X x) {
+          // In case this rule action is misconfigured
+          if ( ! (obj instanceof UserCapabilityJunction) ) {
+            throw new RuntimeException(
+              "ImplyReviewedAction can only be triggered on UCJ objects");
+          }
+
+          // Context requirements
+          var capabilityDAO = (DAO) x.get("capabilityDAO");
+
+          var cap = (Capability) capabilityDAO.find(
+            ((UserCapabilityJunction) obj).getTargetId());
+
+          // Find the review wizard corresponding to this capability.
+          //   A list is used in case there is more than one.
+          List reviewWizards = ((ArraySink) capabilityDAO.where(AND(
+            INSTANCE_OF(ReviewWizard.class),
+            EQ(ReviewWizard.CAPABILITY_TO_REVIEW, cap.getId())
+          )).select(new ArraySink())).getArray();
+          for ( Object o : reviewWizards ) {
+            var reviewWizard = (ReviewWizard) o;
+            grantReview(x, reviewWizard);
+          }
         }
-
-        // Context requirements
-        var capabilityDAO = (DAO) x.get("capabilityDAO");
-
-        var cap = (Capability) obj;
-
-        // Find the review wizard corresponding to this capability. A list is
-        //   used in case there is more than one.
-        List reviewWizards = ((ArraySink) capabilityDAO.where(AND(
-          INSTANCE_OF(ReviewWizard.class),
-          EQ(ReviewWizard.CAPABILITY_TO_REVIEW, cap.getId())
-        )).select(new ArraySink())).getArray();
-        for ( Object o : reviewWizards ) {
-          var reviewWizard = (ReviewWizard) o;
-          grantReview(x, reviewWizard);
-        }
-
+      }, "Imply review capabilities");
       `
     },
     {
