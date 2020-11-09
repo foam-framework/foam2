@@ -80,7 +80,7 @@ foam.CLASS({
             else {
               axiom = cls.getAxiomByName(propName.name);
               if ( axiom )
-                columnHeader.push(propName.tableHeader());
+                columnHeader.push(axiom.tableHeader());
               else
                 columnHeader.push('-');
             }
