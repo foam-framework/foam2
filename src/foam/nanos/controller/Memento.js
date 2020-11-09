@@ -97,25 +97,7 @@ foam.CLASS({
           return;
         }
         this.feedback_ = true;
-
-        var params;
-        if (Object.keys(this.paramsDict).length !== 0) {
-          params = '';
-          for ( var key in this.paramsDict ) {
-            if ( params ) {
-              params += ',';
-            }
-            params += key;
-            params += this.EQUILITY_SIGN;
-            params += this.paramsDict[key].join ? this.paramsDict[key].join(',') : this.paramsDict[key];
-            //foam.Array.isInstance(this.paramsDict[key]): false
-            //fix encoding foam.Array.isInstance(this.paramsDict['search']): true
-          }
-          params = this.PARAMS_BEGIN + encodeURI(params) + this.PARAMS_END;
-        } else {
-          params = null;
-        }
-        this.params = params;
+        this.params = this.paramDictToString(this.paramsDict);
         this.changeIndicator = ! this.changeIndicator;
         this.value = this.combine();
         this.feedback_ = false;
@@ -174,46 +156,107 @@ foam.CLASS({
         var nextParametersAssignmentIndex = equalitySymbolIndex !== -1 ? params.indexOf(this.EQUILITY_SIGN, equalitySymbolIndex + this.NEXT_INDEX) : -1;
         
         var paramBeginIndex = params.indexOf(this.PARAMS_BEGIN, equalitySymbolIndex + this.NEXT_INDEX);
-        var paramEndIndex = params.indexOf(this.PARAMS_END, equalitySymbolIndex + this.NEXT_INDEX);
-        
-        if ( nextParametersAssignmentIndex !== -1 && paramBeginIndex !== -1 && nextParametersAssignmentIndex < paramEndIndex) {
-          nextParametersAssignmentIndex = params.indexOf(this.EQUILITY_SIGN, paramEndIndex + this.NEXT_INDEX);
-        }
-        var isThereAnotherParam = nextParametersAssignmentIndex !== -1;
-        var nextParamIndex = nextParametersAssignmentIndex > -1 ? nextParametersAssignmentIndex : params.length-1;
+        var paramEndIndex = params.indexOf(this.PARAMS_END, equalitySymbolIndex + this.NEXT_INDEX); // if  = params.lengt  = - 1 //better make sure that there is no } at the end !!!!
+
         var thisParameterValueToParse;
 
-        var beginWith1 = -1;
-        var indexOfComa = params.indexOf(this.PARAMS_SEPARATOR, i + this.NEXT_INDEX);
-        while ( indexOfComa !== -1 ) {
-          var isComaLast = indexOfComa > nextParamIndex;
-          if ( isThereAnotherParam ) {
-            var indexOfNextComa = params.indexOf(this.PARAMS_SEPARATOR, indexOfComa + this.NEXT_INDEX);
-            isComaLast = indexOfNextComa > nextParamIndex || indexOfNextComa === -1;
-          }
+        //{collumns={name=Code,order=D},{name=Alternative Names,orderBy=A},search=ad}
+        if ( nextParametersAssignmentIndex !== -1 && paramBeginIndex !== -1 && nextParametersAssignmentIndex > paramBeginIndex && nextParametersAssignmentIndex < paramEndIndex) {
+          
 
-          beginWith1 = indexOfComa;
+          //we need to find the end of the current param
+          var depth = 0;
+          //calculations for one nested param
+          while ( true ) {
+            if ( paramBeginIndex != -1 ) {
+              while( true ) {
+                paramBeginIndex = params.indexOf(this.PARAMS_BEGIN, paramBeginIndex + this.NEXT_INDEX);
+                if ( paramBeginIndex !== -1 && paramBeginIndex < paramEndIndex ) {
+                  depth++;
+                } else {
+                  break;
+                }
+              }
+    
+              while ( depth > 0 ) {
+                paramEndIndex = params.indexOf(this.PARAMS_END, paramEndIndex + this.NEXT_INDEX);
+                depth--;
+              }
+            }
+            
 
-          if ( isComaLast ) {
-            break;
+            var indexOfComa1 = params.indexOf(this.PARAMS_SEPARATOR, paramEndIndex);
+            var indexOfNextComa = params.indexOf(this.PARAMS_SEPARATOR, paramEndIndex);
+            var indexOfNextParamBegin = params.indexOf(this.PARAMS_BEGIN, paramEndIndex);
+            var assignmentIndex = params.indexOf(this.EQUILITY_SIGN, paramEndIndex);
+            if ( paramBeginIndex === -1 || indexOfComa1 == -1 || ( indexOfNextComa > assignmentIndex && ( indexOfNextParamBegin == -1 || indexOfNextParamBegin > assignmentIndex )  )  ) {
+              nextParametersAssignmentIndex = assignmentIndex;
+              break;
+            }
+
+            paramBeginIndex = indexOfNextParamBegin;
+            paramEndIndex = params.indexOf(this.PARAMS_END, paramBeginIndex + this.NEXT_INDEX);
           }
           
-          indexOfComa = params.indexOf(this.PARAMS_SEPARATOR, beginWith1 + this.NEXT_INDEX);
-        }
-
-        thisParameterValueToParse = params.substring(equalitySymbolIndex == -1 ? nextParametersAssignmentIndex + 1 : equalitySymbolIndex + 1, beginWith1 > 0 ? beginWith1 :  params.length-1);
-
-        i = beginWith1 > 0 ? beginWith1 + this.NEXT_INDEX : -1;//instead of NEXT_INDEX may be better to find next alphabetic character
-
-        if ( thisParameterValueToParse.includes(this.PARAMS_BEGIN) ) {
-          thisParameterValueToParse = params.substring(equalitySymbolIndex + 1, params.indexOf(this.PARAMS_END, equalitySymbolIndex)+1);
+          
+          thisParameterValueToParse = params.substring(equalitySymbolIndex + 1, paramEndIndex);
           dict[params.substring(beginWith, equalitySymbolIndex)] = {};
           this.parseParam(dict[params.substring(beginWith, equalitySymbolIndex)], thisParameterValueToParse);
-        } else 
+          if ( paramEndIndex + 1 === params.indexOf(this.PARAMS_END, paramEndIndex+1) )
+            break;
+          i = paramEndIndex+2;// },
+        } else {
+          var isThereAnotherParam = nextParametersAssignmentIndex !== -1;
+          var nextParamIndex = nextParametersAssignmentIndex > -1 ? nextParametersAssignmentIndex : params.length;
+  
+          var beginWith1 = -1;
+          var indexOfComa = params.indexOf(this.PARAMS_SEPARATOR, i + this.NEXT_INDEX);
+          while ( indexOfComa !== -1 ) {
+            var isComaLast = indexOfComa > nextParamIndex;
+            if ( isThereAnotherParam ) {
+              var indexOfNextComa = params.indexOf(this.PARAMS_SEPARATOR, indexOfComa + this.NEXT_INDEX);
+              isComaLast = indexOfNextComa > nextParamIndex || indexOfNextComa > paramBeginIndex || indexOfNextComa === -1;
+            }
+  
+            beginWith1 = indexOfComa;
+  
+            if ( isComaLast ) {
+              break;
+            }
+            
+            indexOfComa = params.indexOf(this.PARAMS_SEPARATOR, beginWith1 + this.NEXT_INDEX);
+          }
+          thisParameterValueToParse = params.substring(equalitySymbolIndex == -1 ? nextParametersAssignmentIndex + 1 : equalitySymbolIndex + 1, beginWith1 > 0 ? beginWith1 :  params.length);
+
+          i = beginWith1 > 0 ? beginWith1 + this.NEXT_INDEX : -1;//instead of NEXT_INDEX may be better to find next alphabetic character
           dict[params.substring(beginWith, equalitySymbolIndex)] = thisParameterValueToParse.split(this.PARAMS_SEPARATOR);
-        if ( beginWith1 === -1 )
-          break; 
+          if ( beginWith1 === -1 )
+            break; 
+        }
       }
+    },
+    function paramDictToString(paramsDict) {
+      var params = '';
+      for ( var key in paramsDict ) {
+        if ( params ) {
+          params += ',';
+        }
+        params += encodeURI(key);
+        params += this.EQUILITY_SIGN;
+        if ( foam.Array.isInstance(paramsDict[key]) )
+          params += encodeURI(paramsDict[key].join ? paramsDict[key].join(',') : paramsDict[key]);
+        else if ( foam.String.isInstance(paramsDict[key]) ) {
+          params += encodeURI(paramsDict[key]);
+        } else {
+          params += this.paramDictToString(paramsDict[key]);
+        }
+      }
+
+      if ( params ) {
+        params = this.PARAMS_BEGIN + params + this.PARAMS_END;
+      }
+
+      return params;
     }
   ]
 });
