@@ -170,6 +170,15 @@ foam.CLASS({
                 ) ) {
                 this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
               }
+            }).catch(err => {
+              if ( err.data && err.data.id === 'foam.nanos.crunch.CapabilityRuntimeException' &&
+                ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-49' ||
+                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-13' ||
+                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-12' ||
+                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-11'
+                ) ) {
+                this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
+              } else throw err;
             });
 
             if ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-20' ) {
