@@ -83,7 +83,7 @@ foam.CLASS({
         var dict = {};
         if ( this.params ) {
           var params = decodeURI(this.params);
-          this.parseParam(dict, params);
+          this.parseParam(dict, params.substr(1, params.length - 2));// as last char is }
         }
         this.paramsDict = dict;
         this.feedback_ = false;
@@ -146,7 +146,7 @@ foam.CLASS({
       this.feedback_ = false;
     },
     function parseParam(dict, params) {
-      var i = 1;//a=q,q,q,b=sd,z=sdf
+      var i = 0;//a=q,q,q,b=sd,z=sdf
       //also i think will need to parse objs
       //like {collumns={name=Code,order=D},{name=Alternative Names,orderBy=A}}
       //to dict too
@@ -199,7 +199,7 @@ foam.CLASS({
           }
           
           
-          thisParameterValueToParse = params.substring(equalitySymbolIndex + 1, paramEndIndex);
+          thisParameterValueToParse = params.substring(equalitySymbolIndex + 2, paramEndIndex);// 2 as of ={
           dict[params.substring(beginWith, equalitySymbolIndex)] = {};
           this.parseParam(dict[params.substring(beginWith, equalitySymbolIndex)], thisParameterValueToParse);
           if ( paramEndIndex + 1 === params.indexOf(this.PARAMS_END, paramEndIndex+1) )
@@ -217,20 +217,19 @@ foam.CLASS({
               var indexOfNextComa = params.indexOf(this.PARAMS_SEPARATOR, indexOfComa + this.NEXT_INDEX);
               isComaLast = indexOfNextComa > nextParamIndex || indexOfNextComa > paramBeginIndex || indexOfNextComa === -1;
             }
-  
-            beginWith1 = indexOfComa;
-  
+    
             if ( isComaLast ) {
               break;
             }
             
             indexOfComa = params.indexOf(this.PARAMS_SEPARATOR, beginWith1 + this.NEXT_INDEX);
+            beginWith1 = indexOfComa;
           }
-          thisParameterValueToParse = params.substring(equalitySymbolIndex == -1 ? nextParametersAssignmentIndex + 1 : equalitySymbolIndex + 1, beginWith1 > 0 ? beginWith1 :  params.length);
+          thisParameterValueToParse = params.substring(equalitySymbolIndex == -1 ? nextParametersAssignmentIndex + 1 : equalitySymbolIndex + 1, indexOfComa > 0 ? indexOfComa :  params.length);
 
-          i = beginWith1 > 0 ? beginWith1 + this.NEXT_INDEX : -1;//instead of NEXT_INDEX may be better to find next alphabetic character
+          i = indexOfComa > 0 ? indexOfComa + this.NEXT_INDEX : -1;//instead of NEXT_INDEX may be better to find next alphabetic character
           dict[params.substring(beginWith, equalitySymbolIndex)] = thisParameterValueToParse.split(this.PARAMS_SEPARATOR);
-          if ( beginWith1 === -1 )
+          if ( indexOfComa === -1 )
             break; 
         }
       }
