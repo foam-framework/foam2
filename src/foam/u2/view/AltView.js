@@ -32,6 +32,34 @@ foam.CLASS({
       view: function(_, X) {
         return foam.u2.view.ChoiceView.create({choices: X.data.views});
       },
+      documentation: `Set one of the views as the selectedView.
+
+        Default to the first item of the views property.
+
+        Set selectedView as a string to look up and load the view by name, or as
+        a number to load the view by index.
+
+        For example:
+
+            {
+              class: 'foam.u2.view.AltView',
+              views: [
+                [
+                  {
+                    // view 1 spec
+                  },
+                  'View 1'
+                ],
+                [
+                  {
+                    // view 2 spec
+                  },
+                  'View 2'
+                ]
+              ],
+              selectedView: 'View 2' // select view by name
+            }
+      `,
       factory: function() {
         return this.views[0][0];
       },
