@@ -136,10 +136,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function initE() {
-      this.updateE()
-    },
-    async function updateE() {
+    async function initE() {
       var self = this
       let languages = (await this.languageDAO
                         .where(foam.mlang.predicate.Eq.create({
