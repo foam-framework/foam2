@@ -255,6 +255,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     if ( status != null ) {
       ucj.setStatus(status);
     }
+    ucj.setLastUpdatedRealUser(subject.getRealUser().getId());
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
     return (UserCapabilityJunction) userCapabilityJunctionDAO.inX(x).put(ucj);
   }

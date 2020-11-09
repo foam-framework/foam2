@@ -31,6 +31,11 @@ foam.CLASS({
         if ( ! ( obj instanceof X ) ) return false;
         var x = (X) obj;
 
+        var newUCJ = (UserCapabilityJunction) x.get("NEW");
+        if ( newUCJ != null ) {
+          x = x.put("subject", newUCJ.getSubject(x));
+        }
+
         // Context requirements
         var crunchService = (CrunchService) x.get("crunchService");
 
