@@ -339,12 +339,14 @@ public class JSONFObjectFormatter
     }
     addInnerNewline();
     PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
-    outputProperty(newFObject, id);
-
+    boolean outputId = ! id.getStorageTransient();
+    if ( outputId ) outputProperty(newFObject, id);
 
     for ( int i = 0 ; i < size ; i++ ) {
-      append(',');
-      addInnerNewline();
+      if ( i > 0 || outputId ) {
+        append(',');
+        addInnerNewline();
+      }
       PropertyInfo prop = (PropertyInfo) delta.get(i);
       outputProperty(newFObject, prop);
     }
