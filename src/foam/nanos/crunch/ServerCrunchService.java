@@ -221,6 +221,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     try {
       DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
+      x = x.put("subject", subject);
       Predicate associationPredicate = getAssociationPredicate_(x);
 
       // Check if a ucj implies the subject.realUser has this permission in relation to the user

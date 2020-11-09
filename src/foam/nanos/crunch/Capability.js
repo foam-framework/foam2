@@ -370,8 +370,7 @@ foam.CLASS({
             var cap = (Capability) capabilityDAO.find(capId);
             if ( cap == null || ! cap.getEnabled() ) continue;
             
-            X subjectContext = x.put("subject", subject);
-            UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(subjectContext, capId, subject);
+            UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(x, capId, subject);
 
             if ( ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) {
               continue;
