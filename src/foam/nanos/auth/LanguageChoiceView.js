@@ -4,8 +4,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-const { find } = require("underscore");
-
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'LanguageChoiceView',
@@ -25,7 +23,8 @@ foam.CLASS({
     'languageDAO',
     'subject',
     'userDAO',
-    'countryDAO'
+    'countryDAO',
+    'translationService'
   ],
 
   exports: [ 'as data' ],
@@ -169,7 +168,7 @@ foam.CLASS({
       let country = await this.countryDAO.find(this.lastLanguage.variant)
       let label = this.lastLanguage.variant != "" ? `${this.lastLanguage.name}(${this.lastLanguage.variant})` : `${this.lastLanguage.name}`
       if ( country && country.name != null ) {
-        label = `${this.lastLanguage.name}(${country.name})`
+        label = `${this.lastLanguage.name}(${this.getCountryName(country.name, country.name)})`
       }
 
       this
@@ -187,9 +186,15 @@ foam.CLASS({
       let country = await this.countryDAO.find(language.variant)
       let label = language.variant != "" ? `${language.name}(${language.variant})` : `${language.name}`
       if ( country && country.name != null ) {
-        label = `${language.name}(${country.name})`
+        label = `${language.name}(${this.getCountryName(country.name, country.name)})`
       }
       return label
+    },
+    function getCountryName(countryName, defaultName) {
+      defaultName = defaultName ? defaultName : ''
+      let translation = this.translationService.getTranslation(foam.locale, `${foam.locale.toLowerCase()}.country.${countryName}`)
+      translation = translation ? translation : defaultName
+      return translation
     }
   ],
 
