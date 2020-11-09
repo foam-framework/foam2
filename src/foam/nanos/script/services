@@ -16,7 +16,12 @@ p({
       .setOrder(new foam.mlang.order.Comparator[] { new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.script.Script.LAST_RUN).build() })
       .build();
   """,
-  "client":"{\"of\":\"foam.nanos.script.Script\"}"
+  "client":"""
+    {
+      "of":"foam.nanos.script.Script",
+      "cache":false
+    }
+  """
 })
 
 p({
