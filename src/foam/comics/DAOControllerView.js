@@ -150,7 +150,7 @@ foam.CLASS({
             .addClass(this.myClass('separate'))
             .start()
               .addClass(this.myClass('title-container'))
-              .start('h1'))
+              .start('h1')
                 .translate(this.data.title$,this.data.title$)
               .end()
               .start()
