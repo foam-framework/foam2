@@ -80,6 +80,8 @@ foam.CLASS({
           this.start().addClass(this.myClass('symbol'))
             .add(e).end();
           continue;
+        } else if ( e.class === 'foam.u2.Fragment' ) {
+          e = e.view;
         }
         var u2Elem = this.start(e)
         u2Elem.on('focus', () => {
@@ -95,6 +97,13 @@ foam.CLASS({
       this.numOfParts = this.delegates.length;
 
       return this;
+    },
+    function processData(data, index, arr) {
+      var currentElement = this.childNodes[index];
+      if ( ! data || ! currentElement ) return arr;
+      var maxLength = this.delegates[index].maxLength;
+      arr.push(data.substring(0, maxLength));
+      return this.processData(data.substring(maxLength), index + 2, arr);
     }
   ],
 
@@ -102,12 +111,41 @@ foam.CLASS({
     {
       name: 'onDataUpdate',
       code: function() {
-        var currentElement = this.childNodes[this.currentIndex];
-        if ( currentElement.getAttribute('maxlength') <= currentElement.data.length ) {
-          this.currentIndex = this.currentIndex + 2;
-          this.childNodes[this.currentIndex].focus();
+        // data update listener will be triggered after the overflowing data is cut into the maxlength of the fragment
+        // so need a check to prevent the listener action from repeating
+        // if ( new == old.substring(0, maxlength) )  return;
+        var arr = this.processData(this.childNodes[this.currentIndex].data, this.currentIndex, []);
+        for ( var i = 0; i < arr.length; i++ ) {
+          var currentElement = this.childNodes[this.currentIndex];
+          currentElement.data = arr[i];
+          var next = this.childNodes[this.currentIndex + 2];
+          var nextInArr = arr[i+1];
+          if ( next ) {
+            if ( next.data && nextInArr ) break;
+
+            if ( ! nextInArr && ( this.delegates[this.currentIndex].maxLength <= arr[i].length ) || ! next.data ) {
+              this.currentIndex = this.currentIndex + 2;
+              next.focus();
+            }
+          }
         }
       }
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'Fragment',
+
+  properties: [
+    {
+      class: 'Int',
+      name: 'maxLength'
+    },
+    {
+      class: 'Object',
+      name: 'view'
+    }
+  ]
+})
