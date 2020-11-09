@@ -55,7 +55,6 @@ foam.CLASS({
       border-top-right-radius: 0px;
       direction: ltr;
       padding: 2px;
-      text-align: center;
     }
 
     ^arrow-right {
