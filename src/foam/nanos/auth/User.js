@@ -449,7 +449,8 @@ foam.CLASS({
       documentation: 'The name of the business associated with the User.',
       width: 50,
       section: 'business',
-      visibility: 'HIDDEN'
+      visibility: 'HIDDEN',
+      tableWidth: 170
     },
     {
       class: 'StringArray',
