@@ -282,6 +282,28 @@ foam.CLASS({
     function updateColumns() {
       localStorage.removeItem(this.of.id);
       localStorage.setItem(this.of.id, JSON.stringify(this.selectedColumnNames.map(c => foam.String.isInstance(c) ? c : c.name )));
+
+      //set memento columns
+      if ( ! this.memento.paramsObj.columns )
+        this.memento.paramsObj.columns = [];
+      else {
+        for ( var i = 0 ; i < this.memento.paramsObj.columns.length ; i++ ) {
+          var col = this.selectedColumnNames.find(s => s == this.columnConfigToPropertyConverter.returnPropertyNameForLabel(this.of, this.memento.paramsObj.columns[i].name));
+          if ( ! col ) {
+            this.memento.paramsObj.columns.splice(i, 1);
+          }
+        }
+      }
+
+      for ( var s of this.selectedColumnNames ) {
+        var label = this.columnConfigToPropertyConverter.returnPropertyLabelForName(this.of, s);
+        var col = this.memento.paramsObj.columns.find(c => c.name === label);
+        if ( !col ) {
+          this.memento.paramsObj.columns.push({ name: label });
+        }
+      }
+      this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
+
       this.isColumnChanged = ! this.isColumnChanged;
     },
 

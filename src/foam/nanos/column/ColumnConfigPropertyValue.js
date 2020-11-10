@@ -272,6 +272,19 @@ foam.CLASS({
         of = prop.of;
       }
       return names.join('.');
+    },
+    function returnPropertyLabelForName(of, name) {
+      var names = name.split('.');
+      var labels = [];
+      var of = of;
+      for ( var i = 0; i < names.length; i++ ) {
+        var prop = of.getAxioms().find(a => a.name && a.name == names[i]);
+        if ( !prop )
+          return '';
+        labels.push(prop.label);
+        of = prop.of;
+      }
+      return labels.join(' / ');
     }
   ]
 });
