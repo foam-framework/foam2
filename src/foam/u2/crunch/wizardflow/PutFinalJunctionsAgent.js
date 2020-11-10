@@ -38,8 +38,9 @@ foam.CLASS({
         filteredWizard => {
           var self = this;
           return this.crunchService.updateJunction(null, filteredWizard.capability.id, null, null)
-            .then(function() {
+            .then(function(ucj) {
               self.crunchService.pub('updateJunction');
+              return ucj;
             })
         }
       ));

@@ -214,8 +214,9 @@ foam.CLASS({
       var self = this;
       return this.crunchService.updateJunction(
         null, wizardlet.capability.id, wizardlet.data, null
-      ).then(function() {
+      ).then(function(ucj) {
         self.crunchService.pub('updateJunction');
+        return ucj;
       });
     },
     async function updateUCJ(wizardlet, associatedEntity) {
