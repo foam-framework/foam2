@@ -42,7 +42,7 @@
         { name: 'optName', type: 'String' }
       ],
       javaCode: `
-if ( optName.equals("") ) optName = "START";
+if ( optName == null || "".equals(optName) ) optName = "START";
 StringPStream ps = new StringPStream();
 ps.setString(str);
 ParserContext parserX = new ParserContextImpl();
