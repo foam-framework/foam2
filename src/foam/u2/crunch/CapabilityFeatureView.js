@@ -83,7 +83,10 @@ foam.CLASS({
   methods: [
     function init() {
        this.SUPER();
-       this.onDetach(this.userCapabilityJunctionDAO.on.put.sub(this.daoUpdate));
+       debugger;
+       // this.userJunctionDAO.put used to trigger a daoUpdate call which updates ucj and the status of the
+       // capability card but since the ucjDAO put is no longer done on the frontend, this is not triggered
+       this.onDetach(this.crunchService.sub('updateJunction', this.daoUpdate));
        this.daoUpdate();
     },
 

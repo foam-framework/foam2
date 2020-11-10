@@ -210,10 +210,14 @@ foam.CLASS({
     },
 
     function save(wizardlet) {
+      debugger;
       if ( ! wizardlet.isAvailable ) return Promise.resolve();
+      var self = this;
       return this.crunchService.updateJunction(
         null, wizardlet.capability.id, wizardlet.data, null
-      )
+      ).then(function() {
+        self.crunchService.pub('updateJunction');
+      });
     },
     async function updateUCJ(wizardlet, associatedEntity) {
       return this.crunchService.getJunction(
