@@ -16,6 +16,10 @@ foam.INTERFACE({
     'foam.nanos.crunch.lite.CapablePayload'
   ],
 
+  topics: [
+    'updateJunction'
+  ],
+
   methods: [
     {
       name: 'getPrereqs',
