@@ -97,7 +97,6 @@ foam.CLASS({
     {
       name: 'selectedColumnNames',
       expression: function(columns, of, memento) {
-        //memento.paramsObj['columns'] collumn labels
         var ls =  memento && memento.paramsObj['columns'] ? memento.paramsObj['columns'].map(c => this.columnConfigToPropertyConverter.returnPropertyNameForLabel(of, c.name)) : JSON.parse(localStorage.getItem(of.id));
         return ls || columns;
       }
@@ -406,6 +405,19 @@ foam.CLASS({
          * writing.
          */
           var view = this;
+          view.props = this.returnPropertiesForColumns(view, view.columns_);
+
+          if ( this.memento ) {
+            for ( var c of this.memento.paramsObj.columns ) {
+              if ( c.order && ! c.name.includes(' / ')) {
+                var prop = view.props.find(p => p.fullPropertyName === this.columnConfigToPropertyConverter.returnPropertyNameForLabel(of, c.name));
+                if ( c.order === 'A' )
+                  dao = dao.orderBy(prop);
+                else
+                  dao = dao.orderBy(this.DESC(prop));
+              }
+            }
+          }
 
           var actions = {};
           var actionsMerger = action => { actions[action.name] = action; };
@@ -423,7 +435,6 @@ foam.CLASS({
             if ( this.order ) dao = dao.orderBy(this.order);
             var proxy = view.ProxyDAO.create({ delegate: dao });
 
-            view.props = this.returnPropertiesForColumns(view, view.columns_);
             var canObjBeBuildFromProjection = true;
 
             for ( var p of view.props ) {
