@@ -56,6 +56,12 @@ foam.CLASS({
       display: block;
 
     }
+
+    .foam-nanos-auth-ChangePasswordView .foam-u2-detail-SectionedDetailPropertyView-validation-container {
+      position: absolute;
+      margin-left: 0px;
+      display: flex;
+    }
   `,
 
   properties: [

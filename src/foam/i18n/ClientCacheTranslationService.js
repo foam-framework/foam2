@@ -23,10 +23,12 @@ foam.CLASS({
     'foam.i18n.Locale'
   ],
 
+  topics: [ 'translation' ],
+
   properties: [
     {
       name: 'initLatch',
-      documentation: 'Latch to denote cache has been loaded and service is ready',
+      documentatin: 'Latch to denote cache has been loaded and service is ready',
       factory: function() { return this.Latch.create(); }
     },
     {
@@ -91,14 +93,12 @@ foam.CLASS({
     */
     {
       name: 'getTranslation',
-      args: [
-        { name: 'locale', type: 'String' },
-        { name: 'source', type: 'String' },
-        { name: 'defaultText', type: 'String' }
-      ],
+      args: [ 'String locale', 'String source', 'String defaultText' ],
       type: 'String',
       code: function(locale, source, defaultText) {
-        return this.localeEntries[source] || defaultText;
+        var txt = this.localeEntries[source];
+        this.translation.pub(locale, source, txt, defaultText);
+        return txt || defaultText;
       }
     }
   ]

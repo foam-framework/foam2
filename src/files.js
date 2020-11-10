@@ -903,6 +903,7 @@ FOAM_FILES([
   { name: 'foam/i18n/Locale' },
   { name: 'foam/i18n/TranslationService' },
   { name: 'foam/i18n/ClientCacheTranslationService' },
+  { name: 'foam/i18n/TranslationView' },
   { name: 'foam/i18n/ClientTranslationService' },
   { name: 'foam/i18n/ProxyTranslationService' },
 

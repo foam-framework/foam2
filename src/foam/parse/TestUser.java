@@ -18,6 +18,7 @@ import foam.lib.parse.ParserContext;
 import foam.lib.parse.ParserContextImpl;
 import foam.lib.parse.StringPStream;
 import foam.nanos.auth.User;
+import foam.nanos.auth.LanguageId;
 
 public class TestUser {
   public static void main(String[] args) {
@@ -34,7 +35,7 @@ public class TestUser {
     u1.setLastName("Test");
     u1.setOrganization("Foam");
     u1.setBusinessName("programmer");
-    u1.setLanguage("en");
+    u1.setLanguage(new LanguageId.Builder(null).setCode("en").build());
     Date date = new GregorianCalendar(2010, 8, 10).getTime();//September
     u1.setBirthday(date);
     int yyyy,mm,d;
