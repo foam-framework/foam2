@@ -35,8 +35,13 @@ foam.CLASS({
       return Promise.all(this.wizardlets.filter(wizardlet => {
         return wizardlet.isAvailable && ( ! wizardlet.capability.of ); 
       }).map(
-        filteredWizard => this.crunchService.updateJunction(
-          null, filteredWizard.capability.id, null, null)
+        filteredWizard => {
+          return this.crunchService.updateJunction(null, filteredWizard.capability.id, null, null)
+            .then((ucj) => {
+              this.crunchService.pub('updateJunction');
+              return ucj;
+            })
+        }
       ));
     }
   ]
