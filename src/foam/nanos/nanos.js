@@ -74,6 +74,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/test/ServiceProviderAwareTest" },
   { name: "foam/nanos/auth/test/UserAndGroupPermissionTest" },
   { name: "foam/nanos/auth/Language" },
+  { name: 'foam/nanos/auth/LanguageChoiceView', flags: ['web'] },
   { name: "foam/nanos/auth/CreatedAwareDAO" },
   { name: "foam/nanos/auth/LastModifiedAwareDAO" },
   { name: "foam/nanos/auth/LifecycleAwareDAO" },
@@ -295,6 +296,7 @@ FOAM_FILES([
   { name: 'foam/nanos/ticket/TicketAddCommentDAO' },
   { name: 'foam/nanos/ticket/TicketOwnerDAO' },
   { name: 'foam/nanos/ticket/TicketCommentOwnerDAO' },
+  { name: 'foam/nanos/ticket/TicketDAOCreateView' },
   { name: 'foam/nanos/ticket/TicketSummaryView' },
   { name: 'foam/nanos/ticket/SummaryCard' },
 

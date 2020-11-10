@@ -318,19 +318,20 @@ foam.CLASS({
           views: [
             [
               {
-                class: this.BrowserView,
+                class: this.DAOBrowserView,
                 stack: this.stack
               },
-              'Controller 1'
+              'New Controller'
             ],
             [
               {
                 class: this.DAOBrowseControllerView,
                 stack: this.stack
               },
-              'Controller 2'
+              'Old Controller'
             ]
-          ]
+          ],
+          selectedView: 'New Controller'
         }
       }, x);
     }
