@@ -531,9 +531,10 @@ var classes = [
 
   'foam.parse.QueryParserUserTest',
   'foam.parse.PSymbol',
-  'foam.java.Grammar',
-  'foam.java.GrammarAction',
-  'foam.java.GrammarParser',
+  'foam.lib.parse.Grammar',
+  'foam.lib.parse.GrammarAction',
+  'foam.lib.parse.GrammarParser',
+  'foam.lib.parse.SymbolParser',
   'foam.util.EmailTest',
   'foam.util.PasswordTest',
   'foam.util.SecurityUtilTest',

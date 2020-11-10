@@ -5,13 +5,14 @@
  */
 
  foam.CLASS({
-  package: 'foam.java',
+  package: 'foam.lib.parse',
   name: 'Grammar',
 
   javaImports: [
     'foam.lib.parse.Parser',
     'foam.lib.parse.StringPStream',
-    'java.util.Map'
+    'java.util.Map',
+    'foam.lib.parse.SymbolParser'
   ],
 
   requires: [
@@ -33,6 +34,16 @@
 
   methods: [
     {
+      name: 'addSymbol',
+      args: [
+        { name: 'symName', type: 'String' },
+        { name: 'symParser', type: 'Parser' }
+      ],
+      javaCode: `
+      getSymbols().put(symName, symParser);
+      `
+    },
+    {
       name: 'parseString',
       type: 'foam.lib.parse.PStream',
       args: [
@@ -43,7 +54,8 @@
       javaCode: `
 if ( optName.equals("") ) optName = "START";
 ps.setString(str);
-return ps.apply(sym(optName), x);
+PStream temp = ps.apply((Parser)getSymbols().get(optName), x);
+return temp;
       `
     },
     {
@@ -51,14 +63,17 @@ return ps.apply(sym(optName), x);
       args: [ { name: 'name', type: 'String' } ],
       type: 'foam.lib.parse.Parser',
       javaCode: `
-      return (Parser) getSymbols().get(name);
+      SymbolParser symParser = new SymbolParser();
+      symParser.setSymbolName(name);
+      symParser.setSymbols(getSymbols());
+      return symParser;
       `
     },
     {
       name:'addActions',
       args: [
         { name: 'name', type: 'String'},
-        { name: 'action', type: 'foam.java.GrammarAction' }
+        { name: 'action', type: 'foam.lib.parse.GrammarAction' }
       ],
       javaCode: `
 
@@ -68,7 +83,7 @@ return ps.apply(sym(optName), x);
       name:'addAction',
       args: [
         { name: 'name', type: 'String'},
-        { name: 'action', type: 'foam.java.GrammarAction' }
+        { name: 'action', type: 'foam.lib.parse.GrammarAction' }
       ],
       javaCode: `
 Map symbols = getSymbols();
@@ -93,14 +108,14 @@ symbols.put(name, grParser);
 });
 
 foam.INTERFACE({
-  package: 'foam.java',
+  package: 'foam.lib.parse',
   name: 'GrammarAction',
   documentation: '',
   methods: [
     {
       name: 'execute',
       args: [
-        { name: 'value', type: 'Object' },
+        { name: 'val', type: 'Object' },
         { name: 'x', type: 'foam.lib.parse.ParserContext' }
       ],
       type: 'Object'
@@ -109,7 +124,7 @@ foam.INTERFACE({
 });
 
 foam.CLASS({
-  package: 'foam.java',
+  package: 'foam.lib.parse',
   name: 'GrammarParser',
   implements: [ 'foam.lib.parse.Parser' ],
   documentation: '',
@@ -121,7 +136,7 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.java.GrammarAction',
+      of: 'foam.lib.parse.GrammarAction',
       name: 'action'
     }
   ],
