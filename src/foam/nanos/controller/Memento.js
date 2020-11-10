@@ -94,7 +94,7 @@ foam.CLASS({
           return;
         }
         this.feedback_ = true;
-        if ( this.params ) {
+        if ( Object.keys(this.paramsDict).length !== 0 ) {
           this.params = JSON.stringify(this.paramsDict);
         } else {
           this.params = '';
