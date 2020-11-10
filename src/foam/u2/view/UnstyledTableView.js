@@ -407,14 +407,16 @@ foam.CLASS({
           var view = this;
           view.props = this.returnPropertiesForColumns(view, view.columns_);
 
-          if ( this.memento ) {
+          if ( this.memento && this.memento.paramsObj.columns ) {
             for ( var c of this.memento.paramsObj.columns ) {
               if ( c.order && ! c.name.includes(' / ')) {
-                var prop = view.props.find(p => p.fullPropertyName === this.columnConfigToPropertyConverter.returnPropertyNameForLabel(of, c.name));
-                if ( c.order === 'A' )
-                  dao = dao.orderBy(prop);
-                else
-                  dao = dao.orderBy(this.DESC(prop));
+                var prop = view.props.find(p => p.fullPropertyName === this.columnConfigToPropertyConverter.returnPropertyNameForLabel(view.of, c.name));
+                if ( prop ) {
+                  if ( c.order === 'D' )
+                    dao = dao.orderBy(this.DESC(prop.property));
+                  else
+                    dao = dao.orderBy(prop.property);
+                }
               }
             }
           }
