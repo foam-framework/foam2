@@ -125,6 +125,9 @@ foam.CLASS({
       if ( i === -1 ) {
         this.head = this.value;
         this.tail = null;
+        this.feedback_ = false;
+        this.params = '';
+        this.feedback_ = true;
       } else {
         this.head = this.value.substring(0, i);
         var tailStr = this.value.substring(i+1);
