@@ -211,11 +211,10 @@ foam.CLASS({
 
     function save(wizardlet) {
       if ( ! wizardlet.isAvailable ) return Promise.resolve();
-      var self = this;
       return this.crunchService.updateJunction(
         null, wizardlet.capability.id, wizardlet.data, null
-      ).then(function(ucj) {
-        self.crunchService.pub('updateJunction');
+      ).then((ucj) => {
+        this.crunchService.pub('updateJunction');
         return ucj;
       });
     },

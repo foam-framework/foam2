@@ -36,10 +36,9 @@ foam.CLASS({
         return wizardlet.isAvailable && ( ! wizardlet.capability.of ); 
       }).map(
         filteredWizard => {
-          var self = this;
           return this.crunchService.updateJunction(null, filteredWizard.capability.id, null, null)
-            .then(function(ucj) {
-              self.crunchService.pub('updateJunction');
+            .then((ucj) => {
+              this.crunchService.pub('updateJunction');
               return ucj;
             })
         }
