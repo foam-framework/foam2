@@ -263,6 +263,20 @@ foam.CLASS({
       this.order = this.order === column ?
         this.DESC(column) :
         column;
+
+      if ( this.memento ) {
+        if ( ! this.memento.paramsObj.columns ) {
+          this.memento.paramsObj.columns = [];
+        }
+        var mementoColumn = this.memento.paramsObj.columns.find(c => c.name === column.label);
+        var orderLetter = this.order === column ? 'D' : 'A';
+        if ( ! mementoColumn ) {
+          this.memento.paramsObj.columns.push({ name: column.label,  order: orderLetter });
+        } else {
+          mementoColumn.order = orderLetter;
+        }
+        this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
+      }
     },
 
     function updateColumns() {

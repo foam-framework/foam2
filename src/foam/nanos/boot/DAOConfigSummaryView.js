@@ -107,7 +107,7 @@ foam.CLASS({
             start().
               addClass(this.myClass('title')).
               start('a').
-                add('Data Management').on('click', () => { /**it's null for some reason**/ this.memento.tail$.set(null); }).
+                add('Data Management').on('click', () => { /**it's null for some reason**/ this.memento$.set(null); }).
               end().
               add(' / ', this.title).
             end().
@@ -163,7 +163,7 @@ foam.CLASS({
 
 
   exports: [
-    'memento'//currentMemento_ as BackBorder will not work
+    'currentMemento_ as memento'// BackBorder will not work
   ],
 
   properties: [

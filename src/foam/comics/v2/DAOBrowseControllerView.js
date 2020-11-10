@@ -16,7 +16,12 @@ foam.CLASS({
 
   imports: [
     'auth',
-    'stack'
+    'stack',
+    'memento'
+  ],
+
+  exports: [
+    'memento'
   ],
 
   requires: [
