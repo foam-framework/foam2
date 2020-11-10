@@ -7,6 +7,16 @@
 foam.CLASS({
   package: 'foam.u2.crunch.wizardflow',
   name: 'CheckNoDataAgent',
+  documentation: `
+    Checks if the capabilities needed (by using crunchService.getGrantPath) all have no
+    data (or capability.of == null).
+
+    If no required capabilties have data, then the wizard is not needed to render and the
+    required capabilities will be granted.
+
+    This applies to the case where the User already has the Prerequisites to capabilit(ies/y) with no data,
+    therefore thee wizard does not need to render and the user should have the capabilit(ies/y) granted
+  `,
 
   implements: [
     'foam.core.ContextAgent',
