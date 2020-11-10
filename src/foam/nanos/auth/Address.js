@@ -88,6 +88,7 @@ foam.CLASS({
       documentation: `A foreign key into the CountryDAO which represents the country.`,
       required: true,
       gridColumns: 6,
+      tableWidth: 135,
       validateObj: function(countryId) {
         if ( typeof countryId !== 'string' || countryId.length === 0 ) {
           return this.COUNTRY_REQUIRED;
