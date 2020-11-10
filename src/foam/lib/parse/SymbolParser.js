@@ -15,10 +15,6 @@
     'java.util.Map'
   ],
 
-  requires: [
-    'foam.parse.ParserWithAction'
-  ],
-
   properties: [
     {
       class: 'Map',
