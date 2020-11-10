@@ -111,7 +111,8 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       section: 'administrative',
-      includeInDigest: true
+      includeInDigest: true,
+      sheetsOutput: true
     },
     {
       class: 'Boolean',
@@ -343,9 +344,14 @@ foam.CLASS({
       name: 'language',
       documentation: 'The default language preferred by the User.',
       of: 'foam.nanos.auth.Language',
-      value: 'en',
       createVisibility: 'HIDDEN',
-      section: 'personal'
+      section: 'personal',
+      factory: function() {
+        return foam.nanos.auth.LanguageId.create({code: 'en'})
+      },
+      javaFactory: `
+        return new foam.nanos.auth.LanguageId.Builder(null).setCode("en").build();
+      `
     },
     {
       class: 'String',
@@ -443,7 +449,8 @@ foam.CLASS({
       documentation: 'The name of the business associated with the User.',
       width: 50,
       section: 'business',
-      visibility: 'HIDDEN'
+      visibility: 'HIDDEN',
+      tableWidth: 170
     },
     {
       class: 'StringArray',
@@ -515,11 +522,11 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.ServiceProvider',
       name: 'spid',
-      tableWidth: 120,	
-      section: 'administrative',	
+      tableWidth: 120,
+      section: 'administrative',
       writePermissionRequired:true,
       documentation: `
-        Need to override getter to return "" because its trying to 
+        Need to override getter to return "" because its trying to
         return null (probably as a result of moving order of files
         in nanos), which breaks tests
       `,
@@ -616,7 +623,7 @@ foam.CLASS({
         if (
           ! updatingSelf &&
           ! hasUserEditPermission &&
-          ! auth.check(x, "spid.update." + user.getSpid())
+          ! auth.check(x, "serviceprovider.update." + user.getSpid())
         ) {
           throw new AuthorizationException("You do not have permission to update this user.");
         }
@@ -649,7 +656,7 @@ foam.CLASS({
         if (
           ! SafetyUtil.equals(this.getId(), user.getId()) &&
           ! auth.check(x, "user.remove." + this.getId()) &&
-          ! auth.check(x, "spid.remove." + this.getSpid())
+          ! auth.check(x, "serviceprovider.remove." + this.getSpid())
         ) {
           throw new RuntimeException("You do not have permission to delete that user.");
         }

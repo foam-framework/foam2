@@ -45,6 +45,10 @@
     {
       name: 'unitPropName',
       class: 'String'
+    },
+    {
+      name: 'projectionIndex',
+      class: 'Int'
     }
   ]
 });

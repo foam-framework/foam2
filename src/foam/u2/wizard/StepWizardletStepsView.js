@@ -13,10 +13,15 @@ foam.CLASS({
     ^item {
       margin-bottom: 24px;
     }
-    ^item > .circle {
+    ^step-number-and-title {
+      display: flex;
+      align-items: center;
+    }
+    ^step-number-and-title > .circle {
       display: inline-block;
       margin-right: 24px;
       vertical-align: middle;
+      min-width: 24px;
       line-height: 26px !important;
     }
     ^sub-item {
@@ -50,6 +55,10 @@ foam.CLASS({
     'foam.u2.wizard.WizardPosition'
   ],
 
+  messages: [
+    { name: 'PART_LABEL', message: 'Part ' }
+  ],
+
   methods: [
     function initE() {
       var self = this;
@@ -74,7 +83,6 @@ foam.CLASS({
               this.data.countAvailableSections(w) < 1
               || ! wizardlet.isAvailable
             ) {
-              console.log('skip');
               wSkipped++;
               continue;
             }
@@ -87,35 +95,37 @@ foam.CLASS({
             elem = elem
               .start()
                 .addClass(self.myClass('item'))
+                .start().addClass(self.myClass('step-number-and-title'))
 
-                // Render circle indicator
-                .start(this.CircleIndicator, {
-                  ...baseCircleIndicator,
-                  ...(isCurrent ? {
-                    borderColor: this.theme.black,
-                    borderColorHover: this.theme.black
-                  } : !afterCurrent && wizardlet.validate() ? {
-                    borderColor: this.theme.approval3,
-                    backgroundColor: this.theme.approval3,
-                    borderColorHover: this.theme.approval3,
-                    icon: this.theme.glyphs.checkmark.getDataUrl({
-                      fill: this.theme.white
-                    }),
-                    label: ''
-                  } : {
-                    borderColor: this.theme.grey2,
-                    borderColorHover: this.theme.grey2
+                  // Render circle indicator
+                  .start(this.CircleIndicator, {
+                    ...baseCircleIndicator,
+                    ...(isCurrent ? {
+                      borderColor: this.theme.black,
+                      borderColorHover: this.theme.black
+                    } : !afterCurrent && wizardlet.validate() ? {
+                      borderColor: this.theme.approval3,
+                      backgroundColor: this.theme.approval3,
+                      borderColorHover: this.theme.approval3,
+                      icon: this.theme.glyphs.checkmark.getDataUrl({
+                        fill: this.theme.white
+                      }),
+                      label: ''
+                    } : {
+                      borderColor: this.theme.grey2,
+                      borderColorHover: this.theme.grey2
+                    })
                   })
-                })
-                  .addClass('circle')
-                .end()
+                    .addClass('circle')
+                  .end()
 
-                // Render title
-                .start('p').addClass(self.myClass('title'))
-                  .add(wizardlet.title)
-                  .style({
-                    'color': isCurrent ? this.theme.black : this.theme.grey2
-                  })
+                  // Render title
+                  .start('p').addClass(self.myClass('title'))
+                    .translate(wizardlet.capability.id+'.name', wizardlet.capability.name)
+                    .style({
+                      'color': isCurrent ? this.theme.black : this.theme.grey2
+                    })
+                  .end()
                 .end();
 
             // Get section index to highlight current section
@@ -162,8 +172,15 @@ foam.CLASS({
     },
     function renderSectionLabel(elem, section, index, isCurrent) {
       let title = section.title;
-      if ( ! title || ! title.trim() ) title = "Part " + index;
-      return elem       
+      if ( ! title || ! foam.Function.isInstance(title) && ! title.trim() ) title = this.PART_LABEL + index;
+
+      title = foam.Function.isInstance(title) ?
+      foam.core.ExpressionSlot.create({
+        obj$: section.data$,
+        code: title
+      }) : title;
+
+      return elem
         .style({
           'color': isCurrent 
             ? this.theme.black

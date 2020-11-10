@@ -178,6 +178,8 @@ foam.CLASS({
           return e;
         }, this.files$))
         .on('drop', this.onDrop)
+        .on('dragover', (e) => { e.preventDefault() })
+        .on('dragenter', (e) => { e.preventDefault() })
         .callIf(this.isMultipleFiles, function() {
           this.start('input')
             .addClass(this.myClass('input'))

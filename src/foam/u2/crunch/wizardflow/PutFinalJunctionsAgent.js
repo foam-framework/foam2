@@ -35,35 +35,8 @@ foam.CLASS({
       return Promise.all(this.wizardlets.filter(wizardlet => {
         return wizardlet.isAvailable && ( ! wizardlet.capability.of ); 
       }).map(
-        filteredWizard => {
-          var cap = filteredWizard.capability; 
-
-          var associatedEntity = cap.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
-           return this.userCapabilityJunctionDAO.find(
-            this.AND(
-              this.OR(
-                this.AND(
-                  this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
-                  this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id)
-                ),
-                this.AND(
-                  this.INSTANCE_OF(this.AgentCapabilityJunction),
-                  this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id),
-                  this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
-                )
-              ),
-              this.EQ(this.UserCapabilityJunction.TARGET_ID, cap.id))
-          ).then((ucj) => {
-            // TODO: should be calling save
-            if ( ucj == null ) {
-              ucj = this.UserCapabilityJunction.create({
-                sourceId: associatedEntity.id,
-                targetId: cap.id
-              });
-            }
-            return this.userCapabilityJunctionDAO.put(ucj).then(() => console.log('SAVED (no-data cap)', cap.id));
-          });
-        }
+        filteredWizard => this.crunchService.updateJunction(
+          null, filteredWizard.capability.id, null, null)
       ));
     }
   ]

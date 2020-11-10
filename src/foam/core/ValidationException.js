@@ -39,8 +39,16 @@ foam.CLASS({
       super(message, cause);
     }
             `
-          }));
-        }
+        }));
       }
-    ]
+    }
+  ],
+
+  methods: [
+    {
+      name: 'getClientRethrowException',
+      type: 'RuntimeException',
+      javaCode: 'return this;'
+    }
+  ]
 });

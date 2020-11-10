@@ -20,30 +20,16 @@ foam.CLASS({
   properties: [
     // Properties specific to CapabilityWizardSection
     {
-      name: 'capability',
-      postSet: function() {
-        var self = this;
-        return this.localeDAO.where(
-          this.AND(
-            this.OR(
-              this.EQ(foam.i18n.Locale.LOCALE, foam.locale),
-              this.EQ(foam.i18n.Locale.LOCALE, foam.locale.substring(0,foam.locale.indexOf('-')))),
-            this.EQ(foam.i18n.Locale.ID, this.capability.id + '.name')))
-        .select().then(function(a){
-          let arr = a.array;
-          if ( arr.length > 0 ) {
-            let ea = arr[0];
-            self.title = ea.target;
-          } else 
-            self.title = self.capability.name;
-        })
-        .catch(function() {
-          self.title = self.capability.name;
-        });
-      }
+      name: 'capability'
     },
     {
       name: 'ucj'
+    },
+    {
+      name: 'id',
+      expression: function (capability) {
+        return 'capability,' + capability.id;
+      }
     },
 
     // Properties for WizardSection interface
@@ -61,19 +47,22 @@ foam.CLASS({
       factory: function() {
         if ( ! this.of ) return null;
 
-        var ret = this.of.getAxiomByName('capability') ?
-          this.of.create({ capability: this.capability }, this) :
-          this.of.create({}, this);
+        var ret = this.of.create({}, this);
+        if ( this.ucj && this.ucj.data ) ret.copyFrom(this.ucj.data);
 
-        if ( this.ucj === null ) return ret;
+        var prop = this.of.getAxiomByName('capability');
+        if ( prop ) prop.set(ret, this.capability);
 
-        ret = Object.assign(ret, this.ucj.data);
         return ret;
       }
     },
     {
       name: 'title',
       class: 'String',
+      expression: function(capability) {
+        if ( ! capability || ! capability.name ) return '';
+        return capability.name;
+      }
     }
   ],
 

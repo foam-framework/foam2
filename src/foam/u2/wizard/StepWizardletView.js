@@ -42,9 +42,9 @@ foam.CLASS({
     { name: 'CANCEL_LABEL', message: 'Cancel' },
     { name: 'SAVE_IN_PROGRESS', message: 'Saving...' },
     { name: 'ERROR_MSG', message: 'Information was not successfully submitted, please try again later' },
-    { name: 'ERROR_MSG_DRAFT', message: 'An error occured while saving your progress.' },
-    { name: 'SUCCESS_MSG', message: 'Information successfully submitted.' },
-    { name: 'SUCCESS_MSG_DRAFT', message: 'Your progress has been saved.' },
+    { name: 'ERROR_MSG_DRAFT', message: 'An error occured while saving your progress' },
+    { name: 'SUCCESS_MSG', message: 'Information successfully submitted' },
+    { name: 'SUCCESS_MSG_DRAFT', message: 'Your progress has been saved' },
   ],
 
   css: `
@@ -52,7 +52,7 @@ foam.CLASS({
       position: relative;
       height: auto;
       background-color: %GREY5%;
-      max-height: 95vh;
+      max-height: 85vh;
       height: 100%;
     }
     ^fullscreen {
@@ -88,7 +88,7 @@ foam.CLASS({
       flex-grow: 1;
       -webkit-mask-image: -webkit-gradient(linear, left 15, left top, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
       overflow-y: auto;
-      padding: 0 50px;
+      padding: 24px 50px 100px 50px;
     }
     ^rightside ^top-buttons {
       text-align: right;
@@ -98,7 +98,7 @@ foam.CLASS({
     }
     ^rightside ^bottom-buttons {
       background-color: %GREY6%;
-      padding: 25px 50px;
+      padding: 0 50px 25px 50px;
       text-align: right;
     }
     ^buttons {

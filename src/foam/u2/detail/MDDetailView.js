@@ -17,7 +17,8 @@ foam.CLASS({
     'foam.u2.property.MDSelect',
     'foam.u2.property.MDCheckBox',
     'foam.u2.property.MDFloatView',
-    'foam.u2.MDCurrencyView'
+    'foam.u2.MDCurrencyView',
+    'foam.u2.property.MDRangeView',
   ],
 
   exports: [
@@ -26,18 +27,13 @@ foam.CLASS({
 
   css: `
   ^ {
-    overflow: scroll;
-    height: 100em;
+        display: grid;
   }
    ^ .property-item {
-      padding: 4rem;
+      padding: 3rem;
       font-size: 3em;
       border: 1px solid #e9ebff;
-    }
-    ^ .label {
-      font-size: larger;
-      font-weight: 500;
-      color: #5a5a5a;
+      height: fit-content;
     }
 //    TODO: move to calendar
     ^ .foam-u2-property-MDCalendar-heading {
@@ -49,6 +45,12 @@ foam.CLASS({
     }
     ^ .foam-u2-Dialog {
       background-color: unset;
+    }
+    ^ .foam-u2-Dialog-body:focus {
+          outline: none;
+    }
+    ^ .foam-u2-Dialog-buttons button, .foam-u2-property-MDDatePicker-switcher button {
+      background-color: #868686;
     }
   `,
 
@@ -103,11 +105,14 @@ foam.CLASS({
       this.__subContext__.register(this.MDSelect, 'foam.u2.tag.Select');
       this.__subContext__.register(this.MDRichSelect, 'foam.u2.view.RichChoiceView');
       this.__subContext__.register(this.MDDateField, 'foam.u2.DateTimeView');
-      this.__subContext__.register(this.MDFloatView, 'foam.u2.FloatView');
+      this.__subContext__.register(this.MDTextField, 'foam.u2.FloatView');
       this.__subContext__.register(this.MDTextField, 'foam.u2.TextField');
       this.__subContext__.register(this.MDTextField, 'foam.u2.IntView');
-      this.__subContext__.register(this.MDTextField, 'foam.u2.view.DualView');
+//      this.__subContext__.register(this.MDTextField, 'foam.u2.view.DualView');
+      this.__subContext__.register(this.MDTextField, 'foam.u2.tag.TextArea');
+      this.__subContext__.register(this.MDTextField, 'foam.u2.view.StringView');
       this.__subContext__.register(this.MDCheckBox, 'foam.u2.CheckBox');
+      this.__subContext__.register(this.MDRangeView, 'foam.u2.RangeView');
 //      this.__subContext__.register(this.MDCurrencyView, 'foam.u2.view.CurrencyView');
 
       this.add(this.slot(function(of, properties) {
@@ -118,7 +123,8 @@ foam.CLASS({
             if ( ! foam.dao.OneToManyRelationshipProperty.isInstance(p) &&
               ! foam.dao.ManyToManyRelationshipProperty.isInstance(p) &&
               ! foam.core.FObjectProperty.isInstance(p)
-              && ! foam.core.FObjectArray.isInstance(p) && p.name !== 'desiredPassword'
+              && ! foam.core.FObjectArray.isInstance(p) &&
+              p.name !== 'desiredPassword' && p.name !== 'status'
               ) {
               this.start().addClass('property-item').add(p).end();
             }

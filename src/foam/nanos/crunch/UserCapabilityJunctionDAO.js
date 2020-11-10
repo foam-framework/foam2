@@ -106,7 +106,7 @@ foam.CLASS({
 
         // do not allow updates to sourceId/targetId properties
         if ( old != null && ucj.getSourceId() != old.getSourceId() ) throw new RuntimeException("User's capability cannot be reassigned.");
-        if ( old != null && ucj.getTargetId() != old.getTargetId() ) throw new RuntimeException("Capability cannot be changed.");
+        if ( old != null && ! ucj.getTargetId().equals(old.getTargetId()) ) throw new RuntimeException("Capability cannot be changed.");
         
         // if ucj data is set but does not match expected data, do not put
         Capability capability = (Capability) ucj.findTargetId(x);

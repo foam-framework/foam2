@@ -49,6 +49,14 @@ foam.CLASS({
         return "*".equals(getId()) ? "Global Service Provider Capability" :
           getId().substring(0, 1).toUpperCase() + getId().substring(1) + " Service Provider Capability";
       `
+    },
+    {
+      name: 'inherentPermissions',
+      javaGetter: 'return new String[] { "serviceprovider.read." + getId() };',
+      factory: function() {
+        return [ 'serviceprovider.read.' + this.id ];
+      },
+      documentation: 'Service provider must have "serviceprovider.read.<SPID>" inherent permission.',
     }
   ],
 

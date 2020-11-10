@@ -148,6 +148,8 @@ foam.INTERFACE({
     },
     {
       name: 'updateJunction',
+      async: true,
+      type: 'UserCapabilityJunction',
       args: [
         {
           name: 'x',
@@ -160,6 +162,10 @@ foam.INTERFACE({
         {
           name: 'data',
           type: 'foam.core.FObject'
+        },
+        {
+          name: 'status',
+          type: 'foam.nanos.crunch.CapabilityJunctionStatus'
         }
       ],
     },
@@ -229,6 +235,17 @@ foam.INTERFACE({
           name: 'capabilityIds',
           type: 'String[]'
         },
+      ]
+    },
+    {
+      name: 'getAllJunctionsForUser',
+      async: true,
+      type: 'UserCapabilityJunction[]',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
       ]
     }
   ]

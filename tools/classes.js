@@ -133,6 +133,7 @@ var classes = [
   'foam.lib.csv.ProxyCSVOutputter',
   'foam.lib.csv.FromCSVSetter',
   'foam.dao.java.JDAO',
+  'foam.dao.CopyFromDAO',
   'foam.dao.FilteredDAO',
   'foam.dao.Journal',
   'foam.dao.RemoveChildrenOnRemoveDAO',
@@ -447,7 +448,13 @@ var classes = [
   'foam.nanos.google.api.auth.GoogleApiAuthService',
   'foam.nanos.google.api.auth.GoogleApiCredentials',
   'foam.nanos.google.api.drive.GoogleDriveService',
+  'foam.nanos.google.api.sheets.ColumnHeaderToPropertyMapping',
   'foam.nanos.google.api.sheets.GoogleSheetsApiService',
+  'foam.nanos.google.api.sheets.GoogleSheetsDataImportService',
+  'foam.nanos.google.api.sheets.GoogleSheetsDataImportServiceImpl',
+  'foam.nanos.google.api.sheets.GoogleSheetsImportConfig',
+  'foam.nanos.google.api.sheets.GoogleSheetsTransactionsDataImportServiceImpl',
+  'foam.nanos.google.api.sheets.ImportDataMessage',
   'foam.dao.jdbc.ConnectionPool',
   'foam.lib.Outputter',
   'foam.lib.PropertyPredicate',
@@ -580,6 +587,7 @@ var classes = [
   'foam.nanos.approval.ApprovalDAO',
   'foam.nanos.audit.AuditDAO',
   'foam.nanos.auth.email.EmailVerificationDAO',
+  'foam.nanos.auth.email.EmailVerificationWebAgent',
   'foam.dao.FreezingDAO',
   'foam.nanos.geocode.GoogleMapsGeocodingDAO',
   'foam.dao.history.HistoryDAO',
@@ -651,11 +659,13 @@ var classes = [
   'foam.nanos.crunch.lite.CapablePayload',
   'foam.nanos.crunch.lite.CapablePayloadStatusDAO',
   'foam.nanos.crunch.lite.CapableCompatibleCapability',
+  'foam.nanos.crunch.CapabilityAvailabilityDAO',
 
   'foam.nanos.crunch.lite.ruler.CapableCreateApprovalsRuleAction',
   'foam.nanos.crunch.lite.ruler.ReputDependantPayloads',
   'foam.nanos.crunch.lite.ruler.SetCapablePayloadStatusOnPut',
   'foam.nanos.crunch.lite.ruler.CapablePayloadApprovableRuleAction',
+  'foam.nanos.crunch.lite.ruler.CapableStatusChangeAdjustApprovalsRuleAction',
 
   'foam.u2.wizard.BaseWizardlet',
   'foam.nanos.crunch.CapabilityCategory',
@@ -663,11 +673,11 @@ var classes = [
   'foam.nanos.crunch.CapabilityJunctionStatus',
   'foam.nanos.crunch.UserCapabilityJunction',
   'foam.nanos.crunch.ui.CapabilityWizardlet',
+  'foam.nanos.crunch.ui.ReviewCapabilityWizardlet',
   'foam.nanos.crunch.ui.MinMaxCapabilityWizardlet',
   'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
   'foam.nanos.crunch.AssociatedEntity',
-  'foam.nanos.crunch.CapabilityAvailabilityDAO',
   'foam.nanos.crunch.RenewableData',
 
   'foam.nanos.crunch.connection.CapabilityPayload',
@@ -693,6 +703,15 @@ var classes = [
   'foam.nanos.crunch.ruler.SetUCJStatusOnPut',
   'foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted',
   'foam.nanos.crunch.ruler.SaveUCJDataOnGranted',
+
+  //crunch extras
+  'foam.nanos.crunch.extra.ReviewCapability',
+  'foam.nanos.crunch.extra.ReviewCapabilityData',
+  'foam.nanos.crunch.extra.ReviewWizard',
+
+  //crunch predicates
+  'foam.nanos.crunch.predicate.CapabilityGranted',
+
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
   // userQueryService
@@ -729,6 +748,10 @@ var classes = [
 
   'foam.core.NumberSet',
 
+  // template
+  'foam.java.ParseTemplateTest',
+  'foam.java.ParseTemplateTestModel',
+
   // Translation Support
   'foam.i18n.XLIFFTranslationValue',
   'foam.i18n.Locale',
@@ -762,6 +785,7 @@ var skeletons = [
   'foam.strategy.StrategizerService',
   'foam.nanos.auth.UserQueryService',
   'foam.nanos.export.GoogleSheetsExport',
+  'foam.nanos.google.api.sheets.GoogleSheetsDataImportService',
   'foam.nanos.crunch.CrunchService',
   'foam.i18n.TranslationService'
 ];

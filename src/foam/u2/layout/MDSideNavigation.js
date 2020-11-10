@@ -34,7 +34,7 @@ foam.CLASS({
       class: 'foam.dao.DAOProperty',
       name: 'dao_',
       factory: function() {
-        return this.menuDAO.orderBy(this.Menu.ORDER);
+        return this.menuDAO;
       }
     },
     {
@@ -128,7 +128,7 @@ foam.CLASS({
 
   css: `
     ^ {
-      z-index: 1;
+      z-index: 1000;
       width: 50rem;
       position: absolute;
       box-shadow: 0px 0px 50px 0px #000;
@@ -140,7 +140,7 @@ foam.CLASS({
     }
 
     ^ .side-nav-view {
-      height: 100rem;
+      height: 109em;
       overflow-x: hidden;
       position: relative;
       background-color: #f5f7fa;

@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'Memento',
 
   constants: {
-    SEPARATOR: '#'
+    SEPARATOR: ':'
   },
 
   properties: [

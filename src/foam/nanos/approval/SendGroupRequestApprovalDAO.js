@@ -73,7 +73,7 @@ foam.CLASS({
 
         if ( group == null ) {
           Logger logger = (Logger) x.get("logger");
-          logger.error(GROUP_NOT_SET_ERROR_MSG);
+          logger.error(GROUP_NOT_SET_ERROR_MSG, request.getGroup(), request.getApprover());
           throw new RuntimeException(GROUP_NOT_SET_ERROR_MSG);
         }
 

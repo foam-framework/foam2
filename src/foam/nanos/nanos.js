@@ -22,6 +22,7 @@ FOAM_FILES([
   { name: 'foam/nanos/fs/FileDAODecorator' },
   { name: 'foam/nanos/fs/FileArray' },
   { name: 'foam/nanos/fs/FileArrayDAODecorator' },
+  { name: 'foam/nanos/fs/FileArrayInCapablePayloadsDecorator' },
   { name: 'foam/nanos/fs/fileDropZone/FileDropZone', flags: ['web'] },
   { name: 'foam/nanos/fs/fileDropZone/FilePreview', flags: ['web'] },
   { name: 'foam/nanos/fs/fileDropZone/FileCard', flags: ['web'] },
@@ -73,6 +74,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/test/ServiceProviderAwareTest" },
   { name: "foam/nanos/auth/test/UserAndGroupPermissionTest" },
   { name: "foam/nanos/auth/Language" },
+  { name: 'foam/nanos/auth/LanguageChoiceView', flags: ['web'] },
   { name: "foam/nanos/auth/CreatedAwareDAO" },
   { name: "foam/nanos/auth/LastModifiedAwareDAO" },
   { name: "foam/nanos/auth/LifecycleAwareDAO" },
@@ -90,6 +92,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/email/EmailDocInterface" },
   { name: "foam/nanos/auth/email/EmailDocService" },
   { name: "foam/nanos/auth/email/ClientEmailDocService" },
+  { name: "foam/nanos/auth/email/EmailVerificationWebAgent" },
   { name: "foam/nanos/auth/resetPassword/SuccessView" },
   { name: "foam/nanos/auth/resetPassword/ResetPasswordTokenService" },
   { name: "foam/nanos/auth/token/TokenService" },
@@ -208,6 +211,15 @@ FOAM_FILES([
   { name: "foam/nanos/google/api/auth/GoogleApiAuthService" },
   { name: "foam/nanos/google/api/auth/GoogleApiCredentials" },
   { name: "foam/nanos/google/api/drive/GoogleDriveService" },
+  { name: "foam/nanos/google/api/sheets/import/ClientGoogleSheetsDataImportService" },
+  { name: "foam/nanos/google/api/sheets/import/GoogleSheetsImportConfig" },
+  { name: "foam/nanos/google/api/sheets/import/GoogleSheetsDataImportService" },
+  { name: "foam/nanos/google/api/sheets/import/GoogleSheetsDataImportServiceImpl" },
+  { name: "foam/nanos/google/api/sheets/import/GoogleSheetsTransactionsDataImportServiceImpl" },
+  { name: "foam/nanos/google/api/sheets/import/ImportDataMessage"},
+  { name: "foam/nanos/google/api/sheets/import/views/modal/ColumnsToPropertiesMappingModal" },
+  { name: "foam/nanos/google/api/sheets/import/views/modal/GoogleSheetImportModal" },
+  { name: "foam/nanos/google/api/sheets/import/views/modal/ImportFromGoogleSheetsForm"},
   { name: "foam/nanos/auth/Relationships" },
   { name: "foam/nanos/NanoService" },
   { name: "foam/nanos/auth/twofactor/OTPKey" },
@@ -284,6 +296,7 @@ FOAM_FILES([
   { name: 'foam/nanos/ticket/TicketAddCommentDAO' },
   { name: 'foam/nanos/ticket/TicketOwnerDAO' },
   { name: 'foam/nanos/ticket/TicketCommentOwnerDAO' },
+  { name: 'foam/nanos/ticket/TicketDAOCreateView' },
   { name: 'foam/nanos/ticket/TicketSummaryView' },
   { name: 'foam/nanos/ticket/SummaryCard' },
 
@@ -355,13 +368,16 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/lite/CapabilityRefinement" },
   { name: "foam/nanos/crunch/lite/MinMaxCapabilityRefinement" },
   { name: "foam/nanos/crunch/crunchtest/TestCapable" },
+  { name: "foam/nanos/crunch/CapabilityAvailabilityDAO" },
 
   // crunch lite rulers
+  { name: "foam/nanos/crunch/lite/ruler/CapableStatusChangeAdjustApprovalsRuleAction" },
   { name: "foam/nanos/crunch/lite/ruler/CapablePayloadApprovableRuleAction" },
   { name: "foam/nanos/crunch/lite/ruler/CapableCreateApprovalsRuleAction" },
   { name: "foam/nanos/crunch/lite/ruler/SetCapablePayloadStatusOnPut" },
   { name: "foam/nanos/crunch/lite/ruler/ReputDependantPayloads" },
 
+  // crunch capability categories
   { name: "foam/nanos/crunch/CapabilityCategory" },
   { name: "foam/nanos/crunch/UserCapabilityJunctionRefine" },
   { name: "foam/nanos/crunch/CapabilityCapabilityJunctionRefine" },
@@ -379,6 +395,8 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/CrunchService" },
   { name: "foam/nanos/crunch/ClientCrunchService" },
   { name: "foam/nanos/crunch/ReputDependentUCJs" },
+  //predicates
+  { name: 'foam/nanos/crunch/predicate/CapabilityGranted' },
   //spid
   { name: "foam/nanos/auth/CreateUserCapabilityJunctionOnSpidSet" },
   { name: "foam/nanos/auth/SetUserServiceProviderJunctionRuleAction" },
@@ -391,9 +409,16 @@ FOAM_FILES([
   //views
   { name: "foam/nanos/crunch/ui/CapableView" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
+  { name: "foam/nanos/crunch/ui/ReviewCapabilityWizardlet" },
+  { name: "foam/nanos/crunch/ui/ReviewCapabilityView" },
+  { name: 'foam/nanos/crunch/ui/UCJView' },
   //boxes
   { name: "foam/nanos/crunch/box/CrunchClientBox" },
   { name: "foam/nanos/crunch/box/CrunchClientReplyBox" },
+  //extras
+  { name: 'foam/nanos/crunch/extra/ReviewCapability' },
+  { name: 'foam/nanos/crunch/extra/ReviewCapabilityData' },
+  { name: 'foam/nanos/crunch/extra/ReviewWizard' },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },
@@ -416,5 +441,6 @@ FOAM_FILES([
   // google
   { name: "foam/nanos/geocode/GoogleMapsCredentials" },
 
-  { name: "com/google/foam/demos/u2/AllViews" }
+  { name: "com/google/foam/demos/u2/AllViews" },
+  { name: "com/google/foam/demos/u2/MDAllViews" }
 ]);

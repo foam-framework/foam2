@@ -11,13 +11,6 @@ foam.CLASS({
 
   documentation: 'iframe for file preview',
 
-  properties: [
-    {
-      class: 'String',
-      name: 'fileSrc'
-    }
-  ],
-
   css: `
     .file-iframe {
       height: 100%;
@@ -42,6 +35,7 @@ foam.CLASS({
       this.SUPER();
 
       this
+        .addClass(this.myClass())
         .start('div')
           .addClass('file-image-div')
           .style({

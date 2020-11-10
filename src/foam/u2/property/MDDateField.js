@@ -136,6 +136,7 @@ foam.CLASS({
       padding: 2rem 0 0 0;
       position: relative;
       z-index: 1;
+      width: 100%;
     }
     ^label {
       color: #999;

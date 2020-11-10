@@ -61,7 +61,8 @@ foam.CLASS({
           if ( foam.core.UnitValue.isInstance(prop) ) {
             cellType = 'CURRENCY';
             pattern = '\"$\"#0.00\" CAD\"';
-            unitProp = of.getAxiomByName(prop.unitPropName).name;
+            if ( prop.unitPropName )
+              unitProp = of.getAxiomByName(prop.unitPropName).name;
           } else if ( foam.core.Date.isInstance(prop) ) {
             cellType = 'DATE';
             pattern = 'yyyy-mm-dd';
@@ -79,7 +80,9 @@ foam.CLASS({
             cellType = 'BOOLEAN';
           } else if ( foam.core.String.isInstance(prop) ) {
             cellType = 'STRING';
-          }
+          } else if ( foam.core.StringArray.isInstance(prop) || foam.core.Array.isInstance(prop) ) {
+            cellType = 'ARRAY';
+          } 
 
           return this.GoogleSheetsPropertyMetadata.create({
             columnName: prop.name,

@@ -56,7 +56,6 @@ foam.CLASS({
         if ( capability == null || ( ! capability.getAvailabilityPredicate().f(x) && ! auth.check(x, AVAILABILITY_PERMISSION + id) ) ) {
           return null;
         }
-
         return getDelegate().find_(x, id);
       `
     },

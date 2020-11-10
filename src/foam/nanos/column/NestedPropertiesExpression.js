@@ -316,8 +316,8 @@ foam.CLASS({
           class: 'StringArray'
         }
       ],
-      code: function(of, propNames) {
-        return foam.mlang.sink.Projection.create({ exprs: this.returnArrayOfExprForArrayOfProperties(of, propNames) });
+      code: function(of, propNames, useProjection) {
+        return foam.mlang.sink.Projection.create({ exprs: this.returnArrayOfExprForArrayOfProperties(of, propNames), useProjection: useProjection });
       },
       javaCode: `
         Expr[] exprs = returnArrayOfExprForArrayOfProperties(x, of, propNames);

@@ -42,7 +42,7 @@ foam.CLASS({
       display: inline-block;
       padding-bottom: 4vh;
     }
-    
+
     ^ p {
       display: inline-block;
       position: relative;
@@ -60,6 +60,7 @@ foam.CLASS({
     }
 
     ^ .circle-center {
+      padding-top: 3vh;
       padding-bottom: 2vh;
       text-align: center;
       height: 80px;
@@ -132,10 +133,10 @@ foam.CLASS({
 
         .start().addClass('titles')
           // title
-          .start().addClass('makeBold').add(mainCapability[0].name).end()
+          .start().addClass('makeBold').translate(mainCapability[0].id+'.name', mainCapability[0].name).end()
           // subTitle
           .start().addClass('subTitle')
-            .add(mainCapability[0].requirementViewTitle ? mainCapability[0].requirementViewTitle : this.INTRO_TEXT)
+            .translate(mainCapability[0].id + '.requirementViewTitle' , mainCapability[0].requirementViewTitle || this.INTRO_TEXT)
           .end()
         .end()
       .start().addClass('actionPosition')
@@ -149,6 +150,7 @@ foam.CLASS({
   actions: [
     {
       name: 'getStarted',
+      label: 'Get started',
       code: function(x) {
         x.closeDialog();
         this.onClose(x, true);

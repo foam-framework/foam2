@@ -1,0 +1,58 @@
+p({
+  "class": "foam.nanos.script.Script",
+  "id": "Generate Review Capabilities",
+  "status": 2,
+  "code": """
+    import foam.dao.ArraySink;
+    import foam.dao.DAO;
+    import foam.nanos.crunch.Capability;
+    import foam.nanos.crunch.CapabilityCapabilityJunction;
+    import foam.nanos.crunch.CrunchService;
+    import foam.nanos.crunch.extra.ReviewCapability;
+    import foam.nanos.crunch.extra.ReviewWizard;
+    import foam.mlang.MLang;
+    import java.util.List;
+
+    // Context Requirements
+    var crunchService = (CrunchService) x.get("crunchService");
+    var capabilityDAO = (DAO) x.get("localCapabilityDAO");
+    var pcjDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
+
+    List reviewWizards = capabilityDAO
+      .where(MLang.INSTANCE_OF(ReviewWizard.class))
+      .select(new ArraySink()).getArray();
+    
+    for ( Object o : reviewWizards ) {
+      var reviewWizard = (ReviewWizard) o;
+
+      // CRUNCH path determines prerequisites for review
+      List idsToReview = crunchService.getCapabilityPath(
+        x, reviewWizard.getCapabilityToReview(), false);
+
+      for ( int i = 0 ; i < idsToReview.size() ; i++ ) {
+        // TODO: add support for minmax lists
+        if ( ! ( idsToReview.get(i) instanceof Capability ) ) continue;
+        var cap = (Capability) idsToReview.get(i);
+
+        // Skip capability with no data to review
+        if ( cap.getOf() == null ) continue;
+
+        // Add review capability for this prerequisite
+        var reviewId = reviewWizard.getId() + ":" + cap.getId();
+        var reviewCapability = new ReviewCapability.Builder(x)
+          .setId(reviewId)
+          .setName(cap.getName())
+          .setCapabilityToReview(cap.getId())
+          .build();
+        capabilityDAO.put(reviewCapability);
+
+        // Add prerequisite junction for this review capability
+        var reviewPrereq = new CapabilityCapabilityJunction.Builder(x)
+          .setSourceId(reviewWizard.getId())
+          .setTargetId(reviewId)
+          .build();
+        pcjDAO.put(reviewPrereq);
+      }
+    }
+  """
+})

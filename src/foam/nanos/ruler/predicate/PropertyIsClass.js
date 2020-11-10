@@ -41,11 +41,14 @@ foam.CLASS({
 
       if ( getIsNew() ) {
         FObject nu  = (FObject) NEW_OBJ.f(obj);
-         return (new IsClassOf(getOf())).f(nu.getProperty(getPropName()));
+        Object value = nu.getProperty(getPropName());
+        return value != null && (new IsClassOf(getOf())).f(value);
       }
       FObject old = (FObject) OLD_OBJ.f(obj);
-      if ( old != null )
-         return (new IsClassOf(getOf())).f(old.getProperty(getPropName()));
+      if ( old != null ) {
+        Object value = old.getProperty(getPropName());
+        return value != null && (new IsClassOf(getOf())).f(value);
+      }
       return false;
       `
     }

@@ -45,13 +45,13 @@ foam.CLASS({
     function load() {
       this.SUPER();
       this.document.body.addEventListener('touchstart', this.onTouch);
-      this.document.body.addEventListener('mousemove', this.onMouseMove);
+//      this.document.body.addEventListener('mousemove', this.onMouseMove);
     },
 
     function unload() {
       this.SUPER();
       this.document.body.removeEventListener('touchstart', this.onTouch);
-      this.document.body.removeEventListener('mousemove', this.onMouseMove);
+//      this.document.body.removeEventListener('mousemove', this.onMouseMove);
     }
   ],
 
@@ -86,11 +86,14 @@ foam.CLASS({
 
   css: `
     ^ {
-      background: white;
+      background: inherit;
       box-shadow: 0px 0px 30px 0px #b7b7b7;
       margin: 0;
       overflow-y: auto;
-      position: absolute;
+      position: relative;
+      bottom: -3rem !important;
+      max-height: 25rem;
+      border-radius: 10px;
     }
     ^ .choice {
       align-content: flex-start;
@@ -103,8 +106,8 @@ foam.CLASS({
     }
     ^ .choice.selected {
       font-weight: bold;
-      border-left: 1rem solid /*%PRIMARY3%*/ #406dea;
-      background-color: /*%PRIMARY5%*/ #e5f1fc;
+      border-left: 0.7rem solid #868686;
+      background-color: #cacaca;
     }
   `
 });

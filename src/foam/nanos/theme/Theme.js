@@ -20,6 +20,7 @@ foam.CLASS({
 //    'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.EnabledAware',
     'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.auth.ServiceProviderAware',
 //    'foam.nanos.auth.LastModifiedByAware'
   ],
 
@@ -506,13 +507,19 @@ foam.CLASS({
       of: 'foam.nanos.auth.Address',
       name: 'supportAddress',
       factory: function() {
-        return foam.nanos.auth.Address.create({});
+        return foam.nanos.auth.Address.create({}, this);
       }
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'personalSupportUser'
+    },
+    {
+      name: 'spid',
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
+      value: foam.nanos.auth.ServiceProviderAware.GLOBAL_SPID
     }
   ],
 

@@ -17,6 +17,8 @@ foam.CLASS({
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCategory',
     'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.crunch.UserCapabilityJunction',
     'foam.u2.crunch.CapabilityCardView',
     'foam.u2.crunch.CapabilityFeatureView',
     'foam.u2.Element',
@@ -34,13 +36,14 @@ foam.CLASS({
     'capabilityCategoryDAO',
     'capabilityDAO',
     'crunchController',
+    'crunchService',
     'registerElement'
   ],
 
   messages: [
     { name: 'TAB_ALL', message: 'All' },
-    { name: 'TITLE', message: 'Capabilities' },
-    { name: 'SUBTITLE', message: 'To fully enable our platform, we require a bit more information about you and your company.' }
+    { name: 'TITLE', message: 'Registration' },
+    { name: 'SUBTITLE', message: 'To complete the registration, follow the steps below' }
   ],
 
   css: `
@@ -83,7 +86,7 @@ foam.CLASS({
 
     ^perFeature {
       display: flex;
-      padding-bottom: 10px;
+      padding-bottom: 55px;
     }
 
     ^left-arrow {
@@ -118,14 +121,28 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'hideGrantedCapabilities',
+      class: 'Boolean'
+    },
+    {
+      name: 'grantedCapabilities',
+      class: 'StringArray'
+    },
+    {
       name: 'visibleCapabilityDAO',
       class: 'foam.dao.DAOProperty',
       documentation: `
         DAO with only visible capabilities.
       `,
-      factory: function() {
+      expression: function(hideGrantedCapabilities, grantedCapabilities) {
+        var predicate = this.EQ(this.Capability.VISIBLE, true);
+        if ( hideGrantedCapabilities )
+          predicate = this.AND(
+            predicate,
+            this.NOT(this.IN(this.Capability.ID, grantedCapabilities))
+          );
         return this.capabilityDAO
-          .where(this.EQ(this.Capability.VISIBLE, true));
+          .where(predicate);
       }
     },
     {
@@ -164,10 +181,21 @@ foam.CLASS({
       name: 'featureCardArray',
       value: [],
       documentation: 'stores the styling of each featureCapability'
-    }
+    },
+    'wizardOpened'
   ],
 
   methods: [
+    function init() {
+      this.crunchService.getAllJunctionsForUser().then(juncs => {
+        this.grantedCapabilities = juncs
+          .filter(
+            junc => junc.status == this.CapabilityJunctionStatus.GRANTED
+          )
+          .map(junc => junc.targetId);
+        this.daoUpdate();
+      })
+    },
     function initE() {
       this.SUPER();
 
@@ -183,8 +211,8 @@ foam.CLASS({
           .add(this.SUBTITLE)
         .end()
         .add(self.renderFeatured())
-        .add(self.accountAndAccountingCard())
         // NOTE: TEMPORARILY REMOVED
+        // .add(self.accountAndAccountingCard())
         // .start(self.Tabs)
         //   .start(self.Tab, { label: this.TAB_ALL, selected: true })
         //     .add(self.renderFeatured())
@@ -223,8 +251,7 @@ foam.CLASS({
                     .addClass(self.myClass('featureSection'))
                   .end()
                   .on('click', () => {
-                    self.crunchController
-                      .createWizardSequence(arr[i].id).execute();
+                    self.openWizard(arr[i].id);
                   })
                 .end());
             }
@@ -281,8 +308,7 @@ foam.CLASS({
                   .start(self.GUnit, { columns: 4 })
                     .tag(self.CapabilityCardView, { data: cap })
                     .on('click', () => {
-                      self.crunchController
-                        .createWizardSequence(cap).execute();
+                      self.openWizard(cap);
                     })
                   .end();
               }
@@ -315,8 +341,7 @@ foam.CLASS({
               .start(self.GUnit, { columns: 4 })
                 .tag(self.CapabilityCardView, { data: cap })
                 .on('click', () => {
-                  self.crunchController
-                    .createWizardSequence(cap).execute();
+                  self.openWizard(cap);
                 })
               .end();
           }
@@ -330,6 +355,42 @@ foam.CLASS({
         this.EQ(
           this.CapabilityCategoryCapabilityJunction.SOURCE_ID,
           categoryId));
+    },
+    function daoUpdate() {
+      Promise.resolve()
+        // Get visible categories
+        .then(() => this.visibleCategoryDAO.select())
+        .then(categorySink => categorySink.array.map(cat => cat.id))
+        // Get capabilities within visible categories
+        .then(categories => {
+          return this.capabilityCategoryCapabilityJunctionDAO
+            .where(this.IN(
+              this.CapabilityCategoryCapabilityJunction.SOURCE_ID,
+              categories)).select();
+        })
+        .then(cccjSink => Object.keys(
+          cccjSink.array.map(cccj => cccj.targetId)
+          .reduce((set, capabilityId) => ({ ...set, [capabilityId]: true }), {})))
+        // Get visible capabilities within visible categories
+        .then(visibleList => this.visibleCapabilityDAO
+          .where(this.OR(
+            this.IN(this.Capability.ID, visibleList),
+            this.IN('featured', this.Capability.KEYWORDS)
+          )).select())
+        .then(sink => {
+          if ( sink.array.length == 1 ) {
+            this.openWizard(sink.array[0]);
+          }
+        })
+    },
+    function openWizard(cap) {
+      if ( this.wizardOpened ) return;
+      this.wizardOpened = true;
+      this.crunchController
+        .createWizardSequence(cap).execute().then(() => {
+          this.wizardOpened = false;
+        });
+      
     }
   ]
 });

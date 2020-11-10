@@ -36,7 +36,9 @@ foam.CLASS({
       this.
         addClass(this.myClass()).
         select(this.data$proxy, function(obj) {
-          return foam.u2.ViewSpec.createView(this.rowView, { data: obj }, this, this.__subSubContext__)
+          var rowView = foam.u2.ViewSpec.createView(this.rowView, { data: obj }, this, this.__subSubContext__);
+          return self.E().start().addClass('md-row')
+            .add(rowView)
             .on('click', function() {
               if ( ! obj ) {
                 dao.find(val[0]).then(function(v) {
@@ -46,6 +48,7 @@ foam.CLASS({
               } else
                 self.dblclick && self.dblclick(obj);
             })
+            .end();
         });
     }
   ],
@@ -54,6 +57,17 @@ foam.CLASS({
   ^ {
     height: 100%;
     overflow: scroll;
+    overflow-x: hidden;
   }
+  ^ .md-row {
+    display: flex;
+    color: /*%GREY1%*/ #5e6061;
+    height: 150px;
+    padding: 3rem;
+    font-size: 2.5rem;
+    font-weight: 300;
+    border-bottom: 1px solid /*%GREY3%*/;
+  }
+
   `
 });

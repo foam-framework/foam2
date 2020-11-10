@@ -44,6 +44,7 @@ foam.CLASS({
       width: 30vw;
     }
     ^section {
+      margin-bottom: 10%;
     }
     /* title  */
     ^ ^section h2 {

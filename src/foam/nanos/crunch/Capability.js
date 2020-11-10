@@ -14,6 +14,7 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.Sink',
@@ -120,10 +121,10 @@ foam.CLASS({
       user will lose permissions implied by this capability and upper level capabilities will ignore this prerequisite`
     },
     {
-      name: 'visible',
-      class: 'Boolean',
-      documentation: `Hide sub-capabilities which aren't top-level and individually selectable. when true, capability is visible to the user`,
-      section: 'uiSettings'
+      name: 'visible',	
+      class: 'Boolean',	
+      documentation: `Hide sub-capabilities which aren't top-level and individually selectable. when true, capability is visible to the user`,	
+      section: 'uiSettings'	
     },
     {
       name: 'expiry',
@@ -151,6 +152,13 @@ foam.CLASS({
       class: 'Class',
       displayWidth: 70,
       documentation: `Model used to store information required by this credential`
+    },
+    {
+      name: 'inherentPermissions',
+      class: 'StringArray',
+      documentation: `List of inherent permissions provided by this capability`,
+      storageTransient: true,
+      visibility: 'HIDDEN'
     },
     {
       name: 'permissionsGranted',
@@ -264,6 +272,11 @@ foam.CLASS({
         // check if permission is a capability string implied by this permission
         if ( this.stringImplies(this.getName(), permission) ) return true;
 
+        String[] inherentPermissions = this.getInherentPermissions();
+        for ( String permissionName : inherentPermissions ) {
+          if ( this.stringImplies(permissionName, permission) ) return true;
+        }
+
         String[] permissionsGranted = this.getPermissionsGranted();
         for ( String permissionName : permissionsGranted ) {
           if ( this.stringImplies(permissionName, permission) ) return true;
@@ -368,11 +381,9 @@ foam.CLASS({
           for ( var capId : prereqs ) {
             var cap = (Capability) capabilityDAO.find(capId);
             if ( cap == null || ! cap.getEnabled() ) continue;
-
-            UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(x, capId, subject);
-            if ( ucJunction == null ) {
-              return CapabilityJunctionStatus.ACTION_REQUIRED;
-            }
+            
+            X subjectContext = x.put("subject", subject);
+            UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(subjectContext, capId, subject);
 
             if ( ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) {
               continue;

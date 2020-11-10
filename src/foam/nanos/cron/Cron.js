@@ -9,7 +9,10 @@ foam.CLASS({
   name: 'Cron',
   extends: 'foam.nanos.script.Script',
 
-  imports: [ 'cronDAO as scriptDAO' ],
+  imports: [
+    'cronDAO',
+    'cronEventDAO'
+  ],
 
   javaImports: [
     'foam.core.X',
@@ -84,6 +87,16 @@ foam.CLASS({
       visibility: 'RO',
       javaFactory: `return getNextScheduledTime(getX());`,
       storageTransient: true
+    },
+    {
+      class: 'String',
+      name: 'daoKey',
+      value: 'cronDAO'
+    },
+    {
+      class: 'String',
+      name: 'eventDaoKey',
+      value: 'cronEventDAO'
     }
   ],
 

@@ -16,25 +16,6 @@ p({
 })
 
 p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "googleSheetsDataExport",
-  "serve": true,
-  "authenticate": true,
-  "boxClass": "foam.nanos.export.GoogleSheetsExportSkeleton",
-  "serviceClass": "foam.nanos.google.api.sheets.GoogleSheetsApiService",
-  "client":"""
-    {
-      "class": "foam.nanos.export.ClientGoogleSheetsExportService",
-      "delegate":
-        {
-          "class": "foam.box.HTTPBox",
-          "url": "service/googleSheetsDataExport"
-        }
-    }
-  """
-})
-
-p({
   "class":"foam.nanos.boot.NSpec",
   "name":"AuthenticatedNSpecDAO",
   "serve":true,
@@ -147,33 +128,6 @@ p({
   "lazy": false,
   "serve": false,
   "serviceClass": "foam.nanos.pool.ThreadPoolAgency"
-})
-
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "testDAO",
-  "serve": true,
-  "serviceScript": """
-    return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setGuid(true)
-      .setOf(foam.nanos.test.Test.getOwnClassInfo())
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName(\"tests\")
-      .setDecorator(new foam.nanos.script.ScriptRunnerDAO(new foam.dao.NullDAO(x, foam.nanos.test.Test.getOwnClassInfo())))
-      .build();
-  """,
-  "client": "{\"of\":\"foam.nanos.test.Test\"}"
-})
-
-p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"pmInfoDAO",
-  "serve":true,
-  "serviceScript":`
-    return new foam.nanos.pm.PMInfoMDAO().orderBy(foam.mlang.MLang.DESC(foam.nanos.pm.PMInfo.TOTAL_TIME));
-  `,
-  "client":"{\"of\":\"foam.nanos.pm.PMInfo\", \"remoteListenerSupport\": false}"
 })
 
 p({
@@ -441,11 +395,26 @@ p({
       .setOrder(new foam.core.PropertyInfo[] {foam.nanos.menu.Menu.ORDER, foam.nanos.menu.Menu.LABEL})
       .build();
   """,
-  "client": "{
-    \"of\":\"foam.nanos.menu.Menu\",
-    \"ttlSelectPurgeTime\": 0,
-    \"ttlPurgeTime\": 0,
-    \"cache\":true}"
+  "client": """
+    {
+      "of": "foam.nanos.menu.Menu",
+      "order": [
+        {
+          "class": "__Property__",
+          "forClass_": "foam.nanos.menu.Menu",
+          "name": "order"
+        },
+        {
+          "class": "__Property__",
+          "forClass_": "foam.nanos.menu.Menu",
+          "name": "label"
+        }
+      ],
+      "ttlSelectPurgeTime": 0,
+      "ttlPurgeTime": 0,
+      "cache": true
+    }
+  """
 })
 
 p({
@@ -553,7 +522,7 @@ p({
   """
     return new foam.nanos.auth.AuthorizationDAO.Builder(x)
       .setDelegate((foam.dao.DAO) x.get("localServiceProviderDAO"))
-      .setAuthorizer(new foam.nanos.auth.StandardAuthorizer("capability"))
+      .setAuthorizer(new foam.nanos.auth.StandardAuthorizer("serviceprovider"))
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.auth.ServiceProvider\"}"
@@ -1003,6 +972,63 @@ p({
   """
     {
       "of":"foam.nanos.google.api.auth.GoogleApiCredentials"
+    }
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "googleSheetsDataExport",
+  "serve": true,
+  "authenticate": true,
+  "boxClass": "foam.nanos.export.GoogleSheetsExportSkeleton",
+  "serviceClass": "foam.nanos.google.api.sheets.GoogleSheetsApiService",
+  "client":"""
+    {
+      "class": "foam.nanos.export.ClientGoogleSheetsExportService",
+      "delegate":
+        {
+          "class": "foam.box.HTTPBox",
+          "url": "service/googleSheetsDataExport"
+        }
+    }
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "googleSheetsDataImport",
+  "serve": true,
+  "authenticate": true,
+  "boxClass": "foam.nanos.google.api.sheets.GoogleSheetsDataImportServiceSkeleton",
+  "serviceClass": "foam.nanos.google.api.sheets.GoogleSheetsDataImportServiceImpl",
+  "client":"""
+    {
+      "class": "foam.nanos.google.api.sheets.ClientGoogleSheetsDataImportService",
+      "delegate":
+        {
+          "class": "foam.box.HTTPBox",
+          "url": "service/googleSheetsDataImport"
+        }
+    }
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "googleSheetsTransactionsDataImport",
+  "serve": true,
+  "authenticate": true,
+  "boxClass": "foam.nanos.google.api.sheets.GoogleSheetsDataImportServiceSkeleton",
+  "serviceClass": "foam.nanos.google.api.sheets.GoogleSheetsTransactionsDataImportServiceImpl",
+  "client":"""
+    {
+      "class": "foam.nanos.google.api.sheets.ClientGoogleSheetsDataImportService",
+      "delegate":
+        {
+          "class": "foam.box.HTTPBox",
+          "url": "service/googleSheetsTransactionsDataImport"
+        }
     }
   """
 })

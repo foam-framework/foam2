@@ -65,4 +65,5 @@ public interface PropertyInfo
   public boolean containsDeletablePII();
   public void validateObj(foam.core.X x, foam.core.FObject obj);
   public void fromCSVLabelMapping(java.util.Map<String, foam.lib.csv.FromCSVSetter> map);
+  public boolean getSheetsOutput();
 }

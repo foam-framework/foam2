@@ -73,14 +73,27 @@ foam.INTERFACE({
 
           var oldCapabilityPayloads = getCapablePayloads();
           
-          if (
-            Arrays.stream(oldCapabilityPayloads)
-                .map((cap) -> cap.getCapability().getId())
-                .noneMatch(capabilityId::equals)
-          ) {
+          if ( ! hasRequirement(x, capabilityId) ) {
             var newCapabilityPayload = crunchService.getCapableObjectPayloads(x, new String[] { capabilityId });
             setCapablePayloads((CapablePayload[]) ArrayUtils.addAll(oldCapabilityPayloads, newCapabilityPayload));
           }
+          `
+        }));
+        cls.methods.push(foam.java.Method.create({
+          name: 'hasRequirement',
+          documentation: 'Checks if the capble opbject has a capability, does not verify it',
+          type: 'Boolean',
+          visibility: 'default',
+          args: [
+            { name: 'x', type: 'X' },
+            { name: 'capabilityId', type: 'String' }
+          ],
+          body: `
+          var oldCapabilityPayloads = getCapablePayloads();
+          
+          return Arrays.stream(oldCapabilityPayloads)
+            .map((cap) -> cap.getCapability())
+            .anyMatch(capabilityId::equals);
           `
         }));
         cls.methods.push(foam.java.Method.create({
@@ -110,7 +123,7 @@ foam.INTERFACE({
             // Marshal payloads into a hashmap
             Map<String, CapablePayload> payloads = new HashMap<String, CapablePayload>();
             for ( CapablePayload payload : getCapablePayloads() ) {
-              payloads.put(payload.getCapability().getId(), payload);
+              payloads.put(payload.getCapability(), payload);
             }
 
             for ( String capId : capabilityIds ) {

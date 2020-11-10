@@ -22,7 +22,7 @@ foam.CLASS({
       background: #EEE;
       width: 220px;
       border-radius: 5px;
-      height: 44px;
+//      height: 44px;
     }
     ^:hover {
       background: #DDD;

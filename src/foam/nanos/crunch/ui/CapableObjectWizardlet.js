@@ -26,6 +26,12 @@ foam.CLASS({
       name: 'capability'
     },
     {
+      name: 'id',
+      expression: function (capability) {
+        return 'capability,' + capability.id;
+      }
+    },
+    {
       name: 'targetPayload',
       class: 'FObjectProperty',
       of: 'foam.nanos.crunch.lite.CapablePayload'
@@ -76,7 +82,7 @@ foam.CLASS({
           return this.capable.getCapablePayloadDAO().put(
             this.targetPayload).then(() => {
               console.log('SAVED ' +
-                this.targetPayload.capability.name);
+                this.targetPayload.capability);
             });
         }
       }
@@ -87,7 +93,7 @@ foam.CLASS({
         return this.capable.getCapablePayloadDAO().remove(
           this.targetPayload).then(() => {
             console.log('CANCELLED ' +
-              this.targetPayload.capability.name);
+              this.targetPayload.capability);
           });
       }
     }

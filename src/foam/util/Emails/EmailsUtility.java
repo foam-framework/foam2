@@ -47,9 +47,15 @@ public class EmailsUtility {
     }
 
     String group = user != null ? user.getGroup() : "";
-    Subject subject = new Subject.Builder(x).setUser(user).build();
-    Theme theme = ((Themes) x.get("themes")).findTheme(x.put("subject", subject));
     AppConfig appConfig = (AppConfig) x.get("appConfig");
+    Theme theme = (Theme) x.get("theme");
+    if ( theme == null ) {
+      Subject subject = new Subject.Builder(x).setUser(user).build();
+      theme = ((Themes) x.get("themes")).findTheme(x.put("subject", subject));
+      if ( theme.getAppConfig() != null ) {
+        appConfig.copyFrom(theme.getAppConfig());
+      }
+    }
 
     // Add template name to templateArgs, to avoid extra parameter passing
     if ( ! SafetyUtil.isEmpty(templateName) ) {

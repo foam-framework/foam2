@@ -19,8 +19,12 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.auth.User',
+    'foam.nanos.auth.Subject',
     'foam.nanos.notification.Notification',
-    'java.util.Date'
+    'foam.nanos.theme.Theme',
+    'foam.nanos.theme.Themes',
+    'java.util.Date',
+    'java.util.HashMap'
   ],
 
   methods: [
@@ -33,8 +37,10 @@ foam.CLASS({
           UserCapabilityJunction junction = (UserCapabilityJunction) obj;
           Capability cap = (Capability) junction.findTargetId(x);
           User user = (User) junction.findSourceId(x);
-          
-          if ( cap == null || ! cap.getVisible() ) return;
+
+          // visible checks if the capability is a top-level capability
+          // and availabilitypredicate checks if the user has access to the capability
+          if ( cap == null || ! ( cap.getVisible() && cap.getAvailabilityPredicate().f(x) ) ) return;
 
           DAO notificationDAO = (DAO) x.get("notificationDAO");
 
@@ -43,6 +49,10 @@ foam.CLASS({
           .append("' has been set to ")
           .append(junction.getStatus())
           .append(".");
+
+          HashMap<String, Object> args = new HashMap<>();
+            args.put("capName", cap.getName());
+            args.put("junctionStatus", junction.getStatus());
 
           Notification notification = new Notification();
 
@@ -54,7 +64,14 @@ foam.CLASS({
           notification.setNotificationType("Capability Status Update");
           notification.setCreated(new Date());
           notification.setBody(sb.toString());
-          user.doNotify(x, notification);
+          notification.setEmailName("top-level-capability-status-update");
+          notification.setEmailArgs(args);
+
+          Themes themes = (Themes) x.get("themes");
+          Theme theme = themes.findThemeBySpid(((X) x.put("subject", new Subject.Builder(x).setUser(user).build())));
+          X notificationX = theme != null ? (X) x.put("theme", theme) : x;
+
+          user.doNotify(notificationX, notification);
         }
       }, "Send Notification On Top Level Capability Status Update");
       `

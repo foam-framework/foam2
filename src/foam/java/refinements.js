@@ -312,7 +312,8 @@ foam.CLASS({
         validateObj:             this.javaValidateObj,
         toCSV:                   this.javaToCSV,
         toCSVLabel:              this.javaToCSVLabel,
-        fromCSVLabelMapping:     this.javaFromCSVLabelMapping
+        fromCSVLabelMapping:     this.javaFromCSVLabelMapping,
+        sheetsOutput:            this.sheetsOutput
       });
     },
 
@@ -890,7 +891,6 @@ foam.CLASS({
         }),
         body: this.javaCode ? this.javaCode : ''
       });
-
 
       var initializerString = this.buildMethodInfoInitializer(cls);
 
@@ -2233,15 +2233,15 @@ foam.CLASS({
       name: 'javaCode',
       getter: function() {
         return `
-try {
-  synchronized ( getDelegate() ) {
-    while ( ! getDelegate().isPropertySet("${this.property}") ) getDelegate().wait();
-  }
-} catch (Exception e) {
-  throw new RuntimeException(e);
-}
-${this.javaType != 'void' ? 'return ' : ''}getDelegate()
-    .${this.name}(${this.args.map(a => a.name).join(', ')});
+          try {
+            synchronized ( getDelegate() ) {
+              while ( ! getDelegate().isPropertySet("${this.property}") ) getDelegate().wait();
+            }
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+          ${this.javaType != 'void' ? 'return ' : ''}getDelegate()
+              .${this.name}(${this.args.map(a => a.name).join(', ')});
         `;
       }
     }
@@ -2290,6 +2290,37 @@ foam.CLASS({
       var compare = info.getMethod('compare');
       compare.body = 'return 0;';
       return info;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'TemplateAxiomJavaRefinement',
+  refines: 'foam.templates.TemplateAxiom',
+  flags: ['java'],
+
+  requires: [
+    'foam.parse.Grammar',
+    'foam.templates.TemplateUtil'
+  ],
+
+  methods: [
+
+    function buildJavaClass(cls) {
+    var result = this.TemplateUtil.create().compileJava(this.template, this.name, this.args || []);
+      var args = [{ type: 'java.lang.StringBuilder', name: 'builder' }];
+      args.push()
+      this.args.forEach(a => args.push({type: a.type, name: a.name}));
+      cls.method({
+        name: 'build' + this.name.charAt(0).toUpperCase() + this.name.slice(1),
+        type: 'void',
+        args: args,
+        body: `
+          ${result};
+        `
+      });
+      return;
     }
   ]
 });

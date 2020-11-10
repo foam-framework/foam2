@@ -446,8 +446,8 @@ foam.CLASS({
     ^body {
       cursor: pointer;
       font-size: 16px;
-      height: 36rem;
-      width: 32rem;
+      height: 40rem;
+      width: 100%;
       overflow: hidden;
       position: relative;
       -webkit-user-select: none;
@@ -463,7 +463,7 @@ foam.CLASS({
       width: 900px;
     }
     ^slider-inner {
-      display: flex;
+//      display: flex;
       height: 100%;
       position: relative;
       width: 100%;

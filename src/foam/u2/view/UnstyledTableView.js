@@ -250,10 +250,6 @@ foam.CLASS({
       }
     },
     {
-      name: 'dataChangedFlag',
-      class: 'Boolean'
-    },
-    {
       name: 'subStack',
       factory: function() {
         return foam.nanos.approval.NoBackStack.create({delegate: this.stack});
@@ -349,7 +345,7 @@ foam.CLASS({
                 this.start().
                   addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + prop.name))
-                  .style({ flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0' })
+                  .style({ flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0', 'word-wrap' : 'break-word', 'white-space' : 'normal'})
                   .add(view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col)).
                   callIf(isFirstLevelProperty && prop.sortable, function() {
                     this.on('click', function(e) {
@@ -409,25 +405,38 @@ foam.CLASS({
          */
           var view = this;
 
-          dao.on.sub(view.changeFlag);
+          var actions = {};
+          var actionsMerger = action => { actions[action.name] = action; };
 
-          var modelActions = view.of.getAxiomsByClass(foam.core.Action);
-          var actions = Array.isArray(view.contextMenuActions)
-            ? view.contextMenuActions.concat(modelActions)
-            : modelActions;
+          // Model actions
+          view.of.getAxiomsByClass(foam.core.Action).forEach(actionsMerger);
+          // Context menu actions
+          view.contextMenuActions.forEach(actionsMerger);
 
           //with this code error created  slot.get cause promise return
           //FIX ME
-          return this.slot(function(data, data$delegate, dataChangedFlag, order, updateValues) {
+          return this.slot(function(data, data$delegate, order, updateValues) {
             // Make sure the DAO set here responds to ordering when a user clicks
             // on a table column header to sort by that column.
             if ( this.order ) dao = dao.orderBy(this.order);
             var proxy = view.ProxyDAO.create({ delegate: dao });
 
             view.props = this.returnPropertiesForColumns(view, view.columns_);
+            var canObjBeBuildFromProjection = true;
+
+            for ( var p of view.props ) {
+              if ( p.property.tableCellFormatter && ! p.property.cls_.hasOwnProperty('tableCellFormatter') ) {
+                canObjBeBuildFromProjection = false;
+                break;
+              }
+              if ( ! foam.lookup(p.property.cls_.id) ) {
+                canObjBeBuildFromProjection = false;
+                break;
+              }
+            }
 
             var propertyNamesToQuery = view.columnHandler.returnPropNamesToQuery(view.props);
-            var valPromises = view.returnRecords(view.of, proxy, propertyNamesToQuery);
+            var valPromises = view.returnRecords(view.of, proxy, propertyNamesToQuery, canObjBeBuildFromProjection);
             var nastedPropertyNamesAndItsIndexes = view.columnHandler.buildArrayOfNestedPropertyNamesAndCorrespondingIndexesInArray(propertyNamesToQuery);
 
             var tbodyElement = this.
@@ -572,13 +581,15 @@ foam.CLASS({
                     tableRowElement.add(elmt);
                   }
 
+                  // Object actions
+                  obj.cls_.getOwnAxiomsByClass(foam.core.Action).forEach(actionsMerger);
                   tableRowElement
                     .start()
                       .addClass(view.myClass('td')).
                       attrs({ name: 'contextMenuCell' }).
                       style({ flex: `0 0 ${view.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
                       tag(view.OverlayActionListView, {
-                        data: actions,
+                        data: Object.values(actions),
                         obj: obj,
                         dao: dao
                       }).
@@ -591,8 +602,8 @@ foam.CLASS({
             });
         }
       },
-      function returnRecords(of, dao, propertyNamesToQuery) {
-        var expr = foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create().buildProjectionForPropertyNamesArray(of, propertyNamesToQuery);
+      function returnRecords(of, dao, propertyNamesToQuery, useProjection) {
+        var expr = foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create().buildProjectionForPropertyNamesArray(of, propertyNamesToQuery, useProjection);
         return dao.select(expr);
       },
       function doesAllColumnsContainsColumnName(obj, col) {
@@ -605,14 +616,6 @@ foam.CLASS({
         var propertyNamesToQuery = columns_.length === 0 ? columns_ : [ 'id' ].concat(obj.filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(obj, columns_).filter(c => ! foam.core.Action.isInstance(obj.of.getAxiomByName(obj.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c)))).map(c => obj.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c)));
         return obj.columnConfigToPropertyConverter.returnPropertyColumnMappings(obj.of, propertyNamesToQuery);
       }
-  ],
-  listeners: [
-    {
-      name: 'changeFlag',
-      code: function() {
-        this.dataChangedFlag = !this.dataChangedFlag;
-      }
-    },
   ]
 });
 

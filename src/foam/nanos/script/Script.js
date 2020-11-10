@@ -22,6 +22,7 @@ foam.CLASS({
   imports: [
     'notificationDAO',
     'scriptDAO',
+    'scriptEventDAO',
     'user'
   ],
 
@@ -237,8 +238,15 @@ foam.CLASS({
       value: 'scriptDAO',
       transient: true,
       visibility: 'HIDDEN',
-      documentation: `Name of dao which journal will be used to store script run logs. To set from inheritor
-      just change property value`
+      documentation: `Name of dao to store script itself. To set from inheritor just change property value`
+    },
+    {
+      class: 'String',
+      name: 'eventDaoKey',
+      value: 'scriptEventDAO',
+      transient: true,
+      visibility: 'HIDDEN',
+      documentation: `Name of dao to store script run/event report. To set from inheritor just change property value`
     },
     {
       name: 'logger',
@@ -267,7 +275,7 @@ foam.CLASS({
         try {
           shell.set("currentScript", this);
           shell.set("x", x);
-          shell.eval("runScript(String name) { script = x.get(\\"scriptDAO\\").find(name); if ( script != null ) eval(script.code); }");
+          shell.eval("runScript(String name) { script = x.get("+getDaoKey()+").find(name); if ( script != null ) eval(script.code); }");
           shell.eval("foam.core.X sudo(String user) { return foam.util.Auth.sudo(x, (String) user); }");
           shell.eval("foam.core.X sudo(Object id) { return foam.util.Auth.sudo(x, id); }");
         } catch (EvalError e) {}
@@ -336,7 +344,7 @@ foam.CLASS({
           event.setOwner(this.getId());
           event.setScriptId(this.getId());
           event.setHostname(System.getProperty("hostname", "localhost"));
-          ((DAO) x.get("scriptEventDAO")).put(event);
+          ((DAO) x.get(getEventDaoKey())).put(event);
 
           if ( thrown != null) {
             throw thrown;
@@ -351,27 +359,29 @@ foam.CLASS({
       code: function() {
         var self = this;
         var interval = setInterval(function() {
-            self.scriptDAO.find(self.id).then(function(script) {
-              if ( script.status !== self.ScriptStatus.RUNNING ) {
-                self.copyFrom(script);
-                clearInterval(interval);
+          self.__context__[self.daoKey].find(self.id).then(function(script) {
+            if ( script.status === self.ScriptStatus.UNSCHEDULED
+              || script.status === self.ScriptStatus.ERROR
+            ) {
+              self.copyFrom(script);
+              clearInterval(interval);
 
-                // create notification
-                var notification = self.ScriptRunNotification.create({
-                  userId: self.user.id,
-                  scriptId: script.id,
-                  notificationType: 'Script Execution',
-                  body: `Status: ${script.status}
+              // create notification
+              var notification = self.ScriptRunNotification.create({
+                userId: self.user.id,
+                scriptId: script.id,
+                notificationType: 'Script Execution',
+                body: `Status: ${script.status}
                     Script Output: ${script.length > self.MAX_NOTIFICATION_OUTPUT_CHARS ?
                       script.output.substring(0, self.MAX_NOTIFICATION_OUTPUT_CHARS) + '...' :
                       script.output }
                     LastDuration: ${script.lastDuration}`
-                });
-                self.notificationDAO.put(notification);
-              }
-            }).catch(function() {
-              clearInterval(interval);
-            });
+              });
+              self.notificationDAO.put(notification);
+            }
+          }).catch(function() {
+            clearInterval(interval);
+          });
         }, 2000);
       }
     }
@@ -389,7 +399,7 @@ foam.CLASS({
         if ( this.server ) {
           this.__context__[this.daoKey].put(this).then(function(script) {
             self.copyFrom(script);
-            if ( script.status === self.ScriptStatus.RUNNING ) {
+            if ( script.status === self.ScriptStatus.SCHEDULED ) {
               self.poll();
             }
           });

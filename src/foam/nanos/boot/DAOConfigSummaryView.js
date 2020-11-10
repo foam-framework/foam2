@@ -205,7 +205,7 @@ foam.CLASS({
           add('Data Management').
         end()
         .start()
-        .style({ 'width': 'fit-content', 'float': 'right', 'margin-right': '4%', 'margin-top': '6px' })
+        .style({ 'width': 'fit-content', 'float': 'right', 'margin-right': '40px', 'margin-top': '6px' })
             .start(this.SEARCH).focus().end()
             .addClass('foam-u2-search-TextSearchView')
             .addClass(this.myClass('foam-u2-search-TextSearchView'))
@@ -318,19 +318,20 @@ foam.CLASS({
           views: [
             [
               {
-                class: this.BrowserView,
-                stack: this.stack
-              },
-              'Controller 1'
-            ],
-            [
-              {
                 class: this.DAOBrowserView,
                 stack: this.stack
               },
-              'Controller 2'
+              'New Controller'
+            ],
+            [
+              {
+                class: this.BrowserView,
+                stack: this.stack
+              },
+              'Old Controller'
             ]
-          ]
+          ],
+          selectedView: 'New Controller'
         }
       }, x);
     }

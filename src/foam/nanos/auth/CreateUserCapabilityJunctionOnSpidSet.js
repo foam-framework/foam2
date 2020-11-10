@@ -42,16 +42,15 @@ foam.CLASS({
       name: 'applyAction',
       javaCode: `
         agency.submit(x, new ContextAgent() {
-          X systemX = ruler.getX();
           @Override
           public void execute(X x) {
             Logger logger = (Logger) x.get("logger");
             User user = (User) obj;
             User old = (User) oldObj;
-    
+
             String spid = user.getSpid() == null ? null : user.getSpid().trim();
             String oldSpid = old == null || old.getSpid() == null ? null : old.getSpid().trim();
-    
+
             if ( spid == null || spid.isEmpty() || spid.equals(oldSpid) ) return;
 
             ServiceProvider sp = (ServiceProvider) user.findSpid(x);

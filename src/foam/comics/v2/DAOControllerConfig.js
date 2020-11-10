@@ -52,6 +52,21 @@ foam.CLASS({
       }
     },
     {
+      class: 'foam.dao.DAOProperty',
+      name: 'unfilteredDAO',
+      hidden: true,
+      expression: function(dao) {
+        var delegate = dao;
+        while ( delegate && foam.dao.ProxyDAO.isInstance(delegate) ) {
+          if ( foam.dao.FilteredDAO.isInstance(delegate) ) {
+            return delegate.delegate;
+          }
+          delegate = delegate.delegate;
+        }
+        return dao;
+      }
+    },
+    {
       class: 'Class',
       name: 'of',
       expression: function(dao$of) { return dao$of; }
@@ -77,7 +92,7 @@ foam.CLASS({
           columns: defaultColumns,
           css: {
             width: '100%',
-            height: '424px'
+            'min-height': '424px'
           }
         };
       }
@@ -95,8 +110,8 @@ foam.CLASS({
         var tableColumns = of.getAxiomByName('tableColumns');
 
         return tableColumns
-                ? tableColumns.columns
-                : of.getAxiomsByClass(foam.core.Property).map(p => p.name);
+          ? tableColumns.columns
+          : of.getAxiomsByClass(foam.core.Property).map(p => p.name);
       }
     },
     {

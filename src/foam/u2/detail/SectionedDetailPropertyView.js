@@ -14,6 +14,11 @@ foam.CLASS({
   `,
 
   css: `
+    ^ {
+      /* Add for fixing UI issue in Safari */
+      display: grid;
+    }
+
     ^ m3 {
       font-size: 16px;
       font-weight: bold;
@@ -50,7 +55,6 @@ foam.CLASS({
       border-top-right-radius: 0px;
       direction: ltr;
       padding: 2px;
-      text-align: center;
     }
 
     ^arrow-right {
@@ -87,6 +91,7 @@ foam.CLASS({
     ^error .foam-u2-IntView,
     ^error .foam-u2-FloatView,
     ^error .foam-u2-DateView,
+    ^error .foam-u2-CurrencyView,
     ^error .foam-u2-view-date-DateTimePicker .date-display-box,
     ^error .foam-u2-view-RichChoiceView-selection-view,
     ^error .foam-u2-view-RichChoiceView-clear-btn
@@ -177,11 +182,9 @@ foam.CLASS({
     }
 
     ^ .foam-u2-CheckBox-label {
-      position: absolute;
-      top: 7;
-      margin-left: 12px;
-      vertical-align: middle;
-      white-space: pre-wrap;
+      word-break: break-word;
+      white-space: normal;
+      margin-top: 6px;
     }
 
     ^ .foam-u2-view-RadioView .foam-u2-view-RadioView {
@@ -271,7 +274,7 @@ foam.CLASS({
                   .end();
                 })
               .end()
-              .callIf(prop.validationTextVisible && mode === self.DisplayMode.RW, function() {
+              .callIf(prop.validationTextVisible && ( mode === self.DisplayMode.RW || mode === self.DisplayMode.DISABLED ), function() {
                 this
                   .start()
                     .style({ 'align-items': 'center' })

@@ -66,30 +66,30 @@ foam.CLASS({
   ],
 
   exports: [
-    'displayWidth',
     'agent',
     'appConfig',
     'as ctrl',
+    'crunchController',
     'currentMenu',
+    'displayWidth',
     'group',
     'lastMenuLaunched',
     'lastMenuLaunchedListener',
     'loginSuccess',
+    'loginVariables',
     'mementoTail as memento',
-    'theme',
     'menuListener',
     'notify',
     'pushMenu',
     'requestLogin',
+    'sessionTimer',
     'signUpEnabled',
-    'loginVariables',
     'stack',
     'subject',
+    'theme',
     'user',
     'webApp',
-    'wrapCSS as installCSS',
-    'sessionTimer',
-    'crunchController'
+    'wrapCSS as installCSS'
   ],
 
   constants: {
@@ -137,7 +137,7 @@ foam.CLASS({
   messages: [
     { name: 'GROUP_FETCH_ERR', message: 'Error fetching group' },
     { name: 'GROUP_NULL_ERR', message: 'Group was null' },
-    { name: 'LOOK_AND_FEEL_NOT_FOUND', message: 'Could not fetch look and feel object.' },
+    { name: 'LOOK_AND_FEEL_NOT_FOUND', message: 'Could not fetch look and feel object' },
     { name: 'LANGUAGE_FETCH_ERR', message: 'Error fetching language' },
   ],
 
@@ -310,8 +310,7 @@ foam.CLASS({
       var self = this;
 
       // Start Memento Support
-      var hash = this.WindowHash.create();
-      this.memento.value$ = hash.value$
+      this.WindowHash.create({value$: this.memento.value$});
 
       this.memento.head$.sub(this.mementoChange);
       this.mementoChange();
@@ -321,6 +320,8 @@ foam.CLASS({
         self.setPrivate_('__subContext__', client.__subContext__);
 
         await self.fetchSubject();
+        await client.translationService.initLatch;
+        self.installLanguage();
 
         // add user and agent for backward compatibility
         Object.defineProperty(self, 'user', {
@@ -344,7 +345,6 @@ foam.CLASS({
         // the line above before executing this one.
         await self.fetchGroup();
         await self.fetchTheme();
-        await self.fetchLanguage();
         self.onUserAgentAndGroupLoaded();
       });
     },
@@ -396,39 +396,14 @@ foam.CLASS({
       });
     },
 
-    async function fetchLanguage() {
-      try {
-        let l = localStorage.getItem('localeLanguage');
-        if ( l !== undefined ) foam.locale = l;
-        //TODO manage more complicated language. 'en-CA'
-        if ( foam.locale !== 'en' && foam.locale !== 'en-US' ) {
-          let ctx = this.__subContext__;
-          let d = await  this.__subContext__.localeDAO;
-          d.select().then(e => {
-            var expr = foam.mlang.Expressions.create();
-            d.where(
-              expr.OR(
-                expr.EQ(foam.i18n.Locale.LOCALE, foam.locale),
-                expr.EQ(foam.i18n.Locale.LOCALE, foam.locale.substring(0,foam.locale.indexOf('-')))
-              )
-            ).select().then(e => {
-              let arr = e.array;
-              arr.forEach(ea => {
-                var node = global;
-                var path = ea.source.split('.');
+    function installLanguage() {
+      var map = this.__subContext__.translationService.localeEntries;
+      for ( var key in map ) {
+        var node = global;
+        var path = key.split('.');
 
-                for ( var i = 0 ; node && i < path.length-1 ; i++ )
-                  node = node[path[i]];
-
-                if ( node )
-                  node[path[path.length-1]] = ea.target;
-              });
-            })
-          })
-        }
-      } catch (err) {//TODO
-        this.notify(this.LANGUAGE_FETCH_ERR, 'error');
-        console.error(err.message || this.LANGUAGE_FETCH_ERR);
+        for ( var i = 0 ; node && i < path.length-1 ; i++ ) node = node[path[i]];
+        if ( node ) node[path[path.length-1]] = map[key];
       }
     },
 

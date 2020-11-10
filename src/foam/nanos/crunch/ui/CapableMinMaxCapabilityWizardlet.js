@@ -11,7 +11,8 @@ foam.CLASS({
 
   imports: [
     'capable',
-    'payload?'
+    'payload?',
+    'capabilityDAO'
   ],
 
   requires: [
@@ -90,9 +91,11 @@ foam.CLASS({
             
             this.capable.getCapablePayloadDAO().remove(
               cw.targetPayload).then(() => {
-                console.log('CANCELLED ' +
-                  cw.targetPayload.capability.name
-                );
+                this.capabilityDAO.find(cw.targetPayload.capability).then(cap => {
+                  console.log('CANCELLED ' +
+                    cap.name
+                  );
+                })
               }
             );
           });
@@ -113,12 +116,13 @@ foam.CLASS({
         return [
           this.WizardletSection.create({
             isAvailable: true,
-            title: this.targetPayload.capability.name,
+            title: this.targetPayload.capability,
             customView: {
               class: 'foam.u2.view.MultiChoiceView',
               choices$: this.choices$,
               booleanView: this.CardSelectView,
               isValidNumberOfChoices$: this.isValid$,
+              showValidNumberOfChoicesHelper: false,
               minSelected$: this.min$,
               maxSelected$: this.max$,
               onSelect: this.adjustCapablePayloads.bind(this)
@@ -149,9 +153,11 @@ foam.CLASS({
 
           this.capable.getCapablePayloadDAO().remove(
             targetPayload).then(() => {
+              this.capabilityDAO.find(targetPayload.capability).then(cap => {
               console.log('CANCELLED ' +
-                targetPayload.capability.name
+                cap.name
               );
+            })
             }
           );
 
@@ -167,9 +173,11 @@ foam.CLASS({
 
           this.capable.getCapablePayloadDAO().put(
             targetPayload).then(() => {
-              console.log('SAVED ' +
-                targetPayload.capability.name
-              );
+              this.capabilityDAO.find(targetPayload.capability).then(cap => {
+                console.log('SAVED ' +
+                  cap.name
+                );
+              })
             });
 
         } else {

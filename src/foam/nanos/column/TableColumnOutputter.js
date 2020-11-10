@@ -9,7 +9,11 @@
   name: 'TableColumnOutputter',
 
   javaImports: [
-    'java.util.ArrayList'
+    'java.util.ArrayList',
+    'java.util.List',
+    'java.util.StringJoiner',
+    'org.apache.commons.lang.ArrayUtils',
+    'org.apache.commons.lang3.StringUtils'
   ], 
 
   documentation: 'Class for returning 2d-array ( ie table ) for array of values ',
@@ -161,7 +165,7 @@
         for ( int i = 0 ; i < arrOfObjectValues.size() ; i++ ) {
           java.util.List<Object> row = new ArrayList<>();
           for ( int j = 0 ; j < metadata.length ; j++ ) {
-            row.add(returnStringValueForMetadata(x, metadata[j], arrOfObjectValues.get(i)[j], null));
+            row.add(returnStringValueForMetadata(x, metadata[j], arrOfObjectValues.get(i)[metadata[j].getProjectionIndex()], null));
           }
           result.add(row);
         }
@@ -209,6 +213,17 @@
           return obj.toString().substring(0, 8);
         case "ENUM":
           return obj.toString();
+        case "ARRAY":
+          StringJoiner strJ = new StringJoiner(", ");
+          Object[] arr = (Object[])obj;
+          for ( int i = 0; i < arr.length; i++ ) {
+            if ( arr[i] == null ) {
+              strJ.add("");
+              continue;
+            }
+            strJ.add(arr[i].toString());
+          }
+          return strJ.toString();
         default:
           return ((foam.core.FObject)obj).toSummary();
       }

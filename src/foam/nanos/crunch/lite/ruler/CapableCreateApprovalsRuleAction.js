@@ -53,10 +53,26 @@ foam.CLASS({
   ],
 
     messages: [
-    { name: 'REQUEST_SEND_MSG', message: 'An approval request has been sent out.' }
+    { name: 'REQUEST_SEND_MSG', message: 'An approval request has been sent out' }
   ],
 
   methods: [
+    {
+      name: 'decorateApprovalRequest',
+      documentation: `
+        For further tweaks needed to be done to the approval request, the default is to not add anything
+      `,
+      type: 'ApprovalRequest',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'request', type: 'ApprovalRequest' },
+        { name: 'capableObj', type: 'Capable' },
+        { name: 'capablePayloadObj', type: 'CapablePayload' }
+      ],
+      javaCode: `
+        return request;
+      `
+    },
     {
       name: 'applyAction',
       javaCode: `
@@ -82,7 +98,8 @@ foam.CLASS({
                 capablePayload.setHasSafeStatus(true);
               }
 
-              Capability capability = capablePayload.getCapability();
+              DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+              Capability capability = (Capability) capabilityDAO.find(capablePayload.getCapability());
 
               if ( ! capability.getReviewRequired() ) {
                 continue;
@@ -144,6 +161,8 @@ foam.CLASS({
                     capablePayload.getObjId()
                   )
                   .setStatus(ApprovalStatus.REQUESTED).build();
+                
+                approvalRequest = decorateApprovalRequest(x, approvalRequest, capableObj, capablePayload);
 
                 approvalRequestDAO.put_(getX(), approvalRequest);
               } catch (Exception e){

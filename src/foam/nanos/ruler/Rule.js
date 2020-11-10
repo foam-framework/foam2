@@ -439,7 +439,7 @@
       javaCode: `
         var auth = (AuthService) x.get("auth");
         if ( ! auth.check(x, "rule.read." + getId())
-          && ! auth.check(x, "spid.read." + getSpid())
+          && ! auth.check(x, "serviceprovider.read." + getSpid())
         ) {
           throw new AuthorizationException("You do not have permission to read the rule.");
         }
@@ -459,7 +459,7 @@
       javaCode: `
         var auth = (AuthService) x.get("auth");
         if ( ! auth.check(x, "rule.remove." + getId())
-          && ! auth.check(x, "spid.update." + getSpid())
+          && ! auth.check(x, "serviceprovider.update." + getSpid())
         ) {
           throw new AuthorizationException("You do not have permission to delete the rule.");
         }

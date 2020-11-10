@@ -10,31 +10,31 @@ foam.ENUM({
     {
       name: 'PENDING',
       label: { en: 'pending', pt: 'pendente'},
-      documentation: `This is awaiting verification. Capability access may take up to 24hrs.`,
+      documentation: 'Our team is currently reviewing. Approvals may take up to 24 hours',
       background: '#bfae32'
     },
     {
       name: 'GRANTED',
       label: { en: 'granted', pt: 'concedida'},
-      documentation: `This passed all checks. This Capability has their features unlocked.`,
+      documentation: 'The information you provided has been approved',
       background: '#32bf5e'
     },
     {
       name: 'EXPIRED',
       label: { en: 'expired', pt: 'expirada'},
-      documentation: `Requirements for this Capability has changed or is no longer valid.`,
+      documentation: 'The information required has changed, or your inputs are no longer valid',
       background: '#bf3232'
     },
     {
       name: 'ACTION_REQUIRED',
       label: { en: 'action required', pt: 'ação requerida'},
-      documentation: `The requirements for this Capability needs to be met.`,
+      documentation: 'Information is missing for required fields',
       background: '#cf6f0a'
     },
     {
       name: 'AVAILABLE',
       label: { en: 'available', pt: 'acessível'},
-      documentation: `This Capability is ready to be made available to you.`,
+      documentation: 'You are ready to get started',
       background: '#604aff'
     },
     {
@@ -48,8 +48,16 @@ foam.ENUM({
     {
       name: 'PENDING_REVIEW',
       label: { en: 'pending review', pt: 'revisão pendente' },
-      documentation: `This is waiting for a privileged user review.`,
+      documentation: 'The information you provided is pending signing officer review',
       background: '#bfae32'
-    }
+    },
+    {
+      name: 'REJECTED',
+      label: { en: 'rejected', pt: 'rejeitada'},
+      documentation: `- not seen by users - Denoting a junction requiring review has been rejected. Meant to mark items in a FINAL rejected state where it is not 
+      expected to go to EXPIRED and have the user fill out more info. Used in the 
+      Capable object junctions.`,
+      background: '#bfae32'
+    },
   ]
 });

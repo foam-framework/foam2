@@ -48,7 +48,7 @@ foam.CLASS({
             f.dataString = undefined;
           }
           return self.fileDAO.put(f);
-        }))
+        }));
       });
 
       return Promise.all(promises).then((values) => {

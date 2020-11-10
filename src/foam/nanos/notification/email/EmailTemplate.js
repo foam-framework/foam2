@@ -12,7 +12,11 @@ foam.CLASS({
   mimics the EmailMessage which is the end obj that is processed into email.`,
 
   javaImports: [
+    'foam.i18n.Locale',
+    'foam.i18n.TranslationService',
     'foam.nanos.logger.Logger',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
     'foam.util.SafetyUtil',
     'java.nio.charset.StandardCharsets',
     'org.jtwig.environment.EnvironmentConfiguration',
@@ -22,11 +26,11 @@ foam.CLASS({
     'org.jtwig.resource.loader.TypedResourceLoader'
   ],
 
-  tableColumns: ['name', 'group'],
+  tableColumns: ['id', 'name', 'group'],
 
   properties: [
     {
-      class: 'Long',
+      class: 'String',
       name: 'id'
     },
     {
@@ -148,7 +152,14 @@ foam.CLASS({
 
         // SUBJECT:
         if ( ! emailMessage.isPropertySet("subject") && ! SafetyUtil.isEmpty(getSubject()) ) {
-          emailMessage.setSubject((JtwigTemplate.inlineTemplate(getSubject(), config)).render(model));
+          // translate first and then set
+          TranslationService ts = (TranslationService) x.get("translationService");
+          Subject subject = (Subject) x.get("subject");
+          User user = subject.getRealUser();
+          String locale = user.getLanguage().toString();
+          String source = getId() + ".subject";
+          String translatedSubject = ts.getTranslation(locale, source, getSubject());
+          emailMessage.setSubject((JtwigTemplate.inlineTemplate(translatedSubject, config)).render(model));
         }
 
         // SEND TO:

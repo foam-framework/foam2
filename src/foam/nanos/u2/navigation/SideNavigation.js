@@ -59,7 +59,6 @@ foam.CLASS({
     function initE() {
       var self = this;
       var dao = this.menuDAO
-        .orderBy(this.Menu.ORDER)
         .where(this.EQ(this.Menu.PARENT, this.menuName));
       this.addClass(this.myClass())
         .start()

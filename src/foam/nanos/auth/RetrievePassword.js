@@ -24,7 +24,7 @@ foam.CLASS({
 
   messages: [
     { name: 'INSTRUC_ONE', message: 'Password reset instructions were sent to' },
-    { name: 'INSTRUC_TWO', message: 'Please check your inbox to continue.' },
+    { name: 'INSTRUC_TWO', message: 'Please check your inbox to continue' },
     { name: 'REDIRECTION_TO', message: 'Back to Sign in' }
   ],
 
@@ -36,6 +36,33 @@ foam.CLASS({
       help: 'Enter your account email and we will send you an email with a link to create a new one.'
     }
   ],
+
+  css: `
+    .foam-nanos-auth-ChangePasswordView .foam-u2-layout-Grid {
+      width: 75%;
+      display: inline-block;
+      vertical-align: bottom;
+    }
+
+    .foam-nanos-auth-ChangePasswordView .foam-u2-layout-Cols {
+      width: auto;
+      display: inline-block;
+      margin-left: 5%;
+      vertical-align: bottom;
+      margin-bottom: 2px;
+    }
+
+    .foam-nanos-auth-ChangePasswordView .foam-u2-layout-Rows {
+      display: block;
+
+    }
+
+    .foam-nanos-auth-ChangePasswordView .foam-u2-detail-SectionedDetailPropertyView-validation-container {
+      position: absolute;
+      margin-left: 0px;
+      display: flex;
+    }
+  `,
 
   properties: [
     {

@@ -81,9 +81,6 @@ foam.CLASS({
           return self.curView;
         }, this.data$, this.data$.dot('top')))
       .end();
-//      this
-//        .start('div').addClass('secondary-stack')
-//        .end();
     }
   ],
 

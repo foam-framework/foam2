@@ -1,0 +1,42 @@
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "testDAO",
+  "serve": true,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setGuid(true)
+      .setOf(foam.nanos.test.Test.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("tests")
+      .setDecorator(new foam.nanos.script.ScriptRunnerDAO(new foam.dao.NullDAO(x, foam.nanos.test.Test.getOwnClassInfo())))
+      .build();
+  """,
+  "client": "{\"of\":\"foam.nanos.test.Test\"}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"testEventDAO",
+  "serve":true,
+  "serviceScript":"""
+    mdao = new foam.dao.MDAO(foam.nanos.script.ScriptEvent.getOwnClassInfo());
+    mdao.addIndex(new foam.core.PropertyInfo[] {foam.nanos.script.ScriptEvent.OWNER});
+    mdao.addIndex(new foam.core.PropertyInfo[] {foam.nanos.script.ScriptEvent.LAST_RUN});
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.script.ScriptEvent.getOwnClassInfo())
+      .setMdao(mdao)
+      .setGuid(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("testEvents")
+      .setWriteOnly(true)
+      .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
+        .setComparator(foam.mlang.MLang.DESC(foam.nanos.script.ScriptEvent.LAST_RUN))
+        .setSize(10000)
+        .build())
+      .setOrder(new foam.mlang.order.Comparator[] { new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.script.ScriptEvent.LAST_RUN).build() })
+      .setRuler(false)
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.script.ScriptEvent\"}"
+})

@@ -10,6 +10,10 @@ foam.CLASS({
   extends: 'foam.u2.view.UnstyledTableView',
 
   css: `
+    ^tbody {
+      display: flow-root;
+    }
+
     ^tr {
       background: white;
       display: flex;
