@@ -131,19 +131,7 @@ foam.CLASS({
     {
       name: 'daoUpdate',
       code: function() {
-        this.userCapabilityJunctionDAO.find(
-          this.AND(
-            this.EQ(this.UserCapabilityJunction.TARGET_ID, this.data.id),
-            this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.associatedEntity.id),
-            this.OR(
-              this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
-              this.AND(
-                this.INSTANCE_OF(this.AgentCapabilityJunction),
-                this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
-              )
-            )
-          )
-        ).then(ucj => {
+        this.crunchService.getJunction(null, this.data.id).then(ucj => {
           if ( ucj ) {
             this.cjStatus = ucj.status === this.CapabilityJunctionStatus.APPROVED ?
               this.CapabilityJunctionStatus.PENDING : ucj.status;
