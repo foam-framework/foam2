@@ -32,7 +32,9 @@ foam.CLASS({
   css: `
     ^ select {
       min-width: 220px;
-      min-height: 100px;
+    }
+    ^ .foam-u2-tag-Select {
+      height: auto;
     }
   `,
 
@@ -120,6 +122,7 @@ foam.CLASS({
         })
         .on('mouseover', function(e) {
           try {
+
             var data = self.view.choices[e.target.value][0];
 
             if ( ! self.previewMode ) {
