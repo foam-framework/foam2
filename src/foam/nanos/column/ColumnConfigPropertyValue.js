@@ -261,7 +261,7 @@ foam.CLASS({
       return result;
     },
     function returnPropertyNameForLabel(of, label) {
-      var labels = label.split('/');
+      var labels = label.split(' / ');
       var names = [];
       var of = of;
       for ( var i = 0; i < labels.length; i++ ) {
