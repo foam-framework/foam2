@@ -210,7 +210,6 @@ foam.CLASS({
     },
 
     function save(wizardlet) {
-      debugger;
       if ( ! wizardlet.isAvailable ) return Promise.resolve();
       var self = this;
       return this.crunchService.updateJunction(
