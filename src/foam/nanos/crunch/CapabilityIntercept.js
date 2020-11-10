@@ -37,16 +37,6 @@ foam.CLASS({
       value: 'foam.box.CapabilityRequiredRemoteException'
     },
     {
-      name: 'exception',
-      class: 'FObjectProperty',
-      of: 'foam.box.CapabilityRequiredRemoteException',
-      postSet: function (_, nu) {
-        this.capabilityOptions = nu.capabilityOptions;
-        this.capableRequirements = nu.capableRequirements;
-        this.daoKey = nu.daoKey;
-      }
-    },
-    {
       name: 'capabilities',
       class: 'StringArray',
       aliases: [ 'capabilityOptions' ]

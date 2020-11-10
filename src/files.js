@@ -363,7 +363,6 @@ FOAM_FILES([
   { name: "foam/box/Box" },
   { name: "foam/box/AnonymousBox" },
   { name: "foam/box/RemoteException" },
-  { name: "foam/box/CapabilityRequiredRemoteException" },
   { name: "foam/box/Skeleton" },
   { name: "foam/box/PromisedBox" },
   { name: "foam/box/ProxyBox" },
