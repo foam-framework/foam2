@@ -33,6 +33,7 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.ConfigureFlowAgent',
     'foam.u2.crunch.wizardflow.CapabilityAdaptAgent',
     'foam.u2.crunch.wizardflow.CheckPendingAgent',
+    'foam.u2.crunch.wizardflow.CheckNoDataAgent',
     'foam.u2.crunch.wizardflow.LoadCapabilitiesAgent',
     'foam.u2.crunch.wizardflow.CreateWizardletsAgent',
     'foam.u2.crunch.wizardflow.FilterWizardletsAgent',
@@ -86,6 +87,7 @@ foam.CLASS({
         .add(this.CapabilityAdaptAgent)
         .add(this.LoadCapabilitiesAgent)
         .add(this.CheckPendingAgent)
+        .add(this.CheckNoDataAgent)
         .add(this.CreateWizardletsAgent)
         .add(this.FilterWizardletsAgent)
         .add(this.RequirementsPreviewAgent)
