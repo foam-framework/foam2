@@ -46,24 +46,24 @@ foam.CLASS({
     async function execute() {
       var shouldOpen = false;
 
-      await this.crunchService.getGrantPath(null, this.rootCapability.id).then(capabilitiesNeeded => {
-        capabilitiesNeeded.forEach(capa => {
-          if ( capa.of ){
-            shouldOpen = true;
-          }
-        })
+      var capabilitiesNeeded = await this.crunchService.getGrantPath(null, this.rootCapability.id);
 
-        if ( ! shouldOpen ) {
-          var updateJunctionPromises = capabilitiesNeeded.map(capa => {
-            return this.crunchService.updateJunction(null, capa.id, null, null);
-          })
-          
-          this.submitted = true;
-          this.endSequence();
-  
-          return Promise.all(updateJunctionPromises);
+      capabilitiesNeeded.forEach(capa => {
+        if ( capa.of ){
+          shouldOpen = true;
         }
       })
+
+      if ( ! shouldOpen ) {
+        var updateJunctionPromises = capabilitiesNeeded.map(capa => {
+          return this.crunchService.updateJunction(null, capa.id, null, null);
+        })
+        
+        this.submitted = true;
+        this.endSequence();
+
+        return Promise.all(updateJunctionPromises);
+      }
     }
   ]
 });
