@@ -9,9 +9,14 @@ package foam.nanos.bench;
 import foam.core.ContextAgent;
 import foam.core.ContextAwareSupport;
 import foam.core.X;
+import foam.nanos.app.AppConfig;
+import foam.nanos.app.Mode;
 import foam.nanos.logger.Logger;
+import foam.nanos.logger.PrefixLogger;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.TimeUnit;
 
 public class BenchmarkRunner
   extends    ContextAwareSupport
@@ -21,7 +26,10 @@ public class BenchmarkRunner
   public static String THREADCOUNT = "Threads";
   public static String OPS         = "Operations/s";
   public static String OPSPT       = "Operations/s/t";
-  public static String MEMORY      = "Memory MB";
+  public static String MEMORY      = "Memory GB";
+  public static String TOTAL       = "Total";
+  public static String PASS        = "Pass";
+  public static String FAIL        = "Fail";
 
   protected String    name_;
   protected int       threadCount_;
@@ -145,43 +153,62 @@ public class BenchmarkRunner
 
   @Override
   public void execute(final X x) {
-    Logger logger = (Logger) x.get("logger");
-    if ( logger != null ) {
-      logger.info(this.getClass().getSimpleName(), "execute", test_.getClass().getSimpleName());
+    Logger log = (Logger) x.get("logger");
+    if ( log != null ) {
+      log = new foam.nanos.logger.StdoutLogger();
     }
+    final Logger logger = new PrefixLogger(new String[] { test_.getClass().getSimpleName() }, log);
 
-    int availableThreads = Runtime.getRuntime().availableProcessors();
+    AppConfig config = (AppConfig) x.get("appConfig");
+    if ( config.getMode() == Mode.PRODUCTION ) {
+      logger.warning("Script execution disabled in PRODUCTION");
+      return;
+    }
+    logger.info("execute", test_.getClass().getSimpleName());
+
+    int availableThreads = Math.min(Runtime.getRuntime().availableProcessors(), getThreadCount());
     int run = 1;
-    if ( runPerThread_ ) {
-      threadCount_ = 1;
-      if ( reverseThreads_ ) {
-        threadCount_ = availableThreads;
-      }
+    int threads = 1;
+    if ( reverseThreads_ ) {
+        threads = availableThreads;
     }
 
     try {
       while ( true ) {
-        // create CountDownLatch and thread group equal
-        final CountDownLatch latch = new CountDownLatch(threadCount_);
+        final CountDownLatch latch = new CountDownLatch(threads);
+        final AtomicLong pass = new AtomicLong();
+        final AtomicLong fail = new AtomicLong();
         ThreadGroup group = new ThreadGroup(name_);
         Map stats = new HashMap<String, Object>();
         stats.put(RUN, run);
-        stats.put(THREADCOUNT, threadCount_);
+        stats.put(THREADCOUNT, threads);
 
         // set up the test
+        logger.info("setup");
         test_.setup(x);
 
         // get start time
         long startTime = System.currentTimeMillis();
 
         // execute all the threads
-        for ( int i = 0 ; i < threadCount_ ; i++ ) {
+        for ( int i = 0 ; i < threads ; i++ ) {
           final int tno = i;
           Thread thread = new Thread(group, new Runnable() {
               @Override
               public void run() {
                 for ( int j = 0 ; j < invocationCount_ ; j++ ) {
-                  test_.execute(x);
+                  try {
+                    test_.execute(x);
+                    pass.incrementAndGet();
+                  } catch (Throwable t) {
+                    fail.incrementAndGet();
+                    Throwable e = t;
+                    if ( t instanceof RuntimeException ) {
+                      e = t.getCause();
+                    }
+                    logger.error(e.getMessage());
+                    logger.debug(e);
+                  }
                 }
                 // count down the latch when finished
                 latch.countDown();
@@ -203,28 +230,31 @@ public class BenchmarkRunner
         // get number of threads completed and duration
         // print out transactions per second
         long  endTime  = System.currentTimeMillis();
-        float complete = (float) (threadCount_ * invocationCount_);
+        float complete = (float) (threads * invocationCount_);
         float duration = ((float) (endTime - startTime) / 1000.0f);
+        stats.put(PASS, pass.get());
+        stats.put(FAIL, fail.get());
+        stats.put(TOTAL, pass.get() + fail.get());
+        stats.put(OPS, String.format("%.02f", (complete / duration)));
+        stats.put(OPSPT, String.format("%.02f", (complete / duration) / (float) threads));
+        stats.put(MEMORY, String.format("%.02f", (((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())) / 1024.0 / 1024.0 / 1024.0)));
 
-        stats.put(OPS, (complete / duration));
-        stats.put(OPSPT, (complete / duration) / (float) threadCount_);
-        stats.put(MEMORY, (((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())) / 1024.0 / 1024.0));
-
+        logger.info("teardown");
         test_.teardown(x, stats);
         results_.add(stats);
 
-        if ( runPerThread_ ) {
+        if ( getRunPerThread() ) {
           String results = formatResults();
           System.out.println(results);
           logger.info(results);
 
           if ( reverseThreads_ ) {
-            threadCount_--;
+            threads--;
           } else {
-            threadCount_++;
+            threads++;
           }
 
-          if ( threadCount_ <= 0 || threadCount_ > availableThreads ) {
+          if ( threads <= 0 || threads > availableThreads ) {
             break;
           }
 
@@ -232,19 +262,13 @@ public class BenchmarkRunner
         } else {
           String results = formatResults();
           System.out.println(results);
-
-          if ( logger != null ) {
-            logger.info(results);
-          }
-
+          logger.info(results);
           break;
         }
       }
     } catch (Throwable t) {
       t.printStackTrace();
-      if ( logger != null ) {
-        logger.error(t);
-      }
+      logger.error(t);
     }
   }
 
