@@ -32,6 +32,7 @@ foam.CLASS({
   css: `
     ^ select {
       min-width: 220px;
+      min-height: 100px;
     }
   `,
 
