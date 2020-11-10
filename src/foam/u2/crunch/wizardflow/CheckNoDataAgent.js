@@ -41,18 +41,18 @@ foam.CLASS({
           if ( capa.of ){
             shouldOpen = true;
           }
-
-          if ( ! shouldOpen ) {
-            var updateJunctionPromises = this.capabilities.map(capa => {
-              return this.crunchService.updateJunction(null, capa.id, null, null);
-            })
-            
-            this.submitted = true;
-            this.endSequence();
-    
-            return Promise.all(updateJunctionPromises);
-          }
         })
+
+        if ( ! shouldOpen ) {
+          var updateJunctionPromises = capabilitiesNeeded.map(capa => {
+            return this.crunchService.updateJunction(null, capa.id, null, null);
+          })
+          
+          this.submitted = true;
+          this.endSequence();
+  
+          return Promise.all(updateJunctionPromises);
+        }
       })
     }
   ]
