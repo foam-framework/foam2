@@ -94,7 +94,11 @@ foam.CLASS({
           return;
         }
         this.feedback_ = true;
-        this.params = JSON.stringify(this.paramsDict);
+        if ( this.params ) {
+          this.params = JSON.stringify(this.paramsDict);
+        } else {
+          this.params = '';
+        }
         this.changeIndicator = ! this.changeIndicator;
         this.value = this.combine();
         this.feedback_ = false;
@@ -132,8 +136,8 @@ foam.CLASS({
             paramEndIndex = paramEndIndex == -1 ? tailStr.length : paramEndIndex + 1;
             this.params = tailStr.substring(tailStr.indexOf(this.PARAMS_BEGIN), paramEndIndex);
             this.feedback_ = true;
-            if ( paramEndIndex !== -1 ) {
-              this.tail = this.cls_.create({ value: this.value.substring(paramEndIndex+2), parent: this });//2 is for excluding } and : 
+            if ( paramEndIndex !== -1 && paramEndIndex !== tailStr.length ) {
+              this.tail = this.cls_.create({ value: tailStr.substring(paramEndIndex + 1), parent: this });
             }
           } else {
             this.tail = this.cls_.create({ value: tailStr, parent: this });
