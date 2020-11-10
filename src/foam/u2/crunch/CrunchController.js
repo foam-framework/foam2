@@ -219,25 +219,12 @@ foam.CLASS({
       });
     },
     async function updateUCJ(wizardlet, associatedEntity) {
-      return this.userCapabilityJunctionDAO.find(
-        this.AND(
-          this.OR(
-            this.AND(
-              this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
-              this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id)
-            ),
-            this.AND(
-              this.INSTANCE_OF(this.AgentCapabilityJunction),
-              this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id),
-              this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
-            )
-          ),
-          this.EQ(this.UserCapabilityJunction.TARGET_ID, wizardlet.capability.id)
-        )
+      return this.crunchService.getJunction(
+        null, wizardlet.capability.id
       ).then(ucj => {
         wizardlet.ucj = ucj;
         return wizardlet;
-      });
+      })
     },
     function purgeCachedCapabilityDAOs() {
       this.capabilityDAO.cmd_(this, foam.dao.CachingDAO.PURGE);

@@ -92,7 +92,7 @@ foam.CLASS({
           columns: defaultColumns,
           css: {
             width: '100%',
-            height: '424px'
+            'min-height': '424px'
           }
         };
       }
