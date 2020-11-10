@@ -23,7 +23,6 @@
     {
       class: 'Map',
       name: 'symbols',
-//      javaFactory: 'return new java.util.HashMap<String, foam.lib.parse.Parser>();'
     },
     {
       class: 'String',

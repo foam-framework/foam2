@@ -24,11 +24,6 @@
       class: 'Map',
       name: 'symbols',
       javaFactory: 'return new java.util.HashMap<String, foam.lib.parse.Parser>();'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.lib.parse.Parser',
-      name: 'lastStart'
     }
   ],
 
@@ -67,16 +62,6 @@ return temp;
       symParser.setSymbolName(name);
       symParser.setSymbols(getSymbols());
       return symParser;
-      `
-    },
-    {
-      name:'addActions',
-      args: [
-        { name: 'name', type: 'String'},
-        { name: 'action', type: 'foam.lib.parse.GrammarAction' }
-      ],
-      javaCode: `
-
       `
     },
     {
