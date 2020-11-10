@@ -346,7 +346,7 @@ foam.CLASS({
                 this.start().
                   addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + prop.name))
-                  .style({ flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0' })
+                  .style({ flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0', 'word-wrap' : 'break-word', 'white-space' : 'normal'})
                   .add(view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col)).
                   callIf(isFirstLevelProperty && prop.sortable, function() {
                     this.on('click', function(e) {
