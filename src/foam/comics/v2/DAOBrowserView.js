@@ -287,14 +287,14 @@ foam.CLASS({
                         this.tag(self.SimpleSearch, {
                           showCount: false,
                           data$: self.searchPredicate$,
-                          searchValue: self.memento && self.memento.paramsDict && self.memento.paramsDict['search'] && self.memento.paramsDict['search'].length > 0 ? self.memento.paramsDict['search'][0] : null
+                          searchValue: self.memento && self.memento.paramsObj && self.memento.paramsObj['search'] ? self.memento.paramsObj['search'] : null
                         });
                       })
                       .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
                         this.tag(self.FilterView, {
                           dao$: self.searchFilterDAO$,
                           data$: self.searchPredicate$,
-                          searchValue: self.memento && self.memento.paramsDict && self.memento.paramsDict['search'] && self.memento.paramsDict['search'].length > 0 ? self.memento.paramsDict['search'][0] : null
+                          searchValue: self.memento && self.memento.paramsObj && self.memento.paramsObj['search'] ? self.memento.paramsObj['search'] : null
                         });
                     })
                     .endContext()

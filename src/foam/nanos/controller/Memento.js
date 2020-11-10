@@ -77,25 +77,25 @@ foam.CLASS({
           return;
         }
         this.feedback_ = true;
-        var dict = {};
+        var obj = {};
         if ( this.params ) {
           this.params = decodeURI(this.params);
-          dict = JSON.parse(this.params);
+          obj = JSON.parse(this.params);
         }
-        this.paramsDict = dict;
+        this.paramsObj = obj;
         this.feedback_ = false;
       },
       value: ''
     },
     {
-      name: 'paramsDict',
+      name: 'paramsObj',
       postSet: function() {
         if ( this.feedback_ ) {
           return;
         }
         this.feedback_ = true;
-        if ( Object.keys(this.paramsDict).length !== 0 ) {
-          this.params = JSON.stringify(this.paramsDict);
+        if ( Object.keys(this.paramsObj).length !== 0 ) {
+          this.params = JSON.stringify(this.paramsObj);
         } else {
           this.params = '';
         }

@@ -184,7 +184,7 @@ foam.CLASS({
                 .add(self.cls.PREDICATE.clone().copyFrom({
                   view: {
                     class: 'foam.u2.view.ReciprocalSearch',
-                    searchValue: self.currentMemento && self.currentMemento.paramsDict && self.currentMemento.paramsDict['search'] && self.currentMemento.paramsDict['search'].length > 0 ? self.currentMemento.paramsDict['search'][0] : null
+                    searchValue: self.currentMemento && self.currentMemento.paramsObj && self.currentMemento.paramsObj['search'] ? self.currentMemento.paramsObj['search'] : null
                   }
                 }))
               .end();
@@ -198,7 +198,7 @@ foam.CLASS({
                       .add(self.cls.PREDICATE.clone().copyFrom({
                         view: { 
                           class: 'foam.u2.view.SimpleSearch',
-                          searchValue: self.currentMemento && self.currentMemento.paramsDict && self.currentMemento.paramsDict['search'] && self.currentMemento.paramsDict['search'].length > 0 ? self.currentMemento.paramsDict['search'][0] : null
+                          searchValue: self.currentMemento && self.currentMemento.paramsObj && self.currentMemento.paramsObj['search'] ? self.currentMemento.paramsObj['search'] : null
                         }
                       }))
                     .end();
