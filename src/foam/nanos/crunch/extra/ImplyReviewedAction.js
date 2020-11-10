@@ -37,8 +37,11 @@ foam.CLASS({
           // Context requirements
           var capabilityDAO = (DAO) x.get("capabilityDAO");
 
-          var cap = (Capability) capabilityDAO.find(
-            ((UserCapabilityJunction) obj).getTargetId());
+          var ucj = (UserCapabilityJunction) obj;
+          var cap = (Capability) capabilityDAO.find(ucj.getTargetId());
+
+          // Create UCJ subject context
+          x = x.put("subject", ucj.getSubject(x));
 
           // Find the review wizard corresponding to this capability.
           //   A list is used in case there is more than one.
