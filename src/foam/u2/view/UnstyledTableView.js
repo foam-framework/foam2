@@ -98,7 +98,7 @@ foam.CLASS({
       name: 'selectedColumnNames',
       expression: function(columns, of, memento) {
         //memento.paramsDict['columns'] collumn labels
-        var ls =  memento.paramsDict['columns'] ? memento.paramsDict['columns'].map(c => this.columnConfigToPropertyConverter.returnPropertyNameForLabel(of, c.name)) : JSON.parse(localStorage.getItem(of.id));
+        var ls =  memento && memento.paramsDict['columns'] ? memento.paramsDict['columns'].map(c => this.columnConfigToPropertyConverter.returnPropertyNameForLabel(of, c.name)) : JSON.parse(localStorage.getItem(of.id));
         return ls || columns;
       }
     },
