@@ -109,7 +109,6 @@ var classes = [
   'com.google.foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
   'foam.box.RemoteException',
-  'foam.box.CapabilityRequiredRemoteException',
   'foam.box.RPCMessage',
   'foam.box.RPCReturnBox',
   'foam.box.RPCReturnMessage',
@@ -655,7 +654,7 @@ var classes = [
   //models
   'foam.nanos.crunch.Renewable',
   'foam.nanos.crunch.Capability',
-  'foam.nanos.crunch.CapabilityRuntimeException',
+  'foam.nanos.crunch.CapabilityIntercept',
   'foam.nanos.crunch.MinMaxCapability',
   'foam.nanos.crunch.lite.Capable',
   'foam.nanos.crunch.lite.CapableDAO',

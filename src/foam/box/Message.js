@@ -19,10 +19,6 @@ foam.CLASS({
   package: 'foam.box',
   name: 'Message',
 
-  javaImports: [
-    'foam.nanos.crunch.CapabilityRuntimeException'
-  ],
-
   properties: [
     {
       class: 'Map',
@@ -53,36 +49,22 @@ foam.CLASS({
 
         if ( replyBox == null ) return;
 
-        RemoteException wrapper = new RemoteException();
-        wrapper.setId(t.getClass().getName());
-        wrapper.setMessage(t.getMessage());
-        if ( t instanceof foam.core.Exception ) {
-          var fe = (foam.core.Exception) t;
-          wrapper.setException(t);
+        Object wrapperObj = null;
+        if ( t instanceof foam.core.ExceptionInterface ) {
+          wrapperObj = t;
+        } else {
+          RemoteException wrapper = new RemoteException();
+          wrapper.setId(t.getClass().getName());
+          wrapper.setMessage(t.getMessage());
+          if ( t instanceof foam.core.Exception ) {
+            var fe = (foam.core.Exception) t;
+            wrapper.setException(t);
+          }
+          wrapperObj = wrapper;
         }
         
-        // Special case for CapabilityRuntimeException
-        if (
-          "foam.nanos.crunch.CapabilityRuntimeException"
-          .equals(t.getClass().getName())
-        ) {
-          CapabilityRuntimeException tCapability =
-            (CapabilityRuntimeException) t;
-          CapabilityRequiredRemoteException wrapperCapability =
-            new CapabilityRequiredRemoteException();
-          wrapperCapability.setId(t.getClass().getName());
-          wrapperCapability.setMessage(t.getMessage());
-          wrapperCapability.setCapabilityOptions(
-            tCapability.getCapabilities());
-          wrapperCapability.setCapableRequirements(
-            tCapability.getCapables());
-          wrapperCapability.setDaoKey(
-            tCapability.getDaoKey());
-          wrapper = wrapperCapability;
-        }
-
         RPCErrorMessage reply = new RPCErrorMessage();
-        reply.setData(wrapper);
+        reply.setData(wrapperObj);
 
         Message replyMessage = new Message();
         replyMessage.setObject(reply);

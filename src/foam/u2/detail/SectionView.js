@@ -52,6 +52,14 @@ foam.CLASS({
       class: 'Boolean',
       name: 'showTitle',
       value: true
+    },
+    {
+      class: 'Function',
+      name: 'evaluateMessage',
+      documentation: `Evaluates model messages without executing potentially harmful values`,
+      factory: function() {
+        return (msg) => msg.replace(/\${(.*?)}/g, (x,g) => this.data[g]);
+      }
     }
   ],
 
@@ -69,6 +77,7 @@ foam.CLASS({
             .callIf(showTitle && section$title, function() {
               var slot$ = foam.Function.isInstance(self.section.title) ?
                 foam.core.ExpressionSlot.create({
+                  args: [ self.evaluateMessage$, self.data$ ],
                   obj$: self.data$,
                   code: section.title
                 }) : section.title$;
@@ -77,6 +86,7 @@ foam.CLASS({
             .callIf(section$subTitle, function() {
               var slot$ = foam.Function.isInstance(self.section.subTitle) ?
               foam.core.ExpressionSlot.create({
+                args: [ self.evaluateMessage$, self.data$ ],
                 obj$: self.data$,
                 code: section.subTitle
               }) : section.subTitle$;
