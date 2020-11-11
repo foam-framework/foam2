@@ -495,27 +495,6 @@ foam.CLASS({
       section: 'administration'
     },
     {
-      class: 'String',
-      name: 'supportPhone'
-    },
-    {
-      class: 'String',
-      name: 'supportEmail'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Address',
-      name: 'supportAddress',
-      factory: function() {
-        return foam.nanos.auth.Address.create({}, this);
-      }
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'personalSupportUser'
-    },
-    {
       name: 'spid',
       class: 'Reference',
       of: 'foam.nanos.auth.ServiceProvider',

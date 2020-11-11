@@ -31,7 +31,7 @@ foam.CLASS({
       `
       EmailPropertyService[] propertyApplied = getData();
       for ( EmailPropertyService eps: propertyApplied ) {
-        emailMessage = eps.apply(x, group, emailMessage, templateArgs, theme);
+        emailMessage = eps.apply(x, group, emailMessage, templateArgs);
       }
       return emailMessage;
       `

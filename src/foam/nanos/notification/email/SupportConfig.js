@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -23,6 +23,19 @@ foam.CLASS({
     {
       class: 'String',
       name: 'supportPhone'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'personalSupportUser'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.Address',
+      name: 'supportAddress',
+      factory: function() {
+        return foam.nanos.auth.Address.create({}, this);
+      }
     }
   ]
 });

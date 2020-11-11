@@ -373,7 +373,6 @@ var classes = [
   'foam.nanos.notification.email.EmailTemplateApplyEmailPropertyService',
   'foam.nanos.notification.email.GroupEmailTemplateService',
   'foam.nanos.notification.email.EmailConfigEmailPropertyService',
-  'foam.nanos.notification.email.SupportConfigEmailPropertyService',
   // EmailMessageDAO(service) decorator
   'foam.nanos.notification.email.EmailServiceDAO',
 
