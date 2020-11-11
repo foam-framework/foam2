@@ -23,7 +23,7 @@
       name: 'returnStringValueForProperty',
       type: 'String',
       documentation: 'Method that converts value to string',
-      code: async function(x, prop, val, unitPropName) {
+      code: async function(x, prop, val, unitPropName, addUnitPropValueToStr) {
         if ( val == 0 || val ) {
           if ( foam.Array.isInstance(val) ) {
             var stringArr = [];
@@ -33,11 +33,13 @@
             return stringArr.join(' ');
           }
           if ( foam.core.UnitValue.isInstance(prop) ) {
-            if ( unitPropName ) {
-              if ( prop.unitPropValueToString ) {
-                return await prop.unitPropValueToString(x, val, unitPropName);
+            if ( addUnitPropValueToStr ) {
+              if ( unitPropName ) {
+                if ( prop.unitPropValueToString ) {
+                  return await prop.unitPropValueToString(x, val, unitPropName);
+                }
+                return unitPropName + ' ' + ( val / 100 ).toString();
               }
-              return unitPropName + ' ' + ( val / 100 ).toString();
             }
             return ( val / 100 ).toString();
           }
@@ -65,7 +67,7 @@
     },
     {
       name: 'arrayOfValuesToArrayOfStrings',
-      code: async function(x, props, values, lengthOfPrimaryPropsRequested) {
+      code: async function(x, props, values, lengthOfPrimaryPropsRequested, addUnitPropValueToStr) {
         var stringValues = [];
         for ( var value of values ) {
           var stringArrayForValue = [];
@@ -73,7 +75,7 @@
             if ( foam.core.UnitValue.isInstance(props[i]) ) {
               var indexOfUnitProp = props.findIndex(p => p.name === props[i].unitPropName);
               if ( indexOfUnitProp !== -1 ) {
-                stringArrayForValue.push(await this.returnStringValueForProperty(x, props[i], value[i], value[indexOfUnitProp]));
+                stringArrayForValue.push(await this.returnStringValueForProperty(x, props[i], value[i], value[indexOfUnitProp], addUnitPropValueToStr));
                 continue;
               }
             }
@@ -101,11 +103,11 @@
     },
     {
       name: 'returnTable',
-      code: async function(x, of, propNames, values, lengthOfPrimaryPropsRequested) {
+      code: async function(x, of, propNames, values, lengthOfPrimaryPropsRequested, addUnitPropValueToStr) {
         var columnConfig = x.columnConfigToPropertyConverter;
         var props = columnConfig.returnProperties(of, propNames);
         var table =  [ this.getColumnHeaders(x, of, propNames.slice(0, lengthOfPrimaryPropsRequested)) ];
-        var values = await this.arrayOfValuesToArrayOfStrings(x, props, values, lengthOfPrimaryPropsRequested);
+        var values = await this.arrayOfValuesToArrayOfStrings(x, props, values, lengthOfPrimaryPropsRequested, addUnitPropValueToStr);
         table = table.concat(values);
         return table;
       }
