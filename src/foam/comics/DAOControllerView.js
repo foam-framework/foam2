@@ -151,10 +151,10 @@ foam.CLASS({
             .start()
               .addClass(this.myClass('title-container'))
               .start('h1')
-                .translate(this.data.title$,this.data.title$)
+                .translate(this.data.title,this.data.title)
               .end()
               .start()
-                .translate(this.data.subtitle$,this.data.subtitle$)
+                .translate(this.data.subtitle,this.data.subtitle)
               .end()
             .end()
             .callIfElse(self.data.createLabel, function() {
