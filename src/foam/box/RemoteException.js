@@ -18,7 +18,8 @@ foam.CLASS({
       name: 'message'
     },
     {
-      class: 'Object',
+      class: 'FObjectProperty',
+      of: 'foam.core.Exception',
       name: 'exception'
     }
   ],
@@ -27,9 +28,9 @@ foam.CLASS({
     {
       name: 'toString',
       type: 'String',
-      javaCode: 'return getMessage();',
+      javaCode: 'return "RemoteException - " + getId() + ": "+getMessage();',
       code: function() {
-        return this.message;
+        return 'RemoteException - ' + this.id + ': ' + this.message;
       }
     }
   ]
