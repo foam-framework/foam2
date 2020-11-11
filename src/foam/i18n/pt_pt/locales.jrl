@@ -251,3 +251,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.PhoneNumber.PHONE_NUMB
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.PhoneNumber.INVALID_PHONE_NUMBER",target:"Número de telefone inválido"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.FObjectProperty.PLEASE_ENTER_VALID",target:"Por favor insira um válido"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.Property.PLEASE_ENTER",target:"Por favor, insira"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.CONFIRM_MSG",target:"Confirmar dispensa do assistente"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.DISMISS_MSG",target:"Você está prestes a dispensar o assistente. Você tem certeza?"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.CONTINUE_MSG",target:"Não, eu quero continuar"})

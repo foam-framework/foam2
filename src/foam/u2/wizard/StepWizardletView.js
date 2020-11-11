@@ -45,6 +45,9 @@ foam.CLASS({
     { name: 'ERROR_MSG_DRAFT', message: 'An error occured while saving your progress' },
     { name: 'SUCCESS_MSG', message: 'Information successfully submitted' },
     { name: 'SUCCESS_MSG_DRAFT', message: 'Your progress has been saved' },
+    { name: 'CONFIRM_MSG', message: 'Confirm Wizard Dismissal' },
+    { name: 'DISMISS_MSG', message: 'You are about to dismiss the wizard. Are you sure?' },
+    { name: 'CONTINUE_MSG', message: 'No, I want to continue' }
   ],
 
   css: `
@@ -193,7 +196,7 @@ foam.CLASS({
             )
           .end()
           .start(this.GUnit, { columns: 8 })
-            .addClass(this.myClass('rightside'))            
+            .addClass(this.myClass('rightside'))
             .add(this.slot(function(hideX) {
               if ( hideX ) {
                 return this.E().addClass(this.myClass('top-padding'));
@@ -259,12 +262,12 @@ foam.CLASS({
         return a;
       }
       prompt = this.Popup.create().tag(this.SimpleActionDialog, {
-        title: 'Confirm Wizard Dismissal',
-        body: 'You are about to dismiss the wizard. Are you sure?',
+        title: this.CONFIRM_MSG,
+        body: this.DISMISS_MSG,
         actions: [
           this.Action.create({
             name: 'cancel',
-            label: 'No, I want to continue',
+            label: this.CONTINUE_MSG,
             code: () => {
               prompt.close();
             }
