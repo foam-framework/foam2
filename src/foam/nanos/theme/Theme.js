@@ -520,6 +520,12 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.ServiceProvider',
       value: foam.nanos.auth.ServiceProviderAware.GLOBAL_SPID
+    },
+    {
+      class: 'foam.core.FObjectProperty',
+      of:'foam.nanos.notification.email.SupportConfig',
+      name: 'supportConfig',
+      factory: function() { return foam.nanos.notification.email.SupportConfig.create({})}
     }
   ],
 

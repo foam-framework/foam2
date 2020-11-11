@@ -32,6 +32,11 @@ foam.INTERFACE({
           name: 'templateArgs',
           type: 'Map',
           documentation: 'Template arguments'
+        },
+        {
+          name: 'theme',
+          type: 'foam.nanos.theme.Theme',
+          documentation: 'theme'
         }
       ],
     }

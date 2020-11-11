@@ -8,6 +8,7 @@ import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.notification.email.EmailMessage;
 import foam.nanos.notification.email.EmailPropertyService;
+import foam.nanos.notification.email.SupportConfig;
 import foam.nanos.theme.Theme;
 import foam.nanos.theme.Themes;
 import foam.util.SafetyUtil;
@@ -57,6 +58,7 @@ public class EmailsUtility {
       }
     }
 
+    SupportConfig supportConfig = theme.getSupportConfig();
     // Add template name to templateArgs, to avoid extra parameter passing
     if ( ! SafetyUtil.isEmpty(templateName) ) {
       if ( templateArgs != null ) {
@@ -65,8 +67,8 @@ public class EmailsUtility {
         templateArgs = new HashMap<>();
         templateArgs.put("template", templateName);
       }
-      templateArgs.put("supportPhone", (theme.getSupportPhone()));
-      templateArgs.put("supportEmail", (theme.getSupportEmail()));
+      templateArgs.put("supportPhone", (supportConfig.getSupportPhone()));
+      templateArgs.put("supportEmail", (supportConfig.getSupportEmail()));
 
       // personal support user
       User psUser = theme.findPersonalSupportUser(x);
@@ -86,7 +88,7 @@ public class EmailsUtility {
     // SERVICE CALL: to fill in email properties.
     EmailPropertyService cts = (EmailPropertyService) x.get("emailPropertyService");
     try {
-      cts.apply(x, group, emailMessage, templateArgs);
+      cts.apply(x, group, emailMessage, templateArgs, theme);
     } catch (Exception e) {
       logger.error(e);
       return;
