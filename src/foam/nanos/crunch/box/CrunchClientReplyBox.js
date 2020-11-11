@@ -15,6 +15,7 @@ foam.CLASS({
 
   requires: [
     'foam.box.RPCErrorMessage',
+    'foam.box.RemoteException',
     'foam.box.RPCReturnMessage',
     'foam.nanos.crunch.CapabilityIntercept'
   ],
