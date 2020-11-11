@@ -6,8 +6,8 @@
 
 foam.CLASS({
   package: 'foam.nanos.crunch',
-  name: 'CapabilityRuntimeException',
-  implements: [ 'foam.core.ExceptionInterface' ],
+  name: 'CapabilityIntercept',
+  implements: [ 'foam.core.Exception', 'foam.core.ExceptionInterface' ],
   javaExtends: 'foam.nanos.auth.AuthorizationException',
 
   javaImports: [
@@ -21,7 +21,7 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(
           `
-            public CapabilityRuntimeException(String message) {
+            public CapabilityIntercept(String message) {
               super(message);
             }
           `
@@ -32,17 +32,72 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
+      name: 'id',
+      value: 'foam.box.CapabilityRequiredRemoteException'
+    },
+    {
       name: 'capabilities',
-      class: 'StringArray'
+      class: 'StringArray',
+      aliases: [ 'capabilityOptions' ]
     },
     {
       name: 'capables',
       class: 'FObjectArray',
       of: 'foam.nanos.crunch.lite.Capable',
+      aliases: [ 'capableRequirements' ]
+    },
+    {
+      name: 'returnCapable',
+      class: 'FObjectProperty',
+      of: 'foam.core.FObject'
     },
     {
       name: 'daoKey',
       class: 'String'
+    },
+    {
+      name: 'resolve',
+      class: 'Function'
+    },
+    {
+      name: 'reject',
+      class: 'Function'
+    },
+    {
+      name: 'resend',
+      class: 'Function'
+    },
+    {
+      name: 'aquired',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'cancelled',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'promise',
+      expression: function (aquired, cancelled) {
+        if ( aquired ) return Promise.resolve();
+        if ( cancelled ) return Promise.reject();
+        var self = this;
+        return new Promise(function (resolve, reject) {
+          var s1, s2;
+          s1 = self.aquired$.sub(() => {
+            s1.detach();
+            s2.detach();
+            resolve();
+          })
+          s1 = self.cancelled$.sub(() => {
+            s1.detach();
+            s2.detach();
+            reject();
+          })
+        });
+      }
     }
   ],
 

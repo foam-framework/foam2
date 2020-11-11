@@ -8,11 +8,9 @@ foam.CLASS({
   package: 'foam.i18n',
   name: 'Locale',
 
+  ids: ['locale', 'variant', 'source'],
+
   properties: [
-    {
-      class: 'String',
-      name: 'id',
-    },
     {
       class: 'String',
       name: 'locale',

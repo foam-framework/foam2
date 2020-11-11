@@ -427,6 +427,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/Refinements" },
   { name: "foam/nanos/crunch/MinMaxCapability" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
+  { name: "foam/nanos/crunch/CapabilityIntercept" },
   { name: "foam/nanos/crunch/lite/CapablePayload" },
   { name: "foam/nanos/crunch/lite/CapablePayloadStatusDAO" },
   { name: "foam/nanos/crunch/lite/Capable" },
