@@ -502,9 +502,9 @@ foam.CLASS({
     },
     {
       class: 'foam.core.FObjectProperty',
-      of:'foam.nanos.notification.email.SupportConfig',
+      of:'foam.nanos.app.SupportConfig',
       name: 'supportConfig',
-      factory: function() { return foam.nanos.notification.email.SupportConfig.create({})}
+      factory: function() { return foam.nanos.app.SupportConfig.create({})}
     }
   ],
 

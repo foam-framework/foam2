@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
-  package: 'foam.nanos.notification.email',
+  package: 'foam.nanos.app',
   name: 'SupportConfig',
 
   documentation: 'Support configuration for email',

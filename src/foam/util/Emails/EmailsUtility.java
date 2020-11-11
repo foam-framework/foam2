@@ -4,12 +4,12 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.app.AppConfig;
 import foam.nanos.app.EmailConfig;
+import foam.nanos.app.SupportConfig;
 import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.notification.email.EmailMessage;
 import foam.nanos.notification.email.EmailPropertyService;
-import foam.nanos.notification.email.SupportConfig;
 import foam.nanos.theme.Theme;
 import foam.nanos.theme.Themes;
 import foam.util.SafetyUtil;
@@ -64,13 +64,19 @@ public class EmailsUtility {
     // Set ReplyTo, From, DisplayName in emailMessage 
     EmailConfig emailConfig = supportConfig.getEmailConfig();
     // REPLY TO:
-    emailMessage.setReplyTo(emailConfig.getReplyTo());
+    if ( ! SafetyUtil.isEmpty(emailConfig.getReplyTo()) ) {
+      emailMessage.setReplyTo(emailConfig.getReplyTo());
+    }
 
     // DISPLAY NAME:
-    emailMessage.setDisplayName(emailConfig.getDisplayName());
+    if ( ! SafetyUtil.isEmpty(emailConfig.getDisplayName()) ) {
+      emailMessage.setDisplayName(emailConfig.getDisplayName());
+    }
 
     // FROM:
-    emailMessage.setFrom(emailConfig.getFrom());
+    if ( ! SafetyUtil.isEmpty(emailConfig.getFrom()) ) {
+      emailMessage.setFrom(emailConfig.getFrom());
+    }
 
     // Add template name to templateArgs, to avoid extra parameter passing
     if ( ! SafetyUtil.isEmpty(templateName) ) {
