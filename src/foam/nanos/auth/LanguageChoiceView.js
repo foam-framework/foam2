@@ -61,10 +61,12 @@ foam.CLASS({
     color: #ffffff;
   }
   ^ .popUpDropDown > div {
+    margin-left: -8px;
+    border-radius: 4px;
     width: 100%;
     text-align: center;
     height: 25;
-    padding-bottom: 5;
+    padding: 0px 8px 5px 8px;
     font-size: 14px;
     font-weight: 300;
     letter-spacing: 0.2px;
@@ -72,11 +74,12 @@ foam.CLASS({
     line-height: 30px;
   }
   ^ .foam-u2-PopupView {
+    border-radius: 4px;
     left: -30 !important;
     top: 51px !important;
-    padding: 0 !important;
+    padding: 0px 8px 0px 8px !important;
     z-index: 1000;
-    width: 110px !important;
+    width: fit-content !important;
     background: white;
     opacity: 1;
     box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.19);
