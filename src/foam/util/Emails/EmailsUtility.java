@@ -67,7 +67,6 @@ public class EmailsUtility {
     if ( supportEmailConfig != null ) {
       emailConfig.copyFrom(supportEmailConfig);
     }
-    emailConfig = supportEmailConfig;
     // REPLY TO:
     if ( ! SafetyUtil.isEmpty(emailConfig.getReplyTo()) ) {
       emailMessage.setReplyTo(emailConfig.getReplyTo());
