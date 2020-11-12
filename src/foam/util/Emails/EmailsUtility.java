@@ -64,7 +64,7 @@ public class EmailsUtility {
     // Set ReplyTo, From, DisplayName in emailMessage 
     EmailConfig emailConfig = (EmailConfig) ((EmailConfig) x.get("emailConfig")).fclone();
     EmailConfig supportEmailConfig = supportConfig.getEmailConfig();
-    if ( emailConfig != null ) {
+    if ( supportEmailConfig != null ) {
       supportEmailConfig.copyFrom(emailConfig);
     }
     emailConfig = supportEmailConfig;
