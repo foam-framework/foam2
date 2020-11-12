@@ -12,7 +12,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'foam.core.FObjectProperty',
+      class: 'FObjectProperty',
       of:'foam.nanos.app.EmailConfig',
       name: 'emailConfig'
     },
