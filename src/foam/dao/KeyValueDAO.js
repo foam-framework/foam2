@@ -34,13 +34,6 @@ foam.CLASS({
       javaCode: 'return obj;'
     },
     {
-      name: 'select_',
-      code: function(sink) {
-        return Promise.resolve(sink);
-      },
-      javaCode: 'return sink;'
-    },
-    {
       name: 'removeAll_',
       code: function() {
         return Promise.resolve();
