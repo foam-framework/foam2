@@ -64,7 +64,10 @@ public class EmailsUtility {
     // Set ReplyTo, From, DisplayName in emailMessage 
     EmailConfig emailConfig = (EmailConfig) ((EmailConfig) x.get("emailConfig")).fclone();
     EmailConfig supportEmailConfig = supportConfig.getEmailConfig();
-    emailConfig = supportConfig.getEmailConfig();
+    if ( emailConfig != null ) {
+      supportEmailConfig.copyFrom(emailConfig);
+    }
+    emailConfig = supportEmailConfig;
     // REPLY TO:
     if ( ! SafetyUtil.isEmpty(emailConfig.getReplyTo()) ) {
       emailMessage.setReplyTo(emailConfig.getReplyTo());
