@@ -17,7 +17,7 @@ p({
         .setSize(100000)
         .build())
       .setIndex(new foam.core.PropertyInfo[] {foam.nanos.logger.LogMessage.CREATED})
-      .setOrder(new foam.mlang.order.Comparator[] {foam.mlang.MLang.DESC(foam.nanos.logger.LogMessage.CREATED)})
+      .setOrder(new foam.mlang.order.Comparator[] {foam.nanos.logger.LogMessage.CREATED})
       .setDecorator(new foam.nanos.logger.StdoutLoggerDAO.Builder(x)
         .setMode(((foam.nanos.app.AppConfig) x.get("appConfig")).getMode())
         .setDelegate(new foam.nanos.logger.LogMessageDAO.Builder(x)
