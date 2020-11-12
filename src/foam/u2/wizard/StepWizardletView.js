@@ -261,7 +261,7 @@ foam.CLASS({
         a.code = action.code.bind(this, this.__subSubContext__);
         return a;
       }
-      prompt = this.Popup.create().tag(this.SimpleActionDialog, {
+      prompt = this.Popup.create({ closeable: false }).tag(this.SimpleActionDialog, {
         title: this.CONFIRM_MSG,
         body: this.DISMISS_MSG,
         actions: [
