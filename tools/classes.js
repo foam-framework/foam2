@@ -610,6 +610,7 @@ var classes = [
   'foam.nanos.dig.exception.GeneralException',
 
   'foam.nanos.app.EmailConfig',
+  'foam.nanos.app.SupportConfig',
 
   'foam.nanos.test.StockSnapshot',
   'foam.nanos.analytics.FoldManagerDAODecorator',

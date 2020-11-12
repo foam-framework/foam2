@@ -3,6 +3,8 @@ package foam.util.Emails;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.app.AppConfig;
+import foam.nanos.app.EmailConfig;
+import foam.nanos.app.SupportConfig;
 import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
@@ -57,6 +59,29 @@ public class EmailsUtility {
       }
     }
 
+    SupportConfig supportConfig = theme.getSupportConfig();
+
+    // Set ReplyTo, From, DisplayName in emailMessage 
+    EmailConfig emailConfig = (EmailConfig) ((EmailConfig) x.get("emailConfig")).fclone();
+    EmailConfig supportEmailConfig = supportConfig.getEmailConfig();
+    if ( supportEmailConfig != null ) {
+      emailConfig.copyFrom(supportEmailConfig);
+    }
+    // REPLY TO:
+    if ( ! SafetyUtil.isEmpty(emailConfig.getReplyTo()) ) {
+      emailMessage.setReplyTo(emailConfig.getReplyTo());
+    }
+
+    // DISPLAY NAME:
+    if ( ! SafetyUtil.isEmpty(emailConfig.getDisplayName()) ) {
+      emailMessage.setDisplayName(emailConfig.getDisplayName());
+    }
+
+    // FROM:
+    if ( ! SafetyUtil.isEmpty(emailConfig.getFrom()) ) {
+      emailMessage.setFrom(emailConfig.getFrom());
+    }
+
     // Add template name to templateArgs, to avoid extra parameter passing
     if ( ! SafetyUtil.isEmpty(templateName) ) {
       if ( templateArgs != null ) {
@@ -65,17 +90,17 @@ public class EmailsUtility {
         templateArgs = new HashMap<>();
         templateArgs.put("template", templateName);
       }
-      templateArgs.put("supportPhone", (theme.getSupportPhone()));
-      templateArgs.put("supportEmail", (theme.getSupportEmail()));
+      templateArgs.put("supportPhone", (supportConfig.getSupportPhone()));
+      templateArgs.put("supportEmail", (supportConfig.getSupportEmail()));
 
       // personal support user
-      User psUser = theme.findPersonalSupportUser(x);
+      User psUser = supportConfig.findPersonalSupportUser(x);
       templateArgs.put("personalSupportPhone", psUser == null ? "" : psUser.getPhoneNumber());
       templateArgs.put("personalSupportEmail", psUser == null ? "" : psUser.getEmail());
       templateArgs.put("personalSupportFirstName", psUser == null ? "" : psUser.getFirstName());
       templateArgs.put("personalSupportFullName", psUser == null ? "" : psUser.getLegalName());
 
-      foam.nanos.auth.Address address = theme.getSupportAddress();
+      foam.nanos.auth.Address address = supportConfig.getSupportAddress();
       templateArgs.put("supportAddress", address == null ? "" : address.toSummary());
       templateArgs.put("appName", (theme.getAppName()));
       templateArgs.put("logo", (appConfig.getUrl() + "/" + theme.getLogo()));
