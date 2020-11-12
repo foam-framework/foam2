@@ -65,7 +65,7 @@ public class EmailsUtility {
     EmailConfig emailConfig = (EmailConfig) ((EmailConfig) x.get("emailConfig")).fclone();
     EmailConfig supportEmailConfig = supportConfig.getEmailConfig();
     if ( supportEmailConfig != null ) {
-      supportEmailConfig.copyFrom(emailConfig);
+      emailConfig.copyFrom(supportEmailConfig);
     }
     emailConfig = supportEmailConfig;
     // REPLY TO:
