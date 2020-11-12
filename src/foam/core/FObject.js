@@ -573,10 +573,6 @@ foam.CLASS({
         var l = listeners.l;
         var s = listeners.sub;
 
-        // Update 'listeners' before notifying because the listener
-        // may set next to null.
-        listeners = listeners.next;
-
         // Like l.apply(l, [s].concat(Array.from(a))), but faster.
         // FUTURE: add benchmark to justify
         // ???: optional exception trapping, benchmark
@@ -597,6 +593,8 @@ foam.CLASS({
         } catch (x) {
           if ( foam._IS_DEBUG_ ) console.warn("Listener threw exception", x);
         }
+
+        listeners = listeners.next;
         count++;
       }
       return count;
@@ -721,11 +719,12 @@ foam.CLASS({
         l:    l
       };
       node.sub.detach = function() {
-        if ( node.next ) node.next.prev = node.prev;
-        if ( node.prev ) node.prev.next = node.next;
+        if ( node.prev ) {
+          node.prev.next = node.next;
+          if ( node.next ) node.next.prev = node.prev;
+        }
 
-        // Disconnect so that calling detach more than once is harmless
-        node.next = node.prev = null;
+        node.prev = null;
       };
 
       if ( listeners.next ) listeners.next.prev = node;

@@ -42,8 +42,8 @@ foam.CLASS({
 
   messages: [
     { name: 'TAB_ALL', message: 'All' },
-    { name: 'TITLE', message: 'Capabilities' },
-    { name: 'SUBTITLE', message: 'To fully enable our platform, we require a bit more information about you and your company.' }
+    { name: 'TITLE', message: 'Registration' },
+    { name: 'SUBTITLE', message: 'To complete the registration, follow the steps below' }
   ],
 
   css: `
@@ -86,7 +86,7 @@ foam.CLASS({
 
     ^perFeature {
       display: flex;
-      padding-bottom: 10px;
+      padding-bottom: 55px;
     }
 
     ^left-arrow {
@@ -181,7 +181,8 @@ foam.CLASS({
       name: 'featureCardArray',
       value: [],
       documentation: 'stores the styling of each featureCapability'
-    }
+    },
+    'wizardOpened'
   ],
 
   methods: [
@@ -250,8 +251,7 @@ foam.CLASS({
                     .addClass(self.myClass('featureSection'))
                   .end()
                   .on('click', () => {
-                    self.crunchController
-                      .createWizardSequence(arr[i].id).execute();
+                    self.openWizard(arr[i].id);
                   })
                 .end());
             }
@@ -308,8 +308,7 @@ foam.CLASS({
                   .start(self.GUnit, { columns: 4 })
                     .tag(self.CapabilityCardView, { data: cap })
                     .on('click', () => {
-                      self.crunchController
-                        .createWizardSequence(cap).execute();
+                      self.openWizard(cap);
                     })
                   .end();
               }
@@ -342,8 +341,7 @@ foam.CLASS({
               .start(self.GUnit, { columns: 4 })
                 .tag(self.CapabilityCardView, { data: cap })
                 .on('click', () => {
-                  self.crunchController
-                    .createWizardSequence(cap).execute();
+                  self.openWizard(cap);
                 })
               .end();
           }
@@ -381,10 +379,18 @@ foam.CLASS({
           )).select())
         .then(sink => {
           if ( sink.array.length == 1 ) {
-            this.crunchController
-              .createWizardSequence(sink.array[0]).execute();
+            this.openWizard(sink.array[0]);
           }
         })
+    },
+    function openWizard(cap) {
+      if ( this.wizardOpened ) return;
+      this.wizardOpened = true;
+      this.crunchController
+        .createWizardSequence(cap).execute().then(() => {
+          this.wizardOpened = false;
+        });
+      
     }
   ]
 });

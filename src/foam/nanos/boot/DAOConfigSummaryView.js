@@ -152,8 +152,8 @@ foam.CLASS({
 
   requires: [
     'foam.comics.BrowserView',
-    'foam.nanos.boot.NSpec',
-    'foam.comics.v2.DAOBrowserView'
+    'foam.comics.v2.DAOBrowseControllerView',
+    'foam.nanos.boot.NSpec'
   ],
 
   implements: [ 'foam.mlang.Expressions' ],
@@ -205,7 +205,7 @@ foam.CLASS({
           add('Data Management').
         end()
         .start()
-        .style({ 'width': 'fit-content', 'float': 'right', 'margin-right': '4%', 'margin-top': '6px' })
+        .style({ 'width': 'fit-content', 'float': 'right', 'margin-right': '40px', 'margin-top': '6px' })
             .start(this.SEARCH).focus().end()
             .addClass('foam-u2-search-TextSearchView')
             .addClass(this.myClass('foam-u2-search-TextSearchView'))
@@ -318,17 +318,17 @@ foam.CLASS({
           views: [
             [
               {
-                class: this.BrowserView,
+                class: this.DAOBrowseControllerView,
                 stack: this.stack
               },
-              'Controller 1'
+              'New Controller'
             ],
             [
               {
-                class: this.DAOBrowserView,
+                class: this.BrowserView,
                 stack: this.stack
               },
-              'Controller 2'
+              'Old Controller'
             ]
           ]
         }

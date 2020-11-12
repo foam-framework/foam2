@@ -88,6 +88,7 @@ var classes = [
   'foam.mlang.predicate.OlderThan',
   'foam.mlang.predicate.isAuthorizedToRead',
   'foam.mlang.predicate.isAuthorizedToDelete',
+  'foam.mlang.predicate.ContextUserPredicate',
   'foam.box.Box',
   'foam.box.Skeleton',
   'foam.box.AbstractSkeleton',
@@ -109,7 +110,6 @@ var classes = [
   'com.google.foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
   'foam.box.RemoteException',
-  'foam.box.CapabilityRequiredRemoteException',
   'foam.box.RPCMessage',
   'foam.box.RPCReturnBox',
   'foam.box.RPCReturnMessage',
@@ -133,6 +133,7 @@ var classes = [
   'foam.lib.csv.ProxyCSVOutputter',
   'foam.lib.csv.FromCSVSetter',
   'foam.dao.java.JDAO',
+  'foam.dao.CopyFromDAO',
   'foam.dao.FilteredDAO',
   'foam.dao.Journal',
   'foam.dao.RemoveChildrenOnRemoveDAO',
@@ -466,6 +467,10 @@ var classes = [
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
   'foam.lib.parse.BlobPStream',
+  'foam.lib.parse.SymbolParser',
+  'foam.lib.parse.Grammar',
+  'foam.lib.parse.Action',
+  'foam.lib.parse.ActionParser',
   'foam.lib.json.JSONParser',
   'foam.lib.json.OutputJSON',
   'foam.lib.json.OutputterMode',
@@ -586,6 +591,7 @@ var classes = [
   'foam.nanos.approval.ApprovalDAO',
   'foam.nanos.audit.AuditDAO',
   'foam.nanos.auth.email.EmailVerificationDAO',
+  'foam.nanos.auth.email.EmailVerificationWebAgent',
   'foam.dao.FreezingDAO',
   'foam.nanos.geocode.GoogleMapsGeocodingDAO',
   'foam.dao.history.HistoryDAO',
@@ -649,7 +655,7 @@ var classes = [
   //models
   'foam.nanos.crunch.Renewable',
   'foam.nanos.crunch.Capability',
-  'foam.nanos.crunch.CapabilityRuntimeException',
+  'foam.nanos.crunch.CapabilityIntercept',
   'foam.nanos.crunch.MinMaxCapability',
   'foam.nanos.crunch.lite.Capable',
   'foam.nanos.crunch.lite.CapableDAO',
@@ -663,6 +669,7 @@ var classes = [
   'foam.nanos.crunch.lite.ruler.ReputDependantPayloads',
   'foam.nanos.crunch.lite.ruler.SetCapablePayloadStatusOnPut',
   'foam.nanos.crunch.lite.ruler.CapablePayloadApprovableRuleAction',
+  'foam.nanos.crunch.lite.ruler.CapableStatusChangeAdjustApprovalsRuleAction',
 
   'foam.u2.wizard.BaseWizardlet',
   'foam.nanos.crunch.CapabilityCategory',
@@ -704,6 +711,10 @@ var classes = [
   //crunch extras
   'foam.nanos.crunch.extra.ReviewCapability',
   'foam.nanos.crunch.extra.ReviewCapabilityData',
+  'foam.nanos.crunch.extra.ReviewWizard',
+
+  //crunch predicates
+  'foam.nanos.crunch.predicate.CapabilityGranted',
 
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
@@ -740,6 +751,10 @@ var classes = [
   'foam.nanos.approval.PopulateApprovalRequestsDAO',
 
   'foam.core.NumberSet',
+
+  // template
+  'foam.java.ParseTemplateTest',
+  'foam.java.ParseTemplateTestModel',
 
   // Translation Support
   'foam.i18n.XLIFFTranslationValue',

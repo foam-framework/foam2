@@ -224,54 +224,73 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       Predicate associationPredicate = getAssociationPredicate_(x);
 
       // Check if a ucj implies the subject.realUser has this permission in relation to the user
-      UserCapabilityJunction ucj = (UserCapabilityJunction)
+      var ucj = (UserCapabilityJunction)
         userCapabilityJunctionDAO.find(AND(associationPredicate,targetPredicate));
-      if ( ucj != null ) {
-        return ucj;
+      if ( ucj == null ) {
+        ucj = buildAssociatedUCJ(x, capabilityId, subject);
+      } else {
+        ucj = (UserCapabilityJunction) ucj.fclone();
       }
 
+      return ucj;
     } catch ( Exception e ) {
       Logger logger = (Logger) x.get("logger");
       logger.error("getJunction", capabilityId, e);
-    }
 
-    return null;
+      // On failure, report that the capability is available
+      var ucj = buildAssociatedUCJ(x, capabilityId, subject);
+      return ucj;
+    }
   }
-  public UserCapabilityJunction updateJunction(X x, String capabilityId, FObject data) {
+  public UserCapabilityJunction updateJunction(
+    X x, String capabilityId, FObject data,
+    CapabilityJunctionStatus status
+  ) {
     Subject subject = (Subject) x.get("subject");
     UserCapabilityJunction ucj = this.getJunction(x, capabilityId);
-    if ( ucj == null ) {
-      // Need Capability to associate UCJ correctly
-      DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-      Capability cap = (Capability) capabilityDAO.find(capabilityId);
-      if ( cap == null ) {
-        throw new RuntimeException(String.format(
-          "Capability with id '%s' not found", capabilityId
-        ));
-      }
-      AssociatedEntity associatedEntity = cap.getAssociatedEntity();
-      boolean isAssociation = associatedEntity == AssociatedEntity.ACTING_USER;
-      User associatedUser = associatedEntity == AssociatedEntity.USER
-        ? subject.getUser()
-        : subject.getRealUser()
-        ;
-      ucj = isAssociation
-        ? new AgentCapabilityJunction.Builder(x)
-          .setSourceId(associatedUser.getId())
-          .setTargetId(capabilityId)
-          .setEffectiveUser(subject.getUser().getId())
-          .build()
-        : new UserCapabilityJunction.Builder(x)
-          .setSourceId(associatedUser.getId())
-          .setTargetId(capabilityId)
-          .build()
-        ;
+    if ( ucj.getStatus() == CapabilityJunctionStatus.AVAILABLE ) {
+      ucj = buildAssociatedUCJ(x, capabilityId, subject);
     }
     if ( data != null ) {
       ucj.setData(data);
     }
+    if ( status != null ) {
+      ucj.setStatus(status);
+    }
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
     return (UserCapabilityJunction) userCapabilityJunctionDAO.inX(x).put(ucj);
+  }
+
+  public UserCapabilityJunction buildAssociatedUCJ(
+    X x, String capabilityId, Subject subject
+  ) {
+    // Need Capability to associate UCJ correctly
+    DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+    Capability cap = (Capability) capabilityDAO.find(capabilityId);
+    if ( cap == null ) {
+      throw new RuntimeException(String.format(
+        "Capability with id '%s' not found", capabilityId
+      ));
+    }
+    AssociatedEntity associatedEntity = cap.getAssociatedEntity();
+    boolean isAssociation = associatedEntity == AssociatedEntity.ACTING_USER;
+    User associatedUser = associatedEntity == AssociatedEntity.USER
+      ? subject.getUser()
+      : subject.getRealUser()
+      ;
+    var ucj = isAssociation
+      ? new AgentCapabilityJunction.Builder(x)
+        .setSourceId(associatedUser.getId())
+        .setTargetId(capabilityId)
+        .setEffectiveUser(subject.getUser().getId())
+        .build()
+      : new UserCapabilityJunction.Builder(x)
+        .setSourceId(associatedUser.getId())
+        .setTargetId(capabilityId)
+        .build()
+      ;
+    ucj.setStatus(CapabilityJunctionStatus.AVAILABLE);
+    return ucj;
   }
 
   public void maybeIntercept(X x, String[] capabilityOptions) {
@@ -293,7 +312,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
     // Throw a capability intercept if none were satisfied
     if ( ! satisfied ) {
-      CapabilityRuntimeException ex = new CapabilityRuntimeException(
+      CapabilityIntercept ex = new CapabilityIntercept(
         "Missing a required capability."
       );
       for ( String capId : capabilityOptions ) {
@@ -396,7 +415,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       Capability payloadCapability = (Capability) capabilities.get(i);
 
       CapablePayload currentPayload = new CapablePayload.Builder(x)
-        .setCapability(payloadCapability)
+        .setCapability(payloadCapability.getId())
         .build();
 
       flattenedPayloads.add(currentPayload);
@@ -404,7 +423,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
     List<CapablePayload> outputPayloads;
     CapablePayload rootPayload = new CapablePayload.Builder(x)
-      .setCapability(rootCapability)
+      .setCapability(rootCapability.getId())
       .build();
 
     if ( isOr ){

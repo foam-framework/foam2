@@ -55,6 +55,10 @@ foam.CLASS({
     'foam.u2.wizard.WizardPosition'
   ],
 
+  messages: [
+    { name: 'PART_LABEL', message: 'Part ' }
+  ],
+
   methods: [
     function initE() {
       var self = this;
@@ -79,7 +83,6 @@ foam.CLASS({
               this.data.countAvailableSections(w) < 1
               || ! wizardlet.isAvailable
             ) {
-              console.log('skip');
               wSkipped++;
               continue;
             }
@@ -168,9 +171,16 @@ foam.CLASS({
         }))
     },
     function renderSectionLabel(elem, section, index, isCurrent) {
-      let title = section.navTitle;
-      if ( ! title || ! title.trim() ) title = "Part " + index;
-      return elem       
+      let title = section.title;
+      if ( ! title || ! foam.Function.isInstance(title) && ! title.trim() ) title = this.PART_LABEL + index;
+
+      title = foam.Function.isInstance(title) ?
+      foam.core.ExpressionSlot.create({
+        obj$: section.data$,
+        code: title
+      }) : title;
+
+      return elem
         .style({
           'color': isCurrent 
             ? this.theme.black

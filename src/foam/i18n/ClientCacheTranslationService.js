@@ -23,18 +23,13 @@ foam.CLASS({
     'foam.i18n.Locale'
   ],
 
+  topics: [ 'translation' ],
+
   properties: [
     {
       name: 'initLatch',
-      documentation: 'Latch to denote cache has been loaded and service is ready',
+      documentatin: 'Latch to denote cache has been loaded and service is ready',
       factory: function() { return this.Latch.create(); }
-    },
-    {
-      class: 'foam.dao.DAOProperty',
-      name: 'localeCache',
-      factory: function() {
-        return this.MDAO.create({of: this.Locale})/*.addPropertyIndex(this.Locale.SOURCE)*/;
-      },
     },
     {
       name: 'locale',
@@ -46,6 +41,13 @@ foam.CLASS({
       name: 'variant',
       factory: function() {
         return (foam.locale || "").substring(3);
+      }
+    },
+    {
+      class: 'Map',
+      name: 'localeEntries',
+      factory: function() {
+        return {};
       }
     }
   ],
@@ -77,13 +79,7 @@ foam.CLASS({
     },
 
     function addLocale(l) {
-//      console.log('************** addLocale2', l.source, '->',l.target);
-      this.localeCache.put(this.Locale.create({
-        id: l.source,
-        // locale: l.locale,
-        // source: l.source,
-        target: l.target
-      }));
+      this.localeEntries[l.source] = l.target;
     },
 
     function hasVariant() { return !! this.variant; },
@@ -97,18 +93,12 @@ foam.CLASS({
     */
     {
       name: 'getTranslation',
-      async: true,
-      args: [ 'String locale', 'String source' ],
+      args: [ 'String locale', 'String source', 'String defaultText' ],
       type: 'String',
-      code: function(locale, source) {
-        return new Promise(resolve => {
-          this.initLatch.then(() => {
-            this.localeCache.find(source).then(l => {
-//              console.log('****** getTranslation', locale, source, l && l.target);
-              resolve(l && l.target);
-            });
-          });
-        });
+      code: function(locale, source, defaultText) {
+        var txt = this.localeEntries[source];
+        this.translation.pub(locale, source, txt, defaultText);
+        return txt || defaultText;
       }
     }
   ]

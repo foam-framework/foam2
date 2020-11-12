@@ -47,13 +47,12 @@ foam.CLASS({
       factory: function() {
         if ( ! this.of ) return null;
 
-        var ret = this.of.getAxiomByName('capability') ?
-          this.of.create({ capability: this.capability }, this) :
-          this.of.create({}, this);
+        var ret = this.of.create({}, this);
+        if ( this.ucj && this.ucj.data ) ret.copyFrom(this.ucj.data);
 
-        if ( this.ucj === null ) return ret;
+        var prop = this.of.getAxiomByName('capability');
+        if ( prop ) prop.set(ret, this.capability);
 
-        ret = Object.assign(ret, this.ucj.data);
         return ret;
       }
     },

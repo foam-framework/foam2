@@ -19,7 +19,10 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.auth.User',
+    'foam.nanos.auth.Subject',
     'foam.nanos.notification.Notification',
+    'foam.nanos.theme.Theme',
+    'foam.nanos.theme.Themes',
     'java.util.Date',
     'java.util.HashMap'
   ],
@@ -63,7 +66,12 @@ foam.CLASS({
           notification.setBody(sb.toString());
           notification.setEmailName("top-level-capability-status-update");
           notification.setEmailArgs(args);
-          user.doNotify(x, notification);
+
+          Themes themes = (Themes) x.get("themes");
+          Theme theme = themes.findThemeBySpid(((X) x.put("subject", new Subject.Builder(x).setUser(user).build())));
+          X notificationX = theme != null ? (X) x.put("theme", theme) : x;
+
+          user.doNotify(notificationX, notification);
         }
       }, "Send Notification On Top Level Capability Status Update");
       `

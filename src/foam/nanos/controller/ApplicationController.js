@@ -46,7 +46,7 @@ foam.CLASS({
     'foam.nanos.theme.ThemeDomain',
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.u2.navigation.FooterView',
-    'foam.u2.crunch.CapabilityIntercept',
+    'foam.nanos.crunch.CapabilityIntercept',
     'foam.u2.crunch.CapabilityInterceptView',
     'foam.u2.crunch.CrunchController',
     'foam.u2.borders.MarginBorder',
@@ -320,6 +320,8 @@ foam.CLASS({
         self.setPrivate_('__subContext__', client.__subContext__);
 
         await self.fetchSubject();
+        await client.translationService.initLatch;
+        self.installLanguage();
 
         // add user and agent for backward compatibility
         Object.defineProperty(self, 'user', {
@@ -343,7 +345,6 @@ foam.CLASS({
         // the line above before executing this one.
         await self.fetchGroup();
         await self.fetchTheme();
-        await self.fetchLanguage();
         self.onUserAgentAndGroupLoaded();
       });
     },
@@ -395,37 +396,14 @@ foam.CLASS({
       });
     },
 
-    async function fetchLanguage() {
-      try {
-        //TODO manage more complicated language. 'en-CA'
-        if ( foam.locale !== 'en' && foam.locale !== 'en-US' ) {
-          let ctx = this.__subContext__;
-          let d = await  this.__subContext__.localeDAO;
-          d.select().then(e => {
-            var expr = foam.mlang.Expressions.create();
-            d.where(
-              expr.OR(
-                expr.EQ(foam.i18n.Locale.LOCALE, foam.locale),
-                expr.EQ(foam.i18n.Locale.LOCALE, foam.locale.substring(0,foam.locale.indexOf('-')))
-              )
-            ).select().then(e => {
-              let arr = e.array;
-              arr.forEach(ea => {
-                var node = global;
-                var path = ea.source.split('.');
+    function installLanguage() {
+      var map = this.__subContext__.translationService.localeEntries;
+      for ( var key in map ) {
+        var node = global;
+        var path = key.split('.');
 
-                for ( var i = 0 ; node && i < path.length-1 ; i++ )
-                  node = node[path[i]];
-
-                if ( node )
-                  node[path[path.length-1]] = ea.target;
-              });
-            })
-          })
-        }
-      } catch (err) {//TODO
-        this.notify(this.LANGUAGE_FETCH_ERR, 'error');
-        console.error(err.message || this.LANGUAGE_FETCH_ERR);
+        for ( var i = 0 ; node && i < path.length-1 ; i++ ) node = node[path[i]];
+        if ( node ) node[path[path.length-1]] = map[key];
       }
     },
 

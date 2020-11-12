@@ -74,6 +74,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/test/ServiceProviderAwareTest" },
   { name: "foam/nanos/auth/test/UserAndGroupPermissionTest" },
   { name: "foam/nanos/auth/Language" },
+  { name: 'foam/nanos/auth/LanguageChoiceView', flags: ['web'] },
   { name: "foam/nanos/auth/CreatedAwareDAO" },
   { name: "foam/nanos/auth/LastModifiedAwareDAO" },
   { name: "foam/nanos/auth/LifecycleAwareDAO" },
@@ -91,6 +92,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/email/EmailDocInterface" },
   { name: "foam/nanos/auth/email/EmailDocService" },
   { name: "foam/nanos/auth/email/ClientEmailDocService" },
+  { name: "foam/nanos/auth/email/EmailVerificationWebAgent" },
   { name: "foam/nanos/auth/resetPassword/SuccessView" },
   { name: "foam/nanos/auth/resetPassword/ResetPasswordTokenService" },
   { name: "foam/nanos/auth/token/TokenService" },
@@ -294,6 +296,7 @@ FOAM_FILES([
   { name: 'foam/nanos/ticket/TicketAddCommentDAO' },
   { name: 'foam/nanos/ticket/TicketOwnerDAO' },
   { name: 'foam/nanos/ticket/TicketCommentOwnerDAO' },
+  { name: 'foam/nanos/ticket/TicketDAOCreateView' },
   { name: 'foam/nanos/ticket/TicketSummaryView' },
   { name: 'foam/nanos/ticket/SummaryCard' },
 
@@ -355,6 +358,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/Refinements" },
   { name: "foam/nanos/crunch/MinMaxCapability" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
+  { name: "foam/nanos/crunch/CapabilityIntercept" },
   { name: "foam/nanos/crunch/lite/CapablePayload" },
   { name: "foam/nanos/crunch/lite/CapablePayloadStatusDAO" },
   { name: "foam/nanos/crunch/lite/Capable" },
@@ -368,6 +372,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/CapabilityAvailabilityDAO" },
 
   // crunch lite rulers
+  { name: "foam/nanos/crunch/lite/ruler/CapableStatusChangeAdjustApprovalsRuleAction" },
   { name: "foam/nanos/crunch/lite/ruler/CapablePayloadApprovableRuleAction" },
   { name: "foam/nanos/crunch/lite/ruler/CapableCreateApprovalsRuleAction" },
   { name: "foam/nanos/crunch/lite/ruler/SetCapablePayloadStatusOnPut" },
@@ -391,6 +396,8 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/CrunchService" },
   { name: "foam/nanos/crunch/ClientCrunchService" },
   { name: "foam/nanos/crunch/ReputDependentUCJs" },
+  //predicates
+  { name: 'foam/nanos/crunch/predicate/CapabilityGranted' },
   //spid
   { name: "foam/nanos/auth/CreateUserCapabilityJunctionOnSpidSet" },
   { name: "foam/nanos/auth/SetUserServiceProviderJunctionRuleAction" },
@@ -412,6 +419,7 @@ FOAM_FILES([
   //extras
   { name: 'foam/nanos/crunch/extra/ReviewCapability' },
   { name: 'foam/nanos/crunch/extra/ReviewCapabilityData' },
+  { name: 'foam/nanos/crunch/extra/ReviewWizard' },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },

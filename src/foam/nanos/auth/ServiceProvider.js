@@ -51,10 +51,12 @@ foam.CLASS({
       `
     },
     {
-      name: 'permissionsGranted',
-      transient: true,
+      name: 'inherentPermissions',
       javaGetter: 'return new String[] { "serviceprovider.read." + getId() };',
-      hidden: true
+      factory: function() {
+        return [ 'serviceprovider.read.' + this.id ];
+      },
+      documentation: 'Service provider must have "serviceprovider.read.<SPID>" inherent permission.',
     }
   ],
 

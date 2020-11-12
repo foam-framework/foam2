@@ -58,7 +58,7 @@ foam.CLASS({
       tableCellFormatter: function(value, obj, axiom) {
         this.__subSubContext__.capabilityDAO
           .find(value)
-          .then((capability) => this.add(capability.name))
+          .then((capability) => this.add(capability.name || capability.id))
           .catch((error) => {
             this.add(value);
           });

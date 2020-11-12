@@ -344,9 +344,14 @@ foam.CLASS({
       name: 'language',
       documentation: 'The default language preferred by the User.',
       of: 'foam.nanos.auth.Language',
-      value: 'en',
       createVisibility: 'HIDDEN',
-      section: 'personal'
+      section: 'personal',
+      factory: function() {
+        return foam.nanos.auth.LanguageId.create({code: 'en'})
+      },
+      javaFactory: `
+        return new foam.nanos.auth.LanguageId.Builder(null).setCode("en").build();
+      `
     },
     {
       class: 'String',
@@ -444,7 +449,8 @@ foam.CLASS({
       documentation: 'The name of the business associated with the User.',
       width: 50,
       section: 'business',
-      visibility: 'HIDDEN'
+      visibility: 'HIDDEN',
+      tableWidth: 170
     },
     {
       class: 'StringArray',

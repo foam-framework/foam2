@@ -50,6 +50,14 @@ foam.ENUM({
       label: { en: 'pending review', pt: 'revisão pendente' },
       documentation: 'The information you provided is pending signing officer review',
       background: '#bfae32'
-    }
+    },
+    {
+      name: 'REJECTED',
+      label: { en: 'rejected', pt: 'rejeitada'},
+      documentation: `- not seen by users - Denoting a junction requiring review has been rejected. Meant to mark items in a FINAL rejected state where it is not 
+      expected to go to EXPIRED and have the user fill out more info. Used in the 
+      Capable object junctions.`,
+      background: '#bfae32'
+    },
   ]
 });

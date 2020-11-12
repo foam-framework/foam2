@@ -126,8 +126,7 @@ foam.LIB({
 
       if ( this.refines ) {
         // TODO This should probably live elsewhere.
-        if ( this.flags &&
-             global.FOAM_FLAGS ) {
+        if ( this.flags && global.FOAM_FLAGS ) {
           var flagged = false;
           for ( var i = 0 ; i < this.flags.length ; i++ ) {
             if ( global.FOAM_FLAGS[this.flags[i]] ) {

@@ -13,7 +13,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'capable'
+    'capable',
+    'capabilityDAO'
   ],
 
   exports: [
@@ -35,22 +36,24 @@ foam.CLASS({
   methods: [
     async function execute() {
       var capable = this.capable;
-      var wizardletsTuple = this.createWizardletsFromPayloads(capable.capablePayloads);
+      var wizardletsTuple = await this.createWizardletsFromPayloads(capable.capablePayloads);
       this.wizardlets = wizardletsTuple.allDescendantWizardlets;
       console.log('CAPABLE', capable);
       console.log('WIZARDLETS', this.wizardlets);
     },
-    function createWizardletsFromPayloads(payloads) {
+    async function createWizardletsFromPayloads(payloads) {
       var newWizardlets = [];
       var childWizardlets = [];
       for ( let i = 0 ; i < payloads.length ; i++ ) {
         let capablePayload = payloads[i];
-        let wizardlet = this.createWizardletFromPayload(capablePayload);
+        let wizardlet = await this.createWizardletFromPayload(capablePayload);
         let handlePrereqsNormally = true;
         let addWizardletAtEnd = true;
 
         // If this is a MinMax capability, handle its prerequisites differently
-        if ( this.MinMaxCapability.isInstance(capablePayload.capability) ) {
+        var capability = await this.capabilityDAO.find(capablePayload.capability);
+
+        if ( this.MinMaxCapability.isInstance(capability) ) {
           handlePrereqsNormally = false;
           addWizardletAtEnd = false;
 
@@ -59,7 +62,7 @@ foam.CLASS({
           childWizardlets.push(wizardlet);
           
           let minMaxPrereqWizardlets =
-            this.createWizardletsFromPayloads(capablePayload.prerequisites);
+            await this.createWizardletsFromPayloads(capablePayload.prerequisites);
           minMaxPrereqWizardlets.directChildrenWizardlets.forEach(prereqWizardlet => {
             prereqWizardlet.isAvailable = false;
             wizardlet.choiceWizardlets.push(prereqWizardlet);
@@ -75,7 +78,7 @@ foam.CLASS({
         // parent.
         if ( handlePrereqsNormally && capablePayload.prerequisites.length > 0 ) {
           let prereqWizardlets =
-            this.createWizardletsFromPayloads(capablePayload.prerequisites);
+            await this.createWizardletsFromPayloads(capablePayload.prerequisites);
           prereqWizardlets.directChildrenWizardlets.forEach(prereqWizardlet => {
             prereqWizardlet.isAvailable$.follow(wizardlet.isAvailable$);
           })
@@ -98,8 +101,10 @@ foam.CLASS({
         directChildrenWizardlets: childWizardlets
       };
     },
-    function createWizardletFromPayload(capablePayload) {
-      let wizardletClass = capablePayload.capability.wizardlet.cls_;
+    async function createWizardletFromPayload(capablePayload) {
+      var capability = await this.capabilityDAO.find(capablePayload.capability);
+
+      let wizardletClass = capability.wizardlet.cls_;
 
       // Override the default wizardlet class with one that does not
       //   save to userCapabilityJunction
@@ -111,7 +116,7 @@ foam.CLASS({
       }
 
       let wizardlet = wizardletClass.create({
-        capability: capablePayload.capability,
+        capability: capability,
         targetPayload: capablePayload,
         data$: capablePayload.data$
       }, this);

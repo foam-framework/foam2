@@ -83,7 +83,7 @@ foam.CLASS({
   methods: [
     function init() {
        this.SUPER();
-       this.onDetach(this.userCapabilityJunctionDAO.on.put.sub(this.daoUpdate));
+       this.onDetach(this.crunchService.sub('updateJunction', this.daoUpdate));
        this.daoUpdate();
     },
 
@@ -123,19 +123,6 @@ foam.CLASS({
         .start()
           .addClass(style.myClass('card-title'))
           .add(( self.data.name != '') ?  { data : self.data, clsInfo : self.data.cls_.NAME.name, default : self.data.name }  : self.data.id)
-        .end()
-        .start()
-          .addClass(style.myClass('card-subtitle'))
-          .select(self.data.categories.dao
-            .where(this.EQ(foam.nanos.crunch.CapabilityCategory.VISIBLE, true)), function (category) {
-              return this.E('span')
-                .addClass(style.myClass('category'))
-                .add({ data : category, clsInfo : category.cls_.NAME.name, default : category.name });
-          })
-        .end()
-        .start()
-          .addClass(style.myClass('card-description'))
-          .add({ data : self.data, clsInfo : self.data.cls_.DESCRIPTION.name, default : self.data.description } || 'no description')
         .end();
     }
   ],
@@ -144,19 +131,7 @@ foam.CLASS({
     {
       name: 'daoUpdate',
       code: function() {
-        this.userCapabilityJunctionDAO.find(
-          this.AND(
-            this.EQ(this.UserCapabilityJunction.TARGET_ID, this.data.id),
-            this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.associatedEntity.id),
-            this.OR(
-              this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
-              this.AND(
-                this.INSTANCE_OF(this.AgentCapabilityJunction),
-                this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
-              )
-            )
-          )
-        ).then(ucj => {
+        this.crunchService.getJunction(null, this.data.id).then(ucj => {
           if ( ucj ) {
             this.cjStatus = ucj.status === this.CapabilityJunctionStatus.APPROVED ?
               this.CapabilityJunctionStatus.PENDING : ucj.status;
@@ -168,10 +143,28 @@ foam.CLASS({
           }
           if ( this.cjStatus === this.CapabilityJunctionStatus.ACTION_REQUIRED ) {
             this.auth.check(this.ctrl.__subContext__, 'certifydatareviewed.rw.reviewed').then(result => {
-              if ( ! result ) {
+              if ( ! result &&
+                ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-49' ||
+                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-13' ||
+                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-12' ||
+                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-11'
+                ) ) {
                 this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
               }
+            }).catch(err => {
+              if ( err.data && err.data.id === 'foam.nanos.crunch.CapabilityRuntimeException' &&
+                ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-49' ||
+                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-13' ||
+                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-12' ||
+                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-11'
+                ) ) {
+                this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
+              } else throw err;
             });
+
+            if ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-20' ) {
+              this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
+            }
           }
         });
       }
