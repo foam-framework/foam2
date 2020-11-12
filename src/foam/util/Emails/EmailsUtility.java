@@ -62,7 +62,9 @@ public class EmailsUtility {
     SupportConfig supportConfig = theme.getSupportConfig();
 
     // Set ReplyTo, From, DisplayName in emailMessage 
-    EmailConfig emailConfig = supportConfig.getEmailConfig();
+    EmailConfig emailConfig = (EmailConfig) ((EmailConfig) x.get("emailConfig")).fclone();
+    EmailConfig supportEmailConfig = supportConfig.getEmailConfig();
+    emailConfig = supportConfig.getEmailConfig();
     // REPLY TO:
     if ( ! SafetyUtil.isEmpty(emailConfig.getReplyTo()) ) {
       emailMessage.setReplyTo(emailConfig.getReplyTo());
