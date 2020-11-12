@@ -168,7 +168,7 @@ foam.CLASS({
       let country = await this.countryDAO.find(this.lastLanguage.variant)
       let label = this.lastLanguage.variant != "" ? `${this.lastLanguage.name}(${this.lastLanguage.variant})` : `${this.lastLanguage.name}`
       if ( country && country.name != null ) {
-        label = `${this.lastLanguage.name}(${this.getCountryName(country.name, country.name)})`
+        label = `${this.lastLanguage.name}\u00A0(${this.getCountryName(country.name, country.name)})`
       }
 
       this
@@ -186,7 +186,7 @@ foam.CLASS({
       let country = await this.countryDAO.find(language.variant)
       let label = language.variant != "" ? `${language.name}(${language.variant})` : `${language.name}`
       if ( country && country.name != null ) {
-        label = `${language.name}(${this.getCountryName(country.name, country.name)})`
+        label = `${language.name}\u00A0(${this.getCountryName(country.name, country.name)})`
       }
       return label
     },
