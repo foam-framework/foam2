@@ -47,7 +47,8 @@ foam.CLASS({
             this.RemoteException.isInstance(msg.object.data) &&
             this.CapabilityIntercept.isInstance(msg.object.data.exception)
         ) {
-          let intercept = msg.object.data.exception;
+          var intercept = msg.object.data.exception;
+          intercept.message = msg.object.data.message;
 
           // Configure events CapabilityIntercept comopletion
           intercept.resolve = function (value) {
