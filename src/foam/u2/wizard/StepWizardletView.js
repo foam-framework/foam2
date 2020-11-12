@@ -122,9 +122,6 @@ foam.CLASS({
       width: 100px;
       height: 100px;
     }
-    ^top-padding {
-      padding-top: 99px;
-    }
     ^ .foam-u2-stack-StackView {
       height: auto;
       margin-bottom: 30px;
@@ -198,10 +195,9 @@ foam.CLASS({
           .start(this.GUnit, { columns: 8 })
             .addClass(this.myClass('rightside'))
             .add(this.slot(function(hideX) {
-              if ( hideX ) {
-                return this.E().addClass(this.myClass('top-padding'));
-              }
-              return this.E().addClass(this.myClass('top-buttons'))
+              return hideX ? 
+                null :
+                this.E().addClass(this.myClass('top-buttons'))
                 .start(this.CircleIndicator, {
                   label: 'X',
                   borderThickness: 2,
