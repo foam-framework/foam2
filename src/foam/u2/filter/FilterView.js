@@ -49,11 +49,25 @@ foam.CLASS({
       max-height: 0;
       overflow: hidden;
 
-      transition: max-height 0.24s ease-in-out;
+      transition: all 0.24s linear;
 
       display: flex;
+
+      border: 1px solid transparent;
+      border-radius: 5px;
+    }
+
+    ^container-drawer-open {
+      border-color: #cbcfd4;
+      margin-top: 24px;
+      max-height: 500px;
+    }
+
+    ^container-filters {
+      display: flex;
+      flex: 1;
       flex-wrap: wrap;
-      justify-content: space-between;
+      align-items: center;
     }
 
     ^general-field {
@@ -64,12 +78,12 @@ foam.CLASS({
     ^general-field .foam-u2-tag-Input {
       width: 100%;
       height: 34px;
-      border-radius: 5px 0 0 5px;
+      border-radius: 0 5px 5px 0;
       border: 1px solid /*%GREY4%*/ #cbcfd4;
     }
 
-    ^container-drawer-open {
-      max-height: 1000px;
+    ^container-search .foam-u2-search-TextSearchView {
+      margin: 0;
     }
 
     ^container-handle {
@@ -77,10 +91,10 @@ foam.CLASS({
       box-sizing: border-box;
       height: 34px;
       border: 1px solid /*%GREY4%*/ #e7eaec;
-      border-radius: 0 5px 5px 0;
+      border-radius: 5px 0 0 5px;
       background-image: linear-gradient(to bottom, #ffffff, #e7eaec);
 
-      flex: 1 1 20%;
+      flex: 1 1 5%;
       display: flex;
       align-items: center;
     }
@@ -88,6 +102,7 @@ foam.CLASS({
     ^handle-title {
       flex: 1;
       margin: 0;
+      text-align: center;
     }
 
     ^container-handle:hover {
@@ -111,35 +126,39 @@ foam.CLASS({
 
     ^link-mode {
       margin: 0;
-      font-size: 12px;
-      padding: 0 8px;
-      color: #4D7AF7;
+      font-size: 14px;
+      margin: 16px;
+      cursor: pointer;
+    }
+
+    ^link-mode.advanced {
+      color: #9ba1a6;
       text-decoration: underline;
     }
 
-    ^link-mode:hover {
-      cursor: pointer;
-      color: #233E8B;
+    ^link-mode.advanced:hover {
+      color: #5e6061;
     }
 
-    ^container-message {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      flex: 1;
-      padding: 16px;
+    ^link-mode.clear {
+      color: red;
+      margin: 24px 16px;
+      flex-shrink: 0;
+      align-self: flex-start;
+    }
+
+    ^link-mode.clear:hover {
+      color: darkred;
     }
 
     ^message-advanced {
-      margin: 0;
+      margin: 16px;
     }
 
     ^message-view {
-      margin: 0;
-      margin-top: 8px;
+      margin: 16px;
+      margin-left: auto;
       color: #4D7AF7;
-      text-decoration: underline;
     }
 
     ^message-view:hover {
@@ -155,11 +174,11 @@ foam.CLASS({
   `,
 
   messages: [
-    { name: 'LABEL_FILTER', message: 'Filter'},
-    { name: 'LABEL_RESULTS', message: 'Filter Results: '},
-    { name: 'LABEL_CLEAR', message: 'Clear'},
-    { name: 'LINK_ADVANCED', message: 'Advanced'},
-    { name: 'LINK_SIMPLE', message: 'Simple'},
+    { name: 'LABEL_FILTER', message: 'Filters'},
+    { name: 'LABEL_RESULTS', message: 'Filter results: '},
+    { name: 'LABEL_CLEAR', message: 'Clear filters'},
+    { name: 'LINK_ADVANCED', message: 'Advanced filters'},
+    { name: 'LINK_SIMPLE', message: 'Switch to simple filters'},
     { name: 'MESSAGE_ADVANCEDMODE', message: 'Advanced filters are currently being used.'},
     { name: 'MESSAGE_VIEWADVANCED', message: 'View filters'},
   ],
@@ -262,6 +281,10 @@ foam.CLASS({
           var e = this.E();
           e.onDetach(self.filterController);
           e.start().addClass(self.myClass('container-search'))
+            .start().addClass(self.myClass('container-handle'))
+              .on('click', self.toggleDrawer)
+              .start('p').addClass(self.myClass('handle-title')).add(self.LABEL_FILTER).end()
+            .end()
             .start(self.TextSearchView, {
               richSearch: true,
               of: self.dao.of.id,
@@ -273,56 +296,56 @@ foam.CLASS({
             }, self.generalSearchField$)
               .addClass(self.myClass('general-field'))
             .end()
-            .start().addClass(self.myClass('container-handle'))
-              .on('click', self.toggleDrawer)
-              .start('p').addClass(self.myClass('handle-title')).add(self.LABEL_FILTER).end()
-              .start({ class: 'foam.u2.tag.Image', data$: self.iconPath$}).end()
-            .end()
+
           .end()
           .add(this.filterController.slot(function (criterias) {
             return self.E().start().addClass(self.myClass('container-drawer'))
               .enableClass(self.myClass('container-drawer-open'), self.isOpen$)
-                .forEach(filters, function(f) {
-                  var axiom = self.dao.of.getAxiomByName(f);
-                  if ( axiom ){
-                    this.start(self.PropertyFilterView, {
-                      criteria: 0,
-                      searchView: axiom.searchView,
-                      property: axiom,
-                      dao: self.dao
-                    })
-                    .hide(self.filterController$.dot('isAdvanced'))
-                    .end();
-                  }
-                })
-                .start().addClass(self.myClass('container-message'))
-                  .show(self.filterController$.dot('isAdvanced'))
+                .start().addClass(self.myClass('container-filters'))
+                  .forEach(filters, function(f) {
+                    var axiom = self.dao.of.getAxiomByName(f);
+                    if ( axiom ){
+                      this.start(self.PropertyFilterView, {
+                        criteria: 0,
+                        searchView: axiom.searchView,
+                        property: axiom,
+                        dao: self.dao
+                      })
+                      .hide(self.filterController$.dot('isAdvanced'))
+                      .end();
+                    }
+                  })
                   .start('p')
+                    .show(self.filterController$.dot('isAdvanced'))
                     .addClass(self.myClass('message-advanced'))
                     .add(self.MESSAGE_ADVANCEDMODE)
                   .end()
                   .start('p')
+                    .show(self.filterController$.dot('isAdvanced'))
                     .addClass(self.myClass('message-view'))
                     .on('click', self.openAdvanced)
                     .add(self.MESSAGE_VIEWADVANCED)
                   .end()
+                  .start('p')
+                    .addClass(self.myClass('link-mode'))
+                    .addClass('advanced')
+                    .on('click', self.toggleMode)
+                    .add(self.modeLabel$)
+                  .end()
                 .end()
+                .start('p')
+                  .hide(self.filterController$.dot('isAdvanced'))
+                  .addClass(self.myClass('link-mode'))
+                  .addClass('clear')
+                  .on('click', self.clearAll)
+                  .add(self.LABEL_CLEAR)
+                .end()
+
             .end()
             .start().addClass(self.myClass('container-footer'))
               .start('p')
                 .addClass(self.myClass('label-results'))
                 .add(self.resultLabel$)
-              .end()
-              .start('p')
-                .hide(self.filterController$.dot('isAdvanced'))
-                .addClass(self.myClass('link-mode'))
-                .on('click', self.clearAll)
-                .add(self.LABEL_CLEAR)
-              .end()
-              .start('p')
-                .addClass(self.myClass('link-mode'))
-                .on('click', self.toggleMode)
-                .add(self.modeLabel$)
               .end()
             .end();
           }))
