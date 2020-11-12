@@ -45,9 +45,9 @@ foam.CLASS({
     { name: 'ERROR_MSG_DRAFT', message: 'An error occured while saving your progress' },
     { name: 'SUCCESS_MSG', message: 'Information successfully submitted' },
     { name: 'SUCCESS_MSG_DRAFT', message: 'Your progress has been saved' },
-    { name: 'CONFIRM_MSG', message: 'Confirm Wizard Dismissal' },
-    { name: 'DISMISS_MSG', message: 'You are about to dismiss the wizard. Are you sure?' },
-    { name: 'CONTINUE_MSG', message: 'No, I want to continue' }
+    { name: 'CONFIRM_MSG', message: 'Save and exit' },
+    { name: 'DISMISS_MSG', message: 'Are you sure you want to leave this screen?' },
+    { name: 'CONTINUE_MSG', message: 'Go back' }
   ],
 
   css: `
