@@ -18,7 +18,8 @@ foam.CLASS({
       name: 'message'
     },
     {
-      class: 'Object',
+      class: 'FObjectProperty',
+      of: 'foam.core.Exception',
       name: 'exception'
     }
   ],

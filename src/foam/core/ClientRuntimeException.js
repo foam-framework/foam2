@@ -23,6 +23,10 @@ foam.CLASS({
             public ClientRuntimeException(Throwable cause) {
               super(cause);
             }
+
+            public ClientRuntimeException(String message, Throwable cause) {
+              super(message, cause);
+            }
           `
         );
       }
