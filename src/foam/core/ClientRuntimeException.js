@@ -8,7 +8,7 @@ foam.CLASS({
   name: 'ClientRuntimeException',
   package: 'foam.core',
   implements: [ 'foam.core.ExceptionInterface' ],
-  javaExtends: 'RuntimeException',
+  javaExtends: 'foam.core.FOAMException',
 
   axioms: [
     {
@@ -45,4 +45,4 @@ foam.CLASS({
         javaCode: `return this;`
     }
   ]
-})
+});

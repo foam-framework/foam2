@@ -7,8 +7,8 @@
 foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'CapabilityIntercept',
-  implements: [ 'foam.core.Exception', 'foam.core.ExceptionInterface' ],
-  javaExtends: 'foam.nanos.auth.AuthorizationException',
+  implements: [ 'foam.core.ExceptionInterface' ],
+  javaExtends: 'foam.core.FOAMException',
 
   javaImports: [
     'foam.nanos.crunch.lite.Capable',
