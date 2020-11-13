@@ -495,31 +495,19 @@ foam.CLASS({
       section: 'administration'
     },
     {
-      class: 'String',
-      name: 'supportPhone'
-    },
-    {
-      class: 'String',
-      name: 'supportEmail'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Address',
-      name: 'supportAddress',
-      factory: function() {
-        return foam.nanos.auth.Address.create({}, this);
-      }
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'personalSupportUser'
-    },
-    {
       name: 'spid',
       class: 'Reference',
       of: 'foam.nanos.auth.ServiceProvider',
       value: foam.nanos.auth.ServiceProviderAware.GLOBAL_SPID
+    },
+    {
+      class: 'foam.core.FObjectProperty',
+      of:'foam.nanos.app.SupportConfig',
+      name: 'supportConfig',
+      factory: function() { return foam.nanos.app.SupportConfig.create({},this)},
+      javaFactory: `
+        return new foam.nanos.app.SupportConfig();
+      `
     }
   ],
 

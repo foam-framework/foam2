@@ -10,7 +10,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.lib.parse.Grammar',
-    'foam.lib.parse.GrammarAction',
+    'foam.lib.parse.Action',
     'foam.lib.parse.*',
     'foam.lib.json.AnyKeyParser',
     'java.util.HashMap',
@@ -43,7 +43,7 @@ foam.CLASS({
 
 
         // define actions for every symbol
-        GrammarAction action = new GrammarAction() {
+        Action action = new Action() {
           @Override
           public Object execute(Object val, ParserContext x) {
             String value = (String) getValues().get(val);
@@ -57,7 +57,7 @@ foam.CLASS({
           }
         };
         grammar.addSymbol("ANY_KEY", new AnyKeyParser());
-        GrammarAction anyAction = new GrammarAction() {
+        Action anyAction = new Action() {
           @Override
           public Object execute(Object val, ParserContext x) {
             getSb().append(val);
@@ -65,7 +65,7 @@ foam.CLASS({
           }
         };
 
-        GrammarAction markup = new GrammarAction() {
+        Action markup = new Action() {
           @Override
           public Object execute(Object value, ParserContext x) {
             return getSb().toString();

@@ -45,6 +45,9 @@ foam.CLASS({
     { name: 'ERROR_MSG_DRAFT', message: 'An error occured while saving your progress' },
     { name: 'SUCCESS_MSG', message: 'Information successfully submitted' },
     { name: 'SUCCESS_MSG_DRAFT', message: 'Your progress has been saved' },
+    { name: 'CONFIRM_MSG', message: 'Save and exit' },
+    { name: 'DISMISS_MSG', message: 'Are you sure you want to leave this screen?' },
+    { name: 'CONTINUE_MSG', message: 'Go back' }
   ],
 
   css: `
@@ -88,8 +91,7 @@ foam.CLASS({
       flex-grow: 1;
       -webkit-mask-image: -webkit-gradient(linear, left 15, left top, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
       overflow-y: auto;
-      padding: 0 50px;
-      padding-top: 24px;
+      padding: 24px 50px 100px 50px;
     }
     ^rightside ^top-buttons {
       text-align: right;
@@ -99,7 +101,7 @@ foam.CLASS({
     }
     ^rightside ^bottom-buttons {
       background-color: %GREY6%;
-      padding: 25px 50px;
+      padding: 0 50px 25px 50px;
       text-align: right;
     }
     ^buttons {
@@ -119,9 +121,6 @@ foam.CLASS({
     ^loading-spinner img {
       width: 100px;
       height: 100px;
-    }
-    ^top-padding {
-      padding-top: 99px;
     }
     ^ .foam-u2-stack-StackView {
       height: auto;
@@ -195,6 +194,20 @@ foam.CLASS({
           .end()
           .start(this.GUnit, { columns: 8 })
             .addClass(this.myClass('rightside'))
+            .add(this.slot(function(hideX) {
+              return hideX ? 
+                null :
+                this.E().addClass(this.myClass('top-buttons'))
+                .start(this.CircleIndicator, {
+                  label: 'X',
+                  borderThickness: 2,
+                  borderColor: this.theme.grey2,
+                  borderColorHover: this.theme.primary1,
+                  clickable: true
+                })
+                .on('click', () => this.showExitPrompt())
+                .end();
+            }))
             .start()
               .addClass(this.myClass('entry'))
               .start()
@@ -244,13 +257,13 @@ foam.CLASS({
         a.code = action.code.bind(this, this.__subSubContext__);
         return a;
       }
-      prompt = this.Popup.create().tag(this.SimpleActionDialog, {
-        title: 'Confirm Wizard Dismissal',
-        body: 'You are about to dismiss the wizard. Are you sure?',
+      prompt = this.Popup.create({ closeable: false }).tag(this.SimpleActionDialog, {
+        title: this.CONFIRM_MSG,
+        body: this.DISMISS_MSG,
         actions: [
           this.Action.create({
             name: 'cancel',
-            label: 'No, I want to continue',
+            label: this.CONTINUE_MSG,
             code: () => {
               prompt.close();
             }

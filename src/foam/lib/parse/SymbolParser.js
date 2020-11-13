@@ -15,15 +15,10 @@
     'java.util.Map'
   ],
 
-  requires: [
-    'foam.parse.ParserWithAction'
-  ],
-
   properties: [
     {
       class: 'Map',
       name: 'symbols',
-//      javaFactory: 'return new java.util.HashMap<String, foam.lib.parse.Parser>();'
     },
     {
       class: 'String',

@@ -8,11 +8,14 @@ foam.CLASS({
   package: 'foam.i18n',
   name: 'Locale',
 
+  ids: ['locale', 'variant', 'source'],
+
+  implements: [
+    'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.auth.LastModifiedByAware'
+  ],
+
   properties: [
-    {
-      class: 'String',
-      name: 'id',
-    },
     {
       class: 'String',
       name: 'locale',
@@ -52,6 +55,26 @@ foam.CLASS({
       class: 'String',
       name: 'note',
       documentation: 'Provided hint to translators. Ex. ( if label is `rad` hint: calculator radian.)'
+    },
+    {
+      class: 'DateTime',
+      name: 'lastModified',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedBy',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      tableCellFormatter: function(value, obj) {
+        this.__subSubContext__.userDAO.find(value).then(function(user) {
+          if ( user ) {
+            this.add(user.legalName);
+          }
+        }.bind(this));
+      }
     }
   ]
 });

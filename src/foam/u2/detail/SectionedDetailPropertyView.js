@@ -55,7 +55,6 @@ foam.CLASS({
       border-top-right-radius: 0px;
       direction: ltr;
       padding: 2px;
-      text-align: center;
     }
 
     ^arrow-right {
@@ -92,6 +91,7 @@ foam.CLASS({
     ^error .foam-u2-IntView,
     ^error .foam-u2-FloatView,
     ^error .foam-u2-DateView,
+    ^error .foam-u2-CurrencyView,
     ^error .foam-u2-view-date-DateTimePicker .date-display-box,
     ^error .foam-u2-view-RichChoiceView-selection-view,
     ^error .foam-u2-view-RichChoiceView-clear-btn

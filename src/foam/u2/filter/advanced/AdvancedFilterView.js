@@ -38,6 +38,10 @@ foam.CLASS({
       height: 90%;
     }
 
+    ^ .foam-u2-filter-property-PropertyFilterView {
+      margin-bottom: 0;
+    }
+
     ^ .foam-u2-ModalHeader {
       border-radius: 5px 5px 0 0;
     }
@@ -119,8 +123,12 @@ foam.CLASS({
     }
 
     ^ .foam-u2-ActionView-clearAll {
-      color: red;
+      color: red !important;
       padding: 0 8px;
+    }
+
+    ^ .foam-u2-ActionView-clearAll:hover {
+      color: darkred !important;
     }
 
     ^ .foam-u2-ActionView-tertiary {
@@ -265,14 +273,14 @@ foam.CLASS({
     },
     {
       name: 'clearAll',
-      label: 'Clear All',
+      label: 'Clear changes',
       code: function(X) {
         this.filterController.clearAll(true);
       }
     },
     {
       name: 'filter',
-      label: 'Apply Filter',
+      label: 'Apply filters',
       isEnabled: function(filterController$previewPredicate) {
         return filterController$previewPredicate !== this.TRUE;
       },

@@ -28,7 +28,7 @@ foam.CLASS({
     {
       name: 'selectedView',
       view: function(_, X) {
-        return foam.u2.view.ChoiceView.create({choices: X.data.views});
+        return foam.u2.view.ChoiceView.create({choices: X.data.views}, X);
       }
     },
     {
