@@ -8,7 +8,8 @@ foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'CapabilityIntercept',
   implements: [ 'foam.core.ExceptionInterface' ],
-  javaExtends: 'foam.core.FOAMException',
+  extends: 'foam.core.FOAMException',
+  javaGenerateConvenienceConstructor: false,
 
   javaImports: [
     'foam.nanos.crunch.lite.Capable',
@@ -21,9 +22,17 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(
           `
-            public CapabilityIntercept(String message) {
-              super(message);
-            }
+  public CapabilityIntercept(String message) {
+    super(message);
+  }
+
+  public CapabilityIntercept(Throwable cause) {
+    super(cause);
+  }
+
+  public CapabilityIntercept(String message, Throwable cause) {
+    super(message, cause);
+  }
           `
         );
       }

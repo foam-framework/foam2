@@ -10,7 +10,7 @@ foam.CLASS({
   implements: [ 'foam.core.Exception' ],
   javaExtends: 'RuntimeException',
   javaGenerateConvenienceConstructor: false,
-
+  
   axioms: [
     {
       name: 'javaExtras',
@@ -36,6 +36,12 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      name: 'javaGenerateConvenienceConstructor',
+      value: false,
+      transient: true,
+      visibility: 'HIDDEN'
+    },
     {
       name: 'message_',
       class: 'String'
