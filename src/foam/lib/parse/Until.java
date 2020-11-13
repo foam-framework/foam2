@@ -12,11 +12,10 @@ public class Until
   protected Parser until_;
 
   public Until(Parser until) {
-    until_ = until;
+    until_ = new Not(until, AnyChar.instance());
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    Parser repeat = new Not(until_, AnyChar.instance());
-    return repeat.parse(ps, x);
+    return until_.parse(ps, x);
   }
 }
