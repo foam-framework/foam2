@@ -49,22 +49,15 @@ foam.CLASS({
 
         if ( replyBox == null ) return;
 
-        Object wrapperObj = null;
-        if ( t instanceof foam.core.ExceptionInterface ) {
-          wrapperObj = t;
-        } else {
-          RemoteException wrapper = new RemoteException();
-          wrapper.setId(t.getClass().getName());
-          wrapper.setMessage(t.getMessage());
-          if ( t instanceof foam.core.Exception ) {
-            var fe = (foam.core.Exception) t;
-            wrapper.setException(t);
-          }
-          wrapperObj = wrapper;
+        RemoteException wrapper = new RemoteException();
+        wrapper.setId(t.getClass().getName());
+        wrapper.setMessage(t.getMessage());
+        if ( t instanceof foam.core.Exception ) {
+          wrapper.setException((foam.core.Exception) t);
         }
-        
+
         RPCErrorMessage reply = new RPCErrorMessage();
-        reply.setData(wrapperObj);
+        reply.setData(wrapper);
 
         Message replyMessage = new Message();
         replyMessage.setObject(reply);
