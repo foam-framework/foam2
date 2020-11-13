@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  name: 'MedusaException',
+  name: 'ClusterException',
   package: 'foam.nanos.medusa',
   javaExtends: 'foam.core.FOAMException',
 
@@ -15,11 +15,11 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  public MedusaException(String message) {
+  public ClusterException(String message) {
     super(message);
   }
 
-  public MedusaException(String message, Throwable cause) {
+  public ClusterException(String message, Throwable cause) {
     super(message, cause);
   }
           `

@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  name: 'MedusaException',
+  name: 'DaggerException',
   package: 'foam.nanos.medusa',
   javaExtends: 'foam.core.FOAMException',
 
@@ -15,13 +15,13 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  public MedusaException(String message) {
+  public DaggerException(String message) {
     super(message);
   }
 
-  public MedusaException(String message, Throwable cause) {
+  public DaggerException(String message, Throwable cause) {
     super(message, cause);
-  }
+  } 
           `
         }));
       }

@@ -195,10 +195,10 @@ foam.CLASS({
         getLogger().error("Error sending message", message, t);
         setValid(false);
         if ( replyBox != null ) {
-          Message reply = new Message();
-          reply.setObject(new RPCErrorMessage(getX(), t.getMessage(), null));
-          replyBox.send(reply);
-          getReplyBoxes().remove(replyBoxId);
+         Message reply = new Message();
+         reply.getAttributes().put("replyBox", replyBox);
+         reply.replyWithException(t);
+         getReplyBoxes().remove(replyBoxId);
         } else {
           throw new RuntimeException(t);
         }
@@ -285,8 +285,13 @@ foam.CLASS({
               if ( o != null &&
                    o instanceof foam.box.RPCErrorMessage ) {
                 foam.box.RemoteException re = (foam.box.RemoteException) ((foam.box.RPCErrorMessage) o).getData();
-                throw new RuntimeException(re.toString());
+                getLogger.warning("RemoteException", re.getId(), re.getMessage(), re.getException());
+                if ( re.getException() != null ) {
+                  throw (foam.core.FOAMException) re.getException();
+                }
+                throw new RuntimeException(re.getMessage());
               }
+              getLogger().error("Failed to process reply", message);
               throw new RuntimeException("Failed to process reply. message: "+message);
             }
           } catch ( java.net.SocketTimeoutException e ) {

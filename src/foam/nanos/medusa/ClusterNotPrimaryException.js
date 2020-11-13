@@ -5,9 +5,9 @@
  */
 
 foam.CLASS({
-  name: 'MedusaException',
+  name: 'ClusterNotPrimaryException',
   package: 'foam.nanos.medusa',
-  javaExtends: 'foam.core.FOAMException',
+  javaExtends: 'foam.nanos.medusa.ClusterException',
 
   axioms: [
     {
@@ -15,13 +15,13 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  public MedusaException(String message) {
+  public ClusterNotPrimaryException(String message) {
     super(message);
   }
 
-  public MedusaException(String message, Throwable cause) {
+  public ClusterNotPrimaryException(String message, Throwable cause) {
     super(message, cause);
-  }
+  } 
           `
         }));
       }
