@@ -1013,6 +1013,8 @@ foam.CLASS({
 
   methods: [
     function init() {
+      if ( ! this.translationService )
+        console.warn('Element ' + this.cls_.name + ' created with globalContext');;
       this.onDetach(this.visitChildren.bind(this, 'detach'));
     },
 
@@ -1588,9 +1590,14 @@ foam.CLASS({
     },
 
     function translate(source, opt_default) {
-      /* Add the translation of the supplied source to the Element as a String */
-      var translation = this.translationService.getTranslation(foam.locale, source, opt_default);
-      return this.add(translation);
+      var translationService = this.translationService;
+      if ( translationService ) {
+        /* Add the translation of the supplied source to the Element as a String */
+        var translation = this.translationService.getTranslation(foam.locale, source, opt_default);
+        return this.add(translation);
+      }
+      console.warn('Missing Translation Service in ', this.cls_.name);
+      return opt_default || 'NO TRANSLATION SERVICE OR DEFAULT';
     },
 
     function add() {
