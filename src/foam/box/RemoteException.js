@@ -28,7 +28,7 @@ foam.CLASS({
     {
       name: 'toString',
       type: 'String',
-      javaCode: 'return getId() + ":"+getMessage();',
+      javaCode: 'return getId() + ": "+getMessage();',
       code: function() {
         return this.id + ':' + this.message;
       }
