@@ -1,0 +1,47 @@
+<title>FLOW Widgets</title>
+
+<h1>FLOW Widgets</h1>
+
+These convenient widgets help with documenting FOAM code in FLOW.
+
+<h2>PropertyShortSummary</h2>
+
+PropertyShortSummary allows you to display a model's properties without
+additional model information. This can be useful to point out a few
+specific properties of a model being discussed.
+
+For example, say you were documenting cron jobs and wanted to display
+a few properties `Cron` has related to scheduling.
+
+<code>
+<foam class="foam.flow.widgets.PropertyShortSummary" of="foam.nanos.cron.Cron" whitelist="['schedule','scheduledTime']" />
+</code>
+
+The above code would display the following:
+
+<foam class="foam.flow.widgets.PropertyShortSummary" of="foam.nanos.cron.Cron" whitelist="['schedule','scheduledTime']" />
+
+<h2>ModelSummary</h2>
+
+ModelSummary displays properties of the model itself, such as its
+package, name, and documentation. The above table is a ModelSummary.
+
+If we wanted to generate the ModelSummary for CRON, we could use the
+following snippet:
+
+<code>
+<foam class="foam.flow.widgets.ModelSummary" of="foam.nanos.cron.Cron" visibleModelProps="id,documentation" />
+</code>
+
+The above code would display the following:
+
+<foam class="foam.flow.widgets.ModelSummary" of="foam.nanos.cron.Cron" visibleModelProps="id,documentation" />
+
+
+<h2>EnumSummary</h2>
+
+<foam class="foam.flow.widgets.DocumentationIncomplete" status="todo" isSection="true" />
+
+<h2>DocumentationIncomplete</h2>
+
+<foam class="foam.flow.widgets.DocumentationIncomplete" status="todo" isSection="true" />
