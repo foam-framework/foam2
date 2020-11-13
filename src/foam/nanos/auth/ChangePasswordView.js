@@ -24,11 +24,11 @@ foam.CLASS({
     ^top-bar {
       background: /*%LOGOBACKGROUNDCOLOUR%*/ #202341;
       width: 100%;
-      height: 8vh;
+      height: 12vh;
       border-bottom: solid 1px #e2e2e3;
     }
     ^top-bar img {
-      height: 4vh;
+      height: 8vh;
       padding-top: 2vh;
       display: block;
       margin: 0 auto;
