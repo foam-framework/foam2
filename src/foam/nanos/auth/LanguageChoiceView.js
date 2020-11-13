@@ -61,10 +61,11 @@ foam.CLASS({
     color: #ffffff;
   }
   ^ .popUpDropDown > div {
+    margin-left: -16px;
     width: 100%;
     text-align: center;
     height: 25;
-    padding-bottom: 5;
+    padding: 0px 16px 5px 16px;
     font-size: 14px;
     font-weight: 300;
     letter-spacing: 0.2px;
@@ -72,11 +73,12 @@ foam.CLASS({
     line-height: 30px;
   }
   ^ .foam-u2-PopupView {
+    border-radius: 4px;
     left: -30 !important;
     top: 51px !important;
-    padding: 0 !important;
+    padding: 0px 16px 0px 16px !important;
     z-index: 1000;
-    width: 110px !important;
+    width: fit-content !important;
     background: white;
     opacity: 1;
     box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.19);
@@ -165,7 +167,7 @@ foam.CLASS({
       let country = await this.countryDAO.find(this.lastLanguage.variant)
       let label = this.lastLanguage.variant != "" ? `${this.lastLanguage.name}(${this.lastLanguage.variant})` : `${this.lastLanguage.name}`
       if ( country && country.name != null ) {
-        label = `${this.lastLanguage.name}(${this.getCountryName(country.name, country.name)})`
+        label = `${this.lastLanguage.name}\u00A0(${this.getCountryName(country.name, country.name)})`
       }
 
       this
@@ -183,7 +185,7 @@ foam.CLASS({
       let country = await this.countryDAO.find(language.variant)
       let label = language.variant != "" ? `${language.name}(${language.variant})` : `${language.name}`
       if ( country && country.name != null ) {
-        label = `${language.name}(${this.getCountryName(country.name, country.name)})`
+        label = `${language.name}\u00A0(${this.getCountryName(country.name, country.name)})`
       }
       return label
     },

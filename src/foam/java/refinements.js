@@ -727,7 +727,10 @@ foam.LIB({
           });
         }
 
-        if ( props.length && props.length < 7 ) {
+        if ( ! cls.hasOwnProperty('javaGenerateConvenienceConstructor') )
+          cls.javaGenerateConvenienceConstructor = props.length && props.length < 7;
+
+        if ( cls.javaGenerateConvenienceConstructor ) {
           // All-property constructor
           cls.method({
             visibility: 'public',
@@ -1903,6 +1906,7 @@ foam.CLASS({
   refines: 'foam.core.Class',
   flags: ['java'],
   properties: [
+    'javaGenerateConvenienceConstructor',
     ['javaType',       'foam.core.ClassInfo'],
     ['javaInfoType',   'foam.core.AbstractClassPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ClassReferenceParser.instance()']
