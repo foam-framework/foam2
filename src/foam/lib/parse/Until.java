@@ -16,7 +16,7 @@ public class Until
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    Parser repeat = new Seq0(AnyChar.instance(), new Not(until_));
+    Parser repeat = new Not(until_, AnyChar.instance());
     return repeat.parse(ps, x);
   }
 }
