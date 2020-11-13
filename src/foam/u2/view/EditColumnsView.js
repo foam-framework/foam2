@@ -63,7 +63,7 @@ foam.CLASS({
       this.SUPER();
 
       var self = this;
-      this.columnConfigPropView = foam.u2.view.ColumnConfigPropView.create({data:self.data});
+      this.columnConfigPropView = foam.u2.view.ColumnConfigPropView.create({data:self.data}, this);
       this.start()
       .addClass(this.myClass())
         .show(this.selectColumnsExpanded$)

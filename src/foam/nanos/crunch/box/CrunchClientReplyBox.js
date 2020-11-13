@@ -15,6 +15,7 @@ foam.CLASS({
 
   requires: [
     'foam.box.RPCErrorMessage',
+    'foam.box.RemoteException',
     'foam.box.RPCReturnMessage',
     'foam.nanos.crunch.CapabilityIntercept'
   ],
@@ -43,9 +44,11 @@ foam.CLASS({
         var self = this;
         if (
           this.RPCErrorMessage.isInstance(msg.object) &&
-          this.CapabilityIntercept.isInstance(msg.object.data)
+            this.RemoteException.isInstance(msg.object.data) &&
+            this.CapabilityIntercept.isInstance(msg.object.data.exception)
         ) {
-          let intercept = msg.object.data;
+          var intercept = msg.object.data.exception;
+          intercept.message = msg.object.data.message;
 
           // Configure events CapabilityIntercept comopletion
           intercept.resolve = function (value) {

@@ -11,6 +11,7 @@ var classes = [
   'foam.core.ContextAware',
   'foam.core.Exception',
   'foam.core.ExceptionInterface',
+  'foam.core.FOAMException',
   'foam.core.Freezable',
   'foam.core.ContextAgent',
   'foam.core.CompoundContextAgency',
@@ -610,6 +611,7 @@ var classes = [
   'foam.nanos.dig.exception.GeneralException',
 
   'foam.nanos.app.EmailConfig',
+  'foam.nanos.app.SupportConfig',
 
   'foam.nanos.test.StockSnapshot',
   'foam.nanos.analytics.FoldManagerDAODecorator',

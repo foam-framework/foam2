@@ -227,6 +227,8 @@ foam.INTERFACE({
       name: 'orderBy',
       type: 'foam.dao.DAO',
       swiftThrows: true,
+      // TODO: would be better to make type Comparator...
+      // to be compabile with JS.
       args: ['foam.mlang.order.Comparator comparator' ]
     },
     {

@@ -8,7 +8,8 @@ foam.CLASS({
   name: 'ClientRuntimeException',
   package: 'foam.core',
   implements: [ 'foam.core.ExceptionInterface' ],
-  javaExtends: 'RuntimeException',
+  extends: 'foam.core.FOAMException',
+  javaGenerateConvenienceConstructor: false,
 
   axioms: [
     {
@@ -16,13 +17,17 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(
           `
-            public ClientRuntimeException(String message) {
-              super(message);
-            }
+  public ClientRuntimeException(String message) {
+    super(message);
+  }
 
-            public ClientRuntimeException(Throwable cause) {
-              super(cause);
-            }
+  public ClientRuntimeException(Throwable cause) {
+    super(cause);
+  }
+
+  public ClientRuntimeException(String message, Throwable cause) {
+    super(message, cause);
+  }
           `
         );
       }
@@ -41,4 +46,4 @@ foam.CLASS({
         javaCode: `return this;`
     }
   ]
-})
+});
