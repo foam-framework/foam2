@@ -47,20 +47,6 @@ foam.CLASS({
       }
     },
     {
-      name: 'of',
-      hidden: true,
-      transient: true,
-      expression: function(daoKey) {
-        if ( ! daoKey )
-          return null;
-        var dao = this.__subContext__.nSpecDAO.find(this.Eq.create({ arg1: foam.nanos.boot.NSpec.NAME, arg2: daoKey }));
-        if ( ! dao || ! dao.client  )
-          return null;
-        var client = JSON.parse(dao.client);
-        return foam.lookup(client.of).create();
-      }
-    },
-    {
       class: 'StringArray',
       name: 'columnNames',
       transient: true,
