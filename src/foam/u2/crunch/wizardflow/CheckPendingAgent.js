@@ -20,8 +20,7 @@ foam.CLASS({
     'ctrl',
     'endSequence',
     'rootCapability',
-    'subject',
-    'userCapabilityJunctionDAO'
+    'subject'
   ],
 
   exports: [
@@ -31,8 +30,7 @@ foam.CLASS({
   requires: [
     'foam.log.LogLevel',
     'foam.nanos.crunch.AgentCapabilityJunction',
-    'foam.nanos.crunch.CapabilityJunctionStatus',
-    'foam.nanos.crunch.UserCapabilityJunction'
+    'foam.nanos.crunch.CapabilityJunctionStatus'
   ],
 
   properties: [
@@ -51,27 +49,11 @@ foam.CLASS({
   methods: [
     // If Property expressions ever unwrap promises this method can be blank.
     async function execute() {
-      var capability = this.rootCapability;
-      var associatedEntity = capability.associatedEntity === foam.nanos.crunch.AssociatedEntity.USER ? this.subject.user : this.subject.realUser;
-      var ucj = await this.userCapabilityJunctionDAO.find(
-        this.AND(
-          this.OR(
-            this.AND(
-              this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
-              this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id)
-            ),
-            this.AND(
-              this.INSTANCE_OF(this.AgentCapabilityJunction),
-              this.EQ(this.UserCapabilityJunction.SOURCE_ID, associatedEntity.id),
-              this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
-            )
-          ),
-          this.EQ(this.UserCapabilityJunction.TARGET_ID, capability.id)
-        )
-      );
+      var ucj = await this.crunchService.getJunction(null, this.rootCapability.id);
+      // this.crunchService.pub('updateJunction');
       
       var shouldReopen = false;
-      if ( ucj ) {
+      if ( ucj.status !== this.CapabilityJunctionStatus.AVAILABLE ) {
         var statusPending = ucj.status === this.CapabilityJunctionStatus.PENDING;
         var shouldReopen = await this.crunchService.maybeReopen(this.ctrl.__subContext__, ucj.targetId);
         if ( ! shouldReopen ) {
