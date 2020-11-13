@@ -213,14 +213,13 @@ foam.CLASS({
 
     function save(wizardlet) {
       if ( ! wizardlet.isAvailable ) return Promise.resolve();
-      return this.crunchService.updateJunction(
-        null, wizardlet.capability.id, wizardlet.data, null
-      ).then((ucj) => {
-        this.crunchService.pub('updateJunction');
-        return ucj;
+      return this.updateUCJ(wizardlet).then(() => {
+        var ucj = wizardlet.ucj;
+        if ( wizardlet.of ) ucj.data = wizardlet.data;
+        return this.userCapabilityJunctionDAO.put(ucj);
       });
     },
-    async function updateUCJ(wizardlet, associatedEntity) {
+    async function updateUCJ(wizardlet) {
       return this.crunchService.getJunction(
         null, wizardlet.capability.id
       ).then(ucj => {
