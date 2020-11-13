@@ -7,8 +7,9 @@
 foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'CapabilityIntercept',
-  implements: [ 'foam.core.Exception', 'foam.core.ExceptionInterface' ],
-  javaExtends: 'foam.nanos.auth.AuthorizationException',
+  implements: [ 'foam.core.ExceptionInterface' ],
+  extends: 'foam.core.FOAMException',
+  javaGenerateConvenienceConstructor: false,
 
   javaImports: [
     'foam.nanos.crunch.lite.Capable',
@@ -21,9 +22,17 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(
           `
-            public CapabilityIntercept(String message) {
-              super(message);
-            }
+  public CapabilityIntercept(String message) {
+    super(message);
+  }
+
+  public CapabilityIntercept(Throwable cause) {
+    super(cause);
+  }
+
+  public CapabilityIntercept(String message, Throwable cause) {
+    super(message, cause);
+  }
           `
         );
       }
@@ -34,7 +43,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      value: 'foam.box.CapabilityRequiredRemoteException'
+      value: 'foam.nanos.crunch.CapabilityIntercept'
     },
     {
       name: 'capabilities',
