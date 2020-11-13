@@ -34,7 +34,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      value: 'foam.box.CapabilityRequiredRemoteException'
+      value: 'foam.box.CapabilityIntercept'
     },
     {
       name: 'capabilities',
