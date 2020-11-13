@@ -76,7 +76,7 @@ foam.CLASS({
       class: 'foam.u2.ViewSpecWithJava',
       name: 'viewView',
       expression: function() {
-        return foam.u2.detail.TabbedDetailView;
+        return foam.u2.detail.SectionedDetailView;
       }
     }
   ],
