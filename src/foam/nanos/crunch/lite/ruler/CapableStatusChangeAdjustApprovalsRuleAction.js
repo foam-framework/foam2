@@ -95,7 +95,7 @@ foam.CLASS({
 
               List<String> prereqIdsList = crunchService.getPrereqs(newCapablePayload.getCapability());
 
-              if ( prereqIdsList != null && prereqIdsList.size() > 0 ){
+              if ( prereqIdsList != null && prereqIdsList.size() > 0 ) {
                 String[] prereqIds = prereqIdsList.toArray(new String[prereqIdsList.size()]);
 
                 ((ArraySink) payloadDAO.select(new ArraySink())).getArray().stream()
