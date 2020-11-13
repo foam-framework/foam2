@@ -504,7 +504,10 @@ foam.CLASS({
       class: 'foam.core.FObjectProperty',
       of:'foam.nanos.app.SupportConfig',
       name: 'supportConfig',
-      factory: function() { return foam.nanos.app.SupportConfig.create({})}
+      factory: function() { return foam.nanos.app.SupportConfig.create({},this)},
+      javaFactory: `
+        return new foam.nanos.app.SupportConfig();
+      `
     }
   ],
 
