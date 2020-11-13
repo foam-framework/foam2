@@ -89,7 +89,7 @@ foam.CLASS({
             }
 
             // handle unapproved requests for a granted minmax
-            if ( capability instanceof foam.nanos.crunch.MinMaxCapability ){
+            if ( capability instanceof foam.nanos.crunch.MinMaxCapability ) {
               var crunchService = (CrunchService) x.get("crunchService");
               var payloadDAO = (DAO) capableNewObj.getCapablePayloadDAO(x);
 
