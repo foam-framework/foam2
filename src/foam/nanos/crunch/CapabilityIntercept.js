@@ -34,7 +34,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      value: 'foam.box.CapabilityIntercept'
+      value: 'foam.nanos.crunch.CapabilityIntercept'
     },
     {
       name: 'capabilities',
