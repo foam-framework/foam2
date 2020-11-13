@@ -43,7 +43,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      value: 'foam.box.CapabilityRequiredRemoteException'
+      value: 'foam.nanos.crunch.CapabilityIntercept'
     },
     {
       name: 'capabilities',

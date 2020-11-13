@@ -106,7 +106,7 @@ foam.CLASS({
     },
     {
       name: 'onBack',
-      factory: function() { 
+      factory: function() {
         return () => this.stack.back();
       }
     }
