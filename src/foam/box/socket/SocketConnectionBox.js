@@ -181,7 +181,7 @@ foam.CLASS({
         }
         // omLogger.log(this.getClass().getSimpleName(), getId(), "pending");
         synchronized (out_) {
-          // getLogger().debug("send", message);
+          getLogger().debug("send", message);
           out_.writeLong(System.currentTimeMillis());
           out_.writeInt(messageBytes.length);
           out_.write(messageBytes);
@@ -262,7 +262,7 @@ foam.CLASS({
             if ( foam.util.SafetyUtil.isEmpty(message) ) {
               throw new RuntimeException("Received empty message.");
             }
-            // getLogger().debug("receive", message);
+            getLogger().debug("receive", message);
             Message msg = (Message) x.create(JSONParser.class).parseString(message);
             if ( msg == null ) {
               throw new RuntimeException("Failed to parse. message: "+message);
@@ -285,7 +285,7 @@ foam.CLASS({
               if ( o != null &&
                    o instanceof foam.box.RPCErrorMessage ) {
                 foam.box.RemoteException re = (foam.box.RemoteException) ((foam.box.RPCErrorMessage) o).getData();
-                getLogger.warning("RemoteException", re.getId(), re.getMessage(), re.getException());
+                getLogger().warning("RemoteException", re.getId(), re.getMessage(), re.getException());
                 if ( re.getException() != null ) {
                   throw (foam.core.FOAMException) re.getException();
                 }
