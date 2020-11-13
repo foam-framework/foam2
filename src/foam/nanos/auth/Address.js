@@ -40,8 +40,8 @@ foam.CLASS({
       class: 'Boolean',
       name: 'structured',
       value: true,
-      documentation: `Determines whether the address is shown in the following structure: 
-        Street Number, Street Name, Suite Number. For an unstructured address field, 
+      documentation: `Determines whether the address is shown in the following structure:
+        Street Number, Street Name, Suite Number. For an unstructured address field,
         use address1 and/or address2.
       `,
       hidden: true
@@ -130,7 +130,7 @@ foam.CLASS({
             return [region.id, region.name];
           },
           dao$: choices
-        });
+        }, X);
       },
       required: true,
       validateObj: function(regionId, countryId) {
