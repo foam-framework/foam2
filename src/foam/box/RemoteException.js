@@ -28,9 +28,9 @@ foam.CLASS({
     {
       name: 'toString',
       type: 'String',
-      javaCode: 'return "RemoteException - " + getId() + ": "+getMessage();',
+      javaCode: 'return getId() + ": "+getMessage();',
       code: function() {
-        return 'RemoteException - ' + this.id + ': ' + this.message;
+        return this.id + ': ' + this.message;
       }
     }
   ]
