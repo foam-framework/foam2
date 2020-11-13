@@ -50,7 +50,6 @@ foam.CLASS({
     // If Property expressions ever unwrap promises this method can be blank.
     async function execute() {
       var ucj = await this.crunchService.getJunction(null, this.rootCapability.id);
-      // this.crunchService.pub('updateJunction');
       
       var shouldReopen = false;
       if ( ucj.status !== this.CapabilityJunctionStatus.AVAILABLE ) {
