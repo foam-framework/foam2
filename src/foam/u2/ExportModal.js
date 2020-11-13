@@ -33,7 +33,7 @@ foam.CLASS({
           objToChoice: function(a) {
             return [a.id, a.id];
           }
-        });
+        }, X);
       },
       value: 'CSV'
     },
