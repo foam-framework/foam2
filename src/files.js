@@ -762,6 +762,7 @@ FOAM_FILES([
   { name: "foam/flow/widgets/ModelSummary" },
   { name: "foam/flow/widgets/EnumSummary" },
   { name: "foam/flow/widgets/DocumentationIncomplete" },
+  { name: "foam/flow/widgets/TryItSnippet" },
 
   { name: "org/chartjs/Lib" },
   { name: "org/chartjs/ChartCView" },

@@ -370,6 +370,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/lite/MinMaxCapabilityRefinement" },
   { name: "foam/nanos/crunch/crunchtest/TestCapable" },
   { name: "foam/nanos/crunch/CapabilityAvailabilityDAO" },
+  { name: "foam/nanos/crunch/example/ExampleData" },
 
   // crunch lite rulers
   { name: "foam/nanos/crunch/lite/ruler/CapableStatusChangeAdjustApprovalsRuleAction" },
