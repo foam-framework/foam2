@@ -24,6 +24,7 @@ foam.CLASS({
     'foam.nanos.approval.ApprovalRequest',
     'foam.nanos.approval.Approvable',
     'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CrunchService',
     'foam.nanos.crunch.lite.Capable',
     'foam.nanos.crunch.lite.CapablePayload',
     'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -31,6 +32,7 @@ foam.CLASS({
     'foam.nanos.ruler.Operations',
     'foam.nanos.auth.Subject',
     'java.util.ArrayList',
+    'java.util.Arrays',
     'java.util.List',
     'java.util.Map',
     'java.util.HashMap'
@@ -84,6 +86,27 @@ foam.CLASS({
 
             if ( capability.getReviewRequired() ){
               updatedApprovalPayloads.add(newCapablePayload);
+            }
+
+            // handle unapproved requests for a granted minmax
+            if ( capability instanceof foam.nanos.crunch.MinMaxCapability ) {
+              var crunchService = (CrunchService) x.get("crunchService");
+              var payloadDAO = (DAO) capableNewObj.getCapablePayloadDAO(x);
+
+              List<String> prereqIdsList = crunchService.getPrereqs(newCapablePayload.getCapability());
+
+              if ( prereqIdsList != null && prereqIdsList.size() > 0 ) {
+                String[] prereqIds = prereqIdsList.toArray(new String[prereqIdsList.size()]);
+
+                ((ArraySink) payloadDAO.select(new ArraySink())).getArray().stream()
+                .filter(cp -> Arrays.stream(prereqIds).anyMatch(((CapablePayload) cp).getCapability()::equals))
+                .forEach(cp -> {
+                  CapablePayload capableCp = (CapablePayload) cp;
+                  if  ( capableCp.getStatus() == CapabilityJunctionStatus.PENDING ) {
+                    updatedApprovalPayloads.add(capableCp);
+                  }
+                });
+              }    
             }
           }
         }
