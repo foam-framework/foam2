@@ -28,7 +28,10 @@ foam.CLASS({
     {
       name: 'selectedView',
       view: function(_, X) {
-        return foam.u2.view.ChoiceView.create({choices: X.data.views}, X);
+        return foam.u2.view.ChoiceView.create(
+          {choices: X.data.views},
+          X.createSubContext({controllerMode: foam.u2.ControllerMode.EDIT})
+        );
       }
     },
     {
