@@ -49,6 +49,18 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'Exercise',
       name: 'program'
+    },
+    {
+      name: 'totalWeight_',
+      expression: function (dictionary) {
+        return dictionary.reduce((acc, e) => acc + e.weight, 0);
+      }
+    },
+    {
+      name: 'totalDuration_',
+      expression: function (program) {
+        return program.reduce((acc, e) => acc + e.length, 0);
+      }
     }
   ],
 
@@ -59,25 +71,21 @@ foam.CLASS({
       var self = this;
 
       this.dictionary = [
-        { name: 'Chin Ups',      length: 1 },
-        { name: 'Clean & Press (L+R)', length: 2 },
-        { name: 'Clean & Press (L+R)', length: 2 },
-        { name: 'Curls',         length: 1 },
-        { name: 'Dips',          length: 1 },
-        { name: 'Dips',          length: 1 },
-        { name: 'Floor Press (L+R)',   length: 2 },
-        { name: 'Plank',         length: 3 },
-        { name: 'Press (L+R)',         length: 2 },
-        { name: 'Push Ups',      length: 1 },
-        { name: 'Rows (L+R)',         length: 2 },
-        { name: 'Snatch (L+R)',        length: 2 },
-        { name: 'Squats (L+R)',        length: 1 },
-        { name: 'Swings (10)',   length: 1 },
-        { name: 'Swings (10)',   length: 1 },
-        { name: 'Swings (20)',   length: 2 },
-        { name: 'Swings (30)',   length: 3 },
-        { name: 'TGU (L+R)',           length: 2 },
-        { name: 'TGU (L+R)',           length: 2 }
+        { name: 'Chin Ups',            length: 1 },
+        { name: 'Clean & Press (L+R)', length: 2, weight: 2 },
+        { name: 'Curls',               length: 1 },
+        { name: 'Dips',                length: 1, weight: 2 },
+        { name: 'Floor Press (L+R)',   length: 2, weight: 2 },
+        { name: 'Goblet Squat',        length: 1, weight: 1.5 },
+        { name: 'Plank',               length: 3, weight: 0.25 },
+        { name: 'Press (L+R)',         length: 2, weight: 2 },
+        { name: 'Push Ups',            length: 1 },
+        { name: 'Rows (L+R)',          length: 2 },
+        { name: 'Snatch (L+R)',        length: 2, weight: 1.5 },
+        { name: 'Swings (10)',         length: 1, weight: 3 },
+        { name: 'Swings (20)',         length: 2 },
+        { name: 'Swings (30)',         length: 3, weight: 0.5 },
+        { name: 'TGU (L+R)',           length: 2, weight: 2 }
       ];
 
       //this.add(this.PROGRAM);
@@ -101,6 +109,7 @@ foam.CLASS({
                 var a = foam.Array.clone(self.program);
                 a.splice(i, 1);
                 self.program = a;
+                self.fill();
               })
             .end()
           .end();
@@ -110,19 +119,40 @@ foam.CLASS({
         return self.E().forEach(p, function(e) { thi.add(e.something); }
       }));
       */
+    },
+
+    function pickRandomExercise() {
+      var i = Math.random() * this.totalWeight_;
+      for ( var j = 0, w = 0 ; ; j++ ) {
+        w += this.dictionary[j].weight;
+        if ( i < w ) return this.dictionary[j];
+      }
+    },
+
+    function fill() {
+      while ( this.totalDuration_ < this.duration ) {
+        var e = this.pickRandomExercise();
+        var a = foam.Array.clone(this.program);
+        a.push(e);
+        this.program = a;
+      }
     }
   ],
 
   actions: [
     function generate() {
+      this.program = [];
+      this.fill();
+      /*
       var a = [];
       var l = 0;
       while ( l < this.duration ) {
-        var e = this.dictionary[Math.floor(this.dictionary.length*Math.random())];
+        var e = this.pickRandomExercise();
         a.push(e);
         l += e.length;
       }
       this.program = a;
+      */
     },
 
     function start() {
