@@ -45,8 +45,11 @@ public class SessionServerBox
   }
 
   public void send(Message msg) {
-    Logger logger = (Logger) getX().get("logger");
     NSpec spec = getX().get(NSpec.class);
+    Logger logger = new PrefixLogger(new Object[] {
+        this.getClass().getSimpleName(),
+        spec.getName()
+      }, (Logger) getX().get("logger"));
     DAO sessionDAO = (DAO) getX().get("localSessionDAO");
     Session session = null;
     String sessionID = null;
@@ -81,28 +84,27 @@ public class SessionServerBox
                   }
                 }
               } else {
-                logger.warning(this.getClass().getSimpleName(), "send", "Authorization: "+authType+" token not found.");
+                logger.warning("send", "Authorization: "+authType+" token not found.");
                 msg.replyWithException(new IllegalArgumentException("Authorization: "+authType+ " token not found."));
                 return;
               }
             } else {
-              logger.warning(this.getClass().getSimpleName(), "send", "Authorization: "+authType+" not supported.");
+              logger.warning("send", "Authorization: "+authType+" not supported.");
               msg.replyWithException(new IllegalArgumentException("Authorization: "+authType+ " not supported."));
               return;
             }
             if ( SafetyUtil.isEmpty(sessionID) ) {
-              logger.warning(this.getClass().getSimpleName(), "send", "Authorization: Bearer token not found.");
+              logger.warning("send", "Authorization: Bearer token not found.");
               msg.replyWithException(new IllegalArgumentException("Authorization: Bearer token not found"));
               return;
             }
           }
         }
       }
-
+      //logger.info("session", session != null,  "sessionID", sessionID);
       if ( session == null ) {
         if ( sessionID == null ) {
           sessionID = (String) msg.getAttributes().get("sessionId");
-
         }
 
         if ( sessionID == null && authenticate_ ) {
@@ -180,7 +182,7 @@ public class SessionServerBox
         spec.checkAuthorization(effectiveContext);
       } catch (AuthorizationException e) {
         Group group = (Group) effectiveContext.get("group");
-        logger.warning("Missing permission", group != null ? group.getId() : "NO GROUP" , "service." + spec.getName());
+        logger.warning("Missing permission", group != null ? group.getId() : "NO GROUP");
         msg.replyWithException(e);
         return;
       }
@@ -188,8 +190,7 @@ public class SessionServerBox
       msg.getLocalAttributes().put("x", effectiveContext);
       getDelegate().send(msg);
     } catch (Throwable t) {
-      logger.error("Error throw in SessionServerBox: " + t, " ,service: " + spec.getName(), t);
-      t.printStackTrace();
+      logger.error(t.getMessage(), t);
       msg.replyWithException(t);
 
       AppConfig appConfig = (AppConfig) getX().get("appConfig");
