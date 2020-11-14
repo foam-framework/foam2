@@ -159,6 +159,7 @@ foam.CLASS({
 
       var indicator;
       if ( this.type == this.LogLevel.ERROR ) {
+        console.error('notification: ' + this.message);
         indicator = {
           size: 18,
           backgroundColor: this.theme.destructive3,
@@ -168,11 +169,13 @@ foam.CLASS({
           })
         };
       } else if ( this.type == this.LogLevel.WARN ) {
+        console.warn('notification: ' + this.message);
         indicator = {
           size: 18,
           icon: 'images/baseline-warning-yellow.svg'
         };
       } else {
+        console.info('notification: ' + this.message);
         indicator = {
           size: 18,
           backgroundColor: this.theme.approval3,
