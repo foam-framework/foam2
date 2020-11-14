@@ -167,9 +167,9 @@ Later themes:
       }
 
       if ( theme == null ) {
-        ((foam.nanos.logger.Logger) x.get("logger")).warning("Theme not found.",
-          "domain:" + (req != null ? req.getServerName() : ""),
-          "user:" + user.getId());
+        // ((foam.nanos.logger.Logger) x.get("logger")).debug("Theme not found.",
+        //   "domain", (req != null ? req.getServerName() : ""),
+        //   "user", user.getId());
         theme = new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
       }
 
