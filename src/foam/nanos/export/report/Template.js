@@ -37,6 +37,8 @@ foam.CLASS({
       documentation: 'List of property labels which required for template',
       postSet: async function(o, n) {
         var dao = await this.__subContext__.nSpecDAO.find(this.Eq.create({ arg1: foam.nanos.boot.NSpec.NAME, arg2: this.daoKey }));
+        if ( ! dao )
+          return;
         var client = JSON.parse(dao.client);
         var of =  foam.lookup(client.of);
         var columnConfigToPropertyConverter = this.columnConfigToPropertyConverter;
