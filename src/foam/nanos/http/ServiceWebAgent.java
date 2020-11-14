@@ -102,9 +102,10 @@ public class ServiceWebAgent
 
       FObject result;
       try {
+        // logger.debug("parseString", builder.toString());
         result = requestContext.create(JSONParser.class).parseString(builder.toString());
       } catch (Throwable t) {
-        System.err.println("Unable to parse: " + builder.toString());
+        logger.error("Unable to parse", builder.toString());
         throw t;
       }
 
