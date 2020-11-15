@@ -2,6 +2,8 @@ foam.CLASS({
   name: 'ExGen',
   extends: 'foam.u2.Controller',
 
+  requires: [ 'foam.util.Timer' ],
+
   classes: [
     {
       name: 'Exercise',
@@ -32,6 +34,10 @@ foam.CLASS({
       color: white;
       background: cornflowerblue;
     }
+    .foam-u2-ProgressView {
+      height: 40px;
+      vertical-align: bottom;
+    }
   `,
 
   properties: [
@@ -49,6 +55,10 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'Exercise',
       name: 'program'
+    },
+    {
+      name: 'timer',
+      factory: function() { return this.Timer.create({minute: 1}); }
     },
     {
       name: 'totalWeight_',
@@ -85,13 +95,24 @@ foam.CLASS({
         { name: 'Swings (10)',         length: 1, weight: 3 },
         { name: 'Swings (20)',         length: 2 },
         { name: 'Swings (30)',         length: 3, weight: 0.5 },
-        { name: 'TGU (L+R)',           length: 2, weight: 2 }
+        { name: 'TGU (L+R)',           length: 2, weight: 2 },
+        { name: 'Thrusters',           length: 1, weight: 1 },
       ];
+
+      this.regenerate();
+      this.duration$.sub(()=>this.regenerate());
 
       //this.add(this.PROGRAM);
       this
         .addClass(this.myClass())
-        .add('Duration: ', this.DURATION, ' ', this.GENERATE)
+        .add('Duration: ', this.DURATION, ' ', this.REGENERATE, ' ')
+        .add(' Seconds: ')
+        .tag({class: foam.u2.ProgressView, data$: this.timer.second$.map(s=>100*s/60)})
+        .start('span').style({width: '50px', display: 'inline-block', 'padding-left': '4px'}).add(this.timer.second$).end()
+        .add(' Minutes: ')
+        .tag({class: foam.u2.ProgressView, data$: this.timer.minute$.map(m=>100*m/this.duration)})
+        .add(' ', this.timer.minute$)
+        .add(' ', this.START_TIMER, ' ', this.PAUSE)
         .tag('hr')
         .forEach(this.program$, function(e, i) {
           this
@@ -114,11 +135,6 @@ foam.CLASS({
             .end()
           .end();
         });
-      /*
-      this.add(this.program$.map(function(p) {
-        return self.E().forEach(p, function(e) { thi.add(e.something); }
-      }));
-      */
     },
 
     function pickRandomExercise() {
@@ -140,7 +156,7 @@ foam.CLASS({
   ],
 
   actions: [
-    function generate() {
+    function regenerate() {
       this.program = [];
       this.fill();
       /*
@@ -155,10 +171,16 @@ foam.CLASS({
       */
     },
 
-    function start() {
+    {
+      name: 'startTimer',
+      label: 'Start',
+      code: function start() {
+        this.timer.start();
+      }
     },
 
     function pause() {
+      this.timer.stop();
     }
   ]
 });
