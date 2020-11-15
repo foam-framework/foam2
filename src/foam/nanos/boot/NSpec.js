@@ -292,11 +292,14 @@ foam.CLASS({
         var service = this.__context__[this.name];
         if ( foam.dao.DAO.isInstance(service) ) {
           this.__context__.stack.push({
-            class: 'foam.comics.BrowserView',
-            createEnabled: true,
-            editEnabled: true,
-            exportEnabled: true,
-            data: service
+            class: 'foam.comics.v2.DAOBrowseControllerView',
+            data: service,
+            config: {
+              class: 'foam.comics.v2.DAOControllerConfig',
+              dao: service,
+              createPredicate: foam.mlang.predicate.True,
+              editPredicate: foam.mlang.predicate.True
+            }
           });
         }
       }
