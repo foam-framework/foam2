@@ -20,7 +20,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'filterController'
+    'filterController',
+    'memento'
   ],
 
   css: `
@@ -148,6 +149,18 @@ foam.CLASS({
           .show(this.active$)
         .end();
       this.isFiltering();
+
+      if ( this.memento.paramsObj.filters && this.memento.paramsObj.filters.length > 0 ) {
+        var filter = this.memento.paramsObj.filters.find(f => f.criteria === this.criteria && f.name === this.property.name);
+        if ( filter ) {
+          this.view_.setFilterValue(filter);
+        }
+      }
+    },
+    function setFilterValue(obj) {},
+    
+    function returnFilterObj() {
+      return this.view_ && this.view_.returnFilterObj ? this.view_.returnFilterObj() : null;
     }
   ],
 
@@ -184,6 +197,24 @@ foam.CLASS({
     },
 
     function isFiltering() {
+      if ( ! this.memento )
+        return;
+
+      if ( ! this.memento.paramsObj.filters ) {
+        this.memento.paramsObj.filters = [];
+      }
+
+      this.memento.paramsObj.filters = this.memento.paramsObj.filters.filter(f => f.name !== this.property.name && f.criteria !== this.criteria );
+
+      var newFilterValue = this.returnFilterObj();
+      if ( newFilterValue ) {
+        this.memento.paramsObj.filters.push(newFilterValue);
+      }
+      if ( this.memento.paramsObj.filters && this.memento.paramsObj.filters.length === 0 ) {
+        delete this.memento.paramsObj.filters;
+      }
+      this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
+
       // Since the existing predicates are lazy loaded (on opening the view),
       // check to see if there is an existing predicate to use the correct label
       if ( this.filterController.getExistingPredicate(this.criteria, this.property) && this.firstTime_ ) {

@@ -307,6 +307,15 @@ foam.CLASS({
       if ( predicate === this.TRUE ) return;
       this.selectedOptions = Array.isArray(predicate.arg2.value) ?
         predicate.arg2.value : [predicate.arg2.value];
+    },
+
+    function setFilterValue(obj) {
+      for ( var i = 0; i < obj.selectedOptions.length; i++ ) {
+        this.selectedOptions = this.selectedOptions.concat(obj.selectedOptions.filter(o => ! this.selectedOptions.includes(o) && this.filteredOptions.includes(o) ));
+      }
+    },
+    function returnFilterObj() {
+      return this.selectedOptions && this.selectedOptions.length > 0 ? { selectedOptions: this.selectedOptions, name: this.property.name } : null;
     }
   ],
 
