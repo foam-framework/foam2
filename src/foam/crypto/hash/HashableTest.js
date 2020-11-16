@@ -28,15 +28,15 @@ foam.CLASS({
 
         // non-chained hash with correct digest
         Hashable_HashWithValidAlgorithm(input, "MD5",
-            "47f68c52aaae1c2cdad696c59a248752");
+            "d41d8cd98f00b204e9800998ecf8427e");
         Hashable_HashWithValidAlgorithm(input, "SHA-1",
-            "b56f36f495469a97928e664ccff17ea62d7d4d78");
+            "da39a3ee5e6b4b0d3255bfef95601890afd80709");
         Hashable_HashWithValidAlgorithm(input, "SHA-256",
-            "ec0604d4874bd8f899a9efcb4e05bd2c83f024b16c5ae8b2a99049a5106b8eb6");
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
         Hashable_HashWithValidAlgorithm(input, "SHA-384",
-            "d2f4e706ec2b7b8f2bfd21b1e80c28bb500453d22a11ab4b6be82dd8de03470b1f172e5b80ffda71f7b5f5f170ec2350");
+            "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b");
         Hashable_HashWithValidAlgorithm(input, "SHA-512",
-            "d6b71a2d9368fac8aba8b285ea489297a55f99e31a6585a19f524fd09b53375d74563040793195f3dbb1eee6e7defff5d03bff569b9962ae06250626f402903a");
+            "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e");
 
         // hashing same objects produces same digest
         Hashable_HashingSameObjects_ProducesSameDigest(input, input,
@@ -61,8 +61,9 @@ foam.CLASS({
       ],
       javaCode: `
         try {
-          test(Hex.toHexString(input.hash(algorithm)).equals(expected),
-              "Input hashed using " + algorithm + " produces correct digest of " + expected);
+          String produced = Hex.toHexString(input.hash(algorithm));
+          test(produced.equals(expected),
+              "Input hashed algorithm: " + algorithm + ", produced: "+produced+ ", expected: "+expected);
         } catch ( Throwable t ) {
           test(false, "Input hashed using " + algorithm + " should not throw an exception");
         }
