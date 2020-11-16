@@ -201,6 +201,7 @@ FOAM_FILES([
   { name: 'foam/nanos/medusa/MedusaUniqueDAO' },
   { name: 'foam/nanos/medusa/MedusaType' },
   { name: 'foam/nanos/medusa/NodeCView' },
+  { name: 'foam/nanos/medusa/PromotedPurgeAgent' },
   { name: 'foam/nanos/medusa/RegionCView' },
   { name: 'foam/nanos/medusa/RegionStatus' },
   { name: 'foam/nanos/medusa/ReplayCmd' },
