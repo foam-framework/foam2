@@ -33,6 +33,7 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.ConfigureFlowAgent',
     'foam.u2.crunch.wizardflow.CapabilityAdaptAgent',
     'foam.u2.crunch.wizardflow.CheckPendingAgent',
+    'foam.u2.crunch.wizardflow.CheckNoDataAgent',
     'foam.u2.crunch.wizardflow.LoadCapabilitiesAgent',
     'foam.u2.crunch.wizardflow.CreateWizardletsAgent',
     'foam.u2.crunch.wizardflow.FilterWizardletsAgent',
@@ -86,6 +87,7 @@ foam.CLASS({
         .add(this.CapabilityAdaptAgent)
         .add(this.LoadCapabilitiesAgent)
         .add(this.CheckPendingAgent)
+        .add(this.CheckNoDataAgent)
         .add(this.CreateWizardletsAgent)
         .add(this.FilterWizardletsAgent)
         .add(this.RequirementsPreviewAgent)
@@ -113,7 +115,7 @@ foam.CLASS({
     function handleIntercept(intercept) {
       var self = this;
 
-      intercept.capabilityOptions.forEach((c) => {
+      intercept.capabilities.forEach((c) => {
         self.capabilityCache.set(c, false);
       });
 
@@ -122,19 +124,19 @@ foam.CLASS({
 
       // Intercept view for regular user capability options
       console.log('intercept', intercept)
-      if ( intercept.capabilityOptions.length > 1 ) {
+      if ( intercept.capabilities.length > 1 ) {
         p = p.then(() => {
           return self.maybeLaunchInterceptView(intercept);
         });
       }
-      else if ( intercept.capabilityOptions.length > 0 ) {
+      else if ( intercept.capabilities.length > 0 ) {
         p = p.then(() => {
-          return self.createWizardSequence(intercept.capabilityOptions[0])
+          return self.createWizardSequence(intercept.capabilities[0])
             .execute();
         });
       }
 
-      let isCapable = intercept.capableRequirements.length > 0;
+      let isCapable = intercept.capables.length > 0;
 
       // Wizard for Capable objects and required user capabilities
       // (note: no intercept view; this case immediately invokes a wizard)
@@ -151,9 +153,9 @@ foam.CLASS({
         var isCompleted = x.submitted || x.cancelled;
 
         if ( isCapable ) {
-          intercept.capableRequirements[0].isWizardCompleted = isCompleted;
+          intercept.capables[0].isWizardCompleted = isCompleted;
           if ( ! isCompleted ) {
-            intercept.resolve(intercept.capableRequirements[0]);
+            intercept.resolve(intercept.capables[0]);
             return;
           }
           intercept.returnCapable.isWizardCompleted = isCompleted;
@@ -183,8 +185,8 @@ foam.CLASS({
 
         // All options in the active intercept need to satisfy the
         // incoming intercept for this to be a match.
-        activeIntercept.capabilityOptions.forEach((capOpt) => {
-          if ( ! intercept.capabilityOptions.includes(capOpt) ) {
+        activeIntercept.capabilities.forEach((capOpt) => {
+          if ( ! intercept.capabilities.includes(capOpt) ) {
             hasAllOptions = false;
           }
         });
@@ -213,7 +215,10 @@ foam.CLASS({
       if ( ! wizardlet.isAvailable ) return Promise.resolve();
       return this.crunchService.updateJunction(
         null, wizardlet.capability.id, wizardlet.data, null
-      )
+      ).then((ucj) => {
+        this.crunchService.pub('updateJunction');
+        return ucj;
+      });
     },
     async function updateUCJ(wizardlet, associatedEntity) {
       return this.crunchService.getJunction(
@@ -236,7 +241,7 @@ foam.CLASS({
     function launchCapableWizard(intercept) {
       var p = Promise.resolve(true);
 
-      intercept.capableRequirements.forEach(capable => {
+      intercept.capables.forEach(capable => {
         var seq = this.createCapableWizardSequence(intercept, capable);
         p = p.then(() => {
           return seq.execute().then(x => {

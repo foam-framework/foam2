@@ -34,6 +34,7 @@ FOAM_FILES([
   { name: "foam/nanos/app/ContextLookupAppConfigService"},
   { name: "foam/nanos/app/AppConfigService" },
   { name: "foam/nanos/app/EmailConfig" },
+  { name: 'foam/nanos/app/SupportConfig' },
   { name: "foam/nanos/notification/email/SMTPConfig" },
   { name: "foam/nanos/app/ClientAppConfigService" },
   { name: "foam/nanos/controller/WindowHash" },
@@ -358,6 +359,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/Refinements" },
   { name: "foam/nanos/crunch/MinMaxCapability" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
+  { name: "foam/nanos/crunch/CapabilityIntercept" },
   { name: "foam/nanos/crunch/lite/CapablePayload" },
   { name: "foam/nanos/crunch/lite/CapablePayloadStatusDAO" },
   { name: "foam/nanos/crunch/lite/Capable" },
@@ -369,6 +371,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/lite/MinMaxCapabilityRefinement" },
   { name: "foam/nanos/crunch/crunchtest/TestCapable" },
   { name: "foam/nanos/crunch/CapabilityAvailabilityDAO" },
+  { name: "foam/nanos/crunch/example/ExampleData" },
 
   // crunch lite rulers
   { name: "foam/nanos/crunch/lite/ruler/CapableStatusChangeAdjustApprovalsRuleAction" },

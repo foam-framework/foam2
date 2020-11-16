@@ -80,7 +80,7 @@ foam.CLASS({
   methods: [
     function init() {
        this.SUPER();
-       this.onDetach(this.userCapabilityJunctionDAO.on.put.sub(this.daoUpdate));
+       this.onDetach(this.crunchService.sub('updateJunction', this.daoUpdate));
        this.daoUpdate();
     },
 
@@ -138,19 +138,7 @@ foam.CLASS({
     {
       name: 'daoUpdate',
       code: function() {
-        this.userCapabilityJunctionDAO.find(
-          this.AND(
-            this.EQ(this.UserCapabilityJunction.TARGET_ID, this.data.id),
-            this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.associatedEntity.id),
-            this.OR(
-              this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
-              this.AND(
-                this.INSTANCE_OF(this.AgentCapabilityJunction),
-                this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
-              )
-            )
-          )
-        ).then(ucj => {
+        this.crunchService.getJunction(null, this.data.id).then(ucj => {
           if ( ucj ) {
             this.cjStatus = ucj.status === this.CapabilityJunctionStatus.APPROVED ?
               this.CapabilityJunctionStatus.PENDING : ucj.status;
@@ -171,7 +159,7 @@ foam.CLASS({
                 this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
               }
             }).catch(err => {
-              if ( err.data && err.data.id === 'foam.nanos.crunch.CapabilityRuntimeException' &&
+              if ( err.data && err.data.id === 'foam.box.CapabilityRequiredRemoteException' &&
                 ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-49' ||
                   ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-13' ||
                   ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-12' ||

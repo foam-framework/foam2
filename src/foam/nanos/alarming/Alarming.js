@@ -42,6 +42,7 @@ foam.CLASS({
             try {
               Notification notification = new Notification();
               notification.setBody("An alarm has been triggered for " + config.getName());
+              notification.setNotificationType("Alarming");
 
               // Notify a user
               User user = (User) ((DAO) x.get("localUserDAO")).find(config.getAlertUser());

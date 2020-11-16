@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Implements',
 
-  documentation: function() {/*
+  documentation: `
     Axiom for declaring intent to implement an interface.
 
     Since interfaces can also have implementations, it
@@ -41,7 +41,7 @@ foam.CLASS({
   Employee extends Person through regular inheritance, but
   the axioms from SalaryI are also added to the class.
   Any number of mix-ins/interfaces can be specified.
-  */},
+  `,
 
   properties: [
     {

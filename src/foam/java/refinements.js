@@ -731,7 +731,12 @@ foam.LIB({
           });
         }
 
-        if ( props.length && props.length < 7 ) {
+        // If the model doesn't explicitly define a value, then compute based
+        // on number of properties.
+        if ( ! this.model_.hasOwnProperty('javaGenerateConvenienceConstructor') )
+          this.model_.javaGenerateConvenienceConstructor = props.length && props.length < 7;
+
+        if ( this.model_.javaGenerateConvenienceConstructor ) {
           // All-property constructor
           cls.method({
             visibility: 'public',
@@ -2080,6 +2085,11 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
+    {
+      class: 'Boolean',
+      name: 'javaGenerateConvenienceConstructor',
+      value: true
+    },
     {
       class: 'AxiomArray',
       of: 'foam.java.JavaImport',
