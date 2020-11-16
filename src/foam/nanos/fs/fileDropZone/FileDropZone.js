@@ -85,11 +85,11 @@ foam.CLASS({
   `,
 
   messages: [
-    { name: 'LABEL_DEFAULT_TITLE', message: 'DRAG & DROP YOUR FILE HERE' },
+    { name: 'LABEL_DEFAULT_TITLE', message: 'Drag your file here' },
     { name: 'LABEL_OR',            message: 'or' },
-    { name: 'LABEL_BROWSE',        message: 'browse' },
+    { name: 'LABEL_BROWSE',        message: 'select from your device' },
     { name: 'LABEL_SUPPORTED',     message: 'Supported file types:' },
-    { name: 'LABEL_MAX_SIZE',      message: 'Max Size:' },
+    { name: 'LABEL_MAX_SIZE',      message: 'Max size:' },
     { name: 'ERROR_FILE_TYPE',     message: 'Invalid file type' },
     { name: 'ERROR_FILE_SIZE',     message: 'File size exceeds 15MB' }
   ],
