@@ -268,3 +268,8 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.DESIRED_PASSWORD.label",target:"Senha"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.LOGIN.label",target:"iniciar"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.USER_NAME.label",target:"Nome do usuário"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.REGION.label",target:"Região"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.REGION.error",target:"Região requerido"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.POSTAL_CODE.label",target:"CEP"})
+p({class:"foam.i18n.Locale"locale:"pt",source:"*.foam.nanos.auth.Address.POSTAL_CODE.error",target:"CEP requerido"})

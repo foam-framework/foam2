@@ -1820,7 +1820,11 @@ foam.CLASS({
      * @param {Function} fn A function to call for each item in the given array.
      */
     function forEach(array, fn) {
-      array.forEach(fn.bind(this));
+      if ( foam.core.Slot.isInstance(array) ) {
+        this.add(array.map(a => this.E().forEach(a, fn)));
+      } else {
+        array.forEach(fn.bind(this));
+      }
       return this;
     },
 
