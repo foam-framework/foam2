@@ -136,6 +136,9 @@ public class SocketServerProcessor
             foam.box.RemoteException remote = new foam.box.RemoteException();
             remote.setId(t.getClass().getName());
             remote.setMessage(t.getMessage());
+            if ( t instanceof foam.core.Exception ) {
+              remote.setException((foam.core.Exception) t);
+            }
             foam.box.RPCErrorMessage error = new foam.box.RPCErrorMessage();
             error.setData(remote);
             foam.box.Message reply = new foam.box.Message();
