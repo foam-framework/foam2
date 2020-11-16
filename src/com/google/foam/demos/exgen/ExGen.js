@@ -27,16 +27,21 @@ foam.CLASS({
 
   css: `
     ^ {
-      font-size: larger;
       color: #555;
+      font-size: larger;
+    }
+    ^title {
+      background: #eee;
+      font-size: larger;
+      width: 100%;
     }
     ^row {
       padding-left: 4px;
     }
     ^row:hover {
-      left-margin: 4px;
-      color: white;
       background: cornflowerblue;
+      color: white;
+      left-margin: 4px;
     }
     .foam-u2-ProgressView {
       height: 40px;
@@ -67,7 +72,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.util.Timer',
       name: 'timer',
-      factory: function() { return this.Timer.create({timeWarp: 10}); }
+      factory: function() { return this.Timer.create(); }
     },
     {
       name: 'totalWeight_',
@@ -122,13 +127,17 @@ foam.CLASS({
       var startTime;
       this
         .addClass(this.myClass())
+        .start('h1')
+          .addClass(self.myClass('title'))
+          .add('Exercise Generator v1.0')
+        .end()
         .add('Duration: ', this.DURATION, ' ', this.REGENERATE, ' ')
         .add(' Seconds: ')
         .tag({class: foam.u2.ProgressView, data$: this.timer.second$.map(s=>100*s/60)})
-        .start('span').style({width: '50px', display: 'inline-block', 'padding-left': '4px'}).add(this.timer.second$).end()
+        .start('span').style({width: '50px', display: 'inline-block', 'padding-left': '4px'}).nbsp().add(' ', this.timer.second$).end()
         .add(' Minutes: ')
-        .tag({class: foam.u2.ProgressView, data$: this.timer.minute$.map(m=>100*m/this.duration)})
-        .add(' ', this.timer.minute$.map(m=>m+1))
+        .tag({class: foam.u2.ProgressView, data$: this.timer.minute$.map(m=>100*(m+1)/this.duration)})
+        .nbsp().add(' ', this.timer.minute$.map(m=>m+1))
         .add(' ', this.START_TIMER, ' ', this.PAUSE, this.SKIP)
         .tag('hr')
         .forEach(this.program$, function(e, i) {
@@ -136,10 +145,9 @@ foam.CLASS({
           this
           .start()
             .addClass(self.myClass('row'))
-            .tag({class: 'foam.u2.CheckBox'})
             .add(' ')
             .start('span')
-              .style({width: '400px', display: 'inline-block'})
+              .style({width: '400px', display: 'inline-block', 'margin-bottom': '4px'})
               .add(' ', e.name)
             .end()
             .call(function() {
@@ -158,7 +166,7 @@ foam.CLASS({
             })
             .start('span')
               .add('x')
-              .style({'vertical-align': 'super', 'margin-right': '4px', float: 'right'})
+              .style({'padding-top': '7px', 'margin-right': '4px', float: 'right'})
               .on('click', () => {
                 var a = foam.Array.clone(self.program);
                 a.splice(i, 1);
@@ -201,12 +209,13 @@ foam.CLASS({
       name: 'startTimer',
       label: 'Start',
       code: function start() {
+        console.log('Start Time: ', new Date());
         this.timer.start();
       }
     },
 
     function skip() {
-      this.timer.stop();
+      this.timer.time = Math.floor((this.timer.time + 60000) / 60000) * 60000;
     },
 
     function pause() {
