@@ -137,9 +137,9 @@ foam.CLASS({
         // If the country hasn't been selected yet, don't show this error.
         if ( countryId == null ) return;
         if ( typeof regionId !== 'string' || regionId.length === 0 ) {
-          let regionError = this.translationService.getTranslation(foam.locale, `${countryId.toLowerCase()}.region.error`);
+          let regionError = this.translationService.getTranslation(foam.locale, `${countryId.toLowerCase()}.foam.nanos.auth.Address.REGION.error`);
           if ( ! regionError ) {
-            regionError = this.translationService.getTranslation(foam.locale, `*.region.error`);
+            regionError = this.translationService.getTranslation(foam.locale, `*.foam.nanos.auth.Address.REGION.error`);
           }
           return regionError ? regionError : this.REGION_REQUIRED;
         }
