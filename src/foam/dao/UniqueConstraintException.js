@@ -7,8 +7,8 @@
 foam.CLASS({
   name: 'UniqueConstraintException',
   package: 'foam.dao',
-  javaExtends: 'RuntimeException',
-  implements: ['foam.core.Exception'],
+  extends: 'foam.core.FOAMException',
+  javaGenerateConvenienceConstructor: false,
 
   axioms: [
     {
