@@ -321,7 +321,6 @@ foam.CLASS({
 
         await client.translationService.initLatch;
         self.installLanguage();
-
         await self.fetchSubject();
 
         // add user and agent for backward compatibility
