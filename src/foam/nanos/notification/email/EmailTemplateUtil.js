@@ -40,7 +40,7 @@ foam.CLASS({
 
 
         // markup symbol defines the pattern for the whole string
-        grammar.addSymbol("markup", new Repeat0(new Alt(grammar.sym("SIMPLE_VAL"), grammar.sym("IF_ELSE")
+        grammar.addSymbol("markup", new Repeat0(new Alt(grammar.sym("SIMPLE_VAL"), grammar.sym("IF_ELSE"),
           grammar.sym("ANY_KEY"))));
         Action markup = new Action() {
           @Override
