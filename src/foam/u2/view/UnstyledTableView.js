@@ -288,8 +288,8 @@ foam.CLASS({
 
       for ( var s of this.selectedColumnNames ) {
         var label = this.columnConfigToPropertyConverter.returnPropertyLabelForName(this.of, s);
-        if ( ! this.memento.paramsObj.column ) 
-          this.memento.paramsObj.column = [];
+        if ( ! this.memento.paramsObj.columns ) 
+          this.memento.paramsObj.columns = [];
         var col = this.memento.paramsObj.columns.find(c => c.name === label);
         if ( !col ) {
           newMementoColumns.push({ name: label });
