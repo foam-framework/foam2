@@ -28,6 +28,10 @@ foam.CLASS({
   css: `
     ^ {
       font-size: larger;
+      color: #555;
+    }
+    ^row {
+      padding-left: 4px;
     }
     ^row:hover {
       left-margin: 4px;
@@ -38,6 +42,9 @@ foam.CLASS({
       height: 40px;
       vertical-align: bottom;
     }
+    .property-duration input { width: 80px; }
+    .foam-u2-ActionView-regenerate { margin-right: 60px !important; }
+    .foam-u2-ActionView-startTimer, .foam-u2-ActionView-pause, .foam-u2-ActionView-skip  { margin-left: 4px; float: right; }
   `,
 
   properties: [
@@ -57,8 +64,10 @@ foam.CLASS({
       name: 'program'
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.util.Timer',
       name: 'timer',
-      factory: function() { return this.Timer.create({minute: 1}); }
+      factory: function() { return this.Timer.create({timeWarp: 10}); }
     },
     {
       name: 'totalWeight_',
@@ -102,7 +111,15 @@ foam.CLASS({
       this.regenerate();
       this.duration$.sub(()=>this.regenerate());
 
-      //this.add(this.PROGRAM);
+      // Stop timer when workout done
+      this.timer.minute$.sub(()=>{
+        if ( this.timer.minute >= this.duration ) {
+          this.timer.stop();
+          this.minute = this.duration-1;
+        }
+      });
+
+      var startTime;
       this
         .addClass(this.myClass())
         .add('Duration: ', this.DURATION, ' ', this.REGENERATE, ' ')
@@ -111,10 +128,11 @@ foam.CLASS({
         .start('span').style({width: '50px', display: 'inline-block', 'padding-left': '4px'}).add(this.timer.second$).end()
         .add(' Minutes: ')
         .tag({class: foam.u2.ProgressView, data$: this.timer.minute$.map(m=>100*m/this.duration)})
-        .add(' ', this.timer.minute$)
-        .add(' ', this.START_TIMER, ' ', this.PAUSE)
+        .add(' ', this.timer.minute$.map(m=>m+1))
+        .add(' ', this.START_TIMER, ' ', this.PAUSE, this.SKIP)
         .tag('hr')
         .forEach(this.program$, function(e, i) {
+          if ( i == 0 ) startTime = 0;
           this
           .start()
             .addClass(self.myClass('row'))
@@ -124,8 +142,23 @@ foam.CLASS({
               .style({width: '400px', display: 'inline-block'})
               .add(' ', e.name)
             .end()
+            .call(function() {
+              for ( var i = 0 ; i < e.length ; i++ ) {
+                let myStartTime = startTime + i;
+                this.start({class: foam.u2.ProgressView, data$: self.timer.slot(function(minute, second) {
+                  return self.timer.minute < myStartTime ? 0 : self.timer.minute > myStartTime ? 100 : 100*self.timer.second/60;
+                })})
+                  /*
+                  .style({'outline': self.timer.slot(function(minute, second) {
+                    return minute == myStartTime ? '2px solid red' : '';
+                  })})
+                  */
+                .end();
+              }
+            })
             .start('span')
               .add('x')
+              .style({'vertical-align': 'super', 'margin-right': '4px', float: 'right'})
               .on('click', () => {
                 var a = foam.Array.clone(self.program);
                 a.splice(i, 1);
@@ -134,6 +167,7 @@ foam.CLASS({
               })
             .end()
           .end();
+          startTime += e.length;
         });
     },
 
@@ -148,9 +182,11 @@ foam.CLASS({
     function fill() {
       while ( this.totalDuration_ < this.duration ) {
         var e = this.pickRandomExercise();
-        var a = foam.Array.clone(this.program);
-        a.push(e);
-        this.program = a;
+        if ( this.totalDuration_ + e.length <= this.duration ) {
+          var a = foam.Array.clone(this.program);
+          a.push(e);
+          this.program = a;
+        }
       }
     }
   ],
@@ -159,16 +195,6 @@ foam.CLASS({
     function regenerate() {
       this.program = [];
       this.fill();
-      /*
-      var a = [];
-      var l = 0;
-      while ( l < this.duration ) {
-        var e = this.pickRandomExercise();
-        a.push(e);
-        l += e.length;
-      }
-      this.program = a;
-      */
     },
 
     {
@@ -177,6 +203,10 @@ foam.CLASS({
       code: function start() {
         this.timer.start();
       }
+    },
+
+    function skip() {
+      this.timer.stop();
     },
 
     function pause() {
