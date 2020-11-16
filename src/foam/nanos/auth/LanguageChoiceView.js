@@ -62,8 +62,8 @@ foam.CLASS({
   }
   ^ .popUpDropDown > div {
     margin-left: -16px;
+    margin-right: -16px;
     width: 100%;
-    text-align: center;
     height: 25;
     padding: 0px 16px 5px 16px;
     font-size: 14px;
