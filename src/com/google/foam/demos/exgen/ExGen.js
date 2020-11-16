@@ -2,7 +2,10 @@ foam.CLASS({
   name: 'ExGen',
   extends: 'foam.u2.Controller',
 
-  requires: [ 'foam.util.Timer' ],
+  requires: [
+    'foam.audio.Beep',
+    'foam.util.Timer'
+  ],
 
   classes: [
     {
@@ -27,17 +30,29 @@ foam.CLASS({
 
   css: `
     ^ {
+      color: #555;
       font-size: larger;
     }
+    ^title {
+      background: #eee;
+      font-size: larger;
+      width: 100%;
+    }
+    ^row {
+      padding-left: 4px;
+    }
     ^row:hover {
-      left-margin: 4px;
-      color: white;
       background: cornflowerblue;
+      color: white;
+      left-margin: 4px;
     }
     .foam-u2-ProgressView {
       height: 40px;
       vertical-align: bottom;
     }
+    .property-duration input { width: 80px; }
+    .foam-u2-ActionView-regenerate { margin-right: 60px !important; }
+    .foam-u2-ActionView-startTimer, .foam-u2-ActionView-pause, .foam-u2-ActionView-skip  { margin-left: 4px; float: right; }
   `,
 
   properties: [
@@ -57,8 +72,10 @@ foam.CLASS({
       name: 'program'
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.util.Timer',
       name: 'timer',
-      factory: function() { return this.Timer.create({minute: 1}); }
+      factory: function() { return this.Timer.create(); }
     },
     {
       name: 'totalWeight_',
@@ -71,6 +88,10 @@ foam.CLASS({
       expression: function (program) {
         return program.reduce((acc, e) => acc + e.length, 0);
       }
+    },
+    {
+      name: 'beep',
+      factory: function() { return this.Beep.create(); }
     }
   ],
 
@@ -102,30 +123,58 @@ foam.CLASS({
       this.regenerate();
       this.duration$.sub(()=>this.regenerate());
 
-      //this.add(this.PROGRAM);
+      // Stop timer when workout done
+      this.timer.minute$.sub(()=>{
+        this.beep.play();
+        if ( this.timer.minute >= this.duration ) {
+          this.timer.stop();
+          this.minute = this.duration-1;
+        }
+      });
+
+      var startTime;
       this
         .addClass(this.myClass())
+        .start('h1')
+          .addClass(self.myClass('title'))
+          .add('Exercise Generator v1.0')
+        .end()
         .add('Duration: ', this.DURATION, ' ', this.REGENERATE, ' ')
         .add(' Seconds: ')
         .tag({class: foam.u2.ProgressView, data$: this.timer.second$.map(s=>100*s/60)})
-        .start('span').style({width: '50px', display: 'inline-block', 'padding-left': '4px'}).add(this.timer.second$).end()
+        .start('span').style({width: '50px', display: 'inline-block', 'padding-left': '4px'}).nbsp().add(' ', this.timer.second$).end()
         .add(' Minutes: ')
-        .tag({class: foam.u2.ProgressView, data$: this.timer.minute$.map(m=>100*m/this.duration)})
-        .add(' ', this.timer.minute$)
-        .add(' ', this.START_TIMER, ' ', this.PAUSE)
+        .tag({class: foam.u2.ProgressView, data$: this.timer.minute$.map(m=>100*(m+1)/this.duration)})
+        .nbsp().add(' ', this.timer.minute$.map(m=>m+1))
+        .add(' ', this.START_TIMER, ' ', this.PAUSE, this.SKIP)
         .tag('hr')
         .forEach(this.program$, function(e, i) {
+          if ( i == 0 ) startTime = 0;
           this
           .start()
             .addClass(self.myClass('row'))
-            .tag({class: 'foam.u2.CheckBox'})
             .add(' ')
             .start('span')
-              .style({width: '400px', display: 'inline-block'})
+              .style({width: '400px', display: 'inline-block', 'margin-bottom': '4px'})
               .add(' ', e.name)
             .end()
+            .call(function() {
+              for ( var i = 0 ; i < e.length ; i++ ) {
+                let myStartTime = startTime + i;
+                this.start({class: foam.u2.ProgressView, data$: self.timer.slot(function(minute, second) {
+                  return self.timer.minute < myStartTime ? 0 : self.timer.minute > myStartTime ? 100 : 100*self.timer.second/60;
+                })})
+                  /*
+                  .style({'outline': self.timer.slot(function(minute, second) {
+                    return minute == myStartTime ? '2px solid red' : '';
+                  })})
+                  */
+                .end();
+              }
+            })
             .start('span')
               .add('x')
+              .style({'padding-top': '7px', 'margin-right': '4px', float: 'right'})
               .on('click', () => {
                 var a = foam.Array.clone(self.program);
                 a.splice(i, 1);
@@ -134,6 +183,7 @@ foam.CLASS({
               })
             .end()
           .end();
+          startTime += e.length;
         });
     },
 
@@ -148,9 +198,11 @@ foam.CLASS({
     function fill() {
       while ( this.totalDuration_ < this.duration ) {
         var e = this.pickRandomExercise();
-        var a = foam.Array.clone(this.program);
-        a.push(e);
-        this.program = a;
+        if ( this.totalDuration_ + e.length <= this.duration ) {
+          var a = foam.Array.clone(this.program);
+          a.push(e);
+          this.program = a;
+        }
       }
     }
   ],
@@ -159,24 +211,19 @@ foam.CLASS({
     function regenerate() {
       this.program = [];
       this.fill();
-      /*
-      var a = [];
-      var l = 0;
-      while ( l < this.duration ) {
-        var e = this.pickRandomExercise();
-        a.push(e);
-        l += e.length;
-      }
-      this.program = a;
-      */
     },
 
     {
       name: 'startTimer',
       label: 'Start',
       code: function start() {
+        console.log('Start Time: ', new Date());
         this.timer.start();
       }
+    },
+
+    function skip() {
+      this.timer.time = Math.floor((this.timer.time + 60000) / 60000) * 60000;
     },
 
     function pause() {

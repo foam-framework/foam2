@@ -40,7 +40,6 @@ p({
       .setOf(foam.nanos.logger.LogMessage.getOwnClassInfo())
       .setInnerDAO(((foam.dao.DAO) x.get("localLogMessageDAO")))
       .setOrder(new foam.mlang.order.Comparator[] { new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.logger.LogMessage.CREATED).build() })
-      .setCluster(false)
       .build();
   """,
   "client": """
