@@ -46,6 +46,7 @@ foam.CLASS({
           if ( getRepeatCount() > 1 ) {
             LogMessage repeatLog = new foam.nanos.logger.LogMessage();
             repeatLog.copyFrom(previous);
+            repeatLog.clearId();
             repeatLog.setMessage("The previous log was repeated " + getRepeatCount() + " times");
             super.put_(x, repeatLog);
           }
@@ -57,6 +58,7 @@ foam.CLASS({
         if ( getRepeatCount() > 1 ) {
           LogMessage repeatLog = new foam.nanos.logger.LogMessage() ;
           repeatLog.copyFrom(previous);
+          repeatLog.clearId();
           repeatLog.setMessage("The previous log was repeated " + getRepeatCount() + " times");
           super.put_(x,repeatLog);
         }
