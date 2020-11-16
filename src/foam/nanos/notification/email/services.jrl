@@ -33,7 +33,6 @@ p({
         .setComparator(foam.mlang.MLang.DESC(foam.nanos.notification.email.EmailMessage.CREATED) )
         .setSize(100000)
         .build())
-      .setCluster(false)
       .setIndex(new foam.core.PropertyInfo[] {foam.nanos.notification.email.EmailMessage.CREATED})
       .build();
   """
