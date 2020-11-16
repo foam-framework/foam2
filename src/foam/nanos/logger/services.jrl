@@ -18,7 +18,6 @@ p({
         .setSize(100000)
         .build())
       .setIndex(new foam.core.PropertyInfo[] {foam.nanos.logger.LogMessage.CREATED})
-      .setOrder(new foam.mlang.order.Comparator[] {foam.nanos.logger.LogMessage.CREATED})
       .setDecorator(new foam.nanos.logger.StdoutLoggerDAO.Builder(x)
         .setMode(((foam.nanos.app.AppConfig) x.get("appConfig")).getMode())
         .setDelegate(new foam.nanos.logger.LogMessageDAO.Builder(x)
@@ -40,6 +39,7 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.logger.LogMessage.getOwnClassInfo())
       .setInnerDAO(((foam.dao.DAO) x.get("localLogMessageDAO")))
+      .setOrder(new foam.mlang.order.Comparator[] { new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.logger.LogMessage.CREATED).build() })
       .setCluster(false)
       .build();
   """,
