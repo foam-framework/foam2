@@ -2,7 +2,10 @@ foam.CLASS({
   name: 'ExGen',
   extends: 'foam.u2.Controller',
 
-  requires: [ 'foam.util.Timer' ],
+  requires: [
+    'foam.audio.Beep',
+    'foam.util.Timer'
+  ],
 
   classes: [
     {
@@ -85,6 +88,10 @@ foam.CLASS({
       expression: function (program) {
         return program.reduce((acc, e) => acc + e.length, 0);
       }
+    },
+    {
+      name: 'beep',
+      factory: function() { return this.Beep.create(); }
     }
   ],
 
@@ -118,6 +125,7 @@ foam.CLASS({
 
       // Stop timer when workout done
       this.timer.minute$.sub(()=>{
+        this.beep.play();
         if ( this.timer.minute >= this.duration ) {
           this.timer.stop();
           this.minute = this.duration-1;
