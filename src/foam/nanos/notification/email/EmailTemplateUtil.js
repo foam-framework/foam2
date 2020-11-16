@@ -37,13 +37,36 @@ foam.CLASS({
       javaFactory: `
         Grammar grammar = new Grammar();
         grammar.addSymbol("START", grammar.sym("markup"));
-        grammar.addSymbol("markup", new Repeat0(new Alt(grammar.sym("SIMPLE_VAL"), grammar.sym("ANY_KEY")),Whitespace.instance()));
-        grammar.addSymbol("SIMPLE_VAL", new Seq1(2, Literal.create("{{"), Whitespace.instance(), new Repeat0(new AnyKeyParser()), Whitespace.instance() ,Literal.create("}}") ));
-//        grammar.addSymbol("SIMPLE_VAL", new Seq1(2, Literal.create("{%"), Whitespace.instance(), new Repeat0(new AnyKeyParser()), Whitespace.instance() ,Literal.create("}}") ));
 
 
-        // define actions for every symbol
-        Action action = new Action() {
+        // markup symbol defines the pattern for the whole string
+        grammar.addSymbol("markup", new Repeat0(new Alt(grammar.sym("SIMPLE_VAL"), grammar.sym("IF_ELSE")
+          grammar.sym("ANY_KEY"))));
+        Action markup = new Action() {
+          @Override
+          public Object execute(Object value, ParserContext x) {
+            return getSb().toString();
+          }
+        };
+        grammar.addAction("markup", markup);
+
+
+        // ANY_KEY symbol applies to any char that doesn't match any other pattern
+        grammar.addSymbol("ANY_KEY", new AnyKeyParser());
+        Action anyKeyAction = new Action() {
+          @Override
+          public Object execute(Object val, ParserContext x) {
+            getSb().append(val);
+            return val;
+          }
+        };
+        grammar.addAction("ANY_KEY", anyKeyAction);
+
+
+        // simple value syntax: "qwerty {{ simple_value }} qwerty"
+        grammar.addSymbol("SIMPLE_VAL", new Seq1(2, Literal.create("{{"), Whitespace.instance(),
+          new Repeat0(new AnyKeyParser()), Whitespace.instance() ,Literal.create("}}") ));
+        Action simpleValAction = new Action() {
           @Override
           public Object execute(Object val, ParserContext x) {
             String value = (String) getValues().get(val);
@@ -56,24 +79,68 @@ foam.CLASS({
             return value;
           }
         };
-        grammar.addSymbol("ANY_KEY", new AnyKeyParser());
-        Action anyAction = new Action() {
-          @Override
-          public Object execute(Object val, ParserContext x) {
-            getSb().append(val);
-            return val;
-          }
-        };
+        grammar.addAction("SIMPLE_VAL", simpleValAction);
 
-        Action markup = new Action() {
-          @Override
-          public Object execute(Object value, ParserContext x) {
-            return getSb().toString();
-          }
-        };
-        grammar.addAction("SIMPLE_VAL", action);
-        grammar.addAction("ANY_KEY", anyAction);
-        grammar.addAction("markup", markup);
+
+        /* IF_ELSE syntax: "qwerty {% if var_name_provided_in_map %} qwer {{ possible_simple_value }} erty
+        {% else %} qwerty" */
+        Parser ifElseParser = new Seq3(4, 8, 16,
+          Literal.create("{%"),
+          Whitespace.instance(),
+          Literal.create("if"),
+          Whitespace.instance(),
+          new Repeat(new Until(Literal.create("%}"))),
+          Whitespace.instance(),
+          Literal.create("%}"),
+          Whitespace.instance(),
+          (new Repeat(new Until(Literal.create("{%")))),
+          Whitespace.instance(),
+          Literal.create("{%"),
+          Whitespace.instance(),
+          Literal.create("else"),
+          Whitespace.instance(),
+          Literal.create("%}"),
+          Whitespace.instance(),
+          (new Repeat(new Until(Literal.create("{%")))),
+          Whitespace.instance(),
+          Literal.create("{%"),
+          Whitespace.instance(),
+          Literal.create("endif"),
+          Whitespace.instance(),
+          Literal.create("%}"));
+
+          grammar.addSymbol("IF_ELSE", ifElseParser);
+          Action ifElseAction  = new Action() {
+            @Override
+            public Object execute(Object val, foam.lib.parse.ParserContext x) {
+              getSb().append("start");
+              Object[][] valArr = (Object[][]) val;
+              StringBuilder ifCond = new StringBuilder();
+              for ( int i= 0; i < valArr[0].length; i++ ) {
+                if ( ! Character.isWhitespace((char)valArr[0][i]) ) ifCond.append(valArr[0][i]);
+              }
+
+              StringBuilder finalVal = new StringBuilder();
+              if ( getValues().get(ifCond.toString() ) != null ) {
+                for ( int i= 0; i < valArr[1].length; i++ ) {
+                  finalVal.append(valArr[1][i]);
+                }
+              } else {
+                for ( int i= 0; i < valArr[2].length; i++ ) {
+                  finalVal.append(valArr[2][i]);
+                }
+              }
+              StringPStream finalValPs = new StringPStream();
+              finalValPs.setString(finalVal);
+              PStream ret = ((Parser) grammar.sym("markup")).parse(finalValPs, new ParserContextImpl());
+              getSb().append(ret);
+              return val;
+            }
+          };
+          grammar.addAction("IF_ELSE", ifElseAction);
+
+
+
         return grammar;
       `
     }
@@ -89,8 +156,7 @@ foam.CLASS({
       type: 'String',
       javaCode: `
       setValues(values);
-      ParserContext parserX = new ParserContextImpl();
-      getGrammar().parseString(body, "", parserX);
+      getGrammar().parseString(body, "");
       System.out.println(getSb().toString());
       return getSb().toString();
       `
