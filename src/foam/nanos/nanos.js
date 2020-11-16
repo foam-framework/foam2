@@ -34,6 +34,7 @@ FOAM_FILES([
   { name: "foam/nanos/app/ContextLookupAppConfigService"},
   { name: "foam/nanos/app/AppConfigService" },
   { name: "foam/nanos/app/EmailConfig" },
+  { name: 'foam/nanos/app/SupportConfig' },
   { name: "foam/nanos/notification/email/SMTPConfig" },
   { name: "foam/nanos/app/ClientAppConfigService" },
   { name: "foam/nanos/controller/WindowHash" },
@@ -74,6 +75,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/test/ServiceProviderAwareTest" },
   { name: "foam/nanos/auth/test/UserAndGroupPermissionTest" },
   { name: "foam/nanos/auth/Language" },
+  { name: 'foam/nanos/auth/LanguageChoiceView', flags: ['web'] },
   { name: "foam/nanos/auth/CreatedAwareDAO" },
   { name: "foam/nanos/auth/LastModifiedAwareDAO" },
   { name: "foam/nanos/auth/LifecycleAwareDAO" },
@@ -91,6 +93,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/email/EmailDocInterface" },
   { name: "foam/nanos/auth/email/EmailDocService" },
   { name: "foam/nanos/auth/email/ClientEmailDocService" },
+  { name: "foam/nanos/auth/email/EmailVerificationWebAgent" },
   { name: "foam/nanos/auth/resetPassword/SuccessView" },
   { name: "foam/nanos/auth/resetPassword/ResetPasswordTokenService" },
   { name: "foam/nanos/auth/token/TokenService" },
@@ -294,6 +297,7 @@ FOAM_FILES([
   { name: 'foam/nanos/ticket/TicketAddCommentDAO' },
   { name: 'foam/nanos/ticket/TicketOwnerDAO' },
   { name: 'foam/nanos/ticket/TicketCommentOwnerDAO' },
+  { name: 'foam/nanos/ticket/TicketDAOCreateView' },
   { name: 'foam/nanos/ticket/TicketSummaryView' },
   { name: 'foam/nanos/ticket/SummaryCard' },
 
@@ -355,6 +359,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/Refinements" },
   { name: "foam/nanos/crunch/MinMaxCapability" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
+  { name: "foam/nanos/crunch/CapabilityIntercept" },
   { name: "foam/nanos/crunch/lite/CapablePayload" },
   { name: "foam/nanos/crunch/lite/CapablePayloadStatusDAO" },
   { name: "foam/nanos/crunch/lite/Capable" },
@@ -366,6 +371,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/lite/MinMaxCapabilityRefinement" },
   { name: "foam/nanos/crunch/crunchtest/TestCapable" },
   { name: "foam/nanos/crunch/CapabilityAvailabilityDAO" },
+  { name: "foam/nanos/crunch/example/ExampleData" },
 
   // crunch lite rulers
   { name: "foam/nanos/crunch/lite/ruler/CapableStatusChangeAdjustApprovalsRuleAction" },

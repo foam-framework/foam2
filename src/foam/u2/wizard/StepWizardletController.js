@@ -273,7 +273,7 @@ foam.CLASS({
     },
     function saveProgress() {
       var p = Promise.resolve();
-      return this.wizardlets.slice(0, this.highestIndex).reduce(
+      return this.wizardlets.reduce(
         (p, wizardlet) => p.then(() => wizardlet.save()), p
       );
     },
