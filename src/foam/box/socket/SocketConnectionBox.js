@@ -181,7 +181,7 @@ foam.CLASS({
         }
         // omLogger.log(this.getClass().getSimpleName(), getId(), "pending");
         synchronized (out_) {
-          getLogger().debug("send", message);
+          // getLogger().debug("send", message);
           out_.writeLong(System.currentTimeMillis());
           out_.writeInt(messageBytes.length);
           out_.write(messageBytes);
@@ -262,7 +262,7 @@ foam.CLASS({
             if ( foam.util.SafetyUtil.isEmpty(message) ) {
               throw new RuntimeException("Received empty message.");
             }
-            getLogger().debug("receive", message);
+            // getLogger().debug("receive", message);
             Message msg = (Message) x.create(JSONParser.class).parseString(message);
             if ( msg == null ) {
               throw new RuntimeException("Failed to parse. message: "+message);
