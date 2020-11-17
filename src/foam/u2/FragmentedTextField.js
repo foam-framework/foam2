@@ -80,7 +80,7 @@ foam.CLASS({
           this.start().addClass(this.myClass('symbol'))
             .add(e).end();
           continue;
-        } else if ( e.view ) {
+        } else if ( e.cls_ === foam.u2.FragmentedTextFieldFragment ) {
           e = e.view;
         }
         var u2Elem = this.start(e)
@@ -119,7 +119,7 @@ foam.CLASS({
           if ( next = this.childNodes[this.currentIndex + 2] ) {
             if ( this.delegates[this.currentIndex].maxLength > arr[i].length ) break;
 
-            if ( ! next.data || next.data.length == 0 ) {
+            if ( ! ( next && next.data ) ) {
               this.currentIndex = this.currentIndex + 2;
               next.focus();
             } else break;
