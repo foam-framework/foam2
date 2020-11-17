@@ -38,6 +38,7 @@ foam.CLASS({
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
+    'foam.nanos.notification.Notification',
     'foam.nanos.session.Session',
     'foam.util.Email',
     'foam.util.Password',
@@ -142,9 +143,16 @@ foam.CLASS({
         Session session = x.get(Session.class);
         session.setUserId(user.getId());
 
-        if ( Group.ADMIN_GROUP.equalsIgnoreCase(user.getGroup()) ) {
-          session.setClusterable(false);
-          ((foam.nanos.logger.Logger) x.get("logger")).warning(Group.ADMIN_GROUP + " login succeeded on", System.getProperty("hostname", "localhost"));
+        if ( Group.ADMIN_GROUP.equalsIgnoreCase(user.getGroup()) ||
+             check(x.put("user", user), "*") ) {
+          session.setClusterable(false); 
+          String msg = "Admin login for " + user.getId() + " succeeded on " + System.getProperty("hostname", "localhost");
+          ((foam.nanos.logger.Logger) x.get("logger")).warning(msg);
+          Notification notification = new Notification.Builder(x)
+            .setTemplate("NOC")
+            .setBody(msg)
+            .build();
+          ((DAO) x.get("localNotificationDAO")).put(notification);
         }
 
         ((DAO) getLocalSessionDAO()).inX(x).put(session);
@@ -152,8 +160,15 @@ foam.CLASS({
         return user;
       } catch ( AuthenticationException e ) {
         if ( user != null &&
-             Group.ADMIN_GROUP.equalsIgnoreCase(user.getGroup()) ) {
-          ((foam.nanos.logger.Logger) x.get("logger")).warning(Group.ADMIN_GROUP + " login failed", System.getProperty("hostname", "localhost"));
+             ( Group.ADMIN_GROUP.equalsIgnoreCase(user.getGroup()) ||
+               check(x.put("user", user), "*") ) ) {
+          String msg = "Admin login for " + user.getId() + " failed on " + System.getProperty("hostname", "localhost");
+          ((foam.nanos.logger.Logger) x.get("logger")).warning(msg);
+          Notification notification = new Notification.Builder(x)
+            .setTemplate("NOC")
+            .setBody(msg)
+            .build();
+          ((DAO) x.get("localNotificationDAO")).put(notification);
         }
         throw e;
       }
@@ -427,6 +442,7 @@ foam.CLASS({
             );
 
             if ( junction == null ) {
+              ((foam.nanos.logger.Logger) x.get("logger")).warning("There was a user and an agent in the context, but a junction between them was not found.", "user", user.getId(), "agent", agent.getId());
               throw new RuntimeException("There was a user and an agent in the context, but a junction between them was not found.");
             }
 
