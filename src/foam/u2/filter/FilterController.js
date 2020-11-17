@@ -202,7 +202,10 @@ foam.CLASS({
       var previewCriteria = this.previewCriterias[criteriaKey];
       var criteria = this.criterias[criteriaKey];
 
-      if ( ! previewCriteria && ! criteria ) return;
+      if ( ! previewCriteria && ! criteria ) {
+        this.addCriteria(criteriaKey);
+        criteria = this.criterias[criteriaKey];
+      }
 
       if ( previewCriteria ) {
         previewCriteria.predicates[propertyName] = predicate;
