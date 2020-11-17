@@ -160,10 +160,10 @@ foam.CLASS({
     },
     
     function returnFilterObj() {
-      if ( ! this.qualifier )
+      if ( ! this.qualifier || this.qualifier == 'True' )
         return null;
-      var obj = { qualifier:this.qualifier, date1:this.date1,  name: this.property.name };
-      if ( date2 )
+      var obj = { name:this.property.name, qualifier:this.qualifier, date1:this.date1 };
+      if ( this.date2 )
         obj.date2 = this.date2;
       return obj;
     }

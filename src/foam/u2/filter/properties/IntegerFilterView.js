@@ -188,7 +188,7 @@ foam.CLASS({
     function returnFilterObj() {
       if ( ! this.qualifier )
         return null;
-      var obj = { qualifier:this.qualifier, amount1:this.amount1,  name: this.property.name };
+      var obj = { name:this.property.name, qualifier:this.qualifier, amount1:this.amount1 };
       if ( amount2 )
         obj.amount2 = this.amount2;
       return obj;

@@ -248,7 +248,7 @@ foam.CLASS({
     },
     
     function returnFilterObj() {
-      return this.selectedOptions && this.selectedOptions.length > 0 ? { selectedOptions: this.selectedOptions, name: this.property.name } : null;
+      return this.selectedOptions && this.selectedOptions.length > 0 ? { name:this.property.name, selectedOptions:this.selectedOptions } : null;
     }
   ],
 

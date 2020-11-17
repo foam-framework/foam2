@@ -155,7 +155,7 @@ foam.CLASS({
       if ( ! this.boolT && ! this.boolF ) {
         return null;
       }
-      var obj = {  name: this.property.name };
+      var obj = {  name:this.property.name };
       if ( this.boolT )
         obj.boolT = this.boolT;
       if ( this.boolF )
