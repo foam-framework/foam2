@@ -123,7 +123,8 @@ foam.CLASS({
     },
     {
       name: 'criteria'
-    }
+    },
+    'isInit'
   ],
 
   methods: [
@@ -148,18 +149,14 @@ foam.CLASS({
         .start('div', null, this.container_$).addClass(this.myClass('container-filter'))
           .show(this.active$)
         .end();
-      this.isFiltering();
 
-      if ( this.memento.paramsObj.filters && this.memento.paramsObj.filters.length > 0 ) {
-        var filter = this.memento.paramsObj.filters.find(f => f.criteria === this.criteria && f.name === this.property.name);
-        if ( filter ) {
-          this.view_.setFilterValue(filter);
-        }
-      }
+      this.isInit = true;
+      this.isFiltering();
+      this.isInit = false;
     },
-    function setFilterValue(obj) {},
+    function setFilterValue(obj) {},//remove me
     
-    function returnFilterObj() {
+    function returnFilterObj() {//remove me
       return this.view_ && this.view_.returnFilterObj ? this.view_.returnFilterObj() : null;
     }
   ],
@@ -179,6 +176,13 @@ foam.CLASS({
         dao$: this.dao$
       }, this.view_$);
 
+      if ( this.memento.paramsObj.filters && this.memento.paramsObj.filters.length > 0 ) {
+        var filter = this.memento.paramsObj.filters.find(f => f.criteria === this.criteria && f.name === this.property.name);
+        if ( filter && this.view_ ) {
+          this.view_.setFilterValue(filter);
+        }
+      }
+
       // Restore the search view using an existing predicate for that view
       // This requires that every search view implements restoreFromPredicate
       var existingPredicate = this.filterController.getExistingPredicate(this.criteria, this.property);
@@ -197,25 +201,32 @@ foam.CLASS({
     },
 
     function isFiltering() {
-      if ( ! this.memento )
-        return;
+      if ( ! this.isInit ) {
+        if ( ! this.view_ )
+          return;
 
-      if ( ! this.memento.paramsObj.filters ) {
-        this.memento.paramsObj.filters = [];
+        if ( ! this.memento.paramsObj.filters ) {
+          this.memento.paramsObj.filters = [];
+        }
+
+        this.memento.paramsObj.filters = this.memento.paramsObj.filters.filter(f => f.name !== this.property.name && f.criteria !== this.criteria );
+
+        var pred =  foam.json.Outputter.create({
+          pretty: true,
+          strict: true
+        }).stringify(this.view.predicate);
+
+        if ( pred ) {
+          var newFilterValue = { criteria: this.criteria, name: this.property.name, pred: pred }
+          this.memento.paramsObj.filters.push(newFilterValue);
+        }
+        if ( this.memento.paramsObj.filters && this.memento.paramsObj.filters.length === 0 ) {
+          delete this.memento.paramsObj.filters;
+        }
+
+        this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
       }
-
-      this.memento.paramsObj.filters = this.memento.paramsObj.filters.filter(f => f.name !== this.property.name && f.criteria !== this.criteria );
-
-      var newFilterValue = this.returnFilterObj();
-      if ( newFilterValue ) {
-        newFilterValue.criteria = this.criteria;
-        this.memento.paramsObj.filters.push(newFilterValue);
-      }
-      if ( this.memento.paramsObj.filters && this.memento.paramsObj.filters.length === 0 ) {
-        delete this.memento.paramsObj.filters;
-      }
-      this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
-
+      
       // Since the existing predicates are lazy loaded (on opening the view),
       // check to see if there is an existing predicate to use the correct label
       if ( this.filterController.getExistingPredicate(this.criteria, this.property) && this.firstTime_ ) {

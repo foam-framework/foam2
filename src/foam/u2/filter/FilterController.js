@@ -197,6 +197,21 @@ foam.CLASS({
       return null;
     },
 
+    function setExistingPredicate(criteriaKey, property, predicate) {
+      var propertyName = typeof property === 'string' ? property : property.name;
+      var previewCriteria = this.previewCriterias[criteriaKey];
+      var criteria = this.criterias[criteriaKey];
+
+      if ( ! previewCriteria && ! criteria ) return;
+
+      if ( previewCriteria ) {
+        previewCriteria.predicates[propertyName] = predicate;
+      }
+      if ( criteria ) {
+        criteria.predicates[propertyName] = predicate;
+      }
+    },
+
     function applyPreview() {
       // At this point, users should be coming from advanced mode
       this.isAdvanced = true;
