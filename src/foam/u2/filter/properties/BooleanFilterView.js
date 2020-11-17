@@ -141,6 +141,26 @@ foam.CLASS({
 
       if ( predicate.arg2.value ) this.boolT = true;
       if ( ! predicate.arg2.value ) this.boolF = true;
+    },
+    function setFilterValue(obj) {
+      if ( obj.boolT ) {
+        this.boolT = obj.boolT || false;
+      }
+      if ( obj.boolF ) {
+        this.boolF = obj.boolT || false;
+      }
+    },
+    
+    function returnFilterObj() {
+      if ( ! this.boolT && ! this.boolF ) {
+        return null;
+      }
+      var obj = {  name: this.property.name };
+      if ( this.boolT )
+        obj.boolT = this.boolT;
+      if ( this.boolF )
+        obj.boolF = this.boolF;
+      return obj;
     }
   ]
 });

@@ -314,6 +314,7 @@ foam.CLASS({
         this.selectedOptions = this.selectedOptions.concat(obj.selectedOptions.filter(o => ! this.selectedOptions.includes(o) && this.filteredOptions.includes(o) ));
       }
     },
+    
     function returnFilterObj() {
       return this.selectedOptions && this.selectedOptions.length > 0 ? { selectedOptions: this.selectedOptions, name: this.property.name } : null;
     }
