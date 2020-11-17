@@ -42,7 +42,7 @@ foam.CLASS({
               ucj.getStatus() == CapabilityJunctionStatus.APPROVED ) 
               return;
 
-            Capability capability = (Capability) ucj.findTargetId(systemX);
+            Capability capability = (Capability) ucj.findTargetId(systemX).fclone();
 
             if ( ! isRenewable ) ucj.setStatus(CapabilityJunctionStatus.ACTION_REQUIRED);
 
