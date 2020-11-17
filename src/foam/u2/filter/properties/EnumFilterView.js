@@ -244,9 +244,7 @@ foam.CLASS({
     },
 
     function setFilterValue(obj) {
-      for ( var i = 0; i < obj.selectedOptions.length; i++ ) {
-        this.selectedOptions = this.selectedOptions.concat(obj.selectedOptions.filter(o => ! this.selectedOptions.includes(o) && this.filteredOptions.includes(o) ));
-      }
+      this.selectedOptions = obj.selectedOptions;
     },
     
     function returnFilterObj() {
