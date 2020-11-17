@@ -153,11 +153,6 @@ foam.CLASS({
       this.isInit = true;
       this.isFiltering();
       this.isInit = false;
-    },
-    function setFilterValue(obj) {},//remove me
-    
-    function returnFilterObj() {//remove me
-      return this.view_ && this.view_.returnFilterObj ? this.view_.returnFilterObj() : null;
     }
   ],
 
@@ -175,13 +170,6 @@ foam.CLASS({
         property: this.property,
         dao$: this.dao$
       }, this.view_$);
-
-      if ( this.memento.paramsObj.filters && this.memento.paramsObj.filters.length > 0 ) {
-        var filter = this.memento.paramsObj.filters.find(f => f.criteria === this.criteria && f.name === this.property.name);
-        if ( filter && this.view_ ) {
-          this.view_.setFilterValue(filter);
-        }
-      }
 
       // Restore the search view using an existing predicate for that view
       // This requires that every search view implements restoreFromPredicate
@@ -211,10 +199,12 @@ foam.CLASS({
 
         this.memento.paramsObj.filters = this.memento.paramsObj.filters.filter(f => f.name !== this.property.name && f.criteria !== this.criteria );
 
-        var pred =  foam.json.Outputter.create({
-          pretty: true,
-          strict: true
-        }).stringify(this.view.predicate);
+        var pred;
+        if ( Object.keys(this.view_.predicate).length > 0 && ! foam.mlang.predicate.True.isInstance(this.view_.predicate) )
+          pred =  foam.json.Outputter.create({
+            pretty: true,
+            strict: true
+          }).stringify(this.view_.predicate);
 
         if ( pred ) {
           var newFilterValue = { criteria: this.criteria, name: this.property.name, pred: pred }
