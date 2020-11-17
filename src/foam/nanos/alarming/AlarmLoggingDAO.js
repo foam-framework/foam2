@@ -21,17 +21,17 @@ foam.CLASS({
       javaCode: `
       Alarm alarm = (Alarm) getDelegate().put_(x, obj);
       Logger logger = (Logger) x.get("logger");
-      switch ( alarm.getSeverity().getName() ) {
-        case "DEBUG":
+      switch ( alarm.getSeverity() ) {
+        case DEBUG:
           logger.debug("Alarm", alarm.getName(), alarm.getIsActive(), alarm.getNote());
           break;
-        case "INFO":
+        case INFO:
           logger.info("Alarm", alarm.getName(), alarm.getIsActive(), alarm.getNote());
           break;
-        case "WARN":
+        case WARN:
           logger.warning("Alarm", alarm.getName(), alarm.getIsActive(), alarm.getNote());
           break;
-        case "ERROR":
+        case ERROR:
           logger.error("Alarm", alarm.getName(), alarm.getIsActive(), alarm.getNote());
           break;
         default:
