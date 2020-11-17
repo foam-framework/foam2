@@ -183,7 +183,7 @@ foam.CLASS({
 
         // update ReplayingInfo for self.
         DAO dao = (DAO) x.get("clusterConfigDAO");
-        dao.find_(x, config.getId());
+        config = (ClusterConfig) dao.find_(x, config.getId());
 
         dao = (DAO) x.get("localClusterConfigDAO");
         List<ClusterConfig> configs = (ArrayList) ((ArraySink) dao
