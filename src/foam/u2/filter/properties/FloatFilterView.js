@@ -27,18 +27,5 @@ foam.CLASS({
         precision: 2
       }
     }
-  ],
-  methods: [
-    function setFilterValue(obj) {
-      this.qualifier = obj.qualifier;
-      this.amount = obj.amount;
-    },
-    
-    function returnFilterObj() {
-      if ( ! this.qualifier )
-        return null;
-      var obj = { name:this.property.name, qualifier:this.qualifier, amount:this.amount };
-      return obj;
-    }
   ]
 });

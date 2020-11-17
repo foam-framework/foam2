@@ -151,21 +151,6 @@ foam.CLASS({
         this.qualifier = qualifier;
         this.date1 = predicate.arg2.value;
       }
-    },
-
-    function setFilterValue(obj) {
-      this.qualifier = obj.qualifier;
-      this.date1 = obj.date1;
-      this.date2 = obj.date2;
-    },
-    
-    function returnFilterObj() {
-      if ( ! this.qualifier || this.qualifier == 'True' )
-        return null;
-      var obj = { name:this.property.name, qualifier:this.qualifier, date1:this.date1 };
-      if ( this.date2 )
-        obj.date2 = this.date2;
-      return obj;
     }
   ]
 });

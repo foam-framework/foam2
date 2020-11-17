@@ -177,21 +177,6 @@ foam.CLASS({
     function clear() {
       this.qualifier = 'True';
       this.value = 0;
-    },
-    
-    function setFilterValue(obj) {
-      this.qualifier = obj.qualifier;
-      this.amount1 = obj.amount1;
-      this.amount2 = obj.amount2;
-    },
-    
-    function returnFilterObj() {
-      if ( ! this.qualifier )
-        return null;
-      var obj = { name:this.property.name, qualifier:this.qualifier, amount1:this.amount1 };
-      if ( this.amount2 )
-        obj.amount2 = this.amount2;
-      return obj;
     }
   ]
 });

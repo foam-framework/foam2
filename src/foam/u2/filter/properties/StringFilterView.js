@@ -307,14 +307,6 @@ foam.CLASS({
       if ( predicate === this.TRUE ) return;
       this.selectedOptions = Array.isArray(predicate.arg2.value) ?
         predicate.arg2.value : [predicate.arg2.value];
-    },
-
-    function setFilterValue(obj) {
-      this.selectedOptions = obj.selectedOptions;
-    },
-
-    function returnFilterObj() {
-      return this.selectedOptions && this.selectedOptions.length > 0 ? { name:this.property.name, selectedOptions: this.selectedOptions } : null;
     }
   ],
 

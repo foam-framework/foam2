@@ -368,14 +368,6 @@ foam.CLASS({
     */
     function clear() {
       this.selectedOptions = [];
-    },
-
-    function setFilterValue(obj) {
-      this.selectedOptions = obj.selectedOptions;
-    },
-    
-    function returnFilterObj() {
-      return this.selectedOptions && this.selectedOptions.length > 0 ? { selectedOptions: this.selectedOptions } : null;
     }
   ],
 
