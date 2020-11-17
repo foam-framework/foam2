@@ -134,10 +134,10 @@ foam.CLASS({
         if (  this.memento ) {//export empty memento to not set wrong TextSearch
           if ( value ) {
             this.memento.paramsObj['search'] = value;
-            this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
           } else {
             delete this.memento.paramsObj['search'];
           }
+          this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
         }
         this.predicate = ! value ?
           this.True.create() :
