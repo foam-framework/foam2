@@ -11,10 +11,12 @@ foam.CLASS({
   properties: [
     {
       name: 'view',
-      value: {
-        class: 'foam.u2.TextField',
-        onKey: true,
-        data: this.data
+      expression: function(data) { 
+        return {
+          class: 'foam.u2.TextField',
+          onKey: true,
+          data: data
+        }
       }
     },
     {
