@@ -189,7 +189,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.FULL_SCREEN.label",target:"tela cheia"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.BACK_DISABLED.label",target:"voltar desativado"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.DISCARD.label",target:"Dispensar"})
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.SAVE_AND_CLOSE.label",target:"Salvar e dispensar"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.SAVE_AND_CLOSE.label",target:"Salvar e sair"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.GO_PREV.label",target:"Costas"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.GO_NEXT.label",target:"Próximo"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollWizardletView.ACTION_LABEL",target:"Enviar"})
@@ -252,7 +252,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.PhoneNumber.INVALID_PH
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.FObjectProperty.PLEASE_ENTER_VALID",target:"Por favor insira um válido"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.Property.PLEASE_ENTER",target:"Por favor, insira"})
 
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.CONFIRM_MSG",target:"Salvar e sair"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.CONFIRM_MSG",target:"Saída"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.DISMISS_MSG",target:"Tem certeza de que deseja sair desta tela?"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.CONTINUE_MSG",target:"Volte"})
 
