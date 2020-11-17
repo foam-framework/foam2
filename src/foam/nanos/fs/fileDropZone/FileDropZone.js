@@ -32,6 +32,7 @@ foam.CLASS({
   css: `
     ^ {
       box-sizing: border-box;
+      max-width: 365px;
       padding: 16px;
       border: 2px dashed #8e9090;
       border-radius: 3px;
@@ -85,11 +86,11 @@ foam.CLASS({
   `,
 
   messages: [
-    { name: 'LABEL_DEFAULT_TITLE', message: 'DRAG & DROP YOUR FILE HERE' },
+    { name: 'LABEL_DEFAULT_TITLE', message: 'Drag your file here' },
     { name: 'LABEL_OR',            message: 'or' },
-    { name: 'LABEL_BROWSE',        message: 'browse' },
+    { name: 'LABEL_BROWSE',        message: 'select from your device' },
     { name: 'LABEL_SUPPORTED',     message: 'Supported file types:' },
-    { name: 'LABEL_MAX_SIZE',      message: 'Max Size:' },
+    { name: 'LABEL_MAX_SIZE',      message: 'Max size:' },
     { name: 'ERROR_FILE_TYPE',     message: 'Invalid file type' },
     { name: 'ERROR_FILE_SIZE',     message: 'File size exceeds 15MB' }
   ],
