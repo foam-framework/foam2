@@ -122,13 +122,13 @@ foam.CLASS({
         { name: 'Goblet Squat',        length: 1, weight: 1.5 },
         { name: 'Plank',               length: 3, weight: 0.25 },
         { name: 'Press (L+R)',         length: 2, weight: 1 },
-        { name: 'Push Ups',            length: 0.9 },
+        { name: 'Push Ups',            length: 1, weight: 0.9 },
         { name: 'Rows (L+R)',          length: 2 },
         { name: 'Snatch (L+R)',        length: 2, weight: 1.5 },
         { name: 'Swings (10)',         length: 1, weight: 4 },
         { name: 'Swings (20)',         length: 2, weight: 2 },
         { name: 'Swings (30)',         length: 3, weight: 0.5 },
-        { name: 'TGU (L+R)',           length: 2, weight: 2 },
+        { name: 'TGU (L+R)',           length: 2, weight: 3 },
         { name: 'Thrusters',           length: 1, weight: 1 },
       ];
 
