@@ -32,6 +32,7 @@ foam.CLASS({
   css: `
     ^ {
       box-sizing: border-box;
+      max-width: 365px;
       padding: 16px;
       border: 2px dashed #8e9090;
       border-radius: 3px;
