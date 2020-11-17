@@ -45,7 +45,7 @@ foam.CLASS({
     { name: 'ERROR_MSG_DRAFT', message: 'An error occured while saving your progress' },
     { name: 'SUCCESS_MSG', message: 'Information successfully submitted' },
     { name: 'SUCCESS_MSG_DRAFT', message: 'Your progress has been saved' },
-    { name: 'CONFIRM_MSG', message: 'Save and exit' },
+    { name: 'CONFIRM_MSG', message: 'Exit' },
     { name: 'DISMISS_MSG', message: 'Are you sure you want to leave this screen?' },
     { name: 'CONTINUE_MSG', message: 'Go back' }
   ],
@@ -306,7 +306,7 @@ foam.CLASS({
     },
     {
       name: 'saveAndClose',
-      label: 'Save & Dismiss',
+      label: 'Save and exit',
       code: function(x) {
         this.data.saveProgress().then(() => {
           this.onClose(x, false);

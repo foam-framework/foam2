@@ -114,9 +114,10 @@ foam.CLASS({
     },
     {
       name: 'createControllerView',
-      expression: function() {
+      expression: function(data) {
         return this.importedCreateControllerView || {
-          class: 'foam.comics.DAOCreateControllerView'
+          class: 'foam.comics.DAOCreateControllerView',
+          detailView: data.detailView
         };
       }
     },
@@ -229,10 +230,7 @@ foam.CLASS({
 
   listeners: [
     function onCreate() {
-      this.stack.push({
-        class: this.createControllerView.class,
-        detailView: this.data.detailView
-      }, this.__subContext__);
+      this.stack.push(this.createControllerView, this.__subContext__);
     },
 
     function onEdit(s, edit, id) {
