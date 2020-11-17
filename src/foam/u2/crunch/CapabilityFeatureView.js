@@ -183,6 +183,8 @@ foam.CLASS({
           } else {
             this.window.setTimeout(this.statusUpdate, 2000);
           }
+        }).catch(err => {
+          throw err;
         })
       }
     }
