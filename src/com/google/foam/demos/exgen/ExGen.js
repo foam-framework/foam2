@@ -17,7 +17,7 @@ foam.CLASS({
         },
         {
           class: 'Int',
-          name: 'length'
+          name: 'duration'
         },
         {
           class: 'Float',
@@ -34,9 +34,10 @@ foam.CLASS({
       font-size: larger;
     }
     ^title {
-      padding-left: 4px;
       background: #eee;
+      color: cornflowerblue;
       font-size: larger;
+      padding-left: 4px;
       width: 100%;
     }
     ^row {
@@ -98,7 +99,7 @@ foam.CLASS({
     {
       name: 'totalDuration_',
       expression: function (program) {
-        return program.reduce((acc, e) => acc + e.length, 0);
+        return program.reduce((acc, e) => acc + e.duration, 0);
       }
     },
     {
@@ -114,22 +115,22 @@ foam.CLASS({
       var self = this;
 
       this.dictionary = [
-        { name: 'Chin Ups',            length: 1 },
-        { name: 'Clean & Press (L+R)', length: 2, weight: 2 },
-        { name: 'Curls',               length: 1 },
-        { name: 'Dips',                length: 1, weight: 2 },
-        { name: 'Floor Press (L+R)',   length: 2, weight: 2 },
-        { name: 'Goblet Squat',        length: 1, weight: 1.5 },
-        { name: 'Plank',               length: 3, weight: 0.25 },
-        { name: 'Press (L+R)',         length: 2, weight: 1 },
-        { name: 'Push Ups',            length: 1, weight: 0.9 },
-        { name: 'Rows (L+R)',          length: 2 },
-        { name: 'Snatch (L+R)',        length: 2, weight: 1.5 },
-        { name: 'Swings (10)',         length: 1, weight: 4 },
-        { name: 'Swings (20)',         length: 2, weight: 2 },
-        { name: 'Swings (30)',         length: 3, weight: 0.5 },
-        { name: 'TGU (L+R)',           length: 2, weight: 3 },
-        { name: 'Thrusters',           length: 1, weight: 1 },
+        { name: 'Chin Ups',            duration: 1 },
+        { name: 'Clean & Press (L+R)', duration: 2, weight: 2 },
+        { name: 'Curls',               duration: 1 },
+        { name: 'Dips',                duration: 1, weight: 2 },
+        { name: 'Floor Press (L+R)',   duration: 2, weight: 2 },
+        { name: 'Goblet Squat',        duration: 1, weight: 1.5 },
+        { name: 'Plank',               duration: 3, weight: 0.25 },
+        { name: 'Press (L+R)',         duration: 2, weight: 1 },
+        { name: 'Push Ups',            duration: 1, weight: 0.9 },
+        { name: 'Rows (L+R)',          duration: 2 },
+        { name: 'Snatch (L+R)',        duration: 2, weight: 1.5 },
+        { name: 'Swings (10)',         duration: 1, weight: 4 },
+        { name: 'Swings (20)',         duration: 2, weight: 2 },
+        { name: 'Swings (30)',         duration: 3, weight: 0.5 },
+        { name: 'TGU (L+R)',           duration: 2, weight: 3 },
+        { name: 'Thrusters',           duration: 1, weight: 1 },
       ];
 
       this.regenerate();
@@ -149,7 +150,7 @@ foam.CLASS({
         .addClass(this.myClass())
         .start('h1')
           .addClass(self.myClass('title'))
-          .add('Exercise Generator v1.0')
+          .add('Exercise Generator')
         .end()
         .add('Duration: ', this.DURATION, ' ', this.REGENERATE)
 
@@ -186,16 +187,11 @@ foam.CLASS({
               .add(' ', e.name)
             .end()
             .call(function() {
-              for ( var i = 0 ; i < e.length ; i++ ) {
+              for ( var i = 0 ; i < e.duration ; i++ ) {
                 let myStartTime = startTime + i;
                 this.start({class: foam.u2.ProgressView, data$: self.timer.slot(function(minute, second) {
                   return self.timer.minute < myStartTime ? 0 : self.timer.minute > myStartTime ? 100 : 100*self.timer.second/60;
                 })})
-                  /*
-                  .style({'outline': self.timer.slot(function(minute, second) {
-                    return minute == myStartTime ? '2px solid red' : '';
-                  })})
-                  */
                 .end();
               }
             })
@@ -210,7 +206,7 @@ foam.CLASS({
               })
             .end()
           .end();
-          startTime += e.length;
+          startTime += e.duration;
         });
     },
 
@@ -225,7 +221,7 @@ foam.CLASS({
     function fill() {
       while ( this.totalDuration_ < this.duration ) {
         var e = this.pickRandomExercise();
-        if ( this.totalDuration_ + e.length <= this.duration ) {
+        if ( this.totalDuration_ + e.duration <= this.duration ) {
           var a = foam.Array.clone(this.program);
           a.push(e);
           this.program = a;
@@ -243,18 +239,27 @@ foam.CLASS({
     {
       name: 'startTimer',
       label: 'Start',
+      isAvailable: function(timer$isStarted) { return ! timer$isStarted; },
       code: function start() {
         console.log('Start Time: ', new Date());
         this.timer.start();
       }
     },
 
-    function next() {
-      this.timer.time = Math.floor((this.timer.time + 60000) / 60000) * 60000;
+    {
+      name: 'next',
+      isAvailable: function(timer$isStarted) { return timer$isStarted; },
+      code: function() {
+        this.timer.time = Math.floor((this.timer.time + 60000) / 60000) * 60000;
+      }
     },
 
-    function pause() {
-      this.timer.stop();
+    {
+      name: 'pause',
+      isAvailable: function(timer$isStarted) { return timer$isStarted; },
+      code: function() {
+        this.timer.stop();
+      }
     }
   ]
 });
