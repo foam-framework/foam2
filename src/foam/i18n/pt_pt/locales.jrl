@@ -260,3 +260,15 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.REGION
 p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.REGION.error",target:"Região requerido"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.POSTAL_CODE.label",target:"CEP"})
 p({class:"foam.i18n.Locale"locale:"pt",source:"*.foam.nanos.auth.Address.POSTAL_CODE.error",target:"CEP requerido"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.OPTIONS_MSG",target:"opções"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHOOSE_AT_LEAST_1_OPTION",target:"Escolha pelo menos uma opção"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHOOSE_1_OF_FOLLOWING_OPTIONS",target:"Escolha uma das seguintes opções"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHOOSE_EXACTLY",target:"Escolha exatamente"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHOOSE_AT_LEAST",target:"Escolha pelo menos"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHOOSE",target:"Escolher"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHOICES.label",target:"escolhas"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHOICES.documentation",target:"Uma matriz de opções que são de escolha única é denotada como [valor, rótulo, isSelected, choiceMode, isFinal], no entanto, o usuário pode apenas passar [valor, rótulo] e a função de adaptação irá transformá-lo em [valor, rótulo, isSelected , choiceMode, isFinal] formato para fins de processamento"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.DAO.documentation",target:"Se o usuário quiser apenas passar um dao, ele será processado para preencher a matriz de opções em vez de inserir manualmente as opções"})
