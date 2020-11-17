@@ -255,3 +255,8 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.Property.PLEASE_ENTER"
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.CONFIRM_MSG",target:"Salvar e sair"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.DISMISS_MSG",target:"Tem certeza de que deseja sair desta tela?"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.CONTINUE_MSG",target:"Volte"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.REGION.label",target:"Região"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.REGION.error",target:"Região requerido"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.POSTAL_CODE.label",target:"CEP"})
+p({class:"foam.i18n.Locale"locale:"pt",source:"*.foam.nanos.auth.Address.POSTAL_CODE.error",target:"CEP requerido"})

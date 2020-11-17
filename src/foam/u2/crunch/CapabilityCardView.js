@@ -159,7 +159,7 @@ foam.CLASS({
                 this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
               }
             }).catch(err => {
-              if ( err.data && err.data.id === 'foam.box.CapabilityRequiredRemoteException' &&
+              if ( err.data && err.data.id === 'foam.nanos.crunch.CapabilityIntercept' &&
                 ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-49' ||
                   ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-13' ||
                   ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-12' ||

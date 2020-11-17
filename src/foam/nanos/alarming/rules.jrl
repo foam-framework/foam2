@@ -27,7 +27,8 @@ p({
   "after":false,
   "action":{"class":"foam.nanos.alarming.Alarming"},
   "enabled":true,
-  "saveHistory":false
+  "saveHistory":false,
+  "lifecycleState":1
 })
 p({
   "class":"foam.nanos.ruler.Rule",

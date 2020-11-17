@@ -34,6 +34,7 @@ foam.CLASS({
       this.auth.logout().then(function() {
         self.window.location.hash = '';
         self.window.location.reload();
+        localStorage.removeItem('defaultSession');
       });
     }
   ]

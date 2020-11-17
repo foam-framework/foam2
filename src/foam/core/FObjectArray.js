@@ -52,6 +52,7 @@ foam.CLASS({
       var ctx = obj.__subContext__ || foam;
       var of = o.class || this.of;
       var cls = ctx.lookup(of);
+      if ( cls == null ) cls = obj[of];
       return cls.isInstance(o) ? o : cls.create(o, obj);
     }],
     {
