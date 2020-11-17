@@ -385,7 +385,7 @@ configuration for contacting the primary node.`,
           ClusterConfig cfg = configs.get(0);
           getLogger().info("nextZone", "configs", configs.size(), "selected", cfg.getId(), cfg.getZone(), cfg.getIsPrimary(), cfg.getPingTime());
           for ( ClusterConfig c : configs ) {
-            getLogger().info("nextZone", "other", cfg.getId(), cfg.getZone(), cfg.getIsPrimary(), cfg.getPingTime());
+            getLogger().info("nextZone", "other", c.getId(), c.getZone(), c.getIsPrimary(), c.getPingTime());
           }
           return cfg;
         }

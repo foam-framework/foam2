@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'ClusterConfigMonitor',
 
-  documentation: 'NOTE: do not start with cronjob. This process starts the ClusterConfigPingSing which polls the Mediators and Nodes and will initiate Replay, and Elections.',
+  documentation: 'NOTE: do not start with cronjob. This process starts the ClusterConfigMonitorAgents which polls the Mediators and Nodes and will initiate Replay, and Elections.',
 
   implements: [
     'foam.core.ContextAgent',
@@ -183,7 +183,7 @@ foam.CLASS({
 
         // update ReplayingInfo for self.
         DAO dao = (DAO) x.get("clusterConfigDAO");
-        dao.find_(x, config.getId());
+        config = (ClusterConfig) dao.find_(x, config.getId());
 
         dao = (DAO) x.get("localClusterConfigDAO");
         List<ClusterConfig> configs = (ArrayList) ((ArraySink) dao
