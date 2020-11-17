@@ -120,6 +120,7 @@ foam.CLASS({
             if ( this.delegates[this.currentIndex].maxLength > arr[i].length ) break;
 
             if ( ! ( next && next.data ) ) {
+              // TODO : typecheck the delegates to determine what currentIndex should be set to next instead of '+2'
               this.currentIndex = this.currentIndex + 2;
               next.focus();
             } else break;
