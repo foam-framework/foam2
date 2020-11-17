@@ -31,4 +31,4 @@ p({"class":"foam.nanos.auth.Country", "code":"ES", "iso31661Code":"ESP","name":"
 p({"class":"foam.nanos.auth.Country", "code":"SE", "iso31661Code":"SWE","name":"Sweden"})
 p({"class":"foam.nanos.auth.Country", "code":"TT", "iso31661Code":"TTO","name":"Trinidad and Tobago"})
 p({"class":"foam.nanos.auth.Country", "code":"GB", "iso31661Code":"GBR","name":"United Kingdom", "alternativeNames":["Great Britain"]})
-p({"class":"foam.nanos.auth.Country", "code":"US", "iso31661Code":"USA","name":"USA", "alternativeNames":["United States", "United States of America"]})
+p({"class":"foam.nanos.auth.Country", "code":"US", "iso31661Code":"USA","name":"US", "alternativeNames":["United States", "United States of America"]})

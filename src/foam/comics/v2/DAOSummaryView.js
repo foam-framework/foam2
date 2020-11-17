@@ -97,7 +97,7 @@ foam.CLASS({
       class: 'foam.u2.ViewSpecWithJava',
       name: 'viewView',
       factory: function() {
-        return foam.u2.detail.SectionedDetailView;
+        return foam.u2.detail.TabbedDetailView;
       }
     },
     {
@@ -109,7 +109,7 @@ foam.CLASS({
     },
     {
       name: 'onBack',
-      factory: function() { 
+      factory: function() {
         return () => this.stack.back();
       }
     },

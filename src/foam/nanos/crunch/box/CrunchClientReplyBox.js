@@ -15,8 +15,9 @@ foam.CLASS({
 
   requires: [
     'foam.box.RPCErrorMessage',
+    'foam.box.RemoteException',
     'foam.box.RPCReturnMessage',
-    'foam.u2.crunch.CapabilityIntercept'
+    'foam.nanos.crunch.CapabilityIntercept'
   ],
 
   imports: [
@@ -43,26 +44,30 @@ foam.CLASS({
         var self = this;
         if (
           this.RPCErrorMessage.isInstance(msg.object) &&
-          msg.object.data.id === 'foam.nanos.crunch.CapabilityRuntimeException'
+            this.RemoteException.isInstance(msg.object.data) &&
+            this.CapabilityIntercept.isInstance(msg.object.data.exception)
         ) {
-          let intercept = self.CapabilityIntercept.create({
-            exception: msg.object.data,
-            resolve: function (value) {
-              var newMsg = msg.clone();
-              newMsg.object = self.RPCReturnMessage.create({
-                data: value
-              });
-              self.delegate.send(newMsg);
-            },
-            reject: function (value) {
-              var newMsg = msg.clone();
-              newMsg.object = new Error(value);
-              self.delegate.send(newMsg);
-            },
-            resend: function () {
-              self.clientBox.send(self.msg);
-            }
-          });
+          var intercept = msg.object.data.exception;
+          intercept.message = msg.object.data.message;
+
+          // Configure events CapabilityIntercept comopletion
+          intercept.resolve = function (value) {
+            var newMsg = msg.clone();
+            newMsg.object = self.RPCReturnMessage.create({
+              data: value
+            });
+            self.delegate.send(newMsg);
+          };
+          intercept.reject = function (value) {
+            var newMsg = msg.clone();
+            newMsg.object = new Error(value);
+            self.delegate.send(newMsg);
+          };
+          intercept.resend = function () {
+            self.clientBox.send(self.msg);
+          };
+
+          // Ask CrunchController to handle the intercept
           this.crunchController.handleIntercept(intercept);
           return;
         }

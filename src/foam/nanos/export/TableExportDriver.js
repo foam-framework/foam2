@@ -57,7 +57,7 @@ foam.CLASS({
       
       var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, propertyNamesToQuery);
       var sink = await dao.select(expr);
-      return await this.outputter.returnTable(X, dao.of, propertyNamesToQuery, sink.projection, propNames.length);
+      return await this.outputter.returnTable(X, dao.of, propertyNamesToQuery, sink.projection, propNames.length, true);
     },
     function getPropName(X, of) {
       var propNames = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(of);

@@ -49,6 +49,16 @@ foam.CLASS({
     }
   `,
 
+
+  messages: [
+    { name: 'OPTIONS_MSG', message: 'options' },
+    { name: 'CHOOSE_1_OF_FOLLOWING_OPTIONS', message: 'Choose one of the following options' },
+    { name: 'CHOOSE_AT_LEAST_1_OPTION', message: 'Choose at least one option' },
+    { name: 'CHOOSE_AT_LEAST', message: 'Choose at least' },
+    { name: 'CHOOSE_EXACTLY', message: 'Choose exactly' },
+    { name: 'CHOOSE', message: 'Choose' }
+  ],
+
   properties: [
     {
       class: 'Function',
@@ -188,12 +198,12 @@ foam.CLASS({
         return ( maxSelected > 0 )
           ? ( minSelected == maxSelected )
             ? ( minSelected == 1 )
-              ? 'Choose one of the following options'
-              : `Choose exactly ${minSelected} options`
-            : `Choose ${minSelected} - ${maxSelected} options`
+              ? this.CHOOSE_1_OF_FOLLOWING_OPTIONS
+              : `${this.CHOOSE_EXACTLY} ${minSelected} ${this.OPTIONS_MSG}`
+            : `${this.CHOOSE} ${minSelected} - ${maxSelected} ${this.OPTIONS_MSG}`
           : ( minSelected == 1 )
-            ? 'Choose at least one option'
-            : `Choose at least ${minSelected} options`
+            ? this.CHOOSE_AT_LEAST_1_OPTION
+            : `${this.CHOOSE_AT_LEAST} ${minSelected} ${this.OPTIONS_MSG}`
           ;
       }
     }

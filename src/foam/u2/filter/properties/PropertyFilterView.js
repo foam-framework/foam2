@@ -26,9 +26,7 @@ foam.CLASS({
 
   css: `
     ^ {
-      margin: 8px;
-      margin-bottom: 0;
-      flex: 1 1 250px;
+      margin: 16px;
     }
 
     ^container-property {

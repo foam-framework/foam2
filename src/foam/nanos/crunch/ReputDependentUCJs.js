@@ -21,6 +21,8 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
     'java.util.ArrayList',
     'java.util.List',
     'static foam.mlang.MLang.*'
@@ -45,14 +47,12 @@ foam.CLASS({
                  old.getStatus() != CapabilityJunctionStatus.APPROVED ||
                  old.getStatus() != CapabilityJunctionStatus.GRANTED ) );
             
-            Long effectiveUser = ( ucj instanceof AgentCapabilityJunction ) ? ((AgentCapabilityJunction) ucj).getEffectiveUser() : null;
+            Long effectiveUserId = ( ucj instanceof AgentCapabilityJunction ) ? ((AgentCapabilityJunction) ucj).getEffectiveUser() : null;
             DAO filteredUserCapabilityJunctionDAO = (DAO) userCapabilityJunctionDAO
-              .where(AND(
+              .where(OR(
                 EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
-                OR(
-                  NOT(INSTANCE_OF(foam.nanos.crunch.AgentCapabilityJunction.class)),
-                  EQ(AgentCapabilityJunction.EFFECTIVE_USER, effectiveUser)
-                )
+                EQ(UserCapabilityJunction.SOURCE_ID, effectiveUserId),
+                EQ(AgentCapabilityJunction.EFFECTIVE_USER, effectiveUserId)
               ));
             DAO filteredPrerequisiteCapabilityJunctionDAO = (DAO) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
               .where(EQ(CapabilityCapabilityJunction.TARGET_ID, ucj.getTargetId()));
@@ -69,9 +69,25 @@ foam.CLASS({
               if ( ucjToReput != null ) ucjsToReput.add(ucjToReput);
             }
 
+            X effectiveX = x;
+            if ( effectiveUserId != null && effectiveUserId > 0 ) {
+              DAO userDAO = (DAO) x.get("localUserDAO");
+              User effectiveUser = (User) userDAO.find(effectiveUserId);
+              Subject subject = (Subject) x.get("subject");
+              if ( effectiveUser != null && subject.getUser().getId() != effectiveUser.getId() ) {
+                subject = new Subject.Builder(x).setUser(subject.getUser()).build();
+                subject.setUser(effectiveUser);
+                effectiveX = x.put("subject", subject);
+              }
+            }
+
             for ( UserCapabilityJunction ucjToReput : ucjsToReput ) {
               if ( isInvalidate ) ucjToReput.setStatus(cascadeInvalidateStatus(x, ucjToReput, ucj));
-              userCapabilityJunctionDAO.inX(x).put(ucjToReput);
+              if ( effectiveUserId != null && effectiveX != null &&
+                   ucjToReput.getSourceId() == effectiveUserId )
+                userCapabilityJunctionDAO.inX(effectiveX).put(ucjToReput);
+              else
+                userCapabilityJunctionDAO.inX(x).put(ucjToReput);
             }
           }
         }, "Reput the UCJs of dependent capabilities");

@@ -46,7 +46,7 @@ foam.CLASS({
     'foam.nanos.theme.ThemeDomain',
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.u2.navigation.FooterView',
-    'foam.u2.crunch.CapabilityIntercept',
+    'foam.nanos.crunch.CapabilityIntercept',
     'foam.u2.crunch.CapabilityInterceptView',
     'foam.u2.crunch.CrunchController',
     'foam.u2.borders.MarginBorder',

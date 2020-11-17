@@ -95,6 +95,27 @@ foam.CLASS({
             unitPropName: unitProp
           });
       }
+    },
+    {
+      name: 'setUnitValueMetadata',
+      code: function(metadata, propNames, stringArray) {
+        for ( var i = 0; i < metadata.length; i++ ) {
+          if ( foam.core.UnitValue.isInstance(metadata[i].prop) ) {
+            var indexOfUnitProp = propNames.indexOf(metadata[i].unitPropName);
+            metadata[i].perValuePatternSpecificValues = stringArray.slice(1).map(a => a[indexOfUnitProp]);
+          }
+        }
+      }
+    },
+    {
+      name: 'setUnitValueMetadataForObj',
+      code: function(metadata, obj) {
+        for ( var i = 0; i < metadata.length; i++ ) {
+          if ( foam.core.UnitValue.isInstance(metadata[i].prop) ) {
+            metadata[i].perValuePatternSpecificValues = [ obj[metadata[i].unitPropName].toString() ];
+          }
+        }
+      }
     }
   ]
 });

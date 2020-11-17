@@ -46,12 +46,36 @@ foam.CLASS({
         return choiceWizardlets.map(wizardlet => {
           var isFinal = wizardlet.ucj !== null &&
           (
-            wizardlet.ucj.status != this.CapabilityJunctionStatus.GRANTED ||
-            wizardlet.ucj.status != this.CapabilityJunctionStatus.PENDING
+            wizardlet.ucj.status === this.CapabilityJunctionStatus.GRANTED ||
+            wizardlet.ucj.status === this.CapabilityJunctionStatus.PENDING
           )
 
           return [wizardlet.title, wizardlet.title, isFinal ? true : wizardlet.isAvailable$, isFinal ?  foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW, isFinal]
         })
+      }
+    },
+    {
+      name: 'sections',
+      flags: ['web'],
+      transient: true,
+      class: 'FObjectArray',
+      of: 'foam.u2.wizard.WizardletSection',
+      factory: function () {
+        return [
+          this.WizardletSection.create({
+            isAvailable: true,
+            title: this.capability.name,
+            customView: {
+              class: 'foam.u2.view.MultiChoiceView',
+              choices$: this.choices$,
+              booleanView: this.CardSelectView,
+              isValidNumberOfChoices$: this.isValid$,
+              showValidNumberOfChoicesHelper: false,
+              minSelected$: this.min$,
+              maxSelected$: this.max$
+            }
+          })
+        ];
       }
     },
     {

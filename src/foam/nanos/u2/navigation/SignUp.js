@@ -35,7 +35,7 @@ foam.CLASS({
     { name: 'FOOTER_LINK', message: 'Sign in' },
     { name: 'ERROR_MSG', message: 'There was a problem creating your account' },
     { name: 'EMAIL_ERR', message: 'Valid email required' },
-    { name: 'EMAIL_AVAILABILITY_ERR', message: 'This email is taken. Please try another.' },
+    { name: 'EMAIL_AVAILABILITY_ERR', message: 'This email is already in use. Please sign in or use a different email' },
     { name: 'USERNAME_EMPTY_ERR', message: 'Username required' },
     { name: 'USERNAME_AVAILABILITY_ERR', message: 'This username is taken. Please try another.' }
   ],

@@ -22,12 +22,18 @@ public class Not
 {
 
   protected Parser p_;
+  protected Parser elseP_ = null;
 
   public Not(Parser parser) {
     p_ = parser;
   }
 
+  public Not(Parser parser, Parser elseParser) {
+    p_ = parser;
+    elseP_ = elseParser;
+  }
+
   public PStream parse(PStream ps, ParserContext x) {
-    return ps.apply(p_, x) != null ? null : ps;
+    return ps.apply(p_, x) != null ? null : elseP_ == null ? ps : ps.apply(elseP_, x);
   }
 }

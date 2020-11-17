@@ -6,9 +6,10 @@
 
 foam.CLASS({
   package: 'foam.nanos.crunch',
-  name: 'CapabilityRuntimeException',
+  name: 'CapabilityIntercept',
   implements: [ 'foam.core.ExceptionInterface' ],
-  javaExtends: 'foam.nanos.auth.AuthorizationException',
+  extends: 'foam.core.FOAMException',
+  javaGenerateConvenienceConstructor: false,
 
   javaImports: [
     'foam.nanos.crunch.lite.Capable',
@@ -21,9 +22,17 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(
           `
-            public CapabilityRuntimeException(String message) {
-              super(message);
-            }
+  public CapabilityIntercept(String message) {
+    super(message);
+  }
+
+  public CapabilityIntercept(Throwable cause) {
+    super(cause);
+  }
+
+  public CapabilityIntercept(String message, Throwable cause) {
+    super(message, cause);
+  }
           `
         );
       }
@@ -32,17 +41,72 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
+      name: 'id',
+      value: 'foam.nanos.crunch.CapabilityIntercept'
+    },
+    {
       name: 'capabilities',
-      class: 'StringArray'
+      class: 'StringArray',
+      aliases: [ 'capabilityOptions' ]
     },
     {
       name: 'capables',
       class: 'FObjectArray',
       of: 'foam.nanos.crunch.lite.Capable',
+      aliases: [ 'capableRequirements' ]
+    },
+    {
+      name: 'returnCapable',
+      class: 'FObjectProperty',
+      of: 'foam.core.FObject'
     },
     {
       name: 'daoKey',
       class: 'String'
+    },
+    {
+      name: 'resolve',
+      class: 'Function'
+    },
+    {
+      name: 'reject',
+      class: 'Function'
+    },
+    {
+      name: 'resend',
+      class: 'Function'
+    },
+    {
+      name: 'aquired',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'cancelled',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'promise',
+      expression: function (aquired, cancelled) {
+        if ( aquired ) return Promise.resolve();
+        if ( cancelled ) return Promise.reject();
+        var self = this;
+        return new Promise(function (resolve, reject) {
+          var s1, s2;
+          s1 = self.aquired$.sub(() => {
+            s1.detach();
+            s2.detach();
+            resolve();
+          })
+          s1 = self.cancelled$.sub(() => {
+            s1.detach();
+            s2.detach();
+            reject();
+          })
+        });
+      }
     }
   ],
 

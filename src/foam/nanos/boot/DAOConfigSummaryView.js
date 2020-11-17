@@ -152,9 +152,7 @@ foam.CLASS({
 
   requires: [
     'foam.comics.BrowserView',
-    'foam.nanos.boot.NSpec',
-    'foam.comics.v2.DAOBrowserView',
-    'foam.nanos.controller.Memento'
+    'foam.comics.v2.DAOBrowseControllerView'
   ],
 
   implements: [ 'foam.mlang.Expressions' ],
@@ -338,7 +336,7 @@ foam.CLASS({
           views: [
             [
               {
-                class: this.DAOBrowserView,
+                class: this.DAOBrowseControllerView,
                 stack: this.stack
               },
               'New Controller'
@@ -350,8 +348,7 @@ foam.CLASS({
               },
               'Old Controller'
             ]
-          ],
-          selectedView: 'New Controller'
+          ]
         }
       }, x);
     }

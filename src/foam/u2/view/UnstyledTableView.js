@@ -308,7 +308,7 @@ foam.CLASS({
 
       //otherwise on adding new column creating new EditColumnsView, which is closed by default
       if (view.editColumnsEnabled)
-        var editColumnView = foam.u2.view.EditColumnsView.create({data:view});
+        var editColumnView = foam.u2.view.EditColumnsView.create({data:view}, this);
 
       if ( this.filteredTableColumns$ ) {
         this.onDetach(this.filteredTableColumns$.follow(
@@ -607,7 +607,7 @@ foam.CLASS({
                       delete view.checkboxes_[obj.id];
                     });
                   });
-                  
+
                   for ( var  j = 0 ; j < view.columns_.length ; j++  ) {
                     var objForCurrentProperty = obj;
                     var propName = view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view.columns_[j]);
