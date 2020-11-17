@@ -1013,8 +1013,10 @@ foam.CLASS({
 
   methods: [
     function init() {
+      /*
       if ( ! this.translationService )
-        console.warn('Element ' + this.cls_.name + ' created with globalContext');;
+        console.warn('Element ' + this.cls_.name + ' created with globalContext');
+      */
       this.onDetach(this.visitChildren.bind(this, 'detach'));
     },
 
@@ -1597,7 +1599,7 @@ foam.CLASS({
         return this.add(translation);
       }
       console.warn('Missing Translation Service in ', this.cls_.name);
-      return opt_default || 'NO TRANSLATION SERVICE OR DEFAULT';
+      return this.add(opt_default || 'NO TRANSLATION SERVICE OR DEFAULT');
     },
 
     function add() {
