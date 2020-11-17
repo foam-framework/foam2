@@ -99,8 +99,10 @@ foam.CLASS({
       return this;
     },
     function processData(data, index, arr) {
+      // returns an array of data chunks in the size of the delegates
       var currentElement = this.childNodes[index];
       if ( ! data || ! currentElement ) return arr;
+
       var maxLength = this.delegates[index].maxLength;
       arr.push(data.substring(0, maxLength));
       return this.processData(data.substring(maxLength), index + 2, arr);
@@ -117,7 +119,7 @@ foam.CLASS({
           if ( next = this.childNodes[this.currentIndex + 2] ) {
             if ( this.delegates[this.currentIndex].maxLength > arr[i].length ) break;
 
-            if ( ! this.childNodes[this.currentIndex + 2].data || this.childNodes[this.currentIndex + 2].data.length == 0 ) {
+            if ( ! next.data || next.data.length == 0 ) {
               this.currentIndex = this.currentIndex + 2;
               next.focus();
             } else break;
