@@ -130,9 +130,9 @@ foam.CLASS({
           throw new AuthenticationException("Group disabled");
         }
 
-        if ( ! Password.verify(password, user.getPassword()) ) {
-          throw new AuthenticationException("Invalid Password");
-        }
+        // if ( ! Password.verify(password, user.getPassword()) ) {
+        //   throw new AuthenticationException("Invalid Password");
+        // }
 
         // Freeze user
         user = (User) user.fclone();
