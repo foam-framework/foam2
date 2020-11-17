@@ -18,7 +18,8 @@ foam.CLASS({
     'crunchService',
     'ctrl',
     'subject',
-    'userCapabilityJunctionDAO'
+    'userCapabilityJunctionDAO',
+    'window'
   ],
 
   requires: [
@@ -175,12 +176,12 @@ foam.CLASS({
       code: function() {
         if ( this.cjStatus != this.CapabilityJunctionStatus.PENDING ) {
           return;
-        };
+        }
         this.crunchService.getJunction(null, this.data.id).then(ucj => {
           if ( ucj && ucj.status === this.CapabilityJunctionStatus.GRANTED ) {
             this.cjStatus = this.CapabilityJunctionStatus.GRANTED;
           } else {
-            window.setTimeout(this.statusUpdate, 2000);
+            this.window.setTimeout(this.statusUpdate, 2000);
           }
         })
       }
