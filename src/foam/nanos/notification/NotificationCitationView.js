@@ -15,6 +15,7 @@ foam.CLASS({
 
   css: `
     ^ {
+      width: 100%;
       line-height: 17px;
     }
     ^ .created {
@@ -27,6 +28,10 @@ foam.CLASS({
       font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       color: #1e1f21;
+      white-space: nowrap;
+      text-overflow:ellipsis;
+      width: 90%;
+      overflow: hidden;
       margin-left: 32px;
       display: inline-block;
     }
@@ -43,12 +48,7 @@ foam.CLASS({
       this.SUPER();
 
       this.created = this.data.created.toUTCString();
-
-      // truncate string if it is too long
       this.description = this.data.body;
-      if ( this.description && this.description != '' && this.description.length > 70 ) {
-        this.description = this.description.substr(0, 70-1) + '...';
-      }
 
       this
         .addClass(this.myClass())

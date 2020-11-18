@@ -3,9 +3,12 @@ p({
   "id":"admin.tickets",
   "label":"Tickets",
   "handler":{
-    "class":"foam.nanos.menu.DAOMenu",
-    "daoKey":"ticketDAO",
-    "title":"Tickets"
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"ticketDAO",
+      "browseTitle":"Tickets"
+    }
   },
   "parent":"admin"
 })

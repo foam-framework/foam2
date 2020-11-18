@@ -154,6 +154,13 @@ foam.CLASS({
       documentation: `Model used to store information required by this credential`
     },
     {
+      name: 'inherentPermissions',
+      class: 'StringArray',
+      documentation: `List of inherent permissions provided by this capability`,
+      storageTransient: true,
+      visibility: 'HIDDEN'
+    },
+    {
       name: 'permissionsGranted',
       class: 'StringArray',
       documentation: `List of permissions granted by this capability`,
@@ -264,6 +271,11 @@ foam.CLASS({
 
         // check if permission is a capability string implied by this permission
         if ( this.stringImplies(this.getName(), permission) ) return true;
+
+        String[] inherentPermissions = this.getInherentPermissions();
+        for ( String permissionName : inherentPermissions ) {
+          if ( this.stringImplies(permissionName, permission) ) return true;
+        }
 
         String[] permissionsGranted = this.getPermissionsGranted();
         for ( String permissionName : permissionsGranted ) {

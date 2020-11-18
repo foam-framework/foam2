@@ -30,8 +30,6 @@ foam.CLASS({
     'format'
   ],
 
-  searchColumns: [],
-
   constants: [
     {
       name: 'MAX_URL_SIZE',

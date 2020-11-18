@@ -80,13 +80,13 @@ foam.CLASS({
             else {
               axiom = cls.getAxiomByName(propName.name);
               if ( axiom )
-                columnHeader.push(propName.tableHeader());
+                columnHeader.push(axiom.tableHeader());
               else
                 columnHeader.push('-');
             }
           }
         }
-        return columnHeader.join('/');
+        return columnHeader.join(' / ');
       }
     },
     {
@@ -260,8 +260,31 @@ foam.CLASS({
       }
       return result;
     },
-    function objToArrayOfStrings(obj, prop) {
-
+    function returnPropertyNameForLabel(of, label) {
+      var labels = label.split(' / ');
+      var names = [];
+      var of = of;
+      for ( var i = 0; i < labels.length; i++ ) {
+        var prop = of.getAxioms().find(a => a.label && a.label == labels[i]);
+        if ( !prop )
+          return '';
+        names.push(prop.name);
+        of = prop.of;
+      }
+      return names.join('.');
+    },
+    function returnPropertyLabelForName(of, name) {
+      var names = name.split('.');
+      var labels = [];
+      var of = of;
+      for ( var i = 0; i < names.length; i++ ) {
+        var prop = of.getAxioms().find(a => a.name && a.name == names[i]);
+        if ( !prop )
+          return '';
+        labels.push(prop.label);
+        of = prop.of;
+      }
+      return labels.join(' / ');
     }
   ]
 });

@@ -229,6 +229,8 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
         userCapabilityJunctionDAO.find(AND(associationPredicate,targetPredicate));
       if ( ucj == null ) {
         ucj = buildAssociatedUCJ(x, capabilityId, subject);
+      } else {
+        ucj = (UserCapabilityJunction) ucj.fclone();
       }
 
       return ucj;
@@ -312,7 +314,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
     // Throw a capability intercept if none were satisfied
     if ( ! satisfied ) {
-      CapabilityRuntimeException ex = new CapabilityRuntimeException(
+      CapabilityIntercept ex = new CapabilityIntercept(
         "Missing a required capability."
       );
       for ( String capId : capabilityOptions ) {

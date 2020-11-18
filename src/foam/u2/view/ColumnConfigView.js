@@ -35,9 +35,9 @@ foam.CLASS({
         var arr = [];
         var notSelectedColumns = [];
         //selectedColumnNames misleading name cause it may contain objects
-        data.selectedColumnNames = data.selectedColumnNames.map(c => 
+        data.selectedColumnNames = data.selectedColumnNames.map(c =>
           {
-            return this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c); 
+            return this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c);
           });
         var tableColumns = this.data.columns;
         tableColumns = tableColumns.filter( c => data.allColumns.includes(this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c))).map(c => this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c));
@@ -61,18 +61,18 @@ foam.CLASS({
               continue;
             }
             rootProperty = [ axiom.name, this.columnHandler.returnAxiomHeader(axiom) ];
-          } else 
+          } else
             rootProperty = data.selectedColumnNames[i];
 
           var rootPropertyName = this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(rootProperty);
           if ( ! topLevelProps.includes(rootPropertyName) ) {
-            arr.push(foam.u2.view.SubColumnSelectConfig.create({ 
-              index:i, 
-              rootProperty:rootProperty, 
-              level:0, 
-              of:data.of, 
-              selectedColumns$:data.selectedColumnNames$, 
-            }));
+            arr.push(foam.u2.view.SubColumnSelectConfig.create({
+              index:i,
+              rootProperty:rootProperty,
+              level:0,
+              of:data.of,
+              selectedColumns$:data.selectedColumnNames$,
+            }, this));
             topLevelProps.push(rootPropertyName);
           }
         }
@@ -80,7 +80,7 @@ foam.CLASS({
         for ( var colToDelete of columnThatShouldBeDeleted) {
           data.selectedColumnNames.splice(data.selectedColumnNames.indexOf(colToDelete), 1);
         }
-        
+
         var notSelectedColumns = data.allColumns.filter(c => {
           return ! topLevelProps.includes(c);
         });
@@ -105,16 +105,16 @@ foam.CLASS({
               continue;
             rootProperty = [ axiom.name, this.columnHandler.returnAxiomHeader(axiom) ];
           }
-          
-          nonSelectedViewModels.push(foam.u2.view.SubColumnSelectConfig.create({ 
-            index:data.selectedColumnNames.length + i, 
+
+          nonSelectedViewModels.push(foam.u2.view.SubColumnSelectConfig.create({
+            index:data.selectedColumnNames.length + i,
             rootProperty: rootProperty,
-            level:0, 
-            of:data.of, 
-            selectedColumns$:data.selectedColumnNames$, 
-          }));
+            level:0,
+            of:data.of,
+            selectedColumns$:data.selectedColumnNames$,
+          }, this));
         }
-        nonSelectedViewModels.sort((a, b) => { 
+        nonSelectedViewModels.sort((a, b) => {
           var aName = this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(a.rootProperty);
           var bName = this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(b.rootProperty);
           return aName.toLowerCase().localeCompare(bName.toLowerCase());
@@ -226,7 +226,7 @@ foam.CLASS({
       var replaceIndex;
       replaceIndex = targetIndex;
       if ( draggableIndex < targetIndex ) {
-        
+
         for ( var i = draggableIndex ; i < targetIndex ; i++ ) {
           thisProps[i+1].index = i;
           views[i].prop = thisProps[i+1];
@@ -266,7 +266,7 @@ foam.CLASS({
       if ( ! startUnselectedIndex )
         return;
       startUnselectedIndex =  startUnselectedIndex.index;
-      
+
       if ( draggableIndex > startUnselectedIndex )
         return this.resetProperties(views, startUnselectedIndex, draggableIndex);
     },
@@ -282,7 +282,7 @@ foam.CLASS({
         if ( currentProp.toLowerCase().localeCompare(comparedToProp.toLowerCase()) < 1 )
           return this.resetProperties(views, startUnselectedIndex-1, draggableIndex);
       }
-      
+
       while(startUnselectedIndex < views.length) {
         var currentProp = this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(views[draggableIndex].prop.rootProperty);
         var comparedToProp =  this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(views[startUnselectedIndex].prop.rootProperty);
@@ -322,7 +322,7 @@ foam.CLASS({
     'index',
     {
       name: 'onDragAndDropParentFunction',
-      documentation: 'parent\'s on this DragAndDrop function' 
+      documentation: 'parent\'s on this DragAndDrop function'
     },
     {
       name: 'onSelectionChangedParentFunction',
@@ -355,7 +355,7 @@ foam.CLASS({
       this.SUPER();
 
       this
-      
+
         .add(self.slot(function(prop) {
           return self.E()
           .attrs({ draggable: prop.isPropertySelected$ ? 'true' : 'false' })
@@ -407,7 +407,7 @@ foam.CLASS({
   name: 'ColumnViewHeader',
   extends: 'foam.u2.View',
   css: `
-  
+
   ^selected {
     background: #cfdbff;
   }
@@ -548,7 +548,7 @@ foam.CLASS({
     function onChildrenSelectionChanged(isColumnSelected, index, isColumnSelectionHaventChanged) {
       //isColumnSelectionHaventChanged to be false on either selectionChanged or being undefined
       if ( ! isColumnSelectionHaventChanged ) {
-        //to change view 
+        //to change view
         this.onSelectionChanged(isColumnSelected, index, this.views);
         //to set currentProperty isColumnSelected
         var hasPropertySelectionChanged = this.data.isPropertySelected;
@@ -612,7 +612,7 @@ foam.CLASS({
         var otherSubProperties = [];
 
         var thisRootPropName = this.columnHandler.checkIfArrayAndReturnPropertyNameForRootProperty(this.rootProperty);
-        //find selectedColumn for the root property 
+        //find selectedColumn for the root property
         var selectedColumn = this.selectedColumns.filter(c => {
           var thisSelectedColumn = foam.String.isInstance(c) ? c : c.name;
           return ( ! foam.String.isInstance(c) && this.level === 0 && thisSelectedColumn === thisRootPropName ) ||
@@ -631,22 +631,22 @@ foam.CLASS({
         otherSubProperties.sort((a, b) => { return a[1].toLowerCase().localeCompare(b[1].toLowerCase());});
 
         for ( var i = 0 ; i < selectedSubProperties.length ; i++ ) {
-          arr.push(this.cls_.create({ 
-            index:i, 
-            rootProperty: selectedSubProperties[i], 
-            selectedColumns$:this.selectedColumns$, 
-            level:l, parentExpanded$:this.expanded$, 
+          arr.push(this.cls_.create({
+            index:i,
+            rootProperty: selectedSubProperties[i],
+            selectedColumns$:this.selectedColumns$,
+            level:l, parentExpanded$:this.expanded$,
             of: r && r.of ? r.of.getAxiomByName([selectedSubProperties[i][0]]).cls_ : r}));
         }
-        
+
         for ( var i = 0 ; i < otherSubProperties.length ; i++ ) {
-          arr.push(this.cls_.create({ 
-            index:selectedSubProperties.length+i, 
-            rootProperty: otherSubProperties[i], 
-            selectedColumns$:this.selectedColumns$, 
-            level:l, parentExpanded$:this.expanded$, 
-            of: r && r.of ? r.of.getAxiomByName([otherSubProperties[i][0]]).cls_ : r, 
-            isPropertySelected:false}));
+          arr.push(this.cls_.create({
+            index:selectedSubProperties.length+i,
+            rootProperty: otherSubProperties[i],
+            selectedColumns$:this.selectedColumns$,
+            level:l, parentExpanded$:this.expanded$,
+            of: r && r.of ? r.of.getAxiomByName([otherSubProperties[i][0]]).cls_ : r,
+            isPropertySelected:false}, this));
         }
 
         return arr;

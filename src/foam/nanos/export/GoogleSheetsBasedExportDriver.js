@@ -32,7 +32,7 @@ foam.CLASS({
       targetDAOKey: 'reportTemplateDAO',
       view: function(args, X) {
         var expr = foam.mlang.Expressions.create();
-        if ( ! X.serviceName ) return [];
+        if ( ! X.serviceName ) return {};
         
         return foam.u2.view.ChoiceView.create({
             placeholder: 'Please select template...',
@@ -40,7 +40,7 @@ foam.CLASS({
             objToChoice: function(a) {
               return [a.id, a.name];
           }
-        });
+        }, X);
       }
     },
     {
@@ -53,7 +53,17 @@ foam.CLASS({
       class: 'Class',
       javaType: 'foam.core.ClassInfo',
       hidden: true
-    }
+    },
+    {
+      name: 'columnHandler',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.column.CommonColumnHandler',
+      factory: function() {
+        return foam.nanos.column.CommonColumnHandler.create();
+      },
+      hidden: true,
+      flags: ['js']
+    },
   ],
 
   methods: [
@@ -63,10 +73,22 @@ foam.CLASS({
       var sheetId  = '';
       var columnConfig = X.columnConfigToPropertyConverter;
 
-      var propNames = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(obj.cls);
+      var propNames;
+
+      if ( ! this.template )
+        propNames =  X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
+      else {
+        var expr1 = foam.mlang.Expressions.create();
+        var template = await X.reportTemplateDAO.find(expr1.EQ(foam.nanos.export.report.Template.ID, this.template));
+        propNames = template && template.columnNames && template.columnNames.length > 0 ? template.columnNames : X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
+      }
+
       propNames = columnConfig.filterExportedProps(X, obj.cls_, propNames);
       
       var metadata = await self.outputter.getColumnMethadata(X, obj.cls_, propNames);
+
+      self.outputter.setUnitValueMetadataForObj(metadata, obj);
+
       var stringArray = [ await this.outputter.objectToTable(X, obj.cls_, obj, propNames) ];
 
       sheetId = await X.googleSheetsDataExport.createSheetAndPopulateWithData(X, metadata, this);
@@ -93,17 +115,21 @@ foam.CLASS({
         var template = await X.reportTemplateDAO.find(expr1.EQ(foam.nanos.export.report.Template.ID, this.template));
         propNames = template && template.columnNames && template.columnNames.length > 0 ? template.columnNames : X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
       }
-      var lengthOfPrimaryPropsRequested = propNames.length;
        
       propNames = columnConfig.filterExportedProps(dao.of, propNames);
+      var lengthOfInitialyPropsRequested = propNames.length;
 
       var metadata = await self.outputter.getColumnMetadata(X, dao.of, propNames);
 
+      var propToColumnMapping = X.columnConfigToPropertyConverter.returnPropertyColumnMappings(dao.of, propNames);
+      propNames = this.columnHandler.returnPropNamesToQuery(propToColumnMapping);
       var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, propNames);
       var sink = await dao.select(expr);
-      
-      var sheetId  = '';
-      var stringArray = await self.outputter.returnTable(X, dao.of, propNames, sink.projection, lengthOfPrimaryPropsRequested);
+
+      var stringArray = await self.outputter.returnTable(X, dao.of, propNames, sink.projection, propNames.length);
+
+      self.outputter.setUnitValueMetadata(metadata, propNames, stringArray);
+      stringArray = stringArray.map(a => a.slice(0, lengthOfInitialyPropsRequested));
 
       var sheetId  = '';
 

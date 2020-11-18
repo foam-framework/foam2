@@ -90,3 +90,9 @@ Setting `associatedEntity` to one of these values will affect which user CRUNCH 
 
 <h2>Subclasses of Capability</h2>
 <foam class="foam.flow.widgets.DocumentationIncomplete" status="todo" isSection="true" />
+
+<h2>CRUNCH Rules</h2>
+<foam class="foam.flow.widgets.DocumentationIncomplete" status="todo" isSection="true" />
+
+notes: ValidateUCJDataOnPut sets of-less cap to PENDING, then
+       SetUCJStatusOnPut will set it to GRANTED or keep it PENDING (or ??)

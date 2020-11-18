@@ -86,7 +86,7 @@ foam.CLASS({
 
     ^perFeature {
       display: flex;
-      padding-bottom: 10px;
+      padding-bottom: 55px;
     }
 
     ^left-arrow {
@@ -118,6 +118,10 @@ foam.CLASS({
       margin-top: 24px;
     }
   `,
+  
+  constants: {
+    MAX_NUM_DISPLAYBLE_CARDS: 4
+  },
 
   properties: [
     {
@@ -182,7 +186,7 @@ foam.CLASS({
       value: [],
       documentation: 'stores the styling of each featureCapability'
     },
-    'cardClicked'
+    'wizardOpened'
   ],
 
   methods: [
@@ -251,16 +255,20 @@ foam.CLASS({
                     .addClass(self.myClass('featureSection'))
                   .end()
                   .on('click', () => {
-                    self.onCardClick(arr[i].id);
+                    self.openWizard(arr[i].id);
                   })
                 .end());
             }
-            spot.start('span').start('img').addClass(self.myClass('left-arrow'))
-                .attr('src', 'images/arrow-back-24px.svg')
-                .on('click', function() {
-                  self.carouselCounter--;
-                })
-              .end().end();
+            self.callIf(self.totalNumCards > self.MAX_NUM_DISPLAYBLE_CARDS, function() {
+              return spot.start('span')
+                .start('img').addClass(self.myClass('left-arrow'))
+                  .attr('src', 'images/arrow-back-24px.svg')
+                  .on('click', function() {
+                    self.carouselCounter--;
+                  })
+                .end()
+              .end();
+            });
             spot.add(self.slot(
               function(carouselCounter, totalNumCards) {
                 var ele = self.E().addClass(self.myClass('feature-column-grid'));
@@ -271,12 +279,16 @@ foam.CLASS({
                 }
                 return ele;
               }));
-            spot.start('span').start('img').addClass(self.myClass('right-arrow'))
-              .attr('src', 'images/arrow-forward-24px.svg')
-              .on('click', function() {
-                self.carouselCounter++;
-              })
-            .end().end();
+            self.callIf(self.totalNumCards > self.MAX_NUM_DISPLAYBLE_CARDS, function() {
+              return spot.start('span')
+                .start('img').addClass(self.myClass('right-arrow'))
+                  .attr('src', 'images/arrow-forward-24px.svg')
+                  .on('click', function() {
+                    self.carouselCounter++;
+                  })
+                .end()
+              .end();
+            })
           });
           return spot;
        })).end();
@@ -308,7 +320,7 @@ foam.CLASS({
                   .start(self.GUnit, { columns: 4 })
                     .tag(self.CapabilityCardView, { data: cap })
                     .on('click', () => {
-                  self.onCardClick(cap);
+                      self.openWizard(cap);
                     })
                   .end();
               }
@@ -341,7 +353,7 @@ foam.CLASS({
               .start(self.GUnit, { columns: 4 })
                 .tag(self.CapabilityCardView, { data: cap })
                 .on('click', () => {
-                  self.onCardClick(cap);
+                  self.openWizard(cap);
                 })
               .end();
           }
@@ -379,17 +391,16 @@ foam.CLASS({
           )).select())
         .then(sink => {
           if ( sink.array.length == 1 ) {
-            this.crunchController
-              .createWizardSequence(sink.array[0]).execute();
+            this.openWizard(sink.array[0]);
           }
         })
     },
-    function onCardClick(cap) {
-      if ( this.cardClicked ) return;
-      this.cardClicked = true;
+    function openWizard(cap) {
+      if ( this.wizardOpened ) return;
+      this.wizardOpened = true;
       this.crunchController
         .createWizardSequence(cap).execute().then(() => {
-          this.cardClicked = false;
+          this.wizardOpened = false;
         });
       
     }
