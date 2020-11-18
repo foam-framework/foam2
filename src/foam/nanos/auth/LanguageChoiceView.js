@@ -119,14 +119,6 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Language',
-      name: 'defaultLanguage',
-      factory: function() {
-        return foam.nanos.auth.Language.create({code: 'en'})
-      }
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Language',
       name: 'lastLanguage',
       factory: function() {
         let language = this.supportedLanguages.find( e => e.toString() === foam.locale )
@@ -139,30 +131,11 @@ foam.CLASS({
 
   methods: [
     async function initE() {
-      var self = this
-      let languages = (await this.languageDAO
+      this.supportedLanguages = (await this.languageDAO
                         .where(foam.mlang.predicate.Eq.create({
                           arg1: foam.nanos.auth.Language.ENABLED,
                           arg2: true
                         })).select()).array;
-
-      this.supportedLanguages = languages
-      if ( this.subject && this.subject.realUser ) {
-        let userPreferLanguage = this.supportedLanguages.find( e => e.id.compareTo(self.subject.realUser.language) === 0 )
-        if ( ! userPreferLanguage ) {
-            foam.locale = this.defaultLanguage.toString()
-            let user = self.subject.realUser
-            user.language = this.defaultLanguage.id
-            localStorage.setItem('localeLanguage', this.defaultLanguage.toString());
-            await self.userDAO.put(user)
-        } else {
-          if ( foam.locale != userPreferLanguage.toString() ) {
-            foam.locale = userPreferLanguage.toString()
-            localStorage.setItem('localeLanguage', userPreferLanguage.toString());
-            location.reload();
-          }
-        }
-      }
 
       let country = await this.countryDAO.find(this.lastLanguage.variant)
       let label = this.lastLanguage.variant != "" ? `${this.lastLanguage.name}(${this.lastLanguage.variant})` : `${this.lastLanguage.name}`

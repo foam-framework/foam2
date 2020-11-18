@@ -301,6 +301,14 @@ foam.CLASS({
         return this.FooterView;
       }
     },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.Language',
+      name: 'defaultLanguage',
+      factory: function() {
+        return foam.nanos.auth.Language.create({code: 'en'})
+      }
+    },
     'currentMenu',
     'lastMenuLaunched',
     'webApp'
@@ -327,8 +335,10 @@ foam.CLASS({
 
         await client.translationService.initLatch;
         self.installLanguage();
-        
+
         await self.fetchSubject();
+
+        await self.maybeReinstallLanguage(client)
         self.languageInstalled.resolve();
 
         // add user and agent for backward compatibility
@@ -412,6 +422,33 @@ foam.CLASS({
 
         for ( var i = 0 ; node && i < path.length-1 ; i++ ) node = node[path[i]];
         if ( node ) node[path[path.length-1]] = map[key];
+      }
+    },
+
+    async function maybeReinstallLanguage(client) {
+      if (
+        this.subject &&
+        this.subject.realUser &&
+        this.subject.realUser.language.toString() != foam.locale
+      ) {
+        let languages = (await client.languageDAO
+          .where(foam.mlang.predicate.Eq.create({
+            arg1: foam.nanos.auth.Language.ENABLED,
+            arg2: true
+          })).select()).array;
+        
+        let userPreferLanguage = languages.find( e => e.id.compareTo(this.subject.realUser.language) === 0 )
+        if ( ! userPreferLanguage ) {
+          foam.locale = this.defaultLanguage.toString()
+          let user = this.subject.realUser
+          user.language = this.defaultLanguage.id
+          await client.userDAO.put(user)
+        } else if ( foam.locale != userPreferLanguage.toString() ) {
+          foam.locale = userPreferLanguage.toString()
+        }
+        client.translationService.maybeReload()
+        await client.translationService.initLatch
+        this.installLanguage()
       }
     },
 
