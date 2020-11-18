@@ -189,7 +189,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.FULL_SCREEN.label",target:"tela cheia"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.BACK_DISABLED.label",target:"voltar desativado"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.DISCARD.label",target:"Dispensar"})
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.SAVE_AND_CLOSE.label",target:"Salvar e dispensar"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.SAVE_AND_CLOSE.label",target:"Salvar e sair"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.GO_PREV.label",target:"Costas"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.GO_NEXT.label",target:"Próximo"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollWizardletView.ACTION_LABEL",target:"Enviar"})
@@ -252,7 +252,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.PhoneNumber.INVALID_PH
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.FObjectProperty.PLEASE_ENTER_VALID",target:"Por favor insira um válido"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.Property.PLEASE_ENTER",target:"Por favor, insira"})
 
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.CONFIRM_MSG",target:"Salvar e sair"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.CONFIRM_MSG",target:"Saída"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.DISMISS_MSG",target:"Tem certeza de que deseja sair desta tela?"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.CONTINUE_MSG",target:"Volte"})
 
@@ -273,3 +273,15 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.REGION
 p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.REGION.error",target:"Região requerido"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.POSTAL_CODE.label",target:"CEP"})
 p({class:"foam.i18n.Locale"locale:"pt",source:"*.foam.nanos.auth.Address.POSTAL_CODE.error",target:"CEP requerido"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.OPTIONS_MSG",target:"opções"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHOOSE_AT_LEAST_1_OPTION",target:"Escolha pelo menos uma opção"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHOOSE_1_OF_FOLLOWING_OPTIONS",target:"Escolha uma das seguintes opções"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHOOSE_EXACTLY",target:"Escolha exatamente"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHOOSE_AT_LEAST",target:"Escolha pelo menos"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHOOSE",target:"Escolher"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHOICES.label",target:"escolhas"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHOICES.documentation",target:"Uma matriz de opções que são de escolha única é denotada como [valor, rótulo, isSelected, choiceMode, isFinal], no entanto, o usuário pode apenas passar [valor, rótulo] e a função de adaptação irá transformá-lo em [valor, rótulo, isSelected , choiceMode, isFinal] formato para fins de processamento"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.DAO.documentation",target:"Se o usuário quiser apenas passar um dao, ele será processado para preencher a matriz de opções em vez de inserir manualmente as opções"})
