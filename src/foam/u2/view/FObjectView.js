@@ -106,8 +106,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'optGroup',
-      documentation: 'The heading text for those options',
+      name: 'dropDownHeader',
+      documentation: 'The heading text for the choices',
     },
     {
       class: 'Array',

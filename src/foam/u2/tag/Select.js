@@ -58,7 +58,7 @@ foam.CLASS({
         .attrs({ size: this.size$ })
         .attrSlot().linkFrom(this.data$);
 
-      this.setChildren(this.slot(function(choices, placeholder, optGroup) {
+      this.setChildren(this.slot(function(choices, placeholder, dropDownHeader) {
         var cs = [];
 
         if ( dropDownHeader ) {
