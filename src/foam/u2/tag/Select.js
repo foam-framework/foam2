@@ -41,9 +41,6 @@ foam.CLASS({
     'size',
     {
       name: 'header',
-      factory: function() {
-        return undefined;
-      },
       documentation: 'The heading text for the choices'
     }
   ],
