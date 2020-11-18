@@ -114,7 +114,7 @@ foam.CLASS({
             start().
               addClass(this.myClass('title')).
               start('a').
-                add('Data Management').on('click', () => { /**it's null for some reason**/ this.memento$.set(null); }).
+                add('Data Management').on('click', () => { /**it's null for some reason**/ this.memento.tail$.set(null); }).
               end().
               add(' / ', this.title).
             end().
