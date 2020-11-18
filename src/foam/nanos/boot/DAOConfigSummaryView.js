@@ -160,6 +160,7 @@ foam.CLASS({
   requires: [
     'foam.comics.BrowserView',
     'foam.comics.v2.DAOBrowseControllerView',
+    'foam.nanos.boot.NSpec',
     'foam.nanos.controller.Memento'
   ],
 
