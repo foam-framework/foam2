@@ -138,9 +138,9 @@ foam.CLASS({
                         })).select()).array;
 
       let country = await this.countryDAO.find(this.lastLanguage.variant)
-      let label = this.lastLanguage.variant != "" ? `${this.lastLanguage.name}(${this.lastLanguage.variant})` : `${this.lastLanguage.name}`
-      if ( country && country.name != null ) {
-        label = `${this.lastLanguage.name}\u00A0(${this.getCountryName(country.name, country.name)})`
+      let label = this.lastLanguage.variant != "" ? `${this.lastLanguage.nativeName}(${this.lastLanguage.variant})` : `${this.lastLanguage.nativeName}`
+      if ( country && country.nativeName != null ) {
+        label = `${this.lastLanguage.nativeName}\u00A0(${country.nativeName})`
       }
 
       this
@@ -156,17 +156,11 @@ foam.CLASS({
     },
     async function formatLabel(language) {
       let country = await this.countryDAO.find(language.variant)
-      let label = language.variant != "" ? `${language.name}(${language.variant})` : `${language.name}`
-      if ( country && country.name != null ) {
-        label = `${language.name}\u00A0(${this.getCountryName(country.name, country.name)})`
+      let label = language.variant != "" ? `${language.nativeName}(${language.variant})` : `${language.nativeName}`
+      if ( country && country.nativeName != null ) {
+        label = `${language.nativeName}\u00A0(${country.nativeName})`
       }
       return label
-    },
-    function getCountryName(countryName, defaultName) {
-      defaultName = defaultName ? defaultName : ''
-      let translation = this.translationService.getTranslation(foam.locale, `${foam.locale.toLowerCase()}.country.${countryName}`)
-      translation = translation ? translation : defaultName
-      return translation
     }
   ],
 
