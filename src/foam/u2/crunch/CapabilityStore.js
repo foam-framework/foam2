@@ -118,6 +118,10 @@ foam.CLASS({
       margin-top: 24px;
     }
   `,
+  
+  constants: {
+    MAX_NUM_DISPLAYBLE_CARDS: 4
+  },
 
   properties: [
     {
@@ -255,12 +259,16 @@ foam.CLASS({
                   })
                 .end());
             }
-            spot.start('span').start('img').addClass(self.myClass('left-arrow'))
-                .attr('src', 'images/arrow-back-24px.svg')
-                .on('click', function() {
-                  self.carouselCounter--;
-                })
-              .end().end();
+            self.callIf(self.totalNumCards > self.MAX_NUM_DISPLAYBLE_CARDS, function() {
+              return spot.start('span')
+                .start('img').addClass(self.myClass('left-arrow'))
+                  .attr('src', 'images/arrow-back-24px.svg')
+                  .on('click', function() {
+                    self.carouselCounter--;
+                  })
+                .end()
+              .end();
+            });
             spot.add(self.slot(
               function(carouselCounter, totalNumCards) {
                 var ele = self.E().addClass(self.myClass('feature-column-grid'));
@@ -271,12 +279,16 @@ foam.CLASS({
                 }
                 return ele;
               }));
-            spot.start('span').start('img').addClass(self.myClass('right-arrow'))
-              .attr('src', 'images/arrow-forward-24px.svg')
-              .on('click', function() {
-                self.carouselCounter++;
-              })
-            .end().end();
+            self.callIf(self.totalNumCards > self.MAX_NUM_DISPLAYBLE_CARDS, function() {
+              return spot.start('span')
+                .start('img').addClass(self.myClass('right-arrow'))
+                  .attr('src', 'images/arrow-forward-24px.svg')
+                  .on('click', function() {
+                    self.carouselCounter++;
+                  })
+                .end()
+              .end();
+            })
           });
           return spot;
        })).end();
