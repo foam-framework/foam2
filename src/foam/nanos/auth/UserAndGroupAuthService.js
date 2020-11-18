@@ -143,9 +143,7 @@ foam.CLASS({
         Session session = x.get(Session.class);
         session.setUserId(user.getId());
 
-        if ( Group.ADMIN_GROUP.equalsIgnoreCase(user.getGroup()) ||
-             check(userX, "*") ) {
-          session.setClusterable(false); 
+        if ( check(userX, "*") ) {
           String msg = "Admin login for " + user.getId() + " succeeded on " + System.getProperty("hostname", "localhost");
           ((foam.nanos.logger.Logger) x.get("logger")).warning(msg);
           Notification notification = new Notification.Builder(x)
@@ -162,8 +160,7 @@ foam.CLASS({
         return user;
       } catch ( AuthenticationException e ) {
         if ( user != null &&
-             ( Group.ADMIN_GROUP.equalsIgnoreCase(user.getGroup()) ||
-               check(x.put("subject", new Subject.Builder(x).setUser(user).build()), "*") ) ) {
+             ( check(x.put("subject", new Subject.Builder(x).setUser(user).build()), "*") ) ) {
           String msg = "Admin login for " + user.getId() + " failed on " + System.getProperty("hostname", "localhost");
           ((foam.nanos.logger.Logger) x.get("logger")).warning(msg);
           Notification notification = new Notification.Builder(x)

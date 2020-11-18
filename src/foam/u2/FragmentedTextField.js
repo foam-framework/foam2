@@ -80,6 +80,8 @@ foam.CLASS({
           this.start().addClass(this.myClass('symbol'))
             .add(e).end();
           continue;
+        } else if ( e.cls_ === foam.u2.FragmentedTextFieldFragment ) {
+          e = e.view;
         }
         var u2Elem = this.start(e)
         u2Elem.on('focus', () => {
@@ -95,6 +97,15 @@ foam.CLASS({
       this.numOfParts = this.delegates.length;
 
       return this;
+    },
+    function processData(data, index, arr) {
+      // returns an array of data chunks in the size of the delegates
+      var currentElement = this.childNodes[index];
+      if ( ! data || ! currentElement ) return arr;
+
+      var maxLength = this.delegates[index].maxLength;
+      arr.push(data.substring(0, maxLength));
+      return this.processData(data.substring(maxLength), index + 2, arr);
     }
   ],
 
@@ -102,11 +113,20 @@ foam.CLASS({
     {
       name: 'onDataUpdate',
       code: function() {
-        var currentElement = this.childNodes[this.currentIndex];
-        if ( currentElement.getAttribute('maxlength') <= currentElement.data.length ) {
-          this.currentIndex = this.currentIndex + 2;
-          this.childNodes[this.currentIndex].focus();
+        var arr = this.processData(this.childNodes[this.currentIndex].data, this.currentIndex, []);
+        for ( var i = 0; i < arr.length; i++ ) {
+          this.childNodes[this.currentIndex].data = arr[i];
+          if ( next = this.childNodes[this.currentIndex + 2] ) {
+            if ( this.delegates[this.currentIndex].maxLength > arr[i].length ) break;
+
+            if ( ! ( next && next.data ) ) {
+              // TODO : typecheck the delegates to determine what currentIndex should be set to next instead of '+2'
+              this.currentIndex = this.currentIndex + 2;
+              next.focus();
+            } else break;
+          }
         }
+        this.childNodes[this.currentIndex].focus();
       }
     }
   ]
