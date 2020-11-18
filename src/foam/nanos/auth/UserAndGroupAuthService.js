@@ -148,12 +148,12 @@ foam.CLASS({
           session.setClusterable(false); 
           String msg = "Admin login for " + user.getId() + " succeeded on " + System.getProperty("hostname", "localhost");
           ((foam.nanos.logger.Logger) x.get("logger")).warning(msg);
-          Notification notification = new Notification.Builder(x)
-            .setTemplate("NOC")
-            .setToastMessage(msg)
-            .setBody(msg)
-            .build();
-          ((DAO) x.get("localNotificationDAO")).put(notification);
+          // Notification notification = new Notification.Builder(x)
+          //   .setTemplate("NOC")
+          //   .setToastMessage(msg)
+          //   .setBody(msg)
+          //   .build();
+          // ((DAO) x.get("localNotificationDAO")).put(notification);
         }
 
         ((DAO) getLocalSessionDAO()).inX(x).put(session);
@@ -165,12 +165,12 @@ foam.CLASS({
                check(x.put("user", user), "*") ) ) {
           String msg = "Admin login for " + user.getId() + " failed on " + System.getProperty("hostname", "localhost");
           ((foam.nanos.logger.Logger) x.get("logger")).warning(msg);
-          Notification notification = new Notification.Builder(x)
-            .setTemplate("NOC")
-            .setToastMessage(msg)
-            .setBody(msg)
-            .build();
-          ((DAO) x.get("localNotificationDAO")).put(notification);
+          // Notification notification = new Notification.Builder(x)
+          //   .setTemplate("NOC")
+          //   .setToastMessage(msg)
+          //   .setBody(msg)
+          //   .build();
+          // ((DAO) x.get("localNotificationDAO")).put(notification);
         }
         throw e;
       }
@@ -413,6 +413,7 @@ foam.CLASS({
       javaCode: `
         Session session = x.get(Session.class);
         if ( session != null && session.getUserId() != 0 ) {
+((foam.nanos.logger.Logger) x.get("logger")).info(this.getClass().getSimpleName(), "logout", session.getId());
           ((DAO) getLocalSessionDAO()).remove(session);
         }
       `
