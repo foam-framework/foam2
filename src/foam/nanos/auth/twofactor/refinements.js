@@ -14,14 +14,14 @@ foam.CLASS({
       class: 'Boolean',
       name: 'twoFactorEnabled',
       documentation: 'Two factor enabled flag',
-      section: 'administrative'
+      section: 'operationsInformation'
     },
     {
       class: 'String',
       name: 'twoFactorSecret',
       documentation: 'Two factor secret',
       networkTransient: true,
-      section: 'administrative'
+      section: 'systemInformation'
     }
   ]
 });

@@ -90,6 +90,34 @@ foam.CLASS({
       help: 'Properties that are used internally by the system.',
       permissionRequired: true
     },
+    {
+      name: 'complianceInformation',
+      title: 'Compliance'
+    },
+    {
+      name: 'accountInformation',
+      title: 'Account'
+    },
+    {
+      name: 'operationsInformation',
+      title: 'Operations'
+    },
+    {
+      name: 'contactInformation',
+      title: 'Contact'
+    },
+    {
+      name: 'deprecatedInformation',
+      title: 'Deprecated'
+    },
+    {
+      name: 'ownerInformation',
+      title: 'Owner'
+    },
+    {
+      name: 'systemInformation',
+      title: 'System Information'
+    }
   ],
 
   // TODO: The following properties don't have to be defined here anymore once
@@ -133,7 +161,7 @@ foam.CLASS({
       class: 'DateTime',
       name: 'lastLogin',
       documentation: 'The date and time of last login by User.',
-      section: 'administrative',
+      section: 'operationsInformation',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO'
     },
@@ -172,7 +200,7 @@ foam.CLASS({
    {
       class: 'String',
       name: 'jobTitle',
-      section: 'personal',
+      section: 'ownerInformation',
       view: function(args, X) {
         return {
           class: 'foam.u2.view.ChoiceWithOtherView',
@@ -204,7 +232,7 @@ foam.CLASS({
         of the User.`,
       width: 50,
       createVisibility: 'HIDDEN',
-      section: 'business'
+      section: 'ownerInformation'
     },
     {
       class: 'String',
@@ -448,7 +476,7 @@ foam.CLASS({
       name: 'disabledTopics',
       documentation: 'Disables types for notifications.',
       createVisibility: 'HIDDEN',
-      section: 'administrative',
+      section: 'operationsInformation',
       javaPostSet: `
         clearDisabledTopicSet();
       `
@@ -506,6 +534,7 @@ foam.CLASS({
       class: 'foam.core.Enum',
       of: 'foam.nanos.auth.LifecycleState',
       name: 'lifecycleState',
+      section: 'systemInformation',
       value: foam.nanos.auth.LifecycleState.PENDING,
       writePermissionRequired: true
     },
@@ -514,7 +543,7 @@ foam.CLASS({
       of: 'foam.nanos.auth.ServiceProvider',
       name: 'spid',
       tableWidth: 120,
-      section: 'administrative',
+      section: 'systemInformation',
       writePermissionRequired:true,
       documentation: `
         Need to override getter to return "" because its trying to
@@ -722,7 +751,7 @@ foam.RELATIONSHIP({
   },
   targetProperty: {
     hidden: false,
-    section: 'administrative'
+    section: 'systemInformation'
   }
 });
 
@@ -748,11 +777,11 @@ foam.RELATIONSHIP({
   junctionDAOKey: 'agentJunctionDAO',
   sourceProperty: {
     createVisibility: 'HIDDEN',
-    section: 'business'
+    section: 'ownerInformation'
   },
   targetProperty: {
     createVisibility: 'HIDDEN',
-    section: 'business'
+    section: 'ownerInformation'
   }
 });
 
@@ -781,6 +810,6 @@ foam.RELATIONSHIP({
     visibility: 'HIDDEN',
   },
   targetProperty: {
-    section: 'administrative'
+    section: 'systemInformation'
   }
 });

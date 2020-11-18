@@ -414,7 +414,7 @@ foam.RELATIONSHIP({
   forwardName: 'capabilities',
   inverseName: 'users',
   sourceProperty: {
-    section: 'capabilities',
+    section: 'systemInformation',
     updateVisibility: 'RO'
   }
 });
