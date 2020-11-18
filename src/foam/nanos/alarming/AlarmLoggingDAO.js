@@ -21,7 +21,7 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      Alarm old = (Alarm) getDelegate().find_(x, obj.getProperty("id"));
+      Alarm old = (Alarm) getDelegate().find_(x, ((Alarm)obj).getId());
       Alarm alarm = (Alarm) getDelegate().put_(x, obj);
       if ( old != null &&
            old.getIsActive() == alarm.getIsActive() ) {
