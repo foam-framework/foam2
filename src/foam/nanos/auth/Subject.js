@@ -39,7 +39,7 @@ foam.CLASS({
       if ( userPath.size() < 2 || val != (User) userPath.get(userPath.size() - 1) ) {
         userPath.add(val);
       } else {
-        userPath.remove(userPath.size());
+        userPath.remove(userPath.size() - 1);
       }
       userIsSet_ = true;
       user_      = val;
