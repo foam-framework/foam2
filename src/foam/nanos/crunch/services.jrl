@@ -41,6 +41,7 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setInnerDAO(x.get("localCapabilityDAO"))
       .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
+      .setDecorator(new foam.nanos.crunch.CapabilityAvailabilityDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.Capability.getOwnClassInfo())))
       .build();
   """,
   "client":"""
@@ -50,7 +51,6 @@ p({
     }
   """
 })
-//      .setDecorator(new foam.nanos.crunch.CapabilityAvailabilityDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.Capability.getOwnClassInfo())))
 
 p({
   "class": "foam.nanos.boot.NSpec",
