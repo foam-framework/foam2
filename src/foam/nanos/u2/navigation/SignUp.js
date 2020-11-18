@@ -38,6 +38,7 @@ foam.CLASS({
     { name: 'EMAIL_AVAILABILITY_ERR', message: 'This email is already in use. Please sign in or use a different email' },
     { name: 'USERNAME_EMPTY_ERR', message: 'Username required' },
     { name: 'USERNAME_AVAILABILITY_ERR', message: 'This username is taken. Please try another.' },
+    //TODO: Find out better way to deal with PASSWORD_ERR
     { name: 'PASSWORD_ERR', message: 'Password should be at least 6 characters.' }
   ],
 
