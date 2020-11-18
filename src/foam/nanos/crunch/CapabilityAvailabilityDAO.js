@@ -33,7 +33,7 @@ foam.CLASS({
           public CapabilityAvailabilityDAO(X x, DAO delegate) {
             setX(x);
             setDelegate(delegate);
-          } 
+          }
         `);
       }
     }
@@ -56,7 +56,7 @@ foam.CLASS({
         if ( capability == null || ( ! capability.getAvailabilityPredicate().f(x) && ! auth.check(x, AVAILABILITY_PERMISSION + id) ) ) {
           return null;
         }
-        return getDelegate().find_(x, id);
+        return capability;
       `
     },
     {
@@ -72,7 +72,8 @@ foam.CLASS({
             }
           }
         };
-        return getDelegate().select_(x, proxy, skip, limit, order, predicate);
+        proxy = (ProxySink) getDelegate().select_(x, proxy, skip, limit, order, predicate);
+        return proxy.getDelegate();
       `
     }
   ],
