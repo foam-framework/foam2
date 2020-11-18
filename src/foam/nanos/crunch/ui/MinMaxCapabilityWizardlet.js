@@ -82,6 +82,13 @@ foam.CLASS({
       class: 'Boolean',
       name: 'isValid',
       value: false
+    },
+    {
+      name: 'isVisible',
+      class: 'Boolean',
+      expression: function(isAvailable) {
+        return isAvailable;
+      }
     }
   ],
 

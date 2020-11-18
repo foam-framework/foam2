@@ -302,7 +302,10 @@ foam.CLASS({
         // Save wizardlets
         return [...Array(N).keys()].map(v => S + v)
           .reduce(
-            (p, i) => p.then(() => this.wizardlets[i].save()),
+            (p, i) => p.then(
+              () => {
+                if ( this.wizardlets[i].isAvailable ) this.wizardlets[i].save();
+              }),
             Promise.resolve()
           ).then(() => {
             this.wizardPosition = nextScreen;
