@@ -11,7 +11,8 @@ foam.CLASS({
   implements: [
     'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
-    'foam.nanos.auth.CreatedByAware'
+    'foam.nanos.auth.CreatedByAware',
+    'foam.nanos.medusa.Clusterable'
   ],
 
   documentation: 'Notification model responsible for system and integrated messaging notifications.',
@@ -183,6 +184,12 @@ foam.CLASS({
       class: 'String',
       name: 'slackMessage',
       documentation: 'Message to be sent to Slack.'
+    },
+    {
+      class: 'Boolean',
+      name: 'clusterable',
+      value: true,
+      includeInDigest: false
     }
   ],
 
