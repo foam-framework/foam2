@@ -80,6 +80,10 @@ foam.CLASS({
 
       imports: [ 'memento', 'stack' ],
 
+      exports: [
+        'currentMemento as memento'
+      ],
+
       css: `
         ^title {
           padding: 25px;
@@ -96,12 +100,15 @@ foam.CLASS({
         {
           class: 'foam.u2.ViewSpec',
           name: 'inner'
-        }
+        },
+        'currentMemento'
       ],
 
       methods: [
         function initE() {
           this.SUPER();
+
+          this.currentMemento$ = this.memento.tail$;
 
           this.
             start().
