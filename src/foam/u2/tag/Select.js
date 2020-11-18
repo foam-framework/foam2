@@ -40,10 +40,11 @@ foam.CLASS({
     },
     'size',
     {
-      name: 'optGroup',
+      name: 'dropDownHeader',
       factory: function() {
         return undefined;
-      }
+      },
+      documentation: 'drop down header is use to indicate the category of choices. it located above placeholder'
     }
   ],
 
@@ -60,8 +61,8 @@ foam.CLASS({
       this.setChildren(this.slot(function(choices, placeholder, optGroup) {
         var cs = [];
 
-        if ( optGroup ) {
-          cs.push(self.E('optgroup').attrs({ label: optGroup }))
+        if ( dropDownHeader ) {
+          cs.push(self.E('optgroup').attrs({ label: dropDownHeader }))
         }
 
         if ( placeholder ) {

@@ -42,7 +42,7 @@ foam.CLASS({
           class: X.data.allowCustom ? 'foam.u2.TextField' : 'foam.u2.view.ChoiceView',
           displayWidth: 60,
           placeholder: X.data.placeholder,
-          optGroup: X.data.optGroup,
+          dropDownHeader: X.data.dropDownHeader,
           choices$: X.data.choices$
         };
       }
