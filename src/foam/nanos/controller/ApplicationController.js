@@ -335,8 +335,6 @@ foam.CLASS({
         if ( ! self.memento.feedback_ )
           self.mementoChange();
       });
-
-      this.mementoChange();
       // End Memento Support
 
       this.clientPromise.then(async function(client) {
@@ -417,6 +415,8 @@ foam.CLASS({
             .end();
           });
       });
+
+      this.mementoChange();
     },
 
     function installLanguage() {
