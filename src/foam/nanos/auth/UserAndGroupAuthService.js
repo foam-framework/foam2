@@ -162,7 +162,7 @@ foam.CLASS({
       } catch ( AuthenticationException e ) {
         if ( user != null &&
              ( Group.ADMIN_GROUP.equalsIgnoreCase(user.getGroup()) ||
-               check(userX, "*") ) ) {
+               check(x.put("subject", new Subject.Builder(x).setUser(user).build()), "*") ) ) {
           String msg = "Admin login for " + user.getId() + " failed on " + System.getProperty("hostname", "localhost");
           ((foam.nanos.logger.Logger) x.get("logger")).warning(msg);
           Notification notification = new Notification.Builder(x)
