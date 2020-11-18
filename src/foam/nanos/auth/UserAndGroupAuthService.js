@@ -149,8 +149,8 @@ foam.CLASS({
           String msg = "Admin login for " + user.getId() + " succeeded on " + System.getProperty("hostname", "localhost");
           ((foam.nanos.logger.Logger) x.get("logger")).warning(msg);
           Notification notification = new Notification.Builder(x)
-            .setTemplate("NOC");
-            .setToastMessage(msg);
+            .setTemplate("NOC")
+            .setToastMessage(msg)
             .setBody(msg)
             .build();
           ((DAO) x.get("localNotificationDAO")).put(notification);
@@ -166,8 +166,8 @@ foam.CLASS({
           String msg = "Admin login for " + user.getId() + " failed on " + System.getProperty("hostname", "localhost");
           ((foam.nanos.logger.Logger) x.get("logger")).warning(msg);
           Notification notification = new Notification.Builder(x)
-            .setTemplate("NOC");
-            .setToastMessage(msg);
+            .setTemplate("NOC")
+            .setToastMessage(msg)
             .setBody(msg)
             .build();
           ((DAO) x.get("localNotificationDAO")).put(notification);
