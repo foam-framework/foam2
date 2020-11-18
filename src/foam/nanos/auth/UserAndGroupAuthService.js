@@ -150,6 +150,7 @@ foam.CLASS({
           ((foam.nanos.logger.Logger) x.get("logger")).warning(msg);
           Notification notification = new Notification.Builder(x)
             .setTemplate("NOC")
+            .setToastMessage(msg);
             .setBody(msg)
             .build();
           ((DAO) x.get("localNotificationDAO")).put(notification);
@@ -166,6 +167,7 @@ foam.CLASS({
           ((foam.nanos.logger.Logger) x.get("logger")).warning(msg);
           Notification notification = new Notification.Builder(x)
             .setTemplate("NOC")
+            .setToastMessage(msg);
             .setBody(msg)
             .build();
           ((DAO) x.get("localNotificationDAO")).put(notification);
