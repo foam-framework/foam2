@@ -167,7 +167,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'dropDownHeader',
+      name: 'header',
       documentation: 'if this is set, a custom header will be add to drop down choices'
     },
     {
@@ -226,7 +226,7 @@ foam.CLASS({
               placeholder$:     self.placeholder$,
               mode$:            self.mode$,
               size$:            self.size$,
-              dropDownHeader$:  self.dropDownHeader$
+              header$:          self.header$
             })
               .attrs({ name: self.name })
               .enableClass('selection-made', self.index$.map((index) => index !== -1))

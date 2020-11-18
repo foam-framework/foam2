@@ -42,7 +42,7 @@ foam.CLASS({
           class: X.data.allowCustom ? 'foam.u2.TextField' : 'foam.u2.view.ChoiceView',
           displayWidth: 60,
           placeholder: X.data.placeholder,
-          dropDownHeader: X.data.dropDownHeader,
+          header: X.data.header,
           choices$: X.data.choices$
         };
       }
@@ -106,7 +106,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'dropDownHeader',
+      name: 'header',
       documentation: 'The heading text for the choices',
     },
     {
