@@ -152,7 +152,8 @@ foam.CLASS({
 
   requires: [
     'foam.comics.BrowserView',
-    'foam.comics.v2.DAOBrowseControllerView'
+    'foam.comics.v2.DAOBrowseControllerView',
+    'foam.nanos.controller.Memento'
   ],
 
   implements: [ 'foam.mlang.Expressions' ],
@@ -161,7 +162,7 @@ foam.CLASS({
 
 
   exports: [
-    'currentMemento_ as memento'// BackBorder will not work
+    'memento'// BackBorder will not work currentMemento_ as 
   ],
 
   properties: [

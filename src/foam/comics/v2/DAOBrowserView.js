@@ -104,8 +104,7 @@ foam.CLASS({
   exports: [
     'dblclick',
     'filteredTableColumns',
-    'serviceName',
-    'memento'//currentMemento as
+    'serviceName'
   ],
 
   properties: [
