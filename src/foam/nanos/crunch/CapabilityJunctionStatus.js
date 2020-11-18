@@ -48,7 +48,7 @@ foam.ENUM({
     {
       name: 'PENDING_REVIEW',
       label: { en: 'pending review', pt: 'revisão pendente' },
-      documentation: 'The information you provided is pending signing officer review',
+      documentation: 'The information you provided is pending final review',
       background: '#bfae32'
     },
     {
