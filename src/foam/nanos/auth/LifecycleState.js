@@ -11,19 +11,19 @@ foam.ENUM({
   values: [
     {
       name: 'PENDING',
-      label: 'Pending'
+      label: { en: 'Pending', pt: 'Pendente'},
     },
     {
       name: 'ACTIVE',
-      label: 'Active'
+      label: { en: 'Active', pt: 'Ativo'},
     },
     {
       name: 'REJECTED',
-      label: 'Rejected'
+      label: { en: 'Rejected', pt: 'Rejeitado'},
     },
     {
       name: 'DELETED',
-      label: 'Deleted'
+      label: { en: 'Deleted', pt: 'Excluído'},
     }
   ]
 });
