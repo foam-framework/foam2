@@ -38,7 +38,13 @@ foam.CLASS({
         return undefined;
       }
     },
-    'size'
+    'size',
+    {
+      name: 'optGroup',
+      factory: function() {
+        return undefined;
+      }
+    }
   ],
 
   methods: [
@@ -51,8 +57,12 @@ foam.CLASS({
         .attrs({ size: this.size$ })
         .attrSlot().linkFrom(this.data$);
 
-      this.setChildren(this.slot(function(choices, placeholder) {
+      this.setChildren(this.slot(function(choices, placeholder, optGroup) {
         var cs = [];
+
+        if ( optGroup ) {
+          cs.push(self.E('optgroup').attrs({ label: optGroup }))
+        }
 
         if ( placeholder ) {
           cs.push(self.E('option').attrs({

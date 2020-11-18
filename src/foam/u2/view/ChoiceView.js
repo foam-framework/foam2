@@ -166,6 +166,10 @@ foam.CLASS({
       name: 'alwaysFloatLabel'
     },
     {
+      class: 'String',
+      name: 'optGroup'
+    },
+    {
       name: 'view_'
     },
     'feedback_',
@@ -220,7 +224,8 @@ foam.CLASS({
               choices$:         self.choices$,
               placeholder$:     self.placeholder$,
               mode$:            self.mode$,
-              size$:            self.size$
+              size$:            self.size$,
+              optGroup$:        self.optGroup$
             })
               .attrs({ name: self.name })
               .enableClass('selection-made', self.index$.map((index) => index !== -1))
