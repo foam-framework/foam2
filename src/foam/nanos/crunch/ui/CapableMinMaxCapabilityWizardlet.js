@@ -124,8 +124,7 @@ foam.CLASS({
               isValidNumberOfChoices$: this.isValid$,
               showValidNumberOfChoicesHelper: false,
               minSelected$: this.min$,
-              maxSelected$: this.max$,
-              onSelect: this.adjustCapablePayloads.bind(this)
+              maxSelected$: this.max$
             }
           })
         ];
@@ -134,65 +133,13 @@ foam.CLASS({
   ],
 
   methods: [
-    {
-      name: 'adjustCapablePayloads',
-      code: function(oldChoices, newChoices) {
-        var choiceWizardlets = this.choiceWizardlets;
-
-        var selectedOldChoicesNames = oldChoices.map(choice => choice[0]);
-        var selectedNewChoicesNames = newChoices.map(choice => choice[0]);
-
-        if ( selectedOldChoicesNames.length > selectedNewChoicesNames.length ){
-          var deselectedChoiceName = selectedOldChoicesNames.filter(choice => selectedNewChoicesNames.indexOf(choice) == -1)[0]
-
-          var deselectedChoice = oldChoices.filter(choice => choice[0] === deselectedChoiceName)[0];
-
-          var deselectedWizard = choiceWizardlets.filter(wizard => wizard.title === deselectedChoice[0]);
-
-          var { targetPayload } =  deselectedWizard[0];
-
-          this.capable.getCapablePayloadDAO().remove(
-            targetPayload).then(() => {
-              this.capabilityDAO.find(targetPayload.capability).then(cap => {
-              console.log('CANCELLED ' +
-                cap.name
-              );
-            })
-            }
-          );
-
-        } else if (selectedOldChoicesNames.length < selectedNewChoicesNames.length ) {
-
-          var selectedChoiceName = selectedNewChoicesNames.filter(choice => selectedOldChoicesNames.indexOf(choice) == -1)[0]
-
-          var selectedChoice = newChoices.filter(choice => choice[0] === selectedChoiceName)[0];
-          
-          var selectedWizard = choiceWizardlets.filter(wizard => wizard.title === selectedChoice[0]);
-
-          var { targetPayload } =  selectedWizard[0];
-
-          this.capable.getCapablePayloadDAO().put(
-            targetPayload).then(() => {
-              this.capabilityDAO.find(targetPayload.capability).then(cap => {
-                console.log('SAVED ' +
-                  cap.name
-                );
-              })
-            });
-
-        } else {
-          console.warn('Both selectedOldChoices and selectedNewChoices should  not have the same length');
-        }
-      }
-    },
     function createView(data) {    
       return this.MultiChoiceView.create({
         choices$: this.choices$,
         booleanView: this.CardSelectView,
         isValidNumberOfChoices$: this.isValid$,
         minSelected$: this.min$,
-        maxSelected$: this.max$,
-        onSelect: this.adjustCapablePayloads.bind(this)
+        maxSelected$: this.max$
       });
     }
   ]

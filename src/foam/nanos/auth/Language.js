@@ -25,6 +25,13 @@ foam.CLASS({
       name: "name"
     },
     {
+      class: 'String',
+      name: 'nativeName',
+      factory: function() {
+        return this.name
+      }
+    },
+    {
       class: "Boolean",
       name: "enabled",
       value: true
