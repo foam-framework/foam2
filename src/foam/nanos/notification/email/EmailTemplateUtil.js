@@ -12,7 +12,6 @@ foam.CLASS({
     'foam.lib.parse.Grammar',
     'foam.lib.parse.Action',
     'foam.lib.parse.*',
-    'foam.lib.json.AnyKeyParser',
     'java.util.HashMap',
     'java.util.Map',
     'foam.lib.json.*',
@@ -41,7 +40,7 @@ foam.CLASS({
 
         // markup symbol defines the pattern for the whole string
         grammar.addSymbol("markup", new Repeat0(new Alt(grammar.sym("IF_ELSE"), grammar.sym("IF"), grammar.sym("SIMPLE_VAL"),
-          grammar.sym("ANY_KEY"), Whitespace.instance())));
+          grammar.sym("ANY_CHAR"))));
         Action markup = new Action() {
           @Override
           public Object execute(Object value, ParserContext x) {
@@ -52,15 +51,15 @@ foam.CLASS({
 
 
         // ANY_KEY symbol applies to any char that doesn't match any other pattern
-        grammar.addSymbol("ANY_KEY", new AnyKeyParser());
-        Action anyKeyAction = new Action() {
+        grammar.addSymbol("ANY_CHAR", AnyChar.instance());
+        Action anyCharAction = new Action() {
           @Override
           public Object execute(Object val, ParserContext x) {
             getSb().append(val);
             return val;
           }
         };
-        grammar.addAction("ANY_KEY", anyKeyAction);
+        grammar.addAction("ANY_CHAR", anyCharAction);
 
 
         // simple value syntax: "qwerty {{ simple_value }} qwerty"
@@ -84,7 +83,7 @@ foam.CLASS({
 
         /* IF_ELSE syntax: "qwerty {% if var_name_provided_in_map %} qwer {{ possible_simple_value }} erty
         {% else %} qwerty {% endif %}" */
-        Parser ifElseParser = new Seq3(4, 8, 16,
+        Parser ifElseParser = new Seq3(4, 7, 13,
           Literal.create("{%"),
           Whitespace.instance(),
           Literal.create("if"),
@@ -92,103 +91,98 @@ foam.CLASS({
           new Repeat(new Until(Literal.create("%}"))),
           Whitespace.instance(),
           Literal.create("%}"),
-//          Whitespace.instance(),
           (new Repeat(new Until(Literal.create("{%")))),
-//          Whitespace.instance(),
           Literal.create("{%"),
           Whitespace.instance(),
           Literal.create("else"),
           Whitespace.instance(),
           Literal.create("%}"),
-//          Whitespace.instance(),
           (new Repeat(new Until(Literal.create("{%")))),
-//          Whitespace.instance(),
+          Literal.create("{%"),
+          Whitespace.instance(),
+          Literal.create("endif"),
+          Whitespace.instance(),
+          Literal.create("%}")
+        );
+
+        grammar.addSymbol("IF_ELSE", ifElseParser);
+        Action ifElseAction  = new Action() {
+          @Override
+          public Object execute(Object val, foam.lib.parse.ParserContext x) {
+            Object[] valArr = (Object[]) val;
+            StringBuilder ifCond = new StringBuilder();
+            Object[] val0 = (Object[]) valArr[0];
+            for ( int i= 0; i < val0.length; i++ ) {
+              if ( ! Character.isWhitespace((char)val0[i]) ) ifCond.append(val0[i]);
+            }
+
+            StringBuilder finalVal = new StringBuilder();
+            if ( getValues().get(ifCond.toString() ) != null ) {
+              Object[] val1 = (Object[]) valArr[1];
+              for ( int i= 0; i < val1.length; i++ ) {
+                finalVal.append(val1[i]);
+              }
+            } else {
+              Object[] val2 = (Object[]) valArr[2];
+              for ( int i= 0; i < val2.length; i++ ) {
+                finalVal.append(val2[i]);
+              }
+            }
+            StringPStream finalValPs = new StringPStream();
+            finalValPs.setString(finalVal);
+            PStream ret = ((Parser) grammar.sym("markup")).parse(finalValPs, new ParserContextImpl());
+            getSb().append(ret.value());
+            return val;
+          }
+        };
+        grammar.addAction("IF_ELSE", ifElseAction);
+
+
+        /* IF symbol syntax: "qwerty {% if var_name_provided_in_map %} qwer {{ possible_simple_value }}
+        qwerty {% endif %}" */
+        Parser ifParser = new Seq2(4, 8,
+          Literal.create("{%"),
+          Whitespace.instance(),
+          Literal.create("if"),
+          Whitespace.instance(),
+          new Repeat(new Until(Literal.create("%}"))),
+          Whitespace.instance(),
+          Literal.create("%}"),
+          Whitespace.instance(),
+          (new Repeat(new Until(Literal.create("{%")))),
+          Whitespace.instance(),
           Literal.create("{%"),
           Whitespace.instance(),
           Literal.create("endif"),
           Whitespace.instance(),
           Literal.create("%}"));
 
-          grammar.addSymbol("IF_ELSE", ifElseParser);
-          Action ifElseAction  = new Action() {
-            @Override
-            public Object execute(Object val, foam.lib.parse.ParserContext x) {
-              Object[] valArr = (Object[]) val;
-              StringBuilder ifCond = new StringBuilder();
-              Object[] val0 = (Object[]) valArr[0];
-              for ( int i= 0; i < val0.length; i++ ) {
-                if ( ! Character.isWhitespace((char)val0[i]) ) ifCond.append(val0[i]);
-              }
+        grammar.addSymbol("IF", ifParser);
+        Action ifAction  = new Action() {
+          @Override
+          public Object execute(Object val, foam.lib.parse.ParserContext x) {
+            Object[] valArr = (Object[]) val;
+            StringBuilder ifCond = new StringBuilder();
+            Object[] val0 = (Object[]) valArr[0];
+            for ( int i= 0; i < val0.length; i++ ) {
+              if ( ! Character.isWhitespace((char)val0[i]) ) ifCond.append(val0[i]);
+            }
 
-              StringBuilder finalVal = new StringBuilder();
-              if ( getValues().get(ifCond.toString() ) != null ) {
-                Object[] val1 = (Object[]) valArr[1];
-                for ( int i= 0; i < val1.length; i++ ) {
-                  finalVal.append(val1[i]);
-                }
-              } else {
-                Object[] val2 = (Object[]) valArr[2];
-                for ( int i= 0; i < val2.length; i++ ) {
-                  finalVal.append(val2[i]);
-                }
+            StringBuilder finalVal = new StringBuilder();
+            if ( getValues().get(ifCond.toString() ) != null ) {
+              Object[] val1 = (Object[]) valArr[1];
+              for ( int i= 0; i < val1.length; i++ ) {
+                finalVal.append(val1[i]);
               }
               StringPStream finalValPs = new StringPStream();
               finalValPs.setString(finalVal);
               PStream ret = ((Parser) grammar.sym("markup")).parse(finalValPs, new ParserContextImpl());
               getSb().append(ret.value());
-              return val;
             }
-          };
-          grammar.addAction("IF_ELSE", ifElseAction);
-
-
-          /* IF symbol syntax: "qwerty {% if var_name_provided_in_map %} qwer {{ possible_simple_value }}
-          qwerty {% endif %}" */
-          Parser ifParser = new Seq2(4, 8,
-            Literal.create("{%"),
-            Whitespace.instance(),
-            Literal.create("if"),
-            Whitespace.instance(),
-            new Repeat(new Until(Literal.create("%}"))),
-            Whitespace.instance(),
-            Literal.create("%}"),
-            Whitespace.instance(),
-            (new Repeat(new Until(Literal.create("{%")))),
-            Whitespace.instance(),
-            Literal.create("{%"),
-            Whitespace.instance(),
-            Literal.create("endif"),
-            Whitespace.instance(),
-            Literal.create("%}"));
-
-            grammar.addSymbol("IF", ifParser);
-            Action ifAction  = new Action() {
-              @Override
-              public Object execute(Object val, foam.lib.parse.ParserContext x) {
-                Object[] valArr = (Object[]) val;
-                StringBuilder ifCond = new StringBuilder();
-                Object[] val0 = (Object[]) valArr[0];
-                for ( int i= 0; i < val0.length; i++ ) {
-                  if ( ! Character.isWhitespace((char)val0[i]) ) ifCond.append(val0[i]);
-                }
-
-                StringBuilder finalVal = new StringBuilder();
-                if ( getValues().get(ifCond.toString() ) != null ) {
-                  Object[] val1 = (Object[]) valArr[1];
-                  for ( int i= 0; i < val1.length; i++ ) {
-                    finalVal.append(val1[i]);
-                  }
-                  StringPStream finalValPs = new StringPStream();
-                  finalValPs.setString(finalVal);
-                  PStream ret = ((Parser) grammar.sym("markup")).parse(finalValPs, new ParserContextImpl());
-                  getSb().append(ret.value());
-                }
-                return val;
-              }
-            };
-            grammar.addAction("IF", ifAction);
-
-
+            return val;
+          }
+        };
+        grammar.addAction("IF", ifAction);
 
         return grammar;
       `
