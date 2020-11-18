@@ -287,6 +287,7 @@ public class RuleEngine extends ContextAwareSupport {
       } catch (Exception e) {
         // Object instantiation should not fail but if it does fail then return
         // the original object as the reloaded object.
+        // REVIEW: this may result in Object is Frozen assertion errors
         return obj;
       }
     }
@@ -307,7 +308,7 @@ public class RuleEngine extends ContextAwareSupport {
 
     // Return the original object as the reloaded object if nu == old or nu == obj.
     if ( nu.equals(old) || nu.equals(cloned) ) {
-      return obj;
+      return cloned;
     }
 
     // For greedy mode, return the reloaded object `nu` as is. Otherwise,

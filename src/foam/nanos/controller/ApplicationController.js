@@ -54,7 +54,8 @@ foam.CLASS({
     'foam.u2.stack.StackView',
     'foam.u2.dialog.NotificationMessage',
     'foam.nanos.session.SessionTimer',
-    'foam.u2.dialog.Popup'
+    'foam.u2.dialog.Popup',
+    'foam.core.Latch'
   ],
 
   imports: [
@@ -202,6 +203,11 @@ foam.CLASS({
       }
     },
     {
+      name: 'languageInstalled',
+      documentation: 'Latch to denote language has been installed',
+      factory: function() { return this.Latch.create(); }
+    },
+    {
       name: 'client',
     },
     {
@@ -322,6 +328,7 @@ foam.CLASS({
         await self.fetchSubject();
         await client.translationService.initLatch;
         self.installLanguage();
+        self.languageInstalled.resolve();
 
         // add user and agent for backward compatibility
         Object.defineProperty(self, 'user', {
@@ -427,6 +434,7 @@ foam.CLASS({
 
         this.subject = result;
       } catch (err) {
+        this.languageInstalled.resolve();
         await this.requestLogin();
         return await this.fetchSubject();
       }
