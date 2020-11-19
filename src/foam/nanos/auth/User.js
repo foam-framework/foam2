@@ -11,6 +11,7 @@ foam.CLASS({
   implements: [
     'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.EnabledAware',
     'foam.nanos.auth.HumanNameTrait',
     'foam.nanos.auth.LastModifiedAware',
@@ -138,7 +139,7 @@ foam.CLASS({
       tableWidth: 100,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative',
+      section: 'business',
       includeInDigest: true,
       sheetsOutput: true
     },
@@ -329,7 +330,7 @@ foam.CLASS({
       `,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative'
+      section: 'business'
     },
     {
       class: 'Date',
@@ -459,7 +460,7 @@ foam.CLASS({
       documentation: 'A field for a note that can be added and appended to the User.',
       displayWidth: 70,
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 },
-      section: 'administrative'
+      section: 'business'
     },
     // TODO: remove after demo
     {
@@ -528,7 +529,7 @@ foam.CLASS({
       documentation: 'The date and time the User was last modified.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative'
+      section: 'business'
     },
     {
       class: 'foam.core.Enum',

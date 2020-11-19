@@ -15,6 +15,7 @@ foam.INTERFACE({
       name: 'createdBy',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
+      section: 'business',
       documentation: 'User who created the entry'
     },
     {
@@ -24,7 +25,7 @@ foam.INTERFACE({
       documentation: 'Agent acting as User who created the entry',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative'
+      section: 'business'
     }
   ]
 });
@@ -51,7 +52,7 @@ foam.CLASS({
       documentation: 'User who created the entry',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative'
+      section: 'business'
     },
     {
       class: 'Reference',
@@ -60,7 +61,7 @@ foam.CLASS({
       documentation: 'Agent acting as User who created the entry',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative'
+      section: 'business'
     }
   ]
 });
