@@ -209,10 +209,10 @@
 
     function initE() {
 
-      if ( this.currentMemento && this.currentMemento.tail ) {
-        var id = this.currentMemento.tail.head;
+      if ( this.currentMemento ) {
+        var id = this.currentMemento.head;
         if ( ! isNaN(id) ) {
-          id = parseInt(this.currentMemento.tail.head);
+          id = parseInt(this.currentMemento.head);
         }
 
         this.stack.push({

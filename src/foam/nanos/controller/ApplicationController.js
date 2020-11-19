@@ -367,6 +367,7 @@ foam.CLASS({
         await self.fetchGroup();
         await self.fetchTheme();
         self.onUserAgentAndGroupLoaded();
+        self.mementoChange();
       });
     },
 
@@ -415,8 +416,6 @@ foam.CLASS({
             .end();
           });
       });
-
-      this.mementoChange();
     },
 
     function installLanguage() {
