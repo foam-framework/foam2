@@ -58,6 +58,8 @@ foam.CLASS({
             contextAgent = cls.create(spec, x).copyFrom(args || {});
           }
 
+          console.log('CALLING: ' + contextAgent.cls_.id);
+
           // Call the context agent and pass its exports to the next one
           return contextAgent.execute().then(() => contextAgent.__subContext__);
         })

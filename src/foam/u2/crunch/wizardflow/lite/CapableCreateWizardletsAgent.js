@@ -117,9 +117,10 @@ foam.CLASS({
 
       let wizardlet = wizardletClass.create({
         capability: capability,
-        targetPayload: capablePayload,
         data$: capablePayload.data$
       }, this);
+
+      wizardlet.dataController.targetPayload = capablePayload;
 
       return wizardlet;
     },

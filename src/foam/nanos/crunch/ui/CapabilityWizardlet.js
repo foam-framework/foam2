@@ -28,6 +28,9 @@ foam.CLASS({
       name: 'capability'
     },
     {
+      name: 'status'
+    },
+    {
       name: 'ucj'
     },
     {

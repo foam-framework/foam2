@@ -9,7 +9,6 @@ foam.CLASS({
   extends: 'foam.u2.wizard.BaseWizardlet',
 
   imports: [
-    'capable',
     'crunchController'
   ],
 
@@ -27,11 +26,6 @@ foam.CLASS({
       expression: function (capability) {
         return 'capability,' + capability.id;
       }
-    },
-    {
-      name: 'targetPayload',
-      class: 'FObjectProperty',
-      of: 'foam.nanos.crunch.lite.CapablePayload'
     },
 
     // Properties for WizardSection interface
@@ -72,7 +66,7 @@ foam.CLASS({
     {
       name: 'dataController',
       factory: function () {
-        return this.CapableWizardletDataController.create();
+        return this.CapableWizardletDataController.create({}, this.__context__);
       }
     }
   ]

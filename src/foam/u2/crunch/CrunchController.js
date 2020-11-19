@@ -109,6 +109,7 @@ foam.CLASS({
         .add(this.ConfigureFlowAgent)
         .add(this.CapableDefaultConfigAgent)
         .add(this.CapableCreateWizardletsAgent)
+        .add(this.LoadWizardletsAgent)
         .add(this.StepWizardAgent)
         .add(this.MaybeDAOPutAgent)
         ;
@@ -242,7 +243,10 @@ foam.CLASS({
     function getWizardletsFromCapable(capable) {
       return this.Sequence.create(null, this.__subContext__.createSubContext({
         capable: capable
-      })).add(this.CapableCreateWizardletsAgent).execute().then(x => x.wizardlets);
+      }))
+        .add(this.CapableCreateWizardletsAgent)
+        .add(this.LoadWizardletsAgent)
+        .execute().then(x => x.wizardlets);
     }
   ]
 });

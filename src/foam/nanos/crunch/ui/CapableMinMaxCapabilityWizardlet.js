@@ -53,10 +53,10 @@ foam.CLASS({
       expression: function(choiceWizardlets){
         return choiceWizardlets.map(wizardlet => {
 
-          var isFinal = wizardlet.targetPayload.status !== null &&
+          var isFinal = wizardlet.status !== null &&
             (
-              wizardlet.targetPayload.status === this.CapabilityJunctionStatus.GRANTED ||
-              wizardlet.targetPayload.status === this.CapabilityJunctionStatus.PENDING
+              wizardlet.status === this.CapabilityJunctionStatus.GRANTED ||
+              wizardlet.status === this.CapabilityJunctionStatus.PENDING
             );
 
           return [wizardlet.title, wizardlet.title, isFinal ? true : wizardlet.isAvailable$, isFinal ?  foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW, isFinal]
@@ -88,16 +88,7 @@ foam.CLASS({
         if ( !n ){
           this.choiceWizardlets.forEach(cw => {
             cw.isAvailable = false
-            
-            this.capable.getCapablePayloadDAO().remove(
-              cw.targetPayload).then(() => {
-                this.capabilityDAO.find(cw.targetPayload.capability).then(cap => {
-                  console.log('CANCELLED ' +
-                    cap.name
-                  );
-                })
-              }
-            );
+            cw.cancel();
           });
 
           this.cancel();
@@ -116,7 +107,7 @@ foam.CLASS({
         return [
           this.WizardletSection.create({
             isAvailable: true,
-            title: this.targetPayload.capability,
+            title: this.capability,
             customView: {
               class: 'foam.u2.view.MultiChoiceView',
               choices$: this.choices$,

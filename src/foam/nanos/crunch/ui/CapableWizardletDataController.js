@@ -1,19 +1,30 @@
 foam.CLASS({
   package: 'foam.nanos.crunch.ui',
   name: 'CapableWizardletDataController',
+  extends: 'foam.u2.wizard.WizardletDataController',
 
   imports: [
+    'capable',
     'crunchService'
+  ],
+
+  requires: [
+    'foam.nanos.crunch.ui.CapabilityWizardlet'
   ],
 
   properties: [
     {
+      name: 'targetPayload',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.crunch.lite.CapablePayload'
+    },
+    {
       name: 'save',
       class: 'Function',
-      value: async wizardlet => {
+      value: async function (wizardlet) {
         if ( wizardlet.isAvailable ){
-          return wizardlet.capable.getCapablePayloadDAO().put(
-            wizardlet.targetPayload
+          return this.capable.getCapablePayloadDAO().put(
+            this.targetPayload
           );
         }
       }
@@ -21,10 +32,19 @@ foam.CLASS({
     {
       name: 'cancel',
       class: 'Function',
-      value: async wizardlet => {
-        return wizardlet.capable.getCapablePayloadDAO().remove(
-          wizardlet.targetPayload
+      value: async function (wizardlet) {
+        return this.capable.getCapablePayloadDAO().remove(
+          this.targetPayload
         );
+      }
+    },
+    {
+      name: 'load',
+      class: 'Function',
+      value: async function (wizardlet) {
+        if ( this.CapabilityWizardlet.isInstance(wizardlet) ) {
+          wizardlet.status = this.targetPayload.status;
+        }
       }
     }
   ]
