@@ -56,6 +56,7 @@ foam.CLASS({
 
       if ( ! shouldOpen ) {
         var updateJunctionPromises = capabilitiesNeeded.map(capa => {
+          if ( Array.isArray(capa) ) return Promise.resolve();
           return this.crunchService.updateJunction(null, capa.id, null, null);
         })
         

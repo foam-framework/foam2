@@ -18,6 +18,10 @@ foam.CLASS({
     'localeDAO'
   ],
 
+  requires: [
+    'foam.nanos.crunch.ui.UCJWizardletDataController',
+  ],
+
   properties: [
     // Properties specific to CapabilityWizardSection
     {
@@ -64,20 +68,11 @@ foam.CLASS({
         if ( ! capability || ! capability.name ) return '';
         return capability.name;
       }
-    }
-  ],
-
-  methods: [
+    },
     {
-      name: 'save',
-      code: function() {
-        if ( ! this.isAvailable ) return Promise.resolve();
-        return this.crunchService.updateJunction(
-          null, this.capability.id, this.data, null
-        ).then((ucj) => {
-          this.crunchService.pub('updateJunction');
-          return ucj;
-        });
+      name: 'dataController',
+      factory: function () {
+        return this.UCJWizardletDataController.create();
       }
     }
   ]

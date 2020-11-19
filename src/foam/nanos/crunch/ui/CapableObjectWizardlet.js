@@ -14,10 +14,7 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.core.Action',
-    'foam.core.Property',
-    'foam.layout.Section',
-    'foam.layout.SectionAxiom'
+    'foam.nanos.crunch.ui.CapableWizardletDataController'
   ],
 
   properties: [
@@ -71,30 +68,11 @@ foam.CLASS({
         if ( nu ) this.save();
         else this.cancel();
       }
-    }
-  ],
-
-  methods: [
-    {
-      name: 'save',
-      code: async function() {
-        if ( this.isAvailable ){
-          return this.capable.getCapablePayloadDAO().put(
-            this.targetPayload).then(() => {
-              console.log('SAVED ' +
-                this.targetPayload.capability);
-            });
-        }
-      }
     },
     {
-      name: 'cancel',
-      code: async function() {
-        return this.capable.getCapablePayloadDAO().remove(
-          this.targetPayload).then(() => {
-            console.log('CANCELLED ' +
-              this.targetPayload.capability);
-          });
+      name: 'dataController',
+      factory: function () {
+        return this.CapableWizardletDataController.create();
       }
     }
   ]
