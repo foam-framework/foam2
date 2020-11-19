@@ -69,19 +69,7 @@ public class SessionServerBox
               if ( st.hasMoreTokens() ) {
                 sessionID = st.nextToken();
                 if ( sessionID != null ) {
-                  session = (Session) sessionDAO.find(sessionID);
-                  if ( session == null ) {
-                    // test and use non-clustered medusa sessions
-                    DAO internalSessionDAO = (DAO) getX().get("internalSessionDAO");
-                    if ( internalSessionDAO != null ) {
-                      session = (Session) internalSessionDAO.find(sessionID);
-                      if ( session != null ) {
-                        logger.debug("Using internalSessionDAO");
-                        session.setClusterable(false);
-                        sessionDAO = internalSessionDAO;
-                      }
-                    }
-                  }
+                  logger.debug("send", "sessionID from HttpServetRequest", sessionID);
                 }
               } else {
                 logger.warning("send", "Authorization: "+authType+" token not found.");
@@ -100,19 +88,35 @@ public class SessionServerBox
             }
           }
         }
+      } else {
+        sessionID = (String) msg.getAttributes().get("sessionId");
+        if ( sessionID != null ) {
+          logger.debug("send", "sessionID from Message", sessionID);
+        }
+      }
+
+      if ( sessionID == null && authenticate_ ) {
+        msg.replyWithException(new IllegalArgumentException("sessionId required for authenticated services"));
+        return;
+      }
+
+      // test and use non-clustered medusa sessions
+      DAO internalSessionDAO = (DAO) getX().get("internalSessionDAO");
+      if ( internalSessionDAO != null ) {
+        session = (Session) internalSessionDAO.find(sessionID);
+        if ( session != null ) {
+          logger.debug("Session found in internalSessionDAO", session.getId(), "user.id", session.getUserId());
+          session = (Session) session.fclone();
+          session.setClusterable(false);
+          //          sessionDAO = internalSessionDAO;
+        }
       }
 
       if ( session == null ) {
-        if ( sessionID == null ) {
-          sessionID = (String) msg.getAttributes().get("sessionId");
+        session = (Session) sessionDAO.find(sessionID);
+        if ( session != null ) {
+          logger.debug("Session found in sessionDAO", session.getId(), session.getUserId());
         }
-
-        if ( sessionID == null && authenticate_ ) {
-          msg.replyWithException(new IllegalArgumentException("sessionid required for authenticated services"));
-          return;
-        }
-
-        session = sessionID == null ? null : (Session) sessionDAO.find(sessionID);
       }
 
       if ( session == null ) {
