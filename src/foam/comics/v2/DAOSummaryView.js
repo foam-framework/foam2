@@ -62,7 +62,7 @@ foam.CLASS({
   exports: [
     'controllerMode',
     'as objectSummaryView',
-    'currentMemento as memento'
+    'memento'
   ],
 
   properties: [
@@ -148,7 +148,8 @@ foam.CLASS({
       code: function() {
         if ( ! this.stack ) return;
 
-        this.currentMemento = this.Memento.create({ head: 'Edit' });
+        if ( ! this.currentMemento || this.currentMemento.head !== 'Edit' )
+          this.currentMemento = this.Memento.create({ head: 'Edit' });
 
         this.stack.push({
           class:  'foam.comics.v2.DAOUpdateView',
@@ -240,7 +241,7 @@ foam.CLASS({
       promise.then(d => {
         if ( d ) self.data = d;
         //id for memento
-        if ( self.memento.tail && self.currentMemento.head === 'Edit' ) {
+        if ( self.memento.tail && self.currentMemento.head === 'Edit' ) {//fix me
           self.edit();
         }
 
