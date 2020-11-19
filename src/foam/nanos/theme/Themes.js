@@ -185,6 +185,7 @@ Later themes:
             if ( ! SafetyUtil.isEmpty(group.getDefaultMenu()) ) {
               theme.setDefaultMenu(group.getDefaultMenu());
             }
+            break;
           } else {
             group = (Group) groupDAO.find(group.getParent());
           }
