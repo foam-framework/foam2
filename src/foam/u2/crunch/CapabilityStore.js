@@ -140,11 +140,12 @@ foam.CLASS({
       `,
       expression: function(hideGrantedCapabilities, grantedCapabilities) {
         var predicate = this.EQ(this.Capability.VISIBLE, true);
-        if ( hideGrantedCapabilities )
+        if ( hideGrantedCapabilities && grantedCapabilities.length > 0 ) {
           predicate = this.AND(
             predicate,
             this.NOT(this.IN(this.Capability.ID, grantedCapabilities))
           );
+        }
         return this.capabilityDAO
           .where(predicate);
       }
