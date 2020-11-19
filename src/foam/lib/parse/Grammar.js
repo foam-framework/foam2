@@ -51,6 +51,22 @@ return temp;
       `
     },
     {
+      name: 'parseSb',
+      type: 'foam.lib.parse.PStream',
+      args: [
+        { name: 'str', type: 'StringBuilder' },
+        { name: 'optName', type: 'String' }
+      ],
+      javaCode: `
+if ( optName == null || "".equals(optName) ) optName = "START";
+StringPStream ps = new StringPStream();
+ps.setString(str);
+ParserContext parserX = new ParserContextImpl();
+PStream temp = ps.apply((Parser)getSymbols().get(optName), parserX);
+return temp;
+      `
+    },
+    {
       name: 'sym',
       args: [ { name: 'name', type: 'String' } ],
       type: 'foam.lib.parse.Parser',
