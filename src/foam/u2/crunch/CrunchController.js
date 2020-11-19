@@ -211,14 +211,6 @@ foam.CLASS({
       });
     },
 
-    async function updateUCJ(wizardlet, associatedEntity) {
-      return this.crunchService.getJunction(
-        null, wizardlet.capability.id
-      ).then(ucj => {
-        wizardlet.ucj = ucj;
-        return wizardlet;
-      })
-    },
     function purgeCachedCapabilityDAOs() {
       this.capabilityDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
       this.capabilityDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
