@@ -72,7 +72,7 @@ foam.CLASS({
               prereqWizardlet.isAvailable$.follow(currentWizardlet.isAvailable$);
             }
 
-            updateUcjPromiseList.push(this.updateUCJ(prereqWizardlet, associatedEntity))
+            updateUcjPromiseList.push(prereqWizardlet.load())
           }
         }
       )
@@ -88,9 +88,9 @@ foam.CLASS({
 
       //  in cases of min max, the min max wizard has to appear first before all it's prereqs in order to select appropriately
       if ( isOr ){
-        updateUcjPromiseList.unshift(this.updateUCJ(currentWizardlet, associatedEntity));
+        updateUcjPromiseList.unshift(currentWizardlet.load());
       } else {  
-        updateUcjPromiseList.push(this.updateUCJ(currentWizardlet, associatedEntity));
+        updateUcjPromiseList.push(currentWizardlet.load());
       }
         
       return updateUcjPromiseList;
@@ -101,12 +101,6 @@ foam.CLASS({
         this.parseArrayToWizards(this.capabilities, null)
       ).then(wizardlets => {
         this.wizardlets = wizardlets;
-      });
-    },
-    async function updateUCJ(wizardlet, associatedEntity) {
-      return this.crunchService.getJunction(null, wizardlet.capability.id).then(ucj => {
-        wizardlet.ucj = ucj;
-        return wizardlet;
       });
     }
   ]

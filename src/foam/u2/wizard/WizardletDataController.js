@@ -18,6 +18,11 @@ foam.CLASS({
       name: 'cancel',
       class: 'Function',
       value: () => {}
+    },
+    {
+      name: 'load',
+      class: 'Function',
+      value: () => {}
     }
   ]
 });

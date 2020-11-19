@@ -33,6 +33,29 @@ foam.CLASS({
           return ucj;
         });
       }
+    },
+    {
+      name: 'load',
+      class: 'Function',
+      value: function (wizardlet) {
+        return this.crunchService.getJunction(
+          null, wizardlet.capability.id
+        ).then(ucj => {
+          // No 'of'? No problem
+          if ( ! wizardlet.of ) return wizardlet;
+
+          // Load UCJ data to wizardlet
+          var loadedData = wizardlet.of.create({}, wizardlet);
+          if ( ucj && ucj.data ) loadedData.copyFrom(ucj.data);
+
+          // Set transient 'capability' property if it exists
+          var prop = wizardlet.of.getAxiomByName('capability');
+          if ( prop ) prop.set(loadedData, wizardlet.capability);
+
+          // Finally, apply new data to wizardlet
+          wizardlet.data = loadedData;
+        });
+      }
     }
   ]
 });

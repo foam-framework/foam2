@@ -120,6 +120,10 @@ foam.CLASS({
     },
     async function cancel() {
       return await this.dataController.cancel(this);
+    },
+    async function load() {
+      await this.dataController.load(this);
+      return this;
     }
   ]
 });

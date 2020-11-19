@@ -48,18 +48,7 @@ foam.CLASS({
     },
     {
       name: 'data',
-      flags: ['web'],
-      factory: function() {
-        if ( ! this.of ) return null;
-
-        var ret = this.of.create({}, this);
-        if ( this.ucj && this.ucj.data ) ret.copyFrom(this.ucj.data);
-
-        var prop = this.of.getAxiomByName('capability');
-        if ( prop ) prop.set(ret, this.capability);
-
-        return ret;
-      }
+      flags: ['web']
     },
     {
       name: 'title',
