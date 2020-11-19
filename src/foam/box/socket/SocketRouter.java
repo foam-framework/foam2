@@ -22,7 +22,6 @@ import foam.dao.SessionDAOSkeleton;
 import foam.lib.json.JSONParser;
 import foam.nanos.boot.NSpec;
 import foam.nanos.boot.NSpecAware;
-import foam.nanos.http.AuthWebAgent;
 import foam.nanos.http.NanoRouter;
 import foam.nanos.http.WebAgent;
 import foam.nanos.logger.PrefixLogger;
