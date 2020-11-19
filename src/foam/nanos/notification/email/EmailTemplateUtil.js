@@ -139,19 +139,19 @@ foam.CLASS({
             Object[] valArr = (Object[]) val;
             StringBuilder ifCond = new StringBuilder();
             Object[] val0 = (Object[]) valArr[0];
-            for ( int i= 0; i < val0.length; i++ ) {
+            for ( int i = 0 ; i < val0.length ; i++ ) {
               if ( ! Character.isWhitespace((char)val0[i]) ) ifCond.append(val0[i]);
             }
 
             StringBuilder finalVal = new StringBuilder();
             if ( getValues().get(ifCond.toString() ) != null ) {
               Object[] val1 = (Object[]) valArr[1];
-              for ( int i= 0; i < val1.length; i++ ) {
+              for ( int i = 0 ; i < val1.length ; i++ ) {
                 finalVal.append(val1[i]);
               }
             } else {
               Object[] val2 = (Object[]) valArr[2];
-              for ( int i= 0; i < val2.length; i++ ) {
+              for ( int i = 0 ; i < val2.length ; i++ ) {
                 finalVal.append(val2[i]);
               }
             }
@@ -191,14 +191,14 @@ foam.CLASS({
             Object[] valArr = (Object[]) val;
             StringBuilder ifCond = new StringBuilder();
             Object[] val0 = (Object[]) valArr[0];
-            for ( int i= 0; i < val0.length; i++ ) {
+            for ( int i = 0 ; i < val0.length ; i++ ) {
               if ( ! Character.isWhitespace((char)val0[i]) ) ifCond.append(val0[i]);
             }
 
             StringBuilder finalVal = new StringBuilder();
             if ( getValues().get(ifCond.toString() ) != null ) {
               Object[] val1 = (Object[]) valArr[1];
-              for ( int i= 0; i < val1.length; i++ ) {
+              for ( int i = 0 ; i < val1.length ; i++ ) {
                 finalVal.append(val1[i]);
               }
               StringPStream finalValPs = new StringPStream();
@@ -294,7 +294,7 @@ foam.CLASS({
           if ( val == null ) return val;
           Object[] valArr = (Object[]) val;
           StringBuilder templateName = new StringBuilder();
-          for ( int i= 0; i < valArr.length; i++ ) {
+          for ( int i = 0 ; i < valArr.length ; i++ ) {
             templateName.append(valArr[i]);
           }
           setExtendedEmailTemplate((EmailTemplate) ((DAO) x_.get("emailTemplateDAO")).find(EQ(EmailTemplate.NAME,templateName.toString())));
@@ -329,7 +329,7 @@ foam.CLASS({
         @Override
         public Object execute(Object val, ParserContext x) {
         Object[] valArr = (Object[]) val;
-          for ( int i = 0; i < valArr.length; i++ ) {
+          for ( int i = 0 ; i < valArr.length ; i++ ) {
             getBlockContentSb().append(valArr[i]);
           }
           return val;
