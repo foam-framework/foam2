@@ -101,7 +101,7 @@ public class SessionServerBox
           }
         }
       }
-      //logger.info("session", session != null,  "sessionID", sessionID);
+
       if ( session == null ) {
         if ( sessionID == null ) {
           sessionID = (String) msg.getAttributes().get("sessionId");
