@@ -22,7 +22,7 @@ p({
   "serviceClass": "foam.nanos.http.UptimeWebAgent"
 })
 
- p({
+p({
   "class": "foam.nanos.boot.NSpec",
   "name": "trace",
   "authenticate": false,
