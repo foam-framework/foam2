@@ -62,7 +62,8 @@ foam.CLASS({
   ],
 
   exports: [
-    'controllerMode'
+    'controllerMode',
+    'currentMemento as memento'
   ],
 
   messages: [
@@ -97,7 +98,8 @@ foam.CLASS({
       expression: function() {
         return foam.u2.detail.SectionedDetailView;
       }
-    }
+    },
+    'currentMemento'
   ],
 
   actions: [
@@ -107,7 +109,7 @@ foam.CLASS({
         return ! workingData$errors_;
       },
       code: function() {
-        this.memento.tail.tail$.set(null);
+        this.memento.tail$.set(null);
 
         this.config.dao.put(this.workingData).then((o) => {
           if ( ! this.data.equals(o) ) {
@@ -143,17 +145,24 @@ foam.CLASS({
     },
     {
       name: 'back',
-      code: function(X) {
-        if ( X.memento.tail && X.memento.tail.tail )
-          X.memento.tail.tail = null;
-        X.stack.back();
+      code: function() {
+        if ( this.memento.tail ) //this will now work
+          this.memento.tail$.set(null);
+        this.stack.back();
       }
     }
   ],
   methods: [
+    // function back() {
+    //   if ( this.memento.tail && this.memento.tail ) //this will now work
+    //     this.memento.tail$.set(null);
+    //   this.stack.back();
+    // },
     function initE() {
       var self = this;
       this.SUPER();
+
+      this.currentMemento$ = this.memento.tail$;
 
       this
         .addClass(this.myClass())
@@ -162,7 +171,7 @@ foam.CLASS({
             .start(self.Rows)
               .start(self.Rows)
                 // we will handle this in the StackView instead
-                .startContext({ data: self.stack })
+                .startContext({ data: self })
                   .tag(self.BACK, {
                     buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                     icon: 'images/back-icon.svg',

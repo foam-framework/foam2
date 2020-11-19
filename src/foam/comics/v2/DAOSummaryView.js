@@ -62,10 +62,7 @@ foam.CLASS({
   exports: [
     'controllerMode',
     'as objectSummaryView',
-    'memento'//will not work for 
-    //need to export memento.tail
-    //for children scroll tables
-    //but if so DAOUpdateView doesn't work
+    'currentMemento as memento'
   ],
 
   properties: [
@@ -123,7 +120,7 @@ foam.CLASS({
     {
       name: 'back',
       code: function(X, data) {
-        X.memento.tail$.set(null);//fix me 
+        X.memento$.set(null);//fix me 
         X.onBack();
       }
     },
