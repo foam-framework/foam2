@@ -11,7 +11,7 @@ package foam.nanos.auth;
  */
 public class AuthenticationException extends SecurityException {
   public AuthenticationException() {
-    super("User is not logged in.");
+    super("Not logged in");
   }
   public AuthenticationException(String message) {
     super(message);
