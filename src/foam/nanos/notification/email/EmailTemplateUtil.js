@@ -110,7 +110,7 @@ foam.CLASS({
 
         /* IF_ELSE syntax: "qwerty {% if var_name_provided_in_map %} qwer {{ possible_simple_value }} erty
         {% else %} qwerty {% endif %}" */
-        Parser ifElseParser = new Seq3(4, 7, 13,
+        Parser ifElseParser = new SeqI(new int[] { 4, 7, 13 },
           Literal.create("{%"),
           Whitespace.instance(),
           Literal.create("if"),

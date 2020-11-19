@@ -6,30 +6,26 @@
 
 package foam.lib.parse;
 
-public class Seq3
+public class SeqI
   implements Parser
 {
   private Parser[] parsers;
-  private int      index1;
-  private int      index2;
-  private int      index3;
+  private int[] indices;
 
-  public Seq3(int i, int j, int k,  Parser... args) {
+  public SeqI(int[] indexes,  Parser... args) {
     parsers = args;
-    index1  = i;
-    index2  = j;
-    index3 = k;
+    indices = indexes;
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    Object[] value = new Object[3];
+    Object[] value = new Object[indices.length];
 
     for ( int i = 0 ; i < parsers.length ; i++ ) {
       ps = ps.apply(parsers[i], x);
       if ( ps == null ) return null;
-      if ( i == index1 ) value[0] = ps.value();
-      if ( i == index2 ) value[1] = ps.value();
-      if ( i == index3 ) value[2] = ps.value();
+      for ( int j = 0; j < indices.length; j++ ) {
+        if ( i == indices[j] ) value[j] = ps.value();
+      }
     }
 
     return ps.setValue(value);
