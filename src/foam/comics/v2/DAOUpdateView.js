@@ -107,7 +107,7 @@ foam.CLASS({
         return ! workingData$errors_;
       },
       code: function() {
-        this.memento.tail$.set(null);
+        this.memento.tail.tail$.set(null);
 
         this.config.dao.put(this.workingData).then((o) => {
           if ( ! this.data.equals(o) ) {
@@ -144,7 +144,8 @@ foam.CLASS({
     {
       name: 'back',
       code: function(X) {
-        X.memento.tail = null;
+        if ( X.memento.tail && X.memento.tail.tail )
+          X.memento.tail.tail = null;
         X.stack.back();
       }
     }
