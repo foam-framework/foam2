@@ -177,15 +177,17 @@ Later themes:
       if ( user != null ) {
         DAO groupDAO = (DAO) x.get("groupDAO");
         Group group = user.findGroup(x);
-        while ( group != null ) {
-          Theme groupTheme = group.findTheme(x);
+        Theme groupTheme = null;
+        while ( groupTheme == null &&  group != null) {
+          groupTheme = group.findTheme(x);
           if ( groupTheme != null ) {
             theme = (Theme) theme.fclone().copyFrom(groupTheme);
             if ( ! SafetyUtil.isEmpty(group.getDefaultMenu()) ) {
               theme.setDefaultMenu(group.getDefaultMenu());
             }
+          } else {
+            group = (Group) groupDAO.find(group.getParent());
           }
-          group = (Group) groupDAO.find(group.getParent());
         }
         Theme userTheme = user.findTheme(x);
         if ( userTheme != null ) {
