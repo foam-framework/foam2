@@ -429,7 +429,6 @@ foam.RELATIONSHIP({
   },
   targetProperty: {
     hidden: false,
-    tableWidth: 120,
-    section: 'administrative'
+    tableWidth: 120
   }
 });

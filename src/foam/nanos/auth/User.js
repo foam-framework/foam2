@@ -79,17 +79,14 @@ foam.CLASS({
 
   sections: [
     {
-      name: 'business',
-      title: 'Business Information'
+      name: 'userInformation',
+      title: 'User Information',
+      order: 1
     },
     {
-      name: 'personal',
-      title: 'Personal Information'
-    },
-    {
-      name: 'administrative',
-      help: 'Properties that are used internally by the system.',
-      permissionRequired: true
+      name: 'businessInformation',
+      title: 'Business Information',
+      order: 2
     },
     {
       name: 'complianceInformation',
@@ -117,6 +114,7 @@ foam.CLASS({
     },
     {
       name: 'systemInformation',
+      help: 'Properties that are used internally by the system.',
       title: 'System Information'
     }
   ],
@@ -139,7 +137,8 @@ foam.CLASS({
       tableWidth: 100,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'business',
+      section: 'userInformation',
+      order: 1,
       includeInDigest: true,
       sheetsOutput: true
     },
@@ -148,7 +147,7 @@ foam.CLASS({
       name: 'enabled',
       documentation: 'Determines whether the User is permitted certain actions.',
       value: true,
-      section: 'administrative'
+      section: 'systemInformation'
     },
     {
       class: 'Boolean',
@@ -156,7 +155,7 @@ foam.CLASS({
       documentation: 'Determines whether the User can login to the platform.',
       writePermissionRequired: true,
       value: true,
-      section: 'administrative'
+      section: 'systemInformation'
     },
     {
       class: 'DateTime',
@@ -172,7 +171,8 @@ foam.CLASS({
       shortName: 'fn',
       documentation: 'The first name of the User.',
       gridColumns: 4,
-      section: 'personal',
+      section: 'userInformation',
+      order: 2,
       includeInDigest: true
    },
     {
@@ -180,7 +180,8 @@ foam.CLASS({
       name: 'middleName',
       documentation: 'The middle name of the User.',
       gridColumns: 4,
-      section: 'personal',
+      section: 'userInformation',
+      order: 3,
       includeInDigest: true
     },
     {
@@ -189,18 +190,21 @@ foam.CLASS({
       shortName: 'ln',
       documentation: 'The last name of the User.',
       gridColumns: 4,
-      section: 'personal',
+      section: 'userInformation',
+      order: 4,
       includeInDigest: true
     },
     {
       name: 'legalName',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'personal'
+      section: 'userInformation',
+      order: 5
     },
    {
       class: 'String',
       name: 'jobTitle',
+      documentation: 'The job title of the individual person, or real user.',
       section: 'ownerInformation',
       view: function(args, X) {
         return {
@@ -224,7 +228,7 @@ foam.CLASS({
       displayWidth: 80,
       width: 100,
       tableWidth: 160,
-      section: 'business'
+      section: 'businessInformation'
     },
     {
       class: 'String',
@@ -240,7 +244,7 @@ foam.CLASS({
       name: 'userName',
       label: 'Username',
       documentation: 'The username of the User.',
-      section: 'personal'
+      section: 'userInformation'
     },
     {
       class: 'EMail',
@@ -256,14 +260,15 @@ foam.CLASS({
       javaSetter:
       `email_ = val.toLowerCase();
        emailIsSet_ = true;`,
-      section: 'personal'
+      section: 'userInformation',
+      order: 6
     },
     {
       class: 'Boolean',
       name: 'emailVerified',
       documentation: 'Determines whether the email address of the User is valid.',
       writePermissionRequired: true,
-      section: 'administrative'
+      section: 'systemInformation'
     },
     {
       class: 'FObjectProperty',
@@ -275,19 +280,19 @@ foam.CLASS({
       },
       view: { class: 'foam.u2.detail.VerticalDetailView' },
       visibility: 'HIDDEN',
-      section: 'personal'
+      section: 'userInformation'
     },
     {
       class: 'PhoneNumber',
       name: 'phoneNumber',
       documentation: 'Personal phone number.',
-      section: 'personal'
+      section: 'userInformation'
     },
     {
       class: 'Boolean',
       name: 'phoneNumberVerified',
       writePermissionRequired: true,
-      section: 'personal'
+      section: 'userInformation'
     },
     {
       class: 'FObjectProperty',
@@ -298,7 +303,7 @@ foam.CLASS({
         return this.Phone.create();
       },
       view: { class: 'foam.u2.detail.VerticalDetailView' },
-      section: 'personal',
+      section: 'userInformation',
       visibility: 'HIDDEN',
       includeInDigest: true
     },
@@ -307,13 +312,13 @@ foam.CLASS({
       name: 'mobileNumber',
       documentation: 'Returns the mobile phone number of the User from the Phone model.',
       createVisibility: 'HIDDEN',
-      section: 'personal'
+      section: 'userInformation'
     },
     {
       class: 'Boolean',
       name: 'mobileNumberVerified',
       writePermissionRequired: true,
-      section: 'personal'
+      section: 'userInformation'
     },
     {
       class: 'String',
@@ -330,13 +335,13 @@ foam.CLASS({
       `,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'business'
+      section: 'userInformation'
     },
     {
       class: 'Date',
       name: 'birthday',
       documentation: 'The date of birth of the individual person, or real user.',
-      section: 'personal'
+      section: 'userInformation'
     },
     {
       class: 'foam.nanos.fs.FileProperty',
@@ -347,7 +352,7 @@ foam.CLASS({
         class: 'foam.nanos.auth.ProfilePictureView',
         placeholderImage: 'images/ic-placeholder.png'
       },
-      section: 'personal'
+      section: 'userInformation'
     },
     {
       class: 'FObjectProperty',
@@ -357,7 +362,7 @@ foam.CLASS({
       factory: function() {
         return this.Address.create();
       },
-      section: 'personal'
+      section: 'userInformation'
     },
     {
       class: 'Reference',
@@ -365,7 +370,7 @@ foam.CLASS({
       documentation: 'The default language preferred by the User.',
       of: 'foam.nanos.auth.Language',
       createVisibility: 'HIDDEN',
-      section: 'personal',
+      section: 'userInformation',
       factory: function() {
         return foam.nanos.auth.LanguageId.create({code: 'en'})
       },
@@ -379,8 +384,7 @@ foam.CLASS({
       documentation: 'The preferred time zone of the User.',
       width: 5,
       createVisibility: 'HIDDEN',
-      section: 'personal'
-      // TODO: create custom view or DAO
+      section: 'userInformation'
     },
     {
       class: 'Password',
@@ -401,7 +405,7 @@ foam.CLASS({
       createVisibility: 'RW',
       updateVisibility: 'RW',
       readVisibility: 'HIDDEN',
-      section: 'administrative'
+      section: 'systemInformation'
     },
     {
       class: 'Password',
@@ -409,7 +413,7 @@ foam.CLASS({
       documentation: 'The password that is currently active with the User.',
       hidden: true,
       networkTransient: true,
-      section: 'administrative',
+      section: 'systemInformation',
       includeInDigest: true
     },
     {
@@ -425,7 +429,7 @@ foam.CLASS({
       `,
       hidden: true,
       networkTransient: true,
-      section: 'administrative',
+      section: 'systemInformation',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO'
     },
@@ -435,7 +439,7 @@ foam.CLASS({
       documentation: 'The password that was previously active with the User.',
       hidden: true,
       networkTransient: true,
-      section: 'administrative'
+      section: 'systemInformation'
     },
     {
       class: 'DateTime',
@@ -443,14 +447,14 @@ foam.CLASS({
       documentation: 'The date and time that the password was last modified.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative'
+      section: 'systemInformation'
     },
     {
       class: 'DateTime',
       name: 'passwordExpiry',
       documentation: `The date and time that the current password of the User
         will expire.`,
-      section: 'administrative'
+      section: 'systemInformation'
     },
     // TODO: startDate, endDate,
     // TODO: do we want to replace 'note' with a simple ticket system?
@@ -460,7 +464,7 @@ foam.CLASS({
       documentation: 'A field for a note that can be added and appended to the User.',
       displayWidth: 70,
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 },
-      section: 'business'
+      section: 'userInformation'
     },
     // TODO: remove after demo
     {
@@ -468,7 +472,7 @@ foam.CLASS({
       name: 'businessName',
       documentation: 'The name of the business associated with the User.',
       width: 50,
-      section: 'business',
+      section: 'businessInformation',
       visibility: 'HIDDEN',
       tableWidth: 170
     },
@@ -489,6 +493,7 @@ foam.CLASS({
       javaType: 'java.util.HashSet',
       hidden: true,
       transient: true,
+      section: 'operationsInformation',
       factory: function() { return {}; },
       javaFactory: `
         HashSet<String> set = new HashSet<>();
@@ -512,7 +517,7 @@ foam.CLASS({
         }
       },
       createVisibility: 'HIDDEN',
-      section: 'personal'
+      section: 'userInformation'
     },
     {
       class: 'DateTime',
@@ -520,7 +525,7 @@ foam.CLASS({
       documentation: 'The date and time of when the User was created in the system.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative',
+      section: 'userInformation',
       includeInDigest: true
     },
     {
@@ -529,7 +534,7 @@ foam.CLASS({
       documentation: 'The date and time the User was last modified.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'business'
+      section: 'userInformation'
     },
     {
       class: 'foam.core.Enum',
