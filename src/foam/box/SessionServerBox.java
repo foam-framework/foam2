@@ -68,9 +68,6 @@ public class SessionServerBox
             if ( HTTPAuthorizationType.BEARER.getName().equalsIgnoreCase(authType) ) {
               if ( st.hasMoreTokens() ) {
                 sessionID = st.nextToken();
-                // if ( sessionID != null ) {
-                //   logger.debug("send", "sessionID from HttpServetRequest", sessionID);
-                // }
               } else {
                 logger.warning("send", "Authorization: "+authType+" token not found.");
                 msg.replyWithException(new IllegalArgumentException("Authorization: "+authType+ " token not found."));
@@ -88,11 +85,9 @@ public class SessionServerBox
             }
           }
         }
-      } else {
+      }
+      if ( sessionID == null ) {
         sessionID = (String) msg.getAttributes().get("sessionId");
-        if ( sessionID != null ) {
-          logger.debug("send", "sessionID from Message", sessionID);
-        }
       }
 
       if ( sessionID == null && authenticate_ ) {
@@ -105,18 +100,13 @@ public class SessionServerBox
       if ( internalSessionDAO != null ) {
         session = (Session) internalSessionDAO.find(sessionID);
         if ( session != null ) {
-          // logger.debug("Session found in internalSessionDAO", session.getId(), "user.id", session.getUserId());
           session = (Session) session.fclone();
           session.setClusterable(false);
-          //          sessionDAO = internalSessionDAO;
         }
       }
 
       if ( session == null ) {
         session = (Session) sessionDAO.find(sessionID);
-        if ( session != null ) {
-          logger.debug("Session found in sessionDAO", session.getId(), session.getUserId());
-        }
       }
 
       if ( session == null ) {
