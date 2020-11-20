@@ -122,7 +122,13 @@ foam.CLASS({
         class: 'foam.u2.view.FObjectPropertyView',
         readView: { class: 'foam.u2.detail.VerticalDetailView' }
       }
-    }
+    },
+    {
+      documentation: 'Restrict members of this group to particular IP address range',
+      class: 'StringArray',
+      name: 'cidrWhiteList',
+      includeInDigest: true
+    },
     /*
       FUTURE
     {
@@ -136,13 +142,12 @@ foam.CLASS({
   javaImports: [
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'static foam.mlang.MLang.EQ',
     'foam.nanos.app.AppConfig',
     'foam.util.SafetyUtil',
-    'org.eclipse.jetty.server.Request',
-    'javax.security.auth.AuthPermission',
-    'javax.servlet.http.HttpServletRequest',
     'java.util.List',
-    'static foam.mlang.MLang.EQ'
+    'java.net.InetAddress',
+    'javax.security.auth.AuthPermission'
   ],
 
   methods: [
@@ -361,6 +366,64 @@ foam.CLASS({
         }
 
         return ancestor;
+      `
+    },
+    {
+      name: 'validateCidrWhiteList',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaThrows: ['foam.core.ValidationException'],
+      javaCode: `
+      if ( getCidrWhiteList() == null ||
+           getCidrWhiteList().length == 0 ) {
+        return;
+      }
+      javax.servlet.http.HttpServletRequest req = (javax.servlet.http.HttpServletRequest) x.get(javax.servlet.http.HttpServletRequest.class); 
+      if ( req == null ) {
+        return;
+      }
+      String remoteIp = null;
+      String forwardedForHeader = req.getHeader("X-Forwarded-For");
+      if ( ! SafetyUtil.isEmpty(forwardedForHeader) ) {
+        String[] addresses = forwardedForHeader.split(",");
+        remoteIp = addresses[addresses.length -1]; // right most
+      } else {
+        remoteIp = req.getRemoteHost();
+      }
+      byte[] remote = remoteIp.getBytes();
+      boolean match = false;
+      for ( String cidr : getCidrWhiteList() ) {
+        String[] parts = cidr.split("/");
+        String address = parts[0];
+        int maskBits = -1;
+        if ( parts.length == 1 ) {
+          if ( address.equals(remoteIp) ) {
+            match = true;
+            return;
+          }
+        }
+        maskBits = Integer.parseInt(parts[1]);
+        byte[] required = address.getBytes();
+
+        int maskFullBytes = maskBits / 8;
+        byte finalByte = (byte) (0xFF00 >> (maskBits & 0x07));
+
+        for (int i = 0; i < maskFullBytes; i++) {
+          if (remote[i] != required[i]) {
+            throw new foam.core.ValidationException("Restricted IP");
+          }
+        }
+
+        if (finalByte != 0) {
+          if ( (remote[maskFullBytes] & finalByte) != (required[maskFullBytes] & finalByte) ) {
+            throw new foam.core.ValidationException("Restricted IP");
+          }
+        }
+      }
       `
     }
   ]
