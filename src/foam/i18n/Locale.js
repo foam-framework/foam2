@@ -42,9 +42,36 @@ foam.CLASS({
 //     }
     {
       class: 'String',
+      name: 'sourceId'
+    },
+    {
+      class: 'String',
+      name: 'sourcePath',
+    },
+    {
+      class: 'String',
       name: 'source',//path+property+propertyproperty
       documentation: `Reference to model or view property to be translated.
-        Ex. (‘FIRST_NAME’, ‘LAST_NAME’, ‘ORGANIZATION’ …etc)`
+        Ex. (‘FIRST_NAME’, ‘LAST_NAME’, ‘ORGANIZATION’ …etc)`,
+//      storageTransient: true
+//      postSet: function(ol, nu) {
+//        this.source = "11";
+//      }
+    },
+    {
+      class: 'String',
+      name: 'source1',
+      storageTransient: true,
+//      preSet: function (ol, nu){
+//        arr = nu.split(".")
+//        sourceId = arr[arr.length - 1];
+//        sourcePath = nu.substring(0, nu.indexOf("."+ sourceId));
+//      }
+      javaSetter: `
+        String[] arr = val.split("[.]");
+        this.setSourceId(arr[arr.length - 1]);
+        this.setSourcePath(val.substring(0, val.indexOf("."+ this.getSourceId())));
+      `,
     },
     {
       class: 'String',

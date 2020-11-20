@@ -165,8 +165,8 @@ foam.CLASS({
       visibility: function(cmd) {
         return (cmd == 'SELECT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       },
-      value: 1000,
-      max: 1000,
+      value: 10000,
+      max: 10000,
       min: 0
     },
     {
