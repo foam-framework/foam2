@@ -242,6 +242,17 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'getAssociationPredicate',
+      async: true,
+      type: 'foam.mlang.predicate.Predicate',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ]
+    },
+    {
       name: 'getAllJunctionsForUser',
       async: true,
       type: 'UserCapabilityJunction[]',

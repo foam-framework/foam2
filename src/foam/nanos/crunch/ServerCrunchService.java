@@ -206,7 +206,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
   }
 
   public UserCapabilityJunction[] getAllJunctionsForUser(X x) {
-    Predicate associationPredicate = getAssociationPredicate_(x);
+    Predicate associationPredicate = getAssociationPredicate(x);
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
     ArraySink arraySink = (ArraySink) userCapabilityJunctionDAO
       .where(associationPredicate)
@@ -221,7 +221,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     try {
       DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
-      Predicate associationPredicate = getAssociationPredicate_(x);
+      Predicate associationPredicate = getAssociationPredicate(x);
 
       // Check if a ucj implies the subject.realUser has this permission in relation to the user
       var ucj = (UserCapabilityJunction)
@@ -440,7 +440,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return outputPayloads;
   }
 
-  private Predicate getAssociationPredicate_(X x) {
+  public Predicate getAssociationPredicate(X x) {
     Subject subject = (Subject) x.get("subject");
 
     User user = subject.getUser();
