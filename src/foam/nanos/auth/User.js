@@ -279,8 +279,7 @@ foam.CLASS({
         return this.Phone.create();
       },
       view: { class: 'foam.u2.detail.VerticalDetailView' },
-      visibility: 'HIDDEN',
-      section: 'userInformation'
+      section: 'deprecatedInformation'
     },
     {
       class: 'PhoneNumber',
@@ -303,8 +302,7 @@ foam.CLASS({
         return this.Phone.create();
       },
       view: { class: 'foam.u2.detail.VerticalDetailView' },
-      section: 'userInformation',
-      visibility: 'HIDDEN',
+      section: 'deprecatedInformation',
       includeInDigest: true
     },
     {
@@ -473,7 +471,6 @@ foam.CLASS({
       documentation: 'The name of the business associated with the User.',
       width: 50,
       section: 'businessInformation',
-      visibility: 'HIDDEN',
       tableWidth: 170
     },
     {
@@ -491,7 +488,6 @@ foam.CLASS({
       /** @private */
       name: 'disabledTopicSet',
       javaType: 'java.util.HashSet',
-      hidden: true,
       transient: true,
       section: 'operationsInformation',
       factory: function() { return {}; },
@@ -768,8 +764,8 @@ foam.RELATIONSHIP({
   forwardName: 'files',
   inverseName: 'owner',
   sourceProperty: {
-    hidden: true,
-    transient: true
+    transient: true,
+    section: 'systemInformation'
   }
 });
 

@@ -422,14 +422,6 @@ foam.RELATIONSHIP({
 
 foam.CLASS({
   package: 'foam.nanos.crunch',
-  name: 'CRUNCHUserRefinement',
-  refines: 'foam.nanos.auth.User',
-  sections: [{ name: 'capabilities' }]
-});
-
-
-foam.CLASS({
-  package: 'foam.nanos.crunch',
   name: 'CRUNCHThemeRefinement',
   refines: 'foam.nanos.theme.Theme',
 
