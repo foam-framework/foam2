@@ -42,11 +42,13 @@ foam.CLASS({
 //     }
     {
       class: 'String',
-      name: 'sourceId'
+      name: 'sourceId',
+      documentation: 'Id of property which needs to be translated'
     },
     {
       class: 'String',
       name: 'sourcePath',
+      documentation: 'path to property which needs to be translated'
     },
     {
       class: 'String',
@@ -54,18 +56,6 @@ foam.CLASS({
       documentation: `Reference to model or view property to be translated.
         Ex. (‘FIRST_NAME’, ‘LAST_NAME’, ‘ORGANIZATION’ …etc)
         Use it to set sourceId and sourcePath with one string`,
-//      storageTransient: true,
-//      javaSetter: `
-//        if (val != null && !val.trim().isEmpty()) {
-//          String[] arr = val.split("[.]");
-//          this.setSourceId(arr[arr.length - 1]);
-//          this.setSourcePath(val.substring(0, val.indexOf("."+ this.getSourceId())));
-//        }
-//      `,
-    },
-    {
-      class: 'String',
-      name: 'sourceSplit',
       storageTransient: true,
       javaSetter: `
         if (val != null && !val.trim().isEmpty()) {
@@ -73,7 +63,7 @@ foam.CLASS({
           this.setSourceId(arr[arr.length - 1]);
           this.setSourcePath(val.substring(0, val.indexOf("."+ this.getSourceId())));
         }
-      `
+      `,
     },
     {
       class: 'String',
