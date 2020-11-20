@@ -46,7 +46,7 @@ foam.CLASS({
 
           // Load UCJ data to wizardlet
           var loadedData = wizardlet.of.create({}, wizardlet);
-          if ( ucj && ucj.data ) loadedData.copyFrom(ucj.data);
+          if ( ucj.data ) loadedData.copyFrom(ucj.data);
 
           // Set transient 'capability' property if it exists
           var prop = wizardlet.of.getAxiomByName('capability');
@@ -54,6 +54,7 @@ foam.CLASS({
 
           // Finally, apply new data to wizardlet
           wizardlet.data = loadedData;
+          wizardlet.status = ucj.status;
         });
       }
     }

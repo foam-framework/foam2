@@ -9,12 +9,6 @@ foam.CLASS({
   name: 'CapableMinMaxCapabilityWizardlet',
   extends: 'foam.nanos.crunch.ui.CapableObjectWizardlet',
 
-  imports: [
-    'capable',
-    'payload?',
-    'capabilityDAO'
-  ],
-
   requires: [
     'foam.u2.view.MultiChoiceView',
     'foam.u2.view.CardSelectView',
@@ -27,7 +21,7 @@ foam.CLASS({
       of: 'foam.u2.wizard.Wizardlet',
       name: 'choiceWizardlets',
       factory: function() {
-        return []
+        return [];
       }
     },
     {
@@ -52,12 +46,9 @@ foam.CLASS({
       name: 'choices',
       expression: function(choiceWizardlets){
         return choiceWizardlets.map(wizardlet => {
-
-          var isFinal = wizardlet.status !== null &&
-            (
-              wizardlet.status === this.CapabilityJunctionStatus.GRANTED ||
-              wizardlet.status === this.CapabilityJunctionStatus.PENDING
-            );
+          var isFinal =
+            wizardlet.status === this.CapabilityJunctionStatus.GRANTED ||
+            wizardlet.status === this.CapabilityJunctionStatus.PENDING;
 
           return [wizardlet.title, wizardlet.title, isFinal ? true : wizardlet.isAvailable$, isFinal ?  foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW, isFinal]
         })
@@ -107,7 +98,7 @@ foam.CLASS({
         return [
           this.WizardletSection.create({
             isAvailable: true,
-            title: this.capability,
+            title: this.capability.name,
             customView: {
               class: 'foam.u2.view.MultiChoiceView',
               choices$: this.choices$,
@@ -124,7 +115,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function createView(data) {    
+    function createView(data) {
       return this.MultiChoiceView.create({
         choices$: this.choices$,
         booleanView: this.CardSelectView,
