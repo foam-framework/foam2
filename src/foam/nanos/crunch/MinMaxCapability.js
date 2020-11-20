@@ -76,7 +76,7 @@ foam.CLASS({
           Capability cap = (Capability) ccJunction.findTargetId(x);
           if ( ! cap.getEnabled() ) continue;
 
-          // Use `getSubject` method of UCJ when NP-2436 (PR 4248) is merged
+          // Use getSubject method of UCJ when NP-2436 (PR 4248) is merged
           Subject subject = new Subject(x);
           if ( ucj instanceof AgentCapabilityJunction ) {
             subject.setUser((User) userDAO.find(ucj.getSourceId()));
