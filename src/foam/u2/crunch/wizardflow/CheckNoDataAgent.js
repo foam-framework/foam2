@@ -52,7 +52,6 @@ foam.CLASS({
         var filteredCapabilitiesNeeded = capabilitiesNeeded.filter(capa => {
           return foam.nanos.crunch.Capability.isInstance(capa);
         });
-        
         var updateJunctionPromises = filteredCapabilitiesNeeded.map(capa => {
           return this.crunchService.updateJunction(null, capa.id, null, null);
         })
@@ -68,9 +67,9 @@ foam.CLASS({
       var shouldOpen = false;
       array.forEach(capa => {
         if ( foam.nanos.crunch.MinMaxCapability.isInstance(capa) ){
-          if ( ! capa.status === foam.nanos.crunch.CapabilityJunctionStatus.GRANTED ){
-            shouldOpen = true;
-          }
+          // TODO: need js implementation of MinMaxCapability.getPrereqsChainedStatus
+          // and check if that is implied GRANTED then grant the min max too no need for wizard
+          shouldOpen = true;
         }
 
         if ( foam.nanos.crunch.Capability.isInstance(capa) ){
