@@ -44,19 +44,15 @@ foam.CLASS({
   methods: [
     // If Property expressions ever unwrap promises this method can be blank.
     async function execute() {
-      var shouldOpen = false;
-
       var capabilitiesNeeded = await this.crunchService.getGrantPath(null, this.rootCapability.id);
 
-      capabilitiesNeeded.forEach(capa => {
-        if ( capa.of ){
-          shouldOpen = true;
-        }
-      })
+      var shouldOpen = this.shouldOpenCapabilitiesArray(capabilitiesNeeded);
 
       if ( ! shouldOpen ) {
-        var updateJunctionPromises = capabilitiesNeeded.map(capa => {
-          if ( Array.isArray(capa) ) return Promise.resolve();
+        var filteredCapabilitiesNeeded = capabilitiesNeeded.filter(capa => {
+          return foam.nanos.crunch.Capability.isInstance(capa);
+        });
+        var updateJunctionPromises = filteredCapabilitiesNeeded.map(capa => {
           return this.crunchService.updateJunction(null, capa.id, null, null);
         })
         
@@ -65,6 +61,29 @@ foam.CLASS({
 
         return Promise.all(updateJunctionPromises);
       }
+    },
+
+    function shouldOpenCapabilitiesArray(array) {
+      var shouldOpen = false;
+      array.forEach(capa => {
+        if ( foam.nanos.crunch.MinMaxCapability.isInstance(capa) ){
+          // TODO: need js implementation of MinMaxCapability.getPrereqsChainedStatus
+          // and check if that is implied GRANTED then grant the min max too no need for wizard
+          shouldOpen = true;
+        }
+
+        if ( foam.nanos.crunch.Capability.isInstance(capa) ){
+          if (capa.of){
+            shouldOpen = true;
+          }
+        }
+
+        if ( Array.isArray(capa) ){
+          shouldOpen = this.shouldOpenCapabilitiesArray(capa) ? true : shouldOpen;
+        }
+      })
+
+      return shouldOpen;
     }
   ]
 });

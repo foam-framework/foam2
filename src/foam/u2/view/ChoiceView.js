@@ -166,6 +166,11 @@ foam.CLASS({
       name: 'alwaysFloatLabel'
     },
     {
+      class: 'String',
+      name: 'header',
+      documentation: 'if this is set, a custom header will be add to drop down choices'
+    },
+    {
       name: 'view_'
     },
     'feedback_',
@@ -220,7 +225,8 @@ foam.CLASS({
               choices$:         self.choices$,
               placeholder$:     self.placeholder$,
               mode$:            self.mode$,
-              size$:            self.size$
+              size$:            self.size$,
+              header$:          self.header$
             })
               .attrs({ name: self.name })
               .enableClass('selection-made', self.index$.map((index) => index !== -1))
