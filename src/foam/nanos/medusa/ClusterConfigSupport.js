@@ -213,13 +213,19 @@ configuration for contacting the primary node.`,
           ))
         .select(COUNT());
       long c = count.getValue();
-      if ( c < 6 ) {
+      if ( c < 4 ) {
         return 1;
       }
-      if ( c < 12 ) {
+      if ( c < 7 ) {
         return 2;
       }
-      return 3;
+      if ( c < 10 ) {
+        return 3;
+      }
+      if ( c < 15 ) {
+        return 4;
+      }
+      return 5;
       `
     },
     {
