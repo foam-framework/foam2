@@ -872,9 +872,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ui/UCJWizardletDataController" },
   { name: "foam/nanos/crunch/ui/CapableWizardletDataController" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
-  { name: "foam/nanos/crunch/ui/CapableObjectWizardlet" },
   { name: "foam/nanos/crunch/ui/MinMaxCapabilityWizardlet" },
-  { name: "foam/nanos/crunch/ui/CapableMinMaxCapabilityWizardlet" },
 
   { name: "foam/graphics/ZoomMapView" },
   { name: "foam/core/CoreTypesValidationTest" },

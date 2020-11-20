@@ -22,7 +22,8 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.crunch.MinMaxCapability'
+    'foam.nanos.crunch.MinMaxCapability',
+    'foam.nanos.crunch.ui.CapableWizardletDataController'
   ],
 
   properties: [
@@ -106,18 +107,11 @@ foam.CLASS({
 
       let wizardletClass = capability.wizardlet.cls_;
 
-      // Override the default wizardlet class with one that does not
-      //   save to userCapabilityJunction
-      if ( wizardletClass.id == 'foam.nanos.crunch.ui.CapabilityWizardlet' ) {
-        wizardletClass = foam.nanos.crunch.ui.CapableObjectWizardlet;
-      }
-      if ( wizardletClass.id == 'foam.nanos.crunch.ui.MinMaxCapabilityWizardlet' ) {
-        wizardletClass = foam.nanos.crunch.ui.CapableMinMaxCapabilityWizardlet;
-      }
-
       let wizardlet = wizardletClass.create({
         capability: capability,
-        data$: capablePayload.data$
+        data$: capablePayload.data$,
+        dataController: this.CapableWizardletDataController.create(
+          {}, this.__context__)
       }, this);
 
       wizardlet.dataController.targetPayload = capablePayload;

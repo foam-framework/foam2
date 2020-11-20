@@ -9,8 +9,7 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.crunch.ui.CapabilityWizardlet',
-    'foam.nanos.crunch.ui.CapableObjectWizardlet'
+    'foam.nanos.crunch.ui.CapabilityWizardlet'
   ],
 
   properties: [
