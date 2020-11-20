@@ -136,6 +136,12 @@ foam.CLASS({
           throw new AuthenticationException("Invalid Password");
         }
 
+        try {
+          group.validateCidrWhiteList(x);
+        } catch (foam.core.ValidationException e) {
+          throw new AuthenticationException("Access Denied");
+        }
+
         // Freeze user
         user = (User) user.fclone();
         user.freeze();
