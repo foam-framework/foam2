@@ -616,6 +616,7 @@ FOAM_FILES([
   { name: "foam/u2/crunch/CrunchController", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/ConfigureFlowAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/CapabilityAdaptAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/CheckRootIdAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/CheckPendingAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/CheckNoDataAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/LoadCapabilitiesAgent", flags: ['web'] },
