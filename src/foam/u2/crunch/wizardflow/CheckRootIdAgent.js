@@ -8,6 +8,10 @@ foam.CLASS({
   package: 'foam.u2.crunch.wizardflow',
   name: 'CheckRootIdAgent',
 
+  imports: [
+    'rootCapability'
+  ],
+
   implements: [
     'foam.core.ContextAgent',
     'foam.mlang.Expressions'
@@ -19,7 +23,6 @@ foam.CLASS({
       name: 'rootIdsBlacklist',
       factory: function(){
         return [
-
           '554af38a-8225-87c8-dfdf-eeb15f71215f-20'
         ]
       }
