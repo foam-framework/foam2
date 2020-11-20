@@ -1,7 +1,7 @@
 foam.CLASS({
   package: 'foam.nanos.crunch.ui',
   name: 'CapableWizardletDataController',
-  extends: 'foam.u2.wizard.WizardletDataController',
+  implements: [ 'foam.u2.wizard.WizardletDataController' ],
 
   imports: [
     'capable',
@@ -18,49 +18,40 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.crunch.lite.CapablePayload'
     },
-    {
-      name: 'save',
-      class: 'Function',
-      value: async function (wizardlet) {
-        if ( wizardlet.isAvailable ){
-          return this.capable.getCapablePayloadDAO().put(
-            this.targetPayload
-          );
-        }
-      }
-    },
-    {
-      name: 'cancel',
-      class: 'Function',
-      value: async function (wizardlet) {
-        return this.capable.getCapablePayloadDAO().remove(
+  ],
+
+  methods: [
+    async function save(wizardlet) {
+      if ( wizardlet.isAvailable ){
+        return this.capable.getCapablePayloadDAO().put(
           this.targetPayload
         );
       }
     },
-    {
-      name: 'load',
-      class: 'Function',
-      value: async function (wizardlet) {
-        wizardlet.status = this.targetPayload.status;
+    async function cancel(wizardlet) {
+      return this.capable.getCapablePayloadDAO().remove(
+        this.targetPayload
+      );
+    },
+    async function load(wizardlet) {
+      wizardlet.status = this.targetPayload.status;
 
-        // No 'of'? No problem
-        if ( ! wizardlet.of ) return wizardlet;
+      // No 'of'? No problem
+      if ( ! wizardlet.of ) return wizardlet;
 
-        // Load CapablePayload data to wizardlet
-        var loadedData = wizardlet.of.create({}, wizardlet);
-        if ( this.targetPayload.data ) {
-          loadedData.copyFrom(this.targetPayload.data);
-        }
-
-        // Set transient 'capability' property if it exists
-        var prop = wizardlet.of.getAxiomByName('capability');
-        if ( prop ) prop.set(loadedData, wizardlet.capability);
-
-        // Finally, apply new data to wizardlet
-        wizardlet.data = loadedData;
-        return;
+      // Load CapablePayload data to wizardlet
+      var loadedData = wizardlet.of.create({}, wizardlet);
+      if ( this.targetPayload.data ) {
+        loadedData.copyFrom(this.targetPayload.data);
       }
+
+      // Set transient 'capability' property if it exists
+      var prop = wizardlet.of.getAxiomByName('capability');
+      if ( prop ) prop.set(loadedData, wizardlet.capability);
+
+      // Finally, apply new data to wizardlet
+      wizardlet.data = loadedData;
+      return;
     }
   ]
 });

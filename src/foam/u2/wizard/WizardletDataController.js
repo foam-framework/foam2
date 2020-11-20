@@ -1,4 +1,4 @@
-foam.CLASS({
+foam.INTERFACE({
   package: 'foam.u2.wizard',
   name: 'WizardletDataController',
   documentation: `
@@ -8,21 +8,18 @@ foam.CLASS({
     this model should be renamed to CallbackWizardletDataController.
   `,
 
-  properties: [
+  methods: [
     {
       name: 'save',
-      class: 'Function',
-      value: () => {}
+      async: true
     },
     {
       name: 'cancel',
-      class: 'Function',
-      value: () => {}
+      async: true
     },
     {
       name: 'load',
-      class: 'Function',
-      value: () => {}
+      async: true
     }
   ]
 });
