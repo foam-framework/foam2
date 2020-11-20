@@ -73,7 +73,7 @@ foam.CLASS({
         Session session = x.get(Session.class);
         // fetch context and check if not null or user id is 0
         if ( session == null || session.getUserId() == 0 ) {
-          throw new AuthenticationException("Not logged in");
+          throw new AuthenticationException();
         }
         // get user from session id
         User user = (User) ((DAO) getLocalUserDAO()).find(session.getUserId());
@@ -125,7 +125,7 @@ foam.CLASS({
           throw new AuthenticationException("Login disabled");
         }
 
-        // check if group enabled        
+        // check if group enabled
         X userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
         Group group = user.findGroup(userX);
         if ( group != null && ! group.getEnabled() ) {
@@ -136,6 +136,12 @@ foam.CLASS({
           throw new AuthenticationException("Invalid Password");
         }
 
+        try {
+          group.validateCidrWhiteList(x);
+        } catch (foam.core.ValidationException e) {
+          throw new AuthenticationException("Access Denied");
+        }
+
         // Freeze user
         user = (User) user.fclone();
         user.freeze();
@@ -143,17 +149,9 @@ foam.CLASS({
         Session session = x.get(Session.class);
         session.setUserId(user.getId());
 
-        if ( Group.ADMIN_GROUP.equalsIgnoreCase(user.getGroup()) ||
-             check(userX, "*") ) {
-          session.setClusterable(false); 
+        if ( check(userX, "*") ) {
           String msg = "Admin login for " + user.getId() + " succeeded on " + System.getProperty("hostname", "localhost");
           ((foam.nanos.logger.Logger) x.get("logger")).warning(msg);
-          Notification notification = new Notification.Builder(x)
-            .setTemplate("NOC")
-            .setToastMessage(msg)
-            .setBody(msg)
-            .build();
-          ((DAO) x.get("localNotificationDAO")).put(notification);
         }
 
         ((DAO) getLocalSessionDAO()).inX(x).put(session);
@@ -161,16 +159,9 @@ foam.CLASS({
         return user;
       } catch ( AuthenticationException e ) {
         if ( user != null &&
-             ( Group.ADMIN_GROUP.equalsIgnoreCase(user.getGroup()) ||
-               check(userX, "*") ) ) {
+             ( check(x.put("subject", new Subject.Builder(x).setUser(user).build()), "*") ) ) {
           String msg = "Admin login for " + user.getId() + " failed on " + System.getProperty("hostname", "localhost");
           ((foam.nanos.logger.Logger) x.get("logger")).warning(msg);
-          Notification notification = new Notification.Builder(x)
-            .setTemplate("NOC")
-            .setToastMessage(msg)
-            .setBody(msg)
-            .build();
-          ((DAO) x.get("localNotificationDAO")).put(notification);
         }
         throw e;
       }
