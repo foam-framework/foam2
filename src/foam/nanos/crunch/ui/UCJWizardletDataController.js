@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'UCJWizardletDataController',
   implements: [ 'foam.u2.wizard.WizardletDataController' ],
 
+  requires: [
+    'foam.nanos.crunch.CapabilityJunctionStatus'
+  ],
+
   imports: [
     'crunchService'
   ],
@@ -16,8 +20,8 @@ foam.CLASS({
   methods: [
     function save(wizardlet) {
       if ( ! wizardlet.isAvailable ) return Promise.resolve();
-      return this.crunchService.updateJunction(
-        null, wizardlet.capability.id, wizardlet.data, null
+      return this.crunchService.updateJunction( null,
+        wizardlet.capability.id, wizardlet.data, null
       ).then((ucj) => {
         this.crunchService.pub('updateJunction');
         return ucj;
@@ -25,8 +29,8 @@ foam.CLASS({
     },
     function cancel(wizardlet) {
       if ( ! wizardlet.isAvailable ) return Promise.resolve();
-      return this.crunchService.updateJunction(
-        null, wizardlet.capability.id, null, 
+      return this.crunchService.updateJunction( null,
+        wizardlet.capability.id, null, this.CapabilityJunctionStatus.AVAILABLE
       ).then((ucj) => {
         this.crunchService.pub('updateJunction');
         return ucj;
