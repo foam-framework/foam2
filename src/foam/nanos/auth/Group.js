@@ -132,7 +132,9 @@ foam.CLASS({
       }
     },
     {
-      documentation: 'Restrict members of this group to particular IP address range',
+      documentation: `Restrict members of this group to particular IP address range.
+@see https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing
+List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 172 network.`,
       class: 'StringArray',
       name: 'cidrWhiteList',
       includeInDigest: true
