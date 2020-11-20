@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.i18n',
   name: 'Locale',
 
-  ids: ['locale', 'variant', 'source'],
+  ids: ['locale', 'variant', 'sourceId', 'sourcePath'],
 
   implements: [
     'foam.nanos.auth.LastModifiedAware',
@@ -52,26 +52,28 @@ foam.CLASS({
       class: 'String',
       name: 'source',//path+property+propertyproperty
       documentation: `Reference to model or view property to be translated.
-        Ex. (‘FIRST_NAME’, ‘LAST_NAME’, ‘ORGANIZATION’ …etc)`,
-//      storageTransient: true
-//      postSet: function(ol, nu) {
-//        this.source = "11";
-//      }
+        Ex. (‘FIRST_NAME’, ‘LAST_NAME’, ‘ORGANIZATION’ …etc)
+        Use it to set sourceId and sourcePath with one string`,
+//      storageTransient: true,
+//      javaSetter: `
+//        if (val != null && !val.trim().isEmpty()) {
+//          String[] arr = val.split("[.]");
+//          this.setSourceId(arr[arr.length - 1]);
+//          this.setSourcePath(val.substring(0, val.indexOf("."+ this.getSourceId())));
+//        }
+//      `,
     },
     {
       class: 'String',
-      name: 'source1',
+      name: 'sourceSplit',
       storageTransient: true,
-//      preSet: function (ol, nu){
-//        arr = nu.split(".")
-//        sourceId = arr[arr.length - 1];
-//        sourcePath = nu.substring(0, nu.indexOf("."+ sourceId));
-//      }
       javaSetter: `
-        String[] arr = val.split("[.]");
-        this.setSourceId(arr[arr.length - 1]);
-        this.setSourcePath(val.substring(0, val.indexOf("."+ this.getSourceId())));
-      `,
+        if (val != null && !val.trim().isEmpty()) {
+          String[] arr = val.split("[.]");
+          this.setSourceId(arr[arr.length - 1]);
+          this.setSourcePath(val.substring(0, val.indexOf("."+ this.getSourceId())));
+        }
+      `
     },
     {
       class: 'String',

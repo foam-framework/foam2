@@ -24,7 +24,11 @@ foam.INTERFACE({
           type: 'String'
         },
         {
-          name: 'source',
+          name: 'sourceId',
+          type: 'String'
+        },
+        {
+          name: 'sourcePath',
           type: 'String'
         },
         {
