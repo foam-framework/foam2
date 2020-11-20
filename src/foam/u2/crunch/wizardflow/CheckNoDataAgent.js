@@ -44,18 +44,16 @@ foam.CLASS({
   methods: [
     // If Property expressions ever unwrap promises this method can be blank.
     async function execute() {
-      var shouldOpen = false;
-
       var capabilitiesNeeded = await this.crunchService.getGrantPath(null, this.rootCapability.id);
 
-      capabilitiesNeeded.forEach(capa => {
-        if ( capa.of ){
-          shouldOpen = true;
-        }
-      })
+      var shouldOpen = this.shouldOpenCapabilitiesArray(capabilitiesNeeded);
 
       if ( ! shouldOpen ) {
-        var updateJunctionPromises = capabilitiesNeeded.map(capa => {
+        var filteredCapabilitiesNeeded = capabilitiesNeeded.filter(capa => {
+          return foam.nanos.crunch.Capability.isInstance(capa);
+        });
+        
+        var updateJunctionPromises = filteredCapabilitiesNeeded.map(capa => {
           return this.crunchService.updateJunction(null, capa.id, null, null);
         })
         
@@ -64,6 +62,29 @@ foam.CLASS({
 
         return Promise.all(updateJunctionPromises);
       }
+    },
+
+    function shouldOpenCapabilitiesArray(array) {
+      var shouldOpen = false;
+      array.forEach(capa => {
+        if ( foam.nanos.crunch.MinMaxCapability.isInstance(capa) ){
+          if ( ! capa.status === foam.nanos.crunch.CapabilityJunctionStatus.GRANTED ){
+            shouldOpen = true;
+          }
+        }
+
+        if ( foam.nanos.crunch.Capability.isInstance(capa) ){
+          if (capa.of){
+            shouldOpen = true;
+          }
+        }
+
+        if ( Array.isArray(capa) ){
+          shouldOpen = this.shouldOpenCapabilitiesArray(capa) ? true : shouldOpen;
+        }
+      })
+
+      return shouldOpen;
     }
   ]
 });
