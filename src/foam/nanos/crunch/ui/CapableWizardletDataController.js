@@ -9,7 +9,8 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.crunch.ui.CapabilityWizardlet'
+    'foam.nanos.crunch.ui.CapabilityWizardlet',
+    'foam.nanos.crunch.ui.CapableObjectWizardlet'
   ],
 
   properties: [
@@ -42,9 +43,24 @@ foam.CLASS({
       name: 'load',
       class: 'Function',
       value: async function (wizardlet) {
-        if ( this.CapabilityWizardlet.isInstance(wizardlet) ) {
-          wizardlet.status = this.targetPayload.status;
+        wizardlet.status = this.targetPayload.status;
+
+        // No 'of'? No problem
+        if ( ! wizardlet.of ) return wizardlet;
+
+        // Load CapablePayload data to wizardlet
+        var loadedData = wizardlet.of.create({}, wizardlet);
+        if ( this.targetPayload.data ) {
+          loadedData.copyFrom(this.targetPayload.data);
         }
+
+        // Set transient 'capability' property if it exists
+        var prop = wizardlet.of.getAxiomByName('capability');
+        if ( prop ) prop.set(loadedData, wizardlet.capability);
+
+        // Finally, apply new data to wizardlet
+        wizardlet.data = loadedData;
+        return;
       }
     }
   ]

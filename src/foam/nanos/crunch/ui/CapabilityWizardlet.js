@@ -8,16 +8,6 @@ foam.CLASS({
   name: 'CapabilityWizardlet',
   extends: 'foam.u2.wizard.BaseWizardlet',
 
-  implements: [
-    'foam.mlang.Expressions'
-  ],
-
-  imports: [
-    'crunchController',
-    'crunchService',
-    'localeDAO'
-  ],
-
   requires: [
     'foam.nanos.crunch.ui.UCJWizardletDataController',
   ],
@@ -29,9 +19,6 @@ foam.CLASS({
     },
     {
       name: 'status'
-    },
-    {
-      name: 'ucj'
     },
     {
       name: 'id',
@@ -62,9 +49,18 @@ foam.CLASS({
       }
     },
     {
+      name: 'isAvailable',
+      class: 'Boolean',
+      value: true,
+      postSet: function (ol, nu) {
+        if ( nu ) this.save();
+        else this.cancel();
+      }
+    },
+    {
       name: 'dataController',
       factory: function () {
-        return this.UCJWizardletDataController.create();
+        return this.UCJWizardletDataController.create({}, this.__context__);
       }
     }
   ]

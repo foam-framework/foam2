@@ -41,6 +41,8 @@ foam.CLASS({
         return this.crunchService.getJunction(
           null, wizardlet.capability.id
         ).then(ucj => {
+          wizardlet.status = ucj.status;
+
           // No 'of'? No problem
           if ( ! wizardlet.of ) return wizardlet;
 
@@ -54,7 +56,6 @@ foam.CLASS({
 
           // Finally, apply new data to wizardlet
           wizardlet.data = loadedData;
-          wizardlet.status = ucj.status;
         });
       }
     }

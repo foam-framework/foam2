@@ -8,10 +8,6 @@ foam.CLASS({
   name: 'CapableObjectWizardlet',
   extends: 'foam.u2.wizard.BaseWizardlet',
 
-  imports: [
-    'crunchController'
-  ],
-
   requires: [
     'foam.nanos.crunch.ui.CapableWizardletDataController'
   ],
@@ -20,6 +16,9 @@ foam.CLASS({
     // Properties specific to CapabilityWizardSection
     {
       name: 'capability'
+    },
+    {
+      name: 'status'
     },
     {
       name: 'id',
@@ -39,16 +38,11 @@ foam.CLASS({
     },
     {
       name: 'data',
-      factory: function () {
-        if ( ! this.of ) return null;
-
-        return this.of.getAxiomByName('capability') ?
-          this.of.create({ capability: this.capability }, this) :
-          this.of.create({}, this);
-      }
+      flags: ['web']
     },
     {
       name: 'title',
+      class: 'String',
       expression: function(capability) {
         if ( ! capability || ! capability.name ) return '';
         return capability.name;
@@ -71,4 +65,3 @@ foam.CLASS({
     }
   ]
 });
-
