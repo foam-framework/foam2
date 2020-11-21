@@ -221,10 +221,6 @@ protected class ResponseThread implements Runnable {
         if ( this.authorizationType === foam.box.HTTPAuthorizationType.BEARER ) {
           headers['Authorization'] = 'BEARER ' + this.sessionID;
         }
-        // TODO: replace with hash of session
-        if ( this.sessionID ) {
-          headers['Cookie'] = 'JSESSIONID=' + this.sessionID;
-        }
         var req = this.HTTPRequest.create({
           url:     this.prepareURL(this.url),
           method: this.method,
@@ -330,10 +326,6 @@ task.resume()
       }
       if ( getAuthorizationType() == HTTPAuthorizationType.BEARER ) {
         conn.setRequestProperty("Authorization", "BEARER "+getSessionID());
-      }
-      // TODO: Replace with other than sessionId
-      if ( ! foam.util.SafetyUtil.isEmpty(getSessionID()) ) {
-        conn.setRequestProperty("Cookie", "JSESSIONID="+getSessionID());
       }
       conn.setConnectTimeout(getConnectTimeout());
       conn.setReadTimeout(getReadTimeout());
