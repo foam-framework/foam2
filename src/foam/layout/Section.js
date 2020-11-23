@@ -31,8 +31,8 @@ foam.CLASS({
       sections: [
         {
           name: 'mainSection'
-          title: function(eval, data) {
-            return data.myProp ? eval(data.myMessage) : 'Set this title if myProp false';
+          title: function(evaluateMessage, data) {
+            return data.myProp ? evaluateMessage(data.myMessage) : 'Set this title if myProp false';
           }
           isAvailable: function(myProp) {
             return ! myProp;
