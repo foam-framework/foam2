@@ -86,7 +86,7 @@ foam.CLASS({
           .select(
             this.GROUP_BY(this.ClusterConfig.ZONE, max)
           );
-      var zones = Object.entries(groupBy.groups).length;
+      var zones = Math.max(1, Object.entries(groupBy.groups).length);
       // TODO: brute force determine max zone.
       var m = 0;
       for ( const c of Object.entries(groupBy.groups) ) {
