@@ -68,8 +68,6 @@ foam.CLASS({
         return this.views[0][0];
       },
       adapt: function(_, nu) {
-      //this.memento.params
-      //use memento here
         if ( typeof nu === 'string' ) {
           for ( var i = 0; i < this.views.length; i++ ) {
             if ( this.views[i][1] === nu ) {
@@ -93,6 +91,13 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
+      if ( this.memento.paramsObj.selectedView )
+        this.selectedView = this.memento.paramsObj.selectedView;
+      else {
+        self.setMementoWithSelectedView();
+      }
+
+
       this.addClass(this.myClass())
       this.startContext({data: this})
         this.start()
@@ -104,6 +109,20 @@ foam.CLASS({
           return self.E().tag(v, {data: self.data$proxy});
         }))
       .end();
+
+      this.selectedView$.sub(function() {
+        self.setMementoWithSelectedView();
+      });
+    }
+  ],
+
+  actions: [
+    function setMementoWithSelectedView() {
+      var view = this.views.find(v => v[0] == this.selectedView);
+      if ( view )
+        this.memento.paramsObj.selectedView = view[1];
+      else
+        delete this.memento.paramsObj.selectedView;
     }
   ]
 });
