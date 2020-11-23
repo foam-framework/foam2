@@ -66,12 +66,7 @@ foam.CLASS({
           notification.setBody(sb.toString());
           notification.setEmailName("top-level-capability-status-update");
           notification.setEmailArgs(args);
-
-          Themes themes = (Themes) x.get("themes");
-          Theme theme = themes.findThemeBySpid(((X) x.put("subject", new Subject.Builder(x).setUser(user).build())));
-          X notificationX = theme != null ? (X) x.put("theme", theme) : x;
-
-          user.doNotify(notificationX, notification);
+          user.doNotify(x, notification);
         }
       }, "Send Notification On Top Level Capability Status Update");
       `

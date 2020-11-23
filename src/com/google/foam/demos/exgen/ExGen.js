@@ -38,6 +38,7 @@ foam.CLASS({
       color: cornflowerblue;
       font-size: larger;
       padding-left: 4px;
+      text-shadow: 2px 2px #bbb;
       width: 100%;
     }
     ^row {
@@ -115,22 +116,29 @@ foam.CLASS({
       var self = this;
 
       this.dictionary = [
-        { name: 'Chin Ups',            duration: 1 },
-        { name: 'Clean & Press (L+R)', duration: 2, weight: 2 },
-        { name: 'Curls',               duration: 1 },
-        { name: 'Dips',                duration: 1, weight: 2 },
-        { name: 'Floor Press (L+R)',   duration: 2, weight: 2 },
-        { name: 'Goblet Squat',        duration: 1, weight: 1.5 },
-        { name: 'Plank',               duration: 3, weight: 0.25 },
-        { name: 'Press (L+R)',         duration: 2, weight: 1 },
-        { name: 'Push Ups',            duration: 1, weight: 0.9 },
-        { name: 'Rows (L+R)',          duration: 2 },
-        { name: 'Snatch (L+R)',        duration: 2, weight: 1.5 },
-        { name: 'Swings (10)',         duration: 1, weight: 4 },
-        { name: 'Swings (20)',         duration: 2, weight: 2 },
-        { name: 'Swings (30)',         duration: 3, weight: 0.5 },
-        { name: 'TGU (L+R)',           duration: 2, weight: 3 },
-        { name: 'Thrusters',           duration: 1, weight: 1 },
+        { name: 'Bottom-Up Press',          duration: 2, weight: 0.2 },
+        { name: 'Chin Ups',                 duration: 1 },
+        { name: 'Clean & Press (L+R)',      duration: 2, weight: 2 },
+        { name: 'Curls',                    duration: 1 },
+        { name: 'Deck Squat',               duration: 1, weight: 0.2 },
+        { name: 'Dips',                     duration: 1, weight: 2 },
+        { name: 'Floor Press (L+R)',        duration: 2, weight: 2 },
+        { name: 'Goblet Squat',             duration: 1, weight: 1.5 },
+        { name: 'Halos',                    duration: 1, weight: 0.1 },
+        { name: 'One-Arm Deadlift',         duration: 2, weight: 0.2 },
+        { name: 'One-Arm One-Leg Deadlift', duration: 2, weight: 0.2 },
+        { name: 'One-Arm Swings',           duration: 2, weight: 0.2 },
+        { name: 'Pistols',                  duration: 2, weight: 0.2 },
+        { name: 'Plank',                    duration: 3, weight: 0.25 },
+        { name: 'Press (L+R)',              duration: 2, weight: 1 },
+        { name: 'Push Ups',                 duration: 1, weight: 0.9 },
+        { name: 'Rows (L+R)',               duration: 2, weight: 1.1 },
+        { name: 'Snatch (L+R)',             duration: 2, weight: 1.5 },
+        { name: 'Swings (10)',              duration: 1, weight: 4 },
+        { name: 'Swings (20)',              duration: 2, weight: 2 },
+        { name: 'Swings (30)',              duration: 3, weight: 0.5 },
+        { name: 'TGU (L+R)',                duration: 2, weight: 3 },
+        { name: 'Thrusters',                duration: 1, weight: 1 },
       ];
 
       this.regenerate();

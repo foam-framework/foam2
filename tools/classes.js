@@ -225,6 +225,7 @@ var classes = [
   'foam.nanos.bench.Benchmark',
   'foam.nanos.auth.Authorizer',
   'foam.nanos.auth.AuthorizationDAO',
+  'foam.nanos.auth.AuthenticationException',
   'foam.nanos.auth.EnabledAware',
   'foam.nanos.auth.EnabledAwareDummy',
   'foam.nanos.auth.GroupPermissionJunction',
