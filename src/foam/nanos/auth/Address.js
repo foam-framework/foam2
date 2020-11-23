@@ -740,7 +740,8 @@ foam.CLASS({
       expression: function(countryId) {
         let translatedPostalCodeLabel = this.translationService.getTranslation(foam.locale, `${countryId.toLowerCase()}.postalCode.label`);
         return translatedPostalCodeLabel ? translatedPostalCodeLabel : this.translationService.getTranslation(foam.locale, 'postalCode.label');
-      }
+      },
+      hidden: true
     },
     {
       class: 'Double',
