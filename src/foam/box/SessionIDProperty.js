@@ -19,7 +19,6 @@ foam.CLASS({
         // Look in context
         if ( this.__context__ && this.__context__.sessionID )
           return this.__context__.sessionID;
-
         // Or check URL
         var urlSession = '';
         try {
