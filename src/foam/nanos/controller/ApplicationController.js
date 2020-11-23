@@ -177,8 +177,8 @@ foam.CLASS({
           urlSession = window.location.search.substring(1).split('&')
            .find(element => element.startsWith("sessionId")).split('=')[1];
         } catch { };
-        return urlSession !== "" ? urlSession : localStorage["sessionId"] ||
-          ( localStorage["sessionId"] = foam.uuid.randomGUID() );
+        return urlSession !== "" ? urlSession : localStorage["defaultSession"] ||
+          ( localStorage["defaultSession"] = foam.uuid.randomGUID() );
       }
     },
     {
