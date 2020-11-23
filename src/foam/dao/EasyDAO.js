@@ -194,6 +194,20 @@ foam.CLASS({
           }
         }
 
+        if ( getGuid() && getSeqNo() )
+          throw new RuntimeException("EasyDAO GUID and SeqNo are mutually exclusive");
+
+        if ( getSeqNo() ) {
+          delegate = new foam.dao.SequenceNumberDAO.Builder(getX()).
+          setDelegate(delegate).
+          setProperty(getSeqPropertyName()).
+          setStartingValue(getSeqStartingValue()).
+          build();
+        }
+
+        if ( getGuid() )
+          delegate = new foam.dao.GUIDDAO.Builder(getX()).setDelegate(delegate).build();
+
         if ( getCluster() ) {
           if ( getMdao() != null ) {
             logger.debug(getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
@@ -240,20 +254,6 @@ foam.CLASS({
             logger.warning("DEPRECATED: EasyDAO", getName(), "'approvableAwareEnabled' is deprecated. Please remove it from the nspec.");
           }
         }
-
-        if ( getGuid() && getSeqNo() )
-          throw new RuntimeException("EasyDAO GUID and SeqNo are mutually exclusive");
-
-        if ( getSeqNo() ) {
-          delegate = new foam.dao.SequenceNumberDAO.Builder(getX()).
-          setDelegate(delegate).
-          setProperty(getSeqPropertyName()).
-          setStartingValue(getSeqStartingValue()).
-          build();
-        }
-
-        if ( getGuid() )
-          delegate = new foam.dao.GUIDDAO.Builder(getX()).setDelegate(delegate).build();
 
         if ( getValidated() ) {
           if ( getValidator() != null )
