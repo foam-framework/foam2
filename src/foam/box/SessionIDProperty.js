@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
- 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'SessionIDProperty',
@@ -14,15 +14,23 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'factory',
+      name: 'getter',
       value: function() {
-         var urlSession = "";
-         try {
-           urlSession = window.location.search.substring(1).split('&')
-            .find(element => element.startsWith("sessionId")).split('=')[1];
-         } catch { };
-         return urlSession !== "" ? urlSession : localStorage[this.sessionName] ||
-             ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
+        // Look in context
+        if ( this.__context__ && this.__context__.sessionID )
+          return this.__context__.sessionID;
+
+        // Or check URL
+        var urlSession = '';
+        try {
+          urlSession = window.location.search.substring(1).split('&')
+           .find(element => element.startsWith("sessionId")).split('=')[1];
+           if ( urlSession ) return urlSession;
+        } catch { };
+
+        // Or localStorage, else generate a random id
+        return localStorage[this.sessionName] ||
+            ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
        }
     },
     {
