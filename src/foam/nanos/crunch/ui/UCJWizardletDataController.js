@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.crunch.ui',
   name: 'UCJWizardletDataController',
   implements: [ 'foam.u2.wizard.WizardletDataController' ],
+  flags: ['web'],
 
   requires: [
     'foam.nanos.crunch.CapabilityJunctionStatus'

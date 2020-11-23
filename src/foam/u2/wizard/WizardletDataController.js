@@ -7,6 +7,7 @@
 foam.INTERFACE({
   package: 'foam.u2.wizard',
   name: 'WizardletDataController',
+  flags: ['web'],
   documentation: `
     Controls how a wizardlet's data is created, saved, and cancelled.
 
