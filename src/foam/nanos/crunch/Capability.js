@@ -406,8 +406,7 @@ foam.CLASS({
       javaCode: `
         CapabilityJunctionStatus status = ucj.getStatus();
 
-        Capability capability = (Capability) ucj.findTargetId(x);
-        boolean reviewRequired = capability.getReviewRequired();
+        boolean reviewRequired = getReviewRequired();
         CapabilityJunctionStatus prereqStatus = prereq.getStatus();
 
         switch ( (CapabilityJunctionStatus) prereqStatus ) {
