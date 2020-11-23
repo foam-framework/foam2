@@ -50,10 +50,7 @@ foam.CLASS({
       javaType: 'java.util.ArrayList<User>',
       name: 'userPath',
       documentation: 'path from realUser to current user',
-      javaFactory: 'return new ArrayList();',
-      factory: function() {
-        return [];
-      }
+      javaFactory: 'return new ArrayList();'
     },
   ],
 
