@@ -66,6 +66,7 @@ foam.CLASS({
       return ret;
       `,
       code: function() {
+        // Question: should we use u.toSummary() instead?
         return ['user path', ...this.userPath.map(u => u.firstName + ' ' + u.lastName)].join(' >> ');
       }
      }
