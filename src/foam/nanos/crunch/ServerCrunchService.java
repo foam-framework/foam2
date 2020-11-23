@@ -258,6 +258,16 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     if ( status != null ) {
       ucj.setStatus(status);
     }
+
+    if (
+      subject.getRealUser().isAdmin()
+      && subject.getRealUser() != subject.getUser()
+    ) {
+      var logger = (Logger) x.get("logger");
+      // This may be correct when testing features as an admin user
+      logger.warning(
+        "admin user is lastUpdatedRealUser on an agent-associated UCJ");
+    }
     ucj.setLastUpdatedRealUser(subject.getRealUser().getId());
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
     return (UserCapabilityJunction) userCapabilityJunctionDAO.inX(x).put(ucj);
