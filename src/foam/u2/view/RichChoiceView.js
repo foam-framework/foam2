@@ -101,7 +101,7 @@ foam.CLASS({
   messages: [
     {
       name: 'CHOOSE_FROM',
-      message: 'Choose from '
+      message: 'Choose from'
     },
     {
       name: 'CLEAR_SELECTION',
@@ -354,7 +354,7 @@ foam.CLASS({
       documentation: 'Replaces choose from placeholder with passed in string.',
       expression: function(of) {
         var plural = of.model_.plural.toLowerCase();
-        return this.CHOOSE_FROM + plural + '...';
+        return this.CHOOSE_FROM + ' ' + plural + '...';
       }
     },
     {
