@@ -24,6 +24,10 @@ foam.CLASS({
     'foam.mlang.predicate.True'
   ],
 
+  imports: [
+    'memento'
+  ],
+
   properties: [
     {
       name: 'views',
@@ -122,6 +126,29 @@ foam.CLASS({
         this.predicate = this.and(this.views);
         // That will tickle the expression for filteredDAO.
         this.updateViews();
+
+        var searches = [];
+        var keys = Object.keys(this.views);
+        if ( keys.length == 0) {
+          delete this.memento.paramsObj.searches;
+        } else {
+          var outputter = foam.json.Outputter.create({
+            pretty: true,
+            strict: true
+          });
+          for ( var key of keys ) {
+            if ( ! foam.mlang.predicate.True.isInstance(this.views[key].predicate ) ) {
+              searches.push({ name: key, pred: outputter.stringify(this.views[key].predicate) });
+            }
+          }
+          if ( searches.length > 0 ) {
+            this.memento.paramsObj.searches = searches;
+          } else {
+            delete this.memento.paramsObj.searches;
+          }
+          
+          this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
+        }
       }
     },
     {
