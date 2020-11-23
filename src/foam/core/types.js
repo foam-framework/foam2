@@ -331,7 +331,11 @@ foam.CLASS({
   name: 'List',
   extends: 'foam.core.Object',
   properties: [
-    [ 'type', 'List' ]
+    [ 'type', 'List' ],
+    [
+      'factory',
+      function() { return []; }
+    ]
   ]
 });
 
