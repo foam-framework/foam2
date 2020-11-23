@@ -13,6 +13,10 @@ foam.CLASS({
   "Takes a views property which should be the value of an array containing arrays that contain desired views, and label." +
   "Ex. views: [[ { class: 'foam.u2.view.TableView' }, 'Table' ]]",
 
+  imports: [
+    'memento'
+  ],
+
   css: `
     ^ { margin: auto; }
     ^ select { height: 26px }
@@ -64,6 +68,8 @@ foam.CLASS({
         return this.views[0][0];
       },
       adapt: function(_, nu) {
+      //this.memento.params
+      //use memento here
         if ( typeof nu === 'string' ) {
           for ( var i = 0; i < this.views.length; i++ ) {
             if ( this.views[i][1] === nu ) {
