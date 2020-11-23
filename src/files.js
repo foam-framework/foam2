@@ -297,6 +297,7 @@ FOAM_FILES([
   { name: "foam/nanos/boot/NSpec" },
   { name: "foam/nanos/boot/NSpecAware" },
   { name: "foam/nanos/auth/Authorizer" },
+  { name: "foam/nanos/auth/AuthenticationException" },
   { name: "foam/nanos/auth/EnabledAware" },
   { name: "foam/nanos/auth/ServiceProviderAware" },
   { name: "foam/nanos/auth/ServiceProviderAwareSink" },
