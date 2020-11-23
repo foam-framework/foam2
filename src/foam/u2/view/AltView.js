@@ -123,6 +123,8 @@ foam.CLASS({
         this.memento.paramsObj.selectedView = view[1];
       else
         delete this.memento.paramsObj.selectedView;
+
+      this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
     }
   ]
 });
