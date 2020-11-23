@@ -15,7 +15,11 @@ foam.CLASS({
     Section title and subtitle functions have a helper method (1st arg)
     to evaluate messages or values that are template literals.
 
-    These functions are also executed when the models data changes,
+    Template literal messages should be considered over constructing strings
+    within these functions. Locale translation support will have an easier time
+    understanding and applying the appropriate translations.
+
+    These functions are also executed when model data changes,
     supporting dynamic section labeling and data awareness.
 
     Example:
