@@ -50,7 +50,10 @@ foam.CLASS({
       javaType: 'java.util.ArrayList<User>',
       name: 'userPath',
       documentation: 'path from realUser to current user',
-      javaFactory: 'return new ArrayList();'
+      javaFactory: 'return new ArrayList();',
+      factory: function() {
+        return [];
+      }
     },
   ],
 
@@ -64,7 +67,10 @@ foam.CLASS({
         ret += " >> " + user.getFirstName() + " " + user.getLastName();
       }
       return ret;
-`
+      `,
+      code: function() {
+        return ['user path', ...this.userPath.map(u => u.firstName + ' ' + u.lastName)].join(' >> ');
+      }
      }
   ]
 })
