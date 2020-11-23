@@ -54,7 +54,8 @@ foam.CLASS({
     'foam.u2.stack.StackView',
     'foam.u2.dialog.NotificationMessage',
     'foam.nanos.session.SessionTimer',
-    'foam.u2.dialog.Popup'
+    'foam.u2.dialog.Popup',
+    'foam.core.Latch'
   ],
 
   imports: [
@@ -201,6 +202,11 @@ foam.CLASS({
       }
     },
     {
+      name: 'languageInstalled',
+      documentation: 'Latch to denote language has been installed',
+      factory: function() { return this.Latch.create(); }
+    },
+    {
       name: 'client',
     },
     {
@@ -294,6 +300,14 @@ foam.CLASS({
         return this.FooterView;
       }
     },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.Language',
+      name: 'defaultLanguage',
+      factory: function() {
+        return foam.nanos.auth.Language.create({code: 'en'})
+      }
+    },
     'currentMenu',
     'lastMenuLaunched',
     'webApp',
@@ -340,9 +354,13 @@ foam.CLASS({
       this.clientPromise.then(async function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
 
-        await self.fetchSubject();
         await client.translationService.initLatch;
         self.installLanguage();
+
+        await self.fetchSubject();
+
+        await self.maybeReinstallLanguage(client)
+        self.languageInstalled.resolve();
 
         // add user and agent for backward compatibility
         Object.defineProperty(self, 'user', {
@@ -429,6 +447,33 @@ foam.CLASS({
       }
     },
 
+    async function maybeReinstallLanguage(client) {
+      if (
+        this.subject &&
+        this.subject.realUser &&
+        this.subject.realUser.language.toString() != foam.locale
+      ) {
+        let languages = (await client.languageDAO
+          .where(foam.mlang.predicate.Eq.create({
+            arg1: foam.nanos.auth.Language.ENABLED,
+            arg2: true
+          })).select()).array;
+        
+        let userPreferLanguage = languages.find( e => e.id.compareTo(this.subject.realUser.language) === 0 )
+        if ( ! userPreferLanguage ) {
+          foam.locale = this.defaultLanguage.toString()
+          let user = this.subject.realUser
+          user.language = this.defaultLanguage.id
+          await client.userDAO.put(user)
+        } else if ( foam.locale != userPreferLanguage.toString() ) {
+          foam.locale = userPreferLanguage.toString()
+        }
+        client.translationService.maybeReload()
+        await client.translationService.initLatch
+        this.installLanguage()
+      }
+    },
+
     async function fetchGroup() {
       try {
         var group = await this.client.auth.getCurrentGroup();
@@ -449,6 +494,7 @@ foam.CLASS({
 
         this.subject = result;
       } catch (err) {
+        this.languageInstalled.resolve();
         await this.requestLogin();
         return await this.fetchSubject();
       }

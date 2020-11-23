@@ -12,14 +12,22 @@ foam.CLASS({
   documentation: `Generate Logger messages for each alarm`,
 
   javaImports: [
+    'foam.dao.DAO',
     'foam.nanos.logger.Logger',
+    'foam.nanos.notification.Notification'
   ],
 
   methods: [
     {
       name: 'put_',
       javaCode: `
+      Alarm old = (Alarm) getDelegate().find_(x, ((Alarm)obj).getId());
       Alarm alarm = (Alarm) getDelegate().put_(x, obj);
+      if ( old != null &&
+           old.getIsActive() == alarm.getIsActive() ) {
+        return alarm;
+      }
+
       Logger logger = (Logger) x.get("logger");
       switch ( alarm.getSeverity() ) {
         case DEBUG:
@@ -33,6 +41,14 @@ foam.CLASS({
           break;
         case ERROR:
           logger.error("Alarm", alarm.getName(), alarm.getIsActive(), alarm.getNote());
+          if ( alarm.getIsActive() ) {
+            Notification notification = new Notification.Builder(x)
+              .setTemplate("NOC")
+              .setToastMessage(alarm.getName())
+              .setBody(alarm.getNote())
+              .build();
+              ((DAO) x.get("localNotificationDAO")).put(notification);
+          }
           break;
         default:
           logger.info("Alarm", alarm.getName(), alarm.getIsActive(), alarm.getNote());

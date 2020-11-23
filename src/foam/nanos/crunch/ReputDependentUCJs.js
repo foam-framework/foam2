@@ -66,7 +66,7 @@ foam.CLASS({
             for ( CapabilityCapabilityJunction ccj : ccjs ) {
               UserCapabilityJunction ucjToReput = (UserCapabilityJunction) filteredUserCapabilityJunctionDAO
                 .find(EQ(UserCapabilityJunction.TARGET_ID, ccj.getSourceId()));
-              if ( ucjToReput != null ) ucjsToReput.add(ucjToReput);
+              if ( ucjToReput != null ) ucjsToReput.add((UserCapabilityJunction) ucjToReput.fclone());
             }
 
             X effectiveX = x;

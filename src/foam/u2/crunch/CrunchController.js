@@ -32,6 +32,7 @@ foam.CLASS({
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.u2.crunch.wizardflow.ConfigureFlowAgent',
     'foam.u2.crunch.wizardflow.CapabilityAdaptAgent',
+    'foam.u2.crunch.wizardflow.CheckRootIdAgent',
     'foam.u2.crunch.wizardflow.CheckPendingAgent',
     'foam.u2.crunch.wizardflow.CheckNoDataAgent',
     'foam.u2.crunch.wizardflow.LoadCapabilitiesAgent',
@@ -86,6 +87,8 @@ foam.CLASS({
         .add(this.ConfigureFlowAgent)
         .add(this.CapabilityAdaptAgent)
         .add(this.LoadCapabilitiesAgent)
+        // TODO: remove CheckRootIdAgent after phase 2 fix on PENDING
+        .add(this.CheckRootIdAgent)
         .add(this.CheckPendingAgent)
         .add(this.CheckNoDataAgent)
         .add(this.CreateWizardletsAgent)
@@ -211,15 +214,6 @@ foam.CLASS({
       });
     },
 
-    function save(wizardlet) {
-      if ( ! wizardlet.isAvailable ) return Promise.resolve();
-      return this.crunchService.updateJunction(
-        null, wizardlet.capability.id, wizardlet.data, null
-      ).then((ucj) => {
-        this.crunchService.pub('updateJunction');
-        return ucj;
-      });
-    },
     async function updateUCJ(wizardlet, associatedEntity) {
       return this.crunchService.getJunction(
         null, wizardlet.capability.id
