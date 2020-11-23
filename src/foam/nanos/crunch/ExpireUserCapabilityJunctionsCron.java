@@ -48,6 +48,7 @@ public class ExpireUserCapabilityJunctionsCron implements ContextAgent {
       .getArray();
 
     for ( UserCapabilityJunction activeJunction : activeJunctions ) {
+      activeJunction = (UserCapabilityJunction) activeJunction.fclone();
       if ( activeJunction.getIsInGracePeriod() || activeJunction.getGracePeriod() <= 0 ) {
         activeJunction.setStatus(CapabilityJunctionStatus.EXPIRED);
         activeJunction.setIsExpired(true);
