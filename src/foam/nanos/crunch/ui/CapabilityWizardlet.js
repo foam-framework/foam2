@@ -14,6 +14,7 @@ foam.CLASS({
 
   imports: [
     'crunchController',
+    'crunchService',
     'localeDAO'
   ],
 
@@ -70,7 +71,13 @@ foam.CLASS({
     {
       name: 'save',
       code: function() {
-        return this.crunchController && this.crunchController.save(this);
+        if ( ! this.isAvailable ) return Promise.resolve();
+        return this.crunchService.updateJunction(
+          null, this.capability.id, this.data, null
+        ).then((ucj) => {
+          this.crunchService.pub('updateJunction');
+          return ucj;
+        });
       }
     }
   ]

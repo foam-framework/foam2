@@ -32,6 +32,13 @@ foam.CLASS({
       documentation: 'The name of the country.'
     },
     {
+      class: 'String',
+      name: 'nativeName',
+      factory: function() {
+        return this.name
+      }
+    },
+    {
       class: 'StringArray',
       name: 'alternativeNames',
       documentation: `A list of known alternative country names.`,
