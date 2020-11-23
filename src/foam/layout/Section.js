@@ -26,7 +26,7 @@ foam.CLASS({
     foam.CLASS({
       name: 'myModel',
       messages: [
-        { name: 'myMessage', message: 'This message will evaluate a template literal $ {myProp}' }
+        { name: 'myMessage', message: 'This message will evaluate a template literal \${myProp}' }
       ],
       sections: [
         {
