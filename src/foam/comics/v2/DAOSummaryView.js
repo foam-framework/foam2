@@ -240,8 +240,10 @@ foam.CLASS({
       // to this view from the edit view on the stack.
       promise.then(d => {
         if ( d ) self.data = d;
-       
-        this
+        if ( self.currentMemento && self.currentMemento.tail && self.currentMemento.tail.head === 'Edit' ) {//fix me
+          self.edit();
+        } else {
+          this
           .addClass(this.myClass())
           .add(self.slot(function(data, config$viewBorder, viewView) {
             return self.E()
@@ -288,10 +290,7 @@ foam.CLASS({
                 .end()
               .end();
           }));
-
-          if ( self.currentMemento && self.currentMemento.tail && self.currentMemento.tail.head === 'Edit' ) {//fix me
-            self.edit();
-          }
+        }
       });
     }
   ]
