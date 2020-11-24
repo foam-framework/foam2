@@ -140,7 +140,7 @@ foam.CLASS({
         console.log('NodeCView.refresh '+self.children.length);
         if ( self.config ) {
           self.config = await self.dao.find(self.config.id);
-         for ( var i = 0; i < self.children.length; i++ ) {
+          for ( var i = 0; i < self.children.length; i++ ) {
             let child = self.children[i];
             child.refresh && child.refresh(child);
           }

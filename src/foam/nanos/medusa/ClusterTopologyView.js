@@ -48,10 +48,6 @@ foam.CLASS({
       value: '#f3f3f3'
     },
     {
-      name: 'realm',
-      value: 'nanopay'
-    },
-    {
       documentation: 'seconds between refreshes.',
       name: 'refreshRate',
       value: 10
@@ -95,11 +91,14 @@ foam.CLASS({
 
       this.canvas.children = [];
 
+      // TODO: presently only support one realm
+      let sink = await this.dao.limit(1).select();
+      let config = sink.array[0];
       let groupBy = await this.dao
           .select(this.GROUP_BY(this.ClusterConfig.REGION));
       for ( let [k, _] of Object.entries(groupBy.groups) ) {
         let cc = this.ClusterConfig.create({
-          realm: this.realm,
+          realm: config.realm,
           region: k
         });
         let region = this.RegionCView.create({
