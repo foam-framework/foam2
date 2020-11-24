@@ -428,6 +428,7 @@ FOAM_FILES([
   { name: "foam/box/ForwardBox" },
   { name: "foam/box/ForwardingBox" },
   { name: "foam/box/SessionClientBox" },
+  { name: "foam/box/SessionIDProperty" },
   { name: "foam/box/AuthServiceClientBox" },
   { name: "foam/box/OneTimeBox" },
   { name: "foam/box/ExportBox" },
