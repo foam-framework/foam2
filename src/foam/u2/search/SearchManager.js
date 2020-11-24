@@ -56,6 +56,10 @@ foam.CLASS({
         this.updateViews();
         return d;
       }
+    },
+    {
+      name: 'isCalledAfterInit',
+      class: 'Boolean'
     }
   ],
 
@@ -127,27 +131,37 @@ foam.CLASS({
         // That will tickle the expression for filteredDAO.
         this.updateViews();
 
-        var searches = [];
-        var keys = Object.keys(this.views);
-        if ( keys.length == 0) {
-          delete this.memento.paramsObj.searches;
-        } else {
-          var outputter = foam.json.Outputter.create({
-            pretty: true,
-            strict: true
-          });
-          for ( var key of keys ) {
-            if ( ! foam.mlang.predicate.True.isInstance(this.views[key].predicate ) ) {
-              searches.push({ name: key, pred: outputter.stringify(this.views[key].predicate) });
-            }
-          }
-          if ( searches.length > 0 ) {
-            this.memento.paramsObj.searches = searches;
+        if ( this.isCalledAfterInit ) {
+          var searches = [];
+          var keys = Object.keys(this.views);
+          if ( keys.length == 0) {
+            delete this.memento.paramsObj.filters;
           } else {
-            delete this.memento.paramsObj.searches;
+            var outputter = foam.json.Outputter.create({
+              pretty: true,
+              strict: true
+            });
+            for ( var key of keys ) {
+              if ( ! foam.mlang.predicate.True.isInstance(this.views[key].predicate ) ) {
+                searches.push({ name: key, criteria: 0, pred: outputter.stringify(this.views[key].predicate) });
+              }
+            }
+            if ( searches.length > 0 ) {
+              this.memento.paramsObj.filters = searches;
+            } else {
+              delete this.memento.paramsObj.filters;
+            }
+            
+            this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
           }
-          
-          this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
+        } else {
+          if ( this.memento.paramsObj.filters.length > 0 ) {
+            var predicates = this.memento.paramsObj.filters.map(f => foam.json.parseString(f.pred, this.__subContext__));
+            this.predicate =  this.And.create({
+              args: predicates
+            }).partialEval();
+          }
+          this.isCalledAfterInit = true;
         }
       }
     },
