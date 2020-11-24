@@ -26,7 +26,7 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'description',
+    'id',
     'enabled',
     'server',
     'passed',
