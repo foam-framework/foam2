@@ -64,16 +64,14 @@
 
   sections: [
     {
+      name: 'requestDetails',
+      title: 'Approval Request Information',
+      order: 0
+    },
+    {
       name: 'systemInformation',
       title: 'System Information',
-      permissionRequired: true
-    },
-    {
-      name: 'requestDetails',
-      title: 'Approval Request Information'
-    },
-    {
-      name: '_defaultSection',
+      order: 1,
       permissionRequired: true
     }
   ],
@@ -625,6 +623,7 @@
     },
     {
       name: 'viewReference',
+      section: 'requestDetails',
       isDefault: true,
       isAvailable: function() {
         var self = this;
