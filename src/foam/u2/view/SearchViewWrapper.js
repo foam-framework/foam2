@@ -17,7 +17,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'searchManager'
+    'searchManager',
+    'memento'
   ],
 
   css: `
@@ -128,6 +129,21 @@ foam.CLASS({
         .end();
 
       this.checkbox.data$.sub(this.checkboxChanged);
+
+      var predicate = this.getPredicateFromMemento();
+      if ( predicate )
+        this.checkbox.data = true;
+
+    },
+    function getPredicateFromMemento() {
+      if ( this.memento.paramsObj.filters && this.memento.paramsObj.filters.length > 0 ) {
+        var f = this.memento.paramsObj.filters.find(f => f.name === this.property.name && f.criteria === 0);
+        if ( f ) {
+          var predicate = foam.json.parseString(f.pred, this.__context__);
+          return predicate;
+        }
+      }
+      return null;
     }
   ],
 
@@ -137,10 +153,14 @@ foam.CLASS({
 
       if ( this.active ) {
         if ( this.firstTime_ ) {
-          this.container_.tag(this.searchView, {
+          this.container_.tag(this.searchView, {//restoreFromPredicate for the searchView here !!!! 
             property: this.property,
             dao: this.dao
           }, this.view_$);
+          var predicate = this.getPredicateFromMemento();
+          if ( predicate ) {
+            this.view_.restoreFromPredicate(predicate);
+          }
           this.searchManager.add(this.view_$.get());
           this.firstTime_ = false;
         }

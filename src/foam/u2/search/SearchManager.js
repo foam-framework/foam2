@@ -28,6 +28,10 @@ foam.CLASS({
     'memento'
   ],
 
+  exports: [
+    'memento'
+  ],
+
   properties: [
     {
       name: 'views',
@@ -155,7 +159,7 @@ foam.CLASS({
             this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
           }
         } else {
-          if ( this.memento.paramsObj.filters.length > 0 ) {
+          if ( this.memento.paramsObj.filters && this.memento.paramsObj.filters.length > 0 ) {
             var predicates = this.memento.paramsObj.filters.map(f => foam.json.parseString(f.pred, this.__subContext__));
             this.predicate =  this.And.create({
               args: predicates
