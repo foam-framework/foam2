@@ -115,7 +115,7 @@ foam.CLASS({
       documentation: `Explicitly set session ID when calling from Java. Use imported sessionID from javascript.`,
       class: 'String',
       name: 'sessionID'
-    }
+    },
   ],
 
   methods: [
