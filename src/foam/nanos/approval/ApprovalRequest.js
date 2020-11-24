@@ -69,9 +69,14 @@
       order: 0
     },
     {
+      name: 'complianceInformation',
+      title: 'Compliance',
+      order: 1
+    },
+    {
       name: 'systemInformation',
       title: 'System Information',
-      order: 1,
+      order: 2,
       permissionRequired: true
     }
   ],
