@@ -75,6 +75,10 @@ foam.CLASS({
       value: 'defaultSession'
     },
     {
+      class: 'foam.box.SessionIDProperty',
+      name: 'sessionId'
+    },
+    {
       class: 'String',
       name: 'url'
     },
@@ -323,7 +327,7 @@ task.resume()
         conn.setRequestProperty("Origin", getOrigin());
       }
       if ( getAuthorizationType() == HTTPAuthorizationType.BEARER ) {
-        conn.setRequestProperty("Authorization", "BEARER "+getSessionID());
+        conn.setRequestProperty("Authorization", "BEARER "+getSessionId());
       }
       conn.setConnectTimeout(getConnectTimeout());
       conn.setReadTimeout(getReadTimeout());
