@@ -198,6 +198,13 @@ foam.CLASS({
       documentation: 'Predicate used to omit or include capabilities from capabilityDAO'
     },
     {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'visibilityPredicate',
+      networkTransient: true,
+      javaFactory: 'return foam.mlang.MLang.TRUE;',
+      documentation: 'Predicate of the visiability for capabilities'
+    },
+    {
       name: 'reviewRequired',
       class: 'Boolean',
       permissionRequired: true
