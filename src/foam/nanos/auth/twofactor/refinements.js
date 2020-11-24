@@ -14,7 +14,8 @@ foam.CLASS({
       class: 'Boolean',
       name: 'twoFactorEnabled',
       documentation: 'Two factor enabled flag',
-      section: 'operationsInformation'
+      section: 'operationsInformation',
+      order: 15
     },
     {
       class: 'String',

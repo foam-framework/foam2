@@ -89,33 +89,33 @@ foam.CLASS({
       order: 2
     },
     {
-      name: 'complianceInformation',
-      title: 'Compliance'
-    },
-    {
-      name: 'accountInformation',
-      title: 'Account'
+      name: 'ownerInformation',
+      title: 'Ownership'
     },
     {
       name: 'operationsInformation',
       title: 'Operations'
     },
     {
+      name: 'complianceInformation',
+      title: 'Compliance'
+    },
+    {
+      name: 'accountInformation',
+      title: 'Accounts'
+    },
+    {
       name: 'contactInformation',
-      title: 'Contact'
-    },
-    {
-      name: 'deprecatedInformation',
-      title: 'Deprecated'
-    },
-    {
-      name: 'ownerInformation',
-      title: 'Owner'
+      title: 'Contacts'
     },
     {
       name: 'systemInformation',
       help: 'Properties that are used internally by the system.',
       title: 'System Information'
+    },
+    {
+      name: 'deprecatedInformation',
+      title: 'Deprecated'
     }
   ],
 
@@ -155,13 +155,15 @@ foam.CLASS({
       documentation: 'Determines whether the User can login to the platform.',
       writePermissionRequired: true,
       value: true,
-      section: 'systemInformation'
+      section: 'systemInformation',
+      order: 30
     },
     {
       class: 'DateTime',
       name: 'lastLogin',
       documentation: 'The date and time of last login by User.',
       section: 'operationsInformation',
+      order: 30,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO'
     },
@@ -268,7 +270,8 @@ foam.CLASS({
       name: 'emailVerified',
       documentation: 'Determines whether the email address of the User is valid.',
       writePermissionRequired: true,
-      section: 'systemInformation'
+      section: 'systemInformation',
+      order: 35
     },
     {
       class: 'FObjectProperty',
@@ -445,14 +448,16 @@ foam.CLASS({
       documentation: 'The date and time that the password was last modified.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'systemInformation'
+      section: 'systemInformation',
+      order: 40
     },
     {
       class: 'DateTime',
       name: 'passwordExpiry',
       documentation: `The date and time that the current password of the User
         will expire.`,
-      section: 'systemInformation'
+      section: 'systemInformation',
+      order: 41
     },
     // TODO: startDate, endDate,
     // TODO: do we want to replace 'note' with a simple ticket system?
@@ -489,6 +494,7 @@ foam.CLASS({
       name: 'disabledTopicSet',
       javaType: 'java.util.HashSet',
       transient: true,
+      hidden: true,
       section: 'operationsInformation',
       factory: function() { return {}; },
       javaFactory: `
@@ -537,6 +543,7 @@ foam.CLASS({
       of: 'foam.nanos.auth.LifecycleState',
       name: 'lifecycleState',
       section: 'systemInformation',
+      order: 20,
       value: foam.nanos.auth.LifecycleState.PENDING,
       writePermissionRequired: true
     },
@@ -546,6 +553,7 @@ foam.CLASS({
       name: 'spid',
       tableWidth: 120,
       section: 'systemInformation',
+      order: 15,
       writePermissionRequired:true,
       documentation: `
         Need to override getter to return "" because its trying to
@@ -753,7 +761,8 @@ foam.RELATIONSHIP({
   },
   targetProperty: {
     hidden: false,
-    section: 'systemInformation'
+    section: 'systemInformation',
+    order: 10
   }
 });
 
@@ -779,11 +788,15 @@ foam.RELATIONSHIP({
   junctionDAOKey: 'agentJunctionDAO',
   sourceProperty: {
     createVisibility: 'HIDDEN',
-    section: 'ownerInformation'
+    label: 'Businesses',
+    section: 'ownerInformation',
+    order: 10
   },
   targetProperty: {
     createVisibility: 'HIDDEN',
-    section: 'ownerInformation'
+    label: 'Agents of Business',
+    section: 'ownerInformation',
+    order: 11
   }
 });
 
