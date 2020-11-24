@@ -159,7 +159,7 @@ foam.CLASS({
             var predicates = this.memento.paramsObj.filters.map(f => foam.json.parseString(f.pred, this.__subContext__));
             this.predicate =  this.And.create({
               args: predicates
-            }).partialEval();
+            }).partialEval();//check if we need partialEval here
           }
           this.isCalledAfterInit = true;
         }
