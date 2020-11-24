@@ -56,6 +56,7 @@ foam.CLASS({
       key: 'me',
       type: 'foam.box.Box'
     },
+    'sessionID',
     'window'
   ],
 
@@ -72,10 +73,6 @@ foam.CLASS({
       class: 'String',
       name: 'sessionName',
       value: 'defaultSession'
-    },
-    {
-      class: 'foam.box.SessionIDProperty',
-      name: 'sessionID'
     },
     {
       class: 'String',

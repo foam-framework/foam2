@@ -170,6 +170,11 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
+      name: 'sessionName',
+      value: 'defaultSession'
+    },
+    {
       name: 'sessionID',
       factory: function() {
         var urlSession = "";
@@ -178,7 +183,7 @@ foam.CLASS({
            .find(element => element.startsWith("sessionId")).split('=')[1];
         } catch { };
         return urlSession !== "" ? urlSession : localStorage[this.sessionName] ||
-            ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
+          ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
       }
     },
     {
