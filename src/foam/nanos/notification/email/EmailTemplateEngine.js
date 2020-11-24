@@ -18,7 +18,6 @@ foam.CLASS({
     'java.util.HashMap',
     'java.util.Map',
     'static foam.mlang.MLang.EQ'
-
   ],
 
   properties: [
