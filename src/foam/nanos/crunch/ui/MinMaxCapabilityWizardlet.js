@@ -27,7 +27,8 @@ foam.CLASS({
       class: 'Int',
       factory: function(){
         if ( foam.nanos.crunch.MinMaxCapability.isInstance(this.capability) ){
-          return this.capability.min;
+          // a capability min of 0 denotes no minimum limit
+          return this.capability.min > 0 ? this.capability.min : this.choices.length;
         }
       }
     },
@@ -82,6 +83,13 @@ foam.CLASS({
       class: 'Boolean',
       name: 'isValid',
       value: false
+    },
+    {
+      name: 'isVisible',
+      class: 'Boolean',
+      expression: function(isAvailable) {
+        return isAvailable;
+      }
     }
   ],
 

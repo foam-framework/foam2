@@ -476,7 +476,7 @@ foam.CLASS({
     function toggleExpanded(e) {
       e.stopPropagation();
       this.data.expanded = ! this.data.expanded;
-      if ( ! this.data.hasSubProperties ) {
+      if ( ! this.data.hasSubProperties || foam.core.Reference.isInstance(this.data.prop) ) {
         this.data.isPropertySelected = ! this.data.isPropertySelected;
         this.onSelectionChangedParentFunction(this.data.isPropertySelected, this.data.index);
       }
@@ -536,10 +536,10 @@ foam.CLASS({
       }))
       .end();
     },
-    function updateSubColumnsOrder(selctionChanged) {
+    function updateSubColumnsOrder(selectionChanged) {
       //re-order subproperties
       this.data.subColumnSelectConfig.sort((a, b) => a.index > b.index ? 1 : -1);
-      this.onSelectionChangedParentFunction(this.data.isPropertySelected, this.data.index, selctionChanged);
+      this.onSelectionChangedParentFunction(this.data.isPropertySelected, this.data.index, selectionChanged);
     },
     function onChildrenDragAndDrop(targetIndex, draggableIndex) {
       this.onDragAndDrop(this.views, targetIndex, draggableIndex);
@@ -547,7 +547,7 @@ foam.CLASS({
     },
     function onChildrenSelectionChanged(isColumnSelected, index, isColumnSelectionHaventChanged) {
       //isColumnSelectionHaventChanged to be false on either selectionChanged or being undefined
-      if ( ! isColumnSelectionHaventChanged ) {
+      if ( ! isColumnSelectionHaventChanged || foam.core.Reference.isInstance(this.data.prop)) {
         //to change view
         this.onSelectionChanged(isColumnSelected, index, this.views);
         //to set currentProperty isColumnSelected
@@ -589,13 +589,18 @@ foam.CLASS({
       documentation: 'array of names of selected proprties'
     },
     {
-      name: 'subProperties',
+      name: 'prop',
       expression: function(rootProperty) {
+        return this.of.getAxiomByName(this.columnHandler.checkIfArrayAndReturnPropertyNameForRootProperty(rootProperty));
+      }
+    },
+    {
+      name: 'subProperties',
+      expression: function(prop) {
         if ( ! this.of || ! this.of.getAxiomByName )
           return [];
-        var r = this.of.getAxiomByName(this.columnHandler.checkIfArrayAndReturnPropertyNameForRootProperty(rootProperty));
-        if ( r && r.cls_ && ( foam.core.FObjectProperty.isInstance(r) || foam.core.Reference.isInstance(r) ) )
-          return r.of.getAxiomsByClass(foam.core.Property).map(p => [p.name, this.columnHandler.returnAxiomHeader(p)]);
+        if ( prop && prop.cls_ && ( foam.core.FObjectProperty.isInstance(prop) || foam.core.Reference.isInstance(prop) ) )
+          return prop.of.getAxiomsByClass(foam.core.Property).map(p => [p.name, this.columnHandler.returnAxiomHeader(p)]);
         return [];
       }
     },

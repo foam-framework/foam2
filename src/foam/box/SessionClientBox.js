@@ -103,25 +103,23 @@ foam.CLASS({
     }
   ],
 
+  imports: [
+    'sessionID as jsSessionID'
+  ],
+
   properties: [
     {
+      documentation: `Explicitly set session ID when calling from Java. Use imported sessionID from javascript.`,
       class: 'String',
-      name: 'sessionName',
-      value: 'defaultSession'
-    },
-    {
-      class: 'foam.box.SessionIDProperty',
       name: 'sessionID'
-    }
+    },
   ],
 
   methods: [
     {
       name: 'send',
       code: function send(msg) {
-        msg.attributes[this.SESSION_KEY] = this.sessionID;
-
-        // console.log('***** SEND SESSION ID: ', this.sessionID/*foam.json.stringify(msg)*/);
+        msg.attributes[this.SESSION_KEY] = this.jsSessionID;
 
         msg.attributes.replyBox.localBox = this.SessionReplyBox.create({
           msg:       msg,

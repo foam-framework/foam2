@@ -119,14 +119,6 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Language',
-      name: 'defaultLanguage',
-      factory: function() {
-        return foam.nanos.auth.Language.create({code: 'en'})
-      }
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Language',
       name: 'lastLanguage',
       factory: function() {
         let language = this.supportedLanguages.find( e => e.toString() === foam.locale )
@@ -139,35 +131,16 @@ foam.CLASS({
 
   methods: [
     async function initE() {
-      var self = this
-      let languages = (await this.languageDAO
+      this.supportedLanguages = (await this.languageDAO
                         .where(foam.mlang.predicate.Eq.create({
                           arg1: foam.nanos.auth.Language.ENABLED,
                           arg2: true
                         })).select()).array;
 
-      this.supportedLanguages = languages
-      if ( this.subject && this.subject.realUser ) {
-        let userPreferLanguage = this.supportedLanguages.find( e => e.id.compareTo(self.subject.realUser.language) === 0 )
-        if ( ! userPreferLanguage ) {
-            foam.locale = this.defaultLanguage.toString()
-            let user = self.subject.realUser
-            user.language = this.defaultLanguage.id
-            localStorage.setItem('localeLanguage', this.defaultLanguage.toString());
-            await self.userDAO.put(user)
-        } else {
-          if ( foam.locale != userPreferLanguage.toString() ) {
-            foam.locale = userPreferLanguage.toString()
-            localStorage.setItem('localeLanguage', userPreferLanguage.toString());
-            location.reload();
-          }
-        }
-      }
-
       let country = await this.countryDAO.find(this.lastLanguage.variant)
-      let label = this.lastLanguage.variant != "" ? `${this.lastLanguage.name}(${this.lastLanguage.variant})` : `${this.lastLanguage.name}`
-      if ( country && country.name != null ) {
-        label = `${this.lastLanguage.name}\u00A0(${this.getCountryName(country.name, country.name)})`
+      let label = this.lastLanguage.variant != "" ? `${this.lastLanguage.nativeName}(${this.lastLanguage.variant})` : `${this.lastLanguage.nativeName}`
+      if ( country && country.nativeName != null ) {
+        label = `${this.lastLanguage.nativeName}\u00A0(${country.nativeName})`
       }
 
       this
@@ -183,17 +156,11 @@ foam.CLASS({
     },
     async function formatLabel(language) {
       let country = await this.countryDAO.find(language.variant)
-      let label = language.variant != "" ? `${language.name}(${language.variant})` : `${language.name}`
-      if ( country && country.name != null ) {
-        label = `${language.name}\u00A0(${this.getCountryName(country.name, country.name)})`
+      let label = language.variant != "" ? `${language.nativeName}(${language.variant})` : `${language.nativeName}`
+      if ( country && country.nativeName != null ) {
+        label = `${language.nativeName}\u00A0(${country.nativeName})`
       }
       return label
-    },
-    function getCountryName(countryName, defaultName) {
-      defaultName = defaultName ? defaultName : ''
-      let translation = this.translationService.getTranslation(foam.locale, `${foam.locale.toLowerCase()}.country.${countryName}`)
-      translation = translation ? translation : defaultName
-      return translation
     }
   ],
 
