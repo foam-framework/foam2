@@ -230,6 +230,7 @@ foam.CLASS({
     },
     {
       class: 'Object',
+      // TODO: rename to wizardConfig; wizardlet config is the property above
       name: 'wizardletConfig',
       documentation: `
         Configuration placed on top level capabilities defining various configuration options supported by client capability wizards.
