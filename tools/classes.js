@@ -367,7 +367,7 @@ var classes = [
   'foam.nanos.notification.email.EmailTemplate',
   'foam.nanos.notification.email.EmailPropertyService',
   'foam.nanos.notification.email.Status',
-  'foam.nanos.notification.email.EmailTemplateUtil',
+  'foam.nanos.notification.email.EmailTemplateEngine',
   // Email service Files
   'foam.nanos.notification.email.SMTPConfig',
   'foam.nanos.notification.email.SMTPEmailService',

@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.notification.email',
-  name: 'EmailTemplateUtil',
+  name: 'EmailTemplateEngine',
 
   javaImports: [
     'foam.dao.DAO',
