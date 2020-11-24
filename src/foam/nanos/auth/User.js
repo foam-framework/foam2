@@ -110,11 +110,13 @@ foam.CLASS({
     {
       name: 'systemInformation',
       help: 'Properties that are used internally by the system.',
-      title: 'System Information'
+      title: 'System Information',
+      permissionRequired: true
     },
     {
       name: 'deprecatedInformation',
-      title: 'Deprecated'
+      title: 'Deprecated',
+      permissionRequired: true
     }
   ],
 
@@ -435,8 +437,6 @@ foam.CLASS({
       section: 'systemInformation',
       order: 41
     },
-    // TODO: startDate, endDate,
-    // TODO: do we want to replace 'note' with a simple ticket system?
     {
       class: 'String',
       name: 'note',
@@ -445,7 +445,6 @@ foam.CLASS({
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 },
       section: 'userInformation'
     },
-    // TODO: remove after demo
     {
       class: 'String',
       name: 'businessName',
@@ -469,9 +468,8 @@ foam.CLASS({
       /** @private */
       name: 'disabledTopicSet',
       javaType: 'java.util.HashSet',
-      transient: true,
       hidden: true,
-      section: 'operationsInformation',
+      transient: true,
       factory: function() { return {}; },
       javaFactory: `
         HashSet<String> set = new HashSet<>();
