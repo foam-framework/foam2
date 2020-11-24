@@ -28,15 +28,15 @@ foam.CLASS({
 
         // non-chained hash with correct digest
         Hashable_HashWithValidAlgorithm(input, "MD5",
-            "47f68c52aaae1c2cdad696c59a248752");
+            "6a6e70ca62d7e0afbde550202cf27bae");
         Hashable_HashWithValidAlgorithm(input, "SHA-1",
-            "b56f36f495469a97928e664ccff17ea62d7d4d78");
+            "8ff96b7d123909fe97ecbdfc40059f43d06cb52a");
         Hashable_HashWithValidAlgorithm(input, "SHA-256",
-            "ec0604d4874bd8f899a9efcb4e05bd2c83f024b16c5ae8b2a99049a5106b8eb6");
+            "9d4aa9f2ed968ba8a1b16bfbc4242a4d9f64df358ca11be051fd80c322c2ffff");
         Hashable_HashWithValidAlgorithm(input, "SHA-384",
-            "d2f4e706ec2b7b8f2bfd21b1e80c28bb500453d22a11ab4b6be82dd8de03470b1f172e5b80ffda71f7b5f5f170ec2350");
+            "fd6d5cbb17477742f4b4680d0d5f17940d7c180d56313d6570947f1674e2f0f04c9721e5af0383192d9e6dde7690e0b4");
         Hashable_HashWithValidAlgorithm(input, "SHA-512",
-            "d6b71a2d9368fac8aba8b285ea489297a55f99e31a6585a19f524fd09b53375d74563040793195f3dbb1eee6e7defff5d03bff569b9962ae06250626f402903a");
+            "1d033a412e9db056510d5a5421bcb576e4feb9a9b7dba88e5c90ab396cb2e4f31028d7e00a8c0422b683de7ba2f309b7a898e9b761817f7e674670710f8ea5b6");
 
         // hashing same objects produces same digest
         Hashable_HashingSameObjects_ProducesSameDigest(input, input,

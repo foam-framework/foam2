@@ -22,8 +22,7 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.auth.Address',
-    'foam.nanos.auth.PriorPassword',
-    'foam.nanos.auth.Phone'
+    'foam.nanos.auth.PriorPassword'
   ],
 
   javaImports: [
@@ -274,17 +273,6 @@ foam.CLASS({
       order: 35
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Phone',
-      name: 'phone',
-      documentation: 'Personal phone number.',
-      factory: function() {
-        return this.Phone.create();
-      },
-      view: { class: 'foam.u2.detail.VerticalDetailView' },
-      section: 'deprecatedInformation'
-    },
-    {
       class: 'PhoneNumber',
       name: 'phoneNumber',
       documentation: 'Personal phone number.',
@@ -295,18 +283,6 @@ foam.CLASS({
       name: 'phoneNumberVerified',
       writePermissionRequired: true,
       section: 'userInformation'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Phone',
-      name: 'mobile',
-      documentation: 'Returns the mobile phone number of the User from the Phone model.',
-      factory: function() {
-        return this.Phone.create();
-      },
-      view: { class: 'foam.u2.detail.VerticalDetailView' },
-      section: 'deprecatedInformation',
-      includeInDigest: true
     },
     {
       class: 'PhoneNumber',
