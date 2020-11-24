@@ -156,12 +156,12 @@ foam.CLASS({
         var isCompleted = x.submitted || x.cancelled;
 
         if ( isCapable ) {
-          intercept.capables[0].isWizardCompleted = isCompleted;
+          intercept.capables[0].isWizardIncomplete = ! isCompleted;
           if ( ! isCompleted ) {
             intercept.resolve(intercept.capables[0]);
             return;
           }
-          intercept.returnCapable.isWizardCompleted = isCompleted;
+          intercept.returnCapable.isWizardIncomplete = ! isCompleted;
           intercept.resolve(intercept.returnCapable);
           return;
         }
