@@ -90,7 +90,7 @@ foam.CLASS({
                 obj$: self.data$,
                 code: section.subTitle
               }) : section.subTitle$;
-              this.start().addClass('subtitle').add(slot$).end();
+              this.start().addClass('subtitle').translate(slot$.obj.capability.id+'.description',slot$).end();
             })
             .start(self.Grid)
               .forEach(section.properties, function(p, index) {
