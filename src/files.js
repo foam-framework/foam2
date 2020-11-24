@@ -376,7 +376,6 @@ FOAM_FILES([
   { name: "foam/box/ProxyBox" },
   { name: "foam/box/Message" },
   { name: "foam/box/SubBoxMessage" },
-  { name: "foam/box/SessionIDProperty" },
   { name: "foam/box/HelloMessage" },
   { name: "foam/box/TimeoutBox" },
   { name: "foam/box/RetryBox" },
