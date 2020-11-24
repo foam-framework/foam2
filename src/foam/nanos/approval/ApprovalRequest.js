@@ -434,10 +434,12 @@
       name: 'daoKey_',
       readPermissionRequired: true,
       writePermissionRequired: true,
-      factory: function(o, n) {
+      factory: function() {
         var key = this.daoKey;
         var X = this.ctrl.__subContext__;
 
+        // TODO: we need to phase this out for the old compliance approval requests
+        // and use serverDaoKey for the local daos
         if ( ! X[key] ) {
           if ( key.startsWith('local') ) {
             key = key.replace('local', '');
@@ -621,6 +623,7 @@
     },
     {
       name: 'viewReference',
+      section: 'requestDetails',
       isDefault: true,
       isAvailable: function() {
         var self = this;
