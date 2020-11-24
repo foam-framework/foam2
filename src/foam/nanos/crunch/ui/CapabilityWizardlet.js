@@ -9,7 +9,7 @@ foam.CLASS({
   extends: 'foam.u2.wizard.BaseWizardlet',
 
   requires: [
-    'foam.nanos.crunch.ui.UCJWizardletDataController',
+    'foam.nanos.crunch.ui.UserCapabilityJunctionWAO',
   ],
 
   properties: [
@@ -60,7 +60,7 @@ foam.CLASS({
     {
       name: 'dataController',
       factory: function () {
-        return this.UCJWizardletDataController.create({}, this.__context__);
+        return this.UserCapabilityJunctionWAO.create({}, this.__context__);
       }
     }
   ]

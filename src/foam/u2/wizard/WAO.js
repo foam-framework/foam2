@@ -6,13 +6,12 @@
 
 foam.INTERFACE({
   package: 'foam.u2.wizard',
-  name: 'WizardletDataController',
+  name: 'WAO',
+  label: 'Wizardlet Access Object',
   flags: ['web'],
   documentation: `
-    Controls how a wizardlet's data is created, saved, and cancelled.
-
-    If an interface is created, it should take on the name of this model, and
-    this model should be renamed to CallbackWizardletDataController.
+    Controls how a wizardlet's data is created, saved, and cancelled. A WAO may
+    also set custom properties when passed recognized wizardlet subclasses.
   `,
 
   methods: [

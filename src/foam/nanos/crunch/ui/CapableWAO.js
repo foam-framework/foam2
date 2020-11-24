@@ -6,8 +6,8 @@
 
 foam.CLASS({
   package: 'foam.nanos.crunch.ui',
-  name: 'CapableWizardletDataController',
-  implements: [ 'foam.u2.wizard.WizardletDataController' ],
+  name: 'CapableWAO',
+  implements: [ 'foam.u2.wizard.WAO' ],
   flags: ['web'],
 
   imports: [

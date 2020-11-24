@@ -23,7 +23,7 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.crunch.MinMaxCapability',
-    'foam.nanos.crunch.ui.CapableWizardletDataController'
+    'foam.nanos.crunch.ui.CapableWAO'
   ],
 
   properties: [
@@ -110,7 +110,7 @@ foam.CLASS({
       let wizardlet = wizardletClass.create({
         capability: capability,
         data$: capablePayload.data$,
-        dataController: this.CapableWizardletDataController.create(
+        dataController: this.CapableWAO.create(
           {}, this.__context__)
       }, this);
 

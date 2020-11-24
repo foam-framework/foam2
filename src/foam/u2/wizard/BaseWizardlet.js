@@ -15,7 +15,7 @@ foam.CLASS({
   requires: [
     'foam.u2.detail.AbstractSectionedDetailView',
     'foam.u2.wizard.WizardletSection',
-    'foam.u2.wizard.WizardletDataController',
+    'foam.u2.wizard.WAO',
   ],
 
   properties: [
@@ -100,10 +100,10 @@ foam.CLASS({
     {
       name: 'dataController',
       class: 'FObjectProperty',
-      of: 'foam.u2.wizard.WizardletDataController',
+      of: 'foam.u2.wizard.WAO',
       flags: ['web'],
       factory: function () {
-        this.WizardletDataController.create();
+        this.WAO.create();
       }
     }
   ],

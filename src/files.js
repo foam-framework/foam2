@@ -869,9 +869,9 @@ FOAM_FILES([
   { name: "foam/u2/wizard/StepWizardletView" },
   { name: "foam/u2/wizard/ScrollWizardletView" },
   { name: "foam/u2/wizard/DAOWizardlet" },
-  { name: "foam/u2/wizard/WizardletDataController" },
-  { name: "foam/nanos/crunch/ui/UCJWizardletDataController" },
-  { name: "foam/nanos/crunch/ui/CapableWizardletDataController" },
+  { name: "foam/u2/wizard/WAO" },
+  { name: "foam/nanos/crunch/ui/UserCapabilityJunctionWAO" },
+  { name: "foam/nanos/crunch/ui/CapableWAO" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
   { name: "foam/nanos/crunch/ui/MinMaxCapabilityWizardlet" },
 
