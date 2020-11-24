@@ -14,6 +14,8 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.dao.MDAO',
     'java.util.Arrays',
+    'java.util.ArrayList',
+    'java.util.List',
     'foam.dao.ArraySink'
   ],
 
@@ -67,7 +69,26 @@ foam.CLASS({
     {
       name: 'remove_',
       javaCode: `
-        return obj; // TODO
+        CapablePayload payload = (CapablePayload) obj;
+
+        CapablePayload[] payloads = getCapable().getCapablePayloads();
+        
+        List<CapablePayload> newPayloadsList = new ArrayList<>();
+
+        for ( int i = 0; i < payloads.length; i++ ){
+          if ( ! payload.getCapability().equals(payloads[i].getCapability()) ){
+            newPayloadsList.add(payloads[i]);
+          }
+        }
+
+        if ( payloads.length == newPayloadsList.size() ){
+          return null;
+        }
+
+        CapablePayload[] newPayloads = newPayloadsList.toArray(new CapablePayload[0]);
+        getCapable().setCapablePayloads(newPayloads);
+
+        return obj;
       `,
       code: async function (x, obj) {
         return this.ifFoundElseIfNotFound_(

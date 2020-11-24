@@ -52,7 +52,6 @@ foam.CLASS({
       var self = this;
       var menu = this.menu;
       var X    = this.__subContext__;
-
       menu.children.select({
         put: function(menu) {
           if ( ! menu.handler ) return;
@@ -64,7 +63,7 @@ foam.CLASS({
                 self.close();
                 menu.launch_(X, e);
               })
-              .translate(menu.id+'.label',menu.label);
+              .translate(menu.id + '.label', menu.label);
             })
           .end();
         },

@@ -64,6 +64,22 @@ foam.CLASS({
       });
     },
 
+    function maybeReload() {
+      /**
+        Reload locales if foam.locale has changed since this class was
+        initially init()-ed.
+      **/
+      var originalLocale = this.locale;
+      if ( this.variant ) originalLocale = originalLocale + '-' + this.variant;
+      if ( foam.locale != originalLocale ) {
+        this.locale = this.variant = undefined;
+        this.initLatch = this.Latch.create();
+        this.localeEntries = {};
+        this.init();
+      }
+      return this.initLatch;
+    },
+
     function loadLanguageLocales() {
       return this.localeDAO.where(
         this.AND(

@@ -158,10 +158,15 @@ foam.CLASS({
             objectToSave = (FObject) getData();
           }
         }
-        objectToSave = objectToSave.fclone().copyFrom(getData());           // finally copy user inputed data into objectToSave <- typed to the safest possibility from above cases
+        if ( dao.getOf().getObjClass().isAssignableFrom(getData().getClass()) ) { // skip copy if data is the same class as dao.of or is a super class of dao.of
+          objectToSave = (FObject) getData();
+        }
+        else {
+          objectToSave = objectToSave.fclone().copyFrom(getData());           // finally copy user inputed data into objectToSave <- typed to the safest possibility from above cases
+        }
 
         try {                                                                   // save data to dao
-          if ( putObject ) dao.put(objectToSave);
+          if ( putObject ) dao.inX(x).put(objectToSave);
         } catch (Exception e) {
           Logger logger = (Logger) x.get("logger");
           logger.warning("Data cannot be added to " + capability.getDaoKey() + " for UserCapabilityJunction object : " + getId() );
