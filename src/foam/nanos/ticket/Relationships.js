@@ -15,9 +15,6 @@ foam.RELATIONSHIP({
   targetDAOKey: 'ticketDAO',
   unauthorizedTargetDAOKey: 'localTicketDAO',
   // REVIEW: unable to get owner to display in any section on Ticket.
-  sourceProperty: {
-    section: 'operationsInformation'
-  },
   targetProperty: {
     visibility: 'RO',
     section: 'infoSection',

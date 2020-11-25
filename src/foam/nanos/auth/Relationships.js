@@ -49,7 +49,7 @@ foam.RELATIONSHIP({
   forwardName: 'notificationSettings',
   inverseName: 'owner',
   sourceProperty: {
-    section: 'systemInformation'
+    hidden: true
   },
   targetDAOKey: 'notificationSettingDAO',
   unauthorizedTargetDAOKey: 'localNotificationSettingDAO'

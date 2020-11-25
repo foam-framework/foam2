@@ -43,7 +43,7 @@ foam.CLASS({
       documentation: 'User who last modified entry',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'userInformation'
+      section: 'administrative'
     }
   ]
 });
