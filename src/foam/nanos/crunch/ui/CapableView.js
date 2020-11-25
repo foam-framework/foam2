@@ -72,9 +72,11 @@ foam.CLASS({
 
       const self = this;
 
-      // set capable payloads for capabilities if they don't already exist
-      if ( ! this.capableObj.capablePayloads ||
-        Object.keys(this.capableObj.capablePayloads).length === 0 ) {
+      // set capable payloads to capabilities if the capbilities don't have payloads yet
+      const hasNoPayloads = ! this.capableObj.capablePayloads ||
+        Object.keys(this.capableObj.capablePayloads).length === 0;
+
+      if ( hasNoPayloads ) {
           try {
             await this.capableObj.setRequirements(this.capableObj.capableRequirements);
           } catch (e) {
@@ -83,24 +85,19 @@ foam.CLASS({
       }
 
       // set wizardlets based on the capableObj
-      if ( this.capableObj != undefined ) {
-        this.wizardlets = await this.crunchController.getWizardletsFromCapable(this.capableObj);
-      } else {
-        this.wizardlets = [];
-      }
+      this.wizardlets = this.capableObj ?
+        await this.crunchController.getWizardletsFromCapable(this.capableObj) : [];
 
       this.start().addClass(this.myClass())
-        .add(self.slot(function(wizardletSectionsList) {
-          return this.E().forEach(wizardletSectionsList, function(sections, index) {
-            sections.map(section => (
-              this.tag(self.SectionView, {
-                section,
-                data: self.wizardlets[index].data,
-                showTitle: self.showTitle
-              })
-            ));
-          });
-        }))
+        .forEach(this.wizardletSectionsList, function(sections, index) {
+          sections.map(section => (
+            this.tag(self.SectionView, {
+              section,
+              data: self.wizardlets[index].data,
+              showTitle: self.showTitle
+            })
+          ));
+        }).end()
       .end();
     },
 
