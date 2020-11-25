@@ -25,8 +25,8 @@ foam.CLASS({
         if ( ! ( obj instanceof Capability) ) return false;
         X x = XLocator.get();
         Capability capability = (Capability) obj;
-        return capability.getVisible() ? capability.getCapabilityVisibilityPredicate() != null 
-        && capability.getCapabilityVisibilityPredicate().f(x) : false;
+        return capability.getVisible() && capability.getCapabilityVisibilityPredicate() != null 
+        && capability.getCapabilityVisibilityPredicate().f(x);
       `
     }
   ]

@@ -202,7 +202,7 @@ foam.CLASS({
       name: 'capabilityVisibilityPredicate',
       networkTransient: true,
       javaFactory: 'return foam.mlang.MLang.TRUE;',
-      documentation: 'Predicate of the visiability for capabilities'
+      documentation: 'Predicate of the visibility for capabilities in the capability store/keyword sections'
     },
     {
       name: 'reviewRequired',
