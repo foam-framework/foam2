@@ -120,7 +120,7 @@ foam.CLASS({
     {
       name: 'back',
       code: function(X, data) {
-        X.memento$.set(null);//fix me 
+        X.memento$.set(null);
         X.onBack();
       }
     },
@@ -259,7 +259,7 @@ foam.CLASS({
                   .endContext()
                   .start(self.Cols).style({ 'align-items': 'center' })
                     .start()
-                      .add(data && data.toSummary() ? data.toSummary() : "")
+                      .add(data && data.toSummary() ? data.toSummary() : '')
                       .addClass(self.myClass('account-name'))
                       .addClass('truncate-ellipsis')
                     .end()
