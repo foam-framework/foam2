@@ -542,7 +542,7 @@ foam.CLASS({
       documentation: 'The date and time the User was last modified.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      storageOptional: true
+      storageOptional: true,
       section: 'userInformation'
     },
     {
@@ -562,7 +562,7 @@ foam.CLASS({
       tableWidth: 120,
       section: 'systemInformation',
       order: 15,
-      writePermissionRequired:true,
+      writePermissionRequired: true,
       documentation: `
         Need to override getter to return "" because its trying to
         return null (probably as a result of moving order of files
