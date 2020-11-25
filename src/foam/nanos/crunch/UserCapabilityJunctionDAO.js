@@ -117,7 +117,7 @@ foam.CLASS({
           capability == null ||
           (
             ! ( capability.getOf() == null || ucj.getData() == null ) &&
-            ! ( ucj.getData().getClassInfo().equals(capability.getOf() )
+            ! ( ucj.getData().getClassInfo().equals(capability.getOf()) )
           )
         ) throw new RuntimeException(this.ERROR_FOUR + ucj.getTargetId());
         
