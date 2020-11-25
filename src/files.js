@@ -763,6 +763,8 @@ FOAM_FILES([
   { name: "foam/flow/DocumentMenu" },
   { name: "foam/flow/MarkupEditor" },
   { name: "foam/flow/DocumentationFolderDAO" },
+  { name: "foam/flow/widgets/AxiomShortSummary" },
+  { name: "foam/flow/widgets/MethodShortSummary" },
   { name: "foam/flow/widgets/PropertyShortSummary" },
   { name: "foam/flow/widgets/ModelSummary" },
   { name: "foam/flow/widgets/EnumSummary" },
