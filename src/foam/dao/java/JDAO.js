@@ -13,9 +13,13 @@ foam.CLASS({
   javaImports: [
     'foam.nanos.fs.ResourceStorage',
     'foam.core.X',
+    'foam.dao.CompositeJournal',
+    'foam.dao.DAO',
     'foam.dao.F3FileJournal',
+    'foam.dao.MDAO',
+    'foam.dao.NullJournal',
     'foam.dao.ReadOnlyF3FileJournal',
-    'foam.dao.NullJournal'
+    'foam.dao.WriteOnlyF3FileJournal',
   ],
 
   axioms: [
@@ -25,27 +29,35 @@ foam.CLASS({
         cls.extras.push(`
           // TODO: These convenience constructors should be removed and done using the facade pattern.
           public JDAO(X x, foam.core.ClassInfo classInfo, String filename) {
-            this(x, new foam.dao.MDAO(classInfo), filename, false);
+            this(x, new MDAO(classInfo), filename, false);
           }
 
-          public JDAO(X x, foam.dao.DAO delegate, String filename) {
+          public JDAO(X x, DAO delegate, String filename) {
             this(x, delegate, filename, false);
           }
 
-          public JDAO(X x, foam.dao.DAO delegate, String filename, Boolean cluster) {
+          public JDAO(X x, DAO delegate, String filename, Boolean cluster) {
             setX(x);
             setOf(delegate.getOf());
             setDelegate(delegate);
 
-            // create journal
+            // Runtime Journal
             if ( cluster ) {
-              setJournal(new foam.dao.NullJournal.Builder(x).build());
+              if ( "ro".equals(System.getProperty("FS")) ) {
+                setJournal(new NullJournal.Builder(x).build());
+              } else {
+                setJournal(new WriteOnlyF3FileJournal.Builder(x)
+                  .setFilename(filename)
+                  .setCreateFile(true)
+                  .setDao(delegate)
+                  .build());
+              }
             } else {
-              F3FileJournal journal = getFileJournal(x);
-              journal.setDao(delegate);
-              journal.setFilename(filename);
-              journal.setCreateFile(false);
-              setJournal(journal);
+              setJournal(new F3FileJournal.Builder(x)
+                .setDao(delegate)
+                .setFilename(filename)
+                .setCreateFile(false)
+                .build());
             }
 
             /* Create a composite journal of repo journal and runtime journal
@@ -56,31 +68,18 @@ foam.CLASS({
                   new ResourceStorage(System.getProperty("resource.journals.dir")));
             }
 
-            if ( cluster ) {
-              F3FileJournal journal = getFileJournal(resourceStorageX);
-              journal.setFilename(filename + ".0");
-              journal.replay(x, delegate);
-            } else {
-              F3FileJournal journal0 = getFileJournal(resourceStorageX);
-              journal0.setFilename(filename + ".0");
-              F3FileJournal journal = getFileJournal(x);
-              journal.setFilename(filename);
+            // Repo Journal
+            F3FileJournal journal0 = new ReadOnlyF3FileJournal.Builder(resourceStorageX)
+              .setFilename(filename + ".0")
+              .build();
 
-              new foam.dao.CompositeJournal.Builder(x)
-                .setDelegates(new foam.dao.Journal[] {
-                  journal0,
-                  journal
-                })
-                .build()
-                .replay(x, delegate);
-            }
-          }
-
-          public foam.dao.F3FileJournal getFileJournal(X x) {
-            if ( "ro".equals(System.getProperty("FS")) ) {
-              return new foam.dao.ReadOnlyF3FileJournal.Builder(x).build();
-            }
-            return new foam.dao.F3FileJournal.Builder(x).build();
+            new CompositeJournal.Builder(resourceStorageX)
+              .setDelegates(new foam.dao.Journal[] {
+                journal0,
+                getJournal()
+              })
+              .build()
+              .replay(resourceStorageX, delegate);
           }
         `);
       }
