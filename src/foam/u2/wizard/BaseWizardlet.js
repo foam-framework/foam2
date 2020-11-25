@@ -15,6 +15,7 @@ foam.CLASS({
   requires: [
     'foam.u2.detail.AbstractSectionedDetailView',
     'foam.u2.wizard.WizardletSection',
+    'foam.u2.wizard.WAO',
   ],
 
   properties: [
@@ -95,6 +96,15 @@ foam.CLASS({
           )
         }));
       }
+    },
+    {
+      name: 'dataController',
+      class: 'FObjectProperty',
+      of: 'foam.u2.wizard.WAO',
+      flags: ['web'],
+      factory: function () {
+        this.WAO.create();
+      }
     }
   ],
 
@@ -104,6 +114,16 @@ foam.CLASS({
     },
     function createView(data) {
       return null;
+    },
+    async function save() {
+      return await this.dataController.save(this);
+    },
+    async function cancel() {
+      return await this.dataController.cancel(this);
+    },
+    async function load() {
+      await this.dataController.load(this);
+      return this;
     }
   ]
 });
