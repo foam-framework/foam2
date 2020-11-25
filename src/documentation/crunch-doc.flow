@@ -8,6 +8,11 @@
 CRUNCH is a CORE subsystem that enables flexible definitions of incremental steps users can take to gain access to features of an application. A key principle of CRUNCH is the user will only enter new information at the time it's required to perform an action. (although it is possible to have users add information ahead of time also)
 </p>
 
+<h2>Purpose of this Document</h2>
+This document aims to help a developer use CRUNCH within a larger application.
+For documentation on CRUNCH internals, see `.flow` documents inside the
+`foam.nanos.crunch` package itself.
+
 <h2>CRUNCH Concepts</h2>
 
 <h3>Capability</h3>
@@ -56,6 +61,46 @@ The `daoKey` property can be used to specify another DAO where the data will be 
 <p>
 The `contextDAOFindKey` property allows an object in the context to be used as a starting point for the object that is stored in the DAO specified by `daoKey`. For example, a capability which sets a property of `User` can specify `subject.user` as the `contextDAOFindKey`.
 </p>
+
+<h4>Configure how capabilities appear in a wizard</h4>
+
+<h3>Wizard configuration with root capability</h3>
+
+<p>
+Whenever a CRUNCH wizard is started, the root capability is able to configure
+global behaviour of the wizard by providing its own StepWizardConfig object. It
+is important to note that a capability will only configure the wizard if it is
+the root capability - usually the most dependant capability in a tree invoked by
+the intercept.
+</p>
+
+<foam class="foam.flow.widgets.PropertyShortSummary" of="foam.nanos.crunch.Capability" whitelist="['wizardletConfig']" />
+
+<p>
+The options available for StepWizardConfig are in the scope of wizard documentation.
+</p>
+
+<!-- TODO: link wizard documentation -->
+
+<p>
+As an example, the following journal entry describes a capability that will
+configure the wizard to disallow skipping sections.
+</p>
+
+<code>
+p({
+  "class": "foam.nanos.crunch.Capability",
+  "id": "4EB60BAE-E915-4464-9D1B-4099F22E9144",
+  "name": "Example Capability",
+  "of": "foam.nanos.crunch.example.ExampleData",
+  "wizardletConfig": {
+    "class": "foam.u2.wizard.StepWizardConfig",
+    "allowSkipping": false
+  }
+})
+</code>
+
+<h3>Wizardlet configuration for a specific capability</h3>
 
 <h4>Specify When the Capability Appears</h4>
 <foam class="foam.flow.widgets.DocumentationIncomplete" status="todo" isSection="true" />
