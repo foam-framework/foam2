@@ -14,7 +14,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'deviceToken',
-      section: 'deprecatedInformation'
+      section: 'administrative'
     }
   ]
 });
