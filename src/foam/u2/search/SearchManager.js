@@ -138,7 +138,7 @@ foam.CLASS({
         if ( this.isCalledAfterInit ) {
           var searches = [];
           var keys = Object.keys(this.views);
-          if ( keys.length == 0) {
+          if ( keys.length == 0 ) {
             delete this.memento.paramsObj.filters;
           } else {
             var outputter = foam.json.Outputter.create({

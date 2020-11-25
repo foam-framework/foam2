@@ -283,7 +283,6 @@ foam.CLASS({
       localStorage.removeItem(this.of.id);
       localStorage.setItem(this.of.id, JSON.stringify(this.selectedColumnNames.map(c => foam.String.isInstance(c) ? c : c.name )));
 
-      //set memento columns
       var newMementoColumns = [];
 
       for ( var s of this.selectedColumnNames ) {
@@ -444,7 +443,7 @@ foam.CLASS({
               if ( c.order && ! c.name.includes(' / ')) {
                 var prop = view.props.find(p => p.fullPropertyName === this.columnConfigToPropertyConverter.returnPropertyNameForLabel(view.of, c.name));
                 if ( prop ) {
-                  if ( c.order === 'D' )
+                  if ( c.order.toLowerCase() === 'd' )
                     dao = dao.orderBy(this.DESC(prop.property));
                   else
                     dao = dao.orderBy(prop.property);

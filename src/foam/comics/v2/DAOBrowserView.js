@@ -239,7 +239,6 @@ foam.CLASS({
     function dblclick(obj, id) {
       if ( ! this.stack ) return;
 
-      // this.memento.feedback_ = true;
       this.memento.tail = this.Memento.create({ head: id });
       this.memento.tail.parent = this.memento;
 

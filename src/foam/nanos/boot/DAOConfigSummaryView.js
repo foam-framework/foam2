@@ -114,7 +114,7 @@ foam.CLASS({
             start().
               addClass(this.myClass('title')).
               start('a').
-                add('Data Management').on('click', () => { /**it's null for some reason**/ this.memento.tail$.set(null); }).
+                add('Data Management').on('click', () => { this.memento.tail$.set(null); }).
               end().
               add(' / ', this.title).
             end().
@@ -170,7 +170,7 @@ foam.CLASS({
 
 
   exports: [
-    'memento'// BackBorder will not work currentMemento_ as 
+    'memento'
   ],
 
   properties: [
@@ -199,7 +199,7 @@ foam.CLASS({
        onKey: true
       }
     },
-    'currentMemento_'//cannot import tail!!! cause on
+    'currentMemento_'
   ],
 
   methods: [
@@ -215,11 +215,6 @@ foam.CLASS({
       });
 
       this.currentMemento_$ = self.memento.tail$;
-      // if ( ! this.memento ) {
-        // this.memento = this.Memento.create({ head })
-      // }
-
-      // var mementoTail
 
       this.addClass(this.myClass()).
       start().
@@ -324,11 +319,8 @@ foam.CLASS({
 
       if ( ! m || ! m.tail ) {
         if ( this.currentMemento_ ) this.stack.back();
-        // this.currentMemento_ = null;
         return;
       }
-
-      // this.currentMemento_$ = m.tail$;
 
       var x = this.__subContext__.createSubContext();
       x.register(this.DAOUpdateControllerView, 'foam.comics.DAOUpdateControllerView');

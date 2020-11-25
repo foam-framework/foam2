@@ -153,7 +153,7 @@ foam.CLASS({
 
       if ( this.active ) {
         if ( this.firstTime_ ) {
-          this.container_.tag(this.searchView, {//restoreFromPredicate for the searchView here !!!! 
+          this.container_.tag(this.searchView, {
             property: this.property,
             dao: this.dao
           }, this.view_$);

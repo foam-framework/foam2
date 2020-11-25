@@ -189,7 +189,7 @@ foam.CLASS({
     {
       name: 'memento',
       factory: function() {
-        return this.Memento.create();//{tail$: this.mementoTail$}
+        return this.Memento.create();
       }
     },
     {
@@ -328,7 +328,7 @@ foam.CLASS({
     },
     'currentMenu',
     'lastMenuLaunched',
-    'webApp',
+    'webApp'
   ],
 
   methods: [
@@ -341,19 +341,9 @@ foam.CLASS({
       var self = this;
 
       // Start Memento Support
-      // old code here
-      // var hash = this.WindowHash.create();
-      // hash.value$ = this.memento.value$;
-
-      //new code
       this.WindowHash.create({value$: this.memento.value$});
 
       this.memento.changeIndicator$.sub(function () {
-        console.log('changeIndicator ApplicationController');
-        // self.memento.feedback_ = true;
-
-        // self.WindowHash.create({value$: self.memento.value$});
-
         self.memento.value = self.memento.combine();
 
         if ( ! self.memento.feedback_ )
@@ -361,7 +351,6 @@ foam.CLASS({
       });
 
       this.memento.value$.sub(function () {
-        //for some reason this subscriber is executed earlier then postSet
         self.memento.parseValue();
 
         if ( ! self.memento.feedback_ )
@@ -576,7 +565,7 @@ foam.CLASS({
       }
       /** Use to load a specific menu. **/
       // Do it this way so as to not reset mementoTail if set
-      if ( this.memento.head !== menu || opt_forceReload ) {//( this.memento.head && this.memento.head.length === 0 ) || <- code removed from earlier
+      if ( this.memento.head !== menu || opt_forceReload ) {
         this.memento.value = menu;
       }
     },

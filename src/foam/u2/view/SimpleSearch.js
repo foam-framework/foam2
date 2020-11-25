@@ -97,9 +97,6 @@ foam.CLASS({
         this.__subSubContext__
       );
 
-
-
-      //generalQueryView.view.data = 'aaaa';
       this.searchManager.add(generalQueryView);
 
       this

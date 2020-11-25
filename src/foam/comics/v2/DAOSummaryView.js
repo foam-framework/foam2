@@ -225,7 +225,7 @@ foam.CLASS({
           data: this.data
         }));
       }
-    },
+    }
   ],
 
   methods: [
@@ -240,7 +240,7 @@ foam.CLASS({
       // to this view from the edit view on the stack.
       promise.then(d => {
         if ( d ) self.data = d;
-        if ( self.currentMemento && self.currentMemento.tail && self.currentMemento.tail.head === 'Edit' ) {//fix me
+        if ( self.currentMemento && self.currentMemento.tail && self.currentMemento.tail.head.toLowerCase() === 'edit' ) {
           self.edit();
         } else {
           this

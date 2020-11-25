@@ -131,7 +131,7 @@ foam.CLASS({
       mergeDelay: 500,
       code: function() {
         var value = this.view.data;
-        if (  this.memento ) {//export empty memento to not set wrong TextSearch
+        if (  this.memento ) {
           if ( value ) {
             this.memento.paramsObj['search'] = value;
           } else {

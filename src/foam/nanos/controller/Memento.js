@@ -40,8 +40,6 @@ foam.CLASS({
     {
       name: 'tail',
       postSet: function(o, n) {
-        // if ( this.tail )
-        //   this.tail.parent = this;
 
         if ( this.feedback_ ) {
           return;
@@ -54,11 +52,7 @@ foam.CLASS({
       value: null
     },
     {
-      name: 'parent',
-      postSet: function() {
-        console.log('parent change');
-        // console.log('not equal: ' + this.parent.tail == this);
-      }
+      name: 'parent'
     },
     {
       name: 'changeIndicator',

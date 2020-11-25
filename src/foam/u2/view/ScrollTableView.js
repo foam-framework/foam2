@@ -17,7 +17,7 @@
   exports: [
     'as summaryView',
     'dblclick',
-    'memento'//
+    'memento'
   ],
 
   requires: [
@@ -199,7 +199,7 @@
   methods: [
     function init() {
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.updateCount })));
-      this.updateCount();//check memento
+      this.updateCount();
 
       if ( this.memento )
         this.currentMemento$ = this.memento.tail$;

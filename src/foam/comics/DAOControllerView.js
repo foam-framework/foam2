@@ -36,7 +36,7 @@ foam.CLASS({
     'data.filteredTableColumns as filteredTableColumns',
     'data.searchColumns as searchColumns',
     'dblclick',
-    'currentMemento as memento'//
+    'currentMemento as memento'
   ],
 
   css: `

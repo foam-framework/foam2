@@ -52,7 +52,7 @@ foam.CLASS({
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.ControllerMode',
-    'foam.u2.dialog.NotificationMessage',
+    'foam.u2.dialog.NotificationMessage'
   ],
 
   imports: [
@@ -146,18 +146,13 @@ foam.CLASS({
     {
       name: 'back',
       code: function() {
-        if ( this.memento.tail ) //this will now work
+        if ( this.memento.tail )
           this.memento.tail$.set(null);
         this.stack.back();
       }
     }
   ],
   methods: [
-    // function back() {
-    //   if ( this.memento.tail && this.memento.tail ) //this will now work
-    //     this.memento.tail$.set(null);
-    //   this.stack.back();
-    // },
     function initE() {
       var self = this;
       this.SUPER();

@@ -38,7 +38,7 @@ foam.CLASS({
   exports: [
     'controllerMode',
     'data',
-    'memento'//currentMemento as 
+    'memento'
   ],
 
   css: `
@@ -186,7 +186,6 @@ foam.CLASS({
         return editEnabled && controllerMode === this.ControllerMode.VIEW;
       },
       code: function() {
-        //initalize me
         this.controllerMode = this.ControllerMode.EDIT;
         var newE = this.container_.createChild_(this.detailView, {
           of: this.dao.of,
