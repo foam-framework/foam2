@@ -13,7 +13,6 @@ foam.CLASS({
   javaImports: [
     'foam.core.FObject',
     'foam.core.XLocator',
-    'foam.core.X',
     'foam.nanos.crunch.Capability'
   ],
 
@@ -23,7 +22,6 @@ foam.CLASS({
       code: () => { return true; },
       javaCode: `
         if ( ! ( obj instanceof Capability) ) return false;
-        X x = XLocator.get();
         Capability capability = (Capability) obj;
         return capability.getVisible() && capability.getCapabilityVisibilityPredicate() != null 
           && capability.getCapabilityVisibilityPredicate().f(XLocator.get());
