@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'CapabilityIsVisible',
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: [ 'foam.core.Serializable' ],
+  axioms: [ { class: 'foam.pattern.Singleton' } ],
 
   javaImports: [
     'foam.core.XLocator',
