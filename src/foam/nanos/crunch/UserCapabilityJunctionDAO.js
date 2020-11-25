@@ -110,8 +110,13 @@ foam.CLASS({
         
         // if ucj data is set but does not match expected data, do not put
         Capability capability = (Capability) ucj.findTargetId(x);
-        if ( capability.getOf() != null && ucj.getData() != null && ! ( ucj.getData().getClassInfo().equals(capability.getOf()) ) )
-          throw new RuntimeException("Capability data provided is not of the correct type.");
+        if ( 
+          capability == null ||
+          (
+            ! ( capability.getOf() == null || ucj.getData() == null ) &&
+            ! ( ucj.getData().getClassInfo().equals(capability.getOf() )
+          )
+        ) throw new RuntimeException("Capability data provided is not of the correct type.");
         
         return super.put_(x, obj);
       `
