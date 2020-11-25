@@ -681,22 +681,28 @@ foam.LIB({
       if ( cls.name ) {
         var props = cls.allProperties;
 
-        // No-arg constructor
-        cls.method({
-          visibility: 'public',
-          name: cls.name,
-          type: '',
-          body: ''
-        });
+        if ( ! this.model_.hasOwnProperty('javaGenerateDefaultConstructor') ) {
+          this.model_.javaGenerateDefaultConstructor = true;
+        }
 
-        // Context-oriented constructor
-        cls.method({
-          visibility: 'public',
-          name: cls.name,
-          type: '',
-          args: [{ type: 'foam.core.X', name: 'x' }],
-          body: 'setX(x);'
-        });
+        if ( this.model_.javaGenerateDefaultConstructor ) {
+          // No-arg constructor
+          cls.method({
+            visibility: 'public',
+            name: cls.name,
+            type: '',
+            body: ''
+          });
+
+          // Context-oriented constructor
+          cls.method({
+            visibility: 'public',
+            name: cls.name,
+            type: '',
+            args: [{ type: 'foam.core.X', name: 'x' }],
+            body: 'setX(x);'
+          });
+        }
 
         cls.method({
           visibility: 'public',
@@ -2085,6 +2091,11 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
+     {
+      class: 'Boolean',
+      name: 'javaGenerateDefaultConstructor',
+      value: true
+    },
     {
       class: 'Boolean',
       name: 'javaGenerateConvenienceConstructor',

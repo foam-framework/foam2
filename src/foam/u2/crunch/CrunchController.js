@@ -37,6 +37,7 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.CheckNoDataAgent',
     'foam.u2.crunch.wizardflow.LoadCapabilitiesAgent',
     'foam.u2.crunch.wizardflow.CreateWizardletsAgent',
+    'foam.u2.crunch.wizardflow.LoadWizardletsAgent',
     'foam.u2.crunch.wizardflow.FilterWizardletsAgent',
     'foam.u2.crunch.wizardflow.RequirementsPreviewAgent',
     'foam.u2.crunch.wizardflow.StepWizardAgent',
@@ -92,6 +93,7 @@ foam.CLASS({
         .add(this.CheckPendingAgent)
         .add(this.CheckNoDataAgent)
         .add(this.CreateWizardletsAgent)
+        .add(this.LoadWizardletsAgent)
         .add(this.FilterWizardletsAgent)
         .add(this.RequirementsPreviewAgent)
         .add(this.LoadTopConfig)
@@ -110,6 +112,7 @@ foam.CLASS({
         .add(this.ConfigureFlowAgent)
         .add(this.CapableDefaultConfigAgent)
         .add(this.CapableCreateWizardletsAgent)
+        .add(this.LoadWizardletsAgent)
         .add(this.StepWizardAgent)
         .add(this.MaybeDAOPutAgent)
         ;
@@ -156,12 +159,12 @@ foam.CLASS({
         var isCompleted = x.submitted || x.cancelled;
 
         if ( isCapable ) {
-          intercept.capables[0].isWizardCompleted = isCompleted;
+          intercept.capables[0].isWizardIncomplete = ! isCompleted;
           if ( ! isCompleted ) {
             intercept.resolve(intercept.capables[0]);
             return;
           }
-          intercept.returnCapable.isWizardCompleted = isCompleted;
+          intercept.returnCapable.isWizardIncomplete = ! isCompleted;
           intercept.resolve(intercept.returnCapable);
           return;
         }
@@ -214,14 +217,6 @@ foam.CLASS({
       });
     },
 
-    async function updateUCJ(wizardlet, associatedEntity) {
-      return this.crunchService.getJunction(
-        null, wizardlet.capability.id
-      ).then(ucj => {
-        wizardlet.ucj = ucj;
-        return wizardlet;
-      })
-    },
     function purgeCachedCapabilityDAOs() {
       this.capabilityDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
       this.capabilityDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
@@ -251,7 +246,10 @@ foam.CLASS({
     function getWizardletsFromCapable(capable) {
       return this.Sequence.create(null, this.__subContext__.createSubContext({
         capable: capable
-      })).add(this.CapableCreateWizardletsAgent).execute().then(x => x.wizardlets);
+      }))
+        .add(this.CapableCreateWizardletsAgent)
+        .add(this.LoadWizardletsAgent)
+        .execute().then(x => x.wizardlets);
     }
   ]
 });

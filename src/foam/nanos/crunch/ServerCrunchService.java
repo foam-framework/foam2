@@ -110,11 +110,11 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
         // Manually grab the direct  prereqs to the  MinMaxCapability
         for ( int i = prereqs.length - 1 ; i >= 0 ; i-- ) {
-          var prereqGrantPath = this.getGrantPath(x, prereqs[i]);
+          var prereqGrantPath = this.getCapabilityPath(x, prereqs[i], filterGrantedUCJ);
 
           // Essentially we reserve arrays to denote  ANDs and ORs, must be at least 2  elements
           if ( prereqGrantPath.size() > 1 ) minMaxArray.add(prereqGrantPath);
-          else minMaxArray.add(prereqGrantPath.get(0));
+          else if ( prereqGrantPath.size() == 1 ) minMaxArray.add(prereqGrantPath.get(0));
         }
 
         /**
@@ -221,6 +221,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     try {
       DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
+      x = x.put("subject", subject);
       Predicate associationPredicate = getAssociationPredicate_(x);
 
       // Check if a ucj implies the subject.realUser has this permission in relation to the user
@@ -257,6 +258,17 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     if ( status != null ) {
       ucj.setStatus(status);
     }
+
+    if (
+      subject.getRealUser().isAdmin()
+      && subject.getRealUser() != subject.getUser()
+    ) {
+      var logger = (Logger) x.get("logger");
+      // This may be correct when testing features as an admin user
+      logger.warning(
+        "admin user is lastUpdatedRealUser on an agent-associated UCJ");
+    }
+    ucj.setLastUpdatedRealUser(subject.getRealUser().getId());
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
     return (UserCapabilityJunction) userCapabilityJunctionDAO.inX(x).put(ucj);
   }
