@@ -11,7 +11,6 @@ foam.CLASS({
   implements: [ 'foam.core.Serializable' ],
 
   javaImports: [
-    'foam.core.FObject',
     'foam.core.XLocator',
     'foam.nanos.crunch.Capability'
   ],
