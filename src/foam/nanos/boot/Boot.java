@@ -63,12 +63,12 @@ public class Boot {
     for ( int i = 0 ; i < l.size() ; i++ ) {
       NSpec sp = (NSpec) l.get(i);
       if ( ! sp.getEnabled() ) {
-        logger.info("Disabled:", sp.getName());
+        logger.info("Disabled", sp.getName());
         continue;
       }
       NSpecFactory factory = new NSpecFactory((ProxyX) root_, sp);
       factories_.put(sp.getName(), factory);
-      logger.info("Registering:", sp.getName());
+      logger.info("Registering", sp.getName());
       root_.putFactory(sp.getName(), factory);
     }
 

@@ -24,7 +24,7 @@ foam.CLASS({
   documentation: 'FOAM class that models a Cron script',
 
   tableColumns: [
-    'description',
+    'id',
     'enabled',
     'lastDuration',
     'lastRun',
