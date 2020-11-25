@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'MultiChoiceView',
   extends: 'foam.u2.View',
+  flags: ['web'],
 
   implements: [ 'foam.mlang.Expressions' ],
 
