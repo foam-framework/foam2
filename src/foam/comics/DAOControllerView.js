@@ -36,7 +36,6 @@ foam.CLASS({
     'data.filteredTableColumns as filteredTableColumns',
     'data.searchColumns as searchColumns',
     'dblclick',
-    'currentMemento as memento'
   ],
 
   css: `
@@ -145,9 +144,6 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-
-      if ( this.memento.tail )
-        this.currentMemento$ = this.memento.tail$;
 
       this.data.border.add(
         this.E()
