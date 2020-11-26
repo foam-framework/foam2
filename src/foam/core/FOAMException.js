@@ -74,7 +74,7 @@ foam.CLASS({
       name: 'toString',
       type: 'String',
       javaCode: `
-      return this.getClass().getName()+" ["+getHostname()+"] "+super.getMessage();
+      return "["+getHostname()+"],"+this.getClass().getName()+","+super.getMessage();
       `
     }
   ]
