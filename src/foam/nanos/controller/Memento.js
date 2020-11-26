@@ -29,7 +29,7 @@ foam.CLASS({
     },
     {
       name: 'head',
-      // value: '',
+      value: '',
       postSet: function(o, n) {
         if ( this.feedback_ ) return;
         this.feedback_ = true;
