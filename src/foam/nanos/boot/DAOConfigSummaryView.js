@@ -210,10 +210,6 @@ foam.CLASS({
       var currentLetter = '';
       var section;
 
-      self.memento$.sub(function() {
-        console.log('memento change DAOConfigSummaryView');
-      });
-
       this.currentMemento_$ = self.memento.tail$;
 
       this.addClass(this.myClass()).
