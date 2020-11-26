@@ -41,7 +41,7 @@ foam.CLASS({
       if ( getNSpec() != null ) {
         return getNSpec().getName();
       }
-      return serviceName_;
+      return "na";
       `
     },
     {

@@ -85,7 +85,6 @@ foam.CLASS({
       ],
       javaCode: `
       if ( box != null ) {
-//        getBoxes().remove(makeKey(box.getHost(), box.getPort()));
         getBoxes().remove(box.getKey());
 
         Socket socket = (Socket) box.getSocket();
@@ -158,7 +157,6 @@ foam.CLASS({
           Agency agency = (Agency) x.get("threadPool");
           agency.submit(x, (ContextAgent) box, socket.getRemoteSocketAddress().toString());
           return box;
-        // } catch ( ConnectException | SocketException | SocketTimeoutException e ) {
         } catch ( IOException e ) {
           getLogger().error(host, port, e.getClass().getSimpleName(), e.getMessage());
           remove(box);

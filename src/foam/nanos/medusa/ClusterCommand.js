@@ -89,6 +89,7 @@ foam.CLASS({
 
   methods: [
     {
+      documentation: `Record path through the network for troubleshooting.`,
       name: 'addHop',
       args: [
         {

@@ -171,7 +171,7 @@ configuration for contacting the primary node.`,
       name: 'mediatorQuorum',
       class: 'Int',
       javaFactory: `
-      return getMediatorCount() / 2 + 1;
+      return (int) Math.floor(getMediatorCount() / 2) + 1;
       `
     },
     {

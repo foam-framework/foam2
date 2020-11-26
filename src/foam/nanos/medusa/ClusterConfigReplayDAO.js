@@ -67,6 +67,7 @@ foam.CLASS({
           ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
           replaying.setStartTime(new java.util.Date());
 
+          // TODO: Presently min,max not used. Intented for more precise replay, but at the moment nodes simply replay everything.
           DAO dao = (DAO) x.get("medusaNodeDAO");
           Min min = (Min) MIN(MedusaEntry.INDEX);
           Max max = (Max) MAX(MedusaEntry.INDEX);
@@ -165,7 +166,6 @@ foam.CLASS({
                  ( myConfig.getType() == MedusaType.NERF &&
                    support.getHasMediatorQuorum() ) ) {
               // special intial case - no data, or baseline
-              // FIXME/REVIEW - not working - on fresh start, zone 1 mediators never go online.
               ((DAO) x.get("localMedusaEntryDAO")).cmd(new ReplayCompleteCmd());
             }
           }

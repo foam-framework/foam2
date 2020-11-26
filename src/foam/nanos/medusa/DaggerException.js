@@ -19,6 +19,10 @@ foam.CLASS({
     super(message);
   }
 
+  public DaggerException(Throwable cause) {
+    super(cause.getMessage(), cause);
+  }
+
   public DaggerException(String message, Throwable cause) {
     super(message, cause);
   } 

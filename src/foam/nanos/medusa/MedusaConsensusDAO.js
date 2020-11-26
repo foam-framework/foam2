@@ -464,15 +464,6 @@ foam.CLASS({
               MedusaEntry e = (MedusaEntry) me.getValue();
               getLogger().info(e.getIndex(), e.getHash(), me.getKey());
             }
-              // getLogger().info(entry.getIndex(), entry.getHash(), Arrays.toString(lastNodes.keySet().toArray(new String[lastNodes.keySet().size()])));
-
-              // for ( MedusaEntry e : nodes.values() ) {
-              //   getLogger().info(e.getIndex(), e.getHash(), Arrays.toString(nodes.keySet().toArray(new String[nodes.keySet().size()])));
-              //   break;
-              // }
-              // // for ( Map<String, MedusaEntry> dups : hashes.values() ) {
-              // //   getLogger().info(entry.getIndex(), entry.getHash(), Arrays.toString(dups.keySet().toArray(new String[dups.keySet().size()])));
-              // // }
             throw t;
           }
         }

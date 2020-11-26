@@ -15,7 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 
 /**
-   Health check web agent.
+   Health check web agent, intented to be called by load balancers
+   to add/remove targets from target group.
+   Responses from haproxy.org
  */
 public class CheckWebAgent
   implements WebAgent
@@ -31,7 +33,6 @@ public class CheckWebAgent
     if ( support != null ) {
       ClusterConfig config = support.getConfig(x, support.getConfigId());
       if ( config.getStatus() != Status.ONLINE ) {
-        // response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
         out.println("maint\n");
         return;

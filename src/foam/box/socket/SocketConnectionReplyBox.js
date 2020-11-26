@@ -83,6 +83,12 @@ foam.CLASS({
 
   methods: [
     {
+      documentation: `Send format:
+timestamp: 4 bytes, // used to generate a PM when received.
+length: 1 byte, // message byte length
+message
+NOTE: duplicated in SocketConnectionBox
+`,
       name: 'send',
       javaCode: `
       X x = msg.getX();

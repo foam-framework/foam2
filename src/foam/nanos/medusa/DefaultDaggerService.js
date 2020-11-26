@@ -42,9 +42,9 @@ foam.CLASS({
   public static String byte2Hex(byte[] bytes) {
     StringBuffer stringBuffer = new StringBuffer();
     String temp = null;
-    for (int i=0;i<bytes.length;i++){
+    for ( int i=0; i<bytes.length; i++ ) {
       temp = Integer.toHexString(bytes[i] & 0xFF);
-      if (temp.length()==1){
+      if ( temp.length() == 1 ) {
         stringBuffer.append("0");
       }
       stringBuffer.append(temp);
@@ -264,14 +264,10 @@ foam.CLASS({
           md.update(parent1.getHash().getBytes(StandardCharsets.UTF_8));
           md.update(Long.toString(parent2.getIndex()).getBytes(StandardCharsets.UTF_8));
           md.update(parent2.getHash().getBytes(StandardCharsets.UTF_8));
-          String calculatedHash = null;
           if ( entry.getData() != null ) {
             md.update(entry.getData().getBytes(StandardCharsets.UTF_8));
-            // calculatedHash = byte2Hex(entry.getData().hash(md));
-            calculatedHash = byte2Hex(md.digest());
-          } else {
-            calculatedHash = byte2Hex(md.digest());
           }
+          String calculatedHash = byte2Hex(md.digest());
           if ( ! calculatedHash.equals(entry.getHash()) ) {
             getLogger().error("verify", entry.getIndex(), "hash", "fail", entry.toSummary());
             throw new DaggerException("Hash verification failed on: "+entry.toSummary());

@@ -616,7 +616,7 @@ foam.CLASS({
       name: 'cluster',
       class: 'Boolean',
       javaFactory: `
-    return "true".equals(System.getProperty("CLUSTER"));
+      return foam.util.SafetyUtil.equals("true", System.getProperty("CLUSTER", "false"));
       `
     },
     {

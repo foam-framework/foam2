@@ -118,10 +118,10 @@ public class SocketServerProcessor
             throw new IllegalArgumentException("Failed to parse. from: "+socket_.getRemoteSocketAddress()+", message: "+message);
           }
           pm.log(x);
-          // { // TODO: remove - debug only
-          //   String serviceKey = (String) msg.getAttributes().get("serviceKey");
-          //   logger_.debug("execute", "service", serviceKey, message);
-          // }
+
+          // NOTE: enable along with send and receive debug calls in SocketConnectionBox to monitor all messages.
+          // logger_.debug("execute", "service", (String) msg.getAttributes().get("serviceKey"), message);
+
           socketRouter_.service(msg);
         } catch ( java.net.SocketTimeoutException e ) {
           continue;

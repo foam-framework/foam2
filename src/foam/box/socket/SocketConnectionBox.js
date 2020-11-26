@@ -150,6 +150,12 @@ foam.CLASS({
 
   methods: [
     {
+      documentation: `Send format:
+timestamp: 4 bytes, // used to generate a PM when received. 
+length: 1 byte, // message byte length
+message
+NOTE: duplicated in SocketConnectionReplyBox
+`,
       name: 'send',
       javaCode: `
       PM pm = PM.create(getX(), this.getClass().getSimpleName(), getId()+":send");
@@ -179,15 +185,16 @@ foam.CLASS({
              ! socket.isConnected() ) {
           throw new SocketException("Socket not connected.");
         }
-        // omLogger.log(this.getClass().getSimpleName(), getId(), "pending");
+        omLogger.log(this.getClass().getSimpleName(), getId(), "pending");
         synchronized (out_) {
+          // NOTE: enable along with send debug call in SocketServerProcessor to monitor all messages.
           // getLogger().debug("send", message);
           out_.writeLong(System.currentTimeMillis());
           out_.writeInt(messageBytes.length);
           out_.write(messageBytes);
           // TODO/REVIEW
           out_.flush();
-          // omLogger.log(this.getClass().getSimpleName(), getId(), "sent");
+          omLogger.log(this.getClass().getSimpleName(), getId(), "sent");
         }
       } catch ( Throwable t ) {
         pm.error(getX(), t);
@@ -257,11 +264,12 @@ foam.CLASS({
                 break;
               }
             }
-            // omLogger.log(this.getClass().getSimpleName(), getId(), "received");
+            omLogger.log(this.getClass().getSimpleName(), getId(), "received");
             String message = data.toString();
             if ( foam.util.SafetyUtil.isEmpty(message) ) {
               throw new RuntimeException("Received empty message.");
             }
+            // NOTE: enable along with send debug call in SocketServerProcessor to monitor all messages.
             // getLogger().debug("receive", message);
             Message msg = (Message) x.create(JSONParser.class).parseString(message);
             if ( msg == null ) {

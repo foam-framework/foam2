@@ -34,7 +34,6 @@ foam.CLASS({
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
         }, (Logger) getX().get("logger"));
-
       `
     },
   ],
@@ -50,10 +49,6 @@ foam.CLASS({
       }
 
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
-      // if ( myConfig.getZone() > 0 ) {
-      //   return getDelegate().put_(x, nu);
-      // }
-
       ClusterConfig old = (ClusterConfig) find_(x, nu.getId());
       Boolean hadQuorum = support.hasQuorum(x);
       nu = (ClusterConfig) getDelegate().put_(x, nu);

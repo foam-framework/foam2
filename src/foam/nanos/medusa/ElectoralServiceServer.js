@@ -275,7 +275,6 @@ foam.CLASS({
       }
       if ( voters.size() < support.getMediatorQuorum() ) {
         getLogger().debug("callVote", getState().getLabel(), "insuficient votes", "voters", voters.size());
-      //     getLogger().warning("callVote", getState().getLabel(), "waiting for mediator quorum", "voters/quorum", voters.size(), support.getMediatorQuorum(), support.getHasNodeQuorum());
         return;
       }
       getLogger().debug("callVote", getState().getLabel(), "achieved mediator and node quorum", "voters/quorum", voters.size(), support.getMediatorQuorum());
@@ -323,12 +322,6 @@ foam.CLASS({
                 getLogger().debug("callVote", "executeJob", "voter", clientConfig.getId(), clientConfig.getName(), e.getMessage());
               }
             }
-
-            // public void endJob() {
-            //   getLogger().debug("callVote", "endJob", config.getId());
-            //   recordResult(x, result, clientConfig);
-            //   callReport(x);
-            // }
           }, this.getClass().getSimpleName()+":callVote");
         }
       } catch ( Exception e) {

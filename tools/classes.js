@@ -386,6 +386,7 @@ var classes = [
   'foam.nanos.medusa.ClusterConfigSupport',
   'foam.nanos.medusa.ClusterConfigSupportDAO',
   'foam.nanos.medusa.ClusterServerDAO',
+  'foam.nanos.medusa.DaggerException',
   'foam.nanos.medusa.DaggerService',
   'foam.nanos.medusa.DaggerLink',
   'foam.nanos.medusa.DaggerLinks',
