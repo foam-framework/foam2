@@ -200,7 +200,6 @@ foam.CLASS({
         var pred;
         if ( Object.keys(this.view_.predicate).length > 0 && ! foam.mlang.predicate.True.isInstance(this.view_.predicate) )
           pred =  foam.json.Outputter.create({
-            pretty: true,
             strict: true
           }).stringify(this.view_.predicate);
 

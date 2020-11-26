@@ -138,7 +138,6 @@ foam.CLASS({
             delete this.memento.paramsObj.filters;
           } else {
             var outputter = foam.json.Outputter.create({
-              pretty: true,
               strict: true
             });
             for ( var key of keys ) {
