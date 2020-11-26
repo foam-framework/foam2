@@ -133,9 +133,9 @@ foam.CLASS({
         var value = this.view.data;
         if (  this.memento ) {
           if ( value ) {
-            this.memento.paramsObj['search'] = value;
+            this.memento.paramsObj.search = value;
           } else {
-            delete this.memento.paramsObj['search'];
+            delete this.memento.paramsObj.search;
           }
           this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
         }
