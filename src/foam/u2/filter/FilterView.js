@@ -276,7 +276,7 @@ foam.CLASS({
     function initE() {
       var self = this;
 
-      if ( this.memento.paramsObj.filters ) {
+      if ( this.memento && this.memento.paramsObj.filters ) {
         this.memento.paramsObj.filters.forEach(f => {
           self.filterController.setExistingPredicate(f.criteria, f.name, foam.json.parseString(f.pred, this.__subContext__));
         });

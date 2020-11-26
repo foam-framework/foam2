@@ -55,7 +55,7 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-     if ( this.memento.paramsObj.selectedView ) {
+     if ( this.memento && this.memento.paramsObj.selectedView ) {
       var view = this.views.find(v => v[1] === this.memento.paramsObj.selectedView);
       if ( view ) {
         this.selectedView = view[0];

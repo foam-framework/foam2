@@ -91,7 +91,7 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      if ( this.memento.paramsObj.selectedView )
+      if ( this.memento && this.memento.paramsObj.selectedView )
         this.selectedView = this.memento.paramsObj.selectedView;
       else {
         self.setMementoWithSelectedView();
