@@ -35,7 +35,7 @@ foam.CLASS({
     'data.data as dao',
     'data.filteredTableColumns as filteredTableColumns',
     'data.searchColumns as searchColumns',
-    'dblclick',
+    'dblclick'
   ],
 
   css: `
