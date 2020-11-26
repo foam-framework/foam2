@@ -28,10 +28,6 @@ foam.CLASS({
     'memento'
   ],
 
-  exports: [
-    'memento'
-  ],
-
   properties: [
     {
       name: 'views',
