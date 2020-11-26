@@ -14,6 +14,8 @@ foam.CLASS({
   javaImports: [
     'foam.core.FObject',
     'foam.dao.DAO',
+    'foam.nanos.alarming.Alarm',
+    'foam.nanos.alarming.AlarmReason',
     'foam.nanos.auth.*',
     'static foam.mlang.MLang.*'
   ],
@@ -119,7 +121,12 @@ foam.CLASS({
             ! ( capability.getOf() == null || ucj.getData() == null ) &&
             ! ( ucj.getData().getClassInfo().equals(capability.getOf()) )
           )
-        ) throw new RuntimeException(this.ERROR_FOUR + ucj.getTargetId());
+        ) {
+          Alarm alarm = new Alarm("CRUNCH Configuration", AlarmReason.CONFIGURATION);
+          alarm.setNote("TargetId of ucj not a valid Capability or has messed up data.");
+          ((DAO) x.get("alarmDAO")).put(alarm);
+          throw new RuntimeException(this.ERROR_FOUR + ucj.getTargetId());
+        }
         
         return super.put_(x, obj);
       `
