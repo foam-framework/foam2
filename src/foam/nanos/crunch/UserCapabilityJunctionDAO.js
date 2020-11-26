@@ -22,7 +22,7 @@ foam.CLASS({
     { name: 'ERROR_ONE', message: 'UserCapabilityJunctions should be disabled via status change.' },
     { name: 'ERROR_TWO', message: 'User\'s capability cannot be reassigned.' },
     { name: 'ERROR_THREE', message: 'Capability cannot be changed.' },
-    { name: 'ERROR_FOUR', message: 'Capability data provided is not of the correct. CapabilityId: ' },
+    { name: 'ERROR_FOUR', message: 'Capability data provided is not of the correct type. CapabilityId: ' },
   ],
 
   methods: [
