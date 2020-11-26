@@ -97,7 +97,6 @@ foam.CLASS({
         self.setMementoWithSelectedView();
       }
 
-
       this.addClass(this.myClass())
       this.startContext({data: this})
         this.start()

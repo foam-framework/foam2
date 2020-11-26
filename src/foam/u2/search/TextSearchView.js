@@ -131,6 +131,7 @@ foam.CLASS({
       mergeDelay: 500,
       code: function() {
         var value = this.view.data;
+
         if (  this.memento ) {
           if ( value ) {
             this.memento.paramsObj.search = value;
@@ -139,6 +140,7 @@ foam.CLASS({
           }
           this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
         }
+        
         this.predicate = ! value ?
           this.True.create() :
           this.richSearch ?

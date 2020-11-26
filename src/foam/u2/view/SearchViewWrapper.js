@@ -157,10 +157,12 @@ foam.CLASS({
             property: this.property,
             dao: this.dao
           }, this.view_$);
+          
           var predicate = this.getPredicateFromMemento();
           if ( predicate ) {
             this.view_.restoreFromPredicate(predicate);
           }
+
           this.searchManager.add(this.view_$.get());
           this.firstTime_ = false;
         }
