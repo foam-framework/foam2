@@ -653,7 +653,6 @@ foam.CLASS({
             of: r && r.of ? r.of.getAxiomByName([otherSubProperties[i][0]]).cls_ : r,
             isPropertySelected:false}, this));
         }
-
         return arr;
       }
     },

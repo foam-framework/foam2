@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'TabbedDetailView',
   extends: 'foam.u2.detail.AbstractSectionedDetailView',
 
+  imports: [
+    'memento'
+  ],
+
   requires: [
     'foam.core.ArraySlot',
     'foam.u2.borders.CardBorder',
@@ -40,7 +44,8 @@ foam.CLASS({
       class: 'String',
       name: 'defaultSectionLabel',
       value: 'Information'
-    }
+    },
+    'tabs'
   ],
 
   methods: [
@@ -59,12 +64,13 @@ foam.CLASS({
 
           return self.E()
             .add(arraySlot.map((visibilities) => {
-              return this.E()
-                .start(self.Tabs)
+              var e = this.E()
+                .start(self.Tabs, {}, self.tabs$)
                   .forEach(sections, function(s, i) {
                     if ( ! visibilities[i] ) return;
+
                     this
-                      .start(self.Tab, { label: s.title || self.defaultSectionLabel })
+                      .start(self.Tab, { label: s.title || self.defaultSectionLabel, selected: self.memento.paramsObj.selectedTab && self.memento.paramsObj.selectedTab === s.title })
                         .call(function() {
                           this.tag(self.SectionView, {
                             data$: self.data$,
@@ -75,6 +81,8 @@ foam.CLASS({
                       .end();
                   })
                 .end();
+              self.tabs.updateMemento = true;
+              return e;
             }))
         }));
     }
