@@ -13,17 +13,20 @@ foam.CLASS({
       name: 'capablePayloads',
       class: 'FObjectArray',
       // javaType: 'java.util.List<foam.nanos.crunch.crunchlite.CapablePayload>',
-      of: 'foam.nanos.crunch.lite.CapablePayload'
+      of: 'foam.nanos.crunch.lite.CapablePayload',
+      section: 'capabilityInformation'
     },
     {
       name: 'userCapabilityRequirements',
       class: 'StringArray',
+      section: 'capabilityInformation'
     },
     {
       name: 'isWizardIncomplete',
       class: 'Boolean',
       transient: true,
-      hidden: true
+      hidden: true,
+      section: 'systemInformation'
     }
   ],
 
