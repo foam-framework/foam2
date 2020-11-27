@@ -706,6 +706,24 @@ foam.CLASS({
           throw new AuthenticationException("User is not active");
         }
       `
+    },
+    {
+      name: 'isAdmin',
+      type: 'Boolean',
+      documentation: `
+        Returns true if the user has the system user id, or is in either the
+        admin or system group.
+
+        **IMPORTANT**: It is possible to misuse the value from this method.
+        A check on this method should never be used to override behaviour of
+        authorization; in this case it is preferred to create a permission that
+        no other user will have.
+      `,
+      javaCode: `
+        return getId() == foam.nanos.auth.User.SYSTEM_USER_ID
+          || getGroup().equals("admin")
+          || getGroup().equals("system");
+      `
     }
   ]
 });

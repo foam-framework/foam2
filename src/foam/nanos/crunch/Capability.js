@@ -230,6 +230,7 @@ foam.CLASS({
     },
     {
       class: 'Object',
+      // TODO: rename to wizardConfig; wizardlet config is the property above
       name: 'wizardletConfig',
       documentation: `
         Configuration placed on top level capabilities defining various configuration options supported by client capability wizards.
@@ -377,29 +378,67 @@ foam.CLASS({
         }
 
         var prereqs = crunchService.getPrereqs(getId());
+        CapabilityJunctionStatus prereqChainedStatus = null;
         if ( prereqs != null ) {
           for ( var capId : prereqs ) {
             var cap = (Capability) capabilityDAO.find(capId);
             if ( cap == null || ! cap.getEnabled() ) continue;
             
-            X subjectContext = x.put("subject", subject);
-            UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(subjectContext, capId, subject);
+            UserCapabilityJunction prereqUcj = crunchService.getJunctionForSubject(x, capId, subject);
 
-            if ( ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) {
-              continue;
-            }
-
-            if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING
-              || ucJunction.getStatus() == CapabilityJunctionStatus.APPROVED
-            ) {
-              allGranted = false;
-            } else {
-              return CapabilityJunctionStatus.ACTION_REQUIRED;
-            }
+            prereqChainedStatus = getPrereqChainedStatus(x, ucj, prereqUcj);
+            if ( prereqChainedStatus == CapabilityJunctionStatus.ACTION_REQUIRED ) return CapabilityJunctionStatus.ACTION_REQUIRED;
+            if ( prereqChainedStatus != CapabilityJunctionStatus.GRANTED ) allGranted = false;
           }
         }
         return allGranted ? CapabilityJunctionStatus.GRANTED : CapabilityJunctionStatus.PENDING;
       `,
+    },
+    {
+      name: 'getPrereqChainedStatus',
+      args: [
+        { name: 'x', javaType: 'foam.core.X' },
+        { name: 'ucj', javaType: 'foam.nanos.crunch.UserCapabilityJunction' },
+        { name: 'prereq', javaType: 'foam.nanos.crunch.UserCapabilityJunction' }
+      ],
+      static: true,
+      javaType: 'foam.nanos.crunch.CapabilityJunctionStatus',
+      javaCode: `
+        CapabilityJunctionStatus status = ucj.getStatus();
+
+        boolean reviewRequired = getReviewRequired();
+        CapabilityJunctionStatus prereqStatus = prereq.getStatus();
+
+        switch ( (CapabilityJunctionStatus) prereqStatus ) {
+          case AVAILABLE : 
+            status = CapabilityJunctionStatus.ACTION_REQUIRED;
+            break;
+          case ACTION_REQUIRED : 
+            status = CapabilityJunctionStatus.ACTION_REQUIRED;
+            break;
+          case PENDING : 
+            status = reviewRequired && 
+              ( status == CapabilityJunctionStatus.APPROVED || 
+                status == CapabilityJunctionStatus.GRANTED
+              ) ? 
+                CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
+            break;
+          case APPROVED : 
+            status = reviewRequired && 
+              ( status == CapabilityJunctionStatus.APPROVED || 
+                status == CapabilityJunctionStatus.GRANTED
+              ) ? 
+                CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
+              break;
+          case EXPIRED :
+            status = CapabilityJunctionStatus.ACTION_REQUIRED;
+            break;
+          default : 
+            status = CapabilityJunctionStatus.GRANTED;
+        }
+        return status;
+
+      `
     }
   ]
 });

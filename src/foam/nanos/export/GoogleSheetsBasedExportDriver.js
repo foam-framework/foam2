@@ -7,9 +7,13 @@
 foam.CLASS({
   package: 'foam.nanos.export',
   name: 'GoogleSheetsBasedExportDriver',
-  implements: [ 
+  implements: [
     'foam.nanos.export.ExportDriver',
     'foam.nanos.export.GoogleSheetsServiceConfig'
+  ],
+
+  messages: [
+    { name: 'PLEASE_SELECT_TEMPLATE', message: 'Please select template...' }
   ],
 
   properties: [
@@ -33,9 +37,9 @@ foam.CLASS({
       view: function(args, X) {
         var expr = foam.mlang.Expressions.create();
         if ( ! X.serviceName ) return {};
-        
+
         return foam.u2.view.ChoiceView.create({
-            placeholder: 'Please select template...',
+            placeholder: X.data.PLEASE_SELECT_TEMPLATE,
             dao: X.reportTemplateDAO.where(expr.EQ(foam.nanos.export.report.Template.DAO_KEY, X.serviceName.split('/')[1])),
             objToChoice: function(a) {
               return [a.id, a.name];
@@ -69,7 +73,7 @@ foam.CLASS({
   methods: [
     async function exportFObjectAndReturnSheetId(X, obj) {
       var self = this;
-      
+
       var sheetId  = '';
       var columnConfig = X.columnConfigToPropertyConverter;
 
@@ -84,7 +88,7 @@ foam.CLASS({
       }
 
       propNames = columnConfig.filterExportedProps(X, obj.cls_, propNames);
-      
+
       var metadata = await self.outputter.getColumnMethadata(X, obj.cls_, propNames);
 
       self.outputter.setUnitValueMetadataForObj(metadata, obj);
@@ -115,7 +119,7 @@ foam.CLASS({
         var template = await X.reportTemplateDAO.find(expr1.EQ(foam.nanos.export.report.Template.ID, this.template));
         propNames = template && template.columnNames && template.columnNames.length > 0 ? template.columnNames : X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
       }
-       
+
       propNames = columnConfig.filterExportedProps(dao.of, propNames);
       var lengthOfInitialyPropsRequested = propNames.length;
 
