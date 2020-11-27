@@ -14,12 +14,17 @@ foam.CLASS({
   javaImports: [
     'foam.core.FObject',
     'foam.dao.DAO',
+    'foam.nanos.alarming.Alarm',
+    'foam.nanos.alarming.AlarmReason',
     'foam.nanos.auth.*',
     'static foam.mlang.MLang.*'
   ],
 
   messages: [
-    { name: 'ERROR_MSG', message: 'Error on UserCapabilityJunction checkOwnership create UCJ denied to user ' }
+    { name: 'ERROR_ONE', message: 'UserCapabilityJunctions should be disabled via status change.' },
+    { name: 'ERROR_TWO', message: 'User\'s capability cannot be reassigned.' },
+    { name: 'ERROR_THREE', message: 'Capability cannot be changed.' },
+    { name: 'ERROR_FOUR', message: 'Capability data provided is not of the correct type. CapabilityId: ' },
   ],
 
   methods: [
@@ -74,13 +79,13 @@ foam.CLASS({
     {
       name: 'remove_',
       javaCode: `
-        throw new UnsupportedOperationException("UserCapabilityJunctions should be disabled via status change.");
+        throw new UnsupportedOperationException(this.ERROR_ONE);
       `
     },
     {
       name: 'removeAll_',
       javaCode: `
-        throw new UnsupportedOperationException("UserCapabilityJunctions should be disabled via status change.");
+        throw new UnsupportedOperationException(this.ERROR_ONE);
       `
     },
     {
@@ -105,13 +110,23 @@ foam.CLASS({
         UserCapabilityJunction old = (UserCapabilityJunction) super.find_(x, ucj.getId());
 
         // do not allow updates to sourceId/targetId properties
-        if ( old != null && ucj.getSourceId() != old.getSourceId() ) throw new RuntimeException("User's capability cannot be reassigned.");
-        if ( old != null && ! ucj.getTargetId().equals(old.getTargetId()) ) throw new RuntimeException("Capability cannot be changed.");
+        if ( old != null && ucj.getSourceId() != old.getSourceId() ) throw new RuntimeException(this.ERROR_TWO);
+        if ( old != null && ! ucj.getTargetId().equals(old.getTargetId()) ) throw new RuntimeException(this.ERROR_THREE);
         
         // if ucj data is set but does not match expected data, do not put
         Capability capability = (Capability) ucj.findTargetId(x);
-        if ( capability.getOf() != null && ucj.getData() != null && ! ( ucj.getData().getClassInfo().equals(capability.getOf()) ) )
-          throw new RuntimeException("Capability data provided is not of the correct type.");
+        if ( 
+          capability == null ||
+          (
+            ! ( capability.getOf() == null || ucj.getData() == null ) &&
+            ! ( ucj.getData().getClassInfo().equals(capability.getOf()) )
+          )
+        ) {
+          Alarm alarm = new Alarm("CRUNCH Configuration", AlarmReason.CONFIGURATION);
+          alarm.setNote("TargetId of ucj not a valid Capability or has messed up data.");
+          ((DAO) x.get("alarmDAO")).put(alarm);
+          throw new RuntimeException(this.ERROR_FOUR + ucj.getTargetId());
+        }
         
         return super.put_(x, obj);
       `
