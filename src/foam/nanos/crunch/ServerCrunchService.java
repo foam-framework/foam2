@@ -205,6 +205,26 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return this.getJunctionForSubject(x, capabilityId, subject);
   }
 
+  public boolean hasPreconditionsMet(
+    X x, String capabilityId
+  ) {
+    var preconditions = Arrays.stream(((CapabilityCapabilityJunction[]) ((ArraySink) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
+      .where(AND(
+        EQ(CapabilityCapabilityJunction.SOURCE_ID, capabilityId),
+        EQ(CapabilityCapabilityJunction.PRECONDITION, true)
+      ))
+      .select(new ArraySink())).getArray()
+      .toArray(new CapabilityCapabilityJunction[0])))
+      .map(CapabilityCapabilityJunction::getTargetId).toArray(String[]::new);
+    
+    for ( String preconditionId : preconditions ) {
+      var ucj = getJunction(x, preconditionId);
+      if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED ) return false;
+    }
+
+    return true;
+  }
+
   public UserCapabilityJunction[] getAllJunctionsForUser(X x) {
     Predicate associationPredicate = getAssociationPredicate_(x);
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");

@@ -265,6 +265,56 @@ foam.CLASS({
 });
 
 
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'ObjectMutationProxyDAO',
+  extends: 'foam.dao.ProxyDAO',
+  flags: ['java'],
+  abstract: true,
+
+  javaImports: [
+    'foam.core.Detachable',
+    'foam.core.FObject',
+    'foam.core.X',
+    'foam.dao.ProxySink'
+  ],
+
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+          public abstract FObject update(X x, FObject obj);
+        `);
+      }
+    }
+  ],
+
+  methods: [
+    {
+      name: 'find_',
+      javaCode: `
+        return update(
+          x, getDelegate().find_(x, id));
+      `
+    },
+    {
+      name: 'select_',
+      javaCode: `
+        if ( sink == null ) sink = new ArraySink();
+        ProxySink refinedSink = new ProxySink(x, sink) {
+          @Override
+          public void put(Object obj, Detachable sub) {
+            super.put(update(x, (FObject) obj), sub);
+          }
+        };
+        return ((ProxySink) super.select_(x, refinedSink, skip, limit, order, predicate)).getDelegate();
+      `
+    }
+  ]
+});
+
+
 foam.LIB({
   name: 'foam.String',
   methods: [
