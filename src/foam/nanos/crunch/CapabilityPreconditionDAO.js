@@ -49,7 +49,7 @@ foam.CLASS({
 
         var crunchService = (CrunchService) x.get("crunchService");
         if ( ! crunchService.hasPreconditionsMet(x, cap.getId()) ) {
-          cap.setCapabilityVisibilityPredicate(FALSE);
+          cap.setVisibilityPredicate(FALSE);
         }
         return cap;
       `
