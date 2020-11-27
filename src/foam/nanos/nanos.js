@@ -287,6 +287,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/ToastState' },
   { name: 'foam/nanos/notification/ScriptRunNotification'},
   { name: 'foam/nanos/notification/ScriptRunNotificationNotificationCitationView'},
+  { name: 'foam/nanos/notification/NotificationMessageModal'},
   { name: 'foam/nanos/dashboard/Demo' },
 
   // Ticket
