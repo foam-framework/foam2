@@ -99,7 +99,7 @@ foam.CLASS({
       style.addBinds(self);
 
       self
-        .show(this.data.capabilityVisibilityPredicate.f())
+        .show(this.data.visibilityPredicate.f())
         .addClass(style.myClass())
         .addClass(style.myClass(), 'mode-card')
         .start()
