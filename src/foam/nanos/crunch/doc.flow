@@ -1,5 +1,21 @@
 <title>CRUNCH Developer Documentation</title>
 
+<h2>Purpose of this Document</h2>
+This document aims to describe CRUNCH internals and interfaces, but is not
+intended as a user guide. To get started with CRUNCH, see the documentation
+in `src/documentation/crunch-doc.flow`.
+
+<h2>CrunchController</h2>
+
+CrunchController contains logic for handling CRUNCH intercepts and
+creating CRUNCH-specific wizard sequences. It should be provided by
+the application's main controller in an exported property named
+`crunchController`.
+
+<h3>CrunchController methods</h3>
+
+<foam class="foam.flow.widgets.MethodShortSummary" of="foam.u2.crunch.CrunchController" />
+
 <h2>CapabilityIntercept</h2>
 
 Capability intercepts (AKA CRUNCH intercepts) allow a server to abort

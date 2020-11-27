@@ -12,6 +12,7 @@ foam.CLASS({
     {
       name: 'capablePayloads',
       class: 'FObjectArray',
+      section: 'capabilityInformation',
       // javaType: 'java.util.List<foam.nanos.crunch.crunchlite.CapablePayload>',
       of: 'foam.nanos.crunch.lite.CapablePayload',
       section: 'capabilityInformation'
@@ -24,6 +25,7 @@ foam.CLASS({
     {
       name: 'isWizardIncomplete',
       class: 'Boolean',
+      section: 'systemInformation',
       transient: true,
       hidden: true,
       section: 'systemInformation'
