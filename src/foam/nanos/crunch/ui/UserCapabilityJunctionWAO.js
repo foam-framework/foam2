@@ -29,7 +29,6 @@ foam.CLASS({
       });
     },
     function cancel(wizardlet) {
-      if ( ! wizardlet.isAvailable ) return Promise.resolve();
       return this.crunchService.updateJunction( null,
         wizardlet.capability.id, null, this.CapabilityJunctionStatus.AVAILABLE
       ).then((ucj) => {

@@ -205,6 +205,26 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return this.getJunctionForSubject(x, capabilityId, subject);
   }
 
+  public boolean hasPreconditionsMet(
+    X x, String capabilityId
+  ) {
+    var preconditions = Arrays.stream(((CapabilityCapabilityJunction[]) ((ArraySink) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
+      .where(AND(
+        EQ(CapabilityCapabilityJunction.SOURCE_ID, capabilityId),
+        EQ(CapabilityCapabilityJunction.PRECONDITION, true)
+      ))
+      .select(new ArraySink())).getArray()
+      .toArray(new CapabilityCapabilityJunction[0])))
+      .map(CapabilityCapabilityJunction::getTargetId).toArray(String[]::new);
+    
+    for ( String preconditionId : preconditions ) {
+      var ucj = getJunction(x, preconditionId);
+      if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED ) return false;
+    }
+
+    return true;
+  }
+
   public UserCapabilityJunction[] getAllJunctionsForUser(X x) {
     Predicate associationPredicate = getAssociationPredicate_(x);
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
@@ -221,6 +241,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     try {
       DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
+      x = x.put("subject", subject);
       Predicate associationPredicate = getAssociationPredicate_(x);
 
       // Check if a ucj implies the subject.realUser has this permission in relation to the user
@@ -257,6 +278,17 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     if ( status != null ) {
       ucj.setStatus(status);
     }
+
+    if (
+      subject.getRealUser().isAdmin()
+      && subject.getRealUser() != subject.getUser()
+    ) {
+      var logger = (Logger) x.get("logger");
+      // This may be correct when testing features as an admin user
+      logger.warning(
+        "admin user is lastUpdatedRealUser on an agent-associated UCJ");
+    }
+    ucj.setLastUpdatedRealUser(subject.getRealUser().getId());
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
     return (UserCapabilityJunction) userCapabilityJunctionDAO.inX(x).put(ucj);
   }

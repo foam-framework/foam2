@@ -371,6 +371,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/lite/MinMaxCapabilityRefinement" },
   { name: "foam/nanos/crunch/crunchtest/TestCapable" },
   { name: "foam/nanos/crunch/CapabilityAvailabilityDAO" },
+  { name: "foam/nanos/crunch/CapabilityPreconditionDAO" },
   { name: "foam/nanos/crunch/example/ExampleData" },
 
   // crunch lite rulers
@@ -422,6 +423,7 @@ FOAM_FILES([
   { name: 'foam/nanos/crunch/extra/ReviewCapability' },
   { name: 'foam/nanos/crunch/extra/ReviewCapabilityData' },
   { name: 'foam/nanos/crunch/extra/ReviewWizard' },
+  { name: 'foam/nanos/crunch/extra/ImplyReviewedAction' },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },

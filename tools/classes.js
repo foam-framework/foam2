@@ -669,6 +669,7 @@ var classes = [
   'foam.nanos.crunch.lite.CapablePayloadStatusDAO',
   'foam.nanos.crunch.lite.CapableCompatibleCapability',
   'foam.nanos.crunch.CapabilityAvailabilityDAO',
+  'foam.nanos.crunch.CapabilityPreconditionDAO',
 
   'foam.nanos.crunch.lite.ruler.CapableCreateApprovalsRuleAction',
   'foam.nanos.crunch.lite.ruler.ReputDependantPayloads',
@@ -717,6 +718,7 @@ var classes = [
   'foam.nanos.crunch.extra.ReviewCapability',
   'foam.nanos.crunch.extra.ReviewCapabilityData',
   'foam.nanos.crunch.extra.ReviewWizard',
+  'foam.nanos.crunch.extra.ImplyReviewedAction',
 
   //crunch predicates
   'foam.nanos.crunch.predicate.CapabilityGranted',

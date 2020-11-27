@@ -80,6 +80,7 @@ foam.CLASS({
       documentation: 'The date and time of when the User was created in the system.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
+      section: 'administrative',
       includeInDigest: true,
       section: 'supportDetails'
     },
@@ -89,6 +90,7 @@ foam.CLASS({
       documentation: 'The date and time the User was last modified.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
+      section: 'administrative',
       storageOptional: true,
       section: 'supportDetails'
     },
