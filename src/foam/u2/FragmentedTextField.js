@@ -17,6 +17,7 @@ foam.CLASS({
     ^ {
       display: flex;
       position: relative;
+      width: min-content;
     }
     ^symbol {
       display: flex;
@@ -41,6 +42,9 @@ foam.CLASS({
     ^ > *:last-child {
       border-top-left-radius: 0 !important;
       border-bottom-left-radius: 0 !important;
+    }
+    ^fragment {
+      text-align: center;
     }
   `,
 
@@ -83,7 +87,7 @@ foam.CLASS({
         } else if ( e.cls_ === foam.u2.FragmentedTextFieldFragment ) {
           e = e.view;
         }
-        var u2Elem = this.start(e)
+        var u2Elem = this.start(e).addClass(this.myClass('fragment'))
         u2Elem.on('focus', () => {
           this.currentIndex = i;
         })
