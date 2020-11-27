@@ -591,7 +591,7 @@ foam.CLASS({
     {
       name: 'prop',
       expression: function(rootProperty) {
-        return this.of.getAxiomByName(this.columnHandler.checkIfArrayAndReturnPropertyNameForRootProperty(rootProperty));
+        return !! this.of.getAxiomByName(this.columnHandler.checkIfArrayAndReturnPropertyNameForRootProperty(rootProperty));
       }
     },
     {
