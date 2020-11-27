@@ -6,7 +6,20 @@ p({
   "class":"foam.nanos.menu.DAOMenu2",
     "config":{
       "class":"foam.comics.v2.DAOControllerConfig",
-      "daoKey":"om1minDAO"
+      "daoKey":"om1minuteDAO"
+    }
+  },
+  "parent":"admin"
+})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.o5m",
+  "label":"Operation Measures - 5 Minute",
+  "handler":{
+  "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"om5minuteDAO"
     }
   },
   "parent":"admin"
@@ -14,7 +27,7 @@ p({
 p({
   "class":"foam.nanos.menu.Menu",
   "id":"admin.o1h",
-  "label":"Operation Measures - 1 Hour",
+  "label":"Operation Measures - Hour",
   "handler":{
     "class":"foam.nanos.menu.DAOMenu2",
     "config":{
@@ -27,7 +40,7 @@ p({
 p({
   "class":"foam.nanos.menu.Menu",
   "id":"admin.o1d",
-  "label":"Operation Measures - 1 Day",
+  "label":"Operation Measures - Day",
   "handler":{
     "class":"foam.nanos.menu.DAOMenu2",
     "config":{
