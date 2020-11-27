@@ -17,7 +17,6 @@ foam.CLASS({
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCategory',
     'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
-    'foam.nanos.crunch.CapabilityIsVisible',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.u2.crunch.CapabilityCardView',
@@ -140,15 +139,7 @@ foam.CLASS({
         DAO with only visible capabilities.
       `,
       expression: function(hideGrantedCapabilities, grantedCapabilities) {
-        var predicate = this.CapabilityIsVisible.create();
-        if ( hideGrantedCapabilities && grantedCapabilities.length > 0 ) {
-          predicate = this.AND(
-            predicate,
-            this.NOT(this.IN(this.Capability.ID, grantedCapabilities))
-          );
-        }
         return this.capabilityDAO
-          .where(predicate);
       }
     },
     {

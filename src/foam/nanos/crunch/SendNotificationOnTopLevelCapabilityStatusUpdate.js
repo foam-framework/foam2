@@ -40,7 +40,7 @@ foam.CLASS({
 
           // visible checks if the capability is a top-level capability
           // and availabilitypredicate checks if the user has access to the capability
-          if ( cap == null || ! ( cap.getVisible() && cap.getAvailabilityPredicate().f(x) ) ) return;
+          if ( cap == null || ! ( cap.getAvailabilityPredicate().f(x) ) ) return;
 
           DAO notificationDAO = (DAO) x.get("notificationDAO");
 

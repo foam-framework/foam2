@@ -121,12 +121,6 @@ foam.CLASS({
       user will lose permissions implied by this capability and upper level capabilities will ignore this prerequisite`
     },
     {
-      name: 'visible',	
-      class: 'Boolean',	
-      documentation: `Hide sub-capabilities which aren't top-level and individually selectable. when true, capability is visible to the user`,	
-      section: 'uiSettings'	
-    },
-    {
       name: 'expiry',
       class: 'DateTime',
       documentation: `Datetime of when capability is no longer valid`
@@ -201,7 +195,7 @@ foam.CLASS({
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'capabilityVisibilityPredicate',
       networkTransient: true,
-      javaFactory: 'return foam.mlang.MLang.TRUE;',
+      javaFactory: 'return foam.mlang.MLang.FALSE;',
       documentation: 'Predicate of the visibility for capabilities in the capability store/keyword sections'
     },
     {
