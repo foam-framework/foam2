@@ -110,6 +110,11 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      class: 'String',
+      name: 'sessionID',
+      factory: function() { return this.jsSessionID; }
+    }
   ],
 
   methods: [
