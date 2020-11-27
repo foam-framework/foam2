@@ -115,13 +115,16 @@ foam.CLASS({
       code: function() {
         var arr = this.processData(this.childNodes[this.currentIndex].data, this.currentIndex, []);
         for ( var i = 0; i < arr.length; i++ ) {
+          var nextIndex = this.currentIndex + 1;
+          while ( this.childNodes[nextIndex] && ! foam.u2.TextField.isInstance(this.childNodes[nextIndex]) ) {
+            nextIndex++;
+          }
           this.childNodes[this.currentIndex].data = arr[i];
-          if ( next = this.childNodes[this.currentIndex + 2] ) {
+          if ( next = this.childNodes[nextIndex] ) {
             if ( this.delegates[this.currentIndex].maxLength > arr[i].length ) break;
 
             if ( ! ( next && next.data ) ) {
-              // TODO : typecheck the delegates to determine what currentIndex should be set to next instead of '+2'
-              this.currentIndex = this.currentIndex + 2;
+              this.currentIndex = nextIndex;
               next.focus();
             } else break;
           }

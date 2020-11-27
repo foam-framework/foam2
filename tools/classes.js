@@ -718,6 +718,7 @@ var classes = [
   'foam.nanos.crunch.extra.ReviewCapability',
   'foam.nanos.crunch.extra.ReviewCapabilityData',
   'foam.nanos.crunch.extra.ReviewWizard',
+  'foam.nanos.crunch.extra.ImplyReviewedAction',
 
   //crunch predicates
   'foam.nanos.crunch.predicate.CapabilityGranted',

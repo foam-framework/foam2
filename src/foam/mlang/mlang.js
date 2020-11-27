@@ -3148,7 +3148,7 @@ foam.CLASS({
     },
     {
       name: 'createStatement',
-      javaCode: `return null;`
+      javaCode: `return getHead().createStatement() + ", " + getTail().createStatement();`
     },
     {
       name: 'prepareStatement',
