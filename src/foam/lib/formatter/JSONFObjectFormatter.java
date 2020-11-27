@@ -338,21 +338,40 @@ public class JSONFObjectFormatter
       append(',');
     }
     addInnerNewline();
-    PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
-    boolean outputId = ! id.getStorageTransient();
-    if ( outputId ) outputProperty(newFObject, id);
+
+    // Always output id although it can be transient or multipart id to ensure
+    // that the entry/record is identifiable on replay.
+    outputId(newFObject, newInfo);
 
     for ( int i = 0 ; i < size ; i++ ) {
-      if ( i > 0 || outputId ) {
-        append(',');
-        addInnerNewline();
-      }
+      append(',');
+      addInnerNewline();
       PropertyInfo prop = (PropertyInfo) delta.get(i);
       outputProperty(newFObject, prop);
     }
 
     addInnerNewline();
     append('}');
+  }
+
+  private void outputId(FObject obj, ClassInfo cls) {
+    PropertyInfo id = (PropertyInfo) cls.getAxiomByName("id");
+    if ( id.getValueClass().getName().equals(cls.getId() + "Id") ) {
+      var objId = (FObject) id.get(obj);
+      var idProps = getProperties(objId.getClassInfo());
+      for ( var i = 0; i < idProps.size(); i++ ) {
+        if ( i > 0 ) {
+          append(',');
+          addInnerNewline();
+        }
+        // Output multipart id's properties
+        outputProperty(objId, (PropertyInfo) idProps.get(i));
+      }
+      return;
+    }
+
+    // Output object's id property
+    outputProperty(obj, id);
   }
 
   protected void addInnerNewline() {
