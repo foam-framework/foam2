@@ -95,6 +95,8 @@ foam.CLASS({
 
   requires: [ 'foam.box.SessionReplyBox' ],
 
+  imports: [ 'sessionID' ],
+
   constants: [
     {
       name: 'SESSION_KEY',
@@ -108,10 +110,6 @@ foam.CLASS({
       class: 'String',
       name: 'sessionName',
       value: 'defaultSession'
-    },
-    {
-      class: 'foam.box.SessionIDProperty',
-      name: 'sessionID'
     }
   ],
 
