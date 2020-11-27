@@ -64,17 +64,19 @@
 
   sections: [
     {
-      name: 'basicInformation',
-      permissionRequired: true
+      name: 'requestDetails',
+      title: 'Approval Request Information',
+      order: 0
     },
     {
-      name: 'requestDetails'
+      name: 'complianceInformation',
+      title: 'Compliance',
+      order: 1
     },
     {
-      name: 'supportDetails'
-    },
-    {
-      name: '_defaultSection',
+      name: 'systemInformation',
+      title: 'System Information',
+      order: 2,
       permissionRequired: true
     }
   ],
@@ -139,7 +141,7 @@
     {
       class: 'Long',
       name: 'id',
-      section: '_defaultSection',
+      section: 'requestDetails',
       visibility: 'RO',
       documentation: 'Sequence number.'
     },
@@ -147,7 +149,7 @@
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'approver',
-      section: 'requestDetails',
+      section: 'systemInformation',
       documentation: `The user that is requested for approval. When set, "group" property is ignored.`,
       view: function(_, X) {
         let slot = foam.core.SimpleSlot.create();
@@ -199,6 +201,7 @@
       class: 'Object',
       javaType: 'Object',
       name: 'objId',
+      section: 'requestDetails',
       documentation: 'id of the object that needs approval.',
       tableWidth: 150,
       tableCellFormatter: function(objId) {
@@ -220,6 +223,7 @@
     {
       class: 'String',
       name: 'daoKey',
+      section: 'systemInformation',
       documentation: `Used internally in approvalDAO to point where requested object can be found.
       Should not be used to retrieve approval requests for a given objects
       since an object can have multiple requests of different nature. When used in conjunction with serverDaoKey,
@@ -228,6 +232,7 @@
     {
       class: 'String',
       name: 'serverDaoKey',
+      section: 'systemInformation',
       documentation: `Used internally in approvalDAO if an approval request concerns both a clientDAO and
       a server side dao. The server dao key is mainly used for backend actions that get executed on
       the object as a cause of the approval request being approved or rejected.`
@@ -260,7 +265,7 @@
       Future: populated in approvalRequestDAO pipeline based on configurations.
       Currentely populated as 1.`,
       gridColumns: 4,
-      section: 'basicInformation',
+      section: 'systemInformation',
       visibility: function(points) {
         return points ?
           foam.u2.DisplayMode.RO :
@@ -272,7 +277,7 @@
       name: 'requiredPoints',
       value: 1,
       gridColumns: 4,
-      section: 'basicInformation',
+      section: 'requestDetails',
       documentation: `Defines how many approvers required and approvers' ranks.
       E.g. when set to 10:
       1) 10 approval requests with "points" set to 1.
@@ -290,7 +295,7 @@
       name: 'requiredRejectedPoints',
       value: 1,
       gridColumns: 4,
-      section: 'basicInformation',
+      section: 'requestDetails',
       visibility: function(requiredRejectedPoints) {
         return requiredRejectedPoints ?
           foam.u2.DisplayMode.RO :
@@ -303,7 +308,7 @@
       name: 'group',
       documentation: `When set, each user in the group will receive a request for approval.
       If "approver" property is set, "group" property is ignored.`,
-      section: 'supportDetails',
+      section: 'requestDetails',
       visibility: function(group) {
         return group ?
           foam.u2.DisplayMode.RO :
@@ -324,7 +329,7 @@
       name: 'memo',
       view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 80 },
       documentation: 'Meant to be used for explanation on why request was approved/rejected',
-      section: 'supportDetails',
+      section: 'requestDetails',
       visibility: function(memo) {
         if ( memo ) {
           return foam.u2.DisplayMode.RO;
@@ -349,14 +354,14 @@
       class: 'String',
       name: 'token',
       documentation: 'token in email for ‘click to approve’.',
-      section: 'basicInformation',
+      section: 'systemInformation',
       readPermissionRequired: true,
       writePermissionRequired: true
     },
     {
       class: 'DateTime',
       name: 'created',
-      section: 'supportDetails',
+      section: 'requestDetails',
       gridColumns: 6,
       visibility: function(created) {
         return created ?
@@ -368,7 +373,7 @@
       class: 'DateTime',
       name: 'lastModified',
       gridColumns: 6,
-      section: 'supportDetails',
+      section: 'requestDetails',
       visibility: function(lastModified) {
         return lastModified ?
           foam.u2.DisplayMode.RO :
@@ -379,7 +384,7 @@
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
-      section: 'supportDetails',
+      section: 'requestDetails',
       tableCellFormatter: function(initiatingUser) {
         let self = this;
         this.__subSubContext__.userDAO.find(initiatingUser).then(user => {
@@ -391,7 +396,7 @@
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdByAgent',
-      section: 'supportDetails',
+      section: 'requestDetails',
       readPermissionRequired: true,
       writePermissionRequired: true
     },
@@ -399,7 +404,7 @@
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
-      section: 'supportDetails',
+      section: 'requestDetails',
       readPermissionRequired: true,
       writePermissionRequired: true
     },
@@ -432,6 +437,7 @@
     {
       class: 'String',
       name: 'daoKey_',
+      section: 'systemInformation',
       readPermissionRequired: true,
       writePermissionRequired: true,
       factory: function() {
@@ -451,7 +457,8 @@
     },
     {
       class: 'Boolean',
-      name: 'isTrackingRequest'
+      name: 'isTrackingRequest',
+      section: 'systemInformation'
     },
     {
       class: 'Boolean',
