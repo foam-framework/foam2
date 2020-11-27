@@ -19,7 +19,8 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.logger.Logger',
     'foam.nanos.auth.Subject',
-    'foam.nanos.auth.User'
+    'foam.nanos.auth.User',
+    'static foam.nanos.crunch.AssociatedEntity.*'
   ],
 
   tableColumns: [
@@ -76,6 +77,15 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.crunch.CapabilityJunctionStatus',
       value: foam.nanos.crunch.CapabilityJunctionStatus.ACTION_REQUIRED
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastUpdatedRealUser',
+      documentation: `
+        This property is helpful when it's necessary to know which real
+        user last changed a capability of an effective user.
+      `
     },
     // renewable
     { name: 'isExpired', section: 'ucjExpirySection' },
@@ -158,16 +168,71 @@ foam.CLASS({
             objectToSave = (FObject) getData();
           }
         }
-        objectToSave = objectToSave.fclone().copyFrom(getData());           // finally copy user inputed data into objectToSave <- typed to the safest possibility from above cases
+        if ( dao.getOf().getObjClass().isAssignableFrom(getData().getClass()) ) { // skip copy if data is the same class as dao.of or is a super class of dao.of
+          objectToSave = (FObject) getData();
+        }
+        else {
+          objectToSave = objectToSave.fclone().copyFrom(getData());           // finally copy user inputed data into objectToSave <- typed to the safest possibility from above cases
+        }
 
         try {                                                                   // save data to dao
-          if ( putObject ) dao.put(objectToSave);
+          if ( putObject ) dao.inX(x).put(objectToSave);
         } catch (Exception e) {
           Logger logger = (Logger) x.get("logger");
           logger.warning("Data cannot be added to " + capability.getDaoKey() + " for UserCapabilityJunction object : " + getId() );
         }
 
         return objectToSave;
+      `
+    },
+    {
+      name: 'getSubject',
+      type: 'foam.nanos.auth.Subject',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+        UserCapabilityJunction ucj = this;
+        var currentSubject = (Subject) x.get("subject");
+        var userDAO = (DAO) x.get("userDAO");
+
+        Subject subject = new Subject(x);
+        if ( ucj instanceof AgentCapabilityJunction ) {
+          subject.setUser((User) userDAO.find(ucj.getSourceId()));
+          AgentCapabilityJunction acj = (AgentCapabilityJunction) ucj;
+          subject.setUser((User) userDAO.find(acj.getEffectiveUser()));
+          return subject;
+        }
+
+        // We will need the capability object to know how it's associated
+        var capabilityDAO = (DAO) x.get("capabilityDAO");
+        var cap = (Capability) capabilityDAO.find(ucj.getTargetId());
+        if ( cap == null ) {
+          throw new RuntimeException(
+            "Tried to call getSubject() on UCJ with unrecognized capability");
+        }
+
+        if ( ucj.getSourceId() == currentSubject.getUser().getId() ) {
+          subject.setUser(currentSubject.getRealUser());
+          subject.setUser(currentSubject.getUser());
+          return subject;
+        }
+
+        if ( cap.getAssociatedEntity() == USER ) {
+          subject.setUser((User) userDAO.find(
+            0 != ucj.getLastUpdatedRealUser()
+              ? ucj.getLastUpdatedRealUser()
+              : ucj.getSourceId()
+          ));
+          subject.setUser((User) userDAO.find(ucj.getSourceId()));
+        }
+        
+        subject.setUser((User) userDAO.find(ucj.getSourceId()));
+        subject.setUser((User) userDAO.find(ucj.getSourceId()));
+        return subject;
       `
     }
   ]

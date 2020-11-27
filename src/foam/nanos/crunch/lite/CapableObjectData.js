@@ -20,9 +20,10 @@ foam.CLASS({
       class: 'StringArray',
     },
     {
-      name: 'isWizardCompleted',
+      name: 'isWizardIncomplete',
       class: 'Boolean',
-      transient: true
+      transient: true,
+      hidden: true
     }
   ],
 

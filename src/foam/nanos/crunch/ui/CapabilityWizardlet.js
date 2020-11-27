@@ -8,13 +8,8 @@ foam.CLASS({
   name: 'CapabilityWizardlet',
   extends: 'foam.u2.wizard.BaseWizardlet',
 
-  implements: [
-    'foam.mlang.Expressions'
-  ],
-
-  imports: [
-    'crunchController',
-    'localeDAO'
+  requires: [
+    'foam.nanos.crunch.ui.UserCapabilityJunctionWAO',
   ],
 
   properties: [
@@ -23,7 +18,7 @@ foam.CLASS({
       name: 'capability'
     },
     {
-      name: 'ucj'
+      name: 'status'
     },
     {
       name: 'id',
@@ -43,18 +38,7 @@ foam.CLASS({
     },
     {
       name: 'data',
-      flags: ['web'],
-      factory: function() {
-        if ( ! this.of ) return null;
-
-        var ret = this.of.create({}, this);
-        if ( this.ucj && this.ucj.data ) ret.copyFrom(this.ucj.data);
-
-        var prop = this.of.getAxiomByName('capability');
-        if ( prop ) prop.set(ret, this.capability);
-
-        return ret;
-      }
+      flags: ['web']
     },
     {
       name: 'title',
@@ -63,14 +47,20 @@ foam.CLASS({
         if ( ! capability || ! capability.name ) return '';
         return capability.name;
       }
-    }
-  ],
-
-  methods: [
+    },
     {
-      name: 'save',
-      code: function() {
-        return this.crunchController && this.crunchController.save(this);
+      name: 'isAvailable',
+      class: 'Boolean',
+      value: true,
+      postSet: function (ol, nu) {
+        if ( nu ) this.save();
+        else this.cancel();
+      }
+    },
+    {
+      name: 'dataController',
+      factory: function () {
+        return this.UserCapabilityJunctionWAO.create({}, this.__context__);
       }
     }
   ]

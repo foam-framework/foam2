@@ -54,7 +54,8 @@ foam.CLASS({
     'foam.u2.stack.StackView',
     'foam.u2.dialog.NotificationMessage',
     'foam.nanos.session.SessionTimer',
-    'foam.u2.dialog.Popup'
+    'foam.u2.dialog.Popup',
+    'foam.core.Latch'
   ],
 
   imports: [
@@ -82,6 +83,7 @@ foam.CLASS({
     'notify',
     'pushMenu',
     'requestLogin',
+    'sessionID',
     'sessionTimer',
     'signUpEnabled',
     'stack',
@@ -168,6 +170,23 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
+      name: 'sessionName',
+      value: 'defaultSession'
+    },
+    {
+      name: 'sessionID',
+      factory: function() {
+        var urlSession = "";
+        try {
+          urlSession = window.location.search.substring(1).split('&')
+           .find(element => element.startsWith("sessionId")).split('=')[1];
+        } catch { };
+        return urlSession !== "" ? urlSession : localStorage[this.sessionName] ||
+          ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
+      }
+    },
+    {
       name: 'memento',
       factory: function() {
         return this.Memento.create({tail$: this.mementoTail$});
@@ -195,11 +214,16 @@ foam.CLASS({
       name: 'clientPromise',
       factory: function() {
         var self = this;
-        return self.ClientBuilder.create().promise.then(function(cls) {
+        return self.ClientBuilder.create({}, this).promise.then(function(cls) {
           self.client = cls.create(null, self);
           return self.client;
         });
       }
+    },
+    {
+      name: 'languageInstalled',
+      documentation: 'Latch to denote language has been installed',
+      factory: function() { return this.Latch.create(); }
     },
     {
       name: 'client',
@@ -295,6 +319,14 @@ foam.CLASS({
         return this.FooterView;
       }
     },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.Language',
+      name: 'defaultLanguage',
+      factory: function() {
+        return foam.nanos.auth.Language.create({code: 'en'})
+      }
+    },
     'currentMenu',
     'lastMenuLaunched',
     'webApp'
@@ -319,9 +351,13 @@ foam.CLASS({
       this.clientPromise.then(async function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
 
-        await self.fetchSubject();
         await client.translationService.initLatch;
         self.installLanguage();
+
+        await self.fetchSubject();
+
+        await self.maybeReinstallLanguage(client)
+        self.languageInstalled.resolve();
 
         // add user and agent for backward compatibility
         Object.defineProperty(self, 'user', {
@@ -407,6 +443,33 @@ foam.CLASS({
       }
     },
 
+    async function maybeReinstallLanguage(client) {
+      if (
+        this.subject &&
+        this.subject.realUser &&
+        this.subject.realUser.language.toString() != foam.locale
+      ) {
+        let languages = (await client.languageDAO
+          .where(foam.mlang.predicate.Eq.create({
+            arg1: foam.nanos.auth.Language.ENABLED,
+            arg2: true
+          })).select()).array;
+
+        let userPreferLanguage = languages.find( e => e.id.compareTo(this.subject.realUser.language) === 0 )
+        if ( ! userPreferLanguage ) {
+          foam.locale = this.defaultLanguage.toString()
+          let user = this.subject.realUser
+          user.language = this.defaultLanguage.id
+          await client.userDAO.put(user)
+        } else if ( foam.locale != userPreferLanguage.toString() ) {
+          foam.locale = userPreferLanguage.toString()
+        }
+        client.translationService.maybeReload()
+        await client.translationService.initLatch
+        this.installLanguage()
+      }
+    },
+
     async function fetchGroup() {
       try {
         var group = await this.client.auth.getCurrentGroup();
@@ -427,6 +490,7 @@ foam.CLASS({
 
         this.subject = result;
       } catch (err) {
+        this.languageInstalled.resolve();
         await this.requestLogin();
         return await this.fetchSubject();
       }

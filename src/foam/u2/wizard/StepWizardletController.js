@@ -97,29 +97,13 @@ foam.CLASS({
 
         availableSlots.forEach((sections, wizardletIndex) => {
           sections.forEach((availableSlot, sectionIndex) => {
+            var listenerPos = this.WizardPosition.create({
+              wizardletIndex: wizardletIndex,
+              sectionIndex: sectionIndex,
+            });
             availableSlot.sub(() => {
-              var val = availableSlot.get();
-              this.sectionAvailableSlots = this.sectionAvailableSlots;
-              let name = 'sectionAvailableSlots';
-              this.propertyChange.pub(name, this.slot(name));
-
-              if ( val ) {
-                // If this is a previous position, move the wizard back
-                var maybeNewPos = this.WizardPosition.create({
-                  wizardletIndex: wizardletIndex,
-                  sectionIndex: sectionIndex,
-                });
-                if ( maybeNewPos.compareTo(this.wizardPosition) < 0 ) {
-                  this.wizardPosition = maybeNewPos;
-                }
-              }
-
-              // Invoke a wizard position update (even if position didn't change)
-              // to re-render steps
-              this.wizardPosition = this.WizardPosition.create({
-                wizardletIndex: this.wizardPosition.wizardletIndex,
-                sectionIndex: this.wizardPosition.sectionIndex
-              });
+              this.onWizardPositionAvailabilityUpdate(
+                listenerPos, availableSlot.get());
             });
           });
         });
@@ -263,13 +247,17 @@ foam.CLASS({
   methods: [
     function init() {
       console.log('stepWizardlet', this);
-      window.sargnarg = this;
-      console.log
-      return this.wizardlets.forEach(wizardlet => {
+      this.wizardlets.forEach(wizardlet => {
         wizardlet.isAvailable$.sub(() => {
           this.availabilityInvalidate++;
         })
-      })
+      });
+
+      // Force update of first section in current wizardlet
+      this.onWizardPositionAvailabilityUpdate(
+        this.wizardPosition,
+        this.wizardPosition.apply(this.sectionAvailableSlots).get()
+      );
     },
     function saveProgress() {
       var p = Promise.resolve();
@@ -302,7 +290,10 @@ foam.CLASS({
         // Save wizardlets
         return [...Array(N).keys()].map(v => S + v)
           .reduce(
-            (p, i) => p.then(() => this.wizardlets[i].save()),
+            (p, i) => p.then(
+              () => {
+                if ( this.wizardlets[i].isAvailable ) this.wizardlets[i].save();
+              }),
             Promise.resolve()
           ).then(() => {
             this.wizardPosition = nextScreen;
@@ -334,6 +325,38 @@ foam.CLASS({
       let previousScreen = this.previousScreen;
       if ( previousScreen !== null ) {
         this.wizardPosition = previousScreen;
+      }
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'onWizardPositionAvailabilityUpdate',
+      code: function onWizardPositionAvailabilityUpdate(listenerPos, val) {
+        this.sectionAvailableSlots = this.sectionAvailableSlots;
+        let name = 'sectionAvailableSlots';
+        this.propertyChange.pub(name, this.slot(name));
+
+        console.log('here', listenerPos, val);
+
+        if ( val ) {
+          // If this is a previous position, move the wizard back
+          if ( listenerPos.compareTo(this.wizardPosition) < 0 ) {
+            this.wizardPosition = listenerPos;
+          }
+        }
+
+        // Trigger "next screen" if the current wizard position is gone
+        if ( ! val && listenerPos.compareTo(this.wizardPosition) == 0 ) {
+          this.wizardPosition = this.nextScreen;
+        } else {
+          // Invoke a wizard position update (even if position didn't change)
+          // to re-render steps
+          this.wizardPosition = this.WizardPosition.create({
+            wizardletIndex: this.wizardPosition.wizardletIndex,
+            sectionIndex: this.wizardPosition.sectionIndex
+          });
+        }
       }
     }
   ]

@@ -328,15 +328,6 @@ foam.CLASS({
       factory: function() {
         return this.Address.create();
       },
-      label: 'Country',
-      tableCellFormatter: function(value, obj, axiom) {
-        let addressString = '';
-        for ( prop in value.instance_ ) if ( prop ) addressString += ` ${value[prop]}`;
-        if ( addressString ) this.setAttribute('title', addressString.trim());
-        return this.__subContext__.countryDAO.find(value.countryId).then((cobj) => {
-          return cobj ? this.add(cobj.name) : this.add(value.countryId);
-        });
-      },
       section: 'personal'
     },
     {
@@ -714,6 +705,24 @@ foam.CLASS({
         if ( this instanceof LifecycleAware && ((LifecycleAware) this).getLifecycleState() != LifecycleState.ACTIVE ) {
           throw new AuthenticationException("User is not active");
         }
+      `
+    },
+    {
+      name: 'isAdmin',
+      type: 'Boolean',
+      documentation: `
+        Returns true if the user has the system user id, or is in either the
+        admin or system group.
+
+        **IMPORTANT**: It is possible to misuse the value from this method.
+        A check on this method should never be used to override behaviour of
+        authorization; in this case it is preferred to create a permission that
+        no other user will have.
+      `,
+      javaCode: `
+        return getId() == foam.nanos.auth.User.SYSTEM_USER_ID
+          || getGroup().equals("admin")
+          || getGroup().equals("system");
       `
     }
   ]

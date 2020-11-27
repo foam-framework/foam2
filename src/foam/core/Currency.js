@@ -15,6 +15,10 @@
     'foam.util.SafetyUtil'
   ],
 
+  imports: [
+    'translationService'
+  ],
+
   tableColumns: [
     'name',
     'id',
@@ -113,7 +117,7 @@
         property. In this case, we are using the id.
       `,
       code: function(x) {
-        return this.id + " - " + this.name;
+        return this.id + " - " + this.translationService.getTranslation(foam.locale, `${this.id}.name`,this.name);
       },
       javaCode: `
         if ( foam.util.SafetyUtil.isEmpty(getId()) || foam.util.SafetyUtil.isEmpty(getName()) )

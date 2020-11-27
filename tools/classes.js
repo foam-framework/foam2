@@ -136,6 +136,7 @@ var classes = [
   'foam.dao.java.JDAO',
   'foam.dao.CopyFromDAO',
   'foam.dao.FilteredDAO',
+  'foam.dao.JSONFormatParseDAO',
   'foam.dao.Journal',
   'foam.dao.RemoveChildrenOnRemoveDAO',
   'foam.dao.AbstractJournal',
@@ -225,6 +226,7 @@ var classes = [
   'foam.nanos.bench.Benchmark',
   'foam.nanos.auth.Authorizer',
   'foam.nanos.auth.AuthorizationDAO',
+  'foam.nanos.auth.AuthenticationException',
   'foam.nanos.auth.EnabledAware',
   'foam.nanos.auth.EnabledAwareDummy',
   'foam.nanos.auth.GroupPermissionJunction',
@@ -715,6 +717,7 @@ var classes = [
   'foam.nanos.crunch.extra.ReviewCapability',
   'foam.nanos.crunch.extra.ReviewCapabilityData',
   'foam.nanos.crunch.extra.ReviewWizard',
+  'foam.nanos.crunch.extra.ImplyReviewedAction',
 
   //crunch predicates
   'foam.nanos.crunch.predicate.CapabilityGranted',

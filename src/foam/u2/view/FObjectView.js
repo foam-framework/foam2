@@ -42,6 +42,7 @@ foam.CLASS({
           class: X.data.allowCustom ? 'foam.u2.TextField' : 'foam.u2.view.ChoiceView',
           displayWidth: 60,
           placeholder: X.data.placeholder,
+          header: X.data.header,
           choices$: X.data.choices$
         };
       }
@@ -102,6 +103,11 @@ foam.CLASS({
       class: 'String',
       name: 'placeholder',
       documentation: 'If no placeholder, the choiceView will select the first element',
+    },
+    {
+      class: 'String',
+      name: 'header',
+      documentation: 'The heading text for the choices',
     },
     {
       class: 'Array',
