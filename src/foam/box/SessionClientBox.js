@@ -95,7 +95,9 @@ foam.CLASS({
 
   requires: [ 'foam.box.SessionReplyBox' ],
 
-  imports: [ 'sessionID' ],
+  imports: [
+    'sessionID as jsSessionID'
+  ],
 
   constants: [
     {
@@ -103,10 +105,6 @@ foam.CLASS({
       value: 'sessionId',
       type: 'String'
     }
-  ],
-
-  imports: [
-    'sessionID as jsSessionID'
   ],
 
   properties: [
