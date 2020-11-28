@@ -95,6 +95,10 @@ foam.CLASS({
 
   requires: [ 'foam.box.SessionReplyBox' ],
 
+  imports: [
+    'sessionID as jsSessionID'
+  ],
+
   constants: [
     {
       name: 'SESSION_KEY',
@@ -103,16 +107,12 @@ foam.CLASS({
     }
   ],
 
-  imports: [
-    'sessionID as jsSessionID'
-  ],
-
   properties: [
     {
-      documentation: `Explicitly set session ID when calling from Java. Use imported sessionID from javascript.`,
       class: 'String',
-      name: 'sessionID'
-    },
+      name: 'sessionID',
+      factory: function() { return this.jsSessionID; }
+    }
   ],
 
   methods: [
