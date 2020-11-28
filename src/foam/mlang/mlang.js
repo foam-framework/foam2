@@ -548,6 +548,23 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'Pass',
+  extends: 'foam.mlang.AbstractExpr',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: 'Expression which returns its input.',
+
+  methods: [
+    {
+      name: 'f',
+      code: function f(o) { return o; },
+      javaCode: 'return obj;'
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
@@ -3665,6 +3682,10 @@ foam.CLASS({
     {
       name: 'TRUE',
       factory: function() { return foam.mlang.predicate.True.create() }
+    },
+    {
+      name: 'PASS',
+      factory: function() { return foam.mlang.Pass.create() }
     }
   ],
 
