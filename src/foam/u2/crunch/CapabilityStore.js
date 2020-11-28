@@ -139,7 +139,12 @@ foam.CLASS({
         DAO with only visible capabilities.
       `,
       expression: function(hideGrantedCapabilities, grantedCapabilities) {
-        return this.capabilityDAO
+        return this.capabilityDAO.where(
+          this.DOT_F(
+            this.Capability.VISIBILITY_PREDICATE,
+            this.PASS
+          )
+        );
       }
     },
     {

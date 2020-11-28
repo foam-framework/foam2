@@ -371,7 +371,6 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/lite/MinMaxCapabilityRefinement" },
   { name: "foam/nanos/crunch/crunchtest/TestCapable" },
   { name: "foam/nanos/crunch/CapabilityAvailabilityDAO" },
-  { name: "foam/nanos/crunch/CapabilityPreconditionDAO" },
   { name: "foam/nanos/crunch/example/ExampleData" },
 
   // crunch lite rulers
@@ -401,6 +400,8 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ReputDependentUCJs" },
   //predicates
   { name: 'foam/nanos/crunch/predicate/CapabilityGranted' },
+  { name: "foam/nanos/crunch/predicate/CapabilityPreconditionPredicate" },
+  { name: "foam/nanos/crunch/predicate/VisibilityPredicate" },
   //spid
   { name: "foam/nanos/auth/CreateUserCapabilityJunctionOnSpidSet" },
   { name: "foam/nanos/auth/SetUserServiceProviderJunctionRuleAction" },

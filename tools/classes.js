@@ -671,7 +671,6 @@ var classes = [
   'foam.nanos.crunch.lite.CapablePayloadStatusDAO',
   'foam.nanos.crunch.lite.CapableCompatibleCapability',
   'foam.nanos.crunch.CapabilityAvailabilityDAO',
-  'foam.nanos.crunch.CapabilityPreconditionDAO',
 
   'foam.nanos.crunch.lite.ruler.CapableCreateApprovalsRuleAction',
   'foam.nanos.crunch.lite.ruler.ReputDependantPayloads',
@@ -724,6 +723,8 @@ var classes = [
 
   //crunch predicates
   'foam.nanos.crunch.predicate.CapabilityGranted',
+  'foam.nanos.crunch.predicate.CapabilityPreconditionPredicate',
+  'foam.nanos.crunch.predicate.VisibilityPredicate',
 
   //authservice
   'foam.nanos.auth.CapabilityAuthService',

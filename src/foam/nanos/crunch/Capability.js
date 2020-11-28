@@ -21,6 +21,7 @@ foam.CLASS({
     'foam.mlang.sink.Count',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
+    'foam.nanos.crunch.predicate.CapabilityPreconditionPredicate',
     'foam.nanos.logger.Logger',
     'java.util.Date',
     'java.util.List',
@@ -195,6 +196,13 @@ foam.CLASS({
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'visibilityPredicate',
       javaFactory: 'return foam.mlang.MLang.FALSE;',
+      javaSetter: `
+        visibilityPredicate_ = AND(
+          new CapabilityPreconditionPredicate(),
+          val
+        );
+        visibilityPredicateIsSet_ = true;
+      `,
       documentation: 'Predicate of the visibility for capabilities in the capability store/keyword sections'
     },
     {
