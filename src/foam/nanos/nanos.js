@@ -401,7 +401,6 @@ FOAM_FILES([
   //predicates
   { name: 'foam/nanos/crunch/predicate/CapabilityGranted' },
   { name: "foam/nanos/crunch/predicate/CapabilityPreconditionPredicate" },
-  { name: "foam/nanos/crunch/predicate/VisibilityPredicate" },
   //spid
   { name: "foam/nanos/auth/CreateUserCapabilityJunctionOnSpidSet" },
   { name: "foam/nanos/auth/SetUserServiceProviderJunctionRuleAction" },

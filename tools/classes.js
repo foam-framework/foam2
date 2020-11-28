@@ -724,7 +724,6 @@ var classes = [
   //crunch predicates
   'foam.nanos.crunch.predicate.CapabilityGranted',
   'foam.nanos.crunch.predicate.CapabilityPreconditionPredicate',
-  'foam.nanos.crunch.predicate.VisibilityPredicate',
 
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
