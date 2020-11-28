@@ -614,7 +614,8 @@ foam.CLASS({
       ],
       javaCode: `
         x_ = x;
-        if ( getArg1() != null ) ((ContextAware) getArg1()).setX(x);
+        if ( getArg1() != null && getArg1() instanceof ContextAware )
+          ((ContextAware) getArg1()).setX(x);
       `
     }
   ]
@@ -813,8 +814,10 @@ getArg2().prepareStatement(stmt);`
       ],
       javaCode: `
         x_ = x;
-        if ( getArg1() != null ) ((ContextAware) getArg1()).setX(x);
-        if ( getArg2() != null ) ((ContextAware) getArg2()).setX(x);
+        if ( getArg1() != null && getArg1() instanceof ContextAware )
+          ((ContextAware) getArg1()).setX(x);
+        if ( getArg2() != null && getArg2() instanceof ContextAware )
+          ((ContextAware) getArg2()).setX(x);
       `
     }
   ]
@@ -904,7 +907,8 @@ foam.CLASS({
       javaCode: `
         x_ = x;
         for ( Object obj : getArgs() ) {
-          if ( obj != null ) ((ContextAware) obj).setX(x);
+          if ( obj != null && obj instanceof ContextAware )
+            ((ContextAware) obj).setX(x);
         }
       `
     }
