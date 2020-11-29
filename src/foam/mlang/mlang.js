@@ -1318,6 +1318,33 @@ return this;`
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
+  name: 'PassContext',
+  extends: 'foam.mlang.predicate.And',
+  implements: ['foam.core.Serializable'],
+
+  documentation: `
+    Passes the context to a delegate predicate. This works as an adapter for
+    predicates made for the rule engine.
+  `,
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: `
+        var x = getX();
+        x = x.put("NEW", obj);
+        for ( int i = 0 ; i < getArgs().length ; i++ ) {
+          if ( ! getArgs()[i].f(x) ) return false;
+        }
+        return true;
+      `
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
   name: 'Contains',
   extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
@@ -3765,6 +3792,7 @@ foam.CLASS({
 
     function OR() { return this._nary_("Or", arguments); },
     function AND() { return this._nary_("And", arguments); },
+    function PASS_CONTEXT() { return this._nary_("PassContext", arguments); },
     function CONTAINS(a, b) { return this._binary_("Contains", a, b); },
     function CONTAINS_IC(a, b) { return this._binary_("ContainsIC", a, b); },
     function EQ(a, b) { return this._binary_("Eq", a, b); },

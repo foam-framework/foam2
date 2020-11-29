@@ -34,6 +34,7 @@ var classes = [
   'foam.mlang.predicate.True',
   'foam.mlang.predicate.False',
   'foam.mlang.Pass',
+  'foam.mlang.predicate.PassContext',
   'foam.mlang.predicate.And',
   'foam.mlang.predicate.Gt',
   'foam.mlang.predicate.Or',
@@ -724,6 +725,7 @@ var classes = [
   //crunch predicates
   'foam.nanos.crunch.predicate.CapabilityGranted',
   'foam.nanos.crunch.predicate.CapabilityPreconditionPredicate',
+  'foam.nanos.crunch.predicate.IsAgent',
 
   //authservice
   'foam.nanos.auth.CapabilityAuthService',

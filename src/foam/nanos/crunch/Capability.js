@@ -196,13 +196,6 @@ foam.CLASS({
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'visibilityPredicate',
       javaFactory: 'return foam.mlang.MLang.FALSE;',
-      javaSetter: `
-        visibilityPredicate_ = AND(
-          new CapabilityPreconditionPredicate(),
-          val
-        );
-        visibilityPredicateIsSet_ = true;
-      `,
       documentation: 'Predicate of the visibility for capabilities in the capability store/keyword sections'
     },
     {

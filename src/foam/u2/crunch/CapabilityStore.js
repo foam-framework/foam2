@@ -19,6 +19,7 @@ foam.CLASS({
     'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.nanos.crunch.predicate.CapabilityPreconditionPredicate',
     'foam.u2.crunch.CapabilityCardView',
     'foam.u2.crunch.CapabilityFeatureView',
     'foam.u2.Element',
@@ -140,9 +141,12 @@ foam.CLASS({
       `,
       expression: function(hideGrantedCapabilities, grantedCapabilities) {
         return this.capabilityDAO.where(
-          this.DOT_F(
-            this.Capability.VISIBILITY_PREDICATE,
-            this.PASS
+          this.AND(
+            this.DOT_F(
+              this.Capability.VISIBILITY_PREDICATE,
+              this.PASS
+            ),
+            this.CapabilityPreconditionPredicate.create()
           )
         );
       }

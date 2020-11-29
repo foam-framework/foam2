@@ -208,6 +208,10 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
   public boolean hasPreconditionsMet(
     X x, String capabilityId
   ) {
+    // Return false if capability does not exist or is not available
+    var capabilityDAO = (DAO) x.get("capabilityDAO");
+    if ( capabilityDAO.inX(x).find(capabilityId) == null ) return false;
+
     var preconditions = Arrays.stream(((CapabilityCapabilityJunction[]) ((ArraySink) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
       .where(AND(
         EQ(CapabilityCapabilityJunction.SOURCE_ID, capabilityId),
@@ -218,6 +222,8 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       .map(CapabilityCapabilityJunction::getTargetId).toArray(String[]::new);
     
     for ( String preconditionId : preconditions ) {
+      // Return false if capability does not exist or is not available
+      if ( capabilityDAO.inX(x).find(preconditionId) == null ) return false;
       var ucj = getJunction(x, preconditionId);
       if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED ) return false;
     }
@@ -298,10 +304,14 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
   ) {
     // Need Capability to associate UCJ correctly
     DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-    Capability cap = (Capability) capabilityDAO.find(capabilityId);
+
+    // If the subject in context doesn't have the capability availabile, we
+    // should act as though it doesn't exist; this is why inX is here.
+    Capability cap = (Capability) capabilityDAO.inX(x).find(capabilityId);
     if ( cap == null ) {
       throw new RuntimeException(String.format(
-        "Capability with id '%s' not found", capabilityId
+        "Capability with id '%s' is either unavailabile or does not exist",
+        capabilityId
       ));
     }
     AssociatedEntity associatedEntity = cap.getAssociatedEntity();

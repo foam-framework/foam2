@@ -18,6 +18,7 @@ foam.CLASS({
     'foam.mlang.predicate.AbstractPredicate',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.Subject',
     'foam.nanos.crunch.Capability',
     'foam.core.X',
     'foam.core.Detachable',
@@ -96,6 +97,10 @@ foam.CLASS({
         { type: 'Capability', name: 'capability' }
       ],
       javaCode: `
+        // TODO: Rules calling capabilityDAO under the system context are
+        //   breaking availability logic. This needs proper investigation.
+        if ( ((Subject) x.get("subject")).getUser().isAdmin() ) return true;
+
         return capability.getAvailabilityPredicate().f(x)
           || getAuth().check(x, AVAILABILITY_PERMISSION + capability.getId());
       `
