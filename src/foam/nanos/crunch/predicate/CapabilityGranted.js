@@ -51,7 +51,7 @@ foam.CLASS({
         var capabilityDAO = (DAO) x.get("capabilityDAO");
 
         // Verify that the capability exists
-        Object cap = capabilityDAO.find(getCapabilityId());
+        Object cap = capabilityDAO.inX(x).find(getCapabilityId());
         if ( cap == null ) return false;
 
         var ucj = crunchService.getJunction(x, getCapabilityId());
