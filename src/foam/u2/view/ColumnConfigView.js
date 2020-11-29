@@ -564,7 +564,7 @@ foam.CLASS({
               this.data.expanded = false;
           }
         }
-        this.updateSubColumnsOrder(hasPropertySelectionChanged === typeof anySelected !== 'undefined');
+        this.updateSubColumnsOrder( hasPropertySelectionChanged === this.data.isPropertySelected );
       } else {
         this.updateSubColumnsOrder(true);
       }
