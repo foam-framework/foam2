@@ -22,6 +22,11 @@ foam.CLASS({
     {
       name: 'capabilityId',
       class: 'String'
+    },
+    {
+      name: 'subjectFromUCJ',
+      class: 'Boolean',
+      value: true
     }
   ],
 
@@ -32,9 +37,13 @@ foam.CLASS({
         if ( ! ( obj instanceof X ) ) return false;
         var x = (X) obj;
 
-        var newUCJ = (UserCapabilityJunction) x.get("NEW");
-        if ( newUCJ != null ) {
-          x = x.put("subject", newUCJ.getSubject(x));
+        // If we have a subject in context, but also a UCJ, this predicate
+        // should evaluate with respect to the UCJ's subject.
+        if ( getSubjectFromUCJ() ) {
+          var newUCJ = (UserCapabilityJunction) x.get("NEW");
+          if ( newUCJ != null ) {
+            x = x.put("subject", newUCJ.getSubject(x));
+          }
         }
 
         // Context requirements
