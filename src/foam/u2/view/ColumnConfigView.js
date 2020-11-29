@@ -740,21 +740,24 @@ foam.CLASS({
 
         for ( var i = 0 ; i < selectedSubProperties.length ; i++ ) {
           arr.push(this.cls_.create({
-            index:i,
+            index: i,
             rootProperty: selectedSubProperties[i],
-            selectedColumns$:this.selectedColumns$,
-            level:l, parentExpanded$:this.expanded$,
-            of: r.of}));
+            selectedColumns$: this.selectedColumns$,
+            level: l,
+            parentExpanded$: this.expanded$,
+            of: r.of
+          }));
         }
 
         for ( var i = 0 ; i < otherSubProperties.length ; i++ ) {
           arr.push(this.cls_.create({
-            index:selectedSubProperties.length+i,
+            index: selectedSubProperties.length+i,
             rootProperty: otherSubProperties[i],
-            selectedColumns$:this.selectedColumns$,
-            level:l, parentExpanded$:this.expanded$,
+            selectedColumns$: this.selectedColumns$,
+            level:l, parentExpanded$: this.expanded$,
             of: r.of,
-            isPropertySelected:false}, this));
+            isPropertySelected: false
+          }, this));
         }
 
         return arr;
