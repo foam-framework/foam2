@@ -126,20 +126,12 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'hideGrantedCapabilities',
-      class: 'Boolean'
-    },
-    {
-      name: 'grantedCapabilities',
-      class: 'StringArray'
-    },
-    {
       name: 'visibleCapabilityDAO',
       class: 'foam.dao.DAOProperty',
       documentation: `
         DAO with only visible capabilities.
       `,
-      expression: function(hideGrantedCapabilities, grantedCapabilities) {
+      expression: function() {
         return this.capabilityDAO.where(
           this.AND(
             this.DOT_F(
@@ -194,11 +186,6 @@ foam.CLASS({
   methods: [
     function init() {
       this.crunchService.getAllJunctionsForUser().then(juncs => {
-        this.grantedCapabilities = juncs
-          .filter(
-            junc => junc.status == this.CapabilityJunctionStatus.GRANTED
-          )
-          .map(junc => junc.targetId);
         this.daoUpdate();
       })
     },
