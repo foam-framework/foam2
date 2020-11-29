@@ -710,7 +710,7 @@ foam.CLASS({
       return this.showOnSearch;
     },
     function returnSubColumnSelectConfig(subProperties, level, expanded) {
-      if ( ! this.of || ! this.of.getAxiomByName || subProperties.length === 0 || !expanded )
+      if ( ! this.of || ! this.of.getAxiomByName || subProperties.length === 0 || ! expanded )
           return [];
         var arr = [];
         var l = level + 1;
