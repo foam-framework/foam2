@@ -287,6 +287,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/ToastState' },
   { name: 'foam/nanos/notification/ScriptRunNotification'},
   { name: 'foam/nanos/notification/ScriptRunNotificationNotificationCitationView'},
+  { name: 'foam/nanos/notification/NotificationMessageModal'},
   { name: 'foam/nanos/dashboard/Demo' },
 
   // Ticket
@@ -422,6 +423,7 @@ FOAM_FILES([
   { name: 'foam/nanos/crunch/extra/ReviewCapability' },
   { name: 'foam/nanos/crunch/extra/ReviewCapabilityData' },
   { name: 'foam/nanos/crunch/extra/ReviewWizard' },
+  { name: 'foam/nanos/crunch/extra/ImplyReviewedAction' },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },

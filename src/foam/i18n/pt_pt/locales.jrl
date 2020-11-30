@@ -285,3 +285,17 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHO
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHOICES.documentation",target:"Uma matriz de opções que são de escolha única é denotada como [valor, rótulo, isSelected, choiceMode, isFinal], no entanto, o usuário pode apenas passar [valor, rótulo] e a função de adaptação irá transformá-lo em [valor, rótulo, isSelected , choiceMode, isFinal] formato para fins de processamento"})
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.DAO.documentation",target:"Se o usuário quiser apenas passar um dao, ele será processado para preencher a matriz de opções em vez de inserir manualmente as opções"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.ExportModal.EXPORT_ALL_COLUMNS.view.label",target:"Exportar todas as colunas"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.ExportModal.EXPORT",target:"Exportar"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.ExportModal.DATA_TYPE_MSG",target:"Tipo de dados"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.ExportModal.OPEN.label",target:"Abrir"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.ExportModal.RESPONSE",target:"Resposta"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.export.GoogleSheetsBasedExportDriver.PLEASE_SELECT_TEMPLATE",target:"Selecione o modelo ..."})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.export.GoogleSheetsBasedExportDriver.TITLE.label",target:"título"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.export.GoogleSheetsBasedExportDriver.TEMPLATE.label",target:"modelo"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.notification.NotificationMessageModal.CREATED_MSG",target:"Criada"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.notification.NotificationMessageModal.MESSAGE_MSG",target:"Mensagem"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.notification.NotificationMessageModal.NATIFICATION_MSG",target:"Notificação"})

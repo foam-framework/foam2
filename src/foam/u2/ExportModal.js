@@ -17,6 +17,11 @@ foam.CLASS({
     'serviceName'
   ],
 
+  messages: [
+    { name: 'EXPORT', message: 'Export1' },
+    { name: 'DATA_TYPE_MSG', message: 'Data Type1' },
+    { name: 'RESPONSE', message: 'Response1' }
+  ],
 
   requires: [
     'foam.u2.ModalHeader',
@@ -52,7 +57,7 @@ foam.CLASS({
     'exportObj',
     {
       name: 'exportAllColumns',
-      view: { class: 'foam.u2.CheckBox',  label: 'Export all columns '},
+      view: { class: 'foam.u2.CheckBox',  label: 'Export all columns'},
       class: 'Boolean'
     },
     'exportDriverReg',
@@ -136,17 +141,17 @@ foam.CLASS({
 
       this
       .tag(this.ModalHeader.create({
-        title: 'Export'
+        title: this.EXPORT
       }))
       .addClass(this.myClass())
       .startContext({ data: this })
         .start()
-          .start().addClass('label').add('Data Type').end()
+          .start().addClass('label').add(this.DATA_TYPE_MSG).end()
           .start(this.DATA_TYPE).end()
           .add(this.slot(function (exportDriver) {
             return this.E().add(exportDriver);
           }))
-          .start().addClass('label').add('Response').end()
+          .start().addClass('label').add(this.RESPONSE).end()
           .start(this.NOTE).addClass('input-box').addClass('note').end()
           .add(
             self.slot(function(exportDriverReg$exportAllColumns) {
@@ -210,7 +215,7 @@ foam.CLASS({
         var p = this.exportData ?
           Promise.resolve(this.exportDriver.exportDAO(this.__context__, this.exportData)) :
           Promise.resolve(this.exportDriver.exportFObject(this.__context__, this.exportObj));
-  
+
         var exportDataResult;
         p.then(result => {
           exportDataResult = result;
