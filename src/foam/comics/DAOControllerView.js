@@ -144,7 +144,6 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-
       this.data.border.add(
         this.E()
           .addClass(this.myClass())
@@ -155,7 +154,7 @@ foam.CLASS({
             .start()
               .addClass(this.myClass('title-container'))
               .start('h1')
-                .add(this.data.title$)
+                .translate(this.data.title, this.data.title)
               .end()
               .start()
                 .add(this.data.subtitle$)

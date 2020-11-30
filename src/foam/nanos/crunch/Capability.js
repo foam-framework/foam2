@@ -230,6 +230,7 @@ foam.CLASS({
     },
     {
       class: 'Object',
+      // TODO: rename to wizardConfig; wizardlet config is the property above
       name: 'wizardletConfig',
       documentation: `
         Configuration placed on top level capabilities defining various configuration options supported by client capability wizards.
@@ -452,17 +453,9 @@ foam.RELATIONSHIP({
   forwardName: 'capabilities',
   inverseName: 'users',
   sourceProperty: {
-    section: 'capabilities',
+    section: 'systemInformation',
     updateVisibility: 'RO'
   }
-});
-
-
-foam.CLASS({
-  package: 'foam.nanos.crunch',
-  name: 'CRUNCHUserRefinement',
-  refines: 'foam.nanos.auth.User',
-  sections: [{ name: 'capabilities' }]
 });
 
 

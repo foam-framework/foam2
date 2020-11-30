@@ -3,21 +3,64 @@ p({
   "name": "OMLogger",
   "serviceClass": "foam.nanos.om.OMLogger"
 })
+
 p({
   "class": "foam.nanos.boot.NSpec",
-  "name": "om1minDAO",
+  "name": "localOm1MinuteDAO",
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
+      .setAuthorize(false)
+      .build();
+  """
+})
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "om1MinuteDAO",
   "serve": true,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setPipelinePm(true)
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("OMMinutely")
       .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
-      .setWriteOnly(true)
+      .setInnerDAO(x.get("localOm1MinuteDAO"))
+      .setOrder(new foam.mlang.order.Comparator[] { foam.mlang.MLang.DESC(foam.nanos.analytics.Candlestick.COUNT) })
       .build();
   """,
   "client": "{\"of\":\"foam.nanos.analytics.Candlestick\"}"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "localOm5MinuteDAO",
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
+      .setAuthorize(false)
+      .build();
+  """
+})
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "om5MinuteDAO",
+  "serve": true,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
+      .setInnerDAO(x.get("localOm5MinuteDAO"))
+      .setOrder(new foam.mlang.order.Comparator[] { foam.mlang.MLang.DESC(foam.nanos.analytics.Candlestick.COUNT) })
+      .build();
+  """,
+  "client": "{\"of\":\"foam.nanos.analytics.Candlestick\"}"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "localOmHourlyDAO",
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
+      .setAuthorize(false)
+      .build();
+  """
 })
 p({
   "class": "foam.nanos.boot.NSpec",
@@ -25,15 +68,25 @@ p({
   "serve": true,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setPipelinePm(true)
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("OMHourly")
       .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
-      .setWriteOnly(true)
+      .setInnerDAO(x.get("localOmHourlyDAO"))
+      .setOrder(new foam.mlang.order.Comparator[] { foam.mlang.MLang.DESC(foam.nanos.analytics.Candlestick.OPEN_VALUE_TIME) })
       .build();
   """,
   "client": "{\"of\":\"foam.nanos.analytics.Candlestick\"}"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "localOmDailyDAO",
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
+      .setAuthorize(false)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("omDaily")
+      .build();
+  """
 })
 p({
   "class": "foam.nanos.boot.NSpec",
@@ -41,24 +94,42 @@ p({
   "serve": true,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
-      .setPipelinePm(true)
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("OMDAILY")
       .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
-      .setWriteOnly(true)
+      .setInnerDAO(x.get("localOmDailyDAO"))
+      .setOrder(new foam.mlang.order.Comparator[] { foam.mlang.MLang.DESC(foam.nanos.analytics.Candlestick.OPEN_VALUE_TIME) })
       .build();
   """,
   "client": "{\"of\":\"foam.nanos.analytics.Candlestick\"}"
 })
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "omFoldManager",
+  "serviceScript": """
+    return new foam.nanos.analytics.DAOFoldManager.Builder(x)
+      .setDao((foam.dao.DAO) x.get("localOm1MinuteDAO"))
+      .setPeriodLengthMs(60*1000)
+      .build();
+  """
+})
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "om5MinuteReduceManager",
+  "serviceScript": """
+    return new foam.nanos.analytics.DAOReduceManager.Builder(x)
+      .setSourceDAO((foam.dao.DAO) x.get("localOm1MinuteDAO"))
+      .setDestDAO((foam.dao.DAO) x.get("localOm5MinuteDAO"))
+      .setPeriodLengthMs(5*60*1000)
+      .build();
+  """
+})
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "omHourlyReduceManager",
-  "serve": true,
   "serviceScript": """
     return new foam.nanos.analytics.DAOReduceManager.Builder(x)
-      .setSourceDAO((foam.dao.DAO) x.get("om1minDAO"))
-      .setDestDAO((foam.dao.DAO) x.get("omHourlyDAO"))
+      .setSourceDAO((foam.dao.DAO) x.get("localOm5MinuteDAO"))
+      .setDestDAO((foam.dao.DAO) x.get("localOmHourlyDAO"))
       .setPeriodLengthMs(60*60*1000)
       .build();
   """
@@ -66,23 +137,11 @@ p({
 p({
   "class": "foam.nanos.boot.NSpec",
   "name": "omDailyReduceManager",
-  "serve": true,
   "serviceScript": """
     return new foam.nanos.analytics.DAOReduceManager.Builder(x)
-      .setSourceDAO((foam.dao.DAO) x.get("omHourlyDAO"))
-      .setDestDAO((foam.dao.DAO) x.get("omDailyDAO"))
+      .setSourceDAO((foam.dao.DAO) x.get("localOmHourlyDAO"))
+      .setDestDAO((foam.dao.DAO) x.get("localOmDailyDAO"))
       .setPeriodLengthMs(24*60*60*1000)
-      .build();
-  """
-})
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "omFoldManager",
-  "serve": true,
-  "serviceScript": """
-    return new foam.nanos.analytics.DAOFoldManager.Builder(x)
-      .setDao((foam.dao.DAO) x.get("om1minDAO"))
-      .setPeriodLengthMs(60*1000)
       .build();
   """
 })
