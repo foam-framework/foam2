@@ -10,6 +10,8 @@ import foam.core.*;
 import foam.dao.AbstractSink;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
+import foam.dao.ProxySink;
+import foam.dao.Sink;
 import foam.mlang.predicate.Predicate;
 import foam.mlang.sink.GroupBy;
 import foam.nanos.NanoService;
@@ -229,6 +231,25 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     }
 
     return true;
+  }
+
+  public ArraySink getEntryCapabilities(X x) {
+    var sink = new ArraySink();
+    var proxySink = new ProxySink(x, sink) {
+      @Override
+      public void put(Object o, Detachable sub) {
+        var cap = (Capability) o;
+        if (
+          ! cap.getVisibilityPredicate().f(x)
+          || ! hasPreconditionsMet(x, cap.getId())
+        ) return;
+        getDelegate().put(o, sub);
+      }
+    };
+
+    var capabilityDAO = ((DAO) x.get("capabilityDAO")).inX(x);
+    capabilityDAO.select(proxySink);
+    return sink;
   }
 
   public UserCapabilityJunction[] getAllJunctionsForUser(X x) {

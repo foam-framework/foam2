@@ -14,6 +14,8 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.dao.ArrayDAO',
+    'foam.dao.NullDAO',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCategory',
     'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
@@ -131,16 +133,8 @@ foam.CLASS({
       documentation: `
         DAO with only visible capabilities.
       `,
-      expression: function() {
-        return this.capabilityDAO.where(
-          this.AND(
-            this.DOT_F(
-              this.Capability.VISIBILITY_PREDICATE,
-              this.PASS
-            ),
-            this.CapabilityPreconditionPredicate.create()
-          )
-        );
+      factory: function() {
+        return this.NullDAO.create();
       }
     },
     {
@@ -149,8 +143,8 @@ foam.CLASS({
       documentation: `
         DAO Property to find capabilities to feature.
       `,
-      factory: function() {
-        return this.visibleCapabilityDAO
+      expression: function(visibleCapabilityDAO) {
+        return visibleCapabilityDAO
           .where(this.IN('featured', this.Capability.KEYWORDS));
       }
     },
@@ -187,7 +181,12 @@ foam.CLASS({
     function init() {
       this.crunchService.getAllJunctionsForUser().then(juncs => {
         this.daoUpdate();
-      })
+      });
+      this.crunchService.getEntryCapabilities().then(a => {
+        this.visibleCapabilityDAO = this.ArrayDAO.create({
+          array: a.array
+        });
+      });
     },
     function initE() {
       this.SUPER();

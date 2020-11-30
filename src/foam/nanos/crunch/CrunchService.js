@@ -13,6 +13,7 @@ foam.INTERFACE({
   `,
 
   javaImports: [
+    'foam.dao.ArraySink',
     'foam.nanos.crunch.lite.CapablePayload'
   ],
 
@@ -238,6 +239,17 @@ foam.INTERFACE({
         {
           name: 'capabilityId',
           type: 'String'
+        }
+      ]
+    },
+    {
+      name: 'getEntryCapabilities',
+      async: true,
+      type: 'ArraySink',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
         }
       ]
     },

@@ -44,7 +44,6 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setInnerDAO(x.get("localCapabilityDAO"))
       .setDecorator(dec)
-      .setContextualizePredicates(true)
       .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
       .build();
   """,
