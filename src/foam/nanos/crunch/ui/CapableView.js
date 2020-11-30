@@ -107,9 +107,7 @@ foam.CLASS({
     // add listeners to payload data
     function listenOnPayloads() {
       for ( const payload of this.capableObj.capablePayloads ) {
-        if ( payload.data === null ) continue;
-
-        payload.data.sub(this.clonePayloads);
+        if ( payload.data ) payload.data.sub(this.clonePayloads);
       }
     }
   ],
