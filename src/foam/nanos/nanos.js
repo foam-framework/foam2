@@ -401,7 +401,6 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ReputDependentUCJs" },
   //predicates
   { name: 'foam/nanos/crunch/predicate/CapabilityGranted' },
-  { name: "foam/nanos/crunch/predicate/CapabilityPreconditionPredicate" },
   { name: 'foam/nanos/crunch/predicate/IsAgent' },
   //spid
   { name: "foam/nanos/auth/CreateUserCapabilityJunctionOnSpidSet" },
