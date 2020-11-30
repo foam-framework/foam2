@@ -97,10 +97,6 @@ foam.CLASS({
         { type: 'Capability', name: 'capability' }
       ],
       javaCode: `
-        // TODO: Rules calling capabilityDAO under the system context are
-        //   breaking availability logic. This needs proper investigation.
-        if ( ((Subject) x.get("subject")).getUser().isAdmin() ) return true;
-
         return capability.getAvailabilityPredicate().f(x)
           || getAuth().check(x, AVAILABILITY_PERMISSION + capability.getId());
       `
