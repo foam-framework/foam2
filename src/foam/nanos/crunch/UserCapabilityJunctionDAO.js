@@ -24,7 +24,8 @@ foam.CLASS({
     { name: 'ERROR_ONE', message: 'UserCapabilityJunctions should be disabled via status change.' },
     { name: 'ERROR_TWO', message: 'User\'s capability cannot be reassigned.' },
     { name: 'ERROR_THREE', message: 'Capability cannot be changed.' },
-    { name: 'ERROR_FOUR', message: 'Capability data provided is not of the correct type. CapabilityId: ' },
+    { name: 'ERROR_FOUR', message: 'Capability data type mismatch ' },
+    { name: 'ERROR_CAPABILITY_NOT_FOUND', message: 'Capability not found ' }
   ],
 
   methods: [
@@ -97,7 +98,7 @@ foam.CLASS({
     },
     {
       name: 'find_',
-      javaCode:`
+      javaCode: `
         FObject result = super.find_(x, id);
         if ( result != null ) checkOwnership(x, (UserCapabilityJunction) result);
         return result;
@@ -112,22 +113,31 @@ foam.CLASS({
         // do not allow updates to sourceId/targetId properties
         if ( old != null && ucj.getSourceId() != old.getSourceId() ) throw new RuntimeException(this.ERROR_TWO);
         if ( old != null && ! ucj.getTargetId().equals(old.getTargetId()) ) throw new RuntimeException(this.ERROR_THREE);
-        
+
         // if ucj data is set but does not match expected data, do not put
         Capability capability = (Capability) ucj.findTargetId(x);
-        if ( 
-          capability == null ||
-          (
-            ! ( capability.getOf() == null || ucj.getData() == null ) &&
-            ! ( ucj.getData().getClassInfo().equals(capability.getOf()) )
-          )
-        ) {
+        if ( capability == null ||
+             ( ! ( capability.getOf() == null || ucj.getData() == null ) &&
+               ! ( ucj.getData().getClassInfo().equals(capability.getOf()) )
+             )
+           ) {
           Alarm alarm = new Alarm("CRUNCH Configuration", AlarmReason.CONFIGURATION);
-          alarm.setNote("TargetId of ucj not a valid Capability or has messed up data.");
+          alarm.setSeverity(foam.log.LogLevel.ERROR);
+          alarm.setNote(this.ERROR_FOUR + ucj.getTargetId());
+
+          foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+
+          if ( capability == null ) {
+            logger.error(this.getClass().getSimpleName(), "Capability not found", ucj.getTargetId());
+            alarm.setNote(this.ERROR_CAPABILITY_NOT_FOUND + ucj.getTargetId());
+          } else if ( capability.getOf() != null &&
+                      ucj.getData() != null ) {
+            logger.error(this.getClass().getSimpleName(), "Type mismatch", "capability", capability.getId(), "expected", capability.getOf().getId(), "received", ucj.getData().getClassInfo().getId());
+          }
           ((DAO) x.get("alarmDAO")).put(alarm);
-          throw new RuntimeException(this.ERROR_FOUR + ucj.getTargetId());
+          throw new RuntimeException(alarm.getNote());
         }
-        
+
         return super.put_(x, obj);
       `
     }
