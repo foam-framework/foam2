@@ -118,7 +118,7 @@ foam.CLASS({
         getLogger().debug("cmd", "ClusterCommand");
         return submit(x, DOP.CMD, (FObject) obj);
       }
-      getLogger().debug("cmd", "delegate", obj.getClass().getSimpleName(), obj.toString(), new Exception("stackTrace"));
+      getLogger().debug("cmd", "delegate", obj.getClass().getSimpleName(), obj.toString());
       return getDelegate().cmd_(x, obj);
       `
     },
