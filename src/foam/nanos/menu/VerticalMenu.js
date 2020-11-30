@@ -76,7 +76,7 @@ foam.CLASS({
       class: 'foam.dao.DAOProperty',
       name: 'dao_',
       factory: function() {
-        return this.menuDAO;
+        return this.menuDAO.orderBy(this.Menu.ORDER);
       }
     },
     {
