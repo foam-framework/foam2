@@ -196,6 +196,11 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
+  public boolean includeInID() {
+    return false;
+  }
+
+  @Override
   public boolean includeInDigest() {
     return true;
   }
@@ -256,7 +261,7 @@ public abstract class AbstractPropertyInfo
 
     return nameAsByteArray_;
   }
-  
+
   public void toCSV(foam.core.X x, Object obj, foam.lib.csv.CSVOutputter outputter) {
     outputter.outputValue(obj != null ? get(obj) : null);
   }
@@ -266,13 +271,13 @@ public abstract class AbstractPropertyInfo
   }
 
   public void fromCSVLabelMapping(java.util.Map<String, foam.lib.csv.FromCSVSetter> map) {
-    
+
     foam.core.PropertyInfo prop = this;
     map.put(getName(), new foam.lib.csv.FromCSVSetter() {
       public void set(foam.core.FObject obj, String str) {
         prop.set(obj, fromString(str));
       }
     });
-  
+
   }
 }
