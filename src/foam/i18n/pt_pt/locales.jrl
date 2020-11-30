@@ -295,3 +295,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.ExportModal.RESPONSE",ta
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.export.GoogleSheetsBasedExportDriver.PLEASE_SELECT_TEMPLATE",target:"Selecione o modelo ..."})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.export.GoogleSheetsBasedExportDriver.TITLE.label",target:"título"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.export.GoogleSheetsBasedExportDriver.TEMPLATE.label",target:"modelo"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.notification.NotificationMessageModal.CREATED_MSG",target:"Criada"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.notification.NotificationMessageModal.MESSAGE_MSG",target:"Mensagem"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.notification.NotificationMessageModal.NATIFICATION_MSG",target:"Notificação"})

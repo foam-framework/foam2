@@ -453,17 +453,9 @@ foam.RELATIONSHIP({
   forwardName: 'capabilities',
   inverseName: 'users',
   sourceProperty: {
-    section: 'capabilities',
+    section: 'systemInformation',
     updateVisibility: 'RO'
   }
-});
-
-
-foam.CLASS({
-  package: 'foam.nanos.crunch',
-  name: 'CRUNCHUserRefinement',
-  refines: 'foam.nanos.auth.User',
-  sections: [{ name: 'capabilities' }]
 });
 
 
