@@ -14,7 +14,8 @@ foam.CLASS({
 
   imports: [
     'capable',
-    'capabilityDAO'
+    'capabilityDAO',
+    'crunchService'
   ],
 
   exports: [
@@ -23,7 +24,8 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.crunch.MinMaxCapability',
-    'foam.nanos.crunch.ui.CapableWAO'
+    'foam.nanos.crunch.ui.CapableWAO',
+    'foam.nanos.crunch.CrunchService'
   ],
 
   properties: [
@@ -37,7 +39,8 @@ foam.CLASS({
   methods: [
     async function execute() {
       var capable = this.capable;
-      var wizardletsTuple = await this.createWizardletsFromPayloads(capable.capablePayloads);
+      var capablePayloads = await this.crunchService.getCapableObjectPayloads(null, this.capable.capabilityIds)
+      var wizardletsTuple = await this.createWizardletsFromPayloads(capablePayloads);
       this.wizardlets = wizardletsTuple.allDescendantWizardlets;
       console.log('CAPABLE', capable);
       console.log('WIZARDLETS', this.wizardlets);
@@ -64,6 +67,9 @@ foam.CLASS({
           
           let minMaxPrereqWizardlets =
             await this.createWizardletsFromPayloads(capablePayload.prerequisites);
+
+          capablePayload.prerequisites = null;
+
           minMaxPrereqWizardlets.directChildrenWizardlets.forEach(prereqWizardlet => {
             prereqWizardlet.isAvailable = false;
             wizardlet.choiceWizardlets.push(prereqWizardlet);
@@ -80,6 +86,9 @@ foam.CLASS({
         if ( handlePrereqsNormally && capablePayload.prerequisites.length > 0 ) {
           let prereqWizardlets =
             await this.createWizardletsFromPayloads(capablePayload.prerequisites);
+
+          capablePayload.prerequisites = null;
+
           prereqWizardlets.directChildrenWizardlets.forEach(prereqWizardlet => {
             prereqWizardlet.isAvailable$.follow(wizardlet.isAvailable$);
           })

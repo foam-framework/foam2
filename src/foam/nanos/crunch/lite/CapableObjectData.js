@@ -27,6 +27,10 @@ foam.CLASS({
       section: 'systemInformation',
       transient: true,
       hidden: true
+    },
+    {
+      class: 'StringArray',
+      name: 'capabilityIds'
     }
   ],
 

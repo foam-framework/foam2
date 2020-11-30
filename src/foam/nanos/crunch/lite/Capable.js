@@ -24,6 +24,7 @@ foam.INTERFACE({
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.CrunchService',
     'foam.nanos.ruler.RulerDAO',
+    'java.util.stream.Collectors',
 
     'java.util.ArrayList',
     'java.util.Arrays',
@@ -53,10 +54,8 @@ foam.INTERFACE({
           body: `
             CrunchService crunchService = (CrunchService) x.get("crunchService");
 
-            setCapablePayloads(
-              crunchService.getCapableObjectPayloads(
-                x, capabilityIds
-              )
+            setCapabilityIds(
+              capabilityIds
             );
           `
         }));
@@ -71,11 +70,20 @@ foam.INTERFACE({
           body: `
           CrunchService crunchService = (CrunchService) x.get("crunchService");
 
-          var oldCapabilityPayloads = getCapablePayloads();
-          
+          var oldCapabilityIds = getCapabilityIds();
+
+          List<String> oldCapabilityIdsList = new ArrayList<>();
+
+          for ( int i = 0; i < oldCapabilityIds.length; i++ ){
+            oldCapabilityIdsList.add(oldCapabilityIds[i]);
+          }
+
+          oldCapabilityIdsList.add(capabilityId);
+
           if ( ! hasRequirement(x, capabilityId) ) {
-            var newCapabilityPayload = crunchService.getCapableObjectPayloads(x, new String[] { capabilityId });
-            setCapablePayloads((CapablePayload[]) ArrayUtils.addAll(oldCapabilityPayloads, newCapabilityPayload));
+            setCapabilityIds(          
+              oldCapabilityIdsList.toArray(new String[0])
+            );
           }
           `
         }));
@@ -204,6 +212,21 @@ foam.INTERFACE({
         {
           name: 'payloads',
           type: 'CapablePayload[]'
+        }
+      ]
+    },
+    {
+      name: 'getCapabilityIds',
+      type: 'String[]',
+      flags: ['java'],
+    },
+    {
+      name: 'setCapabilityIds',
+      flags: ['java'],
+      args: [
+        {
+          name: 'ids',
+          type: 'String[]'
         }
       ]
     },
