@@ -25,7 +25,8 @@ foam.CLASS({
       name: 'SIZES',
       value: {
         TINY:   [176, 358],
-        SMALL:  [312, 358],
+        SMALL:  [312, '-'],
+        SMEDIUM:  [312, 358],
         MEDIUM: [624, 528],
         LARGE:  [936, 528],
         XLARGE: [1580, 698],

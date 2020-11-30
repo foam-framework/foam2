@@ -11,12 +11,18 @@ foam.CLASS({
   requires: [
     'foam.core.Model',
     'foam.dao.ArrayDAO',
-    'foam.u2.view.TableView',
+//    'foam.u2.view.TableView',
   ],
   imports: [
     'data',
   ],
   properties: [
+    {
+      name: 'tableView',
+      factory: function() {
+        return foam.u2.view.TableView;
+      }
+    },
     {
       name: 'tableCls',
       expression: function(data$data$arg1, data$data$arg2) {
@@ -54,7 +60,7 @@ foam.CLASS({
               value: data$data$groups[k].value,
             }));
           })
-          return this.TableView.create({ data: dao });
+          return this.tableView.create({ data: dao });
         }))
     }
   ]
