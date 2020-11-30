@@ -63,8 +63,14 @@ foam.CLASS({
                 .start(self.Tabs)
                   .forEach(sections, function(s, i) {
                     if ( ! visibilities[i] ) return;
+                    var title$ = foam.Function.isInstance(s.title) ?
+                      foam.core.ExpressionSlot.create({
+                        obj$: self.data$,
+                        code: s.title
+                      }) :
+                      s.title$;
                     this
-                      .start(self.Tab, { label: s.title || self.defaultSectionLabel })
+                      .start(self.Tab, { label$: title$ || self.defaultSectionLabel })
                         .call(function() {
                           this.tag(self.SectionView, {
                             data$: self.data$,
