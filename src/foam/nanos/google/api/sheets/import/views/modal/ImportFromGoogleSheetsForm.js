@@ -8,6 +8,11 @@
   package: 'foam.nanos.google.api.sheets',
   name: 'ImportFromGoogleSheetsForm',
   extends: 'net.nanopay.ui.wizardModal.WizardModal',
+
+  imports: [
+    'config'
+  ],
+
   exports: [
     'importConfig',
     'importServiceName'
