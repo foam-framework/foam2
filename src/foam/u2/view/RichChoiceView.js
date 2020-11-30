@@ -609,10 +609,11 @@ foam.CLASS({
 
       methods: [
         function initE() {
+          var summary = this.data.toSummary();
           return this
             .start()
               .addClass(this.myClass('row'))
-              .add(this.data.toSummary())
+              .translate(summary || ('richChoiceSummary.'+this.data.cls_.id+'.'+this.data.id), summary)
             .end();
         }
       ]
@@ -660,9 +661,13 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          return this.add(this.fullObject$.map(o => {
+          var summary = this.fullObject$.map(o => {
             return o ? o.toSummary() : this.defaultSelectionPrompt;
-          }));
+          });
+          var summaryWithoutSlot = this.fullObject && this.fullObject.toSummary()
+            ? this.fullObject.toSummary()
+            : this.defaultSelectionPrompt;
+          return this.translate(summaryWithoutSlot, summary);
         }
       ]
     },
