@@ -30,7 +30,19 @@ foam.CLASS({
   ],
 
   css: `
+    * {
+      font-family: Roboto, sans-serif;
+      color: #555;
+    }
+    body {
+      font-family: Roboto;
+      background: rgb(238, 238, 238);
+      overflow: none;
+    }
+    button { padding: 6px; }
+    button span { color: white; }
     .foam-u2-ActionView-medium { height: 34px !important; background: pink; }
+
   `,
 
   classes: [
@@ -106,6 +118,8 @@ foam.CLASS({
 
   exports: [ 'locale', 'rows', 'search' ],
 
+  requires: [ 'foam.u2.borders.CardBorder' ],
+
   properties: [
     {
       class: 'Int',
@@ -136,9 +150,21 @@ foam.CLASS({
 
     function initE() {
       this.
-        start('div').add('Translation Console').end().
-        add('Search: ', this.SEARCH, ' Locale: ', this.LOCALE).
-        br().tag('hr').start('div', {}, this.content$).style({'overflowY':'scroll'}).end();
+        addClass(this.myClass()).
+        start(this.CardBorder).
+          style({height: '32px'}).
+          start('span').
+            style({'padding-top': '5px', display: 'inline-block', 'font-size': 'larger'}).            add('Translation Console').
+          end().
+          start('div').
+            style({float: 'right'}).
+            add('Search: ', this.SEARCH, '  Locale: ', this.LOCALE).
+          end().
+        end().
+        start(this.CardBorder, {}, this.content$).
+          style({'overflow-y':'scroll'}).
+          style({'margin-top': '10px', height: '90%' }).
+        end();
     }
   ],
 
