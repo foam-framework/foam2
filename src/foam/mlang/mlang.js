@@ -548,23 +548,6 @@ foam.CLASS({
   ]
 });
 
-foam.CLASS({
-  package: 'foam.mlang',
-  name: 'Pass',
-  extends: 'foam.mlang.AbstractExpr',
-  implements: [ 'foam.core.Serializable' ],
-
-  documentation: 'Expression which returns its input.',
-
-  methods: [
-    {
-      name: 'f',
-      code: function f(o) { return o; },
-      javaCode: 'return obj;'
-    }
-  ]
-});
-
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
@@ -1253,33 +1236,6 @@ return this;`
         // no OR args, no DNF transform needed
         return this;
       }
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.mlang.predicate',
-  name: 'PassContext',
-  extends: 'foam.mlang.predicate.And',
-  implements: ['foam.core.Serializable'],
-
-  documentation: `
-    Passes the context to a delegate predicate. This works as an adapter for
-    predicates made for the rule engine.
-  `,
-
-  methods: [
-    {
-      name: 'f',
-      javaCode: `
-        var x = getX();
-        x = x.put("NEW", obj);
-        for ( int i = 0 ; i < getArgs().length ; i++ ) {
-          if ( ! getArgs()[i].f(x) ) return false;
-        }
-        return true;
-      `
     }
   ]
 });
@@ -3709,10 +3665,6 @@ foam.CLASS({
     {
       name: 'TRUE',
       factory: function() { return foam.mlang.predicate.True.create() }
-    },
-    {
-      name: 'PASS',
-      factory: function() { return foam.mlang.Pass.create() }
     }
   ],
 
@@ -3734,7 +3686,6 @@ foam.CLASS({
 
     function OR() { return this._nary_("Or", arguments); },
     function AND() { return this._nary_("And", arguments); },
-    function PASS_CONTEXT() { return this._nary_("PassContext", arguments); },
     function CONTAINS(a, b) { return this._binary_("Contains", a, b); },
     function CONTAINS_IC(a, b) { return this._binary_("ContainsIC", a, b); },
     function EQ(a, b) { return this._binary_("Eq", a, b); },

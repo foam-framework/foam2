@@ -33,8 +33,6 @@ var classes = [
   'foam.mlang.predicate.Predicate',
   'foam.mlang.predicate.True',
   'foam.mlang.predicate.False',
-  'foam.mlang.Pass',
-  'foam.mlang.predicate.PassContext',
   'foam.mlang.predicate.And',
   'foam.mlang.predicate.Gt',
   'foam.mlang.predicate.Or',
