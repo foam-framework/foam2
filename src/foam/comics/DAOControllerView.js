@@ -130,8 +130,7 @@ foam.CLASS({
           class: 'foam.comics.DAOUpdateControllerView'
         };
       }
-    },
-    'currentMemento'
+    }
   ],
 
   reactions: [
@@ -178,7 +177,7 @@ foam.CLASS({
                 .add(self.cls.PREDICATE.clone().copyFrom({
                   view: {
                     class: 'foam.u2.view.ReciprocalSearch',
-                    searchValue: self.currentMemento && self.currentMemento.paramsObj && self.currentMemento.paramsObj.search ? self.currentMemento.paramsObj.search : null
+                    searchValue: self.memento && self.memento.paramsObj.search ? self.memento.paramsObj.search : null
                   }
                 }))
               .end();
@@ -192,7 +191,7 @@ foam.CLASS({
                       .add(self.cls.PREDICATE.clone().copyFrom({
                         view: { 
                           class: 'foam.u2.view.SimpleSearch',
-                          searchValue: self.currentMemento && self.currentMemento.paramsObj && self.currentMemento.paramsObj.search ? self.currentMemento.paramsObj.search : null
+                          searchValue: self.memento && self.memento.paramsObj.search ? self.memento.paramsObj.search : null
                         }
                       }))
                     .end();
