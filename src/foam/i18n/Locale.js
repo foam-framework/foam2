@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.i18n',
   name: 'Locale',
 
-  ids: ['locale', 'variant', 'source'],
+  ids: ['locale', 'variant', 'sourceId', 'sourcePath'],
 
   implements: [
     'foam.nanos.auth.LastModifiedAware',
@@ -42,9 +42,38 @@ foam.CLASS({
 //     }
     {
       class: 'String',
+      name: 'sourceId',
+      documentation: 'Id of property which needs to be translated'
+    },
+    {
+      class: 'String',
+      name: 'sourcePath',
+      documentation: 'path to property which needs to be translated'
+    },
+    {
+      class: 'String',
       name: 'source',//path+property+propertyproperty
       documentation: `Reference to model or view property to be translated.
-        Ex. (‘FIRST_NAME’, ‘LAST_NAME’, ‘ORGANIZATION’ …etc)`
+        Ex. (‘FIRST_NAME’, ‘LAST_NAME’, ‘ORGANIZATION’ …etc)
+        Use it to set sourceId and sourcePath with one string`,
+      storageTransient: true,
+      javaSetter:`
+        int idPosition = 0;
+        if ( val != null && ! val.trim().isEmpty() ) {
+          String[] arr = val.split("[.]");
+          StringBuilder sb = new StringBuilder();
+          boolean b;
+          while ( idPosition != arr.length && ! this.isUpperCase(arr[idPosition]) )
+            idPosition++;
+          for (int i = idPosition; i < arr.length; i++ ){
+            sb.append(arr[i]);
+            if ( i != arr.length - 1)
+              sb.append('.');
+          }
+          this.setSourceId(sb.toString());
+          this.setSourcePath(val.substring(0, val.indexOf("."+ this.getSourceId())));
+        }
+      `
     },
     {
       class: 'String',
@@ -75,6 +104,28 @@ foam.CLASS({
           }
         }.bind(this));
       }
+    }
+  ],
+
+  methods: [
+    {
+      name: 'isUpperCase',
+      type: 'Boolean',
+      args: [
+        {
+          name: 'str',
+          type: 'String'
+        }
+      ],
+      javaCode:`
+        for ( int i=0; i<str.length(); i++ ) {
+          if ( ! Character.isUpperCase(str.charAt(i)) && ! ( str.charAt(i) == '_' || Character.isDigit(str.charAt(i)) ) )
+          {
+            return false;
+          }
+        }
+        return true;
+      `
     }
   ]
 });

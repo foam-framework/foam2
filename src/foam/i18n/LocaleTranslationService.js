@@ -29,11 +29,11 @@ foam.CLASS({
     {
       name: 'getTranslation',
       javaCode: `
-        if ( locale == "" || source == "" ) return defaultText;
+        if ( locale == "" || sourceId == "" ) return defaultText;
 
         DAO localeDAO = (DAO) getX().get("localeDAO");
 
-        // locale - determines locale type (en, fr, es …etc)        
+        // locale - determines locale type (en, fr, es …etc)
         // variant - Locale variation (CA for en-CA, CA for fr-CA, AT for de_AT …etc)
         String variant = "";
         Locale localeEntry = null;
@@ -47,10 +47,24 @@ foam.CLASS({
 
           // search for locale and variant
           localeEntry = (Locale) localeDAO.find(
-            AND(
-              EQ(Locale.SOURCE, source),        
-              EQ(Locale.LOCALE, locale),
-              EQ(Locale.VARIANT, variant)
+            OR(
+              AND(
+                EQ(Locale.SOURCE_ID, sourceId),
+                EQ(Locale.SOURCE_PATH, sourcePath),
+                EQ(Locale.LOCALE, locale),
+                EQ(Locale.VARIANT, variant)
+              ),
+              AND(
+                EQ(Locale.SOURCE_ID, sourceId),
+                EQ(Locale.SOURCE_PATH, ""),
+                EQ(Locale.LOCALE, locale),
+                EQ(Locale.VARIANT, variant)
+              ),
+              AND(
+                EQ(Locale.SOURCE_ID, sourceId),
+                EQ(Locale.LOCALE, locale),
+                EQ(Locale.VARIANT, variant)
+              )
             )
           );
         } else {
@@ -60,16 +74,30 @@ foam.CLASS({
         // search for locale with no variant
         if ( localeEntry == null ) {
           localeEntry = (Locale) localeDAO.find(
-            AND(
-              EQ(Locale.SOURCE, source),
-              EQ(Locale.LOCALE, locale),
-              EQ(Locale.VARIANT, "")
+            OR(
+              AND(
+                EQ(Locale.SOURCE_ID, sourceId),
+                EQ(Locale.SOURCE_PATH, sourcePath),
+                EQ(Locale.LOCALE, locale),
+                EQ(Locale.VARIANT, "")
+              ),
+              AND(
+                EQ(Locale.SOURCE_ID, sourceId),
+                EQ(Locale.SOURCE_PATH, ""),
+                EQ(Locale.LOCALE, locale),
+                EQ(Locale.VARIANT, "")
+              ),
+              AND(
+                EQ(Locale.SOURCE_ID, sourceId),
+                EQ(Locale.LOCALE, locale),
+                EQ(Locale.VARIANT, "")
+              )
             )
           );
         }
 
         String translation = localeEntry != null ? localeEntry.getTarget() : defaultText;
-        
+
         return translation;
       `
     }
