@@ -25,18 +25,20 @@ foam.CLASS({
     'key',
     'openValueTime',
     'closeValueTime',
+    'count',
     'open',
     'close',
     'min',
     'max',
-    'average'
+    'average',
+    'total',
   ],
   properties: [
     {
       class: 'Object',
       name: 'key',
       visibility: 'RO',
-      tableWidth: '350'
+      tableWidth: '300'
     },
     {
       class: 'Float',
@@ -57,13 +59,13 @@ foam.CLASS({
       class: 'DateTime',
       name: 'openValueTime',
       visibility: 'RO',
-      tableWidth: 150
+      tableWidth: 160
     },
     {
       class: 'DateTime',
       name: 'closeTime',
       visibility: 'RO',
-      tableWidth: 150
+      tableWidth: 170
     },
     {
       class: 'Float',
@@ -74,7 +76,7 @@ foam.CLASS({
       class: 'DateTime',
       name: 'closeValueTime',
       visibility: 'RO',
-      tableWidth: 150
+      tableWidth: 170
     },
     {
       class: 'Float',
