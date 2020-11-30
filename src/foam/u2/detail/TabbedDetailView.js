@@ -65,7 +65,7 @@ foam.CLASS({
                     if ( ! visibilities[i] ) return;
                     var title$ = foam.Function.isInstance(s.title) ?
                       foam.core.ExpressionSlot.create({
-                        obj$: self.data$,
+                        obj: self.data,
                         code: s.title
                       }) :
                       s.title$;
