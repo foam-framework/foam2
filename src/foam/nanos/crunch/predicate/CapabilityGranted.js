@@ -26,7 +26,12 @@ foam.CLASS({
     {
       name: 'subjectFromUCJ',
       class: 'Boolean',
-      value: true
+      value: true,
+      documentation: `
+        When this property is true, CapabilityGranted expects a UCJ object in
+        the context which it will use to determine the corresponding subject.
+        Otherwise, the context is assumed to contain the appropriate subject.
+      `
     }
   ],
 
@@ -37,8 +42,6 @@ foam.CLASS({
         if ( ! ( obj instanceof X ) ) return false;
         var x = (X) obj;
 
-        // If we have a subject in context, but also a UCJ, this predicate
-        // should evaluate with respect to the UCJ's subject.
         if ( getSubjectFromUCJ() ) {
           var newUCJ = (UserCapabilityJunction) x.get("NEW");
           if ( newUCJ != null ) {

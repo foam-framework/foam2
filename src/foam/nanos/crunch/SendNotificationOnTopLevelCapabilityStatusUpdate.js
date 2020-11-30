@@ -35,13 +35,16 @@ foam.CLASS({
         @Override
         public void execute(X x) {
           UserCapabilityJunction junction = (UserCapabilityJunction) obj;
-          Capability cap = (Capability) junction.findTargetId(x);
-          User user = (User) junction.findSourceId(x);
 
-          // visible checks if the capability is a top-level capability
-          // and availabilitypredicate checks if the user has access to the capability
-          if ( cap == null || ! ( cap.getAvailabilityPredicate().f(x) ) ) return;
+          var subject = junction.getSubject(x);
+          var subjectX = x.put("subject", subject);
+          var capabilityDAO = ((DAO) subjectX.get("capabilityDAO")).inX(subjectX);
+          var cap = (Capability) capabilityDAO.find(junction.getTargetId());
+          if ( cap == null ) return;
 
+          if ( ! cap.getVisibilityPredicate().f(subjectX) ) return;
+
+          User user = (User) subject.getUser();
           DAO notificationDAO = (DAO) x.get("notificationDAO");
 
           StringBuilder sb = new StringBuilder("The Capability '")

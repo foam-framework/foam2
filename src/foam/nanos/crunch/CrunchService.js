@@ -233,7 +233,7 @@ foam.INTERFACE({
       type: 'Boolean',
       args: [
         {
-          name: 'x',
+          name: 'sessionX',
           type: 'Context'
         },
         {

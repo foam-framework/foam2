@@ -27,8 +27,7 @@ foam.CLASS({
       javaCode: `
         if ( ! ( obj instanceof X ) ) return false;
         X x = (X) obj;
-        return ((Subject) x.get("subject")).getUser().getId()
-          != ((Subject) x.get("subject")).getRealUser().getId();
+        return ((Subject) x.get("subject")).isAgent();
       `
     }
   ]

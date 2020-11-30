@@ -208,13 +208,13 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
   }
 
   public boolean hasPreconditionsMet(
-    X x, String capabilityId
+    X sessionX, String capabilityId
   ) {
     // Return false if capability does not exist or is not available
-    var capabilityDAO = (DAO) x.get("capabilityDAO");
-    if ( capabilityDAO.inX(x).find(capabilityId) == null ) return false;
+    var capabilityDAO = ((DAO) sessionX.get("capabilityDAO")).inX(sessionX);
+    if ( capabilityDAO.find(capabilityId) == null ) return false;
 
-    var preconditions = Arrays.stream(((CapabilityCapabilityJunction[]) ((ArraySink) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
+    var preconditions = Arrays.stream(((CapabilityCapabilityJunction[]) ((ArraySink) ((DAO) sessionX.get("prerequisiteCapabilityJunctionDAO"))
       .where(AND(
         EQ(CapabilityCapabilityJunction.SOURCE_ID, capabilityId),
         EQ(CapabilityCapabilityJunction.PRECONDITION, true)
@@ -225,8 +225,8 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     
     for ( String preconditionId : preconditions ) {
       // Return false if capability does not exist or is not available
-      if ( capabilityDAO.inX(x).find(preconditionId) == null ) return false;
-      var ucj = getJunction(x, preconditionId);
+      if ( capabilityDAO.find(preconditionId) == null ) return false;
+      var ucj = getJunction(sessionX, preconditionId);
       if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED ) return false;
     }
 
