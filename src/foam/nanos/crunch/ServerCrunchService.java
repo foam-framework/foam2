@@ -242,10 +242,9 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       @Override
       public void put(Object o, Detachable sub) {
         var cap = (Capability) o;
-        if (
-          ! cap.getVisibilityPredicate().f(x)
-          || ! hasPreconditionsMet(x, cap.getId())
-        ) return;
+        if ( ! cap.getVisibilityPredicate().f(x) || ! hasPreconditionsMet(x, cap.getId()) ) {
+          return;
+        }
         getDelegate().put(o, sub);
       }
     };
