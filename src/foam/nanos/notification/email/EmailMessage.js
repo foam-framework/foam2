@@ -24,22 +24,37 @@ foam.CLASS({
     'status'
   ],
 
+  sections: [
+    {
+      name: 'emailInformation',
+      order: 1
+    },
+    {
+      name: 'templateInformation',
+      title: 'Template Arguments',
+      order: 2
+    }
+  ],
+
   properties: [
     {
       class: 'Long',
       name: 'id',
       includeInDigest: true,
+      section: 'emailInformation'
     },
     {
       class: 'DateTime',
       name: 'created',
       includeInDigest: true,
+      section: 'emailInformation',
       tableWidth: 170
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
+      section: 'emailInformation',
       documentation: 'User who created the entry',
       includeInDigest: true,
     },
@@ -47,6 +62,7 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdByAgent',
+      section: 'emailInformation',
       documentation: 'User who created the entry',
       includeInDigest: true,
     },
@@ -54,26 +70,31 @@ foam.CLASS({
       class: 'StringArray',
       name: 'to',
       includeInDigest: true,
+      section: 'emailInformation'
     },
     {
       class: 'StringArray',
       name: 'cc',
       includeInDigest: true,
+      section: 'emailInformation'
     },
     {
       class: 'StringArray',
       name: 'bcc',
       includeInDigest: true,
+      section: 'emailInformation'
     },
     {
       class: 'String',
       name: 'subject',
       includeInDigest: true,
+      section: 'emailInformation'
     },
     {
       class: 'String',
       name: 'body',
       includeInDigest: true,
+      section: 'emailInformation',
       view: {
         class: 'foam.u2.MultiView',
         views: [
@@ -86,24 +107,28 @@ foam.CLASS({
       class: 'String',
       name: 'from',
       includeInDigest: true,
+      section: 'emailInformation',
       value: null
     },
     {
       class: 'String',
       name: 'displayName',
       includeInDigest: true,
+      section: 'emailInformation',
       value: null
     },
     {
       class: 'String',
       name: 'replyTo',
       includeInDigest: true,
+      section: 'emailInformation',
       value: null
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
+      section: 'emailInformation',
       value: '1',
       transient: true,
       hidden: true,
@@ -115,12 +140,14 @@ foam.CLASS({
       of: 'foam.nanos.notification.email.Status',
       name: 'status',
       includeInDigest: false,
+      section: 'emailInformation',
       tableWidth: 100
     },
     {
       class: 'Map',
       name: 'templateArguments',
       includeInDigest: true,
+      section: 'templateInformation',
       view: { class: 'foam.u2.view.MapView' }
     }
   ]
