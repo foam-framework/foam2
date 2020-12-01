@@ -44,14 +44,14 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(
           `
-            private static final PropertyPredicate propertyPredicate_ = new StoragePropertyPredicate();
-            private static final PropertyPredicate optionalPredicate_ = new StorageOptionalPropertyPredicate();
+            private static final PropertyPredicate PROPERTY_PREDICATE = new StoragePropertyPredicate();
+            private static final PropertyPredicate OPTIONAL_PREDICATE = new StorageOptionalPropertyPredicate();
 
-            protected static final ThreadLocal<FObjectFormatter> formatter_ = new ThreadLocal<FObjectFormatter>() {
+            protected static final ThreadLocal<FObjectFormatter> formatter__ = new ThreadLocal<FObjectFormatter>() {
               @Override
               protected JSONFObjectFormatter initialValue() {
                 JSONFObjectFormatter formatter = new JSONFObjectFormatter();
-                formatter.setPropertyPredicate(propertyPredicate_);
+                formatter.setPropertyPredicate(PROPERTY_PREDICATE);
                 return formatter;
               }
               
@@ -110,8 +110,8 @@ foam.CLASS({
         var props = info.getAxiomsByClass(PropertyInfo.class);
 
         for ( var prop : props ) {
-          if ( propertyPredicate_.propertyPredicateCheck(x, of, prop)
-            && ! optionalPredicate_.propertyPredicateCheck(x, of, prop)
+          if ( PROPERTY_PREDICATE.propertyPredicateCheck(x, of, prop)
+            && ! OPTIONAL_PREDICATE.propertyPredicateCheck(x, of, prop)
             && prop.compare(currentValue, newValue) != 0
           ) {
             updates.add(new PropertyUpdate(
@@ -142,7 +142,7 @@ foam.CLASS({
           historyRecord.setAgent(formatUserName(agent));
           historyRecord.setTimestamp(new Date());
           if ( current != null ) {
-            FObjectFormatter formatter = formatter_.get();
+            FObjectFormatter formatter = formatter__.get();
             if ( ! formatter.maybeOutputDelta(current, obj) ) {
               return super.put_(x, obj);
             }
