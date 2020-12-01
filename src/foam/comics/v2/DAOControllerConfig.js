@@ -205,10 +205,6 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'hideQueryBar'
-    },
-    {
-      class: 'String',
-      name: 'gsImportDataServiceName'
     }
   ]
 });
