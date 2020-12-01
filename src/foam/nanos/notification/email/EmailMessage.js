@@ -31,7 +31,7 @@ foam.CLASS({
     },
     {
       name: 'templateInformation',
-      label: 'Template Arguments',
+      title: 'Template Arguments',
       order: 2
     }
   ],
