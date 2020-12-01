@@ -14,6 +14,9 @@ foam.CLASS({
     'foam.core.PropertyInfo',
     'foam.core.X',
     'foam.dao.DAO',
+    'foam.lib.PropertyPredicate',
+    'foam.lib.StorageOptionalPropertyPredicate',
+    'foam.lib.StoragePropertyPredicate',
     'foam.lib.formatter.FObjectFormatter',
     'foam.lib.formatter.JSONFObjectFormatter',
     'foam.nanos.auth.Subject',
@@ -40,12 +43,15 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(
-          ` 
+          `
+            private static final PropertyPredicate propertyPredicate_ = new StoragePropertyPredicate();
+            private static final PropertyPredicate optionalPredicate_ = new StorageOptionalPropertyPredicate();
+
             protected static final ThreadLocal<FObjectFormatter> formatter_ = new ThreadLocal<FObjectFormatter>() {
               @Override
               protected JSONFObjectFormatter initialValue() {
                 JSONFObjectFormatter formatter = new JSONFObjectFormatter();
-                formatter.setPropertyPredicate(new foam.lib.StoragePropertyPredicate());
+                formatter.setPropertyPredicate(propertyPredicate_);
                 return formatter;
               }
               
@@ -92,16 +98,22 @@ foam.CLASS({
       visibility: 'protected',
       type: 'PropertyUpdate[]',
       args: [
+        { type: 'Context', name: 'x' },
         { type: 'FObject', name: 'currentValue' },
         { type: 'FObject', name: 'newValue' }
       ],
       documentation: 'Returns an array of updated properties',
       javaCode: `
         var updates = new ArrayList<PropertyUpdate>();
-        var props = newValue.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+        var info = newValue.getClassInfo();
+        var of = info.getObjClass().getSimpleName().toLowerCase();
+        var props = info.getAxiomsByClass(PropertyInfo.class);
 
         for ( var prop : props ) {
-          if ( prop.compare(currentValue, newValue) != 0 ) {
+          if ( propertyPredicate_.propertyPredicateCheck(x, of, prop)
+            && ! optionalPredicate_.propertyPredicateCheck(x, of, prop)
+            && prop.compare(currentValue, newValue) != 0
+          ) {
             updates.add(new PropertyUpdate(
               prop.getName(),
               prop.f(currentValue),
@@ -134,7 +146,7 @@ foam.CLASS({
             if ( ! formatter.maybeOutputDelta(current, obj) ) {
               return super.put_(x, obj);
             }
-            historyRecord.setUpdates(getUpdatedProperties(current, obj));
+            historyRecord.setUpdates(getUpdatedProperties(x, current, obj));
           }
     
           getHistoryDAO().put_(x, historyRecord);
