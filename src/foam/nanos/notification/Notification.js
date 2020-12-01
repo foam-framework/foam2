@@ -200,7 +200,7 @@ foam.CLASS({
       ],
       type: 'Boolean',
       javaCode: `
-        User user = ((Subject) x.get("subject")).getUser();
+        User user = ((Subject) x.get("subject")).getRealUser();
         return user != null && getUserId() == user.getId();
       `
     },
