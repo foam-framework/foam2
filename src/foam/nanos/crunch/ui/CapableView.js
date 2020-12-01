@@ -43,7 +43,7 @@ foam.CLASS({
       name: 'wizardlets',
       documentation: 'wizardlets for capable payloads',
       postSet: function() {
-        this.addListeners();
+        this.listenOnPayloads();
       }
     },
     {
@@ -72,11 +72,12 @@ foam.CLASS({
 
       const self = this;
 
-      // set capable payloads to capabilities if the capbilities don't have payloads yet
-      const hasNoPayloads = ! this.capableObj.capablePayloads ||
-        Object.keys(this.capableObj.capablePayloads).length === 0;
+      // a flag for checking if the capable object has payloads
+      const hasPayloads = this.capableObj.capablePayloads &&
+        Object.keys(this.capableObj.capablePayloads).length > 0;
 
-      if ( hasNoPayloads ) {
+      // set capable payloads to capabilities if the capbilities don't have payloads yet
+      if ( ! hasPayloads ) {
           try {
             await this.capableObj.setRequirements(this.capableObj.capableRequirements);
           } catch (e) {
@@ -85,6 +86,8 @@ foam.CLASS({
       }
 
       // set wizardlets based on the capableObj
+      // note: payloads data are also set from getWizardletsFromCapable
+      //       this is why we add listeners to payloads data after wizardlets are set
       this.wizardlets = this.capableObj ?
         await this.crunchController.getWizardletsFromCapable(this.capableObj) : [];
 
@@ -101,10 +104,10 @@ foam.CLASS({
       .end();
     },
 
-    // add listeners to payloads
-    function addListeners() {
-      for ( payload of this.capableObj.capablePayloads ) {
-        payload.data.sub(this.clonePayloads);
+    // add listeners to payload data
+    function listenOnPayloads() {
+      for ( const payload of this.capableObj.capablePayloads ) {
+        if ( payload.data ) payload.data.sub(this.clonePayloads);
       }
     }
   ],
