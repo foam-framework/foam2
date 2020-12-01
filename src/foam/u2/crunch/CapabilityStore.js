@@ -14,6 +14,8 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.dao.ArrayDAO',
+    'foam.dao.NullDAO',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCategory',
     'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
@@ -125,29 +127,13 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'hideGrantedCapabilities',
-      class: 'Boolean'
-    },
-    {
-      name: 'grantedCapabilities',
-      class: 'StringArray'
-    },
-    {
       name: 'visibleCapabilityDAO',
       class: 'foam.dao.DAOProperty',
       documentation: `
         DAO with only visible capabilities.
       `,
-      expression: function(hideGrantedCapabilities, grantedCapabilities) {
-        var predicate = this.EQ(this.Capability.VISIBLE, true);
-        if ( hideGrantedCapabilities && grantedCapabilities.length > 0 ) {
-          predicate = this.AND(
-            predicate,
-            this.NOT(this.IN(this.Capability.ID, grantedCapabilities))
-          );
-        }
-        return this.capabilityDAO
-          .where(predicate);
+      factory: function() {
+        return this.NullDAO.create();
       }
     },
     {
@@ -156,8 +142,8 @@ foam.CLASS({
       documentation: `
         DAO Property to find capabilities to feature.
       `,
-      factory: function() {
-        return this.visibleCapabilityDAO
+      expression: function(visibleCapabilityDAO) {
+        return visibleCapabilityDAO
           .where(this.IN('featured', this.Capability.KEYWORDS));
       }
     },
@@ -193,13 +179,13 @@ foam.CLASS({
   methods: [
     function init() {
       this.crunchService.getAllJunctionsForUser().then(juncs => {
-        this.grantedCapabilities = juncs
-          .filter(
-            junc => junc.status == this.CapabilityJunctionStatus.GRANTED
-          )
-          .map(junc => junc.targetId);
         this.daoUpdate();
-      })
+      });
+      this.crunchService.getEntryCapabilities().then(a => {
+        this.visibleCapabilityDAO = this.ArrayDAO.create({
+          array: a.array
+        });
+      });
     },
     function initE() {
       this.SUPER();
