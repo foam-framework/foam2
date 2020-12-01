@@ -207,6 +207,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return this.getJunctionForSubject(x, capabilityId, subject);
   }
 
+  // see documentation in CrunchService interface
   public boolean hasPreconditionsMet(
     X sessionX, String capabilityId
   ) {
@@ -233,6 +234,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return true;
   }
 
+  // see documentation in CrunchService interface
   public ArraySink getEntryCapabilities(X x) {
     var sink = new ArraySink();
     var proxySink = new ProxySink(x, sink) {
