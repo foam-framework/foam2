@@ -39,9 +39,15 @@ p({
   "lazy":true,
   "serve":true,
   "serviceScript":"""
+    dec = new foam.dao.NullDAO(x, foam.nanos.crunch.Capability.getOwnClassInfo());
+    dec = new foam.nanos.auth.PreventSystemDAO.Builder(x)
+      .setDelegate(dec)
+      .setPreventionMode(1)
+      .setLocalDAOKey("localCapabilityDAO")
+      .build();
     return new foam.dao.EasyDAO.Builder(x)
       .setInnerDAO(x.get("localCapabilityDAO"))
-      .setDecorator(new foam.nanos.crunch.CapabilityAvailabilityDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.Capability.getOwnClassInfo())))
+      .setDecorator(dec)
       .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
       .build();
   """,
