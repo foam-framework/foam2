@@ -176,7 +176,7 @@ foam.CLASS({
       name: 'firstName',
       shortName: 'fn',
       documentation: 'The first name of the User.',
-      gridColumns: 4,
+      gridColumns: 6,
       section: 'userInformation',
       order: 2,
       includeInDigest: true
@@ -185,7 +185,7 @@ foam.CLASS({
       class: 'String',
       name: 'middleName',
       documentation: 'The middle name of the User.',
-      gridColumns: 4,
+      gridColumns: 6,
       section: 'userInformation',
       order: 3,
       includeInDigest: true
@@ -195,7 +195,7 @@ foam.CLASS({
       name: 'lastName',
       shortName: 'ln',
       documentation: 'The last name of the User.',
-      gridColumns: 4,
+      gridColumns: 6,
       section: 'userInformation',
       order: 4,
       includeInDigest: true
@@ -281,7 +281,7 @@ foam.CLASS({
       name: 'emailVerified',
       documentation: 'Determines whether the email address of the User is valid.',
       writePermissionRequired: true,
-      section: 'systemInformation',
+      section: 'operationsInformation',
       order: 35,
       gridColumns: 6
     },
@@ -296,7 +296,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'phoneNumberVerified',
       writePermissionRequired: true,
-      section: 'userInformation',
+      section: 'operationsInformation',
       gridColumns: 6
     },
     {
@@ -311,7 +311,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'mobileNumberVerified',
       writePermissionRequired: true,
-      section: 'userInformation',
+      section: 'operationsInformation',
       gridColumns: 6
     },
     {
@@ -348,7 +348,7 @@ foam.CLASS({
         class: 'foam.nanos.auth.ProfilePictureView',
         placeholderImage: 'images/ic-placeholder.png'
       },
-      section: 'userInformation'
+      section: 'systemInformation'
     },
     {
       class: 'FObjectProperty',
@@ -461,14 +461,6 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'note',
-      documentation: 'A field for a note that can be added and appended to the User.',
-      displayWidth: 70,
-      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 },
-      section: 'userInformation'
-    },
-    {
-      class: 'String',
       name: 'businessName',
       documentation: 'The name of the business associated with the User.',
       width: 50,
@@ -518,6 +510,14 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       section: 'userInformation',
       gridColumns: 6
+    },
+    {
+      class: 'String',
+      name: 'note',
+      documentation: 'A field for a note that can be added and appended to the User.',
+      displayWidth: 70,
+      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 },
+      section: 'userInformation'
     },
     {
       class: 'DateTime',
@@ -782,7 +782,8 @@ foam.RELATIONSHIP({
   targetProperty: {
     hidden: false,
     section: 'systemInformation',
-    order: 10
+    order: 10,
+    gridColumns: 6
   }
 });
 
@@ -845,6 +846,7 @@ foam.RELATIONSHIP({
     visibility: 'HIDDEN',
   },
   targetProperty: {
-    section: 'systemInformation'
+    section: 'systemInformation',
+    gridColumns: 6
   }
 });
