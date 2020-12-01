@@ -14,16 +14,16 @@ foam.CLASS({
     'foam.core.PropertyInfo',
     'foam.core.X',
     'foam.dao.DAO',
-    'foam.lib.PropertyPredicate',
-    'foam.lib.StorageOptionalPropertyPredicate',
-    'foam.lib.StoragePropertyPredicate',
     'foam.lib.formatter.FObjectFormatter',
     'foam.lib.formatter.JSONFObjectFormatter',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
-    'java.util.ArrayList',
+    'foam.util.SafetyUtil',
     'java.util.Date',
+    'java.util.Iterator',
+    'java.util.List',
+    'java.util.Map',
     'static foam.mlang.MLang.EQ'
   ],
 
@@ -43,15 +43,12 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(
-          `
-            private static final PropertyPredicate PROPERTY_PREDICATE = new StoragePropertyPredicate();
-            private static final PropertyPredicate OPTIONAL_PREDICATE = new StorageOptionalPropertyPredicate();
-
-            protected static final ThreadLocal<FObjectFormatter> formatter__ = new ThreadLocal<FObjectFormatter>() {
+          ` 
+            protected static final ThreadLocal<FObjectFormatter> formatter_ = new ThreadLocal<FObjectFormatter>() {
               @Override
               protected JSONFObjectFormatter initialValue() {
                 JSONFObjectFormatter formatter = new JSONFObjectFormatter();
-                formatter.setPropertyPredicate(PROPERTY_PREDICATE);
+                formatter.setPropertyPredicate(new foam.lib.StoragePropertyPredicate());
                 return formatter;
               }
               
@@ -98,31 +95,22 @@ foam.CLASS({
       visibility: 'protected',
       type: 'PropertyUpdate[]',
       args: [
-        { type: 'Context', name: 'x' },
         { type: 'FObject', name: 'currentValue' },
-        { type: 'FObject', name: 'newValue' }
+        { type: 'FObject', name: 'newValue' },
+        { type: 'FObjectFormatter', name: 'formatter' }
       ],
       documentation: 'Returns an array of updated properties',
       javaCode: `
-        var updates = new ArrayList<PropertyUpdate>();
-        var info = newValue.getClassInfo();
-        var of = info.getObjClass().getSimpleName().toLowerCase();
-        var props = info.getAxiomsByClass(PropertyInfo.class);
+        List<PropertyInfo> delta = ((JSONFObjectFormatter) formatter).getDelta(currentValue, newValue);
 
-        for ( var prop : props ) {
-          if ( PROPERTY_PREDICATE.propertyPredicateCheck(x, of, prop)
-            && ! OPTIONAL_PREDICATE.propertyPredicateCheck(x, of, prop)
-            && prop.compare(currentValue, newValue) != 0
-          ) {
-            updates.add(new PropertyUpdate(
-              prop.getName(),
-              prop.f(currentValue),
-              prop.f(newValue)
-            ));
-          }
+        int index = 0;
+        PropertyUpdate[] updates = new PropertyUpdate[delta.size()];
+        for ( PropertyInfo prop : delta ) {
+          String propName = prop.getName();
+          updates[index++] = new PropertyUpdate(propName, prop.f(currentValue), prop.f(newValue));
         }
 
-        return updates.toArray(new PropertyUpdate[updates.size()]);
+        return updates;
       `
     },
     {
@@ -142,11 +130,12 @@ foam.CLASS({
           historyRecord.setAgent(formatUserName(agent));
           historyRecord.setTimestamp(new Date());
           if ( current != null ) {
-            FObjectFormatter formatter = formatter__.get();
-            if ( ! formatter.maybeOutputDelta(current, obj) ) {
+            FObjectFormatter formatter = formatter_.get();
+            formatter.outputDelta(current, obj);
+            if ( SafetyUtil.isEmpty(formatter.builder().toString().trim()) ) {
               return super.put_(x, obj);
             }
-            historyRecord.setUpdates(getUpdatedProperties(x, current, obj));
+            historyRecord.setUpdates(getUpdatedProperties(current, obj, formatter));
           }
     
           getHistoryDAO().put_(x, historyRecord);
