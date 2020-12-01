@@ -274,6 +274,22 @@ foam.CLASS({
       }
     },
     function createJavaPropertyInfo_(cls) {
+      var isID = false;
+
+      if ( this.sourceCls_ ) {
+        if ( this.sourceCls_.model_.ids ) {
+          var ids = this.sourceCls_.model_.ids;
+          for ( var i = 0 ; i < ids.length ; i++ ) {
+            if ( ids[i] == this.name ) {
+              isID = true;
+              break;
+            }
+          }
+        } else {
+          if ( this.name == 'id' ) isID = true;
+        }
+      }
+
       return foam.java.PropertyInfo.create({
         sourceCls:               cls,
         propName:                this.name,
@@ -301,6 +317,7 @@ foam.CLASS({
         xmlAttribute:            this.xmlAttribute,
         xmlTextNode:             this.xmlTextNode,
         sqlType:                 this.sqlType,
+        includeInID:             isID,
         includeInDigest:         this.includeInDigest,
         includeInSignature:      this.includeInSignature,
         containsPII:             this.containsPII,
