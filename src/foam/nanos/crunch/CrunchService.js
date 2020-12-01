@@ -13,6 +13,7 @@ foam.INTERFACE({
   `,
 
   javaImports: [
+    'foam.dao.ArraySink',
     'foam.nanos.crunch.lite.CapablePayload'
   ],
 
@@ -225,6 +226,48 @@ foam.INTERFACE({
           type: 'String'
         }
       ]
+    },
+    {
+      name: 'hasPreconditionsMet',
+      async: true,
+      type: 'Boolean',
+      args: [
+        {
+          name: 'sessionX',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        }
+      ],
+      documentation: `
+        Check if preconditions are met for capabilityId with respect
+        to the subject of sessionX.
+
+        Preconditions are defined by setting precondition=true on a
+        capability junction. This method will return true only if all
+        prerequisites marked as preconditions are satisfied by the
+        provided subject.
+      `
+    },
+    {
+      name: 'getEntryCapabilities',
+      async: true,
+      type: 'ArraySink',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      documentation: `
+        Query capabilities to be presented in the capability store.
+
+        A capability is an "entry capability" if its visibilityPredicate
+        evaluates true and it has all preconditions met. This is the
+        case when a capability appears in the Capability Store.
+      `
     },
     {
       name: 'getCapableObjectPayloads',

@@ -10,6 +10,8 @@ import foam.core.*;
 import foam.dao.AbstractSink;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
+import foam.dao.ProxySink;
+import foam.dao.Sink;
 import foam.mlang.predicate.Predicate;
 import foam.mlang.sink.GroupBy;
 import foam.nanos.NanoService;
@@ -205,6 +207,53 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return this.getJunctionForSubject(x, capabilityId, subject);
   }
 
+  // see documentation in CrunchService interface
+  public boolean hasPreconditionsMet(
+    X sessionX, String capabilityId
+  ) {
+    // Return false if capability does not exist or is not available
+    var capabilityDAO = ((DAO) sessionX.get("capabilityDAO")).inX(sessionX);
+    if ( capabilityDAO.find(capabilityId) == null ) return false;
+
+    // TODO: use MapSink to simplify/optimize this code
+    var preconditions = Arrays.stream(((CapabilityCapabilityJunction[]) ((ArraySink) ((DAO) sessionX.get("prerequisiteCapabilityJunctionDAO"))
+      .where(AND(
+        EQ(CapabilityCapabilityJunction.SOURCE_ID, capabilityId),
+        EQ(CapabilityCapabilityJunction.PRECONDITION, true)
+      ))
+      .select(new ArraySink())).getArray()
+      .toArray(new CapabilityCapabilityJunction[0])))
+      .map(CapabilityCapabilityJunction::getTargetId).toArray(String[]::new);
+    
+    for ( String preconditionId : preconditions ) {
+      // Return false if capability does not exist or is not available
+      if ( capabilityDAO.find(preconditionId) == null ) return false;
+      var ucj = getJunction(sessionX, preconditionId);
+      if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED ) return false;
+    }
+
+    return true;
+  }
+
+  // see documentation in CrunchService interface
+  public ArraySink getEntryCapabilities(X x) {
+    var sink = new ArraySink();
+    var proxySink = new ProxySink(x, sink) {
+      @Override
+      public void put(Object o, Detachable sub) {
+        var cap = (Capability) o;
+        if ( ! cap.getVisibilityPredicate().f(x) || ! hasPreconditionsMet(x, cap.getId()) ) {
+          return;
+        }
+        getDelegate().put(o, sub);
+      }
+    };
+
+    var capabilityDAO = ((DAO) x.get("capabilityDAO")).inX(x);
+    capabilityDAO.select(proxySink);
+    return sink;
+  }
+
   public UserCapabilityJunction[] getAllJunctionsForUser(X x) {
     Predicate associationPredicate = getAssociationPredicate_(x);
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
@@ -278,10 +327,14 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
   ) {
     // Need Capability to associate UCJ correctly
     DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-    Capability cap = (Capability) capabilityDAO.find(capabilityId);
+
+    // If the subject in context doesn't have the capability availabile, we
+    // should act as though it doesn't exist; this is why inX is here.
+    Capability cap = (Capability) capabilityDAO.inX(x).find(capabilityId);
     if ( cap == null ) {
       throw new RuntimeException(String.format(
-        "Capability with id '%s' not found", capabilityId
+        "Capability with id '%s' is either unavailabile or does not exist",
+        capabilityId
       ));
     }
     AssociatedEntity associatedEntity = cap.getAssociatedEntity();
