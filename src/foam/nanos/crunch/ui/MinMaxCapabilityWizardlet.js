@@ -15,6 +15,10 @@ foam.CLASS({
     'foam.nanos.crunch.CapabilityJunctionStatus'
   ],
 
+  imports: [
+    'translationService'
+  ],
+
   properties: [
     {
       class: 'FObjectArray',
@@ -46,12 +50,13 @@ foam.CLASS({
     {
       name: 'choices',
       expression: function(choiceWizardlets){
+        var self = this;
         return choiceWizardlets.map(wizardlet => {
           var isFinal =
             wizardlet.status === this.CapabilityJunctionStatus.GRANTED ||
             wizardlet.status === this.CapabilityJunctionStatus.PENDING;
 
-          return [wizardlet.title, wizardlet.title, isFinal ? true : wizardlet.isAvailable$, isFinal ?  foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW, isFinal]
+          return [wizardlet.title, self.translationService.getTranslation(foam.locale, `${wizardlet.capability.id}.name`,wizardlet.title), isFinal ? true : wizardlet.isAvailable$, isFinal ?  foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW, isFinal]
         })
       }
     },
