@@ -97,6 +97,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'includeInID'
+    },
+    {
+      class: 'Boolean',
       name: 'includeInDigest'
     },
     {
@@ -446,6 +450,15 @@ foam.CLASS({
             visibility: 'public',
             type:       'boolean',
             body:       `return ${this.includeInDigest};`
+          });
+        }
+
+        if ( ! this.includeInID ) {
+          m.push({
+            name:       'includeInID',
+            visibility: 'public',
+            type:       'boolean',
+            body:       'return true;'
           });
         }
 
