@@ -140,9 +140,9 @@ foam.CLASS({
     position: sticky;
   }
   ^ .image-one {
-    width: 38vw;
+    width: 34vw;
     margin-top: -75vh;
-    margin-left: 10vw;
+    margin-left: 14vw;
   }
   `,
 
