@@ -618,6 +618,7 @@ FOAM_FILES([
   { name: "foam/u2/crunch/wizardflow/StepWizardAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/lite/MaybeDAOPutAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/PutFinalJunctionsAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/PutFinalPayloadsAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/TestAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/LoadTopConfig", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/lite/CapableCreateWizardletsAgent", flags: ['web'] },

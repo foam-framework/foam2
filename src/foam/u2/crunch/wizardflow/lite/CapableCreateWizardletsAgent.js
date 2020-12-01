@@ -41,6 +41,9 @@ foam.CLASS({
       var capable = this.capable;
       var capablePayloads = await this.crunchService.getCapableObjectPayloads(null, this.capable.capabilityIds)
       var wizardletsTuple = await this.createWizardletsFromPayloads(capablePayloads);
+
+      // TODO: not sure how this is going tto work if you have some of the payloads, might have to filter them out
+      // need to finalize with eric before proceeding
       this.wizardlets = wizardletsTuple.allDescendantWizardlets;
       console.log('CAPABLE', capable);
       console.log('WIZARDLETS', this.wizardlets);

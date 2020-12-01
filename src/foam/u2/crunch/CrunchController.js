@@ -42,6 +42,7 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.RequirementsPreviewAgent',
     'foam.u2.crunch.wizardflow.StepWizardAgent',
     'foam.u2.crunch.wizardflow.PutFinalJunctionsAgent',
+    'foam.u2.crunch.wizardflow.PutFinalPayloadsAgent',
     'foam.u2.crunch.wizardflow.TestAgent',
     'foam.u2.crunch.wizardflow.LoadTopConfig',
     'foam.u2.crunch.wizardflow.CapableDefaultConfigAgent',
@@ -130,6 +131,7 @@ foam.CLASS({
           .add(this.CapableCreateWizardletsAgent)
           .add(this.LoadWizardletsAgent)
           .add(this.StepWizardAgent)
+          .add(this.PutFinalPayloadsAgent)
           .add(this.MaybeDAOPutAgent)
           ;
       }
