@@ -314,64 +314,60 @@ public class JSONFObjectFormatter
     outputDelta(oldFObject, newFObject, null);
   }
 
-  public void outputDelta(FObject oldFObject, FObject newFObject, ClassInfo defaultClass) {
-    ClassInfo info = newFObject.getClassInfo();
+  public boolean outputDelta(FObject oldFObject, FObject newFObject, ClassInfo defaultClass) {
+    ClassInfo newInfo   = newFObject.getClassInfo();
+    String    of        = newInfo.getObjClass().getSimpleName().toLowerCase();
+    List      axioms    = getProperties(newInfo);
+    int       size      = axioms.size();
+    int       delta     = 0;
+    int       ids       = 0;
+    int       optional  = 0;
 
-    boolean outputClass = outputClassNames_ && ( info != defaultClass || outputDefaultClassNames_ );
-
-    ClassInfo newInfo        = newFObject.getClassInfo();
-    boolean   outputComma    = true;
-    List      delta          = getDelta(oldFObject, newFObject);
-    int       size           = delta.size();
-
-    if ( size == 0 ) {
-      return;
-    }
-
-    append('{');
-    addInnerNewline();
-    if ( outputClass ) {
-      //output Class name
-      outputKey("class");
-      append(':');
-      output(newInfo.getId());
-      append(',');
-    }
-    addInnerNewline();
-
-    // Always output id although it can be transient or multipart id to ensure
-    // that the entry/record is identifiable on replay.
-    outputId(newFObject, newInfo);
-
-    for ( int i = 0 ; i < size ; i++ ) {
-      append(',');
-      addInnerNewline();
-      PropertyInfo prop = (PropertyInfo) delta.get(i);
-      outputProperty(newFObject, prop);
-    }
-
-    addInnerNewline();
-    append('}');
-  }
-
-  private void outputId(FObject obj, ClassInfo cls) {
-    PropertyInfo id = (PropertyInfo) cls.getAxiomByName("id");
-    if ( id.getValueClass().getName().equals(cls.getId() + "Id") ) {
-      var objId = (FObject) id.get(obj);
-      var idProps = getProperties(objId.getClassInfo());
-      for ( var i = 0; i < idProps.size(); i++ ) {
-        if ( i > 0 ) {
+    String before = builder().toString();
+    reset();
+    for ( int i = 0; i < size ; i++ ) {
+      PropertyInfo prop = (PropertyInfo) axioms.get(i);
+      if ( prop.includeInID() || prop.compare(oldFObject, newFObject) != 0 ) {
+        if ( delta > 0 ) {
           append(',');
           addInnerNewline();
         }
-        // Output multipart id's properties
-        outputProperty(objId, (PropertyInfo) idProps.get(i));
+        outputProperty(newFObject, prop);
+
+        delta += 1;
+        if ( prop.includeInID() )
+          ids += 1;
+        else if ( optionalPredicate_.propertyPredicateCheck(getX(), of, prop) )
+          optional += 1;
       }
-      return;
+    }
+    String output = builder().toString();
+    reset();
+
+    if ( delta > 0 && delta > ids + optional ) {
+      boolean outputClass = outputClassNames_ && ( newInfo != defaultClass || outputDefaultClassNames_ );
+
+      append(before);
+      append('{');
+      addInnerNewline();
+      if ( outputClass ) {
+        //output Class name
+        outputKey("class");
+        append(':');
+        output(newInfo.getId());
+        append(',');
+        addInnerNewline();
+      }
+      append(output);
+      addInnerNewline();
+      append('}');
+
+      return true;
     }
 
-    // Output object's id property
-    outputProperty(obj, id);
+    // Return false when either no delta or the delta are from ids and storage
+    // optional properties
+    return false;
   }
 
   protected void addInnerNewline() {
