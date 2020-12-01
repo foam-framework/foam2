@@ -19,11 +19,8 @@ foam.CLASS({
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
-    'foam.util.SafetyUtil',
+    'java.util.ArrayList',
     'java.util.Date',
-    'java.util.Iterator',
-    'java.util.List',
-    'java.util.Map',
     'static foam.mlang.MLang.EQ'
   ],
 
@@ -96,21 +93,24 @@ foam.CLASS({
       type: 'PropertyUpdate[]',
       args: [
         { type: 'FObject', name: 'currentValue' },
-        { type: 'FObject', name: 'newValue' },
-        { type: 'FObjectFormatter', name: 'formatter' }
+        { type: 'FObject', name: 'newValue' }
       ],
       documentation: 'Returns an array of updated properties',
       javaCode: `
-        List<PropertyInfo> delta = ((JSONFObjectFormatter) formatter).getDelta(currentValue, newValue);
+        var updates = new ArrayList<PropertyUpdate>();
+        var props = newValue.getClassInfo().getAxiomsByClass(PropertyInfo.class);
 
-        int index = 0;
-        PropertyUpdate[] updates = new PropertyUpdate[delta.size()];
-        for ( PropertyInfo prop : delta ) {
-          String propName = prop.getName();
-          updates[index++] = new PropertyUpdate(propName, prop.f(currentValue), prop.f(newValue));
+        for ( var prop : props ) {
+          if ( prop.compare(currentValue, newValue) != 0 ) {
+            updates.add(new PropertyUpdate(
+              prop.getName(),
+              prop.f(currentValue),
+              prop.f(newValue)
+            ));
+          }
         }
 
-        return updates;
+        return updates.toArray(new PropertyUpdate[updates.size()]);
       `
     },
     {
@@ -131,11 +131,10 @@ foam.CLASS({
           historyRecord.setTimestamp(new Date());
           if ( current != null ) {
             FObjectFormatter formatter = formatter_.get();
-            formatter.outputDelta(current, obj);
-            if ( SafetyUtil.isEmpty(formatter.builder().toString().trim()) ) {
+            if ( ! formatter.outputDelta(current, obj) ) {
               return super.put_(x, obj);
             }
-            historyRecord.setUpdates(getUpdatedProperties(current, obj, formatter));
+            historyRecord.setUpdates(getUpdatedProperties(current, obj));
           }
     
           getHistoryDAO().put_(x, historyRecord);

@@ -306,10 +306,6 @@ public class JSONFObjectFormatter
     return true;
   }
 
-  public List getDelta(FObject oldFObject, FObject newFObject) {
-    return delta_ == null ? super.getDelta(oldFObject, newFObject) : delta_;
-  }
-
   public boolean outputDelta(FObject oldFObject, FObject newFObject) {
     return outputDelta(oldFObject, newFObject, null);
   }
