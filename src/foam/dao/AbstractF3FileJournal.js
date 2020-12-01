@@ -219,7 +219,7 @@ try {
           public void executeJob() {
             try {
               if ( old != null ) {
-                fmt.maybeOutputDelta(old, obj, of);
+                fmt.outputDelta(old, obj, of);
               } else {
                 fmt.output(obj, of);
               }
