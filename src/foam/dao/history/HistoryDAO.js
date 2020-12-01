@@ -131,7 +131,7 @@ foam.CLASS({
           historyRecord.setTimestamp(new Date());
           if ( current != null ) {
             FObjectFormatter formatter = formatter_.get();
-            if ( ! formatter.outputDelta(current, obj) ) {
+            if ( ! formatter.maybeOutputDelta(current, obj) ) {
               return super.put_(x, obj);
             }
             historyRecord.setUpdates(getUpdatedProperties(current, obj));

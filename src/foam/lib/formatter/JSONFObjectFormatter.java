@@ -306,11 +306,11 @@ public class JSONFObjectFormatter
     return true;
   }
 
-  public boolean outputDelta(FObject oldFObject, FObject newFObject) {
-    return outputDelta(oldFObject, newFObject, null);
+  public boolean maybeOutputDelta(FObject oldFObject, FObject newFObject) {
+    return maybeOutputDelta(oldFObject, newFObject, null);
   }
 
-  public boolean outputDelta(FObject oldFObject, FObject newFObject, ClassInfo defaultClass) {
+  public boolean maybeOutputDelta(FObject oldFObject, FObject newFObject, ClassInfo defaultClass) {
     ClassInfo newInfo   = newFObject.getClassInfo();
     String    of        = newInfo.getObjClass().getSimpleName().toLowerCase();
     List      axioms    = getProperties(newInfo);

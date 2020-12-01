@@ -7,7 +7,6 @@
 package foam.lib.formatter;
 
 import foam.core.ClassInfo;
-import foam.core.FEnum;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
@@ -59,7 +58,7 @@ public abstract class AbstractFObjectFormatter
 
   public String stringifyDelta(FObject oldFObject, FObject newFObject) {
     reset();
-    outputDelta(oldFObject, newFObject);
+    maybeOutputDelta(oldFObject, newFObject);
     return b_.toString();
   }
 
