@@ -215,6 +215,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     var capabilityDAO = ((DAO) sessionX.get("capabilityDAO")).inX(sessionX);
     if ( capabilityDAO.find(capabilityId) == null ) return false;
 
+    // TODO: use MapSink to simplify/optimize this code
     var preconditions = Arrays.stream(((CapabilityCapabilityJunction[]) ((ArraySink) ((DAO) sessionX.get("prerequisiteCapabilityJunctionDAO"))
       .where(AND(
         EQ(CapabilityCapabilityJunction.SOURCE_ID, capabilityId),
