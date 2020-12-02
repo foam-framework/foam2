@@ -321,7 +321,7 @@ public class JSONFObjectFormatter
 
     String before = builder().toString();
     reset();
-    for ( int i = 0; i < size ; i++ ) {
+    for ( int i = 0; i < size; i++ ) {
       PropertyInfo prop = (PropertyInfo) axioms.get(i);
       if ( prop.includeInID() || prop.compare(oldFObject, newFObject) != 0 ) {
         if ( delta > 0 ) {
