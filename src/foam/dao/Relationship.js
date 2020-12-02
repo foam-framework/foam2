@@ -182,6 +182,14 @@ foam.CLASS({
         Only used for many to many relationships.
         Name of the class that this junction class should inherit from.
       `
+    },
+    {
+      class: 'StringArray',
+      name: 'ids',
+      documentation: "Ids of the relationship.",
+      factory: function() {
+        return ['sourceId', 'targetId'];
+      }
     }
     /* FUTURE:
     {
@@ -300,7 +308,7 @@ foam.CLASS({
         package: this.package,
         name: name,
         extends: this.extends,
-        ids: ['sourceId', 'targetId'],
+        ids: this.ids,
         properties: [
           {
             class: 'Reference',

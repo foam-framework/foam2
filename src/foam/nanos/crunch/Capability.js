@@ -449,6 +449,7 @@ foam.RELATIONSHIP({
   extends:'foam.nanos.crunch.Renewable',
   sourceModel: 'foam.nanos.auth.User',
   targetModel: 'foam.nanos.crunch.Capability',
+  ids: [ 'id' ],
   cardinality: '*:*',
   forwardName: 'capabilities',
   inverseName: 'users',

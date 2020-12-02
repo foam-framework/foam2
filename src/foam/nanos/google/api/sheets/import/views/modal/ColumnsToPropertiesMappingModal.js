@@ -16,9 +16,9 @@
   ],
   imports: [
     'importConfig',
-    'importServiceName',
     'ctrl',
-    'notify'
+    'notify',
+    'config'
   ],
   css: `
     ^footer {
@@ -80,7 +80,7 @@
           return;
         }
 
-        await X[this.importServiceName].importData(X, this.importConfig).then(r => {
+        await X[this.config.of.id === "net.nanopay.tx.model.Transaction" ? 'googleSheetsTransactionsDataImport' : 'googleSheetsDataImport'].importData(X, this.importConfig).then(r => {
           var message = this.NotificationMessage.create();
           if ( r.success )
             message.message = this.SUCCESS_MSG + r.result;

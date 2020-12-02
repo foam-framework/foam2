@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'DAOMenu2',
   extends: 'foam.nanos.menu.AbstractMenu',
 
+  exports: [
+    'config'
+  ],
+
   documentation: `
     A DAOMenu which can accept a DAOControllerConfig and uses
     the v2 DAOController
