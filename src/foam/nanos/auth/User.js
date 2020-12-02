@@ -311,7 +311,8 @@ foam.CLASS({
       includeInDigest: false,
       writePermissionRequired: true,
       section: 'operationsInformation',
-      gridColumns: 6
+      gridColumns: 6,
+      order: 40
     },
     {
       class: 'PhoneNumber',
@@ -328,7 +329,8 @@ foam.CLASS({
       includeInDigest: false,
       writePermissionRequired: true,
       section: 'operationsInformation',
-      gridColumns: 6
+      gridColumns: 6,
+      order: 45
     },
     {
       class: 'String',

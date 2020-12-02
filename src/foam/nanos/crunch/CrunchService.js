@@ -129,6 +129,24 @@ foam.INTERFACE({
       ],
     },
     {
+      name: 'atLeastOneInCategory',
+      documentation: `
+        Returns true if the user has a capability in a category.
+      `,
+      async: true,
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'categoryName',
+          type: 'String'
+        }
+      ],
+    },
+    {
       name: 'getJunctionForSubject',
       documentation: `
         getJunction provides the correct UserCapabilityJunction based on the
