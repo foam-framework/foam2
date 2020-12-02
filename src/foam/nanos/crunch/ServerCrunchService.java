@@ -207,6 +207,29 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return this.getJunctionForSubject(x, capabilityId, subject);
   }
 
+  public boolean atLeastOneInCategory(X x, String category) {
+    var categoryJunctionDAO = (DAO) x.get("capabilityCategoryCapabilityJunctionDAO");
+
+    var junctions = new ArrayList<>();
+    categoryJunctionDAO.where(EQ(CapabilityCategoryCapabilityJunction.SOURCE_ID, category))
+    .select(new AbstractSink() {
+      @Override
+      public void put(Object obj, Detachable sub) {
+        junctions.add(((CapabilityCategoryCapabilityJunction) obj).getTargetId());
+      }
+    });
+
+    var ucj = (UserCapabilityJunction) ((DAO) x.get("userCapabilityJunctionDAO"))
+      .find(AND(
+          getAssociationPredicate_(x),
+          IN(UserCapabilityJunction.TARGET_ID, junctions),
+          EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
+        )
+      );
+
+    return ucj != null;
+  }
+
   // see documentation in CrunchService interface
   public boolean hasPreconditionsMet(
     X sessionX, String capabilityId
