@@ -466,7 +466,7 @@ foam.CLASS({
           });
         }
 
-        if ( ! this.includeInID ) {
+        if ( this.includeInID ) {
           m.push({
             name:       'includeInID',
             visibility: 'public',

@@ -39,7 +39,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'defaultSectionLabel',
-      value: 'Information'
+      value: 'Uncategorized'
     }
   ],
 

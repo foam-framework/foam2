@@ -32,7 +32,7 @@ public interface FObjectFormatter
 
   public String stringifyDelta(FObject oldFObject, FObject newFObject);
 
-  public void outputDelta(FObject oldFObject, FObject newFObject);
+  public boolean maybeOutputDelta(FObject oldFObject, FObject newFObject);
 
   public void output(String val);
 
