@@ -58,8 +58,8 @@ foam.CLASS({
       name: 'evaluateMessage',
       documentation: `Evaluates model messages without executing potentially harmful values`,
       factory: function() {
+        var obj = this.data.clone();
         return (msg) => msg.replace(/\${(.*?)}/g, (x, str) => {
-          var obj = this.data.clone();
           return this.getNestedPropValue(obj, str);
         });
       }
