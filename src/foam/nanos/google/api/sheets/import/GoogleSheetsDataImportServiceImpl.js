@@ -28,6 +28,7 @@
     'java.time.LocalDateTime',
     'java.time.format.DateTimeFormatter',
     'java.util.ArrayList',
+    'java.util.Collections',
     'java.util.Date',
     'java.util.List',
     'java.util.Locale',
@@ -230,7 +231,7 @@
           pasreAndSetValue(x, obj, importConfig.getColumnHeaderPropertyMappings()[j], data.get(i).get(columnIndex));
         }
         if ( ! postSetValues(x, obj) )
-          return new ArrayList<>();
+          return Collections.emptyList();
         objs.add((FObject)obj);
       }
       return objs;
