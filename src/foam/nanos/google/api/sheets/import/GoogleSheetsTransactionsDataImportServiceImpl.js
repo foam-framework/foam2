@@ -60,13 +60,18 @@ foam.CLASS({
 
         Business payee = (Business)businessDAO.find(t.getPayeeId());
         BankAccount payeeBankAccount;
+
+        if ( t.getDestinationCurrency() == null ) {
+          t.setDestinationCurrency(t.getSourceCurrency());
+        }
+
         if ( payee == null ) {
           User payeeUser = (User) userDAO.find(t.getPayeeId());
           if ( payeeUser == null )
             return false;
-          payeeBankAccount = BankAccount.findDefault(x, payeeUser, t.getSourceCurrency());
+          payeeBankAccount = BankAccount.findDefault(x, payeeUser, t.getDestinationCurrency());
         } else {
-          payeeBankAccount = BankAccount.findDefault(x, payee, t.getSourceCurrency());
+          payeeBankAccount = BankAccount.findDefault(x, payee, t.getDestinationCurrency());
         }
 
         if ( payeeBankAccount == null )

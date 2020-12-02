@@ -229,7 +229,8 @@
           Object val = data.get(i).get(columnIndex);
           pasreAndSetValue(x, obj, importConfig.getColumnHeaderPropertyMappings()[j], data.get(i).get(columnIndex));
         }
-        postSetValues(x, obj);
+        if ( ! postSetValues(x, obj) )
+          return new ArrayList<>();
         objs.add((FObject)obj);
       }
       return objs;
