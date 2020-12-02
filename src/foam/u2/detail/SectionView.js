@@ -58,7 +58,21 @@ foam.CLASS({
       name: 'evaluateMessage',
       documentation: `Evaluates model messages without executing potentially harmful values`,
       factory: function() {
-        return (msg) => msg.replace(/\${(.*?)}/g, (x,g) => this.data[g]);
+        return (msg) => msg.replace(/\${(.*?)}/g, (x, str) => {
+          var obj = this.data.clone();
+          return this.getNestedPropValue(obj, str);
+        });
+      }
+    },
+    {
+      class: 'Function',
+      name: 'getNestedPropValue',
+      factory: function() {
+        return (obj, path) => {
+          if ( ! path ) return obj;
+          const props = path.split('.');
+          return this.getNestedPropValue(obj[props.shift()], props.join('.'))
+        }
       }
     }
   ],
