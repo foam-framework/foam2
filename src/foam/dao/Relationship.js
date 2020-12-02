@@ -187,6 +187,9 @@ foam.CLASS({
       class: 'StringArray',
       name: 'ids',
       documentation: "Ids of the relationship.",
+      // NOTE: setting value: ['sourceId', 'targetId'] doesn't work because
+      // StringArray property has a default factory and the factory is evaluated
+      // before value.
       factory: function() {
         return ['sourceId', 'targetId'];
       }
