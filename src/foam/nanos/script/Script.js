@@ -338,7 +338,7 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        PM pm = new PM.Builder(x).setClassType(Script.getOwnClassInfo()).setName(getId()).build();
+        PM pm = new PM.Builder(x).setKey(Script.getOwnClassInfo().getId()).setName(getId()).build();//PM pm = new PM.Builder(x).setClassType(Script.getOwnClassInfo()).setName(getId()).build();
         Language l = getLanguage();
         if ( l == foam.nanos.script.Language.JSHELL ) {
           ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -369,8 +369,8 @@ foam.CLASS({
         try {
           ByteArrayOutputStream baos  = new ByteArrayOutputStream();
           PrintStream           ps    = new PrintStream(baos);
-          Interpreter           shell = createInterpreter(x);//Interpreter shell = (Interpreter) createInterpreter(x, null);
-          PM                    pm    = new PM.Builder(x).setKey(Script.getOwnClassInfo().getId()).setName(getId()).build();
+          Interpreter           shell = (Interpreter) createInterpreter(x, null);//Interpreter shell = (Interpreter) createInterpreter(x, null);
+          //                      pm    = new PM.Builder(x).setKey(Script.getOwnClassInfo().getId()).setName(getId()).build();
           RuntimeException    thrown = null;
 
           // TODO: import common packages like foam.core.*, foam.dao.*, etc.
@@ -411,6 +411,7 @@ foam.CLASS({
         } finally {
           Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
         }
+      }
     `
     },
     {
