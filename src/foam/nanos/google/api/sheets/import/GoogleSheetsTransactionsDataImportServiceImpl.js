@@ -39,30 +39,40 @@ foam.CLASS({
 
         Transaction t = (Transaction)obj;
 
-        User payer = ((Subject) x.get("subject")).getUser();
-        if ( payer == null )
-          return false;
+        DAO businessDAO    = ((DAO) x.get("localBusinessDAO")).inX(x);
+
+        BankAccount payerBankAccount;
+        Business payer = (Business)businessDAO.find(t.getPayerId());
+        if ( payer == null ) {
+          User payerUser = (User) userDAO.find(t.getPayeeId());
+          if ( payerUser == null )
+            return false;
+          payerBankAccount = BankAccount.findDefault(x, payerUser, t.getSourceCurrency());
+        } else {
+          payerBankAccount = BankAccount.findDefault(x, payer, t.getSourceCurrency());
+        }
         
-        t.setPayerId(payer.getId());
-
-        String baseCurrency = ((Business)payer).getSuggestedUserTransactionInfo().getBaseCurrency();
-
         if ( t.getSourceCurrency() == null )
-          t.setSourceCurrency(baseCurrency);
-
-        BankAccount payerBankAccount = BankAccount.findDefault(x, payer, t.getSourceCurrency());
+          return false;
         if ( payerBankAccount == null )
           return false;
         t.setSourceAccount(payerBankAccount.getId());
 
-        User payee = (User)userDAO.find(AND(INSTANCE_OF(Business.getOwnClassInfo()), EQ(Business.ID, t.getPayeeId())));
-        if ( payee == null )
-          return false;
+        Business payee = (Business)businessDAO.find(t.getPayeeId());
+        BankAccount payeeBankAccount;
+        if ( payee == null ) {
+          User payeeUser = (User) userDAO.find(t.getPayeeId());
+          if ( payeeUser == null )
+            return false;
+          payeeBankAccount = BankAccount.findDefault(x, payeeUser, t.getSourceCurrency());
+        } else {
+          payeeBankAccount = BankAccount.findDefault(x, payee, t.getSourceCurrency());
+        }
 
-        BankAccount payeeBankAccount = BankAccount.findDefault(x, payee, t.getSourceCurrency());
-        t.setDestinationAccount(payeeBankAccount.getId());
         if ( payeeBankAccount == null )
           return false;
+         
+        t.setDestinationAccount(payeeBankAccount.getId());
 
         return true;
       `
