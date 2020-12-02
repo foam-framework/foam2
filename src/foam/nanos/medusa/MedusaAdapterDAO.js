@@ -297,7 +297,7 @@ foam.CLASS({
       try {
         FObjectFormatter formatter = formatter_.get();
         if ( old != null ) {
-          formatter.outputDelta(old, obj);
+          formatter.maybeOutputDelta(old, obj);
         } else {
           formatter.output(obj);
         }
