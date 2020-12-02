@@ -8,9 +8,11 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'CitationView',
   extends: 'foam.u2.View',
+
   axioms: [
     foam.pattern.Faceted.create()
   ],
+
   properties: [
     {
       class: 'Class',
@@ -21,10 +23,12 @@ foam.CLASS({
       name: 'summary'
     }
   ],
+
   reactions: [
     ['', 'propertyChange.data', 'updateSummary'],
     ['data', 'propertyChange', 'updateSummary']
   ],
+
   listeners: [
     {
       name: 'updateSummary',
@@ -34,9 +38,11 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
    function initE() {
       this.SUPER();
+      this.updateSummary();
       this.add(this.summary$);
     }
   ]

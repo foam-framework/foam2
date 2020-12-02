@@ -9,7 +9,10 @@ foam.CLASS({
   name: 'Test',
   extends: 'foam.nanos.script.Script',
 
-  imports: ['testDAO as scriptDAO'],
+  imports: [
+    'testDAO',
+    'testEventDAO'
+  ],
 
   javaImports: [
     'bsh.Interpreter',
@@ -25,10 +28,10 @@ foam.CLASS({
   tableColumns: [
     'id', 'enabled', /*'description',*/ 'server',
     'passed', 'failed', 'lastRun', 'lastDuration',
-    'status', 'run'
+    /*'status',*/ 'run'
   ],
 
-  searchColumns: ['id', 'description'],
+  searchColumns: ['id', 'description', 'server'],
 
   documentation: `
     A scriptable Unit Test.
@@ -41,7 +44,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'passed',
-      visibility: foam.u2.DisplayMode.RO,
+      visibility: 'RO',
       tableCellFormatter: function(value) {
         if ( value ) this.start().style({ color: '#0f0' }).add(value).end();
       },
@@ -50,11 +53,25 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'failed',
-      visibility: foam.u2.DisplayMode.RO,
+      visibility: 'RO',
       tableCellFormatter: function(value) {
         if ( value ) this.start().style({ color: '#f00' }).add(value).end();
       },
       tableWidth: 85
+    },
+    {
+      class: 'String',
+      name: 'testSuite'
+    },
+    {
+      class: 'String',
+      name: 'daoKey',
+      value: 'testDAO'
+    },
+    {
+      class: 'String',
+      name: 'eventDaoKey',
+      value: 'testEventDAO'
     }
   ],
 
@@ -63,6 +80,7 @@ foam.CLASS({
       /** Template method used to add additional code in subclasses. */
       name: 'runTest',
       type: 'Void',
+      javaThrows: ['Throwable'],
       code: function(x) {
         return eval(this.code);
       },
@@ -112,39 +130,47 @@ foam.CLASS({
         var ret;
         var startTime = Date.now();
 
-        try {
-          this.passed = 0;
-          this.failed = 0;
-          this.output = '';
-          var log = function() {
-            this.output += Array.from(arguments).join('') + '\n';
-          }.bind(this);
-          var test = (condition, message) => {
-            if ( condition ) {
-              this.passed += 1;
-            } else {
-              this.failed += 1;
-            }
-            this.output += ( condition ? 'SUCCESS: ' : 'FAILURE: ' ) +
+        return new Promise((resolve, reject) => {
+          try {
+            this.passed = 0;
+            this.failed = 0;
+            this.output = '';
+            var log = function() {
+              this.output += Array.from(arguments).join('') + '\n';
+            }.bind(this);
+            var test = (condition, message) => {
+              if ( condition ) {
+                this.passed += 1;
+              } else {
+                this.failed += 1;
+              }
+              this.output += ( condition ? 'SUCCESS: ' : 'FAILURE: ' ) +
                 message + '\n';
-          };
-          with ( { log: log, print: log, x: this.__context__, test: test } )
-            ret = Promise.resolve(eval(this.code));
-        } catch (err) {
-          this.failed += 1;
-          this.output += err;
-          return Promise.reject(err);
-        }
+            };
 
-        ret.then(() => {
-          var endTime = Date.now();
-          var duration = endTime - startTime; // Unit: milliseconds
-          this.lastRun = new Date();
-          this.lastDuration = duration;
-          this.scriptDAO.put(this);
+            var updateStats = () => {
+              var endTime = Date.now();
+              var duration = endTime - startTime; // Unit: milliseconds
+              this.lastRun = new Date();
+              this.lastDuration = duration;
+            };
+
+            with ( { log: log, print: log, x: this.__context__, test: test } ) {
+              Promise.resolve(eval(this.code)).then(() => {
+                updateStats();
+                resolve();
+              }, (err) => {
+                updateStats();
+                this.failed += 1;
+                reject(err);
+              });
+            }
+          } catch (err) {
+            updateStats();
+            this.failed += 1;
+            reject(err);
+          }
         });
-
-        return ret;
       },
       args: [
         {
@@ -171,6 +197,7 @@ foam.CLASS({
           // creates the testing method
           shell.eval("test(boolean exp, String message) { if ( exp ) { currentScript.setPassed(currentScript.getPassed()+1); } else { currentScript.setFailed(currentScript.getFailed()+1); } print((exp ? \\"SUCCESS: \\" : \\"FAILURE: \\")+message);}");
           shell.eval(getCode());
+          // if the test is a java class (not a script), it will just update the lastRun and lastDuration
           runTest(x);
         } catch (Throwable e) {
           setFailed(getFailed()+1);

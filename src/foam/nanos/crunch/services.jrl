@@ -1,0 +1,213 @@
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"capabilityCategoryDAO",
+  "lazy":true,
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("capabilityCategories")
+      .setOf(foam.nanos.crunch.CapabilityCategory.getOwnClassInfo())
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.crunch.CapabilityCategory\"}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"localCapabilityDAO",
+  "lazy":true,
+  "serve":true,
+  "serviceScript":"""
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(false)
+      .setGuid(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("capabilities")
+      .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
+      .build();
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.crunch.Capability.NAME });
+
+    return dao;
+  """,
+  "client":"{\"of\":\"foam.nanos.crunch.Capability\"}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"capabilityDAO",
+  "lazy":true,
+  "serve":true,
+  "serviceScript":"""
+    dec = new foam.dao.NullDAO(x, foam.nanos.crunch.Capability.getOwnClassInfo());
+    dec = new foam.nanos.crunch.CapabilityAvailabilityDAO(x, dec);
+    return new foam.dao.EasyDAO.Builder(x)
+      .setInnerDAO(x.get("localCapabilityDAO"))
+      .setDecorator(dec)
+      .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
+      .build();
+  """,
+  "client":"""
+    {
+      "of":"foam.nanos.crunch.Capability",
+      "cache": false
+    }
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "capabilityCategoryCapabilityJunctionDAO",
+  "lazy": true,
+  "serve": true,
+  "description": "DAO responsible for storing capabilities' categories.",
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("capabilityCategoryCapabilityJunction"))
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("capabilityCategoryCapabilityJunction")
+      .setOf(foam.nanos.crunch.CapabilityCategoryCapabilityJunction.getOwnClassInfo())
+      .build();
+  """,
+  "client": "{\"of\":\"foam.nanos.crunch.CapabilityCategoryCapabilityJunction\", \"remoteListenerSupport\": false}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"userCapabilityJunctionDAO",
+  "serve":true,
+  "serviceScript":"""    
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(false)
+      .setInnerDAO(x.get("bareUserCapabilityJunctionDAO"))
+      .setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo())
+      .build();
+    userCap =  new foam.nanos.crunch.UserCapabilityJunctionDAO.Builder(x).setDelegate(dao).build();
+    return userCap;
+  """,
+  "client":"{\"of\":\"foam.nanos.crunch.UserCapabilityJunction\", \"remoteListenerSupport\": false}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"bareUserCapabilityJunctionDAO",
+  "serviceScript":"""    
+    decorator = new foam.dao.history.HistoryDAO(x, "userCapabilityJunctionHistoryDAO", new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo()).build());
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(false)
+      .setGuid(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("userCapabilityJunctions")
+      .setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo())
+      .setDecorator(decorator)
+      .build();
+    return dao;
+  """,
+  "client":
+  """
+    {
+      "of":"foam.nanos.crunch.UserCapabilityJunction",
+      "remoteListenerSupport": false
+    }
+  """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"deprecatedCapabilityJunctionDAO",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("deprecatedCapabilityJunction"))
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("deprecatedCapabilityJunctions")
+      .setOf(foam.nanos.crunch.CapabilityCapabilityJunction.getOwnClassInfo())
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.crunch.CapabilityCapabilityJunction\", \"remoteListenerSupport\": false}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"prerequisiteCapabilityJunctionDAO",
+  "serve":true,
+  "serviceScript":"""
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setPipelinePm(true)
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("prerequisiteCapabilityJunction"))
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("prerequisiteCapabilityJunctions")
+      .setOf(foam.nanos.crunch.CapabilityCapabilityJunction.getOwnClassInfo())
+      .setOrder(new foam.core.PropertyInfo[] {foam.nanos.crunch.CapabilityCapabilityJunction.PRIORITY})
+      .build();
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.crunch.CapabilityCapabilityJunction.SOURCE_ID });
+
+    return dao;
+  """,
+  "client":"{\"of\":\"foam.nanos.crunch.CapabilityCapabilityJunction\", \"remoteListenerSupport\": false}"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "crunchService",
+  "serve": true,
+  "authenticate": true,
+  "boxClass": "foam.nanos.crunch.CrunchServiceSkeleton",
+  "serviceClass": "foam.nanos.crunch.ServerCrunchService",
+  "client":
+    """
+      {
+        "class": "foam.nanos.crunch.ClientCrunchService",
+        "delegate": {
+          "class": "foam.box.SessionClientBox",
+          "delegate": {
+            "class": "foam.box.HTTPBox",
+            "url": "service/crunchService"
+          }
+        }
+      }
+    """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "userCapabilityJunctionHistoryDAO",
+  "description": "DAO containing any modifications made to userCapabilityJunctions",
+  "serve": true,
+  "lazy": false,
+  "authNotes": "Protected by service-level access control. This service requires the 'service.userCapabilityJunctionHistoryDAO' permission to access.",
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(false)
+      .setSeqNo(true)
+      .setSeqPropertyName("seqNo")
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("userCapabilityJunctionHistory")
+      .setOf(foam.dao.history.HistoryRecord.getOwnClassInfo())
+      .build()
+      .orderBy(foam.mlang.MLang.DESC(foam.dao.history.HistoryRecord.TIMESTAMP));
+  """,
+  "client":
+  """
+    { "of": "foam.dao.history.HistoryRecord" }
+  """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"capabilityPayloadDAO",
+  "lazy":true,
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(false)
+      .setPermissioned(false)
+      .setNullify(true)
+      .setDecorator(new foam.nanos.crunch.connection.CapabilityPayloadDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.connection.CapabilityPayload.getOwnClassInfo())))
+      .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.crunch.Capability\"}"
+})

@@ -24,7 +24,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'id',
-      visibility: foam.u2.DisplayMode.RO,
+      visibility: 'RO',
       label:'Ticket ID'
     }, 
     {
@@ -43,7 +43,7 @@ foam.CLASS({
     {
       class: 'Date',
       name: 'createdAt',
-      visibility: foam.u2.DisplayMode.RO,
+      visibility: 'RO',
       label: 'Time',
       factory: function() {
           return new Date();
@@ -92,7 +92,7 @@ foam.RELATIONSHIP({
   targetModel: 'foam.support.model.Ticket',
   forwardName: 'tickets',
   inverseName: 'user',
-  sourceProperty: { section: 'administrative' }
+  sourceProperty: { section: 'systemInformation' }
 });
 
 

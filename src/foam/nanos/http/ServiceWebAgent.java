@@ -20,7 +20,6 @@ import foam.nanos.jetty.HttpServer;
 import foam.nanos.jetty.HttpServer;
 import foam.nanos.logger.Logger;
 import foam.nanos.servlet.VirtualHostRoutingServlet;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
@@ -87,12 +86,12 @@ public class ServiceWebAgent
         resp.setHeader("Access-Control-Allow-Origin", "*");
       } else if ( ! req.getHeader("Origin").equals("null") ){
         URL url = new URL(req.getHeader("Origin"));
-        if ( ((VirtualHostRoutingServlet) http.getServletMappings()[0].getServletObject()).getHostMapping().containsKey(url.getHost()) )
+        if ( http.containsHostDomain(url.getHost()) )
           resp.setHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));
       }
 
-      int read = 0;
-      int count = 0;
+      int read   = 0;
+      int count  = 0;
       int length = req.getContentLength();
 
       StringBuilder builder = sb.get();

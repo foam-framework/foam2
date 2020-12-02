@@ -16,9 +16,9 @@ foam.CLASS({
     'max',
     [ 'type', 'Integer' ],
     [ 'adapt', function adaptInt(_, v) {
-        return typeof v === 'number' ? Math.trunc(v) :
-          v ? parseInt(v) :
-          0 ;
+      return typeof v === 'number' ? Math.trunc(v) :
+        v ? parseInt(v) :
+        0 ;
       }
     ],
     [ 'fromString', function intFromString(str) {
@@ -46,6 +46,13 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(_, a, p) {
+        if ( foam.Object.isInstance(a) ) {
+          if ( a[foam.locale] !== undefined )
+            return a[foam.locale];
+          if ( a[foam.locale.substring(0, foam.locale.indexOf('-'))] !== undefined )
+            return a[foam.locale.substring(0, foam.locale.indexOf('-'))];
+          return a['en'];// default language.
+        }
         var s = typeof a === 'function' ? foam.String.multiline(a) :
                 typeof a === 'number'   ? String(a)                :
                 a && a.toString         ? a.toString()             :
@@ -55,6 +62,25 @@ foam.CLASS({
     },
     [ 'type', 'String' ],
     [ 'value', '' ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'I18NString',
+  extends: 'String',
+
+  documentation: 'A String which needs to be internationalized before being displayed to users.',
+
+  properties: [
+   {
+     name: 'getter_',
+     value: function(proto, prop, obj, key) {
+       if ( foam.core.I18NString.GETTER__ ) return foam.core.I18NString.GETTER__(proto, prop, obj, key);
+       return obj.instance_[key];
+     }
+   }
   ]
 });
 
@@ -102,7 +128,7 @@ foam.CLASS({
 
           if ( isNaN(ret.getTime()) ) {
             ret = new Date((Number.MAX_SAFE_INTEGER || Number.MAX_VALUE) * 0.9);
-            console.warn("Invalid date: " + d + "; assuming "+ret.toISOString()+".");
+            console.warn("Invalid date: " + d + "; assuming " + ret.toISOString() + ".");
           }
 
           return ret;
@@ -137,6 +163,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Time',
@@ -160,7 +187,9 @@ foam.CLASS({
   label: 'Round byte numbers',
 
   properties: [
-    [ 'type', 'Byte' ]
+    [ 'type', 'Byte' ],
+    [ 'min', -128 ],
+    [ 'max', 127 ]
   ]
 });
 
@@ -174,7 +203,9 @@ foam.CLASS({
   label: 'Round short numbers',
 
   properties: [
-    [ 'type', 'Short' ]
+    [ 'type', 'Short' ],
+    [ 'min', -32768 ],
+    [ 'max', 32767 ]
   ]
 });
 
@@ -250,24 +281,6 @@ foam.CLASS({
 });
 
 
-foam.CLASS({
-  package: 'foam.core',
-  name: 'Duration',
-  extends: 'Long',
-
-  documentation: `
-    A length of time in milliseconds. Further refined in TableCellFormatter.js
-    to make values human-readable when displayed in tables.
-  `,
-
-  properties: [
-    {
-      name: 'units',
-      value: 'ms'
-    }
-  ]
-});
-
 
 foam.CLASS({
   package: 'foam.core',
@@ -295,6 +308,40 @@ foam.CLASS({
       function(v) { return ! v || ! v.length; }
     ],
     [ 'type', 'Any[]' ]
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      this.SUPER(proto);
+      var self = this;
+      Object.defineProperty(proto, self.name + '$push', {
+        get: function classGetter() {
+          return function (v) {
+            // Push value
+            this[self.name].push(v);
+            // Force property update
+            this.propertyChange.pub(self.name, this.slot(self.name));
+          }
+        },
+        configurable: true
+      });
+      Object.defineProperty(proto, self.name + '$remove', {
+        get: function classGetter() {
+          return function (predicate) {
+            // Faster than splice or filter as of the time this was added
+            let oldArry = this[self.name];
+            let newArry = [];
+            for ( let i=0 ; i < oldArry.length ; i++ ) {
+              if ( ! predicate.f(oldArry[i]) ) {
+                newArry.push(oldArry[i]);
+              }
+            }
+            this.propertyChange.pub(self.name, this.slot(self.name));
+          }
+        },
+        configurable: true
+      });
+    }
   ]
 });
 
@@ -304,7 +351,11 @@ foam.CLASS({
   name: 'List',
   extends: 'foam.core.Object',
   properties: [
-    [ 'type', 'List' ]
+    [ 'type', 'List' ],
+    [
+      'factory',
+      function() { return []; }
+    ]
   ]
 });
 
@@ -350,10 +401,11 @@ foam.CLASS({
         if ( v === null ) return;
 
         foam.assert(Array.isArray(v),
-            prop.name, 'Tried to set StringArray to non-array type.');
+          prop.name, 'Tried to set StringArray to non-array type.');
         for ( var i = 0 ; i < v.length ; i++ ) {
-          foam.assert(typeof v[i] === 'string',
-              prop.name, 'Element', i, 'is not a string', v[i]);
+          foam.assert(
+            typeof v[i] === 'string',
+            prop.name, 'Element', i, 'is not a string', v[i]);
         }
       }
     ]
@@ -412,7 +464,6 @@ foam.CLASS({
 
       Object.defineProperty(proto, name, desc);
 
-
       Object.defineProperty(proto, name + '$cls', {
         get: function classGetter() {
           console.warn("Deprecated use of 'cls.$cls'. Just use 'cls' instead.");
@@ -433,8 +484,9 @@ foam.CLASS({
   // FUTURE: verify
   label: 'Email address',
   properties: [
+    [ 'displayWidth', 50 ],
     [
-      'adapt',
+      'preSet',
       function(_, v) {
         return v.toLowerCase().trim();
       }
@@ -484,7 +536,8 @@ foam.CLASS({
   package: 'foam.core',
   name: 'PhoneNumber',
   extends: 'String',
-  label: 'Phone number'
+  label: 'Phone number',
+  properties: [ [ 'displayWidth', 20 ] ]
 });
 
 
@@ -503,7 +556,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'unitPropName',
-      value: 'denomination',
       documentation: `
         The name of the property of a model that contains the denomination String.
       `
@@ -557,6 +609,35 @@ foam.CLASS({
       }
     ],
     [ 'type', 'Map' ]
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      this.SUPER(proto);
+      var self = this;
+      Object.defineProperty(proto, self.name + '$set', {
+        get: function mapSet() {
+          return function (k, v) {
+            // Set value on map
+            this[self.name][k] = v;
+            // Force property update
+            this.propertyChange.pub(self.name, this.slot(self.name));
+          }
+        },
+        configurable: true
+      });
+      Object.defineProperty(proto, self.name + '$remove', {
+        get: function mapRemove() {
+          return function (k) {
+            // Remove value from map
+            delete this[self.name][k];
+            // Force property update
+            this.propertyChange.pub(self.name, this.slot(self.name));
+          }
+        },
+        configurable: true
+      })
+    }
   ]
 });
 
@@ -697,6 +778,37 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'PropertyShortNameRefinement',
+  refines: 'Property',
+
+  properties: [
+    /**
+      A short-name is an optional shorter name for a property.
+      It is used by JSON and XML support when 'useShortNames'
+      is enabled. Short-names enable output to be smaller,
+      which can save disk space and/or network bandwidth.
+      Ex.
+    <pre>
+      properties: [
+        { name: 'firstName', shortName: 'fn' },
+        { name: 'lastName',  shortName: 'ln' }
+      ]
+    </pre>
+    */
+    { class: 'String', name: 'name', required: true },
+    {
+      class: 'I18NString',
+      name: 'label',
+      expression: function(name) { return foam.String.labelize(name); }
+    },
+    { class: 'String', name: 'shortName' }
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.core',
   name: 'ModelUpgradeTypesRefinement',
@@ -706,6 +818,11 @@ foam.CLASS({
 
   properties: [
     { class: 'String',  name: 'name' },
+    {
+      class: 'I18NString',
+      name: 'label',
+      expression: function(name) { return foam.String.labelize(name); }
+    },
     { class: 'Boolean', name: 'abstract' }
   ]
 });
@@ -727,29 +844,6 @@ foam.CLASS({
   ]
 });
 
-
-foam.CLASS({
-  package: 'foam.core',
-  name: 'PropertyShortNameRefinement',
-  refines: 'Property',
-
-  properties: [
-    /**
-      A short-name is an optional shorter name for a property.
-      It is used by JSON and XML support when 'useShortNames'
-      is enabled. Short-names enable output to be smaller,
-      which can save disk space and/or network bandwidth.
-      Ex.
-    <pre>
-      properties: [
-        { name: 'firstName', shortName: 'fn' },
-        { name: 'lastName',  shortName: 'ln' }
-      ]
-    </pre>
-    */
-    { class: 'String', name: 'shortName' }
-  ]
-});
 
 // Upgrade async property to a real boolean property.
 foam.CLASS({

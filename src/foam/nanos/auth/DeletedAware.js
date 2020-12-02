@@ -7,6 +7,9 @@
 foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'DeletedAware',
+  documentation: `
+    DEPRECATED: Please use LifecycleAware and LifecycleAwareDAO
+  `,
 
   methods: [
     {

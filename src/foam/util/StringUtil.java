@@ -34,6 +34,12 @@ public class StringUtil {
       }
     };
 
+  public static String daoize(String s) {
+    return (s.length() > 0 ? s.substring(0,1).toLowerCase() : "")
+      + (s.length() > 1 ? s.substring(1) : "")
+      + "DAO";
+  }
+
   public static String[] split(String s, char separator) {
     java.util.List<String> list = storage__.get();
 
@@ -64,5 +70,12 @@ public class StringUtil {
     String[] result = new String[list.size()];
 
     return list.toArray(result);
+  }
+
+  public static String capitalize(String s) {
+    if ( SafetyUtil.isEmpty(s) ) return s;
+    char[] chars = s.toCharArray();
+    chars[0] = Character.toUpperCase(chars[0]);
+    return new String(chars);
   }
 }

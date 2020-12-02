@@ -1,4 +1,4 @@
-MAVEN_BASE_URL=http://central.maven.org/maven2
+MAVEN_BASE_URL=https://repo.maven.apache.org/maven2
 
 JAVA_DEP_DIR ?= lib
 JAVACFLAGS = -g

@@ -8,12 +8,12 @@ foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOCreateView',
   extends: 'foam.u2.View',
-  
+
   topics: [
     'finished',
     'throwError'
   ],
-  
+
   documentation: `
     A configurable view to create an instance of a specified model
   `,
@@ -29,7 +29,7 @@ foam.CLASS({
 
     ^ .foam-u2-ActionView-back {
       display: flex;
-      align-items: center;
+      align-self: flex-start;
     }
 
     ^account-name {
@@ -43,6 +43,7 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.log.LogLevel',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.ControllerMode',
@@ -87,64 +88,36 @@ foam.CLASS({
       },
       code: function() {
         var cData = this.data;
-
-        if ( foam.nanos.auth.LifecycleAware.isInstance(cData) ) {
-          cData = cData.clone();
-          cData.lifecycleState = foam.nanos.auth.LifecycleState.PENDING;
-        }
         
         this.config.dao.put(cData).then((o) => {
           this.data = o;
           this.finished.pub();
 
-          if ( foam.comics.v2.userfeedback.UserFeedbackAware.isInstance(o) && o.userFeedback ){
+          if ( foam.comics.v2.userfeedback.UserFeedbackAware.isInstance(o) && o.userFeedback ) {
             var currentFeedback = o.userFeedback;
-            while ( currentFeedback ){
-              this.ctrl.add(this.NotificationMessage.create({
-                message: currentFeedback.message,
-                type: currentFeedback.status.name.toLowerCase()
-              }));
-
+            while ( currentFeedback ) {
+              this.ctrl.notify(currentFeedback.message, '', this.LogLevel.INFO, true);
               currentFeedback = currentFeedback.next;
             }
           } else {
-            this.ctrl.add(this.NotificationMessage.create({
-              message: `${this.data.model_.label} created.`
-            }));
+            this.ctrl.notify(`${this.data.model_.label} created.`, '', this.LogLevel.INFO, true);
           }
 
           this.stack.back();
         }, (e) => {
           this.throwError.pub(e);
           
-          // TODO: uncomment this once turn UserFeedbackException into a throwable
-          // if ( foam.comics.v2.userfeedback.UserFeedbackException.isInstance(e) && e.userFeedback  ){
-          //   var currentFeedback = e.userFeedback;
-          //   while ( currentFeedback ){
-          //     this.ctrl.add(this.NotificationMessage.create({
-          //       message: currentFeedback.message,
-          //       type: currentFeedback.status.name.toLowerCase()
-          //     }));
+          if ( e.exception && e.exception.userFeedback  ) {
+            var currentFeedback = e.exception.userFeedback;
+            while ( currentFeedback ) {
+              this.ctrl.notify(currentFeedback.message, '', this.LogLevel.INFO, true);
 
-          //     currentFeedback = currentFeedback.next;
-          //   }
-          // } else {
-          //   this.ctrl.add(this.NotificationMessage.create({
-          //     message: e.message,
-          //     type: 'error'
-          //   }));
-          // }
+              currentFeedback = currentFeedback.next;
+            }
 
-          if ( e.message === "An approval request has been sent out." ){
-            this.ctrl.add(this.NotificationMessage.create({
-              message: e.message,
-              type: 'success'
-            }));
+            this.stack.back();
           } else {
-            this.ctrl.add(this.NotificationMessage.create({
-              message: e.message,
-              type: 'error'
-            }));
+            this.ctrl.notify(e.message, '', this.LogLevel.ERROR, true);
           }
         });
       }

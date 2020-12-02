@@ -51,6 +51,12 @@ foam.CLASS({
       }
     },
     {
+      name: 'tableHeader',
+      value: function() {
+        return this.label || foam.String.labelize(this.name);
+      }
+    },
+    {
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       factory: function() {
@@ -72,11 +78,29 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2.view',
+  name: 'TableHeaderActionRefinement',
+
+  refines: 'foam.core.Action',
+
+  properties: [
+    {
+      name: 'tableHeader',
+      value: function() {
+        return this.label || foam.String.labelize(this.name);
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2.view',
   name: 'ActionTableCellFormatterRefinement',
   refines: 'foam.core.Action',
 
   properties: [
     {
+      tags: ['web'],
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(_, obj, axiom) {
@@ -90,6 +114,7 @@ foam.CLASS({
       }
     },
     {
+      tags: ['web'],
       name: 'tableHeaderFormatter',
       value: function(axiom) {
         this.add(axiom.label);
@@ -109,7 +134,18 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(value) {
-        this.add(value.label)
+        if ( value ) {
+          this.start().
+            addClasses(value.classes()).
+            style(value.toStyle()).
+            add(value.label).
+          end();
+        }
+        else {
+          this.start().
+            add('-').
+          end();
+        }
       }
     }
   ]
@@ -259,25 +295,7 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(value) {
-        value = Math.round(value);
-        var hours = Math.floor(value / 3600000);
-        value -= hours * 3600000;
-        var minutes = Math.floor(value / 60000);
-        value -= minutes * 60000;
-        var seconds = Math.floor(value / 1000);
-        value -= seconds * 1000;
-        var milliseconds = value % 1000;
-
-        // For long durations, don't show milliseconds
-        if ( hours ) seconds = 0;
-
-        // For longer durations, don't show seconds
-        if ( minutes || hours ) milliseconds = 0;
-
-        var formatted = [[hours, 'h'], [minutes, 'm'], [seconds, 's'], [milliseconds, 'ms']].reduce((acc, cur) => {
-          return cur[0] > 0 ? acc.concat([cur[0] + cur[1]]) : acc;
-        }, []).join(' ');
-
+        let formatted = foam.core.Duration.duration(value);
         this.add(formatted || '0ms');
       }
     }

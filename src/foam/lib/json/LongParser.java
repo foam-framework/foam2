@@ -35,8 +35,10 @@ public class LongParser
       c = ps.head();
     }
 
-    if ( Character.isDigit(c) ) n = Character.digit(c, 10);
-    else return null;
+    if ( Character.isDigit(c) )
+      n = Character.digit(c, 10);
+    else
+      return null;
 
     ps = ps.tail();
 

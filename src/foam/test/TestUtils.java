@@ -77,13 +77,20 @@ public class TestUtils {
     boolean wasCorrectExceptionType = false;
     boolean threw = false;
     String returnedMessage = "";
+    Throwable throwable = null;
     try {
       fn.run();
     } catch (Throwable t) {
       wasCorrectExceptionType = exceptionType.isInstance(t);
       threw = true;
       returnedMessage = t.getMessage();
-      if ( ! wasCorrectExceptionType ) t.printStackTrace();
+      if ( ! wasCorrectExceptionType ) {
+        System.out.println("Exception type mismatch.");
+        System.out.println("EXPECTED: \""+exceptionType.getName()+"\"");
+        System.out.println("ACTUAL  : \""+t.getClass().getName()+"\"");
+        t.printStackTrace();
+        throw t;
+      }
     }
     if ( ! returnedMessage.equals(expectedExceptionMessage) ) {
       System.out.println("Error message was not correct.");

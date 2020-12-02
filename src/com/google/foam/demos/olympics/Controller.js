@@ -101,11 +101,11 @@ foam.CLASS({
 
   axioms: [
     foam.u2.CSS.create({
-      code: function CSS() {/*
+      code: `
         ^ {
           display: flex;
           flex-grow: 1;
-          font-family: Roboto, Arial, sans-serif;
+          font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
           width: 100%;
         }
 
@@ -122,7 +122,7 @@ foam.CLASS({
         td {
           padding: 8px;
         }
-      */}
+      `
     })
   ]
 });

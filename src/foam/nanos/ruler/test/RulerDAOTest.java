@@ -10,6 +10,7 @@ import foam.nanos.auth.User;
 import foam.nanos.ruler.*;
 import foam.nanos.test.Test;
 import foam.test.TestUtils;
+import foam.nanos.auth.LifecycleState;
 
 import java.util.List;
 
@@ -18,15 +19,15 @@ import static foam.mlang.MLang.*;
 public class RulerDAOTest extends Test {
   Rule rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9, rule10;
   User user1, user2;
-  DAO ruleDAO, userDAO, ruleHistoryDAO,rgDAO;
+  DAO localRuleDAO, userDAO, ruleHistoryDAO,rgDAO;
   int asyncWait = 1000;
 
   public void runTest(X x) {
-    x = TestUtils.mockDAO(x, "ruleDAO");
+    x = TestUtils.mockDAO(x, "localRuleDAO");
     x = TestUtils.mockDAO(x, "localUserDAO");
     x = TestUtils.mockDAO(x, "ruleHistoryDAO");
 
-    ruleDAO = (DAO) x.get("ruleDAO");
+    localRuleDAO = (DAO) x.get("localRuleDAO");
     userDAO = new RulerDAO(x, (DAO) x.get("localUserDAO"), "localUserDAO");
     ruleHistoryDAO = (DAO) x.get("ruleHistoryDAO");
     RuleGroup rg = new RuleGroup();
@@ -60,7 +61,7 @@ public class RulerDAOTest extends Test {
     test(user1.getEmail().equals("nanos@nanos.net"), "user's email is nanos@nanos.net: on object update 'create' rules are not executed");
     test(user1.getLastName().equals("Unknown"), "user's lastName is 'Unknown': update rule was executed");
     test(user1.getEmailVerified(), "Set emailVerified to true in rule 9");
-    Rule executeRule = (Rule) ruleDAO.find("executeRule");
+    Rule executeRule = (Rule) localRuleDAO.find(EQ(foam.nanos.ruler.Rule.NAME, "executeRule"));
     test(executeRule != null, "Test rule from executor was added successfully");
     test(executeRule.getRuleGroup().equals("fake test group"), "Test rule's group name is fake test group.");
 
@@ -102,12 +103,14 @@ public class RulerDAOTest extends Test {
 
   public void testCompositeRuleAction(X x){
     rule10 = (Rule) rule2.fclone();
-    rule10.setId("rule10. composite rule action");
+    rule10.setId("10");
+    rule10.setName("rule10. composite rule action");
     //test null array of rule actions
     CompositeRuleAction compositeAction = new CompositeRuleAction();
     Predicate pred10 = EQ(DOT(NEW_OBJ, foam.nanos.auth.User.EMAIL), "nanos@nanos.net");
     rule10.setPredicate(pred10);
     rule10.setOperation(Operations.CREATE_OR_UPDATE);
+    rule10.setLifecycleState(LifecycleState.ACTIVE);
 
     // test array of 1 action
     RuleAction[] actions = new RuleAction[1];
@@ -118,7 +121,7 @@ public class RulerDAOTest extends Test {
     actions[0] = r1;
     compositeAction.setRuleActions(actions);
     rule10.setAction(compositeAction);
-    ruleDAO.put(rule10);
+    localRuleDAO.put(rule10);
     user1.setEmail("nanos@nanos.net");
     user1 = (User) userDAO.put_(x, user1).fclone();
     test(user1.getEmail().equals("action1nanos@nanos.net"), "one rule action changed user email as expected: "+ user1.getEmail());
@@ -132,7 +135,7 @@ public class RulerDAOTest extends Test {
     };
     compositeAction.setRuleActions(actions);
     rule10.setAction(compositeAction);
-    ruleDAO.put(rule10);
+    localRuleDAO.put(rule10);
     user1.setEmail("nanos@nanos.net");
     user1 = (User) userDAO.put_(x, user1).fclone();
     test(user1.getEmail().equals("action2action1nanos@nanos.net"), "Both rule actions changed user email as expected: "+user1.getEmail());
@@ -142,15 +145,17 @@ public class RulerDAOTest extends Test {
 
     //the rule with the highest priority in "users:email filter" group and stops execution of the rest.
     rule7 = new Rule();
-    rule7.setId("rule7. userDAO email filter");
+    rule7.setId("7");
+    rule7.setName("rule7. userDAO email filter");
     rule7.setRuleGroup("users:email filter");
     rule7.setDaoKey("localUserDAO");
     rule7.setOperation(Operations.CREATE);
     rule7.setAfter(false);
     rule7.setPriority(100);
+    rule7.setLifecycleState(LifecycleState.ACTIVE);
     RuleAction action7 = (x1, obj, oldObj, ruler, rule7, agent) -> ruler.stop();
     rule7.setAction(action7);
-    rule7 = (Rule) ruleDAO.put_(x, rule7);
+    rule7 = (Rule) localRuleDAO.put_(x, rule7);
 
     user1 = new User();
     user1.setId(12);
@@ -162,8 +167,8 @@ public class RulerDAOTest extends Test {
     " Email is not upated");
     test(user1.getLastName().equals("Smirnova"), "Last name was updated based on the rule4 from a different group");
 
-    ruleDAO.remove_(x, rule4);
-    ruleDAO.remove_(x, rule5);
+    localRuleDAO.remove_(x, rule4);
+    localRuleDAO.remove_(x, rule5);
 
     user1.setLastName("foam");
     user1 = (User) userDAO.put_(x, user1).fclone();
@@ -173,7 +178,8 @@ public class RulerDAOTest extends Test {
   public void createRule(X x) {
     // first rule stops execution of rules with a lower priority within the same group
     rule1 = new Rule();
-    rule1.setId("rule1. userDAO email filter");
+    rule1.setId("1");
+    rule1.setName("rule1. userDAO email filter");
     rule1.setRuleGroup("users:email filter");
     rule1.setDaoKey("localUserDAO");
     rule1.setOperation(Operations.CREATE);
@@ -181,14 +187,17 @@ public class RulerDAOTest extends Test {
     rule1.setPriority(60);
     RuleAction action1 = (x1, obj, oldObj, ruler, rule1, agent) -> ruler.stop();
     rule1.setAction(action1);
-    rule1 = (Rule) ruleDAO.put_(x, rule1);
+    rule1.setLifecycleState(LifecycleState.ACTIVE);
+    rule1 = (Rule) localRuleDAO.put_(x, rule1);
 
     //the rule has a higher priority than the first rule, changes user's email from nanos@nanos.net to foam@nanos.net
     rule2 = new Rule();
-    rule2.setId("rule2. userDAO email filter");
+    rule2.setId("2");
+    rule2.setName("rule2. userDAO email filter");
     rule2.setRuleGroup("users:email filter");
     rule2.setDaoKey("localUserDAO");
     rule2.setOperation(Operations.CREATE);
+    rule2.setLifecycleState(LifecycleState.ACTIVE);
     rule2.setAfter(false);
     rule2.setPriority(80);
     Predicate predicate2 = AND(
@@ -205,30 +214,34 @@ public class RulerDAOTest extends Test {
       throw new RuntimeException("this async action is not supposed to be executed.");
     };
     rule2.setAsyncAction(asyncAction2);
-    rule2 = (Rule) ruleDAO.put_(x, rule2);
+    rule2 = (Rule) localRuleDAO.put_(x, rule2);
 
     //the rule has lower priority than the first one => should never be executed
     rule3 = new Rule();
-    rule3.setId("rule3. userDAO email filter");
+    rule3.setId("3");
+    rule3.setName("rule3. userDAO email filter");
     rule3.setRuleGroup("users:email filter");
     rule3.setDaoKey("localUserDAO");
     rule3.setOperation(Operations.CREATE);
+    rule3.setLifecycleState(LifecycleState.ACTIVE);
     rule3.setAfter(false);
     rule3.setPriority(20);
     RuleAction action3 = (x14, obj, oldObj, ruler, rule3, agent) -> {
       throw new RuntimeException("this rule is not supposed to be executed");
     };
     rule3.setAction(action3);
-    rule3 = (Rule) ruleDAO.put_(x, rule3);
+    rule3 = (Rule) localRuleDAO.put_(x, rule3);
 
     //the rule has lower priority than the first one but has different group so should be executed
     rule4 = new Rule();
-    rule4.setId("rule4. userDAO lastName filter");
+    rule4.setId("4");
+    rule4.setName("rule4. userDAO lastName filter");
     rule4.setRuleGroup("users:change lastName");
     rule4.setDaoKey("localUserDAO");
     rule4.setOperation(Operations.CREATE);
     rule4.setAfter(false);
     rule4.setPriority(10);
+    rule4.setLifecycleState(LifecycleState.ACTIVE);
     Predicate predicate4 = EQ(DOT(NEW_OBJ, INSTANCE_OF(foam.nanos.auth.User.class)), true);
     rule4.setPredicate(predicate4);
     RuleAction action4 = (x15, obj, oldObj, ruler, rule4, agent) -> {
@@ -238,22 +251,25 @@ public class RulerDAOTest extends Test {
     rule4.setAction(action4);
     RuleAction asyncAction4 = (x16, obj, oldObj, ruler, rule4, agent) -> ruler.stop();
     rule4.setAsyncAction(asyncAction4);
-    rule4 = (Rule) ruleDAO.put_(x, rule4);
+    rule4 = (Rule) localRuleDAO.put_(x, rule4);
 
     //the rule has lower priority than the first one but has different group so should be executed
     rule5 = new Rule();
-    rule5.setId("rule5. userDAO lastName filter");
+    rule5.setId("5");
+    rule5.setName("rule5. userDAO lastName filter");
     rule5.setRuleGroup("users:change lastName");
     rule5.setDaoKey("localUserDAO");
     rule5.setOperation(Operations.UPDATE);
     rule5.setAfter(false);
+    rule5.setLifecycleState(LifecycleState.ACTIVE);
     Predicate predicate5 = EQ(DOT(NEW_OBJ, INSTANCE_OF(foam.nanos.auth.User.class)), true);
     rule5.setPredicate(predicate5);
     RuleAction action5 = (x17, obj, oldObj, ruler, rule5, agency) -> {
       User user = (User) obj;
       user.setLastName("Unknown");
       Rule executeRule = new Rule();
-      executeRule.setId("executeRule");
+      executeRule.setId("100");
+      executeRule.setName("executeRule");
       RuleGroup rg = new RuleGroup();
       rg.setId("fake test group");
       rgDAO.put(rg);
@@ -262,7 +278,7 @@ public class RulerDAOTest extends Test {
       agency.submit(x, new ContextAwareAgent() {
         @Override
         public void execute(X x) {
-          ruleDAO.put(executeRule);
+          localRuleDAO.put(executeRule);
         }
       }, "RulerDAOTest add fake rule");
 
@@ -278,18 +294,20 @@ public class RulerDAOTest extends Test {
       user.setLastName("Smith");
     };
     rule5.setAsyncAction(asyncAction5);
-    rule5 = (Rule) ruleDAO.put_(x, rule5);
+    rule5 = (Rule) localRuleDAO.put_(x, rule5);
 
     //the rule only applied to user2
     rule6 = new Rule();
     RuleGroup rg = new RuleGroup();
     rg.setId("user2 update");
     rgDAO.put(rg);
-    rule6.setId("rule6. user2 update");
+    rule6.setId("6");
+    rule6.setName("rule6. user2 update");
     rule6.setRuleGroup("user2 update");
     rule6.setDaoKey("localUserDAO");
     rule6.setOperation(Operations.UPDATE);
     rule6.setSaveHistory(true);
+    rule6.setLifecycleState(LifecycleState.ACTIVE);
     rule6.setPredicate(EQ(DOT(NEW_OBJ, foam.nanos.auth.User.EMAIL), "user2@nanos.net"));
     RuleAction action6 = (x19, obj, oldObj, ruler, rule6, agent) -> ruler.putResult("Pending");
     rule6.setAction(action6);
@@ -302,11 +320,12 @@ public class RulerDAOTest extends Test {
       ruler.putResult("Done");
     };
     rule6.setAsyncAction(asyncAction6);
-    rule6 = (Rule) ruleDAO.put_(x, rule6);
+    rule6 = (Rule) localRuleDAO.put_(x, rule6);
 
     //the rule with erroneous predicate
     rule8 = new Rule();
-    rule8.setId("rule8. Erroneous rule predicate");
+    rule8.setId("8");
+    rule8.setName("rule8. Erroneous rule predicate");
     RuleGroup rg2 = new RuleGroup();
     rg2.setId("user created");
     rgDAO.put(rg2);
@@ -314,14 +333,16 @@ public class RulerDAOTest extends Test {
     rule8.setDaoKey("localUserDAO");
     rule8.setOperation(Operations.CREATE);
     rule8.setAfter(false);
+    rule8.setLifecycleState(LifecycleState.ACTIVE);
     rule8.setPredicate(new DummyErroneousPredicate());
     RuleAction action8 = (x111, obj, oldObj, ruler, rule8, agent) -> ruler.stop();
     rule8.setAction(action8);
-    rule8 = (Rule) ruleDAO.put_(x, rule8);
+    rule8 = (Rule) localRuleDAO.put_(x, rule8);
 
     //the rule with FObject predicate
     rule9 = new Rule();
-    rule9.setId("rule9. FObject rule predicate");
+    rule9.setId("9");
+    rule9.setName("rule9. FObject rule predicate");
     RuleGroup rg3 = new RuleGroup();
     rg3.setId("user updated");
     rgDAO.put(rg3);
@@ -330,22 +351,23 @@ public class RulerDAOTest extends Test {
     rule9.setOperation(Operations.UPDATE);
     rule9.setAfter(false);
     rule9.setPredicate(EQ(foam.nanos.auth.User.EMAIL, "nanos@nanos.net"));
+    rule9.setLifecycleState(LifecycleState.ACTIVE);
     RuleAction action9 = (x113, obj, oldObj, ruler, rule9, agent) -> {
       User user = (User) obj;
       user.setEmailVerified(true);
     };
     rule9.setAction(action9);
-    rule9 = (Rule) ruleDAO.put_(x, rule9);
+    rule9 = (Rule) localRuleDAO.put_(x, rule9);
   }
   public void removeData(X x) {
-    ruleDAO.remove_(x, rule1);
-    ruleDAO.remove_(x, rule2);
-    ruleDAO.remove_(x, rule3);
-    ruleDAO.remove_(x, rule6);
-    ruleDAO.remove_(x, rule7);
-    ruleDAO.remove_(x, rule8);
-    ruleDAO.remove_(x, rule9);
-    ruleDAO.remove_(x, rule10);
+    localRuleDAO.remove_(x, rule1);
+    localRuleDAO.remove_(x, rule2);
+    localRuleDAO.remove_(x, rule3);
+    localRuleDAO.remove_(x, rule6);
+    localRuleDAO.remove_(x, rule7);
+    localRuleDAO.remove_(x, rule8);
+    localRuleDAO.remove_(x, rule9);
+    localRuleDAO.remove_(x, rule10);
     userDAO.remove_(x, user1);
     userDAO.remove_(x, user2);
   }

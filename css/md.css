@@ -1,6 +1,6 @@
 /* Borrowed from MD SharedStyles. */
 body {
-  font-family: Roboto, 'Helvetica Neue', Helvetica, Arial;
+  font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 

@@ -20,12 +20,14 @@ foam.CLASS({
   name: 'RangeView',
   extends: 'foam.u2.tag.Input',
 
+  css: '^ { width: 300px; vertical-align: middle }',
+
   properties: [
-    [ 'type', 'range' ],
-    [ 'step', 0 ],
+    [ 'type',     'range' ],
+    [ 'step',     0 ],
     [ 'minValue', 0 ],
     [ 'maxValue', 100 ],
-    [ 'onKey', true ]
+    [ 'onKey',    true ]
   ],
 
   methods: [
@@ -33,6 +35,11 @@ foam.CLASS({
       this.SUPER();
       if ( this.step ) this.attrs({step: this.step});
       this.attrs({min: this.minValue, max: this.maxValue$});
+    },
+
+    function updateMode_(mode) {
+      if ( mode === foam.u2.DisplayMode.RO || mode === foam.u2.DisplayMode.DISABLED ) this.setAttribute('disabled', true);
+      this.show(mode !== foam.u2.DisplayMode.HIDDEN);
     }
   ]
 });

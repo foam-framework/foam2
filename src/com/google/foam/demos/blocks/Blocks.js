@@ -36,7 +36,7 @@ foam.CLASS({
     {
       name: 'tick',
       isMerged: true,
-      mergeDelay: 1000,
+      mergeDelay: 1,
       code: function() {
         this.time++;
         this.wall.balance();

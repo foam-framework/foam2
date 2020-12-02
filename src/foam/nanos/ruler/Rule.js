@@ -11,34 +11,41 @@
   documentation: 'Rule model represents rules(actions) that need to be applied in case passed object satisfies provided predicate.',
 
   implements: [
+    'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.auth.LastModifiedByAware'
+    'foam.nanos.auth.LastModifiedByAware',
+    'foam.nanos.approval.ApprovableAware',
+    'foam.nanos.auth.ServiceProviderAware'
   ],
 
   imports: [
-    'userDAO'
+    'userDAO?'
   ],
 
   javaImports: [
     'foam.core.DirectAgency',
+    'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.AuthService',
     'foam.nanos.logger.Logger',
     'java.util.Collection'
   ],
 
   tableColumns: [
     'id',
-    'ruleGroup',
+    'name',
+    'ruleGroup.id',
     'enabled',
     'priority',
     'daoKey',
-    'createdBy',
-    'lastModifiedBy'
+    'createdBy.legalName',
+    'lastModifiedBy.legalName'
   ],
 
   searchColumns: [
     'id',
+    'name',
     'ruleGroup',
     'enabled',
     'priority',
@@ -63,7 +70,12 @@
     {
       class: 'String',
       name: 'id',
-      updateVisibility: 'RO',
+      visibility: 'RO'
+      // will display in '_defaultSection'
+    },
+    {
+      class: 'String',
+      name: 'name',
       tableWidth: 300,
       section: 'basicInfo'
     },
@@ -130,6 +142,9 @@
     {
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'predicate',
+      factory: function () {
+        return foam.mlang.predicate.True.create();
+      },
       javaFactory: `
       return foam.mlang.MLang.TRUE;
       `,
@@ -259,6 +274,34 @@
           }
         }.bind(this));
       }
+    },
+    {
+      class: 'foam.core.Enum',
+      of: 'foam.nanos.auth.LifecycleState',
+      name: 'lifecycleState',
+      value: foam.nanos.auth.LifecycleState.PENDING,
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      readVisibility: 'RO',
+      writePermissionRequired: true
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.comics.v2.userfeedback.UserFeedback',
+      name: 'userFeedback',
+      storageTransient: true,
+      visibility: 'HIDDEN'
+    },
+    {
+      name: 'checkerPredicate',
+      javaFactory: 'return foam.mlang.MLang.FALSE;'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
+      name: 'spid',
+      value: foam.nanos.auth.ServiceProviderAware.GLOBAL_SPID,
+      documentation: 'Service Provider Id of the rule. Default to ServiceProviderAware.GLOBAL_SPID for rule applicable to all service providers.'
     }
   ],
 
@@ -281,11 +324,10 @@
         }
       ],
       javaCode: `
+        if ( ! getEnabled() ) return false;
+
         try {
-          return getEnabled()
-            && getPredicate().f(
-              x.put("NEW", obj).put("OLD", oldObj)
-            );
+          return getPredicate().f(x.put("NEW", obj).put("OLD", oldObj));
         } catch ( Throwable t ) {
           try {
             return getPredicate().f(obj);
@@ -372,6 +414,73 @@
       ],
       javaCode: `
       return rule;`
+    },
+    {
+      name: 'toSummary',
+      type: 'String',
+      code: function() {
+        return this.name || this.id;
+      },
+      javaCode: `
+        return foam.util.SafetyUtil.isEmpty(getName()) ? getName() : getId();
+      `
+    },
+    {
+      name: 'authorizeOnCreate',
+      javaCode: `
+        var auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "rule.create") ) {
+          throw new AuthorizationException("You do not have permission to create the rule.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnRead',
+      javaCode: `
+        var auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "rule.read." + getId())
+          && ! auth.check(x, "serviceprovider.read." + getSpid())
+        ) {
+          throw new AuthorizationException("You do not have permission to read the rule.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnUpdate',
+      javaCode: `
+        var auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "rule.update." + getId()) ) {
+          throw new AuthorizationException("You do not have permission to update the rule.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      javaCode: `
+        var auth = (AuthService) x.get("auth");
+        if ( ! auth.check(x, "rule.remove." + getId())
+          && ! auth.check(x, "serviceprovider.update." + getSpid())
+        ) {
+          throw new AuthorizationException("You do not have permission to delete the rule.");
+        }
+      `
+    },
+    {
+      name: 'getUser',
+      type: 'foam.nanos.auth.User',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'obj', type: 'FObject' }
+      ],
+      documentation: `Return user extracted from obj to be used for checking the
+        user permission to access (i.e. execute) the rule.
+
+        Return null (default) to skip access permission check on the rule.
+
+        Subclasses of Rule should override "getUser" method to return the
+        appropriate user for which the permission is checked.
+      `,
+      javaCode: 'return null;'
     }
   ],
 

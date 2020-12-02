@@ -40,6 +40,17 @@ foam.CLASS({
       class: 'Boolean',
       name: 'enableRemoving',
       value: true
+    },
+    // The next two properties are used to avoid excess flickering.
+    // We only update data to data2_ when we know that our feedback
+    // didn't cause the update. This prevents the whole view from
+    // being redrawn when we update a single row's value.
+    {
+      name: 'data2_'
+    },
+    {
+      class: 'Boolean',
+      name: 'feedback_'
     }
   ],
 
@@ -64,7 +75,7 @@ foam.CLASS({
   classes: [
     {
       name: 'Row',
-      imports: [ 
+      imports: [
         'data',
         'enableRemoving',
         'mode',
@@ -99,23 +110,7 @@ foam.CLASS({
     }
   ],
 
-  listeners: [
-    {
-      name: 'updateData',
-      isFramed: true,
-      code: function() {
-        var d = this.data;
-        this.data = [];
-        this.data = d;
-      }
-    }
-  ],
-
   css: `
-    ^value-view-container {
-      border-top: 1px solid /*%GREY4%*/ #e7eaec;
-    }
-
     ^ .foam-u2-ActionView-addRow {
       margin: 8px 0;
     }
@@ -124,8 +119,15 @@ foam.CLASS({
       align-self: flex-start;
     }
 
-    ^value-view-container:last-child {
-      border-bottom: 1px solid /*%GREY4%*/ #e7eaec;
+    ^ .foam-u2-ActionView-remove {
+      margin-left: 4px;
+      padding: 0;
+    }
+
+    ^ .foam-u2-ActionView-remove:focus {
+      border-width: 1px;
+      margin-left: 4px;
+      padding: 0;
     }
 
     ^value-view {
@@ -138,10 +140,13 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
+      this.onDetach(this.data$.sub(() => { if ( ! this.feedback_ ) this.data2_ = this.data; }));
+      this.data2_ = this.data;
       this.addClass(this.myClass());
 
       this
-        .add(this.slot(function(data, valueView) {
+        .add(this.slot(function(data2_, valueView) {
+          var data = data2_;
           return self.E()
             .start(self.Rows)
               .forEach(data || [], function(e, i) {
@@ -155,17 +160,38 @@ foam.CLASS({
                       .end()
                       .tag(self.Row.REMOVE, {
                         isDestructive: true,
-                        icon: 'images/remove-circle.svg',
+                        // icon: '/images/remove-circle.svg',
+                        // encode data as an embedded data URL of the SVG
+                        // because then the GUI updates without flickering
+                        icon: "data:image/svg+xml;utf8,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath fill='%23d9170e' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z'/%3E%3C/svg%3E",
                         buttonStyle: 'UNSTYLED'
                       })
                     .end()
                   .endContext();
-                row.onDetach(row.sub(self.updateData));
+                row.onDetach(row.sub(self.updateDataWithoutFeedback));
               });
         }))
         .startContext({ data: this })
           .tag(this.ADD_ROW, { buttonStyle: 'SECONDARY' })
         .endContext();
     }
+  ],
+
+  listeners: [
+    {
+      name: 'updateData',
+      code: function() {
+        this.data = foam.Array.shallowClone(this.data);
+      }
+    },
+    {
+      name: 'updateDataWithoutFeedback',
+      code: function() {
+        this.feedback_ = true;
+        this.updateData();
+        this.feedback_ = false;
+      }
+    }
+
   ]
 });

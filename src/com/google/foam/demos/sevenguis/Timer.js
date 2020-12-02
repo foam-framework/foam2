@@ -31,9 +31,8 @@ foam.CLASS({
     ^ { padding: 10px !important; font-size: 18px; }
     ^ .elapsed { margin-top: 10px; }
     ^ .label { display: inline-block; width: 130px; }
-    ^ .foam-u2-ActionView- { width: 332px !important; margin-top: 16px !important; }
-    ^ input { margin-left: 12px; }
-    ^ .foam-u2-RangeView- { width: 182px; }
+    ^ .foam-u2-ActionView { width: 332px !important; margin-top: 16px !important; }
+    ^ .foam-u2-RangeView { width: 182px; }
     ^ row { display: block; min-height: 30px; }
   `,
 
@@ -44,11 +43,11 @@ foam.CLASS({
       expression: function(duration, elapsedTime) {
         return this.duration ? 100 * Math.min(1, 1000 * this.elapsedTime / this.duration) : 100;
       },
-      view: { class: 'foam.u2.ProgressView' }
+      view: 'foam.u2.ProgressView'
     },
     {
       name: 'elapsedTime',
-      // units: 's',
+      units: 's',
       label: '',
       value: 0
     },

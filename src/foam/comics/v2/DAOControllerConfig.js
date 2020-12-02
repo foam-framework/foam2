@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOControllerConfig',
+
   documentation: `
     A customizable model to configure any DAOController
   `,
@@ -21,6 +22,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'daoKey'
+    },
+    {
+      class: 'Class',
+      name: 'factory'
     },
     {
       class: 'FObjectProperty',
@@ -47,6 +52,21 @@ foam.CLASS({
       }
     },
     {
+      class: 'foam.dao.DAOProperty',
+      name: 'unfilteredDAO',
+      hidden: true,
+      expression: function(dao) {
+        var delegate = dao;
+        while ( delegate && foam.dao.ProxyDAO.isInstance(delegate) ) {
+          if ( foam.dao.FilteredDAO.isInstance(delegate) ) {
+            return delegate.delegate;
+          }
+          delegate = delegate.delegate;
+        }
+        return dao;
+      }
+    },
+    {
       class: 'Class',
       name: 'of',
       expression: function(dao$of) { return dao$of; }
@@ -54,7 +74,28 @@ foam.CLASS({
     {
       class: 'String',
       name: 'browseTitle',
-      expression: function(of) { return foam.String.pluralize(of.model_.label); }
+      factory: function() { return this.of.model_.plural; }
+    },
+    {
+      class: 'String',
+      name: 'browseSubtitle',
+      factory: function() { return 'View all ' + this.browseTitle.toLowerCase() + '.' }
+    },
+    {
+      // TODO: Make ViewSpecWithJava a refinement to ViewSpec and change below to a ViewSpec
+      class: 'foam.u2.ViewSpecWithJava',
+      name: 'summaryView',
+      expression: function(defaultColumns) {
+        return {
+          class: 'foam.u2.view.ScrollTableView',
+          enableDynamicTableHeight: true,
+          columns: defaultColumns,
+          css: {
+            width: '100%',
+            'min-height': '424px'
+          }
+        };
+      }
     },
     {
       class: 'String',
@@ -69,8 +110,8 @@ foam.CLASS({
         var tableColumns = of.getAxiomByName('tableColumns');
 
         return tableColumns
-                ? tableColumns.columns
-                : of.getAxiomsByClass(foam.core.Property).map(p => p.name);
+          ? tableColumns.columns
+          : of.getAxiomsByClass(foam.core.Property).map(p => p.name);
       }
     },
     {
@@ -112,39 +153,58 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpecWithJava',
       name: 'viewBorder',
-      expression: function() {
+      factory: function() {
         // Can't use a value here because java tries to generate a HasMap
         // for it which doesn't jive with the AbstractFObjectPropertyInfo.
         return { class: 'foam.u2.borders.NullBorder' };
       }
     },
     {
-      class: 'Boolean',
-      name: 'createEnabled',
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'createPredicate',
       documentation: 'If set to false, the "Create" button will not be visible.',
-      value: true
+      factory: function() {
+        return foam.mlang.predicate.True.create();
+      },
+      javaFactory: `
+        return foam.mlang.MLang.TRUE;
+      `
     },
     {
-      class: 'Boolean',
-      name: 'editEnabled',
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'editPredicate',
       documentation: 'True to enable the edit button.',
-      value: true
+      factory: function() {
+        return foam.mlang.predicate.True.create();
+      },
+      javaFactory: `
+        return foam.mlang.MLang.TRUE;
+      `
     },
     {
-      class: 'Boolean',
-      name: 'deleteEnabled',
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'deletePredicate',
       documentation: 'True to enable the delete button.',
-      value: true
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.comics.v2.CRUDActionsAuth',
-      name: 'CRUDActionsAuth'
+      factory: function() {
+        return foam.mlang.predicate.True.create();
+      },
+      javaFactory: `
+        return foam.mlang.MLang.TRUE;
+      `
     },
     {
       of: 'foam.mlang.predicate.Predicate',
       name: 'filterExportPredicate',
       documentation: 'Filtering the types of formats user is able to export from TableView'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.comics.v2.CRUDEnabledActionsAuth',
+      name: 'CRUDEnabledActionsAuth'
+    },
+    {
+      class: 'Boolean',
+      name: 'hideQueryBar'
     }
   ]
 });

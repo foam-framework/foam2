@@ -25,17 +25,21 @@ Use: see ServiceProviderAwareTest
   // and add to generation where 'findFoo' is available to avoid reflection.,
 
   javaImports: [
+    'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.X',
-    'foam.core.FObject',
     'foam.nanos.auth.AuthService',
-    'foam.nanos.auth.Authorizer',
     'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.Authorizer',
+    'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
+    'foam.util.SafetyUtil',
+
+    'java.lang.reflect.Method',
     'java.util.HashMap',
     'java.util.Map',
-    'java.util.Map.Entry',
+    'java.util.Map.Entry'
   ],
 
   properties: [
@@ -50,13 +54,18 @@ Use: see ServiceProviderAwareTest
       class: 'Map',
       visibility: 'HIDDEN',
       javaFactory: 'return new HashMap();'
+    },
+    {
+      class: 'String',
+      name: 'spid',
+      documentation: 'The spid to be matched against. If not set, the context user spid will be used.'
     }
   ],
 
   methods: [
     {
       documentation: `Using Relationship findFoo(x), traverse relationships,
-returning true if the context users spid matches the current object.`,
+returning true if the spid or context users spid matches the current object.`,
       name: 'match',
       args: [
         {
@@ -74,23 +83,31 @@ returning true if the context users spid matches the current object.`,
       ],
       type: 'Boolean',
       javaCode: `
-      User user = (User) x.get("user");
-      if ( user == null ) {
-        // TODO/REVIEW: occurs during login. See AuthenticationApiTest
-        return true;
+      var isUserSpid = false;
+      var spid = getSpid();
+
+      if ( SafetyUtil.isEmpty(spid) ) {
+        var user = ((Subject) x.get("subject")).getUser();
+        if ( user == null ) {
+          // TODO/REVIEW: occurs during login. See AuthenticationApiTest
+          return true;
+        }
+        spid = user.getSpid();
+        isUserSpid = true;
       }
+
+      var auth = (AuthService) x.get("auth");
 
       if ( obj != null &&
            obj instanceof ServiceProviderAware ) {
         ServiceProviderAware sp = (ServiceProviderAware) obj;
-        return user.getSpid().equals(sp.getSpid()) ||
-          ((AuthService) x.get("auth")).check(x, "spid.read." + sp.getSpid());
+        return sp.getSpid().startsWith(spid) || sp.getSpid().equals("*") ||
+                 isUserSpid && auth.check(x, getSpidReadPermission(sp.getSpid()));
       }
 
       Object result = obj;
       while ( result != null &&
               properties != null ) {
-//        PropertyInfo pInfos[] = (PropertyInfo[]) properties.get(result.getClass().getName());
         PropertyInfo pInfos[] = (PropertyInfo[]) getProperties(x, properties, result);
         if ( pInfos == null ) {
           return false;
@@ -98,22 +115,26 @@ returning true if the context users spid matches the current object.`,
         for ( int i = 0; i < pInfos.length; i++ ) {
           foam.core.PropertyInfo pInfo = pInfos[i];
           try {
-            java.lang.reflect.Method method = getFindMethod(x, pInfo.getName(), result);
+            Method method = (Method) getFindMethods().get(pInfo.getName());
+            if ( method == null ) {
+              method = getFindMethod(x, pInfo.getName(), result);
+            }
             result = invokeMethod(x, method, result);
             if ( result != null &&
                  result instanceof ServiceProviderAware ) {
               ServiceProviderAware sp = (ServiceProviderAware) result;
-              if ( user.getSpid().equals(sp.getSpid()) ||
-                  ((AuthService) x.get("auth")).check(x, "spid.read." + sp.getSpid()) ) {
-                return true;
-             }
-           }
-         } catch (Throwable e) {
-           return false;
-         }
-       }
-     }
-     return false;
+              return sp.getSpid().startsWith(spid) || sp.getSpid().equals("*") ||
+                       isUserSpid && auth.check(x, getSpidReadPermission(sp.getSpid()));
+            } else {
+              break;
+            }
+          } catch (NoSuchMethodException e) {
+            ((Logger) x.get("logger")).warning("ServiceProviderAwareSupport.match", result.getClass().getSimpleName(), pInfo.getName(), "NoSuchMethodException");
+            return false;
+          }
+        }
+      }
+      return false;
      `
     },
     {
@@ -149,11 +170,11 @@ store the result for subsequent lookups. `,
         try {
           Class cls = Class.forName(key);
           if ( cls.isAssignableFrom(obj.getClass()) ) {
-            getPropertyInfos().put(name, entry.getValue());
+           getPropertyInfos().put(name, entry.getValue());
             return (PropertyInfo[]) entry.getValue();
           }
         } catch ( ClassNotFoundException e ) {
-          getPropertyInfos().put(name, null);
+          getPropertyInfos().put(name, new PropertyInfo[0]);
           break;
         }
       }
@@ -177,18 +198,13 @@ store the result for subsequent lookups. `,
         }
       ],
       type: 'java.lang.reflect.Method',
-      javaThrows: ['Exception'],
+      javaThrows: ['NoSuchMethodException'],
       javaCode: `
-    java.lang.reflect.Method method = (java.lang.reflect.Method) getFindMethods().get(name);
+    Method method = (Method) getFindMethods().get(name);
     if ( method == null ) {
       String methodName = "find" + name.substring(0,1).toUpperCase() + name.substring(1);
-      try {
-        method = obj.getClass().getMethod(methodName, foam.core.X.class);
-        getFindMethods().put(name, method);
-      } catch (Exception e) {
-        ((Logger) x.get("logger")).error("ServiceProviderAwareSupport", "Failed to find method", methodName, "on", obj.getClass().getSimpleName(), e.getMessage(), e);
-        throw e;
-      }
+      method = obj.getClass().getMethod(methodName, X.class);
+      getFindMethods().put(name, method);
     }
     return method;
      `
@@ -220,14 +236,37 @@ store the result for subsequent lookups. `,
           }
           if ( cause != null &&
                cause instanceof AuthorizationException ) {
-            ((Logger) x.get("logger")).debug("ServiceProviderAwareSupport", "AuthorizationException", method.getName(), "on", obj.getClass().getSimpleName(), cause.getMessage(), cause);
+            ((Logger) x.get("logger")).debug("ServiceProviderAwareSupport.invokeMethod", obj.getClass().getSimpleName(), method.getName(), "AuthorizationException", cause.getMessage(), cause);
             return null;
           } else {
-            ((Logger) x.get("logger")).error("ServiceProviderAwareSupport", "Failed to invoke method", method.getName(), "on", obj.getClass().getSimpleName(), e.getMessage(), e);
+            ((Logger) x.get("logger")).error("ServiceProviderAwareSupport.invokeMethod", obj.getClass().getSimpleName(), method.getName(), e.getMessage(), e);
           }
         }
         return null;
       `
+    },
+    {
+      name: 'getSpidReadPermission',
+      type: 'String',
+      args: [
+        { name: 'spid', type: 'String' }
+      ],
+      javaCode: `
+        return "serviceprovider.read." + (SafetyUtil.isEmpty(spid) ? "*" : spid);
+      `
+    }
+  ],
+
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+          public ServiceProviderAwareSupport(String spid) {
+            setSpid(spid);
+          }
+        `);
+      }
     }
   ]
 });

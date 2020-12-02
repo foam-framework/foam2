@@ -15,14 +15,15 @@ foam.CLASS({
 
   css: `
     ^inner {
-      -webkit-box-shadow: 0px 0px 67px -15px rgba(0,0,0,0.75);
       -moz-box-shadow: 0px 0px 67px -15px rgba(0,0,0,0.75);
-      box-shadow: 0px 0px 67px -15px rgba(0,0,0,0.75);
+      -webkit-box-shadow: 0px 0px 67px -15px rgba(0,0,0,0.75);
       border-bottom-left-radius: 5px;
       border-bottom-right-radius: 5px;
+      box-shadow: 0px 0px 67px -15px rgba(0,0,0,0.75);
+      font-weight: 300;
       position: absolute;
       top: 65px;
-      font-weight: 300;
+      width: 240px;
     }
     ^inner div {
       box-sizing: border-box;
@@ -51,8 +52,7 @@ foam.CLASS({
       var self = this;
       var menu = this.menu;
       var X    = this.__subContext__;
-
-      menu.children.orderBy(this.Menu.ORDER, this.Menu.LABEL).select({
+      menu.children.select({
         put: function(menu) {
           if ( ! menu.handler ) return;
           self.start('div').call(function() {
@@ -63,7 +63,7 @@ foam.CLASS({
                 self.close();
                 menu.launch_(X, e);
               })
-              .add(menu.label);
+              .translate(menu.id + '.label', menu.label);
             })
           .end();
         },

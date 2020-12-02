@@ -29,8 +29,7 @@ foam.CLASS({
 
     ^ .foam-u2-ActionView-back {
       display: flex;
-      align-items: center;
-      width: 50%;
+      align-self: flex-start;
     }
 
     ^account-name {
@@ -49,6 +48,7 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.log.LogLevel',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.ControllerMode',
@@ -114,51 +114,27 @@ foam.CLASS({
             if ( foam.comics.v2.userfeedback.UserFeedbackAware.isInstance(o) && o.userFeedback ) {
               var currentFeedback = o.userFeedback;
               while ( currentFeedback ) {
-                this.ctrl.add(this.NotificationMessage.create({
-                  message: currentFeedback.message,
-                  type: currentFeedback.status.name.toLowerCase()
-                }));
-
+                this.ctrl.notify(currentFeedback.message, '', this.LogLevel.INFO, true);
                 currentFeedback = currentFeedback.next;
               }
             } else {
-              this.ctrl.add(this.NotificationMessage.create({
-                message: `${this.data.model_.label} updated.`
-              }));
+              this.ctrl.notify(`${this.data.model_.label} updated.`, '', this.LogLevel.INFO, true);
             }
           }
           this.stack.back();
         }, (e) => {
           this.throwError.pub(e);
 
-          // TODO: uncomment this once we wire up a proper exception
-          // if ( foam.comics.v2.userfeedback.UserFeedbackException.isInstance(e) && e.userFeedback  ){
-          //   var currentFeedback = e.userFeedback;
-          //   while ( currentFeedback ){
-          //     this.ctrl.add(this.NotificationMessage.create({
-          //       message: currentFeedback.message,
-          //       type: currentFeedback.status.name.toLowerCase()
-          //     }));
+          if ( e.exception && e.exception.userFeedback  ) {
+            var currentFeedback = e.exception.userFeedback;
+            while ( currentFeedback ) {
+              this.ctrl.notify(currentFeedback.message, '', this.LogLevel.INFO, true);
 
-          //     currentFeedback = currentFeedback.next;
-          //   }
-          // } else {
-          //   this.ctrl.add(this.NotificationMessage.create({
-          //     message: e.message,
-          //     type: 'error'
-          //   }));
-          // }
-
-          if ( e.message === 'An approval request has been sent out.' ) {
-            this.ctrl.add(this.NotificationMessage.create({
-              message: e.message,
-              type: 'success'
-            }));
+              currentFeedback = currentFeedback.next;
+            }
+            this.stack.back();
           } else {
-            this.ctrl.add(this.NotificationMessage.create({
-              message: e.message,
-              type: 'error'
-            }));
+            this.ctrl.notify(e.message, '', this.LogLevel.ERROR, true);
           }
         });
       }
@@ -186,8 +162,8 @@ foam.CLASS({
                 .start(self.Cols).style({ 'align-items': 'center' })
                   .start()
                     .add(data.toSummary())
-                      .addClass(this.myClass('account-name'))
-                      .addClass('truncate-ellipsis')
+                    .addClass(this.myClass('account-name'))
+                    .addClass('truncate-ellipsis')
                   .end()
                   .startContext({ data: self }).add(self.SAVE).endContext()
                 .end()

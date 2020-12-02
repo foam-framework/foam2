@@ -17,11 +17,12 @@ foam.CLASS({
     'foam.support.model.Ticket',
     'foam.support.model.TicketMessage',
     'foam.u2.PopupView',
-    'foam.u2.dialog.NotificationMessage'
+    'foam.log.LogLevel'
   ],
 
-  imports:[
+  imports: [
     'ctrl',
+    'notify',
     'ticketDAO',
     'user',
     'hideSummary',
@@ -59,7 +60,7 @@ foam.CLASS({
     }
     ^ .label{
       height: 16px;
-      font-family: Roboto;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       font-weight: 300;
       font-style: normal;
@@ -97,7 +98,7 @@ foam.CLASS({
       width: 186px;
       height: 20px;
       opacity: 0.6;
-      font-family: Roboto;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 20px;
       font-weight: 300;
       font-style: normal;
@@ -126,7 +127,7 @@ foam.CLASS({
       width: 165px;
       height: 35px;
       z-index: 10000
-      font-family: Roboto;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 12px;
       font-weight: normal;
       font-style: normal;
@@ -274,7 +275,7 @@ foam.CLASS({
           status: this.status
         });
 
-        this.dao.put(ticket).then(function(ticket){
+        this.dao.put(ticket).then(function(ticket) {
           if (self.message == "") return;
           var message = self.TicketMessage.create({
             senderId: self.user.id,
@@ -282,8 +283,8 @@ foam.CLASS({
             message: self.message,
             type: 'Internal'
           });
-          ticket.messages.put(message).then(function(a){
-            ctrl.add(self.NotificationMessage.create({ message: 'Ticket Created!' }));
+          ticket.messages.put(message).then(function(a) {
+            self.notify('Ticket Created!', '', self.LogLevel.INFO, true);
           });
         });
         this.stack.push({ class: 'foam.support.view.TicketView' });

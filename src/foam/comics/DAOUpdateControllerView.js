@@ -22,13 +22,15 @@ foam.CLASS({
 
   requires: [
     'foam.comics.DAOUpdateController',
+    'foam.log.LogLevel',
     'foam.u2.ControllerMode',
-    'foam.u2.DisplayMode',
-    'foam.u2.dialog.NotificationMessage'
+    'foam.u2.DisplayMode'
+    
   ],
 
   imports: [
     'stack',
+    'notify',
     'dao? as importedDAO'
   ],
 
@@ -150,7 +152,7 @@ foam.CLASS({
             .end()
           .end()
         .end()
-        
+
         // Container for the detailview
         .start('div', [], this.container_$)
           .addClass(this.myClass('detail-container'))
@@ -194,10 +196,7 @@ foam.CLASS({
     },
     function onThrowError() {
       var self = this;
-      this.add(this.NotificationMessage.create({
-        message: self.data.exception.message,
-        type: 'error'
-     }));
+      self.notify(self.data.exception.message, '', self.LogLevel.ERROR, true);
     }
   ]
 });

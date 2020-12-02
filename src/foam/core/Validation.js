@@ -1,23 +1,13 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2016 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
   package: 'foam.core',
   name: 'ValidationPredicate',
+
   properties: [
     {
       name: 'predicateFactory'
@@ -38,6 +28,8 @@ foam.CLASS({
     },
     {
       class: 'Function',
+      // TODO: it isn't normal for JS functions to have a 'js' prefix
+      // TODO: poor choice of name, should be something with 'assert'
       name: 'jsFunc',
       expression: function(predicate, jsErr) {
         return function() {
@@ -47,30 +39,60 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'errorString'
+      name: 'errorMessage',
+      documentation: `
+        Provide feedback to the user via a Message.
+        To use this, provide the name of the Message you wish to add.
+        When both errorString and errorMessage are specified, the errorMessage will be used.
+      `
+    },
+    {
+      class: 'String',
+      name: 'errorString',
+      // TODO: make deprecated, makes i18n difficult
+      documentation: `
+        Provide feedback to the user via a String.
+        When both errorString and errorMessage are specified, the errorMessage will be used.
+      `
     },
     {
       class: 'Function',
+      // TODO: it isn't normal for JS functions to have a 'js' prefix
       name: 'jsErr',
-      expression: function(errorString) {
-        return function() { return errorString; };
+      expression: function(errorString, errorMessage) {
+        return function(obj) {
+          if ( errorMessage && obj ) {
+            if ( obj[errorMessage] ) return obj[errorMessage];
+            console.warn('Error finding message', errorMessage, '. No such message on object.', obj);
+          }
+          return errorString;
+        }
       }
     }
   ],
+
   methods: [
     function createErrorSlotFor(data) {
+      return data.slot(this.jsFunc, this.args);
+      /*
       return this.ExpressionSlot.create({
         args: this.args.map(a => data[a+'$']),
         code: this.jsFunc.bind(data)
       });
+      */
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
   name: 'PropertyValidationRefinement',
   refines: 'foam.core.Property',
+
+  messages: [
+    { name: 'PLEASE_ENTER', message: 'Please enter' }
+  ],
 
   properties: [
     {
@@ -95,25 +117,32 @@ foam.CLASS({
           return [args, function() {
             for ( var i = 0 ; i < validationPredicates.length ; i++ ) {
               var vp = validationPredicates[i];
-              if ( vp.jsFunc.bind(this)() ) return vp.jsErr.bind(this)();
+              var self = this;
+              if ( vp.jsFunc.call(this) ) return vp.jsErr.call(self, self);
             }
             return null;
           }];
         }
-        return !required ? null : [[name],
+        return ! required ? null : [[name],
           function() {
             const axiom = this.cls_.getAxiomByName(name);
-            return axiom.isDefaultValue(this[name]) && (`Please enter ${label.toLowerCase()}`);
+            return axiom.isDefaultValue(this[name]) && (`${this.PLEASE_ENTER} ${label.toLowerCase()}`);
           }]
-      },
-    },
+      }
+    }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
   name: 'StringPropertyValidationRefinement',
   refines: 'foam.core.String',
+
+  messages: [
+    { name: 'REQUIRED', message: 'required' },
+  ],
+
   properties: [
     'minLength',
     'maxLength',
@@ -123,32 +152,35 @@ foam.CLASS({
       name: 'validationPredicates',
       factory: function() {
         var self = this;
-        var a = [];
+        var a    = [];
+
         if ( foam.Number.isInstance(this.minLength) ) {
           a.push({
             args: [this.name],
             predicateFactory: function(e) {
               return e.GTE(foam.mlang.StringLength.create({ arg1: self }), self.minLength);
             },
-            errorString: `Please enter ${this.label.toLowerCase()} with at least ${this.minLength} character${this.minLength>1?'s':''}`
+            errorString: `${this.label} should be at least ${this.minLength} character${this.minLength>1?'s':''}`
           });
         }
+
         if ( foam.Number.isInstance(this.maxLength) ) {
           a.push({
             args: [this.name],
             predicateFactory: function(e) {
               return e.LTE(foam.mlang.StringLength.create({ arg1: self }), self.maxLength);
             },
-            errorString: `Please enter ${this.label.toLowerCase()} with at most ${this.maxLength} character${this.maxLength>1?'s':''}`
+            errorString: `${this.label} should be at most ${this.maxLength} character${this.maxLength>1?'s':''}`
           });
         }
+
         if ( this.required && ! foam.Number.isInstance(this.minLength) ) {
           a.push({
             args: [this.name],
             predicateFactory: function(e) {
               return e.GTE(foam.mlang.StringLength.create({ arg1: self }), 1);
             },
-            errorString: `Please enter ${this.label.toLowerCase()}`
+            errorString: `${this.label} ${foam.core.String.REQUIRED}`
           });
         }
         return a;
@@ -157,10 +189,16 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'FObjectPropertyValidationRefinement',
   refines: 'foam.core.FObjectProperty',
+
+  messages: [
+    { name: 'PLEASE_ENTER_VALID', message: 'Please enter valid' },
+  ],
+
   properties: [
     {
       class: 'Boolean',
@@ -170,23 +208,26 @@ foam.CLASS({
       name: 'validateObj',
       expression: function(name, label, required, validationPredicates, autoValidate) {
         if ( autoValidate ) {
+          var self = this;
           return [
             [`${name}$errors_`],
             function(errs) {
-              return errs ? `Please enter valid ${label.toLowerCase()}` : null;
+              return errs ? `${self.PLEASE_ENTER_VALID} ${(label || name).toLowerCase()}` : null;
             }
           ];
         }
         return foam.core.Property.VALIDATE_OBJ.expression.apply(this, arguments);
-      },
-    },
+      }
+    }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
   name: 'IntPropertyValidationRefinement',
   refines: 'foam.core.Int',
+
   properties: [
     {
       class: 'Boolean',
@@ -197,7 +238,8 @@ foam.CLASS({
       factory: function() {
         if ( ! this.autoValidate ) return [];
         var self = this;
-        var a = [];
+        var a    = [];
+
         if ( foam.Number.isInstance(self.min) ) {
           a.push({
             args: [self.name],
@@ -207,6 +249,7 @@ foam.CLASS({
             errorString: `Please enter ${self.label.toLowerCase()} greater than or equal to ${self.min}.`
           });
         }
+
         if ( foam.Number.isInstance(self.max) ) {
           a.push({
             args: [self.name],
@@ -216,6 +259,7 @@ foam.CLASS({
             errorString: `Please enter ${self.label.toLowerCase()} less than or equal to ${self.max}`
           });
         }
+
         return a;
       }
     }
@@ -316,10 +360,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'EmailPropertyValidationRefinement',
   refines: 'foam.core.EMail',
+
   properties: [
     {
       class: 'FObjectArray',
@@ -333,10 +379,10 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.OR(
                 e.EQ(self, ''),
-                e.REG_EXP(self, /^[A-Za-z0-9._%+-]+@[a-zA-Z0-9]+\.[a-zA-Z]{2,6}$/)
+                e.REG_EXP(self, /\S+@\S+\.\S+/)
               );
             },
-            errorString: 'Please enter valid email address'
+            errorString: 'Valid email required'
           }
         ];
         if ( this.required ) {
@@ -346,7 +392,7 @@ foam.CLASS({
               predicateFactory: function(e) {
                 return e.NEQ(self, '');
               },
-              errorString: 'Please enter email address'
+              errorString: 'Email required'
             }
           );
         }
@@ -356,10 +402,16 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'PhoneNumberPropertyValidationRefinement',
   refines: 'foam.core.PhoneNumber',
+
+  messages: [
+    { name: 'PHONE_NUMBER_REQUIRED', message: 'Phone number required' },
+    { name: 'INVALID_PHONE_NUMBER',  message: 'Valid phone number required' }
+  ],
 
   properties: [
     {
@@ -368,7 +420,6 @@ foam.CLASS({
       name: 'validationPredicates',
       factory: function() {
         var self = this;
-        const PHONE_NUMBER_REGEX = /^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/;
         return this.required
           ? [
               {
@@ -376,14 +427,14 @@ foam.CLASS({
                 predicateFactory: function(e) {
                   return e.HAS(self);
                 },
-                errorString: 'Phone number required.'
+                errorString: this.PHONE_NUMBER_REQUIRED
               },
               {
                 args: [this.name],
                 predicateFactory: function(e) {
-                  return e.REG_EXP(self, PHONE_NUMBER_REGEX);
+                  return e.REG_EXP(self, foam.nanos.auth.Phone.PHONE_NUMBER_REGEX);
                 },
-                errorString: 'Invalid phone number.'
+                errorString: this.INVALID_PHONE_NUMBER
               }
             ]
           : [
@@ -392,10 +443,10 @@ foam.CLASS({
                 predicateFactory: function(e) {
                     return e.OR(
                       e.EQ(foam.mlang.StringLength.create({ arg1: self }), 0),
-                      e.REG_EXP(self, PHONE_NUMBER_REGEX)
+                      e.REG_EXP(self, foam.nanos.auth.Phone.PHONE_NUMBER_REGEX)
                     );
                 },
-                errorString: 'Invalid phone number.'
+                errorString: this.INVALID_PHONE_NUMBER
               }
             ];
       }
@@ -403,10 +454,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'DatePropertyValidationRefinement',
   refines: 'foam.core.Date',
+
   properties: [
     {
       class: 'FObjectArray',

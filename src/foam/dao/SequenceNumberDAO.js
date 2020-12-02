@@ -13,7 +13,7 @@ foam.CLASS({
     {
       path: 'foam.mlang.Expressions',
       flags: ['js'],
-    },
+    }
   ],
 
   requires: [
@@ -52,7 +52,7 @@ foam.CLASS({
         getDelegate().select(max);
         long v = max.getValue() instanceof Number ? ( (Number) max.getValue() ).longValue() + 1 : 1;
         return v > getStartingValue() ? v : getStartingValue();
-      `,
+      `
     },
     { /** Returns a promise that fulfills when the maximum existing number
           has been found and assigned to this.value */
@@ -70,7 +70,7 @@ foam.CLASS({
             self.value_ = v > startingValue ? v : startingValue
           }
         );
-      },
+      }
     },
     {
       /** @private */
@@ -129,8 +129,8 @@ foam.CLASS({
           }
         }
         return getDelegate().put_(x, obj);
-      `,
-    },
+      `
+    }
   ],
 
   axioms: [

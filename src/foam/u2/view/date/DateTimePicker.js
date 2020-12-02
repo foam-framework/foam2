@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'DateTimePicker',
   extends: 'foam.u2.view.date.AbstractDateView',
 
+  documentation: `
+  This is a simple date time picker for browsers that do not have their own implementation.
+  The date picker will automatically be used if it a browser does not support date, see Element.js`,
+
   requires: [
     'foam.u2.view.date.CalendarDatePicker',
     'foam.u2.view.date.Month',
@@ -65,7 +69,6 @@ foam.CLASS({
 
     ^ .year {
       border-radius: 5px 5px 0px 0px;
-      background-color: #406dea;
       background-color: /*%PRIMARY3%*/ #406dea;
       color: #ffffff;
       display: inline-block;
@@ -75,15 +78,21 @@ foam.CLASS({
       text-align: center;
     }
 
+    ^ .year .property-year {
+      padding-top:4px;
+    }
+
+    ^ .year .property-year .foam-u2-IntView {
+      width: 70px;
+      text-align: center;
+    }
+
     ^ .year-number {
       background: rgba(0,0,0,0);
       border: none;
       color: white;
       display: inline-block;
       font-size: large;
-      margin-left: 88px;
-      margin-top: 15px;
-      width: 128px;
     }
 
     ^ .arrow-left {
@@ -144,6 +153,7 @@ foam.CLASS({
     }
 
     ^ .calendar {
+      display: inline-block;
       text-align: center;
     }
 
@@ -181,7 +191,6 @@ foam.CLASS({
 
     ^ .date-display-text {
       display: inline-block;
-      color: #9ba1a6;
       margin-top: 9px;
       margin-left: 8px;
       width: 176px;

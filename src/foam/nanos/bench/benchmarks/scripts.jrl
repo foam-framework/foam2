@@ -1,0 +1,174 @@
+p({
+	"class": "foam.nanos.script.Script",
+	"id": "benchmarkDateFormat",
+	"description": "Benchmark Date Formatting",
+	"code": `import foam.nanos.bench.*;
+import foam.nanos.bench.benchmarks.*;
+import net.nanopay.bench.*;
+
+x = x.put("pmLogger", null);
+b = new DateFormatBenchmark();
+builder = new BenchmarkRunner.Builder(x).setInvocationCount(10000).setBenchmark(b);
+runner = builder.build();
+runner.execute(x);`,
+	"lastModifiedBy": 1348
+})
+
+p({
+	"class": "foam.nanos.script.Script",
+	"id": "benchmarkFileJournal",
+	"description": "Benchmark Writing to File Journal",
+	"code": """import foam.nanos.bench.*;
+import foam.nanos.bench.benchmarks.*;
+import net.nanopay.bench.*;
+
+x = x.put("pmLogger", null);
+b = new FileJournalBenchmark();
+builder = new BenchmarkRunner.Builder(x).setInvocationCount(100000).setBenchmark(b);
+runner = builder.build();
+runner.execute(x);
+print("done");
+print(runner.getResult());""",
+	"lastModifiedBy": 1348
+})
+
+p({
+	"class": "foam.nanos.script.Script",
+	"id": "benchmarkF3FileJournalReplay",
+	"description": "Benchmark replaying F3FileJournal",
+	"code": """import foam.nanos.bench.*;
+import foam.nanos.bench.benchmarks.*;
+import net.nanopay.bench.*;
+
+// x = x.put("pmLogger", null);
+b = new F3JournalReplayBenchmark(1000);
+builder = new BenchmarkRunner.Builder(x).setInvocationCount(1).setBenchmark(b);
+runner = builder.build();
+runner.execute(x);
+print("done");
+print(runner.getResult());""",
+	"lastModifiedBy": 1348
+})
+
+p({
+	"class": "foam.nanos.script.Script",
+	"id": "benchmarkFileJournalReplay",
+	"description": "Benchmark replaying Journal",
+	"code": """import foam.nanos.bench.*;
+import foam.nanos.bench.benchmarks.*;
+import net.nanopay.bench.*;
+
+// x = x.put("pmLogger", null);
+b = new JournalReplayBenchmark(1000);
+builder = new BenchmarkRunner.Builder(x).setInvocationCount(1).setBenchmark(b);
+runner = builder.build();
+runner.execute(x);
+print("done");
+print(runner.getResult());""",
+	"lastModifiedBy": 1348
+})
+
+p({
+	"class": "foam.nanos.script.Script",
+	"id": "benchmarkF3FileJournal",
+	"description": "Benchmark Writing to F3 File Journal",
+	"code": """import foam.nanos.bench.*;
+import foam.nanos.bench.benchmarks.*;
+import net.nanopay.bench.*;
+
+x = x.put("pmLogger", null);
+b = new F3FileJournalBenchmark();
+builder = new BenchmarkRunner.Builder(x).setInvocationCount(100000).setBenchmark(b);
+runner = builder.build();
+runner.execute(x);
+print("done");
+print(runner.getResult());""",
+	"lastModifiedBy": 1348
+})
+
+p({
+  "class": "foam.nanos.script.Script",
+  "id": "benchmarkPM",
+  "description": "Benchmark PM",
+  "code": """import foam.nanos.bench.*;
+import foam.nanos.bench.benchmarks.*;
+import net.nanopay.bench.*;
+import foam.nanos.pm.PM;
+
+x = x.put("pmLogger", null);
+PMBenchmark b = new PMBenchmark();
+builder = new BenchmarkRunner.Builder(x).setInvocationCount(100000).setBenchmark(b);
+runner = builder.build();
+runner.execute(x);""",
+  "lastModifiedBy": 1348
+})
+
+p({
+	"class": "foam.nanos.script.Script",
+	"id": "benchmarkJSONEscaping",
+  "description": "Benchmark JSON String escaping. Each iteration escapes 1000 strings.",
+	"code": """import foam.nanos.bench.benchmarks.*;
+import foam.nanos.bench.*;
+import net.nanopay.bench.*;
+
+b1 = new JSONOutputterEscapeBenchmark();
+b2 = new JSONUtilEscapeBenchmark();
+
+r1 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(10000).setBenchmark(b1).build();
+r2 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(10000).setBenchmark(b2).build();
+
+r1.execute(x);
+r2.execute(x);""",
+	"lastModifiedBy": 1348
+})
+
+p({
+	"class": "foam.nanos.script.Script",
+	"id": "benchmarkLogging",
+	"description": "Benchmark File Logger",
+	"code": """import foam.nanos.bench.*;
+import foam.nanos.bench.benchmarks.*;
+import net.nanopay.bench.*;
+
+x = x.put("pmLogger", null);
+b = new LoggingBenchmark();
+builder = new BenchmarkRunner.Builder(x).setInvocationCount(10000).setBenchmark(b);
+runner = builder.build();
+runner.execute(x);""",
+	"lastModifiedBy": 1348
+})
+
+p({
+	"class": "foam.nanos.script.Script",
+	"id": "benchmarkTimestamp",
+	"description": "Benchmark Fast Timestamper",
+	"code": """import foam.nanos.bench.*;
+import foam.nanos.bench.benchmarks.*;
+import net.nanopay.bench.*;
+
+x = x.put("pmLogger", null);
+b = new TimestampBenchmark();
+builder = new BenchmarkRunner.Builder(x).setInvocationCount(10000).setBenchmark(b);
+runner = builder.build();
+runner.execute(x);""",
+	"lastModifiedBy": 1348
+})
+
+p({
+	"class": "foam.nanos.script.Script",
+	"id": "benchmarkJSONFormatting",
+	"description": "Benchmark JSON Formatting",
+	"code": """import foam.nanos.bench.benchmarks.*;
+import foam.nanos.bench.*;
+import net.nanopay.bench.*;
+
+b1 = new JSONOutputterBenchmark();
+b2 = new JSONFormatterBenchmark();
+
+r1 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(100000).setBenchmark(b1).build();
+r2 = new BenchmarkRunner.Builder(x).setThreadCount(1).setInvocationCount(100000).setBenchmark(b2).build();
+
+r1.execute(x);
+r2.execute(x);""",
+	"lastModifiedBy": 1348
+})

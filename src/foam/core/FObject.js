@@ -573,10 +573,6 @@ foam.CLASS({
         var l = listeners.l;
         var s = listeners.sub;
 
-        // Update 'listeners' before notifying because the listener
-        // may set next to null.
-        listeners = listeners.next;
-
         // Like l.apply(l, [s].concat(Array.from(a))), but faster.
         // FUTURE: add benchmark to justify
         // ???: optional exception trapping, benchmark
@@ -597,6 +593,8 @@ foam.CLASS({
         } catch (x) {
           if ( foam._IS_DEBUG_ ) console.warn("Listener threw exception", x);
         }
+
+        listeners = listeners.next;
         count++;
       }
       return count;
@@ -721,11 +719,12 @@ foam.CLASS({
         l:    l
       };
       node.sub.detach = function() {
-        if ( node.next ) node.next.prev = node.prev;
-        if ( node.prev ) node.prev.next = node.next;
+        if ( node.prev ) {
+          node.prev.next = node.next;
+          if ( node.next ) node.next.prev = node.prev;
+        }
 
-        // Disconnect so that calling detach more than once is harmless
-        node.next = node.prev = null;
+        node.prev = null;
       };
 
       if ( listeners.next ) listeners.next.prev = node;
@@ -740,6 +739,7 @@ foam.CLASS({
        * different.
        */
       if ( Object.is(oldValue, newValue) ) return;
+      if ( foam.Date.isInstance(newValue) && foam.Date.equals(newValue, oldValue) ) return;
       if ( ! this.hasListeners('propertyChange', prop.name) ) return;
 
       var slot = prop.toSlot(this);
@@ -747,19 +747,19 @@ foam.CLASS({
       this.pub('propertyChange', prop.name, slot);
     },
 
-    function slot(obj) {
+    function slot(obj /*, argList if obj is a function */) {
       /**
        * Creates a Slot for an Axiom.
        */
       if ( typeof obj === 'function' ) {
         return foam.core.ExpressionSlot.create(
-            arguments.length === 1 ?
-                { code: obj, obj: this } :
-                {
-                  code: obj,
-                  obj: this,
-                  args: Array.prototype.slice.call(arguments, 1)
-                });
+          arguments.length === 1 ?
+            { code: obj, obj: this } :
+            {
+              code: obj,
+              obj: this,
+              args: Array.prototype.slice.call(arguments, 1)
+            });
       }
 
       if ( foam.Array.isInstance(obj) ) {

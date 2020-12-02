@@ -25,5 +25,5 @@ foam.CLASS({
       name: 'writeView',
       value: { class: 'foam.u2.IntView' }
     }
-  ],
+  ]
 });

@@ -24,9 +24,8 @@ public class DAOPMLogger
     for ( int i = 0 ; i < locks_.length ; i++ ) locks_[i] = new Object();
   }
 
-
   protected Object getLock(PMInfo pmi) {
-    int hash = pmi.getClsName().hashCode() * 31 + pmi.getName().hashCode();
+    int hash = pmi.getKey().hashCode() * 31 + pmi.getName().hashCode();
     return locks_[(int) Math.abs(hash % locks_.length)];
   }
 
@@ -36,14 +35,15 @@ public class DAOPMLogger
     if (
       // TODO: maybe an exclusion list for names in this package instead
       //       of an inclusion list for names in outside packages
-      ! pm.getClassType().getId().equals("foam.dao.PMDAO") &&
-      ! pm.getClassType().getId().equals("foam.dao.PipelinePMDAO") &&
-      ! pm.getClassType().getId().equals("foam.nanos.auth.PMAuthService")
+      ! pm.getKey().equals("foam.dao.PMDAO") &&
+      ! pm.getKey().equals("foam.dao.PipelinePMDAO") &&
+      ! pm.getKey().equals("foam.nanos.auth.PMAuthService")
     ) {
-      if ( pm.getClassType().getId().indexOf("PM") != -1 ) return;
-      if ( pm.getName().indexOf("PM")              != -1 ) return;
-      if ( pm.getClassType().getId().indexOf("pm") != -1 ) return;
-      if ( pm.getName().indexOf("pm")              != -1 ) return;
+      if ( pm.getKey().indexOf("PM")  != -1 ) return;
+      if ( pm.getName().indexOf("PM") != -1 ) return;
+      if ( pm.getKey().indexOf("pm")  != -1 ) return;
+      if ( pm.getName().indexOf("pm") != -1 ) return;
+      if ( pm.getName().indexOf("LogMessage") != -1 ) return;
     }
 
     // Candlestick, too slow
@@ -53,7 +53,7 @@ public class DAOPMLogger
     // Regular PMInfo
     // TODO: could reuse the PMInfo by also using it as the lock object
     PMInfo pmi = new PMInfo();
-    pmi.setClsName(pm.getClassType().getId());
+    pmi.setKey(pm.getKey());
     pmi.setName(pm.getName());
     DAO pmd = (DAO) getX().get(PM_INFO_DAO_NAME);
 

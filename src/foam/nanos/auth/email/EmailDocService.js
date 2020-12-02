@@ -19,8 +19,8 @@ foam.CLASS({
     'email',
     'localUserDAO',
     'tokenDAO',
-    'htmlDocDAO',
-    'logger'
+    'DAO htmlDocDAO',
+    'Logger logger'
   ],
 
   javaImports: [

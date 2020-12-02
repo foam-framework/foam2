@@ -44,6 +44,7 @@ public class ExprParser
     super(new Alt(
       new PropertyReferenceParser(),
       ClassReferenceParser.instance(),
+      ObjectDateParser.instance(),
       FObjectParser.create(defaultClass)));
   }
 }

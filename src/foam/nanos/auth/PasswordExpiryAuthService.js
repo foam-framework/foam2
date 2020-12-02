@@ -16,40 +16,47 @@ foam.CLASS({
   ],
 
   imports: [
-    'localUserDAO'
+    'DAO localUserDAO'
   ],
 
   javaImports: [
     'foam.dao.DAO',
     'foam.nanos.NanoService',
-    'static foam.mlang.MLang.EQ'
+    'foam.nanos.auth.User',
+
+    'static foam.mlang.MLang.AND',
+    'static foam.mlang.MLang.OR',
+    'static foam.mlang.MLang.EQ',
+    'static foam.mlang.MLang.CLASS_OF'
   ],
 
   methods: [
     {
       name: 'start',
       javaCode:
-`if ( getDelegate() instanceof NanoService ) {
-  ((NanoService) getDelegate()).start();
-}`
+        `if ( getDelegate() instanceof NanoService ) {
+          ((NanoService) getDelegate()).start();
+        }`
     },
     {
       name: 'login',
       javaCode:
-`User user = (User) ((DAO) getLocalUserDAO()).find(userId);
-if ( isPasswordExpired(user) ) {
-  throw new AuthenticationException("Password expired");
-}
-return getDelegate().login(x, userId, password);`
-    },
-    {
-      name: 'loginByEmail',
-      javaCode:
-`User user = (User) ((DAO) getLocalUserDAO()).inX(x).find(EQ(User.EMAIL, email.toLowerCase()));
-if ( isPasswordExpired(user) ) {
-  throw new AuthenticationException("Password expired");
-}
-return getDelegate().loginByEmail(x, email, password);`
+        `User user = (User) ((DAO) getLocalUserDAO())
+          .inX(x)
+          .find(
+            AND(
+              OR(
+                EQ(User.EMAIL, identifier.toLowerCase()),
+                EQ(User.USER_NAME, identifier)
+              ),
+              CLASS_OF(User.class)
+            )
+          );
+
+        if ( isPasswordExpired(user) ) {
+          throw new AuthenticationException("Password expired");
+        }
+        return getDelegate().login(x, identifier, password);`
     },
     {
       name: 'isPasswordExpired',
@@ -59,15 +66,15 @@ return getDelegate().loginByEmail(x, email, password);`
       args: [
         {
           name: 'user',
-          type: 'foam.nanos.auth.User'
+          type: 'User'
         }
       ],
       javaCode:
-`if ( user == null ) {
-  throw new AuthenticationException("User not found");
-}
-// if we are after the expiry date then prevent login
-return user.getPasswordExpiry() != null && user.getPasswordExpiry().getTime() < System.currentTimeMillis();`
+        `if ( user == null ) {
+          throw new AuthenticationException("User not found");
+        }
+        // if we are after the expiry date then prevent login
+        return user.getPasswordExpiry() != null && user.getPasswordExpiry().getTime() < System.currentTimeMillis();`
     }
   ]
 });

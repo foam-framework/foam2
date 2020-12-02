@@ -11,16 +11,14 @@ foam.CLASS({
 
   css: `
     ^ {
-      border-radius: 6px;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
-      border: solid 1px #e7eaec;
       background-color: #ffffff;
+      border: solid 1px #e7eaec;
+      box-shadow: 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12), 0 2px 4px -1px rgba(0,0,0,0.20);
+      padding: 6px;
     }
   `,
 
-  documentation: `
-    A stylized border. Intended for use when creating cards.
-  `,
+  documentation: 'A stylized border. Intended for use when creating cards.',
 
   methods: [
     function initE() {

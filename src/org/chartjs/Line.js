@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'org.chartjs',
   name: 'Line',
   extends: 'org.chartjs.AbstractChartCView',
+  flags: ['web'],
   properties: [
     ['chartType', 'line'],
   ],

@@ -78,7 +78,6 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
-          private X x_;
           private DAO dao_;
           private FObject enabled_;
           private FObject disabled_;

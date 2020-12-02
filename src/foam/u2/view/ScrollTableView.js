@@ -9,15 +9,26 @@
   name: 'ScrollTableView',
   extends: 'foam.u2.Element',
 
+  imports: [
+    'stack'
+  ],
+
+  exports: [
+    'as summaryView',
+    'dblclick'
+  ],
+
   requires: [
     'foam.dao.FnSink',
     'foam.mlang.sink.Count',
-    'foam.u2.view.TableView'
+    'foam.u2.view.TableView',
+    'foam.comics.v2.DAOControllerConfig'
   ],
 
   css: `
     ^ {
       overflow: scroll;
+      padding-bottom: 20px;
     }
     ^table {
       position: relative;
@@ -70,6 +81,7 @@
       name: 'daoCount'
     },
     'selection',
+    'disableUserSelection',
     {
       class: 'Boolean',
       name: 'editColumnsEnabled',
@@ -148,12 +160,33 @@
       class: 'Map',
       name: 'renderedPages_'
     },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.comics.v2.DAOControllerConfig',
+      name: 'config',
+      factory: function() {
+        return this.DAOControllerConfig.create({ dao: this.data });
+      }
+    },
+    {
+      name: 'dblClickListenerAction',
+      factory: () => {
+        return function(obj, id) {
+          if ( ! this.stack ) return;
+          this.stack.push({
+            class: 'foam.comics.v2.DAOSummaryView',
+            data: obj,
+            config: this.config,
+            id: id
+          }, this);
+        }
+      }
+    }
   ],
 
   reactions: [
     ['', 'propertyChange.currentTopPage_', 'updateRenderedPages_'],
-    ['', 'propertyChange.table_', 'updateRenderedPages_'],
-    ['', 'propertyChange.daoCount', 'refresh'],
+    ['', 'propertyChange.table_',          'updateRenderedPages_']
   ],
 
   methods: [
@@ -172,6 +205,7 @@
           contextMenuActions: this.contextMenuActions,
           selection$: this.selection$,
           editColumnsEnabled: this.editColumnsEnabled,
+          disableUserSelection: this.disableUserSelection,
           multiSelectEnabled: this.multiSelectEnabled,
           selectedObjects$: this.selectedObjects$
         }, this.table_$).
@@ -186,7 +220,7 @@
         take the whole page (i.e. we need multiple tables)
         and enableDynamicTableHeight can be switched off
       */
-      if (this.enableDynamicTableHeight) {
+      if ( this.enableDynamicTableHeight ) {
         this.onDetach(this.onload.sub(this.updateTableHeight));
         window.addEventListener('resize', this.updateTableHeight);
         this.onDetach(() => {
@@ -215,6 +249,7 @@
       code: function() {
         return this.data$proxy.select(this.Count.create()).then((s) => {
           this.daoCount = s.value;
+          this.refresh();
         });
       }
     },
@@ -246,7 +281,6 @@
           this.table_.add(tbody);
           this.renderedPages_[page] = tbody;
         }
-
       }
     },
     {
@@ -271,6 +305,9 @@
 
         this.style({ height: `${remainingSpace}px` });
       }
+    },
+    function dblclick(obj, id) {
+      this.dblClickListenerAction(obj, id);
     }
   ]
 });

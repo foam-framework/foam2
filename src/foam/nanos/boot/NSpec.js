@@ -45,7 +45,15 @@ foam.CLASS({
     {
       class: 'String',
       name: 'description',
+      shortName: 'd',
       width: 120
+    },
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      value: true,
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'Boolean',
@@ -80,6 +88,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'authenticate',
+      shortName: 'a',
       value: true,
       tableCellFormatter: function(value, obj, property) {
         this
@@ -122,13 +131,14 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'service',
-      view: { class: 'foam.u2.detail.SectionedDetailView' },
+      view: 'foam.u2.view.FObjectView',
       readPermissionRequired: true,
       writePermissionRequired: true
     },
     {
       class: 'String',
       name: 'serviceClass',
+      shortName: 'sc',
       displayWidth: 80,
       readPermissionRequired: true,
       writePermissionRequired: true
@@ -136,6 +146,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'boxClass',
+      shortName: 'bc',
       displayWidth: 80,
       readPermissionRequired: true,
       writePermissionRequired: true
@@ -154,17 +165,20 @@ foam.CLASS({
     {
       class: 'Code',
       name: 'serviceScript',
+      shortName: 'ss',
       readPermissionRequired: true,
       writePermissionRequired: true
     },
     {
       class: 'Code',
       name: 'client',
+      shortName: 'c',
       value: '{}'
     },
     {
       class: 'String',
       name: 'documentation',
+      shortName: 'doc',
       view: {
         class: 'foam.u2.view.ModeAltView',
         writeView: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 140 },
@@ -185,16 +199,20 @@ foam.CLASS({
       writePermissionRequired: true
     },
     {
-      class: 'Boolean',
-      name: 'enabled',
-      value: true,
-      readPermissionRequired: true,
-      writePermissionRequired: true
+      class: 'StringArray',
+      name: 'keywords',
+      shortName: 'ks'
     },
     {
-          class: 'StringArray',
-          name: 'keywords'
+      class: 'StringArray',
+      name: 'keywords'
     },
+      class: 'String',
+      name: '_choiceText_',
+      transient: true,
+      javaGetter: 'return getName();',
+      getter: function() { return this.name; }
+    }
     // TODO: permissions, lazy, parent
     {
       class: 'Object',
@@ -292,11 +310,14 @@ foam.CLASS({
         var service = this.__context__[this.name];
         if ( foam.dao.DAO.isInstance(service) ) {
           this.__context__.stack.push({
-            class: 'foam.comics.BrowserView',
-            createEnabled: true,
-            editEnabled: true,
-            exportEnabled: true,
-            data: service
+            class: 'foam.comics.v2.DAOBrowseControllerView',
+            data: service,
+            config: {
+              class: 'foam.comics.v2.DAOControllerConfig',
+              dao: service,
+              createPredicate: foam.mlang.predicate.True,
+              editPredicate: foam.mlang.predicate.True
+            }
           });
         }
       }

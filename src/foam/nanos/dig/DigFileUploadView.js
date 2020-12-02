@@ -11,14 +11,17 @@ foam.CLASS({
 
   requires: [
     'foam.blob.BlobBlob',
+    'foam.log.LogLevel',
     'foam.nanos.fs.File',
-    'foam.u2.dialog.NotificationMessage',
+    'foam.nanos.notification.Notification',
+    'foam.nanos.notification.ToastState',
     'foam.u2.tag.Input'
   ],
 
   imports: [
     'user',
-    'blobService'
+    'blobService',
+    'notify'
   ],
 
   exports: [
@@ -222,14 +225,14 @@ foam.CLASS({
           if ( this.isFileType(file) )
             this.addFile(file);
           else
-            this.add(this.NotificationMessage.create({message: this.FileTypeError, type: 'error'}));
+            this.notify(this.FileTypeError, '', this.LogLevel.ERROR, true);
         }
       } else if ( e.dataTransfer.files ) {
         var file = e.dataTransfer.files[0];
         if ( this.isFileType(file) )
           this.addFile(file);
         else
-          this.add(this.NotificationMessage.create({message: this.FileTypeError, type: 'error'}));
+          this.notify(this.FileTypeError, '', this.LogLevel.ERROR, true);
       }
     },
 
@@ -247,7 +250,7 @@ foam.CLASS({
 
     function addFile(file) {
       if ( file.size > ( 2 * 1024 * 1024 ) ) {
-        this.add(this.NotificationMessage.create({ message: this.ErrorMessage, type: 'error' }));
+        this.notify(this.ErrorMessage, '', this.LogLevel.ERROR, true);
         return;
       }
 

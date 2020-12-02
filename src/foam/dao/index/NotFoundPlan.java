@@ -29,4 +29,8 @@ public class NotFoundPlan implements FindPlan, SelectPlan
     return;
   }
 
+  @Override
+  public String toString() {
+    return "not-found(cost:" + cost() + ")";
+  }
 }

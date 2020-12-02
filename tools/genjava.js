@@ -4,6 +4,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+var path_ = require('path');
+var fs_   = require('fs');
+
 process.on('unhandledRejection', function(e) {
   console.error("ERROR: Unhandled promise rejection ", e);
   process.exit(1);
@@ -18,10 +21,18 @@ if ( foamlinkMode ) {
   global.FOAMLINK_DATA = process.env['FOAMLINK_DATA'];
 }
 
+var logger = {};
+logger.debug = () => {};
+
 // Store debug files but only if DEBUG_DATA_DIR is set in environment
 var debugDataDir = null;
 if ( process.env.hasOwnProperty('DEBUG_DATA_DIR') ) {
   debugDataDir = process.env['DEBUG_DATA_DIR'];
+  logger.debug = (...args) => {
+    fs_.appendFileSync(path_.join(debugDataDir, 'debugLog.jrl'),
+      args.join('p({"type": "debug", "value": ' + JSON.stringify(args) + '})\n')
+    );
+  };
 }
 
 require('../src/foam.js');
@@ -50,10 +61,8 @@ if ( process.argv.length > 5  &&
      process.argv[5] !== '--' &&
      process.argv[5] != '' ) {
   incrementalMeta = JSON.parse(process.argv[5]);
+  logger.debug('INCREMENTAL', process.argv[5]);
 }
-
-var path_ = require('path');
-var fs_ = require('fs');
 
 var indir = process.argv[2];
 indir = path_.resolve(path_.normalize(indir));
@@ -78,9 +87,11 @@ var debugFilesWritten = [];
 if ( incrementalMeta !== null && foamlinkMode ) {
   fileWhitelist = {}; // set
   for ( var i = 0; i < incrementalMeta.modified.length; i++ ) {
-    fileWhitelist[incrementalMeta.modified[i]] = true;
+    let relativePath = path_.relative(process.cwd(), incrementalMeta.modified[i]);
+    fileWhitelist[relativePath] = true;
   }
 }
+logger.debug('fileWhitelist', fileWhitelist);
 
 [
   'FObject',
@@ -99,11 +110,10 @@ if ( incrementalMeta !== null && foamlinkMode ) {
   // compile properly.
   'foam.blob.BlobBlob',
   'foam.dao.CompoundDAODecorator',
-  'foam.dao.DAODecorator',
+  'foam.dao.DAOInterceptor',
   'foam.dao.FlowControl',
   'foam.dao.sync.SyncRecord',
   'foam.dao.sync.VersionedSyncRecord',
-  'foam.mlang.order.ThenBy',
   'foam.mlang.Expressions',
   'foam.nanos.menu.MenuBar',
 
@@ -117,7 +127,7 @@ if ( incrementalMeta !== null && foamlinkMode ) {
   'foam.dao.TTLCachingDAO',
   'foam.dao.CachingDAO',
   'foam.dao.CompoundDAODecorator',
-  'foam.dao.DecoratedDAO',
+  'foam.dao.InterceptedDAO',
   'foam.dao.DeDupDAO',
   'foam.dao.IDBDAO',
   'foam.dao.LoggingDAO',
@@ -156,6 +166,7 @@ function loadClass(c) {
     path = path + c[0];
     c = c[1];
   }
+
   if ( ! foam.lookup(c, true) ) {
     console.warn("Using fallback model loading; " +
       "may cause errors for files with multiple definitions.");
@@ -166,14 +177,18 @@ function loadClass(c) {
 }
 
 function generateClass(cls) {
+  logger.debug('call/generateClass:cls', ''+cls);
   if ( foam.Array.isInstance(cls) ) {
     cls = cls[1];
   }
   if ( typeof cls === 'string' )
     cls = foam.lookup(cls);
 
+  logger.debug('call/generateClass:cls.id', cls.id);
+
   if ( fileWhitelist !== null ) {
     let src = cls.model_.source;
+    logger.debug('call/generateClass:src', cls.id, src);
     if ( ! src ) {
       classesNotFound[cls.id] = true;
     } else {
@@ -184,6 +199,7 @@ function generateClass(cls) {
       }
     }
   }
+  logger.debug('call/generateClass:cls.id,build?', cls.id, 'true');
 
   var outfile = outdir + path_.sep +
     cls.id.replace(/\./g, path_.sep) + '.java';
@@ -291,9 +307,18 @@ var addDepsToClasses = function() {
     function collectDeps() {
       var classMap = {};
       var classQueue = classes.slice(0);
+      const PRINT_LIMIT = 25;
+      let printCounter = 0;
       while ( classQueue.length ) {
         var cls = classQueue.pop();
         if ( ! classMap[cls] && ! blacklist[cls] ) {
+          if ( printCounter < PRINT_LIMIT ) {
+            console.log('generating', cls);
+            printCounter = printCounter + 1;
+          } else if ( printCounter == PRINT_LIMIT ) {
+            console.log('generating ...');
+            printCounter = printCounter + 1;
+          }
           cls = foam.lookup(cls);
           if ( ! checkFlags(cls.model_) ) continue;
           classMap[cls.id] = true;

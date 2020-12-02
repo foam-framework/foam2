@@ -123,11 +123,13 @@ foam.CLASS({
           },
           set: function(x) {
             if ( x ) {
+              // Set either contextParent or __context__, depending on if x is
+              // an FObject or Context
               this.setPrivate_(
-                  foam.core.FObject.isInstance(x) ?
-                      'contextParent' :
-                      '__context__',
-                  x);
+                foam.core.FObject.isInstance(x) ?
+                    'contextParent' :
+                    '__context__',
+                x);
             }
           }
         });
@@ -140,8 +142,8 @@ foam.CLASS({
               get: function() { return this.__context__; },
               set: function() {
                 throw new Error(
-                    'Attempted to set unsettable __subContext__ in ' +
-                    this.cls_.id);
+                  'Attempted to set unsettable __subContext__ in ' +
+                  this.cls_.id);
               }
             });
       }
@@ -189,6 +191,10 @@ foam.boot.end();
 
   A storageTransient field is not stored to persistent storage.
   foam.json.Storage does not encode storageTransient fields.
+
+  A storageOptional field is not stored to persistent storage if
+  if it is the only field to be persisted, or the only fields to
+  be persisted are all storageOptional.
  */
 foam.CLASS({
   refines: 'foam.core.Property',
@@ -207,10 +213,21 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'externalTransient',
+      expression: function(transient) {
+        return transient;
+      }
+    },
+    {
+      class: 'Boolean',
       name: 'storageTransient',
       expression: function(transient) {
         return transient;
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'storageOptional'
     }
   ]
 });

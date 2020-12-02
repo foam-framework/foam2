@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'ArrayDAO',
   extends: 'foam.dao.AbstractDAO',
+  abstract: true,
 
   documentation: 'DAO implementation backed by an array.',
 

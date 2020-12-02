@@ -26,7 +26,8 @@ foam.CLASS({
           useTemplateLiterals: true,
           propertyPredicate: function(o, p) { return ! p.storageTransient; }
         };
-       }
+       },
+       hidden:true
     }
   ],
 

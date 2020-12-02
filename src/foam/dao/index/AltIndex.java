@@ -128,7 +128,6 @@ public class AltIndex
       }
 
       SelectPlan plan = delegates_.get(i).planSelect(s[i], sink, skip, limit, order, originalPredicate);
-      bestState = s[i];
 
       if ( plan.cost() < bestPlan.cost() ) {
         bestPlan  = plan;

@@ -15,7 +15,8 @@ foam.INTERFACE({
       name: 'lastModifiedBy',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      documentation: 'User who last modified entry'
+      documentation: 'User who last modified entry',
+      storageOptional: true
     }
   ]
 });
@@ -42,7 +43,7 @@ foam.CLASS({
       documentation: 'User who last modified entry',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative'
+      section: 'userInformation'
     }
   ]
 });

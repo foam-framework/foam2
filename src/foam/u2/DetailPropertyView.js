@@ -22,15 +22,6 @@ foam.CLASS({
 
   documentation: 'View for one row/property of a DetailView.',
 
-  properties: [
-    'prop',
-    [ 'nodeName', 'tr' ],
-    {
-      name: 'label',
-      factory: function() { return this.prop.label }
-    }
-  ],
-
   css: `
     .foam-u2-PropertyView-label {
       color: #444;
@@ -53,6 +44,15 @@ foam.CLASS({
     }
   `,
 
+  properties: [
+    'prop',
+    [ 'nodeName', 'tr' ],
+    {
+      name: 'label',
+      factory: function() { return this.prop.label }
+    }
+  ],
+
   methods: [
     function initE() {
       var prop = this.prop;
@@ -60,6 +60,7 @@ foam.CLASS({
         show(prop.createVisibilityFor(this.__context__.data$, this.controllerMode$).map(function(m) {
           return m != foam.u2.DisplayMode.HIDDEN;
         })).
+        addClass(this.myClass()).
         addClass('foam-u2-PropertyView').
         addClass('foam-u2-PropertyView-prop-' + prop.name).
         start('td').addClass('foam-u2-PropertyView-label').add(this.label).end().

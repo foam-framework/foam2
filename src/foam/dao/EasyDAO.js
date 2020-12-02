@@ -46,7 +46,7 @@ foam.CLASS({
     'foam.dao.CompoundDAODecorator',
     'foam.dao.ContextualizingDAO',
     'foam.dao.DeDupDAO',
-    'foam.dao.DecoratedDAO',
+    'foam.dao.InterceptedDAO',
     'foam.dao.GUIDDAO',
     'foam.dao.IDBDAO',
     {
@@ -70,6 +70,7 @@ foam.CLASS({
     'foam.dao.JournalType',
     'foam.nanos.auth.ServiceProviderAware',
     'foam.nanos.auth.ServiceProviderAwareDAO',
+    'foam.nanos.crunch.box.CrunchClientBox',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.LoggingDAO'
   ],
@@ -77,6 +78,7 @@ foam.CLASS({
   imports: [ 'document', 'log' ],
 
   javaImports: [
+    'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger'
   ],
 
@@ -106,8 +108,10 @@ foam.CLASS({
       javaFactory: `
       if ( getNSpec() != null ) {
         return getNSpec().getName();
+      } else if ( this.getOf() != null ) {
+        return this.getOf().getId();
       }
-      return this.getOf().getId();
+      return "";
      `
     },
     {
@@ -116,33 +120,76 @@ foam.CLASS({
       type: 'foam.nanos.boot.NSpec'
     },
     {
+      /**
+       * TODO: More investigation needed at https://github.com/foam-framework/foam2/pull/4085
+       * Even though this property doesn't get called
+       * If you uncomment the javaFactory it will break debuggers
+       * To reproduce:
+       * 1. Uncomment the javaFactory below
+       * 2. Using intellij, set a breakpoint in a try block within an agency.submit
+       * 3. Trigger the breakpoint
+       * 4. Step over the line
+       * 5. Server should be hanging no threads available to stop the server using Ctrl+C
+       * 6. Intellij should be stuck on "Waiting until last debugger command completes"
+       * 7. Java core dumps should appear as well
+       * 8. Need to resort to using kill -9 on both the server & debugger
+       */
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      visibility: 'HIDDEN',
+      /*
+      javaFactory: `
+        Logger logger = (Logger) getX().get("logger");
+        if ( logger == null ) {
+          logger = new foam.nanos.logger.StdoutLogger();
+        }
+
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, logger);
+      `
+      */
+    },
+    {
       /** This is set automatically when you create an EasyDAO.
         @private */
       name: 'delegate',
       javaFactory: `
+        // TODO: replace logger instantiation once javaFactory issue above is fixed
         Logger logger = (Logger) getX().get("logger");
+        if ( logger == null ) {
+          logger = new foam.nanos.logger.StdoutLogger();
+        }
+
+        logger = new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, logger);
 
         foam.dao.DAO delegate = getInnerDAO();
-        foam.dao.DAO head = delegate;
-        foam.dao.ProxyDAO pxy = null;
-        while( head instanceof foam.dao.ProxyDAO ) {
-          pxy = (foam.dao.ProxyDAO) head;
-          head = ( (ProxyDAO) head).getDelegate();
-        }
-        if ( head instanceof foam.dao.MDAO ) {
-          setMdao((foam.dao.MDAO)head);
-          if ( getIndex() != null && getIndex().length > 0 )
-            getMdao().addIndex(getIndex());
-        }
-        if ( getFixedSize() != null ) {
-          if ( head instanceof foam.dao.MDAO && pxy != null ) {
-            foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
-            fixedSizeDAO.setDelegate(head);
-            pxy.setDelegate(fixedSizeDAO);
-          }
-          else {
-            logger.error(this.getClass().getSimpleName(), "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_, "FixedSizeDAO did not find instanceof MDAO");
-            System.exit(1);
+        if ( delegate == null ) {
+          if ( getNullify() ) {
+            delegate = new foam.dao.NullDAO(getX(), getOf());
+          } else {
+            if ( getMdao() == null ) {
+              setMdao(new foam.dao.MDAO(getOf()));
+            }
+            delegate = getMdao();
+            if ( getIndex() != null && getIndex().length > 0 ) {
+              ((foam.dao.MDAO) getMdao()).addIndex(getIndex());
+            }
+            if ( getFixedSize() != null ) {
+              foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
+              fixedSizeDAO.setDelegate(getMdao());
+              setMdao(fixedSizeDAO);
+            }
+            if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
+              if ( getWriteOnly() ) {
+                delegate = new foam.dao.WriteOnlyJDAO(getX(), getMdao(), getOf(), getJournalName());
+              } else {
+                delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName());
+              }
+            }
           }
         }
 
@@ -150,16 +197,31 @@ foam.CLASS({
 
         if ( getDecorator() != null ) {
           if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
-            logger.error(this.getClass().getSimpleName(), "delegate", "NSpec.name", (getNSpec() != null ) ? getNSpec().getName() : null, "of_", of_ , "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
+            logger.error(getName(), "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
             System.exit(1);
           }
           // The decorator dao may be a proxy chain
           ProxyDAO proxy = (ProxyDAO) getDecorator();
-          while ( proxy.getDelegate() != null &&
-                  proxy.getDelegate() instanceof ProxyDAO )
+          while ( proxy.getDelegate() != null && proxy.getDelegate() instanceof ProxyDAO )
             proxy = (ProxyDAO) proxy.getDelegate();
           proxy.setDelegate(delegate);
           delegate = (ProxyDAO) getDecorator();
+        }
+
+        if ( getApprovableAware() ) {
+          var delegateBuilder = new foam.nanos.approval.ApprovableAwareDAO
+            .Builder(getX())
+            .setDaoKey(getName())
+            .setOf(getOf())
+            .setDelegate(delegate);
+          if(approvableAwareServiceNameIsSet_)
+            delegateBuilder.setServiceName(getApprovableAwareServiceName());
+
+          delegate = delegateBuilder.build();
+
+          if ( getApprovableAwareEnabled() ) {
+            logger.warning("DEPRECATED: EasyDAO", getName(), "'approvableAwareEnabled' is deprecated. Please remove it from the nspec.");
+          }
         }
 
         if ( getGuid() && getSeqNo() )
@@ -191,10 +253,6 @@ foam.CLASS({
           delegate = dao;
         }
 
-        if ( getLifecycleAware() && getDeletedAware() ){
-          throw new RuntimeException("Both DeletedAware and LifecycleAware cannot be used simultaneously");
-        }
-
         if ( getLifecycleAware() ) {
           delegate = new foam.nanos.auth.LifecycleAwareDAO.Builder(getX())
             .setDelegate(delegate)
@@ -203,12 +261,7 @@ foam.CLASS({
         }
 
         if ( getDeletedAware() ) {
-          logger.warning("EasyDAO", getName(), "DEPRECATED: DeletedAware. Use LifecycleAware instead");
-
-          delegate = new foam.nanos.auth.DeletedAwareDAO.Builder(getX())
-            .setDelegate(delegate)
-            .setName(getPermissionPrefix())
-            .build();
+          System.out.println("DEPRECATED: Will be completely removed after services journal migration script. No functionality as of now.");
         }
 
         if ( getRuler() ) {
@@ -227,6 +280,9 @@ foam.CLASS({
 
         if ( getLastModifiedByAware() )
           delegate = new foam.nanos.auth.LastModifiedByAwareDAO.Builder(getX()).setDelegate(delegate).build();
+
+        if ( getCapable() )
+          delegate = new foam.nanos.crunch.lite.CapableDAO.Builder(getX()).setDaoKey(getName()).setDelegate(delegate).build();
 
         if ( getContextualize() ) {
           delegate = new foam.dao.ContextualizingDAO.Builder(getX()).
@@ -247,10 +303,14 @@ foam.CLASS({
             .build();
         }
 
-        if ( getNSpec() != null && getNSpec().getServe() && ! getAuthorize() && ! getReadOnly() )
-          logger.warning("EasyDAO", getNSpec().getName(), "Served DAO should be Authorized, or ReadOnly");
+        if ( getNSpec() != null &&
+             getNSpec().getServe() &&
+             ! getAuthorize() &&
+             ! getReadOnly() )
+          logger.warning("EasyDAO", getName(), "Served DAO should be Authorized, or ReadOnly");
 
-        if ( getPermissioned() && ( getNSpec() != null && getNSpec().getServe() ) )
+        if ( getPermissioned() &&
+            ( getNSpec() != null && getNSpec().getServe() ) )
           delegate = new foam.nanos.auth.PermissionedPropertyDAO.Builder(getX()).setDelegate(delegate).build();
 
         if ( getReadOnly() )
@@ -273,16 +333,6 @@ foam.CLASS({
       class: 'Object',
       type: 'foam.dao.DAO',
       name: 'innerDAO',
-      javaFactory: `
-      if ( getNullify() ) {
-        return new foam.dao.NullDAO.Builder(getX())
-        .setOf(getOf())
-        .build();
-      }
-      if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) )
-        return new foam.dao.java.JDAO(getX(), getOf(), getJournalName());
-      return new foam.dao.MDAO(getOf());
-      `
     },
     {
       class: 'Object',
@@ -376,6 +426,11 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'readOnly',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'writeOnly',
       value: false
     },
     {
@@ -474,8 +529,7 @@ foam.CLASS({
       value: 'foam.dao.IDBDAO'
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.dao.MDAO',
+      class: 'foam.dao.DAOProperty',
       name: 'mdao'
     },
     {
@@ -524,6 +578,11 @@ foam.CLASS({
       generateJava: false,
     },
     {
+      name: 'crunchBoxEnabled',
+      generateJava: false,
+      value: true
+    },
+    {
       documentation: 'Destination address for server',
       name: 'serverBox',
       generateJava: false,
@@ -533,12 +592,15 @@ foam.CLASS({
           delegate: this.remoteListenerSupport ?
             this.WebSocketBox.create({ uri: this.serviceName }) :
             this.HTTPBox.create({ url: this.serviceName })
-        })
+        });
         if ( this.retryBoxMaxAttempts != 0 ) {
           box = this.RetryBox.create({
             maxAttempts: this.retryBoxMaxAttempts,
             delegate: box,
           })
+        }
+        if ( this.crunchBoxEnabled ) {
+          box = this.CrunchClientBox.create({ delegate: box });
         }
         return this.SessionClientBox.create({ delegate: box });
       }
@@ -550,7 +612,7 @@ foam.CLASS({
     },
     {
       class: 'FObjectArray',
-      of: 'foam.dao.DAODecorator',
+      of: 'foam.core.FObject',
       generateJava: false,
       name: 'decorators'
     },
@@ -594,11 +656,6 @@ model from which to test ServiceProvider ID (spid)`,
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.LifecycleAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
-      name: 'deletedAware',
-      class: 'Boolean',
-      javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.DeletedAware.class.isAssignableFrom(getOf().getObjClass());'
-    },
-    {
       name: 'createdAware',
       class: 'Boolean',
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.CreatedAware.class.isAssignableFrom(getOf().getObjClass());'
@@ -619,18 +676,73 @@ model from which to test ServiceProvider ID (spid)`,
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.LastModifiedByAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
+      name: 'capable',
+      class: 'Boolean',
+      javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.crunch.lite.Capable.class.isAssignableFrom(getOf().getObjClass());'
+    },
+    {
       name: 'fixedSize',
       class: 'FObjectProperty',
       of: 'foam.dao.FixedSizeDAO'
     },
- ],
+    {
+      name: 'approvableAware',
+      class: 'Boolean',
+      documentation: `
+        Denotes if a model is approvable aware, and if so it should ALWAYS have this decorator on,
+        if an object is ApprovableAware but the user want the object to skip the checker/approval
+        phase, they should set the object checkerPredicate such that it is evaluated to false.
+
+        Setting easyDAO.approvableAware to false, on the other hand, would opt-out the decorator
+        (ie. ApprovableAwareDAO) completely and since ApprovableAware interface implements
+        LifecycleAware the lifecycleState property on the object will not be changed to ACTIVE.
+      `,
+      javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.approval.ApprovableAware.class.isAssignableFrom(getOf().getObjClass());'
+    },
+    {
+      name: 'approvableAwareEnabled',
+      class: 'Boolean',
+      documentation: `
+        DEPRECATING: Will be removed after services migration. Please use 'approvableAware' instead.
+      `,
+      javaFactory: 'return false;'
+    },
+    {
+      name: 'deletedAware',
+      class: 'Boolean',
+      documentation: `
+        DEPRECATING: Completely removing until services migration journal script is in
+      `,
+      javaFactory: 'return false;'
+    },
+    {
+      name: 'approvableAwareServiceName',
+      class: 'String',
+      documentation: 'If the DAO is approvable aware, this sets the ApprovableAwareDAO ServiceName field'
+    },
+    {
+      name: 'approvableAwareRelationshipName',
+      class: 'String',
+      documentation: 'If the DAO is approvable aware, this sets the ApprovableAwareDAO RelationshipName field'
+    }
+  ],
 
   methods: [
     {
       name: 'init_',
       javaCode: `
        if ( of_ == null ) {
-         foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+
+        // TODO: replace logger instantiation once javaFactory issue above is fixed
+        Logger logger = (Logger) getX().get("logger");
+        if ( logger == null ) {
+          logger = new foam.nanos.logger.StdoutLogger();
+        }
+        
+        logger = new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, logger);
+
          if ( logger != null ) {
            logger.error("EasyDAO", getName(), "'of' not set.", new Exception("of not set"));
          } else {
@@ -803,9 +915,19 @@ model from which to test ServiceProvider ID (spid)`,
       }
 
       if ( this.decorators.length ) {
-        var decorated = this.DecoratedDAO.create({
+        decoratorsArray = [];
+        for ( let i = 0; i < this.decorators.length; i++ ) {
+          if ( foam.dao.ProxyDAO.isInstance(this.decorators[i]) ) {
+            d = this.decorators[i];
+            d.delegate = dao;
+            dao = d;
+          } else {
+            decoratorsArray.push(this.decorators[i]);
+          }
+        }
+        var decorated = this.InterceptedDAO.create({
           decorator: this.CompoundDAODecorator.create({
-            decorators: this.decorators
+            decorators: decoratorsArray
           }),
           delegate: dao
         });
@@ -869,13 +991,13 @@ model from which to test ServiceProvider ID (spid)`,
       name: 'addPropertyIndex',
       type: 'foam.dao.EasyDAO',
       args: [ { javaType: 'foam.core.PropertyInfo...', name: 'props' } ],
-      code:     function addPropertyIndex() {
+      code: function addPropertyIndex() {
         this.mdao && this.mdao.addPropertyIndex.apply(this.mdao, arguments);
         return this;
       },
       javaCode: `
         if ( getMdao() != null ) {
-          getMdao().addIndex(props);
+          ((foam.dao.MDAO) getMdao()).addIndex(props);
         }
         return this;
       `
@@ -898,7 +1020,7 @@ model from which to test ServiceProvider ID (spid)`,
       },
       javaCode: `
         if ( getMdao() != null )
-          getMdao().addIndex(index);
+          ((foam.dao.MDAO) getMdao()).addIndex(index);
         return this;
       `
     },

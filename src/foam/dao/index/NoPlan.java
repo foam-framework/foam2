@@ -30,4 +30,8 @@ public class NoPlan implements FindPlan, SelectPlan
     return;
   }
 
+  @Override
+  public String toString() {
+    return "no-plan(cost:" + cost() + ")";
+  }
 }

@@ -11,22 +11,21 @@ import foam.blob.BlobService;
 import foam.blob.IdentifiedBlob;
 import foam.core.X;
 import foam.dao.DAO;
+import foam.nanos.app.AppConfig;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.User;
 import foam.nanos.fs.File;
-import org.apache.commons.io.IOUtils;
-
+import foam.util.SafetyUtil;
+import java.io.OutputStream;
+import java.util.Base64;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
+import org.apache.commons.io.IOUtils;
 
 public class FileService
-    extends HttpBlobService
+  extends HttpBlobService
 {
   protected DAO fileDAO_;
-  protected DAO userDAO_;
-  protected DAO sessionDAO_;
-
 
   public FileService(X x, BlobService delegate) {
     this(x, "httpFileService", delegate);
@@ -35,23 +34,20 @@ public class FileService
   public FileService(X x, String name, BlobService delegate) {
     super(x, name, delegate);
     fileDAO_ = (DAO) x.get("fileDAO");
-    // use the user dao instead of local user dao
-    // so that we get the authentication decoration
-    userDAO_ = (DAO) x.get("userDAO");
-    sessionDAO_ = (DAO) x.get("localSessionDAO");
   }
 
   @Override
   protected void download(X x) {
-    Blob blob = null;
-    OutputStream os = null;
-    HttpServletRequest  req  = x.get(HttpServletRequest.class);
-    HttpServletResponse resp = x.get(HttpServletResponse.class);
-    AuthService auth       = (AuthService) x.get("auth");
+    Blob                blob      = null;
+    OutputStream        os        = null;
+    HttpServletRequest  req       = x.get(HttpServletRequest.class);
+    HttpServletResponse resp      = x.get(HttpServletResponse.class);
+    AuthService         auth      = (AuthService) x.get("auth");
+    AppConfig           appConfig = (AppConfig) x.get("appConfig");
 
     try {
       String path = req.getRequestURI();
-      String id = path.replaceFirst("/service/" + name_ + "/", "");
+      String id   = path.replaceFirst("/service/" + name_ + "/", "");
 
       // find file from file dao
       File file = (File) fileDAO_.find_(x, id);
@@ -60,21 +56,29 @@ public class FileService
         return;
       }
 
+      //Replace @version@ with actual foam version
+      if ( "text/html".equals(file.getMimeType()) ) {
+        String fileText = file.getText();
+        fileText = fileText.replace("@VERSION@", appConfig.getVersion());
+        String encodedString = Base64.getEncoder().encodeToString(fileText.getBytes());
+        file.setDataString("data:text/html;base64," + encodedString);
+      }
+
       // TODO: Add better ACL support for files.  In the meantime,
       // fileDAO has been decorated to disallow enumeration and File
       // IDs are unguessable cryptographically strong UUIDs, so no
       // permission check is really necessary.
-      User owner = (User) userDAO_.find_(x, file.getOwner());
-      User user = (User) x.get("user");
-      if ( user == null || owner == null || (user.getId() != owner.getId() && ! auth.check(x,"file.read." + file.getId())) ) {
-        resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        return;
-      }
+      // NOTE: 'user' is validated in SessionWebAgent
 
       // get blob and blob size
       // TODO: figure out why delegate is not being set for IdentifiedBlob
-      String blobId = ((IdentifiedBlob) file.getData()).getId();
-      blob = getDelegate().find_(x, blobId);
+      if ( SafetyUtil.isEmpty(file.getDataString()) ) {
+        String blobId = ((IdentifiedBlob) file.getData()).getId();
+        blob = getDelegate().find_(x, blobId);
+      } else {
+        blob = file.getData();
+      }
+
       long size = blob.getSize();
 
       // set response status, content type, content length

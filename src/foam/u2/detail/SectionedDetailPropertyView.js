@@ -14,6 +14,11 @@ foam.CLASS({
   `,
 
   css: `
+    ^ {
+      /* Add for fixing UI issue in Safari */
+      display: grid;
+    }
+
     ^ m3 {
       font-size: 16px;
       font-weight: bold;
@@ -24,6 +29,7 @@ foam.CLASS({
     }
 
     ^helper-icon {
+      padding-left: 12px;
       width: 20px;
       height: 20px;
     }
@@ -49,7 +55,6 @@ foam.CLASS({
       border-top-right-radius: 0px;
       direction: ltr;
       padding: 2px;
-      text-align: center;
     }
 
     ^arrow-right {
@@ -86,6 +91,7 @@ foam.CLASS({
     ^error .foam-u2-IntView,
     ^error .foam-u2-FloatView,
     ^error .foam-u2-DateView,
+    ^error .foam-u2-CurrencyView,
     ^error .foam-u2-view-date-DateTimePicker .date-display-box,
     ^error .foam-u2-view-RichChoiceView-selection-view,
     ^error .foam-u2-view-RichChoiceView-clear-btn
@@ -176,9 +182,9 @@ foam.CLASS({
     }
 
     ^ .foam-u2-CheckBox-label {
-      margin-left: 12px;
-      vertical-align: middle;
-      white-space: pre-wrap;
+      word-break: break-word;
+      white-space: normal;
+      margin-top: 6px;
     }
 
     ^ .foam-u2-view-RadioView .foam-u2-view-RadioView {
@@ -192,6 +198,12 @@ foam.CLASS({
     ^ .foam-u2-view-RadioView label {
       margin-left: 12px;
     }
+
+    ^ .foam-u2-layout-Cols {
+      padding-bottom: 4px;
+      display: flex;
+      align-items: center;
+    }
   `,
 
   requires: [
@@ -204,15 +216,7 @@ foam.CLASS({
   ],
 
   properties: [
-    'prop',
-    {
-      class: 'FObjectProperty',
-      of: 'foam.core.Slot',
-      name: 'visibilitySlot',
-      expression: function(prop) {
-        return prop.createVisibilityFor(this.data$, this.controllerMode$);
-      }
-    }
+    'prop'
   ],
 
   methods: [
@@ -220,13 +224,12 @@ foam.CLASS({
       var self = this;
       this.SUPER();
 
-      const vis$ = this.ProxySlot.create({ delegate$: this.visibilitySlot$ });
-      this.onDetach(this.mode$.follow(vis$));
+      this.onDetach(this.mode$.follow(self.prop.createVisibilityFor(self.data$, self.controllerMode$)));
 
       this
         .addClass(this.myClass())
+        .addClass(`sectioned-detail-property-${this.prop.name}`)
         .add(this.slot(function(mode, prop, prop$label) {
-          if ( mode === self.DisplayMode.HIDDEN ) return null;
 
           var errorSlot = prop.validateObj && prop.validationTextVisible ?
             this.data.slot(prop.validateObj) :
@@ -234,7 +237,7 @@ foam.CLASS({
 
           return self.E()
             .start(self.Rows)
-              .callIf(prop$label, function() {
+              .callIf(prop$label && prop.view.class != 'foam.u2.CheckBox', function() {
                 this.start('m3')
                   .add(prop$label)
                   .style({ 'line-height': '2' })
@@ -244,7 +247,7 @@ foam.CLASS({
                 .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                 .start()
                   .style({ 'flex-grow': 1, 'max-width': '100%' })
-                  .tag(prop, { mode$: vis$ })
+                  .tag(prop, { mode$: self.mode$ })
                   .callIf(prop.validationStyleEnabled, function() {
                     this.enableClass(self.myClass('error'), errorSlot);
                   })
@@ -252,10 +255,7 @@ foam.CLASS({
                 .callIf(prop.help, function() {
                   this.start()
                     .addClass(self.myClass('tooltip'))
-                    .start({
-                      class: 'foam.u2.tag.Image',
-                      data: 'images/question-icon.svg'
-                    })
+                    .start({class: 'foam.u2.tag.Image', data: 'images/question-icon.svg'})
                       .addClass(self.myClass('helper-icon'))
                     .end()
 
@@ -274,7 +274,7 @@ foam.CLASS({
                   .end();
                 })
               .end()
-              .callIf(prop.validationTextVisible && mode === self.DisplayMode.RW, function() {
+              .callIf(prop.validationTextVisible && ( mode === self.DisplayMode.RW || mode === self.DisplayMode.DISABLED ), function() {
                 this
                   .start()
                     .style({ 'align-items': 'center' })

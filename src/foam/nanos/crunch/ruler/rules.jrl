@@ -1,0 +1,219 @@
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-0",
+  "name":"Check Ownership On UCJ Put",
+  "priority":1000,
+  "ruleGroup":"ucjDAO",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":3,
+  "after":false,
+  "enabled":true,
+  "action":{"class":"foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut"},
+  "lifecycleState":1
+})
+
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-1-create",
+  "name":"Validate UCJ Data On Create",
+  "priority":900,
+  "ruleGroup":"ucjDAO",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":0,
+  "after":false,
+  "enabled":true,
+  "action":{"class":"foam.nanos.crunch.ruler.ValidateUCJDataOnPut"},
+  "lifecycleState":1,
+})
+
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-1-update",
+  "name":"Validate UCJ Data On Update",
+  "priority":900,
+  "ruleGroup":"ucjDAO",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":1,
+  "after":false,
+  "enabled":true,
+  "action":{"class":"foam.nanos.crunch.ruler.ValidateUCJDataOnPut"},
+  "lifecycleState":1,
+  "predicate":{
+    "class":"foam.mlang.predicate.And",
+    "args":[
+      {
+        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+        "propName":"status",
+        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":0}
+      },
+      {
+        "class":"foam.mlang.predicate.Or",
+        "args":[
+          {
+            "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+            "propName":"status",
+            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1}
+          },
+          { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isRenewable","propValue":true }
+        ]
+      },
+      {
+        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+        "propName":"status",
+        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":6}
+      },
+      {
+        "class":"foam.mlang.predicate.Or",
+        "args":[
+          {
+            "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+            "propName":"status",
+            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1},
+            "isNew":false
+          },
+          { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isRenewable","propValue":true,"isNew":false }
+        ]
+      },
+      {
+        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+        "propName":"status",
+        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":6},
+        "isNew":false
+      },
+      {
+        "class":"foam.mlang.predicate.Not",
+        "arg1":{
+          "class":"foam.mlang.predicate.And",
+          "args":[
+            { "class":"foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate" },
+            {
+              "class":"foam.mlang.predicate.Or",
+              "args":[
+                { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isInRenewalPeriod","propValue":true },
+                { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isInGracePeriod","propValue":true },
+                { "class":"foam.nanos.ruler.predicate.PropertyEQValue", "propName":"isExpired", "propValue":true }
+              ]
+            }
+          ]
+        }
+        
+      }
+    ]
+  }
+})
+
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-2",
+  "name":"Set UCJ Status On Put",
+  "priority":800,
+  "ruleGroup":"ucjDAO",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":3,
+  "after":false,
+  "enabled":true,
+  "action":{"class":"foam.nanos.crunch.ruler.SetUCJStatusOnPut"},
+  "lifecycleState":1,
+  "predicate":{
+    "class":"foam.mlang.predicate.Or",
+    "args":[
+      {
+        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+        "propName":"status",
+        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1}
+      },
+      { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isRenewable","propValue":true }
+    ]
+  }
+})
+
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-3-c",
+  "name":"Configure UCJ Expiry On Granted - Create",
+  "priority":700,
+  "ruleGroup":"ucjDAO",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":0,
+  "after":false,
+  "enabled":true,
+  "action":{"class":"foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted"},
+  "lifecycleState":1
+})
+
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-3-u",
+  "name":"Configure UCJ Expiry On Granted - Update",
+  "priority":700,
+  "ruleGroup":"ucjDAO",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":1,
+  "after":false,
+  "enabled":true,
+  "action":{"class":"foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted"},
+  "predicate":{
+    "class":"foam.mlang.predicate.Or", 
+    "args":[
+      {
+        "class":"foam.mlang.predicate.Or",
+        "args":[
+          {
+            "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+            "propName":"status",
+            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1},
+            "isNew":false
+          },
+          { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isRenewable","propValue":true,"isNew":false }
+        ]
+      },
+      { "class":"foam.nanos.ruler.predicate.PropertyChangePredicate", "propName":"data" }
+    ]
+  },
+  "lifecycleState":1
+})
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-4-c",
+  "name":"Save UCJ Data On Granted - Create",
+  "priority":600,
+  "ruleGroup":"ucjDAO",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":0,
+  "after":false,
+  "enabled":true,
+  "action":{"class":"foam.nanos.crunch.ruler.SaveUCJDataOnGranted"},
+  "lifecycleState":1
+})
+
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-4-u",
+  "name":"Save UCJ Data On Granted - Update",
+  "priority":600,
+  "ruleGroup":"ucjDAO",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":1,
+  "after":false,
+  "enabled":true,
+  "action":{"class":"foam.nanos.crunch.ruler.SaveUCJDataOnGranted"},
+  "predicate":{
+    "class":"foam.mlang.predicate.Or", 
+    "args":[
+      {
+        "class":"foam.mlang.predicate.Or",
+        "args":[
+          {
+            "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+            "propName":"status",
+            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1},
+            "isNew":false
+          },
+          { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isRenewable","propValue":true,"isNew":false }
+        ]
+      },
+      { "class":"foam.nanos.ruler.predicate.PropertyChangePredicate", "propName":"data" }
+    ]
+  },
+  "lifecycleState":1
+})

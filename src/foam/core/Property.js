@@ -287,6 +287,22 @@ foam.CLASS({
     },
     {
       name: 'type',
+    },
+    {
+      class: 'Boolean',
+      name: 'sortable',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'sheetsOutput'
+    },
+    'valueToString',
+    'unitPropValueToString',
+    {
+      name: 'dependsOnPropertiesWithNames',
+      documentation: 'this axiom contains names of properties which are needed to be set when using projection as they are used for some other axioms of current property (eg tableCellFormatter can use another property\'s value for specific styling)',
+      value: []
     }
   ],
 
@@ -323,7 +339,7 @@ foam.CLASS({
         prop = this.clone();
 
         // sourceCls_ isn't a real property so it gets lost during the clone.
-        prop.sourceCls_ = c; 
+        prop.sourceCls_ = c;
 
         c.axiomMap_[prop.name] = prop;
       }
@@ -381,7 +397,7 @@ foam.CLASS({
       // Take Axiom from class rather than using 'this' directly,
       // since installInClass() may have created a modified version
       // to inherit Property Properties from a super-Property.
-      var prop        = proto.cls_.getAxiomByName(this.name);
+      var prop = proto.cls_.getAxiomByName(this.name);
       if ( prop !== this ) {
         // Delegate to the installInProto found in the class in case it
         // has custom behaviour it wants to do.  See Class property for

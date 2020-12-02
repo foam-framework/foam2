@@ -9,13 +9,14 @@ package foam.mlang;
 import foam.core.ClassInfo;
 import foam.core.X;
 import foam.dao.Sink;
-import foam.mlang.expr.Dot;
-import foam.mlang.order.Comparator;
-import foam.mlang.order.Desc;
+import foam.mlang.expr.*;
+import foam.mlang.order.*;
 import foam.mlang.predicate.*;
 import foam.mlang.sink.*;
 import foam.nanos.auth.Authorizer;
+
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 
 /**
  * Static helper functions for creating MLangs.
@@ -32,6 +33,19 @@ public class MLang
 
   public static Comparator DESC(Comparator c) {
     return new Desc(c);
+  }
+
+  public static Comparator COMPOUND(Comparator... cs) {
+    Comparator c = cs[0];
+    for ( int i = 1 ; i < cs.length ; i++ ) c = THEN_BY(c, cs[i]);
+    return c;
+  }
+
+  public static Comparator THEN_BY(Comparator head, Comparator tail) {
+    ThenBy tb = new ThenBy();
+    tb.setHead(head);
+    tb.setTail(tail);
+    return tb;
   }
 
   public static Expr prepare(Object o) {
@@ -170,6 +184,12 @@ public class MLang
     return dot;
   }
 
+  public static Expr REF(Expr o1) {
+    Ref ref = new Ref();
+    ref.setArg1(o1);
+    return ref;
+  }
+
   public static Predicate CLASS_OF(ClassInfo info) {
     return new IsClassOf(info);
   }
@@ -187,6 +207,13 @@ public class MLang
     containsIC.setArg1(MLang.prepare(o1));
     containsIC.setArg2(MLang.prepare(o2));
     return containsIC;
+  }
+
+  public static Predicate CONTAINS(Object o1, Object o2) {
+    Contains contains = new Contains();
+    contains.setArg1(MLang.prepare(o1));
+    contains.setArg2(MLang.prepare(o2));
+    return contains;
   }
 
   public static Predicate HAS(Object o) {
@@ -220,5 +247,38 @@ public class MLang
     dotF.setArg1(MLang.prepare(o1));
     dotF.setArg2(MLang.prepare(o2));
     return dotF;
+  }
+
+  public static Expr[] toExprArray(Object... args) {
+    return Arrays.stream(args).map(MLang::prepare).toArray(Expr[]::new);
+  }
+
+  public static Expr ADD(Object arg1, Object arg2) {
+    return prepareFormula(new Add(), arg1, arg2);
+  }
+
+  public static Expr SUB(Object arg1, Object arg2) {
+    return prepareFormula(new Subtract(), arg1, arg2);
+  }
+
+  public static Expr MUL(Object arg1, Object arg2) {
+    return prepareFormula(new Multiply(), arg1, arg2);
+  }
+
+  public static Expr DIV(Object arg1, Object arg2) {
+    return prepareFormula(new Divide(), arg1, arg2);
+  }
+
+  public static Expr MIN_FUNC(Object arg1, Object arg2) {
+    return prepareFormula(new MinFunc(), arg1, arg2);
+  }
+
+  public static Expr MAX_FUNC(Object arg1, Object arg2) {
+    return prepareFormula(new MaxFunc(), arg1, arg2);
+  }
+
+  public static Expr prepareFormula(Formula formula, Object... args) {
+    formula.setArgs(toExprArray(args));
+    return formula;
   }
 }

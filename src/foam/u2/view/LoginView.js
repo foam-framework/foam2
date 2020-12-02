@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 // documentation: handles login with SignUp.js and SignIn.js. And a property with img. Will use split border
 
 foam.CLASS({
@@ -82,7 +88,6 @@ foam.CLASS({
   /* ON MODEL */
   ^ .content-form {
     width: 32vw;
-    padding-top: 6.5em;
   }
 
   /* ON ALL FOOTER TEXT */
@@ -118,7 +123,7 @@ foam.CLASS({
       /* ON NO IMG SPLIT & IMG SPLIT */
   ^ .disclaimer-login {
     width: 35vw;
-    font-family: Lato;
+    font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 0.75em;
     color: #8e9090;
     margin-left: 12vw;
@@ -135,9 +140,9 @@ foam.CLASS({
     position: sticky;
   }
   ^ .image-one {
-    width: 38vw;
-    margin-top: -90vh;
-    margin-left: 10vw;
+    width: 34vw;
+    margin-top: -75vh;
+    margin-left: 14vw;
   }
   `,
 

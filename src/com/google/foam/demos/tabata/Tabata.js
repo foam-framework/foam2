@@ -1,26 +1,15 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2016 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
   name: 'Tabata',
 
   requires: [
-    'TabataState',
-    'foam.util.Timer'
+    'foam.util.Timer',
+    'TabataState'
   ],
 
   properties: [
@@ -29,6 +18,11 @@ foam.CLASS({
       name: 'rounds',
       label: 'Number of rounds',
       value: 8
+    },
+    {
+      class: 'Int',
+      value: 5,
+      name: 'setupTime'
     },
     {
       class: 'Int',
@@ -44,38 +38,32 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      value: 5,
-      name: 'setupTime'
-    },
-    {
-      class: 'Int',
       name: 'currentRound',
       value: 1
     },
     {
       class: 'Int',
       name: 'seconds',
-      label: 'Total time'
+      label: 'Total time',
+      postSet: function() {
+        this.elapsed = this.seconds - this.roundStart;
+        this.remaining = this.roundLength - this.elapsed;
+        if ( this.remaining == 0 ) this.state.next(this);
+      }
     },
     {
       class: 'Int',
       name: 'elapsed',
       units: 'seconds',
-      hidden: true,
-      value: 0
+      hidden: true
     },
     {
       class: 'Int',
       name: 'remaining',
+      hidden: true,
       units: 'seconds',
-      value: 0,
       preSet: function(_, n) { return Math.max(0, n) },
       swiftPreSet: 'return max(0, newValue)',
-      postSet: function(_, s) {
-        if ( s == 0 ) {
-          this.state.next(this);
-        }
-      },
       swiftPostSet: function() {/*
 if newValue == 0 {
   state.next(self);
@@ -132,14 +120,7 @@ return t
   methods: [
     {
       name: 'init',
-      code: function() {
-        this.elapsed$ = this.slot(function(seconds, roundStart) {
-          return seconds - roundStart;
-        });
-        this.remaining$ = this.slot(function(elapsed, roundLength) {
-          return roundLength - elapsed;
-        });
-      },
+      code: function() {},
       swiftCode: function() {/*
 elapsed$ = ExpressionSlot([
   "args": [seconds$, roundStart$],
@@ -166,8 +147,8 @@ remaining$ = ExpressionSlot([
           name: 'start',
           code: function(t) {
             t.roundLength = t.setupTime;
-            t.roundStart = t.seconds;
-            t.action = 'Warmup';
+            t.roundStart  = t.seconds;
+            t.action      = 'Warmup';
           },
           swiftCode: function() {/*
 t.roundLength = t.setupTime
@@ -251,8 +232,8 @@ t.state.start(t);
           name: 'start',
           code: function(t) {
             t.roundLength = t.restTime;
-            t.roundStart = t.seconds;
-            t.action = this.action_string;
+            t.roundStart  = t.seconds;
+            t.action      = this.action_string;
           },
           swiftCode: function() {/*
 t.roundLength = t.restTime
@@ -286,9 +267,9 @@ t.state.start(t);
         {
           name: 'start',
           code: function(t) {
-            t.action = this.action_string;
+            t.action      = this.action_string;
             t.roundLength = 0;
-            t.roundStart = t.seconds;
+            t.roundStart  = t.seconds;
             t.stop();
           },
           swiftCode: function() {/*
@@ -328,10 +309,10 @@ state.start(self)
       name: 'reset',
       code: function() {
         this.timer.stop();
-        this.timer = undefined;
+        this.timer        = undefined;
         this.currentRound = undefined;
-        this.state = undefined;
-        this.action = undefined;
+        this.state        = undefined;
+        this.action       = undefined;
       },
       swiftCode: function() {/*
 stop();

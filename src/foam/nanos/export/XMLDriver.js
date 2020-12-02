@@ -16,7 +16,8 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.xml.Outputter',
       name: 'outputter',
-      factory: function() { return foam.xml.Compact; }
+      factory: function() { return foam.xml.Compact; },
+      hidden: true
     }
   ],
 

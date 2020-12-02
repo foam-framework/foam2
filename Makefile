@@ -23,7 +23,14 @@ foam2_MAVEN_DEPS = \
 	commons-codec:commons-codec:1.11 \
 	commons-io:commons-io:2.6 \
 	org.apache-extras.beanshell:bsh:2.0b6 \
-	com.google.api-client:google-api-client:1.22.0 \
+	com.google.api-client:google-api-client:1.30.9 \
+	com.google.oauth-client:google-oauth-client:1.30.6 \
+	com.google.oauth-client:google-oauth-client-java6:1.30.6 \
+	com.google.oauth-client:google-oauth-client-jetty:1.30.6 \
+	com.google.http-client:google-http-client:1.34.2 \
+	com.google.http-client:google-http-client-jackson2:1.34.2 \
+	com.google.apis:google-api-services-sheets:v4-rev578-1.22.0 \
+	com.google.apis:google-api-services-drive:v3-rev72-1.22.0 \
 	org.jtwig:jtwig-core:5.86.1.RELEASE \
 	org.mongodb:mongodb-driver:3.4.2 \
 	org.mongodb:mongodb-driver-core:3.4.2 \
@@ -33,41 +40,43 @@ foam2_MAVEN_DEPS = \
 	org.bouncycastle:bcpkix-jdk15on:1.57 \
 	org.bouncycastle:bcprov-jdk15on:1.57 \
 	org.java-websocket:Java-WebSocket:1.3.7 \
-	org.eclipse.jetty:jetty-alpn-conscrypt-server:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-alpn-java-server:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-alpn-openjdk8-server:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-alpn-server:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-annotations:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-client:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-continuation:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-deploy:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-hazelcast:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-http:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-infinispan:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-io:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-jaas:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-jaspi:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-jmx:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-jndi:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-nosql:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-plus:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-proxy:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-quickstart:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-rewrite:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-security:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-server:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-servlet:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-servlets:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-unixsocket:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-util:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-webapp:9.4.8.v20171121 \
-	org.eclipse.jetty:jetty-xml:9.4.8.v20171121 \
-	org.eclipse.jetty.websocket:websocket-api:9.4.8.v20171121 \
-	org.eclipse.jetty.websocket:websocket-common:9.4.8.v20171121 \
-	org.eclipse.jetty.websocket:websocket-server:9.4.8.v20171121 \
-	org.eclipse.jetty.websocket:websocket-servlet:9.4.8.v20171121 \
+	com.twilio.sdk:twilio:7.50.1 \
+	org.eclipse.jetty:jetty-alpn-conscrypt-server:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-alpn-java-server:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-alpn-openjdk8-server:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-alpn-server:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-annotations:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-client:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-continuation:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-deploy:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-hazelcast:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-http:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-infinispan:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-io:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-jaas:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-jaspi:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-jmx:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-jndi:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-nosql:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-plus:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-proxy:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-quickstart:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-rewrite:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-security:9.4.30.v20200611 \
+    org.eclipse.jetty:jetty-server:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-servlet:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-servlets:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-unixsocket:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-util:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-webapp:9.4.30.v20200611 \
+	org.eclipse.jetty:jetty-xml:9.4.30.v20200611 \
+	org.eclipse.jetty.websocket:websocket-api:9.4.30.v20200611 \
+	org.eclipse.jetty.websocket:websocket-common:9.4.30.v20200611 \
+	org.eclipse.jetty.websocket:websocket-server:9.4.30.v20200611 \
+	org.eclipse.jetty.websocket:websocket-servlet:9.4.30.v20200611 \
 	com.google.guava:guava:23.6-jre \
-	com.google.appengine:appengine-api-1.0-sdk:1.9.24
+	com.google.appengine:appengine-api-1.0-sdk:1.9.24 \
+	io.methvin:directory-watcher:0.9.10
 
 java_JARS = foam2
 

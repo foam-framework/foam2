@@ -15,6 +15,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.dao.NullDAO',
     'foam.log.LogLevel',
+    'foam.nanos.auth.Subject',
     'foam.nanos.auth.User'
   ],
 
@@ -40,10 +41,11 @@ foam.CLASS({
       LogMessage lm = (LogMessage) obj;
       lm.setHostname(getHostname());
       lm.setCreated(((foam.util.SyncFastTimestamper)getTimestamper()).createTimestamp());
-      User user = (User) x.get("user");
+      Subject subject = (Subject) x.get("subject");
+      User user = subject.getUser();
       lm.setCreatedBy(user.getId());
-      User agent = (User) x.get("agent");
-      lm.setCreatedByAgent(agent != null ? agent.getId() : user.getId());
+      User realUser = subject.getRealUser();
+      lm.setCreatedByAgent(realUser.getId());
 
       return getDelegate().put_(x, lm);
       `

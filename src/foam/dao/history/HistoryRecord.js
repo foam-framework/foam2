@@ -39,6 +39,12 @@ foam.CLASS({
       tableWidth: 200
     },
     {
+      class: 'String',
+      name: 'agent',
+      label: 'Updated By',
+      documentation: 'Agent that made the update'
+    },
+    {
       class: 'DateTime',
       name: 'timestamp',
       documentation: 'Date and time history record was created.',

@@ -96,9 +96,9 @@ public class TreeIndex
       }
       // use partialEval to simplify predicate themselves.
       predicate = predicate.partialEval();
-      if ( predicate instanceof True ) return new Object[]{state, null};
     }
 
+    if ( predicate instanceof True ) predicate = null;
     return new Object[]{state, predicate};
   }
 

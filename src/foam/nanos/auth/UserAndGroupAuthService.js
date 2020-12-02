@@ -26,15 +26,19 @@ foam.CLASS({
   ],
 
   imports: [
-    'localGroupDAO',
-    'localSessionDAO',
-    'localUserDAO'
+    'DAO localGroupDAO',
+    'DAO localSessionDAO',
+    'DAO localUserDAO'
   ],
 
   javaImports: [
+    'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.auth.LifecycleState',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
+    'foam.nanos.notification.Notification',
     'foam.nanos.session.Session',
     'foam.util.Email',
     'foam.util.Password',
@@ -45,7 +49,9 @@ foam.CLASS({
     'javax.security.auth.AuthPermission',
 
     'static foam.mlang.MLang.AND',
-    'static foam.mlang.MLang.EQ'
+    'static foam.mlang.MLang.CLASS_OF',
+    'static foam.mlang.MLang.EQ',
+    'static foam.mlang.MLang.OR'
   ],
 
   constants: [
@@ -62,52 +68,29 @@ foam.CLASS({
       javaCode: '// nothing here'
     },
     {
-      name: 'getCurrentUser',
+      name: 'getCurrentSubject',
       javaCode: `
         Session session = x.get(Session.class);
-
         // fetch context and check if not null or user id is 0
         if ( session == null || session.getUserId() == 0 ) {
-          throw new AuthenticationException("Not logged in");
+          throw new AuthenticationException();
         }
-
         // get user from session id
         User user = (User) ((DAO) getLocalUserDAO()).find(session.getUserId());
-        if ( user == null ) {
-          throw new AuthenticationException("User not found: " + session.getUserId());
-        }
-
-        // check that the user is active
-        assertUserIsActive(user);
-
-        // check if user enabled
-        if ( ! user.getEnabled() ) {
-          throw new AuthenticationException("User disabled");
-        }
-
-        // check if user login enabled
-        if ( ! user.getLoginEnabled() ) {
-          throw new AuthenticationException("Login disabled");
-        }
-
+        user.validateAuth(x);
         // check if group enabled
         Group group = getCurrentGroup(x);
         if ( group != null && ! group.getEnabled() ) {
           throw new AuthenticationException("Group disabled");
         }
-
-        // check for two-factor authentication
-        if ( user.getTwoFactorEnabled() && ! session.getContext().getBoolean("twoFactorSuccess") ) {
-          throw new AuthenticationException("User requires two-factor authentication");
-        }
-
-        return user;
+        Subject subject = (Subject) x.get("subject");
+        return subject;
       `
     },
     {
       name: 'loginHelper',
       documentation: `Helper function to reduce duplicated code.`,
-      type: 'foam.nanos.auth.User',
+      type: 'User',
       args: [
         {
           name: 'x',
@@ -115,7 +98,7 @@ foam.CLASS({
         },
         {
           name: 'user',
-          type: 'foam.nanos.auth.User'
+          type: 'User'
         },
         {
           name: 'password',
@@ -124,6 +107,7 @@ foam.CLASS({
       ],
       javaThrows: ['foam.nanos.auth.AuthenticationException'],
       javaCode: `
+      try {
         if ( user == null ) {
           throw new AuthenticationException("User not found");
         }
@@ -142,7 +126,8 @@ foam.CLASS({
         }
 
         // check if group enabled
-        Group group = user.findGroup(x);
+        X userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
+        Group group = user.findGroup(userX);
         if ( group != null && ! group.getEnabled() ) {
           throw new AuthenticationException("Group disabled");
         }
@@ -151,39 +136,53 @@ foam.CLASS({
           throw new AuthenticationException("Invalid Password");
         }
 
+        try {
+          group.validateCidrWhiteList(x);
+        } catch (foam.core.ValidationException e) {
+          throw new AuthenticationException("Access Denied");
+        }
+
         // Freeze user
         user = (User) user.fclone();
         user.freeze();
 
         Session session = x.get(Session.class);
         session.setUserId(user.getId());
+
+        if ( check(userX, "*") ) {
+          String msg = "Admin login for " + user.getId() + " succeeded on " + System.getProperty("hostname", "localhost");
+          ((foam.nanos.logger.Logger) x.get("logger")).warning(msg);
+        }
+
         ((DAO) getLocalSessionDAO()).inX(x).put(session);
         session.setContext(session.applyTo(session.getContext()));
-
         return user;
+      } catch ( AuthenticationException e ) {
+        if ( user != null &&
+             ( check(x.put("subject", new Subject.Builder(x).setUser(user).build()), "*") ) ) {
+          String msg = "Admin login for " + user.getId() + " failed on " + System.getProperty("hostname", "localhost");
+          ((foam.nanos.logger.Logger) x.get("logger")).warning(msg);
+        }
+        throw e;
+      }
       `
     },
     {
       name: 'login',
-      documentation: `Login a user by the id provided, validate the password and
+      documentation: `Login a user by their identifier (email or username) provided, validate the password and
         return the user in the context`,
       javaCode: `
-        if ( userId < 1 || SafetyUtil.isEmpty(password) ) {
-          throw new AuthenticationException("Invalid Parameters");
-        }
-
-        return loginHelper(x, (User) ((DAO) getLocalUserDAO()).find(userId), password);
-      `
-    },
-    {
-      name: 'loginByEmail',
-      javaCode: `
-        User user = (User) ((DAO) getLocalUserDAO()).find(
-          AND(
-            EQ(User.EMAIL, email.toLowerCase()),
-            EQ(User.LOGIN_ENABLED, true)
-          )
-        );
+        User user = (User) ((DAO) getLocalUserDAO())
+          .inX(x)
+          .find(
+            AND(
+              OR(
+                EQ(User.EMAIL, identifier.toLowerCase()),
+                EQ(User.USER_NAME, identifier)
+              ),
+              CLASS_OF(User.class)
+            )
+          );
 
         if ( user == null ) {
           throw new AuthenticationException("User not found");
@@ -360,7 +359,8 @@ foam.CLASS({
         // TODO: modify line to allow actual setting of password expiry in cases where users are required to periodically update their passwords
         user.setPasswordExpiry(null);
         user = (User) ((DAO) getLocalUserDAO()).put(user);
-        session.setContext(session.getContext().put("user", user).put("group", group));
+        Subject subject = new Subject.Builder(x).setUser(user).build();
+        session.setContext(session.getContext().put("subject", subject).put("group", group));
         return user;
       `
     },
@@ -404,6 +404,7 @@ foam.CLASS({
       javaCode: `
         Session session = x.get(Session.class);
         if ( session != null && session.getUserId() != 0 ) {
+((foam.nanos.logger.Logger) x.get("logger")).info(this.getClass().getSimpleName(), "logout", session.getId());
           ((DAO) getLocalSessionDAO()).remove(session);
         }
       `
@@ -418,13 +419,14 @@ foam.CLASS({
 
         if ( group != null ) return group;
 
-        User user = (User) x.get("user");
-        User agent = (User) x.get("agent");
+        Subject subject = (Subject) x.get("subject");
+        User user = subject.getUser();
+        User agent = subject.getRealUser();
 
         // Second highest precedence: If one user is acting as another, return the
         // group on the junction between them.
         if ( user != null ) {
-          if ( agent != null ) {
+          if ( agent != null && agent != user ) {
             DAO agentJunctionDAO = (DAO) x.get("agentJunctionDAO");
             UserUserJunction junction = (UserUserJunction) agentJunctionDAO.find(
               AND(
@@ -434,7 +436,8 @@ foam.CLASS({
             );
 
             if ( junction == null ) {
-              throw new RuntimeException("There was a user and an agent in the context, but a junction between then was not found.");
+              ((foam.nanos.logger.Logger) x.get("logger")).warning("There was a user and an agent in the context, but a junction between them was not found.", "user", user.getId(), "agent", agent.getId());
+              throw new RuntimeException("There was a user and an agent in the context, but a junction between them was not found.");
             }
 
             return (Group) ((DAO) getLocalGroupDAO()).inX(x).find(junction.getGroup());
@@ -452,3 +455,4 @@ foam.CLASS({
     }
   ]
 });
+

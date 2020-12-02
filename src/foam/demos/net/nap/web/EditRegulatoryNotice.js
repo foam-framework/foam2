@@ -17,13 +17,14 @@
 
   requires: [
     'foam.blob.BlobBlob',
-    'foam.nanos.fs.File',
     'foam.demos.net.nap.web.model.RegulatoryNotice',
-    'foam.u2.dialog.NotificationMessage'
+    'foam.log.LogLevel',
+    'foam.nanos.fs.File'
   ],
 
   imports: [
     'blobService',
+    'notify',
     'regulatoryNotice',
     'regulatoryNoticeDAO',
     'stack',
@@ -175,7 +176,7 @@
 
   messages: [
     { name: 'UploadDesc', message: 'Or drag and drop an image here' },
-    { name: 'UploadRestrict', message: '* jpg, jpeg, or png only, 2MB maximum, 100*100 72dpi recommanded' },
+    { name: 'UploadRestrict', message: '* jpg, jpeg, or png only, 2MB maximum, 100*100 72dpi recommended' },
     { name: 'FileError', message: 'File required' },
     { name: 'FileTypeError', message: 'Wrong file format' },
     { name: 'ErrorMessage', message: 'Please upload an image less than 2MB' }
@@ -357,25 +358,26 @@
       var files = [];
       var inputFile;
       if ( e.dataTransfer.items ) {
-        inputFile = e.dataTransfer.items
+        inputFile = e.dataTransfer.items;
         if ( inputFile ) {
           for ( var i = 0; i < inputFile.length; i++ ) {
             // If dropped items aren't files, reject them
             if ( inputFile[i].kind === 'file' ) {
               var file = inputFile[i].getAsFile();
-              if( this.isFileType(file) ) files.push(file);
-              else
-                this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' }));
+              if ( this.isFileType(file) ) files.push(file);
+              else {
+                this.notify(this.FileTypeError, '', this.LogLevel.ERROR, true);
+              }
             }
           }
         }
-      } else if( e.dataTransfer.files ) {
-        inputFile = e.dataTransfer.files
-        for (var i = 0; i < inputFile.length; i++) {
+      } else if ( e.dataTransfer.files ) {
+        inputFile = e.dataTransfer.files;
+        for ( var i = 0; i < inputFile.length; i++ ) {
           var file = inputFile[i];
-          if( this.isFileType(file) ) files.push(file);
-          else{
-            this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' }));
+          if ( this.isFileType(file) ) files.push(file);
+          else {
+            this.notify(this.FileTypeError, '', this.LogLevel.ERROR, true);
           }
         }
       }
@@ -408,7 +410,7 @@
         // skip files that exceed limit
         if ( files[i].size > ( 10 * 1024 * 1024 ) ) {
           if ( ! errors ) errors = true;
-          this.add(this.NotificationMessage.create({ message: this.ErrorMessage, type: 'error' }));
+          this.notify(this.ErrorMessage, '', this.LogLevel.ERROR, true);
           continue;
         }
         var isIncluded = false
@@ -437,12 +439,12 @@
       var self = this;
 
       if ( this.data.title == null || this.data.title == '' ) {
-        this.add(foam.u2.dialog.NotificationMessage.create({ message: 'Please Enter Title.', type: 'error' }));
+        this.notify('Please Enter Title.', '', this.LogLevel.ERROR, true);
         return;
       }
 
       if ( this.data.content == null || this.data.content == '' ) {
-        this.add(foam.u2.dialog.NotificationMessage.create({ message: 'Please Enter Content.', type: 'error' }));
+        this.notify('Please Enter Content.', '', this.LogLevel.ERROR, true);
         return;
       }
 

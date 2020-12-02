@@ -17,5 +17,21 @@ foam.INTERFACE({
       type: 'Void',
       args: [ { name: 'x', type: 'Context' } ]
     }
+  ],
+
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.methods.push(`
+          static <T> T maybeContextualize(X x, T obj) {
+            if ( obj instanceof ContextAware ) {
+              ((ContextAware) obj).setX(x);
+            }
+            return obj;
+          }
+        `);
+      }
+    }
   ]
 });

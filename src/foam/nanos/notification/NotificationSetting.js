@@ -17,26 +17,28 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'java.util.HashSet'
   ],
 
   messages: [
     {
       name: 'LACKS_CREATE_PERMISSION',
-      message: 'You don\'t have permission to create this notification setting.'
+      message: 'You don\'t have permission to create this notification setting'
     },
     {
       name: 'LACKS_UPDATE_PERMISSION',
-      message: 'You don\'t have permission to update notification settings you do not own.'
+      message: 'You don\'t have permission to update notification settings you do not own'
     },
     {
       name: 'LACKS_DELETE_PERMISSION',
-      message: 'You don\'t have permission to delete notification settings you do not own.'
+      message: 'You don\'t have permission to delete notification settings you do not own'
     },
     {
       name: 'LACKS_READ_PERMISSION',
-      message: 'You don\'t have permission to read notification settings you do not own.'
+      message: 'You don\'t have permission to read notification settings you do not own'
     }
   ],
 
@@ -44,31 +46,58 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'id'
+    },
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      value: true
     }
   ],
 
   methods: [
     {
-      name: 'sendNotification',
+      name: 'doNotify',
       args: [
-        { name: 'x', type: 'Context' },
-        { name: 'user', type: 'foam.nanos.auth.User' },
+        { name: 'x',            type: 'Context' },
+        { name: 'user',         type: 'foam.nanos.auth.User' },
         { name: 'notification', type: 'foam.nanos.notification.Notification' }
       ],
       javaCode: `
-        DAO notificationDAO = (DAO) x.get("localNotificationDAO");
+        // Proxy to sendNotificaiton method
+        sendNotification(x, user, notification);
+      `
+    },
+    {
+      name: 'sendNotification',
+      args: [
+        { name: 'x',            type: 'Context' },
+        { name: 'user',         type: 'foam.nanos.auth.User' },
+        { name: 'notification', type: 'foam.nanos.notification.Notification' }
+      ],
+      javaCode: `
         notification = (Notification) notification.fclone();
         notification.setId(0L);
         notification.setUserId(user.getId());
         notification.setBroadcasted(false);
         notification.setGroupId(null);
-        notification.setEmailIsEnabled(false);
+
+        // We cannot permanently disable in-app notifications, so mark them read automatically
+        if ( ! getEnabled() ) {
+          notification.setRead(true);
+        } else if ( user.getDisabledTopicSet() != null ) {
+          HashSet<String> disabledTopicsSet = (HashSet<String>) user.getDisabledTopicSet();
+          if ( disabledTopicsSet.contains(notification.getNotificationType()) ) {
+            notification.setRead(true);
+          }
+        }
+
         try {
+          DAO notificationDAO = (DAO) x.get("localNotificationDAO");
           notificationDAO.put_(x, notification);
         } catch (Throwable t) {
           Logger logger = (Logger) x.get("logger");
           logger.error("Failed to send notification: " + t, t);
-        };
+        }
       `
     },
     {
@@ -89,7 +118,7 @@ foam.CLASS({
       name: 'authorizeOnDelete',
       javaCode: `
       AuthService auth = (AuthService) x.get("auth");
-      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("delete")) ) throw new AuthorizationException(LACKS_DELETE_PERMISSION);
+      if ( ! checkOwnership(x) && ! auth.check(x, createPermission("remove")) ) throw new AuthorizationException(LACKS_DELETE_PERMISSION);
       `
     },
     {
@@ -106,7 +135,7 @@ foam.CLASS({
       ],
       type: 'Boolean',
       javaCode: `
-        User user = (User) x.get("user");
+        User user = ((Subject) x.get("subject")).getUser();
 
         if ( user == null ) return false;
 

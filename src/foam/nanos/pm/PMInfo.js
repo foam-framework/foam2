@@ -10,16 +10,16 @@ foam.CLASS({
 
   documentation: 'Performance Measurement database entry.',
 
-  ids: [ 'clsName', 'name' ],
+  ids: [ 'key', 'name' ],
 
-  tableColumns: [ 'clsName', 'name', 'count', 'minTime', 'average', 'maxTime', 'totalTime' ],
+  tableColumns: [ 'key', 'name', 'count', 'minTime', 'average', 'maxTime', 'totalTime' ],
 
-  searchColumns: [ 'clsName', 'name' ],
+  searchColumns: [ 'key', 'name' ],
 
   properties: [
     {
       class: 'String',
-      name: 'clsName',
+      name: 'key',
       label: 'Class',
       tableWidth: 170,
       tableCellFormatter: function(cls) {
@@ -36,7 +36,7 @@ foam.CLASS({
       class: 'Int',
       name: 'count',
       label: 'Count',
-      tableWidth: 60
+      tableWidth: 70
     },
     {
       class: 'Duration',
@@ -49,7 +49,7 @@ foam.CLASS({
       label: 'Avg',
       getter: function() { return (this.totalTime / this.count).toFixed(2); },
       javaGetter: `return (long) (Math.round( ( (float)getTotalTime() / (float)getCount() ) * 100.0 ) / 100.0);`,
-      transient: true
+      storageTransient: true
     },
     {
       class: 'Duration',

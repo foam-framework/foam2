@@ -9,6 +9,27 @@ foam.CLASS({
   name: 'DocumentationView',
   extends: 'foam.u2.View',
 
+  css: `
+    ^ table { width: 100%; }
+    ^ td , ^ th {
+      text-align: left;
+      padding: 8pt;
+    }
+    ^ th {
+      font-weight: bold;
+      background-color: #E0E0E0;
+    }
+    ^ tr:nth-child(even) td:nth-child(odd) {
+      background-color: #F5F5F5;
+    }
+    ^ tr:nth-child(even) td:nth-child(even) {
+      background-color: #F0F0F0;
+    }
+    ^ tr:nth-child(odd) td:nth-child(even) {
+      background-color: #F7F7F7;
+    }
+  `,
+
   properties: [
     {
       class: 'String',
@@ -33,6 +54,7 @@ foam.CLASS({
   methods: [
     function initE() {
       var dao = this.__context__[this.daoKey];
+      this.addClass(this.myClass());
       if ( ! dao ) {
         this.add('No DAO found for key: ', this.daoKey);
       } else this.add(this.slot(function(data, error) {

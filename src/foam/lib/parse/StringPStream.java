@@ -20,33 +20,33 @@ package foam.lib.parse;
 public class StringPStream
   implements PStream
 {
-  protected Reference<String> str;
+  protected Reference<CharSequence> str;
   protected int               pos;
   protected StringPStream     tail_ = null;
 
   public StringPStream() {
-    this(new Reference<String>());
+    this(new Reference<CharSequence>());
   }
 
-  public StringPStream(String s) {
+  public StringPStream(CharSequence s) {
     this(new Reference<>(s));
   }
 
-  public StringPStream(Reference<String> s) {
+  public StringPStream(Reference<CharSequence> s) {
     this(s, 0);
   }
 
-  public StringPStream(Reference<String> s, int p) {
+  public StringPStream(Reference<CharSequence> s, int p) {
     this(s, p, null);
   }
 
-  public StringPStream(Reference<String> s, int p, Object value) {
+  public StringPStream(Reference<CharSequence> s, int p, Object value) {
     str    = s;
     pos    = p;
     value_ = value;
   }
 
-  public void setString(String s) {
+  public void setString(CharSequence s) {
     str.set(s);
   }
 
@@ -75,7 +75,7 @@ public class StringPStream
   public String substring(PStream end) {
     StringPStream endps = (StringPStream) end;
 
-    return str.get().substring(pos, endps.pos);
+    return str.get().subSequence(pos, endps.pos).toString();
   }
 
   public PStream apply(Parser ps, ParserContext x) {

@@ -36,7 +36,7 @@ foam.CLASS({
         if ( obj.promiseE ) {
           obj.promiseE().then(function(view) { this.installView(el, view); });
         } else if ( obj.toE ) {
-          this.installView(el, obj.toE({}, foam.__context__));
+          this.installView(el, obj.toE({}, obj));
         } else if ( ! foam.u2.Element.isInstance(view) )  {
           installView(el, foam.u2.DetailView.create({data: view, showActions: true}));
         }

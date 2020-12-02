@@ -4,12 +4,10 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-foam.INTERFACE({
+foam.CLASS({
   package: 'foam.u2.history',
   name: 'HistoryItemView',
-  implements: [
-    'foam.u2.View',
-  ],
+  extends: 'foam.u2.View',
 
   documentation: 'View displaying history item',
 

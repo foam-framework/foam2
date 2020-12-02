@@ -69,6 +69,7 @@ foam.CLASS({
       }
 
       LogMessage lm = new LogMessage(getX());
+      lm.setThread(Thread.currentThread().getName());
       lm.setSeverity(severity);
       lm.setMessage(message);
 

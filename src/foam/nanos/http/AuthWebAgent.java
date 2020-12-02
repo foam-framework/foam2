@@ -7,16 +7,10 @@
 package foam.nanos.http;
 
 import foam.core.X;
+import foam.core.XLocator;
 import foam.dao.DAO;
-import static foam.mlang.MLang.AND;
-import static foam.mlang.MLang.EQ;
-
 import foam.nanos.app.AppConfig;
-import foam.nanos.auth.AgentAuthService;
-import foam.nanos.auth.AuthService;
-import foam.nanos.auth.AuthenticationException;
-import foam.nanos.auth.User;
-import foam.nanos.auth.Group;
+import foam.nanos.auth.*;
 import foam.nanos.boot.Boot;
 import foam.nanos.logger.Logger;
 import foam.nanos.session.Session;
@@ -28,6 +22,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.bouncycastle.util.encoders.Base64;
+import static foam.mlang.MLang.AND;
+import static foam.mlang.MLang.EQ;
 
 /**
  * A WebAgent decorator that adds session and authentication support.
@@ -50,7 +46,12 @@ public class AuthWebAgent
     Session     session = authenticate(x);
 
     if ( session == null ) {
-      templateLogin(x);
+      try {
+        XLocator.set(x);
+        templateLogin(x);
+      } finally {
+        XLocator.set(null);
+      }
       return;
     }
 
@@ -67,8 +68,13 @@ public class AuthWebAgent
       .put(HttpServletRequest.class,  x.get(HttpServletRequest.class))
       .put(HttpServletResponse.class, x.get(HttpServletResponse.class))
       .put(PrintWriter.class,         x.get(PrintWriter.class));
-
-    super.execute(requestX);
+    
+    try {
+      XLocator.set(requestX);
+      super.execute(requestX);
+    } finally {
+      XLocator.set(null);
+    }
   }
 
   /** If provided, use user and password parameters to login and create session and cookie. **/
@@ -107,7 +113,8 @@ public class AuthWebAgent
 
       // save cookie
       createCookie(x, session);
-      if ( ! attemptLogin && session.getContext().get("user") != null ) {
+      User user = ((Subject) session.getContext().get("subject")).getUser();
+      if ( ! attemptLogin && user != null ) {
         return session;
       }
     } else {
@@ -171,7 +178,7 @@ public class AuthWebAgent
                 session.setRemoteHost(req.getRemoteHost());
                 X effectiveContext = session.applyTo(x);
                 session.setContext(effectiveContext);
-                User user = (User) effectiveContext.get("user");
+                User user = ((Subject) effectiveContext.get("subject")).getUser();
 
                 try {
                   if ( user == null ) {
@@ -216,7 +223,7 @@ public class AuthWebAgent
       }
 
       try {
-        User user = auth.loginByEmail(session.getContext()
+        User user = auth.login(session.getContext()
           .put(HttpServletRequest.class,  req)
           .put(HttpServletResponse.class, resp), email, password);
 
@@ -236,7 +243,7 @@ public class AuthWebAgent
         }
 
         // user should not be null, any login failure should throw an Exception
-        logger.error("AuthService.loginByEmail returned null user and did not throw AuthenticationException.");
+        logger.error("AuthService.login returned null user and did not throw AuthenticationException.");
         // TODO: generate stack trace.
         if ( ! SafetyUtil.isEmpty(authHeader) ) {
           resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

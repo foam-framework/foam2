@@ -1,0 +1,55 @@
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"localSmsMessageDAO",
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.notification.sms.SMSMessage.getOwnClassInfo())
+      .setAuthorize(false)
+      .setCreatedByAware(true)
+      .setCreatedAware(true)
+      .setSeqNo(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("smsMessages")
+      .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
+        .setComparator(foam.mlang.MLang.DESC(foam.nanos.notification.sms.SMSMessage.CREATED))
+        .setPredicate(foam.mlang.MLang.EQ(foam.nanos.notification.sms.SMSMessage.STATUS, foam.nanos.notification.sms.SMSStatus.SENT))
+        .setSize(1000)
+        .build())
+      .setIndex(new foam.core.PropertyInfo[] {foam.nanos.notification.sms.SMSMessage.CREATED})
+      .build();
+  """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"smsMessageDAO",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.notification.sms.SMSMessage.getOwnClassInfo())
+      .setInnerDAO((foam.dao.DAO) x.get("localSmsMessageDAO"))
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.notification.sms.SMSMessage\"}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"smsService",
+  "serviceScript":"""
+    import foam.nanos.notification.sms.NullSMSService;
+    import foam.nanos.notification.sms.ProxySMSService;
+
+    return new ProxySMSService.Builder(x)
+      .setDelegate(
+        new NullSMSService.Builder(x).build())
+      .build();
+  """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec", 
+  "name":"twilioConfig",                     
+  "lazy":false,  
+  "service":{"class":"foam.nanos.notification.sms.TwilioConfig"}
+})

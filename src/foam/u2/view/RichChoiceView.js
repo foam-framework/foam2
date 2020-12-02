@@ -23,6 +23,11 @@ foam.CLASS({
       factory: function() { return this.dao; }
     },
     {
+      class: 'Array',
+      name: 'searchBy',
+      documentation: 'An array of PropertyInfos to reduce the filter scope by. If empty or not set, revert to KEYWORD lookup.'
+    },
+    {
       class: 'Boolean',
       name: 'hideIfEmpty',
       documentation: 'This section will be hidden if there are no items in it if this is set to true.'
@@ -39,6 +44,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2.view',
@@ -95,7 +101,7 @@ foam.CLASS({
   messages: [
     {
       name: 'CHOOSE_FROM',
-      message: 'Choose from '
+      message: 'Choose from'
     },
     {
       name: 'CLEAR_SELECTION',
@@ -320,9 +326,19 @@ foam.CLASS({
       documentation: 'The text that the user typed in to search by.',
       postSet: function(oldValue, newValue) {
         this.sections.forEach((section) => {
-          section.filteredDAO = newValue
-            ? section.dao.where(this.KEYWORD(newValue))
-            : section.dao;
+          if ( newValue ) {
+            if ( section.searchBy.length > 0 ) {
+              var arrOfExpressions = section.searchBy.map((prop) => this.CONTAINS_IC(prop, newValue));
+              var pred = this.Or.create({ args: arrOfExpressions });
+            }
+            else {
+              var pred = this.KEYWORD(newValue);
+            }
+            section.filteredDAO = section.dao.where(pred);
+          }
+          else {
+            section.filteredDAO = section.dao;
+          }
         });
       }
     },
@@ -338,7 +354,7 @@ foam.CLASS({
       documentation: 'Replaces choose from placeholder with passed in string.',
       expression: function(of) {
         var plural = of.model_.plural.toLowerCase();
-        return this.CHOOSE_FROM + plural + '...';
+        return this.CHOOSE_FROM + ' ' + plural + '...';
       }
     },
     {
@@ -487,7 +503,7 @@ foam.CLASS({
                         this.addClass(self.myClass('setAbove'))
                           .start().hide(!! section.hideIfEmpty && resp[index].value <= 0 || ! section.heading)
                             .addClass(self.myClass('heading'))
-                            .add(section.heading)
+                            .translate(section.heading, section.heading)
                           .end()
                           .start()
                             .select(section.filteredDAO$proxy, (obj) => {
@@ -593,10 +609,11 @@ foam.CLASS({
 
       methods: [
         function initE() {
+          var summary = this.data.toSummary();
           return this
             .start()
               .addClass(this.myClass('row'))
-              .add(this.data.toSummary())
+              .translate(summary || ('richChoiceSummary.'+this.data.cls_.id+'.'+this.data.id), summary)
             .end();
         }
       ]
@@ -644,9 +661,13 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          return this.add(this.fullObject$.map(o => {
+          var summary = this.fullObject$.map(o => {
             return o ? o.toSummary() : this.defaultSelectionPrompt;
-          }));
+          });
+          var summaryWithoutSlot = this.fullObject && this.fullObject.toSummary()
+            ? this.fullObject.toSummary()
+            : this.defaultSelectionPrompt;
+          return this.translate(summaryWithoutSlot, summary);
         }
       ]
     },

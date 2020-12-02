@@ -18,17 +18,30 @@ foam.CLASS({
     'foam.doc.DocBorder',
     'foam.doc.SimpleClassView',
     'foam.doc.UMLDiagram',
-    'foam.nanos.boot.NSpec',
+    'foam.nanos.boot.NSpec'
   ],
 
-  imports: [
-    'nSpecDAO',
-  ],
+  imports: [ 'nSpecDAO' ],
+
+  exports: [ 'conventionalUML' ],
+
 
   properties: [
+    [ 'conventionalUML', false ],
+    {
+      class: 'Map',
+      name: 'allowedModels',
+      adapt: function(_,models) {
+        if ( foam.Array.isInstance(models) ) {
+          var map = {};
+          models.forEach((m) => map[m.id] = true);
+        }
+        return models;
+      }
+    },
     {
       name: 'modelDAO',
-      expression: function(nSpecDAO) {
+      expression: function(nSpecDAO,allowedModels) {
         var self = this;
         var dao = self.ArrayDAO.create({ of: self.Model })
         return self.PromisedDAO.create({
@@ -37,7 +50,7 @@ foam.CLASS({
               a.array.map(function(nspec) {
                 return self.parseClientModel(nspec)
               }).filter(function(cls) {
-                return !!cls;
+                return cls && (allowedModels == undefined || ( Object.keys(allowedModels).length && Object.values(allowedModels).some( e => e == true) ) ? !!allowedModels[cls.id] : true );
               }).map(function(cls) {
                 return dao.put(cls.model_);
               })
@@ -88,7 +101,7 @@ foam.CLASS({
         .start().add(this.PRINT_PAGE).end()
         .select(this.modelDAO, function(model) {
           var cls = foam.lookup(model.id);
-          return this.E().
+          return self.E().
               start().style({ 'font-size': '20px', 'margin-top': '20px' }).
                 add('Model ' + model).
               end().
@@ -100,6 +113,11 @@ foam.CLASS({
 
     function parseClientModel(n) {
       var cls = JSON.parse(n.client);
+      if ( Object.keys(cls).length === 0 ){
+        console.log('this model', n.name, 'is not accessible in the client side or is a service')
+        //throw new Error('Unsupported');
+        return null;
+      }
       var clsName = cls.of ? cls.of : cls.class;
       return foam.lookup(clsName, true);
     }

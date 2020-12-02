@@ -39,13 +39,14 @@ foam.CLASS({
     function updateChild(c) {
       this.SUPER(c);
 
-      var gravity  = c.gravity;
-      var friction = c.friction;
+      var gravity  = c.gravity, friction = c.friction;
 
+      // Gravity
       if ( gravity && this.gravity ) {
         c.vy += gravity * this.gravityStrength;
       }
 
+      // Friction
       if ( friction ) {
         c.vx = Math.abs(c.vx) < 0.001 ? 0 : c.vx * friction;
         c.vy = Math.abs(c.vy) < 0.001 ? 0 : c.vy * friction;

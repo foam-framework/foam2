@@ -69,11 +69,10 @@ externalFile.blacklist.forEach(function(cls) {
   // compile properly.
   'foam.blob.BlobBlob',
   'foam.dao.CompoundDAODecorator',
-  'foam.dao.DAODecorator',
+  'foam.dao.DAOInterceptor',
   'foam.dao.FlowControl',
   'foam.dao.sync.SyncRecord',
   'foam.dao.sync.VersionedSyncRecord',
-  'foam.mlang.order.ThenBy',
   'foam.mlang.Expressions',
   'foam.nanos.menu.MenuBar',
 
@@ -87,7 +86,7 @@ externalFile.blacklist.forEach(function(cls) {
   'foam.dao.CachingDAO',
   'foam.dao.TTLCachingDAO',
   'foam.dao.CompoundDAODecorator',
-  'foam.dao.DecoratedDAO',
+  'foam.dao.InterceptedDAO',
   'foam.dao.DeDupDAO',
   'foam.dao.IDBDAO',
   'foam.dao.LoggingDAO',

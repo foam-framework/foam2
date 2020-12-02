@@ -24,11 +24,11 @@ foam.CLASS({
             setDelegate(delegate);
 
             // create journal
-            setJournal(new foam.dao.WriteOnlyFileJournal.Builder(x)
+            setJournal(new foam.dao.WriteOnlyF3FileJournal.Builder(x)
               .setFilename(filename)
               .setCreateFile(true)
               .setDao(getDelegate())
-              .setLogger(new foam.nanos.logger.StdoutLogger())
+              .setLogger(new foam.nanos.logger.PrefixLogger(new Object[] { "[JDAO]", filename }, new foam.nanos.logger.StdoutLogger()))
               .build());
           }
         `);

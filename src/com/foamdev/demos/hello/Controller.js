@@ -13,7 +13,7 @@ foam.CLASS({
 
   css: `
     h1 { color: #aaa; }
-    body, input[text] { color: #888; font-family: Cambria, Georgia; }
+    body, input[text] { color: #888; font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif; }
   `,
 
   properties: [

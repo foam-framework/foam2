@@ -44,6 +44,7 @@ foam.ENUM({
   ]
 });
 
+
 foam.ENUM({
   package: 'foam.u2',
   name: 'DisplayMode',
@@ -123,7 +124,7 @@ foam.CLASS({
 
   methods: [
     function asKey(document, cls) {
-      return this.expands_ ? document.$UID + "." + cls.id : document.$UID;
+      return this.expands_ ? document.$UID + '.' + cls.id : document.$UID;
     },
 
     function installInClass(cls) {
@@ -351,7 +352,8 @@ foam.CLASS({
       this.visitChildren('load');
       this.state = this.LOADED;
       if ( this.tabIndex ) this.setAttribute('tabindex', this.tabIndex);
-      if ( this.focused ) this.el().focus();
+      // Add a delay before setting the focus in case the DOM isn't visible yet.
+      if ( this.focused ) window.setTimeout(() => this.el().focus(), 50);
       // Allows you to take the DOM element and map it back to a
       // foam.u2.Element object.  This is expensive when building
       // lots of DOM since it adds an extra DOM call per Element.
@@ -654,7 +656,12 @@ foam.CLASS({
     'document',
     'elementValidator',
     'framed',
-    'getElementById'
+    'getElementById',
+    'translationService?'
+  ],
+
+  implements: [
+    'foam.mlang.Expressions',
   ],
 
   topics: [
@@ -809,7 +816,7 @@ foam.CLASS({
         '39': 'right',
         '40': 'down'
       }
-    },
+    }
   ],
 
   css: `
@@ -836,6 +843,12 @@ foam.CLASS({
       name: 'id',
       transient: true,
       factory: function() { return this.NEXT_ID(); }
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.ControllerMode',
+      name: 'controllerMode',
+      factory: function() { return this.__context__.controllerMode || foam.u2.ControllerMode.CREATE; }
     },
     {
       name: 'state',
@@ -868,7 +881,7 @@ foam.CLASS({
       class: 'String',
       name: 'tooltip',
       postSet: function(o, n) {
-        if ( ! o && n ) this.initTooltip();
+        if ( n && ! o && this.state == this.LOADED ) this.initTooltip();
         return n;
       }
     },
@@ -957,7 +970,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'focused'
+      name: 'focused',
+      postSet: function(o, n) {
+        if ( n ) this.onFocus();
+      }
     },
     {
       name: 'outerHTML',
@@ -987,6 +1003,9 @@ foam.CLASS({
     },
     {
       name: '__subSubContext__',
+      documentation:
+        `Current subContext to use when creating children.
+        Defaults to __subContext__ unless in a nested startContext().`,
       factory: function() { return this.__subContext__; }
     },
     'keyMap_'
@@ -994,6 +1013,10 @@ foam.CLASS({
 
   methods: [
     function init() {
+      /*
+      if ( ! this.translationService )
+        console.warn('Element ' + this.cls_.name + ' created with globalContext');
+      */
       this.onDetach(this.visitChildren.bind(this, 'detach'));
     },
 
@@ -1159,6 +1182,10 @@ foam.CLASS({
       return f(opt_extra);
     },
 
+    function instanceClass(opt_extra) {
+      return this.myClass(this.id + '-' + opt_extra);
+    },
+
     function visitChildren(methodName) {
       /*
         Call the named method on all children.
@@ -1174,7 +1201,6 @@ foam.CLASS({
 
     function focus() {
       this.focused = true;
-      this.onFocus();
       return this;
     },
 
@@ -1442,6 +1468,11 @@ foam.CLASS({
       return this;
     },
 
+    function addClasses(a) {
+      a && a.forEach((i) => this.addClass(i));
+      return this;
+    },
+
     function enableCls(cls, enabled, opt_negate) {
       console.warn('Deprecated use of Element.enableCls(). Use enableClass() instead.');
       return this.enableClass(cls, enabled, opt_negate);
@@ -1560,6 +1591,17 @@ foam.CLASS({
       return this.parentNode;
     },
 
+    function translate(source, opt_default) {
+      var translationService = this.translationService;
+      if ( translationService ) {
+        /* Add the translation of the supplied source to the Element as a String */
+        var translation = this.translationService.getTranslation(foam.locale, source, opt_default);
+        return this.add(translation);
+      }
+      console.warn('Missing Translation Service in ', this.cls_.name);
+      return this.add(opt_default || 'NO TRANSLATION SERVICE OR DEFAULT');
+    },
+
     function add() {
       if ( this.content ) {
         this.content.add_(arguments, this);
@@ -1569,9 +1611,7 @@ foam.CLASS({
       return this;
     },
 
-    function toE() {
-      return this;
-    },
+    function toE() { return this; },
 
     function add_(cs, parentNode) {
       /* Add Children to this Element. */
@@ -1609,6 +1649,10 @@ foam.CLASS({
           this.add(this.PromiseSlot.create({ promise: c }));
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
+        } else if ( this.translationService && c && c.data && c.data.id ) {
+          var key = c.data.id + '.' + c.clsInfo;
+          var translation = this.translationService.getTranslation(foam.locale, key, c.default);
+          return this.add(translation);
         } else {
           es.push(c);
         }
@@ -1706,7 +1750,12 @@ foam.CLASS({
           // No use adding new children if the parent has already been removed
           if ( self.state === foam.u2.Element.UNLOADED ) return;
 
-          if ( update ) o = o.clone();
+          if ( update ) {
+            o = o.clone();
+            o.propertyChange.sub(function() {
+              o.copyFrom(dao.put(o.clone()));
+            });
+          }
 
           self.startContext({data: o});
 
@@ -1716,12 +1765,6 @@ foam.CLASS({
           // want anything to be added.
           if ( e === undefined )
             this.__context__.warn(self.SELECT_BAD_USAGE);
-
-          if ( update ) {
-            o.propertyChange.sub(function(_,__,prop,slot) {
-              dao.put(o.clone());
-            });
-          }
 
           self.endContext();
 
@@ -1779,7 +1822,11 @@ foam.CLASS({
      * @param {Function} fn A function to call for each item in the given array.
      */
     function forEach(array, fn) {
-      array.forEach(fn.bind(this));
+      if ( foam.core.Slot.isInstance(array) ) {
+        this.add(array.map(a => this.E().forEach(a, fn)));
+      } else {
+        array.forEach(fn.bind(this));
+      }
       return this;
     },
 
@@ -1836,7 +1883,7 @@ foam.CLASS({
     },
 
     function toString() {
-      return this.cls_.id + '(nodeName=' + this.nodeName + ', state=' + this.state + ')';
+      return this.cls_.id + '(id=' + this.id + ', nodeName=' + this.nodeName + ', state=' + this.state + ')';
       /* Converts Element to HTML String without transitioning state. */
       /*
         TODO: put this somewhere useful for debugging
@@ -1859,11 +1906,11 @@ foam.CLASS({
       if ( ! Array.isArray(children) ) children = [ children ];
 
       var Y = this.__subSubContext__;
-      children = children.map(function(e) {
+      children = children.map(e => {
         e = e.toE ? e.toE(null, Y) : e;
         e.parentNode = this;
         return e;
-      }.bind(this));
+      });
 
       var index = before ? i : (i + 1);
       this.childNodes.splice.apply(this.childNodes, [index, 0].concat(children));
@@ -1952,15 +1999,27 @@ foam.CLASS({
       }
 
       var e = nextE();
-      var l = function() {
+      var l = this.framed(function() {
         if ( self.state !== self.LOADED ) {
           return;
         }
         var first = Array.isArray(e) ? e[0] : e;
-        var tmp   = self.E();
+
+        if ( first.state == first.INITIAL ) {
+          // updated requested before initial element loaded
+          // not a problem, just defer loading
+          first.onload.sub(foam.events.oneTime(l));
+          return;
+        }
+
+        var tmp = self.E();
         self.insertBefore(tmp, first);
         if ( Array.isArray(e) ) {
-          for ( var i = 0 ; i < e.length ; i++ ) { e[i].remove(); e[i].detach(); }
+          for ( var i = 0 ; i < e.length ; i++ ) {
+            if ( e[i].state === e[i].LOADED ) {
+              e[i].remove(); e[i].detach();
+            }
+          }
         } else {
           if ( e.state === e.LOADED ) { e.remove(); e.detach(); }
         }
@@ -1968,9 +2027,9 @@ foam.CLASS({
         self.insertBefore(e2, tmp);
         tmp.remove();
         e = e2;
-      };
+      });
 
-      this.onDetach(slot.sub(this.framed(l)));
+      this.onDetach(slot.sub(l));
 
       return e;
     },
@@ -1987,7 +2046,7 @@ foam.CLASS({
     function output_(out) {
       /** Output the element without transitioning to the OUTPUT state. **/
       out('<', this.nodeName);
-      if ( this.id !== null ) out(' id="', this.id, '"');
+      if ( this.id !== null ) out(' id="', this.id.replace ? this.id.replace(/"/g, "&quot;") : this.id, '"');
 
       var first = true;
       if ( this.hasOwnProperty('classes') ) {
@@ -2071,7 +2130,7 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'U2Context',
 
-  documentation: 'Context which includes U2 functionality.',
+  documentation: 'Context which includes U2 functionality. Replaces foam.__context__.',
 
   exports: [
     'E',
@@ -2089,6 +2148,8 @@ foam.CLASS({
 
   methods: [
     {
+      // A Method which has the call-site context added as the first arg
+      // when exported.
       class: 'foam.core.ContextMethod',
       name: 'E',
       code: function E(ctx, opt_nodeName) {
@@ -2116,10 +2177,10 @@ foam.CLASS({
 foam.SCRIPT({
   package: 'foam.u2',
   name: 'U2ContextScript',
-  requires: [
-    'foam.u2.U2Context',
-  ],
+
+  requires: [ 'foam.u2.U2Context' ],
   flags: ['web'],
+
   code: function() {
     foam.__context__ = foam.u2.U2Context.create().__subContext__;
   }
@@ -2147,7 +2208,7 @@ foam.ENUM({
   properties: [
     {
       class: 'Array',
-      name: 'allowedValues',
+      name: 'allowedValues'
     },
     {
       class: 'Enum',
@@ -2196,6 +2257,7 @@ foam.ENUM({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'PropertyViewRefinements',
@@ -2222,20 +2284,24 @@ foam.CLASS({
     },
     {
       name: 'visibility',
+      adapt: function(o, n) { if ( foam.Object.isInstance(n) ) return foam.u2.DisplayMode.create(n); return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'Exists for backwards compatability. You should set createVisibility, updateVisibility, or readVisibility instead. If this property is set, it will override the other three.'
     },
     {
       name: 'createVisibility',
+      adapt: function(o, n) { if ( foam.Object.isInstance(n) ) return foam.u2.DisplayMode.create(n); return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'The display mode for this property when the controller mode is CREATE.',
       value: 'RW'
     },
     {
       name: 'readVisibility',
+      adapt: function(o, n) { if ( foam.Object.isInstance(n) ) return foam.u2.DisplayMode.create(n); return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'The display mode for this property when the controller mode is VIEW.',
       value: 'RO'
     },
     {
       name: 'updateVisibility',
+      adapt: function(o, n) { if ( foam.Object.isInstance(n) ) return foam.u2.DisplayMode.create(n); return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'The display mode for this property when the controller mode is EDIT.',
       value: 'RW'
     },
@@ -2257,7 +2323,7 @@ foam.CLASS({
       documentation: `
         The order to render the property in if rendering multiple properties.
       `,
-      value: Number.MAX_VALUE
+      value: Number.MAX_SAFE_INTEGER
     }
   ],
 
@@ -2290,24 +2356,31 @@ foam.CLASS({
       const DisplayMode = foam.u2.DisplayMode;
 
       var slot = foam.core.ProxySlot.create({
-        delegate$: controllerMode$.map((controllerMode) => {
+        delegate$: controllerMode$.map(controllerMode => {
           var value = controllerMode.getVisibilityValue(this);
 
-          if ( foam.String.isInstance(value) ) {
-            return foam.core.ConstantSlot.create({
-              value: DisplayMode[foam.String.constantize(value)]
-            });
-          }
+          if ( foam.String.isInstance(value) )
+            value = DisplayMode[foam.String.constantize(value)];
 
           if ( DisplayMode.isInstance(value) ) {
             return foam.core.ConstantSlot.create({ value: value });
           }
 
           if ( foam.Function.isInstance(value) ) {
-            return foam.core.ExpressionSlot.create({
+            var slot = foam.core.ExpressionSlot.create({
               obj$: data$,
+              // Disallow RW DisplayMode when in View Controller Mode
               code: value
             });
+
+            slot.args;
+
+            slot.code = function() {
+              var ret = value.apply(this, arguments);
+              return controllerMode == foam.u2.ControllerMode.VIEW && ret == DisplayMode.RW ? DisplayMode.RO : ret;
+            };
+
+            return slot;
           }
 
           if ( foam.core.Slot.isInstance(value) ) {
@@ -2323,22 +2396,21 @@ foam.CLASS({
         var visSlot  = slot;
         var permSlot = data$.map((data) => {
           if ( ! data || ! data.__subContext__.auth ) return PPVC.HIDDEN;
-          var auth = data.__subContext__.auth;
-
+          var auth     = data.__subContext__.auth;
           var propName = this.name.toLowerCase();
-          var clsName  = this.forClass_.substring(this.forClass_.lastIndexOf('.') + 1).toLowerCase();
+          var clsName  = data.cls_.name.toLowerCase();
           var canRead  = this.readPermissionRequired === false;
 
           return auth.check(null, `${clsName}.rw.${propName}`)
-              .then(function(rw) {
-                if ( rw ) return PPVC.ANYTHING;
-                if ( canRead ) return PPVC.RO_OR_HIDDEN;
-                return auth.check(null, `${clsName}.ro.${propName}`)
-                  .then((ro) => ro ? PPVC.RO_OR_HIDDEN : PPVC.HIDDEN);
-              });
+            .then(function(rw) {
+              if ( rw ) return PPVC.ANYTHING;
+              if ( canRead ) return PPVC.RO_OR_HIDDEN;
+              return auth.check(null, `${clsName}.ro.${propName}`)
+                .then((ro) => ro ? PPVC.RO_OR_HIDDEN : PPVC.HIDDEN);
+            });
         });
 
-        slot = foam.core.ArraySlot.create({ slots: [visSlot, permSlot] }).map((arr) => {
+        slot = foam.core.ArraySlot.create({slots: [visSlot, permSlot] }).map((arr) => {
           var vis  = arr[0];
           var perm = arr[1] || PPVC.HIDDEN;
 
@@ -2394,9 +2466,19 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DateViewRefinement',
   refines: 'foam.core.Date',
-  requires: [ 'foam.u2.view.DateView' ],
+  requires: [ 'foam.u2.view.DateView', 'foam.u2.view.date.DateTimePicker' ],
   properties: [
-    [ 'view', { class: 'foam.u2.view.DateView' } ]
+    [ 'view', function() {
+      // Detect if the browser has date support. If it does use the browsers default
+      // date picker, otherwise use the foam date picker.
+      let e = document.createElement('input');
+      e.setAttribute('type', 'date');
+      // If a browser doesn't support date, the type  will default to text
+      if ( e.type !== 'text' ) {
+        return { class: 'foam.u2.view.DateView' };
+      }
+      return { class: 'foam.u2.view.date.DateTimePicker' };
+    } ]
   ]
 });
 
@@ -2467,20 +2549,16 @@ foam.CLASS({
   properties: [
     {
       name: 'view',
-      expression: function(label2, label2Formatter) {
+      expression: function(label, labelFormatter) {
         return {
           class: 'foam.u2.CheckBox',
-          label: label2,
-          labelFormatter: label2Formatter
+          label: label,
+          labelFormatter: labelFormatter
         };
       }
     },
     {
-      class: 'String',
-      name: 'label2'
-    },
-    {
-      name: 'label2Formatter'
+      name: 'labelFormatter'
     }
   ]
 });
@@ -2692,6 +2770,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'PasswordPropertyRefinement',
@@ -2706,24 +2785,6 @@ foam.CLASS({
         class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       }
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.u2',
-  name: 'ControllerViewTrait',
-
-  documentation: 'Trait for adding a ControllerMode controllerMode Property.',
-
-  exports: [ 'controllerMode' ],
-
-  properties: [
-    {
-      class: 'Enum',
-      of: 'foam.u2.ControllerMode',
-      name: 'controllerMode'
     }
   ]
 });
@@ -2757,12 +2818,6 @@ foam.CLASS({
   exports: [ 'data' ],
 
   properties: [
-    {
-      class: 'Enum',
-      of: 'foam.u2.ControllerMode',
-      name: 'controllerMode',
-      factory: function() { return this.__context__.controllerMode || foam.u2.ControllerMode.CREATE; }
-    },
     {
       name: 'data',
       attribute: true

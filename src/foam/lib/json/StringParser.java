@@ -47,7 +47,8 @@ public class StringParser
   final static Parser delimiterParser = new Alt(
     Literal.create("\"\"\""),
     Literal.create("\""),
-    Literal.create("'")
+    Literal.create("'"),
+    Literal.create("`")
   );
 
   final static char ESCAPE = '\\';

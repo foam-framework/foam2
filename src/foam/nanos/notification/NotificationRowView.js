@@ -10,31 +10,42 @@
     extends: 'foam.u2.View',
 
     requires: [
+      'foam.log.LogLevel',
       'foam.nanos.auth.User',
-      'foam.nanos.notification.NotificationView',
-      'foam.u2.view.OverlayActionListView'
+      'foam.nanos.notification.NotificationCitationView',
+      'foam.u2.view.OverlayActionListView',
+      'foam.u2.dialog.Popup'
     ],
 
     imports: [
+      'summaryView?',
       'invoiceDAO',
       'notificationDAO',
+      'notify',
       'stack',
       'user',
-      'userDAO'
+      'userDAO',
+      'ctrl'
     ],
 
     exports: [
       'as rowView'
     ],
 
+    topics: [
+      'finished',
+      'throwError'
+    ],
+
     css: `
       ^ {
         position: relative;
         padding: 8px;
+        margin-right: 32px;
       }
       ^ .foam-u2-view-OverlayActionListView {
         position: absolute;
-        top: 8px;
+        top: 20px;
         right: 8px;
       }
       ^ i {
@@ -56,6 +67,10 @@
       ^ .msg.fully-visible {
         display: block;
       }
+      ^ .notificationDiv {
+        display: flex;
+        flex-direction: row;
+      }
     `,
 
     properties: [
@@ -66,21 +81,31 @@
 
     methods: [
       function initE() {
+        var self = this;
         this
           .addClass(this.myClass())
-          .tag(this.OverlayActionListView, {
-            data: [
-              this.READ,
-              this.MARK_UNREAD,
-              this.HIDE_NOTIFICATION_TYPE,
-              this.REMOVE_NOTIFICATION
-            ],
-            obj: this.data
-          })
-          .tag(this.NotificationView, {
-            of: this.data.cls_,
-            data: this.data
-          });
+          .start().addClass('notificationDiv')
+            .on('dblclick', function() {
+              self.ctrl.add(self.Popup.create().tag({
+                class: 'foam.nanos.notification.NotificationMessageModal',
+                data: self.data
+              }));    
+            })
+            .tag(this.NotificationCitationView, {
+              of: this.data.cls_,
+              data: this.data
+            })
+            .tag(this.OverlayActionListView, {
+              data: [
+                this.MARK_AS_READ,
+                this.MARK_AS_UNREAD,
+                this.HIDE_NOTIFICATION_TYPE,
+                this.REMOVE_NOTIFICATION
+              ],
+              obj: this.data,
+              dao: this.notificationDAO
+            })
+          .end();
       }
     ],
 
@@ -89,38 +114,99 @@
         name: 'removeNotification',
         code: function(X) {
           var self = X.rowView;
-          self.notificationDAO.remove(self.data);
+          self.notificationDAO.remove(self.data).then(_ => {
+            self.finished.pub();
+            if ( self.summaryView && foam.u2.GroupingDAOList.isInstance(self.summaryView) ){
+              self.summaryView.update();
+            } else {
+              self.stack.push({
+                class: 'foam.nanos.notification.NotificationView'
+              });
+            }
+          })
         },
         confirmationRequired: true
       },
-
       function hideNotificationType(X) {
         var self = X.rowView;
-        self.user = self.user.clone();
-        self.user.disabledTopics.push(self.data.notificationType);
-        self.userDAO.put(self.user);
-        self.stack.push({
-          class: 'foam.nanos.notification.NotificationListView'
-        });
-      },
 
-      function read(X) {
-        var self = X.rowView;
-        if ( ! self.data.read ) {
-          self.data.read = true;
-          self.notificationDAO.put(this.data);
+        if ( self.user.disabledTopics.includes(self.data.notificationType) ) {
+          self.notify('Disabled already exists for this notification something went wrong.', '', self.LogLevel.ERROR, true);
+          return;
+        }
+
+        var userClone = self.user.clone();
+
+        // check if disabledTopic already exists
+        userClone.disabledTopics.push(self.data.notificationType);
+        self.userDAO.put(userClone).then(user => {
+          self.finished.pub();
+          self.user = user;
+          
+          if ( self.summaryView && foam.u2.GroupingDAOList.isInstance(self.summaryView) ){
+            self.summaryView.update();
+          } else {
+            self.stack.push({
+              class: 'foam.nanos.notification.NotificationView'
+            });
+          }
+        }).catch(e => {
+          self.throwError.pub(e);
+
+          if ( e.exception && e.exception.userFeedback  ) {
+            var currentFeedback = e.exception.userFeedback;
+            while ( currentFeedback ) {
+              this.ctrl.notify(currentFeedback.message, '', this.LogLevel.INFO, true);
+              currentFeedback = currentFeedback.next;
+            }
+          } else {
+            this.ctrl.notify(e.message, '', this.LogLevel.ERROR, true);
+          }
+        })
+      },
+      {
+        name: 'markAsRead',
+        isAvailable: (read) => {
+          return ! read;
+        },
+        code: function(X) {
+          var self = X.rowView;
+          if ( ! self.data.read ) {
+            self.data.read = true;
+            self.notificationDAO.put(self.data).then(_ => {
+              self.finished.pub();
+              if ( self.summaryView && foam.u2.GroupingDAOList.isInstance(self.summaryView) ){
+                self.summaryView.update();
+              } else {
+                self.stack.push({
+                  class: 'foam.nanos.notification.NotificationView'
+                });
+              }
+            });
+          }
         }
       },
-
-      function markUnread(X) {
-        var self = X.rowView;
-        if ( self.data.read ) {
-          self.data.read = false;
-          self.notificationDAO.put(self.data);
+      {
+        name: 'markAsUnread',
+        isAvailable: (read) => {
+          return read;
+        },
+        code: function(X) {
+          var self = X.rowView;
+          if ( self.data.read ) {
+            self.data.read = false;
+            self.notificationDAO.put(self.data).then(_ => {
+              self.finished.pub();
+              if ( self.summaryView && foam.u2.GroupingDAOList.isInstance(self.summaryView) ){
+                self.summaryView.update();
+              } else {
+                self.stack.push({
+                  class: 'foam.nanos.notification.NotificationView'
+                });
+              }
+            })
+          }
         }
-        self.stack.push({
-          class: 'foam.nanos.notification.NotificationListView'
-        });
       }
     ]
   });

@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2014 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2014 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 /** Collision detection manager. **/
@@ -43,6 +32,16 @@ foam.CLASS({
       name: 'stopped_',
       value: true,
       hidden: true
+    },
+    {
+      class: 'Boolean',
+      name: 'colliding_',
+      hidden: true
+    },
+    {
+      name: 'removedChildren_',
+      factory: function() { return []; },
+      hidden: true
     }
   ],
 
@@ -66,10 +65,10 @@ foam.CLASS({
 
     function detectCollisions() {
       /* implicit k-d-tree divide-and-conquer algorithm */
-      this.detectCollisions_(0, this.children.length-1, 'x', false, '');
+      this.detectCollisions_(0, this.children.length-1, 'x', false);
 
-      // TODO: put back above line when properly supports mixing circles and squares
-      // this.detectCollisions__(0, this.children.length-1, 'x', false, '');
+      // simpler and less efficient version, use to debug above
+      // this.detectCollisions__(0, this.children.length-1, 'x', false);
     },
 
     function detectCollisions__(start, end) {
@@ -78,7 +77,7 @@ foam.CLASS({
         once data is partitioned.
       */
       var cs = this.children;
-      for ( var i = start ; i <= end ; i++ ) {
+      for ( var i = start ; i < end ; i++ ) {
         var c1 = cs[i];
         for ( var j = i+1 ; j <= end ; j++ ) {
           var c2 = cs[j];
@@ -88,34 +87,51 @@ foam.CLASS({
     },
 
     function choosePivot(start, end, axis) {
-      var p = 0, cs = this.children, n = end-start;
+      var cs = this.children;
+      axis = axis + '_';
+      var p = 0, n = end-start+1;
       for ( var i = start ; i <= end ; i++ ) p += cs[i][axis] / n;
       return p;
     },
 
-    // TODO: Add support for rectangular objects
+    function swap(a, i1, i2) {
+      var tmp = a[i1];
+      a[i1] = a[i2];
+      a[i2] = tmp;
+    },
+
     function detectCollisions_(start, end, axis, oneD) {
       if ( start >= end ) return;
 
-      var cs = this.children;
-      var pivot = this.choosePivot(start, end, axis);
+      /*
+      I think some collisions are missed, and adding this code makes it worse.
+
+      if ( end - start < 10 ) {
+        this.detectCollisions__(start, end);
+        return;
+      }
+      */
+
+      var cs       = this.children;
+      var pivot    = this.choosePivot(start, end, axis);
       var nextAxis = oneD ? axis : axis === 'x' ? 'y' : 'x' ;
 
-      var p = start;
+      var p = start; // pivot, all values left of 'p' are in first half
       for ( var i = start ; i <= end ; i++ ) {
         var c = cs[i];
-        if ( c[axis] - c.radius < pivot ) {
-          var t = cs[p];
-          cs[p] = c;
-          cs[i] = t;
+        if ( c[axis == 'x' ? 'left_' : 'top_'] <= pivot ) {
+          this.swap(cs, p, i);
           p++;
         }
       }
 
+      // If all values are in first half
       if ( p === end + 1 ) {
         if ( oneD ) {
+          // switch to simple detection if already 1-dimensional
           this.detectCollisions__(start, end);
         } else {
+          // switch to one dimensional search
           this.detectCollisions_(start, end, nextAxis, true);
         }
       } else {
@@ -124,10 +140,8 @@ foam.CLASS({
         p--;
         for ( var i = p ; i >= start ; i-- ) {
           var c = cs[i];
-          if ( c[axis] + c.radius > pivot ) {
-            var t = cs[p];
-            cs[p] = c;
-            cs[i] = t;
+          if ( c[axis == 'x' ? 'right_' : 'bottom_'] >= pivot ) {
+            this.swap(cs, p, i);
             p--;
           }
         }
@@ -143,17 +157,20 @@ foam.CLASS({
       }
     },
 
-    // TODO: add support for rectangles
+    function angleOfImpact(c1, c2) {
+      return Math.atan2(c2.y_-c1.y_, c2.x_-c1.x_);
+    },
+
     function collide(c1, c2) {
       c1.collideWith && c1.collideWith(c2);
       c2.collideWith && c2.collideWith(c1);
 
       if ( ! c1.mass || ! c2.mass ) return;
 
-      var a  = Math.atan2(c2.y-c1.y, c2.x-c1.x);
+      var a  = this.angleOfImpact(c1, c2);
       var m1 =  c1.momentumAtAngle(a);
       var m2 = -c2.momentumAtAngle(a);
-      var m  = ( m1 + m2 )/2;
+      var m  = (m1 + m2) * 2;
 
       // ensure a minimum amount of momentum so that objects don't overlap
       if ( m >= 0 ) {
@@ -196,8 +213,12 @@ foam.CLASS({
     },
 
     function remove() {
-      for ( var i = 0 ; i < arguments.length ; i++ ) {
-        foam.Array.remove(this.children, arguments[i]);
+      if ( this.colliding_ ) {
+        this.removedChildren_.push.apply(this.removedChildren_, arguments);
+      } else {
+        for ( var i = 0 ; i < arguments.length ; i++ ) {
+          foam.Array.remove(this.children, arguments[i]);
+        }
       }
       return this;
     },
@@ -230,8 +251,18 @@ foam.CLASS({
       isFramed: true,
       code: function tick() {
         if ( this.stopped_ ) return;
-        this.onTick.pub();
-        this.detectCollisions();
+
+        this.colliding_ = true;
+          this.onTick.pub();
+          this.detectCollisions();
+        this.colliding_ = false;
+
+        // Now remove all children that were requested to be removed
+        // while detecting collisions. We don't remove while colliding
+        // because it messes up the children array causing errors.
+        this.remove.apply(this, this.removedChildren_);
+        this.removedChildren_.length = 0;
+
         this.updateChildren();
 
         this.tick();

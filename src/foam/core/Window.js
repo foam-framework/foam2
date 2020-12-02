@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Window',
 
-  documentation: function(){/*
+  documentation: `
     Encapsulates top-level window/document features.
 
     Export common window/document services through the Context.
@@ -41,7 +41,7 @@ foam.CLASS({
     A foam.core.Window is installed by FOAM on starup for the default
     window/document, but if user code opens a new Window, it should create
     and install a new foam.core.Window explicitly.
-  */},
+  `,
 
   exports: [
     'getElementsByClassName',
@@ -125,7 +125,7 @@ foam.CLASS({
 
     function merged(l, opt_delay) {
       var delay = opt_delay || 16;
-      var ctx     = this;
+      var ctx   = this;
 
       return foam.Function.setName(function() {
         var triggered = false;

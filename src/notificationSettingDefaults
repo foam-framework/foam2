@@ -1,0 +1,4 @@
+p({"class":"foam.nanos.notification.NotificationSetting","id":1})
+p({"class":"foam.nanos.notification.EmailSetting","id":2})
+p({"class":"foam.nanos.notification.SlackSetting","id":3})
+p({"class":"foam.nanos.notification.sms.SMSSetting","id":4,"enabled":false})

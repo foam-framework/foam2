@@ -44,4 +44,8 @@ public abstract class AbstractMapPropertyInfo
     }
     return 0;
   }
+  
+  public String getSQLType() {
+    return "";
+  }
 }

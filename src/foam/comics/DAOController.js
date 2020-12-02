@@ -23,7 +23,7 @@ foam.CLASS({
   requires: [
     'foam.comics.SearchMode',
     'foam.u2.borders.NullBorder',
-    'foam.nanos.export.CSVDriver'
+    'foam.nanos.export.CSVTableExportDriver'
   ],
 
   topics: [
@@ -49,7 +49,7 @@ foam.CLASS({
     {
       name: 'csvDriver',
       factory: function() {
-        return this.CSVDriver.create();
+        return this.CSVTableExportDriver.create();
       }
     },
     {

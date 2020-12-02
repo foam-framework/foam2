@@ -31,5 +31,5 @@ foam.CLASS({
         viewb: { class: 'foam.u2.view.ColorPicker', onKey: true }
       }
     }
-  ],
+  ]
 });

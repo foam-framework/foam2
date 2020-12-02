@@ -1,1 +1,32 @@
 p({"class":"foam.mlang.MLangTest","id":"mlang","description":"testing java mlangs","server":true})
+p({
+  class: "foam.nanos.test.Test",
+  id: "mlangFormulas",
+  description: "Testing mlang Formulas",
+  server: false,
+  code: """
+    const testThrow = (func) =>
+      new Promise((resolve, reject) => resolve(func())).then(() => { throw false });
+
+    const E = foam.mlang.ExpressionsSingleton.create();
+    const main = function() {
+      // Test basic formulas
+      test(E.ADD(1, 2, 3, 4, 5).f() ===  15, 'test Add');
+      test(E.SUB(9, 1, 2, 3, 4).f() ===  -1, 'test Subtract');
+      test(E.MUL(1, 2, 3, 4, 5).f() === 120, 'test Multiply');
+      test(E.DIV(120, 5, 4, 3, 2).f() === 1, 'test Divide');
+      test(E.MIN_FUNC(1, 2, 3, 4).f() === 1, 'test MinFunc');
+      test(E.MAX_FUNC(1, 2, 3, 4).f() === 4, 'test MaxFunc');
+
+      // Test nested formula
+      test(E.DIV(1, E.ADD(2, E.MUL(3, E.SUB(4, 5)))).f() === -1 , 'test 1/(2+(3*(4-5))) === -1');
+
+      // Test divide involving zeros
+      test(E.DIV(0, 1).f() == 0, 'test 0/1 === 0');
+      testThrow(() => E.DIV(1, 0).f()).catch(e => test(e && e.message === 'Failed to evaluate formula:Divide(1, 0), result: Infinity', 'test 1/0 throws error'));
+      testThrow(() => E.DIV(0, 0).f()).catch(e => test(e && e.message === 'Failed to evaluate formula:Divide(0, 0), result: NaN', 'test 0/0 throws error'));
+    };
+
+    main();
+  """
+})

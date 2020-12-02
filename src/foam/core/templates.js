@@ -73,46 +73,9 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'grammar',
+      name: 'jsGrammar',
       factory: function() {
-        var g = this.Grammar.create({
-          symbols: function(repeat0, simpleAlt, sym, seq1, seq, repeat, notChars, anyChar, not, optional, literal) {
-            return {
-              START: sym('markup'),
-
-              markup: repeat0(simpleAlt(
-                sym('comment'),
-                sym('simple value'),
-                sym('raw values tag'),
-                sym('code tag'),
-                sym('ignored newline'),
-                sym('newline'),
-                sym('single quote'),
-                sym('text')
-              )),
-
-              'comment': seq1(1, '<!--', repeat0(not('-->', anyChar())), '-->'),
-
-              'simple value': seq('%%', repeat(notChars(' ()-"\r\n><:;,')), optional('()')),
-
-              'raw values tag': simpleAlt(
-                seq('<%=', repeat(not('%>', anyChar())), '%>')
-              ),
-
-              'code tag': seq('<%', repeat(not('%>', anyChar())), '%>'),
-              'ignored newline': simpleAlt(
-                literal('\\\r\\\n'),
-                literal('\\\n')
-              ),
-              newline: simpleAlt(
-                literal('\r\n'),
-                literal('\n')
-              ),
-              'single quote': literal("'"),
-              text: anyChar()
-            }
-          }
-        });
+        var g = this.createAbstractGrammar();
 
         var self = this;
 
@@ -154,16 +117,111 @@ foam.CLASS({
       }
     },
     {
+      name: 'javaGrammar',
+      factory: function() {
+        var g = this.createAbstractGrammar();
+
+        var self = this;
+
+        g.addActions({
+          markup: function(v) {
+            var ret = '';
+            var wasSimple = self.simple;
+            for ( var i = 0; i < self.out.length; i++ ) {
+              if ( self.out[i].length == 1 && ( i == 0 || self.out[i-1].length > 1 ) ) {
+                ret += 'builder.append("';
+              }
+              ret += self.out[i];
+              if ( self.out[i].length == 1 && ( i == self.out.length -1 || self.out[i + 1].length > 1 ) )
+                ret += '");\n';
+            }
+            ret = wasSimple ? null : ret;
+            self.out = [];
+            self.simple = true;
+            return [wasSimple, ret];
+          },
+          'simple value': function(v) {
+            self.push("',\n self.",
+                v[1].join(''),
+                v[2],
+                ",\n'");
+          },
+          'raw values tag': function (v) {
+            var value = v[1].join('').replace(/\s/g, '');
+            var argExist = self.argsSet.includes(value);
+            if ( ! argExist )
+              value = 'get' + value.charAt(0).toUpperCase() + value.slice(1) + '()';
+            self.push('builder.append(' + value + ');\n');
+          },
+          'code tag': function (v) {
+            self.push(v[1].join('') + '\n');
+          },
+          'single quote': function() {
+            self.push("\\'");
+          },
+          newline: function() {
+            self.push('\\n');
+          },
+          text: function(v) {
+            self.pushSimple(v);
+          }
+        });
+        return g;
+      }
+    },
+    {
       name: 'out',
       factory: function() { return []; }
     },
     {
       name: 'simple',
       value: true
-    }
+    },
+    'argsSet'
   ],
 
   methods: [
+    function createAbstractGrammar() {
+      return this.Grammar.create({
+       symbols: function(repeat0, simpleAlt, sym, seq1, seq, repeat, notChars, anyChar, not, optional, literal) {
+          return {
+            START: sym('markup'),
+
+            markup: repeat0(simpleAlt(
+              sym('comment'),
+              sym('simple value'),
+              sym('raw values tag'),
+              sym('code tag'),
+              sym('ignored newline'),
+              sym('newline'),
+              sym('single quote'),
+              sym('text')
+            )),
+
+            'comment': seq1(1, '<!--', repeat0(not('-->', anyChar())), '-->'),
+
+            'simple value': seq('%%', repeat(notChars(' ()-"\r\n><:;,')), optional('()')),
+
+            'raw values tag': simpleAlt(
+              seq('<%=', repeat(not('%>', anyChar())), '%>')
+            ),
+
+            'code tag': seq('<%', repeat(not('%>', anyChar())), '%>'),
+            'ignored newline': simpleAlt(
+              literal('\\\r\\\n'),
+              literal('\\\n')
+            ),
+            newline: simpleAlt(
+              literal('\r\n'),
+              literal('\n')
+            ),
+            'single quote': literal("'"),
+            text: anyChar()
+          }
+        }
+      });
+    },
+
     function push() {
       this.simple = false;
       this.pushSimple.apply(this, arguments);
@@ -174,7 +232,7 @@ foam.CLASS({
     },
 
     function compile(t, name, args) {
-      var result = this.grammar.parseString(t);
+      var result = this.jsGrammar.parseString(t);
       if ( ! result ) throw "Error parsing template " + name;
 
       var code = this.HEADER +
@@ -192,6 +250,16 @@ foam.CLASS({
 
       return f;
     },
+
+    function compileJava(t, name, args) {
+      this.argsSet = args.map(ar => ar.name);
+      var result = this.javaGrammar.parseString(t);
+      if ( ! result ) throw "Error parsing template " + name;
+
+      var code = result[1];
+
+      return code;
+        },
 
     function lazyCompile(t, name, args) {
       return (function(util) {
@@ -227,8 +295,8 @@ foam.CLASS({
   methods: [
     function installInProto(proto) {
       proto[this.name] =
-          foam.templates.TemplateUtil.create().lazyCompile(
-              this.template, this.name, this.args || []);
+        foam.templates.TemplateUtil.create().lazyCompile(
+          this.template, this.name, this.args || []);
     }
   ]
 });

@@ -82,6 +82,7 @@ public class FObjectParser
 
             return null;
           } catch (Throwable t) {
+            t.printStackTrace();
             return null;
           }
         }

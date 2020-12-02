@@ -17,9 +17,9 @@ foam.CLASS({
 
   properties: [
     [ 'borderWidth', 0 ],
-    [ 'width', 600 ],
-    [ 'height', 500 ],
-    [ 'color', 'white' ]
+    [ 'width',       600 ],
+    [ 'height',      500 ],
+    [ 'color',       'white' ]
   ],
 
   methods: [
@@ -41,7 +41,7 @@ foam.CLASS({
 
     function part() {
       this.start(arguments[0], arguments[1]);
-      for ( var i = 2 ; i < arguments.length ; i+=2 )
+      for ( var i = 2 ; i < arguments.length ; i += 2 )
         this.line(arguments[i], arguments[i+1]);
     },
 

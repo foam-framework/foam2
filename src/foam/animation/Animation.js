@@ -1,19 +1,9 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2016 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 
 // Experimental Animation Support
 // What about nested objects?
@@ -51,6 +41,125 @@ foam.LIB({
       }
 
 //      janitor.detach();
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.animation',
+  name: 'Animation',
+
+  imports: [ 'setTimeout' ],
+
+  // TODO: add support for interpolating colours
+  properties: [
+    {
+      class: 'Int',
+      name: 'delay',
+      units: 'ms'
+    },
+    {
+      class: 'Int',
+      name: 'duration',
+      units: 'ms',
+      value: 1000
+    },
+    {
+      name: 'f',
+    },
+    {
+      class: 'Array',
+      name: 'objs'
+    },
+    {
+      name: 'onEnd',
+      value: function() {}
+    },
+    {
+      name: 'startTime_'
+    },
+    {
+      class: 'Map',
+      name: 'slots_'
+    },
+    {
+      class: 'Boolean',
+      name: 'stopped'
+    },
+    {
+      name: 'interp',
+      value: function(t) { return t; }
+    }
+  ],
+
+  methods: [
+    function start() {
+      if ( this.delay > 0 ) {
+        this.setTimeout(this.start_.bind(this), this.delay);
+      } else {
+        this.start_();
+      }
+    },
+
+    function start_() {
+      var self    = this;
+      var cleanup = foam.core.FObject.create();
+
+      this.objs.forEach(function(o) {
+        cleanup.onDetach(o.propertyChange.sub(self.propertySet));
+      });
+
+      this.f();
+
+      cleanup.detach();
+
+      this.startTime_ = Date.now();
+
+      this.animateValues();
+      this.tick();
+
+      this.onDetach(() => this.stopped = true);
+
+      return this;
+    },
+
+    function animateValues() {
+      for ( var key in this.slots_ ) {
+        var s     = this.slots_[key];
+        var slot  = s[0], startValue = s[1], endValue = s[2];
+        var time  = Math.min(1, (Date.now() - this.startTime_) / this.duration);
+        var value = startValue + (endValue-startValue) * this.interp(time);
+        slot.set(value);
+      }
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'propertySet',
+      code: function(_, __, __, slot) {
+        if ( this.slots_[slot] ) return;
+
+        var oldValue = slot.getPrev(), newValue = slot.get();
+
+        if ( ! foam.Number.isInstance(oldValue) || Number.isNaN(oldValue) ) return;
+
+        this.slots_[slot] = [ slot, oldValue, newValue ];
+      }
+    },
+    {
+      name: 'tick',
+      isFramed: true,
+      code: function() {
+        this.animateValues();
+
+        if ( Date.now() < this.startTime_ + this.duration ) {
+          this.tick();
+        } else {
+          this.onEnd();
+        }
+      }
     }
   ]
 });

@@ -25,6 +25,7 @@ foam.CLASS({
     'foam.nanos.auth.GroupPermissionJunction',
     'foam.nanos.auth.User',
     'foam.nanos.auth.ServiceProviderAwareDAO',
+    'foam.nanos.auth.LifecycleState',
     'foam.util.Auth',
     'java.util.HashMap',
     'java.util.List',
@@ -61,9 +62,9 @@ foam.CLASS({
         groupPermissionJunctionDAO.where(EQ(GroupPermissionJunction.SOURCE_ID, "test")).removeAll();
 
         // not explicitly testing spids
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("spid.create").build());
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("spid.read.*").build());
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("spid.update.*").build());
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("serviceprovider.create").build());
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("serviceprovider.read.*").build());
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("serviceprovider.update.*").build());
 
         DAO delegate = new MDAO(User.getOwnClassInfo());
         DAO dao = new foam.nanos.auth.AuthorizationDAO.Builder(x)
@@ -80,6 +81,7 @@ foam.CLASS({
           .setId(99995)
           .setEmail("test@example.com")
           .setGroup("admin")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         ctxUser = (User) delegate.put(ctxUser);
         y = Auth.sudo(y, ctxUser);
@@ -91,6 +93,7 @@ foam.CLASS({
           .setLastName("last")
           .setEmail("99999@test.com")
           .setGroup("test")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
 
         user1 = (User) dao.put(user1);
@@ -103,6 +106,7 @@ foam.CLASS({
           .setLastName("last_two")
           .setEmail("99998@test.com")
           .setGroup("test")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         user2 = (User) dao.put(user2);
 
@@ -153,13 +157,14 @@ foam.CLASS({
         users = sink.getArray();
         test (users.size() == 2, "select with user.read.id found self and id. expected: 2, found: "+users.size());
 
-        // create/update 
+        // create/update
         User user3 = (User) new User.Builder(x)
           .setId(99997)
           .setFirstName("three")
           .setLastName("last")
           .setEmail("three@test.com")
           .setGroup("test")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
 
         try {
@@ -224,6 +229,7 @@ foam.CLASS({
           .setId(99995)
           .setEmail("test@example.com")
           .setGroup("admin")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         ctxUser = (User) delegate.put(ctxUser);
         y = Auth.sudo(y, ctxUser);
@@ -235,6 +241,7 @@ foam.CLASS({
           .setLastName("last")
           .setEmail("99999@test.com")
           .setGroup("test")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
 
         user1 = (User) dao.put(user1);
@@ -247,6 +254,7 @@ foam.CLASS({
           .setLastName("last_two")
           .setEmail("99998@test.com")
           .setGroup("test")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         user2 = (User) dao.put(user2);
 
@@ -257,6 +265,7 @@ foam.CLASS({
           .setEmail("99998@test.com")
           .setGroup("test")
           .setSpid("other")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         user3 = (User) dao.put(user3);
 
@@ -307,7 +316,7 @@ foam.CLASS({
         users = sink.getArray();
         test (users.size() == 2, "select with user.read.1&&2 found self and id. expected: 2, found: "+users.size());
 
-        // create/update 
+        // create/update
         User user4 = (User) new User.Builder(x)
           .setId(88897)
           .setFirstName("four")
@@ -315,6 +324,7 @@ foam.CLASS({
           .setEmail("four@test.com")
           .setGroup("test")
           .setSpid("other")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
 
         try {
@@ -333,7 +343,7 @@ foam.CLASS({
           test(false, "put without spid.create should not throw AuthorizationException: "+e.getMessage());
         }
 
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("spid.update.spid").build());
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("serviceprovider.update.spid").build());
         // with ServiceProviderAwareDAO without spid.update the put returns null rather
         // than throwing the exception - not yet sure if this is the correct/expected behaviour
         // as not sure where the return of null is occuring.
@@ -346,8 +356,8 @@ foam.CLASS({
           test(true, "put without spid.update.target_spid threw AuthorizationException: "+e.getMessage());
         }
 
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("spid.update.spid").build());
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("spid.update.other").build());
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("serviceprovider.update.spid").build());
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("serviceprovider.update.other").build());
 
         try {
           user4 = (User) dao.put(user4);
@@ -384,7 +394,7 @@ foam.CLASS({
         } catch (AuthorizationException e) {
           test(true, "put without spid.update.target_spid threw AuthorizationException: "+e.getMessage());
         }
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("spid.update.another").build());
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("serviceprovider.update.another").build());
 
         try {
           user4 = (User) dao.put(user4);

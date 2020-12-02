@@ -13,7 +13,8 @@ public class ArrayParser
 {
   private final static Parser instance__ = new ArrayParser();
 
-  public static Parser instance() { return instance__ == null  ? new ProxyParser() { public Parser getDelegate() { return instance__; } } : instance__; }
+  // Unusual definition of instance() to avoid circular references.
+  public static Parser instance() { return instance__ == null ? new ProxyParser() { public Parser getDelegate() { return instance__; } } : instance__; }
 
   public ArrayParser() {
     super(new Seq1(3,

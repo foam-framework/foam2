@@ -11,28 +11,34 @@ foam.CLASS({
   implements: [
     'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.EnabledAware',
     'foam.nanos.auth.HumanNameTrait',
     'foam.nanos.auth.LastModifiedAware',
     'foam.nanos.auth.ServiceProviderAware',
+    'foam.nanos.auth.LifecycleAware',
     'foam.nanos.notification.Notifiable'
   ],
 
   requires: [
     'foam.nanos.auth.Address',
-    'foam.nanos.auth.PriorPassword',
-    'foam.nanos.auth.Phone'
+    'foam.nanos.auth.PriorPassword'
   ],
 
   javaImports: [
     'foam.core.X',
     'foam.dao.DAO',
     'foam.dao.ArraySink',
-
+    'foam.nanos.auth.LifecycleAware',
+    'foam.nanos.auth.LifecycleState',
     'foam.nanos.notification.NotificationSetting',
+    'foam.nanos.session.Session',
+    'foam.nanos.theme.Theme',
     'foam.util.SafetyUtil',
+    'java.util.Arrays',
+    'java.util.HashMap',
+    'java.util.HashSet',
     'java.util.List',
-    'static foam.mlang.MLang.EQ'
   ],
 
   documentation: `The User represents a person or entity with the ability
@@ -45,8 +51,7 @@ foam.CLASS({
   tableColumns: [
     'id',
     'type',
-    'group',
-    'legalName',
+    'group.id',
     'organization',
     'email'
   ],
@@ -73,18 +78,46 @@ foam.CLASS({
 
   sections: [
     {
-      name: 'business',
-      title: 'Business Information'
+      name: 'userInformation',
+      title: 'User Information',
+      order: 1
     },
     {
-      name: 'personal',
-      title: 'Personal Information'
+      name: 'businessInformation',
+      title: 'Business Information',
+      order: 2
     },
     {
-      name: 'administrative',
+      name: 'ownerInformation',
+      title: 'Ownership'
+    },
+    {
+      name: 'operationsInformation',
+      title: 'Operations'
+    },
+    {
+      name: 'complianceInformation',
+      title: 'Compliance'
+    },
+    {
+      name: 'accountInformation',
+      title: 'Accounts'
+    },
+    {
+      name: 'contactInformation',
+      title: 'Contacts'
+    },
+    {
+      name: 'systemInformation',
       help: 'Properties that are used internally by the system.',
+      title: 'System Information',
       permissionRequired: true
     },
+    {
+      name: 'deprecatedInformation',
+      title: 'Deprecated',
+      permissionRequired: true
+    }
   ],
 
   // TODO: The following properties don't have to be defined here anymore once
@@ -105,15 +138,17 @@ foam.CLASS({
       tableWidth: 100,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative',
-      includeInDigest: true
-   },
+      section: 'userInformation',
+      order: 1,
+      includeInDigest: true,
+      sheetsOutput: true
+    },
     {
       class: 'Boolean',
       name: 'enabled',
       documentation: 'Determines whether the User is permitted certain actions.',
       value: true,
-      section: 'administrative'
+      section: 'systemInformation'
     },
     {
       class: 'Boolean',
@@ -121,28 +156,26 @@ foam.CLASS({
       documentation: 'Determines whether the User can login to the platform.',
       writePermissionRequired: true,
       value: true,
-      section: 'administrative'
+      section: 'systemInformation',
+      order: 30
     },
     {
       class: 'DateTime',
       name: 'lastLogin',
       documentation: 'The date and time of last login by User.',
-      section: 'administrative',
+      section: 'operationsInformation',
+      order: 30,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO'
     },
     {
       class: 'String',
       name: 'firstName',
+      shortName: 'fn',
       documentation: 'The first name of the User.',
-      // TODO: Use validatationPredicates instead.
-      validateObj: function(firstName) {
-        if ( ! firstName.trim() ) {
-          return 'First name required.';
-        }
-      },
       gridColumns: 4,
-      section: 'personal',
+      section: 'userInformation',
+      order: 2,
       includeInDigest: true
    },
     {
@@ -150,33 +183,32 @@ foam.CLASS({
       name: 'middleName',
       documentation: 'The middle name of the User.',
       gridColumns: 4,
-      section: 'personal',
+      section: 'userInformation',
+      order: 3,
       includeInDigest: true
     },
     {
       class: 'String',
       name: 'lastName',
+      shortName: 'ln',
       documentation: 'The last name of the User.',
-      // TODO: Use validatationPredicates instead.
-      validateObj: function(lastName) {
-        if ( ! lastName.trim() ) {
-          return 'Last name required.';
-        }
-      },
       gridColumns: 4,
-      section: 'personal',
+      section: 'userInformation',
+      order: 4,
       includeInDigest: true
     },
     {
       name: 'legalName',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'personal'
+      section: 'userInformation',
+      order: 5
     },
    {
       class: 'String',
       name: 'jobTitle',
-      section: 'personal',
+      documentation: 'The job title of the individual person, or real user.',
+      section: 'ownerInformation',
       view: function(args, X) {
         return {
           class: 'foam.u2.view.ChoiceWithOtherView',
@@ -199,7 +231,7 @@ foam.CLASS({
       displayWidth: 80,
       width: 100,
       tableWidth: 160,
-      section: 'business'
+      section: 'businessInformation'
     },
     {
       class: 'String',
@@ -208,12 +240,22 @@ foam.CLASS({
         of the User.`,
       width: 50,
       createVisibility: 'HIDDEN',
-      section: 'business'
+      section: 'ownerInformation'
+    },
+    {
+      class: 'String',
+      name: 'userName',
+      label: 'Username',
+      documentation: 'The username of the User.',
+      section: 'userInformation'
     },
     {
       class: 'EMail',
       name: 'email',
-      label: 'Email Address',
+      label: {
+        'en' :'Email Address',
+        'fr' :'Adresse e-mail'
+      },
       documentation: 'The email address of the User.',
       displayWidth: 80,
       width: 100,
@@ -221,64 +263,41 @@ foam.CLASS({
       javaSetter:
       `email_ = val.toLowerCase();
        emailIsSet_ = true;`,
-      section: 'personal'
+      section: 'userInformation',
+      order: 6
     },
     {
       class: 'Boolean',
       name: 'emailVerified',
       documentation: 'Determines whether the email address of the User is valid.',
       writePermissionRequired: true,
-      section: 'administrative'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Phone',
-      name: 'phone',
-      documentation: 'Personal phone number.',
-      factory: function() {
-        return this.Phone.create();
-      },
-      view: { class: 'foam.u2.detail.VerticalDetailView' },
-      createVisibility: 'HIDDEN',
-      section: 'personal'
+      section: 'systemInformation',
+      order: 35
     },
     {
       class: 'PhoneNumber',
       name: 'phoneNumber',
       documentation: 'Personal phone number.',
-      section: 'personal'
+      section: 'userInformation'
     },
     {
       class: 'Boolean',
       name: 'phoneNumberVerified',
       writePermissionRequired: true,
-      section: 'personal'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Phone',
-      name: 'mobile',
-      documentation: 'Returns the mobile phone number of the User from the Phone model.',
-      factory: function() {
-        return this.Phone.create();
-      },
-      view: { class: 'foam.u2.detail.VerticalDetailView' },
-      section: 'personal',
-      createVisibility: 'HIDDEN',
-      includeInDigest: true
+      section: 'userInformation'
     },
     {
       class: 'PhoneNumber',
       name: 'mobileNumber',
       documentation: 'Returns the mobile phone number of the User from the Phone model.',
       createVisibility: 'HIDDEN',
-      section: 'personal'
+      section: 'userInformation'
     },
     {
       class: 'Boolean',
       name: 'mobileNumberVerified',
       writePermissionRequired: true,
-      section: 'personal'
+      section: 'userInformation'
     },
     {
       class: 'String',
@@ -295,13 +314,13 @@ foam.CLASS({
       `,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative'
+      section: 'userInformation'
     },
     {
       class: 'Date',
       name: 'birthday',
       documentation: 'The date of birth of the individual person, or real user.',
-      section: 'personal'
+      section: 'userInformation'
     },
     {
       class: 'foam.nanos.fs.FileProperty',
@@ -312,7 +331,7 @@ foam.CLASS({
         class: 'foam.nanos.auth.ProfilePictureView',
         placeholderImage: 'images/ic-placeholder.png'
       },
-      section: 'personal'
+      section: 'userInformation'
     },
     {
       class: 'FObjectProperty',
@@ -322,25 +341,21 @@ foam.CLASS({
       factory: function() {
         return this.Address.create();
       },
-      label: 'Country',
-      tableCellFormatter: function(value, obj, axiom) {
-        let addressString = '';
-        for ( prop in value.instance_ ) if ( prop ) addressString += ` ${value[prop]}`;
-        if ( addressString ) this.setAttribute('title', addressString.trim());
-        return this.__subContext__.countryDAO.find(value.countryId).then((cobj) => {
-          return cobj ? this.add(cobj.name) : this.add(value.countryId);
-        });
-      },
-      section: 'personal'
+      section: 'userInformation'
     },
     {
       class: 'Reference',
       name: 'language',
       documentation: 'The default language preferred by the User.',
       of: 'foam.nanos.auth.Language',
-      value: 'en',
       createVisibility: 'HIDDEN',
-      section: 'personal'
+      section: 'userInformation',
+      factory: function() {
+        return foam.nanos.auth.LanguageId.create({code: 'en'})
+      },
+      javaFactory: `
+        return new foam.nanos.auth.LanguageId.Builder(null).setCode("en").build();
+      `
     },
     {
       class: 'String',
@@ -348,8 +363,7 @@ foam.CLASS({
       documentation: 'The preferred time zone of the User.',
       width: 5,
       createVisibility: 'HIDDEN',
-      section: 'personal'
-      // TODO: create custom view or DAO
+      section: 'userInformation'
     },
     {
       class: 'Password',
@@ -370,7 +384,7 @@ foam.CLASS({
       createVisibility: 'RW',
       updateVisibility: 'RW',
       readVisibility: 'HIDDEN',
-      section: 'administrative'
+      section: 'systemInformation'
     },
     {
       class: 'Password',
@@ -378,7 +392,7 @@ foam.CLASS({
       documentation: 'The password that is currently active with the User.',
       hidden: true,
       networkTransient: true,
-      section: 'administrative',
+      section: 'systemInformation',
       includeInDigest: true
     },
     {
@@ -394,7 +408,7 @@ foam.CLASS({
       `,
       hidden: true,
       networkTransient: true,
-      section: 'administrative',
+      section: 'systemInformation',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO'
     },
@@ -404,7 +418,7 @@ foam.CLASS({
       documentation: 'The password that was previously active with the User.',
       hidden: true,
       networkTransient: true,
-      section: 'administrative'
+      section: 'systemInformation'
     },
     {
       class: 'DateTime',
@@ -412,47 +426,58 @@ foam.CLASS({
       documentation: 'The date and time that the password was last modified.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative'
+      section: 'systemInformation',
+      order: 40
     },
     {
       class: 'DateTime',
       name: 'passwordExpiry',
       documentation: `The date and time that the current password of the User
         will expire.`,
-      section: 'administrative'
+      section: 'systemInformation',
+      order: 41
     },
-    // TODO: startDate, endDate,
-    // TODO: do we want to replace 'note' with a simple ticket system?
     {
       class: 'String',
       name: 'note',
       documentation: 'A field for a note that can be added and appended to the User.',
       displayWidth: 70,
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 },
-      section: 'administrative'
+      section: 'userInformation'
     },
-    // TODO: remove after demo
     {
       class: 'String',
       name: 'businessName',
       documentation: 'The name of the business associated with the User.',
       width: 50,
-      section: 'business',
-      hidden: true
+      section: 'businessInformation',
+      tableWidth: 170
     },
     {
       class: 'StringArray',
       name: 'disabledTopics',
       documentation: 'Disables types for notifications.',
       createVisibility: 'HIDDEN',
-      section: 'administrative'
+      section: 'operationsInformation',
+      javaPostSet: `
+        clearDisabledTopicSet();
+      `
     },
     {
-      class: 'StringArray',
-      name: 'disabledTopicsEmail',
-      documentation: 'Disables types for email notifications.',
-      createVisibility: 'HIDDEN',
-      section: 'administrative'
+      class: 'Object',
+      /** @private */
+      name: 'disabledTopicSet',
+      javaType: 'java.util.HashSet',
+      hidden: true,
+      transient: true,
+      factory: function() { return {}; },
+      javaFactory: `
+        HashSet<String> set = new HashSet<>();
+        for ( String s : getDisabledTopics() ) {
+          set.add(s);
+        }
+        return set;
+      `
     },
     {
       class: 'URL',
@@ -468,7 +493,7 @@ foam.CLASS({
         }
       },
       createVisibility: 'HIDDEN',
-      section: 'personal'
+      section: 'userInformation'
     },
     {
       class: 'DateTime',
@@ -476,7 +501,7 @@ foam.CLASS({
       documentation: 'The date and time of when the User was created in the system.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative',
+      section: 'userInformation',
       includeInDigest: true
     },
     {
@@ -485,15 +510,44 @@ foam.CLASS({
       documentation: 'The date and time the User was last modified.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative'
+      section: 'userInformation'
+    },
+    {
+      class: 'foam.core.Enum',
+      of: 'foam.nanos.auth.LifecycleState',
+      name: 'lifecycleState',
+      section: 'systemInformation',
+      order: 20,
+      value: foam.nanos.auth.LifecycleState.PENDING,
+      writePermissionRequired: true
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
+      name: 'spid',
+      tableWidth: 120,
+      section: 'systemInformation',
+      order: 15,
+      writePermissionRequired:true,
+      documentation: `
+        Need to override getter to return "" because its trying to
+        return null (probably as a result of moving order of files
+        in nanos), which breaks tests
+      `,
+      javaGetter: `
+        if ( ! spidIsSet_ ) {
+          return "";
+        }
+        return spid_;
+      `
     }
   ],
 
   methods: [
     {
-      name: 'label',
+      name: 'toSummary',
       type: 'String',
-      code: function label() {
+      code: function toSummary() {
         if ( this.legalName ) return this.legalName;
         if ( this.lastName && this.firstName ) return this.firstName + ' ' + this.lastName;
         if ( this.lastName ) return this.lastName;
@@ -532,8 +586,9 @@ foam.CLASS({
       ],
       javaThrows: ['AuthorizationException'],
       javaCode: `
-        User user = (User) x.get("user");
-        User agent = (User) x.get("agent");
+        Subject subject = (Subject) x.get("subject");
+        User user = subject.getUser();
+        User agent = subject.getRealUser();
         AuthService auth = (AuthService) x.get("auth");
         boolean findSelf = SafetyUtil.equals(this.getId(), user.getId()) ||
           (
@@ -556,21 +611,23 @@ foam.CLASS({
       ],
       javaThrows: ['AuthorizationException'],
       javaCode: `
-        User user = (User) x.get("user");
+        User user = ((Subject) x.get("subject")).getUser();
         AuthService auth = (AuthService) x.get("auth");
         User oldUser = (User) oldObj;
 
+        Subject subject = (Subject) x.get("subject");
+        User agent = subject.getRealUser();
         boolean updatingSelf = SafetyUtil.equals(this.getId(), user.getId()) ||
           (
-            x.get("agent") != null &&
-            SafetyUtil.equals(((User) x.get("agent")).getId(), this.getId())
+            agent != null &&
+            SafetyUtil.equals(agent.getId(), this.getId())
           );
         boolean hasUserEditPermission = auth.check(x, "user.update." + this.getId());
 
         if (
           ! updatingSelf &&
           ! hasUserEditPermission &&
-          ! auth.check(x, "spid.update." + user.getSpid())
+          ! auth.check(x, "serviceprovider.update." + user.getSpid())
         ) {
           throw new AuthorizationException("You do not have permission to update this user.");
         }
@@ -597,31 +654,88 @@ foam.CLASS({
       ],
       javaThrows: ['AuthorizationException'],
       javaCode: `
-        User user = (User) x.get("user");
+        User user = ((Subject) x.get("subject")).getUser();
         AuthService auth = (AuthService) x.get("auth");
 
         if (
           ! SafetyUtil.equals(this.getId(), user.getId()) &&
-          ! auth.check(x, "user.delete." + this.getId()) &&
-          ! auth.check(x, "spid.delete." + this.getSpid())
+          ! auth.check(x, "user.remove." + this.getId()) &&
+          ! auth.check(x, "serviceprovider.remove." + this.getSpid())
         ) {
           throw new RuntimeException("You do not have permission to delete that user.");
         }
       `
     },
     {
-      name: 'toSummary',
-      code: function() {
-        return this.label();
-      }
-    },
-    {
       name: 'doNotify',
       javaCode: `
-        List<NotificationSetting> settings = ((ArraySink) getNotificationSettings(x).select(new ArraySink())).getArray();
-        for( NotificationSetting setting : settings ) {
-          setting.sendNotification(x, this, notification);
+        // Get the default settings for the user if none are already defined
+        List<NotificationSetting> settingDefaults = ((ArraySink) ((DAO) x.get("notificationSettingDefaultsDAO")).select(new ArraySink())).getArray();
+        HashMap<String, NotificationSetting> settingsMap = new HashMap<String, NotificationSetting>();
+        for ( NotificationSetting setting : settingDefaults ) {
+          settingsMap.put(setting.getClassInfo().getId(), setting);
         }
+
+        // Get the configured notifications settings for the user and overwrite the defaults
+        List<NotificationSetting> settings = ((ArraySink) getNotificationSettings(x).select(new ArraySink())).getArray();
+        for ( NotificationSetting setting : settings ) {
+          settingsMap.put(setting.getClassInfo().getId(), setting);
+        }
+
+        for ( NotificationSetting setting : settingsMap.values() ) {
+          setting.doNotify(x, this, notification);
+        }
+      `
+    },
+    {
+      name: 'validateAuth',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaCode: `
+
+        // check if user enabled
+        if ( ! this.getEnabled() ) {
+          throw new AuthenticationException("User disabled");
+        }
+
+        // check if user login enabled
+        if ( ! this.getLoginEnabled() ) {
+          throw new AuthenticationException("Login disabled");
+        }
+
+        // fetch context from session and check two factor success if enabled.
+        Session session = x.get(Session.class);
+        if ( session == null ) {
+          throw new AuthenticationException("No session exists.");
+        }
+
+        // check for two-factor authentication
+        if ( this.getTwoFactorEnabled() && ! session.getContext().getBoolean("twoFactorSuccess") ) {
+          throw new AuthenticationException("User requires two-factor authentication");
+        }
+
+        if ( this instanceof LifecycleAware && ((LifecycleAware) this).getLifecycleState() != LifecycleState.ACTIVE ) {
+          throw new AuthenticationException("User is not active");
+        }
+      `
+    },
+    {
+      name: 'isAdmin',
+      type: 'Boolean',
+      documentation: `
+        Returns true if the user has the system user id, or is in either the
+        admin or system group.
+
+        **IMPORTANT**: It is possible to misuse the value from this method.
+        A check on this method should never be used to override behaviour of
+        authorization; in this case it is preferred to create a permission that
+        no other user will have.
+      `,
+      javaCode: `
+        return getId() == foam.nanos.auth.User.SYSTEM_USER_ID
+          || getGroup().equals("admin")
+          || getGroup().equals("system");
       `
     }
   ]
@@ -639,7 +753,8 @@ foam.RELATIONSHIP({
   },
   targetProperty: {
     hidden: false,
-    section: 'administrative'
+    section: 'systemInformation',
+    order: 10
   }
 });
 
@@ -650,24 +765,8 @@ foam.RELATIONSHIP({
   forwardName: 'files',
   inverseName: 'owner',
   sourceProperty: {
-    hidden: true,
-    transient: true
-  }
-});
-
-foam.RELATIONSHIP({
-  cardinality: '1:*',
-  sourceModel: 'foam.nanos.auth.ServiceProvider',
-  targetModel: 'foam.nanos.auth.User',
-  forwardName: 'users',
-  inverseName: 'spid',
-  sourceProperty: {
-    hidden: true
-  },
-  targetProperty: {
-    hidden: false,
-    tableWidth: 120,
-    section: 'administrative'
+    transient: true,
+    section: 'systemInformation'
   }
 });
 
@@ -681,11 +780,15 @@ foam.RELATIONSHIP({
   junctionDAOKey: 'agentJunctionDAO',
   sourceProperty: {
     createVisibility: 'HIDDEN',
-    section: 'business'
+    label: 'Businesses',
+    section: 'ownerInformation',
+    order: 10
   },
   targetProperty: {
     createVisibility: 'HIDDEN',
-    section: 'business'
+    label: 'Agents of Business',
+    section: 'ownerInformation',
+    order: 11
   }
 });
 
@@ -701,4 +804,19 @@ foam.CLASS({
       name: 'group'
     }
   ]
+});
+
+foam.RELATIONSHIP({
+  sourceModel: 'foam.nanos.theme.Theme',
+  targetModel: 'foam.nanos.auth.User',
+  cardinality: '1:*',
+  forwardName: 'users',
+  inverseName: 'theme',
+  sourceProperty: {
+    hidden: true,
+    visibility: 'HIDDEN',
+  },
+  targetProperty: {
+    section: 'systemInformation'
+  }
 });

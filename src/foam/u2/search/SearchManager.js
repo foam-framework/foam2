@@ -117,7 +117,7 @@ foam.CLASS({
     {
       name: 'onViewUpdate',
       isMerged: true,
-      mergeDelay: 10,
+      mergeDelay: 250,
       code: function() {
         this.predicate = this.and(this.views);
         // That will tickle the expression for filteredDAO.
@@ -127,7 +127,7 @@ foam.CLASS({
     {
       name: 'updateViews',
       isMerged: true,
-      mergeDelay: 20,
+      mergeDelay: 250,
       code: function() {
         // TODO: Why do we need this and not just one function combined with
         //       onViewUpdate? Revisit

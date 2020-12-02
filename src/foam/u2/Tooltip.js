@@ -51,17 +51,17 @@ foam.CLASS({
           clearTimeout(self.timer);
         }
         self.timer = setTimeout(function() {
-          if ( self.opened === false ) {
+          if ( ! self.opened ) {
             self.document.body.insertAdjacentHTML('beforeend', self.outerHTML);
 
-            var domRect = self.target.el().getBoundingClientRect();
-            var screenWidth = self.window.innerWidth;
+            var domRect      = self.target.el().getBoundingClientRect();
+            var screenWidth  = self.window.innerWidth;
             var screenHeight = self.window.innerHeight;
-            var scrollY = self.window.scrollY;
-            var selfRect = self.el().getBoundingClientRect();
-            var height = self.el().getBoundingClientRect().height;
-            var top = (domRect.top - scrollY > screenHeight / 2) ? evt.pageY - 30 - height : evt.pageY + 30;
-            var left = (domRect.left > screenWidth / 2) ? evt.pageX - 20 - selfRect.width  :  evt.pageX + 20;
+            var scrollY      = self.window.scrollY;
+            var selfRect     = self.el().getBoundingClientRect();
+            var height       = self.el().getBoundingClientRect().height;
+            var top          = (domRect.top - scrollY > screenHeight / 2) ? evt.pageY - 30 - height : evt.pageY + 30;
+            var left         = (domRect.left > screenWidth / 2) ? evt.pageX - 20 - selfRect.width  :  evt.pageX + 20;
 
             self.opened = true;
             self.load();
@@ -79,11 +79,11 @@ foam.CLASS({
           }
         }, 500);
       });
-      
-      self.target.on('mousedown', self.close);
+
+      self.target.on('mousedown',  self.close);
       self.target.on('mouseleave', self.close);
       self.target.on('touchstart', self.close);
-      self.target.on('unload', self.close);
+      self.target.on('unload',     self.close);
     },
 
     function close() {
@@ -93,9 +93,8 @@ foam.CLASS({
       }
       clearTimeout(this.timer);
     },
-    
-    function loadTooltip() {
 
+    function loadTooltip() {
       if ( ! this.target || ! this.target.el() ) return;
 
       var oldTips = this.document.getElementsByClassName(this.myClass());

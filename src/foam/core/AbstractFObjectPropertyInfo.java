@@ -6,6 +6,8 @@
 
 package foam.core;
 
+import foam.lib.json.OutputJSON;
+import foam.lib.json.UnknownFObject;
 import foam.nanos.logger.Logger;
 import foam.util.SafetyUtil;
 import org.w3c.dom.Document;
@@ -116,5 +118,35 @@ public abstract class AbstractFObjectPropertyInfo
     Object d = ((FObject) this.get(o1)).hardDiff((FObject)this.get(o2));
     this.set(diff, d);
     return d != null;
+  }
+  
+  public String getSQLType() {
+    return "";
+  }
+  
+  public boolean isDefaultValue(Object o) {
+    return foam.util.SafetyUtil.compare(get_(o), null) == 0;
+  }
+  
+  public void format(foam.lib.formatter.FObjectFormatter formatter, foam.core.FObject obj) {
+    Object propObj = get_(obj);
+    if ( propObj instanceof FObject && ! (propObj instanceof OutputJSON) ) {
+      formatter.output((FObject) propObj, of());
+    }
+    else {
+      formatter.output(propObj);
+    }
+  }
+  
+  public int compare(Object o1, Object o2) {
+    return foam.util.SafetyUtil.compare(get_(o1), get_(o2));
+  }
+
+  public int comparePropertyToObject(Object key, Object o) {
+    return foam.util.SafetyUtil.compare(cast(key), get_(o));
+  }
+
+  public int comparePropertyToValue(Object key, Object value) {
+    return foam.util.SafetyUtil.compare(cast(key), cast(value));
   }
 }

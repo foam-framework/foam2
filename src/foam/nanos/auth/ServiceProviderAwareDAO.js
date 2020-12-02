@@ -64,8 +64,8 @@ ServiceProviderAware`,
     if ( isCreate ) {
       if ( SafetyUtil.isEmpty(sp.getSpid()) ||
            ( ! SafetyUtil.isEmpty(sp.getSpid()) &&
-             ! auth.check(x, "spid.create." + sp.getSpid()) ) ) {
-        User user = (User) x.get("user");
+             ! auth.check(x, "serviceprovider.create." + sp.getSpid()) ) ) {
+        User user = ((Subject) x.get("subject")).getUser();
         if ( user != null &&
              ! SafetyUtil.isEmpty(user.getSpid()) ) {
           sp.setSpid(user.getSpid());
@@ -74,9 +74,12 @@ ServiceProviderAware`,
         }
       }
     } else if ( ! sp.getSpid().equals(oldSp.getSpid()) &&
-                ! (auth.check(x, "spid.update." + oldSp.getSpid()) &&
-                   auth.check(x, "spid.update." + sp.getSpid())) ) {
+                ! (auth.check(x, "serviceprovider.update." + oldSp.getSpid()) &&
+                   auth.check(x, "serviceprovider.update." + sp.getSpid())) ) {
       throw new AuthorizationException("You do not have permission to update ServiceProvider (spid) property.");
+    } else if ( sp.getSpid().equals(oldSp.getSpid()) &&
+                ! auth.check(x, "serviceprovider.read." + sp.getSpid()) ) {
+      throw new AuthorizationException("You do not have permission to update data on other ServiceProvider.");
     }
 
     return super.put_(x, obj);
@@ -112,7 +115,10 @@ ServiceProviderAware`,
       if ( ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass()) ) {
 
         PropertyInfo spidProperty = ((PropertyInfo) getOf().getAxiomByName("spid"));
-        spidPredicate = MLang.EQ(spidProperty, spid);
+        spidPredicate = MLang.OR(
+          MLang.EQ(spidProperty, spid),
+          new ServiceProviderAwarePredicate(x, null, getPropertyInfos())
+        );
 
         if ( predicate != null ) {
           spidPredicate = MLang.AND(
@@ -135,6 +141,17 @@ ServiceProviderAware`,
       spidPredicate
     );
      `
+    },
+    {
+      name: 'cmd_',
+      documentation: 'Process ServiceProviderAwareSupport action which performs spid matching on "OBJ" in the context.',
+      javaCode: `
+        if ( obj instanceof ServiceProviderAwareSupport ) {
+          return ((ServiceProviderAwareSupport) obj).match(x, getPropertyInfos(), x.get("OBJ"));
+        }
+
+        return getDelegate().cmd_(x, obj);
+      `
     }
   ]
 });

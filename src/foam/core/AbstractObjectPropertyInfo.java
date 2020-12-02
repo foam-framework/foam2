@@ -10,6 +10,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import foam.box.RPCReturnMessage;
 
 public abstract class AbstractObjectPropertyInfo
   extends AbstractPropertyInfo
@@ -50,5 +51,47 @@ public abstract class AbstractObjectPropertyInfo
     //shodow copy
     this.set(diff, this.get(o2));
     return true;
+  }
+  
+  public String getSQLType() {
+    return "";
+  }
+
+  public Class getValueClass() {
+    return Object.class;
+  }
+
+  public Object cast(Object o) {
+    return o;
+  }
+
+  protected abstract Object get_(Object o);
+
+  public int compare(Object o1, Object o2) {
+    return foam.util.SafetyUtil.compare(get_(o1), get_(o2));
+  }
+
+  public int comparePropertyToObject(Object key, Object o) {
+    return foam.util.SafetyUtil.compare(cast(key), get_(o));
+  }
+
+  public int comparePropertyToValue(Object key, Object value) {
+    return foam.util.SafetyUtil.compare(cast(key), cast(value));
+  }
+
+  public foam.lib.parse.Parser queryParser() {
+    return foam.lib.query.AnyParser.instance();
+  }
+
+  public foam.lib.parse.Parser csvParser() {
+    return foam.lib.csv.CSVStringParser.instance();
+  }
+
+  public boolean isDefaultValue(Object o) {
+    return foam.util.SafetyUtil.compare(get_(o), null) == 0;
+  }
+
+  public void format(foam.lib.formatter.FObjectFormatter formatter, foam.core.FObject obj) {
+    formatter.output(get_(obj));
   }
 }

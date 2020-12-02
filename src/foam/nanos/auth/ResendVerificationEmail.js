@@ -11,12 +11,13 @@ foam.CLASS({
   documentation: 'Resend verification email view',
 
   requires: [
-    'foam.u2.dialog.NotificationMessage'
+    'foam.log.LogLevel'
   ],
 
   imports: [
     'auth',
     'emailToken',
+    'notify',
     'stack',
     'user'
   ],
@@ -57,10 +58,10 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'Title', message: 'You\'re almost there...' },
-    { name: 'Instructions1', message: 'We have sent you an email.' },
-    { name: 'Instructions2', message: 'Please go to your inbox to confirm your email address.' },
-    { name: 'Instructions3', message: 'Your email address needs to be verified before getting started.' }
+    { name: 'Title', message: `You're almost there...` },
+    { name: 'Instructions1', message: `We've sent you an email` },
+    { name: 'Instructions2', message: 'Please go to your inbox to confirm your email address' },
+    { name: 'Instructions3', message: 'Your email address needs to be verified before getting started' }
   ],
 
   methods: [
@@ -93,9 +94,9 @@ foam.CLASS({
           if ( ! result ) {
             throw new Error('Error generating reset token');
           }
-          self.add(self.NotificationMessage.create({ message: 'Verification email sent to ' + self.user.email }));
+          self.notify('Verification email sent to ' + self.user.email, '', self.LogLevel.INFO, true);
         }).catch(function(err) {
-          self.add(self.NotificationMessage.create({ message: err.message, type: 'error' }));
+          self.notify(err.message, '', self.LogLevel.ERROR, true);
         });
       }
     },
@@ -106,6 +107,7 @@ foam.CLASS({
         this.auth.logout().then(function() {
           this.window.location.hash = '';
           this.window.location.reload();
+          localStorage.removeItem('defaultSession');
         });
       }
     }

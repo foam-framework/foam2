@@ -8,10 +8,7 @@ package foam.nanos.http;
 
 import foam.core.X;
 import foam.dao.DAO;
-import foam.nanos.auth.AuthService;
-import foam.nanos.auth.AuthenticationException;
-import foam.nanos.auth.AuthorizationException;
-import foam.nanos.auth.User;
+import foam.nanos.auth.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
@@ -68,12 +65,17 @@ public class SessionWebAgent
       }
 
       // display a warning if querystring contains sessionId
+      // TODO: whitelist 'services' that we allow/expect sessionId,
+      // such as file requests
       if ( req.getQueryString().contains("sessionId") ) {
-        logger.warning(
-          "\033[31;1m" +
-          "Querystring contains 'sessionId'! Please inform the security team!" +
-          "\033[0m"
-        );
+        if ( ! req.getRequestURI().contains("httpFileService") ) {
+          logger.warning(
+            "\033[31;1m" +
+            req.getRequestURI() +
+            " contains 'sessionId'! Please inform the security team!" +
+            "\033[0m"
+            );
+        }
       }
 
       // find session
@@ -89,16 +91,24 @@ public class SessionWebAgent
       }
 
       // check permissions
-      session.setContext(session.getContext().put("user", user));
+      Subject subject = new Subject.Builder(x).setUser(user).build();
+      session.setContext(session.getContext().put("subject", subject));
       if ( ! auth.check(session.getContext(), permission_) ) {
         throw new AuthorizationException();
       }
 
       // execute delegate
       getDelegate().execute(session.getContext().put(HttpServletResponse.class, resp).put(HttpServletRequest.class, req));
-  } catch ( Throwable t ) {
+
+    } catch ( AuthorizationException e ) {
+      // report permission issues
+      logger.warning("SessionWebAgent", e);
+      resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    } catch ( AuthenticationException e ) {
+      logger.debug("SessionWebAgent", e);
+      resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    } catch ( Throwable t ) {
       logger.error("Unexpected exception in SessionWebAgent", t);
-      // throw unauthorized on error
       resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
   }

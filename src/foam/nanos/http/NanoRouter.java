@@ -113,6 +113,7 @@ public class NanoRouter
     } catch (Throwable t) {
       System.err.println("Error serving " + serviceKey + " " + path);
       t.printStackTrace();
+      throw t;
     } finally {
       if ( ! serviceKey.equals("static") ) pm.log(x_);
     }

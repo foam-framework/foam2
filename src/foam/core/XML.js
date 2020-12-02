@@ -22,12 +22,14 @@ foam.CLASS({
     },
     {
       name: 'fromXML',
+      hidden: true,
       value: function fromXML(value, ctx, prop, xml) {
         return foam.xml.parse(value, null, ctx);
       }
     },
     {
       name: 'toXML',
+      hidden: true,
       value: function toXML(value, Outputter) { return value; }
     }
   ],

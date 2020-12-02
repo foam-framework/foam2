@@ -23,16 +23,19 @@ foam.CLASS({
     'contextData as data'
   ],
 
+
   properties: [
+    [ 'nodeName', 'span' ],
     {
       class: 'foam.u2.ViewSpec',
-      name: 'readView',
+      name: 'readView'
     },
     {
       class: 'foam.u2.ViewSpec',
-      name: 'writeView',
+      name: 'writeView'
     },
     'prop',
+    'args',
     {
       name: 'contextData',
       documentation: "See the comment in 'exports' above as to why this is necessary.",
@@ -43,32 +46,44 @@ foam.CLASS({
   ],
 
   methods: [
+    function initArgs(args) {
+      this.SUPER.apply(this, arguments);
+      if ( args ) {
+        this.args = foam.util.clone(args);
+        delete this.args['class'];
+        delete this.args['readView'];
+        delete this.args['writeView'];
+      } else {
+        this.args = {};
+      }
+    },
     function initE() {
       var self = this;
       var callFromProperty = function() {
         self.prop && this.fromProperty && this.fromProperty(self.prop);
       };
       this.SUPER();
-      this.addClass(this.myClass());
-      this.add(this.slot(function(mode) {
+      this.addClass(this.myClass()).add(this.slot(function(mode) {
         switch ( mode ) {
           case self.DisplayMode.RW:
           case self.DisplayMode.DISABLED:
-            return self.E()
-              .start(self.writeView, {
+            return self.createChild_(
+              self.writeView,
+              {
+                ...this.args,
+                focused$: this.focused$,
                 data$: self.data$,
                 mode: mode
-              })
-                .call(callFromProperty)
-              .end();
+              }).call(callFromProperty);
           case self.DisplayMode.RO:
-            return self.E()
-              .start(self.readView, {
+            return self.createChild_(
+              self.readView,
+              {
+                ...this.args,
+                focused$: this.focused$,
                 data$: self.data$,
                 mode: mode
-              })
-                .call(callFromProperty)
-              .end();
+              }).call(callFromProperty);
           case self.DisplayMode.HIDDEN:
             break;
           default:

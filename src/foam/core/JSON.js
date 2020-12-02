@@ -394,6 +394,11 @@ foam.CLASS({
       }
     },
 
+    function outputRegExp(o) {
+      // These methods happen to have identical implementation
+      this.outputFunction(o);
+    },
+
     function outputFObject(o, opt_cls) {
       if ( o.outputJSON ) {
         o.outputJSON(this);
@@ -474,6 +479,7 @@ foam.CLASS({
         Boolean:   function(o) { this.out(o); },
         Date:      function(o) { this.outputDate(o); },
         Function:  function(o) { this.outputFunction(o); },
+        RegExp:  function(o) { this.outputRegExp(o); },
         FObject: function(o, opt_cls) { this.outputFObject(o, opt_cls); },
         Array: function(o, opt_cls) {
           this.start('[');
@@ -610,8 +616,10 @@ foam.CLASS({
     function parseClassFromString(str, opt_cls, opt_ctx) {
       return this.strict ?
           // JSON.parse() is faster; use it when data format allows.
-          foam.json.parse(JSON.parse(str), opt_cls,
-                          opt_ctx || this.creationContext) :
+          foam.json.parse(
+            JSON.parse(str),
+            opt_cls,
+            opt_ctx || this.creationContext) :
           // Create new parser iff different context was injected; otherwise
           // use same parser bound to "creationContext" each time.
           opt_ctx ? foam.parsers.FON.create({
@@ -679,6 +687,17 @@ foam.LIB({
       propertyPredicate: function(o, p) { return ! p.networkTransient; }
     }),
 
+    // Short, but exclude network-transient properties.
+    Dig: foam.json.Outputter.create({
+      pretty: true,
+      strict: false,
+      formatDatesAsNumbers: false,
+      outputDefaultValues: true,
+      useShortNames: false,
+      convertUnserializableToStubs: true,
+      propertyPredicate: function(o, p) { return ! p.externalTransient && ! p.networkTransient; }
+    }),
+
     // Short, but exclude storage-transient properties.
     Storage: foam.json.Outputter.create({
       pretty: false,
@@ -708,8 +727,8 @@ foam.LIB({
     {
       name: 'parse',
       args: [
-        { type: 'Any', name: 'o' },
-        { type: 'Class', name: 'opt_class' },
+        { type: 'Any',     name: 'o' },
+        { type: 'Class',   name: 'opt_class' },
         { type: 'Context', name: 'opt_ctx' },
       ],
       code: foam.mmethod({
@@ -732,15 +751,32 @@ foam.LIB({
                 "In foam.core.JSON.parse(Object): JSON parser tried to deserialize class '"
                   + cls + "' and failed. Is this class available to the client?"
               );
+              return null;
             }
+
             // TODO(markdittmer): Turn into static method: "parseJSON" once
             // https://github.com/foam-framework/foam2/issues/613 is fixed.
             if ( c.PARSE_JSON ) return c.PARSE_JSON(json, opt_class, opt_ctx);
 
+            var pMap = c.model_.getPrivate_('axiomsByNameOrShortnameMap');
+
+            if ( ! pMap ) {
+              pMap = c.model_.setPrivate_('axiomsByNameOrShortnameMap', {});
+              c.getAxiomsByClass(foam.core.Property).forEach(function(p) {
+                pMap[p.name] = p;
+                if ( p.shortName ) pMap[p.shortName] = p;
+              });
+            }
+
             for ( var key in json ) {
-              var prop = c.getAxiomByName(key);
+              var prop = pMap[key];
               if ( prop ) {
-                json[key] = prop.fromJSON(json[key], opt_ctx, prop, this);
+                var js = prop.fromJSON(json[key], opt_ctx, prop, this);
+                if ( js == null && json[key] != 'null' ) {
+                  console.warn('Unable to parse property "' + key + '"', 'in', json);
+                } else {
+                  json[prop.name] = js;
+                }
               }
             }
 
@@ -779,12 +815,12 @@ foam.LIB({
               })
               continue;
             }
-            if ( ( key === 'of' ||
-                   key === 'class' ||
-                   key === 'view' ||
+            if ( ( key === 'of'          ||
+                   key === 'class'       ||
+                   key === 'view'        ||
                    key === 'sourceModel' ||
                    key === 'targetModel' ||
-                   key === 'refines' ) &&
+                   key === 'refines' )   &&
                  foam.String.isInstance(o[key]) ) {
               r.push(x.classloader.maybeLoad(o[key]));
               continue;

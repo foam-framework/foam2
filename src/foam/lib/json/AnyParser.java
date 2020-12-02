@@ -24,12 +24,13 @@ public class AnyParser
       // parse long but fail if decimal is found
       new Seq1(0,
         LongParser.instance(),
-        new Not(Literal.create("."))),
+        new Not(Literal.create("."))
+      ),
       DoubleParser.instance(),
-      new ObjectDateParser(),
       StringArrayParser.instance(),
       new StringDoubleArrayParser(),
       new PropertyReferenceParser(),
+      ObjectDateParser.instance(),
       ClassReferenceParser.instance(),
       ArrayParser.instance(),
       FObjectParser.instance(),

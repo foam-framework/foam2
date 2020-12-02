@@ -30,19 +30,35 @@ public class ExpireUserCapabilityJunctionsCron implements ContextAgent {
     userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
     Date today = new Date();
 
-    // Only active, i.e., GRANTED, UserCapabilityJunctions should be checked
     List<UserCapabilityJunction> activeJunctions = ((ArraySink) userCapabilityJunctionDAO
-      .where(AND(
-        EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED),
-        LT(UserCapabilityJunction.EXPIRY, today)
+      .where(OR(
+        AND(
+          EQ(UserCapabilityJunction.IS_IN_GRACE_PERIOD, true),
+          LTE(UserCapabilityJunction.GRACE_PERIOD, 0)
+        ),
+        AND(
+          OR(
+            EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
+          ),
+          NEQ(UserCapabilityJunction.EXPIRY, null),
+          LT(UserCapabilityJunction.EXPIRY, today)
+        )
       ))
       .select(new ArraySink()))
       .getArray();
 
     for ( UserCapabilityJunction activeJunction : activeJunctions ) {
-      activeJunction.setStatus(CapabilityJunctionStatus.EXPIRED);
+      activeJunction = (UserCapabilityJunction) activeJunction.fclone();
+      if ( activeJunction.getIsInGracePeriod() || activeJunction.getGracePeriod() <= 0 ) {
+        activeJunction.setStatus(CapabilityJunctionStatus.EXPIRED);
+        activeJunction.setIsExpired(true);
+      } else {
+        activeJunction.setIsInGracePeriod(true);
+      }
+      if ( activeJunction.getStatus() == CapabilityJunctionStatus.EXPIRED ) activeJunction.clearData();
+      
+      logger.debug("Moved UserCapabilityJunction : " + activeJunction.getId() + " into status :" + activeJunction.getStatus());
       userCapabilityJunctionDAO.put(activeJunction);
-      logger.debug("Expired UserCapabilityJunction : " + activeJunction.getId());
     }
   }
 }

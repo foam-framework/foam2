@@ -22,43 +22,35 @@ foam.CLASS({
 
   css: `
     ^ {
-      height: 40.8px;
-      width: 448px;
-      background-color: /*%PRIMARY1%*/ #202341;
-      border-radius: 2px 2px 0 0;
-      margin: auto;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      width: 100%; /* This is to fit the width of its parent container */
+      padding-top: 8px;
+      padding-bottom: 24px;
+      box-sizing: border-box;
+      border-bottom: solid 1px #CBCFD4;
     }
-    ^ .title{
-      height: 40px;
-      font-family: Roboto;
-      font-size: 14px;
-      line-height: 2.86;
-      text-align: left;
-      color: #ffffff;
-      margin-left: 25px;
-      display: inline-block;
+    ^title{
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: #1E1F21;
+      margin: 0;
+      flex: 1;
     }
-    ^ .close{
+    ^close{
       background: 0;
       width: 24px;
       height: 24px;
-      margin-top: 5px;
+      padding: 0 !important;
       cursor: pointer;
-      position: relative;
-      top: -3px;
-      right: 20px;
-      float: right;
     }
     ^ .foam-u2-ActionView-closeModal{
-      position: relative;
-      right: 0px;
-      width: 50px;
-      height: 40px;
-      background: transparent;
+      background: transparent !important;
       margin-top: 0;
-      top: 0;
-      right: 0;
-      border: none;
+      border: none !important;
     }
   `,
 
@@ -68,15 +60,15 @@ foam.CLASS({
 
     this
       .addClass(this.myClass())
-      .start().addClass('title').add(this.title).end()
-      .start(this.CLOSE_MODAL).addClass('close').end();
+      .start().addClass(this.myClass('title')).add(this.title).end()
+      .start(this.CLOSE_MODAL).addClass(this.myClass('close')).end();
     }
   ],
 
   actions: [
     {
       name: 'closeModal',
-      icon: 'images/ic-cancelwhite.svg',
+      icon: 'images/ic-cancelblack.svg',
       label: '',
       code: function(X) {
         X.closeDialog();

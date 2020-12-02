@@ -28,7 +28,8 @@ foam.CLASS({
               href: data.data && data.data.blob ?
                 URL.createObjectURL(data.data.blob) :
                 data.address,
-              target: '_blank'
+              target: '_blank',
+              download: true
             })
             .add('Download');
         }, this.data$));

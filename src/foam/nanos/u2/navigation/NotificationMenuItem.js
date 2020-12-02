@@ -88,7 +88,7 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'INVALID_MENU', message: `No menu in menuDAO with id: "notifications".` }
+    { name: 'INVALID_MENU', message: `No menu in menuDAO with id: "notifications"` }
   ],
 
   methods: [

@@ -8,10 +8,7 @@ package foam.nanos.ruler;
 
 import foam.core.*;
 import foam.dao.DAO;
-import foam.nanos.auth.LastModifiedAware;
-import foam.nanos.auth.LastModifiedByAware;
-import foam.nanos.auth.LifecycleAware;
-import foam.nanos.auth.LifecycleState;
+import foam.nanos.auth.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
@@ -66,24 +63,42 @@ public class RuleEngine extends ContextAwareSupport {
     for (Rule rule : rules) {
       try {
         if ( stops_.get() ) break;
+        if ( ! checkPermission(rule, obj) ) continue;
         if ( ! isRuleApplicable(rule, obj, oldObj)) continue;
         PM pm = (PM) x_.get("PM");
-        pm.setClassType(RulerDAO.getOwnClassInfo());
+        pm.setKey(RulerDAO.getOwnClassInfo().getId());
         pm.setName(rule.getDaoKey() + ": " + rule.getId());
         pm.init_();
         applyRule(rule, obj, oldObj, agency);
         pm.log(x_);
         agency.submit(x_, x -> saveHistory(rule, obj), "Save history. Rule id:" + rule.getId());
-      } catch ( Exception e ) {
-        // logger.debug(this.getClass().getSimpleName(), "id", rule.getId(), "\\nrule", rule, "\\nobj", obj, "\\nold", oldObj, "\\n", e);
-        logger.error(this.getClass().getSimpleName(), "id", rule.getId(), e);
+      } catch (Exception e) {
+        // To be expected if a rule blocks an operation. Not an error.
+        logger.debug(this.getClass().getSimpleName(), "id", rule.getId(), "\\nrule", rule, "\\nobj", obj, "\\nold", oldObj, "\\n", e);
         throw e;
       }
     }
     try {
       compoundAgency.execute(x_);
     } catch (Exception e) {
-      logger.error(e.getMessage(), e);
+      // Allow network exceptions to pass through
+      // TODO: use foam.core.Exception when interface properties
+      //       are supported in Java generation
+      if ( e instanceof foam.core.ExceptionInterface ) {
+        RuntimeException clientE = (RuntimeException)
+          ((ExceptionInterface) e).getClientRethrowException();
+        if ( clientE != null ) {
+          throw clientE;
+        }
+      }
+
+      // This should never happen.
+      // It means there's a bug in a Rule agent and it should be fixed.
+      var message = "CRITICAL UNEXPECTED EXCEPTION EXECUTING RULE";
+
+      logger.error(message, e);
+      // TODO: this breaks CI, enable when all test cases passing
+      // throw new RuntimeException(message, e);
     }
 
     asyncApplyRules(rules, obj, oldObj);
@@ -100,7 +115,7 @@ public class RuleEngine extends ContextAwareSupport {
    */
   public void probe(List<Rule> rules, RulerProbe rulerProbe, FObject obj, FObject oldObj) {
       PM pm = (PM) x_.get("PM");
-      pm.setClassType(RulerProbe.getOwnClassInfo());
+      pm.setKey(RulerProbe.getOwnClassInfo().getId());
       pm.setName("Probe:" + obj.getClassInfo());
       pm.init_();
     for (Rule rule : rules) {
@@ -174,6 +189,15 @@ public class RuleEngine extends ContextAwareSupport {
       && rule.f(userX_, obj, oldObj);
   }
 
+  private boolean checkPermission(Rule rule, FObject obj) {
+    var user = rule.getUser(getX(), obj);
+    if ( user != null ) {
+      var auth = (AuthService) getX().get("auth");
+      return auth.checkUser(getX(), user, "rule.read." + rule.getId());
+    }
+    return true;
+  }
+
   private void asyncApplyRules(List<Rule> rules, FObject obj, FObject oldObj) {
     if (rules.isEmpty()) return;
     ((Agency) getX().get("threadPool")).submit(userX_, x -> {
@@ -182,7 +206,8 @@ public class RuleEngine extends ContextAwareSupport {
         if ( stops_.get() ) return;
 
         currentRule_ = rule;
-        if ( rule.getAsyncAction() != null
+        if ( checkPermission(rule, obj)
+          && rule.getAsyncAction() != null
           && rule.f(x, obj, oldObj)
         ) {
           // We assume the original object `obj` is stale when running after rules.
@@ -204,7 +229,7 @@ public class RuleEngine extends ContextAwareSupport {
   }
 
   private void retryAsyncApply(X x, Rule rule, FObject obj, FObject oldObj) {
-    new RetryManager(rule.getId()).submit(x, x1 -> {
+    new RetryManager(rule.getName()).submit(x, x1 -> {
       rule.asyncApply(x, obj, oldObj, RuleEngine.this, rule);
       saveHistory(rule, obj);
     });
@@ -262,6 +287,7 @@ public class RuleEngine extends ContextAwareSupport {
       } catch (Exception e) {
         // Object instantiation should not fail but if it does fail then return
         // the original object as the reloaded object.
+        // REVIEW: this may result in Object is Frozen assertion errors
         return obj;
       }
     }
@@ -282,7 +308,7 @@ public class RuleEngine extends ContextAwareSupport {
 
     // Return the original object as the reloaded object if nu == old or nu == obj.
     if ( nu.equals(old) || nu.equals(cloned) ) {
-      return obj;
+      return cloned;
     }
 
     // For greedy mode, return the reloaded object `nu` as is. Otherwise,

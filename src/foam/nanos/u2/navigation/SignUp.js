@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.u2.navigation',
   name: 'SignUp',
@@ -5,25 +11,35 @@ foam.CLASS({
   documentation: `Model used for registering/creating an user.
   Hidden properties create the different functionalities for this view (Ex. coming in with a signUp token)`,
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
   imports: [
     'appConfig',
     'auth',
-    'notify',
+    'ctrl',
     'stack',
     'user'
   ],
 
   requires: [
-    'foam.nanos.auth.Address',
-    'foam.nanos.auth.Country',
-    'foam.nanos.auth.Phone',
-    'foam.nanos.auth.User'
+    'foam.log.LogLevel',
+    'foam.nanos.auth.User',
+    'foam.u2.dialog.NotificationMessage'
   ],
 
   messages: [
-    { name: 'TITLE', message: 'Create a free account' },
+    { name: 'TITLE', message: 'Create an account' },
     { name: 'FOOTER_TXT', message: 'Already have an account?' },
-    { name: 'FOOTER_LINK', message: 'Sign in' }
+    { name: 'FOOTER_LINK', message: 'Sign in' },
+    { name: 'ERROR_MSG', message: 'There was a problem creating your account' },
+    { name: 'EMAIL_ERR', message: 'Valid email required' },
+    { name: 'EMAIL_AVAILABILITY_ERR', message: 'This email is already in use. Please sign in or use a different email' },
+    { name: 'USERNAME_EMPTY_ERR', message: 'Username required' },
+    { name: 'USERNAME_AVAILABILITY_ERR', message: 'This username is taken. Please try another.' },
+    //TODO: Find out better way to deal with PASSWORD_ERR
+    { name: 'PASSWORD_ERR', message: 'Password should be at least 6 characters.' }
   ],
 
   properties: [
@@ -57,115 +73,63 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'disableCompanyName_',
-      documentation: `Set this to true to disable the Company Name input field.`,
+      name: 'emailAvailable',
+      documentation: `Binded property used to display email not available error.`,
+      value: true,
       hidden: true
-    },
-    {
-      class: 'StringArray',
-      name: 'countryChoices_',
-      documentation: `Set this to the list of countries (Country.NAME) we want our signing up user to be able to select.`,
-      hidden: true
-    },
-    {
-      class: 'String',
-      name: 'firstName',
-      gridColumns: 6,
-      view: {
-        class: 'foam.u2.TextField',
-        placeholder: 'Jane'
-      },
-      required: true
-    },
-    {
-      class: 'String',
-      name: 'lastName',
-      gridColumns: 6,
-      view: {
-        class: 'foam.u2.TextField',
-        placeholder: 'Doe'
-      },
-      required: true
-    },
-    {
-      class: 'String',
-      name: 'jobTitle',
-      view: function(args, X) {
-        return {
-          class: 'foam.u2.view.ChoiceWithOtherView',
-          otherKey: 'Other',
-          choiceView: {
-            class: 'foam.u2.view.ChoiceView',
-            placeholder: 'Please select...',
-            dao: X.jobTitleDAO,
-            objToChoice: function(a) {
-              return [a.name, a.label];
-            }
-          }
-        };
-      },
-      validationPredicates: [
-        {
-          args: ['jobTitle'],
-          predicateFactory: function(e) {
-            return e.NEQ(foam.nanos.u2.navigation.SignUp.JOB_TITLE, '');
-          },
-          errorString: 'Please enter job title'
-        }
-      ],
-      required: true
-    },
-    {
-      class: 'PhoneNumber',
-      name: 'phone',
-      required: true
-    },
-    {
-      class: 'String',
-      name: 'organization',
-      label: 'Company Name',
-      view: {
-        class: 'foam.u2.TextField',
-        placeholder: 'ABC Company'
-      },
-      visibility: function(disableCompanyName_) {
-        return disableCompanyName_ ? foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW;
-      },
-      required: true
-    },
-    {
-      class: 'Reference',
-      targetDAOKey: 'countryDAO',
-      name: 'countryId',
-      label: 'Country',
-      of: 'foam.nanos.auth.Country',
-      documentation: 'Country address.',
-      view: function(_, X) {
-        var E = foam.mlang.Expressions.create();
-        choices = X.data.slot(function(countryChoices_) {
-          if ( ! countryChoices_ || countryChoices_.length == 0 ) return X.countryDAO;
-          return X.countryDAO.where(E.IN(X.data.Country.ID, countryChoices_));
-        });
-        return foam.u2.view.ChoiceView.create({
-          placeholder: 'Select your country',
-          objToChoice: function(a) {
-            return [a.id, a.name];
-          },
-          dao$: choices
-        }, X);
-      },
-      required: true,
     },
     {
       class: 'EMail',
       name: 'email',
-      view: {
-        class: 'foam.u2.TextField',
-        placeholder: 'example@example.com'
+      placeholder: 'example@example.com',
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.UserPropertyAvailabilityView',
+          icon: 'images/checkmark-small-green.svg',
+          onKey: true,
+          isAvailable$: X.data.emailAvailable$,
+          targetProperty: foam.nanos.auth.User.EMAIL,
+          inputValidation: /\S+@\S+\.\S+/,
+          restrictedCharacters: /^[^\s]$/,
+          displayMode: X.data.disableEmail_ ? foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW
+        };
       },
-      visibility: function(disableEmail_) {
-        return disableEmail_ ?
-          foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW;
+      validateObj: function(email, emailAvailable) {
+        // Empty Check
+        if ( email.length === 0 || ! /\S+@\S+\.\S+/.test(email) ) return this.EMAIL_ERR;
+        // Availability Check
+        if ( ! emailAvailable ) return this.EMAIL_AVAILABILITY_ERR;
+      },
+      required: true
+    },
+    {
+      class: 'Boolean',
+      name: 'usernameAvailable',
+      documentation: `Binded property used to display username not available error.`,
+      value: true,
+      hidden: true
+    },
+    {
+      class: 'String',
+      name: 'userName',
+      label: 'Username',
+      placeholder: 'example123',
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.UserPropertyAvailabilityView',
+          icon: 'images/checkmark-small-green.svg',
+          onKey: true,
+          isAvailable$: X.data.usernameAvailable$,
+          targetProperty: foam.nanos.auth.User.USER_NAME,
+          inputValidation: /^[^\s\/]+$/,
+          restrictedCharacters: /^[^\s\/]$/
+        };
+      },
+      validateObj: function(userName, usernameAvailable) {
+        // Empty Check
+        if ( userName.length === 0 ) return this.USERNAME_EMPTY_ERR;
+        // Availability Check
+        if ( ! usernameAvailable ) return this.USERNAME_AVAILABILITY_ERR;
       },
       required: true
     },
@@ -177,7 +141,10 @@ foam.CLASS({
         class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
-      minLength: 6
+      validateObj: function(desiredPassword) {
+        if ( ! desiredPassword || desiredPassword.length < 6 ) return this.PASSWORD_ERR;
+      },
+      required: true
     }
   ],
 
@@ -197,19 +164,20 @@ foam.CLASS({
     },
     {
       name: 'updateUser',
-      code: function(x) {
-        this.finalRedirectionCall();
+      code: async function(x) {
+        await this.finalRedirectionCall(x);
       }
     },
     {
       name: 'finalRedirectionCall',
-      code: function() {
+      code: async function(x) {
         if ( this.user.emailVerified ) {
           // When a link was sent to user to SignUp, they will have already verified thier email,
           // thus thier user.emailVerified should be true and they can simply login from here.
           window.history.replaceState(null, null, window.location.origin);
           location.reload();
         } else {
+          await this.auth.login(x, this.email, this.desiredPassword);
           this.stack.push({
             class: 'foam.nanos.auth.ResendVerificationEmail'
           });
@@ -221,7 +189,7 @@ foam.CLASS({
   actions: [
     {
       name: 'login',
-      label: 'Get Started',
+      label: 'Get started',
       isEnabled: function(errors_, isLoading_) {
         return ! errors_ && ! isLoading_;
       },
@@ -229,23 +197,20 @@ foam.CLASS({
         this.isLoading_ = true;
         this.dao_
           .put(this.User.create({
-            firstName: this.firstName,
-            lastName: this.lastName,
-            organization: this.organization,
+            userName: this.userName,
             email: this.email,
             desiredPassword: this.desiredPassword,
             signUpToken: this.token_,
-            address: this.Address.create({ countryId: this.countryId }),
-            welcomeEmailSent: true,
-            jobTitle: this.jobTitle,
-            phone: this.Phone.create({ number: this.phone }),
             group: this.group_
           }))
-          .then((user) => {
+          .then(async (user) => {
             this.user.copyFrom(user);
-            this.updateUser(x);
+            await this.updateUser(x);
           }).catch((err) => {
-            this.notify(err.message || 'There was a problem creating your account.', 'error');
+            this.ctrl.add(this.NotificationMessage.create({
+              message: err.message || this.ERROR_MSG,
+              type: this.LogLevel.ERROR
+            }));
           })
           .finally(() => {
             this.isLoading_ = false;

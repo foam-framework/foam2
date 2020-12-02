@@ -2,18 +2,24 @@ package foam.util.Emails;
 
 import foam.core.X;
 import foam.dao.DAO;
+import foam.nanos.app.AppConfig;
+import foam.nanos.app.EmailConfig;
+import foam.nanos.app.SupportConfig;
+import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.notification.email.EmailMessage;
 import foam.nanos.notification.email.EmailPropertyService;
+import foam.nanos.theme.Theme;
+import foam.nanos.theme.Themes;
 import foam.util.SafetyUtil;
 import java.util.HashMap;
 import java.util.Map;
 
 public class EmailsUtility {
   /*
-  documentation: 
-  Purpose of this function/service is to facilitate the population of an email properties and then to actually send the email. 
+  documentation:
+  Purpose of this function/service is to facilitate the population of an email properties and then to actually send the email.
     STEP 1) EXIT CASES && VARIABLE SET UP
     STEP 2) SERVICE CALL: to fill in email properties.
     STEP 3) SERVICE CALL: passing emailMessage through to actual email service.
@@ -43,6 +49,36 @@ public class EmailsUtility {
     }
 
     String group = user != null ? user.getGroup() : "";
+    AppConfig appConfig = (AppConfig) x.get("appConfig");
+    Theme theme = (Theme) x.get("theme");
+    X userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
+    if ( theme == null ) {
+      theme = ((Themes) x.get("themes")).findTheme(userX);
+      if ( theme.getAppConfig() != null ) {
+        appConfig.copyFrom(theme.getAppConfig());
+      }
+    }
+
+    SupportConfig supportConfig = theme.getSupportConfig();
+    EmailConfig supportEmailConfig = supportConfig.getEmailConfig();
+
+    // Set ReplyTo, From, DisplayName from support email config
+    if ( supportEmailConfig != null ) {
+      // REPLY TO:
+      if ( ! SafetyUtil.isEmpty(supportEmailConfig.getReplyTo()) ) {
+        emailMessage.setReplyTo(supportEmailConfig.getReplyTo());
+      }
+
+      // DISPLAY NAME:
+      if ( ! SafetyUtil.isEmpty(supportEmailConfig.getDisplayName()) ) {
+        emailMessage.setDisplayName(supportEmailConfig.getDisplayName());
+      }
+
+      // FROM:
+      if ( ! SafetyUtil.isEmpty(supportEmailConfig.getFrom()) ) {
+        emailMessage.setFrom(supportEmailConfig.getFrom());
+      }
+    }
 
     // Add template name to templateArgs, to avoid extra parameter passing
     if ( ! SafetyUtil.isEmpty(templateName) ) {
@@ -52,12 +88,28 @@ public class EmailsUtility {
         templateArgs = new HashMap<>();
         templateArgs.put("template", templateName);
       }
+      templateArgs.put("supportPhone", (supportConfig.getSupportPhone()));
+      templateArgs.put("supportEmail", (supportConfig.getSupportEmail()));
+
+      // personal support user
+      User psUser = supportConfig.findPersonalSupportUser(x);
+      templateArgs.put("personalSupportPhone", psUser == null ? "" : psUser.getPhoneNumber());
+      templateArgs.put("personalSupportEmail", psUser == null ? "" : psUser.getEmail());
+      templateArgs.put("personalSupportFirstName", psUser == null ? "" : psUser.getFirstName());
+      templateArgs.put("personalSupportFullName", psUser == null ? "" : psUser.getLegalName());
+
+      foam.nanos.auth.Address address = supportConfig.getSupportAddress();
+      templateArgs.put("supportAddress", address == null ? "" : address.toSummary());
+      templateArgs.put("appName", (theme.getAppName()));
+      templateArgs.put("logo", (appConfig.getUrl() + "/" + theme.getLogo()));
+      templateArgs.put("appLink", (appConfig.getUrl()));
+      emailMessage.setTemplateArguments(templateArgs);
     }
 
-    // SERVICE CALL: to fill in email properties. 
+    // SERVICE CALL: to fill in email properties.
     EmailPropertyService cts = (EmailPropertyService) x.get("emailPropertyService");
     try {
-      cts.apply(x, group, emailMessage, templateArgs);
+      cts.apply(userX, group, emailMessage, templateArgs);
     } catch (Exception e) {
       logger.error(e);
       return;

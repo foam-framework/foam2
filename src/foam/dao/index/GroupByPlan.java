@@ -42,4 +42,10 @@ public class GroupByPlan implements SelectPlan {
     ( (TreeNode) state ).groupBy((TreeNode) state_, sink, tail_);
   }
 
+  @Override
+  public String toString() {
+    var size = state_ == null ? 0
+                : state_ instanceof TreeNode ? ((TreeNode) state_).size : 1;
+    return "group-by(size:" + size + ", cost:" + cost() + ")";
+  }
 }

@@ -17,35 +17,124 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.Detachable',
+    'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.dao.LimitedSink',
+    'foam.dao.ProxySink',
+    'foam.dao.Sink',
+    'foam.mlang.predicate.AbstractPredicate',
     'foam.mlang.predicate.Predicate',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CapabilityIntercept',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.logger.Logger',
     'foam.nanos.session.Session',
+
     'java.util.Date',
     'java.util.List',
+    'java.util.Map',
+    'java.util.concurrent.ConcurrentHashMap',
     'static foam.mlang.MLang.*'
   ],
 
+  properties: [
+    {
+      class: 'Map',
+      name: 'cache',
+      javaFactory: `
+        return new ConcurrentHashMap<String, Boolean>();
+      `
+    },
+    {
+      name: 'initialized',
+      class: 'Boolean',
+      value: false
+    }
+  ],
+
   methods: [
+    {
+      name: 'initialize',
+      synchronized: true,
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+      ],
+      javaCode: `
+        if ( getInitialized() )
+          return;
+
+        DAO userCapabilityJunctionDAO = (DAO) getX().get("userCapabilityJunctionDAO");
+        DAO capabilityDAO = (DAO) getX().get("localCapabilityDAO");
+        if ( capabilityDAO == null || userCapabilityJunctionDAO == null )
+          return;
+
+        Map<String, Boolean> cache = ( Map<String, Boolean> ) getCache();
+        Sink purgeSink = new Sink() {
+          public void put(Object obj, Detachable sub) {
+            cache.clear();
+          }
+          public void remove(Object obj, Detachable sub) {
+            cache.clear();
+          }
+          public void eof() {
+          }
+          public void reset(Detachable sub) {
+            cache.clear();
+          }
+        };
+
+        // Add the purge listener
+        userCapabilityJunctionDAO.listen(purgeSink, TRUE);
+        capabilityDAO.listen(purgeSink, TRUE);
+
+        // Initialization done
+        setInitialized(true);
+      `
+    },
     {
       name: 'check',
       documentation: `
       Check if the given input string is in the userCapabilityJunctions or implied by a capability in userCapabilityJunctions for the current context user
       `,
       javaCode: `
-        User user = (User) x.get("user");
+        User user = ((Subject) x.get("subject")).getUser();
 
-        if ( user != null && checkUser(x, user, permission) ) return true;
-
-        return getDelegate().check(x, permission);
+        boolean hasViaCrunch = capabilityCheck(x, user, permission);
+        return ( user != null && hasViaCrunch ) || getDelegate().check(x, permission);
       `
     },
     {
       name: 'checkUser',
+      javaCode: `
+        boolean hasViaCrunch = capabilityCheck(x, user, permission);
+        return hasViaCrunch || getDelegate().checkUser(x, user, permission);
+      `
+    },
+    {
+      name: 'capabilityCheck',
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'user',
+          type: 'foam.nanos.auth.User'
+        },
+        {
+          name: 'permission',
+          type: 'String'
+        }
+      ],
       documentation: `
         Check if the given input string is in the userCapabilityJunctions or
         implied by a capability in userCapabilityJunctions for a given user.
@@ -54,46 +143,134 @@ foam.CLASS({
         if ( x == null || permission == null ) return false;
         if ( x.get(Session.class) == null ) return false;
         if ( user == null || ! user.getEnabled() ) return false;
+        User realUser = ((Subject) x.get("subject")).getRealUser();
+        String associationKey = realUser.getId() == user.getId() ?
+          null :
+          user.getId() + ":" + realUser.getId() + permission;
+        String userKey = user.getId() + permission;
+        String realUserKey = realUser.getId() == user.getId() ? null : realUser.getId() + permission;
+        this.initialize(x);
 
-        // Check whether user has permission to check user permissions.
-        if ( ! getDelegate().check(x, "service.auth.checkUser") ) return false;
-
-        try {
-          DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-
-          Capability cap = (Capability) capabilityDAO.find(permission);
-
-          Predicate capabilityScope = AND(
-            EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
-            OR(
-              NOT(HAS(UserCapabilityJunction.EXPIRY)),
-              NOT(EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.EXPIRED))
-            )
-          );
-
-          DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-
-          if ( userCapabilityJunctionDAO.find(
-            AND(
-              capabilityScope,
-              EQ(UserCapabilityJunction.TARGET_ID, permission),
-              EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
-            )) != null ) return true;
-
-          List<UserCapabilityJunction> userCapabilityJunctions = ((ArraySink) user.getCapabilities(x).getJunctionDAO()
-            .where(capabilityScope)
-            .select(new ArraySink())).getArray();
-
-          for ( UserCapabilityJunction ucJunction : userCapabilityJunctions ) {
-            Capability capability = (Capability) capabilityDAO.find(ucJunction.getTargetId());
-            if ( capability.implies(x, permission) ) return true;
-          }
-        } catch (Exception e) {
-          Logger logger = (Logger) x.get("logger");
-          logger.error("check", permission, e);
+        Boolean result = ( (Map<String, Boolean>) getCache() ).get(userKey);
+        if ( realUserKey != null ) result = result == null || ! result ?  ( (Map<String, Boolean>) getCache() ).get(realUserKey) : result;
+        if ( associationKey != null ) result = result == null || ! result ?  ( (Map<String, Boolean>) getCache() ).get(associationKey) : result;
+        if ( result != null ) {
+          if ( ! result ) maybeIntercept(x, permission);
+          return result;
         }
 
-        return getDelegate().checkUser(x, user, permission);
+        result = false;
+
+        try {
+          DAO capabilityDAO = ( x.get("localCapabilityDAO") == null ) ? (DAO) x.get("capabilityDAO") : (DAO) x.get("localCapabilityDAO");
+          DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+
+          Predicate capabilityScope = OR(
+              NOT(HAS(UserCapabilityJunction.EXPIRY)),
+              NOT(EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.EXPIRED))
+          );
+          AbstractPredicate predicate = new AbstractPredicate(x) {
+            @Override
+            public boolean f(Object obj) {
+              UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
+              if ( ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
+                Capability c = (Capability) capabilityDAO.find(ucj.getTargetId());
+                if ( c != null && ! c.isDeprecated(x) && c.implies(x, permission) ) {
+                  return true;
+                }
+              }
+              return false;
+            }
+          };
+
+          // Check if a ucj implies the subject.user(business) has this permission
+          Predicate userPredicate = AND(
+            NOT(INSTANCE_OF(AgentCapabilityJunction.class)),
+            EQ(UserCapabilityJunction.SOURCE_ID, user.getId())
+          );
+          if ( userCapabilityJunctionDAO.find(AND(userPredicate, capabilityScope, predicate)) != null ) {
+            result = true;
+          }
+
+          (( Map<String, Boolean> ) getCache()).put(userKey, result);
+          if ( result ) {
+            return true;
+          }
+
+          // Check if a ucj implies the subject.realUser has this permission
+          if ( realUser != null && realUserKey != null ) {
+            userPredicate = AND(
+              NOT(INSTANCE_OF(AgentCapabilityJunction.class)),
+              EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId())
+            );
+            if ( userCapabilityJunctionDAO.find(AND(userPredicate, capabilityScope, predicate)) != null ) {
+              result = true;
+            }
+
+            (( Map<String, Boolean> ) getCache()).put(realUserKey, result);
+            if ( result ) {
+              return true;
+            }
+          }
+
+          // Check if a ucj implies the subject.realUser has this permission in relation to the user
+          if ( realUser != null && associationKey != null ) {
+            userPredicate = AND(
+              INSTANCE_OF(AgentCapabilityJunction.class),
+              EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId()),
+              EQ(AgentCapabilityJunction.EFFECTIVE_USER, user.getId())
+            );
+            if ( userCapabilityJunctionDAO.find(AND(userPredicate, capabilityScope, predicate)) != null ) {
+              result = true;
+            }
+
+            (( Map<String, Boolean> ) getCache()).put(associationKey, result);
+            if ( result ) {
+              return true;
+            }
+          }
+        } catch ( Exception e ) {
+          Logger logger = (Logger) x.get("logger");
+          logger.error("capabilityCheck", permission, e);
+        }
+
+        maybeIntercept(x, permission);
+        return false;
+      `
+    },
+    {
+      name: 'maybeIntercept',
+      documentation: `
+        This method might throw a CapabilityIntercept if a capability can intercept.
+      `,
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'permission',
+          type: 'String'
+        }
+      ],
+      javaCode: `
+        DAO capabilityDAO = (DAO) getX().get("localCapabilityDAO");
+
+        // Find intercepting capabilities
+        List<Capability> capabilities =
+          ( (ArraySink) capabilityDAO.where(CONTAINS(Capability.PERMISSIONS_INTERCEPTED, permission))
+            .select(new ArraySink()) ).getArray();
+
+        if ( capabilities.size() < 1 ) return;
+
+        // Add filteredCapabilities to a runtime exception and throw it
+        CapabilityIntercept ex = new CapabilityIntercept(
+          "Permission [" + permission + "] denied. Filtered Capabilities available.");
+        for ( Capability cap : capabilities ) {
+          if ( cap.getInterceptIf().f(x) ) ex.addCapabilityId(cap.getId());
+        }
+
+        if ( ex.getCapabilities().length > 0 ) throw ex;
       `
     }
   ]

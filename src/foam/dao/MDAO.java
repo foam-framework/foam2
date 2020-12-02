@@ -7,6 +7,7 @@ package foam.dao;
 
 import foam.core.*;
 import foam.dao.index.*;
+import foam.mlang.MLang;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Or;
 import foam.mlang.predicate.Predicate;
@@ -44,8 +45,32 @@ import java.util.Set;
 public class MDAO
   extends AbstractDAO
 {
+  public static class DetachSelect implements Detachable {
+    private static Detachable instance__ = new DetachSelect();
+    public  static Detachable instance() { return instance__; }
+
+    public void detach() {
+      throw DetachSelectException.instance();
+    }
+  }
+
+  public static class DetachSelectException extends RuntimeException {
+    private static StackTraceElement[] EMPTY_STACK = new StackTraceElement[0];
+
+    private static DetachSelectException instance__ = new DetachSelectException();
+    public  static DetachSelectException instance() { return instance__; }
+
+    public void detach() {
+      throw DetachSelectException.instance();
+    }
+
+    public StackTraceElement[] getStackTrace() {
+      return EMPTY_STACK;
+    }
+  }
+
   protected AltIndex index_;
-  protected Object   state_ = null;
+  protected Object   state_     = null;
   protected Object   writeLock_ = new Object();
   protected Set      unindexed_ = new HashSet();
 
@@ -173,21 +198,24 @@ public class MDAO
       plan = index_.planSelect(state, sink, skip, limit, order, simplePredicate);
     }
 
-    if ( state != null && predicate != null && plan.cost() > 10 && plan.cost() >= index_.size(state) ) {
+    if ( state != null && simplePredicate != null && simplePredicate != MLang.TRUE && plan.cost() > 10 && plan.cost() >= index_.size(state) ) {
       pm = new PM(this.getClass(), "MDAO:UnindexedSelect:" + getOf().getId());
       if ( ! unindexed_.contains(getOf().getId())) {
-        if ( ! predicate.equals(simplePredicate) && 
-             logger != null ) {
-            logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
+        if ( ! predicate.equals(simplePredicate) && logger != null ) {
+          logger.debug(String.format("The original predicate was %s but it was simplified to %s.", predicate.toString(), simplePredicate.toString()));
         }
         unindexed_.add(getOf().getId());
         if ( logger != null ) {
-          logger.warning("Unindexed search on MDAO", getOf().getId(), simplePredicate.toString());
+          logger.warning("Unindexed search on MDAO", getOf().getId(), simplePredicate.toString(), plan.toString());
         }
       }
     }
 
-    plan.select(state, sink, skip, limit, order, simplePredicate);
+    try {
+      plan.select(state, sink, skip, limit, order, simplePredicate);
+    } catch (DetachSelectException e) {
+      // NOP, not a real exception, just used to terminate a select early
+    }
 
     if ( pm != null ) pm.log(x);
 

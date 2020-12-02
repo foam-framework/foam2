@@ -15,12 +15,28 @@
     'foam.util.SafetyUtil'
   ],
 
+  imports: [
+    'translationService'
+  ],
+
   tableColumns: [
     'name',
     'id',
     'country',
     'symbol',
     'emoji'
+  ],
+
+  axioms: [
+    {
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+          public String format(long amount) {
+            return format(amount, false);
+          }
+        `);
+      }
+    }
   ],
 
   properties: [
@@ -95,17 +111,23 @@
   methods: [
     {
       name: 'toSummary',
+      type: 'String',
       documentation: `When using a reference to the currencyDAO, the labels associated
         to it will show a chosen property rather than the first alphabetical string
         property. In this case, we are using the id.
       `,
       code: function(x) {
-        return this.id + " - " + this.name;
-      }
+        return this.id + " - " + this.translationService.getTranslation(foam.locale, `${this.id}.name`,this.name);
+      },
+      javaCode: `
+        if ( foam.util.SafetyUtil.isEmpty(getId()) || foam.util.SafetyUtil.isEmpty(getName()) )
+          return "";
+        return getId() + " - " + getName();
+      `
     },
     {
       name: 'format',
-      code: function(amount) {
+      code: function(amount, hideId) {
         /**
          * Given a number, display it as a currency using the appropriate
          * precision, decimal character, delimiter, symbol, and placement
@@ -124,28 +146,32 @@
         var beforeDecimal = amount.substring(0, amount.length - this.precision);
         var formatted = isNegative ? '-' : '';
 
-        if ( this.leftOrRight === 'right' ) {
-          formatted += this.id;
-          formatted += ' ';
+        if ( ! hideId ) {
+          if ( this.leftOrRight === 'right' ) {
+            formatted += this.id;
+            formatted += ' ';
+          }
+          if ( this.leftOrRight === 'left' ) {
+            formatted += this.symbol;
+            if ( this.showSpace ) formatted += ' ';
+          }
         }
 
-        if ( this.leftOrRight === 'left' ) {
-          formatted += this.symbol;
-          if ( this.showSpace ) formatted += ' ';
-        }
         formatted += beforeDecimal.replace(/\B(?=(\d{3})+(?!\d))/g, this.delimiter) || '0';
         if ( this.precision > 0 ) {
           formatted += this.decimalCharacter;
           formatted += amount.substring(amount.length - this.precision);
         }
-        if ( this.leftOrRight === 'right' ) {
-          if ( this.showSpace ) formatted += ' ';
-          formatted += this.symbol;
-        }
 
-        if ( this.leftOrRight === 'left' ) {
-          formatted += ' ';
-          formatted += this.id;
+        if ( ! hideId ) {
+          if ( this.leftOrRight === 'right' ) {
+            if ( this.showSpace ) formatted += ' ';
+            formatted += this.symbol;
+          }
+          if ( this.leftOrRight === 'left' ) {
+            formatted += ' ';
+            formatted += this.id;
+          }
         }
 
         return formatted;
@@ -154,6 +180,11 @@
         {
           class: 'foam.core.UnitValue',
           name: 'amount'
+        },
+        {
+          class: 'Boolean',
+          name: 'hideId',
+          documentation: 'If true, will not add symbol or ID to formatted currency'
         }
       ],
       type: 'String',
@@ -168,7 +199,7 @@
         String formatted = isNegative ? "-" : "";
 
 
-        if ( SafetyUtil.equals(this.getLeftOrRight(), "left") ) {
+        if ( ! hideId && SafetyUtil.equals(this.getLeftOrRight(), "left") ) {
           formatted += this.getSymbol();
           if ( this.getShowSpace() ) {
             formatted += " ";
@@ -184,7 +215,7 @@
           formatted += amountStr.substring(amountStr.length() - this.getPrecision());
         }
 
-        if ( SafetyUtil.equals(this.getLeftOrRight(), "right") ) {
+        if ( ! hideId && SafetyUtil.equals(this.getLeftOrRight(), "right") ) {
           if ( this.getShowSpace() ) {
             formatted += " ";
           }

@@ -11,17 +11,24 @@ foam.CLASS({
 
   documentation: 'Data Integration Gateway - Perform DAO operations against a web service',
 
-  requires: ['foam.net.web.HTTPRequest'],
+  requires: [
+    'foam.net.web.HTTPRequest'
+  ],
+
+  implements: [
+    'foam.mlang.Expressions',
+    'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware',
+    'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.auth.LastModifiedByAware'
+  ],
 
   tableColumns: [
     'id',
-    'daoKey',
+    'daoKey.name',
     'cmd',
-    'format',
-    'owner'
+    'format'
   ],
-
-  searchColumns: [],
 
   constants: [
     {
@@ -31,68 +38,152 @@ foam.CLASS({
     }
   ],
 
-  properties: [
-    'id',
+  imports: [
+    'AuthenticatedNSpecDAO'
+  ],
+
+  sections: [
     {
-      class: 'String',
+      name: 'details'
+    },
+    {
+      name: 'supportDetails'
+    },
+    {
+      name: '_defaultSection',
+      permissionRequired: true
+    }
+  ],
+
+  properties: [
+    {
+      name: 'id',
+      label: 'Request Name',
+      section: 'details'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
+      section: 'supportDetails'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+      section: 'supportDetails'
+    },
+    {
+      class: 'DateTime',
+      name: 'created',
+      documentation: 'The date and time of when the User was created in the system.',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'supportDetails',
+      includeInDigest: true
+    },
+    {
+      class: 'DateTime',
+      name: 'lastModified',
+      documentation: 'The date and time the User was last modified.',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'supportDetails',
+      storageOptional: true
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedBy',
+      section: 'supportDetails',
+      readPermissionRequired: true,
+      writePermissionRequired: true,
+      storageOptional: true
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.boot.NSpec',
+      label: 'Data Access Object (DAO)',
       name: 'daoKey',
-      label: 'DAO',
+      documentation: `The DAO in the DIG request.`,
       view: function(_, X) {
         var E = foam.mlang.Expressions.create();
-        return foam.u2.view.ChoiceView.create({
-          dao: X.nSpecDAO
-            .where(E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO'))
-            .where(E.EQ(foam.nanos.boot.NSpec.SERVE, E.TRUE))
-            .orderBy(foam.nanos.boot.NSpec.ID),
-          objToChoice: function(nspec) {
-            return [nspec.id, nspec.id];
-          }
-        });
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          search: true,
+          sections: [
+            {
+              heading: 'DAO',
+              dao: X.AuthenticatedNSpecDAO
+                .where(E.AND(
+                  E.EQ(foam.nanos.boot.NSpec.SERVE, true),
+                  E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO')
+                ))
+                .orderBy(foam.nanos.boot.NSpec.ID)
+            }
+          ]
+        };
       },
-      value: 'accountDAO'
+      value: 'userDAO',
+      section: 'details'
     },
-    'cmd',
-    'format',
     {
-      class: 'String',
-      name: 'dao',
-      hidden: true,
-      transient: true,
-      postSet: function(old, nu) {
-        this.daoKey = nu;
+      name: 'cmd',
+      label: 'API Command',
+      section: 'details'
+    },
+    {
+      name: 'format',
+      label: 'Data Format',
+      section: 'details',
+      visibility: function(cmd) {
+        return ( cmd == 'SELECT' || cmd == 'PUT' ) ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       }
     },
     {
       class: 'String',
+      name: 'key',
+      label: 'Object ID',
+      section: 'details',
+      visibility: function(cmd) {
+        return ( cmd == 'SELECT' || cmd == 'REMOVE' ) ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
+      }
+  },
+  {
+      class: 'String',
       name: 'q',
-      label: 'Query'
+      label: 'Select Query',
+      section: 'details',
+      visibility: function(cmd) {
+        return (cmd == 'SELECT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
+      }
     },
     {
       class: 'Long',
       name: 'limit',
-      value: Number.MAX_SAFE_INTEGER
+      section: 'details',
+      visibility: function(cmd) {
+        return (cmd == 'SELECT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
+      },
+      value: 1000,
+      max: 1000,
+      min: 0
     },
     {
-        class: 'String',
-        name: 'key'
+      class: 'Long',
+      name: 'skip',
+      section: 'details',
+      visibility: function(cmd) {
+        return (cmd == 'SELECT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
+      },
+      min: 0
     },
     {
-      class: 'EMail',
-      displayWidth: 100,
-      name: 'email'
-    },
-    {
-      class: 'String',
-      displayWidth: 100,
-      name: 'subject'
-    },
-    'data',
-    {
-      class: 'foam.nanos.fs.FileProperty',
-      name: 'dataFile',
-      label: 'DataFile',
-      documentation: 'dig file to put data',
-      view: { class: 'foam.nanos.dig.DigFileUploadView', data: this.dataFile$ },
+      name: 'data',
+      section: 'details',
+      visibility: function(cmd) {
+        return (cmd == 'PUT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
+      }
     },
     {
       class: 'URL',
@@ -103,8 +194,9 @@ foam.CLASS({
       name: 'snippet',
       label: 'Snippet',
       documentation: 'show a specific type of request would look like in a given language.',
+      section: 'details',
       view: { class: 'foam.nanos.dig.DigSnippetView' },
-      expression: function(key, data, email, subject, daoKey, cmd, format, q, limit, dataFile) {
+      expression: function(key, data, daoKey, cmd, format, q, limit, skip) {
         var query = false;
         var url = "/service/dig";
 
@@ -128,33 +220,23 @@ foam.CLASS({
           query = true;
           url += "id=" + key;
         }
-        if ( email ) {
-          url += query ? "&" : "?";
-          query = true;
-          url += "email=" + email;
-
-          if ( subject ) {
-            url += "&";
-            url += "subject=" + encodeURIComponent(subject);
-          }
-        }
         if ( q ) {
           url += query ? "&" : "?";
           query = true;
           url += "q=" + encodeURIComponent(q);
         }
-        if ( limit >= 0 && limit != Number.MAX_SAFE_INTEGER ) {
+        if ( limit > 0 && limit != Number.MAX_SAFE_INTEGER && limit != 1000 ) {
           url += query ? "&" : "?";
           query = true;
           url += "limit=" + limit;
         }
-        this.postURL = url;
-
-        if ( dataFile ) {
+        if ( skip > 0 && skip != Number.MAX_SAFE_INTEGER ) {
           url += query ? "&" : "?";
           query = true;
-          url += "&fileaddress=" + encodeURIComponent(dataFile.address);
+          url += "skip=" + skip;
         }
+        this.postURL = url;
+
         if ( data ) {
           if ( data.length + url.length < this.MAX_URL_SIZE ) {
             url += query ? "&" : "?";
@@ -171,8 +253,14 @@ foam.CLASS({
       name: 'result',
       value: 'No Request Sent Yet.',
       view: { class: 'foam.nanos.dig.ResultView' },
-//       view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 120 },
+      section: 'details',
       visibility: 'RO'
+    },
+    {
+      class: 'String',
+      name: 'description',
+      section: 'details',
+      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 144 }
     }
   ],
 

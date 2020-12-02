@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.u2.navigation',
   name: 'SignIn',
@@ -7,18 +13,25 @@ foam.CLASS({
 
   imports: [
     'auth',
+    'ctrl',
     'loginSuccess',
-    'notify',
     'stack',
     'user',
     'menuDAO'
+  ],
+
+  requires: [
+    'foam.log.LogLevel',
+    'foam.u2.dialog.NotificationMessage'
   ],
 
   messages: [
     { name: 'TITLE', message: 'Welcome!' },
     { name: 'FOOTER_TXT', message: 'Not a user yet?' },
     { name: 'FOOTER_LINK', message: 'Create an account' },
-    { name: 'SUB_FOOTER_LINK', message: 'Forgot password?' }
+    { name: 'SUB_FOOTER_LINK', message: 'Forgot password?' },
+    { name: 'ERROR_MSG', message: 'There was an issue logging in' },
+    { name: 'ERROR_MSG2', message: 'Please enter email or username' }
   ],
 
   properties: [
@@ -27,28 +40,28 @@ foam.CLASS({
       hidden: true
     },
     {
-      class: 'EMail',
-      name: 'email',
+      class: 'String',
+      name: 'identifier',
       required: true,
+      label: 'Email or Username',
       view: {
         class: 'foam.u2.TextField',
         focused: true
       },
-      visibility: function(disableEmail_) {
-        return disableEmail_ ?
-          foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW;
+      visibilityExpression: function(disableIdentifier_) {
+        return disableIdentifier_ ?
+          foam.u2.Visibility.DISABLED : foam.u2.Visibility.RW;
       },
       validationTextVisible: false
     },
     {
       class: 'Password',
       name: 'password',
-      required: true,
       view: { class: 'foam.u2.view.PasswordView', passwordIcon: true }
     },
     {
       class: 'Boolean',
-      name: 'disableEmail_',
+      name: 'disableIdentifier_',
       hidden: true
     },
     {
@@ -70,7 +83,8 @@ foam.CLASS({
       name: 'subfooterLink',
       code: function() {
         this.stack.push({
-          class: 'foam.nanos.auth.resetPassword.ForgotPasswordView'
+          class: 'foam.nanos.auth.ChangePasswordView',
+          modelOf: 'foam.nanos.auth.RetrievePassword'
         });
       }
     },
@@ -102,31 +116,43 @@ foam.CLASS({
     {
       name: 'login',
       label: 'Sign in',
-      isEnabled: function(errors_) {
-        return ! errors_;
-      },
+      // if you use isAvailable or isEnabled - with model error_, then note that auto validate will not
+      // work correctly. Chorme for example will not read a field auto populated without a user action
       code: async function(X) {
-        this.auth.loginByEmail(X, this.email, this.password).then(
-          (logedInUser) => {
-            if ( ! logedInUser ) return;
-            if ( this.token_ ) {
-              logedInUser.signUpToken = this.token_;
-              this.dao_.put(logedInUser)
-                .then((updatedUser) => {
-                  this.user.copyFrom(updatedUser);
-                  this.nextStep();
-                }).catch((err) => {
-                  this.notify(err.message || 'There was an issue with logging in.', 'error');
-                });
-            } else {
-              this.user.copyFrom(logedInUser);
-              this.nextStep();
+        if ( this.identifier.length > 0 ) {
+          this.auth.login(X, this.identifier, this.password).then(
+            logedInUser => {
+              if ( ! logedInUser ) return;
+              if ( this.token_ ) {
+                logedInUser.signUpToken = this.token_;
+                this.dao_.put(logedInUser)
+                  .then(updatedUser => {
+                    this.user.copyFrom(updatedUser);
+                    this.nextStep();
+                  }).catch(err => {
+                    this.ctrl.add(this.NotificationMessage.create({
+                      message: err.message || this.ERROR_MSG,
+                      type: this.LogLevel.ERROR
+                    }));
+                  });
+              } else {
+                this.user.copyFrom(logedInUser);
+                this.nextStep();
+              }
             }
-          }
-        ).catch(
-          (err) => {
-            this.notify(err.message || 'There was a problem logging in.', 'error');
-        });
+          ).catch(
+            err => {
+              this.ctrl.add(this.NotificationMessage.create({
+                message: err.message || this.ERROR_MSG,
+                type: this.LogLevel.ERROR
+              }));
+          });
+        } else {
+          this.ctrl.add(this.NotificationMessage.create({
+            message: this.ERROR_MSG2,
+            type: this.LogLevel.ERROR
+          }));
+        }
       }
     }
   ]

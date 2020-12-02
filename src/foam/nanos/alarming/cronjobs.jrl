@@ -1,0 +1,118 @@
+p({
+  "class":"foam.nanos.cron.Cron",
+  "schedule":{
+    "class":"foam.nanos.cron.CronSchedule",
+    "minute":-1,
+    "hour":-1,
+    "dayOfMonth":-1,
+    "month":-1,
+    "dayOfWeek":-1,
+    "second":0
+  },
+  "scheduledTime":"2019-09-09T16:56:00.000Z",
+  "enabled":false,
+  "id":"Alarming and Monitoring",
+  "lastRun":"2019-09-09T16:55:32.134Z",
+  "lastDuration":301,
+  "code":"""
+  import foam.nanos.alarming.AlarmConfig;
+  import foam.nanos.alarming.MonitoringReport;
+  import foam.nanos.alarming.MonitorType;
+  import foam.mlang.MLang;
+  alarmConfigDAO = x.get("alarmConfigDAO");
+  monitorReportDAO = x.get("monitoringReportDAO");
+  alarms = alarmConfigDAO.select().getArray();
+  for ( alarm : alarms ) {
+    if ( alarm.getManual() ) {
+      continue;
+    }
+    MonitoringReport report = (MonitoringReport) monitorReportDAO.find(MLang.EQ(MonitoringReport.NAME, alarm.getName()));
+    if ( report == null ) {
+      report = new MonitoringReport();
+      report.setName(alarm.getName());  
+    }
+    monitorReportDAO.put(report.fclone());
+  }
+  print(\"done\");
+  """
+})
+
+p({
+  "class":"foam.nanos.cron.Cron",
+  "enabled":false,
+  "schedule":{
+    "class":"foam.nanos.cron.CronSchedule",
+    "minute":0,
+    "hour":-1,
+    "dayOfMonth":-1,
+    "month":-1,
+    "dayOfWeek":-1,
+    "second":0
+  },
+  "id":"Transaction Monitoring",
+  "code":"""
+    import foam.core.Detachable;
+    import foam.core.X;
+    import foam.dao.AbstractSink;
+    import foam.dao.DAO;
+    import foam.mlang.predicate.Predicate;
+    import foam.nanos.tx.bmo.cico.BmoCITransaction;
+    import foam.nanos.tx.bmo.cico.BmoCOTransaction;
+    import foam.nanos.tx.bmo.cico.BmoVerificationTransaction;
+    import foam.nanos.tx.model.Transaction;
+    import foam.nanos.tx.model.TransactionStatus;
+    import foam.nanos.tx.ComplianceTransaction;
+    import java.util.*;
+    import foam.nanos.alarming.Alarm;
+    import foam.nanos.alarming.AlarmReason;
+    import java.time.LocalDate;
+    import java.time.ZoneId;
+    import static foam.mlang.MLang.*;
+
+
+    transactionDAO = x.get("localTransactionDAO");
+    alarmDAO = x.get("alarmDAO");
+    sentIds = "";
+    sentCount = 0;
+    pendingIds = "";
+    pendingCount = 0;
+    date = Date.from(LocalDate.now().plusDays(1l).atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+    transactionDAO.where(AND(new Predicate[] {
+      OR(new Predicate[] {
+        EQ(Transaction.STATUS, TransactionStatus.SENT),
+        EQ(Transaction.STATUS, TransactionStatus.PENDING)
+      }),
+      NOT(INSTANCE_OF(ComplianceTransaction.class))
+    })).select(new AbstractSink() {
+      public void put(Object obj, Detachable sub) {
+        if ( ! (obj instanceof BmoCITransaction || obj instanceof BmoCOTransaction || obj instanceof BmoVerificationTransaction) ) {
+          statusHistory = obj.getStatusHistory();
+          status = statusHistory[statusHistory.length-1];
+          if ( status.getStatus() == TransactionStatus.PENDING && status.getTimeStamp().before(date) ) {
+            pendingCount ++;
+            pendingIds += obj.getId() + "\\n";
+          }
+        } else if ( obj.getStatus() == TransactionStatus.SENT && obj.getCompletionDate().before(new Date()) ) {
+          sentCount ++;
+          sentIds += obj.getId() + "\\n";
+        }
+      }
+    });
+
+    if ( pendingCount + sentCount > 0 ) {
+      note = "Stuck in sent: " + sentCount + "\\n" + sentIds +  "\\n\\nStuck in pending: \\n " + pendingCount + "\\n" + pendingIds;
+      Alarm alarm = (Alarm) alarmDAO.find(EQ(Alarm.NAME, "Transaction Alarm"));
+      if ( alarm == null ) {
+        alarm = new Alarm();
+        alarm.setName("Transaction Alarm");
+      }
+      alarm.setIsActive(true);
+      alarm.setReason(AlarmReason.TRANSACTION);
+      alarm.setNote(note);
+      alarmDAO.put(alarm);
+    }
+
+    print("done");
+  """
+})

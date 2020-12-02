@@ -19,13 +19,14 @@ foam.CLASS({
     'foam.support.model.SupportEmail',
     'foam.support.modal.NewEmailSupportConfirmationModal',
     'foam.u2.ModalHeader',
-    'foam.u2.dialog.NotificationMessage',
+    'foam.log.LogLevel',
     'foam.u2.dialog.Popup'
   ],
 
   imports: [
     'closeDialog',
     'ctrl',
+    'notify',
     'supportEmailDAO',
     'user',
   ],
@@ -42,7 +43,7 @@ foam.CLASS({
       margin-left: 20px;
       width: 198px;
       height: 40px;
-      font-family: Roboto;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       font-weight: normal;
       font-style: normal;
@@ -65,7 +66,7 @@ foam.CLASS({
       border-radius: 2px;
       // background-color: rgba(164, 179, 184, 0.1);
       box-shadow: 0 0 1px 0 rgba(9, 54, 73, 0.8);
-      font-family: Roboto;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       font-weight: normal;
       font-style: normal;
@@ -80,7 +81,7 @@ foam.CLASS({
       border-radius: 2px;
       background-color: #59a5d5;
       float: right;
-      font-family: Roboto;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       font-weight: normal;
       font-style: normal;
@@ -161,7 +162,7 @@ foam.CLASS({
           if(!this.email) return;
           var self = this;
           if (!this.emailRegex.test(this.email)) {
-            this.add(this.NotificationMessage.create({ message: this.emailInvalid, type: 'error' })); 
+            this.notify(this.emailInvalid, '', this.LogLevel.ERROR, true);
             return;
           }
 
@@ -178,7 +179,7 @@ foam.CLASS({
                 self.ctrl.add(foam.u2.dialog.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportConfirmationModal' }));
                 X.closeDialog();
               } else {
-                self.add(self.NotificationMessage.create({ message: this.emailExists, type: 'error' }));
+                this.notify(this.emailExists, '', this.LogLevel.ERROR, true);
               }
             }
           );

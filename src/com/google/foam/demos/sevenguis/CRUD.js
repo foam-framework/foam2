@@ -24,7 +24,7 @@ foam.CLASS({
   tableColumns: [ 'id', 'surname', 'name' ],
 
   properties: [
-    { name: 'id', hidden: true },
+    { name: 'id', class: 'Int', xxxhidden: true },
     { name: 'name',    view: { class: 'foam.u2.TextField', onKey: true } },
     { name: 'surname', view: { class: 'foam.u2.TextField', onKey: true } }
   ]
@@ -86,7 +86,7 @@ foam.CLASS({
         return dao.where(this.STARTS_WITH_IC(this.Person.SURNAME, prefix));
       },
       view: {
-        class: 'foam.u2.view.TableView',
+        class: 'foam.u2.view.ScrollTableView',
         of: com.google.foam.demos.sevenguis.Person,
         title: '',
         editColumnsEnabled: false
@@ -128,11 +128,12 @@ foam.CLASS({
     {
       name: 'createItem',
       label: 'Create',
-//      isEnabled: function(person) { return person.name && person.surname; },
+      isEnabled: function(person$name, person$surname) { return person$name && person$surname; },
       code: function() {
         var data = this.person.clone();
         data.id = undefined;
         this.dao.put(data).then(function(data) {
+          // copies the assigned id from the data, so that update will work
           this.person.copyFrom(data);
         }.bind(this));
       }
@@ -140,7 +141,7 @@ foam.CLASS({
     {
       name: 'updateItem',
       label: 'Update',
-//      isEnabled: function(person) { return person.id; },
+      isEnabled: function(person$id) { return person$id; },
       code: function() {
         this.dao.put(this.person.clone());
       }
@@ -148,10 +149,10 @@ foam.CLASS({
     {
       name: 'deleteItem',
       label: 'Delete',
-//      isEnabled: function(person) { return person.id; },
+      isEnabled: function(person$id) { return person$id; },
       code: function() {
         this.dao.remove(this.person).then(function() {
-          // this.person.id = this.person.name = this.person.surname = '';
+          this.person.id = this.person.name = this.person.surname = undefined;
         }.bind(this));
       }
     }

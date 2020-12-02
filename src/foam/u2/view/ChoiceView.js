@@ -20,6 +20,10 @@ foam.CLASS({
   name: 'ChoiceView',
   extends: 'foam.u2.View',
 
+  implements: [ 'foam.mlang.Expressions' ],
+
+  imports: [ 'warn' ],
+
   documentation: `
     Wraps a tag that represents a singular choice. That is,
     this controller shows the user a fixed, probably small set of
@@ -101,6 +105,8 @@ foam.CLASS({
           }
         }
 
+        if ( nu.length == 1 ) this.data = nu[0][0];
+
         if ( this.dynamicSize ) this.size = Math.min(nu.length, this.maxSize);
         return nu;
       }
@@ -160,6 +166,11 @@ foam.CLASS({
       name: 'alwaysFloatLabel'
     },
     {
+      class: 'String',
+      name: 'header',
+      documentation: 'if this is set, a custom header will be add to drop down choices'
+    },
+    {
       name: 'view_'
     },
     'feedback_',
@@ -184,7 +195,8 @@ foam.CLASS({
       documentation: `The size of the select element should never be greater
         than this number.`,
       value: Number.MAX_SAFE_INTEGER
-    }
+    },
+    'prop_'
   ],
 
   methods: [
@@ -207,13 +219,14 @@ foam.CLASS({
         if ( mode !== foam.u2.DisplayMode.RO ) {
           return self.E()
             .start(self.selectSpec, {
-              data$: self.index$,
-              label$: self.label$,
+              data$:            self.index$,
+              label$:           self.label$,
               alwaysFloatLabel: self.alwaysFloatLabel,
-              choices$: self.choices$,
-              placeholder$: self.placeholder$,
-              mode$: self.mode$,
-              size$: self.size$
+              choices$:         self.choices$,
+              placeholder$:     self.placeholder$,
+              mode$:            self.mode$,
+              size$:            self.size$,
+              header$:          self.header$
             })
               .attrs({ name: self.name })
               .enableClass('selection-made', self.index$.map((index) => index !== -1))
@@ -229,7 +242,7 @@ foam.CLASS({
     function findIndexOfChoice(choice) {
       if ( ! choice ) return -1;
       var choices = this.choices;
-      var data = choice[0];
+      var data    = choice[0];
       for ( var i = 0 ; i < choices.length ; i++ ) {
         if ( foam.util.equals(choices[i][0], data) ) return i;
       }
@@ -258,7 +271,9 @@ foam.CLASS({
 
     function fromProperty(p) {
       this.SUPER(p);
+      this.prop_ = p;
       this.defaultValue = p.value;
+      this.label = p.label || this.label || p.name;
     }
   ],
 
@@ -280,17 +295,43 @@ foam.CLASS({
       code: function() {
         if ( ! foam.dao.DAO.isInstance(this.dao) ) return;
 
+        var of = this.dao.of
+        if ( of._CHOICE_TEXT_ ) {
+          this.dao.select(this.PROJECTION(of.ID, of._CHOICE_TEXT_)).then((s) => {
+            this.choices = s.projection;
+          });
+          return;
+        } else {
+          this.warn('Inefficient ChoiceView. Consider creating transient _choiceText_ property on ' + of.id + ' DAO, prop: ' + this.prop_);
+          /* Ex.:
+          {
+            class: 'String',
+            name: '_choiceText_',
+            transient: true,
+            javaGetter: 'return getName();',
+            getter: function() { return this.name; }
+          }
+          */
+        }
         var p = this.mode === foam.u2.DisplayMode.RW ?
           this.dao.select().then(s => s.array) :
           this.dao.find(this.data).then(o => o ? [o] : []);
 
-        p.then(function(a) {
-          this.choices = a.map(this.objToChoice);
+        p.then(a => {
+          var choices = a.map(this.objToChoice);
+          var choiceLabels = a.map(o => { return this.objToChoice(o)[1]});
+          Promise.all(choiceLabels).then(resolvedChoiceLabels => {
+            for ( let i = 0; i < choices.length; i++ ) {
+              choices[i][1] = resolvedChoiceLabels[i];
+            }
+            this.choices = choices;
+          });
           if ( this.data == null && this.index === -1 ) this.index = this.placeholder ? -1 : 0;
-        }.bind(this));
+        });
       }
     }
   ],
+
   reactions: [
     ['', 'propertyChange.mode', 'onDAOUpdate']
   ]

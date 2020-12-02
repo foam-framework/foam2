@@ -25,9 +25,8 @@ foam.CLASS({
       },
       javaCode: `
         if ( obj instanceof LastModifiedByAware && ! obj.equals(getDelegate().find_(x, obj)) ) {
-          User user = (User) x.get("user");
-          User agent = (User) x.get("agent");
-          ((LastModifiedByAware) obj).setLastModifiedBy(agent != null ? agent.getId() : user.getId());
+          User user = ((Subject) x.get("subject")).getRealUser();
+          ((LastModifiedByAware) obj).setLastModifiedBy(user.getId());
         }
         return super.put_(x, obj);
       `

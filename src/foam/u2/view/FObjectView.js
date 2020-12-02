@@ -7,59 +7,55 @@
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'FObjectView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Controller',
 
   documentation: 'View for editing FObjects.',
 
   imports: [
-    'strategizer'
+    'setTimeout',
+    'strategizer?'
+  ],
+
+  requires: [
+    'foam.core.Latch'
   ],
 
   properties: [
     {
+      class: 'foam.core.FObjectProperty',
+      of: 'foam.core.Latch',
+      name: 'choicesLoaded',
+      documentation: 'A latch used to wait on choices loaded.',
+      factory: function() { return this.Latch.create(); }
+    },
+    {
       class: 'String',
       name: 'objectClass',
       label: '',
-      visibility: function(choices) {
-        return choices.length > 1 ?
-          foam.u2.DisplayMode.RW :
-          foam.u2.DisplayMode.HIDDEN;
+      visibility: function(allowCustom, classIsFinal, choices, data) {
+        if ( ! allowCustom && choices.length <= 1  ) return foam.u2.DisplayMode.HIDDEN;
+        if ( classIsFinal && this.dataWasProvided_ ) return foam.u2.DisplayMode.HIDDEN;
+        return foam.u2.DisplayMode.RW;
       },
       view: function(args, X) {
         return {
-          class: 'foam.u2.view.ChoiceView',
-          choices$: X.data.choices$,
-          defaultValue$: X.data.choices$.map((choices) => {
-            return Array.isArray(choices) && choices.length > 0 ? choices[0][0] : '';
-          })
+          class: X.data.allowCustom ? 'foam.u2.TextField' : 'foam.u2.view.ChoiceView',
+          displayWidth: 60,
+          placeholder: X.data.placeholder,
+          header: X.data.header,
+          choices$: X.data.choices$
         };
-      },
-      postSet: function(oldValue, newValue) {
-        if ( newValue !== oldValue && oldValue !== '' ) {
-          var m = this.__context__.lookup(newValue, true);
-          if ( m ) {
-            this.data = m.create(null, this);
-          }
-        }
       }
     },
     {
       class: 'FObjectProperty',
       name: 'data',
       label: '',
-      postSet: function(_, data) {
-        if ( ! data ) {
-          this.objectClass = undefined;
-        } else if ( data.cls_.id != this.objectClass ) {
-          this.objectClass = data.cls_.id;
-        }
-      },
       // We need to override the default view, otherwise we end up with a
       // circular definition where FObjectView has an FObjectProperty which gets
       // rendered as an FObjectView, which leads to infinite recursion.
-      view: function(args, X) {
-        return X.data.dataView || { class: 'foam.u2.detail.SectionedDetailView' }
-      }
+      preSet: function(o, n) { return n || o; },
+      view: 'foam.u2.detail.SectionedDetailView'
     },
     {
       class: 'foam.u2.ViewSpec',
@@ -71,6 +67,49 @@ foam.CLASS({
       name: 'of'
     },
     {
+      class: 'Boolean',
+      name: 'allowCustom',
+      expression: function(choices) {
+        return choices.length == 0;
+      }
+    },
+    {
+      class: 'Function',
+      name: 'copyOldData',
+      documentation: `
+        Function to copy data from old object to new object when objectClass changes.
+        The default implementation copies all properties with the same name, but
+        if you don't want this behaviour, then implement your own copy method.
+        Ex. if we only wanted to copy two fields:
+          copyOldData: function(o) { return {
+            field1: o.field1,
+            field2: o.field2
+        }; }
+        You do not need to handle the case where the old object is null.
+      `,
+      value: function(o) { return o; }
+    },
+    {
+      class: 'Boolean',
+      name: 'classIsFinal',
+      documentation: 'If true, objectClass cannot be changed if data is provided.'
+    },
+    {
+      class: 'Boolean',
+      name: 'dataWasProvided_',
+      documentation: 'Set to true if data was initially provided. Used to implement classIsFinal.'
+    },
+    {
+      class: 'String',
+      name: 'placeholder',
+      documentation: 'If no placeholder, the choiceView will select the first element',
+    },
+    {
+      class: 'String',
+      name: 'header',
+      documentation: 'The heading text for the choices',
+    },
+    {
       class: 'Array',
       name: 'choices',
       documentation: `
@@ -78,18 +117,37 @@ foam.CLASS({
         model in the 'of' property. The user can choose to create an instance
         of one of the models in this list.
       `
+    },
+    {
+      name: 'predicate',
+      documentation: `
+        Predicate to pass into strategizer query request. Used to define results from strategizer query.
+        Example use of strategizer predicate on FObjectView from property view:
+
+        name: 'exampleProp',
+        view: function(_, X) {
+          let predicate = expr.AND(
+              expr.EQ(foam.strategy.StrategyReference.DESIRED_MODEL_ID, 'foam.nanos.auth.User'),
+              expr.IN(
+                foam.strategy.StrategyReference.STRATEGY,
+                [foam.lookup('foam.nanos.auth.SomeUserClass'), foam.lookup('foam.nanos.auth.AnotherUserClass') ]
+              )
+          );
+          return foam.u2.view.FObjectView.create({
+            data: X.data.exampleProp,
+            of: foam.nanos.auth.User,
+            predicate: predicate
+          }, X);
+        }
+      `
     }
   ],
 
   methods: [
-    function init() {
-      this.onDetach(this.of$.sub(this.updateChoices));
-      this.updateChoices();
-    },
-
     function updateChoices() {
       if ( this.of == null ) {
         this.choices = [];
+        this.choicesLoaded.resolve();
         return;
       }
 
@@ -98,9 +156,10 @@ foam.CLASS({
       // populate the list of choices using models related to 'of' via the
       // implements and extends relations.
       if ( this.strategizer != null ) {
-        this.strategizer.query(null, this.of.id).then((strategyReferences) => {
+        this.strategizer.query(null, this.of.id, null, this.predicate).then((strategyReferences) => {
           if ( ! Array.isArray(strategyReferences) || strategyReferences.length === 0 ) {
             this.choices = [[this.of.id, this.of.model_.label]];
+            this.choicesLoaded.resolve();
             return;
           }
 
@@ -119,20 +178,55 @@ foam.CLASS({
           choices.sort((a, b) => a[1] > b[1] ? 1 : -1);
 
           this.choices = choices;
+          this.choicesLoaded.resolve();
         }).catch(err => console.warn(err));
       } else {
         this.choices = this.choicesFallback(this.of);
       }
     },
 
-    function initE() {
+    async function initE() {
       this.SUPER();
-      this
-        .tag(foam.u2.detail.VerticalDetailView, {
-          data: this,
-          sections: [{
-            properties: [this.OBJECT_CLASS, this.DATA]
-          }]
+
+      function dataToClass(d) {
+        return d ? d.cls_.id : '';
+      }
+
+      var classToData = function(c) {
+        var m = c && this.__context__.lookup(c, true);
+        return m.create(this.data ? this.copyOldData(this.data) : null, this);
+      }.bind(this);
+
+      this.dataWasProvided_ = !! this.data;
+
+      if ( ! this.data && this.objectClass )
+        this.data = classToData(this.objectClass);
+
+      if ( ! this.choices.length ) {
+        this.onDetach(this.of$.sub(this.updateChoices));
+        this.updateChoices();
+        await this.choicesLoaded;
+      }
+
+      this.data$.relateTo(
+        this.objectClass$,
+        dataToClass,
+        classToData
+      );
+
+      if ( this.data ) { this.objectClass = dataToClass(this.data); }
+      if ( ! this.data && ! this.objectClass && this.choices.length && !this.placeholder ) this.objectClass = this.choices[0][0];
+
+      this.
+        start(this.OBJECT_CLASS).
+          // If we were using a DetailView, this would be done for us, but since
+          // we aren't, we need to connect the 'visibility' property ourself.
+          show(this.OBJECT_CLASS.createVisibilityFor(foam.core.SimpleSlot.create({value: this}), this.controllerMode$).map(function(m) {
+            return m != foam.u2.DisplayMode.HIDDEN;
+          })).
+        end().
+        tag(foam.u2.detail.VerticalDetailView, {
+          data$: this.data$
         });
     },
 

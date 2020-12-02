@@ -19,6 +19,15 @@ foam.INTERFACE({
           javaType: 'foam.lib.json.Outputter'
         }
       ]
-    }  
+    },
+    {
+      name: 'formatJSON',
+      args: [
+        {
+          name: 'formatter',
+          javaType: 'foam.lib.formatter.JSONFObjectFormatter'
+        }
+      ]
+    }
   ]
 });

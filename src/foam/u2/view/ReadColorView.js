@@ -13,11 +13,12 @@ foam.CLASS({
 
   css: `
     ^ {
-      height: /*%INPUTHEIGHT%*/ 32px;
-      display: flex;
       align-items: center;
-      justify-content: center;
       border-radius: 3px;
+      display: flex;
+      height: /*%INPUTHEIGHT%*/ 32px;
+      justify-content: center;
+      padding: 0 32px;
     }
 
     ^black {

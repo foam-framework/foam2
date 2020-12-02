@@ -24,47 +24,68 @@ foam.CLASS({
     'status'
   ],
 
+  sections: [
+    {
+      name: 'emailInformation',
+      order: 1
+    },
+    {
+      name: 'templateInformation',
+      title: 'Template Arguments',
+      order: 2
+    }
+  ],
+
   properties: [
     {
       class: 'Long',
       name: 'id',
+      section: 'emailInformation'
     },
     {
       class: 'DateTime',
       name: 'created',
+      section: 'emailInformation',
       tableWidth: 170
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
+      section: 'emailInformation',
       documentation: 'User who created the entry',
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdByAgent',
+      section: 'emailInformation',
       documentation: 'User who created the entry',
     },
     {
       class: 'StringArray',
-      name: 'to'
+      name: 'to',
+      section: 'emailInformation'
     },
     {
       class: 'StringArray',
       name: 'cc',
+      section: 'emailInformation'
     },
     {
       class: 'StringArray',
-      name: 'bcc'
+      name: 'bcc',
+      section: 'emailInformation'
     },
     {
       class: 'String',
-      name: 'subject'
+      name: 'subject',
+      section: 'emailInformation'
     },
     {
       class: 'String',
       name: 'body',
+      section: 'emailInformation',
       view: {
         class: 'foam.u2.MultiView',
         views: [
@@ -76,22 +97,26 @@ foam.CLASS({
     {
       class: 'String',
       name: 'from',
+      section: 'emailInformation',
       value: null
     },
     {
       class: 'String',
       name: 'displayName',
+      section: 'emailInformation',
       value: null
     },
     {
       class: 'String',
       name: 'replyTo',
+      section: 'emailInformation',
       value: null
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
+      section: 'emailInformation',
       value: '1',
       transient: true,
       hidden: true,
@@ -102,7 +127,14 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.notification.email.Status',
       name: 'status',
+      section: 'emailInformation',
       tableWidth: 100
     },
+    {
+      class: 'Map',
+      name: 'templateArguments',
+      section: 'templateInformation',
+      view: { class: 'foam.u2.view.MapView' }
+    }
   ]
 });

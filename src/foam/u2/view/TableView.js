@@ -10,10 +10,15 @@ foam.CLASS({
   extends: 'foam.u2.view.UnstyledTableView',
 
   css: `
+    ^tbody {
+      display: flow-root;
+    }
+
     ^tr {
       background: white;
       display: flex;
       height: 48px;
+      justify-content: space-between;
     }
 
     ^tbody > ^tr {
@@ -34,6 +39,7 @@ foam.CLASS({
       overflow: hidden;
       position: sticky;
       top: 0;
+      overflow-x: scroll;
     }
 
     ^td,
@@ -42,7 +48,7 @@ foam.CLASS({
       box-sizing: border-box;
       color: /*%BLACK%*/ #1e1f21;
       display: flex;
-      font-family: Roboto, 'Helvetica Neue', helvetica, sans-serif;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       line-height: 1.5;
       overflow: hidden;

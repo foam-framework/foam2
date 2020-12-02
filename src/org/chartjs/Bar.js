@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'org.chartjs',
   name: 'Bar',
   extends: 'org.chartjs.AbstractChartCView',
+  flags: ['web'],
   properties: [
     [ 'chartType', 'bar' ]
   ],

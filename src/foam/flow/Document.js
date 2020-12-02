@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.flow',
   name: 'Document',
+
   properties: [
     {
       class: 'String',
@@ -22,6 +23,7 @@ foam.CLASS({
       view: { class: 'foam.flow.MarkupEditor' }
     }
   ],
+
   methods: [
     function toE(args, x) {
       var f = this.htmlish.parseString(this.markup, this.cls_.id);
@@ -29,6 +31,7 @@ foam.CLASS({
         x.E('span').add(this.htmlish.getLastError());
     }
   ],
+
   grammars: [
     {
       name: 'htmlish',
@@ -56,6 +59,7 @@ foam.CLASS({
           // TODO: FOAM tags have their own entry because the registerElement support
           // does not actually take effect during Element.start/tag/add
           'tag': alt(sym('foam'),
+                     sym('foam-with-contents'),
                      sym('code'),
                      sym('self-closed-tag'),
                      sym('normal-tag')),
@@ -120,6 +124,9 @@ foam.CLASS({
           'code': seq1(1, '<code>', join(until('</code>'))),
 
           'foam': seq1(1, '<foam', sym('attributes'), '/>'),
+          'foam-with-contents': seq(
+            seq1(1, '<foam', sym('attributes'), '>'),
+            join(until('</foam>'))),
 
           'attributes': repeat(sym('attrib-key-value'), ' '),
 
@@ -143,6 +150,9 @@ foam.CLASS({
             return x.
               E('article').
               cssClass('foam-flow-Document').
+              // This is needed because one you click on a #link href
+              // the document view moves up for some unknown reason.
+              style({'margin-top': '60px'}).
               call(children, [x]);
           };
         },
@@ -174,7 +184,6 @@ foam.CLASS({
           }
 
           return function(x) {
-            console.log("Tag", openIdent, "attributes", attributes);
             this.
               start(openIdent).
               attrs(attributes).
@@ -368,6 +377,58 @@ foam.CLASS({
 
                   if ( ! viewName ) this.add(obj)
                   else this.tag(view, { data: obj });
+                });
+            }))
+
+          };
+        },
+
+        'foam-with-contents': function(v) {
+          // TODO: Figure out how to DRY this
+          var attributes = v[0];
+          var body = v[1];
+          return function(x) {
+            var viewName = attributes.view;
+            var className = attributes.class;
+
+            // TODO: Reuse FoamTagLoader support
+            var promise = Promise.all([
+              viewName ? x.classloader.load(viewName) : Promise.resolve(),
+              className ? x.classloader.load(className) : Promise.resolve(),
+            ])
+
+            var self = this;
+            this.add(promise.then(function(o) {
+              return self.E().
+                callIf(o, function() {
+                  var cls = x.lookup(className, true);
+                  var view = x.lookup(viewName, true);
+
+                  if ( className && ! cls )
+                    this.add('Unknown class', className);
+                  if ( viewName && ! view )
+                    this.add('Unknown view', viewName);
+
+                  if ( ! cls && ! view ) return;
+
+                  // Expose element contents to the context
+                  var subCtx = this.__subContext__.createSubContext({
+                    innerFLOW: body
+                  });
+
+                  var obj = null;
+                  this
+                    .startContext({ innerFLOW: body })
+                      .callIf(true, function () {
+                        obj = cls.create(attributes, this.__subSubContext__);
+                      })
+                      .callIfElse(!! viewName, function () {
+                        this.tag(view, { data: obj });
+                      }, function () {
+                        this.add(obj);
+                      })
+                    .endContext()
+                    ;
                 });
             }))
 

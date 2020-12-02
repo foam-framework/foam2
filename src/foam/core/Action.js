@@ -111,6 +111,11 @@ foam.CLASS({
       value: null
     },
     {
+      class: 'Function',
+      name: 'confirmationView',
+      value: null
+    },
+    {
       class: 'StringArray',
       name: 'availablePermissions',
       documentation: `Permissions required for the action to be available.

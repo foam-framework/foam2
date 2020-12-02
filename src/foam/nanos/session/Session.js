@@ -18,14 +18,18 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.*',
+    'foam.nanos.auth.Subject',
     'foam.nanos.boot.NSpec',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
+    'foam.nanos.theme.Theme',
+    'foam.nanos.theme.ThemeDomain',
+    'foam.nanos.theme.Themes',
     'foam.util.SafetyUtil',
     'java.util.Date',
-    'static foam.mlang.MLang.*',
     'javax.servlet.http.HttpServletRequest',
-    'org.eclipse.jetty.server.Request'
+    'org.eclipse.jetty.server.Request',
+    'static foam.mlang.MLang.*'
   ],
 
   tableColumns: [
@@ -50,11 +54,11 @@ foam.CLASS({
       tableCellFormatter: function(value, obj) {
         this.add(value);
         this.__context__.userDAO.find(value).then(function(user) {
-          this.add(' ', user && user.label());
+          this.add(' ', user && user.toSummary());
         }.bind(this));
       },
       required: true,
-      updateVisibility: 'RO',
+      updateVisibility: 'RO'
     },
     {
       class: 'Long',
@@ -63,10 +67,10 @@ foam.CLASS({
         if ( ! value ) return;
         this.add(value);
         this.__context__.userDAO.find(value).then(function(user) {
-          this.add(' ', user.label());
+          this.add(' ', user.toSummary());
         }.bind(this));
       },
-      visibility: 'RO',
+      visibility: 'RO'
     },
     {
       class: 'DateTime',
@@ -191,10 +195,10 @@ foam.CLASS({
         entries have been reset to their empty default values.
       `,
       javaCode: `
+      Subject subject = new Subject.Builder(x).setUser(null).build();
         return x
           .put(Session.class, this)
-          .put("user", null)
-          .put("agent", null)
+          .put("subject", subject)
           .put("group", null)
           .put("twoFactorSuccess", false)
           .put(CachingAuthService.CACHE_KEY, null)
@@ -233,21 +237,16 @@ foam.CLASS({
           }
           AppConfig appConfig = (AppConfig) x.get("appConfig");
           appConfig = (AppConfig) appConfig.fclone();
-          String configUrl = ((Request) req).getRootURL().toString();
 
-          if ( appConfig.getForceHttps() ) {
-            if ( configUrl.startsWith("https://") ) {
-               // Don't need to do anything.
-            } else if ( configUrl.startsWith("http://") ) {
-              configUrl = "https" + configUrl.substring(4);
-            } else {
-              configUrl = "https://" + configUrl;
-            }
+          Theme theme = ((Themes) x.get("themes")).findTheme(x);
+          rtn = rtn.put("theme", theme);
+
+          AppConfig themeAppConfig = theme.getAppConfig();
+          if ( themeAppConfig != null ) {
+            appConfig.copyFrom(themeAppConfig);
           }
-          if ( configUrl.endsWith("/") ) {
-            configUrl = configUrl.substring(0, configUrl.length()-1);
-          }
-          appConfig.setUrl(configUrl);
+          appConfig = appConfig.configure(x, null);
+
           rtn = rtn.put("appConfig", appConfig);
 
           return rtn;
@@ -262,12 +261,14 @@ foam.CLASS({
         User user         = (User) localUserDAO.find(getUserId());
         User agent        = (User) localUserDAO.find(getAgentId());
         Object[] prefix   = agent == null
-          ? new Object[] { String.format("%s (%d)", user.label(), user.getId()) }
-          : new Object[] { String.format("%s (%d) acting as %s (%d)", agent.label(), agent.getId(), user.label(), user.getId()) };
+          ? new Object[] { String.format("%s (%d)", user.toSummary(), user.getId()) }
+          : new Object[] { String.format("%s (%d) acting as %s (%d)", agent.toSummary(), agent.getId(), user.toSummary(), user.getId()) };
 
+        Subject subject = new Subject();
+        subject.setUser(agent);
+        subject.setUser(user);
         rtn = rtn
-          .put("user", user)
-          .put("agent", agent)
+          .put("subject", subject)
           .put("logger", new PrefixLogger(prefix, (Logger) x.get("logger")))
           .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
           .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
@@ -285,6 +286,7 @@ foam.CLASS({
             .put("group", group)
             .put("appConfig", group.getAppConfig(rtn));
         }
+        rtn = rtn.put("theme", ((Themes) x.get("themes")).findTheme(rtn));
 
         return rtn;
       `
@@ -309,18 +311,6 @@ foam.CLASS({
 
         if ( getAgentId() > 0 ) {
           checkUserEnabled(x, getAgentId());
-
-          DAO agentJunctionDAO = (DAO) x.get("agentJunctionDAO");
-          UserUserJunction junction = (UserUserJunction) agentJunctionDAO.find(
-            AND(
-              EQ(UserUserJunction.SOURCE_ID, getAgentId()),
-              EQ(UserUserJunction.TARGET_ID, getUserId())
-            )
-          );
-
-          if ( junction == null ) {
-            throw new RuntimeException("The junction between user and agent was not found.");
-          }
         }
       `
     },
@@ -333,10 +323,9 @@ foam.CLASS({
       javaCode: `
         User user = (User) ((DAO) x.get("localUserDAO")).find(userId);
 
-       if ( user == null
-         || (user instanceof DeletedAware && ((DeletedAware)user).getDeleted()
-         || (user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE) )
-       ) {
+        if ( user == null
+         || (user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE)
+        ) {
           throw new RuntimeException(String.format("User with id '%d' not found.", userId));
         }
 

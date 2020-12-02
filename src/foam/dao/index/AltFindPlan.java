@@ -29,4 +29,9 @@ public class AltFindPlan implements FindPlan {
   public long cost() {
     return bestPlan_.cost();
   }
+
+  @Override
+  public String toString() {
+    return bestPlan_.toString();
+  }
 }

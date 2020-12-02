@@ -38,7 +38,11 @@ foam.CLASS({
         return undefined;
       }
     },
-    'size'
+    'size',
+    {
+      name: 'header',
+      documentation: 'The heading text for the choices'
+    }
   ],
 
   methods: [
@@ -51,8 +55,12 @@ foam.CLASS({
         .attrs({ size: this.size$ })
         .attrSlot().linkFrom(this.data$);
 
-      this.setChildren(this.slot(function(choices, placeholder) {
+      this.setChildren(this.slot(function(choices, placeholder, header) {
         var cs = [];
+
+        if ( header ) {
+          cs.push(self.E('optgroup').attrs({ label: header }))
+        }
 
         if ( placeholder ) {
           cs.push(self.E('option').attrs({
@@ -67,7 +75,7 @@ foam.CLASS({
           let e = self.E('option').attrs({
             value: i,
             selected: self.data === i
-          }).add(value);
+          }).translate(c[0], value)
 
           if ( value.indexOf('  ') !== -1 ) {
             // Hack to display spaces as nbsp's

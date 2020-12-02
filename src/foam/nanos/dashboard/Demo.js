@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.dashboard',
   name: 'Demo',
   extends: 'foam.dashboard.view.Dashboard',
+  flags: ['web'],
   imports: [
     'nSpecDAO',
   ],

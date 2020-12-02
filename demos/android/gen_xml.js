@@ -3,10 +3,15 @@
 var dir = __dirname;
 var root = dir + '/../..';
 
+global.FOAM_FLAGS = {
+  'android': true
+};
+
 require(root + '/src/foam.js');
 require(root + '/src/foam/classloader/OrDAO.js');
 require(root + '/src/foam/classloader/NodeModelFileDAO.js');
 require(root + '/src/foam/classloader/NodeJsModelExecutor.js');
+require(root + '/src/foam/android/tools/GenStrings.js');
 
 var execSync = require('child_process').execSync
 execSync('rm -rf ' + dir + '/gen');

@@ -15,7 +15,7 @@ foam.CLASS({
     class: 'String',
     name: 'name',
     documentation: 'Parameters defined name',
-    visibility: foam.u2.DisplayMode.RO
+    visibility: 'RO'
    },
    {
      class: 'String',
@@ -23,14 +23,14 @@ foam.CLASS({
      label: 'java Type',
      displayWidth: '100',
      documentation: 'Parameters defined javaType',
-     visibility: foam.u2.DisplayMode.RO
+     visibility: 'RO'
     },
     {
      class: 'String',
      name: 'of',
      label: 'of',
      displayWidth: '100',
-     visibility: foam.u2.DisplayMode.RO
+     visibility: 'RO'
     },
     {
       class: 'String',

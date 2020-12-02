@@ -24,7 +24,8 @@ foam.CLASS({
     'stack',
     'summaryView? as importedSummaryView',
     'updateView? as importedUpdateView',
-    'window'
+    'window',
+    'translationService'
   ],
 
   exports: [
@@ -38,12 +39,8 @@ foam.CLASS({
 
   css: `
     ^ {
-      /* The following three lines are a cross-browser
-         equivalent to width: fit-content; in Chrome */
-      width: intrinsic;
-      width: -moz-max-content;
-      width: -webkit-max-content;
       margin: 24px auto 0 auto;
+      padding: 0 32px;
     }
 
     ^top-row {
@@ -62,8 +59,7 @@ foam.CLASS({
     }
 
     ^container {
-      display: flex;
-      justify-content: space-between;
+      padding: 0 0px;
     }
 
     ^ .actions {
@@ -77,10 +73,14 @@ foam.CLASS({
 
     ^full-search-container {
       flex: 0 0 250px;
+      padding-right: 18px;
+      width: 250px;
+      float: left;
+      padding-top: 23px;
     }
 
-    ^ .foam-u2-view-TableView {
-      width: 1024px;
+    ^manual-width-adjust {
+      width: inherit;
     }
   `,
 
@@ -115,9 +115,10 @@ foam.CLASS({
     },
     {
       name: 'createControllerView',
-      expression: function() {
+      expression: function(data) {
         return this.importedCreateControllerView || {
-          class: 'foam.comics.DAOCreateControllerView'
+          class: 'foam.comics.DAOCreateControllerView',
+          detailView: data.detailView
         };
       }
     },
@@ -141,25 +142,25 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-
       this.data.border.add(
         this.E()
           .addClass(this.myClass())
+          .start()
           .start()
             .addClass(this.myClass('top-row'))
             .addClass(this.myClass('separate'))
             .start()
               .addClass(this.myClass('title-container'))
               .start('h1')
-                .add(this.data.title$)
+                .translate(this.data.title, this.data.title)
               .end()
               .start()
-                .add(this.data.subtitle$)
+                .translate(this.data.subtitle, this.data.subtitle)
               .end()
             .end()
             .callIfElse(self.data.createLabel, function() {
               this.tag(self.data.primaryAction, {
-                label$: self.data.createLabel$,
+                label: self.translationService.getTranslation(foam.locale, `${self.parentNode.createControllerView.menu}.createLabel`, self.data.createLabel),
                 size: 'LARGE'
               });
             }, function() {
@@ -177,7 +178,7 @@ foam.CLASS({
                 }))
               .end();
             })
-            .start()
+            .start().addClass(this.myClass('manual-width-adjust'))
               .start()
                 .addClass(this.myClass('separate'))
                 .callIf(this.data.searchMode === this.SearchMode.SIMPLE, function() {
@@ -188,35 +189,29 @@ foam.CLASS({
                       }))
                     .end();
                 })
-                .start()
-                  .addClass('actions')
-                  .show(self.mode$.map((m) => m === foam.u2.DisplayMode.RW))
-                  .start()
-                    .forEach(self.cls.getAxiomsByClass(foam.core.Action).filter((action) => {
-                      return action.name !== self.data.primaryAction.name;
-                    }), function(action) {
-                      this.tag(action, { buttonStyle: 'TERTIARY' });
-                    })
-                    .add()
-                  .end()
+                .start().show(self.mode$.map(m => m === foam.u2.DisplayMode.RW))
+                  .forEach(self.cls.getAxiomsByClass(foam.core.Action).filter(action => {
+                    return action.name !== self.data.primaryAction.name;
+                  }), function(action) {
+                    this.tag(action, { buttonStyle: 'TERTIARY' });
+                  })
+                  .add()
                 .end()
               .end()
-              .start()
-                .style({ 'overflow-x': 'auto' })
-                .tag(this.summaryView, {
-                  data$: this.data.filteredDAO$,
-                  multiSelectEnabled: !! this.data.relationship,
-                  selectedObjects$: this.data.selectedObjects$
-                })
-              .end()
+              .tag(this.summaryView, {
+                data$: this.data.filteredDAO$,
+                multiSelectEnabled: !! this.data.relationship,
+                selectedObjects$: this.data.selectedObjects$
+              })
             .end()
-          .end());
+          .end()
+        .end());
 
       this.add(this.data.border);
       if ( this.isIframe() ) this.tag(this.IFrameTopNavigation);
     },
 
-    function isIframe () {
+    function isIframe() {
       try {
         return window.self !== window.top;
       } catch (e) {
@@ -224,21 +219,18 @@ foam.CLASS({
       }
     },
 
-    function dblclick(obj) {
+    function dblclick(obj, id) {
       if ( this.data.dblclick ) {
-        this.data.dblclick(obj);
+        this.data.dblclick(obj, obj && obj.id ? obj.id : id);
       } else {
-        this.onEdit(null, null, obj.id);
+        this.onEdit(null, null, obj && obj.id ? obj.id : id);
       }
     }
   ],
 
   listeners: [
     function onCreate() {
-      this.stack.push({
-        class: this.createControllerView.class,
-        detailView: this.data.detailView
-      }, this);
+      this.stack.push(this.createControllerView, this.__subContext__);
     },
 
     function onEdit(s, edit, id) {
@@ -247,7 +239,7 @@ foam.CLASS({
         detailView: this.data.detailView,
         editEnabled: this.data.editEnabled,
         key: id
-      }, this);
+      }, this.__subContext__);
     },
 
     function onFinished() {

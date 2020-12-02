@@ -63,7 +63,7 @@ foam.CLASS({
     PM pm = null;
     if ( getEnabled() ) {
       pm = (PM) x.get("PM");
-      pm.setClassType(this.getClassType());
+      pm.setKey(this.getClassType().getId());
       pm.setName(op);
       pm.init_();
     }
@@ -111,18 +111,7 @@ foam.CLASS({
       javaCode: `
       PM pm = createPM(x, getNameFor("login"));
       try {
-        return super.login(x, userId, password);
-      } finally {
-        log(x, pm);
-      }
-     `
-    },
-    {
-      name: 'loginByEmail',
-      javaCode: `
-      PM pm = createPM(x, getNameFor("loginByEmail"));
-      try {
-        return super.loginByEmail(x, email, password);
+        return super.login(x, identifier, password);
       } finally {
         log(x, pm);
       }

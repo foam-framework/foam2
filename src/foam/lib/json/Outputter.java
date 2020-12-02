@@ -23,8 +23,9 @@ import java.util.*;
 import org.apache.commons.io.IOUtils;
 
 public class Outputter
-  extends AbstractSink
-  implements foam.lib.Outputter {
+  extends    AbstractSink
+  implements foam.lib.Outputter
+{
 
   protected static ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
@@ -35,14 +36,14 @@ public class Outputter
     }
   };
 
-  protected foam.core.X x_;
-  public PrintWriter   writer_;
-  protected StringWriter  stringWriter_        = null;
-  protected boolean       outputShortNames_    = false;
-  protected boolean       outputDefaultValues_ = false;
-  protected boolean       multiLineOutput_     = false;
-  protected boolean       outputClassNames_    = true;
-  protected boolean       outputReadableDates_ = true;
+  protected foam.core.X       x_;
+  public    PrintWriter       writer_;
+  protected StringWriter      stringWriter_        = null;
+  protected boolean           outputShortNames_    = false;
+  protected boolean           outputDefaultValues_ = false;
+  protected boolean           multiLineOutput_     = false;
+  protected boolean           outputClassNames_    = true;
+  protected boolean           outputReadableDates_ = true;
   protected PropertyPredicate propertyPredicate_;
   protected Map<String, List<PropertyInfo>> propertyMap_ = new HashMap<>();
 
@@ -90,6 +91,10 @@ public class Outputter
     writer_ = writer;
   }
 
+  public void setOutputReadableDates(boolean f) {
+    outputReadableDates_ = f;
+  }
+
   protected void outputUndefined() {
   }
 
@@ -111,6 +116,12 @@ public class Outputter
   }
 
   public String escape(String s) {
+    // I tested with a ThreadLocal StringBuilder, but
+    // not faster in Java 11. KGR
+    StringBuilder sb = new StringBuilder();
+    foam.lib.json.Util.escape(s, sb);
+    return sb.toString();
+    /*
     s = s.replace("\\", "\\\\")
             .replace("\"", "\\\"")
             .replace("\t", "\\t")
@@ -118,6 +129,7 @@ public class Outputter
             .replace("\n","\\n");
     s = escapeControlCharacters(s);
     return s;
+    */
   }
 
   public String escapeMultiline(String s) {
@@ -348,20 +360,20 @@ public class Outputter
     ClassInfo info           = oldFObject.getClassInfo();
     ClassInfo newInfo        = newFObject.getClassInfo();
     boolean   outputComma    = true;
-    boolean   isDiff         = false;
+    boolean   opened         = false;
     boolean   isPropertyDiff = false;
 
     if ( ! oldFObject.equals(newFObject) ) {
       List     axioms = getProperties(info);
       Iterator i      = axioms.iterator();
 
-      writer_.append("{");
-      if ( multiLineOutput_ ) addInnerNewline();
+      addInnerNewline();
       while ( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
         isPropertyDiff = maybeOutputPropertyDelta(oldFObject, newFObject, prop);
         if ( isPropertyDiff) {
-          if ( ! isDiff ) {
+          if ( ! opened ) {
+            writer_.append("{");
             if ( outputClassNames_ ) {
               //output Class name
               writer_.append(beforeKey_());
@@ -374,7 +386,7 @@ public class Outputter
             addInnerNewline();
             PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
             outputProperty(newFObject, id);
-            isDiff = true;
+            opened = true;
           }
           writer_.append(",");
           addInnerNewline();
@@ -382,8 +394,8 @@ public class Outputter
         }
       }
 
-      if ( isDiff ) {
-        if ( multiLineOutput_ )  writer_.append("\n");
+      if ( opened ) {
+        addInnerNewline();
         writer_.append("}");
       }
     }

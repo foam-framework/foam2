@@ -17,6 +17,7 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.X',
     'foam.dao.DAO',
+    'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
     'foam.core.ContextAgent',
     'foam.nanos.notification.Notification',
@@ -37,6 +38,15 @@ foam.CLASS({
          agency.submit(x, new ContextAgent() {
             @Override
             public void execute(X x) {
+              if ( getNotification() != null ) {
+                DAO userDAO = (DAO) x.get("localUserDAO");
+                User user = (User) userDAO.find(getNotification().getUserId());
+                if ( user != null ) {
+                  user.doNotify(x, getNotification());
+                  return;
+                }
+              }
+              
               DAO notificationDAO = (DAO) x.get("localNotificationDAO");
               if ( getNotification() != null && notificationDAO != null ) {
                 try {

@@ -436,7 +436,7 @@ foam.CLASS({
 
   css: `
     ^ {
-      font-family: roboto, arial;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       color: #555;
     }
     ^ th {
@@ -537,7 +537,6 @@ foam.CLASS({
     function initE() {
       for ( var key in foam.UNUSED ) foam.lookup(key);
       this.SUPER();
-
       this.
         addClass(this.myClass()).
         tag(this.PATH, {displayWidth: 80}).
@@ -568,7 +567,7 @@ foam.CLASS({
             end().
             start('td').
               style({'vertical-align': 'top'}).
-              tag(this.ClassList, {title: 'Class List', showPackages: false, showSummary: true, data: Object.values(foam.USED).sort(this.MODEL_COMPARATOR)}).
+              tag(this.ClassList, {title: 'Class List', showPackages: false, showSummary: true, data: Object.values(foam.USED).filter((e) => {e != undefined }).sort(this.MODEL_COMPARATOR)}).
             end().
             start('td').
               style({'vertical-align': 'top'}).
@@ -732,7 +731,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'className',
-      value: 'className',
+      value: 'className'
     },
     {
       name: 'elementMap'
@@ -740,15 +739,15 @@ foam.CLASS({
     {
       class: 'String',
       name: 'prop',
-      value: 'propName',
+      value: 'propName'
     },
     {
       name: 'triangleSize',
-      value: 5,
+      value: 5
     },
     {
       name: 'dashedstep',
-      value: 10,
+      value: 10
     },
     {
       name: 'properties',
@@ -792,7 +791,7 @@ foam.CLASS({
       name: 'lastRelatedToY',
       value: 0,
       documentation: 'the y of the last required to element draw in the canvas.',
-    },
+    }
   ],
 
   methods: [
@@ -895,7 +894,7 @@ foam.CLASS({
 
       var triangleEnd = this.triangle( extendsLinkLine.endX, extendsLinkLine.endY, Math.PI / 2 );
 
-      this.selected = this.canvas.addChildren( legendBox, legendLabel, extendsLinkLine, triangleEnd, ExtendsNameLabel );
+      this.selected = this.canvas.add( legendBox, legendLabel, extendsLinkLine, triangleEnd, ExtendsNameLabel );
 
       var dashedLine = foam.graphics.Line.create({
         startX: x - 510 || startX,
@@ -920,7 +919,7 @@ foam.CLASS({
         text: 'Implement'
       });
 
-      this.selected = this.canvas.addChildren( ImplementNameLabel, triangleEndImplement, dashedLine );
+      this.selected = this.canvas.add( ImplementNameLabel, triangleEndImplement, dashedLine );
 
       var requiredLine = foam.graphics.Line.create({
         startX: x - 510 || startX,
@@ -950,7 +949,7 @@ foam.CLASS({
         text: 'Required By'
       });
 
-      this.selected = this.canvas.addChildren( requiredLine, requiredConnectorEnd, requiredNameLabel );
+      this.selected = this.canvas.add( requiredLine, requiredConnectorEnd, requiredNameLabel );
 
       requiresLink = foam.graphics.Line.create({
         startX: x - 510 || startX,
@@ -981,7 +980,7 @@ foam.CLASS({
         height: h || 30,
         text: 'Requires'
       });
-      this.selected = this.canvas.addChildren( requiresLink, requiresConnectorCircle, RequiresNameLabel );
+      this.selected = this.canvas.add( requiresLink, requiresConnectorCircle, RequiresNameLabel );
 
       var RelatedToNameLabel = foam.graphics.Label.create({
         align: 'center',
@@ -1003,7 +1002,7 @@ foam.CLASS({
         lineWidth: 2
       });
       var arrowRelatedto = this.arrowEnd( RelatedToLinkLine.endX, RelatedToLinkLine.endY, 3 * Math.PI / 2 );
-      this.selected = this.canvas.addChildren( RelatedToNameLabel, RelatedToLinkLine, arrowRelatedto );
+      this.selected = this.canvas.add( RelatedToNameLabel, RelatedToLinkLine, arrowRelatedto );
 
       var RelatedFromNameLabel = foam.graphics.Label.create({
         align: 'center',
@@ -1026,7 +1025,7 @@ foam.CLASS({
       });
       var arrowRelatedFrom = this.arrowEnd( RelatedFromLinkLine.startX, RelatedFromLinkLine.startY, Math.PI / 2 );
 
-      this.selected = this.canvas.addChildren( RelatedFromNameLabel, RelatedFromLinkLine, arrowRelatedFrom );
+      this.selected = this.canvas.add( RelatedFromNameLabel, RelatedFromLinkLine, arrowRelatedFrom );
     },
 
     function addModel(x, y, w, h) {
@@ -1060,11 +1059,10 @@ foam.CLASS({
         width: w || defaultWidth,
         height: h || this.conventionalUML ? step * this.properties.length : step * 5,
         color: '#ffffff', //this.UNSELECTED_COLOR
-        border: 'black',
-        text: this.prop
+        border: 'black'
       });
 
-      this.selected = this.canvas.addChildren( modelBox, modelNameLabel, propertyBox );
+      this.selected = this.canvas.add( modelBox, modelNameLabel, propertyBox );
       var propertyPadding = - this.widthCenterModel +10;
 
       if ( ! this.conventionalUML ){
@@ -1123,7 +1121,7 @@ foam.CLASS({
           text: 'Relationship:' + ( cls.getAxiomsByClass(foam.dao.Relationship) !== undefined ?  cls.getAxiomsByClass(foam.dao.Relationship).length : 0 )
         });
 
-        this.selected = this.canvas.addChildren( propertyNameLabel, methodsNameLabel, actionsNameLabel, listenersNameLabel,RelationshipNameLabel );
+        this.selected = this.canvas.add( propertyNameLabel, methodsNameLabel, actionsNameLabel, listenersNameLabel,RelationshipNameLabel );
       } else {
         for ( var i in this.properties ) {
            var methodsNameLabel = foam.graphics.Label.create({
@@ -1135,7 +1133,7 @@ foam.CLASS({
                   height: h || 30,
                   text: this.properties[i].name + ' : ' + this.properties[i].cls_.name
                 });
-            this.selected = this.canvas.addChildren( methodsNameLabel );
+            this.selected = this.canvas.add( methodsNameLabel );
         }
       }
     },
@@ -1201,7 +1199,7 @@ foam.CLASS({
 
         var triangleEndExtends = this.triangle( x + extendsBox.width / 2, y - (d * i) - (extendsBox.height * 2), 0 );
 
-        this.selected = this.canvas.addChildren( extendsBox, extendsNameLabel, extendsLine, triangleEndExtends );
+        this.selected = this.canvas.add( extendsBox, extendsNameLabel, extendsLine, triangleEndExtends );
 
         this.setData( extendsBox.x, extendsBox.y, cls.id );
 
@@ -1253,7 +1251,7 @@ foam.CLASS({
 
             var triangleEndImplement = this.triangle( implementsName.x, implementsName.y, 0 );
 
-            this.selected = this.canvas.addChildren( implementsName, implementsNameLabel, triangleEndImplement , dashedLine );
+            this.selected = this.canvas.add( implementsName, implementsNameLabel, triangleEndImplement , dashedLine );
           }
         }
       }
@@ -1305,7 +1303,7 @@ foam.CLASS({
             border: 'black',
             color: 'white'
           });
-          this.selected = this.canvas.addChildren(requiresByLine, requiresByConnectorCircle, requiresByName, requiresByNameLabel);
+          this.selected = this.canvas.add(requiresByLine, requiresByConnectorCircle, requiresByName, requiresByNameLabel);
           this.lastRelatedToY = this.lastRequiredByY = requiresByName.y + ( h || 30 );
         }
       }
@@ -1365,7 +1363,7 @@ foam.CLASS({
             border: 'black',
             color: 'white'
           });
-          this.selected = this.canvas.addChildren( requiresName, requiresNameLabel, requiresLine, requiresConnector );
+          this.selected = this.canvas.add( requiresName, requiresNameLabel, requiresLine, requiresConnector );
           this.lastRelatedFromY = this.lastRequireY = requiresName.y + ( h || 30 );
         }
       }
@@ -1451,9 +1449,9 @@ foam.CLASS({
             lineWidth: 2
           });
 
-          this.selected = this.canvas.addChildren( subClassesLine, subClassesName, subClassesNameLabel,subClassesLineNRow1, subClassesLineNRow2 );
+          this.selected = this.canvas.add( subClassesLine, subClassesName, subClassesNameLabel,subClassesLineNRow1, subClassesLineNRow2 );
         }else {
-          this.selected = this.canvas.addChildren( subClassesLine, subClassesName, subClassesNameLabel );
+          this.selected = this.canvas.add( subClassesLine, subClassesName, subClassesNameLabel );
         }
       }
 
@@ -1477,7 +1475,7 @@ foam.CLASS({
         lineWidth: 2
       });
 
-      this.selected = this.canvas.addChildren( triangleEndSubClasses, subClassesLineV, subClassesLineH );
+      this.selected = this.canvas.add( triangleEndSubClasses, subClassesLineV, subClassesLineH );
       if ( subClassesName.y >= this.height && subClassesName.y >= this.canvasHeightExtension ) this.canvasHeightExtension = subClassesName.y + ( ( h || 30 ) * 2 );
     },
 
@@ -1539,9 +1537,9 @@ foam.CLASS({
                 font: '20px Arial',
                 text: a.cardinality
               } );
-              this.selected = this.canvas.addChildren( relatedtoline, arrowRelatedto, cardinalityToNameLabel );
+              this.selected = this.canvas.add( relatedtoline, arrowRelatedto, cardinalityToNameLabel );
           } else {
-            this.selected = this.canvas.addChildren( relatedtoline, arrowRelatedto );
+            this.selected = this.canvas.add( relatedtoline, arrowRelatedto );
           }
         }
         if ( targetM !== undefined ) {
@@ -1587,9 +1585,9 @@ foam.CLASS({
                 height: h || 30,
                 text: a.cardinality
               } );
-              this.selected = this.canvas.addChildren( relatedtoName, relatedtoNameLabel, relatedtoline, arrowRelatedto, cardinalityToNameLabel );
+              this.selected = this.canvas.add( relatedtoName, relatedtoNameLabel, relatedtoline, arrowRelatedto, cardinalityToNameLabel );
             } else {
-              this.selected = this.canvas.addChildren( relatedtoName, relatedtoNameLabel, relatedtoline, arrowRelatedto );
+              this.selected = this.canvas.add( relatedtoName, relatedtoNameLabel, relatedtoline, arrowRelatedto );
             }
             if ( relatedtoName.y >= this.height && relatedtoName.y >= this.canvasHeightExtension ) {
               this.canvasHeightExtension = relatedtoName.y + (( h || 30 ) * 2 );
@@ -1654,9 +1652,9 @@ foam.CLASS({
                 font: '20px Arial',
                 text: a.cardinality
               } );
-              this.selected = this.canvas.addChildren( relatedtoline, arrowRelatedto, cardinalityToNameLabel );
+              this.selected = this.canvas.add( relatedtoline, arrowRelatedto, cardinalityToNameLabel );
           } else {
-            this.selected = this.canvas.addChildren( relatedtoline, arrowRelatedto );
+            this.selected = this.canvas.add( relatedtoline, arrowRelatedto );
           }
         }
 
@@ -1704,9 +1702,9 @@ foam.CLASS({
                 height: h || 30,
                 text: a.cardinality
               } );
-              this.selected = this.canvas.addChildren( RelatedFromName, RelatedFromNameLabel, RelatedFromLine, arrowRelatedFrom, cardinalityFromNameLabel );
+              this.selected = this.canvas.add( RelatedFromName, RelatedFromNameLabel, RelatedFromLine, arrowRelatedFrom, cardinalityFromNameLabel );
             } else {
-              this.selected = this.canvas.addChildren( RelatedFromName, RelatedFromNameLabel, RelatedFromLine, arrowRelatedFrom );
+              this.selected = this.canvas.add( RelatedFromName, RelatedFromNameLabel, RelatedFromLine, arrowRelatedFrom );
             }
             if ( RelatedFromName.y >= this.height && RelatedFromName.y >= this.canvasHeightExtension ) {
               this.canvasHeightExtension = axeY + ( ( h || 30 ) * 3 );
@@ -1756,7 +1754,7 @@ foam.CLASS({
             lineWidth: 2
           });
 
-          this.selected = this.canvas.addChildren( exportsName, exportsNameLabel ); // TODO add the link
+          this.selected = this.canvas.add( exportsName, exportsNameLabel ); // TODO add the link
         }
       }
     },
@@ -1796,7 +1794,7 @@ foam.CLASS({
             lineWidth: 2
           });
 
-          this.selected = this.canvas.addChildren( importsName, importsNameLabel ); //TODO add the link
+          this.selected = this.canvas.add( importsName, importsNameLabel ); //TODO add the link
         }
       }
     }

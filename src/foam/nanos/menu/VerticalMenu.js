@@ -29,8 +29,8 @@ foam.CLASS({
   ],
 
   css: `
-  input {
-    width: 220px;
+  ^ input[type="search"] {
+    width: 210px;
   }
 
   ^ .side-nav-view {
@@ -39,7 +39,7 @@ foam.CLASS({
     display: inline-block;
     position: absolute;
     height: calc(100vh - 80px);
-    width: 240px;
+    width: 250px;
     overflow-x: hidden;
     z-index: 100;
     font-size: 26px;
@@ -50,7 +50,7 @@ foam.CLASS({
 
   .foam-u2-search-TextSearchView {
     text-align: center;
-    margin: 4px 0;
+    margin: 14px 0 0;
   }
 
   ^ .foam-u2-view-TreeViewRow-label {
@@ -94,7 +94,6 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-
       this
       .addClass(this.myClass())
       .start()
@@ -115,7 +114,8 @@ foam.CLASS({
               startExpanded: true,
               query: self.menuSearch$,
               onClickAddOn: function(data) { self.openMenu(data); },
-              formatter: function(data) { this.add(data.label); }
+              selection$: self.currentMenu$,
+              formatter: function(data) { this.add({ data : data, clsInfo : data.cls_.LABEL.name, default : data.label }); }
             })
           .end()
         .end()
@@ -123,8 +123,8 @@ foam.CLASS({
     },
 
     function openMenu(menu) {
-      if ( Object.keys(menu.handler.instance_).length > 0 ) {
-        this.pushMenu(menu.id);
+      if ( menu.handler ) {
+        this.pushMenu(menu);
         this.menuListener(menu);
       }
     }

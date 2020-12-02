@@ -16,7 +16,6 @@ foam.INTERFACE({
       * getCurrentUser
       * getCurrentGroup
       * login
-      * loginByEmail
       * logout
       * validatePassword
       * updatePassword
@@ -31,9 +30,9 @@ foam.INTERFACE({
   methods: [
     // TODO: Decide if we want to keep this method and if we do, document it.
     {
-      name: 'getCurrentUser',
+      name: 'getCurrentSubject',
       async: true,
-      type: 'foam.nanos.auth.User',
+      type: 'foam.nanos.auth.Subject',
       javaThrows: ['foam.nanos.auth.AuthenticationException'],
       swiftThrows: true,
       args: [
@@ -65,7 +64,8 @@ foam.INTERFACE({
     {
       name: 'login',
       documentation: `
-        Log the user in using their system id and password to authenticate them.
+        Log the user in using their identifier (email or username) and password to
+        authenticate them.
       `,
       async: true,
       type: 'foam.nanos.auth.User',
@@ -77,31 +77,7 @@ foam.INTERFACE({
           type: 'Context'
         },
         {
-          name: 'userId',
-          type: 'Long'
-        },
-        {
-          name: 'password',
-          type: 'String'
-        }
-      ]
-    },
-    {
-      name: 'loginByEmail',
-      documentation: `
-        Log the user in using their email and password to authenticate them.
-      `,
-      async: true,
-      type: 'foam.nanos.auth.User',
-      javaThrows: ['foam.nanos.auth.AuthenticationException'],
-      swiftThrows: true,
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'email',
+          name: 'identifier',
           type: 'String'
         },
         {
@@ -128,7 +104,7 @@ foam.INTERFACE({
         },
         {
           name: 'potentialPassword',
-          type: 'String',
+          type: 'String'
         }
       ]
     },
@@ -137,7 +113,7 @@ foam.INTERFACE({
     // parameter? Something like:
     //
     //   Boolean check(X x, String permission) {
-    //     User user = (User) x.get("user"); // Or use `getCurrentUser`
+    //     User user = (User) ((Subject)x.get("subject")).getUser(); // Or use `getCurrentUser`
     //     return check(x, user, permission);
     //   }
     //

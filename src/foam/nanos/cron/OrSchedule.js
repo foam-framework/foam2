@@ -17,6 +17,7 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.X',
     'java.util.Date'
   ],
 
@@ -45,6 +46,10 @@ foam.CLASS({
       name: 'getNextScheduledTime',
       args: [
         {
+          name: 'x',
+          type: 'X'
+        },
+        {
           name: 'from',
           type: 'java.util.Date'
         }
@@ -52,9 +57,9 @@ foam.CLASS({
       javaCode: `
         Date min = null;
         for ( Schedule sched : getDelegates() ) {
-          Date next = sched.getNextScheduledTime(from);
+          Date next = sched.getNextScheduledTime(x, from);
           if ( min == null ) {
-            min = sched.getNextScheduledTime(from);
+            min = sched.getNextScheduledTime(x, from);
           } else if ( next.getTime() < min.getTime() ) {
             min = next;
           }

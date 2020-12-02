@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2016 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 // http://www.discoversdk.com/blog/grid-control-with-different-javascript-frameworks
@@ -44,7 +33,7 @@ foam.CLASS({
 
   css: `
     body {
-      font-family:Arial;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       color:#3a3a3a;
     }
     ^list {
@@ -110,7 +99,7 @@ foam.CLASS({
 //       view: { class: 'foam.u2.DAOList', of: com.google.foam.demos.grid.Resource, rowView: { class: 'com.google.foam.demos.grid.ResourceView' } }
     },
     {
-      name: 'person',
+      name: 'resource',
       view: {
         class: 'foam.u2.DetailView',
         config: {
@@ -131,18 +120,11 @@ foam.CLASS({
         start('h3').add('Add Resources').end().
 
         // Use this block to create the form manually
-        /*
-        add('Description: ').
-        start(this.person.DESCRIPTION, {data$: this.person.description$}).end().
-        add(' URL: ').
-        start(this.person.URL,         {data$: this.person.url$}).end().
-        */
+        startContext({data: this.resource}).
+          add('Description: ', this.resource.DESCRIPTION, ' URL: ', this.resource.URL).
+        endContext().
 
-        // Or this to use a DetailView
-        start('span').style({display: "flex"}).
-          add(this.PERSON).
-          add(this.ADD_RESOURCE).
-        end().
+        add(' ', this.ADD_RESOURCE).
 
         start('h3').add('List of Resources').end().
 
@@ -180,8 +162,7 @@ foam.CLASS({
       name: 'addResource',
       label: 'Add',
       code: function() {
-        var p = this.person;
-        // TODO: remove clone()
+        var p = this.resource;
         this.dao.put(p.clone());
         p.id = p.description = p.url = undefined;
       }
@@ -192,16 +173,10 @@ foam.CLASS({
         console.log('show');
         this.dao.select().then(function(s) {
           window.alert(foam.json.Outputter.create({
-            pretty: false,
+            pretty:           false,
             outputClassNames: false
           }).stringify(s.array));
         });
-      }
-    },
-    {
-      name: 'deleteItem',
-      label: 'Delete',
-      code: function() {
       }
     }
   ]

@@ -39,7 +39,7 @@ foam.CLASS({
       name: 'onBlur',
       isFramed: true,
       code: function() {
-        if ( ! this.el() ) return;
+        if ( ! this.el() || ! this.data ) return;
         this.el().value = this.dataToInput(this.data);
       }
     }

@@ -39,4 +39,8 @@ public class TreeLookupFindPlan implements FindPlan {
     return null;
   }
 
+  @Override
+  public String toString() {
+    return "tree-lookup(size:" + size_ + ", cost:" + cost() + ", prop:" + prop_.toString() + ")";
+  }
 }

@@ -31,7 +31,7 @@ foam.CLASS({
             setDelegate(delegate);
 
             // create journal
-            setJournal(new foam.dao.FileJournal.Builder(x)
+            setJournal(new foam.dao.F3FileJournal.Builder(x)
               .setDao(delegate)
               .setFilename(filename)
               .setCreateFile(true)
@@ -46,11 +46,11 @@ foam.CLASS({
             }
 
             new foam.dao.CompositeJournal.Builder(x)
-              .setDelegates(new foam.dao.Journal[]{
-                new foam.dao.FileJournal.Builder(resourceStorageX)
+              .setDelegates(new foam.dao.Journal[] {
+                new foam.dao.F3FileJournal.Builder(resourceStorageX)
                   .setFilename(filename + ".0")
                   .build(),
-                new foam.dao.FileJournal.Builder(x)
+                new foam.dao.F3FileJournal.Builder(x)
                   .setFilename(filename)
                   .build()
               })

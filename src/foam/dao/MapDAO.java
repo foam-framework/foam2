@@ -53,10 +53,10 @@ public class MapDAO
     }
     obj = obj.fclone();
     obj.freeze();
-    
+
     getData().put(key, obj);
     onPut(obj);
-    
+
     return obj;
   }
 
@@ -75,7 +75,7 @@ public class MapDAO
       return null;
     }
 
-    return AbstractFObject.maybeClone(
+    return FObject.maybeClone(
         getOf().isInstance(o)
           ? getData().get(getPrimaryKey().get(o))
           : getData().get(o)

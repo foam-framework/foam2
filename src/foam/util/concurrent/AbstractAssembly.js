@@ -26,14 +26,7 @@ foam.CLASS({
       synchronized: true,
       value: false,
       documentation: 'True once endJob() has executed.'
-    },
-    {
-      name: 'last',
-      class: 'Boolean',
-      synchronized: true,
-      value: true,
-      documentation: 'True if no new Assembly is waiting for this task to complete.'
-    },
+    }
   ],
 
   methods: [
@@ -64,16 +57,9 @@ foam.CLASS({
     },
     {
       name: 'endJob',
+      args: [ 'boolean isLast' ],
       javaCode: `
         // Template method, override in subclass if desired
-      `
-    },
-    {
-      name: 'isLast',
-      type: 'boolean',
-      synchronized: true,
-      javaCode: `
-        return getLast();
       `
     },
     {
@@ -99,5 +85,4 @@ foam.CLASS({
       `
     }
   ]
-
-})
+});

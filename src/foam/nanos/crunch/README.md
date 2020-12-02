@@ -12,7 +12,7 @@ CRUNCH uses this knowledge graph to dynamically generate onboarding wizards for 
 Capability is the core model of CRUNCH, and describes a task that the user can perform, or a permission they are granted. 
 
 Some important properties on the Capability model are: 
-- `id` - A descriptive String id, which will soon be migrated to a Long id (TODO ruby) 
+- `name` - This could be the "permission" granted by this capability, or simply a descriptive name for the capability.
 - `of` - The ClassInfo for the `data` of the `UserCapabilityJunction`
 - `daoKey` - If provided, the `data` of the `UserCapabilityJunction` is stored in this DAO
 - `permissionsGranted` - A list of String denoting the permissions implied by this Capability. If a user has a capability granting permission p, CapabilityAuthService.check(x, p) will return true.

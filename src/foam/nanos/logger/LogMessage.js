@@ -80,9 +80,8 @@ foam.CLASS({
       }
     },
     {
-      name: 'threadName',
+      name: 'thread',
       class: 'String',
-      label: 'Thread',
       visibility: 'RO',
       javaFactory: `return Thread.currentThread().getName();`,
     },
@@ -106,7 +105,7 @@ foam.CLASS({
       name: 'id',
       class: 'Long',
       storageTransient: 'true',
-      hidden: 'true'
+      visibility: 'HIDDEN'
     },
     {
       name: 'message',

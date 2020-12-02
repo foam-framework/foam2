@@ -1,0 +1,42 @@
+p({
+  "class":"foam.nanos.cron.Cron",
+  "id":"Expire User CapabilityJunctions",
+  "description":"Daily check to remove expired UserCapabilityJunctions",
+  "schedule":{
+    "class":"foam.nanos.cron.CronSchedule",
+    "minute":0,
+    "hour":0,
+    "dayOfMonth":-1,
+    "month":-1,
+    "dayOfWeek":-1,
+    "second":0
+  },
+  "code": """
+    cron = new foam.nanos.crunch.ExpireUserCapabilityJunctionsCron();
+    cron.execute(x);
+    print("done");
+  """,
+  "enabled":true
+})
+
+p({
+  "class":"foam.nanos.cron.Cron",
+  "id":"Decrement Grace Days Left On UCJ",
+  "description":"Daily job to reduce the grace period on a ucj",
+  "schedule": {
+    "class": "foam.nanos.cron.CronSchedule",
+    "minute": 0,
+    "hour": 0,
+    "dayOfMonth": -1,
+    "month": -1,
+    "dayOfWeek": -1,
+    "second": 0
+  },
+  "code": """
+    cron = new foam.nanos.crunch.DecrementGraceDaysLeftCron();
+    cron.execute(x);
+    print("done");
+  """,
+  "enabled":true
+})
+

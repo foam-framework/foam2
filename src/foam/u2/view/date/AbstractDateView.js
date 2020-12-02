@@ -22,6 +22,11 @@ foam.CLASS({
         }
         return data.getYear() + 1900;
       },
+      preSet: function(old, nu) {
+        var regex = /^\d{4}$/;
+        if ( regex.test(nu) ) return nu;
+        return old;
+      },
       postSet: function(_, n) {
         var d = new Date(this.data);
         d.setYear(n);

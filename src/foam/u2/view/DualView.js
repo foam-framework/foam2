@@ -18,7 +18,14 @@
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'DualView',
-  extends: 'foam.u2.Element',
+  extends: 'foam.u2.MultiView',
+
+  // deprecated: 'Use foam.u2.MultiView instead.',
+
+  css: `
+    ^viewa, ^viewb { padding: 2px 0; }
+    ^viewa { margin-right: 8px; }
+  `,
 
   properties: [
     {
@@ -29,30 +36,10 @@ foam.CLASS({
       class: 'foam.u2.ViewSpec',
       name: 'viewb'
     },
-    'data',
-    'prop'
-  ],
-
-  methods: [
-    function initE() {
-      var a = foam.u2.ViewSpec.createView(this.viewa, {
-        data$: this.data$ }, this, this);
-      var b = foam.u2.ViewSpec.createView(this.viewb, {
-        data$: this.data$ }, this, this);
-
-      if ( this.prop ) {
-        a.fromProperty && a.fromProperty(this.prop);
-        b.fromProperty && b.fromProperty(this.prop);
-      }
-
-      this
-        .start(a).addClass( this.myClass('viewa') ).end()
-        .nbsp()
-        .start(b).addClass( this.myClass('viewb') ).end();
-    },
-
-    function fromProperty(prop) {
-      this.prop = prop;
+    {
+      class: 'Array',
+      name: 'views',
+      factory: function() { return [this.viewa, this.viewb]; }
     }
   ]
 });

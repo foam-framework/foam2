@@ -31,7 +31,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'duration',
-      value: 200,
+      value: 100,
       units: 'ms'
     },
     {
@@ -58,30 +58,31 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'envelope'
+      name: 'envelope',
+      value: true
     },
     {
       class: 'Int',
       name: 'attack',
-      value: 100,
+      value: 1,
       units: 'ms'
     },
     {
       class: 'Int',
       name: 'decay',
-      value: 100,
+      value: 0,
       units: 'ms'
     },
     {
       class: 'Float',
       name: 'sustain',
-      value: 50,
+      value: 100,
       units: '%'
     },
     {
       class: 'Int',
       name: 'release',
-      value: 100,
+      value: 1,
       units: 'ms'
     }
   ],
@@ -107,6 +108,8 @@ foam.CLASS({
         env.gain.setValueAtTime(0, now);
         env.gain.linearRampToValueAtTime(1, now+this.attack/1000);
         env.gain.linearRampToValueAtTime(this.sustain/100, now+(this.attack+this.decay)/1000);
+ //       env.gain.linearRampToValueAtTime(this.sustain/100, now+(this.duration-this.release)/1000);
+        env.gain.setValueAtTime(this.sustain/100, now+(this.duration-this.release)/1000);
         env.gain.linearRampToValueAtTime(0, now+this.duration/1000);
         env.connect(destination);
         destination = env;
@@ -139,7 +142,6 @@ foam.CLASS({
       }
 
       o.start(0);
-
       o.stop(now + this.duration/1000);
 
       // There should be a better way to know when to cleanup.

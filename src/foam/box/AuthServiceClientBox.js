@@ -11,26 +11,12 @@ foam.CLASS({
 
   documentation: 'ClientBox which does not wrap replyBox in SessionReplyBox',
 
+  imports: [ 'sessionID' ],
+
   constants: [
     {
       name: 'SESSION_KEY',
       value: 'sessionId'
-    }
-  ],
-
-  properties: [
-    {
-      class: 'String',
-      name: 'sessionName',
-      value: 'defaultSession'
-    },
-    {
-      class: 'String',
-      name: 'sessionID',
-      factory: function() {
-        return localStorage[this.sessionName] ||
-            ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
-      }
     }
   ],
 

@@ -25,8 +25,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import static foam.mlang.MLang.AND;
-import static foam.mlang.MLang.EQ;
+import static foam.mlang.MLang.*;
 
 public class CapabilityTest extends Test {
   private Capability c1, c2;
@@ -256,7 +255,6 @@ public class CapabilityTest extends Test {
     grantCrunch.setTargetId(crunch.getId());
     grantCrunch.setData(data);
     grantCrunch.setExpiry(((new GregorianCalendar(2038, Calendar.JULY, 1)).getTime()));
-    System.out.println(grantCrunch.getExpiry().toString());
     userCapabilityJunctionDAO.put_(x, grantCrunch);
 
     // test that user has permissions before capability junction expires
@@ -265,7 +263,6 @@ public class CapabilityTest extends Test {
 
     // expire the cabability-user junction
     grantCrunch.setExpiry(((new GregorianCalendar(1970, Calendar.JULY, 1)).getTime()));
-    System.out.println(grantCrunch.getExpiry().toString());
     userCapabilityJunctionDAO.put_(x, grantCrunch);
 
     // test that user loses permissions after capability expires
@@ -399,7 +396,7 @@ public class CapabilityTest extends Test {
     c1.setNotes("noted");
     c1.setVersion("0.0.0.0");
     c1.setEnabled(true);
-    c1.setVisible(false);
+    c1.setVisibilityPredicate(TRUE);
     c1.setPermissionsGranted( new String[] {p1} );
     c1.setExpiry(((new GregorianCalendar(2867, Calendar.JULY, 1)).getTime()));
     c1 = (Capability) capabilityDAO.put(c1);

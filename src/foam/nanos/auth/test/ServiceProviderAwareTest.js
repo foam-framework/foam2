@@ -30,6 +30,7 @@ foam.CLASS({
     'foam.nanos.auth.ServiceProviderAwareSink',
     'foam.nanos.auth.GroupPermissionJunction',
     'foam.nanos.auth.test.DummySp',
+    'foam.nanos.auth.LifecycleState',
     'java.util.HashMap',
     'java.util.List',
     'java.util.Map',
@@ -98,6 +99,7 @@ foam.CLASS({
           .setEmail("test@example.com")
           .setSpid("spid")
           .setGroup("admin")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         ctxUser = (User) userDAODelegate.put(ctxUser);
         y = Auth.sudo(y, ctxUser);
@@ -110,6 +112,7 @@ foam.CLASS({
           .setLastName("lastname")
           .setEmail("user1@example.com")
           .setGroup("test")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         user1 = (User) userDAO.put_(y, user1);
 
@@ -119,6 +122,7 @@ foam.CLASS({
           .setLastName("lastname")
           .setEmail("user2@example.com")
           .setGroup("test")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         user2 = (User) userDAO.put_(y, user2);
 
@@ -128,6 +132,7 @@ foam.CLASS({
           .setLastName("lastname")
           .setEmail("user3@example.com")
           .setGroup("test")
+          .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         user3 = (User) userDAO.put_(y, user3);
 

@@ -348,7 +348,7 @@ foam.CLASS({
   extends: 'foam.blob.ProxyBlob',
 
   imports: [
-    'blobStore?',
+    'BlobStore blobStore?',
     'blobService'
   ],
 
@@ -377,15 +377,33 @@ foam.CLASS({
   ],
 
   methods: [
-    function compareTo(other) {
-      return foam.blob.IdentifiedBlob.isInstance(other) && other.id == this.id;
-    },
-
     function read(buffer, offset) {
       return this.delegate.then(function(d) {
         return d.read(buffer, offset);
       });
-    }
+    },
+
+    {
+      name: 'compareTo',
+      type: 'int',
+      args:
+        [
+          {
+            name: 'o',
+            type: 'Object',
+          }
+        ],
+      javaCode: `
+        IdentifiedBlob o2 = (IdentifiedBlob) o;
+        if ( o2 == null ) return 1;
+        if ( o2 == this ) return 0;
+        return foam.util.SafetyUtil.compare(getId(), o2.getId());
+      `,
+      code: function(other) {
+        if ( other === null ) return 1;
+        return this.id.localeCompare(other.id);
+      },
+    },
   ]
 });
 
@@ -561,15 +579,18 @@ foam.CLASS({
 
         this.isSet = true;
       },
-      javaCode:`if ( this.getIsSet() )
-  return;
-ensureDir(x, getTmp());
-ensureDir(x, getSha256());
-setIsSet(true);`
+      javaCode:`
+        if ( this.getIsSet() )
+          return;
+          ensureDir(x, getTmp());
+          ensureDir(x, getSha256());
+          setIsSet(true);
+      `
     },
     {
       name: 'ensureDir',
       type: 'Void',
+      synchronized: true,
       args: [ { name: 'x', type: 'Context' },
               { name: 'path', type: 'String' } ],
       code: function ensureDir(path) {
@@ -584,14 +605,16 @@ setIsSet(true);`
           throw e;
         }
       },
-      javaCode: `File parsed = x.get(Storage.class).get(path);
-if ( parsed.exists() && parsed.isDirectory() ) {
-  return;
-}
+      javaCode: `
+        File parsed = x.get(Storage.class).get(path);
+        if ( parsed.exists() && parsed.isDirectory() ) {
+          return;
+        }
 
-if ( ! parsed.mkdirs() ) {
-  throw new RuntimeException("Failed to create: " + path);
-}`
+        if ( ! parsed.mkdirs() ) {
+          throw new RuntimeException("Failed to create: " + path);
+        }
+      `
     },
     {
       name: 'allocateTmp',
@@ -721,10 +744,12 @@ try ( HashingOutputStream os = new HashingOutputStream(new FileOutputStream(tmp)
 
   String digest = new String(Hex.encodeHexString(os.digest()));
   File dest = x.get(Storage.class).get(getSha256() + File.separator + digest);
-  if ( !tmp.renameTo(dest) ) {
-    throw new IOException("Rename failed!");
+  if ( ! tmp.renameTo(dest) ) {
+    // File already exists, so remove tmp version
+    try {
+      tmp.delete();
+    } catch (Throwable t) {}
   }
-
   IdentifiedBlob result = new IdentifiedBlob();
   result.setId(digest);
   result.setX(getX());
@@ -968,14 +993,15 @@ foam.CLASS({
 
     function find_(x, id) {
       return Promise.resolve(this.blobs[id] ?
-                             this.BlobBlob.create({ blob: this.blobs[id] }) :
-                             null);
+        this.BlobBlob.create({ blob: this.blobs[id] }) :
+        null);
     },
 
     function urlFor_(x, blob) {
       if ( this.IdentifiedBlob.isInstance(blob) ) {
         return URL.createObjectURL(this.blobs[blob.id]);
-      } else if ( this.BlobBlob.isInstance(blob) ) {
+      }
+      if ( this.BlobBlob.isInstance(blob) ) {
         return URL.createObjectURL(blob.blob);
       }
 

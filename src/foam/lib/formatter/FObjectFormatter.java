@@ -7,6 +7,8 @@
  package foam.lib.formatter;
 
 import foam.core.ClassInfo;
+import foam.core.ContextAware;
+import foam.core.FEnum;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
@@ -14,11 +16,17 @@ import foam.lib.PropertyPredicate;
 import java.util.*;
 
 public interface FObjectFormatter
+  extends ContextAware
 {
+  public void setX(X x);
+
+  public X getX();
 
   public StringBuilder builder();
 
   public void reset();
+
+  public StringBuilder append(Object o);
 
   public String stringify(FObject obj);
 
@@ -54,7 +62,7 @@ public interface FObjectFormatter
 
   public void output(List list);
 
-  public void output(Enum<?> val);
+  public void outputEnum(FEnum val);
 
   public void output(Object val);
 

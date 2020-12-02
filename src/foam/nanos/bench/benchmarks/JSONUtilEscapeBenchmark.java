@@ -23,8 +23,10 @@ public class JSONUtilEscapeBenchmark
   }
 
   @Override
-  public synchronized void execute(X x) {
+  public void execute(X x) {
     b_.setLength(0);
-    foam.lib.json.Util.escape("abcdefg\n\t\\\u2605\\u0007xjxjxjxjxjxjxjxjxjxj", b_);
+    for ( int i = 0 ; i < 1000 ; i++ ) {
+      foam.lib.json.Util.escape("abcdefg\n\t\\\u2605\\u0007xjxjxjxjxjxjxjxjxjxj", b_);
+    }
   }
 }

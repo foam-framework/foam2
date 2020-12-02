@@ -1,13 +1,8 @@
 /**
  * @license
- * Copyright 2017 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
-*/
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 
 foam.CLASS({
   package: 'foam.u2.view',
@@ -35,7 +30,50 @@ foam.CLASS({
     {
       name: 'selectedView',
       view: function(_, X) {
-        return foam.u2.view.ChoiceView.create({choices: X.data.views});
+        return foam.u2.view.ChoiceView.create({choices: X.data.views}, X);
+      },
+      documentation: `Set one of the views as the selectedView.
+
+        Default to the first item of the views property.
+
+        Set selectedView as a string to look up and load the view by name, or as
+        a number to load the view by index.
+
+        For example:
+
+            {
+              class: 'foam.u2.view.AltView',
+              views: [
+                [
+                  {
+                    // view 1 spec
+                  },
+                  'View 1'
+                ],
+                [
+                  {
+                    // view 2 spec
+                  },
+                  'View 2'
+                ]
+              ],
+              selectedView: 'View 2' // select view by name
+            }
+      `,
+      factory: function() {
+        return this.views[0][0];
+      },
+      adapt: function(_, nu) {
+        if ( typeof nu === 'string' ) {
+          for ( var i = 0; i < this.views.length; i++ ) {
+            if ( this.views[i][1] === nu ) {
+              return this.views[i][0];
+            }
+          }
+        } else if ( typeof nu === 'number' ) {
+          return this.views[nu][0];
+        }
+        return nu;
       }
     },
     {
@@ -48,8 +86,6 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
-
-     this.selectedView = this.views[0][0];
 
       this.addClass(this.myClass())
       this.startContext({data: this})

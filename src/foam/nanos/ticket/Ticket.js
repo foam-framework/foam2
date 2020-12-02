@@ -12,6 +12,7 @@ foam.CLASS({
 
   implements: [
     'foam.core.Validatable',
+    'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.LastModifiedAware',
@@ -23,7 +24,11 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'java.util.Date',
+    'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
+    'java.util.Date'
   ],
 
   imports: [
@@ -37,6 +42,7 @@ foam.CLASS({
     'type',
     // REVIEW: view fails to display when owner in tableColumn, the 2nd entry in allColumns is undefined.
     // 'owner',
+    'createdBy.legalName',
     'lastModified',
     'status',
     'title'
@@ -52,11 +58,14 @@ foam.CLASS({
       isAvailable: function(id) {
         return id != 0;
       },
-      title: '',
+      title: 'Audit',
     },
     {
+      // NOTE: if a section is name: commentSection
+      // then navigating to a comment detail view
+      // does not work.
       name: '_defaultSection',
-      permissionRequired: true
+      title: 'Comments'
     },
   ],
 
@@ -152,10 +161,7 @@ foam.CLASS({
         {
           args: ['title', 'type'],
           predicateFactory: function(e) {
-            return e.GT(
-              foam.mlang.StringLength.create({
-                arg1: foam.nanos.ticket.Ticket.TITLE
-              }), 0);
+            return e.NEQ(foam.nanos.ticket.Ticket.TITLE, "");
           },
           errorString: 'Please provide a summary of the Ticket.'
         }
@@ -169,6 +175,7 @@ foam.CLASS({
     // required: true,
       storageTransient: true,
       section: 'infoSection',
+      readVisibility: 'HIDDEN',
       validationPredicates: [
         {
           args: ['id', 'title', 'comment'],
@@ -176,15 +183,9 @@ foam.CLASS({
             return e.OR(
               e.AND(
                 e.EQ(foam.nanos.ticket.Ticket.ID, 0),
-                e.GT(
-                  foam.mlang.StringLength.create({
-                    arg1: foam.nanos.ticket.Ticket.TITLE
-                  }), 0)
+                e.NEQ(foam.nanos.ticket.Ticket.TITLE, "")
               ),
-              e.GT(
-              foam.mlang.StringLength.create({
-                arg1: foam.nanos.ticket.Ticket.COMMENT
-              }), 0)
+              e.NEQ(foam.nanos.ticket.Ticket.COMMENT, "")
             );
           },
           errorString: 'Please provide a comment.'
@@ -212,7 +213,7 @@ foam.CLASS({
           }
         }.bind(this));
       },
-      section: 'metaSection',
+      section: 'infoSection', // until 'owner' showing
     },
     {
       class: 'Reference',
@@ -261,13 +262,70 @@ foam.CLASS({
     }
   ],
 
+  methods: [
+    {
+      name: 'authorizeOnCreate',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        // Everyone can create a ticket
+      `
+    },
+    {
+      name: 'authorizeOnRead',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
+        Subject subject = (Subject) x.get("subject");
+        User user = subject.getRealUser();
+
+        if ( user.getId() != this.getCreatedBy() && ! auth.check(x, "ticket.read." + this.getId()) ) {
+          throw new AuthorizationException("You don't have permission to read this ticket.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnUpdate',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'oldObj', type: 'foam.core.FObject' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        AuthService auth = (AuthService) x.get("auth");
+        Subject subject = (Subject) x.get("subject");
+        User user = subject.getRealUser();
+
+        if ( user.getId() != this.getCreatedBy() && ! auth.check(x, "ticket.update." + this.getId()) ) {
+          throw new AuthorizationException("You don't have permission to update this ticket.");
+        }
+      `
+    },
+    {
+      name: 'authorizeOnDelete',
+      args: [
+        { name: 'x', type: 'Context' }
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+        // The checkGlobalRemove has checked the permission for deleting the ticket already.
+      `
+    }
+  ],
+
   actions: [
     {
       name: 'close',
       tableWidth: 70,
       confirmationRequired: true,
-      isAvailable: function(status) {
-        return status != 'CLOSED';
+      isAvailable: function(status, id) {
+        return status != 'CLOSED' &&
+               id > 0;
       },
       code: function() {
         this.status = 'CLOSED';

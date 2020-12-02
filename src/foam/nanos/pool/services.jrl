@@ -1,0 +1,5 @@
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "threadPoolInfo",
+  "serviceClass": "foam.nanos.pool.ThreadPoolWebAgent"
+})

@@ -1,0 +1,20 @@
+p({
+	"class": "foam.nanos.script.Script",
+	"id": "Test JSON Formatting",
+	"code": `import foam.lib.json.Outputter;
+import foam.nanos.auth.User;
+import foam.lib.formatter.JSONFObjectFormatter;
+
+
+Outputter            o = new Outputter(null);
+JSONFObjectFormatter f = new JSONFObjectFormatter(null);
+// User                 u = new User();
+u = x.get("subject").getUser();
+
+print(o.stringify(u));
+print(f.stringify(u));`,
+	"output": `{"class":"foam.nanos.auth.User","id":1348,"firstName":"admin","middleName":"","lastName":"admin","organization":"","department":"","email":"admin@nanopay.net","emailVerified":true,"type":"User","language":"en","timeZone":"","password":"RAosri2pHX0=:KmtXlFF9KqA4tdsVqrBdcokHxJJnKbrzItO7kGxAFWZvzLQ+38uPV0p5kL9e29i+c5u2IiRoIiFzWulTshSK9A==","passwordHistory":[{"class":"foam.nanos.auth.PriorPassword","timeStamp":"2020-02-20T19:46:24.525Z","password":"RAosri2pHX0=:KmtXlFF9KqA4tdsVqrBdcokHxJJnKbrzItO7kGxAFWZvzLQ+38uPV0p5kL9e29i+c5u2IiRoIiFzWulTshSK9A=="}],"passwordLastModified":"2017-12-03T18:02:50.968Z","note":"","businessName":"","website":"","status":2,"deviceToken":"","spid":"nanopay","group":"admin","nextLoginAttemptAllowedAt":"2020-02-20T19:46:24.525Z","compliance":1}
+{class:"foam.nanos.auth.User",id:1348,f:"admin",mn:"",ln:"admin",o:"",d:"",e:"admin@nanopay.net",ev:true,type:"User",l:"en",tz:"",pw:"RAosri2pHX0=:KmtXlFF9KqA4tdsVqrBdcokHxJJnKbrzItO7kGxAFWZvzLQ+38uPV0p5kL9e29i+c5u2IiRoIiFzWulTshSK9A==",ph:,plm:1512324170968,note:"",bn:"",ws:"",status:2,deviceToken:"",spid:"nanopay",group:"admin",nlaaa:1582227984525,compliance:1}
+`,
+	"lastModifiedBy": 1348
+})

@@ -14,7 +14,6 @@ foam.CLASS({
       name: 'name'
     },
     {
-      class: 'String',
       name: 'title',
       expression: function(name) {
         if ( name === '_defaultSection' ) return '';
@@ -22,13 +21,18 @@ foam.CLASS({
       }
     },
     {
-      class: 'String',
+      name: 'subTitle'
+    },
+    {
+      name: 'navTitle'
+    },
+    {
       name: 'help'
     },
     {
       class: 'Int',
       name: 'order',
-      value: Number.MAX_VALUE
+      value: Number.MAX_SAFE_INTEGER
     },
     {
       class: 'Boolean',
@@ -41,6 +45,16 @@ foam.CLASS({
       class: 'Function',
       name: 'isAvailable',
       value: function() { return true; }
+    },
+    {
+      class: 'String',
+      name: 'section',
+      getter: function() { return this.section_ ; },
+      setter: function(m) { this.section_ = m; }
+    },
+    {
+      class: 'Simple',
+      name: 'section_'
     }
   ],
 
@@ -51,6 +65,9 @@ foam.CLASS({
         obj$: data$,
         code: this.isAvailable
       });
+      var availabilitySlots = [slot];
+
+      // Conditionally, add permission check, (permSlot)
       if ( this.permissionRequired ) {
         var permSlot = foam.core.SimpleSlot.create({value: false});
         var update = function() {
@@ -64,11 +81,33 @@ foam.CLASS({
         };
         update();
         data$.sub(update);
-        slot = foam.core.ArraySlot.create({slots: [slot, permSlot]}).map(arr => {
-          return arr.every(b => b);
-        });
+        availabilitySlots.push(permSlot);
       }
-      return slot;
+
+      // Add check for at least one visible property (propVisSlot)
+      var data = data$.get();
+      var propVisSlot = foam.core.ArraySlot.create({
+        slots: data.cls_.getAxiomsByClass(foam.core.Property).filter(
+          p => p.section == this.name
+        ).map(
+          p => p.createVisibilityFor(data$,
+            data.__subContext__.controllerMode$ ||
+            (data.__subContext__.ctrl && data.__subContext__.ctrl.controllerMode$) ||
+            foam.core.ConstantSlot.create({value: foam.u2.ControllerMode.CREATE})
+          )
+        )
+      }).map(arr => arr.some(m => {
+        return m != foam.u2.DisplayMode.HIDDEN
+      }));
+      availabilitySlots.push(propVisSlot);
+
+      return foam.core.ArraySlot.create({slots: availabilitySlots}).map(arr => {
+        return arr.every(b => b);
+      });
+    },
+
+    function installInClass(cls) {
+      cls['SECTION_'+foam.String.constantize(this.name)] = this;
     }
   ]
 });

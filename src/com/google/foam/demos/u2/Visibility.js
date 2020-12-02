@@ -138,6 +138,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'com.google.foam.demos.u2',
   name: 'VisibilityDemo',
@@ -159,7 +160,7 @@ foam.CLASS({
 
   css: `
     body {
-      font-family: 'IBM Plex Sans', Helvetica, sans-serif;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       line-height: 1.5;
     }
 
@@ -393,5 +394,5 @@ foam.CLASS({
           .start().add(this.USER_HAS_READ_WRITE_PERMISSION).end()
         .end();
     }
-  ],
+  ]
 });

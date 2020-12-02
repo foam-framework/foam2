@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the 'License');
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an 'AS IS' BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2016 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 // This must be declared as the first foam.LIB() using { name: ..., code: ... }
@@ -660,6 +649,38 @@ foam.LIB({
         return map[val] || (map[val] = val.toString());
       };
     })(),
+    function applyFormat(string, formatString, placeholder, escapeChar) {
+      placeholder = placeholder || 'x';
+      escapeChar = escapeChar || '\\';
+      var newString = '';
+      var escaping = false;
+      var safe = true;
+      formatString.split('').forEach(chr => {
+        if ( escaping ) {
+          newString += chr;
+          escaping = false;
+          return;
+        }
+        if ( chr == escapeChar ) {
+          escaping = true;
+          return;
+        }
+        if ( chr == placeholder ) {
+          if ( string.length < 1 ) {
+            safe = false;
+            return;
+          }
+          newString += string[0];
+          string = string.slice(1);
+          return;
+        }
+        newString += chr;
+      })
+      safe = safe && string.length == 0;
+      if ( ! safe ) console.warn(
+        'performed foam.String.applyMask with unsafe inputs');
+      return newString;
+    }
   ]
 });
 
@@ -778,7 +799,11 @@ foam.LIB({
     function isInstance(o) { return o instanceof Date; },
     function is(a, b) { return a === b; },
     function clone(o) { return new Date(o); },
-    function getTime(d) { return ! d ? 0 : d.getTime ? d.getTime() : d ; },
+    function getTime(d) { 
+      // if d is null we should return null instead of 0
+      // since 0 is also the value returned when d == 1970/01/01
+      return d && d.getTime ? d.getTime() : d;
+    },
     function equals(a, b) { return this.getTime(a) === this.getTime(b); },
     function compare(a, b) {
       if ( ! foam.Date.isInstance(b) ) return 1;
@@ -950,7 +975,7 @@ foam.typeOf = (function() {
     if ( tDate.isInstance(o) )      return tDate;
     if ( tFunction.isInstance(o) )  return tFunction;
     if ( tFObject.isInstance(o) )   return tFObject;
-    if ( tRegExp.isInstance(o) )   return tRegExp;
+    if ( tRegExp.isInstance(o) )    return tRegExp;
     return tObject;
   };
 })();
@@ -962,16 +987,16 @@ foam.typeOf = (function() {
 */
 
 foam.core.FObject.ordinal = 0;
-foam.Date.ordinal = 1;
-foam.RegExp.ordinal = 2;
-foam.Object.ordinal = 3;
-foam.Function.ordinal = 4;
-foam.Array.ordinal = 5;
-foam.String.ordinal = 6;
-foam.Number.ordinal = 7;
-foam.Boolean.ordinal = 8;
-foam.Null.ordinal = 9;
-foam.Undefined.ordinal = 10;
+foam.Date.ordinal         = 1;
+foam.RegExp.ordinal       = 2;
+foam.Object.ordinal       = 3;
+foam.Function.ordinal     = 4;
+foam.Array.ordinal        = 5;
+foam.String.ordinal       = 6;
+foam.Number.ordinal       = 7;
+foam.Boolean.ordinal      = 8;
+foam.Null.ordinal         = 9;
+foam.Undefined.ordinal    = 10;
 
 foam.LIB({
   name: 'foam',
@@ -1001,16 +1026,16 @@ foam.LIB({
         }
 
         var type = arg1 && arg1.cls_ && arg1.cls_[uid] ?
-            arg1.cls_ :
-            foam.typeOf(arg1) ;
+          arg1.cls_ :
+          foam.typeOf(arg1) ;
 
         if ( ! opt_defaultMethod ) {
           foam.assert(type, 'Unknown type: ', arg1,
-              'and no default method provided');
+            'and no default method provided');
           foam.assert(
-              type[uid],
-              'Missing ' + name + ' multi-method for type ', arg1, ' map: ', map,
-              'and no default method provided');
+            type[uid],
+            'Missing ' + name + ' multi-method for type ', arg1, ' map: ', map,
+            'and no default method provided');
         }
 
         return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
@@ -1045,6 +1070,20 @@ foam.LIB({
 
 (function() {
   var typeOf = foam.typeOf;
+  /*
+  var typeOf = mmethod({
+    Undefined: () => foam.Undefined,
+    Null:      () => foam.Null,
+    String:    () => foam.String,
+    Number:    () => foam.Number,
+    Boolean:   () => foam.Boolean,
+    Date:      () => foam.Date,
+    Function:  () => foam.Function,
+    FObject:   () => foam.FObject,
+    Array:     () => foam.Array,
+    Object:    () => foam.Object
+  });
+  */
 
   foam.LIB({
     name: 'foam.util',
@@ -1067,7 +1106,7 @@ foam.LIB({
         var aType = typeOf(a);
         var bType = typeOf(b);
         return aType.ordinal > bType.ordinal ? 1 :
-            aType.ordinal < bType.ordinal ? -1 : aType.compare(a, b);
+          aType.ordinal < bType.ordinal ? -1 : aType.compare(a, b);
       },
       function hashCode(o)   { return typeOf(o).hashCode(o); },
       function diff(a, b)    {

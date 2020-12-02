@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2016 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 /**
@@ -175,18 +164,24 @@ foam.CLASS({
 
   methods: [
     function getExportMap() {
-      var m = {};
+      var m  = {};
       var bs = this.cls_.getAxiomsByClass(foam.core.Export);
       for ( var i = 0 ; i < bs.length ; i++ ) {
         var b = bs[i];
 
         if ( b.key ) {
           var path = b.key.split('.');
+          var a    = this.cls_.getAxiomByName(path[0]);
 
-          var a = this.cls_.getAxiomByName(path[0]);
-
-          foam.assert(!!a, 'Unknown axiom: "', path[0], '" in model: ',
-                      this.cls_.id, ", trying to export: '", b.key, "'");
+          foam.assert(
+            a,
+            'Unknown axiom: "',
+            path[0],
+            '" in model: ',
+            this.cls_.id,
+            ", trying to export: '",
+            b.key,
+            "'");
 
           // Axioms have an option of wrapping a value for export.
           // This could be used to bind a method to 'this', for example.
@@ -233,22 +228,29 @@ foam.CLASS({
   refines: 'foam.core.Model',
   package: 'foam.core',
   name: 'ImportExportModelRefine',
+
   requires: [
     'foam.core.Import',
     'foam.core.Export',
   ],
+
   properties: [
     {
       class: 'AxiomArray',
       of: 'Import',
       name: 'imports',
       adaptArrayElement: function(o) {
-        if ( typeof o === 'string' ) {
-          var a        = o.split(' as ');
-          var key      = a[0];
+        if ( foam.String.isInstance(o) ) {
+          // Matches strings in the form [(javatype)] (name[?]) [as (name)]
+          // Where [] is optional and () is a capture group
+          let res      = /(?:(?:([\w.$]+)\s+)(?!as))?([\w$?]+)(?:\s+as\s+([\w$]+))?/g.exec(o);
+          let javaType = res[1];
+          let key      = res[2];
+          let name     = res[3];
+
           var optional = key.endsWith('?');
           if ( optional ) key = key.slice(0, key.length-1);
-          return foam.core.Import.create({name: a[1] || key, key: key, required: ! optional});
+          return foam.core.Import.create({name: name || key, key: key, required: ! optional, javaType: javaType || 'null'});
         }
 
         return foam.core.Import.create(o);
@@ -269,19 +271,19 @@ foam.CLASS({
             case 2:
               // Export 'this'
               foam.assert(
-                  a[0] === 'as',
-                  'Invalid export syntax: key [as value] | as value');
+                a[0] === 'as',
+                'Invalid export syntax: key [as value] | as value');
               return foam.core.Export.create({exportName: a[1], key: null});
 
             case 3:
               foam.assert(
-                  a[1] === 'as',
-                  'Invalid export syntax: key [as value] | as value');
+                a[1] === 'as',
+                'Invalid export syntax: key [as value] | as value');
               return foam.core.Export.create({exportName: a[2], key: a[0]});
 
             default:
               foam.assert(false,
-                  'Invalid export syntax: key [as value] | as value');
+                'Invalid export syntax: key [as value] | as value');
           }
         }
 

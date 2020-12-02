@@ -13,6 +13,10 @@ public class RemoveExpiredNotificationCronjob implements ContextAgent {
   @Override
   public void execute(X x){
     DAO notificationDAO = (DAO) x.get("notificationDAO");
-    notificationDAO.where(MLang.LTE(Notification.EXPIRY_DATE, new Date())).removeAll();
+    notificationDAO.where(
+    MLang.AND(
+      MLang.LTE(Notification.EXPIRY_DATE, new Date()),
+      MLang.NEQ(Notification.EXPIRY_DATE, null)
+      )).removeAll();
   }
 }

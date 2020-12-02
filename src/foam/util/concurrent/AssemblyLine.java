@@ -26,4 +26,7 @@ package foam.util.concurrent;
 public interface AssemblyLine {
   // TODO: add a lock id
   public void enqueue(Assembly job);
+
+  /** Shutdown after processing all previously enqueued assemblies. **/
+  public void shutdown();
 }

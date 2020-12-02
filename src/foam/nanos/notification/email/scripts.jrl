@@ -15,7 +15,7 @@ p({
     import foam.util.Emails.EmailsUtility;
     email = x.get("email");
     print("email: " + email.getClass());
-    user = x.get("user");
+    user = x.get("subject").getUser();
     print("user: " + user.getId());
     message = new foam.nanos.notification.email.EmailMessage();
     message.setTo(new String[] { EMAIL_DESTINATION });

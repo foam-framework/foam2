@@ -26,7 +26,9 @@ foam.CLASS({
     'foam.mlang.order.Desc',
     'foam.mlang.predicate.Predicate',
     'foam.mlang.sink.GroupBy',
+    'foam.nanos.auth.ServiceProviderAwareSupport',
     'foam.util.SafetyUtil',
+    'java.util.stream.Collectors',
     'java.util.List',
     'java.util.Map',
     'static foam.mlang.MLang.*'
@@ -168,11 +170,41 @@ for ( Object key : sink.getGroupKeys() ) {
     ((foam.nanos.logger.Logger) x.get("logger")).error("RuleGroup not found.", key);
   } else if ( rg.f(x, obj, oldObj) ) {
     List<Rule> group = ((ArraySink) sink.getGroups().get(key)).getArray();
-    if ( ! group.isEmpty() ) {
-      new RuleEngine(x, getX(), this).execute(group, obj, oldObj);
+    var rules = enforceSpid(x, obj, group);
+    if ( ! rules.isEmpty() ) {
+      new RuleEngine(x, getX(), this).execute(rules, obj, oldObj);
     }
   }
 }`
+    },
+    {
+      name: 'enforceSpid',
+      type: 'List<Rule>',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'obj', type: 'FObject' },
+        { name: 'rules', type: 'List<Rule>' }
+      ],
+      javaCode: `
+        return rules.stream()
+          .filter(rule -> rule.isGlobalSpid() || isSpidMatched(x, rule, obj))
+          .collect(Collectors.toList());
+      `
+    },
+    {
+      name: 'isSpidMatched',
+      type: 'boolean',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'rule', type: 'Rule' },
+        { name: 'obj', type: 'FObject' }
+      ],
+      documentation: 'Send a ServiceProviderAwareSupport action command to the DAO for spid matching test.',
+      javaCode: `
+        var result = getDelegate().cmd_(x.put("OBJ", obj),
+          new ServiceProviderAwareSupport(rule.getSpid()));
+        return result instanceof Boolean ? (boolean) result : true;
+      `
     },
     {
       name: 'updateRules',
@@ -182,32 +214,33 @@ for ( Object key : sink.getGroupKeys() ) {
           type: 'Context'
         }
       ],
-      javaCode: `DAO ruleDAO = ((DAO) x.get("ruleDAO")).where(
-  EQ(Rule.DAO_KEY, getDaoKey())
-);
-ruleDAO.listen(
+      javaCode: `DAO localRuleDAO = new foam.dao.ProxyDAO(x,
+  getDaoKey().equals("localRuleDAO") ? this : (DAO) x.get("localRuleDAO")
+).where( EQ(Rule.DAO_KEY, getDaoKey()) );
+
+localRuleDAO.listen(
   new UpdateRulesListSink.Builder(getX())
     .setDao(this)
     .build()
   , null
 );
 
-ruleDAO = ruleDAO.where(
+localRuleDAO = localRuleDAO.where(
   EQ(Rule.ENABLED, true)
 ).orderBy(new Desc(Rule.PRIORITY));
-ruleDAO.select(new AbstractSink(new ReadOnlyDAOContext(getX())) {
+localRuleDAO.select(new AbstractSink(new ReadOnlyDAOContext(getX())) {
       @Override
       public void put(Object obj, Detachable sub) {
         Rule rule = (Rule) obj;
         rule.setX(getX());
       }
     });
-addRuleList(ruleDAO, getCreateBefore());
-addRuleList(ruleDAO, getUpdateBefore());
-addRuleList(ruleDAO, getRemoveBefore());
-addRuleList(ruleDAO, getCreateAfter());
-addRuleList(ruleDAO, getUpdateAfter());
-addRuleList(ruleDAO, getRemoveAfter());`
+addRuleList(localRuleDAO, getCreateBefore());
+addRuleList(localRuleDAO, getUpdateBefore());
+addRuleList(localRuleDAO, getRemoveBefore());
+addRuleList(localRuleDAO, getCreateAfter());
+addRuleList(localRuleDAO, getUpdateAfter());
+addRuleList(localRuleDAO, getRemoveAfter());`
     },
     {
       name: 'cmd_',
@@ -243,7 +276,7 @@ if ( ! ( obj instanceof RulerProbe ) ) return getDelegate().cmd_(x, obj);
 RuleEngine engine = new RuleEngine(x, getX(), this);
 Map rulesList = getRulesList();
 FObject oldObj = getDelegate().find_(x, probe.getObject());
-groups = (GroupBy)rulesList.get(predicate);
+groups = (GroupBy) rulesList.get(predicate);
 for ( Object key : groups.getGroupKeys() ) {
   List<Rule> rules = ((ArraySink)(groups.getGroups().get(key))).getArray();
   engine.probe(rules, probe, (FObject)probe.getObject(), oldObj);
@@ -278,6 +311,8 @@ for ( Object key : groups.getGroupKeys() ) {
       setX(x);
       setDelegate(delegate);
       setDaoKey(serviceName);
+      // This doesn't get called when using Builder,
+      //   it must be called manually in this case.
       updateRules(x);
     }
       `

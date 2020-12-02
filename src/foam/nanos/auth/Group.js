@@ -1,3 +1,4 @@
+
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
@@ -20,7 +21,7 @@ foam.CLASS({
 
   documentation: 'A Group of Users.',
 
-  tableColumns: [ 'id', 'description', 'defaultMenu', 'parent' ],
+  tableColumns: [ 'id', 'description', 'defaultMenu.id', 'parent.id' ],
 
   searchColumns: [ 'id', 'description' ],
 
@@ -103,6 +104,10 @@ foam.CLASS({
       name: 'supportEmail'
     },
     {
+      class: 'String',
+      name: 'supportPhone'
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.PasswordPolicy',
       name: 'passwordPolicy',
@@ -117,7 +122,15 @@ foam.CLASS({
         class: 'foam.u2.view.FObjectPropertyView',
         readView: { class: 'foam.u2.detail.VerticalDetailView' }
       }
-    }
+    },
+    {
+      documentation: `Restrict members of this group to particular IP address range.
+@see https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing
+List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 172 network.`,
+      class: 'StringArray',
+      name: 'cidrWhiteList',
+      includeInDigest: true
+    },
     /*
       FUTURE
     {
@@ -131,13 +144,12 @@ foam.CLASS({
   javaImports: [
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'static foam.mlang.MLang.EQ',
     'foam.nanos.app.AppConfig',
     'foam.util.SafetyUtil',
-    'org.eclipse.jetty.server.Request',
-    'javax.security.auth.AuthPermission',
-    'javax.servlet.http.HttpServletRequest',
     'java.util.List',
-    'static foam.mlang.MLang.EQ'
+    'java.net.InetAddress',
+    'javax.security.auth.AuthPermission'
   ],
 
   methods: [
@@ -156,9 +168,16 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        List<GroupPermissionJunction> junctions = ((ArraySink) getPermissions(x).getJunctionDAO().where(EQ(GroupPermissionJunction.SOURCE_ID, getId())).select(new ArraySink())).getArray();
+        List<GroupPermissionJunction> junctions = ((ArraySink) getPermissions(x)
+          .getJunctionDAO()
+            .where(EQ(GroupPermissionJunction.SOURCE_ID, getId()))
+            .select(new ArraySink())).getArray();
 
         for ( GroupPermissionJunction j : junctions ) {
+          if ( j.getTargetId().isBlank() ) {
+            continue;
+          }
+
           if ( j.getTargetId().startsWith("@") ) {
             DAO   dao   = (DAO) x.get("groupDAO");
             Group group = (Group) dao.find(j.getTargetId().substring(1));
@@ -195,66 +214,22 @@ foam.CLASS({
       ],
       javaCode: `
         // Find Group details, by iterating up through group.parent
-        AppConfig config          = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
-        String configUrl          = "";
-        String configSupportEmail = "";
-        Boolean urlFound          = false;
-        Boolean supportEmailFound = false;
         Group group               = this;
-        String grp                = "";
         DAO groupDAO              = (DAO) x.get("groupDAO");
 
+        String configUrl           = "";
+
+        // Get support info and url off group or parents.
         while ( group != null ) {
-          if ( ! urlFound &&
-               ! SafetyUtil.isEmpty(group.getUrl()) ) {
-            configUrl = group.getUrl();
-          }
-          configSupportEmail = supportEmailFound ? configSupportEmail : group.getSupportEmail();
-      
-          // Once true, stay true
-          urlFound          = urlFound   ? urlFound   : ! SafetyUtil.isEmpty(configUrl);
-          supportEmailFound = supportEmailFound ? supportEmailFound : ! SafetyUtil.isEmpty(configSupportEmail);
+          configUrl = ! SafetyUtil.isEmpty(group.getUrl()) && SafetyUtil.isEmpty(configUrl) ?
+              group.getUrl() : configUrl;
 
-          if ( urlFound && supportEmailFound ) break;
-
-          grp   = group.getParent();
-          group = (Group)groupDAO.find(grp);
+          if ( ! SafetyUtil.isEmpty(group.getUrl()) && ! SafetyUtil.isEmpty(configUrl) ) break;
+          group = (Group) groupDAO.find(group.getParent());
         }
 
-        // FIND URL
-        if ( ! urlFound ) {
-          // populate AppConfig url with request's RootUrl
-          HttpServletRequest req = x.get(HttpServletRequest.class);
-          if ( (req != null) && ! SafetyUtil.isEmpty(req.getRequestURI()) ) {
-            configUrl = ((Request) req).getRootURL().toString();
-          }
-        }
-
-        // FORCE HTTPS IN URL?
-        if ( config.getForceHttps() ) {
-          if ( ! configUrl.startsWith("https://") ) {
-            if ( configUrl.startsWith("http://") ) {
-              configUrl = "https" + configUrl.substring(4);
-            } else {
-              configUrl = "https://" + configUrl;
-            }
-          }
-        }
-
-        // Strip trailing / to simplify other url building components, such as email templates. 
-        if ( configUrl.endsWith("/") ) {
-          configUrl = configUrl.substring(0, configUrl.length()-1);
-        } 
-
-        // SET URL
-        config.setUrl(configUrl);
-
-        // SET SupportEmail
-        if ( supportEmailFound ) {
-          config.setSupportEmail(configSupportEmail);
-        }
-
-        return config;
+        AppConfig config = (AppConfig) x.get("appConfig");
+        return config.configure(x, configUrl);
         `
     },
     {
@@ -302,7 +277,23 @@ foam.CLASS({
     },
     {
       name: 'authorizeOnRead',
-      javaCode: '// NOOP'
+      javaCode: `
+        // if the group is the group of the user, or an ancestor of the group of the user,
+        // then user should be authorized to read
+        DAO localGroupDAO = (DAO) x.get("localGroupDAO");
+        User user = (User) ((Subject) x.get("subject")).getUser();
+        Group userGroup = (Group) localGroupDAO.find(user.getGroup());
+        while ( userGroup != null ) { 
+          if ( getId() == userGroup.getId() ) return;
+          userGroup = getAncestor(x, userGroup);  
+        }
+
+        AuthService auth = (AuthService) x.get("auth");
+        String permissionId = String.format("group.read.%s", getId());
+        if ( ! auth.check(x, permissionId) ) {
+          throw new AuthorizationException("You do not have permission to read this group.");
+        }
+      `
     },
     {
       name: 'authorizeOnUpdate',
@@ -378,6 +369,64 @@ foam.CLASS({
 
         return ancestor;
       `
+    },
+    {
+      name: 'validateCidrWhiteList',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaThrows: ['foam.core.ValidationException'],
+      javaCode: `
+      if ( getCidrWhiteList() == null ||
+           getCidrWhiteList().length == 0 ) {
+        return;
+      }
+      javax.servlet.http.HttpServletRequest req = (javax.servlet.http.HttpServletRequest) x.get(javax.servlet.http.HttpServletRequest.class); 
+      if ( req == null ) {
+        return;
+      }
+      String remoteIp = null;
+      String forwardedForHeader = req.getHeader("X-Forwarded-For");
+      if ( ! SafetyUtil.isEmpty(forwardedForHeader) ) {
+        String[] addresses = forwardedForHeader.split(",");
+        remoteIp = addresses[addresses.length -1]; // right most
+      } else {
+        remoteIp = req.getRemoteHost();
+      }
+      byte[] remote = remoteIp.getBytes();
+      boolean match = false;
+      for ( String cidr : getCidrWhiteList() ) {
+        String[] parts = cidr.split("/");
+        String address = parts[0];
+        int maskBits = -1;
+        if ( parts.length == 1 ) {
+          if ( address.equals(remoteIp) ) {
+            match = true;
+            return;
+          }
+        }
+        maskBits = Integer.parseInt(parts[1]);
+        byte[] required = address.getBytes();
+
+        int maskFullBytes = maskBits / 8;
+        byte finalByte = (byte) (0xFF00 >> (maskBits & 0x07));
+
+        for (int i = 0; i < maskFullBytes; i++) {
+          if (remote[i] != required[i]) {
+            throw new foam.core.ValidationException("Restricted IP");
+          }
+        }
+
+        if (finalByte != 0) {
+          if ( (remote[maskFullBytes] & finalByte) != (required[maskFullBytes] & finalByte) ) {
+            throw new foam.core.ValidationException("Restricted IP");
+          }
+        }
+      }
+      `
     }
   ]
 });
@@ -393,14 +442,19 @@ foam.CLASS({
     it.
   `,
 
-  imports: ['auth'],
+  imports: [
+    'AuthService auth'
+  ],
 
-  javaImports: ['foam.dao.DAO'],
+  javaImports: [
+    'foam.dao.DAO',
+    'foam.nanos.auth.AuthService'
+  ],
 
   messages: [
     {
       name: 'ERROR_MESSAGE',
-      message: 'Permission denied. You cannot change the parent of a group if doing so grants that group permissions that you do not have.',
+      message: 'Permission denied. You cannot change the parent of a group.',
     }
   ],
 
@@ -426,4 +480,20 @@ foam.CLASS({
       `
     }
   ]
+});
+
+
+foam.RELATIONSHIP({
+  cardinality: '1:*',
+  sourceModel: 'foam.nanos.theme.Theme',
+  targetModel: 'foam.nanos.auth.Group',
+  forwardName: 'groups',
+  inverseName: 'theme',
+  sourceProperty: {
+    hidden: true
+  },
+  targetProperty: {
+    hidden: false,
+    tableWidth: 120
+  }
 });

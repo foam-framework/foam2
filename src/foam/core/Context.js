@@ -45,6 +45,8 @@ foam.SCRIPT({
 
 (function() {
   var __context__ = {
+    isContext: true,
+
     /**
      * Lookup a class in the context.  Throws an exception if the value
      * couldn't be found, unless opt_suppress is true.
@@ -57,8 +59,8 @@ foam.SCRIPT({
 
       if ( ! opt_suppress ) {
         foam.assert(
-            ret,
-            'Could not find any registered class for ' + id);
+          ret,
+          'Could not find any registered class for', id);
       }
 
       return foam.Function.isInstance(ret) ? ret() : ret;
@@ -84,8 +86,8 @@ foam.SCRIPT({
         this.registerInCache_(cls, this.__cache__, opt_id);
       } else {
         foam.assert(
-            typeof cls.id === 'string',
-            'Must have an .id property to be registered in a context.');
+          typeof cls.id === 'string',
+          'Must have an .id property to be registered in a context.');
 
         this.registerInCache_(cls, this.__cache__, cls.id);
 
@@ -140,9 +142,9 @@ foam.SCRIPT({
       // Okay to replace a function with an actual class.
       // This happens after a lazy class is initialized.
       foam.assert(
-          ! hasOld ||
-              (foam.Function.isInstance(old) && ! foam.Function.isInstance(cls)),
-          name + ' is already registered in this context.');
+        ! hasOld ||
+            (foam.Function.isInstance(old) && ! foam.Function.isInstance(cls)),
+        name, 'is already registered in this context.');
 
       cache[name] = cls;
     },
@@ -158,11 +160,12 @@ foam.SCRIPT({
      *     Currently unused.
      */
     createSubContext: function createSubContext(opt_args, opt_name) {
+
       if ( ! opt_args ) return this;
 
       foam.assert(
-          opt_name === undefined || typeof opt_name === 'string',
-          'opt_name must be left undefined or be a string.');
+        opt_name === undefined || typeof opt_name === 'string',
+        'opt_name must be left undefined or be a string.');
 
       var sub = Object.create(this);
 
@@ -175,7 +178,7 @@ foam.SCRIPT({
 
       for ( var key in opt_args ) {
         if ( opt_args.hasOwnProperty(key) ) {
-          var v = opt_args[key];
+          let v = opt_args[key];
 
           if ( ! foam.core.Slot.isInstance(v) ) {
             Object.defineProperty(sub, this.toSlotName_(key), {
@@ -193,12 +196,10 @@ foam.SCRIPT({
               enumerable: true
             });
 
-            (function(v) {
-              Object.defineProperty(sub, key, {
-                get: function() { return v.get(); },
-                enumerable: true
-              });
-            })(v);
+            Object.defineProperty(sub, key, {
+              get: function() { return v.get(); },
+              enumerable: true
+            });
           }
         }
       }

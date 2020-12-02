@@ -22,7 +22,12 @@ foam.CLASS({
   methods: [
     function init(){
       this.views = [
-        [ { class: 'foam.u2.view.TableView' }, 'Table' ],
+        [
+          { 
+            class: 'foam.u2.view.TableView'
+          },
+         'Table'
+        ],
         [ {
             class: 'foam.u2.view.TreeView',
             relationship: foam.nanos.menu.MenuMenuChildrenRelationship,

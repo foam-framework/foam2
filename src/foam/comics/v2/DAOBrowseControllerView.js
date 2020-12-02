@@ -10,11 +10,12 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   documentation: `
-    The inline DAO controller for a collection of instances of a model that can 
+    The inline DAO controller for a collection of instances of a model that can
     switch between multiple views
   `,
-  
+
   imports: [
+    'auth',
     'stack'
   ],
 
@@ -41,6 +42,13 @@ foam.CLASS({
       font-weight: 600;
       line-height: 1.33;
       color: #1e1f21;
+    }
+
+    ^browse-subtitle {
+      font-size: 18px;
+      line-height: 1.56;
+      color: #5e6061;
+      width: 50%;
     }
 
     ^altview-container {
@@ -74,23 +82,41 @@ foam.CLASS({
       }
     }
   ],
+
   actions: [
     {
       name: 'create',
-      isAvailable: function(config$createEnabled) {
-        return config$createEnabled;
+      isEnabled: function(config, data) {
+        if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
+          try {
+            let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.CREATE, data);
+
+            return this.auth.check(null, permissionString);
+          } catch(e) {
+            return false;
+          }
+        }
+        return true;
+      },
+      isAvailable: function(config) {
+        try {
+          return config.createPredicate.f();
+        } catch(e) {
+          return false;
+        }
       },
       code: function() {
         if ( ! this.stack ) return;
         this.stack.push({
           class: 'foam.comics.v2.DAOCreateView',
-          data: this.data.of.create({ mode: 'create' }, this),
+          data: ((this.config.factory && this.config.factory$cls) ||  this.data.of).create({ mode: 'create'}, this),
           config$: this.config$,
           of: this.data.of
-        });
+        }, this.__subContext__);
       }
     }
   ],
+
   methods: [
     function initE() {
     this.SUPER();
@@ -98,30 +124,33 @@ foam.CLASS({
     var self = this;
 
       this.addClass(this.myClass())
-      .add(this.slot(function(data, config, config$CRUDActionsAuth$create, config$browseBorder, config$browseViews, config$browseTitle) {
-        var createAction = config$CRUDActionsAuth$create
-            ? self.CREATE.clone().copyFrom({
-              availablePermissions: self.CREATE.availablePermissions.concat(config$CRUDActionsAuth$create)
-            })
-            : self.CREATE;
-
+      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle) {
         return self.E()
           .start(self.Rows)
             .addClass(self.myClass('container'))
-            .start(self.Cols)
-              .addClass(self.myClass('header-container'))
               .start()
-                .addClass(self.myClass('browse-title'))
-                .add(config$browseTitle)
+                .addClass(self.myClass('header-container'))
+                .start(self.Cols)
+                  .start()
+                    .addClass(self.myClass('browse-title'))
+                    .add(config$browseTitle)
+                  .end()
+                  .startContext({ data: self }).tag(self.CREATE).endContext()
+                .end()
+                .callIf(config$browseSubtitle.length > 0, function() {
+                  this
+                    .start()
+                      .addClass(self.myClass('browse-subtitle'))
+                      .add(config$browseSubtitle)
+                    .end();
+                })
               .end()
-              .startContext({ data: self }).tag(createAction).endContext()
-            .end()
             .start(self.CardBorder)
               .style({ position: 'relative' })
               .start(config$browseBorder)
-                .callIf(config$browseViews.length > 1, function() {
+                .callIf(config$browseViews.length > 1 && config.cannedQueries.length > 0, function() {
                   this
-                    .start(self.IconChoiceView, { 
+                    .start(self.IconChoiceView, {
                       choices:config$browseViews.map(o => [o.view, o.icon]),
                       data$: self.browseView$
                     })

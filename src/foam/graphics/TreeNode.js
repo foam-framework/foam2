@@ -45,7 +45,7 @@ foam.CLASS({
         var outlineBelowRoot = [];
 
         /**
-         * We need to check the outlines of each child node against eachother regardless 
+         * We need to check the outlines of each child node against eachother regardless
          * of overlap so that we get actual max left and max right of each level,
          * overlap and corresponding adjustments are dealt with in the @layout method
          */
@@ -124,9 +124,9 @@ foam.CLASS({
 
       this.formatNode();
 
-      if (this.relationship) {
+      if ( this.relationship ) {
         this.data[this.relationship.forwardName].select(childData => {
-          this.addChildNode({ 
+          this.addChildNode({
             data: childData,
             width: this.width,
             height: this.height,
@@ -189,12 +189,12 @@ foam.CLASS({
       x.lineWidth = this.lineWidth;
       x.strokeStyle = this.border;
 
-      if (this.expanded && this.childNodes.length) {
+      if ( this.expanded && this.childNodes.length ) {
         var h = this.childNodes[0].y * 3 / 4;
         var l = this.childNodes.length;
 
         line(0, this.height, 0, h);
-        for (var i = 0; i < l; i++) {
+        for ( var i = 0 ; i < l ; i++ ) {
           var c = this.childNodes[i];
           line(0, h, c.x, h);
           line(c.x, h, c.x, c.y);
@@ -203,8 +203,8 @@ foam.CLASS({
 
       // Paint expand/collapse arrow
       x.lineWidth = this.borderWidth;
-      
-      if (this.childNodes.length) {
+
+      if ( this.childNodes.length ) {
         var d = this.expanded ? 5 : -5;
         var y = this.height - 8;
         line(-5, y, 0, y + d);
@@ -297,21 +297,17 @@ foam.CLASS({
             c.centerX = d;
             moved = true;
           }
-        })
+        });
       }
       return moved;
     },
 
     function findNode(id){
-      if (this.data.id === id) {
-        return this;
-      }
+      if ( this.data.id === id ) return this;
 
-      for (var i = 0; i < this.childNodes.length; i++) {
+      for ( var i = 0 ; i < this.childNodes.length ; i++ ) {
         var foundNode = this.childNodes[i].findNode(id);
-        if (foundNode) {
-          return foundNode;
-        }
+        if ( foundNode ) return foundNode;
       }
     }
   ]

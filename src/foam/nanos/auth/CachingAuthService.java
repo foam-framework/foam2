@@ -11,6 +11,7 @@ import foam.core.XFactory;
 import foam.dao.DAO;
 import foam.dao.Sink;
 import foam.mlang.predicate.Predicate;
+import foam.nanos.auth.User;
 import foam.nanos.session.Session;
 import java.security.Permission;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,7 +60,19 @@ public class CachingAuthService
   public static String CACHE_KEY = "CachingAuthService.PermissionCache";
 
   protected static Map<String,Boolean> getPermissionMap(final X x) {
-    Session             session = x.get(Session.class);
+    Session session = x.get(Session.class);
+    Subject subject = (Subject) x.get("subject");
+    User    user    = subject.getUser();
+
+    // If the user in the context does not match the session user, do not use the
+    // cache permission map, which belong to session user
+    Long contextUserId = user.getId();
+    Long sessionUserId = session.getUserId();
+
+    if ( ! contextUserId.equals(sessionUserId) ) {
+      return new ConcurrentHashMap<String,Boolean>();
+    }
+
     Map<String,Boolean> map     = (Map) session.getContext().get(CACHE_KEY);
 
     if ( map == null ) {
@@ -80,14 +93,13 @@ public class CachingAuthService
         }
       };
 
-      DAO userDAO       = (DAO) x.get("localUserDAO");
-      DAO groupDAO      = (DAO) x.get("localGroupDAO");
-      DAO groupPermissionJunctionDAO = (DAO) x.get("groupPermissionJunctionDAO");
-      User user         = (User) x.get("user");
-      User agent        = (User) x.get("agent");
+      DAO       userDAO   = (DAO) x.get("localUserDAO");
+      DAO       groupDAO  = (DAO) x.get("localGroupDAO");
+      DAO       groupPermissionJunctionDAO = (DAO) x.get("groupPermissionJunctionDAO");
+      User      agent     = subject.getRealUser();
       Predicate predicate = EQ(User.ID, user.getId());
 
-      if ( agent != null ) {
+      if ( agent != user ) {
         predicate = OR(predicate, EQ(User.ID, agent.getId()));
       }
 

@@ -23,6 +23,7 @@ foam.SCRIPT({
   }
 });
 
+
 foam.CLASS({
   package: 'foam.i18n',
   name: 'MessageAxiom',
@@ -30,7 +31,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'name'
+      name: 'name',
+      preSet: function(o, n) { return foam.String.constantize(n); }
     },
     {
       class: 'String',
@@ -45,8 +47,21 @@ foam.CLASS({
     {
       class: 'String',
       name: 'message',
-      getter: function() { return this.message_ || this.messageMap[foam.locale]; },
-      setter: function(m) { this.message_ = this.messageMap[foam.locale] = m; }
+      getter: function() {
+        var msg = this.message_;
+        if ( foam.locale ) {
+          msg = msg || this.messageMap[foam.locale];
+          if ( ! msg && foam.locale ) {
+            var i = foam.locale.indexOf('-');
+            var lang = ( i == -1 ) ? foam.locale : foam.locale.substring(0, 2);
+            msg = msg || this.messageMap[foam.lang];
+          }
+        }
+        return msg || this.messageMap.en;
+      },
+      setter: function(m) {
+        this.message_ = this.messageMap[foam.locale] = m;
+      }
     },
     {
       class: 'Simple',
@@ -56,6 +71,8 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) {
+      cls[this.name] = this.message;
+      /*
       Object.defineProperty(
         cls,
         this.name,
@@ -63,10 +80,18 @@ foam.CLASS({
           value: this.message,
           configurable: false
         });
+        */
     },
 
     function installInProto(proto) {
-      this.installInClass(proto);
+      var name = this.name;
+      Object.defineProperty(
+        proto,
+        this.name,
+        {
+          get: function() { return this.cls_[name] },
+          configurable: false
+        });
     }
   ]
 });

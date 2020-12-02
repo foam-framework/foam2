@@ -18,6 +18,10 @@ foam.INTERFACE({
       name: 'getNextScheduledTime',
       args: [
         {
+          name: 'x',
+          type: 'foam.core.X'
+        },
+        {
           name: 'from',
           type: 'java.util.Date',
           documentation: `

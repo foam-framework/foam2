@@ -31,14 +31,19 @@ foam.CLASS({
 
   requires: [
     'foam.u2.ButtonSize',
-    'foam.u2.ButtonStyle'
+    'foam.u2.ButtonStyle',
+    'foam.u2.dialog.Popup'
   ],
 
   css: `
     ^ {
-      border-radius: 3px;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      border-radius: 4px;
       text-align: center;
-      display: inline-block;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      outline: none;
       border: 1px solid transparent;
     }
 
@@ -76,43 +81,50 @@ foam.CLASS({
      */
 
     ^primary {
-      border-color: #355bc4;
+      border-color: /*%SECONDARY1%*/ #4a33f4;
       background-color: /*%PRIMARY3%*/ #406dea;
       color: white;
     }
 
     ^primary:hover:not(:disabled) {
       border-color: /*%PRIMARY1%*/ #202341;
+      border: 1px solid #294798;
       background-color: /*%PRIMARY2%*/ #144794;
     }
 
-    ^primary:focus {
+    ^primary:focus:not(:hover) {
+      border-color: #23186c;
       box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
     }
 
     ^primary:disabled {
-      border-color: /*%PRIMARY4%*/ #a7beff;
+      border: 1px solid /*%PRIMARY4%*/ #a7beff;
       background-color: /*%PRIMARY4%*/ #a7beff;
     }
 
+    /*
+     * Primary destructive
+     */
+
     ^primary-destructive {
-      border-color: /*%DESTRUCTIVE3%*/ #d9170e;
       background-color: /*%DESTRUCTIVE3%*/ #d9170e;
+      border: 1px solid /*%DESTRUCTIVE3%*/ #d9170e;
       color: white;
     }
 
     ^primary-destructive:hover:not(:disabled) {
-      border-color: /*%DESTRUCTIVE1%*/ #631414;
+      border-color: /*%DESTRUCTIVE1%*/ #a61414;
       background-color: /*%DESTRUCTIVE2%*/ #a61414;
     }
 
     ^primary-destructive:focus {
-      border-color: /*%DESTRUCTIVE1%*/ #631414;
+      border: 2px solid #a61414;
+      padding: 7px 15px;
       box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
     }
 
     ^primary-destructive:disabled {
-      border-color: /*%DESTRUCTIVE4%*/ #f79393;
+      border-color: /*%DESTRUCTIVE4%*/ #ed8e8d;
       background-color: /*%DESTRUCTIVE5%*/ #fbedec;
     }
 
@@ -122,25 +134,31 @@ foam.CLASS({
      */
 
     ^secondary {
-      border-color: #cbcfd4;
-      background-image: linear-gradient(to bottom, #ffffff, #e7eaec);
-      color: /*%BLACK%*/ #1e1f21;
+      border: 1px solid /*%PRIMARY3%*/ #406dea;
+      background-color: white;
+      color: /*%PRIMARY3%*/ #406dea;
     }
 
     ^secondary:hover {
-      border-color: #cbcfd4;
-      background-image: linear-gradient(to bottom, #ffffff, #d3d6d8);
+      border-color: /*%PRIMARY2%*/ #144794;
+      background-color: white;
+      color: /*%PRIMARY2%*/ #144794;
     }
 
-    ^secondary:focus {
-      background-image: linear-gradient(to bottom, #ffffff, #d3d6d8);
-      border-color: /*%PRIMARY3%*/ #406dea;
+    ^secondary:focus:not(:hover) {
+      border-color: /*%SECONDARY2%*/ #432de7;
+      color: /*%PRIMARY2%*/ #144794;
     }
 
     ^secondary:disabled {
-      border-color: #e7eaec;
-      color: /*%GREY3%*/ #cbcfd4;
+      border-color: /*%PRIMARY4%*/ #a7beff;
+      color: /*%PRIMARY4%*/ #a7beff;
     }
+
+
+    /*
+     * Secondary destructive
+     */
 
     ^secondary-destructive {
       border-color: /*%DESTRUCTIVE3%*/ #d9170e;
@@ -165,28 +183,28 @@ foam.CLASS({
      */
 
     ^tertiary {
-      border-color: transparent;
-      background-color: transparent;
-      color: /*%GREY1%*/ #5e6061;
-      border-radius: 0;
+      background: none;
+      border: 1px solid transparent;
+      box-shadow: none;
+      color: #8e9090;
     }
 
     ^tertiary:hover:not(:disabled) {
-      border-color: transparent;
-      background-color: transparent;
-      color: /*%BLACK%*/ #1e1f21;
+      color: /*%PRIMARY3%*/ #406dea;
     }
 
-    ^tertiary:focus {
-      border-bottom-color: /*%PRIMARY3%*/ #406dea;
-      border-left-width: 0;
-      border-right-width: 0;
-      color: /*%BLACK%*/ #1e1f21;
+    ^tertiary:focus:not(:hover) {
+      border-color: /*%SECONDARY1%*/ #4a33f4;
     }
 
     ^tertiary:disabled {
       color: /*%GREY3%*/ #cbcfd4;
     }
+
+
+    /*
+     * Tertiary destructive
+     */
 
     ^tertiary-destructive {
       border-color: transparent;
@@ -214,12 +232,8 @@ foam.CLASS({
      */
 
     ^small {
-      font-size: 12px;
+      font-size: 10px;
       padding: 8px 16px;
-    }
-
-    ^small:focus {
-      padding: 7px 15px;
     }
 
     ^medium {
@@ -227,17 +241,9 @@ foam.CLASS({
       padding: 9px 16px;
     }
 
-    ^medium:focus {
-      padding: 8px 15px;
-    }
-
     ^large {
       font-size: 16px;
-      padding: 10px 16px;
-    }
-
-    ^large:focus {
-      padding: 9px 15px;
+      padding: 13px 16px;
     }
 
     ^tertiary^small,
@@ -255,6 +261,10 @@ foam.CLASS({
     }
   `,
 
+  imports: [
+    'ctrl'
+  ],
+
   enums: [
     {
       name: 'ButtonState',
@@ -268,7 +278,7 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'confirm', message: 'Confirm' }
+    { name: 'CONFIRM', message: 'Confirm' }
   ],
 
   properties: [
@@ -349,11 +359,10 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      
       this.tooltip = this.action.toolTip;
 
       this.SUPER();
-      
+
       this.initCls();
 
       this.on('click', this.click);
@@ -397,19 +406,26 @@ foam.CLASS({
 
   listeners: [
     function click(e) {
-      if ( this.buttonState == this.ButtonState.NO_CONFIRM ) {
-        this.action && this.action.maybeCall(this.__subContext__, this.data);
-      } else if ( this.buttonState == this.ButtonState.CONFIRM ) {
-        this.buttonState = this.ButtonState.DEBOUNCE;
-        this.removeAllChildren();
-        this.add(this.confirm);
-        this.debounce();
-      } else if ( this.buttonState == this.ButtonState.ARMED ) {
-        this.buttonState = this.ButtonState.CONFIRM;
-        this.removeAllChildren();
-        this.addContent();
-        this.action && this.action.maybeCall(this.__subContext__, this.data);
-      }
+      try {
+        if ( this.action && this.action.confirmationView && this.buttonState == this.ButtonState.NO_CONFIRM ) {
+          this.ctrl.add(this.Popup.create().tag(this.action.confirmationView, {
+            action: this.action,
+            data: this.data
+          }));
+        } else if ( this.buttonState == this.ButtonState.NO_CONFIRM ) {
+          this.action && this.action.maybeCall(this.__subContext__, this.data);
+        } else if ( this.buttonState == this.ButtonState.CONFIRM ) {
+          this.buttonState = this.ButtonState.DEBOUNCE;
+          this.removeAllChildren();
+          this.add(this.CONFIRM);
+          this.debounce();
+        } else if ( this.buttonState == this.ButtonState.ARMED ) {
+          this.buttonState = this.ButtonState.CONFIRM;
+          this.removeAllChildren();
+          this.addContent();
+          this.action && this.action.maybeCall(this.__subContext__, this.data);
+        }
+      } catch (x) {}
 
       e.preventDefault();
       e.stopPropagation();

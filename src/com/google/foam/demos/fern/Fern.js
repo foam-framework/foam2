@@ -33,7 +33,7 @@ foam.CLASS({
           this.age++;
           this.rotation -= 0.0001;
           if ( this.age === 60 ) {
-            this.add(this.cls_.create({depth: this.depth+1, x: 0, y: -2, scaleX: 0.8, scaleY: 0.8, xxxrotation: -Math.PI/20}, this.__context__));
+            this.add(this.cls_.create({depth: this.depth+1, x: 0, y: -2, scaleX: 0.8, scaleY: 0.8, rotation: -Math.PI/20}, this.__context__));
           }
           if ( this.age === 100 ) {
             this.add(this.cls_.create({depth: this.depth+1.5, x: -1.5, y: 0, scaleX: 0.5, scaleY: 0.5, rotation:  Math.PI/2}, this.__context__));
@@ -45,9 +45,9 @@ foam.CLASS({
   ],
 
   properties: [
-    [ 'width', 1000 ],
+    [ 'width',  1000 ],
     [ 'height', 800 ],
-    [ 'color', 'white' ],
+    [ 'color',  'white' ],
     { class: 'Int', name: 'time' },
     'root'
   ],

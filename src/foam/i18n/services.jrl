@@ -1,0 +1,62 @@
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"xliffTranslationDAO",
+  "serve":true,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(false)
+      .setJournalName("xliffTranslations")
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setOf(foam.i18n.XLIFFTranslationValue.getOwnClassInfo())
+      .build();
+  """,
+  "client":
+  """
+    {
+      "of":"foam.i18n.XLIFFTranslationValue"
+    }
+  """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"localeDAO",
+  "description":"Locale DAO",
+  "serve":true,
+  "authenticate":false,
+  "serviceScript":
+  """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("localeDAO"))
+      .setJournalName("locales")
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setOf(foam.i18n.Locale.getOwnClassInfo())
+      .build();
+  """,
+  "client":
+  """
+    {
+      "of":"foam.i18n.Locale"
+    }
+  """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"translationService",
+  "description":"Translation Service",
+  "serve":true,
+  "authenticate":false,
+  "serviceScript":
+  """
+    return new foam.i18n.LocaleTranslationService.Builder(x).build();
+  """,
+  "client":
+  """
+  {
+      "class":"foam.i18n.ClientCacheTranslationService",
+      "delegate":"foam.i18n.ClientTranslationService"
+  }
+  """
+})
