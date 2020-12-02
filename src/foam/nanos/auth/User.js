@@ -567,7 +567,6 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       storageOptional: true,
-      section: 'userInformation'
       section: 'userInformation',
       gridColumns: 6
     },
