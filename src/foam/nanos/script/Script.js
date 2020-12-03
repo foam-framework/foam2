@@ -135,6 +135,12 @@ foam.CLASS({
       includeInDigest: false,
     },
     {
+      documentation: 'Generate notification on script completion',
+      name: 'notify',
+      class: 'Boolean',
+      value: false
+    },
+    {
       class: 'DateTime',
       name: 'lastRun',
       documentation: 'Date and time the script ran last.',
@@ -388,18 +394,20 @@ foam.CLASS({
               self.copyFrom(script);
               clearInterval(interval);
 
-              // create notification
-              var notification = self.ScriptRunNotification.create({
-                userId: self.user.id,
-                scriptId: script.id,
-                notificationType: 'Script Execution',
-                body: `Status: ${script.status}
+              if ( self.notify ) {
+                // create notification
+                var notification = self.ScriptRunNotification.create({
+                  userId: self.user.id,
+                  scriptId: script.id,
+                  notificationType: 'Script Execution',
+                  body: `Status: ${script.status}
                     Script Output: ${script.length > self.MAX_NOTIFICATION_OUTPUT_CHARS ?
                       script.output.substring(0, self.MAX_NOTIFICATION_OUTPUT_CHARS) + '...' :
                       script.output }
                     LastDuration: ${script.lastDuration}`
-              });
-              self.notificationDAO.put(notification);
+                });
+                self.notificationDAO.put(notification);
+              }
             }
           }).catch(function() {
             clearInterval(interval);
