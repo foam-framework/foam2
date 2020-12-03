@@ -46,7 +46,7 @@ foam.CLASS({
       padding: 4px;
       font-weight: normal;
       display: inline-block;
-      color: #9BA1A6;
+      color: #5E6061;
       font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       font-weight: normal;
