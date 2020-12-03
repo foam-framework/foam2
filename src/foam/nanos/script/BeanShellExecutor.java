@@ -28,7 +28,6 @@ public class BeanShellExecutor {
     try {
       shell.set("x", x);
       Object service = shell.eval(serviceScript);
-      nSpec.saveService(x, service);
       return service;
     } catch (EvalError e) {
       Logger logger = (Logger) x.get("logger");
