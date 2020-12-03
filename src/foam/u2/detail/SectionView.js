@@ -25,7 +25,7 @@ foam.CLASS({
 
   css: `
     .subtitle {
-      color: /*%GREY2%*/ #8e9090;
+      color: /*%GREY2%*/ #9ba1a6;
       font-size: 14px;
       line-height: 1.5;
       margin-bottom: 15px;
