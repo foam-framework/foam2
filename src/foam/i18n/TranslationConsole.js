@@ -14,6 +14,12 @@ foam.CLASS({
   static: [
     function OPEN() {
       var w      = global.window.open("", 'Translation Console', "width=800,height=800,scrollbars=no", true);
+
+      // Reset the document to remove old content and styles
+      // Reset $UID so that new styles will be re-installed
+      w.document.body.innerText = w.document.head.innerText = '';
+      w.document.$UID = foam.next$UID();
+
       var window = foam.core.Window.create({window: w}, ctrl);
       var v      = this.create({}, window);
       v.write(window.document);
@@ -41,7 +47,8 @@ foam.CLASS({
       background: rgb(238, 238, 238);
       overflow: none;
     }
-    button { padding: 6px; background: white; }
+    button { padding: 6px; background: white !important; }
+    button span { background: white; }
     .foam-u2-ActionView-medium { height: 34px !important; background: pink; }
     .foam-u2-view-TableView-th-editColumns { display: none; }
     .foam-u2-view-TableView-td[name="contextMenuCell"] { display: none; }
@@ -79,11 +86,8 @@ foam.CLASS({
             this.startContext({data: obj}).add(prop).endContext();
           },
           displayWidth: 65,
-          tableWidth: 300
+          tableWidth: 350
         }
-      ],
-
-      methods: [
       ],
 
       actions: [
@@ -179,9 +183,7 @@ foam.CLASS({
   ],
 
   actions: [
-    function clear() {
-      this.dao.removeAll();
-    }
+    function clear() { this.dao.removeAll(); }
   ],
 
   listeners: [
