@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'TranslationConsole',
   extends: 'foam.u2.Controller',
 
+  implements: [ 'foam.mlang.Expressions' ],
+
   static: [
     function OPEN() {
       var w      = global.window.open("", 'Translation Console', "width=800,height=800,scrollbars=no", true);
@@ -129,7 +131,15 @@ foam.CLASS({
     {
       name: 'filteredDAO',
       expression: function(search, dao) {
-        return dao;
+        search = search.trim();
+        if ( search == '' ) return dao;
+
+        return dao.where(
+          this.OR(
+            this.CONTAINS_IC(this.Row.SOURCE,       search),
+            this.CONTAINS_IC(this.Row.DEFAULT_TEXT, search),
+            this.CONTAINS_IC(this.Row.TEXT,         search)
+          ));
       },
       view: 'foam.u2.view.ScrollTableView'
     },
