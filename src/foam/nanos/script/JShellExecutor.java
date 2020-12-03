@@ -36,7 +36,6 @@ public class JShellExecutor {
     String init = "import foam.core.X; import foam.nanos.boot.NSpec; X x = foam.nanos.script.Script.X_HOLDER[0]; ";
 
     execute(x, jShell, init + serviceScript);
-    // saveService(x, service)//TODO delete this method.
     jShell.eval("foam.nanos.boot.NSpec.OBJECT_HOLDER[0] = service;");
     return OBJECT_HOLDER[0];
   }

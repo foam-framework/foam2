@@ -206,15 +206,8 @@ foam.CLASS({
       transient: true,
       javaGetter: 'return getName();',
       getter: function() { return this.name; }
-    },
-    // TODO: permissions, lazy, parent
-    {
-      class: 'Object',
-      name: 'objectJshell',
-      static: true,
-      readPermissionRequired: true,
-      writePermissionRequired: true
     }
+    // TODO: permissions, lazy, parent
   ],
 
   methods: [
@@ -255,8 +248,8 @@ foam.CLASS({
         Language l = getLanguage();
         if ( l == foam.nanos.script.Language.JSHELL )
           return new JShellExecutor().runExecutor(x, ps, getServiceScript());
-        //if ( l == foam.nanos.script.Language.BEANSHELL ) {
-        return new BeanShellExecutor(this).execute(x, ps, getServiceScript());
+        if ( l == foam.nanos.script.Language.BEANSHELL ) 
+          return new BeanShellExecutor(this).execute(x, ps, getServiceScript());
       `,
       javaThrows: [
         'java.lang.ClassNotFoundException',
