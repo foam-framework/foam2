@@ -78,7 +78,9 @@ foam.INTERFACE({
             oldCapabilityIdsList.add(oldCapabilityIds[i]);
           }
 
-          oldCapabilityIdsList.add(capabilityId);
+          if ( ! oldCapabilityIdsList.contains(capabilityId) ){
+            oldCapabilityIdsList.add(capabilityId);
+          }
 
           if ( ! hasRequirement(x, capabilityId) ) {
             setCapabilityIds(          

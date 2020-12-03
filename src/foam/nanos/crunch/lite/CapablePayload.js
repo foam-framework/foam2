@@ -62,6 +62,7 @@ foam.CLASS({
       javaFactory: `
         return null;
       `,
+      storageTransient: true,
       permissionRequired: true
     },
     {
