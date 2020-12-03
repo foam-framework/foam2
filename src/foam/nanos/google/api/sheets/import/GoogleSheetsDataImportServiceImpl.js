@@ -28,6 +28,7 @@
     'java.time.LocalDateTime',
     'java.time.format.DateTimeFormatter',
     'java.util.ArrayList',
+    'java.util.Collections',
     'java.util.Date',
     'java.util.List',
     'java.util.Locale',
@@ -229,7 +230,8 @@
           Object val = data.get(i).get(columnIndex);
           pasreAndSetValue(x, obj, importConfig.getColumnHeaderPropertyMappings()[j], data.get(i).get(columnIndex));
         }
-        postSetValues(x, obj);
+        if ( ! postSetValues(x, obj) )
+          return Collections.emptyList();
         objs.add((FObject)obj);
       }
       return objs;
