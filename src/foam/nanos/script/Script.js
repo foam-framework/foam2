@@ -338,63 +338,61 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        PM pm = new PM.Builder(x).setKey(Script.getOwnClassInfo().getId()).setName(getId()).build();//PM pm = new PM.Builder(x).setClassType(Script.getOwnClassInfo()).setName(getId()).build();
-        Language l = getLanguage();
-        if ( l == foam.nanos.script.Language.JSHELL ) {
-          ByteArrayOutputStream baos = new ByteArrayOutputStream();
-          PrintStream ps = new PrintStream(baos);
-          String print = null;
-          try {
-            JShell jShell = (JShell) createInterpreter(x,ps);
-            print = new JShellExecutor().execute(x, jShell, getCode());
-            ps.print(print);
-          } catch (Throwable e) {
-            e.printStackTrace();
-            Logger logger = (Logger) x.get("logger");
-            logger.error(e);
-          } finally {
-            pm.log(x);
-          }
-          setLastRun(new Date());
-          setLastDuration(pm.getTime());
-          ps.flush();
-          setOutput(baos.toString());
-        } else { //if ( l == foam.nanos.script.Language.BEANSHELL ) {
-
-        String startScript = System.getProperty("foam.main", "main");
+        PM               pm          = new PM.Builder(x).setKey(Script.getOwnClassInfo().getId()).setName(getId()).build();
+        RuntimeException thrown      = null;
+        Language         l           = getLanguage();
+        String           startScript = System.getProperty("foam.main", "main");//TODO it is not used
         // Run on all instances if:
         // - startup "main" script
 
         Thread.currentThread().setPriority(getPriority());
+
         try {
-          ByteArrayOutputStream baos  = new ByteArrayOutputStream();
-          PrintStream           ps    = new PrintStream(baos);
-          Interpreter           shell = (Interpreter) createInterpreter(x, null);//Interpreter shell = (Interpreter) createInterpreter(x, null);
-          //                      pm    = new PM.Builder(x).setKey(Script.getOwnClassInfo().getId()).setName(getId()).build();
-          RuntimeException    thrown = null;
+          if ( l == foam.nanos.script.Language.JSHELL ) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PrintStream ps = new PrintStream(baos);
+            String print = null;
+            try {
+              JShell jShell = (JShell) createInterpreter(x,ps);
+              print = new JShellExecutor().execute(x, jShell, getCode());
+              ps.print(print);
+            } catch (Throwable e) {
+              e.printStackTrace();
+              Logger logger = (Logger) x.get("logger");
+              logger.error(e);
+            } finally {
+              pm.log(x);
+            }
+            setLastRun(new Date());
+            setLastDuration(pm.getTime());
+            ps.flush();
+            setOutput(baos.toString());
+          } else { //if ( l == foam.nanos.script.Language.BEANSHELL ) {
 
-          // TODO: import common packages like foam.core.*, foam.dao.*, etc.
+            ByteArrayOutputStream baos  = new ByteArrayOutputStream();
+            PrintStream           ps    = new PrintStream(baos);
+            Interpreter           shell = (Interpreter) createInterpreter(x, null);//Interpreter shell = (Interpreter) createInterpreter(x, null);
 
-          try {
-            setOutput("");
-            shell.setOut(ps);
-            shell.eval(getCode());
-          } catch (Throwable t) {
-            thrown = new RuntimeException(t);
-            ps.println();
-            t.printStackTrace(ps);
-            Logger logger = (Logger) x.get("logger");
-            logger.error(t);
-            pm.error(x, t);
-          } finally {
-            pm.log(x);
+            try {
+              setOutput("");
+              shell.setOut(ps);
+              shell.eval(getCode());
+            } catch (Throwable t) {
+              thrown = new RuntimeException(t);
+              ps.println();
+              t.printStackTrace(ps);
+              Logger logger = (Logger) x.get("logger");
+              logger.error(t);
+              pm.error(x, t);
+            } finally {
+              pm.log(x);
+            }
+
+            setLastRun(new Date());
+            setLastDuration(pm.getTime());
+            ps.flush();
+            setOutput(baos.toString());
           }
-
-          setLastRun(new Date());
-          setLastDuration(pm.getTime());
-          ps.flush();
-          setOutput(baos.toString());
-
           ScriptEvent event = new ScriptEvent(x);
           event.setLastRun(this.getLastRun());
           event.setLastDuration(this.getLastDuration());
@@ -411,7 +409,6 @@ foam.CLASS({
         } finally {
           Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
         }
-      }
     `
     },
     {
