@@ -34,7 +34,20 @@ foam.CLASS({
 
   css: `
     ^export {
+      border: 1px solid #CBCFD4;
       margin-left: 16px;
+    }
+
+    ^export:hover {
+      border: 1px solid #1E1F21;
+    }
+
+    ^refresh {
+      border: 1px solid #CBCFD4;
+    }
+
+    ^refresh:hover {
+      border: 1px solid #1E1F21;
     }
 
     ^export img {
