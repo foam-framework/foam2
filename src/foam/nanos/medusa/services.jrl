@@ -10,6 +10,14 @@ p({
 
 p({
   "class": "foam.nanos.boot.NSpec",
+  "name": "check",
+  "lazy": false,
+  "authenticate": false,
+  "serviceClass": "foam.nanos.medusa.CheckWebAgent"
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
   "name": "localClusterConfigDAO",
   "serviceScript": """
     dao = new foam.dao.EasyDAO.Builder(x)

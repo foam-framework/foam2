@@ -1,13 +1,5 @@
 p({
   "class": "foam.nanos.boot.NSpec",
-  "name": "check",
-  "lazy": false,
-  "authenticate": false,
-  "serviceClass": "foam.nanos.http.CheckWebAgent"
-})
-
-p({
-  "class": "foam.nanos.boot.NSpec",
   "name": "ping",
   "lazy": false,
   "authenticate": false,

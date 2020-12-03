@@ -4,13 +4,10 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam.nanos.http;
+package foam.nanos.medusa;
 
 import foam.core.X;
-import foam.nanos.medusa.ClusterConfig;
-import foam.nanos.medusa.ClusterConfigSupport;
-import foam.nanos.medusa.Status;
-
+import foam.nanos.http.WebAgent;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 
@@ -30,9 +27,12 @@ public class CheckWebAgent
     response.setContentType("text/plain");
 
     ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+    ElectoralService electoral = (ElectoralService) x.get("electoralService");
+2
     if ( support != null ) {
       ClusterConfig config = support.getConfig(x, support.getConfigId());
-      if ( config.getStatus() != Status.ONLINE ) {
+      if ( config.getStatus() != Status.ONLINE ||
+           electoral.getStatus() != ElectoralServiceStatus.IN_SESSION ) {
         response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
         out.println("maint\n");
         return;
