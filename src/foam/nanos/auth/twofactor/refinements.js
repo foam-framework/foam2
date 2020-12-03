@@ -15,14 +15,16 @@ foam.CLASS({
       name: 'twoFactorEnabled',
       documentation: 'Two factor enabled flag',
       section: 'operationsInformation',
-      order: 15
+      order: 15,
+      gridColumns: 6
     },
     {
       class: 'String',
       name: 'twoFactorSecret',
       documentation: 'Two factor secret',
       networkTransient: true,
-      section: 'systemInformation'
+      section: 'systemInformation',
+      gridColumns: 6
     }
   ]
 });

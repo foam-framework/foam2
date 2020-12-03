@@ -69,6 +69,13 @@ foam.CLASS({
         // Question: should we use u.toSummary() instead?
         return ['user path', ...this.userPath.map(u => u.firstName + ' ' + u.lastName)].join(' >> ');
       }
-     }
+    },
+    {
+      name: 'isAgent',
+      type: 'Boolean',
+      javaCode: `
+        return getUser().getId() != getRealUser().getId();
+      `
+    }
   ]
 })
