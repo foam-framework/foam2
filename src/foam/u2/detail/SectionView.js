@@ -67,6 +67,10 @@ foam.CLASS({
     {
       class: 'Function',
       name: 'getNestedPropValue',
+      documentation: `
+        Finds the value of an object in reference to the property path provided
+        ex. 'obj.innerobj.name' will return the value of 'name' belonging to 'innerobj'.
+      `,
       factory: function() {
         return (obj, path) => {
           if ( ! path ) return obj;
