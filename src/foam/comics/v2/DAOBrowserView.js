@@ -43,6 +43,10 @@ foam.CLASS({
       border: 1px solid #1E1F21;
     }
 
+    ^export:focus:not(:hover) {
+      border: 1px solid #CBCFD4;
+    }
+
     ^refresh {
       background-image: linear-gradient(to bottom, #ffffff, #e7eaec);
       border: 1px solid #CBCFD4;
@@ -50,6 +54,10 @@ foam.CLASS({
 
     ^refresh:hover {
       border: 1px solid #1E1F21;
+    }
+
+    ^refresh:focus:not(:hover) {
+      border: 1px solid #CBCFD4;
     }
 
     ^export img {
