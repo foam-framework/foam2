@@ -24,7 +24,8 @@ foam.CLASS({
     'stack',
     'summaryView? as importedSummaryView',
     'updateView? as importedUpdateView',
-    'window'
+    'window',
+    'translationService'
   ],
 
   exports: [
@@ -141,7 +142,6 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-
       this.data.border.add(
         this.E()
           .addClass(this.myClass())
@@ -152,15 +152,15 @@ foam.CLASS({
             .start()
               .addClass(this.myClass('title-container'))
               .start('h1')
-                .add(this.data.title$)
+                .translate(this.data.title, this.data.title)
               .end()
               .start()
-                .add(this.data.subtitle$)
+                .translate(this.data.subtitle, this.data.subtitle)
               .end()
             .end()
             .callIfElse(self.data.createLabel, function() {
               this.tag(self.data.primaryAction, {
-                label$: self.data.createLabel$,
+                label: self.translationService.getTranslation(foam.locale, `${self.parentNode.createControllerView.menu}.createLabel`, self.data.createLabel),
                 size: 'LARGE'
               });
             }, function() {

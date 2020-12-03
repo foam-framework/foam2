@@ -287,6 +287,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/ToastState' },
   { name: 'foam/nanos/notification/ScriptRunNotification'},
   { name: 'foam/nanos/notification/ScriptRunNotificationNotificationCitationView'},
+  { name: 'foam/nanos/notification/NotificationMessageModal'},
   { name: 'foam/nanos/dashboard/Demo' },
 
   // Ticket
@@ -400,6 +401,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ReputDependentUCJs" },
   //predicates
   { name: 'foam/nanos/crunch/predicate/CapabilityGranted' },
+  { name: 'foam/nanos/crunch/predicate/IsAgent' },
   //spid
   { name: "foam/nanos/auth/CreateUserCapabilityJunctionOnSpidSet" },
   { name: "foam/nanos/auth/SetUserServiceProviderJunctionRuleAction" },

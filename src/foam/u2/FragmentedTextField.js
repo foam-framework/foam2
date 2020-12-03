@@ -42,6 +42,9 @@ foam.CLASS({
       border-top-left-radius: 0 !important;
       border-bottom-left-radius: 0 !important;
     }
+    ^fragment {
+      text-align: center;
+    }
   `,
 
   properties: [
@@ -84,6 +87,8 @@ foam.CLASS({
           e = e.view;
         }
         var u2Elem = this.start(e)
+          .style({ width: this.delegates[i].maxLength * 10 })
+          .addClass(this.myClass('fragment'))
         u2Elem.on('focus', () => {
           this.currentIndex = i;
         })

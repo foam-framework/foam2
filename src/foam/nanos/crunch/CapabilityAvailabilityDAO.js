@@ -18,6 +18,7 @@ foam.CLASS({
     'foam.mlang.predicate.AbstractPredicate',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.Subject',
     'foam.nanos.crunch.Capability',
     'foam.core.X',
     'foam.core.Detachable',

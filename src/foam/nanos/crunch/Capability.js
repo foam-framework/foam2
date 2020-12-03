@@ -121,12 +121,6 @@ foam.CLASS({
       user will lose permissions implied by this capability and upper level capabilities will ignore this prerequisite`
     },
     {
-      name: 'visible',	
-      class: 'Boolean',	
-      documentation: `Hide sub-capabilities which aren't top-level and individually selectable. when true, capability is visible to the user`,	
-      section: 'uiSettings'	
-    },
-    {
       name: 'expiry',
       class: 'DateTime',
       documentation: `Datetime of when capability is no longer valid`
@@ -196,6 +190,12 @@ foam.CLASS({
       networkTransient: true,
       javaFactory: 'return foam.mlang.MLang.TRUE;',
       documentation: 'Predicate used to omit or include capabilities from capabilityDAO'
+    },
+    {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'visibilityPredicate',
+      javaFactory: 'return foam.mlang.MLang.FALSE;',
+      documentation: 'Predicate of the visibility for capabilities in the capability store/keyword sections'
     },
     {
       name: 'reviewRequired',
@@ -449,21 +449,14 @@ foam.RELATIONSHIP({
   extends:'foam.nanos.crunch.Renewable',
   sourceModel: 'foam.nanos.auth.User',
   targetModel: 'foam.nanos.crunch.Capability',
+  ids: [ 'id' ],
   cardinality: '*:*',
   forwardName: 'capabilities',
   inverseName: 'users',
   sourceProperty: {
-    section: 'capabilities',
+    section: 'systemInformation',
     updateVisibility: 'RO'
   }
-});
-
-
-foam.CLASS({
-  package: 'foam.nanos.crunch',
-  name: 'CRUNCHUserRefinement',
-  refines: 'foam.nanos.auth.User',
-  sections: [{ name: 'capabilities' }]
 });
 
 
