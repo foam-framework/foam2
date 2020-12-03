@@ -34,6 +34,7 @@ foam.CLASS({
 
   css: `
     ^export {
+      background-image: linear-gradient(to bottom, #ffffff, #e7eaec);
       border: 1px solid #CBCFD4;
       margin-left: 16px;
     }
@@ -43,6 +44,7 @@ foam.CLASS({
     }
 
     ^refresh {
+      background-image: linear-gradient(to bottom, #ffffff, #e7eaec);
       border: 1px solid #CBCFD4;
     }
 
