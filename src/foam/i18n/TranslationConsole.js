@@ -41,7 +41,7 @@ foam.CLASS({
       background: rgb(238, 238, 238);
       overflow: none;
     }
-    button { padding: 6px; }
+    button { padding: 6px; background: white; }
     .foam-u2-ActionView-medium { height: 34px !important; background: pink; }
     .foam-u2-view-TableView-th-editColumns { display: none; }
     .foam-u2-view-TableView-td[name="contextMenuCell"] { display: none; }
@@ -70,7 +70,7 @@ foam.CLASS({
         {
           class: 'String',
           name: 'defaultText',
-          displayWidth: 200
+          displayWidth: 250
         },
         {
           class: 'String',
@@ -78,7 +78,8 @@ foam.CLASS({
           tableCellFormatter: function(val, obj, prop) {
             this.startContext({data: obj}).add(prop).endContext();
           },
-          tableWidth: 250
+          displayWidth: 65,
+          tableWidth: 300
         }
       ],
 
@@ -87,7 +88,6 @@ foam.CLASS({
 
       actions: [
         function update() {
-          console.log('***** UPDATE', this.source, this.text);
           var l = this.Locale.create({
             locale:  this.locale.substring(0, 2),
             variant: this.locale.substring(3),
@@ -167,7 +167,7 @@ foam.CLASS({
           end().
           start('div').
             style({float: 'right'}).
-            add('Search: ', this.SEARCH, '  Locale: ', this.LOCALE).
+            add('Search: ', this.SEARCH, '  Locale: ', this.LOCALE, ' ' , this.CLEAR).
           end().
         end().
         start(this.CardBorder, {}, this.content$).
@@ -175,6 +175,12 @@ foam.CLASS({
           style({'margin-top': '10px', height: '90%' }).
           add(this.FILTERED_DAO).
         end();
+    }
+  ],
+
+  actions: [
+    function clear() {
+      this.dao.removeAll();
     }
   ],
 
