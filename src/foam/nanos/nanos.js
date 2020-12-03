@@ -447,5 +447,8 @@ FOAM_FILES([
   { name: "foam/nanos/geocode/GoogleMapsCredentials" },
 
   { name: "com/google/foam/demos/u2/AllViews" },
-  { name: "com/google/foam/demos/u2/MDAllViews" }
+  { name: "com/google/foam/demos/u2/MDAllViews" },
+
+  //IBAN
+  { name: "foam/nanos/iban/ValidationIBAN" },
 ]);
