@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.script;
 
 import java.io.BufferedReader;
@@ -35,7 +41,7 @@ public class JShellExecutor {
     return OBJECT_HOLDER[0];
   }
 
-  public String execute(X x, JShell jShell,String script) throws IOException {
+  public String execute(X x, JShell jShell, String script) throws IOException {
     BufferedReader rdr = new BufferedReader(new StringReader(script));
     List<String> l1 = new ArrayList<String>();
 
@@ -53,7 +59,6 @@ public class JShellExecutor {
       Logger logger = (Logger) x.get("logger");
       logger.error(e);
     }
-    //ps.print(print);
     return print;
   }
 

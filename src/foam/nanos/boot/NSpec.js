@@ -157,10 +157,7 @@ foam.CLASS({
       name: 'language',
       factory: function() {
         return this.Language.BEANSHELL;
-      },
-      //javaValue: 'foam.nanos.script.Language.BEANSHELL',
-//      readPermissionRequired: true,
-//      writePermissionRequired: true
+      }
     },
     {
       class: 'Code',
@@ -202,10 +199,6 @@ foam.CLASS({
       class: 'StringArray',
       name: 'keywords',
       shortName: 'ks'
-    },
-    {
-      class: 'StringArray',
-      name: 'keywords'
     },
     {
       class: 'String',
@@ -261,7 +254,7 @@ foam.CLASS({
 
         Language l = getLanguage();
         if ( l == foam.nanos.script.Language.JSHELL )
-          return new JShellExecutor().runExecutor(x,ps,getServiceScript());
+          return new JShellExecutor().runExecutor(x, ps, getServiceScript());
         //if ( l == foam.nanos.script.Language.BEANSHELL ) {
         return new BeanShellExecutor(this).execute(x, ps, getServiceScript());
       `,

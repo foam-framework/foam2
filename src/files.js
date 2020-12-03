@@ -311,9 +311,6 @@ FOAM_FILES([
   { name: "foam/nanos/logger/DAOLogger" },
   { name: "foam/nanos/logger/LoggingDAO" },
 
-  { name: "foam/nanos/notification/Notifiable" },
-  { name: "foam/nanos/notification/EmailSetting" },
-  { name: "foam/nanos/notification/NotificationSetting" },
   { name: "foam/nanos/script/Language", flags: ['java', 'web'] },
 
   { name: "foam/dao/EasyDAO" },

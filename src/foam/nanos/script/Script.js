@@ -303,8 +303,6 @@ foam.CLASS({
           try {
             shell.set("currentScript", this);
             shell.set("x", x);
-            //shell.eval(
-            //    "runScript(String name) { script = x.get(\\"scriptDAO\\").find(name); if ( script != null ) eval(script.code); }");
             shell.eval("runScript(String name) { script = x.get("+getDaoKey()+").find(name); if ( script != null ) eval(script.code); }");
             shell.eval("foam.core.X sudo(String user) { foam.util.Auth.sudo(x, (String) user); }");
             shell.eval("foam.core.X sudo(Object id) { foam.util.Auth.sudo(x, id); }");
@@ -341,7 +339,7 @@ foam.CLASS({
         PM               pm          = new PM.Builder(x).setKey(Script.getOwnClassInfo().getId()).setName(getId()).build();
         RuntimeException thrown      = null;
         Language         l           = getLanguage();
-        String           startScript = System.getProperty("foam.main", "main");//TODO it is not used
+        String           startScript = System.getProperty("foam.main", "main");
         // Run on all instances if:
         // - startup "main" script
 
@@ -371,7 +369,7 @@ foam.CLASS({
 
             ByteArrayOutputStream baos  = new ByteArrayOutputStream();
             PrintStream           ps    = new PrintStream(baos);
-            Interpreter           shell = (Interpreter) createInterpreter(x, null);//Interpreter shell = (Interpreter) createInterpreter(x, null);
+            Interpreter           shell = (Interpreter) createInterpreter(x, null);
 
             try {
               setOutput("");
