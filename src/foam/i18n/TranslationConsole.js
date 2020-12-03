@@ -40,63 +40,51 @@ foam.CLASS({
       overflow: none;
     }
     button { padding: 6px; }
-    button span { color: white; }
     .foam-u2-ActionView-medium { height: 34px !important; background: pink; }
+    .foam-u2-view-TableView-th-editColumns { display: none; }
+    .foam-u2-view-TableView-td[name="contextMenuCell"] { display: none; }
+    .foam-u2-view-TableView { height: auto !important; }
 
   `,
 
   classes: [
     {
-      name: 'RowView',
-      extends: 'foam.u2.Controller',
+      name: 'Row',
 
-      constants: [
-        { name: 'MAX_ROWS', value: 1000 }
-      ],
-
-      imports: [ 'locale', 'localeDAO', 'rows', 'search', 'translationService' ],
+      imports: [ 'locale', 'localeDAO', 'search', 'translationService' ],
 
       requires: [ 'foam.i18n.Locale' ],
+
+      tableColumns: [ 'source', 'defaultText', 'text', 'update' ],
+
+      ids: [ 'source' ],
 
       properties: [
         {
           class: 'String',
           name: 'source',
-          displayWidth: 50
+          tableWidth: 350
+        },
+        {
+          class: 'String',
+          name: 'defaultText'
         },
         {
           class: 'String',
           name: 'text',
-          displayWidth: 50
-        },
-        {
-          class: 'String',
-          name: 'defaultText',
-          displayWidth: 50
-        },
+          tableCellFormatter: function(val, obj, prop) {
+            this.startContext({data: obj}).add(prop).endContext();
+          },
+          tableWidth: 250
+        }
       ],
 
       methods: [
-        function initE() {
-          this.SUPER();
-          var row  = this.rows;
-          var self = this;
-
-          this.onDetach(this.rows$.sub(() => { if ( this.rows > row + this.MAX_ROWS ) this.remove(); }));
-
-          this.
-            show(this.search$.map(
-              function(s) {
-                var str = ( self.source + ' ' + self.text + ' ' + self.defaultText ).toLowerCase();
-                return str.indexOf(s.toLowerCase()) != -1;
-              }
-            )).
-            add('Source: ', this.SOURCE, ' Translation: ', this.TEXT, ' ', this.DEFAULT_TEXT, ' ', this.UPDATE).
-            br();
-        }
       ],
+
       actions: [
         function update() {
+          console.log('***** UPDATE', this.source, this.text);
           var l = this.Locale.create({
             locale:  this.locale.substring(0, 2),
             variant: this.locale.substring(3),
@@ -116,15 +104,14 @@ foam.CLASS({
     'translationService'
   ],
 
-  exports: [ 'locale', 'rows', 'search' ],
+  exports: [ 'locale', 'search' ],
 
-  requires: [ 'foam.u2.borders.CardBorder' ],
+  requires: [
+    'foam.dao.MDAO',
+    'foam.u2.borders.CardBorder'
+  ],
 
   properties: [
-    {
-      class: 'Int',
-      name: 'rows'
-    },
     {
       class: 'String',
       name: 'search',
@@ -133,6 +120,17 @@ foam.CLASS({
         type: 'search',
         onKey: true
       }
+    },
+    {
+      name: 'dao',
+      factory: function() { return this.MDAO.create({of: this.Row}); }
+    },
+    {
+      name: 'filteredDAO',
+      expression: function(search, dao) {
+        return dao;
+      },
+      view: 'foam.u2.view.ScrollTableView'
     },
     {
       class: 'String',
@@ -164,19 +162,19 @@ foam.CLASS({
         start(this.CardBorder, {}, this.content$).
           style({'overflow-y':'scroll'}).
           style({'margin-top': '10px', height: '90%' }).
+          add(this.FILTERED_DAO).
         end();
     }
   ],
 
   listeners: [
     function onTranslation(_, __, locale, source, txt, defaultText) {
-      this.add(this.RowView.create({
+      this.dao.put(this.Row.create({
         locale:      locale,
         source:      source,
         text:        txt,
         defaultText: defaultText
       }));
-      this.rows++;
     }
   ]
 });
