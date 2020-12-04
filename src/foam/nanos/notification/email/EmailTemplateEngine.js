@@ -48,12 +48,12 @@ foam.CLASS({
       documentation: `If provided email template extends another email template,
           it will be stored in this prop`
     },
-    {
-      class: 'Object',
-      javaType: 'java.lang.StringBuilder',
-      name: 'blockContentSb',
-      javaFactory: `return new StringBuilder();`
-    },
+//    {
+//      class: 'Object',
+//      javaType: 'java.lang.StringBuilder',
+//      name: 'blockContentSb',
+//      javaFactory: `return new StringBuilder();`
+//    },
     {
       class: 'FObjectProperty',
       of: 'foam.lib.parse.Grammar',
@@ -66,7 +66,7 @@ foam.CLASS({
 
         // markup symbol defines the pattern for the whole string
         grammar.addSymbol("markup", new Repeat0(new Alt(grammar.sym("IF_ELSE"), grammar.sym("IF"), grammar.sym("SIMPLE_VAL"),
-          grammar.sym("ANY_CHAR"))));
+          grammar.sym("ANY_CHAR"), grammar.sym("INCLUDE"), grammar.sym("INCLUDE_CONTENT"))));
         Action markup = new Action() {
           @Override
           public Object execute(Object value, ParserContext x) {
@@ -210,6 +210,56 @@ foam.CLASS({
         };
         grammar.addAction("IF", ifAction);
 
+
+        /* INCLUDE symbol syntax: "qwerty <include name="templ_name"/> */
+        Parser include = new Seq1(7,
+          Literal.create("<include"),
+          Whitespace.instance(),
+          Literal.create("template"),
+          Whitespace.instance(),
+          Literal.create("="),
+          Whitespace.instance(),
+          Literal.create("'"),
+          new Repeat(new Until(Literal.create("'"))),
+          Whitespace.instance(),
+          Literal.create("'"),
+          Whitespace.instance(),
+          Literal.create("/>"));
+
+        grammar.addSymbol("INCLUDE", include);
+        Action includeAction  = new Action() {
+          @Override
+          public Object execute(Object val, foam.lib.parse.ParserContext x) {
+            Object[] valArr = (Object[]) val;
+            StringBuilder templateName = new StringBuilder();
+            for ( int i = 0 ; i < valArr.length ; i++ ) {
+              templateName.append(valArr[i]);
+            }
+            EmailTemplate superTempl = (EmailTemplate) ((DAO) x_.get("emailTemplateDAO")).find(EQ(EmailTemplate.NAME,templateName.toString()));
+            StringPStream finalValPs = new StringPStream();
+            finalValPs.setString(superTempl.getBody());
+            PStream ret = ((Parser) grammar.sym("markup")).parse(finalValPs, new ParserContextImpl());
+            getSb().append(ret.value());
+            return val;
+          }
+        };
+        grammar.addAction("INCLUDE", includeAction);
+
+        /* INCLUDE_CONTENT symbol syntax: "qwerty <include name="templ_name"> */
+        Parser includeContent = new Seq(
+          Literal.create("<include template"),
+          new Until(Literal.create("</include>"))
+          );
+        grammar.addSymbol("INCLUDE_CONTENT", includeContent);
+        Action includeContentAction  = new Action() {
+          @Override
+          public Object execute(Object val, foam.lib.parse.ParserContext x) {
+            getSb().append(getFinalSb());
+            return val;
+          }
+        };
+        grammar.addAction("INCLUDE_CONTENT", includeContentAction);
+
         return grammar;
       `
     }
@@ -219,19 +269,28 @@ foam.CLASS({
     {
       name: 'renderTemplate',
       args: [
-        { name: 'body', type: 'String' }
+        { name: 'id', type: 'String' }
       ],
       type: 'StringBuilder',
       javaCode: `
 
       // if the template doesn't extend any other template, parse the original body.
       // Otherwise join two templates and then parse
-      if ( ! isMultiTemplated(body) ) {
-        getGrammar().parseString(body, "");
-      }
-      else {
-        getGrammar().parseSb(getFinalSb(), "");
-      }
+//      if ( ! isMultiTemplated(body) ) {
+//        getGrammar().parseString(body, "");
+//      }
+//      else {
+//        getGrammar().parseSb(getFinalSb(), "");
+//      }
+      EmailTemplate template = (EmailTemplate) ((DAO) x_.get("emailTemplateDAO")).find(id);
+      extendedEmailTemplate_ = template;
+//      while ( extendedEmailTemplate_ != null && template != extendedEmailTemplate_ ) {
+//        template = extendedEmailTemplate_;
+        joinTemplates(template.getBody());
+//        if ( template == extendedEmailTemplate_ ) return;
+//      }
+
+      getGrammar().parseString(template.getBody(), "");
       return getSb();
       `
     },
@@ -244,120 +303,100 @@ foam.CLASS({
       documentation: `checks if template extends another templates, if yes, joins two and returns true`,
       javaCode: `
 
-      extractSuperEmailTemplateAndBlockContent(body);
+//      extractSuperEmailTemplateAndBlockContent(body);
 
-      if ( getBlockContentSb().length() == 0 ||
-              getExtendedEmailTemplate() == null ) return false;
+//      if ( getBlockContentSb().length() == 0 ||
+//              getExtendedEmailTemplate() == null ) return false;
 
-      joinTemplates();
+//      return joinTemplates(body);
 
       return true;
       `
     },
     {
-      name: 'extractSuperEmailTemplateAndBlockContent',
+      name: 'joinTemplates',
       args: [
         { name: 'body', type: 'String' }
       ],
+//      type: 'Boolean',
       javaCode: `
+      setExtendedEmailTemplate(null);
+      StringBuilder blockContentSb = new StringBuilder();
+      StringBuilder tempSb = new StringBuilder();
       Grammar grammar = new Grammar();
       grammar.addSymbol("START", grammar.sym("markup"));
 
       grammar.addSymbol("markup", new Repeat0(new Alt(
-              grammar.sym("BLOCK_CONTENT"), grammar.sym("EXTENDS"), grammar.sym("ANY_CHAR"))));
+              grammar.sym("INCLUDE_CONTENT"), grammar.sym("ANY_CHAR"))));
 
       grammar.addSymbol("ANY_CHAR", AnyChar.instance());
-      Action anyCharAction = new Action() {
+      Action anyAction = new Action() {
         @Override
         public Object execute(Object val, ParserContext x) {
-          getFinalSb().append(val);
+//          tempSb.append(val);
           return val;
         }
       };
-      grammar.addAction("ANY_CHAR", anyCharAction);
+      grammar.addAction("ANY_CHAR", anyAction);
 
-      grammar.addSymbol("EXTENDS", new Seq1(5,
-        Literal.create("{%"),
+      /* INCLUDE_CONTENT symbol syntax: "qwerty <include name="templ_name"> */
+      Parser include = new Seq2(7, 13,
+        Literal.create("<include"),
         Whitespace.instance(),
-        Literal.create("extends"),
+        Literal.create("template"),
+        Whitespace.instance(),
+        Literal.create("="),
         Whitespace.instance(),
         Literal.create("'"),
         new Repeat(new Until(Literal.create("'"))),
+        Whitespace.instance(),
         Literal.create("'"),
         Whitespace.instance(),
-        Literal.create("%}"))
-      );
-      Action extendsAction = new Action() {
+        Literal.create(">"),
+        Whitespace.instance(),
+        new Repeat(new Until(Literal.create("</include>"))),
+        Literal.create("</include>")
+        );
+      grammar.addSymbol("INCLUDE_CONTENT", include);
+      Action includeContentAction  = new Action() {
         @Override
-        public Object execute(Object val, ParserContext x) {
-          if ( val == null ) return val;
+        public Object execute(Object val, foam.lib.parse.ParserContext x) {
           Object[] valArr = (Object[]) val;
+          StringBuilder ifCond = new StringBuilder();
+          Object[] val0 = (Object[]) valArr[0];
           StringBuilder templateName = new StringBuilder();
-          for ( int i = 0 ; i < valArr.length ; i++ ) {
-            templateName.append(valArr[i]);
+          for ( int i = 0 ; i < val0.length ; i++ ) {
+            templateName.append(val0[i]);
           }
-          setExtendedEmailTemplate((EmailTemplate) ((DAO) x_.get("emailTemplateDAO")).find(EQ(EmailTemplate.NAME,templateName.toString())));
+          extendedEmailTemplate_ = ((EmailTemplate) ((DAO) x_.get("emailTemplateDAO")).find(EQ(EmailTemplate.NAME,templateName.toString())));
           if ( extendedEmailTemplate_ == null ) {
             foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x_.get("logger");
             logger.error("Extended template not found " + val);
           }
-          return val;
-        }
-      };
-      grammar.addAction("EXTENDS", extendsAction);
-
-
-      grammar.addSymbol("BLOCK_CONTENT", new Seq1(7,
-        Literal.create("{%"),
-        Whitespace.instance(),
-        Literal.create("block"),
-        Whitespace.instance(),
-        Literal.create("content"),
-        Whitespace.instance(),
-        Literal.create("%}"),
-        new Repeat(new Until(new Seq(Literal.create("{%"), Whitespace.instance(), Literal.create("endblock")))),
-        Literal.create("{%"),
-        Whitespace.instance(),
-        Literal.create("endblock"),
-        Whitespace.instance(),
-        Literal.create("content"),
-        Whitespace.instance(),
-        Literal.create("%}")
-      ));
-      Action blockContentAction = new Action() {
-        @Override
-        public Object execute(Object val, ParserContext x) {
-        Object[] valArr = (Object[]) val;
-          for ( int i = 0 ; i < valArr.length ; i++ ) {
-            getBlockContentSb().append(valArr[i]);
+          Object[] val1 = (Object[]) valArr[1];
+          for ( int i = 0 ; i < val1.length ; i++ ) {
+            blockContentSb.append(val1[i]);
           }
           return val;
         }
       };
-      grammar.addAction("BLOCK_CONTENT", blockContentAction);
-
+      grammar.addAction("INCLUDE_CONTENT", includeContentAction);
 
       grammar.parseString(body, "");
-      `
-    },
-    {
-      name: 'joinTemplates',
-      javaCode: `
-      Grammar grammar = new Grammar();
-      grammar.addSymbol("START", grammar.sym("markup"));
-      grammar.addSymbol("markup", new Repeat0(new Alt(grammar.sym("SUPER_BLOCK_CONTENT"),
-        grammar.sym("ANY_CHAR"))));
-      Action markup = new Action() {
-        @Override
-        public Object execute(Object value, ParserContext x) {
-          return getFinalSb().toString();
-        }
-      };
-      grammar.addAction("markup", markup);
+
+      if ( blockContentSb.length() == 0 ||
+        extendedEmailTemplate_ == null ) return;
+
+      getFinalSb().append(tempSb);
+
+      Grammar joiningGrammar = new Grammar();
+      joiningGrammar.addSymbol("START", joiningGrammar.sym("markup"));
+      joiningGrammar.addSymbol("markup", new Repeat0(new Alt(joiningGrammar.sym("SUPER_BLOCK_CONTENT"),
+        joiningGrammar.sym("ANY_CHAR"))));
 
 
       // ANY_KEY symbol applies to any char that doesn't match any other pattern
-      grammar.addSymbol("ANY_CHAR", AnyChar.instance());
+      joiningGrammar.addSymbol("ANY_CHAR", AnyChar.instance());
       Action anyCharAction = new Action() {
         @Override
         public Object execute(Object val, ParserContext x) {
@@ -365,30 +404,31 @@ foam.CLASS({
           return val;
         }
       };
-      grammar.addAction("ANY_CHAR", anyCharAction);
+      joiningGrammar.addAction("ANY_CHAR", anyCharAction);
 
       // ANY_KEY symbol applies to any char that doesn't match any other pattern
-      grammar.addSymbol("SUPER_BLOCK_CONTENT", new Seq(
-        Literal.create("{%"),
+      joiningGrammar.addSymbol("SUPER_BLOCK_CONTENT", new Seq(
+        Literal.create("<"),
         Whitespace.instance(),
-        Literal.create("block content"),
+        Literal.create("content"),
         Whitespace.instance(),
-        Literal.create("%}"),
-        Literal.create("{%"),
+        Literal.create(">"),
+        Literal.create("</"),
         Whitespace.instance(),
-        Literal.create("endblock content"),
+        Literal.create("content"),
         Whitespace.instance(),
-        Literal.create("%}")
+        Literal.create(">")
       ));
       Action superBlockAction = new Action() {
         @Override
         public Object execute(Object val, ParserContext x) {
-          getFinalSb().append(getBlockContentSb());
+          getFinalSb().append(blockContentSb);
           return val;
         }
       };
-      grammar.addAction("SUPER_BLOCK_CONTENT", superBlockAction);
-      grammar.parseString(getExtendedEmailTemplate().getBody(), "");
+      joiningGrammar.addAction("SUPER_BLOCK_CONTENT", superBlockAction);
+      joiningGrammar.parseString(extendedEmailTemplate_.getBody(), "");
+      joinTemplates(extendedEmailTemplate_.getBody());
       `
     }
   ]
