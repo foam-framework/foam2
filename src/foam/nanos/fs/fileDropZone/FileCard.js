@@ -109,7 +109,7 @@ foam.CLASS({
       this.SUPER();
       if ( this.selected == this.index ) {
         this.style({
-          "border-color": "blue"
+          "border-color": "/*%PRIMARY1%*/ #604aff"
         })
       }
       this.addClass(this.myClass())
