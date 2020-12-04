@@ -18,7 +18,8 @@ foam.CLASS({
 
   imports: [
     'allowRemoval',
-    'removeFile'
+    'removeFile',
+    'highlight'
   ],
 
   exports: [
@@ -37,6 +38,7 @@ foam.CLASS({
       box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.16);
       box-sizing: border-box;
       padding: 12px 16px;
+      color: red;
 
       -webkit-transition: all .15s ease-in-out;
       -moz-transition: all .15s ease-in-out;
@@ -97,12 +99,20 @@ foam.CLASS({
     },
     {
       name: 'index'
+    },
+    {
+      name: 'selected'
     }
   ],
 
   methods: [
     function initE() {
       this.SUPER();
+      if ( this.selected == this.index ) {
+        this.style({
+          "border-color": "blue"
+        })
+      }
       this.addClass(this.myClass())
         .start({ class: 'foam.u2.tag.Image', data: 'images/attach-icon.svg' }).end()
         .start('p').addClass(this.myClass('name'))
@@ -116,7 +126,9 @@ foam.CLASS({
         .start(this.REMOVE_FILE_X, {
           buttonStyle: foam.u2.ButtonStyle.TERTIARY,
           icon: 'images/cancel-x.png'
-        }).show(this.allowRemoval && this.canBeRemoved).addClass(this.myClass('close-action')).end()
+        }).show(this.allowRemoval && this.canBeRemoved).addClass(this.myClass('close-action')).end();
+
+      this.on('click', this.test);
     }
   ],
 
@@ -141,6 +153,17 @@ foam.CLASS({
           var url = this.data.address;
           window.open(url);
         }
+      }
+    },
+    {
+      name: 'test',
+      code: function(X) {
+//      debugger;
+        this.highlight(this.index);
+//      console.log(this.selected);
+//        this.style({
+//          "border-color": "blue"
+//        })
       }
     }
   ]

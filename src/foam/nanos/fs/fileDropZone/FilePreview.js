@@ -30,6 +30,12 @@ foam.CLASS({
     }
   `,
 
+  properties: [
+    {
+      name: 'selected'
+    }
+  ],
+
   methods: [
     function initE() {
       this.SUPER();
@@ -51,7 +57,6 @@ foam.CLASS({
             visibility: 'hidden'
           })
         .end();
-
       this.data$.sub(() => this.showData());
     },
 
@@ -59,19 +64,25 @@ foam.CLASS({
       let iFrame = document.getElementsByClassName('file-iframe')[0],
           image = document.getElementsByClassName('file-image')[0],
           div = document.getElementsByClassName('file-image-div')[0],
-          url = '';
+          url = '',
+          pos;
 
       iFrame.style.visibility = 'hidden';
       div.style.visibility = 'hidden';
       div.style.display = 'none';
-
-      if ( ! this.data[0] ) {
-        return;
+      debugger;
+      if ( this.selected == undefined || this.selected == this.data.length ) {
+        pos = this.data.length - 1;
+      } else {
+        pos = this.selected;
       }
 
-      url = URL.createObjectURL(this.data[this.data.length - 1].data.blob);
+      if ( ! this.data[pos] ) {
+        return;
+      }
+      url = URL.createObjectURL(this.data[pos].data.blob);
 
-      if (this.data[this.data.length - 1].mimeType !== "application/pdf") {
+      if (this.data[pos].mimeType !== "application/pdf") {
         image.src = url;
         div.style.visibility = 'visible';
         div.style.display = 'block';
