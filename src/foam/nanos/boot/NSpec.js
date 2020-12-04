@@ -240,7 +240,6 @@ foam.CLASS({
 
         if ( getServiceClass().length() > 0 ) {
           Object service = Class.forName(getServiceClass()).newInstance();
-          // TODO: doesn't work with DAO's, fix
           return service;
         }
 
@@ -248,7 +247,7 @@ foam.CLASS({
         Object service;
         if ( l == foam.nanos.script.Language.JSHELL )
           service = return new JShellExecutor().runExecutor(x, ps, getServiceScript());
-        else if ( l == foam.nanos.script.Language.BEANSHELL ) 
+        else if ( l == foam.nanos.script.Language.BEANSHELL )
           service = return new BeanShellExecutor(this).execute(x, ps, getServiceScript());
         else
           throw new RuntimeException("Script language not supported");
