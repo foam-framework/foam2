@@ -148,7 +148,8 @@ foam.CLASS({
       name: 'enabled',
       documentation: 'Determines whether the User is permitted certain actions.',
       value: true,
-      section: 'systemInformation'
+      section: 'systemInformation',
+      gridColumns: 6
     },
     {
       class: 'Boolean',
@@ -157,7 +158,8 @@ foam.CLASS({
       writePermissionRequired: true,
       value: true,
       section: 'systemInformation',
-      order: 30
+      order: 30,
+      gridColumns: 6,
     },
     {
       class: 'DateTime',
@@ -165,6 +167,7 @@ foam.CLASS({
       documentation: 'The date and time of last login by User.',
       section: 'operationsInformation',
       order: 30,
+      gridColumns: 6,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO'
     },
@@ -173,7 +176,7 @@ foam.CLASS({
       name: 'firstName',
       shortName: 'fn',
       documentation: 'The first name of the User.',
-      gridColumns: 4,
+      gridColumns: 6,
       section: 'userInformation',
       order: 2,
       includeInDigest: true
@@ -182,7 +185,7 @@ foam.CLASS({
       class: 'String',
       name: 'middleName',
       documentation: 'The middle name of the User.',
-      gridColumns: 4,
+      gridColumns: 6,
       section: 'userInformation',
       order: 3,
       includeInDigest: true
@@ -192,7 +195,7 @@ foam.CLASS({
       name: 'lastName',
       shortName: 'ln',
       documentation: 'The last name of the User.',
-      gridColumns: 4,
+      gridColumns: 6,
       section: 'userInformation',
       order: 4,
       includeInDigest: true
@@ -202,13 +205,15 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       section: 'userInformation',
-      order: 5
+      order: 5,
+      gridColumns: 6
     },
    {
       class: 'String',
       name: 'jobTitle',
       documentation: 'The job title of the individual person, or real user.',
       section: 'ownerInformation',
+      gridColumns: 6,
       view: function(args, X) {
         return {
           class: 'foam.u2.view.ChoiceWithOtherView',
@@ -231,7 +236,8 @@ foam.CLASS({
       displayWidth: 80,
       width: 100,
       tableWidth: 160,
-      section: 'businessInformation'
+      section: 'businessInformation',
+      gridColumns: 6
     },
     {
       class: 'String',
@@ -240,14 +246,17 @@ foam.CLASS({
         of the User.`,
       width: 50,
       createVisibility: 'HIDDEN',
-      section: 'ownerInformation'
+      section: 'ownerInformation',
+      gridColumns: 6
     },
     {
       class: 'String',
       name: 'userName',
       label: 'Username',
       documentation: 'The username of the User.',
-      section: 'userInformation'
+      section: 'userInformation',
+      order: 7,
+      gridColumns: 6
     },
     {
       class: 'EMail',
@@ -264,40 +273,48 @@ foam.CLASS({
       `email_ = val.toLowerCase();
        emailIsSet_ = true;`,
       section: 'userInformation',
-      order: 6
+      order: 6,
+      gridColumns: 6
     },
     {
       class: 'Boolean',
       name: 'emailVerified',
       documentation: 'Determines whether the email address of the User is valid.',
       writePermissionRequired: true,
-      section: 'systemInformation',
-      order: 35
+      section: 'operationsInformation',
+      order: 35,
+      gridColumns: 6
     },
     {
       class: 'PhoneNumber',
       name: 'phoneNumber',
       documentation: 'Personal phone number.',
-      section: 'userInformation'
+      section: 'userInformation',
+      gridColumns: 6
     },
     {
       class: 'Boolean',
       name: 'phoneNumberVerified',
       writePermissionRequired: true,
-      section: 'userInformation'
+      section: 'operationsInformation',
+      gridColumns: 6,
+      order: 40
     },
     {
       class: 'PhoneNumber',
       name: 'mobileNumber',
       documentation: 'Returns the mobile phone number of the User from the Phone model.',
       createVisibility: 'HIDDEN',
-      section: 'userInformation'
+      section: 'userInformation',
+      gridColumns: 6
     },
     {
       class: 'Boolean',
       name: 'mobileNumberVerified',
       writePermissionRequired: true,
-      section: 'userInformation'
+      section: 'operationsInformation',
+      gridColumns: 6,
+      order: 45
     },
     {
       class: 'String',
@@ -314,13 +331,15 @@ foam.CLASS({
       `,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'userInformation'
+      section: 'userInformation',
+      gridColumns: 6
     },
     {
       class: 'Date',
       name: 'birthday',
       documentation: 'The date of birth of the individual person, or real user.',
-      section: 'userInformation'
+      section: 'userInformation',
+      gridColumns: 6
     },
     {
       class: 'foam.nanos.fs.FileProperty',
@@ -331,7 +350,7 @@ foam.CLASS({
         class: 'foam.nanos.auth.ProfilePictureView',
         placeholderImage: 'images/ic-placeholder.png'
       },
-      section: 'userInformation'
+      section: 'systemInformation'
     },
     {
       class: 'FObjectProperty',
@@ -350,6 +369,7 @@ foam.CLASS({
       of: 'foam.nanos.auth.Language',
       createVisibility: 'HIDDEN',
       section: 'userInformation',
+      gridColumns: 6,
       factory: function() {
         return foam.nanos.auth.LanguageId.create({code: 'en'})
       },
@@ -363,7 +383,8 @@ foam.CLASS({
       documentation: 'The preferred time zone of the User.',
       width: 5,
       createVisibility: 'HIDDEN',
-      section: 'userInformation'
+      section: 'userInformation',
+      gridColumns: 6
     },
     {
       class: 'Password',
@@ -384,7 +405,8 @@ foam.CLASS({
       createVisibility: 'RW',
       updateVisibility: 'RW',
       readVisibility: 'HIDDEN',
-      section: 'systemInformation'
+      section: 'systemInformation',
+      gridColumns: 6
     },
     {
       class: 'Password',
@@ -427,7 +449,8 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       section: 'systemInformation',
-      order: 40
+      order: 40,
+      gridColumns: 6
     },
     {
       class: 'DateTime',
@@ -435,15 +458,8 @@ foam.CLASS({
       documentation: `The date and time that the current password of the User
         will expire.`,
       section: 'systemInformation',
-      order: 41
-    },
-    {
-      class: 'String',
-      name: 'note',
-      documentation: 'A field for a note that can be added and appended to the User.',
-      displayWidth: 70,
-      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 },
-      section: 'userInformation'
+      order: 41,
+      gridColumns: 6
     },
     {
       class: 'String',
@@ -451,6 +467,7 @@ foam.CLASS({
       documentation: 'The name of the business associated with the User.',
       width: 50,
       section: 'businessInformation',
+      gridColumns: 6,
       tableWidth: 170
     },
     {
@@ -493,6 +510,15 @@ foam.CLASS({
         }
       },
       createVisibility: 'HIDDEN',
+      section: 'userInformation',
+      gridColumns: 6
+    },
+    {
+      class: 'String',
+      name: 'note',
+      documentation: 'A field for a note that can be added and appended to the User.',
+      displayWidth: 70,
+      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 },
       section: 'userInformation'
     },
     {
@@ -502,6 +528,7 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       section: 'userInformation',
+      gridColumns: 6,
       includeInDigest: true
     },
     {
@@ -510,7 +537,8 @@ foam.CLASS({
       documentation: 'The date and time the User was last modified.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'userInformation'
+      section: 'userInformation',
+      gridColumns: 6
     },
     {
       class: 'foam.core.Enum',
@@ -518,6 +546,7 @@ foam.CLASS({
       name: 'lifecycleState',
       section: 'systemInformation',
       order: 20,
+      gridColumns: 6,
       value: foam.nanos.auth.LifecycleState.PENDING,
       writePermissionRequired: true
     },
@@ -528,6 +557,7 @@ foam.CLASS({
       tableWidth: 120,
       section: 'systemInformation',
       order: 15,
+      gridColumns: 6,
       writePermissionRequired:true,
       documentation: `
         Need to override getter to return "" because its trying to
@@ -754,7 +784,8 @@ foam.RELATIONSHIP({
   targetProperty: {
     hidden: false,
     section: 'systemInformation',
-    order: 10
+    order: 10,
+    gridColumns: 6
   }
 });
 
@@ -817,6 +848,7 @@ foam.RELATIONSHIP({
     visibility: 'HIDDEN',
   },
   targetProperty: {
-    section: 'systemInformation'
+    section: 'systemInformation',
+    gridColumns: 6
   }
 });
