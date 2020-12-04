@@ -46,7 +46,7 @@ foam.CLASS({
       padding: 4px;
       font-weight: normal;
       display: inline-block;
-      color: #5E6061;
+      color: /*%GREY1%*/ #5E6061;
       font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       font-weight: normal;
@@ -69,7 +69,7 @@ foam.CLASS({
     }
 
     ^selected > ^heading > ^label{
-      color: #1E1F21 !important;
+      color: /*%BLACK%*/ #1E1F21 !important;
       font-weight: bold;
     }
   `,
