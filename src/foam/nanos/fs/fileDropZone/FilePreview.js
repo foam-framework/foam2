@@ -70,7 +70,7 @@ foam.CLASS({
       iFrame.style.visibility = 'hidden';
       div.style.visibility = 'hidden';
       div.style.display = 'none';
-      debugger;
+
       if ( this.selected == undefined || this.selected == this.data.length ) {
         pos = this.data.length - 1;
       } else {

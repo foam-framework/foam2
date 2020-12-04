@@ -38,7 +38,6 @@ foam.CLASS({
       box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.16);
       box-sizing: border-box;
       padding: 12px 16px;
-      color: red;
 
       -webkit-transition: all .15s ease-in-out;
       -moz-transition: all .15s ease-in-out;
@@ -128,7 +127,7 @@ foam.CLASS({
           icon: 'images/cancel-x.png'
         }).show(this.allowRemoval && this.canBeRemoved).addClass(this.myClass('close-action')).end();
 
-      this.on('click', this.test);
+      this.on('click', this.pick);
     }
   ],
 
@@ -156,14 +155,9 @@ foam.CLASS({
       }
     },
     {
-      name: 'test',
+      name: 'pick',
       code: function(X) {
-//      debugger;
         this.highlight(this.index);
-//      console.log(this.selected);
-//        this.style({
-//          "border-color": "blue"
-//        })
       }
     }
   ]

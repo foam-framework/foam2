@@ -134,9 +134,7 @@ foam.CLASS({
       documentation: 'When a file has been selected/changed/removed, this function will be called. (OPTIONAL)'
     },
     {
-      class: 'Int',
-      name: 'selected',
-      value: 0
+      name: 'selected'
     }
   ],
 
