@@ -31,6 +31,10 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'capabilityIds'
+    },
+    {
+      class: 'String',
+      name: 'daoKey'
     }
   ],
 

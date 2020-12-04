@@ -84,19 +84,20 @@ foam.CLASS({
 
         Capable capableObj = (Capable) clonedObj;
 
+        if ( 
+          String.valueOf(obj.getProperty("id")) == null || 
+          SafetyUtil.isEmpty(String.valueOf(capableObj.getDaoKey()))
+        ){
+          logger.error("Missing id and/or daoKey from Capable object");
+          throw new RuntimeException("Missing id and/or daoKey from Capable object");
+        }
+
+
         agency.submit(x, new ContextAwareAgent() {
           
           @Override
           public void execute(X x) {
             for ( CapablePayload capablePayload : capableObj.getCapablePayloads() ){
-
-              if ( 
-                capablePayload.getObjId() == null || 
-                SafetyUtil.isEmpty(String.valueOf(capablePayload.getObjId()))
-              ){
-                capablePayload.setObjId(obj.getProperty("id"));
-                capablePayload.setHasSafeStatus(true);
-              }
 
               DAO capabilityDAO = (DAO) x.get("capabilityDAO");
               Capability capability = (Capability) capabilityDAO.find(capablePayload.getCapability());
@@ -111,9 +112,9 @@ foam.CLASS({
               Operations operation = Operations.CREATE;
 
               String hashedId = new StringBuilder("d")
-                .append(capablePayload.getDaoKey())
+                .append(capableObj.getDaoKey())
                 .append(":o")
-                .append(String.valueOf(capablePayload.getObjId()))
+                .append(String.valueOf(obj.getProperty("id")))
                 .append(":c")
                 .append(capability.getId())
                 .toString();
@@ -138,10 +139,10 @@ foam.CLASS({
 
                 Approvable approvable = (Approvable) approvableDAO.put_(getX(), new Approvable.Builder(getX())
                   .setLookupId(hashedId)
-                  .setDaoKey(capablePayload.getDaoKey())
-                  .setServerDaoKey(capablePayload.getDaoKey())
+                  .setDaoKey(capableObj.getDaoKey())
+                  .setServerDaoKey(capableObj.getDaoKey())
                   .setStatus(ApprovalStatus.REQUESTED)
-                  .setObjId(capablePayload.getObjId())
+                  .setObjId(String.valueOf(obj.getProperty("id")))
                   .setOperation(operation)
                   .setOf(capablePayload.getClassInfo())
                   .setIsUsingNestedJournal(true)
@@ -158,7 +159,7 @@ foam.CLASS({
                     " for " + 
                     obj.getClassInfo().getObjClass().getSimpleName() + 
                     " - id:" + 
-                    capablePayload.getObjId()
+                    String.valueOf(obj.getProperty("id"))
                   )
                   .setStatus(ApprovalStatus.REQUESTED).build();
                 

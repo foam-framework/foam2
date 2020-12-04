@@ -246,6 +246,21 @@ foam.INTERFACE({
           type: 'String[]'
         }
       ]
+    },
+    {
+      name: 'getDaoKey',
+      type: 'String',
+      flags: ['java']
+    },
+    {
+      name: 'setDaoKey',
+      flags: ['java'],
+      args: [
+        {
+          name: 'daokey',
+          type: 'String'
+        }
+      ]
     }
   ],
 });

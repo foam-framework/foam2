@@ -50,18 +50,26 @@ foam.CLASS({
         // CapablePayload.objId fields since they don't get filled out by client
         if ( currentObjectInDao == null ) {
           for (int i = 0; i < toPutCapablePayloadArray.length; i++){
+
+            toPutCapableObj.setDaoKey(getDaoKey());
         
             CapablePayload currentCapablePayload = toPutCapablePayloadArray[i];
 
             if ( ! currentCapablePayload.getHasSafeStatus() ){
               currentCapablePayload.setStatus(getDefaultStatus());
             }
-
-            currentCapablePayload.setDaoKey(getDaoKey());
-            currentCapablePayload.setObjId(obj.getProperty("id"));
           }          
         } else {
           Capable storedCapableObj = (Capable) currentObjectInDao;
+
+          toPutCapableObj.setDaoKey(storedCapableObj.getDaoKey());
+          
+          // should always be sync'd with whatever is on the backend
+          if ( 
+            SafetyUtil.isEmpty(String.valueOf(storedCapableObj.getDaoKey())) 
+          ) {
+            toPutCapableObj.setDaoKey(getDaoKey());
+          }
 
           DAO storedCapablePayloadDAO = storedCapableObj.getCapablePayloadDAO(x);
 
@@ -77,23 +85,7 @@ foam.CLASS({
 
               if ( storedCapablePayload != null ){
                 toPutCapablePayload.setStatus(storedCapablePayload.getStatus());
-                toPutCapablePayload.setDaoKey(storedCapablePayload.getDaoKey());
-                toPutCapablePayload.setObjId(storedCapablePayload.getObjId());
               }
-            }
-
-            if ( 
-              toPutCapablePayload.getDaoKey() == null || 
-              SafetyUtil.isEmpty(toPutCapablePayload.getDaoKey()) 
-            ) {
-              toPutCapablePayload.setDaoKey(getDaoKey());
-            }
-
-            if ( 
-              toPutCapablePayload.getObjId() == null || 
-              SafetyUtil.isEmpty(String.valueOf(toPutCapablePayload.getObjId())) 
-            ) {
-              toPutCapablePayload.setObjId(obj.getProperty("id"));
             }
           }
         }

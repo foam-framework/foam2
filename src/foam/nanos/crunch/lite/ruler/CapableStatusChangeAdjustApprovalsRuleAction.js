@@ -121,9 +121,9 @@ foam.CLASS({
               Capability capability = (Capability) capabilityDAO.find(capablePayload.getCapability());
 
               String hashedId = new StringBuilder("d")
-                .append(capablePayload.getDaoKey())
+                .append(capableNewObj.getDaoKey())
                 .append(":o")
-                .append(String.valueOf(capablePayload.getObjId()))
+                .append(String.valueOf(obj.getProperty("id")))
                 .append(":c")
                 .append(capability.getId())
                 .toString();

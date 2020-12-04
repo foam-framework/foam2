@@ -29,15 +29,6 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'String',
-      name: 'daoKey'
-    },
-    {
-      class: 'Object',
-      javaType: 'Object',
-      name: 'objId',
-    },
-    {
       class: 'Reference',
       name: 'capability',
       of: 'foam.nanos.crunch.Capability'
@@ -118,7 +109,8 @@ foam.CLASS({
     {
       name: 'toSummary',
       code: function(){
-        return `${this.daoKey}:${this.objId} - ${this.capability}`
+        // TODO: need to update this;
+        return `${this.capability}`
       }
     }
   ],
