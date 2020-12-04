@@ -284,7 +284,6 @@ foam.CLASS({
     function removeFile(atIndex) {
       var files = Array.from(this.files);
       files.splice(atIndex, 1);
-      debugger;
       if ( this.selected === files.length )
               this.selected = files.length - 1;
       this.files = files;
