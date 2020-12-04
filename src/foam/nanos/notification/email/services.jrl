@@ -1,4 +1,4 @@
-p({"class":"foam.nanos.boot.NSpec", "name":"localEmailTemplateDAO",                 "lazy":false,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setOf(foam.nanos.notification.email.EmailTemplate.getOwnClassInfo()).setAuthorize(false).setPm(true).setPipelinePm(true).setSeqNo(true).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"emailTemplates\").build();"})
+p({"class":"foam.nanos.boot.NSpec", "name":"localEmailTemplateDAO",                 "lazy":false,  "serviceScript":"return new foam.dao.EasyDAO.Builder(x).setOf(foam.nanos.notification.email.EmailTemplate.getOwnClassInfo()).setAuthorize(false).setPm(true).setPipelinePm(true).setJournalType(foam.dao.JournalType.SINGLE_JOURNAL).setJournalName(\"emailTemplates\").build();"})
 
 p({
   "class":"foam.nanos.boot.NSpec",
