@@ -13,6 +13,7 @@ foam.CLASS({
     ^ {
       background-color: #ffffff;
       border: solid 1px #e7eaec;
+      border-radius: 6px;
       box-shadow: 0px 1px 3px 0px #E7E7E7;
       -webkit-box-shadow: 0px 1px 3px 0px #E7E7E7;
       -moz-box-shadow: 0px 1px 3px 0px #E7E7E7;
