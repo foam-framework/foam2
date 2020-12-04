@@ -13,6 +13,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
+    'foam.i18n.TranslationService',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
     'foam.nanos.notification.email.DAOResourceLoader',
@@ -51,9 +52,6 @@ foam.CLASS({
         { name: 'x', javaType: 'foam.core.X' }
       ],
       javaCode: `
-        String             message          = this.EMAIL_VERIFIED_SUCCESS;
-        PrintWriter        out              = x.get(PrintWriter.class);
-    
         DAO                userDAO          = (DAO) x.get("localUserDAO");
         EmailTokenService  emailToken       = (EmailTokenService) x.get("emailToken");
     
@@ -65,17 +63,27 @@ foam.CLASS({
         String             redirect         = request.getParameter("redirect");
         User               user             = (User) userDAO.find(Long.valueOf(userId));
 
+        TranslationService ts = (TranslationService) x.get("translationService");
+        String local = user.getLanguage().getCode().toString();
+        String translatedMsg = "";
+
+        String             message          = ts.getTranslation(local, getClassInfo().getId()+ ".EMAIL_VERIFIED_SUCCESS", this.EMAIL_VERIFIED_SUCCESS);
+        PrintWriter        out              = x.get(PrintWriter.class);
+
         try {
           if ( token == null || "".equals(token) ) {
-            throw new Exception(this.TOKEN_NOT_FOUND);
+            translatedMsg = ts.getTranslation(local, getClassInfo().getId()+ ".TOKEN_NOT_FOUND", this.TOKEN_NOT_FOUND);
+            throw new Exception(translatedMsg);
           }
     
           if ( "".equals(userId) || ! StringUtils.isNumeric(userId) ) {
-            throw new Exception(this.USER_NOT_FOUND);
+            translatedMsg = ts.getTranslation(local, getClassInfo().getId()+ ".USER_NOT_FOUND", this.USER_NOT_FOUND);
+            throw new Exception(translatedMsg);
           }
     
           if ( user.getEmailVerified() ) {
-            throw new Exception(this.EMAIL_ALREADY_VERIFIED);
+            translatedMsg = ts.getTranslation(local, getClassInfo().getId()+ ".EMAIL_ALREADY_VERIFIED", this.EMAIL_ALREADY_VERIFIED);
+            throw new Exception(translatedMsg);
           }
           user = (User) user.fclone();
           emailToken.processToken(x, user, token);
@@ -83,7 +91,8 @@ foam.CLASS({
           String msg = t.getMessage();
           ((Logger) x.get("logger")).error(msg);
           t.printStackTrace();
-          message = this.EMAIL_VERIFIED_ERROR + "<br>" + msg;
+          translatedMsg = ts.getTranslation(local, getClassInfo().getId()+ ".EMAIL_VERIFIED_ERROR", this.EMAIL_VERIFIED_ERROR);
+          message = translatedMsg + "<br>" + msg;
         } finally {
           if ( getConfig() == null ) {
             setConfig(EnvironmentConfigurationBuilder
