@@ -42,17 +42,25 @@ foam.CLASS({
               EQ(UserCapabilityJunction.TARGET_ID, ucj.getTargetId())
             ));
 
-            boolean isInvalidate = ucj.getStatus() != CapabilityJunctionStatus.GRANTED || 
-              ( ucj.getStatus() == CapabilityJunctionStatus.APPROVED && (
-                 old.getStatus() != CapabilityJunctionStatus.APPROVED ||
-                 old.getStatus() != CapabilityJunctionStatus.GRANTED ) );
+            // boolean isInvalidate = ucj.getStatus() != old.getStatus() && ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED ||
+            //   ( ucj.getStatus() == CapabilityJunctionStatus.APPROVED && (
+            //     old.getStatus() != CapabilityJunctionStatus.APPROVED ||
+            //     old.getStatus() != CapabilityJunctionStatus.GRANTED ) ) );
             
             Long effectiveUserId = ( ucj instanceof AgentCapabilityJunction ) ? ((AgentCapabilityJunction) ucj).getEffectiveUser() : null;
             DAO filteredUserCapabilityJunctionDAO = (DAO) userCapabilityJunctionDAO
               .where(OR(
                 EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
+                // TODO: is it really a good idea to update capabilities of a
+                //   business when a user's business-associated capability has
+                //   a change in status?
                 EQ(UserCapabilityJunction.SOURCE_ID, effectiveUserId),
-                EQ(AgentCapabilityJunction.EFFECTIVE_USER, effectiveUserId)
+                EQ(AgentCapabilityJunction.EFFECTIVE_USER, ucj.getSourceId()),
+                // TODO: consider this new (commented) code for not being commented
+                // AND(
+                  EQ(AgentCapabilityJunction.EFFECTIVE_USER, effectiveUserId)
+                  // EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId())
+                // )
               ));
             DAO filteredPrerequisiteCapabilityJunctionDAO = (DAO) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
               .where(EQ(CapabilityCapabilityJunction.TARGET_ID, ucj.getTargetId()));
@@ -91,7 +99,6 @@ foam.CLASS({
             Capability dependent = null;
             for ( UserCapabilityJunction ucjToReput : ucjsToReput ) {
               dependent = (Capability) ucjToReput.findTargetId(x);
-              if ( isInvalidate ) ucjToReput.setStatus(dependent.getPrereqChainedStatus(x, ucjToReput, ucj));
               if ( ucjToReput.getStatus() == CapabilityJunctionStatus.GRANTED ) {
                 if ( ucj.getIsInGracePeriod() ) ucjToReput.setIsInGracePeriod(true);
                 if ( ucj.getIsRenewable() ) ucjToReput.setIsRenewable(true);

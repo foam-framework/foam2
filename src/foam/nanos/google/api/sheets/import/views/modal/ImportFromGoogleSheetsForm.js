@@ -8,9 +8,13 @@
   package: 'foam.nanos.google.api.sheets',
   name: 'ImportFromGoogleSheetsForm',
   extends: 'net.nanopay.ui.wizardModal.WizardModal',
+
+  imports: [
+    'config'
+  ],
+
   exports: [
-    'importConfig',
-    'importServiceName'
+    'importConfig'
   ],
   css: `
     ^ {
@@ -27,11 +31,6 @@
       expression: function(of, dao) {
         return foam.nanos.google.api.sheets.GoogleSheetsImportConfig.create({importClassInfo: of, DAO: dao.includes('/') ? dao.split('/')[1] : dao });
       }
-    },
-    {
-      name: 'importServiceName',
-      class: 'String',
-      value: 'googleSheetsDataImport'
     },
     'of',
     'dao'
