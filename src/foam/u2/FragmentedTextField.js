@@ -21,8 +21,6 @@ foam.CLASS({
     ^symbol {
       display: flex;
       align-items: center;
-      background: /*%GREY5%*/ #f5f7fa;
-      border: 1px solid /*%GREY3%*/ #cbcfd4;
       margin-left: -1px;
       margin-right: -1px;
       line-height: 100%;
