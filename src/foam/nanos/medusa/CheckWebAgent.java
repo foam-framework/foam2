@@ -28,11 +28,11 @@ public class CheckWebAgent
 
     ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
     ElectoralService electoral = (ElectoralService) x.get("electoralService");
-2
+
     if ( support != null ) {
       ClusterConfig config = support.getConfig(x, support.getConfigId());
       if ( config.getStatus() != Status.ONLINE ||
-           electoral.getStatus() != ElectoralServiceStatus.IN_SESSION ) {
+           electoral.getState() != ElectoralServiceState.IN_SESSION ) {
         response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
         out.println("maint\n");
         return;
