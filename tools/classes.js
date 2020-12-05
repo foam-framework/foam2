@@ -509,6 +509,7 @@ var classes = [
   'foam.nanos.demo.relationship.CourseType',
   'foam.nanos.demo.relationship.StudentCourseJunction',
   'foam.nanos.fs.File',
+  'foam.nanos.fs.FileDataDAO',
   'foam.nanos.fs.FileType',
   'foam.nanos.fs.SupportFileTypeDAO',
   'foam.crypto.hash.Hasher',
