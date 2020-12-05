@@ -13,8 +13,10 @@ foam.CLASS({
     ^ {
       background-color: #ffffff;
       border: solid 1px #e7eaec;
-      box-shadow: 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12), 0 2px 4px -1px rgba(0,0,0,0.20);
-      padding: 6px;
+      border-radius: 6px;
+      box-shadow: 0px 1px 3px 0px #E7E7E7;
+      -webkit-box-shadow: 0px 1px 3px 0px #E7E7E7;
+      -moz-box-shadow: 0px 1px 3px 0px #E7E7E7;
     }
   `,
 
