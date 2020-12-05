@@ -43,21 +43,21 @@ foam.CLASS({
 
             // Runtime Journal
             if ( cluster ) {
+              setJournal(new NullJournal.Builder(x).build());
+            } else {
               if ( "ro".equals(System.getProperty("FS")) ) {
-                setJournal(new NullJournal.Builder(x).build());
-              } else {
-                setJournal(new WriteOnlyF3FileJournal.Builder(x)
+                setJournal(new ReadOnlyF3FileJournal.Builder(x)
                   .setFilename(filename)
                   .setCreateFile(true)
                   .setDao(delegate)
                   .build());
+              } else {
+                setJournal(new F3FileJournal.Builder(x)
+                  .setDao(delegate)
+                  .setFilename(filename)
+                  .setCreateFile(false)
+                  .build());
               }
-            } else {
-              setJournal(new F3FileJournal.Builder(x)
-                .setDao(delegate)
-                .setFilename(filename)
-                .setCreateFile(false)
-                .build());
             }
 
             /* Create a composite journal of repo journal and runtime journal
