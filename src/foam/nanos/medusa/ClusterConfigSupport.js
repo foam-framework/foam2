@@ -196,42 +196,39 @@ configuration for contacting the primary node.`,
       `
     },
     {
-      documentation: 'Enabled and Online nodes in each bucket to achieve quorum',
+      // NOTE: replace all the quorum logic with a plug in quorum strategy
+      documentation: 'Enabled and Online nodes to achieve quorum. Entries are written out one to each bucket, so quorum requires a reply from at least x buckets.',
       name: 'nodeQuorum',
       class: 'Int',
       javaFactory: `
-      ClusterConfig config = getConfig(getX(), getConfigId());
-      Count count = (Count) ((DAO) getX().get("localClusterConfigDAO"))
-        .where(
-          AND(
-            EQ(ClusterConfig.ZONE, 0L),
-            EQ(ClusterConfig.REALM, config.getRealm()),
-            EQ(ClusterConfig.REGION, config.getRegion()),
-            EQ(ClusterConfig.TYPE, MedusaType.NODE),
-            EQ(ClusterConfig.ENABLED, true),
-            EQ(ClusterConfig.ACCESS_MODE, AccessMode.RW)
-          ))
-        .select(COUNT());
-      long c = count.getValue();
-      if ( c < 4 ) {
+      return (int) Math.floor(getNodeGroups() / 2) + 1;
+      `
+    },
+    {
+      name: 'nodeGroups',
+      class: 'Int',
+      javaFactory: `
+      int c = getNodeCount();
+
+      if ( c < 2 ) {
         return 1;
       }
-      if ( c < 7 ) {
+      if ( c < 6 ) {
         return 2;
       }
-      if ( c < 10 ) {
+      if ( c < 12 ) {
         return 3;
       }
-      if ( c < 15 ) {
+      if ( c < 20 ) {
         return 4;
       }
       return 5;
       `
     },
     {
-      documentation: 'Additional node redundancy in each bucket.',
-      name: 'nodeRedundancy',
+      name: 'nodeCount',
       class: 'Int',
+      visibility: 'RO',
       javaFactory: `
       ClusterConfig config = getConfig(getX(), getConfigId());
       Count count = (Count) ((DAO) getX().get("localClusterConfigDAO"))
@@ -245,38 +242,7 @@ configuration for contacting the primary node.`,
             EQ(ClusterConfig.ACCESS_MODE, AccessMode.RW)
           ))
         .select(COUNT());
-      long c = count.getValue();
-      if ( c < 2 ) {
-        return 0;
-      }
-      return 1;
-      `
-    },
-    {
-      name: 'nodeGroups',
-      class: 'Int',
-      expression: function(nodeQuorum, nodeRedundancy) {
-        return this.nodeCount / (nodeQuorum + nodeRedundancy);
-      },
-      javaFactory: `
-      return (int) Math.max(1, Math.floor(getNodeCount() / (getNodeQuorum() + Math.max(1, getNodeRedundancy()))));
-      `
-    },
-    {
-      documentation: 'see ClusterConfigSupportDAO',
-      name: 'nodeCount',
-      class: 'Int',
-      visibility: 'RO',
-      javaFactory: `
-      Count count = (Count) ((DAO) getX().get("localClusterConfigDAO"))
-        .where(
-          AND(
-            EQ(ClusterConfig.ZONE, 0),
-            EQ(ClusterConfig.TYPE, MedusaType.NODE),
-            EQ(ClusterConfig.ENABLED, true)
-          ))
-        .select(COUNT());
-      return ((Long)count.getValue()).intValue();
+      return (int) count.getValue();
       `
     },
     {
@@ -288,34 +254,32 @@ configuration for contacting the primary node.`,
       visibility: 'RO'
     },
     {
-      documentation: 'Are at least half+1 of the expected nodes online?',
+      documentation: 'Are sufficient nodes enabled and online? Require a quorum count of buckets and a quorum count of nodes in each bucket',
       name: 'hasNodeQuorum',
       class: 'Boolean',
       visibility: 'RO',
       javaFactory: `
-      int quorumCount = getNodeQuorum();
+      int minNodesInBucket = (int) Math.max(1, Math.floor(getNodeCount() / getNodeGroups()) - 1);
+
       Map buckets = getNodeBuckets();
-      if ( buckets.size() < getNodeGroups() ) {
-        getLogger().warning("hasNodeQuorum", "false", "insufficient buckets", buckets.size(), "threshold", getNodeGroups());
+      if ( buckets.size() < getNodeQuorum() ) {
+        getLogger().warning("hasNodeQuorum", "false", "insufficient buckets", buckets.size(), "threshold", getNodeQuorum());
         outputBuckets(getX());
         return false;
       }
       for ( int i = 0; i < buckets.size(); i++ ) {
         List bucket = (List) buckets.get(i);
-        if ( bucket.size() < quorumCount ) {
-          getLogger().warning("hasNodeQuorum", "false", "insufficient nodes in bucket", "buckets", bucket.size(), "threshold", quorumCount);
-          outputBuckets(getX());
-          return false;
-        }
-        int count = 0;
+
+        // Need at least minNodesInBucket in ONLINE state for Quorum.
+        int online = 0;
         for ( int j = 0; j < bucket.size(); j++ ) {
           ClusterConfig config = getConfig(getX(), (String) bucket.get(j));
           if ( config.getStatus() == Status.ONLINE ) {
-            count += 1;
+            online += 1;
           }
         }
-        if ( count < quorumCount ) {
-           getLogger().warning("hasNodeQuorum", "false", "insufficient ONLINE nodes in bucket", "bucket", i, "count", count, "threshold", quorumCount);
+        if ( online < minNodesInBucket ) {
+           getLogger().warning("hasNodeQuorum", "false", "insufficient ONLINE nodes in bucket", "bucket", i, "online", online, "threshold", minNodesInBucket);
           outputBuckets(getX());
           return false;
         }

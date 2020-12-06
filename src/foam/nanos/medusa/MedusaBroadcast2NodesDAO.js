@@ -66,15 +66,17 @@ foam.CLASS({
       final MedusaEntry entry = (MedusaEntry) obj;
       final ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       final ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
-
-      int groups = support.getNodeGroups();
-      Map buckets = support.getNodeBuckets();
-      int index = (int) (entry.getIndex() % groups);
-      List bucket = (List) buckets.get(index);
       Agency agency = (Agency) x.get("threadPool");
 
-      for ( int i = 0; i < bucket.size(); i++ ) {
-        ClusterConfig config = support.getConfig(x, (String) bucket.get(i));
+//      int groups = support.getNodeGroups();
+      Map buckets = support.getNodeBuckets();
+//      int index = (int) (entry.getIndex() % groups);
+//      List bucket = (List) buckets.get(index);
+
+      for ( int i = 0; i < buckets.size(); i++ ) {
+        List bucket = (List) buckets.get(i);
+        int index = (int) (entry.getIndex() % bucket.size());
+        ClusterConfig config = support.getConfig(x, (String) bucket.get(index));
         agency.submit(x, new ContextAgent() {
           public void execute(X x) {
             try {

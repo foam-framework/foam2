@@ -48,11 +48,9 @@ foam.CLASS({
         ClusterConfigSupport.NODE_COUNT.clear(support);
         ClusterConfigSupport.NODE_GROUPS.clear(support);
         ClusterConfigSupport.NODE_QUORUM.clear(support);
-        ClusterConfigSupport.NODE_REDUNDANCY.clear(support);
         ClusterConfigSupport.HAS_NODE_QUORUM.clear(support);
         ClusterConfigSupport.MEDIATOR_COUNT.clear(support);
         ClusterConfigSupport.HAS_MEDIATOR_QUORUM.clear(support);
-//        ClusterConfigSupport.HAS_QUORUM.clear(support);
         ClusterConfigSupport.STAND_ALONE.clear(support);
         ClusterConfigSupport.CLIENTS.clear(support);
         ClusterConfigSupport.BROADCAST_MEDIATORS.clear(support);
@@ -66,7 +64,6 @@ foam.CLASS({
                   nu.getType() == MedusaType.NODE &&
                   old.getAccessMode() != nu.getAccessMode() ) {
         ClusterConfigSupport.NODE_QUORUM.clear(support);
-        ClusterConfigSupport.NODE_REDUNDANCY.clear(support);
       }
 
       return nu;
