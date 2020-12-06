@@ -26,6 +26,7 @@ foam.CLASS({
     'foam.lib.json.JSONParser',
     'static foam.mlang.MLang.COUNT',
     'static foam.mlang.MLang.EQ',
+    'static foam.mlang.MLang.GT',
     'static foam.mlang.MLang.MAX',
     'static foam.mlang.MLang.OR',
     'foam.mlang.sink.Count',
@@ -319,7 +320,7 @@ foam.CLASS({
             } else {
               // If stalled on nextIndex and nextIndex + 1 exists and has conenssus, test if nextIndex exists in nodes, if not, skip.
               if ( nextIndex == replaying.getIndex() + 1 &&
-                   ( System.currentTimeMillis() - nextIndexSince ) > 60000 ) {
+                   ( System.currentTimeMillis() - nextIndexSince ) > 10000 ) {
                 gap(x, nextIndex);
                 nextIndexSince = System.currentTimeMillis();
               }
@@ -489,6 +490,9 @@ foam.CLASS({
       javaCode: `
 // TODO: another scenario - broadcast from primary - but primary dies before broadcasting to quorum of Nodes.  So only x of y nodes have copy.  The entry will not be promoted, and the system will effectively halt.   It is possible to recover from this scenario by deleting the x node entries.
 
+      // NOTE: use internalMedusaDAO, else we'll block on ReplayingDAO.
+      DAO dao = (DAO) x.get("internalMedusaDAO");
+
       PM pm = PM.create(x, this.getClass().getSimpleName(), "gap");
 
       try {
@@ -508,21 +512,31 @@ foam.CLASS({
             if ( nodeCount == 0L ) {
               getLogger().warning("gap", "found", index);
               Alarm alarm = new Alarm();
+              alarm.setClusterable(false);
               alarm.setName("Medusa Gap");
               alarm.setIsActive(true);
               alarm.setNote("Index: "+index+"\\n"+"Dependecies: UNKNOWN");
               alarm = (Alarm) ((DAO) x.get("alarmDAO")).put(alarm);
+              config.setErrorMessage("gap detected, investigating...");
+              ((DAO) x.get("clusterConfigDAO")).put(config);
 
               // Test for gap index dependencies - of course can only look
               // ahead as far as we have entries locally.
-              Count count = (Count) ((DAO) getX().get("localMedusaEntryDAO"))
+              // TODO: Combine these two counts into a sequence.
+              Count lookAhead = (Count) dao
+                .where(
+                    GT(MedusaEntry.INDEX, index)
+                  )
+                .select(COUNT());
+              Count dependencies = (Count) dao
                 .where(
                   OR(
                     EQ(MedusaEntry.INDEX1, index),
                     EQ(MedusaEntry.INDEX2, index)
                   ))
                 .select(COUNT());
-              if ( ((Long)count.getValue()).intValue() == 0 ) {
+              if ( ((Long)dependencies.getValue()).intValue() == 0 &&
+                   ((Long)lookAhead.getValue()).intValue() > 10 ) { // REVIEW: How far to look ahead?
                 // Recovery - set global index to the gap index. Then
                 // the promoter will look for the entry after the gap.
                 getLogger().info("gap", "recovery", index);
@@ -532,13 +546,16 @@ foam.CLASS({
                 alarm.setIsActive(false);
                 alarm.setNote("Index: "+index+"\\n"+"Dependecies: NO");
                 ((DAO) x.get("alarmDAO")).put(alarm);
-                // TODO: set ClusterConfig.errorMessage
+                config.setErrorMessage("");
+                ((DAO) x.get("clusterConfigDAO")).put(config);
               } else {
                 getLogger().error("gap", "dependencies", index);
                 alarm.setNote("Index: "+index+"\\n"+"Dependecies: YES");
                 alarm.setSeverity(foam.log.LogLevel.ERROR);
                 ((DAO) x.get("alarmDAO")).put(alarm);
-                throw new MedusaException("gap with dependencies detected");
+                config.setErrorMessage("gap with dependencies");
+                ((DAO) x.get("clusterConfigDAO")).put(config);
+                throw new MedusaException("gap with dependencies");
               }
             } else {
               getLogger().info("gap", "not-found", index);
