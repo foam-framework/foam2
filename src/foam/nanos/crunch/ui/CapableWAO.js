@@ -41,6 +41,9 @@ foam.CLASS({
       );
     },
     async function load(wizardlet) {
+      targetPayload = this.capable.getCapablePayloadDAO().find(
+        wizardlet.capability);
+      this.targetPayload = targetPayload;
       wizardlet.status = this.targetPayload.status;
 
       // No 'of'? No problem
