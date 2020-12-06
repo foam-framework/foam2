@@ -168,8 +168,10 @@ foam.CLASS({
         foam.assert(ids.length, 'Ids must contain at least one property.');
 
         // Don't build MultiPartID property if the id is not multi part.
-        if ( ids.length == 1 ) this.axioms_.push(foam.core.IDAlias.create({ propName: ids[0] }));
-        else this.axioms_.push(foam.core.MultiPartID.create({propNames: ids}));
+        if ( ids.length == 1 )
+          this.axioms_.push(foam.core.IDAlias.create({ propName: ids[0] }));
+        else
+          this.axioms_.push(foam.core.MultiPartID.create({propNames: ids}));
       }
     }
   ]

@@ -26,7 +26,8 @@ foam.CLASS({
     'summaryView? as importedSummaryView',
     'updateView? as importedUpdateView',
     'window',
-    'memento'
+    'memento',
+    'translationService'
   ],
 
   exports: [
@@ -156,12 +157,12 @@ foam.CLASS({
                 .translate(this.data.title, this.data.title)
               .end()
               .start()
-                .add(this.data.subtitle$)
+                .translate(this.data.subtitle, this.data.subtitle)
               .end()
             .end()
             .callIfElse(self.data.createLabel, function() {
               this.tag(self.data.primaryAction, {
-                label$: self.data.createLabel$,
+                label: self.translationService.getTranslation(foam.locale, `${self.parentNode.createControllerView.menu}.createLabel`, self.data.createLabel),
                 size: 'LARGE'
               });
             }, function() {

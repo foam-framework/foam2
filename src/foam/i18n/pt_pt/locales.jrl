@@ -299,3 +299,9 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.export.GoogleSheetsBa
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.notification.NotificationMessageModal.CREATED_MSG",target:"Criada"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.notification.NotificationMessageModal.MESSAGE_MSG",target:"Mensagem"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.notification.NotificationMessageModal.NATIFICATION_MSG",target:"Notificação"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.email.EmailVerificationWebAgent.EMAIL_VERIFIED_SUCCESS",target:"Seu e-mail foi verificado."})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.email.EmailVerificationWebAgent.EMAIL_VERIFIED_ERROR",target:"Ocorreu um problema ao verificar seu e-mail."})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.email.EmailVerificationWebAgent.USER_NOT_FOUND",target:"Usuário não encontrado."})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.email.EmailVerificationWebAgent.TOKEN_NOT_FOUND",target:"Token não encontrado."})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.email.EmailVerificationWebAgent.EMAIL_ALREADY_VERIFIED",target:"Email já verificado."})

@@ -43,7 +43,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'defaultSectionLabel',
-      value: 'Information'
+      value: 'Uncategorized'
     },
     'tabs'
   ],
@@ -68,9 +68,14 @@ foam.CLASS({
                 .start(self.Tabs, {}, self.tabs$)
                   .forEach(sections, function(s, i) {
                     if ( ! visibilities[i] ) return;
-
+                    var title$ = foam.Function.isInstance(s.title) ?
+                      foam.core.ExpressionSlot.create({
+                        obj: self.data,
+                        code: s.title
+                      }) :
+                      s.title$;
                     this
-                      .start(self.Tab, { label: s.title || self.defaultSectionLabel, selected: self.memento.paramsObj.selectedTab && self.memento.paramsObj.selectedTab === s.title })
+                      .start(self.Tab, { label$: title$ || self.defaultSectionLabel, selected: self.memento.paramsObj.selectedTab && self.memento.paramsObj.selectedTab === s.title })
                         .call(function() {
                           this.tag(self.SectionView, {
                             data$: self.data$,

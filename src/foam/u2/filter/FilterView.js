@@ -80,7 +80,7 @@ foam.CLASS({
       width: 100%;
       height: 34px;
       border-radius: 0 5px 5px 0;
-      border: 1px solid /*%GREY4%*/ #cbcfd4;
+      border: 1px solid /*%GREY4%*/ #e7eaec;
     }
 
     ^container-search .foam-u2-search-TextSearchView {

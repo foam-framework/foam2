@@ -21,8 +21,8 @@ foam.CLASS({
     ^symbol {
       display: flex;
       align-items: center;
-      background: %GREY5%;
-      border: 1px solid %GREY3%;
+      background: /*%GREY5%*/ #f5f7fa;
+      border: 1px solid /*%GREY3%*/ #cbcfd4;
       margin-left: -1px;
       margin-right: -1px;
       line-height: 100%;
@@ -41,6 +41,9 @@ foam.CLASS({
     ^ > *:last-child {
       border-top-left-radius: 0 !important;
       border-bottom-left-radius: 0 !important;
+    }
+    ^fragment {
+      text-align: center;
     }
   `,
 
@@ -84,6 +87,8 @@ foam.CLASS({
           e = e.view;
         }
         var u2Elem = this.start(e)
+          .style({ width: this.delegates[i].maxLength * 10 })
+          .addClass(this.myClass('fragment'))
         u2Elem.on('focus', () => {
           this.currentIndex = i;
         })

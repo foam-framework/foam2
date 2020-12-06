@@ -49,7 +49,13 @@ foam.CLASS({
           return EQ(old.getClassInfo().getAxiomByName(getPropName()), getPropValue()).f(old);
         }
         return false;
-      `
+      `,
+      code: function f(o) {
+        return this.Eq.create({
+          arg1: o.cls_.getAxiomByName(this.propName),
+          arg2: this.propValue
+        }).f(o);
+      }
     }
   ]
 });

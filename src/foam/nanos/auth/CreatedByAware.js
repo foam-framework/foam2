@@ -50,7 +50,8 @@ foam.CLASS({
       documentation: 'User who created the entry',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'userInformation'
+      section: 'userInformation',
+      gridColumns: 6
     },
     {
       class: 'Reference',
@@ -59,7 +60,8 @@ foam.CLASS({
       documentation: 'Agent acting as User who created the entry',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'userInformation'
+      section: 'userInformation',
+      gridColumns: 6
     }
   ]
 });

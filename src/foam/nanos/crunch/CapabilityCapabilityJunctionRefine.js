@@ -39,6 +39,16 @@ foam.CLASS({
             this.add(value);
           });
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'precondition',
+      documentation: `
+        This property applies to prerequisite capability junctions.
+
+        If a prerequisite is considered a "precondition", it must be granted
+        before the corresponding dependant is shown in the capability store.
+      `
     }
   ]
 });
