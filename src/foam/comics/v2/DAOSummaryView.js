@@ -113,7 +113,14 @@ foam.CLASS({
         return () => this.stack.back();
       }
     },
-    'currentMemento'
+    'currentMemento',
+    {
+      class: 'String',
+      name: 'mementoHead',
+      factory: function() {
+        return this.id;
+      }
+    }
   ],
 
   actions: [

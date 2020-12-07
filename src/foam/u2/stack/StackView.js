@@ -77,6 +77,11 @@ foam.CLASS({
           }
         }
 
+        //on stack push
+        // if ( v.mementoHead ) {
+        //   var currMemento = findCurrentMemento();
+        //   currMemento.tail = this.Memento.create({ head: v.mementoHead });
+        // }
         return foam.u2.ViewSpec.createView(view, null, this, X);
 
       }, this.data$.dot('top')));
