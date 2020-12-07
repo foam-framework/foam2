@@ -281,6 +281,7 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var isID = false;
 
+      // sourceCls_ isn't set for Proxy delegate properties
       if ( this.sourceCls_ ) {
         if ( this.sourceCls_.model_.ids ) {
           var ids = this.sourceCls_.model_.ids;

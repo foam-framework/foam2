@@ -26,7 +26,8 @@ foam.CLASS({
 
   exports: [
     'allowRemoval',
-    'removeFile'
+    'removeFile',
+    'highlight'
   ],
 
   css: `
@@ -131,6 +132,9 @@ foam.CLASS({
     {
       name: 'onFilesChanged',
       documentation: 'When a file has been selected/changed/removed, this function will be called. (OPTIONAL)'
+    },
+    {
+      name: 'selected'
     }
   ],
 
@@ -173,6 +177,7 @@ foam.CLASS({
             e.tag({
               class: 'foam.nanos.fs.fileDropZone.FileCard',
               data: files[i],
+              selected: this.selected,
               index: i
             });
           }
@@ -268,6 +273,7 @@ foam.CLASS({
           });
         }
       }
+      this.selected = this.files.length - 1;
       this.files = Array.from(this.files);
     },
 
@@ -278,8 +284,16 @@ foam.CLASS({
     function removeFile(atIndex) {
       var files = Array.from(this.files);
       files.splice(atIndex, 1);
+      if ( this.selected === files.length )
+              this.selected = files.length - 1;
       this.files = files;
       this.document.querySelector('.' + this.instanceClass(`input`)).value = null;
+
+    },
+
+    function highlight(atIndex) {
+      this.selected = atIndex;
+      this.files = this.files;
     }
   ],
 
