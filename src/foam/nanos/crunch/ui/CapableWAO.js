@@ -16,44 +16,36 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.nanos.crunch.lite.CapablePayload',
     'foam.nanos.crunch.ui.CapabilityWizardlet'
-  ],
-
-  properties: [
-    {
-      name: 'targetPayload',
-      class: 'FObjectProperty',
-      of: 'foam.nanos.crunch.lite.CapablePayload'
-    },
   ],
 
   methods: [
     async function save(wizardlet) {
       if ( wizardlet.isAvailable ){
         return this.capable.getCapablePayloadDAO().put(
-          this.targetPayload
+          this.makePayload(wizardlet)
         );
       }
     },
     async function cancel(wizardlet) {
       return this.capable.getCapablePayloadDAO().remove(
-        this.targetPayload
+        this.makePayload(wizardlet)
       );
     },
     async function load(wizardlet) {
-      targetPayload = this.capable.getCapablePayloadDAO().find(
-        wizardlet.capability);
-      this.targetPayload = targetPayload;
-      wizardlet.status = this.targetPayload.status;
+      var targetPayload = await this.capable.getCapablePayloadDAO().find(
+        wizardlet.capability) || this.targetPayload;
+
+      if ( targetPayload ) wizardlet.status = targetPayload.status;
 
       // No 'of'? No problem
-      if ( ! wizardlet.of ) return wizardlet;
+      if ( ! wizardlet.of ) return;
 
       // Load CapablePayload data to wizardlet
       var loadedData = wizardlet.of.create({}, wizardlet);
-      if ( this.targetPayload.data ) {
-        loadedData.copyFrom(this.targetPayload.data);
-      }
+      if ( targetPayload && targetPayload.data )
+        loadedData.copyFrom(targetPayload.data);
 
       // Set transient 'capability' property if it exists
       var prop = wizardlet.of.getAxiomByName('capability');
@@ -61,7 +53,12 @@ foam.CLASS({
 
       // Finally, apply new data to wizardlet
       wizardlet.data = loadedData;
-      return;
+    },
+    function makePayload(wizardlet) {
+      return this.CapablePayload.create({
+        capability: wizardlet.capability,
+        data: wizardlet.data
+      });
     }
   ]
 });

@@ -85,7 +85,7 @@ foam.CLASS({
       name: 'createWizardSequence',
       documentation: `
         Create the default wizard sequence for the specified capability in
-        association with the user. The wizard can be 
+        association with the user. The wizard can be
       `,
       code: function createWizardSequence(capabilityOrId, x) {
         if ( ! x ) x = this.__subContext__;
@@ -115,7 +115,7 @@ foam.CLASS({
       documentation: `
         Create the default wizard sequence for the specified Capable object
         intercept.
-        
+
         A Capable object intercept occurs when the server replies with an object
         implementing Capable. These objects can have data requirements in the
         form of capabilities that are stored object-locally rather than in
@@ -124,9 +124,13 @@ foam.CLASS({
       code: function createCapableWizardSequence(intercept, capable) {
         return this.Sequence.create(null, this.__subContext__.createSubContext({
           intercept: intercept,
-          capable: capable
+          capable: capable,
+          // TODO: support multiple capability IDs by invoking multiple wizards
+          rootCapability: capable.capabilityIds[0],
         }))
           .add(this.ConfigureFlowAgent)
+          .add(this.CapabilityAdaptAgent)
+          .add(this.LoadCapabilitiesAgent)
           .add(this.CapableDefaultConfigAgent)
           .add(this.CapableCreateWizardletsAgent)
           .add(this.LoadWizardletsAgent)
@@ -173,7 +177,7 @@ foam.CLASS({
           return x;
         });
       }
-      
+
       p = p.then(x => {
         var isCompleted = x.submitted || x.cancelled;
 
@@ -191,6 +195,7 @@ foam.CLASS({
       })
 
       p.catch(err => {
+        console.error(err); // do not remove
         intercept.reject(err.data);
       })
 

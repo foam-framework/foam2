@@ -14,6 +14,7 @@ foam.CLASS({
 
   imports: [
     'capable',
+    'capabilities',
     'capabilityDAO',
     'crunchService'
   ],
@@ -25,6 +26,7 @@ foam.CLASS({
   requires: [
     'foam.nanos.crunch.MinMaxCapability',
     'foam.nanos.crunch.ui.CapableWAO',
+    'foam.nanos.crunch.ui.PrerequisiteAwareWizardlet',
     'foam.nanos.crunch.CrunchService'
   ],
 
@@ -38,6 +40,9 @@ foam.CLASS({
 
   methods: [
     async function execute() {
+      var wizardlets = await this.parseArrayToWizardlets(this.capabilities);
+      this.wizardlets = wizardlets;
+      return;
       var capable = this.capable;
       var capablePayloads = await this.crunchService.getCapableObjectPayloads(null, this.capable.capabilityIds)
       var wizardletsTuple = await this.createWizardletsFromPayloads(capablePayloads);
@@ -47,6 +52,61 @@ foam.CLASS({
       this.wizardlets = wizardletsTuple.allDescendantWizardlets;
       console.log('CAPABLE', capable);
       console.log('WIZARDLETS', this.wizardlets);
+    },
+    async function parseArrayToWizardlets(array, parent) {
+      var capabilityDesired = array[array.length - 1];
+      var capabilityPrereqs = array.slice(0, array.length - 1);
+      var wizardlets = [];
+
+      var rootWizardlet = this.getWizardlet(capabilityDesired);
+      var beforeWizardlet = this.getWizardlet(capabilityDesired, true);
+
+      if ( beforeWizardlet )
+        beforeWizardlet.isAvailable$.follow(rootWizardlet.isAvailable$);
+
+      var addPrerequisite = (wizardlet) => {
+        var defaultPrerequisiteHandling = true;
+
+        if ( this.isPrerequisiteAware(rootWizardlet) ) {
+          rootWizardlet.addPrerequisite(wizardlet);
+          defaultPrerequisiteHandling = false;
+        }
+
+        if ( beforeWizardlet && this.isPrerequisiteAware(beforeWizardlet) ) {
+          beforeWizardlet.addPrerequisite(wizardlet);
+          defaultPrerequisiteHandling = false;
+        }
+
+        if ( defaultPrerequisiteHandling )
+          wizardlet.isAvailable$.follow(rootWizardlet.isAvailable$);
+      }
+
+      for ( let capability of capabilityPrereqs ) {
+        if ( Array.isArray(capability) ) {
+          let subWizardlets = await this.parseArrayToWizardlets(capability);
+          addPrerequisite(subWizardlets[subWizardlets.length - 1]);
+          wizardlets.push(...subWizardlets);
+          continue;
+        }
+        let wizardlet = this.getWizardlet(capability);
+        addPrerequisite(wizardlet);
+        wizardlets.push(wizardlet);
+      }
+
+      if ( beforeWizardlet ) wizardlets.unshift(beforeWizardlet);
+      wizardlets.push(rootWizardlet);
+      return wizardlets;
+    },
+    function getWizardlet(capability, isBefore) {
+        let wizardlet = capability[isBefore ? 'beforeWizardlet' : 'wizardlet'];
+        return wizardlet && wizardlet.clone().copyFrom({
+          capability: capability,
+          dataController: this.CapableWAO.create(
+          {}, this.__context__)
+        }, this.__subContext__);
+    },
+    function isPrerequisiteAware(wizardlet) {
+      return this.PrerequisiteAwareWizardlet.isInstance(wizardlet);
     },
     async function createWizardletsFromPayloads(payloads) {
       var newWizardlets = [];
@@ -67,7 +127,7 @@ foam.CLASS({
           // MinMax wizardlets appear before their prerequisites
           newWizardlets.push(wizardlet);
           childWizardlets.push(wizardlet);
-          
+
           let minMaxPrereqWizardlets =
             await this.createWizardletsFromPayloads(capablePayload.prerequisites);
 
