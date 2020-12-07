@@ -845,6 +845,11 @@ p({
         )
       )
       .setIndex(new foam.core.PropertyInfo[] {foam.nanos.approval.ApprovalRequest.CREATED})
+      .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
+        .setPredicate(foam.mlang.MLang.NEQ(foam.nanos.approval.ApprovalRequest.STATUS, foam.nanos.approval.ApprovalStatus.REQUESTED))
+        .setComparator(foam.mlang.MLang.DESC(foam.nanos.approval.ApprovalRequest.CREATED))
+        .setSize(10000)
+        .build())
       .build()
       .orderBy(foam.mlang.MLang.DESC(foam.nanos.approval.ApprovalRequest.CREATED));
   """,
