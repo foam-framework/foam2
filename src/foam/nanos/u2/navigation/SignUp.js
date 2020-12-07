@@ -187,12 +187,12 @@ foam.CLASS({
     {
       name: 'defaultUserLanguage',
       code: function() {
-        let l = foam.locale.split("-")
-        let code = l[0]
-        let variant = l[1] || undefined
-        let language = foam.nanos.auth.Language.create({code: code})
-        if ( variant ) language.variant = variant
-        return language
+        let l = foam.locale.split("-");
+        let code = l[0];
+        let variant = l[1];
+        let language = foam.nanos.auth.Language.create({code: code});
+        if ( variant ) language.variant = variant;
+        return language;
       }
     }
   ],
