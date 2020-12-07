@@ -16,7 +16,8 @@ foam.CLASS({
     'capable',
     'capabilities',
     'capabilityDAO',
-    'crunchService'
+    'crunchService',
+    'getWAO' // Provided  by LoadCapabilitiesAgent
   ],
 
   exports: [
@@ -91,8 +92,7 @@ foam.CLASS({
         let wizardlet = capability[isBefore ? 'beforeWizardlet' : 'wizardlet'];
         return wizardlet && wizardlet.clone().copyFrom({
           capability: capability,
-          dataController: this.CapableWAO.create(
-          {}, this.__context__)
+          dataController: this.getWAO()
         }, this.__subContext__);
     },
     function isPrerequisiteAware(wizardlet) {
