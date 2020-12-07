@@ -60,7 +60,7 @@ foam.CLASS({
       `,
       code: async function (x, obj) {
         return this.ifFoundElseIfNotFound_(
-          obj,
+          obj.capability,
           (payloads, i) => { payloads[i] = obj; return obj; },
           (payloads) => { payloads.push(obj); }
         );
@@ -92,7 +92,7 @@ foam.CLASS({
       `,
       code: async function (x, obj) {
         return this.ifFoundElseIfNotFound_(
-          obj,
+          obj.capability,
           (payloads, i) => { payloads.splice(i, 1); return obj },
           (payloads) => obj
         );
@@ -116,7 +116,16 @@ foam.CLASS({
           }
         }
         return null;
-      `
+      `,
+      code: async function (x, obj) {
+        let capability = typeof obj == 'string'
+          ? obj : obj.capability ;
+        return this.ifFoundElseIfNotFound_(
+          capability,
+          (payloads, i) => { return payloads[i] },
+          (payloads) => null
+        );
+      }
     },
     {
       name: 'select_',
@@ -131,12 +140,12 @@ foam.CLASS({
     {
       name: 'ifFoundElseIfNotFound_',
       flags: ['web'],
-      code: function (payload, ifFound, ifNotFound) {
+      code: function (capability, ifFound, ifNotFound) {
         var found = false;
         var foundReturn = null;
         payloads = this.capable.capablePayloads;
         for ( var i = 0 ; i < payloads.length ; i++ ) {
-          if ( payload.capability == payloads[i].capability ) {
+          if ( capability == payloads[i].capability ) {
             foundReturn = ifFound(payloads, i);
             found = true;
           }
