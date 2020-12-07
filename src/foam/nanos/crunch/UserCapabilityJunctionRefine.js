@@ -49,13 +49,15 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'sourceId',
-      label: 'User'
+      label: 'User',
+      includeInDigest: true,
     },
     {
       class: 'Reference',
       of: 'foam.nanos.crunch.Capability',
       name: 'targetId',
       label: 'Capability',
+      includeInDigest: true,
       tableCellFormatter: function(value, obj, axiom) {
         this.__subSubContext__.capabilityDAO
           .find(value)
@@ -70,13 +72,15 @@ foam.CLASS({
       class: 'foam.core.FObjectProperty',
       of: 'foam.core.FObject',
       documentation: `data for capability.of`,
+      includeInDigest: true,
       view: { class: 'foam.u2.detail.VerticalDetailView' }
     },
     {
       name: 'status',
       class: 'Enum',
       of: 'foam.nanos.crunch.CapabilityJunctionStatus',
-      value: foam.nanos.crunch.CapabilityJunctionStatus.ACTION_REQUIRED
+      value: foam.nanos.crunch.CapabilityJunctionStatus.ACTION_REQUIRED,
+      includeInDigest: true,
     },
     {
       class: 'Reference',
@@ -85,15 +89,40 @@ foam.CLASS({
       documentation: `
         This property is helpful when it's necessary to know which real
         user last changed a capability of an effective user.
-      `
+      `,
+      includeInDigest: true,
     },
     // renewable
-    { name: 'isExpired', section: 'ucjExpirySection' },
-    { name: 'isRenewable', section: 'ucjExpirySection' },
-    { name: 'isInRenewablePeriod', section: 'ucjExpirySection' },
-    { name: 'isInGracePeriod', section: 'ucjExpirySection' },
-    { name: 'expiry', section: 'ucjExpirySection' },
-    { name: 'gracePeriod', section: 'ucjExpirySection' }
+    {
+      name: 'isExpired',
+      includeInDigest: true,
+      section: 'ucjExpirySection'
+    },
+    {
+      name: 'isRenewable',
+      includeInDigest: true,
+      section: 'ucjExpirySection'
+    },
+    {
+      name: 'isInRenewablePeriod',
+      includeInDigest: true,
+      section: 'ucjExpirySection'
+    },
+    {
+      name: 'isInGracePeriod',
+      includeInDigest: true,
+      section: 'ucjExpirySection'
+    },
+    {
+      name: 'expiry',
+      includeInDigest: true,
+      section: 'ucjExpirySection'
+    },
+    {
+      name: 'gracePeriod',
+      includeInDigest: true,
+      section: 'ucjExpirySection'
+    }
   ],
 
   methods: [

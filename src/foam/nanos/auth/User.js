@@ -177,48 +177,50 @@ foam.CLASS({
     {
       class: 'String',
       name: 'firstName',
-      includeInDigest: true,
       shortName: 'fn',
       documentation: 'The first name of the User.',
       gridColumns: 6,
       section: 'userInformation',
       order: 2,
-      includeInDigest: true
+      includeInDigest: true,
+      containsPII: true
    },
     {
       class: 'String',
       name: 'middleName',
-      includeInDigest: true,
       documentation: 'The middle name of the User.',
       gridColumns: 6,
       section: 'userInformation',
       order: 3,
-      includeInDigest: true
+      includeInDigest: true,
+      containsPII: true
     },
     {
       class: 'String',
       name: 'lastName',
-      includeInDigest: true,
       shortName: 'ln',
       documentation: 'The last name of the User.',
       gridColumns: 6,
       section: 'userInformation',
       order: 4,
-      includeInDigest: true
+      includeInDigest: true,
+      containsPII: true
     },
     {
       name: 'legalName',
-      includeInDigest: true,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       section: 'userInformation',
       order: 5,
-      gridColumns: 6
+      gridColumns: 6,
+      includeInDigest: false,
+      containsPII: true
     },
     {
       class: 'String',
       name: 'jobTitle',
       includeInDigest: false,
+      containsPII: false,
       documentation: 'The job title of the individual person, or real user.',
       section: 'ownerInformation',
       gridColumns: 6,
@@ -241,6 +243,7 @@ foam.CLASS({
       class: 'String',
       name: 'organization',
       includeInDigest: false,
+      containsPII: false,
       documentation: 'The organization/business associated with the User.',
       displayWidth: 80,
       width: 100,
@@ -252,6 +255,7 @@ foam.CLASS({
       class: 'String',
       name: 'department',
       includeInDigest: false,
+      containsPII: false,
       documentation: `The department associated with the organization/business
         of the User.`,
       width: 50,
@@ -264,6 +268,7 @@ foam.CLASS({
       name: 'userName',
       label: 'Username',
       includeInDigest: true,
+      containsPII: false,
       documentation: 'The username of the User.',
       section: 'userInformation',
       order: 7,
@@ -277,6 +282,7 @@ foam.CLASS({
         'fr' :'Adresse e-mail'
       },
       includeInDigest: true,
+      containsPII: true,
       documentation: 'The email address of the User.',
       displayWidth: 80,
       width: 100,
@@ -300,7 +306,8 @@ foam.CLASS({
     {
       class: 'PhoneNumber',
       name: 'phoneNumber',
-      includeInDigest: true,
+      includeInDigest: false,
+      containsPII: true,
       documentation: 'Personal phone number.',
       section: 'userInformation',
       gridColumns: 6
@@ -317,7 +324,7 @@ foam.CLASS({
     {
       class: 'PhoneNumber',
       name: 'mobileNumber',
-      includeInDigest: true,
+      includeInDigest: false,
       documentation: 'Returns the mobile phone number of the User from the Phone model.',
       createVisibility: 'HIDDEN',
       section: 'userInformation',
@@ -354,6 +361,7 @@ foam.CLASS({
       class: 'Date',
       name: 'birthday',
       includeInDigest: false,
+      containsPII: false,
       documentation: 'The date of birth of the individual person, or real user.',
       section: 'userInformation',
       gridColumns: 6
@@ -362,6 +370,7 @@ foam.CLASS({
       class: 'foam.nanos.fs.FileProperty',
       name: 'profilePicture',
       includeInDigest: false,
+      containsPII: true,
       documentation: `The profile picture of the individual user, initially
         defaulting to a placeholder picture.`,
       view: {
@@ -374,6 +383,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Address',
       includeInDigest: false,
+      containsPII: true,
       name: 'address',
       documentation: 'Returns the postal address from the Address model.',
       factory: function() {
@@ -385,6 +395,7 @@ foam.CLASS({
       class: 'Reference',
       name: 'language',
       includeInDigest: false,
+      containsPII: false,
       documentation: 'The default language preferred by the User.',
       of: 'foam.nanos.auth.Language',
       createVisibility: 'HIDDEN',
@@ -436,8 +447,7 @@ foam.CLASS({
       documentation: 'The password that is currently active with the User.',
       hidden: true,
       networkTransient: true,
-      section: 'systemInformation',
-      includeInDigest: true
+      section: 'systemInformation'
     },
     {
       name: 'passwordHistory',
@@ -587,6 +597,7 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.ServiceProvider',
       name: 'spid',
+      includeInDigest: true,
       tableWidth: 120,
       section: 'systemInformation',
       order: 15,
