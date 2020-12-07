@@ -188,7 +188,11 @@
         }
       }
     },
-    'currentMemento'
+    'currentMemento',
+    {
+      class: 'Boolean',
+      name: 'isInit'
+    }
   ],
 
   reactions: [
@@ -208,6 +212,7 @@
     },
 
     function initE() {
+      // var self = this;
 
       if ( this.currentMemento ) {
         var id = this.currentMemento.head;
@@ -254,6 +259,30 @@
           window.removeEventListener('resize', this.updateTableHeight);
         });
       }
+
+      // self.scrollHeight$.sub(function() {
+      //   if ( self.scrollHeight !== self.TABLE_HEAD_HEIGHT && ! self.isInit && self.memento.paramsObj.scroll ) {
+      //     // self.renderPage(3);
+      //     // self.el().scrollTop = self.TABLE_HEAD_HEIGHT + 3 * self.pageSize * self.rowHeight;
+      //     document.getElementById(self.table_.id).style.height =  self.scrollHeight
+      //     var scroll = self.TABLE_HEAD_HEIGHT + 3 * self.pageSize * self.rowHeight;
+      //     document.getElementById(self.id).scrollTop = scroll;
+      //     self.scrollPos_ = scroll;
+      //   }
+      // });
+    },
+
+    function renderPage(page) {
+      if ( this.renderedPages_[page] ) return;
+      var dao = this.data$proxy.limit(this.pageSize).skip(page * this.pageSize);
+      var tbody = this.table_.slotE_(this.table_.rowsFrom(dao));
+      tbody.style({
+        position: 'absolute',
+        width: '100%',
+        top: this.TABLE_HEAD_HEIGHT + page * this.pageSize * this.rowHeight + 'px'
+      });
+      this.table_.add(tbody);
+      this.renderedPages_[page] = tbody;
     }
   ],
 
@@ -297,16 +326,7 @@
         // Add any pages that are not already rendered.
         for ( var i = 0; i < Math.min(this.numPages_, this.NUM_PAGES_TO_RENDER) ; i++) {
           var page = this.currentTopPage_ + i;
-          if ( this.renderedPages_[page] ) continue;
-          var dao = this.data$proxy.limit(this.pageSize).skip(page * this.pageSize);
-          var tbody = this.table_.slotE_(this.table_.rowsFrom(dao));
-          tbody.style({
-            position: 'absolute',
-            width: '100%',
-            top: this.TABLE_HEAD_HEIGHT + page * this.pageSize * this.rowHeight + 'px'
-          });
-          this.table_.add(tbody);
-          this.renderedPages_[page] = tbody;
+          this.renderPage(page);
         }
       }
     },
@@ -314,7 +334,17 @@
       name: 'onScroll',
       isFramed: true,
       code: function(e) {
+        if ( ! this.isInit ) {
+          document.getElementById(this.table_.id).style.height =  this.scrollHeight
+          var scroll = this.TABLE_HEAD_HEIGHT + 3 * this.pageSize * this.rowHeight;
+          document.getElementById(this.id).scrollTop = scroll;
+          this.scrollPos_ = scroll;
+          this.isInit = true;
+          return;
+        }
         this.scrollPos_ = e.target.scrollTop;
+        this.memento.paramsObj.scroll = this.scrollPos_;
+        this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
       }
     },
     {
