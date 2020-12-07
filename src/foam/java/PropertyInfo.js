@@ -105,11 +105,13 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'includeInDigest'
+      name: 'includeInDigest',
+      value: true
     },
     {
       class: 'Boolean',
-      name: 'includeInSignature'
+      name: 'includeInSignature',
+      value: true
     },
     {
       class: 'Boolean',
