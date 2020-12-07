@@ -347,7 +347,7 @@ foam.CLASS({
       // add pre-set function
       if ( this.javaPreSet ) {
         setter += this.javaPreSet;
-      };
+      }
 
       // set value
       // Don't include oldVal if not used
