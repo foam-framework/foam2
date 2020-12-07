@@ -273,10 +273,11 @@
         });
         this.updateRenderedPages_();
         if ( this.el() && ! this.isInit && this.memento.paramsObj.record ) {
-          document.getElementById(this.table_.id).style.height =  this.scrollHeight
           var scroll = this.TABLE_HEAD_HEIGHT + this.memento.paramsObj.record * this.rowHeight;
+          scroll = scroll >= this.TABLE_HEAD_HEIGHT && scroll < this.scrollHeight ? scroll : 0;
+
           document.getElementById(this.id).scrollTop = scroll;
-          this.scrollPos_ = scroll;
+
           this.isInit = true;
           return;
         } else if ( this.el() ) this.el().scrollTop = 0;
@@ -327,7 +328,7 @@
       isFramed: true,
       code: function(e) {
         this.scrollPos_ = e.target.scrollTop;
-        this.memento.paramsObj.record = this.scrollPos_ >= this.TABLE_HEAD_HEIGHT ? Math.floor(( this.scrollPos_ - this.TABLE_HEAD_HEIGHT ) / this.rowHeight) : 0;
+        this.memento.paramsObj.record = this.scrollPos_ >= this.TABLE_HEAD_HEIGHT && this.scrollPos_ < this.scrollHeight ? Math.floor(( this.scrollPos_ - this.TABLE_HEAD_HEIGHT ) / this.rowHeight) : 0;
         this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
       }
     },
