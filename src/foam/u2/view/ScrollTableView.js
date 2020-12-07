@@ -270,20 +270,20 @@
       //     self.scrollPos_ = scroll;
       //   }
       // });
-    },
+    }//,
 
-    function renderPage(page) {
-      if ( this.renderedPages_[page] ) return;
-      var dao = this.data$proxy.limit(this.pageSize).skip(page * this.pageSize);
-      var tbody = this.table_.slotE_(this.table_.rowsFrom(dao));
-      tbody.style({
-        position: 'absolute',
-        width: '100%',
-        top: this.TABLE_HEAD_HEIGHT + page * this.pageSize * this.rowHeight + 'px'
-      });
-      this.table_.add(tbody);
-      this.renderedPages_[page] = tbody;
-    }
+    // function renderPage(page) {
+    //   if ( this.renderedPages_[page] ) return;
+    //   var dao = this.data$proxy.limit(this.pageSize).skip(page * this.pageSize);
+    //   var tbody = this.table_.slotE_(this.table_.rowsFrom(dao));
+    //   tbody.style({
+    //     position: 'absolute',
+    //     width: '100%',
+    //     top: this.TABLE_HEAD_HEIGHT + page * this.pageSize * this.rowHeight + 'px'
+    //   });
+    //   this.table_.add(tbody);
+    //   this.renderedPages_[page] = tbody;
+    // }
   ],
 
   listeners: [
@@ -326,7 +326,17 @@
         // Add any pages that are not already rendered.
         for ( var i = 0; i < Math.min(this.numPages_, this.NUM_PAGES_TO_RENDER) ; i++) {
           var page = this.currentTopPage_ + i;
-          this.renderPage(page);
+          if ( this.renderedPages_[page] ) continue;
+          var dao = this.data$proxy.limit(this.pageSize).skip(page * this.pageSize);
+          var tbody = this.table_.slotE_(this.table_.rowsFrom(dao));
+          tbody.style({
+            position: 'absolute',
+            width: '100%',
+            top: this.TABLE_HEAD_HEIGHT + page * this.pageSize * this.rowHeight + 'px'
+          });
+          this.table_.add(tbody);
+          this.renderedPages_[page] = tbody;
+          // this.renderPage(page);
         }
       }
     },
