@@ -81,15 +81,15 @@ foam.CLASS({
      */
 
     ^primary {
-      border-color: /*%SECONDARY1%*/ #4a33f4;
       background-color: /*%PRIMARY3%*/ #406dea;
+      border-color: /*%SECONDARY1%*/ #4a33f4;
       color: white;
     }
 
     ^primary:hover:not(:disabled) {
+      background-color: /*%PRIMARY2%*/ #144794;
       border-color: /*%PRIMARY1%*/ #202341;
       border: 1px solid #294798;
-      background-color: /*%PRIMARY2%*/ #144794;
     }
 
     ^primary:focus:not(:hover) {
@@ -100,8 +100,8 @@ foam.CLASS({
       border: 2px solid #23186c;
     }
     ^primary:disabled {
-      border: 1px solid /*%PRIMARY4%*/ #a7beff;
       background-color: /*%PRIMARY4%*/ #a7beff;
+      border: 1px solid /*%PRIMARY4%*/ #a7beff;
     }
 
     /*
@@ -115,19 +115,19 @@ foam.CLASS({
     }
 
     ^primary-destructive:hover:not(:disabled) {
-      border-color: /*%DESTRUCTIVE1%*/ #a61414;
       background-color: /*%DESTRUCTIVE2%*/ #a61414;
+      border-color: /*%DESTRUCTIVE1%*/ #a61414;
     }
 
     ^primary-destructive:focus {
       border: 2px solid #a61414;
-      padding: 7px 15px;
       box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
+      padding: 7px 15px;
     }
 
     ^primary-destructive:disabled {
-      border-color: /*%DESTRUCTIVE4%*/ #ed8e8d;
       background-color: /*%DESTRUCTIVE5%*/ #fbedec;
+      border-color: /*%DESTRUCTIVE4%*/ #ed8e8d;
     }
 
 
@@ -136,14 +136,14 @@ foam.CLASS({
      */
 
     ^secondary {
-      border: 1px solid /*%PRIMARY3%*/ #406dea;
       background-color: white;
+      border: 1px solid /*%PRIMARY3%*/ #406dea;
       color: /*%PRIMARY3%*/ #406dea;
     }
 
     ^secondary:hover {
-      border-color: /*%PRIMARY2%*/ #144794;
       background-color: white;
+      border-color: /*%PRIMARY2%*/ #144794;
       color: /*%PRIMARY2%*/ #144794;
     }
 
@@ -166,14 +166,14 @@ foam.CLASS({
      */
 
     ^secondary-destructive {
-      border-color: /*%DESTRUCTIVE3%*/ #d9170e;
       background-color: white;
+      border-color: /*%DESTRUCTIVE3%*/ #d9170e;
       color: /*%DESTRUCTIVE3%*/ #d9170e;
     }
 
     ^secondary-destructive:hover {
-      border-color: /*%DESTRUCTIVE2%*/ #a61414;
       background-color: white;
+      border-color: /*%DESTRUCTIVE2%*/ #a61414;
       color: /*%DESTRUCTIVE2%*/ #a61414;
     }
 
@@ -216,19 +216,18 @@ foam.CLASS({
      */
 
     ^tertiary-destructive {
-      border-color: transparent;
       background-color: transparent;
+      border-color: transparent;
       color: /*%BLACK%*/ #1e1f21;
     }
 
     ^tertiary-destructive:hover:not(:disabled) {
-      border-color: transparent;
       background-color: transparent;
+      border-color: transparent;
     }
 
     ^tertiary-destructive:focus:not(:hover) {
       border-bottom-color: /*%PRIMARY3%*/ #406dea;
-
     }
 
     ^tertiary-destructive:disabled {
