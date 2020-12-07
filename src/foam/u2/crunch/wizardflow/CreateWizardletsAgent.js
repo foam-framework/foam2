@@ -13,10 +13,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'capable',
     'capabilities',
-    'capabilityDAO',
-    'crunchService',
     'getWAO' // Provided  by LoadCapabilitiesAgent
   ],
 
@@ -27,8 +24,7 @@ foam.CLASS({
   requires: [
     'foam.nanos.crunch.MinMaxCapability',
     'foam.nanos.crunch.ui.CapableWAO',
-    'foam.nanos.crunch.ui.PrerequisiteAwareWizardlet',
-    'foam.nanos.crunch.CrunchService'
+    'foam.nanos.crunch.ui.PrerequisiteAwareWizardlet'
   ],
 
   properties: [
@@ -41,8 +37,7 @@ foam.CLASS({
 
   methods: [
     async function execute() {
-      var wizardlets = await this.parseArrayToWizardlets(this.capabilities);
-      this.wizardlets = wizardlets;
+      this.wizardlets = await this.parseArrayToWizardlets(this.capabilities);
     },
     async function parseArrayToWizardlets(array, parent) {
       var capabilityDesired = array[array.length - 1];
