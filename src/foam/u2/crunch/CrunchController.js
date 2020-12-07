@@ -99,8 +99,7 @@ foam.CLASS({
           .add(this.CheckRootIdAgent)
           .add(this.CheckPendingAgent)
           .add(this.CheckNoDataAgent)
-          // .add(this.CreateWizardletsAgent)
-          .add(this.CapableCreateWizardletsAgent)
+          .add(this.CreateWizardletsAgent)
           .add(this.LoadWizardletsAgent)
           .add(this.FilterWizardletsAgent)
           .add(this.RequirementsPreviewAgent)
@@ -134,7 +133,7 @@ foam.CLASS({
           .add(this.LoadCapabilitiesAgent, {
             waoSetting: this.LoadCapabilitiesAgent.WAOSetting.CAPABLE })
           .add(this.CapableDefaultConfigAgent)
-          .add(this.CapableCreateWizardletsAgent)
+          .add(this.CreateWizardletsAgent)
           .add(this.LoadWizardletsAgent)
           .add(this.StepWizardAgent)
           .add(this.PutFinalPayloadsAgent)
