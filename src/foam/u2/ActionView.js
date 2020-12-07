@@ -96,7 +96,9 @@ foam.CLASS({
       border-color: #23186c;
       box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
     }
-
+    ^primary:focus:hover {
+      border: 2px solid #23186c;
+    }
     ^primary:disabled {
       border: 1px solid /*%PRIMARY4%*/ #a7beff;
       background-color: /*%PRIMARY4%*/ #a7beff;
@@ -149,6 +151,9 @@ foam.CLASS({
       border-color: /*%SECONDARY2%*/ #432de7;
       color: /*%PRIMARY2%*/ #144794;
     }
+    ^secondary:focus:hover {
+      border: 2px solid /*%SECONDARY2%*/ #432de7;
+    }
 
     ^secondary:disabled {
       border-color: /*%PRIMARY4%*/ #a7beff;
@@ -195,6 +200,10 @@ foam.CLASS({
 
     ^tertiary:focus:not(:hover) {
       border-color: /*%SECONDARY1%*/ #4a33f4;
+    }
+
+    ^tertiary:focus:hover {
+      border: 2px solid /*%SECONDARY1%*/ #4a33f4;
     }
 
     ^tertiary:disabled {
