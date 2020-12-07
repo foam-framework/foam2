@@ -20,7 +20,8 @@ foam.CLASS({
 
       // Reset the document to remove old content and styles
       // Reset $UID so that new styles will be re-installed
-      w.document.body.innerText = w.document.head.innerText = '';
+      w.document.body.innerText = '';
+      w.document.head.innerHTML = '<title>Translation Console</title>';
       w.document.$UID = foam.next$UID();
 
       var window = foam.core.Window.create({window: w}, ctrl);
@@ -154,7 +155,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'locale',
-      factory: function() { return foam.locale; }
+      factory: function() { return foam.locale.substring(0,2); }
 //          view: 'net.nanopay.ui.topNavigation.LanguageChoiceView'
     }
   ],
