@@ -401,6 +401,7 @@ FOAM_FILES([
   { name: "foam/box/RPCMessage" },
   { name: "foam/box/socket/SocketClientBox" },
   { name: "foam/box/socket/SocketClientReplyBox" },
+  { name: "foam/box/socket/SocketConnectionBoxManager" },
   { name: "foam/dao/BaseClientDAO" },
   { name: "foam/dao/BaseNotificationClientDAO" },
   { name: "foam/dao/MergeBox" },
