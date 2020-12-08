@@ -113,7 +113,6 @@ foam.CLASS({
         + tail;
     },
     function parseValue() {
-      //added as value's subscribers methods are executed earlier then post set
       if ( this.feedback_ ) return;
       this.feedback_ = true;
       var i = this.value.indexOf(this.SEPARATOR);

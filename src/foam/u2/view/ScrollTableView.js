@@ -277,7 +277,6 @@
           document.getElementById(this.id).scrollTop = scroll;
 
           this.isInit = true;
-          return;
         } else if ( this.el() ) this.el().scrollTop = 0;
       }
     },

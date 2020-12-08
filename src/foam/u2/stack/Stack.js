@@ -92,7 +92,6 @@ foam.CLASS({
       this.pos = pos;
     },
     function setToNullCurrentMemento() {
-      //clean memento
       var m = this.memento;
       var tail = this.memento.tail;
       if ( tail == null ) {
@@ -110,7 +109,6 @@ foam.CLASS({
       }
     },
     function findCurrentMemento() {
-      //clean memento
       var tail = this.memento;
       while(true) {
         if ( tail.tail == null ) {
