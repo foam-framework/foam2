@@ -116,11 +116,13 @@ public class TreeIndex
   }
 
   public Object remove(Object state, FObject value) {
+     Object key;
     try {
-      return ((TreeNode) state).removeKeyValue((TreeNode) state, prop_, prop_.f(value), value, tail_);
+      key = prop_.f(value);
     } catch (ClassCastException e) {
-      return ((TreeNode) state).removeKeyValue((TreeNode) state, prop_, null, value, tail_);
+      key = null;
     }
+    return ((TreeNode) state).removeKeyValue((TreeNode) state, prop_, key, value, tail_);
   }
 
   public Object removeAll() {
