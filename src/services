@@ -1115,3 +1115,10 @@ p({
   """,
   "client": "{\"of\":\"foam.nanos.auth.TimeZone\"}"
 })
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "templateEngine",
+  "lazy": false,
+  "serve": false,
+  "serviceClass": "foam.nanos.notification.email.EmailTemplateEngine"
+})
