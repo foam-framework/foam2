@@ -147,14 +147,6 @@ foam.CLASS({
           }
         });
       }
-    },
-    {
-      name: 'back',
-      code: function() {
-        if ( this.memento.tail )
-          this.memento.tail$.set(null);
-        this.stack.back();
-      }
     }
   ],
   methods: [
@@ -171,10 +163,11 @@ foam.CLASS({
             .start(self.Rows)
               .start(self.Rows)
                 // we will handle this in the StackView instead
-                .startContext({ data: self })
-                  .tag(self.BACK, {
+                .startContext({ data: self.stack })
+                  .tag(self.stack.BACK, {
                     buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                     icon: 'images/back-icon.svg',
+                    label: this.BACK
                   })
                 .endContext()
                 .start(self.Cols).style({ 'align-items': 'center' })

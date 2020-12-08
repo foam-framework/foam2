@@ -127,9 +127,7 @@ foam.CLASS({
   actions: [
     {
       name: 'back',
-      code: function(X, data) {
-        X.onBack();
-      }
+      code: (data) => data.onBack()
     },
     {
       name: 'edit',
