@@ -508,6 +508,11 @@ foam.CLASS({
       javaFactory: `
         return new foam.nanos.app.SupportConfig();
       `
+    },
+    {
+      class: 'String',
+      name: 'customRefinement',
+      displayWidth: 80
     }
   ],
 

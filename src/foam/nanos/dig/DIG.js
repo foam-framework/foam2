@@ -106,6 +106,7 @@ foam.CLASS({
       label: 'Data Access Object (DAO)',
       name: 'daoKey',
       documentation: `The DAO in the DIG request.`,
+      targetDAOKey: 'AuthenticatedNSpecDAO',
       view: function(_, X) {
         var E = foam.mlang.Expressions.create();
         return {
@@ -124,7 +125,6 @@ foam.CLASS({
           ]
         };
       },
-      value: 'userDAO',
       section: 'details'
     },
     {
