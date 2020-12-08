@@ -13,7 +13,7 @@ process.on('unhandledRejection', function(e) {
 });
 
 // enable FOAM java support.
-global.FOAM_FLAGS = { 'java': true, 'debug': true, 'js': false, 'swift': true };
+global.FOAM_FLAGS = { 'java': true, 'debug': true, 'js': false, 'swift': false };
 
 // Enable FOAMLink mode but only if FOAMLINK_DATA is set in environment
 var foamlinkMode = process.env.hasOwnProperty('FOAMLINK_DATA');
