@@ -104,25 +104,24 @@ public class TreeIndex
 
   public Object put(Object state, FObject value) {
     if ( state == null ) state = TreeNode.getNullNode();
+    Object key = returnKeyForValue(value);
+    return ((TreeNode) state).putKeyValue((TreeNode)state,
+      prop_, key, value, tail_);
+  }
+
+  public Object remove(Object state, FObject value) {
+    Object key = returnKeyForValue(value);
+    return ((TreeNode) state).removeKeyValue((TreeNode) state, prop_, key, value, tail_);
+  }
+
+  public Object returnKeyForValue(FObject value) {
     Object key;
     try {
       key = prop_.f(value);
     } catch (ClassCastException e) {
       key = null;
     }
-
-    return ((TreeNode) state).putKeyValue((TreeNode)state,
-      prop_, key, value, tail_);
-  }
-
-  public Object remove(Object state, FObject value) {
-     Object key;
-    try {
-      key = prop_.f(value);
-    } catch (ClassCastException e) {
-      key = null;
-    }
-    return ((TreeNode) state).removeKeyValue((TreeNode) state, prop_, key, value, tail_);
+    return key;
   }
 
   public Object removeAll() {
