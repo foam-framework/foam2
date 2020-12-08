@@ -90,12 +90,6 @@ foam.CLASS({
       this.stack_.length = this.depth;
       this.stack_[pos] = [v, parent, opt_id];
       this.pos = pos;
-
-      //to stackView
-      // if ( v.mementoHead ) {
-      //   var currMemento = findCurrentMemento();
-      //   currMemento.tail = this.Memento.create({ head: v.mementoHead });
-      // }
     },
     function setToNullCurrentMemento() {
       //clean memento
