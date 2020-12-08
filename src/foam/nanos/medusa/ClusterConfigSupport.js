@@ -85,7 +85,6 @@ configuration for contacting the primary node.`,
     {
       name: 'isPrimary',
       class: 'Boolean',
-      // STANDALONE, SINGLE
       value: false,
       // value: true, // STANDALONE
       visibility: 'RO'
