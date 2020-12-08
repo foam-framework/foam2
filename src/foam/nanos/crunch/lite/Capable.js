@@ -21,6 +21,7 @@ foam.INTERFACE({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CapabilityJunctionPayload',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.CrunchService',
     'foam.nanos.ruler.RulerDAO',
@@ -83,7 +84,7 @@ foam.INTERFACE({
           }
 
           if ( ! hasRequirement(x, capabilityId) ) {
-            setCapabilityIds(          
+            setCapabilityIds(
               oldCapabilityIdsList.toArray(new String[0])
             );
           }
@@ -100,7 +101,7 @@ foam.INTERFACE({
           ],
           body: `
           var oldCapabilityPayloads = getCapablePayloads();
-          
+
           return Arrays.stream(oldCapabilityPayloads)
             .map((cap) -> cap.getCapability())
             .anyMatch(capabilityId::equals);
@@ -131,8 +132,9 @@ foam.INTERFACE({
           ],
           body: `
             // Marshal payloads into a hashmap
-            Map<String, CapablePayload> payloads = new HashMap<String, CapablePayload>();
-            for ( CapablePayload payload : getCapablePayloads() ) {
+            Map<String, CapabilityJunctionPayload> payloads =
+              new HashMap<String, CapabilityJunctionPayload>();
+            for ( CapabilityJunctionPayload payload : getCapablePayloads() ) {
               payloads.put(payload.getCapability(), payload);
             }
 
@@ -144,7 +146,7 @@ foam.INTERFACE({
                 ));
               }
 
-              CapablePayload payload = payloads.get(capId);
+              CapabilityJunctionPayload payload = payloads.get(capId);
               if ( payload.getStatus() != status ) {
                 throw new IllegalStateException(String.format(
                   "Object does not have %s status for capability '%s'",
@@ -180,10 +182,10 @@ foam.INTERFACE({
           args: [
             { name: 'x', type: 'X' },
           ],
-          body: `            
+          body: `
             DAO capablePayloadDAO = new CapableAdapterDAO.Builder(x)
               .setCapable(this)
-              .setOf(CapablePayload.getOwnClassInfo())
+              .setOf(CapabilityJunctionPayload.getOwnClassInfo())
               .build();
 
             x = x.put("capablePayloadDAO", capablePayloadDAO);
@@ -191,9 +193,9 @@ foam.INTERFACE({
             // TODO: Look into why rulerdao acts sketchy here and if it can replace CapablePayloadStatusDAO
             DAO CapablePayloadStatusDAO = new CapablePayloadStatusDAO.Builder(x)
               .setDelegate(capablePayloadDAO)
-              .setOf(CapablePayload.getOwnClassInfo())
+              .setOf(CapabilityJunctionPayload.getOwnClassInfo())
               .build();
-              
+
             return CapablePayloadStatusDAO;
           `
         }));
@@ -204,7 +206,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'getCapablePayloads',
-      type: 'CapablePayload[]',
+      type: 'CapabilityJunctionPayload[]',
       flags: ['java'],
     },
     {
@@ -213,7 +215,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'payloads',
-          type: 'CapablePayload[]'
+          type: 'CapabilityJunctionPayload[]'
         }
       ]
     },

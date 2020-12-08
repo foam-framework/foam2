@@ -11,7 +11,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
-    'foam.nanos.crunch.lite.CapablePayload',
+    'foam.nanos.crunch.CapabilityJunctionPayload',
     'static foam.nanos.crunch.CapabilityJunctionStatus.*'
   ],
 
@@ -31,18 +31,18 @@ foam.CLASS({
         List<CapabilityCapabilityJunction> ccJunctions =
           ((ArraySink) myPrerequisitesDAO.select(new ArraySink()))
           .getArray();
-        
+
         boolean isPending = false;
         boolean isRejected = false;
 
         for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
-          CapablePayload prereqPayload = (CapablePayload)
+          CapabilityJunctionPayload prereqPayload = (CapabilityJunctionPayload)
             capablePayloadDAO.find(ccJunction.getTargetId());
 
           if ( prereqPayload == null ) {
             return ACTION_REQUIRED;
           }
-          
+
           switch ( prereqPayload.getStatus() ) {
             case PENDING:
               isPending = true;
@@ -57,8 +57,8 @@ foam.CLASS({
           }
         }
 
-        return isRejected 
-                ? REJECTED 
+        return isRejected
+                ? REJECTED
                 : isPending ? PENDING : GRANTED;
       `
     }

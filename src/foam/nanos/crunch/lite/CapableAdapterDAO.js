@@ -16,7 +16,8 @@ foam.CLASS({
     'java.util.Arrays',
     'java.util.ArrayList',
     'java.util.List',
-    'foam.dao.ArraySink'
+    'foam.dao.ArraySink',
+    'foam.nanos.crunch.CapabilityJunctionPayload'
   ],
 
   documentation: `
@@ -39,9 +40,9 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-        CapablePayload payload = (CapablePayload) obj;
+        CapabilityJunctionPayload payload = (CapabilityJunctionPayload) obj;
 
-        CapablePayload[] payloads = getCapable().getCapablePayloads();
+        CapabilityJunctionPayload[] payloads = getCapable().getCapablePayloads();
         for ( int i = 0 ; i < payloads.length ; i++ ) {
           if (
             payload.getCapability().equals(
@@ -69,11 +70,11 @@ foam.CLASS({
     {
       name: 'remove_',
       javaCode: `
-        CapablePayload payload = (CapablePayload) obj;
+        CapabilityJunctionPayload payload = (CapabilityJunctionPayload) obj;
 
-        CapablePayload[] payloads = getCapable().getCapablePayloads();
-        
-        List<CapablePayload> newPayloadsList = new ArrayList<>();
+        CapabilityJunctionPayload[] payloads = getCapable().getCapablePayloads();
+
+        List<CapabilityJunctionPayload> newPayloadsList = new ArrayList<>();
 
         for ( int i = 0; i < payloads.length; i++ ){
           if ( ! payload.getCapability().equals(payloads[i].getCapability()) ){
@@ -85,7 +86,8 @@ foam.CLASS({
           return null;
         }
 
-        CapablePayload[] newPayloads = newPayloadsList.toArray(new CapablePayload[0]);
+        CapabilityJunctionPayload[] newPayloads =
+          newPayloadsList.toArray(new CapabilityJunctionPayload[0]);
         getCapable().setCapablePayloads(newPayloads);
 
         return obj;
@@ -102,12 +104,12 @@ foam.CLASS({
       name: 'find_',
       javaCode: `
         String idString = null;
-        if ( id instanceof CapablePayload ) {
-          idString = ((CapablePayload) id).getCapability();
+        if ( id instanceof CapabilityJunctionPayload ) {
+          idString = ((CapabilityJunctionPayload) id).getCapability();
         } else {
           idString = (String) id;
         }
-        CapablePayload[] payloads = getCapable().getCapablePayloads();
+        CapabilityJunctionPayload[] payloads = getCapable().getCapablePayloads();
         for ( int i = 0 ; i < payloads.length ; i++ ) {
           if (
             payloads[i].getCapability().equals(idString)

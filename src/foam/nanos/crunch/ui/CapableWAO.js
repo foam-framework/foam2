@@ -16,7 +16,7 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.crunch.lite.CapablePayload',
+    'foam.nanos.crunch.CapabilityJunctionPayload',
     'foam.nanos.crunch.ui.CapabilityWizardlet'
   ],
 
@@ -55,7 +55,7 @@ foam.CLASS({
       wizardlet.data = loadedData;
     },
     function makePayload(wizardlet) {
-      return this.CapablePayload.create({
+      return this.CapabilityJunctionPayload.create({
         capability: wizardlet.capability,
         data: wizardlet.data
       });
