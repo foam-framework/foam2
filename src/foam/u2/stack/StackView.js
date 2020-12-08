@@ -83,7 +83,7 @@ foam.CLASS({
           var currMemento = this.data.findCurrentMemento();
           //we need to check if memento is already set
           //for example when we copy-paste url
-          if ( v.mementoHead != currMemento.head ) {
+          if ( ! X.memento.value.includes(v.mementoHead) ) {
             var m = this.Memento.create();
 
             m.head$ = v.mementoHead$;
