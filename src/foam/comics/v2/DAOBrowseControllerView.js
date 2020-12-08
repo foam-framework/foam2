@@ -132,7 +132,7 @@ foam.CLASS({
     var self = this;
 
       this.addClass(this.myClass())
-      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle) {
+      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction) {
         return self.E()
           .start(self.Rows)
             .addClass(self.myClass('container'))
@@ -144,6 +144,9 @@ foam.CLASS({
                     .add(config$browseTitle)
                   .end()
                   .startContext({ data: self }).tag(self.CREATE).endContext()
+                  .callIf(config$primaryAction, function() {
+                    this.tag(config$primaryAction);
+                  })
                 .end()
                 .callIf(config$browseSubtitle.length > 0, function() {
                   this
@@ -166,7 +169,8 @@ foam.CLASS({
                     .end();
                 })
                 .add(self.slot(function(browseView) {
-                  return self.E().tag(browseView, {data: data, config: config});
+                  //conditionally don't set data
+                  return self.E().tag(browseView, {config: config});
                 }))
               .end()
             .end()
