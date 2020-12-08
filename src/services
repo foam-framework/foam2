@@ -20,12 +20,12 @@ p({
   "name":"AuthenticatedNSpecDAO",
   "serve":true,
   "serviceScript":"""
-    return new foam.dao.PMDAO(x,
-      new foam.nanos.auth.AuthorizationDAO.Builder(x)
-        .setDelegate(x.get("nSpecDAO"))
-        .setAuthorizer(new foam.nanos.auth.StandardAuthorizer("service"))
-        .build()
-    );
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setAuthorizer(new foam.nanos.auth.StandardAuthorizer("service"))
+      .setInnerDAO(x.get("nSpecDAO"))
+      .setOf(foam.nanos.boot.NSpec.getOwnClassInfo())
+      .build();
   """,
   "client":"""
     {
