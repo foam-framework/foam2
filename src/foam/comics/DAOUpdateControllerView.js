@@ -187,8 +187,6 @@ foam.CLASS({
     {
       name: 'edit',
       isAvailable: function(controllerMode, editEnabled) {
-        //change mementoHead prop
-        // this.currentMemento.tail = this.Memento.create({ head: 'Edit' });
         return editEnabled && controllerMode === this.ControllerMode.VIEW;
       },
       code: function() {
