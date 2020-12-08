@@ -108,7 +108,7 @@ public class TreeIndex
     try {
       key = prop_.f(value);
     } catch (ClassCastException e) {
-      return state;
+      key = null;
     }
 
     return ((TreeNode) state).putKeyValue((TreeNode)state,
@@ -119,7 +119,7 @@ public class TreeIndex
     try {
       return ((TreeNode) state).removeKeyValue((TreeNode) state, prop_, prop_.f(value), value, tail_);
     } catch (ClassCastException e) {
-      return state;
+      return ((TreeNode) state).removeKeyValue((TreeNode) state, prop_, null, value, tail_);
     }
   }
 
