@@ -18,9 +18,9 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'EXPORT', message: 'Export1' },
-    { name: 'DATA_TYPE_MSG', message: 'Data Type1' },
-    { name: 'RESPONSE', message: 'Response1' }
+    { name: 'EXPORT', message: 'Export' },
+    { name: 'DATA_TYPE_MSG', message: 'Data Type' },
+    { name: 'RESPONSE', message: 'Response' }
   ],
 
   requires: [
@@ -111,6 +111,10 @@ foam.CLASS({
 
     ^ .foam-u2-ActionView-primary {
       margin: 12px;
+    }
+
+    ^ .foam-u2-ModalHeader-title {
+      margin-left: 25px;
     }
   `,
 
