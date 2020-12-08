@@ -45,38 +45,39 @@ public class FileService
     AuthService         auth      = (AuthService) x.get("auth");
     AppConfig           appConfig = (AppConfig) x.get("appConfig");
 
+    // TODO: Add better ACL support for files.  In the meantime,
+    // fileDAO has been decorated to disallow enumeration and File
+    // IDs are unguessable cryptographically strong UUIDs, so no
+    // permission check is really necessary.
+    // NOTE: 'user' is validated in SessionWebAgent
+
     try {
       String path = req.getRequestURI();
       String id   = path.replaceFirst("/service/" + name_ + "/", "");
 
-      // find file from file dao
       File file = (File) fileDAO_.find_(x, id);
-      if ( file == null || file.getData() == null ) {
+      if ( file == null ) {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         return;
       }
 
-      //Replace @version@ with actual foam version
-      if ( "text/html".equals(file.getMimeType()) ) {
-        String fileText = file.getText();
-        fileText = fileText.replace("@VERSION@", appConfig.getVersion());
-        String encodedString = Base64.getEncoder().encodeToString(fileText.getBytes());
-        file.setDataString("data:text/html;base64," + encodedString);
-      }
-
-      // TODO: Add better ACL support for files.  In the meantime,
-      // fileDAO has been decorated to disallow enumeration and File
-      // IDs are unguessable cryptographically strong UUIDs, so no
-      // permission check is really necessary.
-      // NOTE: 'user' is validated in SessionWebAgent
-
-      // get blob and blob size
-      // TODO: figure out why delegate is not being set for IdentifiedBlob
-      if ( SafetyUtil.isEmpty(file.getDataString()) ) {
-        String blobId = ((IdentifiedBlob) file.getData()).getId();
-        blob = getDelegate().find_(x, blobId);
+      if ( SafetyUtil.isEmpty(file.getDataString()) ){
+        BlobService store = (BlobService) x.get("blobStore");
+        blob = store.find(file.getId());
       } else {
+        //Replace @version@ with actual foam version
+        if ( "text/html".equals(file.getMimeType()) ) {
+          String fileText = file.getText();
+          fileText = fileText.replace("@VERSION@", appConfig.getVersion());
+          String encodedString = Base64.getEncoder().encodeToString(fileText.getBytes());
+          file.setDataString("data:"+file.getMimeType()+";base64," + encodedString);
+        }
+
         blob = file.getData();
+      }
+      if ( blob == null ) {
+        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        return;
       }
 
       long size = blob.getSize();
@@ -92,7 +93,7 @@ public class FileService
       blob.read(os, 0, size);
       os.close();
     } catch (Throwable t) {
-      throw new RuntimeException(t);
+      throw new foam.core.FOAMException(t);
     } finally {
       IOUtils.closeQuietly(os);
     }
