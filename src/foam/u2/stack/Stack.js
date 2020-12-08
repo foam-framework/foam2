@@ -113,7 +113,7 @@ foam.CLASS({
     },
     function findCurrentMemento() {
       //clean memento
-      var tail = this.memento.tail;
+      var tail = this.memento;
       while(true) {
         if ( tail.tail == null ) {
           return tail;
