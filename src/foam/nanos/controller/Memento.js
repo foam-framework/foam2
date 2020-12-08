@@ -66,7 +66,7 @@ foam.CLASS({
     },
     {
       name: 'params',
-      documentation: 'This property used to store parameters to configure a view. For example, for a table view such parameters could be search or filters.',
+      documentation: 'This property used to store parameters to configure a view. For example, for a table view such parameters could be search value or filter values.',
       postSet: function() {
         if ( this.feedback_ ) {
           return;
