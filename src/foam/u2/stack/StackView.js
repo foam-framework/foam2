@@ -81,12 +81,16 @@ foam.CLASS({
         var v = foam.u2.ViewSpec.createView(view, null, this, X);
         if ( v.mementoHead ) {
           var currMemento = this.data.findCurrentMemento();
-          var m = this.Memento.create();
+          //we need to check if memento is already set
+          //for example when we copy-paste url
+          if ( v.mementoHead != currMemento.head ) {
+            var m = this.Memento.create();
 
-          m.head$ = v.mementoHead$;
-          m.parent = currMemento;
-
-          currMemento.tail = m;
+            m.head$ = v.mementoHead$;
+            m.parent = currMemento;
+  
+            currMemento.tail = m;
+          }
         }
         return v;
 
