@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'ObjAltView',
   extends: 'foam.u2.View',
 
-  imports: [ 'memento'],
+  imports: [ 'memento' ],
 
   documentation: "Like AltView, but for Objects instead of DAO's.",
 
