@@ -42,6 +42,13 @@ p({
     "class":"foam.mlang.predicate.And",
     "args":[
       {
+        class: "foam.mlang.predicate.Not",
+        arg1: {
+          class: "foam.nanos.crunch.predicate.StatusChangedTo",
+          status: 4
+        }
+      },
+      {
         "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
         "propName":"status",
         "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":0}

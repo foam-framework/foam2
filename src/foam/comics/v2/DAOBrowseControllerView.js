@@ -56,6 +56,14 @@ foam.CLASS({
       right: 0;
       padding: 12px 16px 0 0;
     }
+
+    ^ .foam-u2-borders-CardBorder {
+      padding: 0px;
+      border-radius: 6px;
+      box-shadow: 0px 1px 3px 0px #E7E7E7;
+      -webkit-box-shadow: 0px 1px 3px 0px #E7E7E7;
+      -moz-box-shadow: 0px 1px 3px 0px #E7E7E7;
+    }
   `,
 
   properties: [
