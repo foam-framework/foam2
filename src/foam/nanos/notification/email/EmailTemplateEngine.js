@@ -22,17 +22,6 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Object',
-      javaType: 'java.lang.StringBuilder',
-      name: 'sb',
-      javaFactory: `return new StringBuilder();`,
-      documentation: `this StringBuilder is used to store the final parsed value`
-    },
-    {
-      class: 'Boolean',
-      name: 'isNextTemplateExtending'
-    },
-    {
       class: 'Map',
       name: 'values',
       documentation: `map of values of values for simple values where {{ key }} will be replaced with value`
@@ -53,7 +42,7 @@ foam.CLASS({
         Action markup = new Action() {
           @Override
           public Object execute(Object value, ParserContext x) {
-            return getSb().toString();
+            return ((StringBuilder) x.get("sb")).toString();
           }
         };
         grammar.addAction("markup", markup);
@@ -64,7 +53,7 @@ foam.CLASS({
         Action anyCharAction = new Action() {
           @Override
           public Object execute(Object val, ParserContext x) {
-            getSb().append(val);
+            ((StringBuilder) x.get("sb")).append(val);
             return val;
           }
         };
@@ -83,7 +72,7 @@ foam.CLASS({
               foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x_.get("logger");
               logger.error("No value provided for variable " + val);
             }
-            getSb().append(value);
+            ((StringBuilder) x.get("sb")).append(value);
             return value;
           }
         };
@@ -140,7 +129,7 @@ foam.CLASS({
             StringPStream finalValPs = new StringPStream();
             finalValPs.setString(finalVal);
             PStream ret = ((Parser) grammar.sym("markup")).parse(finalValPs, new ParserContextImpl());
-            getSb().append(ret.value());
+            ((StringBuilder) x.get("sb")).append(ret.value());
             return val;
           }
         };
@@ -186,13 +175,130 @@ foam.CLASS({
               StringPStream finalValPs = new StringPStream();
               finalValPs.setString(finalVal);
               PStream ret = ((Parser) grammar.sym("markup")).parse(finalValPs, new ParserContextImpl());
-              getSb().append(ret.value());
+              ((StringBuilder) x.get("sb")).append(ret.value());
             }
             return val;
           }
         };
         grammar.addAction("IF", ifAction);
 
+        return grammar;
+      `
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.lib.parse.Grammar',
+      name: 'contentGrammar',
+      documentation: `grammar for parsing "{{ val }}", "{% if/else}}" symbols`,
+      javaFactory: `
+        Grammar grammar = new Grammar();
+        grammar.addSymbol("START", grammar.sym("markup"));
+        grammar.addSymbol("markup", new Repeat0(new Alt(grammar.sym("SUPER_BLOCK_CONTENT"),
+          grammar.sym("ANY_CHAR"))));
+
+        grammar.addSymbol("ANY_CHAR", AnyChar.instance());
+        Action anyCharAction = new Action() {
+          @Override
+          public Object execute(Object val, ParserContext x) {
+            ((StringBuilder) x.get("sb")).append(val);
+            return val;
+          }
+        };
+        grammar.addAction("ANY_CHAR", anyCharAction);
+
+        /* SUPER_BLOCK_CONTENT finds pattern <content></content> and inserts content
+        from extending template */
+        grammar.addSymbol("SUPER_BLOCK_CONTENT", new Seq(
+          Literal.create("<"),
+          Whitespace.instance(),
+          Literal.create("content"),
+          Whitespace.instance(),
+          Literal.create(">"),
+          Literal.create("</"),
+          Whitespace.instance(),
+          Literal.create("content"),
+          Whitespace.instance(),
+          Literal.create(">")
+        ));
+        Action superBlockAction = new Action() {
+          @Override
+          public Object execute(Object val, ParserContext x) {
+            ((StringBuilder) x.get("sb")).append((String) x.get("content"));
+            return val;
+          }
+        };
+        grammar.addAction("SUPER_BLOCK_CONTENT", superBlockAction);
+        return grammar;
+      `
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.lib.parse.Grammar',
+      name: 'includeGrammar',
+      documentation: `grammar for parsing "{{ val }}", "{% if/else}}" symbols`,
+      javaFactory: `
+        Grammar grammar = new Grammar();
+        grammar.addSymbol("START", grammar.sym("markup"));
+
+        grammar.addSymbol("markup", new Repeat0(new Alt(grammar.sym("INCLUDE_CONTENT"),
+        grammar.sym("ANY_CHAR"))));
+
+        grammar.addSymbol("ANY_CHAR", AnyChar.instance());
+        Action anyAction = new Action() {
+          @Override
+          public Object execute(Object val, ParserContext x) {
+            ((StringBuilder) x.get("sb")).append(val);
+            return val;
+          }
+        };
+        grammar.addAction("ANY_CHAR", anyAction);
+
+        /* INCLUDE_CONTENT symbol syntax: "qwerty <include name="templ_name"> some content
+          </include>*/
+        Parser include = new Seq2(7, 11,
+          Literal.create("<include"),
+          Whitespace.instance(),
+          Literal.create("template"),
+          Whitespace.instance(),
+          Literal.create("="),
+          Whitespace.instance(),
+          Literal.create("'"),
+          new Until(Literal.create("'")),
+          Whitespace.instance(),
+          Literal.create(">"),
+          Whitespace.instance(),
+          new Until(Literal.create("</include>"))
+          );
+        grammar.addSymbol("INCLUDE_CONTENT", include);
+        Action includeContentAction  = new Action() {
+          @Override
+          public Object execute(Object val, foam.lib.parse.ParserContext x) {
+            Object[] valArr = (Object[]) val;
+            Object[] tempVal = (Object[]) valArr[0];
+            Object[] val0 = (Object[]) tempVal[0];
+            StringBuilder templateName = new StringBuilder();
+            for ( int i = 0 ; i < val0.length ; i++ ) {
+              templateName.append(val0[i]);
+            }
+            EmailTemplate extendedEmailTemplate = ((EmailTemplate) ((DAO) x_.get("emailTemplateDAO")).find(EQ(EmailTemplate.NAME,templateName.toString())));
+            if ( extendedEmailTemplate == null ) {
+              foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x_.get("logger");
+              logger.error("Extended template not found " + val);
+              return val;
+            }
+            StringBuilder content = new StringBuilder();
+            tempVal = (Object[]) valArr[1];
+            Object[] val1 = (Object[]) tempVal[0];
+            for ( int i = 0 ; i < val1.length ; i++ ) {
+              content.append(val1[i]);
+            }
+            String body = extendedEmailTemplate.getBody();
+            x.set("isNextTemplateExtending", body.contains("<include template=") || body.contains("<include template ="));
+            ((StringBuilder) x.get("sb")).append(outputContent(extendedEmailTemplate.getBody(), content.toString()));
+            return val;
+          }
+        };
+        grammar.addAction("INCLUDE_CONTENT", includeContentAction);
         return grammar;
       `
     }
@@ -218,8 +324,14 @@ foam.CLASS({
       type: 'StringBuilder',
       javaCode: `
       StringBuilder joinedTempl = joinTemplates(str);
-      getGrammar().parseSb(joinedTempl, "");
-      return getSb();
+
+      StringPStream ps = new StringPStream();
+      ps.setString(joinedTempl);
+      ParserContext parserX = new ParserContextImpl();
+      StringBuilder sb = new StringBuilder(); // better to be ThreadLocal
+      parserX.set("sb", sb);
+      getGrammar().parse(ps, parserX, "");
+      return (StringBuilder) parserX.get("sb");
       `
     },
     {
@@ -230,48 +342,16 @@ foam.CLASS({
       ],
       type: 'StringBuilder',
       javaCode: `
-      StringBuilder ret = new StringBuilder();
-      Grammar grammar = new Grammar();
-      grammar.addSymbol("START", grammar.sym("markup"));
-      grammar.addSymbol("markup", new Repeat0(new Alt(grammar.sym("SUPER_BLOCK_CONTENT"),
-        grammar.sym("ANY_CHAR"))));
+      StringBuilder sb = new StringBuilder();
 
-      grammar.addSymbol("ANY_CHAR", AnyChar.instance());
-      Action anyCharAction = new Action() {
-        @Override
-        public Object execute(Object val, ParserContext x) {
-          ret.append(val);
-          return val;
-        }
-      };
-      grammar.addAction("ANY_CHAR", anyCharAction);
+      StringPStream ps = new StringPStream();
+      ps.setString(body);
+      ParserContext parserX = new ParserContextImpl();
+      parserX.set("sb", sb);
+      parserX.set("content", content);
+      getContentGrammar().parse(ps, parserX, "");
 
-      /* SUPER_BLOCK_CONTENT finds pattern <content></content> and inserts content
-      from extending template */
-      grammar.addSymbol("SUPER_BLOCK_CONTENT", new Seq(
-        Literal.create("<"),
-        Whitespace.instance(),
-        Literal.create("content"),
-        Whitespace.instance(),
-        Literal.create(">"),
-        Literal.create("</"),
-        Whitespace.instance(),
-        Literal.create("content"),
-        Whitespace.instance(),
-        Literal.create(">")
-      ));
-      Action superBlockAction = new Action() {
-        @Override
-        public Object execute(Object val, ParserContext x) {
-          ret.append(content);
-          return val;
-        }
-      };
-      grammar.addAction("SUPER_BLOCK_CONTENT", superBlockAction);
-
-      grammar.parseString(body, "");
-
-      return ret;
+      return sb;
       `
     },
     {
@@ -284,75 +364,17 @@ foam.CLASS({
       (e.g. <include template = "tempalte_name"> extending template content </include>).
       In case when there is more than one template extended, joinTemplates is called recursively`,
       javaCode: `
-      StringBuilder tempSb = new StringBuilder();
-      setIsNextTemplateExtending(false);
-      Grammar grammar = new Grammar();
-      grammar.addSymbol("START", grammar.sym("markup"));
+      StringBuilder sb = new StringBuilder();
 
-      grammar.addSymbol("markup", new Repeat0(new Alt(grammar.sym("INCLUDE_CONTENT"),
-      grammar.sym("ANY_CHAR"))));
+      StringPStream ps = new StringPStream();
+      ps.setString(body);
+      ParserContext parserX = new ParserContextImpl();
+      parserX.set("sb", sb);
+      parserX.set("isNextTemplateExtending", false);
+      getIncludeGrammar().parse(ps, parserX, "");
 
-      grammar.addSymbol("ANY_CHAR", AnyChar.instance());
-      Action anyAction = new Action() {
-        @Override
-        public Object execute(Object val, ParserContext x) {
-          tempSb.append(val);
-          return val;
-        }
-      };
-      grammar.addAction("ANY_CHAR", anyAction);
-
-      /* INCLUDE_CONTENT symbol syntax: "qwerty <include name="templ_name"> some content
-        </include>*/
-      Parser include = new Seq2(7, 11,
-        Literal.create("<include"),
-        Whitespace.instance(),
-        Literal.create("template"),
-        Whitespace.instance(),
-        Literal.create("="),
-        Whitespace.instance(),
-        Literal.create("'"),
-        new Until(Literal.create("'")),
-        Whitespace.instance(),
-        Literal.create(">"),
-        Whitespace.instance(),
-        new Until(Literal.create("</include>"))
-        );
-      grammar.addSymbol("INCLUDE_CONTENT", include);
-      Action includeContentAction  = new Action() {
-        @Override
-        public Object execute(Object val, foam.lib.parse.ParserContext x) {
-          Object[] valArr = (Object[]) val;
-          Object[] tempVal = (Object[]) valArr[0];
-          Object[] val0 = (Object[]) tempVal[0];
-          StringBuilder templateName = new StringBuilder();
-          for ( int i = 0 ; i < val0.length ; i++ ) {
-            templateName.append(val0[i]);
-          }
-          EmailTemplate extendedEmailTemplate = ((EmailTemplate) ((DAO) x_.get("emailTemplateDAO")).find(EQ(EmailTemplate.NAME,templateName.toString())));
-          if ( extendedEmailTemplate == null ) {
-            foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x_.get("logger");
-            logger.error("Extended template not found " + val);
-            return val;
-          }
-          StringBuilder content = new StringBuilder();
-          tempVal = (Object[]) valArr[1];
-          Object[] val1 = (Object[]) tempVal[0];
-          for ( int i = 0 ; i < val1.length ; i++ ) {
-            content.append(val1[i]);
-          }
-          String body = extendedEmailTemplate.getBody();
-          setIsNextTemplateExtending(body.contains("<include template=") || body.contains("<include template ="));
-          tempSb.append(outputContent(extendedEmailTemplate.getBody(), content.toString()));
-          return val;
-        }
-      };
-      grammar.addAction("INCLUDE_CONTENT", includeContentAction);
-
-      grammar.parseString(body, "");
-
-      if ( ! getIsNextTemplateExtending() ) return tempSb;
-      return joinTemplates(tempSb.toString());
+      if ( ! (Boolean) parserX.get("isNextTemplateExtending") ) return sb;
+      return joinTemplates(sb.toString());
       `
     }
   ]
