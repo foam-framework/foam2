@@ -328,10 +328,13 @@ foam.CLASS({
       StringPStream ps = new StringPStream();
       ps.setString(joinedTempl);
       ParserContext parserX = new ParserContextImpl();
-      StringBuilder sb = new StringBuilder(); // better to be ThreadLocal
+      StringBuilder sb = new StringBuilder();
       parserX.set("sb", sb);
       getGrammar().parse(ps, parserX, "");
-      return (StringBuilder) parserX.get("sb");
+      if (sb.length() == 0 ) {
+        throw new RuntimeException("Wrong template format");
+      }
+      return sb;
       `
     },
     {
