@@ -29,7 +29,10 @@ p({
   """,
   "client":"""
     {
-      "of":"foam.nanos.boot.NSpec"
+      "of":"foam.nanos.boot.NSpec",
+      "cache":true,
+      "ttlSelectPurgeTime": 0,
+      "ttlPurgeTime": 0
     }
   """,
   documentation:"The authenticated version of nSpecDAO - for dig and docs."
