@@ -176,8 +176,8 @@
       factory: () => {
         return function(obj, id) {
           if ( ! this.stack ) return;
-          this.memento.tail$.set(this.Memento.create({ head: id }));
-          this.memento.tail.parent = this.memento;
+          // this.memento.tail$.set(this.Memento.create({ head: id }));
+          // this.memento.tail.parent = this.memento;
 
           this.stack.push({
             class: 'foam.comics.v2.DAOSummaryView',

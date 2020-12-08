@@ -243,8 +243,8 @@ foam.CLASS({
 
     function onEdit(s, edit, id) {
 
-      this.memento.tail = this.Memento.create({ head: id });
-      this.memento.tail.parent = this.memento;
+      // this.memento.tail = this.Memento.create({ head: id });
+      // this.memento.tail.parent = this.memento;
 
       this.stack.push({
         class: this.updateView.class,

@@ -112,7 +112,12 @@ foam.CLASS({
       of: 'foam.u2.Element',
       name: 'detailViewElement_'
     },
-    'currentMemento'
+    'currentMemento',
+    {
+      class: 'String',
+      name: 'mementoHead',
+      value: 'Edit'//
+    }
   ],
 
   reactions: [
@@ -182,7 +187,8 @@ foam.CLASS({
     {
       name: 'edit',
       isAvailable: function(controllerMode, editEnabled) {
-        this.currentMemento.tail = this.Memento.create({ head: 'Edit' });
+        //change mementoHead prop
+        // this.currentMemento.tail = this.Memento.create({ head: 'Edit' });
         return editEnabled && controllerMode === this.ControllerMode.VIEW;
       },
       code: function() {

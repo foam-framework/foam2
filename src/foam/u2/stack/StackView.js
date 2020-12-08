@@ -21,6 +21,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
+    'foam.nanos.controller.Memento',
     'foam.u2.stack.Stack'
   ],
 
@@ -82,7 +83,18 @@ foam.CLASS({
         //   var currMemento = findCurrentMemento();
         //   currMemento.tail = this.Memento.create({ head: v.mementoHead });
         // }
-        return foam.u2.ViewSpec.createView(view, null, this, X);
+
+        var v = foam.u2.ViewSpec.createView(view, null, this, X);
+        if ( v.mementoHead ) {
+          var currMemento = this.data.findCurrentMemento();
+          var m = this.Memento.create();
+
+          m.head$ = v.mementoHead$;
+          m.parent = currMemento;
+          
+          currMemento.tail = m;
+        }
+        return v;
 
       }, this.data$.dot('top')));
     }

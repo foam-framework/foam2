@@ -99,7 +99,12 @@ foam.CLASS({
         return foam.u2.detail.SectionedDetailView;
       }
     },
-    'currentMemento'
+    'currentMemento',
+    {
+      class: 'String',
+      name: 'mementoHead',
+      value: 'Edit'
+    }
   ],
 
   actions: [

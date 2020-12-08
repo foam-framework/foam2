@@ -155,8 +155,8 @@ foam.CLASS({
       code: function() {
         if ( ! this.stack ) return;
 
-        if ( ! this.currentMemento.tail || this.currentMemento.tail.head !== 'Edit' )
-          this.currentMemento.tail = this.Memento.create({ head: 'Edit' });
+        // if ( ! this.currentMemento.tail || this.currentMemento.tail.head !== 'Edit' )
+          // this.currentMemento.tail = this.Memento.create({ head: 'Edit' });
 
         this.stack.push({
           class:  'foam.comics.v2.DAOUpdateView',
