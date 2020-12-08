@@ -328,7 +328,7 @@ foam.CLASS({
       StringPStream ps = new StringPStream();
       ps.setString(joinedTempl);
       ParserContext parserX = new ParserContextImpl();
-      StringBuilder sb = new StringBuilder();
+      StringBuilder sb = sb_.get();
       parserX.set("sb", sb);
       getGrammar().parse(ps, parserX, "");
       if (sb.length() == 0 ) {
@@ -345,16 +345,16 @@ foam.CLASS({
       ],
       type: 'StringBuilder',
       javaCode: `
-      StringBuilder sb = new StringBuilder();
+      StringBuilder sbContent = sbContent_.get();
 
       StringPStream ps = new StringPStream();
       ps.setString(body);
       ParserContext parserX = new ParserContextImpl();
-      parserX.set("sb", sb);
+      parserX.set("sb", sbContent);
       parserX.set("content", content);
       getContentGrammar().parse(ps, parserX, "");
 
-      return sb;
+      return sbContent;
       `
     },
     {
@@ -367,18 +367,63 @@ foam.CLASS({
       (e.g. <include template = "tempalte_name"> extending template content </include>).
       In case when there is more than one template extended, joinTemplates is called recursively`,
       javaCode: `
-      StringBuilder sb = new StringBuilder();
+      StringBuilder sbJoin = sbJoin_.get();
 
       StringPStream ps = new StringPStream();
       ps.setString(body);
       ParserContext parserX = new ParserContextImpl();
-      parserX.set("sb", sb);
+      parserX.set("sb", sbJoin);
       parserX.set("isNextTemplateExtending", false);
       getIncludeGrammar().parse(ps, parserX, "");
 
-      if ( ! (Boolean) parserX.get("isNextTemplateExtending") ) return sb;
-      return joinTemplates(sb.toString());
+      if ( ! (Boolean) parserX.get("isNextTemplateExtending") ) return sbJoin;
+      return joinTemplates(sbJoin.toString());
       `
+    }
+  ],
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function (cls) {
+        cls.extras.push(`
+          protected static ThreadLocal<StringBuilder> sb_ = new ThreadLocal<StringBuilder>() {
+            @Override
+            protected StringBuilder initialValue() {
+              return new StringBuilder();
+            }
+            @Override
+            public StringBuilder get() {
+              StringBuilder b = super.get();
+              b.setLength(0);
+              return b;
+            }
+          };
+          protected static ThreadLocal<StringBuilder> sbContent_ = new ThreadLocal<StringBuilder>() {
+            @Override
+            protected StringBuilder initialValue() {
+              return new StringBuilder();
+            }
+            @Override
+            public StringBuilder get() {
+              StringBuilder b = super.get();
+              b.setLength(0);
+              return b;
+            }
+          };
+          protected static ThreadLocal<StringBuilder> sbJoin_ = new ThreadLocal<StringBuilder>() {
+            @Override
+            protected StringBuilder initialValue() {
+              return new StringBuilder();
+            }
+            @Override
+            public StringBuilder get() {
+              StringBuilder b = super.get();
+              b.setLength(0);
+              return b;
+            }
+          };
+        `);
+      }
     }
   ]
 });
