@@ -412,11 +412,15 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ruler/ConfigureUCJExpiryOnGranted" },
   { name: "foam/nanos/crunch/ruler/SaveUCJDataOnGranted" },
   //views
-  { name: "foam/nanos/crunch/ui/CapableView" },
+  { name: "foam/nanos/crunch/ui/UserCapabilityJunctionWAO" },
+  { name: "foam/nanos/crunch/ui/CapableWAO" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
+  { name: "foam/nanos/crunch/ui/MinMaxCapabilityWizardlet" },
   { name: "foam/nanos/crunch/ui/ReviewCapabilityWizardlet" },
   { name: "foam/nanos/crunch/ui/ReviewCapabilityView" },
+  { name: "foam/nanos/crunch/ui/CapableView" },
   { name: 'foam/nanos/crunch/ui/UCJView' },
+  { name: "foam/nanos/crunch/ui/PrerequisiteAwareWizardlet" },
   //boxes
   { name: "foam/nanos/crunch/box/CrunchClientBox" },
   { name: "foam/nanos/crunch/box/CrunchClientReplyBox" },
