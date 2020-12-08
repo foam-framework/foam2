@@ -36,35 +36,16 @@
       `
     },
     {
-      name: 'parseString',
+      name: 'parse',
       type: 'foam.lib.parse.PStream',
       args: [
-        { name: 'str', type: 'String' },
+        { name: 'ps', type: 'PStream' },
+        { name: 'parserX', type: 'ParserContext' },
         { name: 'optName', type: 'String' }
       ],
       javaCode: `
 if ( SafetyUtil.isEmpty(optName) ) optName = "START";
-StringPStream ps = new StringPStream();
-ps.setString(str);
-ParserContext parserX = new ParserContextImpl();
-PStream temp = ps.apply((Parser)getSymbols().get(optName), parserX);
-return temp;
-      `
-    },
-    {
-      name: 'parseSb',
-      type: 'foam.lib.parse.PStream',
-      args: [
-        { name: 'str', type: 'StringBuilder' },
-        { name: 'optName', type: 'String' }
-      ],
-      javaCode: `
-if ( SafetyUtil.isEmpty(optName) ) optName = "START";
-StringPStream ps = new StringPStream();
-ps.setString(str);
-ParserContext parserX = new ParserContextImpl();
-PStream temp = ps.apply((Parser)getSymbols().get(optName), parserX);
-return temp;
+return ps.apply((Parser)getSymbols().get(optName), parserX);
       `
     },
     {
