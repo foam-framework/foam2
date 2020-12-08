@@ -101,6 +101,10 @@ foam.CLASS({
       //clean memento
       var m = this.memento;
       var tail = this.memento.tail;
+      if ( tail == null ) {
+        this.memento.value$.set('');
+        return;
+      }
       while(true) {
         if ( tail.tail == null ) {
           m.tail$.set(null);
