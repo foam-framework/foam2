@@ -15,9 +15,13 @@ foam.CLASS({
     function OPEN() {
       var w      = global.window.open("", 'Translation Console', "width=800,height=800,scrollbars=no", true);
 
+      // I would like to close 'w' when the parent window is reloaded, but it doesn't work.
+      document.body.addEventListener('beforeunload', () => w.close());
+
       // Reset the document to remove old content and styles
       // Reset $UID so that new styles will be re-installed
-      w.document.body.innerText = w.document.head.innerText = '';
+      w.document.body.innerText = '';
+      w.document.head.innerHTML = '<title>Translation Console</title>';
       w.document.$UID = foam.next$UID();
 
       var window = foam.core.Window.create({window: w}, ctrl);
@@ -60,7 +64,7 @@ foam.CLASS({
     {
       name: 'Row',
 
-      imports: [ 'locale', 'localeDAO', 'search', 'translationService' ],
+      imports: [ 'locale', 'localeDAO', 'translationService' ],
 
       requires: [ 'foam.i18n.Locale' ],
 
@@ -72,7 +76,7 @@ foam.CLASS({
         {
           class: 'String',
           name: 'source',
-          tableWidth: 350
+          tableWidth: 380
         },
         {
           class: 'String',
@@ -85,8 +89,8 @@ foam.CLASS({
           tableCellFormatter: function(val, obj, prop) {
             this.startContext({data: obj}).add(prop).endContext();
           },
-          displayWidth: 65,
-          tableWidth: 350
+          displayWidth: 50,
+          tableWidth: 400
         }
       ],
 
@@ -111,7 +115,7 @@ foam.CLASS({
     'translationService'
   ],
 
-  exports: [ 'locale', 'search' ],
+  exports: [ 'locale' ],
 
   requires: [
     'foam.dao.MDAO',
@@ -125,6 +129,7 @@ foam.CLASS({
       view: {
         class: 'foam.u2.TextField',
         type: 'search',
+        placeholder: 'Search',
         onKey: true
       }
     },
@@ -150,7 +155,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'locale',
-      factory: function() { return foam.locale; }
+      factory: function() { return foam.locale.substring(0,2); }
 //          view: 'net.nanopay.ui.topNavigation.LanguageChoiceView'
     }
   ],
@@ -171,7 +176,9 @@ foam.CLASS({
           end().
           start('div').
             style({float: 'right'}).
-            add('Search: ', this.SEARCH, '  Locale: ', this.LOCALE, ' ' , this.CLEAR).
+            add(this.SEARCH, '  Locale: ').
+            tag({class: 'foam.u2.TextField', data$: this.locale$, size: 10}).
+            add(' ' , this.CLEAR).
           end().
         end().
         start(this.CardBorder, {}, this.content$).
@@ -189,7 +196,6 @@ foam.CLASS({
   listeners: [
     function onTranslation(_, __, locale, source, txt, defaultText) {
       this.dao.put(this.Row.create({
-        locale:      locale,
         source:      source,
         text:        txt,
         defaultText: defaultText

@@ -63,7 +63,7 @@ foam.CLASS({
   /* SET ABOVE MODEL */
   ^ .topBar-logo-Back {
     height: 6vh;
-    background: /*%LOGOBACKGROUNDCOLOUR%*/  #202341;
+    background: /*%LOGOBACKGROUNDCOLOUR%*/ #202341;
   }
 
   /* SET ON LOGO IMG */

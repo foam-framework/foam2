@@ -26,7 +26,9 @@ foam.CLASS({
   css: `
     ^ .foam-u2-Tabs-content > div {
       background: white;
-      padding: 14px 16px
+      padding: 14px 16px;
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
     }
 
     ^ .foam-u2-view-ScrollTableView table {
@@ -36,6 +38,8 @@ foam.CLASS({
     ^ .foam-u2-Tabs-tabRow {
       overflow-x: scroll;
       white-space: nowrap;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
     }
   `,
 
