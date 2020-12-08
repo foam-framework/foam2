@@ -189,6 +189,13 @@ foam.CLASS({
 
       if ( ! support.hasQuorum(x) ) {
         setState(ElectoralServiceState.ADJOURNED);
+        support.setIsPrimary(false);
+        ClusterConfig config = support.getConfig(getX(), support.getConfigId());
+        if ( config.getIsPrimary() ) {
+          config.setIsPrimary(false);
+          ((DAO) x.get("clusterConfigDAO")).put(config);
+        }
+
         getLogger().debug("dissolve", getState().getLabel());
         return;
       }
