@@ -176,7 +176,7 @@ foam.CLASS({
 
           reader.onerror = reject;
 
-          reader.readAsText(this.data.blob)
+          reader.readAsText(this.data.blob);
         });
       },
       javaCode: `
