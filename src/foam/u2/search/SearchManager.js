@@ -61,7 +61,6 @@ foam.CLASS({
 
   methods: [
     function init() {
-      console.log('search manager ');
       if ( this.memento && this.memento.paramsObj.filters && this.memento.paramsObj.filters.length > 0 ) {
         var predicates = this.memento.paramsObj.filters.map(f => foam.json.parseString(f.pred, this.__subContext__));
         this.predicate = this.And.create({
