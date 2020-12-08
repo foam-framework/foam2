@@ -116,7 +116,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'mementoHead',
-      value: 'Edit'//
+      value: 'Edit'
     }
   ],
 

@@ -78,12 +78,6 @@ foam.CLASS({
           }
         }
 
-        //on stack push
-        // if ( v.mementoHead ) {
-        //   var currMemento = findCurrentMemento();
-        //   currMemento.tail = this.Memento.create({ head: v.mementoHead });
-        // }
-
         var v = foam.u2.ViewSpec.createView(view, null, this, X);
         if ( v.mementoHead ) {
           var currMemento = this.data.findCurrentMemento();
@@ -91,7 +85,7 @@ foam.CLASS({
 
           m.head$ = v.mementoHead$;
           m.parent = currMemento;
-          
+
           currMemento.tail = m;
         }
         return v;
