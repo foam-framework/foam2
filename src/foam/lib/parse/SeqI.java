@@ -23,7 +23,7 @@ public class SeqI
     for ( int i = 0 ; i < parsers.length ; i++ ) {
       ps = ps.apply(parsers[i], x);
       if ( ps == null ) return null;
-      for ( int j = 0; j < indices.length; j++ ) {
+      for ( int j = 0 ; j < indices.length ; j++ ) {
         if ( i == indices[j] ) value[j] = ps.value();
       }
     }

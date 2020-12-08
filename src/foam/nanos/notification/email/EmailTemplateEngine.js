@@ -163,7 +163,7 @@ foam.CLASS({
             StringBuilder ifCond = new StringBuilder();
             Object[] val0 = (Object[]) valArr[0];
             for ( int i = 0 ; i < val0.length ; i++ ) {
-              if ( ! Character.isWhitespace((char)val0[i]) ) ifCond.append(val0[i]);
+              if ( ! Character.isWhitespace((char) val0[i]) ) ifCond.append(val0[i]);
             }
 
             StringBuilder finalVal = new StringBuilder();
