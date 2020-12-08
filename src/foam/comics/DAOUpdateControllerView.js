@@ -180,7 +180,6 @@ foam.CLASS({
     {
       name: 'cancel',
       code: function() {
-        this.currentMemento = null;
         this.stack.back();
       }
     },

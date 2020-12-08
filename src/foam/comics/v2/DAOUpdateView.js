@@ -114,8 +114,6 @@ foam.CLASS({
         return ! workingData$errors_;
       },
       code: function() {
-        this.memento.tail$.set(null);
-
         this.config.dao.put(this.workingData).then((o) => {
           if ( ! this.data.equals(o) ) {
             this.data = o;
