@@ -369,6 +369,7 @@ var classes = [
   'foam.nanos.notification.email.EmailTemplate',
   'foam.nanos.notification.email.EmailPropertyService',
   'foam.nanos.notification.email.Status',
+  'foam.nanos.notification.email.EmailTemplateEngine',
   // Email service Files
   'foam.nanos.notification.email.SMTPConfig',
   'foam.nanos.notification.email.SMTPEmailService',
@@ -540,6 +541,11 @@ var classes = [
   'foam.lib.query.FooEnum',
 
   'foam.parse.QueryParserUserTest',
+  'foam.parse.PSymbol',
+  'foam.lib.parse.Grammar',
+  'foam.lib.parse.Action',
+  'foam.lib.parse.ActionParser',
+  'foam.lib.parse.SymbolParser',
   'foam.util.EmailTest',
   'foam.util.PasswordTest',
   'foam.util.SecurityUtilTest',
