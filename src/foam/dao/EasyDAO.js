@@ -45,6 +45,7 @@ foam.CLASS({
     'foam.dao.ClientDAO',
     'foam.dao.CompoundDAODecorator',
     'foam.dao.ContextualizingDAO',
+    'foam.dao.PredicateContextualizingDAO',
     'foam.dao.DeDupDAO',
     'foam.dao.InterceptedDAO',
     'foam.dao.GUIDDAO',
@@ -290,6 +291,12 @@ foam.CLASS({
           build();
         }
 
+        if ( getContextualizePredicates() ) {
+          delegate = new foam.dao.PredicateContextualizingDAO.Builder(getX()).
+          setDelegate(delegate).
+          build();
+        }
+
         if ( getOrder() != null && getOrder().length > 0 ) {
           // TODO: CompositeDAO or thenBy
           for ( foam.mlang.order.Comparator comp : getOrder() )
@@ -501,6 +508,12 @@ foam.CLASS({
       documentation: 'Contextualize objects on .find, re-creating them with this EasyDAO\'s exports, as if they were children of this EasyDAO.',
       class: 'Boolean',
       name: 'contextualize',
+      value: false
+    },
+    {
+      documentation: 'Contextualize passed predicates with the context passed to select().',
+      class: 'Boolean',
+      name: 'contextualizePredicates',
       value: false
     },
     {

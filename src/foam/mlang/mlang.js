@@ -555,6 +555,10 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.AbstractPredicate',
   abstract: true,
 
+  javaImports: [
+    'foam.core.ContextAware'
+  ],
+
   documentation: 'Abstract Unary (single-argument) Predicate base-class.',
 
   properties: [
@@ -581,6 +585,20 @@ foam.CLASS({
       name: 'authorize',
       javaCode: `
         getArg1().authorize(x);
+      `
+    },
+    {
+      name: 'setX',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+        x_ = x;
+        if ( getArg1() != null && getArg1() instanceof ContextAware )
+          ((ContextAware) getArg1()).setX(x);
       `
     }
   ]
@@ -694,6 +712,10 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.AbstractPredicate',
   abstract: true,
 
+  javaImports: [
+    'foam.core.ContextAware'
+  ],
+
   documentation: 'Abstract Binary (two-argument) Predicate base-class.',
 
   properties: [
@@ -764,6 +786,22 @@ getArg2().prepareStatement(stmt);`
         getArg1().authorize(x);
         getArg2().authorize(x);
       `
+    },
+    {
+      name: 'setX',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+        x_ = x;
+        if ( getArg1() != null && getArg1() instanceof ContextAware )
+          ((ContextAware) getArg1()).setX(x);
+        if ( getArg2() != null && getArg2() instanceof ContextAware )
+          ((ContextAware) getArg2()).setX(x);
+      `
     }
   ]
 });
@@ -774,6 +812,10 @@ foam.CLASS({
   name: 'Nary',
   extends: 'foam.mlang.predicate.AbstractPredicate',
   abstract: true,
+
+  javaImports: [
+    'foam.core.ContextAware'
+  ],
 
   documentation: 'Abstract n-ary (many-argument) Predicate base-class.',
 
@@ -834,6 +876,22 @@ foam.CLASS({
       javaCode: `
         for ( Predicate predicate : getArgs() ) {
           predicate.authorize(x);
+        }
+      `
+    },
+    {
+      name: 'setX',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+        x_ = x;
+        for ( Object obj : getArgs() ) {
+          if ( obj != null && obj instanceof ContextAware )
+            ((ContextAware) obj).setX(x);
         }
       `
     }

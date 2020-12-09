@@ -284,6 +284,7 @@ FOAM_FILES([
   { name: "foam/dao/SequenceNumberDAO" },
   { name: "foam/dao/SequenceNumberDAOTest" },
   { name: "foam/dao/ContextualizingDAO" },
+  { name: "foam/dao/PredicateContextualizingDAO" },
   { name: "foam/dao/VersionNoDAO" },
   { name: "foam/dao/sync/SyncRecord" },
   { name: "foam/dao/SyncDAO" },
