@@ -100,7 +100,7 @@ foam.CLASS({
       }
       while(true) {
         if ( tail.tail == null ) {
-          m.tail$.set(null);
+          tail.tail$.set(null);
           return;
         } else {
           m = tail;
