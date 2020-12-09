@@ -77,13 +77,13 @@ foam.CLASS({
         Object.keys(this.capableObj.capablePayloads).length > 0;
 
       // set capable payloads to capabilities if the capbilities don't have payloads yet
-      if ( ! hasPayloads ) {
-          try {
-            await this.capableObj.setRequirements(this.capableObj.capableRequirements);
-          } catch (e) {
-            this.notify(e.message, '', this.LogLevel.ERROR, true);
-          }
-      }
+      // if ( ! hasPayloads ) {
+      //     try {
+      //       await this.capableObj.setRequirements(this.capableObj.capableRequirements);
+      //     } catch (e) {
+      //       this.notify(e.message, '', this.LogLevel.ERROR, true);
+      //     }
+      // }
 
       // set wizardlets based on the capableObj
       // note: payloads data are also set from getWizardletsFromCapable

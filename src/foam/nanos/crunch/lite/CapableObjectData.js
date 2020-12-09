@@ -30,11 +30,13 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
-      name: 'capabilityIds'
+      name: 'capabilityIds',
+      section: 'capabilityInformation'
     },
     {
       class: 'String',
-      name: 'daoKey'
+      name: 'daoKey',
+      section: 'capabilityInformation'
     }
   ],
 
