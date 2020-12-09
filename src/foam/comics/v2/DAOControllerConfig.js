@@ -91,6 +91,14 @@ foam.CLASS({
       value: null
     },
     {
+      class: 'Boolean',
+      name: 'disableBrowseViewDataSet',
+      documentation: `
+        Toggle property that prevents BrowseView data from being set if true.
+      `,
+      value: false
+    },
+    {
       // TODO: Make ViewSpecWithJava a refinement to ViewSpec and change below to a ViewSpec
       class: 'foam.u2.ViewSpecWithJava',
       name: 'summaryView',

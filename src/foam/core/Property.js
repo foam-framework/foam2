@@ -589,6 +589,7 @@ foam.CLASS({
     /** Validate an object which has this Property. */
     function validateInstance(o) {
       return;
+      
       if ( this.required && ! o[this.name] ) {
         throw 'Required property ' +
             o.cls_.id + '.' + this.name +

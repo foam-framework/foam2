@@ -132,7 +132,7 @@ foam.CLASS({
     var self = this;
 
       this.addClass(this.myClass())
-      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction) {
+      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction, config$disableBrowseViewDataSet) {
         return self.E()
           .start(self.Rows)
             .addClass(self.myClass('container'))
@@ -145,7 +145,7 @@ foam.CLASS({
                   .end()
                   .startContext({ data: self }).tag(self.CREATE).endContext()
                   .callIf(config$primaryAction, function() {
-                    this.tag(config$primaryAction);
+                    this.startContext({ data: self }).tag(config$primaryAction, { size: 'LARGE' }).endContext();
                   })
                 .end()
                 .callIf(config$browseSubtitle.length > 0, function() {
@@ -168,9 +168,9 @@ foam.CLASS({
                       .addClass(self.myClass('altview-container'))
                     .end();
                 })
-                .add(self.slot(function(browseView) {
-                  //conditionally don't set data
-                  return self.E().tag(browseView, {config: config});
+                .add(self.slot(function(browseView, config$disableBrowseViewDataSet) {
+                  if ( config$disableBrowseViewDataSet ) return self.E().tag(browseView, { config: config });
+                  return self.E().tag(browseView, { data: data, config: config });
                 }))
               .end()
             .end()
