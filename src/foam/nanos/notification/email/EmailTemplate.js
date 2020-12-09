@@ -110,21 +110,19 @@ foam.CLASS({
         }
 
         EmailTemplateEngine templateEngine = (EmailTemplateEngine) x.get("templateEngine");
-        templateEngine.setX(x);
-        templateEngine.setValues(templateArgs);
         // BODY:
         if ( ! emailMessage.isPropertySet("body") ) {
-          emailMessage.setBody(templateEngine.renderTemplate(getBody()).toString());
+          emailMessage.setBody(templateEngine.renderTemplate(getBody(), templateArgs, x).toString());
         }
 
         // REPLY TO:
         if ( ! emailMessage.isPropertySet("replyTo") && ! SafetyUtil.isEmpty(getReplyTo()) ) {
-            emailMessage.setReplyTo(templateEngine.renderTemplate(getReplyTo()).toString());
+            emailMessage.setReplyTo(templateEngine.renderTemplate(getReplyTo(), templateArgs, x).toString());
         }
 
         // DISPLAY NAME:
         if ( ! emailMessage.isPropertySet("displayName") && ! SafetyUtil.isEmpty(getDisplayName()) ) {
-          emailMessage.setDisplayName(templateEngine.renderTemplate(getDisplayName()).toString());
+          emailMessage.setDisplayName(templateEngine.renderTemplate(getDisplayName(), templateArgs, x).toString());
         }
 
         // SUBJECT:
@@ -136,12 +134,12 @@ foam.CLASS({
           String locale = user.getLanguage().toString();
           String source = getId() + ".subject";
           String translatedSubject = ts.getTranslation(locale, source, getSubject());
-          emailMessage.setSubject(templateEngine.renderTemplate(translatedSubject).toString());
+          emailMessage.setSubject(templateEngine.renderTemplate(translatedSubject, templateArgs, x).toString());
         }
 
         // SEND TO:
         if ( ! emailMessage.isPropertySet("to") && ! SafetyUtil.isEmpty(getSendTo()) ) {
-          emailMessage.setTo(new String[] { templateEngine.renderTemplate(getSendTo()).toString() });
+          emailMessage.setTo(new String[] { templateEngine.renderTemplate(getSendTo(), templateArgs, x).toString() });
         }
 
         return emailMessage;

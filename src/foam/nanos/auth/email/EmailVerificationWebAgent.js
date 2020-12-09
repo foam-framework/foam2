@@ -84,12 +84,10 @@ foam.CLASS({
           message = translatedMsg + "<br>" + msg;
         } finally {
           EmailTemplateEngine templateEngine = (EmailTemplateEngine) x.get("templateEngine");
-          templateEngine.setX(x);
           HashMap args = new HashMap();
           args.put("msg", message);
-          templateEngine.setValues(args);
           EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(x, "verify-email-link", (String) user.getGroup());
-          StringBuilder templateBody = templateEngine.renderTemplate(emailTemplate.getBody());
+          StringBuilder templateBody = templateEngine.renderTemplate(emailTemplate.getBody(), args, x);
           out.write(templateBody.toString());
           if ( ! redirect.equals("null") ){
             try {

@@ -36,7 +36,7 @@ foam.CLASS({
         Action markup = new Action() {
           @Override
           public Object execute(Object value, ParserContext x) {
-            return x.get("sb");
+            return (StringBuilder) x.get("sb");
           }
         };
         grammar.addAction("markup", markup);
@@ -72,22 +72,18 @@ foam.CLASS({
 
         /* IF_ELSE syntax: "qwerty {% if var_name_provided_in_map %} qwer {{ possible_simple_value }} erty
         {% else %} qwerty {% endif %}" */
-        Parser ifElseParser = new SeqI(new int[] { 4, 7, 13 },
+        Parser ifElseParser = new SeqI(new int[] { 4, 5, 10 },
           Literal.create("{%"),
           Whitespace.instance(),
           Literal.create("if"),
           Whitespace.instance(),
           new Until(Literal.create("%}")),
-          Whitespace.instance(),
-          Literal.create("%}"),
           new Until(Literal.create("{%")),
-          Literal.create("{%"),
           Whitespace.instance(),
           Literal.create("else"),
           Whitespace.instance(),
           Literal.create("%}"),
           new Until(Literal.create("{%")),
-          Literal.create("{%"),
           Whitespace.instance(),
           Literal.create("endif"),
           Whitespace.instance(),
@@ -99,28 +95,30 @@ foam.CLASS({
           @Override
           public Object execute(Object val, foam.lib.parse.ParserContext x) {
             Object[] valArr = (Object[]) val;
+            Object[] tempVal = (Object[]) valArr[0];
+            Object[] val0 = (Object[]) tempVal[0];
             StringBuilder ifCond = new StringBuilder();
-            Object[] val0 = (Object[]) valArr[0];
             for ( int i = 0 ; i < val0.length ; i++ ) {
               if ( ! Character.isWhitespace((char)val0[i]) ) ifCond.append(val0[i]);
             }
 
             StringBuilder finalVal = new StringBuilder();
             if ( ((Map) x.get("values")).get(ifCond.toString() ) != null ) {
-              Object[] val1 = (Object[]) valArr[1];
+              tempVal = (Object[]) valArr[1];
+              Object[] val1 = (Object[]) tempVal[0];
               for ( int i = 0 ; i < val1.length ; i++ ) {
                 finalVal.append(val1[i]);
               }
             } else {
-              Object[] val2 = (Object[]) valArr[2];
+              tempVal = (Object[]) valArr[2];
+              Object[] val2 = (Object[]) tempVal[0];
               for ( int i = 0 ; i < val2.length ; i++ ) {
                 finalVal.append(val2[i]);
               }
             }
             StringPStream finalValPs = new StringPStream();
             finalValPs.setString(finalVal);
-            PStream ret = ((Parser) grammar.sym("markup")).parse(finalValPs, new ParserContextImpl());
-            ((StringBuilder) x.get("sb")).append(ret.value());
+            ((Parser) grammar.sym("markup")).parse(finalValPs, x);
             return val;
           }
         };
@@ -129,18 +127,13 @@ foam.CLASS({
 
         /* IF symbol syntax: "qwerty {% if var_name_provided_in_map %} qwer {{ possible_simple_value }}
         qwerty {% endif %}" */
-        Parser ifParser = new Seq2(4, 8,
+        Parser ifParser = new Seq2(4, 5,
           Literal.create("{%"),
           Whitespace.instance(),
           Literal.create("if"),
           Whitespace.instance(),
           new Until(Literal.create("%}")),
-          Whitespace.instance(),
-          Literal.create("%}"),
-          Whitespace.instance(),
           new Until(Literal.create("{%")),
-          Whitespace.instance(),
-          Literal.create("{%"),
           Whitespace.instance(),
           Literal.create("endif"),
           Whitespace.instance(),
@@ -152,22 +145,23 @@ foam.CLASS({
           @Override
           public Object execute(Object val, foam.lib.parse.ParserContext x) {
             Object[] valArr = (Object[]) val;
+            Object[] tempVal = (Object[]) valArr[0];
+            Object[] val0 = (Object[]) tempVal[0];
             StringBuilder ifCond = new StringBuilder();
-            Object[] val0 = (Object[]) valArr[0];
             for ( int i = 0 ; i < val0.length ; i++ ) {
               if ( ! Character.isWhitespace((char) val0[i]) ) ifCond.append(val0[i]);
             }
 
             StringBuilder finalVal = new StringBuilder();
             if ( ((Map) x.get("values")).get(ifCond.toString() ) != null ) {
-              Object[] val1 = (Object[]) valArr[1];
+              tempVal = (Object[]) valArr[1];
+              Object[] val1 = (Object[]) tempVal[0];
               for ( int i = 0 ; i < val1.length ; i++ ) {
                 finalVal.append(val1[i]);
               }
               StringPStream finalValPs = new StringPStream();
               finalValPs.setString(finalVal);
-              PStream ret = ((Parser) grammar.sym("markup")).parse(finalValPs, new ParserContextImpl());
-              ((StringBuilder) x.get("sb")).append(ret.value());
+              ((Parser) grammar.sym("markup")).parse(finalValPs, x);
             }
             return val;
           }
@@ -375,7 +369,7 @@ foam.CLASS({
       getIncludeGrammar().parse(ps, parserX, "");
 
       if ( ! (Boolean) parserX.get("isNextTemplateExtending") ) return sbJoin;
-      return joinTemplates(sbJoin.toString());
+      return joinTemplates(sbJoin.toString(), x);
       `
     }
   ],
