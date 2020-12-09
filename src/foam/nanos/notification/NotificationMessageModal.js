@@ -16,11 +16,10 @@ foam.CLASS({
         background-color: #fff;
         width: 60vw;
         max-height: 80vh;
-        padding: 24px;
         overflow-y: scroll;
       }
       ^ .main {
-        padding: 8px 24px 0px;
+        padding: 8px 48px 24px;
       }
       ^ .bold-label {
         font-size: 16px;

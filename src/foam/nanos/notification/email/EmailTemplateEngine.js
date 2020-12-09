@@ -41,7 +41,7 @@ foam.CLASS({
         Action markup = new Action() {
           @Override
           public Object execute(Object value, ParserContext x) {
-            return ((StringBuilder) x.get("sb")).toString();
+            return x.get("sb");
           }
         };
         grammar.addAction("markup", markup);
@@ -220,7 +220,7 @@ foam.CLASS({
         Action superBlockAction = new Action() {
           @Override
           public Object execute(Object val, ParserContext x) {
-            ((StringBuilder) x.get("sb")).append((String) x.get("content"));
+            ((StringBuilder) x.get("sb")).append(x.get("content"));
             return val;
           }
         };
@@ -310,11 +310,11 @@ foam.CLASS({
       type: 'StringBuilder',
       javaCode: `
       EmailTemplate template = (EmailTemplate) ((DAO) x_.get("emailTemplateDAO")).find(id);
-      return renderTemplateStr(template.getBody());
+      return renderTemplate(template.getBody());
       `
     },
     {
-      name: 'renderTemplateStr',
+      name: 'renderTemplate',
       args: [
         { name: 'str', type: 'String' }
       ],
