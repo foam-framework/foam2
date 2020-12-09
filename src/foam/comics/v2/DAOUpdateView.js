@@ -67,6 +67,7 @@ foam.CLASS({
   ],
 
   messages: [
+    { name: 'BACK', message: 'Back' }
   ],
 
   properties: [
