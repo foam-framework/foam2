@@ -41,6 +41,7 @@ configuration for contacting the primary node.`,
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
+    'foam.nanos.session.Session',
     'foam.net.Host',
     'foam.util.SafetyUtil',
     'java.net.HttpURLConnection',
@@ -731,13 +732,18 @@ configuration for contacting the primary node.`,
       javaCode: `
       PM pm = PM.create(x, this.getClass().getSimpleName(), "getClientDAO");
       try {
-      return new ClientDAO.Builder(x)
-        .setOf(MedusaEntry.getOwnClassInfo())
-        .setDelegate(new SessionClientBox.Builder(x)
-          .setSessionID(sendClusterConfig.getSessionId())
+        String sessionId = sendClusterConfig.getSessionId();
+        Session session = (Session) x.get("session");
+        if ( session != null ) {
+          sessionId = session.getId();
+        }
+        return new ClientDAO.Builder(x)
+          .setOf(MedusaEntry.getOwnClassInfo())
+          .setDelegate(new SessionClientBox.Builder(x)
+          .setSessionID(sessionId)
           .setDelegate(getSocketClientBox(x, serviceName, sendClusterConfig, receiveClusterConfig))
           .build())
-        .build();
+          .build();
       } finally {
         pm.log(x);
       }
@@ -768,10 +774,15 @@ configuration for contacting the primary node.`,
       PM pm = PM.create(x, this.getClass().getSimpleName(), "getHTTPClientDAO");
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       try {
+        String sessionId = sendClusterConfig.getSessionId();
+        Session session = (Session) x.get("session");
+        if ( session != null ) {
+          sessionId = session.getId();
+        }
         return new foam.dao.ClientDAO.Builder(x)
           .setOf(MedusaEntry.getOwnClassInfo())
           .setDelegate(new foam.box.SessionClientBox.Builder(x)
-          .setSessionID(sendClusterConfig.getSessionId())
+          .setSessionID(sessionId)
           .setDelegate(new foam.box.HTTPBox.Builder(x)
             .setAuthorizationType(foam.box.HTTPAuthorizationType.BEARER)
             .setSessionID(sendClusterConfig.getSessionId())
@@ -811,10 +822,15 @@ configuration for contacting the primary node.`,
       javaCode: `
       PM pm = PM.create(x, this.getClass().getSimpleName(), "getBroadcastClientDAO");
       try {
-      return new NotificationClientDAO.Builder(x)
-        .setOf(MedusaEntry.getOwnClassInfo())
-        .setDelegate(new SessionClientBox.Builder(x)
-          .setSessionID(sendClusterConfig.getSessionId())
+        String sessionId = sendClusterConfig.getSessionId();
+        Session session = (Session) x.get("session");
+        if ( session != null ) {
+          sessionId = session.getId();
+        }
+        return new NotificationClientDAO.Builder(x)
+          .setOf(MedusaEntry.getOwnClassInfo())
+          .setDelegate(new SessionClientBox.Builder(x)
+          .setSessionID(sessionId)
           .setDelegate(getSocketClientBox(x, serviceName, sendClusterConfig, receiveClusterConfig))
           .build())
         .build();
