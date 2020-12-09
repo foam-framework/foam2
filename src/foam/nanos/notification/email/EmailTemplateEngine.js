@@ -310,11 +310,11 @@ foam.CLASS({
       type: 'StringBuilder',
       javaCode: `
       EmailTemplate template = (EmailTemplate) ((DAO) x_.get("emailTemplateDAO")).find(id);
-      return renderTemplateStr(template.getBody());
+      return renderTemplate(template.getBody());
       `
     },
     {
-      name: 'renderTemplateStr',
+      name: 'renderTemplate',
       args: [
         { name: 'str', type: 'String' }
       ],
