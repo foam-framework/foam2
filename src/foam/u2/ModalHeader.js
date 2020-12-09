@@ -26,7 +26,7 @@ foam.CLASS({
       align-items: center;
 
       width: 100%; /* This is to fit the width of its parent container */
-      padding: 32px 24px 24px;
+      padding: 24px 24px 20px;
       box-sizing: border-box;
       border-bottom: solid 1px #CBCFD4;
     }
