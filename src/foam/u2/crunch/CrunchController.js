@@ -46,7 +46,7 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.TestAgent',
     'foam.u2.crunch.wizardflow.LoadTopConfig',
     'foam.u2.crunch.wizardflow.CapableDefaultConfigAgent',
-    'foam.u2.crunch.wizardflow.CapableCreateWizardletsAgent',
+    'foam.u2.crunch.wizardflow.SkipGrantedAgent',
     'foam.u2.crunch.wizardflow.MaybeDAOPutAgent',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
@@ -101,7 +101,8 @@ foam.CLASS({
           .add(this.CheckNoDataAgent)
           .add(this.CreateWizardletsAgent)
           .add(this.LoadWizardletsAgent)
-          .add(this.FilterWizardletsAgent)
+          // .add(this.FilterWizardletsAgent)
+          .add(this.SkipGrantedAgent)
           .add(this.RequirementsPreviewAgent)
           .add(this.LoadTopConfig)
           .add(this.StepWizardAgent)
