@@ -107,7 +107,7 @@ foam.CLASS({
       javaGetter: `
         return getPayload().getStatus();
       `,
-      getter: function (nu) { this.payload.status = nu },
+      setter: function (nu) { this.payload.status = nu },
       javaSetter: `
         getPayload().setStatus(val);
       `
