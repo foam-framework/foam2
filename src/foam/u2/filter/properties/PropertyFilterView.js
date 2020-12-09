@@ -195,7 +195,7 @@ foam.CLASS({
           this.memento.paramsObj.filters = [];
         }
 
-        this.memento.paramsObj.filters = this.memento.paramsObj.filters.filter(f => f.name !== this.property.name && f.criteria !== this.criteria );
+        this.memento.paramsObj.filters = this.memento.paramsObj.filters.filter(f => f.name !== this.property.name || f.criteria !== this.criteria );
 
         var pred;
         if ( Object.keys(this.view_.predicate).length > 0 && ! foam.mlang.predicate.True.isInstance(this.view_.predicate) )
