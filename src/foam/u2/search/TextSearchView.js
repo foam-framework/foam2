@@ -110,7 +110,6 @@ foam.CLASS({
         }, this.view$);
 
       this.view.data$.sub(this.updateValue);
-      this.view.data = '';
       this.updateValue();
 
       if ( this.searchValue ) {
