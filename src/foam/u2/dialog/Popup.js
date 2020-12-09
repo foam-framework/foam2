@@ -43,8 +43,8 @@ foam.CLASS({
     }
     ^X {
       position: absolute;
-      top: 32px;
-      right: 24px;
+      top: 8px;
+      right: 16px;
       z-index: 1000;
       background: none !important;
       width: 24px !important;
@@ -74,6 +74,7 @@ foam.CLASS({
     ^inner {
       z-index: 3;
       max-width: 80vw;
+      position: relative;
       /* The following line fixes a stacking problem in certain browsers. */
       will-change: opacity;
     }
