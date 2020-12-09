@@ -68,7 +68,7 @@ foam.CLASS({
           public Object execute(Object val, ParserContext x) {
             String value = (String) getValues().get(val);
             if ( value == null ) {
-              value = "undefined";
+              value = "";
               foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x_.get("logger");
               logger.error("No value provided for variable " + val);
             }
