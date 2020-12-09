@@ -35,7 +35,6 @@ foam.CLASS({
         Grammar grammar = new Grammar();
         grammar.addSymbol("START", grammar.sym("markup"));
 
-
         // markup symbol defines the pattern for the whole string
         grammar.addSymbol("markup", new Repeat0(new Alt(grammar.sym("IF_ELSE"),
           grammar.sym("IF"), grammar.sym("SIMPLE_VAL"), grammar.sym("ANY_CHAR"))));
@@ -47,7 +46,6 @@ foam.CLASS({
         };
         grammar.addAction("markup", markup);
 
-
         // ANY_KEY symbol applies to any char that doesn't match any other pattern
         grammar.addSymbol("ANY_CHAR", AnyChar.instance());
         Action anyCharAction = new Action() {
@@ -58,7 +56,6 @@ foam.CLASS({
           }
         };
         grammar.addAction("ANY_CHAR", anyCharAction);
-
 
         // simple value syntax: "qwerty {{ simple_value }} qwerty"
         grammar.addSymbol("SIMPLE_VAL", new Seq1(2, Literal.create("{{"), Whitespace.instance(),
@@ -77,7 +74,6 @@ foam.CLASS({
           }
         };
         grammar.addAction("SIMPLE_VAL", simpleValAction);
-
 
         /* IF_ELSE syntax: "qwerty {% if var_name_provided_in_map %} qwer {{ possible_simple_value }} erty
         {% else %} qwerty {% endif %}" */
@@ -153,7 +149,8 @@ foam.CLASS({
           Whitespace.instance(),
           Literal.create("endif"),
           Whitespace.instance(),
-          Literal.create("%}"));
+          Literal.create("%}")
+        );
 
         grammar.addSymbol("IF", ifParser);
         Action ifAction  = new Action() {
@@ -346,7 +343,6 @@ foam.CLASS({
       type: 'StringBuilder',
       javaCode: `
       StringBuilder sbContent = sbContent_.get();
-
       StringPStream ps = new StringPStream();
       ps.setString(body);
       ParserContext parserX = new ParserContextImpl();
