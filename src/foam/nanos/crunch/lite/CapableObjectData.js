@@ -35,7 +35,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'daoKey',
+      name: 'DAOKey',
       section: 'capabilityInformation'
     }
   ],

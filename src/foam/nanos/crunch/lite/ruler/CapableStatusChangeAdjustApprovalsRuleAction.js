@@ -122,7 +122,7 @@ foam.CLASS({
               Capability capability = (Capability) capabilityDAO.find(capablePayload.getCapability());
 
               String hashedId = new StringBuilder("d")
-                .append(capableNewObj.getDaoKey())
+                .append(capableNewObj.getDAOKey())
                 .append(":o")
                 .append(String.valueOf(obj.getProperty("id")))
                 .append(":c")

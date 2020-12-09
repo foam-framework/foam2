@@ -86,10 +86,10 @@ foam.CLASS({
 
         if (
           String.valueOf(obj.getProperty("id")) == null ||
-          SafetyUtil.isEmpty(String.valueOf(capableObj.getDaoKey()))
+          SafetyUtil.isEmpty(String.valueOf(capableObj.getDAOKey()))
         ){
-          logger.error("Missing id and/or daoKey from Capable object");
-          throw new RuntimeException("Missing id and/or daoKey from Capable object");
+          logger.error("Missing id and/or DAOKey from Capable object");
+          throw new RuntimeException("Missing id and/or DAOKey from Capable object");
         }
 
 
@@ -112,7 +112,7 @@ foam.CLASS({
               Operations operation = Operations.CREATE;
 
               String hashedId = new StringBuilder("d")
-                .append(capableObj.getDaoKey())
+                .append(capableObj.getDAOKey())
                 .append(":o")
                 .append(String.valueOf(obj.getProperty("id")))
                 .append(":c")
@@ -139,8 +139,8 @@ foam.CLASS({
 
                 Approvable approvable = (Approvable) approvableDAO.put_(getX(), new Approvable.Builder(getX())
                   .setLookupId(hashedId)
-                  .setDaoKey(capableObj.getDaoKey())
-                  .setServerDaoKey(capableObj.getDaoKey())
+                  .setDaoKey(capableObj.getDAOKey())
+                  .setServerDaoKey(capableObj.getDAOKey())
                   .setStatus(ApprovalStatus.REQUESTED)
                   .setObjId(String.valueOf(obj.getProperty("id")))
                   .setOperation(operation)

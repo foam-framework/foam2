@@ -52,7 +52,7 @@ foam.CLASS({
         if ( currentObjectInDao == null ) {
           for (int i = 0; i < toPutCapablePayloadArray.length; i++){
 
-            toPutCapableObj.setDaoKey(getDaoKey());
+            toPutCapableObj.setDAOKey(getDaoKey());
 
             CapabilityJunctionPayload currentCapablePayload = toPutCapablePayloadArray[i];
 
@@ -63,13 +63,13 @@ foam.CLASS({
         } else {
           Capable storedCapableObj = (Capable) currentObjectInDao;
 
-          toPutCapableObj.setDaoKey(storedCapableObj.getDaoKey());
+          toPutCapableObj.setDAOKey(storedCapableObj.getDAOKey());
 
           // should always be sync'd with whatever is on the backend
           if (
-            SafetyUtil.isEmpty(String.valueOf(storedCapableObj.getDaoKey()))
+            SafetyUtil.isEmpty(String.valueOf(storedCapableObj.getDAOKey()))
           ) {
-            toPutCapableObj.setDaoKey(getDaoKey());
+            toPutCapableObj.setDAOKey(getDaoKey());
           }
 
           DAO storedCapablePayloadDAO = storedCapableObj.getCapablePayloadDAO(x);

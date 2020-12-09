@@ -250,12 +250,12 @@ foam.INTERFACE({
       ]
     },
     {
-      name: 'getDaoKey',
+      name: 'getDAOKey',
       type: 'String',
       flags: ['java']
     },
     {
-      name: 'setDaoKey',
+      name: 'setDAOKey',
       flags: ['java'],
       args: [
         {
@@ -264,5 +264,5 @@ foam.INTERFACE({
         }
       ]
     }
-  ],
+  ]
 });
