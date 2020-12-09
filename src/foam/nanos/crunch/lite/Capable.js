@@ -221,11 +221,18 @@ foam.INTERFACE({
     },
     {
       name: 'getCapabilityIds',
+      documentation: `
+        Getting the ids of the root capabilit(y/ies) required for the capable object.
+      `,
       type: 'String[]',
       flags: ['java'],
     },
     {
       name: 'setCapabilityIds',
+      documentation: `
+        Setting the ids of the root capabilit(y/ies) required for the capable object.
+        Should be handled by using capable.addRequirement rather than directly setting.
+    `,
       flags: ['java'],
       args: [
         {
