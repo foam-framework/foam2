@@ -31,8 +31,8 @@ p({
     {
       "of":"foam.nanos.boot.NSpec",
       "cache":true,
-      "ttlSelectPurgeTime": 0,
-      "ttlPurgeTime": 0
+      "ttlPurgeTime":0,
+      "ttlSelectPurgeTime": 25000
     }
   """,
   documentation:"The authenticated version of nSpecDAO - for dig and docs."
