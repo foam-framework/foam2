@@ -46,7 +46,6 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.TestAgent',
     'foam.u2.crunch.wizardflow.LoadTopConfig',
     'foam.u2.crunch.wizardflow.CapableDefaultConfigAgent',
-    'foam.u2.crunch.wizardflow.CapableCreateWizardletsAgent',
     'foam.u2.crunch.wizardflow.MaybeDAOPutAgent',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
@@ -273,7 +272,9 @@ foam.CLASS({
         capable: capable,
         rootCapability: capable.capabilityIds[0]
       }))
-        .add(this.CapableCreateWizardletsAgent)
+        .add(this.LoadCapabilitiesAgent, {
+          waoSetting: this.LoadCapabilitiesAgent.WAOSetting.CAPABLE })
+        .add(this.CreateWizardletsAgent)
         .add(this.LoadWizardletsAgent)
         .execute().then(x => x.wizardlets);
     }
