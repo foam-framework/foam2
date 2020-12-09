@@ -5,12 +5,11 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.crunch.lite',
-  name: 'CapablePayload',
+  package: 'foam.nanos.crunch',
+  name: 'CapabilityJunctionPayload',
   documentation: `
-    Composite object containing a capability ID and an instance of
-    payload data. This is similar to a UserCapabilityJunction, but
-    it is not associated with a user and has less features.
+    Capability data that can be stored in a UserCapabilityJunction or on a
+    Capable object.
   `,
 
   javaImports: [
@@ -38,25 +37,6 @@ foam.CLASS({
       class: 'FObjectProperty'
     },
     {
-      name: 'prerequisites',
-      class: 'FObjectArray',
-      of: 'foam.nanos.crunch.lite.CapablePayload',
-      documentation: `
-        Specifies prerequisites that were not present in the higher-level
-        capability path, for example options for a MinMaxCapability.
-
-        To save data to one of these payloads, clone it and add it to the
-        parent-most list of CapablePayload objects. The validator will not
-        recurse into this list because these payloads may be conditionally
-        applicable.
-      `,
-      javaFactory: `
-        return null;
-      `,
-      storageTransient: true,
-      permissionRequired: true
-    },
-    {
       name: 'status',
       class: 'Enum',
       of: 'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -65,17 +45,13 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'hasSafeStatus',
-      documentation: `
-        TODO: 
-      `,
+      // TODO: Check where this should be used in UCJ rules
       transient: true
     },
     {
       class: 'Boolean',
       name: 'needsApproval',
-      documentation: `
-        TODO: Review with Eric
-      `,
+      // TODO: Check if this is useful for UCJ rules
       transient: true
     }
   ],

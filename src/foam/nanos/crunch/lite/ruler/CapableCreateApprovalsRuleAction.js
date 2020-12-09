@@ -33,7 +33,7 @@ foam.CLASS({
     'foam.util.SafetyUtil',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.lite.Capable',
-    'foam.nanos.crunch.lite.CapablePayload',
+    'foam.nanos.crunch.CapabilityJunctionPayload',
     'foam.nanos.logger.Logger'
   ],
 
@@ -67,7 +67,7 @@ foam.CLASS({
         { name: 'x', type: 'Context' },
         { name: 'request', type: 'ApprovalRequest' },
         { name: 'capableObj', type: 'Capable' },
-        { name: 'capablePayloadObj', type: 'CapablePayload' }
+        { name: 'capablePayloadObj', type: 'CapabilityJunctionPayload' }
       ],
       javaCode: `
         return request;
@@ -84,8 +84,8 @@ foam.CLASS({
 
         Capable capableObj = (Capable) clonedObj;
 
-        if ( 
-          String.valueOf(obj.getProperty("id")) == null || 
+        if (
+          String.valueOf(obj.getProperty("id")) == null ||
           SafetyUtil.isEmpty(String.valueOf(capableObj.getDaoKey()))
         ){
           logger.error("Missing id and/or daoKey from Capable object");
@@ -94,10 +94,10 @@ foam.CLASS({
 
 
         agency.submit(x, new ContextAwareAgent() {
-          
+
           @Override
           public void execute(X x) {
-            for ( CapablePayload capablePayload : capableObj.getCapablePayloads() ){
+            for ( CapabilityJunctionPayload capablePayload : capableObj.getCapablePayloads() ){
 
               DAO capabilityDAO = (DAO) x.get("capabilityDAO");
               Capability capability = (Capability) capabilityDAO.find(capablePayload.getCapability());
@@ -124,7 +124,7 @@ foam.CLASS({
                   foam.mlang.MLang.EQ(Approvable.LOOKUP_ID, hashedId),
                   foam.mlang.MLang.EQ(Approvable.STATUS, ApprovalStatus.REQUESTED)
                 )).inX(getX()).select(new ArraySink())).getArray();
-              
+
               if ( approvablesPending.size() > 0 ){
                 logger.warning("Approvable already  exists for: " + hashedId);
                 // TODO: throw an error once we add the paymentId checks as this is supposed  to be  unexpected
@@ -134,7 +134,7 @@ foam.CLASS({
 
               try {
                 FObject objectToDiffAgainst = (FObject) capablePayload.getClassInfo().newInstance();
-              
+
                 Map propertiesToApprove = objectToDiffAgainst.diff(capablePayload);
 
                 Approvable approvable = (Approvable) approvableDAO.put_(getX(), new Approvable.Builder(getX())
@@ -155,14 +155,14 @@ foam.CLASS({
                   .setCreatedBy(user.getId())
                   .setGroup(getGroupToNotify())
                   .setClassification(
-                    capability.getName() + 
-                    " for " + 
-                    obj.getClassInfo().getObjClass().getSimpleName() + 
-                    " - id:" + 
+                    capability.getName() +
+                    " for " +
+                    obj.getClassInfo().getObjClass().getSimpleName() +
+                    " - id:" +
                     String.valueOf(obj.getProperty("id"))
                   )
                   .setStatus(ApprovalStatus.REQUESTED).build();
-                
+
                 approvalRequest = decorateApprovalRequest(x, approvalRequest, capableObj, capablePayload);
 
                 approvalRequestDAO.put_(getX(), approvalRequest);

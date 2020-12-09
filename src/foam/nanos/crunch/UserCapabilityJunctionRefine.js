@@ -13,7 +13,11 @@ foam.CLASS({
     Model for UserCapabilityJunction, contains the data needed to grant the
     capability to user.
   `,
-  
+
+  requires: [
+    'foam.nanos.crunch.CapabilityJunctionPayload'
+  ],
+
   javaImports: [
     'foam.core.FObject',
     'foam.dao.DAO',
@@ -66,17 +70,47 @@ foam.CLASS({
       }
     },
     {
+      name: 'payload',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.crunch.CapabilityJunctionPayload',
+      factory: function () {
+        return this.CapabilityJunctionPayload.create();
+      },
+      javaFactory: `
+        var payload = new CapabilityJunctionPayload();
+        // Temporary so outdated test journals work
+        if ( statusIsSet_ ) payload.setStatus(getStatus());
+        if ( dataIsSet_ ) payload.setData(getData());
+        return payload;
+      `
+    },
+    {
       name: 'data',
       class: 'foam.core.FObjectProperty',
       of: 'foam.core.FObject',
       documentation: `data for capability.of`,
-      view: { class: 'foam.u2.detail.VerticalDetailView' }
+      view: { class: 'foam.u2.detail.VerticalDetailView' },
+      getter: function () { return this.payload.data },
+      javaGetter: `
+        return getPayload().getData();
+      `,
+      setter: function (nu) { this.payload.data = nu; },
+      javaSetter: `
+        getPayload().setData(val);
+      `
     },
     {
       name: 'status',
       class: 'Enum',
       of: 'foam.nanos.crunch.CapabilityJunctionStatus',
-      value: foam.nanos.crunch.CapabilityJunctionStatus.ACTION_REQUIRED
+      getter: function () { return this.payload.status },
+      javaGetter: `
+        return getPayload().getStatus();
+      `,
+      getter: function (nu) { this.payload.status = nu },
+      javaSetter: `
+        getPayload().setStatus(val);
+      `
     },
     {
       class: 'Reference',
@@ -122,9 +156,9 @@ foam.CLASS({
         If the data on an UserCapabilityJunction should be stored in some DAO, the daoKey should be provided on its corresponding Capability object.
       `,
       javaCode: `
-        if ( getData() == null ) 
+        if ( getData() == null )
           throw new RuntimeException("UserCapabilityJunction data not submitted for capability: " + getTargetId());
-        
+
         String daoKey = capability.getDaoKey();
         if ( daoKey == null ) return null;
 
@@ -138,10 +172,10 @@ foam.CLASS({
           if ( contextDAOFindKey.toLowerCase().contains("subject") ) {         // 1- Case if subject lookup
             String[] words = foam.util.StringUtil.split(contextDAOFindKey, '.');
             objectToSave = (FObject) x.get("subject");
-            
+
             if ( objectToSave == null || words.length < 2 )
               throw new RuntimeException("@UserCapabilityJunction capability.contextDAOFindKey not found in context. Please check capability: " + getTargetId() + " and its contextDAOFindKey: " + contextDAOFindKey);
-            
+
             if ( words[1].toLowerCase().equals("user") ) {
               objectToSave = ((Subject) objectToSave).getUser();
             } else if ( words[1].toLowerCase().equals("realuser") ) {
@@ -229,7 +263,7 @@ foam.CLASS({
           ));
           subject.setUser((User) userDAO.find(ucj.getSourceId()));
         }
-        
+
         subject.setUser((User) userDAO.find(ucj.getSourceId()));
         subject.setUser((User) userDAO.find(ucj.getSourceId()));
         return subject;
