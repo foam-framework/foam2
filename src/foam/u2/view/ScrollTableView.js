@@ -210,8 +210,6 @@
     },
 
     function initE() {
-      // var self = this;
-
       if ( this.currentMemento ) {
         var id = this.currentMemento.head;
         if ( ! isNaN(id) ) {
