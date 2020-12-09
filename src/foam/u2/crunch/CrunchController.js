@@ -272,11 +272,14 @@ foam.CLASS({
         capable: capable,
         rootCapability: capable.capabilityIds[0]
       }))
+        .add(this.CapabilityAdaptAgent)
         .add(this.LoadCapabilitiesAgent, {
           waoSetting: this.LoadCapabilitiesAgent.WAOSetting.CAPABLE })
         .add(this.CreateWizardletsAgent)
         .add(this.LoadWizardletsAgent)
-        .execute().then(x => x.wizardlets);
+        .execute().then(x => {
+          return x.wizardlets
+        })
     }
   ]
 });
