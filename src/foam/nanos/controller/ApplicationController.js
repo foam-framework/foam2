@@ -342,7 +342,7 @@ foam.CLASS({
 
       // Start Memento Support
       this.WindowHash.create({value$: this.memento.value$});
-//can we somehow combine this 346-358
+
       this.memento.changeIndicator$.sub(function () {
         self.memento.value = self.memento.combine();
 
