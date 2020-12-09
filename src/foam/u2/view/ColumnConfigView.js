@@ -414,6 +414,7 @@ foam.CLASS({
   ^some-padding {
     text-align: left;
     padding: 3px;
+    height: 14px;
   }
   `,
   constants: [

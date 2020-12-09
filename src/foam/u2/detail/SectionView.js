@@ -25,7 +25,7 @@ foam.CLASS({
 
   css: `
     .subtitle {
-      color: /*%GREY2%*/ #8e9090;
+      color: /*%GREY2%*/ #9ba1a6;
       font-size: 14px;
       line-height: 1.5;
       margin-bottom: 15px;
@@ -58,7 +58,25 @@ foam.CLASS({
       name: 'evaluateMessage',
       documentation: `Evaluates model messages without executing potentially harmful values`,
       factory: function() {
-        return (msg) => msg.replace(/\${(.*?)}/g, (x,g) => this.data[g]);
+        var obj = this.data.clone();
+        return (msg) => msg.replace(/\${(.*?)}/g, (x, str) => {
+          return this.getNestedPropValue(obj, str);
+        });
+      }
+    },
+    {
+      class: 'Function',
+      name: 'getNestedPropValue',
+      documentation: `
+        Finds the value of an object in reference to the property path provided
+        ex. 'obj.innerobj.name' will return the value of 'name' belonging to 'innerobj'.
+      `,
+      factory: function() {
+        return (obj, path) => {
+          if ( ! path ) return obj;
+          const props = path.split('.');
+          return this.getNestedPropValue(obj[props.shift()], props.join('.'))
+        }
       }
     }
   ],

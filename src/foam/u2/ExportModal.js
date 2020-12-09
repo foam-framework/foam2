@@ -18,9 +18,9 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'EXPORT', message: 'Export1' },
-    { name: 'DATA_TYPE_MSG', message: 'Data Type1' },
-    { name: 'RESPONSE', message: 'Response1' }
+    { name: 'EXPORT', message: 'Export' },
+    { name: 'DATA_TYPE_MSG', message: 'Data Type' },
+    { name: 'RESPONSE', message: 'Response' }
   ],
 
   requires: [
@@ -85,7 +85,7 @@ foam.CLASS({
       width: 190px;
       height: 40px;
       border-radius: 0;
-      margin-left: 25px;
+      margin-left: 24px;
       padding: 12px 20px;
       border: solid 1px rgba(164, 179, 184, 0.5);
       background-color: white;
@@ -98,12 +98,12 @@ foam.CLASS({
       border: solid 1px #59A5D5;
     }
     ^ .label{
-      margin: 10px 0px 0px 25px;
+      margin: 10px 0px 0px 24px;
     }
     ^ .note {
       height: 150px;
       width: 398px;
-      margin-left: 25px;
+      margin-left: 24px;
     }
     ^buttons {
       padding: 12px;
@@ -146,12 +146,12 @@ foam.CLASS({
       .addClass(this.myClass())
       .startContext({ data: this })
         .start()
-          .start().addClass('label').add(this.DATA_TYPE_MSG).end()
+          .start().addClass('label').style({'padding-top': '14px'}).add(this.DATA_TYPE_MSG).end()
           .start(this.DATA_TYPE).end()
           .add(this.slot(function (exportDriver) {
             return this.E().add(exportDriver);
           }))
-          .start().addClass('label').add(this.RESPONSE).end()
+          .start().addClass('label').style({'padding-top': '14px'}).add(this.RESPONSE).end()
           .start(this.NOTE).addClass('input-box').addClass('note').end()
           .add(
             self.slot(function(exportDriverReg$exportAllColumns) {

@@ -156,7 +156,7 @@ foam.CLASS({
           TranslationService ts = (TranslationService) x.get("translationService");
           Subject subject = (Subject) x.get("subject");
           User user = subject.getRealUser();
-          String locale = user.getLanguage().toString();
+          String locale = user.getLanguage().getCode().toString();
           String source = getId() + ".subject";
           String translatedSubject = ts.getTranslation(locale, source, getSubject());
           emailMessage.setSubject((JtwigTemplate.inlineTemplate(translatedSubject, config)).render(model));

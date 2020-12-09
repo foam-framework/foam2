@@ -105,6 +105,7 @@ var classes = [
   'foam.box.HTTPReplyBox',
   'foam.box.AuthServiceClientBox',
   'foam.box.ExportBox',
+  'foam.nanos.iban.ValidationIBAN',
   'foam.nanos.app.AppConfig',
   'foam.nanos.app.ContextLookupAppConfigService',
   'foam.nanos.http.WebAgent',
@@ -369,6 +370,7 @@ var classes = [
   'foam.nanos.notification.email.EmailTemplate',
   'foam.nanos.notification.email.EmailPropertyService',
   'foam.nanos.notification.email.Status',
+  'foam.nanos.notification.email.EmailTemplateEngine',
   // Email service Files
   'foam.nanos.notification.email.SMTPConfig',
   'foam.nanos.notification.email.SMTPEmailService',
@@ -511,6 +513,7 @@ var classes = [
   'foam.nanos.demo.relationship.CourseType',
   'foam.nanos.demo.relationship.StudentCourseJunction',
   'foam.nanos.fs.File',
+  'foam.nanos.fs.FileDataDAO',
   'foam.nanos.fs.FileType',
   'foam.nanos.fs.SupportFileTypeDAO',
   'foam.crypto.hash.Hasher',
@@ -539,6 +542,11 @@ var classes = [
   'foam.lib.query.FooEnum',
 
   'foam.parse.QueryParserUserTest',
+  'foam.parse.PSymbol',
+  'foam.lib.parse.Grammar',
+  'foam.lib.parse.Action',
+  'foam.lib.parse.ActionParser',
+  'foam.lib.parse.SymbolParser',
   'foam.util.EmailTest',
   'foam.util.PasswordTest',
   'foam.util.SecurityUtilTest',
@@ -723,6 +731,8 @@ var classes = [
 
   //crunch predicates
   'foam.nanos.crunch.predicate.CapabilityGranted',
+  'foam.nanos.crunch.predicate.StatusChangedTo',
+  'foam.nanos.crunch.predicate.IsAgent',
 
   //authservice
   'foam.nanos.auth.CapabilityAuthService',

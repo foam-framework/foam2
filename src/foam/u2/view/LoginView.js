@@ -63,7 +63,7 @@ foam.CLASS({
   /* SET ABOVE MODEL */
   ^ .topBar-logo-Back {
     height: 6vh;
-    background: /*%LOGOBACKGROUNDCOLOUR%*/  #202341;
+    background: /*%LOGOBACKGROUNDCOLOUR%*/ #202341;
   }
 
   /* SET ON LOGO IMG */
@@ -140,9 +140,9 @@ foam.CLASS({
     position: sticky;
   }
   ^ .image-one {
-    width: 38vw;
+    width: 34vw;
     margin-top: -75vh;
-    margin-left: 10vw;
+    margin-left: 14vw;
   }
   `,
 

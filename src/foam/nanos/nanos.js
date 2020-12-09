@@ -403,6 +403,8 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ReputDependentUCJs" },
   //predicates
   { name: 'foam/nanos/crunch/predicate/CapabilityGranted' },
+  { name: 'foam/nanos/crunch/predicate/StatusChangedTo' },
+  { name: 'foam/nanos/crunch/predicate/IsAgent' },
   //spid
   { name: "foam/nanos/auth/CreateUserCapabilityJunctionOnSpidSet" },
   { name: "foam/nanos/auth/SetUserServiceProviderJunctionRuleAction" },
@@ -449,5 +451,8 @@ FOAM_FILES([
   { name: "foam/nanos/geocode/GoogleMapsCredentials" },
 
   { name: "com/google/foam/demos/u2/AllViews" },
-  { name: "com/google/foam/demos/u2/MDAllViews" }
+  { name: "com/google/foam/demos/u2/MDAllViews" },
+
+  //IBAN
+  { name: "foam/nanos/iban/ValidationIBAN" },
 ]);

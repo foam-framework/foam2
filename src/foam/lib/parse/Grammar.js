@@ -12,6 +12,7 @@
     'foam.lib.parse.Parser',
     'foam.lib.parse.StringPStream',
     'foam.lib.parse.SymbolParser',
+    'foam.util.SafetyUtil',
     'java.util.Map'
   ],
 
@@ -35,19 +36,16 @@
       `
     },
     {
-      name: 'parseString',
+      name: 'parse',
       type: 'foam.lib.parse.PStream',
       args: [
-        { name: 'str', type: 'String' },
+        { name: 'ps', type: 'PStream' },
+        { name: 'parserX', type: 'ParserContext' },
         { name: 'optName', type: 'String' }
       ],
       javaCode: `
-if ( optName == null || "".equals(optName) ) optName = "START";
-StringPStream ps = new StringPStream();
-ps.setString(str);
-ParserContext parserX = new ParserContextImpl();
-PStream temp = ps.apply((Parser)getSymbols().get(optName), parserX);
-return temp;
+if ( SafetyUtil.isEmpty(optName) ) optName = "START";
+return ps.apply((Parser)getSymbols().get(optName), parserX);
       `
     },
     {
@@ -75,8 +73,7 @@ grParser.setParser((Parser) symbols.get(name));
 symbols.put(name, grParser);
       `
     }
-  ],
-
+  ]
 });
 
 foam.INTERFACE({
