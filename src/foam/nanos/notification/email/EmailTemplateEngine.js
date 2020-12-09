@@ -22,11 +22,6 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Map',
-      name: 'values',
-      documentation: `map of values of values for simple values where {{ key }} will be replaced with value`
-    },
-    {
       class: 'FObjectProperty',
       of: 'foam.lib.parse.Grammar',
       name: 'grammar',
@@ -63,7 +58,7 @@ foam.CLASS({
         Action simpleValAction = new Action() {
           @Override
           public Object execute(Object val, ParserContext x) {
-            String value = (String) getValues().get(val);
+            String value = (String) ((Map) x.get("values")).get(val);
             if ( value == null ) {
               value = "";
               foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x_.get("logger");
@@ -111,7 +106,7 @@ foam.CLASS({
             }
 
             StringBuilder finalVal = new StringBuilder();
-            if ( getValues().get(ifCond.toString() ) != null ) {
+            if ( ((Map) x.get("values")).get(ifCond.toString() ) != null ) {
               Object[] val1 = (Object[]) valArr[1];
               for ( int i = 0 ; i < val1.length ; i++ ) {
                 finalVal.append(val1[i]);
@@ -164,7 +159,7 @@ foam.CLASS({
             }
 
             StringBuilder finalVal = new StringBuilder();
-            if ( getValues().get(ifCond.toString() ) != null ) {
+            if ( ((Map) x.get("values")).get(ifCond.toString() ) != null ) {
               Object[] val1 = (Object[]) valArr[1];
               for ( int i = 0 ; i < val1.length ; i++ ) {
                 finalVal.append(val1[i]);
@@ -277,7 +272,7 @@ foam.CLASS({
             for ( int i = 0 ; i < val0.length ; i++ ) {
               templateName.append(val0[i]);
             }
-            EmailTemplate extendedEmailTemplate = ((EmailTemplate) ((DAO) x_.get("emailTemplateDAO")).find(EQ(EmailTemplate.NAME,templateName.toString())));
+            EmailTemplate extendedEmailTemplate = ((EmailTemplate) ((DAO) x.get("emailTemplateDAO")).find(EQ(EmailTemplate.NAME,templateName.toString())));
             if ( extendedEmailTemplate == null ) {
               foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x_.get("logger");
               logger.error("Extended template not found " + val);
@@ -305,28 +300,33 @@ foam.CLASS({
     {
       name: 'renderTemplateById',
       args: [
-        { name: 'id', type: 'String' }
+        { name: 'id', type: 'String' },
+        { name: 'values', type: 'Map' },
+        { name: 'x', type: 'Context' }
       ],
       type: 'StringBuilder',
       javaCode: `
       EmailTemplate template = (EmailTemplate) ((DAO) x_.get("emailTemplateDAO")).find(id);
-      return renderTemplate(template.getBody());
+      return renderTemplate(template.getBody(), values, x);
       `
     },
     {
       name: 'renderTemplate',
       args: [
-        { name: 'str', type: 'String' }
+        { name: 'str', type: 'String' },
+        { name: 'values', type: 'Map' },
+        { name: 'x', type: 'Context' }
       ],
       type: 'StringBuilder',
       javaCode: `
-      StringBuilder joinedTempl = joinTemplates(str);
+      StringBuilder joinedTempl = joinTemplates(str, x);
 
       StringPStream ps = new StringPStream();
       ps.setString(joinedTempl);
       ParserContext parserX = new ParserContextImpl();
       StringBuilder sb = sb_.get();
       parserX.set("sb", sb);
+      parserX.set("values", values);
       getGrammar().parse(ps, parserX, "");
       if (sb.length() == 0 ) {
         throw new RuntimeException("Wrong template format");
@@ -356,7 +356,8 @@ foam.CLASS({
     {
       name: 'joinTemplates',
       args: [
-        { name: 'body', type: 'String' }
+        { name: 'body', type: 'String' },
+        { name: 'x', type: 'Context' }
       ],
       type: 'StringBuilder',
       documentation: `joins two templates where one extends another
@@ -369,6 +370,7 @@ foam.CLASS({
       ps.setString(body);
       ParserContext parserX = new ParserContextImpl();
       parserX.set("sb", sbJoin);
+      parserX.set("emailTemplateDAO", x.get("emailTemplateDAO"));
       parserX.set("isNextTemplateExtending", false);
       getIncludeGrammar().parse(ps, parserX, "");
 
