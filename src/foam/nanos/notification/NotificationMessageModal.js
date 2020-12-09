@@ -19,7 +19,7 @@ foam.CLASS({
         overflow-y: scroll;
       }
       ^ .main {
-        padding: 8px 48px 24px;
+        padding: 8px 24px 24px;
       }
       ^ .bold-label {
         font-size: 16px;
