@@ -52,22 +52,29 @@ foam.CLASS({
   methods: [
     function execute() {
       return new Promise((resolve, reject) => {
+        var data = this.StepWizardletController.create({
+          wizardlets: this.wizardlets,
+          config: this.wizardConfig,
+          submitted$: this.submitted$,
+          ...(this.initialPosition ? {
+            wizardPosition: this.initialPosition
+          } : {})
+        }),
         this.pushView({
           ...this.view,
-          data: this.StepWizardletController.create({
-            wizardlets: this.wizardlets,
-            config: this.wizardConfig,
-            submitted$: this.submitted$,
-            ...(this.initialPosition ? {
-              wizardPosition: this.initialPosition
-            } : {})
-          }),
+          data: data,
+          closeable: true,
           onClose: (x) => {
             this.popView(x)
             resolve();
           }
-        }, () => {
-          resolve();
+        }, (x) => {
+          data.saveProgress().then(() => {
+            resolve();
+          }).catch(e => {
+            console.error(e);
+            x.ctrl.notify(this.ERROR_MSG_DRAFT, '', this.LogLevel.ERROR, true);
+          });
         });
       });
     }

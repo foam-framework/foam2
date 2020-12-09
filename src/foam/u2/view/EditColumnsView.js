@@ -68,15 +68,6 @@ foam.CLASS({
       .addClass(this.myClass())
         .show(this.selectColumnsExpanded$)
         .addClass(this.myClass('drop-down-bg'))
-        .start()
-          .style({
-            'right': '40px',
-            'top': '80px',
-            'position': 'fixed'
-          })
-          .startContext({data: this})
-            .add(this.CLOSE_BUTTON)
-          .endContext()
           .start()
             .style({
               'border-radius': '5px',
@@ -91,7 +82,6 @@ foam.CLASS({
             })
             .add(this.columnConfigPropView)
           .end()
-        .end()
       .on('click', this.closeDropDown.bind(this))
       .end();
     }

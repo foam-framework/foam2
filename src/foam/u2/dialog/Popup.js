@@ -41,6 +41,19 @@ foam.CLASS({
       top: 0;
       z-index: 1000;
     }
+    ^X {
+      position: absolute;
+      top: 8px;
+      right: 16px;
+      z-index: 1000;
+      background: none !important;
+      width: 24px !important;
+      height: 24px !important;
+      cursor: pointer;
+      transition: ease 0.2s;
+      padding: 0;
+      border: none !important;
+    }
     ^container {
       align-items: center;
       display: flex;
@@ -61,6 +74,7 @@ foam.CLASS({
     ^inner {
       z-index: 3;
       max-width: 80vw;
+      position: relative;
       /* The following line fixes a stacking problem in certain browsers. */
       will-change: opacity;
     }
@@ -92,6 +106,11 @@ foam.CLASS({
           .call(function() { content = this; })
           .addClass(this.myClass('inner'))
           .style({ 'background-color': this.backgroundColor })
+          .startContext({ data: this })
+            .start(this.CLOSE_MODAL).show(this.closeable$)
+              .addClass(this.myClass('X'))
+            .end()
+          .endContext()
         .end()
       .end();
 
@@ -108,6 +127,17 @@ foam.CLASS({
     function close() {
       if ( this.onClose ) this.onClose();
       this.remove();
+    }
+  ],
+
+  actions: [
+    {
+      name: 'closeModal',
+      icon: 'images/ic-cancelblack.svg',
+      label: '',
+      code: function(X) {
+        this.close();
+      }
     }
   ]
 });

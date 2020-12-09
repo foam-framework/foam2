@@ -158,16 +158,17 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     if ( prereqsCache_ == null ) {
       prereqsCache_ = new ConcurrentHashMap<>();
       var dao = (DAO) getX().get("prerequisiteCapabilityJunctionDAO");
-      var sink = (GroupBy) dao.select(
-        GROUP_BY(
-          CapabilityCapabilityJunction.SOURCE_ID,
-          MAP(
-            CapabilityCapabilityJunction.TARGET_ID,
-            new ArraySink()
+      var sink = (GroupBy) dao.
+        orderBy(CapabilityCapabilityJunction.PRIORITY).
+        select(
+          GROUP_BY(
+            CapabilityCapabilityJunction.SOURCE_ID,
+            MAP(
+              CapabilityCapabilityJunction.TARGET_ID,
+              new ArraySink()
+            )
           )
-        )
-      );
-
+        );
       for (var key : sink.getGroupKeys()) {
         prereqsCache_.put(key.toString(), ((ArraySink) ((foam.mlang.sink.Map)
           sink.getGroups().get(key)).getDelegate()).getArray());

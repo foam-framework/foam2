@@ -259,7 +259,7 @@ foam.CLASS({
       var code = result[1];
 
       return code;
-        },
+    },
 
     function lazyCompile(t, name, args) {
       return (function(util) {
