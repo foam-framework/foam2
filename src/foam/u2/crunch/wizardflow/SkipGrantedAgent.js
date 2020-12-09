@@ -22,7 +22,31 @@ foam.CLASS({
   enums: [
     {
       name: 'SkipMode',
-      values: ['HIDE','SHOW','SKIP']
+      values: [
+        {
+          name: 'HIDE',
+          label: 'hide',
+          documentation: `
+            Hides all wizardlets that are PENDING or GRANTED
+          `
+        },
+        {
+          name: 'SHOW',
+          label: 'show',
+          documentation: `
+            Shows all wizardlets regardless of PENDING or GRANTED and starts at the 
+            first-indexed wizard regardless of status
+          `
+        },
+        {
+          name: 'SKIP',
+          label: 'skip',
+          documentation: `
+            Show all wizardlets regardless of PENDING or GRANTED and starts at the
+            first wizard that is NOT PENDING or GRANTED
+          `
+        }
+      ]
     }
   ],
 
