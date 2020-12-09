@@ -59,7 +59,8 @@ foam.CLASS({
           ...(this.initialPosition ? {
             wizardPosition: this.initialPosition
           } : {})
-        }),
+        })
+        
         this.pushView({
           ...this.view,
           data: data,
