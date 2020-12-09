@@ -90,6 +90,7 @@ foam.CLASS({
       of: 'foam.core.FObject',
       documentation: `data for capability.of`,
       view: { class: 'foam.u2.detail.VerticalDetailView' },
+      storageTransient: true,
       getter: function () { return this.payload.data },
       javaGetter: `
         return getPayload().getData();
@@ -103,6 +104,7 @@ foam.CLASS({
       name: 'status',
       class: 'Enum',
       of: 'foam.nanos.crunch.CapabilityJunctionStatus',
+      storageTransient: true,
       getter: function () { return this.payload.status },
       javaGetter: `
         return getPayload().getStatus();
