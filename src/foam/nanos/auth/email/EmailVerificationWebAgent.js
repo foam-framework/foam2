@@ -18,15 +18,12 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'foam.nanos.notification.email.DAOResourceLoader',
     'foam.nanos.notification.email.EmailTemplate',
+    'foam.nanos.notification.email.EmailTemplateEngine',
     'java.io.PrintWriter',
-    'java.util.Collections',
+    'java.util.HashMap',
     'javax.servlet.http.HttpServletRequest',
     'javax.servlet.http.HttpServletResponse',
-    'org.apache.commons.lang3.StringUtils',
-    'org.jtwig.environment.EnvironmentConfigurationBuilder',
-    'org.jtwig.JtwigModel',
-    'org.jtwig.JtwigTemplate',
-    'org.jtwig.resource.loader.TypedResourceLoader'
+    'org.apache.commons.lang3.StringUtils'
   ],
 
   messages: [
@@ -35,14 +32,6 @@ foam.CLASS({
     { name: 'USER_NOT_FOUND', message: 'User not found.' },
     { name: 'TOKEN_NOT_FOUND', message: 'Token not found.' },
     { name: 'EMAIL_ALREADY_VERIFIED', message: 'Email already verified.' }
-  ],
-
-  properties: [
-    {
-      name: 'config',
-      class: 'Object',
-      javaType: 'org.jtwig.environment.EnvironmentConfiguration'
-    }
   ],
 
   methods: [
@@ -94,20 +83,14 @@ foam.CLASS({
           translatedMsg = ts.getTranslation(local, getClassInfo().getId()+ ".EMAIL_VERIFIED_ERROR", this.EMAIL_VERIFIED_ERROR);
           message = translatedMsg + "<br>" + msg;
         } finally {
-          if ( getConfig() == null ) {
-            setConfig(EnvironmentConfigurationBuilder
-                .configuration()
-                .resources()
-                .resourceLoaders()
-                .add(new TypedResourceLoader("dao", new DAOResourceLoader(x, (String) user.getGroup())))
-                .and().and()
-                .build());
-          }
-    
+          EmailTemplateEngine templateEngine = (EmailTemplateEngine) x.get("templateEngine");
+          templateEngine.setX(x);
+          HashMap args = new HashMap();
+          args.put("msg", message);
+          templateEngine.setValues(args);
           EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(x, "verify-email-link", (String) user.getGroup());
-          JtwigTemplate template = JtwigTemplate.inlineTemplate(emailTemplate.getBody(), getConfig());
-          JtwigModel model = JtwigModel.newModel(Collections.<String, Object>singletonMap("msg", message));
-          out.write(template.render(model));
+          StringBuilder templateBody = templateEngine.renderTemplate(emailTemplate.getBody());
+          out.write(templateBody.toString());
           if ( ! redirect.equals("null") ){
             try {
               response.addHeader("REFRESH","2;URL="+redirect);
