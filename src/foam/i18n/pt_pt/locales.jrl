@@ -305,3 +305,6 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.email.EmailVerif
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.email.EmailVerificationWebAgent.USER_NOT_FOUND",target:"Usuário não encontrado."})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.email.EmailVerificationWebAgent.TOKEN_NOT_FOUND",target:"Token não encontrado."})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.email.EmailVerificationWebAgent.EMAIL_ALREADY_VERIFIED",target:"Email já verificado."})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate.NOTIFICATION_BODY_P1",target:"Sua capacidade \""})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate.NOTIFICATION_BODY_P2",target:"\" foi definido para o status "})

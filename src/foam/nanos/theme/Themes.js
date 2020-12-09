@@ -115,9 +115,11 @@ Later themes:
           }
         }
         if ( theme ) {
+          if ( theme.customRefinement ) await x.__subContext__.classloader.load(theme.customRefinement, []);
           return theme;
         }
-        return foam.nanos.theme.Theme.create({ 'name': 'foam', 'appName': 'FOAM' });
+
+        foam.nanos.theme.Theme.create({ 'name': 'foam', 'appName': 'FOAM' });
       },
       javaCode: `
       DAO themeDAO = ((DAO) x.get("themeDAO"));

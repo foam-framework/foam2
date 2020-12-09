@@ -167,7 +167,7 @@ foam.CLASS({
     {
       name: 'hideX',
       class: 'Boolean',
-      value: false
+      value: true
     },
     {
       name: 'backDisabled',
