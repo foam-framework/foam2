@@ -8,6 +8,10 @@ foam.CLASS({
   package: 'foam.nanos.iban',
   name: 'ValidationIBAN',
 
+  javaImports: [
+    'foam.core.ValidationException'
+  ],
+
   constants: [
     {
       name: 'COUNTRIES',
@@ -241,7 +245,7 @@ foam.CLASS({
       javaCode: `
         Object[] cInfo = (Object[]) COUNTRIES.get(cc);
         if ( cInfo != null ) return (String) cInfo[0];
-        return "null";
+        return null;
       `
     },
     {
@@ -279,24 +283,24 @@ foam.CLASS({
       },
       javaCode: `
         iban = trim(iban);
-        if ( "".equals(iban) ) throw new IllegalStateException(IBAN_REQUIRED);
+        if ( "".equals(iban) ) throw new ValidationException(IBAN_REQUIRED);
 
         String cc = iban.substring(0, 2);
         String format = getFormatForCountry(cc);
 
-        if ( format == null ) throw new IllegalStateException(UNKNOWN_COUNTRY_CODE + cc);
+        if ( format == null ) throw new ValidationException(UNKNOWN_COUNTRY_CODE + cc);
 
         if ( iban.length() != format.length() + 2 )
-          throw new IllegalStateException(LENGTH_MISMATCHED_1 + (format.length() + 2) + LENGTH_MISMATCHED_2 + iban.length());
+          throw new ValidationException(LENGTH_MISMATCHED_1 + (format.length() + 2) + LENGTH_MISMATCHED_2 + iban.length());
 
         for ( int i = 0 ; i < format.length() ; i++ ) {
-          if ( ! validateChar(format.charAt(i), iban.charAt(i+2) )) throw new IllegalStateException(INVALID_CHARACTER + (i+2));
+          if ( ! validateChar(format.charAt(i), iban.charAt(i+2) )) throw new ValidationException(INVALID_CHARACTER + (i+2));
         }
 
         String num = toNumber(iban);
         int checksum = mod(num, 97);
 
-        if ( checksum != 1 ) throw new IllegalStateException(INVALID_CHECKSUM + checksum);
+        if ( checksum != 1 ) throw new ValidationException(INVALID_CHECKSUM + checksum);
 
       `
     },
