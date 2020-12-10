@@ -198,6 +198,12 @@ foam.CLASS({
       documentation: 'Predicate of the visibility for capabilities in the capability store/keyword sections'
     },
     {
+      name: 'grantMode',
+      class: 'Enum',
+      of: 'foam.nanos.crunch.CapabilityGrantMode',
+      value: foam.nanos.crunch.CapabilityGrantMode.AUTOMATIC
+    },
+    {
       name: 'reviewRequired',
       class: 'Boolean',
       permissionRequired: true
