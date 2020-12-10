@@ -314,7 +314,6 @@ foam.CLASS({
         let num = this.toNumber(iban);
         let checksum = this.mod(num, 97);
         let desiredChecksum = 98 - checksum;
-        debugger;
         iban = iban.substring(0,2) + ('' + desiredChecksum).padStart(2, '0') + iban.substring(4);
         return iban;
       },
