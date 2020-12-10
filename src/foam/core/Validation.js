@@ -367,8 +367,8 @@ foam.CLASS({
   refines: 'foam.core.EMail',
 
   messages: [
-    { name: 'EMAIL_REQUIRED', message: 'email required' },
-    { name: 'VALID_EMAIL_REQUIRED', message: 'valid email required' }
+    { name: 'EMAIL_REQUIRED', message: 'Email required' },
+    { name: 'VALID_EMAIL_REQUIRED', message: 'Valid email required' }
   ],
 
   properties: [
