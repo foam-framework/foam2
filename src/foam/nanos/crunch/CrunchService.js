@@ -14,7 +14,7 @@ foam.INTERFACE({
 
   javaImports: [
     'foam.dao.ArraySink',
-    'foam.nanos.crunch.lite.CapablePayload'
+    'foam.nanos.crunch.CapabilityJunctionPayload'
   ],
 
   topics: [
@@ -286,21 +286,6 @@ foam.INTERFACE({
         evaluates true and it has all preconditions met. This is the
         case when a capability appears in the Capability Store.
       `
-    },
-    {
-      name: 'getCapableObjectPayloads',
-      async: true,
-      type: 'CapablePayload[]',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'capabilityIds',
-          type: 'String[]'
-        },
-      ]
     },
     {
       name: 'getAllJunctionsForUser',
