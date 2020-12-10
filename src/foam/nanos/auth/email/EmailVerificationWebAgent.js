@@ -87,7 +87,7 @@ foam.CLASS({
           HashMap args = new HashMap();
           args.put("msg", message);
           EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(x, "verify-email-link", (String) user.getGroup());
-          StringBuilder templateBody = templateEngine.renderTemplate(emailTemplate.getBody(), args, x);
+          StringBuilder templateBody = templateEngine.renderTemplate(x, emailTemplate.getBody(), args);
           out.write(templateBody.toString());
           if ( ! redirect.equals("null") ){
             try {

@@ -294,26 +294,26 @@ foam.CLASS({
     {
       name: 'renderTemplateById',
       args: [
+        { name: 'x', type: 'Context' },
         { name: 'id', type: 'String' },
-        { name: 'values', type: 'Map' },
-        { name: 'x', type: 'Context' }
+        { name: 'values', type: 'Map' }
       ],
       type: 'StringBuilder',
       javaCode: `
       EmailTemplate template = (EmailTemplate) ((DAO) x_.get("emailTemplateDAO")).find(id);
-      return renderTemplate(template.getBody(), values, x);
+      return renderTemplate(x, template.getBody(), values);
       `
     },
     {
       name: 'renderTemplate',
       args: [
+        { name: 'x', type: 'Context' },
         { name: 'str', type: 'String' },
-        { name: 'values', type: 'Map' },
-        { name: 'x', type: 'Context' }
+        { name: 'values', type: 'Map' }
       ],
       type: 'StringBuilder',
       javaCode: `
-      StringBuilder joinedTempl = joinTemplates(str, x);
+      StringBuilder joinedTempl = joinTemplates(x, str);
 
       StringPStream ps = new StringPStream();
       ps.setString(joinedTempl);
@@ -350,8 +350,8 @@ foam.CLASS({
     {
       name: 'joinTemplates',
       args: [
-        { name: 'body', type: 'String' },
-        { name: 'x', type: 'Context' }
+        { name: 'x', type: 'Context' },
+        { name: 'body', type: 'CharSequence' }
       ],
       type: 'StringBuilder',
       documentation: `joins two templates where one extends another
@@ -369,7 +369,7 @@ foam.CLASS({
       getIncludeGrammar().parse(ps, parserX, "");
 
       if ( ! (Boolean) parserX.get("isNextTemplateExtending") ) return sbJoin;
-      return joinTemplates(sbJoin.toString(), x);
+      return joinTemplates(x, sbJoin);
       `
     }
   ],
