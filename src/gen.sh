@@ -23,5 +23,5 @@ if [ ${CLEAN_BUILD} -eq 1 ]; then
   rm -r ../build/
 fi
 
-node ../tools/genjava.js -i ../tools/classes.js -o ../build/
+node ../tools/genjava.js ../tools/classes.js ../build/
 node ../tools/build.js web

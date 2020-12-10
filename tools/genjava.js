@@ -12,34 +12,8 @@ process.on('unhandledRejection', function(e) {
   process.exit(1);
 });
 
-const yargs = require("yargs/yargs")
-const { hideBin } = require('yargs/helpers')
-const argv  = yargs(hideBin(process.argv))
-  .option("i", {
-    alias: "input",
-    demandOption: "The input file is required.",
-    type: "string"
-  })
-  .option("o", {
-    alias: "output",
-    demandOption: "The input dir is required.",
-    type: "string"
-  })
-  .option("s", {
-    alias: "source",
-    type: "string"
-  })
-  .option("f", {
-    alias: "increment",
-    type: "string"
-  })
-  .option("genswift", {
-    type: "boolean"
-  })
-  .argv
-
 // enable FOAM java support.
-global.FOAM_FLAGS = { 'java': true, 'debug': true, 'js': false, 'swift': argv.genswift };
+global.FOAM_FLAGS = { 'java': true, 'debug': true, 'js': false, 'swift': true };
 
 // Enable FOAMLink mode but only if FOAMLINK_DATA is set in environment
 var foamlinkMode = process.env.hasOwnProperty('FOAMLINK_DATA');
@@ -65,26 +39,33 @@ require('../src/foam.js');
 require('../src/foam/nanos/nanos.js');
 require('../src/foam/support/support.js');
 
-var incrementalMeta = null;
-if ( argv.f ) {
-  incrementalMeta = JSON.parse(argv.f);
-  logger.debug('INCREMENTAL', argv.f);
+var srcPath = __dirname + "/../src/";
+
+if ( ! (
+  process.argv.length == 4 ||
+  process.argv.length == 5 ||
+  process.argv.length == 6 ) ) {
+  console.log("USAGE: genjava.js input-path output-path src-path(optional) files-to-update (optional)");
+  process.exit(1);
 }
 
-if ( argv.s ) {
-  srcPath = argv.s;
+if ( process.argv.length > 4 && process.argv[4] !== '--' ) {
+  srcPath = process.argv[4];
   if ( ! srcPath.endsWith('/') ) {
     srcPath = srcPath + '/';
   }
 }
 
-var indir = argv.i
+var incrementalMeta = null;
+if ( process.argv.length > 5  &&
+     process.argv[5] !== '--' &&
+     process.argv[5] != '' ) {
+  incrementalMeta = JSON.parse(process.argv[5]);
+  logger.debug('INCREMENTAL', process.argv[5]);
+}
+
+var indir = process.argv[2];
 indir = path_.resolve(path_.normalize(indir));
-
-var outdir = argv.o
-outdir = path_.resolve(path_.normalize(outdir));
-
-var srcPath = __dirname + "/../src/";
 
 var externalFile = require(indir);
 var classes = externalFile.classes;
@@ -157,6 +138,9 @@ logger.debug('fileWhitelist', fileWhitelist);
 ].forEach(function(cls) {
   blacklist[cls] = true;
 });
+
+var outdir = process.argv[3];
+outdir = path_.resolve(path_.normalize(outdir));
 
 function ensurePath(p) {
   var i = 1 ;
