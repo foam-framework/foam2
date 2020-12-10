@@ -150,98 +150,276 @@ foam.CLASS({
   ],
 
   methods: [
-    function validateChar(format, c) {
-      switch ( format ) {
-        case "A": return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9';
-        case "B": return c >= 'A' && c <= 'Z' || c >= '0' && c <= '9';
-        case "C": return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z';
-        case "F": return c >= '0' && c <= '9';
-        case "L": return c >= 'a' && c <= 'z';
-        case "U": return c >= 'A' && c <= 'Z';
-        case "W": return c >= 'a' && c <= 'z' || c >= '0' && c <= '9';
-      }
-      return true;
-    },
-
-    function trim(iban) {
-      return iban.replace(/ /g, '');
-    },
-
-    function format(iban) {
-      var l = iban.length;
-      for ( var i = l - l % 4 ; i > 0 ; i -= 4 ) iban = iban.substring(0, i) + ' ' + iban.substring(i);
-      return iban;
-    },
-
-    function getFormatForCountry(cc) {
-      var cInfo = this.COUNTRIES[cc];
-      return cInfo && cInfo[0];
-    },
-
-    function validate(iban) {
-      iban = this.trim(iban);
-
-      if ( iban == '' ) return `${this.IBAN_REQUIRED}`;
-
-      var cc = iban.substring(0, 2);
-      var format = this.getFormatForCountry(cc);
-
-      if ( ! format ) return `${this.UNKNOWN_COUNTRY_CODE} ${cc}`;
-
-      if ( iban.length != format.length + 2 )
-        return `${this.LENGTH_MISMATCHED_1} ${(format.length + 2)} ${this.LENGTH_MISMATCHED_2} ${iban.length}`;
-
-      for ( var i = 0 ; i < format.length ; i++ ) {
-        if ( ! this.validateChar(format.charAt(i), iban.charAt(i+2)) ) return `${this.INVALID_CHARACTER}  '${(i+2)}'`;
-      }
-
-      var num = this.toNumber(iban);
-      var checksum = this.mod(num, 97);
-
-      if ( checksum != 1 ) return `${this.INVALID_CHECKSUM} ${checksum}`;
-
-      return 'passed';
-    },
-
-    function setChecksum(iban) {
-      iban = iban.substring(0,2) + '00' + iban.substring(4, 200);
-      var num = this.toNumber(iban);
-      var checksum = this.mod(num, 97);
-      var desiredChecksum = 98 - checksum;
-      iban = iban.substring(0,2) + ('' + desiredChecksum).padStart(2, '0') + iban.substring(4);
-      return iban;
-    },
-
-    function toNumber(iban) {
-      iban = iban.substring(4) + iban.substring(0, 4);
-      for ( var l = iban.length ; l >= 0 ; l-- ) {
-        var c = iban.charAt(l);
-        if ( c >= 'A' && c <= 'Z' ) {
-          iban = iban.substring(0, l) + (10 + ( c.charCodeAt(0) - 'A'.charCodeAt(0) )) + iban.substring(l+1)
+    {
+      name: 'validateChar',
+      type: 'boolean',
+      args: [
+        {
+          name: 'format',
+          type: 'Char'
+        },
+        {
+          name: 'c',
+          type: 'Char'
         }
-      }
-      return iban;
-    },
-
-    function mod(num, a) {
-      /** IBANs may be too long to represent as integers, so implement a string-based mod function. **/
-      var ret = 0;
-
-      // One by one process all digits of 'num'
-      for ( var i = 0 ; i < num.length ; i++ )
-        ret = (ret*10 + (num.charAt(i) - '0')) % a;
-
-      return ret;
-    },
-
-    function next(iban) {
-      for ( var i = iban.length-1 ; i >= 2 ; i-- ) {
-        var c = iban.charAt(i);
-        if ( c < '9' ) {
-          return this.setChecksum(iban.substring(0, i) + (parseInt(iban.charAt(i)) + 1 + '') + iban.substring(i+1));
+      ],
+      code: function(format, c) {
+        switch ( format ) {
+          case "A": return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9';
+          case "B": return c >= 'A' && c <= 'Z' || c >= '0' && c <= '9';
+          case "C": return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z';
+          case "F": return c >= '0' && c <= '9';
+          case "L": return c >= 'a' && c <= 'z';
+          case "U": return c >= 'A' && c <= 'Z';
+          case "W": return c >= 'a' && c <= 'z' || c >= '0' && c <= '9';
         }
-        iban = iban.substring(0, i) + '0' + iban.substring(i+1);
-      }
+        return true;
+      },
+      javaCode: `
+        String f = Character.toString(format);
+        switch ( f ) {
+          case "A": return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9';
+            case "B": return c >= 'A' && c <= 'Z' || c >= '0' && c <= '9';
+            case "C": return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z';
+            case "F": return c >= '0' && c <= '9';
+            case "L": return c >= 'a' && c <= 'z';
+            case "U": return c >= 'A' && c <= 'Z';
+            case "W": return c >= 'a' && c <= 'z' || c >= '0' && c <= '9';
+        }
+        return true;
+      `
+    },
+    {
+      name: 'trim',
+      type: 'String',
+      args: [
+        {
+          name: 'iban',
+          type: 'String'
+        }
+      ],
+      code: function(iban) {
+        return iban.replace(/ /g, '');
+      },
+      javaCode: `
+        return iban.replaceAll(" ", "");
+      `
+    },
+    {
+      name: 'format',
+      type: 'String',
+      args: [
+        {
+          name: 'iban',
+          type: 'String'
+        }
+      ],
+      code: function(iban) {
+        var l = iban.length;
+        for ( let i = l - l % 4 ; i > 0 ; i -= 4 ) iban = iban.substring(0, i) + ' ' + iban.substring(i);
+        return iban;
+      },
+      javaCode: `
+        int l = iban.length();
+        for ( int i = l - l % 4 ; i > 0 ; i -= 4 ) iban = iban.substring(0, i) + ' ' + iban.substring(i);
+        return iban;
+      `
+    },
+    {
+      name: 'getFormatForCountry',
+      type: 'String',
+      args: [
+        {
+          name: 'cc',
+          type: 'String'
+        }
+      ],
+      code:  function(cc) {
+        var cInfo = this.COUNTRIES[cc];
+        return cInfo && cInfo[0];
+      },
+      javaCode: `
+        Object[] cInfo = (Object[]) COUNTRIES.get(cc);
+        if ( cInfo != null ) return (String) cInfo[0];
+        return "null";
+      `
+    },
+    {
+      name: 'validate',
+      type: 'Void',
+      args: [
+        {
+          name: 'iban',
+          type: 'String'
+        }
+      ],
+      code: function(iban) {
+        iban = this.trim(iban);
+
+        if ( iban == '' ) return `${this.IBAN_REQUIRED}`;
+
+        let cc = iban.substring(0, 2);
+        let format = this.getFormatForCountry(cc);
+
+        if ( ! format ) return `${this.UNKNOWN_COUNTRY_CODE} ${cc}`;
+
+        if ( iban.length != format.length + 2 )
+          return `${this.LENGTH_MISMATCHED_1} ${(format.length + 2)} ${this.LENGTH_MISMATCHED_2} ${iban.length}`;
+
+        for ( let i = 0 ; i < format.length ; i++ ) {
+          if ( ! this.validateChar(format.charAt(i), iban.charAt(i+2)) ) return `${this.INVALID_CHARACTER}  '${(i+2)}'`;
+        }
+
+        let num = this.toNumber(iban);
+        let checksum = this.mod(num, 97);
+
+        if ( checksum != 1 ) return `${this.INVALID_CHECKSUM} ${checksum}`;
+
+        return 'passed';
+      },
+      javaCode: `
+        iban = trim(iban);
+        if ( "".equals(iban) ) throw new IllegalStateException(IBAN_REQUIRED);
+
+        String cc = iban.substring(0, 2);
+        String format = getFormatForCountry(cc);
+
+        if ( format == null ) throw new IllegalStateException(UNKNOWN_COUNTRY_CODE + cc);
+
+        if ( iban.length() != format.length() + 2 )
+          throw new IllegalStateException(LENGTH_MISMATCHED_1 + (format.length() + 2) + LENGTH_MISMATCHED_2 + iban.length());
+
+        for ( int i = 0 ; i < format.length() ; i++ ) {
+          if ( ! validateChar(format.charAt(i), iban.charAt(i+2) )) throw new IllegalStateException(INVALID_CHARACTER + (i+2));
+        }
+
+        String num = toNumber(iban);
+        int checksum = mod(num, 97);
+
+        if ( checksum != 1 ) throw new IllegalStateException(INVALID_CHECKSUM + checksum);
+
+      `
+    },
+    {
+      name: 'setChecksum',
+      type: 'String',
+      args: [
+        {
+          name: 'iban',
+          type: 'String'
+        }
+      ],
+      code: function(iban) {
+        iban = iban.substring(0,2) + '00' + iban.substring(4, 200);
+        let num = this.toNumber(iban);
+        let checksum = this.mod(num, 97);
+        let desiredChecksum = 98 - checksum;
+        debugger;
+        iban = iban.substring(0,2) + ('' + desiredChecksum).padStart(2, '0') + iban.substring(4);
+        return iban;
+      },
+      javaCode: `
+        iban = iban.substring(0,2) + "00" + iban.substring(4, 200);
+        String num = toNumber(iban);
+        int checksum = mod(num, 97);
+        int desiredChecksum = 98 - checksum;
+        iban = iban.substring(0,2) + ("" + String.format("%2s", "" + desiredChecksum).replace(' ', '0') + iban.substring(4));
+        return iban;
+      `
+    },
+    {
+      name: 'toNumber',
+      type: 'String',
+      args: [
+        {
+          name: 'iban',
+          type: 'String'
+        }
+      ],
+      code: function(iban) {
+        iban = iban.substring(4) + iban.substring(0, 4);
+        let c = "";
+        for ( let l = iban.length - 1; l >= 0 ; l-- ) {
+          c = iban.charAt(l);
+          console.log(!!c);
+          if ( c >= 'A' && c <= 'Z' ) {
+            iban = iban.substring(0, l) + (10 + ( c.charCodeAt(0) - 'A'.charCodeAt(0) )) + iban.substring(l+1);
+          }
+        }
+        return iban;
+      },
+      javaCode: `
+        iban = iban.substring(4) + iban.substring(0, 4);
+        for ( int l = iban.length() - 1 ; l >= 0 ; l--) {
+          char c = iban.charAt(l);
+          if ( c >= 'A' && c <= 'Z' ) {
+           iban = iban.substring(0, l) + (10 + (Character.codePointAt(Character.toString(c), 0) - Character.codePointAt(Character.toString('A'), 0))) + iban.substring(l+1);
+          }
+        }
+        return iban;
+      `
+    },
+    {
+      name: 'mod',
+      type: 'Integer',
+      args: [
+        {
+          name: 'num',
+          type: 'String'
+        },
+        {
+          name: 'a',
+          type: 'Integer'
+        }
+      ],
+      code: function(num, a) {
+        /** IBANs may be too long to represent as integers, so implement a string-based mod function. **/
+        let ret = 0;
+
+        // One by one process all digits of 'num'
+        for ( let i = 0 ; i < num.length ; i++ )
+          ret = (ret * 10 + (num.charAt(i) - '0')) % a;
+
+        return ret;
+      },
+      javaCode: `
+        int ret = 0;
+
+        for ( int i = 0 ; i < num.length() ; i++ ) {
+          ret = (ret * 10 + (num.charAt(i) - '0')) % a;
+        }
+
+        return ret;
+      `
+    },
+    {
+      name: 'next',
+      type: 'String',
+      args: [
+        {
+          name: 'iban',
+          type: 'String'
+        }
+      ],
+      code: function(iban) {
+        for ( let i = iban.length-1 ; i >= 2 ; i-- ) {
+          let c = iban.charAt(i);
+          if ( c < '9' ) {
+            return this.setChecksum(iban.substring(0, i) + (parseInt(iban.charAt(i)) + 1 + '') + iban.substring(i+1));
+          }
+          iban = iban.substring(0, i) + '0' + iban.substring(i+1);
+        }
+      },
+      javaCode: `
+        for ( int i = iban.length() - 1 ; i >= 2 ; i-- ){
+          char c = iban.charAt(i);
+          if ( c < '9' ) {
+            return setChecksum(iban.substring(0, i) + (Integer.parseInt("" + iban.charAt(i)) + 1 + "") + iban.substring(i+1));
+          }
+          iban = iban.substring(0, i) + '0' + iban.substring(i+1);
+        }
+        return null;
+      `
     }
   ]
 });
