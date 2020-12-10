@@ -33,7 +33,7 @@ foam.CLASS({
     'foam.util.SafetyUtil',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.lite.Capable',
-    'foam.nanos.crunch.lite.CapablePayload',
+    'foam.nanos.crunch.CapabilityJunctionPayload',
     'foam.nanos.logger.Logger'
   ],
 
@@ -67,7 +67,7 @@ foam.CLASS({
         { name: 'x', type: 'Context' },
         { name: 'request', type: 'ApprovalRequest' },
         { name: 'capableObj', type: 'Capable' },
-        { name: 'capablePayloadObj', type: 'CapablePayload' }
+        { name: 'capablePayloadObj', type: 'CapabilityJunctionPayload' }
       ],
       javaCode: `
         return request;
@@ -84,19 +84,20 @@ foam.CLASS({
 
         Capable capableObj = (Capable) clonedObj;
 
+        if (
+          String.valueOf(obj.getProperty("id")) == null ||
+          SafetyUtil.isEmpty(String.valueOf(capableObj.getDAOKey()))
+        ){
+          logger.error("Missing id and/or DAOKey from Capable object");
+          throw new RuntimeException("Missing id and/or DAOKey from Capable object");
+        }
+
+
         agency.submit(x, new ContextAwareAgent() {
-          
+
           @Override
           public void execute(X x) {
-            for ( CapablePayload capablePayload : capableObj.getCapablePayloads() ){
-
-              if ( 
-                capablePayload.getObjId() == null || 
-                SafetyUtil.isEmpty(String.valueOf(capablePayload.getObjId()))
-              ){
-                capablePayload.setObjId(obj.getProperty("id"));
-                capablePayload.setHasSafeStatus(true);
-              }
+            for ( CapabilityJunctionPayload capablePayload : capableObj.getCapablePayloads() ){
 
               DAO capabilityDAO = (DAO) x.get("capabilityDAO");
               Capability capability = (Capability) capabilityDAO.find(capablePayload.getCapability());
@@ -111,9 +112,9 @@ foam.CLASS({
               Operations operation = Operations.CREATE;
 
               String hashedId = new StringBuilder("d")
-                .append(capablePayload.getDaoKey())
+                .append(capableObj.getDAOKey())
                 .append(":o")
-                .append(String.valueOf(capablePayload.getObjId()))
+                .append(String.valueOf(obj.getProperty("id")))
                 .append(":c")
                 .append(capability.getId())
                 .toString();
@@ -123,7 +124,7 @@ foam.CLASS({
                   foam.mlang.MLang.EQ(Approvable.LOOKUP_ID, hashedId),
                   foam.mlang.MLang.EQ(Approvable.STATUS, ApprovalStatus.REQUESTED)
                 )).inX(getX()).select(new ArraySink())).getArray();
-              
+
               if ( approvablesPending.size() > 0 ){
                 logger.warning("Approvable already  exists for: " + hashedId);
                 // TODO: throw an error once we add the paymentId checks as this is supposed  to be  unexpected
@@ -133,15 +134,15 @@ foam.CLASS({
 
               try {
                 FObject objectToDiffAgainst = (FObject) capablePayload.getClassInfo().newInstance();
-              
+
                 Map propertiesToApprove = objectToDiffAgainst.diff(capablePayload);
 
                 Approvable approvable = (Approvable) approvableDAO.put_(getX(), new Approvable.Builder(getX())
                   .setLookupId(hashedId)
-                  .setDaoKey(capablePayload.getDaoKey())
-                  .setServerDaoKey(capablePayload.getDaoKey())
+                  .setDaoKey(capableObj.getDAOKey())
+                  .setServerDaoKey(capableObj.getDAOKey())
                   .setStatus(ApprovalStatus.REQUESTED)
-                  .setObjId(capablePayload.getObjId())
+                  .setObjId(String.valueOf(obj.getProperty("id")))
                   .setOperation(operation)
                   .setOf(capablePayload.getClassInfo())
                   .setIsUsingNestedJournal(true)
@@ -154,14 +155,14 @@ foam.CLASS({
                   .setCreatedBy(user.getId())
                   .setGroup(getGroupToNotify())
                   .setClassification(
-                    capability.getName() + 
-                    " for " + 
-                    obj.getClassInfo().getObjClass().getSimpleName() + 
-                    " - id:" + 
-                    capablePayload.getObjId()
+                    capability.getName() +
+                    " for " +
+                    obj.getClassInfo().getObjClass().getSimpleName() +
+                    " - id:" +
+                    String.valueOf(obj.getProperty("id"))
                   )
                   .setStatus(ApprovalStatus.REQUESTED).build();
-                
+
                 approvalRequest = decorateApprovalRequest(x, approvalRequest, capableObj, capablePayload);
 
                 approvalRequestDAO.put_(getX(), approvalRequest);

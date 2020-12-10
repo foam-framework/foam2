@@ -350,7 +350,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'ConstantSlot',
 
-  implements: [ 'foam.core.Slot' ],
+  extends: 'foam.core.Slot',
 
   documentation: 'An immutable constant valued Slot.',
 
@@ -517,7 +517,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'ArraySlot',
 
-  implements: [ 'foam.core.Slot' ],
+  extends: 'foam.core.Slot',
 
   documentation: `
     A slot that takes an array of Slots and notifies when either changes.
@@ -556,7 +556,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'SimpleSlot',
-  implements: [ 'foam.core.Slot' ],
+  extends: 'foam.core.Slot',
 
   properties: [
     {

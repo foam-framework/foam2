@@ -78,4 +78,9 @@ public class StringUtil {
     chars[0] = Character.toUpperCase(chars[0]);
     return new String(chars);
   }
+
+  // Replace non ASC-II unicode with non unicode representation, finally strip out any remaining printable unicode characters.
+  public static String normalize(String s) {
+    return java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD).replaceAll("\\P{Print}", "");
+  }
 }

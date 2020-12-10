@@ -13,16 +13,30 @@ foam.CLASS({
       name: 'capablePayloads',
       class: 'FObjectArray',
       // javaType: 'java.util.List<foam.nanos.crunch.crunchlite.CapablePayload>',
-      of: 'foam.nanos.crunch.lite.CapablePayload'
+      of: 'foam.nanos.crunch.CapabilityJunctionPayload',
+      section: 'capabilityInformation'
     },
     {
       name: 'userCapabilityRequirements',
       class: 'StringArray',
+      section: 'capabilityInformation'
     },
     {
-      name: 'isWizardCompleted',
+      name: 'isWizardIncomplete',
       class: 'Boolean',
-      transient: true
+      section: 'systemInformation',
+      transient: true,
+      hidden: true
+    },
+    {
+      class: 'StringArray',
+      name: 'capabilityIds',
+      section: 'capabilityInformation'
+    },
+    {
+      class: 'String',
+      name: 'DAOKey',
+      section: 'capabilityInformation'
     }
   ],
 
@@ -35,13 +49,8 @@ foam.CLASS({
       name: 'setRequirements',
       flags: ['web'],
       code: function(capabilityIds) {
-        var crunchService = this.__subContext__['crunchService'];
-        return crunchService.getCapableObjectPayloads(
-          null, capabilityIds
-        ).then(result => {
-          this.capablePayloads = result;
-        });
-      },
+        this.capabilityIds = capabilityIds;
+      }
     },
     {
       name: 'getCapablePayloadDAO',

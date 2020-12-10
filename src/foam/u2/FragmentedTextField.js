@@ -21,8 +21,6 @@ foam.CLASS({
     ^symbol {
       display: flex;
       align-items: center;
-      background: %GREY5%;
-      border: 1px solid %GREY3%;
       margin-left: -1px;
       margin-right: -1px;
       line-height: 100%;
@@ -41,6 +39,9 @@ foam.CLASS({
     ^ > *:last-child {
       border-top-left-radius: 0 !important;
       border-bottom-left-radius: 0 !important;
+    }
+    ^fragment {
+      text-align: center;
     }
   `,
 
@@ -84,6 +85,8 @@ foam.CLASS({
           e = e.view;
         }
         var u2Elem = this.start(e)
+          .style({ width: this.delegates[i].maxLength * 10 })
+          .addClass(this.myClass('fragment'))
         u2Elem.on('focus', () => {
           this.currentIndex = i;
         })
@@ -115,13 +118,16 @@ foam.CLASS({
       code: function() {
         var arr = this.processData(this.childNodes[this.currentIndex].data, this.currentIndex, []);
         for ( var i = 0; i < arr.length; i++ ) {
+          var nextIndex = this.currentIndex + 1;
+          while ( this.childNodes[nextIndex] && ! foam.u2.TextField.isInstance(this.childNodes[nextIndex]) ) {
+            nextIndex++;
+          }
           this.childNodes[this.currentIndex].data = arr[i];
-          if ( next = this.childNodes[this.currentIndex + 2] ) {
+          if ( next = this.childNodes[nextIndex] ) {
             if ( this.delegates[this.currentIndex].maxLength > arr[i].length ) break;
 
             if ( ! ( next && next.data ) ) {
-              // TODO : typecheck the delegates to determine what currentIndex should be set to next instead of '+2'
-              this.currentIndex = this.currentIndex + 2;
+              this.currentIndex = nextIndex;
               next.focus();
             } else break;
           }

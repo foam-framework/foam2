@@ -8,9 +8,16 @@ foam.CLASS({
   package: 'foam.nanos.crunch.ui',
   name: 'MinMaxCapabilityWizardlet',
   extends: 'foam.nanos.crunch.ui.CapabilityWizardlet',
+  implements: [ 'foam.nanos.crunch.ui.PrerequisiteAwareWizardlet' ],
 
   requires: [
+    'foam.u2.view.MultiChoiceView',
+    'foam.u2.view.CardSelectView',
     'foam.nanos.crunch.CapabilityJunctionStatus'
+  ],
+
+  imports: [
+    'translationService'
   ],
 
   properties: [
@@ -19,7 +26,7 @@ foam.CLASS({
       of: 'foam.u2.wizard.Wizardlet',
       name: 'choiceWizardlets',
       factory: function() {
-        return []
+        return [];
       }
     },
     {
@@ -27,7 +34,8 @@ foam.CLASS({
       class: 'Int',
       factory: function(){
         if ( foam.nanos.crunch.MinMaxCapability.isInstance(this.capability) ){
-          return this.capability.min;
+          // a capability min of 0 denotes no minimum limit
+          return this.capability.min > 0 ? this.capability.min : this.choices.length;
         }
       }
     },
@@ -43,15 +51,48 @@ foam.CLASS({
     {
       name: 'choices',
       expression: function(choiceWizardlets){
+        var self = this;
         return choiceWizardlets.map(wizardlet => {
-          var isFinal = wizardlet.ucj !== null &&
-          (
-            wizardlet.ucj.status === this.CapabilityJunctionStatus.GRANTED ||
-            wizardlet.ucj.status === this.CapabilityJunctionStatus.PENDING
-          )
+          var isFinal =
+            wizardlet.status === this.CapabilityJunctionStatus.GRANTED ||
+            wizardlet.status === this.CapabilityJunctionStatus.PENDING;
 
-          return [wizardlet.title, wizardlet.title, isFinal ? true : wizardlet.isAvailable$, isFinal ?  foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW, isFinal]
+          return [wizardlet.title, self.translationService.getTranslation(foam.locale, `${wizardlet.capability.id}.name`,wizardlet.title), isFinal ? true : wizardlet.isAvailable$, isFinal ?  foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW, isFinal]
         })
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'isValid',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'isVisible',
+      expression: function (isAvailable) {
+        return isAvailable;
+      }
+    },
+    {
+      name: 'isAvailable',
+      class: 'Boolean',
+      value: true,
+      documentation: `
+        Specify the availability of this wizardlet. If true, wizardlet is
+        available iff at least one section is available. If false, wizardlet
+        does not display even if some sections are available.
+      `,
+      postSet: function(_,n){
+        if ( !n ){
+          this.choiceWizardlets.forEach(cw => {
+            cw.isAvailable = false
+            cw.cancel();
+          });
+
+          this.cancel();
+        } else {
+          this.save();
+        }
       }
     },
     {
@@ -77,30 +118,22 @@ foam.CLASS({
           })
         ];
       }
-    },
-    {
-      class: 'Boolean',
-      name: 'isValid',
-      value: false
-    },
-    {
-      name: 'isVisible',
-      class: 'Boolean',
-      expression: function(isAvailable) {
-        return isAvailable;
-      }
     }
   ],
 
   methods: [
     function createView(data) {
-      return foam.u2.view.MultiChoiceView.create({
+      return this.MultiChoiceView.create({
         choices$: this.choices$,
-        booleanView: foam.u2.view.CardSelectView,
+        booleanView: this.CardSelectView,
         isValidNumberOfChoices$: this.isValid$,
         minSelected$: this.min$,
         maxSelected$: this.max$
       });
+    },
+    function addPrerequisite(wizardlet) {
+      wizardlet.isAvailable = false;
+      this.choiceWizardlets.push(wizardlet);
     }
   ]
 });

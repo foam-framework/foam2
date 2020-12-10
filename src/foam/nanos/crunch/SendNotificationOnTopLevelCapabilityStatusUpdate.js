@@ -18,6 +18,7 @@ foam.CLASS({
     'foam.core.ContextAgent',
     'foam.core.X',
     'foam.dao.DAO',
+    'foam.i18n.TranslationService',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Subject',
     'foam.nanos.notification.Notification',
@@ -25,6 +26,11 @@ foam.CLASS({
     'foam.nanos.theme.Themes',
     'java.util.Date',
     'java.util.HashMap'
+  ],
+
+  messages: [
+    { name: 'NOTIFICATION_BODY_P1', message: 'Your capability \"'},
+    { name: 'NOTIFICATION_BODY_P2', message: '\" has been set to the status '}
   ],
 
   methods: [
@@ -35,24 +41,36 @@ foam.CLASS({
         @Override
         public void execute(X x) {
           UserCapabilityJunction junction = (UserCapabilityJunction) obj;
-          Capability cap = (Capability) junction.findTargetId(x);
-          User user = (User) junction.findSourceId(x);
 
-          // visible checks if the capability is a top-level capability
-          // and availabilitypredicate checks if the user has access to the capability
-          if ( cap == null || ! ( cap.getVisible() && cap.getAvailabilityPredicate().f(x) ) ) return;
+          var subject = junction.getSubject(x);
+          var subjectX = x.put("subject", subject);
+          var capabilityDAO = ((DAO) subjectX.get("capabilityDAO")).inX(subjectX);
+          var cap = (Capability) capabilityDAO.find(junction.getTargetId());
+          if ( cap == null ) return;
 
-          DAO notificationDAO = (DAO) x.get("notificationDAO");
+          if ( ! cap.getVisibilityPredicate().f(subjectX) ) return;
 
-          StringBuilder sb = new StringBuilder("The Capability '")
-          .append(cap.getName())
-          .append("' has been set to ")
-          .append(junction.getStatus())
+          User user = (User) subject.getUser();
+
+          TranslationService ts = (TranslationService) x.get("translationService");
+          String locale = user.getLanguage().getCode().toString();
+          String capabilityName = ts.getTranslation(locale, cap.getId() + ".name", cap.getName());
+          String junctionStatus = ts.getTranslation(locale, "foam.nanos.crunch.CapabilityJunctionStatus." + junction.getStatus().getName() + ".label", junction.getStatus().getLabel());
+
+          String notificationP1 = ts.getTranslation(locale, getClassInfo().getId()+ ".NOTIFICATION_BODY_P1", NOTIFICATION_BODY_P1);
+          String notificationP2 = ts.getTranslation(locale, getClassInfo().getId()+ ".NOTIFICATION_BODY_P2", NOTIFICATION_BODY_P2);
+
+          StringBuilder sb = new StringBuilder(notificationP1)
+          .append(capabilityName)
+          .append(notificationP2)
+          .append(junctionStatus)
           .append(".");
 
           HashMap<String, Object> args = new HashMap<>();
-            args.put("capName", cap.getName());
-            args.put("junctionStatus", junction.getStatus());
+            args.put("capNameEn", cap.getName());
+            args.put("capName", capabilityName);
+            args.put("junctionStatusEn", junction.getStatus());
+            args.put("junctionStatus", junctionStatus);
 
           Notification notification = new Notification();
 

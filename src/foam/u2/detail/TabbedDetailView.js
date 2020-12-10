@@ -22,7 +22,9 @@ foam.CLASS({
   css: `
     ^ .foam-u2-Tabs-content > div {
       background: white;
-      padding: 14px 16px
+      padding: 14px 16px;
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
     }
 
     ^ .foam-u2-view-ScrollTableView table {
@@ -32,6 +34,8 @@ foam.CLASS({
     ^ .foam-u2-Tabs-tabRow {
       overflow-x: scroll;
       white-space: nowrap;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
     }
   `,
 
@@ -39,7 +43,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'defaultSectionLabel',
-      value: 'Information'
+      value: 'Uncategorized'
     }
   ],
 
@@ -63,8 +67,14 @@ foam.CLASS({
                 .start(self.Tabs)
                   .forEach(sections, function(s, i) {
                     if ( ! visibilities[i] ) return;
+                    var title$ = foam.Function.isInstance(s.title) ?
+                      foam.core.ExpressionSlot.create({
+                        obj: self.data,
+                        code: s.title
+                      }) :
+                      s.title$;
                     this
-                      .start(self.Tab, { label: s.title || self.defaultSectionLabel })
+                      .start(self.Tab, { label$: title$ || self.defaultSectionLabel })
                         .call(function() {
                           this.tag(self.SectionView, {
                             data$: self.data$,

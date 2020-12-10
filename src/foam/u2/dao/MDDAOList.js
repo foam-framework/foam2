@@ -66,7 +66,7 @@ foam.CLASS({
     padding: 3rem;
     font-size: 2.5rem;
     font-weight: 300;
-    border-bottom: 1px solid /*%GREY3%*/;
+    border-bottom: 1px solid /*%GREY3%*/ #cbcfd4;
   }
 
   `

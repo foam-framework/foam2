@@ -10,13 +10,15 @@ import foam.core.*;
 import foam.dao.AbstractSink;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
+import foam.dao.ProxySink;
+import foam.dao.Sink;
 import foam.mlang.predicate.Predicate;
 import foam.mlang.sink.GroupBy;
 import foam.nanos.NanoService;
 import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.crunch.lite.Capable;
-import foam.nanos.crunch.lite.CapablePayload;
+import foam.nanos.crunch.CapabilityJunctionPayload;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 
@@ -110,11 +112,11 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
         // Manually grab the direct  prereqs to the  MinMaxCapability
         for ( int i = prereqs.length - 1 ; i >= 0 ; i-- ) {
-          var prereqGrantPath = this.getGrantPath(x, prereqs[i]);
+          var prereqGrantPath = this.getCapabilityPath(x, prereqs[i], filterGrantedUCJ);
 
           // Essentially we reserve arrays to denote  ANDs and ORs, must be at least 2  elements
           if ( prereqGrantPath.size() > 1 ) minMaxArray.add(prereqGrantPath);
-          else minMaxArray.add(prereqGrantPath.get(0));
+          else if ( prereqGrantPath.size() == 1 ) minMaxArray.add(prereqGrantPath.get(0));
         }
 
         /**
@@ -143,7 +145,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     pm.log(x);
     return grantPath;
   }
-  
+
   public String[] getDependantIds(X x, String capabilityId) {
     return Arrays.stream(((CapabilityCapabilityJunction[]) ((ArraySink) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
       .where(EQ(CapabilityCapabilityJunction.TARGET_ID, capabilityId))
@@ -156,16 +158,17 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     if ( prereqsCache_ == null ) {
       prereqsCache_ = new ConcurrentHashMap<>();
       var dao = (DAO) getX().get("prerequisiteCapabilityJunctionDAO");
-      var sink = (GroupBy) dao.select(
-        GROUP_BY(
-          CapabilityCapabilityJunction.SOURCE_ID,
-          MAP(
-            CapabilityCapabilityJunction.TARGET_ID,
-            new ArraySink()
+      var sink = (GroupBy) dao.
+        orderBy(CapabilityCapabilityJunction.PRIORITY).
+        select(
+          GROUP_BY(
+            CapabilityCapabilityJunction.SOURCE_ID,
+            MAP(
+              CapabilityCapabilityJunction.TARGET_ID,
+              new ArraySink()
+            )
           )
-        )
-      );
-
+        );
       for (var key : sink.getGroupKeys()) {
         prereqsCache_.put(key.toString(), ((ArraySink) ((foam.mlang.sink.Map)
           sink.getGroups().get(key)).getDelegate()).getArray());
@@ -205,6 +208,76 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return this.getJunctionForSubject(x, capabilityId, subject);
   }
 
+  public boolean atLeastOneInCategory(X x, String category) {
+    var categoryJunctionDAO = (DAO) x.get("capabilityCategoryCapabilityJunctionDAO");
+
+    var junctions = new ArrayList<>();
+    categoryJunctionDAO.where(EQ(CapabilityCategoryCapabilityJunction.SOURCE_ID, category))
+    .select(new AbstractSink() {
+      @Override
+      public void put(Object obj, Detachable sub) {
+        junctions.add(((CapabilityCategoryCapabilityJunction) obj).getTargetId());
+      }
+    });
+
+    var ucj = (UserCapabilityJunction) ((DAO) x.get("userCapabilityJunctionDAO"))
+      .find(AND(
+          getAssociationPredicate_(x),
+          IN(UserCapabilityJunction.TARGET_ID, junctions),
+          EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.GRANTED)
+        )
+      );
+
+    return ucj != null;
+  }
+
+  // see documentation in CrunchService interface
+  public boolean hasPreconditionsMet(
+    X sessionX, String capabilityId
+  ) {
+    // Return false if capability does not exist or is not available
+    var capabilityDAO = ((DAO) sessionX.get("capabilityDAO")).inX(sessionX);
+    if ( capabilityDAO.find(capabilityId) == null ) return false;
+
+    // TODO: use MapSink to simplify/optimize this code
+    var preconditions = Arrays.stream(((CapabilityCapabilityJunction[]) ((ArraySink) ((DAO) sessionX.get("prerequisiteCapabilityJunctionDAO"))
+      .where(AND(
+        EQ(CapabilityCapabilityJunction.SOURCE_ID, capabilityId),
+        EQ(CapabilityCapabilityJunction.PRECONDITION, true)
+      ))
+      .select(new ArraySink())).getArray()
+      .toArray(new CapabilityCapabilityJunction[0])))
+      .map(CapabilityCapabilityJunction::getTargetId).toArray(String[]::new);
+
+    for ( String preconditionId : preconditions ) {
+      // Return false if capability does not exist or is not available
+      if ( capabilityDAO.find(preconditionId) == null ) return false;
+      var ucj = getJunction(sessionX, preconditionId);
+      if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED ) return false;
+    }
+
+    return true;
+  }
+
+  // see documentation in CrunchService interface
+  public ArraySink getEntryCapabilities(X x) {
+    var sink = new ArraySink();
+    var proxySink = new ProxySink(x, sink) {
+      @Override
+      public void put(Object o, Detachable sub) {
+        var cap = (Capability) o;
+        if ( ! cap.getVisibilityPredicate().f(x) || ! hasPreconditionsMet(x, cap.getId()) ) {
+          return;
+        }
+        getDelegate().put(o, sub);
+      }
+    };
+
+    var capabilityDAO = ((DAO) x.get("capabilityDAO")).inX(x);
+    capabilityDAO.select(proxySink);
+    return sink;
+  }
+
   public UserCapabilityJunction[] getAllJunctionsForUser(X x) {
     Predicate associationPredicate = getAssociationPredicate_(x);
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
@@ -221,6 +294,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     try {
       DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
+      x = x.put("subject", subject);
       Predicate associationPredicate = getAssociationPredicate_(x);
 
       // Check if a ucj implies the subject.realUser has this permission in relation to the user
@@ -257,6 +331,17 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     if ( status != null ) {
       ucj.setStatus(status);
     }
+
+    if (
+      subject.getRealUser().isAdmin()
+      && subject.getRealUser() != subject.getUser()
+    ) {
+      var logger = (Logger) x.get("logger");
+      // This may be correct when testing features as an admin user
+      logger.warning(
+        "admin user is lastUpdatedRealUser on an agent-associated UCJ");
+    }
+    ucj.setLastUpdatedRealUser(subject.getRealUser().getId());
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
     return (UserCapabilityJunction) userCapabilityJunctionDAO.inX(x).put(ucj);
   }
@@ -266,10 +351,14 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
   ) {
     // Need Capability to associate UCJ correctly
     DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-    Capability cap = (Capability) capabilityDAO.find(capabilityId);
+
+    // If the subject in context doesn't have the capability availabile, we
+    // should act as though it doesn't exist; this is why inX is here.
+    Capability cap = (Capability) capabilityDAO.inX(x).find(capabilityId);
     if ( cap == null ) {
       throw new RuntimeException(String.format(
-        "Capability with id '%s' not found", capabilityId
+        "Capability with id '%s' is either unavailabile or does not exist",
+        capabilityId
       ));
     }
     AssociatedEntity associatedEntity = cap.getAssociatedEntity();
@@ -367,77 +456,6 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
               ucj.getStatus() != CapabilityJunctionStatus.PENDING &&
               ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return true;
     return false;
-  }
-
-  public CapablePayload[] getCapableObjectPayloads(X x, String[] capabilityIds) {
-    CrunchService crunchService = (CrunchService) x.get("crunchService");
-    List crunchPath = crunchService.getMultipleCapabilityPath(
-      x, capabilityIds, false);
-
-    List<CapablePayload> payloads = getCapableObjectPayloads(x, crunchPath);
-
-    return payloads.toArray(new CapablePayload[payloads.size()]);
-  }
-
-  private List<CapablePayload> getCapableObjectPayloads(X x, List capabilities){
-    List<CapablePayload> flattenedPayloads = new ArrayList<>();
-
-    Capability rootCapability = (Capability) capabilities.get(capabilities.size() - 1);
-
-    boolean isOr = capabilities.get(capabilities.size() - 1) instanceof MinMaxCapability;
-
-    for ( int i = 0 ; i < capabilities.size() - 1 ; i++ ){
-      Object currentObject = capabilities.get(i);
-
-      if ( currentObject instanceof List ){
-        List<CapablePayload> recursedPayloads = getCapableObjectPayloads(x, (List) currentObject);
-
-        if ( isOr && recursedPayloads.size() > 1 ){
-          CapablePayload recursedPayloadRoot = recursedPayloads.get(recursedPayloads.size() - 1);
-
-          List<CapablePayload> recursedPayloadChildren = recursedPayloads.subList(0, recursedPayloads.size() - 1);
-
-          recursedPayloadRoot.setPrerequisites(recursedPayloadChildren.toArray(new CapablePayload[0]));
-
-          flattenedPayloads.add(recursedPayloadRoot);
-        } else {
-          flattenedPayloads.addAll(recursedPayloads);
-        }
-        continue;
-      }
-
-      if ( ! (currentObject instanceof Capability) ){
-        throw new RuntimeException(
-          "Expected capability or list"
-        );
-      }
-
-      Capability payloadCapability = (Capability) capabilities.get(i);
-
-      CapablePayload currentPayload = new CapablePayload.Builder(x)
-        .setCapability(payloadCapability.getId())
-        .build();
-
-      flattenedPayloads.add(currentPayload);
-    }
-
-    List<CapablePayload> outputPayloads;
-    CapablePayload rootPayload = new CapablePayload.Builder(x)
-      .setCapability(rootCapability.getId())
-      .build();
-
-    if ( isOr ){
-      outputPayloads = new ArrayList<>();
-
-      rootPayload.setPrerequisites(flattenedPayloads.toArray(new CapablePayload[0]));
-
-    } else {
-      outputPayloads = flattenedPayloads;
-    }
-
-    outputPayloads.add(rootPayload);
-
-    return outputPayloads;
   }
 
   private Predicate getAssociationPredicate_(X x) {

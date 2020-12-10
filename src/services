@@ -20,12 +20,12 @@ p({
   "name":"AuthenticatedNSpecDAO",
   "serve":true,
   "serviceScript":"""
-    return new foam.dao.PMDAO(x,
-      new foam.nanos.auth.AuthorizationDAO.Builder(x)
-        .setDelegate(x.get("nSpecDAO"))
-        .setAuthorizer(new foam.nanos.auth.StandardAuthorizer("service"))
-        .build()
-    );
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setAuthorizer(new foam.nanos.auth.StandardAuthorizer("service"))
+      .setInnerDAO(x.get("nSpecDAO"))
+      .setOf(foam.nanos.boot.NSpec.getOwnClassInfo())
+      .build();
   """,
   "client":"""
     {
@@ -453,7 +453,18 @@ p({
   """
 })
 
-p({"class":"foam.nanos.boot.NSpec", "name":"blobService",                        "serve":true,  "client": "{ \"class\":\"foam.blob.RestBlobService\", \"serviceName\":\"service/httpBlobService\" }"})
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"blobService",
+  "serve":true,
+  "client": """
+    {
+      "class":"foam.blob.RestBlobService",
+      "serviceName":"service/httpBlobService"
+    }
+  """
+})
+
 p({"class":"foam.nanos.boot.NSpec", "name":"resetPasswordToken",                 "serve":true,  "authenticate": false, "serviceClass":"foam.nanos.auth.resetPassword.ResetPasswordTokenService","boxClass":"foam.nanos.auth.token.TokenServiceSkeleton","client":"{\"class\":\"foam.nanos.auth.token.ClientTokenService\"}"})
 
 p({
@@ -910,6 +921,11 @@ p({
         )
       )
       .setIndex(new foam.core.PropertyInfo[] {foam.nanos.approval.ApprovalRequest.CREATED})
+      .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
+        .setPredicate(foam.mlang.MLang.NEQ(foam.nanos.approval.ApprovalRequest.STATUS, foam.nanos.approval.ApprovalStatus.REQUESTED))
+        .setComparator(foam.mlang.MLang.DESC(foam.nanos.approval.ApprovalRequest.CREATED))
+        .setSize(10000)
+        .build())
       .build()
       .orderBy(foam.mlang.MLang.DESC(foam.nanos.approval.ApprovalRequest.CREATED));
   """,
@@ -1114,4 +1130,10 @@ p({
     return dao;
   """,
   "client": "{\"of\":\"foam.nanos.auth.TimeZone\"}"
+})
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "templateEngine",
+  "serve": false,
+  "serviceClass": "foam.nanos.notification.email.EmailTemplateEngine"
 })

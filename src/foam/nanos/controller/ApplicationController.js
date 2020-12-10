@@ -170,6 +170,11 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
+      name: 'sessionName',
+      value: 'defaultSession'
+    },
+    {
       name: 'sessionID',
       factory: function() {
         var urlSession = "";
@@ -177,8 +182,8 @@ foam.CLASS({
           urlSession = window.location.search.substring(1).split('&')
            .find(element => element.startsWith("sessionId")).split('=')[1];
         } catch { };
-        return urlSession !== "" ? urlSession : localStorage["defaultSession"] ||
-          ( localStorage["defaultSession"] = foam.uuid.randomGUID() );
+        return urlSession !== "" ? urlSession : localStorage[this.sessionName] ||
+          ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
       }
     },
     {
@@ -504,18 +509,18 @@ foam.CLASS({
       // then we don't want this method to expand the commented portion of that
       // CSS because it's already in long form. By checking if */ follows the
       // macro, we can tell if it's already in long form and skip it.
-      return css.replace(
+      return this.theme[m] ? css.replace(
         new RegExp('%' + M + '%(?!\\*/)', 'g'),
-        '/*%' + M + '%*/ ' + this.theme[m]);
+        '/*%' + M + '%*/ ' + this.theme[m]) : css;
     },
 
     function expandLongFormMacro(css, m) {
       // A long-form macros is of the form "/*%PRIMARY_COLOR%*/ blue".
       var M = m.toUpperCase();
 
-      return css.replace(
+      return this.theme[m] ? css.replace(
         new RegExp('/\\*%' + M + '%\\*/[^;!]*', 'g'),
-        '/*%' + M + '%*/ ' + this.theme[m]);
+        '/*%' + M + '%*/ ' + this.theme[m]) : css;
     },
 
     function wrapCSS(text, id) {

@@ -65,6 +65,26 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'I18NString',
+  extends: 'String',
+
+  documentation: 'A String which needs to be internationalized before being displayed to users.',
+
+  properties: [
+   {
+     name: 'getter_',
+     value: function(proto, prop, obj, key) {
+       if ( foam.core.I18NString.GETTER__ ) return foam.core.I18NString.GETTER__(proto, prop, obj, key);
+       return obj.instance_[key];
+     }
+   }
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.core',
   name: 'ModelDocumentationRefinement',
@@ -331,7 +351,11 @@ foam.CLASS({
   name: 'List',
   extends: 'foam.core.Object',
   properties: [
-    [ 'type', 'List' ]
+    [ 'type', 'List' ],
+    [
+      'factory',
+      function() { return []; }
+    ]
   ]
 });
 
@@ -754,6 +778,37 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'PropertyShortNameRefinement',
+  refines: 'Property',
+
+  properties: [
+    /**
+      A short-name is an optional shorter name for a property.
+      It is used by JSON and XML support when 'useShortNames'
+      is enabled. Short-names enable output to be smaller,
+      which can save disk space and/or network bandwidth.
+      Ex.
+    <pre>
+      properties: [
+        { name: 'firstName', shortName: 'fn' },
+        { name: 'lastName',  shortName: 'ln' }
+      ]
+    </pre>
+    */
+    { class: 'String', name: 'name', required: true },
+    {
+      class: 'I18NString',
+      name: 'label',
+      expression: function(name) { return foam.String.labelize(name); }
+    },
+    { class: 'String', name: 'shortName' }
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.core',
   name: 'ModelUpgradeTypesRefinement',
@@ -764,7 +819,7 @@ foam.CLASS({
   properties: [
     { class: 'String',  name: 'name' },
     {
-      class: 'String',
+      class: 'I18NString',
       name: 'label',
       expression: function(name) { return foam.String.labelize(name); }
     },
@@ -789,35 +844,6 @@ foam.CLASS({
   ]
 });
 
-
-foam.CLASS({
-  package: 'foam.core',
-  name: 'PropertyShortNameRefinement',
-  refines: 'Property',
-
-  properties: [
-    /**
-      A short-name is an optional shorter name for a property.
-      It is used by JSON and XML support when 'useShortNames'
-      is enabled. Short-names enable output to be smaller,
-      which can save disk space and/or network bandwidth.
-      Ex.
-    <pre>
-      properties: [
-        { name: 'firstName', shortName: 'fn' },
-        { name: 'lastName',  shortName: 'ln' }
-      ]
-    </pre>
-    */
-    { class: 'String', name: 'name', required: true },
-    {
-      class: 'String',
-      name: 'label',
-      expression: function(name) { return foam.String.labelize(name); }
-    },
-    { class: 'String', name: 'shortName' }
-  ]
-});
 
 // Upgrade async property to a real boolean property.
 foam.CLASS({

@@ -29,7 +29,7 @@ foam.CLASS({
     { name: 'CITY_REQUIRED', message: 'City required' },
     { name: 'COUNTRY_REQUIRED', message: 'Country required' },
     { name: 'REGION_REQUIRED', message: 'Region required' },
-    { name: 'INVALID_ADDRESS_1', message: 'Invalid value for address 1' },
+    { name: 'INVALID_ADDRESS_1', message: 'Invalid value for address line 1' },
     { name: 'INVALID_POSTAL_CODE', message: 'Valid Postal Code or ZIP Code required' },
     { name: 'STREET_NAME_REQUIRED', message: 'Street name required' },
     { name: 'STREET_NUMBER_REQUIRED', message: 'Street number required' }
@@ -49,6 +49,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'address1',
+      label: 'Address Line 1',
       width: 70,
       displayWidth: 50,
       documentation: 'An unstructured field for the main postal address.',
@@ -74,6 +75,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'address2',
+      label: 'Address Line 2',
       width: 70,
       displayWidth: 50,
       documentation: 'An unstructured field for the sub postal address.',
@@ -740,7 +742,8 @@ foam.CLASS({
       expression: function(countryId) {
         let translatedPostalCodeLabel = this.translationService.getTranslation(foam.locale, `${countryId.toLowerCase()}.postalCode.label`);
         return translatedPostalCodeLabel ? translatedPostalCodeLabel : this.translationService.getTranslation(foam.locale, 'postalCode.label');
-      }
+      },
+      hidden: true
     },
     {
       class: 'Double',

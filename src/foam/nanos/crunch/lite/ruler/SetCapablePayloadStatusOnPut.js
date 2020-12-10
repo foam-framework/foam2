@@ -19,11 +19,11 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CapabilityJunctionPayload',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.CrunchService',
     'foam.nanos.crunch.lite.Capable',
     'foam.nanos.crunch.lite.CapableAdapterDAO',
-    'foam.nanos.crunch.lite.CapablePayload',
 
     'java.util.List',
     'java.util.Arrays',
@@ -41,7 +41,7 @@ foam.CLASS({
           Capable capableTarget = tempPayloadDAO.getCapable();
           var payloadDAO = (DAO) capableTarget.getCapablePayloadDAO(agencyX);
 
-          CapablePayload payload = (CapablePayload) obj;
+          CapabilityJunctionPayload payload = (CapabilityJunctionPayload) obj;
 
           CapabilityJunctionStatus defaultStatus = PENDING;
 
@@ -63,9 +63,9 @@ foam.CLASS({
             var depIds = crunchService.getDependantIds(agencyX, payload.getCapability());
 
             ((ArraySink) payloadDAO.select(new ArraySink())).getArray().stream()
-            .filter(cp -> Arrays.stream(depIds).anyMatch(((CapablePayload) cp).getCapability()::equals))
+            .filter(cp -> Arrays.stream(depIds).anyMatch(((CapabilityJunctionPayload) cp).getCapability()::equals))
             .forEach(cp -> {
-              payloadDAO.put((CapablePayload) cp);
+              payloadDAO.put((CapabilityJunctionPayload) cp);
             });
           }
         }, "Set capable payload status on put");
