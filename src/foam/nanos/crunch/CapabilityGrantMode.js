@@ -7,6 +7,11 @@
 foam.ENUM({
   package: 'foam.nanos.crunch',
   name: 'CapabilityGrantMode',
+  documentation: `
+    Set grantMode of a capability to MANUAL if you do not wish for the
+    capability to be granted automatically by a user action. This is useful
+    when an event outside of CRUNCH is expected to grant the capability.
+  `,
   values: [
     {
       name: 'AUTOMATIC',
