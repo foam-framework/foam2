@@ -29,6 +29,10 @@ foam.ENUM({
         The capability will not be automatically granted. It must be granted
         explicitly by a user with permission to grant capabilities, or by a
         rule outside of CRUNCH.
+
+        When performing a manual grant, set the status to APPROVED. This will
+        allow prerequisites in PENDING to block granting of the capability
+        until they are also APPROVED or GRANTED.
       `
     }
   ]
