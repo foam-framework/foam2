@@ -366,6 +366,11 @@ foam.CLASS({
   name: 'EmailPropertyValidationRefinement',
   refines: 'foam.core.EMail',
 
+  messages: [
+    { name: 'EMAIL_REQUIRED', message: 'email required' },
+    { name: 'VALID_EMAIL_REQUIRED', message: 'valid email required' }
+  ],
+
   properties: [
     {
       class: 'FObjectArray',
@@ -382,7 +387,7 @@ foam.CLASS({
                 e.REG_EXP(self, /\S+@\S+\.\S+/)
               );
             },
-            errorString: 'Valid email required'
+            errorString: this.VALID_EMAIL_REQUIRED
           }
         ];
         if ( this.required ) {
@@ -392,7 +397,7 @@ foam.CLASS({
               predicateFactory: function(e) {
                 return e.NEQ(self, '');
               },
-              errorString: 'Email required'
+              errorString: this.EMAIL_REQUIRED
             }
           );
         }
