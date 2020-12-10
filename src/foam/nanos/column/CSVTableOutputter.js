@@ -13,6 +13,9 @@ foam.CLASS({
     function arrayToCSV(arrayOfValues) {
       var output = [];
       for ( var row of arrayOfValues ) {
+        row = row.map(v =>  {
+          return v.replace('"', '""');
+        });
         row = row.map(v =>  '"' + v + '"' );
         output.push(row.join(','));
       }
