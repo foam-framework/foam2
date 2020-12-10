@@ -61,8 +61,7 @@ foam.CLASS({
     },
     {
       name: 'icon',
-      generateJava: false,
-      
+      generateJava: false
     },
     {
       class: 'Boolean',

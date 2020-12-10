@@ -94,7 +94,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'disableBrowseViewDataSet',
       documentation: `
-        Toggle property that prevents BrowseView data from being set if true.
+        Toggle property that prevents BrowseView's data from being set if true.
       `,
       value: false
     },

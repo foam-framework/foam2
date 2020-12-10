@@ -16,8 +16,8 @@ foam.CLASS({
 
   imports: [
     'auth',
-    'stack',
-    'currentMenu'
+    'currentMenu',
+    'stack'
   ],
 
   requires: [
