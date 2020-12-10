@@ -73,7 +73,11 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isModalRequired'
-    }
+    },
+    {
+      name: 'propertyData',
+      attribute: true
+    },
   ],
 
   methods: [
@@ -107,9 +111,10 @@ foam.CLASS({
   actions: [
     {
       name: 'ok',
-      isEnabled: (isModalRequired, property) => {
+      isEnabled: (isModalRequired, propertyData) => {
         if ( ! isModalRequired ) return true;
-        return property != '';
+
+        return propertyData;
       },
       code: function(X) {
         this.onExecute();

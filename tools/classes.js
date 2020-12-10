@@ -754,6 +754,7 @@ var classes = [
   'foam.nanos.crunch.crunchtest.TestCapable',
   //models
   'foam.nanos.crunch.Renewable',
+  'foam.nanos.crunch.CapabilityGrantMode',
   'foam.nanos.crunch.Capability',
   'foam.nanos.crunch.CapabilityIntercept',
   'foam.nanos.crunch.MinMaxCapability',

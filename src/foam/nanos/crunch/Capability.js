@@ -218,6 +218,12 @@ foam.CLASS({
       includeInDigest: true
     },
     {
+      name: 'grantMode',
+      class: 'Enum',
+      of: 'foam.nanos.crunch.CapabilityGrantMode',
+      value: foam.nanos.crunch.CapabilityGrantMode.AUTOMATIC
+    },
+    {
       name: 'reviewRequired',
       class: 'Boolean',
       includeInDigest: true,
