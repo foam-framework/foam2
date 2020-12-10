@@ -198,6 +198,12 @@ foam.CLASS({
       documentation: 'Predicate of the visibility for capabilities in the capability store/keyword sections'
     },
     {
+      name: 'grantMode',
+      class: 'Enum',
+      of: 'foam.nanos.crunch.CapabilityGrantMode',
+      value: foam.nanos.crunch.CapabilityGrantMode.AUTOMATIC
+    },
+    {
       name: 'reviewRequired',
       class: 'Boolean',
       permissionRequired: true
@@ -383,7 +389,7 @@ foam.CLASS({
           for ( var capId : prereqs ) {
             var cap = (Capability) capabilityDAO.find(capId);
             if ( cap == null || ! cap.getEnabled() ) continue;
-            
+
             UserCapabilityJunction prereqUcj = crunchService.getJunctionForSubject(x, capId, subject);
 
             prereqChainedStatus = getPrereqChainedStatus(x, ucj, prereqUcj);
@@ -410,30 +416,30 @@ foam.CLASS({
         CapabilityJunctionStatus prereqStatus = prereq.getStatus();
 
         switch ( (CapabilityJunctionStatus) prereqStatus ) {
-          case AVAILABLE : 
+          case AVAILABLE :
             status = CapabilityJunctionStatus.ACTION_REQUIRED;
             break;
-          case ACTION_REQUIRED : 
+          case ACTION_REQUIRED :
             status = CapabilityJunctionStatus.ACTION_REQUIRED;
             break;
-          case PENDING : 
-            status = reviewRequired && 
-              ( status == CapabilityJunctionStatus.APPROVED || 
+          case PENDING :
+            status = reviewRequired &&
+              ( status == CapabilityJunctionStatus.APPROVED ||
                 status == CapabilityJunctionStatus.GRANTED
-              ) ? 
+              ) ?
                 CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
             break;
-          case APPROVED : 
-            status = reviewRequired && 
-              ( status == CapabilityJunctionStatus.APPROVED || 
+          case APPROVED :
+            status = reviewRequired &&
+              ( status == CapabilityJunctionStatus.APPROVED ||
                 status == CapabilityJunctionStatus.GRANTED
-              ) ? 
+              ) ?
                 CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
               break;
           case EXPIRED :
             status = CapabilityJunctionStatus.ACTION_REQUIRED;
             break;
-          default : 
+          default :
             status = CapabilityJunctionStatus.GRANTED;
         }
         return status;
