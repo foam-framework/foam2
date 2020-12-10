@@ -21,9 +21,11 @@ foam.INTERFACE({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CapabilityJunctionPayload',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.CrunchService',
     'foam.nanos.ruler.RulerDAO',
+    'java.util.stream.Collectors',
 
     'java.util.ArrayList',
     'java.util.Arrays',
@@ -53,10 +55,8 @@ foam.INTERFACE({
           body: `
             CrunchService crunchService = (CrunchService) x.get("crunchService");
 
-            setCapablePayloads(
-              crunchService.getCapableObjectPayloads(
-                x, capabilityIds
-              )
+            setCapabilityIds(
+              capabilityIds
             );
           `
         }));
@@ -71,11 +71,22 @@ foam.INTERFACE({
           body: `
           CrunchService crunchService = (CrunchService) x.get("crunchService");
 
-          var oldCapabilityPayloads = getCapablePayloads();
-          
+          var oldCapabilityIds = getCapabilityIds();
+
+          List<String> oldCapabilityIdsList = new ArrayList<>();
+
+          for ( int i = 0; i < oldCapabilityIds.length; i++ ){
+            oldCapabilityIdsList.add(oldCapabilityIds[i]);
+          }
+
+          if ( ! oldCapabilityIdsList.contains(capabilityId) ){
+            oldCapabilityIdsList.add(capabilityId);
+          }
+
           if ( ! hasRequirement(x, capabilityId) ) {
-            var newCapabilityPayload = crunchService.getCapableObjectPayloads(x, new String[] { capabilityId });
-            setCapablePayloads((CapablePayload[]) ArrayUtils.addAll(oldCapabilityPayloads, newCapabilityPayload));
+            setCapabilityIds(
+              oldCapabilityIdsList.toArray(new String[0])
+            );
           }
           `
         }));
@@ -90,7 +101,7 @@ foam.INTERFACE({
           ],
           body: `
           var oldCapabilityPayloads = getCapablePayloads();
-          
+
           return Arrays.stream(oldCapabilityPayloads)
             .map((cap) -> cap.getCapability())
             .anyMatch(capabilityId::equals);
@@ -121,8 +132,9 @@ foam.INTERFACE({
           ],
           body: `
             // Marshal payloads into a hashmap
-            Map<String, CapablePayload> payloads = new HashMap<String, CapablePayload>();
-            for ( CapablePayload payload : getCapablePayloads() ) {
+            Map<String, CapabilityJunctionPayload> payloads =
+              new HashMap<String, CapabilityJunctionPayload>();
+            for ( CapabilityJunctionPayload payload : getCapablePayloads() ) {
               payloads.put(payload.getCapability(), payload);
             }
 
@@ -134,7 +146,7 @@ foam.INTERFACE({
                 ));
               }
 
-              CapablePayload payload = payloads.get(capId);
+              CapabilityJunctionPayload payload = payloads.get(capId);
               if ( payload.getStatus() != status ) {
                 throw new IllegalStateException(String.format(
                   "Object does not have %s status for capability '%s'",
@@ -170,10 +182,10 @@ foam.INTERFACE({
           args: [
             { name: 'x', type: 'X' },
           ],
-          body: `            
+          body: `
             DAO capablePayloadDAO = new CapableAdapterDAO.Builder(x)
               .setCapable(this)
-              .setOf(CapablePayload.getOwnClassInfo())
+              .setOf(CapabilityJunctionPayload.getOwnClassInfo())
               .build();
 
             x = x.put("capablePayloadDAO", capablePayloadDAO);
@@ -181,9 +193,9 @@ foam.INTERFACE({
             // TODO: Look into why rulerdao acts sketchy here and if it can replace CapablePayloadStatusDAO
             DAO CapablePayloadStatusDAO = new CapablePayloadStatusDAO.Builder(x)
               .setDelegate(capablePayloadDAO)
-              .setOf(CapablePayload.getOwnClassInfo())
+              .setOf(CapabilityJunctionPayload.getOwnClassInfo())
               .build();
-              
+
             return CapablePayloadStatusDAO;
           `
         }));
@@ -194,7 +206,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'getCapablePayloads',
-      type: 'CapablePayload[]',
+      type: 'CapabilityJunctionPayload[]',
       flags: ['java'],
     },
     {
@@ -203,7 +215,29 @@ foam.INTERFACE({
       args: [
         {
           name: 'payloads',
-          type: 'CapablePayload[]'
+          type: 'CapabilityJunctionPayload[]'
+        }
+      ]
+    },
+    {
+      name: 'getCapabilityIds',
+      documentation: `
+        Getting the ids of the root capabilit(y/ies) required for the capable object.
+      `,
+      type: 'String[]',
+      flags: ['java'],
+    },
+    {
+      name: 'setCapabilityIds',
+      documentation: `
+        Setting the ids of the root capabilit(y/ies) required for the capable object.
+        Should be handled by using capable.addRequirement rather than directly setting.
+    `,
+      flags: ['java'],
+      args: [
+        {
+          name: 'ids',
+          type: 'String[]'
         }
       ]
     },
@@ -221,6 +255,21 @@ foam.INTERFACE({
           type: 'String[]'
         }
       ]
+    },
+    {
+      name: 'getDAOKey',
+      type: 'String',
+      flags: ['java']
+    },
+    {
+      name: 'setDAOKey',
+      flags: ['java'],
+      args: [
+        {
+          name: 'daokey',
+          type: 'String'
+        }
+      ]
     }
-  ],
+  ]
 });

@@ -17,7 +17,8 @@ foam.CLASS({
     'wizardlets',
     'wizardConfig',
     'pushView',
-    'popView'
+    'popView',
+    'initialPosition?'
   ],
 
   exports: [
@@ -55,7 +56,11 @@ foam.CLASS({
           wizardlets: this.wizardlets,
           config: this.wizardConfig,
           submitted$: this.submitted$,
-        });
+          ...(this.initialPosition ? {
+            wizardPosition: this.initialPosition
+          } : {})
+        })
+        
         this.pushView({
           ...this.view,
           data: data,

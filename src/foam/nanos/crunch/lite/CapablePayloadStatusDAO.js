@@ -20,7 +20,7 @@ foam.CLASS({
     'foam.nanos.crunch.CrunchService',
     'foam.nanos.crunch.lite.Capable',
     'foam.nanos.crunch.lite.CapableAdapterDAO',
-    'foam.nanos.crunch.lite.CapablePayload',
+    'foam.nanos.crunch.CapabilityJunctionPayload',
 
     'foam.nanos.logger.Logger',
 
@@ -41,7 +41,7 @@ foam.CLASS({
         Capable capableTarget = tempPayloadDAO.getCapable();
         var payloadDAO = (DAO) capableTarget.getCapablePayloadDAO(x);
 
-        CapablePayload payload = (CapablePayload) obj;
+        CapabilityJunctionPayload payload = (CapabilityJunctionPayload) obj;
 
         CapabilityJunctionStatus defaultStatus = PENDING;
 
@@ -72,19 +72,19 @@ foam.CLASS({
               String[] prereqIds = prereqIdsList.toArray(new String[prereqIdsList.size()]);
 
               ((ArraySink) payloadDAO.select(new ArraySink())).getArray().stream()
-              .filter(cp -> Arrays.stream(prereqIds).anyMatch(((CapablePayload) cp).getCapability()::equals))
+              .filter(cp -> Arrays.stream(prereqIds).anyMatch(((CapabilityJunctionPayload) cp).getCapability()::equals))
               .forEach(cp -> {
-                CapablePayload capableCp = (CapablePayload) cp;
+                CapabilityJunctionPayload capableCp = (CapabilityJunctionPayload) cp;
                 capableCp.setStatus(REJECTED);
                 capableCp.setHasSafeStatus(true);
                 payloadDAO.put(capableCp);
               });
-            }            
+            }
           }
 
           newStatus = REJECTED;
         }
-        
+
         if ( cap.getReviewRequired() ) {
           if ( oldStatus == PENDING && newStatus != REJECTED ) {
             return getDelegate().put_(x, obj);
@@ -101,9 +101,9 @@ foam.CLASS({
           var depIds = crunchService.getDependantIds(x, payload.getCapability());
 
           ((ArraySink) payloadDAO.select(new ArraySink())).getArray().stream()
-          .filter(cp -> Arrays.stream(depIds).anyMatch(((CapablePayload) cp).getCapability()::equals))
+          .filter(cp -> Arrays.stream(depIds).anyMatch(((CapabilityJunctionPayload) cp).getCapability()::equals))
           .forEach(cp -> {
-            CapablePayload capableCp = (CapablePayload) cp;
+            CapabilityJunctionPayload capableCp = (CapabilityJunctionPayload) cp;
             capableCp.setHasSafeStatus(true);
             payloadDAO.put(capableCp);
           });
