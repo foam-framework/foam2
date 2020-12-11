@@ -32,8 +32,8 @@ foam.CLASS({
       class: 'String',
       name: 'objectClass',
       label: '',
-      visibility: function(allowCustom, classIsFinal, choices, data) {
-        if ( ! allowCustom && choices.length <= 1  ) return foam.u2.DisplayMode.HIDDEN;
+      visibility: function(allowCustom, classIsFinal, choices, data, placeholder) {
+        if ( ! allowCustom && choices.length <= 1 && ! placeholder ) return foam.u2.DisplayMode.HIDDEN;
         if ( classIsFinal && this.dataWasProvided_ ) return foam.u2.DisplayMode.HIDDEN;
         return foam.u2.DisplayMode.RW;
       },

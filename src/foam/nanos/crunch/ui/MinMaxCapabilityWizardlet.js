@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.crunch.ui',
   name: 'MinMaxCapabilityWizardlet',
   extends: 'foam.nanos.crunch.ui.CapabilityWizardlet',
+  implements: [ 'foam.nanos.crunch.ui.PrerequisiteAwareWizardlet' ],
 
   requires: [
     'foam.u2.view.MultiChoiceView',
@@ -129,6 +130,10 @@ foam.CLASS({
         minSelected$: this.min$,
         maxSelected$: this.max$
       });
+    },
+    function addPrerequisite(wizardlet) {
+      wizardlet.isAvailable = false;
+      this.choiceWizardlets.push(wizardlet);
     }
   ]
 });

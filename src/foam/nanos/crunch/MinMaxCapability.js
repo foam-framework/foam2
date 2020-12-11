@@ -32,7 +32,7 @@ foam.CLASS({
     },
     {
       class: 'Object',
-      name: 'wizardlet',
+      name: 'beforeWizardlet',
       documentation: `
         Defines a wizardlet used when displaying this capability on related client crunch wizards.
       `,
