@@ -49,6 +49,7 @@ foam.CLASS({
           break;
         }
       }
+      return this;
     },
     function remove(name) {
       let found = -1;
@@ -58,7 +59,8 @@ foam.CLASS({
           break;
         }
       }
-      if ( found >= 0 ) this.contextAgentSpecs$splice(i, 1);
+      if ( found >= 0 ) this.contextAgentSpecs$splice(found, 1);
+      return this;
     },
 
     // Launching a sequence

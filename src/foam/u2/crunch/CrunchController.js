@@ -123,22 +123,16 @@ foam.CLASS({
         association with a user.
       `,
       code: function createCapableWizardSequence(intercept, capable) {
-        return this.Sequence.create(null, this.__subContext__.createSubContext({
+        let x = this.__subContext__.createSubContext({
           intercept: intercept,
-          capable: capable,
-          // TODO: support multiple capability IDs by invoking multiple wizards
-          rootCapability: capable.capabilityIds[0],
-        }))
-          .add(this.ConfigureFlowAgent)
-          .add(this.CapabilityAdaptAgent)
-          .add(this.LoadTopConfig)
-          .add(this.LoadCapabilitiesAgent, {
+          capable: capable
+        });
+        return this.createWizardSequence(capable.capabilityIds[0], x)
+          .reconfigure('LoadCapabilitiesAgent', {
             waoSetting: this.LoadCapabilitiesAgent.WAOSetting.CAPABLE })
-          .add(this.CapableDefaultConfigAgent)
-          .add(this.CreateWizardletsAgent)
-          .add(this.LoadWizardletsAgent)
-          .add(this.StepWizardAgent)
-          .add(this.PutFinalPayloadsAgent)
+          .remove('CheckRootIdAgent')
+          .remove('CheckPendingAgent')
+          .remove('CheckNoDataAgent')
           .add(this.MaybeDAOPutAgent)
           ;
       }
