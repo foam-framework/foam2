@@ -15,39 +15,9 @@ foam.CLASS({
   exports: [ 'initialPosition' ],
   requires: [
     'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.u2.crunch.wizardflow.SkipMode',
     'foam.nanos.crunch.ui.CapabilityWizardlet',
     'foam.u2.wizard.WizardPosition'
-  ],
-
-  enums: [
-    {
-      name: 'SkipMode',
-      values: [
-        {
-          name: 'HIDE',
-          label: 'hide',
-          documentation: `
-            Hides all wizardlets that are PENDING or GRANTED
-          `
-        },
-        {
-          name: 'SHOW',
-          label: 'show',
-          documentation: `
-            Shows all wizardlets regardless of PENDING or GRANTED and starts at the 
-            first-indexed wizard regardless of status
-          `
-        },
-        {
-          name: 'SKIP',
-          label: 'skip',
-          documentation: `
-            Show all wizardlets regardless of PENDING or GRANTED and starts at the
-            first wizard that is NOT PENDING or GRANTED
-          `
-        }
-      ]
-    }
   ],
 
   properties: [
@@ -64,6 +34,8 @@ foam.CLASS({
     },
     {
       name: 'mode',
+      class: 'Enum',
+      of: 'foam.u2.crunch.wizardflow.SkipMode',
       factory: function () {
         return this.SkipMode.SKIP;
       }
@@ -85,7 +57,9 @@ foam.CLASS({
           continue;
         }
         if ( ! foundFirstWizardlet ) passedAtBeginning++;
-        if ( this.mode == this.SkipMode.HIDE ) wizardlet.isAvailable = false;
+        if ( this.mode == this.SkipMode.HIDE ) {
+          wizardlet.isVisible = false;
+        }
       }
 
       this.initialPosition.wizardletIndex = passedAtBeginning;

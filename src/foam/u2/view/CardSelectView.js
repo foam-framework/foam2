@@ -16,8 +16,6 @@ foam.CLASS({
   css: `
     ^ {
       display: flex;
-      padding: 5%;
-      margin: 1%;
       justify-content: center;
       flex-grow: 1;
       align-items: center;
@@ -74,7 +72,7 @@ foam.CLASS({
             return data && mode === foam.u2.DisplayMode.DISABLED
           }))
           .on('click', this.onClick)
-          .add(this.label) 
+          .add(this.label)
         .end()
     }
   ],

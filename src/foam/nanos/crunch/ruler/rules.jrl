@@ -103,7 +103,7 @@ p({
             }
           ]
         }
-        
+
       }
     ]
   }
@@ -160,7 +160,7 @@ p({
   "enabled":true,
   "action":{"class":"foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted"},
   "predicate":{
-    "class":"foam.mlang.predicate.Or", 
+    "class":"foam.mlang.predicate.Or",
     "args":[
       {
         "class":"foam.mlang.predicate.Or",
@@ -205,7 +205,7 @@ p({
   "enabled":true,
   "action":{"class":"foam.nanos.crunch.ruler.SaveUCJDataOnGranted"},
   "predicate":{
-    "class":"foam.mlang.predicate.Or", 
+    "class":"foam.mlang.predicate.Or",
     "args":[
       {
         "class":"foam.mlang.predicate.Or",
