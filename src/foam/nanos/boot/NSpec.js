@@ -155,9 +155,7 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.script.Language',
       name: 'language',
-      factory: function() {
-        return this.Language.BEANSHELL;
-      }
+      value: 'BEANSHELL'
     },
     {
       class: 'Code',
@@ -246,9 +244,9 @@ foam.CLASS({
         Language l = getLanguage();
         Object service;
         if ( l == foam.nanos.script.Language.JSHELL )
-          service = return new JShellExecutor().runExecutor(x, ps, getServiceScript());
+          service = new JShellExecutor().runExecutor(x, ps, getServiceScript());
         else if ( l == foam.nanos.script.Language.BEANSHELL )
-          service = return new BeanShellExecutor(this).execute(x, ps, getServiceScript());
+          service = new BeanShellExecutor(this).execute(x, ps, getServiceScript());
         else
           throw new RuntimeException("Script language not supported");
         saveService(x, service);
