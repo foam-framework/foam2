@@ -344,6 +344,16 @@ foam.CLASS({
         },
         configurable: true
       });
+      // Does not modify the original array; returns an array containing all
+      //   elements that satisfy the provided predicate.
+      Object.defineProperty(proto, self.name + '$filter', {
+        get: function classGetter() {
+          return function (predicate) {
+            return foam.Array.filter(this[self.name], predicate);
+          }
+        },
+        configurable: true
+      });
     }
   ]
 });
