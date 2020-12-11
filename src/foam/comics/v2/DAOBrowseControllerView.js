@@ -133,7 +133,7 @@ foam.CLASS({
     var self = this;
 
       this.addClass(this.myClass())
-      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction, config$disableBrowseViewDataSet) {
+      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction) {
         return self.E()
           .start(self.Rows)
             .addClass(self.myClass('container'))
@@ -142,7 +142,7 @@ foam.CLASS({
                 .start(self.Cols)
                   .start()
                     .addClass(self.myClass('browse-title'))
-                    .translate(self.currentMenu.id + '.handler.config.browseTitle', config$browseTitle)
+                    .translate(self.currentMenu ? self.currentMenu.id + '.handler.config.browseTitle' : config$browseTitle, config$browseTitle)
                   .end()
                   .startContext({ data: self }).tag(self.CREATE).endContext()
                   .callIf(config$primaryAction, function() {
@@ -153,7 +153,7 @@ foam.CLASS({
                   this
                     .start()
                       .addClass(self.myClass('browse-subtitle'))
-                      .translate(self.currentMenu.id + '.handler.config.browseSubtitle', config$browseSubtitle)
+                      .translate(self.currentMenu ? self.currentMenu.id + '.handler.config.browseSubtitle' : config$browseTitle, config$browseSubtitle)
                     .end();
                 })
               .end()
@@ -169,8 +169,7 @@ foam.CLASS({
                       .addClass(self.myClass('altview-container'))
                     .end();
                 })
-                .add(self.slot(function(browseView, config$disableBrowseViewDataSet) {
-                  if ( config$disableBrowseViewDataSet ) return self.E().tag(browseView, { config: config });
+                .add(self.slot(function(browseView) {
                   return self.E().tag(browseView, { data: data, config: config });
                 }))
               .end()
