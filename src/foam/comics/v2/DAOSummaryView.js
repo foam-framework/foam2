@@ -33,6 +33,7 @@ foam.CLASS({
     ^account-name {
       font-size: 36px;
       font-weight: 600;
+      margin-bottom: 32px;
     }
 
     ^actions-header .foam-u2-ActionView {

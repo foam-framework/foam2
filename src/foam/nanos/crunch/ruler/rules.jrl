@@ -42,6 +42,13 @@ p({
     "class":"foam.mlang.predicate.And",
     "args":[
       {
+        class: "foam.mlang.predicate.Not",
+        arg1: {
+          class: "foam.nanos.crunch.predicate.StatusChangedTo",
+          status: 4
+        }
+      },
+      {
         "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
         "propName":"status",
         "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":0}
@@ -96,7 +103,7 @@ p({
             }
           ]
         }
-        
+
       }
     ]
   }
@@ -153,7 +160,7 @@ p({
   "enabled":true,
   "action":{"class":"foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted"},
   "predicate":{
-    "class":"foam.mlang.predicate.Or", 
+    "class":"foam.mlang.predicate.Or",
     "args":[
       {
         "class":"foam.mlang.predicate.Or",
@@ -198,7 +205,7 @@ p({
   "enabled":true,
   "action":{"class":"foam.nanos.crunch.ruler.SaveUCJDataOnGranted"},
   "predicate":{
-    "class":"foam.mlang.predicate.Or", 
+    "class":"foam.mlang.predicate.Or",
     "args":[
       {
         "class":"foam.mlang.predicate.Or",

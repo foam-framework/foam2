@@ -323,7 +323,7 @@ foam.CLASS({
     {
       name: 'headerClick',
       isFramed: true,
-      documentatin: 'Called to flip the mode from calendar view to years view.',
+      documentation: 'Called to flip the mode from calendar view to years view.',
       code: function() {
         this.showYears_ = ! this.showYears_;
         if ( this.showYears_ ) this.scrollToYear();

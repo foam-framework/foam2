@@ -76,15 +76,6 @@ foam.CLASS({
       const hasPayloads = this.capableObj.capablePayloads &&
         Object.keys(this.capableObj.capablePayloads).length > 0;
 
-      // set capable payloads to capabilities if the capbilities don't have payloads yet
-      if ( ! hasPayloads ) {
-          try {
-            await this.capableObj.setRequirements(this.capableObj.capableRequirements);
-          } catch (e) {
-            this.notify(e.message, '', this.LogLevel.ERROR, true);
-          }
-      }
-
       // set wizardlets based on the capableObj
       // note: payloads data are also set from getWizardletsFromCapable
       //       this is why we add listeners to payloads data after wizardlets are set

@@ -34,7 +34,30 @@ foam.CLASS({
 
   css: `
     ^export {
+      background-image: linear-gradient(to bottom, #ffffff, #e7eaec);
+      border: 1px solid /*%GREY3%*/ #CBCFD4;
       margin-left: 16px;
+    }
+
+    ^export:hover {
+      border: 1px solid /*%BLACK%*/ #1E1F21;
+    }
+
+    ^export:focus:not(:hover) {
+      border: 1px solid /*%GREY3%*/ #CBCFD4;
+    }
+
+    ^refresh {
+      background-image: linear-gradient(to bottom, #ffffff, #e7eaec);
+      border: 1px solid /*%GREY3%*/ #CBCFD4;
+    }
+
+    ^refresh:hover {
+      border: 1px solid /*%BLACK%*/ #1E1F21;
+    }
+
+    ^refresh:focus:not(:hover) {
+      border: 1px solid /*%GREY3%*/ #CBCFD4;
     }
 
     ^export img {
@@ -64,7 +87,6 @@ foam.CLASS({
     ^browse-view-container {
       margin: auto;
       border-bottom: solid 1px #e7eaec;
-      margin: 0px 0px 72px 0px;
       box-sizing: border-box;
       padding: 0 16px;
     }
@@ -102,7 +124,8 @@ foam.CLASS({
   exports: [
     'dblclick',
     'filteredTableColumns',
-    'serviceName'
+    'serviceName',
+    'config'
   ],
 
   properties: [

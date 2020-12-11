@@ -105,6 +105,7 @@ var classes = [
   'foam.box.HTTPReplyBox',
   'foam.box.AuthServiceClientBox',
   'foam.box.ExportBox',
+  'foam.nanos.iban.ValidationIBAN',
   'foam.nanos.app.AppConfig',
   'foam.nanos.app.ContextLookupAppConfigService',
   'foam.nanos.http.WebAgent',
@@ -367,6 +368,7 @@ var classes = [
   'foam.nanos.notification.email.EmailTemplate',
   'foam.nanos.notification.email.EmailPropertyService',
   'foam.nanos.notification.email.Status',
+  'foam.nanos.notification.email.EmailTemplateEngine',
   // Email service Files
   'foam.nanos.notification.email.SMTPConfig',
   'foam.nanos.notification.email.SMTPEmailService',
@@ -439,6 +441,8 @@ var classes = [
   'foam.u2.DefaultValidator',
   'foam.u2.DisplayMode',
   'foam.u2.wizard.StepWizardConfig',
+  'foam.u2.crunch.wizardflow.SkipMode',
+  'foam.u2.crunch.EasyCrunchWizard',
   'foam.nanos.export.ClientGoogleSheetsExportService',
   'foam.nanos.export.ExportDriverRegistry',
   'foam.nanos.export.GoogleSheetsBasedExportDriver',
@@ -509,6 +513,7 @@ var classes = [
   'foam.nanos.demo.relationship.CourseType',
   'foam.nanos.demo.relationship.StudentCourseJunction',
   'foam.nanos.fs.File',
+  'foam.nanos.fs.FileDataDAO',
   'foam.nanos.fs.FileType',
   'foam.nanos.fs.SupportFileTypeDAO',
   'foam.crypto.hash.Hasher',
@@ -537,6 +542,11 @@ var classes = [
   'foam.lib.query.FooEnum',
 
   'foam.parse.QueryParserUserTest',
+  'foam.parse.PSymbol',
+  'foam.lib.parse.Grammar',
+  'foam.lib.parse.Action',
+  'foam.lib.parse.ActionParser',
+  'foam.lib.parse.SymbolParser',
   'foam.util.EmailTest',
   'foam.util.PasswordTest',
   'foam.util.SecurityUtilTest',
@@ -659,13 +669,14 @@ var classes = [
   'foam.nanos.crunch.crunchtest.TestCapable',
   //models
   'foam.nanos.crunch.Renewable',
+  'foam.nanos.crunch.CapabilityGrantMode',
   'foam.nanos.crunch.Capability',
   'foam.nanos.crunch.CapabilityIntercept',
   'foam.nanos.crunch.MinMaxCapability',
+  'foam.nanos.crunch.CapabilityJunctionPayload',
   'foam.nanos.crunch.lite.Capable',
   'foam.nanos.crunch.lite.CapableDAO',
   'foam.nanos.crunch.lite.CapableAdapterDAO',
-  'foam.nanos.crunch.lite.CapablePayload',
   'foam.nanos.crunch.lite.CapablePayloadStatusDAO',
   'foam.nanos.crunch.lite.CapableCompatibleCapability',
   'foam.nanos.crunch.CapabilityAvailabilityDAO',
@@ -684,6 +695,7 @@ var classes = [
   'foam.nanos.crunch.ui.CapabilityWizardlet',
   'foam.nanos.crunch.ui.ReviewCapabilityWizardlet',
   'foam.nanos.crunch.ui.MinMaxCapabilityWizardlet',
+  'foam.nanos.crunch.ui.PrerequisiteAwareWizardlet',
   'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
   'foam.nanos.crunch.AssociatedEntity',
@@ -721,6 +733,7 @@ var classes = [
 
   //crunch predicates
   'foam.nanos.crunch.predicate.CapabilityGranted',
+  'foam.nanos.crunch.predicate.StatusChangedTo',
   'foam.nanos.crunch.predicate.IsAgent',
 
   //authservice

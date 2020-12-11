@@ -160,9 +160,9 @@ foam.CLASS({
             continue;
           }
 
-          if ( 
-            sectionAvailableSlots[p.wizardletIndex].length > 0 && 
-            sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() 
+          if (
+            sectionAvailableSlots[p.wizardletIndex].length > 0 &&
+            sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get()
             ) {
             return p;
           }
@@ -199,9 +199,9 @@ foam.CLASS({
           }
 
           // Land on an available section
-          if ( 
-            sectionAvailableSlots[p.wizardletIndex].length > 0 && 
-            sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() 
+          if (
+            sectionAvailableSlots[p.wizardletIndex].length > 0 &&
+            sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get()
             ) {
             return p;
           }
