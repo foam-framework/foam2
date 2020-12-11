@@ -9,7 +9,8 @@ foam.CLASS({
   name: 'Sequence',
 
   implements: [
-    'foam.core.ContextAgent'
+    'foam.core.ContextAgent',
+    'foam.mlang.Expressions'
   ],
 
   exports: [
@@ -20,7 +21,7 @@ foam.CLASS({
     {
       name: 'contextAgentSpecs',
       class: 'FObjectArray',
-      of: 'Object'
+      of: 'FObject'
     },
     {
       name: 'halted_',
@@ -35,11 +36,11 @@ foam.CLASS({
       return this.addAs(spec.name, spec, args);
     },
     function addAs(name, spec, args) {
-      this.contextAgentSpecs.push({
+      this.contextAgentSpecs$push(this.Step.create({
         name: spec.name,
         spec: spec,
         args: args
-      });
+      }));
       return this;
     },
     function reconfigure(name, args) {
@@ -52,14 +53,8 @@ foam.CLASS({
       return this;
     },
     function remove(name) {
-      let found = -1;
-      for ( let i = 0 ; i < this.contextAgentSpecs.length ; i++ ) {
-        if ( name == this.contextAgentSpecs[i].name ) {
-          found = i;
-          break;
-        }
-      }
-      if ( found >= 0 ) this.contextAgentSpecs$splice(found, 1);
+      this.contextAgentSpecs$remove(this.EQ(
+        this.Step.NAME, name));
       return this;
     },
 
@@ -99,4 +94,15 @@ foam.CLASS({
       this.halted_ = true;
     },
   ],
+
+  classes: [
+    {
+      name: 'Step',
+      properties: [
+        { name: 'name', class: 'String' },
+        { name: 'spec', class: 'Class' },
+        { name: 'args', class: 'Object' }
+      ],
+    }
+  ]
 });

@@ -339,7 +339,7 @@ foam.CLASS({
                 newArry.push(oldArry[i]);
               }
             }
-            this.propertyChange.pub(self.name, this.slot(self.name));
+            this[self.name] = newArry;
           }
         },
         configurable: true
