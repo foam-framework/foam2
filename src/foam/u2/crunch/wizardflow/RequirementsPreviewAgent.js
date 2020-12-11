@@ -13,8 +13,8 @@ foam.CLASS({
   imports: [
     'capabilities',
     'ctrl',
-    'endSequence',
     'rootCapability',
+    'sequence',
     'wizardlets'
   ],
 
@@ -58,7 +58,7 @@ foam.CLASS({
           ).end();
         }).then(isContinueAction => {
           if ( ! isContinueAction ) {
-            this.endSequence();
+            this.sequence.endSequence();
             return Promise.resolve();
           }
         })
