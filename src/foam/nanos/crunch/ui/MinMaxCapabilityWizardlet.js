@@ -109,7 +109,7 @@ foam.CLASS({
             customView: {
               class: 'foam.u2.view.MultiChoiceView',
               choices$: this.choices$,
-              booleanView: this.CardSelectView, // TODO
+              booleanView: this.CardSelectView,
               isValidNumberOfChoices$: this.isValid$,
               showValidNumberOfChoicesHelper: false,
               minSelected$: this.min$,
