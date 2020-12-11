@@ -94,6 +94,7 @@ foam.CLASS({
         }))
           .add(this.ConfigureFlowAgent)
           .add(this.CapabilityAdaptAgent)
+          .add(this.LoadTopConfig)
           .add(this.LoadCapabilitiesAgent)
           // TODO: remove CheckRootIdAgent after phase 2 fix on PENDING
           .add(this.CheckRootIdAgent)
@@ -104,7 +105,6 @@ foam.CLASS({
           // .add(this.FilterWizardletsAgent)
           .add(this.SkipGrantedAgent)
           .add(this.RequirementsPreviewAgent)
-          .add(this.LoadTopConfig)
           .add(this.StepWizardAgent)
           .add(this.PutFinalJunctionsAgent)
           // .add(this.TestAgent)
@@ -131,6 +131,7 @@ foam.CLASS({
         }))
           .add(this.ConfigureFlowAgent)
           .add(this.CapabilityAdaptAgent)
+          .add(this.LoadTopConfig)
           .add(this.LoadCapabilitiesAgent, {
             waoSetting: this.LoadCapabilitiesAgent.WAOSetting.CAPABLE })
           .add(this.CapableDefaultConfigAgent)

@@ -13,7 +13,7 @@ foam.CLASS({
   ],
 
   exports: [
-    'endSequence'
+    'as sequence'
   ],
 
   properties: [
@@ -29,13 +29,40 @@ foam.CLASS({
   ],
 
   methods: [
+    // Sequence DSL
+
     function add(spec, args) {
+      return this.addAs(spec.name, spec, args);
+    },
+    function addAs(name, spec, args) {
       this.contextAgentSpecs.push({
+        name: spec.name,
         spec: spec,
         args: args
       });
       return this;
     },
+    function reconfigure(name, args) {
+      for ( let ca of this.contextAgentSpecs ) {
+        if ( name == ca.name ) {
+          ca.args = { ...ca.args, ...args };
+          break;
+        }
+      }
+    },
+    function remove(name) {
+      let found = -1;
+      for ( let i = 0 ; i < this.contextAgentSpecs.length ; i++ ) {
+        if ( name == this.contextAgentSpecs[i].name ) {
+          found = i;
+          break;
+        }
+      }
+      if ( found >= 0 ) this.contextAgentSpecs$splice(i, 1);
+    },
+
+    // Launching a sequence
+
     function execute() {
       // Call ContextAgents sequentially while reducing to a Promise
       var p = Promise.resolve(this.__subContext__);
@@ -63,8 +90,11 @@ foam.CLASS({
         })
       }, p);
     },
+
+    // Sequence runtime commands
+
     function endSequence() {
       this.halted_ = true;
-    }
+    },
   ],
 });

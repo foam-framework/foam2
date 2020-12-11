@@ -26,8 +26,8 @@ foam.CLASS({
   imports: [
     'capabilities',
     'crunchService',
-    'endSequence',
-    'rootCapability'
+    'rootCapability',
+    'sequence'
   ],
 
   exports: [
@@ -55,9 +55,9 @@ foam.CLASS({
         var updateJunctionPromises = filteredCapabilitiesNeeded.map(capa => {
           return this.crunchService.updateJunction(null, capa.id, null, null);
         })
-        
+
         this.submitted = true;
-        this.endSequence();
+        this.sequence.endSequence();
 
         return Promise.all(updateJunctionPromises);
       }
@@ -87,4 +87,3 @@ foam.CLASS({
     }
   ]
 });
-
