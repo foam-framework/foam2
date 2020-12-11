@@ -16,7 +16,6 @@ foam.CLASS({
 
   imports: [
     'auth',
-    'currentMenu',
     'stack'
   ],
 
@@ -142,7 +141,7 @@ foam.CLASS({
                 .start(self.Cols)
                   .start()
                     .addClass(self.myClass('browse-title'))
-                    .translate(self.currentMenu ? self.currentMenu.id + '.handler.config.browseTitle' : config$browseTitle, config$browseTitle)
+                    .translate(config$browseTitle, config$browseTitle)
                   .end()
                   .startContext({ data: self }).tag(self.CREATE).endContext()
                   .callIf(config$primaryAction, function() {
@@ -153,7 +152,7 @@ foam.CLASS({
                   this
                     .start()
                       .addClass(self.myClass('browse-subtitle'))
-                      .translate(self.currentMenu ? self.currentMenu.id + '.handler.config.browseSubtitle' : config$browseTitle, config$browseSubtitle)
+                      .translate(config$browseSubtitle, config$browseSubtitle)
                     .end();
                 })
               .end()
