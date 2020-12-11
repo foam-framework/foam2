@@ -160,11 +160,11 @@ foam.CLASS({
       args: [
         {
           name: 'format',
-          type: 'Char'
+          type: 'String'
         },
         {
           name: 'c',
-          type: 'Char'
+          type: 'char'
         }
       ],
       code: function(format, c) {
@@ -372,7 +372,7 @@ foam.CLASS({
         },
         {
           name: 'a',
-          type: 'Integer'
+          type: 'int'
         }
       ],
       code: function(num, a) {
