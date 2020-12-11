@@ -314,17 +314,20 @@ foam.CLASS({
     function installInProto(proto) {
       this.SUPER(proto);
       var self = this;
-      Object.defineProperty(proto, self.name + '$push', {
-        get: function classGetter() {
-          return function (v) {
-            // Push value
-            this[self.name].push(v);
-            // Force property update
-            this.propertyChange.pub(self.name, this.slot(self.name));
-          }
-        },
-        configurable: true
-      });
+      ['push','splice','unshift'].forEach(func => {
+        Object.defineProperty(proto, self.name + '$' + func, {
+          get: function classGetter() {
+            return function (...args) {
+              // Push value
+              let val = this[self.name][func](...args);
+              // Force property update
+              this.propertyChange.pub(self.name, this.slot(self.name));
+              return val;
+            }
+          },
+          configurable: true
+        });
+      })
       Object.defineProperty(proto, self.name + '$remove', {
         get: function classGetter() {
           return function (predicate) {
@@ -336,7 +339,7 @@ foam.CLASS({
                 newArry.push(oldArry[i]);
               }
             }
-            this.propertyChange.pub(self.name, this.slot(self.name));
+            this[self.name] = newArry;
           }
         },
         configurable: true

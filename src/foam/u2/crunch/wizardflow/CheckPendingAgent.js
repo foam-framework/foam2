@@ -18,8 +18,8 @@ foam.CLASS({
     'capabilities',
     'crunchService',
     'ctrl',
-    'endSequence',
     'rootCapability',
+    'sequence',
     'subject'
   ],
 
@@ -50,7 +50,7 @@ foam.CLASS({
     // If Property expressions ever unwrap promises this method can be blank.
     async function execute() {
       var ucj = await this.crunchService.getJunction(null, this.rootCapability.id);
-      
+
       var shouldReopen = false;
       if ( ucj.status !== this.CapabilityJunctionStatus.AVAILABLE ) {
         var statusPending = ucj.status === this.CapabilityJunctionStatus.PENDING;
@@ -59,7 +59,7 @@ foam.CLASS({
           var message = statusPending ? this.CANNOT_OPEN_PENDING : this.CANNOT_OPEN_GRANTED;
           this.ctrl.notify(message, '', this.LogLevel.INFO, true);
           this.cancelled = true;
-          this.endSequence();
+          this.sequence.endSequence();
           return;
         }
       }
@@ -67,9 +67,8 @@ foam.CLASS({
         // This is here because of a CertifyDataReviewed capability.
         this.ctrl.notify(this.CANNOT_OPEN_ACTION_PENDING);
         this.cancelled = true;
-        this.endSequence();
+        this.sequence.endSequence();
       }
     }
   ]
 });
-

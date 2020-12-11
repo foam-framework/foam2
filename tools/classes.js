@@ -441,6 +441,8 @@ var classes = [
   'foam.u2.DefaultValidator',
   'foam.u2.DisplayMode',
   'foam.u2.wizard.StepWizardConfig',
+  'foam.u2.crunch.wizardflow.SkipMode',
+  'foam.u2.crunch.EasyCrunchWizard',
   'foam.nanos.export.ClientGoogleSheetsExportService',
   'foam.nanos.export.ExportDriverRegistry',
   'foam.nanos.export.GoogleSheetsBasedExportDriver',

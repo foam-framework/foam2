@@ -43,10 +43,13 @@ foam.CLASS({
     ^flexer {
       flex-wrap: wrap;
       align-items: stretch;
+      text-align: center;
     }
     ^innerFlexer {
       display: inline-flex;
       flex-grow: 1;
+      padding: 4px;
+      box-sizing: border-box;
     }
   `,
 
@@ -251,6 +254,7 @@ foam.CLASS({
 
                 return self.E()
                   .addClass(self.myClass('innerFlexer'))
+                  // NOTE: This should not be the way we implement columns.
                   .style({
                     'width':`${100 / self.numberOfColumns}%`
                   })

@@ -9,14 +9,15 @@ foam.CLASS({
   name: 'CheckRootIdAgent',
 
   imports: [
-    'rootCapability'
+    'rootCapability',
+    'sequence'
   ],
 
   implements: [
     'foam.core.ContextAgent',
     'foam.mlang.Expressions'
   ],
-  
+
   properties: [
     {
       class: 'StringArray',
@@ -33,10 +34,9 @@ foam.CLASS({
     // If Property expressions ever unwrap promises this method can be blank.
     async function execute() {
       if ( this.rootIdsBlacklist.includes(this.rootCapability.id) ) {
-        this.endSequence();
+        this.sequence.endSequence();
         return;
       }
     }
   ]
 });
-
