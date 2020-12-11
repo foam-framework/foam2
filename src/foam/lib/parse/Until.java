@@ -1,3 +1,4 @@
+
 /**
  * @license
  * Copyright 2020 The FOAM Authors. All Rights Reserved.
@@ -19,6 +20,7 @@ public class Until
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    return until_.parse(ps, x);
+    PStream pst = until_.parse(ps, x);
+    return pst;
   }
 }
