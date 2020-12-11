@@ -14,16 +14,12 @@ foam.CLASS({
   javaImports: [
     'foam.i18n.Locale',
     'foam.i18n.TranslationService',
-    'foam.nanos.logger.Logger',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
+    'foam.nanos.logger.Logger',
+    'foam.nanos.notification.email.EmailTemplateEngine',
     'foam.util.SafetyUtil',
-    'java.nio.charset.StandardCharsets',
-    'org.jtwig.environment.EnvironmentConfiguration',
-    'org.jtwig.environment.EnvironmentConfigurationBuilder',
-    'org.jtwig.JtwigModel',
-    'org.jtwig.JtwigTemplate',
-    'org.jtwig.resource.loader.TypedResourceLoader'
+    'java.nio.charset.StandardCharsets'
   ],
 
   tableColumns: ['id', 'name', 'group'],
@@ -113,41 +109,20 @@ foam.CLASS({
           throw new NoSuchFieldException("emailMessage is Null");
         }
 
-        String tempKeyString = "";
-        Object value = null;
-        JtwigModel model = null;
-
-        EnvironmentConfiguration config = EnvironmentConfigurationBuilder
-          .configuration()
-            .resources()
-              .resourceLoaders()
-                .add(new TypedResourceLoader("dao", new DAOResourceLoader(x, group)))
-                .and()
-            .and()
-          .build();
-
-        // Creating model from template
-        for ( Object key : templateArgs.keySet() ) {
-          value = templateArgs.get((String)key);
-          model = JtwigModel.newModel(templateArgs);
-          if ( model == null ) {
-            throw new NoSuchFieldException("JtwigModel is Null");
-          }
-        }
-
+        EmailTemplateEngine templateEngine = (EmailTemplateEngine) x.get("templateEngine");
         // BODY:
         if ( ! emailMessage.isPropertySet("body") ) {
-          emailMessage.setBody((JtwigTemplate.inlineTemplate(getBody(), config)).render(model));
+          emailMessage.setBody(templateEngine.renderTemplate(x, getBody(), templateArgs).toString());
         }
 
         // REPLY TO:
         if ( ! emailMessage.isPropertySet("replyTo") && ! SafetyUtil.isEmpty(getReplyTo()) ) {
-            emailMessage.setReplyTo((JtwigTemplate.inlineTemplate(getReplyTo(), config)).render(model));
+            emailMessage.setReplyTo(templateEngine.renderTemplate(x, getReplyTo(), templateArgs).toString());
         }
 
         // DISPLAY NAME:
         if ( ! emailMessage.isPropertySet("displayName") && ! SafetyUtil.isEmpty(getDisplayName()) ) {
-          emailMessage.setDisplayName((JtwigTemplate.inlineTemplate(getDisplayName(), config)).render(model));
+          emailMessage.setDisplayName(templateEngine.renderTemplate(x, getDisplayName(), templateArgs).toString());
         }
 
         // SUBJECT:
@@ -156,15 +131,15 @@ foam.CLASS({
           TranslationService ts = (TranslationService) x.get("translationService");
           Subject subject = (Subject) x.get("subject");
           User user = subject.getRealUser();
-          String locale = user.getLanguage().getCode().toString();
+          String locale = user.getLanguage().toString();
           String source = getId() + ".subject";
           String translatedSubject = ts.getTranslation(locale, source, getSubject());
-          emailMessage.setSubject((JtwigTemplate.inlineTemplate(translatedSubject, config)).render(model));
+          emailMessage.setSubject(templateEngine.renderTemplate(x, translatedSubject, templateArgs).toString());
         }
 
         // SEND TO:
         if ( ! emailMessage.isPropertySet("to") && ! SafetyUtil.isEmpty(getSendTo()) ) {
-          emailMessage.setTo(new String[] { (JtwigTemplate.inlineTemplate(getSendTo(), config)).render(model) });
+          emailMessage.setTo(new String[] { templateEngine.renderTemplate(x, getSendTo(), templateArgs).toString() });
         }
 
         return emailMessage;
