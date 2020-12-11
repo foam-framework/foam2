@@ -8,6 +8,10 @@ foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'Capability',
 
+  implements: [
+    'foam.nanos.auth.EnabledAware'
+  ],
+
   imports: [
     'capabilityDAO',
     'prerequisiteCapabilityJunctionDAO'
@@ -27,8 +31,8 @@ foam.CLASS({
     'static foam.mlang.MLang.*'
   ],
 
-  implements: [
-    'foam.nanos.auth.EnabledAware'
+  requires: [
+    'foam.u2.crunch.EasyCrunchWizard'
   ],
 
   tableColumns: [
@@ -268,16 +272,17 @@ foam.CLASS({
       `
     },
     {
-      class: 'Object',
-      // TODO: rename to wizardConfig; wizardlet config is the property above
-      name: 'wizardletConfig',
+      class: 'FObjectProperty',
+      of: 'foam.u2.crunch.EasyCrunchWizard',
+      name: 'wizardConfig',
       documentation: `
-        Configuration placed on top level capabilities defining various configuration options supported by client capability wizards.
+        Configuration placed on top level capabilities defining various
+        configuration options supported by client capability wizards.
       `,
-      factory: function() {
-        return foam.u2.wizard.StepWizardConfig.create({}, this);
-      },
       includeInDigest: false,
+      factory: function() {
+        return this.EasyCrunchWizard.create({}, this);
+      }
     },
     {
       name: 'requirementViewTitle',
