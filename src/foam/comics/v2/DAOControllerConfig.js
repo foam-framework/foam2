@@ -82,6 +82,15 @@ foam.CLASS({
       factory: function() { return 'View all ' + this.browseTitle.toLowerCase() + '.' }
     },
     {
+      class: 'FObjectProperty',
+      name: 'primaryAction',
+      documentation: `
+        The most important action on the page. The view for this controller may
+        choose to display this action prominently.
+      `,
+      value: null
+    },
+    {
       // TODO: Make ViewSpecWithJava a refinement to ViewSpec and change below to a ViewSpec
       class: 'foam.u2.ViewSpecWithJava',
       name: 'summaryView',
