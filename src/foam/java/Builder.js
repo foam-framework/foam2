@@ -66,7 +66,7 @@ obj.setX(x_);
           name: isSet,
           type: 'boolean',
           visibility: 'protected',
-          initializer: 'false;'
+          initializer: 'false'
         });
 
         builder.method({
