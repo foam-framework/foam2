@@ -28,15 +28,16 @@ foam.CLASS({
 
         // non-chained hash with correct digest
         Hashable_HashWithValidAlgorithm(input, "MD5",
-            "d41d8cd98f00b204e9800998ecf8427e");
+            "6a6e70ca62d7e0afbde550202cf27bae");
         Hashable_HashWithValidAlgorithm(input, "SHA-1",
-            "da39a3ee5e6b4b0d3255bfef95601890afd80709");
+            "8ff96b7d123909fe97ecbdfc40059f43d06cb52a");
         Hashable_HashWithValidAlgorithm(input, "SHA-256",
-            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+            "9d4aa9f2ed968ba8a1b16bfbc4242a4d9f64df358ca11be051fd80c322c2ffff");
         Hashable_HashWithValidAlgorithm(input, "SHA-384",
-            "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b");
+            "fd6d5cbb17477742f4b4680d0d5f17940d7c180d56313d6570947f1674e2f0f04c9721e5af0383192d9e6dde7690e0b4");
         Hashable_HashWithValidAlgorithm(input, "SHA-512",
-            "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e");
+            "1d033a412e9db056510d5a5421bcb576e4feb9a9b7dba88e5c90ab396cb2e4f31028d7e00a8c0422b683de7ba2f309b7a898e9b761817f7e674670710f8ea5b6");
+
         // hashing same objects produces same digest
         Hashable_HashingSameObjects_ProducesSameDigest(input, input,
             "Hashing the same object produces the same digest");
@@ -60,9 +61,8 @@ foam.CLASS({
       ],
       javaCode: `
         try {
-          String produced = Hex.toHexString(input.hash(algorithm));
-          test(produced.equals(expected),
-              "Input hashed algorithm: " + algorithm + ", produced: "+produced+ ", expected: "+expected);
+          test(Hex.toHexString(input.hash(algorithm)).equals(expected),
+              "Input hashed using " + algorithm + " produces correct digest of " + expected);
         } catch ( Throwable t ) {
           test(false, "Input hashed using " + algorithm + " should not throw an exception");
         }
