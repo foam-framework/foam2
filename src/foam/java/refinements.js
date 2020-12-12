@@ -396,7 +396,7 @@ foam.CLASS({
           name: isSet,
           type: 'boolean',
           visibility: 'private',
-          initializer: 'false'
+          initializer: 'false;'
         }).
         method({
           name: 'get' + capitalized,
@@ -591,7 +591,7 @@ foam.LIB({
           static: false,
           final: false,
           type: 'foam.core.X',
-          initializer: "foam.core.EmptyX.instance()"
+          initializer: "foam.core.EmptyX.instance();"
         });
 
         cls.method({
@@ -621,7 +621,7 @@ foam.LIB({
           static: false,
           final: false,
           type: 'boolean',
-          initializer: "false"
+          initializer: "false;"
         });
 
         if ( ! this.hasOwnAxiom('freeze') ) {
@@ -892,7 +892,7 @@ foam.CLASS({
       }
 
       initializerString += `}
-      }
+      };
       `;
       return initializerString;
     },
