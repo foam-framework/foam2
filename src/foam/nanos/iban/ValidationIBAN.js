@@ -138,13 +138,18 @@ Columns: validation format, parsing format, example`,
           'SEkk bbbc cccc cccc cccc cccc'
           */
         ].forEach(function (c) {
-          var format = c[0]
+          var format = c[0];
           m[format.substring(0,2)] = [format.substring(2).replace(/ /g, ''), c[1], c[2]];
         });
 
         return m;
       },
       javaType: 'java.util.Map'
+    },
+    {
+      name: 'MIN_IBAN_LENGTH',
+      type: 'int',
+      value: 20
     }
   ],
 
@@ -261,9 +266,8 @@ Columns: validation format, parsing format, example`,
         }
       ],
       code: function(iban) {
+        if ( ! iban || iban.length < MIN_IBAN_LENGTH ) return `${this.IBAN_REQUIRED}`;
         iban = this.trim(iban);
-
-        if ( iban == '' ) return `${this.IBAN_REQUIRED}`;
 
         let cc = iban.substring(0, 2);
         let format = this.getFormatForCountry(cc);
@@ -285,8 +289,11 @@ Columns: validation format, parsing format, example`,
         return 'passed';
       },
       javaCode: `
+        if ( foam.util.SafetyUtil.isEmpty(iban) ||
+             iban.length() < MIN_IBAN_LENGTH ) {
+          throw new ValidationException(IBAN_REQUIRED);
+        }
         iban = trim(iban);
-        if ( "".equals(iban) ) throw new ValidationException(IBAN_REQUIRED);
 
         String cc = iban.substring(0, 2);
         String format = getFormatForCountry(cc);
@@ -446,12 +453,15 @@ Columns: validation format, parsing format, example`,
         ibanInfo.setCountry(iban.substring(0,2));
         Object[] temp = (Object[]) COUNTRIES.get(ibanInfo.getCountry());
 
-        if ( temp[1] == null || SafetyUtil.isEmpty((String)temp[1]) ) {
+        if ( temp == null ||
+             temp[1] == null ||
+             SafetyUtil.isEmpty((String)temp[1]) ) {
           ((foam.nanos.logger.Logger) getX().get("logger")).warning(this.getClass().getSimpleName(), "parse", "Format not found", ibanInfo.getCountry());
           return null;
         }
 
         char[] format = ((String) temp[1]).replaceAll(" ","").trim().toCharArray();
+
         StringBuilder previous = null;
         StringBuilder bankCode = new StringBuilder();
         StringBuilder branch = new StringBuilder();
@@ -469,9 +479,9 @@ Columns: validation format, parsing format, example`,
           char next = iban.charAt(i);
 
           switch ( format[i] ) {
-            case ' ' :
+            case ' ':
               break;
-            case 'b' : // BIC
+            case 'b': // BIC
               bankCode.append(next);
               previous = bankCode;
               break;
