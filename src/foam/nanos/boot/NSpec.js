@@ -210,23 +210,6 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'saveService',
-      args: [
-        { name: 'x', type: 'Context' },
-        { name: 'service', type: 'Any' }
-      ],
-      javaCode: `
-      /*
-        System.err.println("saveService: " + this.getName());
-        if ( service instanceof FObject ) {
-          setService((FObject) service);
-          DAO dao = (DAO) x.get("nSpecDAO");
-          dao.put(this);
-        }
-        */
-      `
-    },
-    {
       name: 'createService',
       args: [
         { name: 'x', type: 'Context' },
@@ -236,21 +219,16 @@ foam.CLASS({
       javaCode: `
         if ( getService() != null ) return getService();
 
-        if ( getServiceClass().length() > 0 ) {
-          Object service = Class.forName(getServiceClass()).newInstance();
-          return service;
-        }
+        if ( getServiceClass().length() > 0 )
+          return Class.forName(getServiceClass()).newInstance();
 
         Language l = getLanguage();
-        Object service;
         if ( l == foam.nanos.script.Language.JSHELL )
-          service = new JShellExecutor().runExecutor(x, ps, getServiceScript());
+          return new JShellExecutor().runExecutor(x, ps, getServiceScript());
         else if ( l == foam.nanos.script.Language.BEANSHELL )
-          service = new BeanShellExecutor(this).execute(x, ps, getServiceScript());
+          return new BeanShellExecutor(this).execute(x, ps, getServiceScript());
         else
           throw new RuntimeException("Script language not supported");
-        saveService(x, service);
-        return service;
       `,
       javaThrows: [
         'java.lang.ClassNotFoundException',
