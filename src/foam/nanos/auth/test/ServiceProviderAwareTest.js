@@ -82,11 +82,6 @@ foam.CLASS({
           .setAuthorizer(new foam.nanos.auth.StandardAuthorizer(DummySp.class.getSimpleName().toLowerCase()))
           .setDelegate(
             new ServiceProviderAwareDAO.Builder(y)
-              .setPropertyInfos(
-                              new HashMap<String, PropertyInfo[]>() {{
-                                put(DummySp.class.getName(), new PropertyInfo[] { DummySp.OWNER });
-                              }}
-                            )
               .setDelegate(delegate)
               .build())
           .build())
