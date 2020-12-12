@@ -63,7 +63,6 @@ foam.CLASS({
   tableColumns: [
     'id',
     'description',
-    'server',
     'lastDuration',
     'lastRun',
     'status'
@@ -71,8 +70,7 @@ foam.CLASS({
 
   searchColumns: [
     'id',
-    'description',
-    'server'
+    'description'
   ],
 
   constants: [
@@ -171,20 +169,7 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.script.Language',
       name: 'language',
-      value: foam.nanos.script.Language.BEANSHELL
-    },
-    {
-      class: 'Boolean',
-      name: 'server',
-      includeInDigest: false,
-      documentation: 'Runs on server side if enabled.',
-      tableCellFormatter: function(value) {
-        this.start()
-          .add(value ? 'Y' : 'N')
-        .end();
-      },
-      value: true,
-      tableWidth: 80
+      value: 'BEANSHELL'
     },
     {
       class: 'foam.core.Enum',
@@ -307,9 +292,8 @@ foam.CLASS({
             shell.eval("foam.core.X sudo(String user) { foam.util.Auth.sudo(x, (String) user); }");
             shell.eval("foam.core.X sudo(Object id) { foam.util.Auth.sudo(x, id); }");
           } catch (EvalError e) {
-              e.printStackTrace();
-              Logger logger = (Logger) x.get("logger");
-              logger.error(e);
+            Logger logger = (Logger) x.get("logger");
+            logger.error(this.getClass().getSimpleName(), "createInterpreter", getId(), e);
           }
           return shell;
         }
@@ -355,9 +339,8 @@ foam.CLASS({
               print = new JShellExecutor().execute(x, jShell, getCode());
               ps.print(print);
             } catch (Throwable e) {
-              e.printStackTrace();
               Logger logger = (Logger) x.get("logger");
-              logger.error(e);
+              logger.error(this.getClass().getSimpleName(), "runScript", getId(), e);
             } finally {
               pm.log(x);
             }
@@ -380,7 +363,7 @@ foam.CLASS({
               ps.println();
               t.printStackTrace(ps);
               Logger logger = (Logger) x.get("logger");
-              logger.error(t);
+              logger.error(this.getClass().getSimpleName(), "runScript", getId(), t);
               pm.error(x, t);
             } finally {
               pm.log(x);

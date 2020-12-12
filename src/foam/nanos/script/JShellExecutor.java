@@ -54,9 +54,11 @@ public class JShellExecutor {
     try {
       print = console.runEvalInstruction();
     } catch (Exception e) {
-      e.printStackTrace();
       Logger logger = (Logger) x.get("logger");
-      logger.error(e);
+      if ( logger != null ) {
+        logger = new foam.nanos.logger.StdoutLogger();
+      }
+      logger.error(this.getClass().getSimpleName(), "execute", e);
     }
     return print;
   }

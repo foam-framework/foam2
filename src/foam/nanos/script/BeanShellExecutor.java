@@ -34,7 +34,7 @@ public class BeanShellExecutor {
       if ( logger != null ) {
         logger = new foam.nanos.logger.StdoutLogger();
       }
-      logger.error("NSpec serviceScript error", serviceScript, e);
+      logger.error(this.getClass().getSimpleName(), "execute", (this.nSpec != null ? this.nSpec.getName() : ""), e);
       return null;
     }
   }
