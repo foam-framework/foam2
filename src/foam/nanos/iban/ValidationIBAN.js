@@ -65,7 +65,7 @@ foam.CLASS({
           ["LCFF UUUU FFFF FFFF FFFF FFFF FFFF FFFF ", "", "LC07 HEMM 0001 0001 0012 0012 0001 3015 "],
           ["LIFF FFFF FAAA AAAA AAAA A", "", "LI21 0881 0000 2324 013A A"],
           ["LTFF FFFF FFFF FFFF FFFF", "LTkk bbbb bccc cccc cccc", "LT12 1000 0111 0100 1000"],
-          ["LUFF FFFA AAAA AAAA AAAA", "LIkk bbbc cccc cccc cccc", "LU28 0019 4006 4475 0000"],
+          ["LUFF FFFA AAAA AAAA AAAA", "LUkk bbbc cccc cccc cccc", "LU28 0019 4006 4475 0000"],
           ["LVFF UUUU AAAA AAAA AAAA A", "LVkk bbbb cccc cccc cccc c", "LV80 BANK 0000 4351 9500 1"],
           ["MCFF FFFF FFFF FFAA AAAA AAAA AFF", "", "MC58 1122 2000 0101 2345 6789 030"],
           ["MDFF UUAA AAAA AAAA AAAA AAAA ", "", "MD24 AG00 0225 1000 1310 4168 "],
