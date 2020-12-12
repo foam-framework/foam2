@@ -180,15 +180,14 @@ foam.CLASS({
         return true;
       },
       javaCode: `
-        String f = Character.toString(format);
-        switch ( f ) {
-          case "A": return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9';
-            case "B": return c >= 'A' && c <= 'Z' || c >= '0' && c <= '9';
-            case "C": return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z';
-            case "F": return c >= '0' && c <= '9';
-            case "L": return c >= 'a' && c <= 'z';
-            case "U": return c >= 'A' && c <= 'Z';
-            case "W": return c >= 'a' && c <= 'z' || c >= '0' && c <= '9';
+        switch ( format ) {
+          case 'A': return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9';
+            case 'B': return c >= 'A' && c <= 'Z' || c >= '0' && c <= '9';
+            case 'C': return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z';
+            case 'F': return c >= '0' && c <= '9';
+            case 'L': return c >= 'a' && c <= 'z';
+            case 'U': return c >= 'A' && c <= 'Z';
+            case 'W': return c >= 'a' && c <= 'z' || c >= '0' && c <= '9';
         }
         return true;
       `
