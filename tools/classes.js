@@ -107,6 +107,7 @@ var classes = [
   'foam.box.AuthServiceClientBox',
   'foam.box.ExportBox',
   'foam.nanos.iban.ValidationIBAN',
+  'foam.nanos.iban.IBANInfo',
   'foam.nanos.app.AppConfig',
   'foam.nanos.app.ContextLookupAppConfigService',
   'foam.nanos.http.WebAgent',
