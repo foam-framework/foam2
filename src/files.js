@@ -945,6 +945,7 @@ FOAM_FILES([
   { name: 'foam/i18n/TranslationConsoleMenu' },
   { name: 'foam/i18n/ClientTranslationService' },
   { name: 'foam/i18n/ProxyTranslationService' },
+  { name: 'foam/i18n/InlineLocaleEditor' },
 
   { name: "foam/nanos/pool/AbstractFixedThreadPool" },
   { name: "foam/nanos/pool/ThreadPoolAgency" },
