@@ -12,6 +12,7 @@ foam.CLASS({
   javaImports: [
     'foam.dao.DAO',
     'foam.dao.ArraySink',
+    'foam.nanos.script.Language',
     'foam.nanos.script.TestRunnerConfig',
     'foam.nanos.test.Test',
     'java.util.*',
@@ -147,9 +148,10 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        if ( test.getServer() ) {
+        if ( test.getLanguage() == Language.BEANSHELL ||
+             test.getLanguage() == Language.JSHELL ) {
           runServerSideTest(x, test);
-        } else {
+        } else { 
           // TODO: Run client side tests in a headless browser.
         }
       `

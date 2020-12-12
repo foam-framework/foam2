@@ -75,6 +75,30 @@ p({"class":"foam.nanos.script.Script","id":"Generate Screenshots","server":false
 
 p({
   "class":"foam.nanos.script.Script",
+  "id":"TestScriptShell",
+  "language":1,
+  "code":
+  """
+    int main()
+    {
+      int t=3;
+        for ( int i = 0 ; i < 1000000 ; i++ ) {
+          t+=i;
+        }
+      return t;
+    }
+    
+    long startTime = System.currentTimeMillis();
+    int r = main();
+    long endTime = System.currentTimeMillis();
+    long d = endTime-startTime;
+
+    System.out.println( "The execution time is " + d + " " + r );
+  """
+})
+
+p({
+  "class":"foam.nanos.script.Script",
   "id":"addGoogleSheetsAndPDFGoogleSheetsExportDriverRegistry",
   "description":"Add GoogleSheets and PDFGoogleSheets to exportDriverRegistryDAO.",
   "server":true,
