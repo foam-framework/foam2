@@ -39,8 +39,10 @@ public class ReadLineByLine {
       }
       br.close();
     } catch (Exception e) {
-      e.printStackTrace();
       Logger logger = (Logger) x.get("logger");
+      if ( logger == null ) {
+        logger = new foam.nanos.logger.StdoutLogger();
+      }
       logger.error(e);
     }
     return lineScripts;
