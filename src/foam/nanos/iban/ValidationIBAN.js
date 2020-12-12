@@ -16,6 +16,8 @@ foam.CLASS({
 
   constants: [
     {
+      documentation: `See https://en.wikipedia.org/wiki/International_Bank_Account_Number
+Columns: validation format, parsing format, example`,
       name: 'COUNTRIES',
       factory: function() {
         var m = {};
@@ -429,11 +431,7 @@ foam.CLASS({
       name: 'parse',
       type: 'IBANInfo',
       args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
+       {
           name: 'iban',
           type: 'String'
         }
@@ -443,69 +441,87 @@ foam.CLASS({
              iban.length() < 20 ) {
           return null;
         }
+        iban = iban.replaceAll(" ", "").trim();
         IBANInfo ibanInfo = new IBANInfo();
         ibanInfo.setCountry(iban.substring(0,2));
         Object[] temp = (Object[]) COUNTRIES.get(ibanInfo.getCountry());
 
-        if ( temp[1] == null || SafetyUtil.isEmpty((String)temp[1]) )
-          return ibanInfo;
+        if ( temp[1] == null || SafetyUtil.isEmpty((String)temp[1]) ) {
+          ((foam.nanos.logger.Logger) getX().get("logger")).warning(this.getClass().getSimpleName(), "parse", "Format not found", ibanInfo.getCountry());
+          return null;
+        }
 
-        char[] format = ((String) temp[1]).toCharArray();
+        char[] format = ((String) temp[1]).replaceAll(" ","").trim().toCharArray();
         StringBuilder previous = null;
         StringBuilder bankCode = new StringBuilder();
         StringBuilder branch = new StringBuilder();
         StringBuilder accountNumber  = new StringBuilder();
         StringBuilder ibanChecksum = new StringBuilder();
         StringBuilder accountType = new StringBuilder();
+        StringBuilder ownerAccountNumber = new StringBuilder();
+
+        // TODO: flag mismatch of character type in parse format.
 
         for ( int i = 2; i < format.length; i ++ ) {
-          // format may have spaces in it, so it's length is longer than
-          // the argument iban.
           if ( i >= iban.length() ) {
             break;
           }
+          char next = iban.charAt(i);
 
           switch ( format[i] ) {
             case ' ' :
               break;
             case 'b' : // BIC
-              bankCode.append(iban.charAt(i));
+              bankCode.append(next);
               previous = bankCode;
               break;
-            case 's': // branch
-              branch.append(iban.charAt(i));
-              previous = branch;
-              break;
             case 'c': // account number
-              accountNumber.append(iban.charAt(i));
+              accountNumber.append(next);
               previous = accountNumber;
               break;
-            case 'i': // personal identifier (iceland)
-              accountNumber.append(iban.charAt(i));
+            case 'i': // personal identifier - Iceland
+              accountNumber.append(next);
               previous = accountNumber;
               break;
             case 'k': // iban checksum
-              ibanChecksum.append(iban.charAt(i));
+              ibanChecksum.append(next);
               previous = ibanChecksum;
               break;
-            case 'x': // add to previous
-              previous.append(iban.charAt(i));
+            case 'm': // currency code
+              accountNumber.append(next);
+              break;
+            case 'n': // owner account - Brazil
+              ownerAccountNumber.append(next);
+              accountNumber.append(next);
+              break;
+            case 's': // branch
+              branch.append(next);
+              previous = branch;
               break;
             case 't': // account type
-              accountType.append(iban.charAt(i));
+              accountType.append(next);
+              accountNumber.append(next);
               break;
-            case 'n': // Owner account number (Brazil only)
-              ibanInfo.setOwnerAccountNumber(String.valueOf(iban.charAt(i)));
+            case 'x': // add to previous
+              previous.append(next);
+              break;
+            case '0': // Zero
+              previous.append('0');
+              if ( Character.compare('0', next) != 0 ) {
+                ((foam.nanos.logger.Logger) getX().get("logger")).warning(this.getClass().getSimpleName(), "parse", "symbol mismatch", format, i, format[i], next);
+              }
               break;
             default:
-              ((foam.nanos.logger.Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "parse", "unexpected symbol", format, i, format[i]);
+              ((foam.nanos.logger.Logger) getX().get("logger")).warning(this.getClass().getSimpleName(), "parse", "unexpected symbol", format, i, format[i]);
           }
         }
 
+        ibanInfo.setIbanChecksum(ibanChecksum.toString());
         ibanInfo.setBankCode(bankCode.toString());
         ibanInfo.setBranch(branch.toString());
         ibanInfo.setAccountNumber(accountNumber.toString());
         ibanInfo.setAccountType(accountType.toString());
+        ibanInfo.setOwnerAccountNumber(ownerAccountNumber.toString());
         return  ibanInfo;
       `
     }
