@@ -527,5 +527,7 @@ FOAM_FILES([
   { name: "com/google/foam/demos/u2/MDAllViews" },
 
   //IBAN
+  { name: "foam/nanos/iban/IBANInfo" },
   { name: "foam/nanos/iban/ValidationIBAN" },
+  { name: "foam/nanos/iban/test/ValidationIBANTest" },
 ]);
