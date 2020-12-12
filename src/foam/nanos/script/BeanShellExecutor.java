@@ -27,8 +27,7 @@ public class BeanShellExecutor {
     Interpreter shell = new Interpreter();
     try {
       shell.set("x", x);
-      Object service = shell.eval(serviceScript);
-      return service;
+      return shell.eval(serviceScript);
     } catch (EvalError e) {
       Logger logger = (Logger) x.get("logger");
       if ( logger != null ) {
