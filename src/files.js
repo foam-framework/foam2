@@ -310,6 +310,9 @@ FOAM_FILES([
   { name: "foam/nanos/logger/Logger" },
   { name: "foam/nanos/logger/DAOLogger" },
   { name: "foam/nanos/logger/LoggingDAO" },
+
+  { name: "foam/nanos/script/Language", flags: ['java', 'web'] },
+
   { name: "foam/dao/EasyDAO" },
   { name: "foam/dao/NoSelectAllDAO" },
   { name: "foam/dao/NullDAO" },
@@ -945,6 +948,7 @@ FOAM_FILES([
   { name: 'foam/i18n/TranslationConsoleMenu' },
   { name: 'foam/i18n/ClientTranslationService' },
   { name: 'foam/i18n/ProxyTranslationService' },
+  { name: 'foam/i18n/InlineLocaleEditor' },
 
   { name: "foam/nanos/pool/AbstractFixedThreadPool" },
   { name: "foam/nanos/pool/ThreadPoolAgency" },
