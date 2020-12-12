@@ -148,7 +148,6 @@ foam.CLASS({
         }
       ],
       javaCode: `
-System.out.println("TestRunnerScript language: "+test.getLanguage());
         if ( test.getLanguage() == Language.BEANSHELL ||
              test.getLanguage() == Language.JSHELL ) {
           runServerSideTest(x, test);

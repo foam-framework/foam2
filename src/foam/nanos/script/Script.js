@@ -315,7 +315,6 @@ foam.CLASS({
         } else {
           throw new RuntimeException("Script language not supported");
         }
-        // return null;
       `
     },
     {
