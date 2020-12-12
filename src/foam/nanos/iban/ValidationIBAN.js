@@ -160,7 +160,7 @@ foam.CLASS({
       args: [
         {
           name: 'format',
-          type: 'String'
+          type: 'char'
         },
         {
           name: 'c',
