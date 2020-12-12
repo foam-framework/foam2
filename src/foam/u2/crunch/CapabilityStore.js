@@ -120,7 +120,7 @@ foam.CLASS({
       margin-top: 24px;
     }
   `,
-  
+
   constants: {
     MAX_NUM_DISPLAYBLE_CARDS: 4
   },
@@ -189,7 +189,6 @@ foam.CLASS({
     },
     function initE() {
       this.SUPER();
-      this.onDetach(this.crunchService.sub('updateJunction', this.onChange));
       var self = this;
       window.cstore = self;
 
@@ -387,17 +386,7 @@ foam.CLASS({
         .createWizardSequence(cap).execute().then(() => {
           this.wizardOpened = false;
         });
-      
-    }
-  ],
 
-  listeners: [
-    {
-      name: 'onChange',
-      isMerged: true,
-      code: function() {
-        this.init();
-      }
     }
   ]
 });

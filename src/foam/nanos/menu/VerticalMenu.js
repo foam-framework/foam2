@@ -115,7 +115,9 @@ foam.CLASS({
               query: self.menuSearch$,
               onClickAddOn: function(data) { self.openMenu(data); },
               selection$: self.currentMenu$,
-              formatter: function(data) { this.add({ data : data, clsInfo : data.cls_.LABEL.name, default : data.label }); }
+              formatter: function(data) {
+                this.translate(data.id + '.label', data.label);
+              }
             })
           .end()
         .end()
