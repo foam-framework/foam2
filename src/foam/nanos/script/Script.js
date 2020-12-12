@@ -27,8 +27,26 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'java.io.BufferedReader',
+    'java.io.ByteArrayOutputStream',
+    'java.io.PrintStream',
+    'java.io.StringReader',
+    'java.util.ArrayList',
+    'java.util.Date',
+    'java.util.List',
+    'java.util.Map',
+
     'bsh.EvalError',
     'bsh.Interpreter',
+
+    'foam.nanos.script.jShell.EvalInstruction',
+    'foam.nanos.script.jShell.InstructionPresentation',
+    'jdk.jshell.JShell',
+    'jdk.jshell.execution.DirectExecutionControl',
+    'jdk.jshell.spi.ExecutionControl',
+    'jdk.jshell.spi.ExecutionControlProvider',
+    'jdk.jshell.spi.ExecutionEnv',
+
     'foam.core.*',
     'foam.dao.*',
     'static foam.mlang.MLang.*',
@@ -45,7 +63,6 @@ foam.CLASS({
   tableColumns: [
     'id',
     'description',
-    'server',
     'lastDuration',
     'lastRun',
     'status'
@@ -53,8 +70,7 @@ foam.CLASS({
 
   searchColumns: [
     'id',
-    'description',
-    'server'
+    'description'
   ],
 
   constants: [
@@ -67,6 +83,11 @@ foam.CLASS({
       name: 'MAX_NOTIFICATION_OUTPUT_CHARS',
       type: 'Integer',
       value: 200
+    },
+    {
+      javaType: 'X[]',
+      name: 'X_HOLDER',
+      javaValue: 'new X[1]'
     }
   ],
 
@@ -144,28 +165,11 @@ foam.CLASS({
       tableWidth: 125,
       storageTransient: true
     },
-    /*
     {
       class: 'Enum',
       of: 'foam.nanos.script.Language',
       name: 'language',
-      value: foam.nanos.script.Language.BEANSHELL,
-      transient: true
-      // TODO: fix JS support
-    },
-    */
-    {
-      class: 'Boolean',
-      name: 'server',
-      includeInDigest: false,
-      documentation: 'Runs on server side if enabled.',
-      tableCellFormatter: function(value) {
-        this.start()
-          .add(value ? 'Y' : 'N')
-        .end();
-      },
-      value: true,
-      tableWidth: 80
+      value: 'BEANSHELL'
     },
     {
       class: 'foam.core.Enum',
@@ -266,21 +270,34 @@ foam.CLASS({
     {
       name: 'createInterpreter',
       args: [
-        { name: 'x', type: 'Context' }
+        { name: 'x', type: 'Context' },
+        { name: 'ps', type: 'PrintStream' }
       ],
-      javaType: 'Interpreter',
+      javaType: 'Object',
+      synchronized: true,
       javaCode: `
-        Interpreter shell = new Interpreter();
-
-        try {
-          shell.set("currentScript", this);
-          shell.set("x", x);
-          shell.eval("runScript(String name) { script = x.get("+getDaoKey()+").find(name); if ( script != null ) eval(script.code); }");
-          shell.eval("foam.core.X sudo(String user) { return foam.util.Auth.sudo(x, (String) user); }");
-          shell.eval("foam.core.X sudo(Object id) { return foam.util.Auth.sudo(x, id); }");
-        } catch (EvalError e) {}
-
-        return shell;
+        Language l = getLanguage();
+        if ( l == foam.nanos.script.Language.JSHELL ) {
+          JShell jShell = new JShellExecutor().createJShell(ps);
+          Script.X_HOLDER[0] = x.put("out",  ps);
+          jShell.eval("import foam.core.X;");
+          jShell.eval("X x = foam.nanos.script.Script.X_HOLDER[0];");
+          return jShell;
+        } else if ( l == foam.nanos.script.Language.BEANSHELL ) {
+          Interpreter shell = new Interpreter();
+          try {
+            shell.set("currentScript", this);
+            shell.set("x", x);
+            shell.eval("runScript(String name) { script = x.get("+getDaoKey()+").find(name); if ( script != null ) eval(script.code); }");
+            shell.eval("foam.core.X sudo(String user) { foam.util.Auth.sudo(x, (String) user); }");
+            shell.eval("foam.core.X sudo(Object id) { foam.util.Auth.sudo(x, id); }");
+          } catch (EvalError e) {
+            Logger logger = (Logger) x.get("logger");
+            logger.error(this.getClass().getSimpleName(), "createInterpreter", getId(), e);
+          }
+          return shell;
+        }
+        return null;
       `
     },
     {
@@ -303,39 +320,60 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        String startScript = System.getProperty("foam.main", "main");
+        PM               pm          = new PM.Builder(x).setKey(Script.getOwnClassInfo().getId()).setName(getId()).build();
+        RuntimeException thrown      = null;
+        Language         l           = getLanguage();
+        String           startScript = System.getProperty("foam.main", "main");
         // Run on all instances if:
         // - startup "main" script
 
         Thread.currentThread().setPriority(getPriority());
+
         try {
-          ByteArrayOutputStream baos  = new ByteArrayOutputStream();
-          PrintStream           ps    = new PrintStream(baos);
-          Interpreter           shell = createInterpreter(x);
-          PM                    pm    = new PM.Builder(x).setKey(Script.getOwnClassInfo().getId()).setName(getId()).build();
-          RuntimeException    thrown = null;
+          if ( l == foam.nanos.script.Language.JSHELL ) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PrintStream ps = new PrintStream(baos);
+            String print = null;
+            try {
+              JShell jShell = (JShell) createInterpreter(x,ps);
+              print = new JShellExecutor().execute(x, jShell, getCode());
+              ps.print(print);
+            } catch (Throwable e) {
+              Logger logger = (Logger) x.get("logger");
+              logger.error(this.getClass().getSimpleName(), "runScript", getId(), e);
+            } finally {
+              pm.log(x);
+            }
+            setLastRun(new Date());
+            setLastDuration(pm.getTime());
+            ps.flush();
+            setOutput(baos.toString());
+          } else { //if ( l == foam.nanos.script.Language.BEANSHELL ) {
 
-          // TODO: import common packages like foam.core.*, foam.dao.*, etc.
-          try {
-            setOutput("");
-            shell.setOut(ps);
-            shell.eval(getCode());
-          } catch (Throwable t) {
-            thrown = new RuntimeException(t);
-            ps.println();
-            t.printStackTrace(ps);
-            Logger logger = (Logger) x.get("logger");
-            logger.error(t);
-            pm.error(x, t);
-          } finally {
-            pm.log(x);
+            ByteArrayOutputStream baos  = new ByteArrayOutputStream();
+            PrintStream           ps    = new PrintStream(baos);
+            Interpreter           shell = (Interpreter) createInterpreter(x, null);
+
+            try {
+              setOutput("");
+              shell.setOut(ps);
+              shell.eval(getCode());
+            } catch (Throwable t) {
+              thrown = new RuntimeException(t);
+              ps.println();
+              t.printStackTrace(ps);
+              Logger logger = (Logger) x.get("logger");
+              logger.error(this.getClass().getSimpleName(), "runScript", getId(), t);
+              pm.error(x, t);
+            } finally {
+              pm.log(x);
+            }
+
+            setLastRun(new Date());
+            setLastDuration(pm.getTime());
+            ps.flush();
+            setOutput(baos.toString());
           }
-
-          setLastRun(new Date());
-          setLastDuration(pm.getTime());
-          ps.flush();
-          setOutput(baos.toString());
-
           ScriptEvent event = new ScriptEvent(x);
           event.setLastRun(this.getLastRun());
           event.setLastDuration(this.getLastDuration());
