@@ -15,6 +15,7 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.nanos.script.Language',
     'foam.nanos.script.ScriptStatus',
     'foam.nanos.notification.ScriptRunNotification'
   ],
@@ -172,6 +173,21 @@ foam.CLASS({
       value: 'BEANSHELL'
     },
     {
+      documentation: 'Legacy support for JS scripts created before JShell',
+      class: 'Boolean',
+      name: 'server',
+      value: true,
+      transient: true,
+      visibility: 'HIDDEN',
+      javaSetter: `
+        if ( val ) {
+          setLanguage(foam.nanos.script.Language.BEANSHELL);
+        } else {
+          setLanguage(foam.nanos.script.Language.JS);
+        }
+      `,
+    },
+    {
       class: 'foam.core.Enum',
       of: 'foam.nanos.script.ScriptStatus',
       name: 'status',
@@ -296,8 +312,10 @@ foam.CLASS({
             logger.error(this.getClass().getSimpleName(), "createInterpreter", getId(), e);
           }
           return shell;
+        } else {
+          throw new RuntimeException("Script language not supported");
         }
-        return null;
+        // return null;
       `
     },
     {
@@ -348,8 +366,7 @@ foam.CLASS({
             setLastDuration(pm.getTime());
             ps.flush();
             setOutput(baos.toString());
-          } else { //if ( l == foam.nanos.script.Language.BEANSHELL ) {
-
+          } else if ( l == foam.nanos.script.Language.BEANSHELL ) {
             ByteArrayOutputStream baos  = new ByteArrayOutputStream();
             PrintStream           ps    = new PrintStream(baos);
             Interpreter           shell = (Interpreter) createInterpreter(x, null);
@@ -373,6 +390,8 @@ foam.CLASS({
             setLastDuration(pm.getTime());
             ps.flush();
             setOutput(baos.toString());
+          } else {
+            throw new RuntimeException("Script language not supported");
           }
           ScriptEvent event = new ScriptEvent(x);
           event.setLastRun(this.getLastRun());
@@ -434,7 +453,8 @@ foam.CLASS({
         var self = this;
         this.output = '';
         this.status = this.ScriptStatus.SCHEDULED;
-        if ( this.server ) {
+        if ( this.language == this.Language.BEANSHELL ||
+             this.language == this.Language.JSHELL ) {
           this.__context__[this.daoKey].put(this).then(function(script) {
             self.copyFrom(script);
             if ( script.status === self.ScriptStatus.SCHEDULED ) {
