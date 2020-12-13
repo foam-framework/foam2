@@ -19,6 +19,10 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'ibanChecksum'
+    },
+    {
+      class: 'String',
       name: 'bankCode',
       documentation: `BIC`
     },
