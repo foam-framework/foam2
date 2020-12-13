@@ -266,7 +266,7 @@ Columns: validation format, parsing format, example`,
         }
       ],
       code: function(iban) {
-        if ( ! iban || iban.length < MIN_IBAN_LENGTH ) return `${this.IBAN_REQUIRED}`;
+        if ( ! iban || iban.length < this.MIN_IBAN_LENGTH ) return `${this.IBAN_REQUIRED}`;
         iban = this.trim(iban);
 
         let cc = iban.substring(0, 2);
