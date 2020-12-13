@@ -346,6 +346,35 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return (UserCapabilityJunction) userCapabilityJunctionDAO.inX(x).put(ucj);
   }
 
+  public UserCapabilityJunction updateUserJunction(
+    X x, Subject subject, String capabilityId, FObject data,
+    CapabilityJunctionStatus status
+  ) {
+    UserCapabilityJunction ucj = this.getJunction(x, capabilityId);
+    if ( ucj.getStatus() == CapabilityJunctionStatus.AVAILABLE ) {
+      ucj = buildAssociatedUCJ(x, capabilityId, subject);
+    }
+    if ( data != null ) {
+      ucj.setData(data);
+    }
+    if ( status != null ) {
+      ucj.setStatus(status);
+    }
+
+    if (
+      subject.getRealUser().isAdmin()
+      && subject.getRealUser() != subject.getUser()
+    ) {
+      var logger = (Logger) x.get("logger");
+      // This may be correct when testing features as an admin user
+      logger.warning(
+        "admin user is lastUpdatedRealUser on an agent-associated UCJ");
+    }
+    ucj.setLastUpdatedRealUser(subject.getRealUser().getId());
+    DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+    return (UserCapabilityJunction) userCapabilityJunctionDAO.inX(x).put(ucj);
+  }
+
   public UserCapabilityJunction buildAssociatedUCJ(
     X x, String capabilityId, Subject subject
   ) {
