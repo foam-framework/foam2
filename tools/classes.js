@@ -722,6 +722,7 @@ var classes = [
   'foam.nanos.auth.SetUserServiceProviderJunctionRuleAction',
 
   //ucjdao rules
+  'foam.nanos.crunch.ruler.AuthorizeUCJStatusOnPut',
   'foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut',
   'foam.nanos.crunch.ruler.ValidateUCJDataOnPut',
   'foam.nanos.crunch.ruler.SetUCJStatusOnPut',
