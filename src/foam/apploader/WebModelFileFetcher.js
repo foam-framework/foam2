@@ -7,20 +7,23 @@
 foam.CLASS({
   package: 'foam.apploader',
   name: 'WebModelFileFetcher',
+
   requires: [
     'foam.net.HTTPRequest'
   ],
+
   properties: [
     {
       name: 'root',
       preSet: function(_, a) {
         if ( a.endsWith('/') )
           a = a.substring(0, a.lastIndexOf('/'));
-        
+
         return a;
       }
     }
   ],
+
   methods: [
     function getFile(id) {
       return this.HTTPRequest.create({
