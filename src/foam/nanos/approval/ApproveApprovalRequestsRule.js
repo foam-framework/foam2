@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'net.nanopay.partner.treviso',
+  package: 'foam.nanos.approval',
   name: 'ApproveApprovalRequestsRule',
 
   implements: [
