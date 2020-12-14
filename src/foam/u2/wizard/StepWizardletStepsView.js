@@ -187,7 +187,7 @@ foam.CLASS({
             ? this.theme.black
             : this.theme.grey2
         })
-        .add(title);
+        .translate(title, title);
     }
   ]
 });
