@@ -12,8 +12,10 @@ foam.CLASS({
 
   implements: [ 'foam.mlang.Expressions' ],
 
+  requires: [ 'foam.u2.view.CardSelectView' ],
+
   documentation: `
-    -takes a faceted CardSelectView - based on MinMax.choice[0].cls_
+    -takes a faceted CardSelectView - based on each choice[2].cls_
 
     Wraps a tag that represents multiple choices.
 
@@ -26,15 +28,8 @@ foam.CLASS({
 
     Calling the following methods:
 
-    1. MultiChoiceView.outputSelectedChoicesInValueLabelFormat() - will return an array containing the
-    selected choices in [ value, label ] format only if the minSelected, maxSelected criteria is respected
-    2. MultiChoiceView.outputSelectedChoicesInValueLabelFormat() - will return a predicated dao containing thee
-    selected choices in only if the minSelected, maxSelected criteria is respected
-
     MultiChoiceView.data will be automatically set to a predicated dao based on the choices selected only if
     the minSelected, maxSelected criteria is respected, it will be foam.dao.NullDAO othrewise
-
-    this.booleanView is a ViewSpec for each choice. It defaults to foam.u2.CheckBox
   `,
 
   css: `
@@ -54,6 +49,9 @@ foam.CLASS({
     }
   `,
 
+  constants: {
+    NUM_COLUMNS: 3
+  },
 
   messages: [
     { name: 'OPTIONS_MSG', message: 'options' },
@@ -84,13 +82,13 @@ foam.CLASS({
 
         if ( n.length > 0 ) {
           n = n.sort();
-          var valueLabelChoices = n.filter(choice => choice.length === 2)
-          var fullChoices = n.filter(choice => choice.length === 5)
+          var valueLabelChoices = n.filter(choice => choice.length === 2);
+          var fullChoices = n.filter(choice => choice.length === 5);
 
-          if ( valueLabelChoices.length === n.length ) return n.map(choice => [ choice[0], choice[1], false, this.mode, false ])
-          if ( fullChoices.length === n.length  ) return n;
+          if ( valueLabelChoices.length === n.length ) return n.map(choice => [choice[0], choice[1], false, this.mode, false]);
+          if ( fullChoices.length === n.length ) return n;
 
-          throw new Error('Items in choices array do not have consistent lengths')
+          throw new Error('Items in choices array do not have consistent lengths');
         }
 
         return n;
@@ -120,7 +118,7 @@ foam.CLASS({
               ? choice[4].get()
               : choice[4];
 
-            if ( ! isSelected  && ! isFinal && foam.core.Slot.isInstance(choice[3]) ) {
+            if ( ! isSelected && ! isFinal && foam.core.Slot.isInstance(choice[3]) ) {
               choice[3].set(foam.u2.DisplayMode.RW);
             }
           });
@@ -143,19 +141,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'isValidNumberOfChoices',
-      expression: function(selectedChoices, minSelected, maxSelected) {
-        return selectedChoices.length >= minSelected && selectedChoices.length <= maxSelected;
-      }
-    },
-    {
-      class: 'Boolean',
       name: 'showMinMaxHelper',
-      value: true
-    },
-    {
-      class: 'Boolean',
-      name: 'showValidNumberOfChoicesHelper',
       value: true
     },
     {
@@ -171,19 +157,6 @@ foam.CLASS({
       value: 2
     },
     {
-      class: 'foam.u2.ViewSpecWithJava',
-      name: 'booleanView',
-      expression: function(choices) {
-        var cap = choices
-        && choices[0]
-        && choices[0][2]
-        && choices[0][2].obj
-        && choices[0][2].obj.capability;
-        var cls = cap.cls_.id;
-        return { class: 'foam.u2.view.CardSelectView', of: cls, obj: cap };
-      }
-    },
-    {
       class: 'Boolean',
       name: 'isVertical',
       value: false
@@ -192,11 +165,6 @@ foam.CLASS({
       class: 'Boolean',
       name: 'isDaoFetched',
       value: false
-    },
-    {
-      class: 'Int',
-      name: 'numberOfColumns',
-      value: 3
     },
     {
       name: 'objToChoice',
@@ -245,7 +213,7 @@ foam.CLASS({
         .end()
         .start(self.isVertical ? foam.u2.layout.Rows : foam.u2.layout.Cols)
           .addClass(self.myClass('flexer'))
-          .add(
+          .add( // TODO isDoaFetched and simpSlot0 aren't used should be clean up
             self.isDaoFetched$.map(isDaoFetched => {
               var newChoices = [];
 
@@ -260,17 +228,20 @@ foam.CLASS({
                   ...newChoices,
                   [choice[0], simpSlot1, simpSlot2, simpSlot3, simpSlot4]
                 ];
-
+                var cap = choice[2] && choice[2].obj && choice[2].obj.capability;
+                var cls =  cap && cap.cls_.id;
                 return self.E()
                   .addClass(self.myClass('innerFlexer'))
                   // NOTE: This should not be the way we implement columns.
                   .style({
-                    'width': `${100 / self.numberOfColumns}%`
+                    'width': `${100 / self.NUM_COLUMNS}%`
                   })
-                  .tag(self.booleanView, {
+                  .tag(self.CardSelectView, {
                       data$: simpSlot2,
                       label$: simpSlot1,
-                      mode$: simpSlot3
+                      mode$: simpSlot3,
+                      of: cls,
+                      obj: cap
                     });
               });
 
@@ -291,64 +262,7 @@ foam.CLASS({
               return toRender;
             })
           )
-        .end()
-        .start()
-          .add(
-            self.slot(function(showValidNumberOfChoicesHelper, isValidNumberOfChoices, choices) {
-              return self.E()
-              .callIf(! isValidNumberOfChoices && showValidNumberOfChoicesHelper, function() {
-                this
-                  .add('Please select a valid number of choices');
-              })
-              .callIf(isValidNumberOfChoices && showValidNumberOfChoicesHelper, function() {
-                this
-                  .start()
-                    .add('Here are your valid selected choices using the outputSelectedChoicesInValueLabelFormat() function:')
-                  .end()
-                  .start()
-                    .add(
-                      self.outputSelectedChoicesInValueLabelFormat()
-                        .map(function(choice) {
-                          return self.E().add(`[${choice[0]},${choice[1]}]`);
-                        })
-                    )
-                  .end();
-              });
-            })
-          )
         .end();
-    },
-
-    function outputSelectedChoicesInValueLabelFormat() {
-      if ( ! this.isValidNumberOfChoices ) {
-        console.warn('Please select a valid number of choices');
-        return [];
-      }
-
-      var filteredChoices = this.choices.filter(this.choiceTrue);
-
-      return filteredChoices.map(choice => [choice[0], choice[1]]);
-    },
-
-    function outputSelectedChoicesInDAO() {
-      if ( ! this.isValidNumberOfChoices ) {
-        console.warn('Please select a valid number of choices');
-        return foam.dao.NullDAO;
-      }
-
-      var of = this.dao.of;
-
-      var filteredChoices = this.choices.filter(choice => choice[2]);
-
-      return this.dao
-        .where(this.IN(of.ID, filteredChoices.map(choice => choice[0])));
-    },
-
-    function choiceTrue(choice) {
-      return foam.core.Slot.isInstance(choice[2])
-        ? choice[2].get()
-        : choice[2]
-        ;
     },
 
     function mustSlot(v) {
