@@ -13,6 +13,8 @@ foam.CLASS({
   implements: [ 'foam.mlang.Expressions' ],
 
   documentation: `
+    -takes a faceted CardSelectView - based on MinMax.choice[0].cls_
+
     Wraps a tag that represents multiple choices.
 
     The choices are in [value, label, isSelected, choiceMode ] quartets.
@@ -47,7 +49,6 @@ foam.CLASS({
     }
     ^innerFlexer {
       display: inline-flex;
-      flex-grow: 1;
       padding: 4px;
       box-sizing: border-box;
     }
@@ -171,7 +172,15 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpecWithJava',
       name: 'booleanView',
-      value: { class: 'foam.u2.view.CardSelectView' }
+      expression: function(choices) {
+        var cap = choices
+        && choices[0]
+        && choices[0][2]
+        && choices[0][2].obj
+        && choices[0][2].obj.capability;
+        var cls = cap.cls_.id;
+        return { class: 'foam.u2.view.CardSelectView', of: cls, obj: cap };
+      }
     },
     {
       class: 'Boolean',
