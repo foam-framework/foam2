@@ -16,8 +16,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Boolean',
-      name: 'allowSkipping',
-      value: true
+      name: 'allowSkipping'
     },
     {
       class: 'Boolean',
