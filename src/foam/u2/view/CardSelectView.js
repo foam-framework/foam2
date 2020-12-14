@@ -13,11 +13,13 @@ foam.CLASS({
     'foam.u2.borders.CardBorder'
   ],
 
+  axioms: [
+    foam.pattern.Faceted.create()
+  ],
+
   css: `
     ^ {
       display: flex;
-      padding: 5%;
-      margin: 1%;
       justify-content: center;
       flex-grow: 1;
       align-items: center;
@@ -39,8 +41,7 @@ foam.CLASS({
     }
 
     ^innerFlexer {
-      display: inline-flex;
-      flex-grow: 1;
+      min-width: -webkit-fill-available;
     }
   `,
 
@@ -52,9 +53,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'label',
-      factory: function(){
+      factory: function() {
         return String(this.value);
       }
+    },
+    {
+      name: 'obj'
     }
   ],
 
@@ -74,7 +78,7 @@ foam.CLASS({
             return data && mode === foam.u2.DisplayMode.DISABLED
           }))
           .on('click', this.onClick)
-          .add(this.label) 
+          .add(this.label)
         .end()
     }
   ],

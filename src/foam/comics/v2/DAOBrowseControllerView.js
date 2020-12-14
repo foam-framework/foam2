@@ -137,7 +137,7 @@ foam.CLASS({
     var self = this;
 
       this.addClass(this.myClass())
-      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle) {
+      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction) {
         return self.E()
           .start(self.Rows)
             .addClass(self.myClass('container'))
@@ -146,15 +146,18 @@ foam.CLASS({
                 .start(self.Cols)
                   .start()
                     .addClass(self.myClass('browse-title'))
-                    .add(config$browseTitle)
+                    .translate(config$browseTitle, config$browseTitle)
                   .end()
                   .startContext({ data: self }).tag(self.CREATE).endContext()
+                  .callIf(config$primaryAction, function() {
+                    this.startContext({ data: self }).tag(config$primaryAction, { size: 'LARGE' }).endContext();
+                  })
                 .end()
                 .callIf(config$browseSubtitle.length > 0, function() {
                   this
                     .start()
                       .addClass(self.myClass('browse-subtitle'))
-                      .add(config$browseSubtitle)
+                      .translate(config$browseSubtitle, config$browseSubtitle)
                     .end();
                 })
               .end()
@@ -171,7 +174,7 @@ foam.CLASS({
                     .end();
                 })
                 .add(self.slot(function(browseView) {
-                  return self.E().tag(browseView, {data: data, config: config});
+                  return self.E().tag(browseView, { data: data, config: config });
                 }))
               .end()
             .end()

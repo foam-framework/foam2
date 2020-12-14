@@ -14,7 +14,7 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.nanos.crunch.lite.CapablePayload',
+    'foam.nanos.crunch.CapabilityJunctionPayload',
 
     'static foam.nanos.crunch.CapabilityJunctionStatus.*'
   ],
@@ -23,21 +23,21 @@ foam.CLASS({
     {
       name: 'getCapableChainedStatus',
       documentation: `
-        numberGrantedOrPending are  the available CapablePayloads which are GRANTED or can eventually be turned into 
-        GRANTED from PENDING state. If  MinMaxCapability.min is greater than the number of available payloads which are GRANTED or 
-        can eventually be turned into GRANTED, then it is impossible for the total amount of GRANTED payloads to be greater than the MIN, 
+        numberGrantedOrPending are  the available CapablePayloads which are GRANTED or can eventually be turned into
+        GRANTED from PENDING state. If  MinMaxCapability.min is greater than the number of available payloads which are GRANTED or
+        can eventually be turned into GRANTED, then it is impossible for the total amount of GRANTED payloads to be greater than the MIN,
         thereby fulfilling the minimum requirement.
 
         For example, let there be a min max capablity which has 10 prerequisites and a min of 2.
 
-        If the user selected only 3 of those prereqs in the wizard, then the CapablePayload.status for those 3 will each be in PENDING 
-        state with approvals generated for each one. Note, there will only be these 3 CapablePayloads out of the 10 Prereqs avaliable on the 
+        If the user selected only 3 of those prereqs in the wizard, then the CapablePayload.status for those 3 will each be in PENDING
+        state with approvals generated for each one. Note, there will only be these 3 CapablePayloads out of the 10 Prereqs avaliable on the
         Capable object since the user only selected 3.
 
-        If 1 of those 3 CapablePayloads get rejected. Then there will be 2 numberGrantedOrPending which could still potentially satisfy 
+        If 1 of those 3 CapablePayloads get rejected. Then there will be 2 numberGrantedOrPending which could still potentially satisfy
         the min requirement of 2 if those 2 CapablePayloads get set to GRANTED.
 
-        If 2 of those 3 CapablePayloads get rejected. Then there will be 1 numberGrantedOrPending which would be impossible to satisfy the 
+        If 2 of those 3 CapablePayloads get rejected. Then there will be 1 numberGrantedOrPending which would be impossible to satisfy the
         MinMaxCapability.min requirement of 2 even if that 1 CapablePayload is GRANTED.
       `,
       javaCode: `
@@ -49,19 +49,19 @@ foam.CLASS({
         List<CapabilityCapabilityJunction> ccJunctions =
           ((ArraySink) myPrerequisitesDAO.select(new ArraySink()))
           .getArray();
-        
+
         int numberGranted = 0;
         int numberPending = 0;
         int numberRejected = 0;
 
         for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
-          CapablePayload prereqPayload = (CapablePayload)
+          CapabilityJunctionPayload prereqPayload = (CapabilityJunctionPayload)
             capablePayloadDAO.find(ccJunction.getTargetId());
-          
+
           if ( prereqPayload == null ) {
             continue;
           }
-          
+
           switch ( prereqPayload.getStatus() ) {
             case GRANTED:
               numberGranted++;

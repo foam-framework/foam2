@@ -28,7 +28,7 @@ foam.CLASS({
   properties: [
     {
       name: 'initLatch',
-      documentatin: 'Latch to denote cache has been loaded and service is ready',
+      documentation: 'Latch to denote cache has been loaded and service is ready',
       factory: function() { return this.Latch.create(); }
     },
     {
