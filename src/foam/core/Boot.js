@@ -225,6 +225,7 @@ foam.LIB({
         }
       );
       foam.locale = l || 'en';
+      foam.xmsg = global.window && ( global.window.location.href.indexOf('XMSG') != -1 );
     },
 
     /** Start second phase of bootstrap process. */
