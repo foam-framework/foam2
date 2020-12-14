@@ -67,7 +67,7 @@ foam.CLASS({
             }
           }
         }
-      }, "Approve approval request, which classification is specified in autoApprovablePermissions property of the rule");
+      }, "Approve approval requests, classifications of which are specified in autoApprovablePermissions property of the rule");
       `
     }
   ]
