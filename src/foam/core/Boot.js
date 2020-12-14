@@ -208,6 +208,22 @@ foam.LIB({
         return cls;
       };
       let l = global.localStorage && global.localStorage.getItem('localeLanguage');
+      var locale_;
+
+      // Update foam.lang and foam.variant whenever foam.locale is set
+      Object.defineProperty(
+        foam,
+        'locale',
+        {
+          get: function() { return locale_; },
+          set: function(l) {
+            locale_ = l;
+            foam.lang    = l.substring(0,2);
+            foam.variant = l.substring(3);
+          },
+          configurable: false
+        }
+      );
       foam.locale = l || 'en';
     },
 
