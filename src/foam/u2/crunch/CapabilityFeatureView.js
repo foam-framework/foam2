@@ -86,7 +86,7 @@ foam.CLASS({
        this.SUPER();
        this.onDetach(this.crunchService.sub('updateJunction', this.daoUpdate));
        this.daoUpdate();
-       this.onDetach(this.cjStatus$.sub(this.statusUpdate));
+       if ( this.cjStatus != this.CapabilityJunctionStatus.PENDING ) this.onDetach(this.cjStatus$.sub(this.statusUpdate));
     },
 
     function initE() {
@@ -133,6 +133,7 @@ foam.CLASS({
     {
       name: 'daoUpdate',
       code: function() {
+        // This code looks hardcorded - why aren't the statuses being set and shown using ucj data status?
         this.crunchService.getJunction(null, this.data.id).then(ucj => {
           if ( ucj ) {
             this.cjStatus = ucj.status === this.CapabilityJunctionStatus.APPROVED ?

@@ -396,7 +396,11 @@ foam.CLASS({
       name: 'onChange',
       isMerged: true,
       code: function() {
-        this.init();
+        this.crunchService.getEntryCapabilities().then(a => {
+          this.visibleCapabilityDAO = this.ArrayDAO.create({
+            array: a.array
+          });
+        });
       }
     }
   ]
