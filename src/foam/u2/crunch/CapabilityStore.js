@@ -189,7 +189,7 @@ foam.CLASS({
     },
     function initE() {
       this.SUPER();
-      this.onDetach(this.crunchService.sub('updateJunction', this.onChange));
+      this.onDetach(this.crunchService.sub('grantedJunction', this.onChange));
       var self = this;
       window.cstore = self;
 

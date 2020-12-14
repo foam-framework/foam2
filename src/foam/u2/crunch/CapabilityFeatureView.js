@@ -181,7 +181,7 @@ foam.CLASS({
         this.crunchService.getJunction(null, this.data.id).then(ucj => {
           if ( ucj && ucj.status === this.CapabilityJunctionStatus.GRANTED ) {
             this.auth.cache = {};
-            this.crunchService.pub('updateJunction');
+            this.crunchService.pub('grantedJunction');
             this.cjStatus = this.CapabilityJunctionStatus.GRANTED;
           } else {
             this.window.setTimeout(this.statusUpdate, 2000);
