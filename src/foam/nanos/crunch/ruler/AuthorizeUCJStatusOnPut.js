@@ -22,7 +22,7 @@ foam.CLASS({
 
   documentation: `
     This rule prevents a UCJ status from being set above ACTION_REQUIRED if the
-    user in context does not have
+    user in context does not have 'service.crunchService.unsafeSetStatus'.
   `,
 
   constants: [
