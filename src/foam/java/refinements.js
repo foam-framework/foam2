@@ -53,6 +53,7 @@ foam.LIB({
         },
         Null: function(n) { return "null"; },
         Object: function(o) {
+          if ( o.asJavaValue ) return o.asJavaValue.call(o, o);
           return `foam.util.Arrays.asMap(new Object[] {
 ${Object.keys(o).map(function(k, i, a) {
   return `  ${foam.java.asJavaValue(k)}, ${foam.java.asJavaValue(o[k])}` + ((i == a.length-1) ? '' : ',')
@@ -396,7 +397,7 @@ foam.CLASS({
           name: isSet,
           type: 'boolean',
           visibility: 'private',
-          initializer: 'false'
+          initializer: 'false;'
         }).
         method({
           name: 'get' + capitalized,
@@ -591,7 +592,7 @@ foam.LIB({
           static: false,
           final: false,
           type: 'foam.core.X',
-          initializer: "foam.core.EmptyX.instance()"
+          initializer: "foam.core.EmptyX.instance();"
         });
 
         cls.method({
@@ -621,7 +622,7 @@ foam.LIB({
           static: false,
           final: false,
           type: 'boolean',
-          initializer: "false"
+          initializer: "false;"
         });
 
         if ( ! this.hasOwnAxiom('freeze') ) {
@@ -892,7 +893,7 @@ foam.CLASS({
       }
 
       initializerString += `}
-      }
+      };
       `;
       return initializerString;
     },

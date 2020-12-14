@@ -81,7 +81,7 @@ foam.CLASS({
         {
           class: 'String',
           name: 'defaultText',
-          displayWidth: 250
+          displayWidth: 300
         },
         {
           class: 'String',

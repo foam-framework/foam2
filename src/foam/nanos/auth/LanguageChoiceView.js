@@ -14,7 +14,7 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.u2.PopupView',
+    'foam.u2.View',
     'foam.nanos.auth.Language',
   ],
 
@@ -30,87 +30,85 @@ foam.CLASS({
   exports: [ 'as data' ],
 
   css: `
-  ^carrot {
-    width: 0;
-    height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 5px solid white;
-    display: inline-block;
-    float: right;
-    margin-top: 7px;
-    margin-left: 7px;
-  }
-  ^ .foam-u2-ActionView-languageChoice {
-    display: inline-block;
-    background: none !important;
-    border: 0 !important;
-    box-shadow: none !important;
-    width: max-content;
-    cursor: pointer;
-    margin-right: 27px;
-  }
-  ^ .foam-nanos-u2-navigation-TopNavigation-LanguageChoiceView {
-    align-items: center;
-  }
-  ^ .foam-u2-ActionView-languageChoice > span {
-    font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    font-weight: 300;
-    letter-spacing: 0.2px;
-    color: #ffffff;
-  }
-  ^ .popUpDropDown > div {
-    margin-left: -16px;
-    margin-right: -16px;
-    width: 100%;
-    height: 25;
-    padding: 0px 16px 5px 16px;
-    font-size: 14px;
-    font-weight: 300;
-    letter-spacing: 0.2px;
-    color: /*%BLACK%*/ #1e1f21;
-    line-height: 30px;
-  }
-  ^ .foam-u2-PopupView {
-    border-radius: 4px;
-    left: -30 !important;
-    top: 51px !important;
-    padding: 0px 16px 0px 16px !important;
-    z-index: 1000;
-    width: fit-content !important;
-    background: white;
-    opacity: 1;
-    box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.19);
-  }
-  ^ .popUpDropDown > div:hover{
-    background-color: #1cc2b7;
-    color: white;
-    cursor: pointer;
-  }
-  ^ .popUpDropDown::before {
-    content: ' ';
-    position: absolute;
-    height: 0;
-    width: 0;
-    border: 8px solid transparent;
-    border-bottom-color: white;
-    -ms-transform: translate(110px, -16px);
-    transform: translate(50px, -16px);
-  }
-  ^ .flag {
-    width: 30px !important;
-    height: 17.6px;
-    object-fit: contain;
-    padding-top: 6px;
-    padding-left: 10px;
-    margin-right: 23px;
-  }
-  ^ img {
-    height: 17.6px !important;
-    margin-right: 6;
-    width: auto;
-  }
+    ^container {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+    ^container:hover {
+      cursor: pointer;
+    }
+    ^container span {
+      font-size: 12px;
+    }
+    ^carrot {
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid white;
+      display: inline-block;
+      float: right;
+      margin-top: 7px;
+      margin-left: 7px;
+    }
+    ^ .foam-u2-ActionView-languageChoice {
+      display: inline-block;
+      background: none !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      width: max-content;
+      cursor: pointer;
+      margin-right: 27px;
+    }
+    ^ .foam-nanos-u2-navigation-TopNavigation-LanguageChoiceView {
+      align-items: center;
+    }
+    ^ .foam-u2-ActionView-languageChoice > span {
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 15px;
+      font-weight: 300;
+      letter-spacing: 0.2px;
+      color: #ffffff;
+    }
+    ^ .popUpDropDown > div {
+      height: 40px;
+      padding: 8px 24px;
+      padding-right: 48px;
+      font-size: 14px;
+      font-weight: 300;
+      color: /*%BLACK%*/ #1e1f21;
+      line-height: 25px;
+      box-sizing: border-box;
+      cursor: pointer;
+      background: white;
+      color: black;
+      border-left: solid 1px /*%GREY5%*/ #f5f7fa;
+      border-right: solid 1px /*%GREY5%*/ #f5f7fa;
+    }
+    ^ .popUpDropDown {
+      z-index: 950;
+      box-shadow: none;
+      position: absolute;
+      top: 60px;
+      font-weight: 300;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      width: 160px;
+    }
+    ^ .popUpDropDown > div:hover{
+      background: /*%PRIMARY5%*/ #e5f1fc !important;
+      border-left: solid 1px /*%PRIMARY5%*/ #e5f1fc;
+      border-right: solid 1px /*%PRIMARY5%*/ #e5f1fc;
+    }
+    ^background {
+      bottom: 0;
+      left: 0;
+      opacity: 0.4;
+      right: 0;
+      top: 0;
+      position: fixed;
+      z-index: 850;
+    }
   `,
 
   properties: [
@@ -154,6 +152,7 @@ foam.CLASS({
         .end()
       .end();
     },
+
     async function formatLabel(language) {
       let country = await this.countryDAO.find(language.variant)
       let label = language.variant != "" ? `${language.nativeName}(${language.variant})` : `${language.nativeName}`
@@ -170,32 +169,34 @@ foam.CLASS({
       label: '',
       code: function() {
         var self = this;
-        self.optionPopup_ = this.PopupView.create({
-          width: 1165,
-          x: -1137,
-          y: 140
-        }).on('click', function() {
-          return self.optionPopup_.remove();
-        });
+        self.optionPopup_ = this.View.create({});
 
-        self.optionPopup_ = self.optionPopup_.start('div').addClass('popUpDropDown')
-          .add(
-            this.supportedLanguages.map( c => {
-              return self.E()
-                .start('div')
-                  .add(self.formatLabel(c))
-                  .on('click', async function() {
-                    let user = self.subject.realUser
-                    user.language = c.id
-                    await self.userDAO.put(user)
+        self.optionPopup_ = self.optionPopup_
+          .start('div').addClass('popUpDropDown')
+            .add(
+              this.supportedLanguages.map( c => {
+                return self.E()
+                  .start('div')
+                    .add(self.formatLabel(c))
+                    .on('click', async function() {
+                      let user = self.subject.realUser
+                      user.language = c.id
+                      await self.userDAO.put(user)
 
-                    location.reload();
+                      location.reload();
 
-                    // TODO: Figure out a better way to store user preferences
-                    localStorage.setItem('localeLanguage', c.toString());
-                  });
-            }))
+                      // TODO: Figure out a better way to store user preferences
+                      localStorage.setItem('localeLanguage', c.toString());
+                    });
+              }))
+          .end()
+          .start()
+            .addClass(this.myClass('background'))
+            .on('click', () => {
+              self.optionPopup_.remove();
+            })
           .end();
+
         self.optionsBtn_.add(self.optionPopup_);
       }
     }

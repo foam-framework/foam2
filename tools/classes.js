@@ -5,6 +5,7 @@
  */
 
 var classes = [
+  'foam.core.Action',
   'foam.core.Axiom',
   'foam.core.Detachable',
   'foam.core.Serializable',
@@ -105,7 +106,9 @@ var classes = [
   'foam.box.HTTPReplyBox',
   'foam.box.AuthServiceClientBox',
   'foam.box.ExportBox',
+  'foam.nanos.iban.IBANInfo',
   'foam.nanos.iban.ValidationIBAN',
+  'foam.nanos.iban.test.ValidationIBANTest',
   'foam.nanos.app.AppConfig',
   'foam.nanos.app.ContextLookupAppConfigService',
   'foam.nanos.http.WebAgent',
@@ -692,6 +695,8 @@ var classes = [
   'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
   'foam.nanos.crunch.CapabilityJunctionStatus',
   'foam.nanos.crunch.UserCapabilityJunction',
+  'foam.nanos.crunch.ui.WizardState',
+  // 'foam.nanos.crunch.ui.UserCapabilityWizardState',
   'foam.nanos.crunch.ui.CapabilityWizardlet',
   'foam.nanos.crunch.ui.ReviewCapabilityWizardlet',
   'foam.nanos.crunch.ui.MinMaxCapabilityWizardlet',

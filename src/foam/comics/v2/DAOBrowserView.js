@@ -85,7 +85,6 @@ foam.CLASS({
     }
 
     ^browse-view-container {
-      margin: auto;
       border-bottom: solid 1px #e7eaec;
       box-sizing: border-box;
       padding: 0 16px;
