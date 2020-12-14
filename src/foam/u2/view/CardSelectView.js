@@ -13,6 +13,10 @@ foam.CLASS({
     'foam.u2.borders.CardBorder'
   ],
 
+  axioms: [
+    foam.pattern.Faceted.create()
+  ],
+
   css: `
     ^ {
       display: flex;
@@ -37,8 +41,7 @@ foam.CLASS({
     }
 
     ^innerFlexer {
-      display: inline-flex;
-      flex-grow: 1;
+      min-width: -webkit-fill-available;
     }
   `,
 
@@ -50,9 +53,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'label',
-      factory: function(){
+      factory: function() {
         return String(this.value);
       }
+    },
+    {
+      name: 'obj'
     }
   ],
 

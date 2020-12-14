@@ -12,7 +12,11 @@ foam.CLASS({
 
   implements: [ 'foam.mlang.Expressions' ],
 
+  requires: [ 'foam.u2.view.CardSelectView' ],
+
   documentation: `
+    -takes a faceted CardSelectView - based on each choice[2].cls_
+
     Wraps a tag that represents multiple choices.
 
     The choices are in [value, label, isSelected, choiceMode ] quartets.
@@ -24,15 +28,8 @@ foam.CLASS({
 
     Calling the following methods:
 
-    1. MultiChoiceView.outputSelectedChoicesInValueLabelFormat() - will return an array containing the
-    selected choices in [ value, label ] format only if the minSelected, maxSelected criteria is respected
-    2. MultiChoiceView.outputSelectedChoicesInValueLabelFormat() - will return a predicated dao containing thee
-    selected choices in only if the minSelected, maxSelected criteria is respected
-
     MultiChoiceView.data will be automatically set to a predicated dao based on the choices selected only if
     the minSelected, maxSelected criteria is respected, it will be foam.dao.NullDAO othrewise
-
-    this.booleanView is a ViewSpec for each choice. It defaults to foam.u2.CheckBox
   `,
 
   css: `
@@ -47,12 +44,14 @@ foam.CLASS({
     }
     ^innerFlexer {
       display: inline-flex;
-      flex-grow: 1;
       padding: 4px;
       box-sizing: border-box;
     }
   `,
 
+  constants: {
+    NUM_COLUMNS: 3
+  },
 
   messages: [
     { name: 'OPTIONS_MSG', message: 'options' },
@@ -79,16 +78,17 @@ foam.CLASS({
         return [];
       },
       adapt: function(_, n) {
-        if ( ! Array.isArray(n) ) throw new Error("Please submit an array to choices in the MultiChoiceView");
+        if ( ! Array.isArray(n) ) throw new Error('Please submit an array to choices in the MultiChoiceView');
 
-        if ( n.length > 0 ){
-          var valueLabelChoices = n.filter(choice => choice.length === 2)
-          var fullChoices = n.filter(choice => choice.length === 5)
+        if ( n.length > 0 ) {
+          n = n.sort();
+          var valueLabelChoices = n.filter(choice => choice.length === 2);
+          var fullChoices = n.filter(choice => choice.length === 5);
 
-          if ( valueLabelChoices.length === n.length ) return n.map(choice => [ choice[0], choice[1], false, this.mode, false ])
-          if ( fullChoices.length === n.length  ) return n;
+          if ( valueLabelChoices.length === n.length ) return n.map(choice => [choice[0], choice[1], false, this.mode, false]);
+          if ( fullChoices.length === n.length ) return n;
 
-          throw new Error("Items in choices array do not have consistent lengths")
+          throw new Error('Items in choices array do not have consistent lengths');
         }
 
         return n;
@@ -105,45 +105,38 @@ foam.CLASS({
     {
       name: 'selectedChoices',
       value: [],
-      postSet: function(o,n){
-        if ( this.onSelect ) this.onSelect(o,n);
+      postSet: function(o, n) {
+        if ( this.onSelect ) this.onSelect(o, n);
 
         if ( this.selectedChoices.length < this.maxSelected ) {
-          this.choices.forEach((choice) => {
+          this.choices.forEach(choice => {
             var isSelected = foam.core.Slot.isInstance(choice[2])
               ? choice[2].get()
               : choice[2];
 
             var isFinal = foam.core.Slot.isInstance(choice[4])
               ? choice[4].get()
-              : choice[4]
+              : choice[4];
 
-            if ( ! isSelected  && ! isFinal && foam.core.Slot.isInstance(choice[3])){
-              choice[3].set(foam.u2.DisplayMode.RW)
+            if ( ! isSelected && ! isFinal && foam.core.Slot.isInstance(choice[3]) ) {
+              choice[3].set(foam.u2.DisplayMode.RW);
             }
-          })
+          });
         } else {
-          this.choices.forEach((choice) => {
+          this.choices.forEach(choice => {
             var isSelected = foam.core.Slot.isInstance(choice[2])
               ? choice[2].get()
               : choice[2];
 
             var isFinal = foam.core.Slot.isInstance(choice[4])
               ? choice[4].get()
-              : choice[4]
+              : choice[4];
 
-            if ( ! isSelected && ! isFinal && foam.core.Slot.isInstance(choice[3])){
-              choice[3].set(foam.u2.DisplayMode.DISABLED)
+            if ( ! isSelected && ! isFinal && foam.core.Slot.isInstance(choice[3]) ) {
+              choice[3].set(foam.u2.DisplayMode.DISABLED);
             }
-          })
+          });
         }
-      }
-    },
-    {
-      class: 'Boolean',
-      name: 'isValidNumberOfChoices',
-      expression: function(selectedChoices, minSelected, maxSelected){
-        return selectedChoices.length >= minSelected && selectedChoices.length <= maxSelected;
       }
     },
     {
@@ -152,26 +145,16 @@ foam.CLASS({
       value: true
     },
     {
-      class: 'Boolean',
-      name: 'showValidNumberOfChoicesHelper',
-      value: true
-    },
-    {
       class: 'Int',
       name: 'minSelected',
       expression: function(choices) {
-        return choices.length > 0 ? 1 : 0
+        return choices.length > 0 ? 1 : 0;
       }
     },
     {
       class: 'Int',
       name: 'maxSelected',
       value: 2
-    },
-    {
-      class: 'foam.u2.ViewSpecWithJava',
-      name: 'booleanView',
-      value: { class: 'foam.u2.view.CardSelectView' }
     },
     {
       class: 'Boolean',
@@ -184,20 +167,15 @@ foam.CLASS({
       value: false
     },
     {
-      class: 'Int',
-      name: 'numberOfColumns',
-      value: 3
-    },
-    {
       name: 'objToChoice',
       class: 'Function',
       value: function(obj) {
-        return [ obj.id, obj.toSummary() ];
+        return [obj.id, obj.toSummary()];
       }
     },
     {
       name: 'helpText_',
-      expression: function (minSelected, maxSelected) {
+      expression: function(minSelected, maxSelected) {
         // TODO: Change this when formatted messages are supported
         return ( maxSelected > 0 )
           ? ( minSelected == maxSelected )
@@ -229,18 +207,17 @@ foam.CLASS({
                   .addClass(self.myClass('helpTextRow'))
                   .add(self.helpText_)
                 .end()
-              .end()
-            })
+              .end();
+            });
           }))
         .end()
         .start(self.isVertical ? foam.u2.layout.Rows : foam.u2.layout.Cols)
           .addClass(self.myClass('flexer'))
-          .add(
+          .add( // TODO isDoaFetched and simpSlot0 aren't used should be clean up
             self.isDaoFetched$.map(isDaoFetched => {
-
               var newChoices = [];
 
-              var toRender = self.choices.map(function (choice) {
+              var toRender = self.choices.map(function(choice) {
                 var simpSlot0 = self.mustSlot(choice[0]);
                 var simpSlot1 = self.mustSlot(choice[1]);
                 var simpSlot2 = self.mustSlot(choice[2]);
@@ -251,19 +228,22 @@ foam.CLASS({
                   ...newChoices,
                   [choice[0], simpSlot1, simpSlot2, simpSlot3, simpSlot4]
                 ];
-
+                var cap = choice[2] && choice[2].obj && choice[2].obj.capability;
+                var cls =  cap && cap.cls_.id;
                 return self.E()
                   .addClass(self.myClass('innerFlexer'))
                   // NOTE: This should not be the way we implement columns.
                   .style({
-                    'width':`${100 / self.numberOfColumns}%`
+                    'width': `${100 / self.NUM_COLUMNS}%`
                   })
-                  .tag(self.booleanView, {
+                  .tag(self.CardSelectView, {
                       data$: simpSlot2,
                       label$: simpSlot1,
-                      mode$: simpSlot3
-                    })
-              })
+                      mode$: simpSlot3,
+                      of: cls,
+                      obj: cap
+                    });
+              });
 
               self.selectedChoices$ = foam.core.ArraySlot.create({
                 slots: newChoices.map(choice => {
@@ -271,80 +251,24 @@ foam.CLASS({
                 })
               }).map(v => {
                 var selectedChoices = [];
-                v.forEach((w,i) => {
-                  if ( w ){
+                v.forEach((w, i) => {
+                  if ( w ) {
                     selectedChoices.push(this.choices[i]);
                   }
-                })
+                });
                 return selectedChoices;
               });
-
               this.choices = newChoices;
               return toRender;
-            })
-          )
-        .end()
-        .start()
-          .add(
-            self.slot(function(showValidNumberOfChoicesHelper ,isValidNumberOfChoices, choices) {
-              return self.E()
-              .callIf(! isValidNumberOfChoices && showValidNumberOfChoicesHelper, function() {
-                this
-                  .add("Please select a valid number of choices")
-              })
-              .callIf(isValidNumberOfChoices && showValidNumberOfChoicesHelper, function() {
-                this
-                  .start()
-                    .add("Here are your valid selected choices using the outputSelectedChoicesInValueLabelFormat() function:")
-                  .end()
-                  .start()
-                    .add(
-                      self.outputSelectedChoicesInValueLabelFormat().map(function(choice){
-                        return self.E().add(`[${choice[0]},${choice[1]}]`)
-                      })
-                    )
-                  .end()
-              })
             })
           )
         .end();
     },
 
-    function outputSelectedChoicesInValueLabelFormat() {
-      if ( ! this.isValidNumberOfChoices ) {
-        console.warn("Please select a valid number of choices");
-        return [];
-      }
-
-      var filteredChoices = this.choices.filter(this.choiceTrue);
-
-      return filteredChoices.map(choice => [choice[0], choice[1]]);
-    },
-
-    function outputSelectedChoicesInDAO() {
-      if ( ! this.isValidNumberOfChoices ) {
-        console.warn("Please select a valid number of choices");
-        return foam.dao.NullDAO;
-      }
-
-      var of = this.dao.of
-
-      var filteredChoices = this.choices.filter(choice => choice[2]);
-
-      return this.dao.where(this.IN(of.ID, filteredChoices.map(choice => choice[0])));
-    },
-
-    function choiceTrue(choice) {
-      return foam.core.Slot.isInstance(choice[2])
-        ? choice[2].get()
-        : choice[2]
-        ;
-    },
-
     function mustSlot(v) {
       return foam.core.Slot.isInstance(v) ?
         v :
-        foam.core.SimpleSlot.create({ value: v }) ;
+        foam.core.SimpleSlot.create({ value: v });
     }
   ],
 
@@ -355,11 +279,11 @@ foam.CLASS({
       code: function() {
         if ( ! this.dao || ! foam.dao.DAO.isInstance(this.dao) ) return;
 
-        var of = this.dao.of
+        var of = this.dao.of;
         if ( of._CHOICE_TEXT_ ) {
-          this.dao.select(this.PROJECTION(of.ID, of._CHOICE_TEXT_)).then((s) => {
+          this.dao.select(this.PROJECTION(of.ID, of._CHOICE_TEXT_)).then(s => {
             this.choices      = s.projection;
-            this.isDaoFetched = true
+            this.isDaoFetched = true;
           });
           return;
         }
@@ -380,13 +304,13 @@ foam.CLASS({
 
         p.then(a => {
           var choices = a.map(this.objToChoice);
-          var choiceLabels = a.map(o => { return this.objToChoice(o)[1]});
+          var choiceLabels = a.map(o => this.objToChoice(o)[1]);
           Promise.all(choiceLabels).then(resolvedChoiceLabels => {
             for ( let i = 0; i < choices.length; i++ ) {
               choices[i][1] = resolvedChoiceLabels[i];
             }
             this.choices = choices;
-            this.isDaoFetched = true
+            this.isDaoFetched = true;
           });
         });
       }
