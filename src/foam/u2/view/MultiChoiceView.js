@@ -145,6 +145,13 @@ foam.CLASS({
       value: true
     },
     {
+      class: 'Boolean',
+      name: 'isValidNumberOfChoices',
+      expression: function(minSelected, maxSelected, selectedChoices){
+        return selectedChoices.length >= minSelected && selectedChoices.length <= maxSelected;
+      }
+    },
+    {
       class: 'Int',
       name: 'minSelected',
       expression: function(choices) {
