@@ -14,7 +14,8 @@ foam.INTERFACE({
 
   javaImports: [
     'foam.dao.ArraySink',
-    'foam.nanos.crunch.CapabilityJunctionPayload'
+    'foam.nanos.crunch.CapabilityJunctionPayload',
+    'foam.nanos.crunch.ui.WizardState'
   ],
 
   topics: [
@@ -295,6 +296,21 @@ foam.INTERFACE({
         {
           name: 'x',
           type: 'Context'
+        }
+      ]
+    },
+    {
+      name: 'getWizardState',
+      async: true,
+      type: 'WizardState',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
         }
       ]
     }

@@ -782,6 +782,8 @@ var classes = [
   'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
   'foam.nanos.crunch.CapabilityJunctionStatus',
   'foam.nanos.crunch.UserCapabilityJunction',
+  'foam.nanos.crunch.ui.WizardState',
+  // 'foam.nanos.crunch.ui.UserCapabilityWizardState',
   'foam.nanos.crunch.ui.CapabilityWizardlet',
   'foam.nanos.crunch.ui.ReviewCapabilityWizardlet',
   'foam.nanos.crunch.ui.MinMaxCapabilityWizardlet',
