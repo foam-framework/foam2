@@ -321,11 +321,13 @@ FOAM_FILES([
   // foam/nanos/ruler
   { name: "foam/nanos/ruler/RuleGroup" },
   { name: "foam/nanos/ruler/Operations" },
+  { name: "foam/nanos/ruler/Ruled" },
   { name: "foam/nanos/ruler/Rule" },
   { name: "foam/nanos/ruler/RuleAction" },
   { name: "foam/nanos/ruler/CompositeRuleAction" },
   { name: "foam/nanos/ruler/RuleHistory" },
   { name: "foam/nanos/ruler/RuleHistoryStatus" },
+  { name: "foam/nanos/ruler/RuledDAO" },
   { name: "foam/nanos/ruler/RulerDAO" },
   { name: "foam/nanos/ruler/ScriptPredicate"},
   { name: "foam/nanos/ruler/UpdateRulesListSink" },
