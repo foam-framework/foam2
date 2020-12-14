@@ -11,14 +11,12 @@ foam.CLASS({
 
   css: `
     ^ {
-      min-height: 60px;
-
+      min-height: 10vh;
       background-color: #ffffff;
       border: solid 1px #e7eaec;
       border-radius: 5px;
-
+      position: relative;
       padding: 16px;
-
       transition: all 0.2s linear;
     }
   `,
@@ -27,7 +25,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.addClass(this.myClass())
+      this.addClass(this.myClass());
     }
   ]
 });
