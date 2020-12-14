@@ -430,10 +430,8 @@ foam.CLASS({
           name: 'clear' + capitalized,
           visibility: 'public',
           type: 'void',
-          body: `
-          assertNotFrozen();
-          ${isSet} = false;
-          `
+          body: `assertNotFrozen();
+${isSet} = false;`
         });
 
       if ( this.javaFactory ) {
@@ -630,11 +628,9 @@ foam.LIB({
             name: 'freeze',
             type: 'foam.core.FObject',
             visibility: 'public',
-            body: `
-              beforeFreeze();
-              __frozen__ = true;
-              return this;
-            `
+            body: `beforeFreeze();
+__frozen__ = true;
+return this;`
           });
         }
 
@@ -643,9 +639,7 @@ foam.LIB({
             name: 'isFrozen',
             type: 'boolean',
             visibility: 'public',
-            body: `
-              return __frozen__;
-            `
+            body: `return __frozen__;`
           });
         }
 
@@ -655,11 +649,9 @@ foam.LIB({
             name: 'toString',
             type: 'String',
             visibility: 'public',
-            body: `
-              StringBuilder sb = new StringBuilder();
-              append(sb);
-              return sb.toString();
-            `
+            body: `StringBuilder sb = new StringBuilder();
+append(sb);
+return sb.toString();`
           });
         }
 
@@ -674,9 +666,7 @@ foam.LIB({
                 type: 'Object'
               }
             ],
-            body: `
-              return compareTo(o) == 0;
-            `
+            body: `return compareTo(o) == 0;`
           });
         }
 
