@@ -850,21 +850,21 @@ foam.CLASS({
     function buildMethodInfoInitializer(cls) {
       // Add MethodInfo field for each method
       initializerString = `new foam.core.MethodInfo(){
-        @Override
-        public String getName(){
-          return "${this.name}";
-        }
-        @Override
-        public Object call(foam.core.X x, Object receiver, Object[] args){
-      `;
+@Override
+public String getName(){
+  return "${this.name}";
+}
+@Override
+public Object call(foam.core.X x, Object receiver, Object[] args){
+`;
       // See if call needs try catch block
       var exceptions = this.javaThrows.length > 0;
       if ( exceptions ) initializerString += `    try {
         `;
 
-      if ( this.javaType != 'void' ) initializerString += '    return ';
+      if ( this.javaType != 'void' ) initializerString += '  return ';
       // Use ((typeCast)receiver).methodName() to call method because of rare collisions between inner and outer class method names
-      initializerString += `    ((${cls.name})receiver).${this.name}(`;
+      initializerString += `((${cls.name})receiver).${this.name}(`;
       argsString = '';
       for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
         if ( this.args[i].javaType )
@@ -893,8 +893,8 @@ foam.CLASS({
       }
 
       initializerString += `}
-      };
-      `;
+};
+`;
       return initializerString;
     },
 
