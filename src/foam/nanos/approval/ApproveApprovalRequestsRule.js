@@ -23,14 +23,14 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.app.AppConfig',
     'foam.nanos.app.Mode',
+    'foam.nanos.approval.ApprovalRequest',
+    'foam.nanos.approval.ApprovalStatus',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.User',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.logger.Logger',
-    'static foam.mlang.MLang.*',
-    'foam.nanos.approval.ApprovalRequest',
-    'foam.nanos.approval.ApprovalStatus',
-    'java.util.List'
+    'java.util.List',
+    'static foam.mlang.MLang.*'
   ],
 
   properties: [
@@ -67,7 +67,7 @@ foam.CLASS({
             }
           }
         }
-      }, "When the business account is approved, send emails to all directors, signing officers who have signed contratos de câmbio.");
+      }, "Approve approval request, which classification is specified in autoApprovablePermissions property of the rule");
       `
     }
   ]
