@@ -55,8 +55,10 @@ foam.CLASS({
             
             DAO approvalRequestDAO = (DAO) x.get("approvalRequestDAO");
 
-            List approvalRequestToApproveSink = ((ArraySink) ((DAO)x.get("approvalRequestDAO")).inX(x).where(
-              IN(ApprovalRequest.CLASSIFICATION, getAutoApprovablePermissions())
+            List approvalRequestToApproveSink = ((ArraySink) ((DAO)x.get("approvalRequestDAO")).inX(x).where(AND(
+              IN(ApprovalRequest.CLASSIFICATION, getAutoApprovablePermissions()),
+              EQ(ApprovalRequest.STATUS, ApprovalStatus.REQUESTED)
+              )
             ).select(new ArraySink())).getArray();   
 
             for ( Object obj: approvalRequestToApproveSink ) {
