@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'EasyCrunchWizard',
   requires: [
     'foam.u2.crunch.wizardflow.SkipGrantedAgent',
+    'foam.u2.crunch.wizardflow.SkipMode',
     'foam.u2.wizard.StepWizardConfig'
   ],
 
@@ -26,7 +27,10 @@ foam.CLASS({
     {
       name: 'skipMode',
       class: 'Enum',
-      of: 'foam.u2.crunch.wizardflow.SkipMode'
+      of: 'foam.u2.crunch.wizardflow.SkipMode',
+      factory: function () {
+        return this.SkipMode.SKIP;
+      }
     }
   ],
 
