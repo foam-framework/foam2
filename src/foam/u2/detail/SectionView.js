@@ -107,7 +107,7 @@ foam.CLASS({
             })
             .callIf(section$subTitle, function() {
               if ( foam.Function.isInstance(self.section.subTitle) ) {
-                const slot$ = ExpressionSlot.create({
+                const slot$ = foam.core.ExpressionSlot.create({
                   args: [ self.evaluateMessage$, self.data$ ],
                   code: section.subTitle
                 });
