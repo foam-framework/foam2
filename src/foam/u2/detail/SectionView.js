@@ -84,8 +84,7 @@ foam.CLASS({
       name: 'loadLatch',
       preSet: function(o, n) {
         return ! ( o || n );
-      },
-      value: true
+      }
     }
   ],
 
