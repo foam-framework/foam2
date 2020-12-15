@@ -86,8 +86,6 @@ foam.CLASS({
                           })
                         })
                       .end();
-
-                      console.log(tab);
                   })
                 .end();
             }))
