@@ -10,19 +10,22 @@
   extends: 'foam.u2.Element',
 
   imports: [
+    'memento',
     'stack'
   ],
 
   exports: [
     'as summaryView',
-    'dblclick'
+    'dblclick',
+    'memento'
   ],
 
   requires: [
     'foam.dao.FnSink',
     'foam.mlang.sink.Count',
     'foam.u2.view.TableView',
-    'foam.comics.v2.DAOControllerConfig'
+    'foam.comics.v2.DAOControllerConfig',
+    'foam.nanos.controller.Memento'
   ],
 
   css: `
@@ -173,6 +176,7 @@
       factory: () => {
         return function(obj, id) {
           if ( ! this.stack ) return;
+
           this.stack.push({
             class: 'foam.comics.v2.DAOSummaryView',
             data: obj,
@@ -181,6 +185,11 @@
           }, this);
         }
       }
+    },
+    'currentMemento',
+    {
+      class: 'Boolean',
+      name: 'isInit'
     }
   ],
 
@@ -193,9 +202,28 @@
     function init() {
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.updateCount })));
       this.updateCount();
+
+      if ( this.memento )
+        this.currentMemento$ = this.memento.tail$;
+      else
+        this.currentMemento$ = this.memento$;
     },
 
     function initE() {
+      if ( this.currentMemento ) {
+        var id = this.currentMemento.head;
+        if ( ! isNaN(id) ) {
+          id = parseInt(this.currentMemento.head);
+        }
+
+        this.stack.push({
+          class: 'foam.comics.v2.DAOSummaryView',
+          data: null,
+          config: this.config,
+          id: id
+        }, this);
+      }
+
       this.
         addClass(this.myClass()).
         on('scroll', this.onScroll).
@@ -240,7 +268,14 @@
           delete this.renderedPages_[i];
         });
         this.updateRenderedPages_();
-        if ( this.el() ) this.el().scrollTop = 0;
+        if ( this.el() && ! this.isInit && this.memento.paramsObj.record ) {
+          var scroll = this.TABLE_HEAD_HEIGHT + this.memento.paramsObj.record * this.rowHeight;
+          scroll = scroll >= this.TABLE_HEAD_HEIGHT && scroll < this.scrollHeight ? scroll : 0;
+
+          document.getElementById(this.id).scrollTop = scroll;
+
+          this.isInit = true;
+        } else if ( this.el() ) this.el().scrollTop = 0;
       }
     },
     {
@@ -288,6 +323,8 @@
       isFramed: true,
       code: function(e) {
         this.scrollPos_ = e.target.scrollTop;
+        this.memento.paramsObj.record = this.scrollPos_ >= this.TABLE_HEAD_HEIGHT && this.scrollPos_ < this.scrollHeight ? Math.floor(( this.scrollPos_ - this.TABLE_HEAD_HEIGHT ) / this.rowHeight) : 0;
+        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
       }
     },
     {
