@@ -415,6 +415,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ruler/ConfigureUCJExpiryOnGranted" },
   { name: "foam/nanos/crunch/ruler/SaveUCJDataOnGranted" },
   //views
+  { name: "foam/nanos/crunch/ui/WizardState" },
   { name: "foam/nanos/crunch/ui/UserCapabilityJunctionWAO" },
   { name: "foam/nanos/crunch/ui/CapableWAO" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },

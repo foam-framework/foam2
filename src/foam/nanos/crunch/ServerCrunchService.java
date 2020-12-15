@@ -19,6 +19,7 @@ import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.crunch.lite.Capable;
 import foam.nanos.crunch.CapabilityJunctionPayload;
+import foam.nanos.crunch.ui.WizardState;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 
@@ -485,6 +486,79 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
               ucj.getStatus() != CapabilityJunctionStatus.PENDING &&
               ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return true;
     return false;
+  }
+
+  public WizardState getWizardState(X x, String capabilityId) {
+    var subject = (Subject) x.get("subject");
+
+    if ( ! subject.isAgent() ) {
+      return getWizardStateFor_(x, subject, capabilityId);
+    }
+
+    { // Save unassociated wizard states if none exist yet
+      var realUser = new Subject();
+      realUser.setUser(subject.getRealUser());
+      realUser.setUser(subject.getRealUser());
+      getWizardStateFor_(x, realUser, capabilityId);
+      var effectiveUser = new Subject();
+      effectiveUser.setUser(subject.getUser());
+      effectiveUser.setUser(subject.getUser());
+      getWizardStateFor_(x, effectiveUser, capabilityId);
+    }
+
+    return getWizardStateFor_(x, subject, capabilityId);
+  }
+
+  private WizardState getWizardStateFor_(X x, Subject s, String capabilityId) {
+    var wizardStateDAO = (DAO) x.get("wizardStateDAO");
+
+    var wizardState = new WizardState.Builder(x)
+      .setRealUser(s.getRealUser().getId())
+      .setEffectiveUser(s.getUser().getId())
+      .setCapability(capabilityId)
+      .build();
+
+    var wizardStateFind = wizardStateDAO.find(wizardState);
+
+    if ( wizardStateFind != null ) return (WizardState) wizardStateFind;
+
+    wizardState.setIgnoreList(getGrantedFor_(x, s, capabilityId));
+    wizardStateDAO.put(wizardState);
+    return wizardState;
+  }
+
+  private String[] getGrantedFor_(X x, Subject s, String capabilityId) {
+    x = x.put("subject", s);
+    var capsOrLists = getCapabilityPath(x, capabilityId, false);
+    var granted = (List<String>) new ArrayList<String>();
+
+    var grantedStatuses = new CapabilityJunctionStatus[] {
+      CapabilityJunctionStatus.GRANTED,
+      CapabilityJunctionStatus.PENDING,
+      CapabilityJunctionStatus.APPROVED,
+    };
+
+    for ( Object obj : capsOrLists ) {
+      Capability cap;
+      if ( obj instanceof List ) {
+        var list = (List) obj;
+        cap = (Capability) list.get(list.size() - 1);
+      } else {
+        cap = (Capability) obj;
+      }
+
+      try {
+        var ucj = getJunction(x, cap.getId());
+        if ( IN(UserCapabilityJunction.STATUS, grantedStatuses).f(ucj) ) {
+          granted.add(cap.getId());
+        }
+      } catch ( RuntimeException e ) {
+        // This happens if getJunction was called with an unavailabile
+        // capability, which is fine here.
+      }
+    }
+
+    return granted.toArray(new String[0]);
   }
 
   private Predicate getAssociationPredicate_(X x) {

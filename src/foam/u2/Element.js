@@ -1596,10 +1596,14 @@ foam.CLASS({
       if ( translationService ) {
         /* Add the translation of the supplied source to the Element as a String */
         var translation = this.translationService.getTranslation(foam.locale, source, opt_default);
+        if ( foam.xmsg ) {
+          return this.tag({class: 'foam.i18n.InlineLocaleEditor', source: source, defaultText: opt_default, data: translation});
+        }
         return this.add(translation);
       }
       console.warn('Missing Translation Service in ', this.cls_.name);
-      return this.add(opt_default || 'NO TRANSLATION SERVICE OR DEFAULT');
+      opt_default = opt_default || 'NO TRANSLATION SERVICE OR DEFAULT';
+      return this.add(opt_default);
     },
 
     function add() {
@@ -1650,7 +1654,9 @@ foam.CLASS({
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
         } else if ( this.translationService && c && c.data && c.data.id ) {
+          // TODO: remove
           var key = c.data.id + '.' + c.clsInfo;
+          console.log('DEPRECATED, use translate() instead ******************* add translate ', key, c.default);
           var translation = this.translationService.getTranslation(foam.locale, key, c.default);
           return this.add(translation);
         } else {
