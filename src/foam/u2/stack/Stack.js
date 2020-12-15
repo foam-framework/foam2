@@ -92,20 +92,22 @@ foam.CLASS({
       this.pos = pos;
     },
     function setToNullCurrentMemento() {
+      /** setting the last not null memento in memento chain to null to update application controller memento value on stack.back **/
       var m = this.memento;
       var tail = this.memento.tail;
+      
       if ( tail == null ) {
         this.memento.value$.set('');
         return;
       }
+
       while(true) {
         if ( tail.tail == null ) {
           m.tail$.set(null);
           return;
-        } else {
-          m = tail;
-          tail = tail.tail;
         }
+        m = tail;
+        tail = tail.tail;
       }
     },
     function findCurrentMemento() {
@@ -113,9 +115,8 @@ foam.CLASS({
       while(true) {
         if ( tail.tail == null ) {
           return tail;
-        } else {
-          tail = tail.tail;
         }
+        tail = tail.tail;
       }
     }
   ],
