@@ -81,7 +81,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'skipLoading'
+      name: 'loadLatch',
     }
   ],
 
@@ -117,10 +117,10 @@ foam.CLASS({
               this.start().addClass('subtitle').add(slot$).end();
             })
             .start(self.Grid)
-              .add(this.slot(function(skipLoading) {
+              .add(this.slot(function(loadLatch) {
                 var view = this.E();
                 
-                if ( ! skipLoading ) {
+                if ( ! loadLatch ) {
                   if ( ! sectionContent ) {
                     view.forEach(section.properties, function(p, index) {
                       this.start(self.GUnit, {columns: p.gridColumns})
