@@ -73,16 +73,21 @@ foam.CLASS({
                         code: s.title
                       }) :
                       s.title$;
+
+                    var tab = foam.core.SimpleSlot.create();
                     this
-                      .start(self.Tab, { label$: title$ || self.defaultSectionLabel })
+                      .start(self.Tab, { label$: title$ || self.defaultSectionLabel }, tab)
                         .call(function() {
                           this.tag(self.SectionView, {
                             data$: self.data$,
                             section: s,
-                            showTitle: false
+                            showTitle: false,
+                            skipLoading$: tab.value.selected$.map(function(s) {return !s;})
                           })
                         })
                       .end();
+
+                      console.log(tab);
                   })
                 .end();
             }))

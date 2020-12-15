@@ -78,6 +78,10 @@ foam.CLASS({
           return this.getNestedPropValue(obj[props.shift()], props.join('.'))
         }
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'skipLoading'
     }
   ],
 
@@ -85,6 +89,8 @@ foam.CLASS({
     function initE() {
       var self = this;
       self.SUPER();
+
+      var sectionContent;
 
       self
         .addClass(self.myClass())
@@ -111,15 +117,28 @@ foam.CLASS({
               this.start().addClass('subtitle').add(slot$).end();
             })
             .start(self.Grid)
-              .forEach(section.properties, function(p, index) {
-                this.start(self.GUnit, {columns: p.gridColumns})
-                  .show(p.createVisibilityFor(self.data$, self.controllerMode$).map(mode => mode !== self.DisplayMode.HIDDEN))
-                  .tag(self.SectionedDetailPropertyView, {
-                    prop: p,
-                    data$: self.data$
-                  })
-                .end();
-              })
+              .add(this.slot(function(skipLoading) {
+                var view = this.E();
+                
+                if ( ! skipLoading ) {
+                  if ( ! sectionContent ) {
+                    view.forEach(section.properties, function(p, index) {
+                      this.start(self.GUnit, {columns: p.gridColumns})
+                        .show(p.createVisibilityFor(self.data$, self.controllerMode$).map(mode => mode !== self.DisplayMode.HIDDEN))
+                        .tag(self.SectionedDetailPropertyView, {
+                          prop: p,
+                          data$: self.data$
+                        })
+                      .end();
+                    });
+                    sectionContent = view;
+                  } else {
+                    return sectionContent;
+                  }
+                }
+
+                return view;
+              }))
             .end()
             .start(self.Cols)
               .style({
