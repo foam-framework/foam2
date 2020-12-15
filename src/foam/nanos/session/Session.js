@@ -303,8 +303,7 @@ foam.CLASS({
 
         if ( group != null ) {
           rtn = rtn
-            .put("group", group)
-            .put("appConfig", group.getAppConfig(rtn));
+            .put("group", group);
         }
         rtn = rtn.put("theme", ((Themes) x.get("themes")).findTheme(rtn));
 

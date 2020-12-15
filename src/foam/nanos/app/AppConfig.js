@@ -96,7 +96,7 @@ foam.CLASS({
           type: 'Context'
         },
         {
-          name: 'url',
+          name: 'host',
           type: 'String'
         }
       ],
@@ -109,27 +109,40 @@ foam.CLASS({
         appConfig.copyFrom(themeAppConfig);
       }
 
-      String configUrl = url;
+      String protocol = "http";
+      int port = 80;
+      String filename = null;
       HttpServletRequest req = x.get(HttpServletRequest.class);
       if ( req != null ) {
-        configUrl = ((Request) req).getRootURL().toString();
-      }
-      if ( ! foam.util.SafetyUtil.isEmpty(configUrl) ) {
-        if ( appConfig.getForceHttps() ) {
-          if ( configUrl.startsWith("https://") ) {
-             // nop
-          } else if ( configUrl.startsWith("http://") ) {
-            configUrl = "https" + configUrl.substring(4);
-          } else {
-            configUrl = "https://" + configUrl;
+        String surl = ((Request) req).getRootURL().toString();
+        try {
+          java.net.URL url = new java.net.URL(surl);
+          protocol = url.getProtocol();
+          port = url.getPort();
+          filename = url.getFile();
+          if ( host == null ) {
+            host = url.getHost();
           }
+        } catch (java.net.MalformedURLException e ) {
+          ((foam.nanos.logger.Logger) x.get("logger")).error(surl, e);
         }
-        if ( configUrl.endsWith("/") ) {
-          configUrl = configUrl.substring(0, configUrl.length()-1);
-        }
-        appConfig.setUrl(configUrl);
       }
-
+      if ( ! "https".equals(protocol) &&
+           appConfig.getForceHttps() ) {
+        protocol = "https";
+        port = 443;
+      }
+      if ( host == null ) {
+        host = "localhost";
+      } else if ( host.endsWith("/") ) {
+        host = host.substring(0, host.length() -1);
+      }
+      try {
+        java.net.URL url = new java.net.URL(protocol, host, port, filename);
+        appConfig.setUrl(url.toString());
+      } catch (java.net.MalformedURLException e) {
+        ((foam.nanos.logger.Logger) x.get("logger")).error(e);
+      }
       return appConfig;
       `
     }

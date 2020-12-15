@@ -76,6 +76,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/ServiceProviderAwareSupport" },
   { name: "foam/nanos/auth/test/ServiceProviderAwareTest" },
   { name: "foam/nanos/auth/test/UserAndGroupPermissionTest" },
+  { name: "foam/nanos/auth/SpidGroupURL" },
   { name: "foam/nanos/auth/Language" },
   { name: 'foam/nanos/auth/LanguageChoiceView', flags: ['web'] },
   { name: "foam/nanos/auth/CreatedAwareDAO" },

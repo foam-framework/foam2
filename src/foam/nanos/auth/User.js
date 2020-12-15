@@ -614,6 +614,30 @@ foam.CLASS({
         }
         return spid_;
       `
+    },
+    {
+      documentation: 'URL that this user will use to contact the server.',
+      name: 'url',
+      class: 'String',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      storageTransient: true,
+      javaFactory: `
+      foam.dao.DAO dao = (foam.dao.DAO) getX().get("localSpidGroupURLDAO");
+      Group group = findGroup(getX());
+      while ( true ) {
+        SpidGroupURL sgu = (SpidGroupURL) dao.find(new SpidGroupURLId(getSpid(), group.getId()));
+        if ( sgu != null ) {
+          return sgu.getUrl();
+        }
+        group = group.findParent(getX());
+        if ( group == null ) {
+          break;
+        }
+      }
+      ((foam.nanos.logger.Logger) getX().get("logger")).warning("URL not found", "user", getId());
+      return "http://localhost:8080";
+      `
     }
   ],
 

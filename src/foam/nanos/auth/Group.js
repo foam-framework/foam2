@@ -220,35 +220,35 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
         return junctions.some((j) => foam.nanos.auth.Permission.create({ id: j.targetId }).implies(permissionId));
       }
     },
-    {
-      name: 'getAppConfig',
-      type: 'foam.nanos.app.AppConfig',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      javaCode: `
-        // Find Group details, by iterating up through group.parent
-        Group group               = this;
-        DAO groupDAO              = (DAO) x.get("groupDAO");
+    // {
+    //   name: 'getAppConfig',
+    //   type: 'foam.nanos.app.AppConfig',
+    //   args: [
+    //     {
+    //       name: 'x',
+    //       type: 'Context'
+    //     }
+    //   ],
+    //   javaCode: `
+    //     // Find Group details, by iterating up through group.parent
+    //     Group group               = this;
+    //     DAO groupDAO              = (DAO) x.get("groupDAO");
 
-        String configUrl           = "";
+    //     String configUrl           = "";
 
-        // Get support info and url off group or parents.
-        while ( group != null ) {
-          configUrl = ! SafetyUtil.isEmpty(group.getUrl()) && SafetyUtil.isEmpty(configUrl) ?
-              group.getUrl() : configUrl;
+    //     // Get support info and url off group or parents.
+    //     while ( group != null ) {
+    //       configUrl = ! SafetyUtil.isEmpty(group.getUrl()) && SafetyUtil.isEmpty(configUrl) ?
+    //           group.getUrl() : configUrl;
 
-          if ( ! SafetyUtil.isEmpty(group.getUrl()) && ! SafetyUtil.isEmpty(configUrl) ) break;
-          group = (Group) groupDAO.find(group.getParent());
-        }
+    //       if ( ! SafetyUtil.isEmpty(group.getUrl()) && ! SafetyUtil.isEmpty(configUrl) ) break;
+    //       group = (Group) groupDAO.find(group.getParent());
+    //     }
 
-        AppConfig config = (AppConfig) x.get("appConfig");
-        return config.configure(x, configUrl);
-        `
-    },
+    //     AppConfig config = (AppConfig) x.get("appConfig");
+    //     return config.configure(x, configUrl);
+    //     `
+    // },
     {
       name: 'isDescendantOf',
       code: async function(groupId, groupDAO) {
