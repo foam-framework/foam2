@@ -121,7 +121,8 @@ foam.CLASS({
       factory: function() {
         return this.id;
       }
-    }
+    },
+    'id'
   ],
 
   actions: [
