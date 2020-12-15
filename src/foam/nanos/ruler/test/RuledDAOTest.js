@@ -10,7 +10,6 @@ foam.CLASS({
   extends: 'foam.nanos.test.Test',
 
   javaImports: [
-    'foam.core.ClassInfo',
     'foam.dao.DAO',
     'foam.dao.GUIDDAO',
     'foam.dao.MDAO',
@@ -23,6 +22,8 @@ foam.CLASS({
       name: 'runTest',
       javaCode: `
         RuledDAOTest_find_ruled_obj_without_predicate(x);
+        RuledDAOTest_find_ruled_obj_with_truthy_predicate(x);
+        RuledDAOTest_find_ruled_obj_with_falsely_predicate(x);
       `
     },
     {
@@ -30,7 +31,7 @@ foam.CLASS({
       type: 'DAO',
       args: [
         { type: 'Context', name: 'x' },
-        { type: 'ClassInfo', name: 'of' }
+        { type: 'Class', name: 'of' }
       ],
       javaCode: `
         return new RuledDAO.Builder(x).setDelegate(
@@ -45,8 +46,30 @@ foam.CLASS({
       ],
       javaCode: `
         var dao = setUpDAO(x, RuledDummy.getOwnClassInfo());
-        var found = dao.put(new RuledDummy());
-        test(found != null, "Find ruled obj without predicate");
+        var obj = dao.put(new RuledDummy());
+        test(obj != null && dao.find(obj).equals(obj), "Find ruled obj without predicate");
+      `
+    },
+    {
+      name: 'RuledDAOTest_find_ruled_obj_with_truthy_predicate',
+      args: [
+        { type: 'Context', name: 'x' }
+      ],
+      javaCode: `
+        var dao = setUpDAO(x, RuledDummy.getOwnClassInfo());
+        var obj = dao.put(new RuledDummy.Builder(x).setPredicate(TRUE).build());
+        test(obj != null && dao.find(obj).equals(obj), "Find ruled obj with truthy predicate");
+      `
+    },
+    {
+      name: 'RuledDAOTest_find_ruled_obj_with_falsely_predicate',
+      args: [
+        { type: 'Context', name: 'x' }
+      ],
+      javaCode: `
+        var dao = setUpDAO(x, RuledDummy.getOwnClassInfo());
+        var obj = dao.put(new RuledDummy.Builder(x).setPredicate(FALSE).build());
+        test(obj != null && dao.find(obj) == null, "Find ruled obj with falsely predicate");
       `
     }
   ]
