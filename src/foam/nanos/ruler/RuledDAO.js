@@ -17,6 +17,21 @@ foam.CLASS({
     'static foam.mlang.MLang.*'
   ],
 
+  properties: [
+    {
+      name: 'delegate',
+      javaPostSet: 'setOf(val.getOf());'
+    },
+    {
+      name: 'of',
+      javaPreSet: `
+        if ( ! Ruled.class.isAssignableFrom(val.getObjClass()) ) {
+          throw new RuntimeException("RuledDAO error: " + val.getId() + " must extend " + Ruled.class.getName());
+        }
+      `
+    }
+  ],
+
   methods: [
     {
       name: 'cmd_',
@@ -26,9 +41,7 @@ foam.CLASS({
           // object re-assignment from within AbstractSink doesn't compile.
           Object[] result = { null };
           getDelegate()
-            .where(AND(
-              INSTANCE_OF(Ruled.getOwnClassInfo()),
-              EQ(Ruled.RULE_GROUP, ((FindRuledCommand) obj).getRuleGroup()) ))
+            .where(EQ(Ruled.RULE_GROUP, ((FindRuledCommand) obj).getRuleGroup()))
             .orderBy(DESC(Ruled.PRIORITY))
             .select(new AbstractSink() {
               @Override
