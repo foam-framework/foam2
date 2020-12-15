@@ -29,10 +29,10 @@ foam.CLASS({
   ],
 
   imports: [
-    'stack',
-    'notify',
     'dao? as importedDAO',
-    'memento'
+    'notify',
+    'memento',
+    'stack'
   ],
 
   exports: [
