@@ -45,7 +45,8 @@ foam.CLASS({
         .start('div')
           .addClass('file-image-div')
           .style({
-            visibility: 'hidden'
+            visibility: 'hidden',
+            display: 'none'
           })
           .start('img')
             .addClass('file-image')
@@ -54,7 +55,8 @@ foam.CLASS({
         .start('iframe')
           .addClass('file-iframe')
           .style({
-            visibility: 'hidden'
+            visibility: 'hidden',
+            display: 'none'
           })
         .end();
       this.data$.sub(() => this.showData());
@@ -68,6 +70,7 @@ foam.CLASS({
           pos;
 
       iFrame.style.visibility = 'hidden';
+      iFrame.style.display = 'none';
       div.style.visibility = 'hidden';
       div.style.display = 'none';
 
@@ -89,6 +92,7 @@ foam.CLASS({
       } else {
         iFrame.src = url;
         iFrame.style.visibility = 'visible';
+        iFrame.style.display = 'block';
       }
     }
   ]
