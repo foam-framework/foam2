@@ -275,7 +275,7 @@ foam.CLASS({
         } else {
           mementoColumn.order = orderLetter;
         }
-        this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
+        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
       }
     },
 
@@ -297,7 +297,7 @@ foam.CLASS({
         }
       }
       this.memento.paramsObj.columns = newMementoColumns;
-      this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
+      this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj)
 
       this.isColumnChanged = ! this.isColumnChanged;
     },

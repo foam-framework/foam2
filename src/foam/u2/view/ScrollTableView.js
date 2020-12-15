@@ -324,7 +324,7 @@
       code: function(e) {
         this.scrollPos_ = e.target.scrollTop;
         this.memento.paramsObj.record = this.scrollPos_ >= this.TABLE_HEAD_HEIGHT && this.scrollPos_ < this.scrollHeight ? Math.floor(( this.scrollPos_ - this.TABLE_HEAD_HEIGHT ) / this.rowHeight) : 0;
-        this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
+        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
       }
     },
     {

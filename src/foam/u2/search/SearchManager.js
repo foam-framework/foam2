@@ -155,7 +155,7 @@ foam.CLASS({
             delete this.memento.paramsObj.filters;
           }
           
-          this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
+          this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
         }
         
       }

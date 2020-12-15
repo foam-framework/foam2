@@ -123,7 +123,7 @@ foam.CLASS({
       else
         delete this.memento.paramsObj.selectedView;
 
-      this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
+      this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
     }
   ]
 });

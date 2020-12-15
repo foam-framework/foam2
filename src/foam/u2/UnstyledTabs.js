@@ -69,7 +69,7 @@ foam.CLASS({
         return;
       if ( this.memento ) {
         this.memento.paramsObj.selectedTab = this.selected.label;
-        this.memento.paramsObj = Object.assign({}, this.memento.paramsObj);
+        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
       }
     }
   ]
