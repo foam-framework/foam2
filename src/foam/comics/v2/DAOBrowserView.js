@@ -117,9 +117,9 @@ foam.CLASS({
   ],
 
   imports: [
-    'stack?',
     'ctrl',
-    'memento'
+    'memento',
+    'stack?'
   ],
 
   exports: [
