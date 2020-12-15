@@ -321,6 +321,7 @@ FOAM_FILES([
   // foam/nanos/ruler
   { name: "foam/nanos/ruler/RuleGroup" },
   { name: "foam/nanos/ruler/Operations" },
+  { name: "foam/nanos/ruler/FindRuledCommand" },
   { name: "foam/nanos/ruler/Ruled" },
   { name: "foam/nanos/ruler/Rule" },
   { name: "foam/nanos/ruler/RuleAction" },

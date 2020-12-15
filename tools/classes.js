@@ -576,6 +576,7 @@ var classes = [
   'foam.flow.DocumentMenu',
 
   'foam.nanos.ruler.RuleGroup',
+  'foam.nanos.ruler.FindRuledCommand',
   'foam.nanos.ruler.Ruled',
   'foam.nanos.ruler.Rule',
   'foam.nanos.ruler.RuledDAO',

@@ -9,39 +9,33 @@ foam.CLASS({
   name: 'RuledDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: 'Applied ruled (i.e, rule-like model) predicate on find_ and select_.',
+  documentation: 'Finds applicable ruled (i.e, rule-like) object by FindRuledCommand.',
 
   javaImports: [
-    'foam.mlang.predicate.AbstractPredicate',
-    'foam.mlang.predicate.Predicate',
-    'foam.nanos.ruler.Ruled'
+    'foam.dao.ArraySink',
+    'static foam.mlang.MLang.*'
   ],
 
   methods: [
     {
-      name: 'find_',
+      name: 'cmd_',
       javaCode: `
-        var ret = getDelegate().find_(x, id);
-        if ( ret instanceof Ruled ) {
-          return ((Ruled) ret).f(x) ? ret: null;
-        }
-        return ret;
-      `
-    },
-    {
-      name: 'select_',
-      javaCode: `
-        Predicate ruledPredicate = new AbstractPredicate(x) {
-          @Override
-          public boolean f(Object obj) {
-            if ( predicate != null && ! predicate.f(obj) ) return false;
-            if ( obj instanceof Ruled ) {
-              return ((Ruled) obj).f(x);
+        if ( obj instanceof FindRuledCommand ) {
+          var sink = (ArraySink) getDelegate()
+            .where(AND(
+              INSTANCE_OF(Ruled.getOwnClassInfo()),
+              EQ(Ruled.RULE_GROUP, ((FindRuledCommand) obj).getRuleGroup()) ))
+            .orderBy(DESC(Ruled.PRIORITY))
+            .select(new ArraySink());
+
+          for ( var o : sink.getArray() ) {
+            if ( ((Ruled) o).f(x) ) {
+              return o;
             }
-            return true;
           }
-        };
-        return getDelegate().select_(x, sink, skip, limit, order, ruledPredicate);
+          return null;
+        }
+        return getDelegate().cmd_(x, obj);
       `
     }
   ]
