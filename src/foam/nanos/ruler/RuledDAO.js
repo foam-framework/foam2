@@ -12,7 +12,8 @@ foam.CLASS({
   documentation: 'Finds applicable ruled (i.e, rule-like) object by FindRuledCommand.',
 
   javaImports: [
-    'foam.dao.ArraySink',
+    'foam.core.Detachable',
+    'foam.dao.AbstractSink',
     'static foam.mlang.MLang.*'
   ],
 
@@ -21,19 +22,24 @@ foam.CLASS({
       name: 'cmd_',
       javaCode: `
         if ( obj instanceof FindRuledCommand ) {
-          var sink = (ArraySink) getDelegate()
+          // NOTE: use array to collect the first matching object since plain
+          // object re-assignment from within AbstractSink doesn't compile.
+          Object[] result = { null };
+          getDelegate()
             .where(AND(
               INSTANCE_OF(Ruled.getOwnClassInfo()),
               EQ(Ruled.RULE_GROUP, ((FindRuledCommand) obj).getRuleGroup()) ))
             .orderBy(DESC(Ruled.PRIORITY))
-            .select(new ArraySink());
-
-          for ( var o : sink.getArray() ) {
-            if ( ((Ruled) o).f(x) ) {
-              return o;
-            }
-          }
-          return null;
+            .select(new AbstractSink() {
+              @Override
+              public void put(Object o, Detachable s) {
+                if ( ((Ruled) o).f(x) ) {
+                  result[0] = o;
+                  s.detach();
+                }
+              }
+            });
+          return result[0];
         }
         return getDelegate().cmd_(x, obj);
       `
