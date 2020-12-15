@@ -101,7 +101,7 @@ foam.CLASS({
         return;
       }
 
-      while(true) {
+      while ( true ) {
         if ( tail.tail == null ) {
           m.tail$.set(null);
           return;
@@ -112,7 +112,7 @@ foam.CLASS({
     },
     function findCurrentMemento() {
       var tail = this.memento;
-      while(true) {
+      while ( true ) {
         if ( tail.tail == null ) {
           return tail;
         }
