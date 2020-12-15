@@ -31,12 +31,14 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'capabilityIds',
-      section: 'capabilityInformation'
+      section: 'capabilityInformation',
+      visibility: 'HIDDEN'
     },
     {
       class: 'String',
       name: 'DAOKey',
-      section: 'capabilityInformation'
+      section: 'capabilityInformation',
+      visibility: 'HIDDEN'
     }
   ],
 
