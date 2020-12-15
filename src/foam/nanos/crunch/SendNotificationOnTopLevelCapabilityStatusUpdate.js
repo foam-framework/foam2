@@ -69,7 +69,7 @@ foam.CLASS({
           HashMap<String, Object> args = new HashMap<>();
             args.put("capNameEn", cap.getName());
             args.put("capName", capabilityName);
-            args.put("junctionStatusEn", junction.getStatus());
+            args.put("junctionStatusEn", junction.getStatus().getLabel());
             args.put("junctionStatus", junctionStatus);
 
           Notification notification = new Notification();
