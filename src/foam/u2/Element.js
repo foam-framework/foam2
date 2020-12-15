@@ -1596,9 +1596,9 @@ foam.CLASS({
       if ( translationService ) {
         /* Add the translation of the supplied source to the Element as a String */
         var translation = this.translationService.getTranslation(foam.locale, source, opt_default);
-        // console.log('******************** translation', translation);
-        if ( foam.xmsg )
+        if ( foam.xmsg ) {
           return this.tag({class: 'foam.i18n.InlineLocaleEditor', source: source, defaultText: opt_default, data: translation});
+        }
         return this.add(translation);
       }
       console.warn('Missing Translation Service in ', this.cls_.name);

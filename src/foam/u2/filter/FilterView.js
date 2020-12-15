@@ -27,7 +27,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'searchColumns'
+    'searchColumns',
+    'memento'
   ],
 
   exports: [
@@ -267,12 +268,20 @@ foam.CLASS({
       expression: function(filterController$isAdvanced) {
         return filterController$isAdvanced ? this.LINK_SIMPLE : this.LINK_ADVANCED;
       }
-    }
+    },
+    'searchValue'
   ],
 
   methods: [
     function initE() {
       var self = this;
+
+      if ( this.memento && this.memento.paramsObj.filters ) {
+        this.memento.paramsObj.filters.forEach(f => {
+          self.filterController.setExistingPredicate(f.criteria, f.name, foam.json.parseString(f.pred, this.__subContext__));
+        });
+      }
+
       this.onDetach(this.filterController$.dot('isAdvanced').sub(this.isAdvancedChanged));
       this.addClass(self.myClass())
         .add(this.slot(function(filters) {
@@ -289,6 +298,7 @@ foam.CLASS({
               richSearch: true,
               of: self.dao.of.id,
               onKey: true,
+              searchValue: self.searchValue,
               viewSpec: {
                 class: 'foam.u2.tag.Input',
                 placeholder: 'Search'

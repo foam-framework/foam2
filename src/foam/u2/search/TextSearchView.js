@@ -20,6 +20,10 @@ foam.CLASS({
   name: 'TextSearchView',
   extends: 'foam.u2.View',
 
+  imports: [
+    'memento'
+  ],
+
   requires: [
     'foam.parse.QueryParser',
     'foam.u2.tag.Input'
@@ -90,7 +94,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'onKey'
-    }
+    },
+    'searchValue'
   ],
 
   methods: [
@@ -106,6 +111,10 @@ foam.CLASS({
 
       this.view.data$.sub(this.updateValue);
       this.updateValue();
+
+      if ( this.searchValue ) {
+        this.view.data = this.searchValue;
+      }
     },
 
     function clear() {
@@ -121,6 +130,16 @@ foam.CLASS({
       mergeDelay: 500,
       code: function() {
         var value = this.view.data;
+
+        if (  this.memento ) {
+          if ( value ) {
+            this.memento.paramsObj.search = value;
+          } else {
+            delete this.memento.paramsObj.search;
+          }
+          this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
+        }
+        
         this.predicate = ! value ?
           this.True.create() :
           this.richSearch ?
