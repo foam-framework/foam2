@@ -49,18 +49,42 @@ foam.CLASS({
       name: 'message',
       getter: function() {
         var msg = this.message_;
-        if ( foam.locale ) {
-          msg = msg || this.messageMap[foam.locale];
-          if ( ! msg && foam.locale ) {
-            var i = foam.locale.indexOf('-');
-            var lang = ( i == -1 ) ? foam.locale : foam.locale.substring(0, 2);
-            msg = msg || this.messageMap[foam.lang];
+
+        if ( foam.Undefined.isInstance(msg) ) {
+          if ( foam.locale )
+            msg = this.messageMap[foam.locale] || this.messageMap[foam.lang];
+
+          msg = msg || this.messageMap.en;
+
+          // While booting, foam.i18n may not have loaded yet
+          if ( foam.i18n && foam.xmsg ) {
+            var msg_ = msg;
+            // Create an object which can be used to call toString() on, but
+            // also has a toE() method.
+            msg = {
+              asJavaValue: function() {
+                return foam.java.asJavaValue(msg_);
+              },
+              toE: () => {
+                return foam.i18n.InlineLocaleEditor.create({
+                  //source: this.sourceCls_ + '.' + this.name,
+                  defaultText: msg_,
+                  data: msg_});
+              },
+              toString: function() {
+                return msg_;
+              }
+            };
           }
+
+          this.message_ = msg;
         }
-        return msg || this.messageMap.en;
+
+        return msg;
       },
       setter: function(m) {
-        this.message_ = this.messageMap[foam.locale] = m;
+        this.messageMap[foam.locale] = m;
+        this.message_ = undefined;
       }
     },
     {
@@ -71,16 +95,15 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) {
-      cls[this.name] = this.message;
-      /*
+      var self = this;
       Object.defineProperty(
         cls,
         this.name,
         {
-          value: this.message,
+          get: function() { return self.message; },
+          set: function(v) { self.messageMap[foam.locale] = v; self.message_ = undefined; },
           configurable: false
         });
-        */
     },
 
     function installInProto(proto) {
