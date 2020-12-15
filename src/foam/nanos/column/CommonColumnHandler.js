@@ -130,6 +130,6 @@ foam.CLASS({
         filteredArr.push(valuesArray[indexes[i]]);
       }
       return filteredArr;
-    },
+    }
   ]
 });

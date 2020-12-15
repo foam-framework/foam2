@@ -104,22 +104,32 @@ foam.CLASS({
           return self.Rows.create()
             .show(section.createIsAvailableFor(self.data$))
             .callIf(showTitle && section$title, function() {
-              var slot$ = foam.Function.isInstance(self.section.title) ?
-                foam.core.ExpressionSlot.create({
+              if ( foam.Function.isInstance(self.section.title) ) {
+                const slot$ = foam.core.ExpressionSlot.create({
                   args: [ self.evaluateMessage$, self.data$ ],
                   obj$: self.data$,
                   code: section.title
-                }) : section.title$;
-              this.start('h2').add(slot$).end();
+                });
+                if ( slot$.value ) {
+                  this.start('h2').add(slot$.value).end();
+                }
+              } else {
+                this.start('h2').add(section.title).end();
+              }
             })
             .callIf(section$subTitle, function() {
-              var slot$ = foam.Function.isInstance(self.section.subTitle) ?
-              foam.core.ExpressionSlot.create({
-                args: [ self.evaluateMessage$, self.data$ ],
-                obj$: self.data$,
-                code: section.subTitle
-              }) : section.subTitle$;
-              this.start().addClass('subtitle').add(slot$).end();
+              if ( foam.Function.isInstance(self.section.subTitle) ) {
+                const slot$ = foam.core.ExpressionSlot.create({
+                  args: [ self.evaluateMessage$, self.data$ ],
+                  obj$: self.data$,
+                  code: section.subTitle
+                });
+                if ( slot$.value ) {
+                  this.start().addClass('subtitle').add(slot$.value).end();
+                }
+              } else {
+                this.start().addClass('subtitle').add(section.subTitle).end();
+              }
             })
             .start(self.Grid)
               .add(this.slot(function(loadLatch) {

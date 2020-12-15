@@ -19,6 +19,14 @@ foam.CLASS({
   package: 'foam.u2.stack',
   name: 'Stack',
 
+  imports: [
+    'memento'
+  ],
+
+  requires: [
+    'foam.nanos.controller.Memento'
+  ],
+
   properties: [
     {
       name: 'stack_',
@@ -82,6 +90,34 @@ foam.CLASS({
       this.stack_.length = this.depth;
       this.stack_[pos] = [v, parent, opt_id];
       this.pos = pos;
+    },
+    function setToNullCurrentMemento() {
+      /** setting the last not null memento in memento chain to null to update application controller memento value on stack.back **/
+      var m = this.memento;
+      var tail = this.memento.tail;
+      
+      if ( tail == null ) {
+        this.memento.value$.set('');
+        return;
+      }
+
+      while ( true ) {
+        if ( tail.tail == null ) {
+          m.tail$.set(null);
+          return;
+        }
+        m = tail;
+        tail = tail.tail;
+      }
+    },
+    function findCurrentMemento() {
+      var tail = this.memento;
+      while ( true ) {
+        if ( tail.tail == null ) {
+          return tail;
+        }
+        tail = tail.tail;
+      }
     }
   ],
 
@@ -90,7 +126,10 @@ foam.CLASS({
       name: 'back',
       // icon: 'arrow_back',
       isEnabled: function(pos) { return pos > 0; },
-      code: function() { this.pos--; }
+      code: function() {
+        this.pos--;
+        this.setToNullCurrentMemento();
+      }
     },
     {
       name: 'forward',

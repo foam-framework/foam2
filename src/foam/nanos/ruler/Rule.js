@@ -7,6 +7,7 @@
  foam.CLASS({
   package: 'foam.nanos.ruler',
   name: 'Rule',
+  extends: 'foam.nanos.ruler.Ruled',
 
   documentation: 'Rule model represents rules(actions) that need to be applied in case passed object satisfies provided predicate.',
 
@@ -80,13 +81,7 @@
       section: 'basicInfo'
     },
     {
-      class: 'Int',
       name: 'priority',
-      documentation: 'Priority defines the order in which rules are to be applied.'+
-      'Rules with a higher priority are to be applied first.'+
-      'The convention for values is ints that are multiple of 10.',
-      readPermissionRequired: true,
-      writePermissionRequired: true,
       tableWidth: 66,
       section: 'basicInfo'
     },
@@ -139,18 +134,7 @@
       documentation: 'Defines if the rule needs to be applied before or after operation is completed'+
       'E.g. on dao.put: before object was stored in a dao or after.'
     },
-    {
-      class: 'foam.mlang.predicate.PredicateProperty',
-      name: 'predicate',
-      factory: function () {
-        return foam.mlang.predicate.True.create();
-      },
-      javaFactory: `
-      return foam.mlang.MLang.TRUE;
-      `,
-      documentation: 'predicate is checked against an object; if returns true, the action is executed.'+
-      'Defaults to return true.'
-    },
+    'predicate',
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.ruler.RuleAction',
@@ -166,12 +150,7 @@
       documentation: 'The action to be executed asynchronously if predicates returns true for passed object.'
     },
     {
-      class: 'Boolean',
       name: 'enabled',
-      value: true,
-      documentation: 'Enables the rule.',
-      readPermissionRequired: true,
-      writePermissionRequired: true,
       tableWidth: 70,
       section: 'basicInfo'
     },
