@@ -21,10 +21,6 @@
 
   properties: [
     {
-      class: 'String',
-      name: 'id'
-    },
-    {
       class: 'Boolean',
       name: 'enabled',
       documentation: 'Enables the rule.',
@@ -75,7 +71,8 @@
           } catch ( Throwable th ) { }
 
           ((Logger) x.get("logger")).error("Failed to evaluate predicate on",
-            "class: " + getClass().getName(), "id: " + getId(), t);
+            "class: " + getClass().getName(),
+            "id: " + String.valueOf(getProperty("id")), t);
           return false;
         }
       `

@@ -328,6 +328,8 @@ FOAM_FILES([
   { name: "foam/nanos/ruler/RuleHistory" },
   { name: "foam/nanos/ruler/RuleHistoryStatus" },
   { name: "foam/nanos/ruler/RuledDAO" },
+  { name: "foam/nanos/ruler/test/RuledDAOTest" },
+  { name: "foam/nanos/ruler/test/RuledDummy" },
   { name: "foam/nanos/ruler/RulerDAO" },
   { name: "foam/nanos/ruler/ScriptPredicate"},
   { name: "foam/nanos/ruler/UpdateRulesListSink" },
