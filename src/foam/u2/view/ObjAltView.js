@@ -55,16 +55,16 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-     if ( this.memento && this.memento.paramsObj.selectedView ) {
-      var view = this.views.find(v => v[1] === this.memento.paramsObj.selectedView);
-      if ( view ) {
-        this.selectedView = view[0];
+      if ( this.memento && this.memento.paramsObj.selectedView ) {
+        var view = this.views.find(v => v[1] === this.memento.paramsObj.selectedView);
+        if ( view ) {
+          this.selectedView = view[0];
+        } else {
+          this.selectedView = this.views[0][0];
+        }
       } else {
         this.selectedView = this.views[0][0];
       }
-     } else {
-      this.selectedView = this.views[0][0];
-     }
 
       this.addClass(this.myClass())
       this.startContext({data: this})
