@@ -43,6 +43,30 @@ foam.CLASS({
       }));
       return this;
     },
+    function addBefore(name, spec, args) {
+      for ( var i = 0; i < this.contextAgentSpecs.length; i++ ){
+        let ca = this.contextAgentSpecs[i];
+        if ( name == ca.name ) {
+          break;
+        }
+      }
+
+      var firstHalf = this.contextAgentSpecs.slice(0, i);
+      var secondHalf = this.contextAgentSpecs.slice(i);
+
+      this.contextAgentSpecs = [
+        ...firstHalf,
+        this.Step.create({
+          name: spec.name,
+          spec: spec,
+          args: args
+        }),
+        ...secondHalf
+      ]
+
+      return this;
+    },
+
     function reconfigure(name, args) {
       for ( let ca of this.contextAgentSpecs ) {
         if ( name == ca.name ) {
