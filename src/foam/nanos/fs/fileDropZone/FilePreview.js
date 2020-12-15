@@ -52,7 +52,6 @@ foam.CLASS({
     },
 
     function showData() {
-    debugger;
       let iFrame = document.getElementsByClassName('file-iframe' + this.id)[0],
           image = document.getElementsByClassName('file-image' + this.id)[0],
           div = document.getElementsByClassName('file-image-div' + this.id)[0],
