@@ -83,7 +83,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'loadLatch',
       preSet: function(o, n) {
-        return this.sectionContentViewSet ? o || n : n;
+        return this.sectionContentViewSet ? o : n;
       }
     },
     {
