@@ -13,9 +13,11 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.dao.DAO',
     'foam.util.SafetyUtil',
+    'foam.nanos.crunch.CapabilityIntercept',
     'foam.nanos.crunch.lite.Capable',
     'foam.nanos.crunch.CapabilityJunctionPayload',
     'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
     'java.util.Arrays',
     'java.util.ArrayList',
     'java.util.List'
@@ -96,6 +98,16 @@ foam.CLASS({
 
         for ( CapabilityJunctionPayload currentPayload : capablePayloads ){
           toPutCapablePayloadDAO.put(currentPayload);
+        }
+
+        if ( 
+          ! toPutCapableObj.checkRequirementsStatusNoThrow(x, toPutCapableObj.getCapabilityIds(), CapabilityJunctionStatus.GRANTED) &&
+          ! toPutCapableObj.checkRequirementsStatusNoThrow(x, toPutCapableObj.getCapabilityIds(), CapabilityJunctionStatus.PENDING)
+        ) {
+          CapabilityIntercept cre = new CapabilityIntercept();
+          cre.setDaoKey(getDaoKey());
+          cre.addCapable(toPutCapableObj);
+          throw cre;
         }
 
         return super.put_(x, obj);
