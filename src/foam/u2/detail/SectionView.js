@@ -99,7 +99,7 @@ foam.CLASS({
                   code: section.title
                 });
                 if ( slot$.value ) {
-                  this.start('h2').add(slot$).end();
+                  this.start('h2').add(slot$.value).end();
                 }
               } else {
                 this.start('h2').add(section.title).end();
@@ -112,7 +112,7 @@ foam.CLASS({
                   code: section.subTitle
                 });
                 if ( slot$.value ) {
-                  this.start().addClass('subtitle').add(slot$).end();
+                  this.start().addClass('subtitle').add(slot$.value).end();
                 }
               } else {
                 this.start().addClass('subtitle').add(section.subTitle).end();
