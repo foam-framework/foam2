@@ -50,8 +50,8 @@ foam.CLASS({
               return;
             }
 
-            if (
-              nu.getStatus() == AVAILABLE || nu.getStatus() == ACTION_REQUIRED
+            if ( nu.getStatus() == AVAILABLE ||
+              nu.getStatus() == ACTION_REQUIRED
             ) {
               // TODO: Update code when decision is made about isRenewable
               return;
