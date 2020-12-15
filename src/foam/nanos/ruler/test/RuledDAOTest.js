@@ -13,6 +13,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.dao.GUIDDAO',
     'foam.dao.MDAO',
+    'foam.mlang.ContextObject',
     'foam.nanos.ruler.FindRuledCommand',
     'foam.nanos.ruler.RuledDAO',
     'static foam.mlang.MLang.*'
@@ -26,6 +27,8 @@ foam.CLASS({
         RuledDAOTest_find_ruled_obj_order_by_priority(x);
         RuledDAOTest_find_ruled_obj_with_truthy_predicate(x);
         RuledDAOTest_find_ruled_obj_with_falsely_predicate(x);
+        RuledDAOTest_find_ruled_obj_with_context_predicate(x);
+        RuledDAOTest_find_ruled_obj_with_self_object_predicate(x);
       `
     },
     {
@@ -96,6 +99,32 @@ foam.CLASS({
 
         var notFound = dao.cmd(new FindRuledCommand("test"));
         test(notFound == null, "Find ruled obj with falsely predicate");
+      `
+    },
+    {
+      name: 'RuledDAOTest_find_ruled_obj_with_context_predicate',
+      args: [
+        { type: 'Context', name: 'x' }
+      ],
+      javaCode: `
+        var dao = setUpDAO(x, RuledDummy.getOwnClassInfo());
+        var obj = dao.put(new RuledDummy.Builder(x).setRuleGroup("test").setPredicate(EQ(new ContextObject("test_key"), "secret")).build());
+
+        var found = dao.inX(x.put("test_key", "secret")).cmd(new FindRuledCommand("test"));
+        test(found != null && obj.equals(found), "Find ruled obj with context predicate");
+      `
+    },
+    {
+      name: 'RuledDAOTest_find_ruled_obj_with_self_object_predicate',
+      args: [
+        { type: 'Context', name: 'x' }
+      ],
+      javaCode: `
+        var dao = setUpDAO(x, RuledDummy.getOwnClassInfo());
+        var obj = dao.put(new RuledDummy.Builder(x).setProp("foo").setRuleGroup("test").setPredicate(EQ(RuledDummy.PROP, "foo")).build());
+
+        var found = dao.cmd(new FindRuledCommand("test"));
+        test(found != null && obj.equals(found), "Find ruled obj with self object predicate");
       `
     }
   ]

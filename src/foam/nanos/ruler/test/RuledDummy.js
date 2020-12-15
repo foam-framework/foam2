@@ -15,6 +15,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id'
+    },
+    {
+      class: 'String',
+      name: 'prop'
     }
   ]
 })
