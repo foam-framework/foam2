@@ -7,9 +7,11 @@
 foam.CLASS({
   package: 'foam.apploader',
   name: 'NodeModelFileFetcher',
+
   properties: [
-    'root',
+    'root'
   ],
+
   methods: [
     function getFile(id) {
       var self = this;
@@ -23,6 +25,6 @@ foam.CLASS({
           ret(null);
         }
       });
-    },
+    }
   ]
 });

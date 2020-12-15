@@ -94,9 +94,9 @@ foam.CLASS({
         Action ifElseAction  = new Action() {
           @Override
           public Object execute(Object val, foam.lib.parse.ParserContext x) {
-            Object[] valArr = (Object[]) val;
+            Object[] valArr  = (Object[]) val;
             Object[] tempVal = (Object[]) valArr[0];
-            Object[] val0 = (Object[]) tempVal[0];
+            Object[] val0    = (Object[]) tempVal[0];
             StringBuilder ifCond = new StringBuilder();
             for ( int i = 0 ; i < val0.length ; i++ ) {
               if ( ! Character.isWhitespace((char)val0[i]) ) ifCond.append(val0[i]);
@@ -144,9 +144,9 @@ foam.CLASS({
         Action ifAction  = new Action() {
           @Override
           public Object execute(Object val, foam.lib.parse.ParserContext x) {
-            Object[] valArr = (Object[]) val;
+            Object[] valArr  = (Object[]) val;
             Object[] tempVal = (Object[]) valArr[0];
-            Object[] val0 = (Object[]) tempVal[0];
+            Object[] val0    = (Object[]) tempVal[0];
             StringBuilder ifCond = new StringBuilder();
             for ( int i = 0 ; i < val0.length ; i++ ) {
               if ( ! Character.isWhitespace((char) val0[i]) ) ifCond.append(val0[i]);
@@ -259,9 +259,9 @@ foam.CLASS({
         Action includeContentAction  = new Action() {
           @Override
           public Object execute(Object val, foam.lib.parse.ParserContext x) {
-            Object[] valArr = (Object[]) val;
+            Object[] valArr  = (Object[]) val;
             Object[] tempVal = (Object[]) valArr[0];
-            Object[] val0 = (Object[]) tempVal[0];
+            Object[] val0    = (Object[]) tempVal[0];
             StringBuilder templateName = new StringBuilder();
             for ( int i = 0 ; i < val0.length ; i++ ) {
               templateName.append(val0[i]);
@@ -294,8 +294,8 @@ foam.CLASS({
     {
       name: 'renderTemplateById',
       args: [
-        { name: 'x', type: 'Context' },
-        { name: 'id', type: 'String' },
+        { name: 'x',      type: 'Context' },
+        { name: 'id',     type: 'String' },
         { name: 'values', type: 'Map' }
       ],
       type: 'StringBuilder',
@@ -307,8 +307,8 @@ foam.CLASS({
     {
       name: 'renderTemplate',
       args: [
-        { name: 'x', type: 'Context' },
-        { name: 'str', type: 'String' },
+        { name: 'x',      type: 'Context' },
+        { name: 'str',    type: 'String' },
         { name: 'values', type: 'Map' }
       ],
       type: 'StringBuilder',
@@ -331,7 +331,7 @@ foam.CLASS({
     {
       name: 'outputContent',
       args: [
-        { name: 'body', type: 'String' },
+        { name: 'body',    type: 'String' },
         { name: 'content', type: 'String' }
       ],
       type: 'StringBuilder',
@@ -350,7 +350,7 @@ foam.CLASS({
     {
       name: 'joinTemplates',
       args: [
-        { name: 'x', type: 'Context' },
+        { name: 'x',    type: 'Context' },
         { name: 'body', type: 'CharSequence' }
       ],
       type: 'StringBuilder',
@@ -373,6 +373,7 @@ foam.CLASS({
       `
     }
   ],
+
   axioms: [
     {
       name: 'javaExtras',
@@ -390,6 +391,7 @@ foam.CLASS({
               return b;
             }
           };
+
           protected static ThreadLocal<StringBuilder> sbContent_ = new ThreadLocal<StringBuilder>() {
             @Override
             protected StringBuilder initialValue() {
@@ -402,6 +404,7 @@ foam.CLASS({
               return b;
             }
           };
+
           protected static ThreadLocal<StringBuilder> sbJoin_ = new ThreadLocal<StringBuilder>() {
             @Override
             protected StringBuilder initialValue() {

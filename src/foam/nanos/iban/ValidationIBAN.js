@@ -278,7 +278,7 @@ Columns: validation format, parsing format, example`,
           return `${this.LENGTH_MISMATCHED_1} ${(format.length + 2)} ${this.LENGTH_MISMATCHED_2} ${iban.length}`;
 
         for ( let i = 0 ; i < format.length ; i++ ) {
-          if ( ! this.validateChar(format.charAt(i), iban.charAt(i+2)) ) return `${this.INVALID_CHARACTER}  '${(i+2)}'`;
+          if ( ! this.validateChar(format.charAt(i), iban.charAt(i+2)) ) return `${this.INVALID_CHARACTER}  ${(i+2)}`;
         }
 
         let num = this.toNumber(iban);
