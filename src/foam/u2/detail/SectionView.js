@@ -82,6 +82,13 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'loadLatch',
+      preSet: function(o, n) {
+        if ( ! o && n ) {
+          return o;
+        }
+        return n;
+      },
+      value: true
     }
   ],
 
