@@ -23,9 +23,9 @@ foam.CLASS({
   requires: [
     'foam.comics.DAOUpdateController',
     'foam.log.LogLevel',
+    'foam.nanos.controller.Memento',
     'foam.u2.ControllerMode',
-    'foam.u2.DisplayMode',
-    'foam.nanos.controller.Memento'
+    'foam.u2.DisplayMode'
   ],
 
   imports: [

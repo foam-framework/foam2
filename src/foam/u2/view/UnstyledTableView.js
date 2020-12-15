@@ -37,9 +37,9 @@ foam.CLASS({
     'dblclick?',
     'editRecord?',
     'filteredTableColumns?',
+    'memento',
     'selection? as importSelection',
-    'stack?',
-    'memento'
+    'stack?'
   ],
 
   constants: [

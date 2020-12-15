@@ -47,17 +47,17 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.nanos.controller.Memento',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.ControllerMode',
-    'foam.u2.dialog.Popup',
-    'foam.nanos.controller.Memento'
+    'foam.u2.dialog.Popup'
   ],
 
   imports: [
     'auth',
-    'stack',
-    'memento'
+    'memento',
+    'stack'
   ],
 
   exports: [

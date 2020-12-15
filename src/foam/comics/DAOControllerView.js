@@ -13,20 +13,20 @@ foam.CLASS({
     'foam.comics.SearchMode',
     'foam.comics.DAOController',
     'foam.comics.DAOUpdateControllerView',
-    'foam.u2.view.ScrollTableView',
+    'foam.nanos.controller.Memento',
     'foam.nanos.u2.navigation.IFrameTopNavigation',
     'foam.u2.dialog.Popup',
-    'foam.nanos.controller.Memento'
+    'foam.u2.view.ScrollTableView'
   ],
 
   imports: [
     'createControllerView? as importedCreateControllerView',
     'data? as importedData',
+    'memento',
     'stack',
     'summaryView? as importedSummaryView',
     'updateView? as importedUpdateView',
     'window',
-    'memento',
     'translationService'
   ],
 

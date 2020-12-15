@@ -10,8 +10,8 @@
   extends: 'foam.u2.Element',
 
   imports: [
-    'stack',
-    'memento'
+    'memento',
+    'stack'
   ],
 
   exports: [

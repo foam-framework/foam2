@@ -13,6 +13,7 @@ foam.CLASS({
     'foam.comics.SearchMode',
     'foam.comics.v2.DAOControllerConfig',
     'foam.log.LogLevel',
+    'foam.nanos.controller.Memento',
     'foam.u2.ActionView',
     'foam.u2.dialog.Popup',
     'foam.u2.filter.FilterView',
@@ -20,8 +21,7 @@ foam.CLASS({
     'foam.u2.layout.Rows',
     'foam.u2.view.ScrollTableView',
     'foam.u2.view.SimpleSearch',
-    'foam.u2.view.TabChoiceView',
-    'foam.nanos.controller.Memento'
+    'foam.u2.view.TabChoiceView'
   ],
 
   implements: [
