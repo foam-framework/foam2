@@ -10,11 +10,13 @@ foam.CLASS({
   extends: 'foam.nanos.test.Test',
 
   javaImports: [
+    'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.GUIDDAO',
     'foam.dao.MDAO',
     'foam.nanos.ruler.RuledDAO',
-    'static foam.mlang.MLang.*'
+    'static foam.mlang.MLang.FALSE',
+    'static foam.mlang.MLang.TRUE'
   ],
 
   methods: [
@@ -24,6 +26,9 @@ foam.CLASS({
         RuledDAOTest_find_ruled_obj_without_predicate(x);
         RuledDAOTest_find_ruled_obj_with_truthy_predicate(x);
         RuledDAOTest_find_ruled_obj_with_falsely_predicate(x);
+        RuledDAOTest_select_ruled_obj_without_predicate(x);
+        RuledDAOTest_select_ruled_obj_with_truthy_predicate(x);
+        RuledDAOTest_select_ruled_obj_with_falsely_predicate(x);
       `
     },
     {
@@ -70,6 +75,44 @@ foam.CLASS({
         var dao = setUpDAO(x, RuledDummy.getOwnClassInfo());
         var obj = dao.put(new RuledDummy.Builder(x).setPredicate(FALSE).build());
         test(obj != null && dao.find(obj) == null, "Find ruled obj with falsely predicate");
+      `
+    },
+    {
+      name: 'RuledDAOTest_select_ruled_obj_without_predicate',
+      args: [
+        { type: 'Context', name: 'x' }
+      ],
+      javaCode: `
+        var dao = setUpDAO(x, RuledDummy.getOwnClassInfo());
+        var obj = (RuledDummy) dao.put(new RuledDummy());
+        var ret = ((ArraySink) dao.select(new ArraySink())).getArray();
+        test(ret.size() == 1 && ((RuledDummy) ret.get(0)).getId().equals(obj.getId())
+          , "Select ruled obj without predicate");
+      `
+    },
+    {
+      name: 'RuledDAOTest_select_ruled_obj_with_truthy_predicate',
+      args: [
+        { type: 'Context', name: 'x' }
+      ],
+      javaCode: `
+        var dao = setUpDAO(x, RuledDummy.getOwnClassInfo());
+        var obj = (RuledDummy) dao.put(new RuledDummy.Builder(x).setPredicate(TRUE).build());
+        var ret = ((ArraySink) dao.select(new ArraySink())).getArray();
+        test(ret.size() == 1 && ((RuledDummy) ret.get(0)).getId().equals(obj.getId())
+          , "Select ruled obj with truthy predicate");
+      `
+    },
+    {
+      name: 'RuledDAOTest_select_ruled_obj_with_falsely_predicate',
+      args: [
+        { type: 'Context', name: 'x' }
+      ],
+      javaCode: `
+        var dao = setUpDAO(x, RuledDummy.getOwnClassInfo());
+        var obj = (RuledDummy) dao.put(new RuledDummy.Builder(x).setPredicate(FALSE).build());
+        var ret = ((ArraySink) dao.select(new ArraySink())).getArray();
+        test(ret.size() == 0, "Select ruled obj with falsely predicate");
       `
     }
   ]
