@@ -97,8 +97,6 @@ foam.CLASS({
       var self = this;
       self.SUPER();
 
-      var sectionContent;
-
       self
         .addClass(self.myClass())
         .add(self.slot(function(section, showTitle, section$title, section$subTitle) {
@@ -128,21 +126,16 @@ foam.CLASS({
                 var view = this.E();
                 
                 if ( ! loadLatch ) {
-                  if ( ! sectionContent ) {
-                    view.forEach(section.properties, function(p, index) {
-                      this.start(self.GUnit, {columns: p.gridColumns})
-                        .show(p.createVisibilityFor(self.data$, self.controllerMode$).map(mode => mode !== self.DisplayMode.HIDDEN))
-                        .tag(self.SectionedDetailPropertyView, {
-                          prop: p,
-                          data$: self.data$
-                        })
-                      .end();
-                    });
-                    sectionContent = view;
-                    self.sectionContentViewSet = true;
-                  } else {
-                    return sectionContent;
-                  }
+                  view.forEach(section.properties, function(p, index) {
+                    this.start(self.GUnit, {columns: p.gridColumns})
+                      .show(p.createVisibilityFor(self.data$, self.controllerMode$).map(mode => mode !== self.DisplayMode.HIDDEN))
+                      .tag(self.SectionedDetailPropertyView, {
+                        prop: p,
+                        data$: self.data$
+                      })
+                    .end();
+                  });
+                  self.sectionContentViewSet = true;
                 }
 
                 return view;
