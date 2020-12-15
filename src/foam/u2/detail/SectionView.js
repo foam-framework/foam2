@@ -111,7 +111,7 @@ foam.CLASS({
                   args: [ self.evaluateMessage$, self.data$ ],
                   code: section.subTitle
                 });
-                if ( slot$.value ) { 
+                if ( slot$.value ) {
                   this.start().addClass('subtitle').add(slot$.value).end();
                 }
               } else {
