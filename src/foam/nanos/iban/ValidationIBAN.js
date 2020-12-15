@@ -354,7 +354,6 @@ Columns: validation format, parsing format, example`,
         let c = "";
         for ( let l = iban.length - 1; l >= 0 ; l-- ) {
           c = iban.charAt(l);
-          console.log(!!c);
           if ( c >= 'A' && c <= 'Z' ) {
             iban = iban.substring(0, l) + (10 + ( c.charCodeAt(0) - 'A'.charCodeAt(0) )) + iban.substring(l+1);
           }
