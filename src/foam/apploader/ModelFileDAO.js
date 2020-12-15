@@ -9,13 +9,15 @@ foam.CLASS({
   name: 'ModelFileDAO',
   documentation: 'ModelDAO which reads hand written models.',
   extends: 'foam.dao.AbstractDAO',
+
   properties: [
     {
       class: 'Map',
       name: 'cache'
     },
-    'fetcher',
+    'fetcher'
   ],
+
   methods: [
     {
       name: 'find_',
