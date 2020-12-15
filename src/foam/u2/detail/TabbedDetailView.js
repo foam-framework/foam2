@@ -82,7 +82,7 @@ foam.CLASS({
                             data$: self.data$,
                             section: s,
                             showTitle: false,
-                            skipLoading$: tab.value.selected$.map(function(s) {return !s;})
+                            skipLoading$: tab.value.selected$.map(function(s) {return ! s;})
                           })
                         })
                       .end();
