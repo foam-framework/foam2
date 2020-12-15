@@ -96,6 +96,7 @@ foam.CLASS({
               if ( foam.Function.isInstance(self.section.title) ) {
                 const slot$ = foam.core.ExpressionSlot.create({
                   args: [ self.evaluateMessage$, self.data$ ],
+                  obj$: self.data$,
                   code: section.title
                 });
                 if ( slot$.value ) {
@@ -109,6 +110,7 @@ foam.CLASS({
               if ( foam.Function.isInstance(self.section.subTitle) ) {
                 const slot$ = foam.core.ExpressionSlot.create({
                   args: [ self.evaluateMessage$, self.data$ ],
+                  obj$: self.data$,
                   code: section.subTitle
                 });
                 if ( slot$.value ) {
