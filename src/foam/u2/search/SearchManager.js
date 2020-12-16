@@ -24,6 +24,10 @@ foam.CLASS({
     'foam.mlang.predicate.True'
   ],
 
+  imports: [
+    'memento'
+  ],
+
   properties: [
     {
       name: 'views',
@@ -56,6 +60,15 @@ foam.CLASS({
   ],
 
   methods: [
+    function init() {
+      if ( this.memento && this.memento.paramsObj.filters && this.memento.paramsObj.filters.length > 0 ) {
+        var predicates = this.memento.paramsObj.filters.map(f => foam.json.parseString(f.pred, this.__subContext__));
+        this.predicate = this.And.create({
+          args: predicates
+        }).partialEval();
+      }
+    },
+
     function and(views) {
       return this.And.create({
         args: Object.keys(views).map(function(k) { return views[k].predicate; })
@@ -122,6 +135,29 @@ foam.CLASS({
         this.predicate = this.and(this.views);
         // That will tickle the expression for filteredDAO.
         this.updateViews();
+
+        var searches = [];
+        var keys = Object.keys(this.views);
+        if ( keys.length == 0 ) {
+          delete this.memento.paramsObj.filters;
+        } else {
+          var outputter = foam.json.Outputter.create({
+            strict: true
+          });
+          for ( var key of keys ) {
+            if ( ! foam.mlang.predicate.True.isInstance(this.views[key].predicate ) ) {
+              searches.push({ name: key, criteria: 0, pred: outputter.stringify(this.views[key].predicate) });
+            }
+          }
+          if ( searches.length > 0 ) {
+            this.memento.paramsObj.filters = searches;
+          } else {
+            delete this.memento.paramsObj.filters;
+          }
+          
+          this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
+        }
+        
       }
     },
     {

@@ -78,7 +78,7 @@ foam.CLASS({
     'lastMenuLaunchedListener',
     'loginSuccess',
     'loginVariables',
-    'mementoTail as memento',
+    'memento',
     'menuListener',
     'notify',
     'pushMenu',
@@ -189,10 +189,9 @@ foam.CLASS({
     {
       name: 'memento',
       factory: function() {
-        return this.Memento.create({tail$: this.mementoTail$});
+        return this.Memento.create();
       }
     },
-    'mementoTail',
     {
       name: 'loginVariables',
       expression: function(client$userDAO) {
@@ -344,8 +343,19 @@ foam.CLASS({
       // Start Memento Support
       this.WindowHash.create({value$: this.memento.value$});
 
-      this.memento.head$.sub(this.mementoChange);
-      this.mementoChange();
+      this.memento.changeIndicator$.sub(function () {
+        self.memento.value = self.memento.combine();
+
+        if ( ! self.memento.feedback_ )
+          self.mementoChange();
+      });
+
+      this.memento.value$.sub(function () {
+        self.memento.parseValue();
+
+        if ( ! self.memento.feedback_ )
+          self.mementoChange();
+      });
       // End Memento Support
 
       this.clientPromise.then(async function(client) {
@@ -382,6 +392,7 @@ foam.CLASS({
         await self.fetchGroup();
         await self.fetchTheme();
         self.onUserAgentAndGroupLoaded();
+        self.mementoChange();
       });
     },
 
@@ -554,7 +565,7 @@ foam.CLASS({
       }
       /** Use to load a specific menu. **/
       // Do it this way so as to not reset mementoTail if set
-      if ( this.memento.head != menu || opt_forceReload ) {
+      if ( this.memento.head !== menu || opt_forceReload ) {
         this.memento.value = menu;
       }
     },

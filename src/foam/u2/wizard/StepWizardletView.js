@@ -105,6 +105,7 @@ foam.CLASS({
     }
     ^rightside ^hide-X-entry {
       flex-grow: 1;
+      -webkit-mask-image: -webkit-gradient(linear, left 15, left top, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
       overflow-y: auto;
       padding: 50px 50px 100px 50px;
     }
