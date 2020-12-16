@@ -129,6 +129,9 @@ foam.CLASS({
       code: function() {
         var isMementoSetWithView = false;
 
+        //check if the class of the view to which current position points has property MEMENTO_HEAD
+        //or if the view is object and it has mementoHead set
+        //if so we need to set last not-null memento in the memento chain to null as we're going back
         if ( this.stack_[this.pos][0].class ) {
           var classObj = this.stack_[this.pos][0].class;
           if ( foam.String.isInstance(classObj) ) {
