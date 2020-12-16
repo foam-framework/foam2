@@ -136,25 +136,23 @@ foam.CLASS({
                 this.start().addClass('subtitle').add(section.subTitle).end();
               }
             })
-            .start(self.Grid)
-              .add(this.slot(function(loadLatch) {
-                var view = this.E();
-                
-                if ( loadLatch ) { 
-                  view.forEach(section.properties, function(p, index) {
-                    this.start(self.GUnit, {columns: p.gridColumns})
-                      .show(p.createVisibilityFor(self.data$, self.controllerMode$).map(mode => mode !== self.DisplayMode.HIDDEN))
-                      .tag(self.SectionedDetailPropertyView, {
-                        prop: p,
-                        data$: self.data$
-                      })
-                    .end();
-                  });
-                }
+            .add(this.slot(function(loadLatch) {
+              var view = this.E().start(self.Grid);
+              
+              if ( loadLatch ) {
+                view.forEach(section.properties, function(p, index) {
+                  this.start(self.GUnit, { columns: p.gridColumns })
+                    .show(p.createVisibilityFor(self.data$, self.controllerMode$).map(mode => mode !== self.DisplayMode.HIDDEN))
+                    .tag(self.SectionedDetailPropertyView, {
+                      prop: p,
+                      data$: self.data$
+                    })
+                  .end();
+                });
+              }
 
-                return view;
-              }))
-            .end()
+              return view;
+            }))
             .start(self.Cols)
               .style({
                 'justify-content': 'end',
