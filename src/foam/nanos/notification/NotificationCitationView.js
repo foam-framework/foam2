@@ -15,7 +15,7 @@ foam.CLASS({
 
   css: `
     ^ {
-      width: 100%;
+      width: 90%;
       line-height: 17px;
     }
     ^ .created {
@@ -30,7 +30,7 @@ foam.CLASS({
       color: #1e1f21;
       white-space: nowrap;
       text-overflow:ellipsis;
-      width: 90%;
+      width: 100%;
       overflow: hidden;
       margin-left: 32px;
       display: inline-block;

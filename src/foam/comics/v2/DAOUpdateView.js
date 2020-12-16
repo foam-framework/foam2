@@ -57,11 +57,13 @@ foam.CLASS({
 
   imports: [
     'ctrl',
+    'memento',
     'stack'
   ],
 
   exports: [
-    'controllerMode'
+    'controllerMode',
+    'currentMemento as memento'
   ],
 
   messages: [
@@ -97,6 +99,12 @@ foam.CLASS({
       expression: function() {
         return foam.u2.detail.SectionedDetailView;
       }
+    },
+    'currentMemento',
+    {
+      class: 'String',
+      name: 'mementoHead',
+      value: 'Edit'
     }
   ],
 
@@ -138,12 +146,14 @@ foam.CLASS({
           }
         });
       }
-    },
+    }
   ],
   methods: [
     function initE() {
       var self = this;
       this.SUPER();
+
+      this.currentMemento$ = this.memento.tail$;
 
       this
         .addClass(this.myClass())

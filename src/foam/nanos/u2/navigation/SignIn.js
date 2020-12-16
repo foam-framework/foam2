@@ -17,7 +17,8 @@ foam.CLASS({
     'loginSuccess',
     'stack',
     'user',
-    'menuDAO'
+    'menuDAO',
+    'memento'
   ],
 
   requires: [
@@ -104,7 +105,8 @@ foam.CLASS({
             });
           } else {
             this.menuDAO.cmd_(X, foam.dao.CachingDAO.PURGE);
-            window.location.hash = '';
+            if ( ! this.memento || this.memento.value.length === 0 )
+              window.location.hash = '';
             this.loginSuccess = !! this.user;
           }
         }

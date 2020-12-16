@@ -21,6 +21,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
+    'foam.nanos.controller.Memento',
     'foam.u2.stack.Stack'
   ],
 
@@ -77,7 +78,24 @@ foam.CLASS({
           }
         }
 
-        return foam.u2.ViewSpec.createView(view, null, this, X);
+        var v = foam.u2.ViewSpec.createView(view, null, this, X);
+        if ( v.mementoHead ) {
+          var currMemento = this.data.findCurrentMemento();
+          //we need to check if memento is already set
+          //for example when we copy-paste url
+
+          //X.memento.head is parent view head
+          //so the v view mementoHead is X.memento.tail.head
+          if ( ! X.memento.tail || X.memento.tail.head !== v.mementoHead ) {
+            var m = this.Memento.create();
+
+            m.head$ = v.mementoHead$;
+            m.parent = currMemento;
+  
+            currMemento.tail = m;
+          }
+        }
+        return v;
 
       }, this.data$.dot('top')));
     }

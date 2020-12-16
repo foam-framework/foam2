@@ -663,7 +663,12 @@ var classes = [
   'foam.flow.DocumentMenu',
 
   'foam.nanos.ruler.RuleGroup',
+  'foam.nanos.ruler.FindRuledCommand',
+  'foam.nanos.ruler.Ruled',
   'foam.nanos.ruler.Rule',
+  'foam.nanos.ruler.RuledDAO',
+  'foam.nanos.ruler.test.RuledDAOTest',
+  'foam.nanos.ruler.test.RuledDummy',
   'foam.nanos.ruler.RulerDAO',
   'foam.nanos.ruler.Operations',
   'foam.nanos.ruler.RulerProbe',
@@ -811,6 +816,7 @@ var classes = [
   'foam.nanos.auth.SetUserServiceProviderJunctionRuleAction',
 
   //ucjdao rules
+  'foam.nanos.crunch.ruler.AuthorizeUCJStatusOnPut',
   'foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut',
   'foam.nanos.crunch.ruler.ValidateUCJDataOnPut',
   'foam.nanos.crunch.ruler.SetUCJStatusOnPut',
