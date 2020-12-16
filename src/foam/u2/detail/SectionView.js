@@ -97,7 +97,6 @@ foam.CLASS({
       },
       value: true
     }
-    
   ],
 
   methods: [
