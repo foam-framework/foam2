@@ -328,7 +328,11 @@ foam.CLASS({
     },
     'currentMenu',
     'lastMenuLaunched',
-    'webApp'
+    'webApp',
+    {
+      name: 'languageDefaults_',
+      factory: function() { return []; }
+    }
   ],
 
   methods: [
@@ -444,13 +448,22 @@ foam.CLASS({
     },
 
     function installLanguage() {
+      for ( var i = 0 ; i < this.languageDefaults_.length ; i++ ) {
+        var ld = this.languageDefaults_[i];
+        ld[0][ld[1]] = ld[2];
+      }
+      this.languageDefaults_ = undefined;
+
       var map = this.__subContext__.translationService.localeEntries;
       for ( var key in map ) {
         var node = global;
         var path = key.split('.');
 
         for ( var i = 0 ; node && i < path.length-1 ; i++ ) node = node[path[i]];
-        if ( node ) node[path[path.length-1]] = map[key];
+        if ( node ) {
+          node[path[path.length-1]] = map[key];
+          this.languageDefaults_.push([node, path[path.length-1], map[key]]);
+        }
       }
     },
 

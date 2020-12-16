@@ -16,7 +16,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'data',
+    'data'
   ],
 
   css: `
@@ -60,7 +60,7 @@ foam.CLASS({
             }));
           })
           return this.TableView.create({ data: dao });
-        }))
+        }));
     }
   ]
 });
