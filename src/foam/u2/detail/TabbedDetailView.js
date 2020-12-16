@@ -78,13 +78,16 @@ foam.CLASS({
                         code: s.title
                       }) :
                       s.title$;
+
+                    var tab = foam.core.SimpleSlot.create();
                     this
-                      .start(self.Tab, { label$: title$ || self.defaultSectionLabel, selected: self.memento.paramsObj.selectedTab && self.memento.paramsObj.selectedTab === s.title })
+                      .start(self.Tab, { label$: title$ || self.defaultSectionLabel, selected: self.memento.paramsObj.selectedTab && self.memento.paramsObj.selectedTab === s.title }, tab)
                         .call(function() {
                           this.tag(self.SectionView, {
                             data$: self.data$,
                             section: s,
-                            showTitle: false
+                            showTitle: false,
+                            selected$: tab.value.selected$
                           })
                         })
                       .end();

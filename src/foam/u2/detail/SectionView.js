@@ -78,6 +78,22 @@ foam.CLASS({
           return this.getNestedPropValue(obj[props.shift()], props.join('.'))
         }
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'loadLatch',
+      factory: function() {
+        return this.selected;
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'selected',
+      postSet: function() {
+        if ( this.selected ) 
+          this.loadLatch = this.selected;
+      },
+      value: true
     }
   ],
 
@@ -121,15 +137,23 @@ foam.CLASS({
               }
             })
             .start(self.Grid)
-              .forEach(section.properties, function(p, index) {
-                this.start(self.GUnit, {columns: p.gridColumns})
-                  .show(p.createVisibilityFor(self.data$, self.controllerMode$).map(mode => mode !== self.DisplayMode.HIDDEN))
-                  .tag(self.SectionedDetailPropertyView, {
-                    prop: p,
-                    data$: self.data$
-                  })
-                .end();
-              })
+              .add(this.slot(function(loadLatch) {
+                var view = this.E();
+                
+                if ( loadLatch ) { 
+                  view.forEach(section.properties, function(p, index) {
+                    this.start(self.GUnit, {columns: p.gridColumns})
+                      .show(p.createVisibilityFor(self.data$, self.controllerMode$).map(mode => mode !== self.DisplayMode.HIDDEN))
+                      .tag(self.SectionedDetailPropertyView, {
+                        prop: p,
+                        data$: self.data$
+                      })
+                    .end();
+                  });
+                }
+
+                return view;
+              }))
             .end()
             .start(self.Cols)
               .style({
