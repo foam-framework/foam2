@@ -26,8 +26,6 @@ foam.CLASS({
         .start('div')
           .addClass('file-image-div' + this.id)
           .style({
-            'visibility': 'hidden',
-            'height': '100%',
             'width:': 'auto',
             'max-height': '244px',
             'max-width': '300px'
@@ -39,14 +37,15 @@ foam.CLASS({
               'max-height': '100%'
             })
           .end()
-        .end()
-        .start('iframe')
-          .addClass('file-iframe' + this.id)
-          .style({
-            'visibility': 'hidden',
-            'height': '100%',
-            'width': '100%'
-          })
+          .start('iframe')
+            .addClass('file-iframe' + this.id)
+            .style({
+              'visibility': 'hidden',
+              'height': '100%',
+              'width': '100%',
+              'position': 'absolute'
+            })
+          .end()
         .end();
       this.data$.sub(() => this.showData());
     },
@@ -73,7 +72,7 @@ foam.CLASS({
       }
       url = URL.createObjectURL(this.data[pos].data.blob);
 
-      if (this.data[pos].mimeType !== "application/pdf") {
+      if ( this.data[pos].mimeType !== 'application/pdf' ) {
         image.src = url;
         div.style.visibility = 'visible';
         div.style.display = 'block';
@@ -83,4 +82,4 @@ foam.CLASS({
       }
     }
   ]
-})
+});
