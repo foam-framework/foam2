@@ -323,9 +323,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
   ) {
     Subject subject = (Subject) x.get("subject");
     UserCapabilityJunction ucj = this.getJunction(x, capabilityId);
-    if ( ucj.getStatus() == CapabilityJunctionStatus.AVAILABLE ) {
-      ucj = buildAssociatedUCJ(x, capabilityId, subject);
-    }
+
     if ( data != null ) {
       ucj.setData(data);
     }
@@ -352,9 +350,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     CapabilityJunctionStatus status
   ) {
     UserCapabilityJunction ucj = this.getJunction(x, capabilityId);
-    if ( ucj.getStatus() == CapabilityJunctionStatus.AVAILABLE ) {
-      ucj = buildAssociatedUCJ(x, capabilityId, subject);
-    }
+    
     if ( data != null ) {
       ucj.setData(data);
     }
