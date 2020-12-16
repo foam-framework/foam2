@@ -413,6 +413,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/CreateUserCapabilityJunctionOnSpidSet" },
   { name: "foam/nanos/auth/SetUserServiceProviderJunctionRuleAction" },
   //ucjDAO rules
+  { name: "foam/nanos/crunch/ruler/AuthorizeUCJStatusOnPut" },
   { name: "foam/nanos/crunch/ruler/CheckUCJOwnershipOnPut" },
   { name: "foam/nanos/crunch/ruler/ValidateUCJDataOnPut" },
   { name: "foam/nanos/crunch/ruler/SetUCJStatusOnPut" },
