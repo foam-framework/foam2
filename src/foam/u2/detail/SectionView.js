@@ -82,18 +82,16 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'loadLatch',
-      expression: function(selected) {
-        return selected;
-      },
-      preSet: function(o, n) {
-        return o || n;
+      factory: function() {
+        return this.selected;
       }
     },
     {
       class: 'Boolean',
       name: 'selected',
       postSet: function() {
-        this.loadLatch = this.selected;
+        if ( this.selected ) 
+          this.loadLatch = this.selected;
       },
       value: true
     }
