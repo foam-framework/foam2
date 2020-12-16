@@ -82,6 +82,9 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'loadLatch',
+      expression: function(selected) {
+        return selected;
+      },
       preSet: function(o, n) {
         return o || n;
       }
@@ -89,10 +92,10 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'selected',
-      value: true,
       postSet: function() {
         this.loadLatch = this.selected;
-      }
+      },
+      value: true
     }
     
   ],
