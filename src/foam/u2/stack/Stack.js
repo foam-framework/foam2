@@ -127,8 +127,25 @@ foam.CLASS({
       // icon: 'arrow_back',
       isEnabled: function(pos) { return pos > 0; },
       code: function() {
+        var isMementoSetWithView = false;
+
+        if ( this.stack_[this.pos][0].class ) {
+          var classObj = this.stack_[this.pos][0].class;
+          if ( foam.String.isInstance(classObj) ) {
+            classObj = foam.lookup(this.stack_[this.pos][0].class);
+          }
+          if ( classObj.MEMENTO_HEAD )
+            isMementoSetWithView = true;
+        } else {
+          if ( this.stack_[this.pos][0].mementoHead ) {
+            isMementoSetWithView = true;
+          }
+        }
+
         this.pos--;
-        this.setToNullCurrentMemento();
+
+        if ( isMementoSetWithView )
+          this.setToNullCurrentMemento();
       }
     },
     {
