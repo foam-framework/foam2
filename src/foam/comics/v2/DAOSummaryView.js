@@ -119,10 +119,10 @@ foam.CLASS({
       class: 'String',
       name: 'mementoHead',
       factory: function() {
-        return this.id;
+        return this.idOfRecord;
       }
     },
-    'id'
+    'idOfRecord'
   ],
 
   actions: [
@@ -237,7 +237,7 @@ foam.CLASS({
       this.SUPER();
       this.currentMemento$ = this.memento.tail$;
 
-      var promise = this.data ? Promise.resolve(this.data) : this.config.unfilteredDAO.inX(this.__subContext__).find(this.id);
+      var promise = this.data ? Promise.resolve(this.data) : this.config.unfilteredDAO.inX(this.__subContext__).find(this.idOfRecord);
 
       // Get a fresh copy of the data, especially when we've been returned
       // to this view from the edit view on the stack.

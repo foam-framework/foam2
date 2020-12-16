@@ -265,7 +265,7 @@ foam.CLASS({
         class: 'foam.comics.v2.DAOSummaryView',
         data: obj,
         config: this.config,
-        id: id
+        idOfRecord: id
       }, this.__subContext__);
     },
     function initE() {

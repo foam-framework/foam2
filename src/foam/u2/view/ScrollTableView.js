@@ -181,7 +181,7 @@
             class: 'foam.comics.v2.DAOSummaryView',
             data: obj,
             config: this.config,
-            id: id
+            idOfRecord: id
           }, this);
         }
       }
@@ -220,8 +220,9 @@
           class: 'foam.comics.v2.DAOSummaryView',
           data: null,
           config: this.config,
-          id: id
+          idOfRecord: id
         }, this);
+        return;
       }
 
       this.
