@@ -303,8 +303,7 @@ foam.CLASS({
         });
       });
 
-//      this.onDetach(this.memento$.sub(this.mementoChange));
-      this.memento.tail$.sub(this.mementoChange);
+      this.onDetach( this.memento.tail$.sub(this.mementoChange)); 
       this.mementoChange();
     }
   ],
