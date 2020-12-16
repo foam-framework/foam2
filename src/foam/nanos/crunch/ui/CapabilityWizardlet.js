@@ -62,6 +62,13 @@ foam.CLASS({
       factory: function () {
         return this.UserCapabilityJunctionWAO.create({}, this.__context__);
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'isLoaded',
+      documentation: `
+        True if CapabilityJunctionData is loaded - currently used only in Capable
+      `
     }
   ]
 });
