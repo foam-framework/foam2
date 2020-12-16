@@ -50,6 +50,7 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.CapableDefaultConfigAgent',
     'foam.u2.crunch.wizardflow.SkipGrantedAgent',
     'foam.u2.crunch.wizardflow.MaybeDAOPutAgent',
+    'foam.u2.crunch.wizardflow.ShowPreexistingAgent',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
     'foam.u2.crunch.CapabilityInterceptView',
@@ -133,6 +134,7 @@ foam.CLASS({
         return this.createWizardSequence(capable.capabilityIds[0], x)
           .reconfigure('LoadCapabilitiesAgent', {
             waoSetting: this.LoadCapabilitiesAgent.WAOSetting.CAPABLE })
+          .addBefore('SkipGrantedAgent',this.ShowPreexistingAgent)
           .remove('CheckRootIdAgent')
           .remove('CheckPendingAgent')
           .remove('CheckNoDataAgent')
