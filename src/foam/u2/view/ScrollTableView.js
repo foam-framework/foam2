@@ -181,7 +181,7 @@
             class: 'foam.comics.v2.DAOSummaryView',
             data: obj,
             config: this.config,
-            id: id
+            idOfRecord: id
           }, this);
         }
       }
@@ -211,17 +211,30 @@
 
     function initE() {
       if ( this.currentMemento ) {
-        var id = this.currentMemento.head;
-        if ( ! isNaN(id) ) {
-          id = parseInt(this.currentMemento.head);
+        var mementoHead = this.currentMemento.head;
+
+        if ( mementoHead === 'Create' ) {
+          this.stack.push({
+            class: 'foam.comics.v2.DAOCreateView',
+            data: ((this.config.factory && this.config.factory$cls) ||  this.data.of).create({ mode: 'create'}, this),
+            config$: this.config$,
+            of: this.data.of
+          }, this.__subContext__);
+          return;
+        }
+
+        var id = mementoHead;
+        if ( ! isNaN(mementoHead) ) {
+          id = parseInt(mementoHead);
         }
 
         this.stack.push({
           class: 'foam.comics.v2.DAOSummaryView',
           data: null,
           config: this.config,
-          id: id
+          idOfRecord: id
         }, this);
+        return;
       }
 
       this.
