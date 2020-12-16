@@ -479,6 +479,9 @@ foam.CLASS({
           case EXPIRED :
             status = CapabilityJunctionStatus.ACTION_REQUIRED;
             break;
+          case PENDING_REVIEW :
+            status = CapabilityJunctionStatus.ACTION_REQUIRED;
+            break;
           default :
             status = CapabilityJunctionStatus.GRANTED;
         }

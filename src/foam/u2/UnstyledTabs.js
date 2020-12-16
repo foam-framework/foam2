@@ -10,15 +10,26 @@ foam.CLASS({
   extends: 'foam.u2.Element',
   documentation: 'An unstyled tab.',
   requires: [ 'foam.u2.Tab' ],
+
+  imports: [
+    'memento'
+  ],
+
   properties: [
     {
       name: 'selected',
       postSet: function(o, n) {
         if ( o ) o.selected = false;
         n.selected = true;
+
+        this.setMementoWithSelectedTab();
       }
     },
-    'tabRow'
+    'tabRow',
+    {
+      name: 'updateMemento',
+      class: 'Boolean'
+    }
   ],
 
   methods: [
@@ -41,7 +52,10 @@ foam.CLASS({
         this.tabRow.start('span').
           addClass(this.myClass('tab')).
           enableClass('selected', tab.selected$).
-          on('click', function() { this.selected = tab; }.bind(this)).
+          on('click', function() { 
+            this.selected = tab;
+            this.setMementoWithSelectedTab(tab);
+          }.bind(this)).
           add(tab.label$).
         end();
 
@@ -49,6 +63,14 @@ foam.CLASS({
       }
 
       this.SUPER(tab);
+    },
+    function setMementoWithSelectedTab() {
+      if ( ! this.updateMemento )
+        return;
+      if ( this.memento ) {
+        this.memento.paramsObj.selectedTab = this.selected.label;
+        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
+      }
     }
   ]
 });

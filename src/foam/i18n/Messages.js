@@ -48,8 +48,7 @@ foam.CLASS({
       class: 'String',
       name: 'message',
       getter: function() {
-        var msg = this.message_;
-
+        var msg  = this.message_;
         if ( foam.Undefined.isInstance(msg) ) {
           if ( foam.locale )
             msg = this.messageMap[foam.locale] || this.messageMap[foam.lang];
@@ -58,18 +57,18 @@ foam.CLASS({
 
           // While booting, foam.i18n may not have loaded yet
           if ( foam.i18n && foam.xmsg ) {
-            var msg_ = msg;
+            let msg_ = msg;
             // Create an object which can be used to call toString() on, but
             // also has a toE() method.
             msg = {
               asJavaValue: function() {
                 return foam.java.asJavaValue(msg_);
               },
-              toE: () => {
+              toE: (_, X) => {
                 return foam.i18n.InlineLocaleEditor.create({
-                  //source: this.sourceCls_ + '.' + this.name,
+                  source: this.sourceCls_.id + '.' + this.name,
                   defaultText: msg_,
-                  data: msg_});
+                  data: msg_}, X);
               },
               toString: function() {
                 return msg_;
