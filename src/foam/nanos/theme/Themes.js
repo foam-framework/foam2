@@ -126,10 +126,34 @@ Later themes:
       Theme theme = null;
       ThemeDomain td = null;
       String domain = null;
-      User user = ((Subject) x.get("subject")).getUser();
+
+      HttpServletRequest req = x.get(HttpServletRequest.class);
+      if ( req != null ) {
+        domain = req.getServerName();
+      }
+
+      // Find theme from themeDomain via domain
+      if ( domain != null ) {
+        var themeDomainDAO = (DAO) x.get("themeDomainDAO");
+        td = (ThemeDomain) themeDomainDAO.find(domain);
+        if ( td == null &&
+             ! "localhost".equals(domain) ) {
+          td = (ThemeDomain) themeDomainDAO.find("localhost");
+        }
+        if ( td != null ) {
+          theme = (Theme) themeDAO.find(
+            MLang.AND(
+              MLang.EQ(Theme.ID, td.getTheme()),
+              MLang.EQ(Theme.ENABLED, true)
+            ));
+        }
+      }
 
       // Find theme from user via SPID
-      if ( user != null ) {
+      User user = ((Subject) x.get("subject")).getUser();
+      if ( user != null &&
+           ( theme == null ||
+             ! domain.equals(td.getId()) ) ) {
         var spid = user.getSpid();
         while ( ! SafetyUtil.isEmpty(spid) ) {
           theme = (Theme) themeDAO.find(
@@ -146,35 +170,9 @@ Later themes:
       }
 
       if ( theme == null ) {
-        HttpServletRequest req = x.get(HttpServletRequest.class);
-        if ( req != null ) {
-          domain = req.getServerName();
-        }
-
-        // Find theme from themeDomain via domain
-        if ( domain != null ) {
-          var themeDomainDAO = (DAO) x.get("themeDomainDAO");
-          td = (ThemeDomain) themeDomainDAO.find(domain);
-          if ( td == null &&
-               ! "localhost".equals(domain) ) {
-            td = (ThemeDomain) themeDomainDAO.find("localhost");
-          }
-          if ( td != null ) {
-            theme = (Theme) themeDAO.find(
-              MLang.AND(
-                MLang.EQ(Theme.ID, td.getTheme()),
-                MLang.EQ(Theme.ENABLED, true)
-              ));
-          }
-        }
-
-        if ( theme == null ) {
-          ((foam.nanos.logger.Logger) x.get("logger")).warning("Theme not found.",
-            "domain:" + (req != null ? req.getServerName() : ""),
-            "user:" + user.getId());
-        }
-      }
-      if ( theme == null ) {
+        // ((foam.nanos.logger.Logger) x.get("logger")).debug("Theme not found.",
+        //   "domain", (req != null ? req.getServerName() : ""),
+        //   "user", user.getId());
         theme = new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
       }
 

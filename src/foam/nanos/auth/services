@@ -1,13 +1,13 @@
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"localSpidGroupDomainDAO",
-  "description":"Domain by spid and group",
+  "name":"localSpidGroupURLDAO",
+  "description":"URL by spid and group",
   "authenticate": false,
   "serviceScript":
   """
     return new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.auth.SpidGroupDomain.getOwnClassInfo())
-      .setJournalName("spidGroupDomains")
+      .setOf(foam.nanos.auth.SpidGroupURL.getOwnClassInfo())
+      .setJournalName("spidGroupURLs")
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setPm(true)
       .build();
@@ -16,17 +16,22 @@ p({
 
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"spidGroupDomainDAO",
-  "description":"Domain by spid and group",
+  "name":"spidGroupURLDAO",
+  "description":"URL by spid and group",
   "serve": true,
   "authenticate": true,
   "serviceScript":
   """
     return new foam.dao.EasyDAO.Builder(x)
-      .setOf(foam.nanos.auth.SpidGroupDomain.getOwnClassInfo())
-      .setInnerDAO(x.get("localSpidGroupDomainDAO"))
+      .setOf(foam.nanos.auth.SpidGroupURL.getOwnClassInfo())
+      .setInnerDAO(x.get("localSpidGroupURLDAO"))
       .setPm(true)
       .setEnableInterfaceDecorators(false)
       .build();
+  """,
+  "client": """
+  {
+    "of": "foam.nanos.auth.SpidGroupURL"
+  }
   """
 })

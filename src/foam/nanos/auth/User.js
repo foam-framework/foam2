@@ -29,6 +29,7 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.dao.ArraySink',
+    'foam.nanos.app.AppConfig',
     'foam.nanos.auth.LifecycleAware',
     'foam.nanos.auth.LifecycleState',
     'foam.nanos.notification.NotificationSetting',
@@ -622,13 +623,23 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       storageTransient: true,
-      javaFactory: `
-      foam.dao.DAO dao = (foam.dao.DAO) getX().get("localSpidGroupURLDAO");
+      javaGetter: `
+      String url = "http://localhost:8080";
+      if ( getX() == null ||
+           getX().get("groupDAO") == null ) {
+        return url;
+      }
       Group group = findGroup(getX());
+      if ( group == null ) {
+        return url;
+      }
       while ( true ) {
+        foam.dao.DAO dao = (foam.dao.DAO) getX().get("localSpidGroupURLDAO");
         SpidGroupURL sgu = (SpidGroupURL) dao.find(new SpidGroupURLId(getSpid(), group.getId()));
         if ( sgu != null ) {
-          return sgu.getUrl();
+          urlIsSet_ = true;
+          url_ = sgu.getUrl();
+          return url_;
         }
         group = group.findParent(getX());
         if ( group == null ) {
@@ -636,7 +647,12 @@ foam.CLASS({
         }
       }
       ((foam.nanos.logger.Logger) getX().get("logger")).warning("URL not found", "user", getId());
-      return "http://localhost:8080";
+      AppConfig appConfig = (AppConfig) getX().get("appConfig");
+      if ( appConfig != null ) {
+        appConfig = appConfig.configure(getX(), null);
+        return appConfig.getUrl();
+      }
+      return url;
       `
     }
   ],

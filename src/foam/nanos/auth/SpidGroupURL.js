@@ -50,15 +50,15 @@ foam.CLASS({
       storageTransient: true,
       expression: function(protocol, host, port) {
         if ( port == 80 || port == 443 ) {
-          return protocol+"//"+host+"/";
+          return protocol+'://'+host;
         }
-        return protocol+":"+port+"//"+host+"/";
+        return protocol+'://'+host+':'+port;
       },
       javaFactory: `
         if ( getPort() == 80 || getPort() == 443 ) {
-          return getProtocol()+"//"+getHost()+"/";
+          return getProtocol()+"://"+getHost();
         }
-        return getProtocol()+":"+getPort()+"//"+getHost()+"/";
+        return getProtocol()+"://"+getHost()+":"+getPort();
       `
     }
   ]
