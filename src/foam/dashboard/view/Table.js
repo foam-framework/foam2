@@ -8,14 +8,23 @@ foam.CLASS({
   package: 'foam.dashboard.view',
   name: 'Table',
   extends: 'foam.u2.Element',
+
   requires: [
     'foam.core.Model',
     'foam.dao.ArrayDAO',
-    'foam.u2.view.TableView',
+    'foam.u2.view.TableView'
   ],
+
   imports: [
-    'data',
+    'data'
   ],
+
+  css: `
+    ^ table {
+      width: 100%;
+    }
+  `,
+
   properties: [
     {
       name: 'tableCls',
@@ -25,23 +34,19 @@ foam.CLASS({
           properties: [
             {
               name: 'id',
-              label: data$data$arg1.label || data$data$arg1.cls_.name,
+              label: data$data$arg1.label || data$data$arg1.cls_.name
             },
             {
               name: 'value',
-              label: data$data$arg2.label || data$data$arg2.cls_.name,
-            },
+              label: data$data$arg2.label || data$data$arg2.cls_.name
+            }
           ]
         });
         return model.buildClass();
-      },
-    },
-  ],
-  css: `
-    ^ table {
-      width: 100%;
+      }
     }
-  `,
+  ],
+
   methods: [
     function initE() {
       this.
@@ -55,7 +60,7 @@ foam.CLASS({
             }));
           })
           return this.TableView.create({ data: dao });
-        }))
+        }));
     }
   ]
 });
