@@ -14,6 +14,7 @@ foam.INTERFACE({
 
   javaImports: [
     'foam.dao.ArraySink',
+    'foam.nanos.auth.Subject',
     'foam.nanos.crunch.CapabilityJunctionPayload',
     'foam.nanos.crunch.ui.WizardState'
   ],
@@ -178,6 +179,33 @@ foam.INTERFACE({
         {
           name: 'x',
           type: 'Context'
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        },
+        {
+          name: 'data',
+          type: 'foam.core.FObject'
+        },
+        {
+          name: 'status',
+          type: 'foam.nanos.crunch.CapabilityJunctionStatus'
+        }
+      ],
+    },
+    {
+      name: 'updateUserJunction',
+      async: true,
+      type: 'UserCapabilityJunction',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'subject',
+          type: 'foam.nanos.auth.Subject'
         },
         {
           name: 'capabilityId',

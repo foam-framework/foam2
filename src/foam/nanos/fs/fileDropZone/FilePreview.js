@@ -28,7 +28,8 @@ foam.CLASS({
           .style({
             'width:': 'auto',
             'max-height': '244px',
-            'max-width': '300px'
+            'max-width': '300px',
+            'display': 'none'
           })
           .start('img')
             .addClass('file-image' + this.id)
@@ -79,6 +80,7 @@ foam.CLASS({
       } else {
         iFrame.src = url;
         iFrame.style.visibility = 'visible';
+        iFrame.style.display = 'block';
       }
     }
   ]
