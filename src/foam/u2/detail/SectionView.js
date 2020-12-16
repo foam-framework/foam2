@@ -153,7 +153,6 @@ foam.CLASS({
                       })
                     .end();
                   });
-                  self.sectionContentViewSet = true;
                 }
 
                 return view;
