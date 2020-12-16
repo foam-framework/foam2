@@ -89,7 +89,7 @@ foam.CLASS({
           if ( oldStatus == PENDING && newStatus != REJECTED ) {
             return getDelegate().put_(x, obj);
           }
-          if ( oldStatus == ACTION_REQUIRED ) {
+          if ( oldStatus == ACTION_REQUIRED && newStatus == GRANTED ) {
             newStatus = PENDING;
           }
         }
