@@ -86,10 +86,11 @@ foam.CLASS({
         if ( !n ){
           this.choiceWizardlets.forEach(cw => {
             cw.isAvailable = false
-            cw.cancel();
           });
 
-          this.cancel();
+          this.isAvailablePromise =
+            Promise.all(this.choiceWizardlets.map(cw => cw.isAvailablePromise))
+              .then(() => { this.cancel(); });
         } else {
           this.save();
         }

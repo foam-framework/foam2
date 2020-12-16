@@ -49,12 +49,18 @@ foam.CLASS({
       }
     },
     {
+      name: 'isAvailablePromise',
+      factory: () => Promise.resolve(),
+    },
+    {
       name: 'isAvailable',
       class: 'Boolean',
       value: true,
       postSet: function (ol, nu) {
-        if ( nu ) this.save();
-        else this.cancel();
+        if ( nu ) this.isAvailablePromise =
+          this.isAvailablePromise.then(() => this.save());
+        else this.isAvailablePromise =
+          this.isAvailablePromise.then(() => this.cancel());
       }
     },
     {
