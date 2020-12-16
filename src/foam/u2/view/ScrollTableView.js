@@ -213,19 +213,20 @@
       if ( this.currentMemento ) {
         var mementoHead = this.currentMemento.head;
 
-        if ( mementoHead === 'Create' ) {
+        var of = this.data.of || this.config.of;
+        if ( mementoHead === 'Create' && of ) {
           this.stack.push({
             class: 'foam.comics.v2.DAOCreateView',
             data: ((this.config.factory && this.config.factory$cls) ||  this.data.of).create({ mode: 'create'}, this),
             config$: this.config$,
-            of: this.data.of
+            of: of
           }, this.__subContext__);
           return;
         }
 
         var id = mementoHead;
-        if ( ! isNaN(mementoHead) ) {
-          id = parseInt(mementoHead);
+        if ( of ) {
+          id = of.ID.fromString(mementoHead);
         }
 
         this.stack.push({
