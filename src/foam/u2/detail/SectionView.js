@@ -83,13 +83,18 @@ foam.CLASS({
       class: 'Boolean',
       name: 'loadLatch',
       preSet: function(o, n) {
-        return this.sectionContentViewSet ? o : n;
+        return o || n;
       }
     },
     {
       class: 'Boolean',
-      name: 'sectionContentViewSet'
+      name: 'selected',
+      value: true,
+      postSet: function() {
+        this.loadLatch = this.selected;
+      }
     }
+    
   ],
 
   methods: [
@@ -135,7 +140,7 @@ foam.CLASS({
               .add(this.slot(function(loadLatch) {
                 var view = this.E();
                 
-                if ( ! loadLatch ) {
+                if ( loadLatch ) { 
                   view.forEach(section.properties, function(p, index) {
                     this.start(self.GUnit, {columns: p.gridColumns})
                       .show(p.createVisibilityFor(self.data$, self.controllerMode$).map(mode => mode !== self.DisplayMode.HIDDEN))

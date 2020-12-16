@@ -87,7 +87,7 @@ foam.CLASS({
                             data$: self.data$,
                             section: s,
                             showTitle: false,
-                            loadLatch$: tab.value.selected$.map(function(s) {return ! s;})
+                            selected$: tab.value.selected$
                           })
                         })
                       .end();
