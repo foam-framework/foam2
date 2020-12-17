@@ -89,7 +89,6 @@ public class SessionWebAgent
       if ( user == null ) {
         throw new AuthenticationException("User not found");
       }
-
       // check permissions
       Subject subject = new Subject.Builder(x).setUser(user).build();
       session.setContext(session.getContext().put("subject", subject));
