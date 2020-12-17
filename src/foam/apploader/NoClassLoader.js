@@ -7,11 +7,11 @@
 foam.CLASS({
   package: "foam.apploader",
   name: "NoClassLoaderContext",
-  requires: [
-  ],
+
   exports: [
     'classloader'
   ],
+
   properties: [
     {
       name: "classloader",
@@ -30,12 +30,15 @@ foam.CLASS({
   ]
 });
 
+
 foam.SCRIPT({
   package: 'foam.apploader',
   name: 'NoClassLoaderContextScript',
+
   requires: [
     'foam.apploader.NoClassLoaderContext',
   ],
+
   code: function() {
     var classLoaderContext = foam.apploader.NoClassLoaderContext.create(
         null, foam.__context__);

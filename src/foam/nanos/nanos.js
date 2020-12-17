@@ -321,11 +321,16 @@ FOAM_FILES([
   // foam/nanos/ruler
   { name: "foam/nanos/ruler/RuleGroup" },
   { name: "foam/nanos/ruler/Operations" },
+  { name: "foam/nanos/ruler/FindRuledCommand" },
+  { name: "foam/nanos/ruler/Ruled" },
   { name: "foam/nanos/ruler/Rule" },
   { name: "foam/nanos/ruler/RuleAction" },
   { name: "foam/nanos/ruler/CompositeRuleAction" },
   { name: "foam/nanos/ruler/RuleHistory" },
   { name: "foam/nanos/ruler/RuleHistoryStatus" },
+  { name: "foam/nanos/ruler/RuledDAO" },
+  { name: "foam/nanos/ruler/test/RuledDAOTest" },
+  { name: "foam/nanos/ruler/test/RuledDummy" },
   { name: "foam/nanos/ruler/RulerDAO" },
   { name: "foam/nanos/ruler/ScriptPredicate"},
   { name: "foam/nanos/ruler/UpdateRulesListSink" },
@@ -408,12 +413,14 @@ FOAM_FILES([
   { name: "foam/nanos/auth/CreateUserCapabilityJunctionOnSpidSet" },
   { name: "foam/nanos/auth/SetUserServiceProviderJunctionRuleAction" },
   //ucjDAO rules
+  { name: "foam/nanos/crunch/ruler/AuthorizeUCJStatusOnPut" },
   { name: "foam/nanos/crunch/ruler/CheckUCJOwnershipOnPut" },
   { name: "foam/nanos/crunch/ruler/ValidateUCJDataOnPut" },
   { name: "foam/nanos/crunch/ruler/SetUCJStatusOnPut" },
   { name: "foam/nanos/crunch/ruler/ConfigureUCJExpiryOnGranted" },
   { name: "foam/nanos/crunch/ruler/SaveUCJDataOnGranted" },
   //views
+  { name: "foam/nanos/crunch/ui/WizardState" },
   { name: "foam/nanos/crunch/ui/UserCapabilityJunctionWAO" },
   { name: "foam/nanos/crunch/ui/CapableWAO" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
@@ -457,5 +464,7 @@ FOAM_FILES([
   { name: "com/google/foam/demos/u2/MDAllViews" },
 
   //IBAN
+  { name: "foam/nanos/iban/IBANInfo" },
   { name: "foam/nanos/iban/ValidationIBAN" },
+  { name: "foam/nanos/iban/test/ValidationIBANTest" },
 ]);

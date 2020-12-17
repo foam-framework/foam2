@@ -11,25 +11,6 @@ foam.CLASS({
 
   documentation: 'iframe for file preview',
 
-  css: `
-    .file-iframe {
-      height: 100%;
-      width: 100%;
-    }
-
-    img {
-      max-width: 100%;
-      max-height: 100%;
-    }
-
-    .file-image-div {
-      height: 100%;
-      width: auto;
-      max-height: 244px;
-      max-width: 300px;
-    }
-  `,
-
   properties: [
     {
       name: 'selected'
@@ -43,27 +24,37 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start('div')
-          .addClass('file-image-div')
+          .addClass('file-image-div' + this.id)
           .style({
-            visibility: 'hidden'
+            'width:': 'auto',
+            'max-height': '244px',
+            'max-width': '300px',
+            'display': 'none'
           })
           .start('img')
-            .addClass('file-image')
+            .addClass('file-image' + this.id)
+            .style({
+              'max-width': '100%',
+              'max-height': '100%'
+            })
           .end()
-        .end()
-        .start('iframe')
-          .addClass('file-iframe')
-          .style({
-            visibility: 'hidden'
-          })
+          .start('iframe')
+            .addClass('file-iframe' + this.id)
+            .style({
+              'visibility': 'hidden',
+              'height': '100%',
+              'width': '100%',
+              'position': 'absolute'
+            })
+          .end()
         .end();
       this.data$.sub(() => this.showData());
     },
 
     function showData() {
-      let iFrame = document.getElementsByClassName('file-iframe')[0],
-          image = document.getElementsByClassName('file-image')[0],
-          div = document.getElementsByClassName('file-image-div')[0],
+      let iFrame = document.getElementsByClassName('file-iframe' + this.id)[0],
+          image = document.getElementsByClassName('file-image' + this.id)[0],
+          div = document.getElementsByClassName('file-image-div' + this.id)[0],
           url = '',
           pos;
 
@@ -82,14 +73,15 @@ foam.CLASS({
       }
       url = URL.createObjectURL(this.data[pos].data.blob);
 
-      if (this.data[pos].mimeType !== "application/pdf") {
+      if ( this.data[pos].mimeType !== 'application/pdf' ) {
         image.src = url;
         div.style.visibility = 'visible';
         div.style.display = 'block';
       } else {
         iFrame.src = url;
         iFrame.style.visibility = 'visible';
+        iFrame.style.display = 'block';
       }
     }
   ]
-})
+});

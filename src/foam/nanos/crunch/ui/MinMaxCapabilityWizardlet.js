@@ -101,7 +101,7 @@ foam.CLASS({
       transient: true,
       class: 'FObjectArray',
       of: 'foam.u2.wizard.WizardletSection',
-      factory: function () {
+      factory: function() {
         return [
           this.WizardletSection.create({
             isAvailable: true,
@@ -109,7 +109,6 @@ foam.CLASS({
             customView: {
               class: 'foam.u2.view.MultiChoiceView',
               choices$: this.choices$,
-              booleanView: this.CardSelectView,
               isValidNumberOfChoices$: this.isValid$,
               showValidNumberOfChoicesHelper: false,
               minSelected$: this.min$,

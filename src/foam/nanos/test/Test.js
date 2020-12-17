@@ -185,7 +185,7 @@ foam.CLASS({
 
         ByteArrayOutputStream baos  = new ByteArrayOutputStream();
         PrintStream           ps    = new PrintStream(baos);
-        Interpreter           shell = createInterpreter(x);
+        Interpreter           shell = (Interpreter) createInterpreter(x, null);
         PM                    pm    = new PM(this.getClass(), getId());
 
         try {

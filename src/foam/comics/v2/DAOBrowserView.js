@@ -13,6 +13,7 @@ foam.CLASS({
     'foam.comics.SearchMode',
     'foam.comics.v2.DAOControllerConfig',
     'foam.log.LogLevel',
+    'foam.nanos.controller.Memento',
     'foam.u2.ActionView',
     'foam.u2.dialog.Popup',
     'foam.u2.filter.FilterView',
@@ -20,7 +21,7 @@ foam.CLASS({
     'foam.u2.layout.Rows',
     'foam.u2.view.ScrollTableView',
     'foam.u2.view.SimpleSearch',
-    'foam.u2.view.TabChoiceView',
+    'foam.u2.view.TabChoiceView'
   ],
 
   implements: [
@@ -85,7 +86,6 @@ foam.CLASS({
     }
 
     ^browse-view-container {
-      margin: auto;
       border-bottom: solid 1px #e7eaec;
       box-sizing: border-box;
       padding: 0 16px;
@@ -117,8 +117,9 @@ foam.CLASS({
   ],
 
   imports: [
-    'stack?',
-    'ctrl'
+    'ctrl',
+    'memento',
+    'stack?'
   ],
 
   exports: [
@@ -207,7 +208,8 @@ foam.CLASS({
           dao: this.serviceName
         };
       }
-    }
+    },
+    'currentMemento'
   ],
 
   actions: [
@@ -253,14 +255,17 @@ foam.CLASS({
       this.onDetach(this.cannedPredicate$.sub(() => {
         this.searchPredicate = foam.mlang.predicate.True.create();
       }));
+
+      this.currentMemento$ = this.memento.tail$;
     },
     function dblclick(obj, id) {
       if ( ! this.stack ) return;
+
       this.stack.push({
         class: 'foam.comics.v2.DAOSummaryView',
         data: obj,
         config: this.config,
-        id: id
+        idOfRecord: id
       }, this.__subContext__);
     },
     function initE() {
@@ -298,15 +303,17 @@ foam.CLASS({
                       .callIf(self.config.searchMode === self.SearchMode.SIMPLE, function() {
                         this.tag(self.SimpleSearch, {
                           showCount: false,
-                          data$: self.searchPredicate$
+                          data$: self.searchPredicate$,
+                          searchValue: self.memento && self.memento.paramsObj.search
                         });
                       })
                       .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
                         this.tag(self.FilterView, {
                           dao$: self.searchFilterDAO$,
-                          data$: self.searchPredicate$
+                          data$: self.searchPredicate$,
+                          searchValue: self.memento && self.memento.paramsObj.search
                         });
-                      })
+                    })
                     .endContext()
                     .startContext({ data: self })
                       .start(self.EXPORT, { buttonStyle: 'SECONDARY' })

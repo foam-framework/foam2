@@ -40,6 +40,7 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.LoadWizardletsAgent',
     'foam.u2.crunch.wizardflow.FilterWizardletsAgent',
     'foam.u2.crunch.wizardflow.FilterGrantModeAgent',
+    'foam.u2.crunch.wizardflow.WizardStateAgent',
     'foam.u2.crunch.wizardflow.RequirementsPreviewAgent',
     'foam.u2.crunch.wizardflow.StepWizardAgent',
     'foam.u2.crunch.wizardflow.PutFinalJunctionsAgent',
@@ -49,6 +50,7 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.CapableDefaultConfigAgent',
     'foam.u2.crunch.wizardflow.SkipGrantedAgent',
     'foam.u2.crunch.wizardflow.MaybeDAOPutAgent',
+    'foam.u2.crunch.wizardflow.ShowPreexistingAgent',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
     'foam.u2.crunch.CapabilityInterceptView',
@@ -102,6 +104,7 @@ foam.CLASS({
           .add(this.CheckPendingAgent)
           .add(this.CheckNoDataAgent)
           .add(this.CreateWizardletsAgent)
+          .add(this.WizardStateAgent)
           .add(this.FilterGrantModeAgent)
           .add(this.LoadWizardletsAgent)
           .add(this.SkipGrantedAgent)
@@ -131,6 +134,7 @@ foam.CLASS({
         return this.createWizardSequence(capable.capabilityIds[0], x)
           .reconfigure('LoadCapabilitiesAgent', {
             waoSetting: this.LoadCapabilitiesAgent.WAOSetting.CAPABLE })
+          .addBefore('SkipGrantedAgent',this.ShowPreexistingAgent)
           .remove('CheckRootIdAgent')
           .remove('CheckPendingAgent')
           .remove('CheckNoDataAgent')

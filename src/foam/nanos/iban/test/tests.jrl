@@ -1,0 +1,4 @@
+p({
+  "class":"foam.nanos.iban.test.ValidationIBANTest",
+  "id":"ValidationIBANTest"
+})

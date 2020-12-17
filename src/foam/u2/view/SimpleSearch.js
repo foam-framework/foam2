@@ -14,7 +14,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'dao'
+    'dao',
+    'memento'
   ],
 
   exports: [
@@ -60,7 +61,8 @@ foam.CLASS({
       class: 'Boolean',
       name: 'showCount',
       value: true
-    }
+    },
+    'searchValue'
   ],
 
   methods: [
@@ -78,7 +80,10 @@ foam.CLASS({
       self.updateSelectedCount(0, 0, 0, this.searchManager.filteredDAO$);
 
       var generalQueryView = foam.u2.ViewSpec.createView(
-        { class: 'foam.u2.search.TextSearchView' },
+        { 
+          class: 'foam.u2.search.TextSearchView',
+          searchValue: this.searchValue
+        },
         {
           richSearch: true,
           of: this.dao.of.id,

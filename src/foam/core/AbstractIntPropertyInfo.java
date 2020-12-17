@@ -56,26 +56,26 @@ public abstract class AbstractIntPropertyInfo
     int val = (int) get(obj);
     sig.update((ByteBuffer) bb.get().putInt(val).flip());
   }
-  
+
   public String getSQLType() {
     return "INT";
   }
-  
+
   public Class getValueClass() {
     return int.class;
   }
-  
+
   public int cast(Object o) {
-    int i = ( o instanceof String ) ? Integer.valueOf((String) o) : (int) o;
-    return ( o instanceof Number ) ? ((Number) o).intValue() : i;
+    if ( o instanceof String ) return Integer.valueOf((String) o);
+    return ((Number) o).intValue();
   }
-  
+
   public Object get(Object o) {
     return get_(o);
   }
 
   protected abstract int get_(Object o);
-  
+
   public int compare(Object o1, Object o2) {
     return foam.util.SafetyUtil.compare(get_(o1), get_(o2));
   }
@@ -87,7 +87,7 @@ public abstract class AbstractIntPropertyInfo
   public int comparePropertyToValue(Object key, Object value) {
     return foam.util.SafetyUtil.compare(cast(key), cast(value));
   }
-  
+
   public foam.lib.parse.Parser jsonParser() {
     return foam.lib.json.IntParser.instance();
   }
@@ -99,7 +99,7 @@ public abstract class AbstractIntPropertyInfo
   public foam.lib.parse.Parser csvParser() {
     return foam.lib.json.IntParser.instance();
   }
-  
+
   public boolean isDefaultValue(Object o) {
     return foam.util.SafetyUtil.compare(get_(o), 0) == 0;
   }
