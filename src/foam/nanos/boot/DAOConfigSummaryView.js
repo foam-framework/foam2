@@ -114,7 +114,10 @@ foam.CLASS({
             start().
               addClass(this.myClass('title')).
               start('a').
-                add('Data Management').on('click', () => { this.memento.tail$.set(null); }).
+                add('Data Management').on('click', () => { 
+                  this.memento.tail$.set(null);
+                  this.stack.back();
+                }).
               end().
               add(' / ', this.title).
             end().
@@ -303,8 +306,7 @@ foam.CLASS({
         });
       });
 
-//      this.onDetach(this.memento$.sub(this.mementoChange));
-      this.memento.tail$.sub(this.mementoChange);
+      this.onDetach(this.memento.tail$.sub(this.mementoChange)); 
       this.mementoChange();
     }
   ],

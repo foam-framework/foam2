@@ -21,7 +21,7 @@ p({
   "daoKey":"userCapabilityJunctionDAO",
   "operation":3,
   "after":false,
-  "enabled":true,
+  "enabled":false,
   "action":{"class":"foam.nanos.crunch.ruler.AuthorizeUCJStatusOnPut"},
   "lifecycleState":1
 })
