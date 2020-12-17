@@ -440,6 +440,19 @@
       section: 'systemInformation',
       readPermissionRequired: true,
       writePermissionRequired: true,
+      javaFactory: `
+        String key = getDaoKey().toString();
+
+        // TODO: we need to phase this out for the old compliance approval requests
+        // and use serverDaoKey for the local daos
+        if ( ! getX().get(key) ) {
+          if ( key.startsWith("local") ) {
+            key = key.replace("local", "");
+            key = Character.toString(key.charAt(0)).toLowerCase() + key.substring(1);
+          }
+        }
+        return key;
+      `,
       factory: function() {
         var key = this.daoKey;
         var X = this.ctrl.__subContext__;
