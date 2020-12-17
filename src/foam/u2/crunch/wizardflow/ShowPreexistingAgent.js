@@ -4,8 +4,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-const { max } = require('underscore');
-
 foam.CLASS({
   package: 'foam.u2.crunch.wizardflow',
   name: 'ShowPreexistingAgent',
@@ -29,7 +27,7 @@ foam.CLASS({
           }
         }
 
-        if ( 
+        if (
           wizardlet.status !== this.CapabilityJunctionStatus.AVAILABLE &&
           ! wizardletsToIgnore.includes(wizardlet)
         ) {
