@@ -86,7 +86,8 @@ foam.CLASS({
        this.SUPER();
        this.onDetach(this.crunchService.sub('updateJunction', this.daoUpdate));
        this.daoUpdate();
-       if ( this.cjStatus != this.CapabilityJunctionStatus.PENDING ) this.onDetach(this.cjStatus$.sub(this.statusUpdate));
+       if ( this.cjStatus != this.CapabilityJunctionStatus.PENDING && this.cjStatus != this.CapabilityJunctionStatus.PENDING_REVIEW ) 
+          this.onDetach(this.cjStatus$.sub(this.statusUpdate));
     },
 
     function initE() {
@@ -175,7 +176,8 @@ foam.CLASS({
     {
       name: 'statusUpdate',
       code: function() {
-        if ( this.cjStatus != this.CapabilityJunctionStatus.PENDING ) {
+        if ( this.cjStatus != this.CapabilityJunctionStatus.PENDING &&
+              this.cjStatus != this.CapabilityJunctionStatus.PENDING_REVIEW ) {
           return;
         }
         this.crunchService.getJunction(null, this.data.id).then(ucj => {

@@ -391,16 +391,16 @@ foam.CLASS({
   ],
 
   listeners: [
-    {
-      name: 'onChange',
-      isMerged: true,
-      code: function() {
-        this.crunchService.getEntryCapabilities().then(a => {
-          this.visibleCapabilityDAO = this.ArrayDAO.create({
-            array: a.array
-          });
-        });
-      }
+    async function onChange() {
+      let a = await this.crunchService.getEntryCapabilities();
+      this.visibleCapabilityDAO = this.ArrayDAO.create({
+        array: a.array
+      });
+      await this.crunchService.getAllJunctionsForUser();
+      this.daoUpdate();
+      // Attempting to reset menuDAO incase of menu permission grantings.
+      this.menuDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
+      this.menuDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
     }
   ]
 });
