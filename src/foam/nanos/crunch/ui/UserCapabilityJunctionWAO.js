@@ -25,6 +25,7 @@ foam.CLASS({
         wizardlet.capability.id, wizardlet.data, null
       ).then((ucj) => {
         this.crunchService.pub('updateJunction');
+        this.crunchService.pub('grantedJunction');
         return ucj;
       });
     },

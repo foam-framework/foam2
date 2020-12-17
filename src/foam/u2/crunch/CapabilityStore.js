@@ -39,6 +39,7 @@ foam.CLASS({
     'capabilityDAO',
     'crunchController',
     'crunchService',
+    'menuDAO',
     'registerElement'
   ],
 
@@ -394,12 +395,17 @@ foam.CLASS({
     {
       name: 'onChange',
       isMerged: true,
-      code: function() {
-        this.crunchService.getEntryCapabilities().then(a => {
-          this.visibleCapabilityDAO = this.ArrayDAO.create({
-            array: a.array
-          });
+      mergeDelay: 2000,
+      code: async function() {
+        let a = await this.crunchService.getEntryCapabilities();
+        this.visibleCapabilityDAO = this.ArrayDAO.create({
+          array: a.array
         });
+        await this.crunchService.getAllJunctionsForUser();
+        this.daoUpdate();
+        // Attempting to reset menuDAO incase of menu permission grantings.
+        this.menuDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
+        this.menuDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
       }
     }
   ]
