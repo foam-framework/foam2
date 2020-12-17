@@ -124,10 +124,6 @@ foam.CLASS({
     }
   `,
 
-  constants: {
-    MAX_NUM_DISPLAYBLE_CARDS: 4
-  },
-
   properties: [
     {
       name: 'visibleCapabilityDAO',
