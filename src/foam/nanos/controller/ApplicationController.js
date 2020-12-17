@@ -461,8 +461,8 @@ foam.CLASS({
 
         for ( var i = 0 ; node && i < path.length-1 ; i++ ) node = node[path[i]];
         if ( node ) {
+          this.languageDefaults_.push([node, path[path.length-1], node[path[path.length-1]]]);
           node[path[path.length-1]] = map[key];
-          this.languageDefaults_.push([node, path[path.length-1], map[key]]);
         }
       }
     },
