@@ -954,6 +954,10 @@ FOAM_FILES([
   { name: 'foam/nanos/fs/fileDropZone/FileDropZone', flags: ['web'] },
   { name: 'foam/nanos/fs/fileDropZone/FileCard', flags: ['web'] },
   { name: 'foam/nanos/fs/fileDropZone/FilePreview', flags: ['web'] },
-  { name: 'foam/nanos/fs/TextSaveView' }
+  { name: 'foam/nanos/fs/TextSaveView' },
+
+
+  { name: 'foam/counter/Counter' },
+  { name: 'foam/dashboard/view/TableView' },
 
 ])

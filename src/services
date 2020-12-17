@@ -1137,3 +1137,22 @@ p({
   "serve": false,
   "serviceClass": "foam.nanos.notification.email.EmailTemplateEngine"
 })
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "counterDAO",
+  "description": "A reporting count DAO being updated on other dao update",
+  "serve": true,
+  "serviceScript": """
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setSeqNo(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("counters")
+      .setOf(foam.counter.Counter.getOwnClassInfo())
+      .build();
+
+    return dao;
+  """,
+  "client": "{\"of\":\"foam.counter.Counter\"}"
+})

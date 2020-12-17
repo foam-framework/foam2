@@ -24,10 +24,17 @@ foam.CLASS({
       }
     },
     {
+      name: 'listDaoName'
+    },
+    {
+      name: 'searchKey'
+    },
+    {
       name: 'tableCls',
       expression: function(data$data$arg1, data$data$arg2) {
         var model = this.Model.create({
           name: 'TableModel',
+          tableColumns: [ 'id', 'value' ],
           properties: [
             {
               name: 'id',
@@ -37,6 +44,12 @@ foam.CLASS({
               name: 'value',
               label: data$data$arg2.label || data$data$arg2.cls_.name,
             },
+            {
+              name: 'listDaoName'
+            },
+            {
+              name: 'searchKey'
+            }
           ]
         });
         return model.buildClass();
@@ -50,6 +63,7 @@ foam.CLASS({
   `,
   methods: [
     function initE() {
+    var self = this;
       this.
         addClass(this.myClass()).
         add(this.slot(function(tableCls, data$data$groups, data$data) {
@@ -58,9 +72,11 @@ foam.CLASS({
             dao.put(tableCls.create({
               id: '' + k,
               value: data$data$groups[k].value,
+              searchKey: self.searchKey,
+              listDaoName: self.listDaoName
             }));
           })
-          return this.tableView.create({ data: dao });
+          return this.tableView.create({ data: dao }, this);
         }))
     }
   ]
