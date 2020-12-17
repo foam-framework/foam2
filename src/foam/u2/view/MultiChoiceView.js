@@ -118,8 +118,9 @@ foam.CLASS({
               ? choice[4].get()
               : choice[4];
 
-            if ( ! isSelected && ! isFinal && foam.core.Slot.isInstance(choice[3]) ) {
-              choice[3].set(foam.u2.DisplayMode.RW);
+            if ( ! isSelected && ! isFinal ) {
+              choice[3] = this.mustSlot(choice[3]);
+              choice[3].set(foam.u2.DisplayMode.RW)
             }
           });
         } else {
@@ -132,7 +133,8 @@ foam.CLASS({
               ? choice[4].get()
               : choice[4];
 
-            if ( ! isSelected && ! isFinal && foam.core.Slot.isInstance(choice[3]) ) {
+            if ( ! isSelected && ! isFinal ) {
+              choice[3] = this.mustSlot(choice[3]);
               choice[3].set(foam.u2.DisplayMode.DISABLED);
             }
           });
@@ -252,6 +254,8 @@ foam.CLASS({
                     });
               });
 
+              this.choices = newChoices;
+
               self.selectedChoices$ = foam.core.ArraySlot.create({
                 slots: newChoices.map(choice => {
                   return this.mustSlot(choice[2]);
@@ -265,7 +269,6 @@ foam.CLASS({
                 });
                 return selectedChoices;
               });
-              this.choices = newChoices;
               return toRender;
             })
           )
