@@ -109,7 +109,7 @@ foam.CLASS({
         }))
       .end();
 
-      this.onDetauch(this.selectedView$.sub(function() {
+      this.onDetach(this.selectedView$.sub(function() {
         self.setMementoWithSelectedView();
       }));
     }
