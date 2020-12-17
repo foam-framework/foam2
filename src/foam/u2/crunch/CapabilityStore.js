@@ -78,8 +78,8 @@ foam.CLASS({
 
     ^feature-column-grid {
       display: inline-flex;
-      width: 94%;
-      overflow: hidden;
+      width: calc(100% - 48px);
+      overflow-x: scroll;
     }
 
     ^featureSection {
@@ -93,7 +93,8 @@ foam.CLASS({
     }
 
     ^left-arrow {
-      width: 3%;
+      width: 24px;
+      height: 24px;
       float: left;
       display: flex;
       cursor: pointer;
@@ -102,7 +103,8 @@ foam.CLASS({
     }
 
     ^right-arrow {
-      width: 3%;
+      width: 24px;
+      height: 24px;
       float: right;
       display: flex;
       cursor: pointer;
@@ -174,6 +176,11 @@ foam.CLASS({
       value: [],
       documentation: 'stores the styling of each featureCapability'
     },
+    {
+      name: 'cardsOverflow',
+      class: 'Boolean',
+      value: false
+    },
     'wizardOpened'
   ],
 
@@ -225,6 +232,7 @@ foam.CLASS({
         //     });
         //   })
         .end();
+        window.addEventListener('resize', this.onResize);
     },
 
     function renderFeatured() { // Featured Capabilities in carousel view
@@ -246,16 +254,14 @@ foam.CLASS({
               })
             .end());
         }
-        self.callIf(self.totalNumCards > self.MAX_NUM_DISPLAYBLE_CARDS, function() {
-          return spot.start('span')
-            .start('img').addClass(self.myClass('left-arrow'))
-              .attr('src', 'images/arrow-back-24px.svg')
-              .on('click', function() {
-                self.carouselCounter--;
-              })
-            .end()
-          .end();
-        });
+        spot.start().start('span')
+          .start('img').addClass(self.myClass('left-arrow')).show(this.cardsOverflow$)
+            .attr('src', 'images/arrow-back-24px.svg')
+            .on('click', function() {
+              self.carouselCounter--;
+            })
+          .end()
+        .end();
         spot.add(self.slot(
           function(carouselCounter, totalNumCards) {
             var ele = self.E().addClass(self.myClass('feature-column-grid'));
@@ -266,16 +272,15 @@ foam.CLASS({
             }
             return ele;
           }));
-        self.callIf(self.totalNumCards > self.MAX_NUM_DISPLAYBLE_CARDS, function() {
-          return spot.start('span')
-            .start('img').addClass(self.myClass('right-arrow'))
-              .attr('src', 'images/arrow-forward-24px.svg')
-              .on('click', function() {
-                self.carouselCounter++;
-              })
-            .end()
-          .end();
-        })
+        spot.start('span')
+          .start('img').addClass(self.myClass('right-arrow')).show(this.cardsOverflow$)
+            .attr('src', 'images/arrow-forward-24px.svg')
+            .on('click', function() {
+              self.carouselCounter++;
+            })
+          .end()
+        .end();
+        self.onResize();
       });
       return spot;
     },
@@ -406,6 +411,14 @@ foam.CLASS({
         // Attempting to reset menuDAO incase of menu permission grantings.
         this.menuDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
         this.menuDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
+      }
+    },
+    {
+      name: 'onResize',
+      code: function() {
+        var scrollWidth = this.document.querySelector(`.foam-u2-crunch-CapabilityStore-feature-column-grid`).scrollWidth;
+        var clientWidth = this.document.querySelector(`.foam-u2-crunch-CapabilityStore-feature-column-grid`).clientWidth;
+        this.cardsOverflow = scrollWidth > clientWidth;
       }
     }
   ]
