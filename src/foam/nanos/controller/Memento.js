@@ -116,12 +116,11 @@ foam.CLASS({
       if ( this.feedback_ ) return;
       this.feedback_ = true;
       var i = this.value.indexOf(this.SEPARATOR);
+
+      var params = '';
       if ( i === -1 ) {
         this.head = this.value;
         this.tail = null;
-        this.feedback_ = false;
-        this.params = '';
-        this.feedback_ = true;
       } else {
         this.head = this.value.substring(0, i);
         var tailStr = this.value.substring(i+1);
@@ -131,21 +130,20 @@ foam.CLASS({
             this.feedback_ = false;
             var paramEndIndex = tailStr.indexOf(this.PARAMS_END + this.SEPARATOR);
             paramEndIndex = paramEndIndex == -1 ? tailStr.length : paramEndIndex + 1;
-            this.params = tailStr.substring(tailStr.indexOf(this.PARAMS_BEGIN), paramEndIndex);
+            params = tailStr.substring(tailStr.indexOf(this.PARAMS_BEGIN), paramEndIndex);
             this.feedback_ = true;
             if ( paramEndIndex !== -1 && paramEndIndex !== tailStr.length ) {
               this.tail = this.cls_.create({ value: tailStr.substring(paramEndIndex + 1), parent: this });
             }
           } else {
             this.tail = this.cls_.create({ value: tailStr, parent: this });
-            this.params = '';
           }
         } else {
           this.tail = this.cls_.create({ value: tailStr, parent: this });
-          this.params = '';
         }
       }
       this.feedback_ = false;
+      this.params = params;
     }
   ]
 });
