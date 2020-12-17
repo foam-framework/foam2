@@ -138,9 +138,11 @@ foam.CLASS({
             }
           } else {
             this.tail = this.cls_.create({ value: tailStr, parent: this });
+            this.params = '';
           }
         } else {
           this.tail = this.cls_.create({ value: tailStr, parent: this });
+          this.params = '';
         }
       }
       this.feedback_ = false;
