@@ -86,8 +86,7 @@ foam.CLASS({
        this.SUPER();
        this.onDetach(this.crunchService.sub('updateJunction', this.daoUpdate));
        this.daoUpdate();
-       if ( this.cjStatus == this.CapabilityJunctionStatus.PENDING || this.cjStatus == this.CapabilityJunctionStatus.PENDING_REVIEW ) 
-          this.onDetach(this.cjStatus$.sub(this.statusUpdate));
+       this.onDetach(this.cjStatus$.sub(this.statusUpdate));
     },
 
     function initE() {
@@ -170,7 +169,6 @@ foam.CLASS({
               this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
             }
           }
-          this.onDetach(this.cjStatus$.sub(this.statusUpdate));
         });
       }
     },
