@@ -174,8 +174,7 @@ foam.CLASS({
     },
     {
       name: 'cardsOverflow',
-      class: 'Boolean',
-      value: false
+      class: 'Boolean'
     },
     'wizardOpened'
   ],
