@@ -120,7 +120,7 @@ foam.CLASS({
 
             if ( ! isSelected && ! isFinal ) {
               choice[3] = this.mustSlot(choice[3]);
-              choice[3].set(foam.u2.DisplayMode.RW)
+              choice[3].set(foam.u2.DisplayMode.RW);
             }
           });
         } else {
