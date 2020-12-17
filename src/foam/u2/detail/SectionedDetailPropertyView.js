@@ -55,6 +55,18 @@ foam.CLASS({
       border-top-right-radius: 0px;
       direction: ltr;
       padding: 2px;
+      max-height: 100px;
+      overflow: hidden;
+    }
+
+    ^helper-text p {
+      padding: 3px;
+      margin: 0;
+      /* css trick for hiding scroll bar in all browsers */
+      margin-right: -50px; /* Maximum width of scrollbar */
+      padding-right: 50px; /* Maximum width of scrollbar */
+      height: 100%;
+      overflow-y: scroll;
     }
 
     ^arrow-right {
@@ -263,7 +275,7 @@ foam.CLASS({
                       .addClass(self.myClass('tooltip-container'))
                       .start()
                         .addClass(self.myClass('helper-text'))
-                        .start('p').style({ 'padding': '3px' })
+                        .start('p')
                           .add(prop.help)
                         .end()
                       .end()
