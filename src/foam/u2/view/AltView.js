@@ -109,9 +109,9 @@ foam.CLASS({
         }))
       .end();
 
-      this.selectedView$.sub(function() {
+      this.onDetauch(this.selectedView$.sub(function() {
         self.setMementoWithSelectedView();
-      });
+      }));
     }
   ],
 
