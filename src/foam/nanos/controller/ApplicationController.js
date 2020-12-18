@@ -347,19 +347,19 @@ foam.CLASS({
       // Start Memento Support
       this.WindowHash.create({value$: this.memento.value$});
 
-      this.memento.changeIndicator$.sub(function () {
+      this.onDetach(this.memento.changeIndicator$.sub(function () {
         self.memento.value = self.memento.combine();
 
         if ( ! self.memento.feedback_ )
           self.mementoChange();
-      });
+      }));
 
-      this.memento.value$.sub(function () {
+      this.onDetach(this.memento.value$.sub(function () {
         self.memento.parseValue();
 
         if ( ! self.memento.feedback_ )
           self.mementoChange();
-      });
+      }));
       // End Memento Support
 
       this.clientPromise.then(async function(client) {

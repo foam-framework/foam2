@@ -137,8 +137,10 @@ foam.CLASS({
           if ( foam.String.isInstance(classObj) ) {
             classObj = foam.lookup(this.stack_[this.pos][0].class);
           }
-          if ( classObj.MEMENTO_HEAD )
+          var obj = classObj.create(this.stack_[this.pos][0]);
+          if ( obj && obj.mementoHead ) {
             isMementoSetWithView = true;
+          }
         } else {
           if ( this.stack_[this.pos][0].mementoHead ) {
             isMementoSetWithView = true;

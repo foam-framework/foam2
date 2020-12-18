@@ -742,6 +742,8 @@
                     createPredicate: foam.mlang.predicate.False.create(),
                     deletePredicate: foam.mlang.predicate.False.create()
                   }),
+                  mementoHead: null,
+                  backLabel: 'Back'
                 });
               } else {
                 of = obj.of;
@@ -771,7 +773,9 @@
                 editPredicate: foam.mlang.predicate.False.create(),
                 createPredicate: foam.mlang.predicate.False.create(),
                 deletePredicate: foam.mlang.predicate.False.create()
-              })
+              }),
+              mementoHead: null,
+              backLabel: 'Back'
             });
           })
           .catch(err => {
