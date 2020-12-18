@@ -18,13 +18,6 @@ foam.CLASS({
   ],
 
   css: `
-    ^ {
-      display: flex;
-      justify-content: center;
-      flex-grow: 1;
-      align-items: center;
-    }
-
     ^selected {
       border-color: /*%PRIMARY3%*/ #406dea !important;
     }
@@ -42,6 +35,16 @@ foam.CLASS({
 
     ^innerFlexer {
       min-width: -webkit-fill-available;
+    }
+
+    ^ .foam-u2-borders-CardBorder {
+      min-height: 10vh;
+      background-color: #ffffff;
+      border: solid 1px #e7eaec;
+      border-radius: 5px;
+      position: relative;
+      padding: 16px;
+      transition: all 0.2s linear;
     }
   `,
 
@@ -65,28 +68,28 @@ foam.CLASS({
   methods: [
     function initE() {
       this
-        .addClass(this.myClass('innerFlexer'))
-        .start(this.CardBorder)
-          .addClass(this.myClass())
-          .enableClass(this.myClass('selected'), this.slot((data, mode) => {
-            return data && mode !== foam.u2.DisplayMode.DISABLED
-          }))
-          .enableClass(this.myClass('disabled'), this.slot((data, mode) => {
-            return ! data && mode === foam.u2.DisplayMode.DISABLED
-          }))
-          .enableClass(this.myClass('selected-disabled'), this.slot((data, mode) => {
-            return data && mode === foam.u2.DisplayMode.DISABLED
-          }))
-          .on('click', this.onClick)
-          .add(this.label)
-        .end()
+      .addClass(this.myClass())
+      .addClass(this.myClass('innerFlexer'))
+      .start(this.CardBorder)
+        .enableClass(this.myClass('selected'), this.slot((data, mode) => {
+          return data && mode !== foam.u2.DisplayMode.DISABLED;
+        }))
+        .enableClass(this.myClass('disabled'), this.slot((data, mode) => {
+          return ! data && mode === foam.u2.DisplayMode.DISABLED;
+        }))
+        .enableClass(this.myClass('selected-disabled'), this.slot((data, mode) => {
+          return data && mode === foam.u2.DisplayMode.DISABLED;
+        }))
+        .on('click', this.onClick)
+        .add(this.label)
+      .end();
     }
   ],
 
   listeners: [
     function onClick() {
       if ( this.mode !== foam.u2.DisplayMode.DISABLED ) {
-        this.data = ! this.data
+        this.data = ! this.data;
       }
     }
   ]

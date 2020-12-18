@@ -290,7 +290,7 @@ foam.CLASS({
           this.memento.paramsObj.columns = [];
         var label = this.columnConfigToPropertyConverter.returnPropertyLabelForName(this.of, s);
         var col = this.memento.paramsObj.columns.find(c => c.name === label);
-        if ( !col ) {
+        if ( ! col ) {
           newMementoColumns.push({ name: label });
         } else {
           newMementoColumns.push(col);
@@ -304,6 +304,14 @@ foam.CLASS({
 
     async function initE() {
       var view = this;
+
+      //set memento's selected columns
+      if ( ! this.memento.paramsObj.columns ) {
+        this.memento.paramsObj.columns = this.columns_.map(c => {
+          return { name: this.columnConfigToPropertyConverter.returnPropertyLabelForName(this.of, this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c)) }
+        });
+        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj)
+      }
 
       //otherwise on adding new column creating new EditColumnsView, which is closed by default
       if (view.editColumnsEnabled)
