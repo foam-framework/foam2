@@ -8,6 +8,8 @@ foam.CLASS({
   package: 'foam.counter',
   name: 'Counter',
 
+  documentation: `Generic model that can be used by multiples daos for reporting purposes(e.g. groupby).`,
+
   properties: [
     {
       class: 'Long',
@@ -16,11 +18,13 @@ foam.CLASS({
     {
       name: 'name',
       class: 'String',
-      documentation: `daoName should match the dao where real object can be found`
+      documentation: `name is used to differentiate different objects from each other. Most likely you would
+        want to do something like x.counterDAO.where(eq(NAME, 'name_created_specifically_for_this_group'))`
     },
     {
       name: 'key',
-      class: 'String'
+      class: 'String',
+      documentation: `key is the value by which the result would be grouped`
     }
   ]
 });

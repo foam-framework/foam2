@@ -161,7 +161,7 @@ foam.CLASS({
   ],
   methods: [
     function toE(args, x) {
-      return foam.dashboard.view.Card.create({ data: this }, x);
+      return x.lookup('foam.dashboard.view.Card').create({ data: this }, x);
     }
   ],
   reactions: [
