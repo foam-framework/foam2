@@ -19,7 +19,7 @@ foam.CLASS({
   properties: [
     {
       name: 'readView',
-      value: { class: 'foam.u2.view.ValueView' }
+      value: { class: 'foam.u2.view.DateReadView' }
     },
     {
       name: 'writeView',
