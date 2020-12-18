@@ -89,11 +89,6 @@ foam.CLASS({
               continue;
             }
 
-            let baseCircleIndicator = {
-              size: 24,
-              borderThickness: 2,
-              label: '' + (1 + w - wSkipped),
-            };
             elem = elem
               .start()
                 .addClass(self.myClass('item'))
@@ -101,7 +96,7 @@ foam.CLASS({
 
                   // Render circle indicator
                   .start(this.CircleIndicator, this.configureIndicator(
-                    wizardlet, isCurrent, 1 + 2 - wSkipped
+                    wizardlet, isCurrent, (1 + w - wSkipped)
                   ))
                     .addClass('circle')
                   .end()
