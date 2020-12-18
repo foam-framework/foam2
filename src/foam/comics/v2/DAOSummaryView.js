@@ -47,20 +47,23 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.nanos.controller.Memento',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.ControllerMode',
-    'foam.u2.dialog.Popup',
+    'foam.u2.dialog.Popup'
   ],
 
   imports: [
     'auth',
+    'memento',
     'stack'
   ],
 
   exports: [
     'controllerMode',
-    'as objectSummaryView'
+    'as objectSummaryView',
+    'currentMemento as memento'
   ],
 
   properties: [
@@ -110,7 +113,16 @@ foam.CLASS({
       factory: function() {
         return () => this.stack.back();
       }
-    }
+    },
+    'currentMemento',
+    {
+      class: 'String',
+      name: 'mementoHead',
+      factory: function() {
+        return this.idOfRecord;
+      }
+    },
+    'idOfRecord'
   ],
 
   actions: [
@@ -141,6 +153,7 @@ foam.CLASS({
       },
       code: function() {
         if ( ! this.stack ) return;
+
         this.stack.push({
           class:  'foam.comics.v2.DAOUpdateView',
           data:   this.data,
@@ -222,15 +235,18 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.SUPER();
+      this.currentMemento$ = this.memento.tail$;
 
-      var promise = this.data ? Promise.resolve(this.data) : this.config.unfilteredDAO.inX(this.__subContext__).find(this.id);
+      var promise = this.data ? Promise.resolve(this.data) : this.config.unfilteredDAO.inX(this.__subContext__).find(this.idOfRecord);
 
       // Get a fresh copy of the data, especially when we've been returned
       // to this view from the edit view on the stack.
       promise.then(d => {
         if ( d ) self.data = d;
-
-        this
+        if ( self.currentMemento && self.currentMemento.tail && self.currentMemento.tail.head.toLowerCase() === 'edit' ) {
+          self.edit();
+        } else {
+          this
           .addClass(this.myClass())
           .add(self.slot(function(data, config$viewBorder, viewView) {
             return self.E()
@@ -246,7 +262,7 @@ foam.CLASS({
                   .endContext()
                   .start(self.Cols).style({ 'align-items': 'center' })
                     .start()
-                      .add(data.toSummary())
+                      .add(data && data.toSummary() ? data.toSummary() : '')
                       .addClass(self.myClass('account-name'))
                       .addClass('truncate-ellipsis')
                     .end()
@@ -277,6 +293,7 @@ foam.CLASS({
                 .end()
               .end();
           }));
+        }
       });
     }
   ]

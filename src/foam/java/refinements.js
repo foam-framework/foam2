@@ -53,6 +53,7 @@ foam.LIB({
         },
         Null: function(n) { return "null"; },
         Object: function(o) {
+          if ( o.asJavaValue ) return o.asJavaValue.call(o, o);
           return `foam.util.Arrays.asMap(new Object[] {
 ${Object.keys(o).map(function(k, i, a) {
   return `  ${foam.java.asJavaValue(k)}, ${foam.java.asJavaValue(o[k])}` + ((i == a.length-1) ? '' : ',')
@@ -396,7 +397,7 @@ foam.CLASS({
           name: isSet,
           type: 'boolean',
           visibility: 'private',
-          initializer: 'false'
+          initializer: 'false;'
         }).
         method({
           name: 'get' + capitalized,
@@ -429,10 +430,8 @@ foam.CLASS({
           name: 'clear' + capitalized,
           visibility: 'public',
           type: 'void',
-          body: `
-          assertNotFrozen();
-          ${isSet} = false;
-          `
+          body: `assertNotFrozen();
+${isSet} = false;`
         });
 
       if ( this.javaFactory ) {
@@ -591,7 +590,7 @@ foam.LIB({
           static: false,
           final: false,
           type: 'foam.core.X',
-          initializer: "foam.core.EmptyX.instance()"
+          initializer: "foam.core.EmptyX.instance();"
         });
 
         cls.method({
@@ -621,7 +620,7 @@ foam.LIB({
           static: false,
           final: false,
           type: 'boolean',
-          initializer: "false"
+          initializer: "false;"
         });
 
         if ( ! this.hasOwnAxiom('freeze') ) {
@@ -629,11 +628,9 @@ foam.LIB({
             name: 'freeze',
             type: 'foam.core.FObject',
             visibility: 'public',
-            body: `
-              beforeFreeze();
-              __frozen__ = true;
-              return this;
-            `
+            body: `beforeFreeze();
+__frozen__ = true;
+return this;`
           });
         }
 
@@ -642,9 +639,7 @@ foam.LIB({
             name: 'isFrozen',
             type: 'boolean',
             visibility: 'public',
-            body: `
-              return __frozen__;
-            `
+            body: `return __frozen__;`
           });
         }
 
@@ -654,11 +649,9 @@ foam.LIB({
             name: 'toString',
             type: 'String',
             visibility: 'public',
-            body: `
-              StringBuilder sb = new StringBuilder();
-              append(sb);
-              return sb.toString();
-            `
+            body: `StringBuilder sb = new StringBuilder();
+append(sb);
+return sb.toString();`
           });
         }
 
@@ -673,9 +666,7 @@ foam.LIB({
                 type: 'Object'
               }
             ],
-            body: `
-              return compareTo(o) == 0;
-            `
+            body: `return compareTo(o) == 0;`
           });
         }
 
@@ -849,21 +840,21 @@ foam.CLASS({
     function buildMethodInfoInitializer(cls) {
       // Add MethodInfo field for each method
       initializerString = `new foam.core.MethodInfo(){
-        @Override
-        public String getName(){
-          return "${this.name}";
-        }
-        @Override
-        public Object call(foam.core.X x, Object receiver, Object[] args){
-      `;
+@Override
+public String getName(){
+  return "${this.name}";
+}
+@Override
+public Object call(foam.core.X x, Object receiver, Object[] args){
+`;
       // See if call needs try catch block
       var exceptions = this.javaThrows.length > 0;
       if ( exceptions ) initializerString += `    try {
         `;
 
-      if ( this.javaType != 'void' ) initializerString += '    return ';
+      if ( this.javaType != 'void' ) initializerString += '  return ';
       // Use ((typeCast)receiver).methodName() to call method because of rare collisions between inner and outer class method names
-      initializerString += `    ((${cls.name})receiver).${this.name}(`;
+      initializerString += `((${cls.name})receiver).${this.name}(`;
       argsString = '';
       for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
         if ( this.args[i].javaType )
@@ -892,8 +883,8 @@ foam.CLASS({
       }
 
       initializerString += `}
-      }
-      `;
+};
+`;
       return initializerString;
     },
 

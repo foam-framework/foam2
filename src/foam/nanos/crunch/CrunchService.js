@@ -14,7 +14,9 @@ foam.INTERFACE({
 
   javaImports: [
     'foam.dao.ArraySink',
-    'foam.nanos.crunch.CapabilityJunctionPayload'
+    'foam.nanos.auth.Subject',
+    'foam.nanos.crunch.CapabilityJunctionPayload',
+    'foam.nanos.crunch.ui.WizardState'
   ],
 
   topics: [
@@ -193,6 +195,33 @@ foam.INTERFACE({
       ],
     },
     {
+      name: 'updateUserJunction',
+      async: true,
+      type: 'UserCapabilityJunction',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'subject',
+          type: 'foam.nanos.auth.Subject'
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        },
+        {
+          name: 'data',
+          type: 'foam.core.FObject'
+        },
+        {
+          name: 'status',
+          type: 'foam.nanos.crunch.CapabilityJunctionStatus'
+        }
+      ],
+    },
+    {
       name: 'maybeIntercept',
       documentation: `
         Invoke a capability intercept if no capabilities from the list of
@@ -295,6 +324,21 @@ foam.INTERFACE({
         {
           name: 'x',
           type: 'Context'
+        }
+      ]
+    },
+    {
+      name: 'getWizardState',
+      async: true,
+      type: 'WizardState',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
         }
       ]
     }

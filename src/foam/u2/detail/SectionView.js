@@ -78,6 +78,22 @@ foam.CLASS({
           return this.getNestedPropValue(obj[props.shift()], props.join('.'))
         }
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'loadLatch',
+      factory: function() {
+        return this.selected;
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'selected',
+      postSet: function() {
+        if ( this.selected ) 
+          this.loadLatch = this.selected;
+      },
+      value: true
     }
   ],
 
@@ -93,34 +109,50 @@ foam.CLASS({
           return self.Rows.create()
             .show(section.createIsAvailableFor(self.data$))
             .callIf(showTitle && section$title, function() {
-              var slot$ = foam.Function.isInstance(self.section.title) ?
-                foam.core.ExpressionSlot.create({
+              if ( foam.Function.isInstance(self.section.title) ) {
+                const slot$ = foam.core.ExpressionSlot.create({
                   args: [ self.evaluateMessage$, self.data$ ],
                   obj$: self.data$,
                   code: section.title
-                }) : section.title$;
-              this.start('h2').add(slot$).end();
+                });
+                if ( slot$.value ) {
+                  this.start('h2').add(slot$.value).end();
+                }
+              } else {
+                this.start('h2').add(section.title).end();
+              }
             })
             .callIf(section$subTitle, function() {
-              var slot$ = foam.Function.isInstance(self.section.subTitle) ?
-              foam.core.ExpressionSlot.create({
-                args: [ self.evaluateMessage$, self.data$ ],
-                obj$: self.data$,
-                code: section.subTitle
-              }) : section.subTitle$;
-              this.start().addClass('subtitle').add(slot$).end();
+              if ( foam.Function.isInstance(self.section.subTitle) ) {
+                const slot$ = foam.core.ExpressionSlot.create({
+                  args: [ self.evaluateMessage$, self.data$ ],
+                  obj$: self.data$,
+                  code: section.subTitle
+                });
+                if ( slot$.value ) {
+                  this.start().addClass('subtitle').add(slot$.value).end();
+                }
+              } else {
+                this.start().addClass('subtitle').add(section.subTitle).end();
+              }
             })
-            .start(self.Grid)
-              .forEach(section.properties, function(p, index) {
-                this.start(self.GUnit, {columns: p.gridColumns})
-                  .show(p.createVisibilityFor(self.data$, self.controllerMode$).map(mode => mode !== self.DisplayMode.HIDDEN))
-                  .tag(self.SectionedDetailPropertyView, {
-                    prop: p,
-                    data$: self.data$
-                  })
-                .end();
-              })
-            .end()
+            .add(this.slot(function(loadLatch) {
+              var view = this.E().start(self.Grid);
+              
+              if ( loadLatch ) {
+                view.forEach(section.properties, function(p, index) {
+                  this.start(self.GUnit, { columns: p.gridColumns })
+                    .show(p.createVisibilityFor(self.data$, self.controllerMode$).map(mode => mode !== self.DisplayMode.HIDDEN))
+                    .tag(self.SectionedDetailPropertyView, {
+                      prop: p,
+                      data$: self.data$
+                    })
+                  .end();
+                });
+              }
+
+              return view;
+            }))
             .start(self.Cols)
               .style({
                 'justify-content': 'end',

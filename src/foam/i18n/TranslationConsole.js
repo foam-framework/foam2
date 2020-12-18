@@ -64,9 +64,9 @@ foam.CLASS({
     {
       name: 'Row',
 
-      imports: [ 'locale', 'localeDAO', 'translationService' ],
-
       requires: [ 'foam.i18n.Locale' ],
+
+      imports: [ 'locale', 'localeDAO', 'translationService' ],
 
       tableColumns: [ 'source', 'defaultText', 'text', 'update' ],
 
@@ -81,7 +81,7 @@ foam.CLASS({
         {
           class: 'String',
           name: 'defaultText',
-          displayWidth: 250
+          displayWidth: 300
         },
         {
           class: 'String',

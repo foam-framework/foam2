@@ -18,7 +18,7 @@ foam.CLASS({
       border-radius: 5px;
 
       padding: 16px;
-
+      
       transition: all 0.2s linear;
     }
   `,
@@ -27,7 +27,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.addClass(this.myClass())
+      this.addClass(this.myClass());
     }
   ]
 });

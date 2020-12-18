@@ -78,7 +78,7 @@ foam.CLASS({
     'lastMenuLaunchedListener',
     'loginSuccess',
     'loginVariables',
-    'mementoTail as memento',
+    'memento',
     'menuListener',
     'notify',
     'pushMenu',
@@ -189,10 +189,9 @@ foam.CLASS({
     {
       name: 'memento',
       factory: function() {
-        return this.Memento.create({tail$: this.mementoTail$});
+        return this.Memento.create();
       }
     },
-    'mementoTail',
     {
       name: 'loginVariables',
       expression: function(client$userDAO) {
@@ -329,7 +328,11 @@ foam.CLASS({
     },
     'currentMenu',
     'lastMenuLaunched',
-    'webApp'
+    'webApp',
+    {
+      name: 'languageDefaults_',
+      factory: function() { return []; }
+    }
   ],
 
   methods: [
@@ -344,8 +347,19 @@ foam.CLASS({
       // Start Memento Support
       this.WindowHash.create({value$: this.memento.value$});
 
-      this.memento.head$.sub(this.mementoChange);
-      this.mementoChange();
+      this.onDetach(this.memento.changeIndicator$.sub(function () {
+        self.memento.value = self.memento.combine();
+
+        if ( ! self.memento.feedback_ )
+          self.mementoChange();
+      }));
+
+      this.onDetach(this.memento.value$.sub(function () {
+        self.memento.parseValue();
+
+        if ( ! self.memento.feedback_ )
+          self.mementoChange();
+      }));
       // End Memento Support
 
       this.clientPromise.then(async function(client) {
@@ -382,6 +396,7 @@ foam.CLASS({
         await self.fetchGroup();
         await self.fetchTheme();
         self.onUserAgentAndGroupLoaded();
+        self.mementoChange();
       });
     },
 
@@ -433,13 +448,22 @@ foam.CLASS({
     },
 
     function installLanguage() {
+      for ( var i = 0 ; i < this.languageDefaults_.length ; i++ ) {
+        var ld = this.languageDefaults_[i];
+        ld[0][ld[1]] = ld[2];
+      }
+      this.languageDefaults_ = undefined;
+
       var map = this.__subContext__.translationService.localeEntries;
       for ( var key in map ) {
         var node = global;
         var path = key.split('.');
 
         for ( var i = 0 ; node && i < path.length-1 ; i++ ) node = node[path[i]];
-        if ( node ) node[path[path.length-1]] = map[key];
+        if ( node ) {
+          this.languageDefaults_.push([node, path[path.length-1], node[path[path.length-1]]]);
+          node[path[path.length-1]] = map[key];
+        }
       }
     },
 
@@ -554,7 +578,7 @@ foam.CLASS({
       }
       /** Use to load a specific menu. **/
       // Do it this way so as to not reset mementoTail if set
-      if ( this.memento.head != menu || opt_forceReload ) {
+      if ( this.memento.head !== menu || opt_forceReload ) {
         this.memento.value = menu;
       }
     },

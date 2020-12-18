@@ -5,6 +5,7 @@
  */
 
 var classes = [
+  'foam.core.Action',
   'foam.core.Axiom',
   'foam.core.Detachable',
   'foam.core.Serializable',
@@ -105,7 +106,9 @@ var classes = [
   'foam.box.HTTPReplyBox',
   'foam.box.AuthServiceClientBox',
   'foam.box.ExportBox',
+  'foam.nanos.iban.IBANInfo',
   'foam.nanos.iban.ValidationIBAN',
+  'foam.nanos.iban.test.ValidationIBANTest',
   'foam.nanos.app.AppConfig',
   'foam.nanos.app.ContextLookupAppConfigService',
   'foam.nanos.http.WebAgent',
@@ -573,7 +576,12 @@ var classes = [
   'foam.flow.DocumentMenu',
 
   'foam.nanos.ruler.RuleGroup',
+  'foam.nanos.ruler.FindRuledCommand',
+  'foam.nanos.ruler.Ruled',
   'foam.nanos.ruler.Rule',
+  'foam.nanos.ruler.RuledDAO',
+  'foam.nanos.ruler.test.RuledDAOTest',
+  'foam.nanos.ruler.test.RuledDummy',
   'foam.nanos.ruler.RulerDAO',
   'foam.nanos.ruler.Operations',
   'foam.nanos.ruler.RulerProbe',
@@ -692,6 +700,8 @@ var classes = [
   'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
   'foam.nanos.crunch.CapabilityJunctionStatus',
   'foam.nanos.crunch.UserCapabilityJunction',
+  'foam.nanos.crunch.ui.WizardState',
+  // 'foam.nanos.crunch.ui.UserCapabilityWizardState',
   'foam.nanos.crunch.ui.CapabilityWizardlet',
   'foam.nanos.crunch.ui.ReviewCapabilityWizardlet',
   'foam.nanos.crunch.ui.MinMaxCapabilityWizardlet',
@@ -719,6 +729,7 @@ var classes = [
   'foam.nanos.auth.SetUserServiceProviderJunctionRuleAction',
 
   //ucjdao rules
+  'foam.nanos.crunch.ruler.AuthorizeUCJStatusOnPut',
   'foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut',
   'foam.nanos.crunch.ruler.ValidateUCJDataOnPut',
   'foam.nanos.crunch.ruler.SetUCJStatusOnPut',
@@ -733,6 +744,7 @@ var classes = [
 
   //crunch predicates
   'foam.nanos.crunch.predicate.CapabilityGranted',
+  'foam.nanos.crunch.predicate.CapabilityPrerequisitesGranted',
   'foam.nanos.crunch.predicate.StatusChangedTo',
   'foam.nanos.crunch.predicate.IsAgent',
 
