@@ -14,6 +14,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this.SUPER();
+      if ( ! foam.Date.isInstance(this.data) ) return;
 
       let stringDate = '';
       try {
