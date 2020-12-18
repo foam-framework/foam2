@@ -149,7 +149,7 @@ foam.CLASS({
     },
 
     function updatePredicate_(choice) {
-      var exists = typeof choice !== 'undefined' && choice !== '';
+      var exists = typeof choice !== 'undefined' && choice !== '' && choice != null;
       this.predicate = exists ? this.op.create({
         arg1: this.property,
         arg2: this.Constant.create({ value: choice })
