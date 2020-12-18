@@ -8,11 +8,24 @@ foam.CLASS({
   package: 'foam.i18n',
   name: 'Locale',
 
+  javaImports: [
+    'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
+  ],
+
   ids: ['locale', 'variant', 'source'],
 
   implements: [
     'foam.nanos.auth.LastModifiedAware',
     'foam.nanos.auth.LastModifiedByAware'
+  ],
+
+  messages: [
+    {
+      name: 'LACKS_UPDATE_PERMISSION',
+      message: 'You don\'t have permission to update the translation'
+    },
   ],
 
   properties: [
@@ -75,6 +88,24 @@ foam.CLASS({
           }
         }.bind(this));
       }
+    }
+  ],
+
+  methods: [
+    {
+      name: 'authorizeOnUpdate',
+      args: [
+        { name: 'x', type: 'Context' },
+      ],
+      javaThrows: ['AuthorizationException'],
+      javaCode: `
+      Subject subject = (Subject) x.get("subject");
+      User user = subject.getUser();
+
+      if ( user == null ) {
+        throw new AuthorizationException(LACKS_UPDATE_PERMISSION);
+      }
+      `
     }
   ]
 });
