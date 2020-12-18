@@ -206,10 +206,14 @@ foam.CLASS({
 
         if ( searchColumns ) return searchColumns;
 
-        if ( of.model_.searchColumns ) return of.model_.searchColumns;
+        var columns = of.getAxiomByName('searchColumns');
+        columns = columns && columns.columns;
+        if ( columns ) return columns;
 
-        if ( of.model_.tableColumns ) {
-          return of.model_.tableColumns.filter(function(c) {
+        columns = of.getAxiomByName('tableColumns');
+        columns = columns && columns.columns;
+        if ( columns ) {
+          return columns.filter(function(c) {
             var axiom = of.getAxiomByName(c);
             return axiom && axiom.searchView;
           });
