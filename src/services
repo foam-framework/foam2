@@ -986,6 +986,7 @@ p({
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("reportTemplates")
       .setAuthorize(true)
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("reportTemplateDAO"))
       .build();
   """,
   "client":
