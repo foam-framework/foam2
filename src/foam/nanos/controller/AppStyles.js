@@ -79,6 +79,9 @@ foam.CLASS({
   .inline-block {
     display: inline-block;
   }
-
+  .status-container {
+    display: inline-flex;
+    align-items: center;
+  }
   `
 });
