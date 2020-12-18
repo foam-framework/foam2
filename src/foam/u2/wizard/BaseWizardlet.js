@@ -14,8 +14,9 @@ foam.CLASS({
 
   requires: [
     'foam.u2.detail.AbstractSectionedDetailView',
+    'foam.u2.wizard.WizardletIndicator',
     'foam.u2.wizard.WizardletSection',
-    'foam.u2.wizard.WAO',
+    'foam.u2.wizard.WAO'
   ],
 
   properties: [
@@ -104,6 +105,18 @@ foam.CLASS({
       flags: ['web'],
       factory: function () {
         this.WAO.create();
+      }
+    },
+    {
+      name: 'indicator',
+      class: 'Enum',
+      of: 'foam.u2.wizard.WizardletIndicator',
+      documentation: `
+        Describes how this wizardlet will appear in the list of steps.
+      `,
+      expression: function (isValid) {
+        return isValid ? this.WizardletIndicator.COMPLETED
+          : this.WizardletIndicator.PLEASE_FILL;
       }
     }
   ],
