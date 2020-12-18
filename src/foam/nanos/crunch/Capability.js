@@ -455,6 +455,7 @@ foam.CLASS({
             status = CapabilityJunctionStatus.ACTION_REQUIRED;
             break;
           case PENDING_REVIEW :
+            // note: this shouldn't happen
             status = CapabilityJunctionStatus.ACTION_REQUIRED;
             break;
           default :
