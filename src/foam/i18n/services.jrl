@@ -47,7 +47,7 @@ p({
   "name":"translationService",
   "description":"Translation Service",
   "serve":true,
-  "authenticate":false,
+  "authenticate":true,
   "serviceScript":
   """
     return new foam.i18n.LocaleTranslationService.Builder(x).build();
