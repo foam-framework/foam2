@@ -40,7 +40,7 @@ foam.CLASS({
 
         return foam.u2.view.ChoiceView.create({
             placeholder: X.data.PLEASE_SELECT_TEMPLATE,
-            dao: X.reportTemplateDAO.where(expr.EQ(foam.nanos.export.report.Template.DAO_KEY, X.serviceName.split('/')[1])),
+            dao: X.reportTemplateDAO.where(expr.EQ(foam.nanos.export.report.Template.DAO_KEY, X.serviceName.includes('/') ? X.serviceName.split('/')[1] : X.serviceName )),
             objToChoice: function(a) {
               return [a.id, a.name];
           }
