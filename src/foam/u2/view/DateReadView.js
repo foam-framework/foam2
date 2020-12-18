@@ -11,18 +11,12 @@ foam.CLASS({
 
   documentation: 'formats date based on locale',
 
+  imports: ['formatDate'],
+
   methods: [
     function initE() {
       this.SUPER();
-      if ( ! foam.Date.isInstance(this.data) ) return;
-
-      let stringDate = '';
-      try {
-        stringDate = new Intl.DateTimeFormat(foam.locale).format(this.data);
-      } catch (e) {
-        stringDate = new Intl.DateTimeFormat('en-CA').format(this.data);
-      }
-      return this.add(stringDate);
+      return this.add(this.formatDate(this.data));
     }
-  ],
+  ]
 });
