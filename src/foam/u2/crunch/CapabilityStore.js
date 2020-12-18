@@ -248,6 +248,7 @@ foam.CLASS({
               })
             .end());
         }
+
         spot.start().start('span')
           .start('img').addClass(self.myClass('left-arrow')).show(this.cardsOverflow$)
             .attr('src', 'images/arrow-back-24px.svg')
@@ -279,6 +280,7 @@ foam.CLASS({
             })
           .end()
         .end();
+
         window.addEventListener('resize', checkCardsOverflow);
         checkCardsOverflow();
         self.onDetach(() => {
