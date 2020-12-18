@@ -43,7 +43,7 @@ foam.CLASS({
     ^innerFlexer {
       min-width: -webkit-fill-available;
     }
-    .foam-u2-borders-CardBorder {
+    ^.foam-u2-borders-CardBorder {
       min-height: 10vh;
       background-color: #ffffff;
       border: solid 1px #e7eaec;
