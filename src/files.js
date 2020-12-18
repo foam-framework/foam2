@@ -958,6 +958,6 @@ FOAM_FILES([
 
 
   { name: 'foam/counter/Counter' },
-  { name: 'foam/dashboard/view/TableView' },
+  { name: 'foam/dashboard/view/DashboardCitationView' },
 
 ])

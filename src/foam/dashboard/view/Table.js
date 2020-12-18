@@ -8,21 +8,19 @@ foam.CLASS({
   package: 'foam.dashboard.view',
   name: 'Table',
   extends: 'foam.u2.Element',
+
   requires: [
     'foam.core.Model',
     'foam.dao.ArrayDAO',
-//    'foam.u2.view.TableView',
+    'foam.dashboard.view.DashboardCitationView'
   ],
+
   imports: [
     'data',
+    'openFilteredListView'
   ],
+
   properties: [
-    {
-      name: 'tableView',
-      factory: function() {
-        return foam.u2.view.TableView;
-      }
-    },
     {
       name: 'listDaoName'
     },
@@ -56,11 +54,7 @@ foam.CLASS({
       },
     },
   ],
-  css: `
-    ^ table {
-      width: 100%;
-    }
-  `,
+
   methods: [
     function initE() {
     var self = this;
@@ -76,8 +70,33 @@ foam.CLASS({
               listDaoName: self.listDaoName
             }));
           })
-          return this.tableView.create({ data: dao }, this);
-        }))
+          return self.E()
+            .addClass(this.myClass())
+            .select(dao, function(obj) {
+              return self.E()
+                .start().addClass('table-row')
+                .start({
+                  class: self.DashboardCitationView,
+                  data: obj,
+                  of: dao.of
+                })
+                .on('click', function() {
+                  self.openFilteredListView(obj);
+                })
+               .end();
+           });
+       }))
     }
-  ]
+  ],
+
+  css: `
+    ^ .table-row:hover {
+      background: /*%GREY5%*/ #f5f7fa;
+      cursor: pointer;
+    }
+    ^ .table-row {
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+  `
 });

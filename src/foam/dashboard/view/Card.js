@@ -66,7 +66,7 @@ foam.CLASS({
       border-radius: 10px;
       background: white;
       margin: 8px;
-      padding-bottom: 20px;
+//      padding-bottom: 20px;
       box-shadow: 3px 8px 6px -2px #cccccc;
     }
 
@@ -75,7 +75,7 @@ foam.CLASS({
       padding-right: 16px;
       padding-top: 20px;
       padding-bottom: 20px;
-      margin-bottom: 16px;
+//      margin-bottom: 16px;
 //      border-bottom: 1px solid #ccc;
       font-weight: 500;
       height: 20px;
@@ -112,13 +112,13 @@ foam.CLASS({
         start('div').
         addClass(this.myClass('header')).
         start().
-//          style({ float: 'left' }).
+          style({ float: 'left' }).
           add(this.data.label$).
         end().
-//        start().
-//          style({ float: 'right' }).
-//          add(this.data.configView$).
-//        end().
+        start().
+          style({ float: 'right' }).
+          add(this.data.configView$).
+        end().
         end('div').
         start('div').
         addClass(this.myClass('content')).
