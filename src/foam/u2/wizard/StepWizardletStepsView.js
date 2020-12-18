@@ -168,6 +168,7 @@ foam.CLASS({
             if ( isCurrent ) afterCurrent = true;
           }
 
+          elem.onload.sub(self.setScrollPos);
           return elem;
         }))
     },
@@ -189,5 +190,24 @@ foam.CLASS({
         })
         .translate(title, title);
     }
+  ],
+
+  listeners: [
+    {
+      name: 'setScrollPos',
+      code: function() {
+        let currI = 0;
+        for ( let w = 0 ; w < this.data.wizardlets.length ; w++ ) {
+          let wizardlet = this.data.wizardlets[w];
+          if (wizardlet === this.data.currentWizardlet){
+            currI = Math.max(w - 1, 0);
+          }
+        }
+
+        var padding = this.childNodes[0].childNodes[0].el().offsetTop;
+        var scrollTop = this.childNodes[0].childNodes[currI].el().offsetTop;
+        this.parentNode.el().scrollTop = scrollTop - padding;
+      }
+    },
   ]
 });
