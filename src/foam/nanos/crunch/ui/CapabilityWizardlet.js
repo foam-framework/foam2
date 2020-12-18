@@ -9,7 +9,9 @@ foam.CLASS({
   extends: 'foam.u2.wizard.BaseWizardlet',
 
   requires: [
+    'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.ui.UserCapabilityJunctionWAO',
+    'foam.u2.wizard.WizardletIndicator'
   ],
 
   properties: [
@@ -67,6 +69,19 @@ foam.CLASS({
       name: 'dataController',
       factory: function () {
         return this.UserCapabilityJunctionWAO.create({}, this.__context__);
+      }
+    },
+    {
+      name: 'indicator',
+      expression: function (status) {
+        if (
+          status == this.CapabilityJunctionStatus.GRANTED ||
+          status == this.CapabilityJunctionStatus.PENDING ||
+          status == this.CapabilityJunctionStatus.GRACE_PERIOD
+        ) {
+          return this.WizardletIndicator.COMPLETED;
+        }
+        return this.WizardletIndicator.PLEASE_FILL;
       }
     },
     {

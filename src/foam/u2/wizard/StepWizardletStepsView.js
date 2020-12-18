@@ -52,7 +52,8 @@ foam.CLASS({
   requires: [
     'foam.u2.detail.AbstractSectionedDetailView',
     'foam.u2.tag.CircleIndicator',
-    'foam.u2.wizard.WizardPosition'
+    'foam.u2.wizard.WizardPosition',
+    'foam.u2.wizard.WizardletIndicator'
   ],
 
   messages: [
@@ -99,24 +100,9 @@ foam.CLASS({
                 .start().addClass(self.myClass('step-number-and-title'))
 
                   // Render circle indicator
-                  .start(this.CircleIndicator, {
-                    ...baseCircleIndicator,
-                    ...(isCurrent ? {
-                      borderColor: this.theme.black,
-                      borderColorHover: this.theme.black
-                    } : !afterCurrent && wizardlet.validate() ? {
-                      borderColor: this.theme.approval3,
-                      backgroundColor: this.theme.approval3,
-                      borderColorHover: this.theme.approval3,
-                      icon: this.theme.glyphs.checkmark.getDataUrl({
-                        fill: this.theme.white
-                      }),
-                      label: ''
-                    } : {
-                      borderColor: this.theme.grey2,
-                      borderColorHover: this.theme.grey2
-                    })
-                  })
+                  .start(this.CircleIndicator, this.configureIndicator(
+                    wizardlet, isCurrent, 1 + 2 - wSkipped
+                  ))
                     .addClass('circle')
                   .end()
 
@@ -188,6 +174,37 @@ foam.CLASS({
             : this.theme.grey2
         })
         .translate(title, title);
+    },
+    function configureIndicator(wizardlet, isCurrent, number) {
+      var args = {
+        size: 24, borderThickness: 2,
+      };
+      if ( wizardlet.indicator == this.WizardletIndicator.COMPLETED ) {
+        args = {
+          ...args,
+          borderColor: this.theme.approval3,
+          backgroundColor: this.theme.approval3,
+          borderColorHover: this.theme.approval3,
+          icon: this.theme.glyphs.checkmark.getDataUrl({
+            fill: this.theme.white
+          }),
+        };
+      } else {
+        args = {
+          ...args,
+          borderColor: this.theme.grey2,
+          borderColorHover: this.theme.grey2,
+          label: '' + number
+        };
+      }
+      if ( isCurrent ) {
+        args = {
+          ...args,
+          borderColor: this.theme.black,
+          borderColorHover: this.theme.black
+        };
+      }
+      return args;
     }
   ]
 });
