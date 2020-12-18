@@ -76,7 +76,7 @@ p({
   "class":"foam.nanos.boot.NSpec",
   "name":"userCapabilityJunctionDAO",
   "serve":true,
-  "serviceScript":"""    
+  "serviceScript":"""
     dao = new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(false)
       .setInnerDAO(x.get("bareUserCapabilityJunctionDAO"))
@@ -91,7 +91,7 @@ p({
 p({
   "class":"foam.nanos.boot.NSpec",
   "name":"bareUserCapabilityJunctionDAO",
-  "serviceScript":"""    
+  "serviceScript":"""
     decorator = new foam.dao.history.HistoryDAO(x, "userCapabilityJunctionHistoryDAO", new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo()).build());
     dao = new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(false)
@@ -210,4 +210,17 @@ p({
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.crunch.Capability\"}"
+})
+
+p({
+  class: "foam.nanos.boot.NSpec",
+  name: "wizardStateDAO",
+  lazy: true,
+  serve: true,
+  serviceScript: `
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.crunch.ui.WizardState.getOwnClassInfo())
+      .build();
+  `,
+  client: "{\"of\":\"foam.nanos.crunch.ui.WizardState\"}"
 })

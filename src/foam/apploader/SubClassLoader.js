@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'foam.apploader',
   name: 'SubClassLoader',
   exports: ['as classloader'],
+
   properties: [
     {
       class: 'Proxy',
@@ -19,6 +20,7 @@ foam.CLASS({
       value: [],
     },
   ],
+
   methods: [
     function maybeLoad(id) {
       return this.delegate.maybeLoad_(id, this.path);

@@ -36,7 +36,7 @@ foam.CLASS({
           properties: [
             {
               name: 'id',
-              label: data$data$arg1.label || data$data$arg1.cls_.name,
+              label: data$data$arg1.label || data$data$arg1.cls_.name
             },
             {
               name: 'value',
@@ -51,8 +51,8 @@ foam.CLASS({
           ]
         });
         return model.buildClass();
-      },
-    },
+      }
+    }
   ],
 
   methods: [

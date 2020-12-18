@@ -17,25 +17,36 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.crunch.CapabilityJunctionPayload',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.ui.CapabilityWizardlet'
   ],
 
   methods: [
     async function save(wizardlet) {
       if ( wizardlet.isAvailable ){
+
+        if ( wizardlet.status === this.CapabilityJunctionStatus.AVAILABLE ) {
+          wizardlet.status = this.CapabilityJunctionStatus.ACTION_REQUIRED;
+        }
+
         return this.capable.getCapablePayloadDAO().put(
           this.makePayload(wizardlet)
         );
       }
     },
     async function cancel(wizardlet) {
+      if ( ! wizardlet.isLoaded ) return;
       return this.capable.getCapablePayloadDAO().remove(
         this.makePayload(wizardlet)
       );
     },
     async function load(wizardlet) {
+      wizardlet.isLoaded = true;
+
       var targetPayload = await this.capable.getCapablePayloadDAO().find(
-        wizardlet.capability) || this.targetPayload;
+        wizardlet.capability.id ) || this.targetPayload;
+
+      wizardlet.status = this.CapabilityJunctionStatus.AVAILABLE;
 
       if ( targetPayload ) wizardlet.status = targetPayload.status;
 

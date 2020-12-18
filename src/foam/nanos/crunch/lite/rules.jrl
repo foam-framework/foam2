@@ -66,6 +66,6 @@ p({
     "class":"foam.nanos.approval.ApprovableApprovalRequestsRule"
   },
   "enabled":true,
-  "saveHistory":true,
+  "saveHistory":false,
   "lifecycleState":1
 })

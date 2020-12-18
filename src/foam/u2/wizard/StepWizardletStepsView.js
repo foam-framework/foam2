@@ -82,6 +82,7 @@ foam.CLASS({
             if (
               this.data.countAvailableSections(w) < 1
               || ! wizardlet.isAvailable
+              || ! wizardlet.isVisible
             ) {
               wSkipped++;
               continue;
@@ -182,11 +183,11 @@ foam.CLASS({
 
       return elem
         .style({
-          'color': isCurrent 
+          'color': isCurrent
             ? this.theme.black
             : this.theme.grey2
         })
-        .add(title);
+        .translate(title, title);
     }
   ]
 });

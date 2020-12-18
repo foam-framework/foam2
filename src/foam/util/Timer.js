@@ -120,7 +120,7 @@ return newValue as! Int
         {
           name: 'b',
           swiftType: 'Float?',
-        },
+        }
       ],
       code: function(frequency, a, b) {
         var s = Math.sin(this.time/1000*frequency*Math.PI*2);
@@ -133,8 +133,8 @@ let s = sin(Float(time)/1000*frequency*Float.pi*2)
 if a == nil { return s }
 if b == nil { return s * a! }
 return a! + (1 + s) * (b!-a!)/2;
-      */},
-    },
+      */}
+    }
   ],
 
   actions: [
