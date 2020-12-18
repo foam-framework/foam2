@@ -565,3 +565,12 @@ p({"class":"foam.nanos.auth.Region", "code":"US-WA", "name": "Washington", "coun
 p({"class":"foam.nanos.auth.Region", "code":"US-WV", "name": "West Virginia", "countryId":"US"})
 p({"class":"foam.nanos.auth.Region", "code":"US-WI", "name": "Wisconsin", "countryId":"US"})
 p({"class":"foam.nanos.auth.Region", "code":"US-WY", "name": "Wyoming", "countryId":"US"})
+
+
+//temp set up
+p({"class":"foam.nanos.auth.Region", "code":"JM-DEFAULT", "name": "", "countryId":"JM"})
+p({"class":"foam.nanos.auth.Region", "code":"LB-DEFAULT", "name": "", "countryId":"LB"})
+p({"class":"foam.nanos.auth.Region", "code":"MY-DEFAULT", "name": "", "countryId":"MY"})
+p({"class":"foam.nanos.auth.Region", "code":"MX-DEFAULT", "name": "", "countryId":"MX"})
+p({"class":"foam.nanos.auth.Region", "code":"ZA-DEFAULT", "name": "", "countryId":"ZA"})
+p({"class":"foam.nanos.auth.Region", "code":"TT-DEFAULT", "name": "", "countryId":"TT"})
