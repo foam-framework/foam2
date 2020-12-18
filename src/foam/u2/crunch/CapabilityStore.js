@@ -227,7 +227,6 @@ foam.CLASS({
         //     });
         //   })
         .end();
-        window.addEventListener('resize', this.onResize);
     },
 
     function renderFeatured() { // Featured Capabilities in carousel view
@@ -257,9 +256,14 @@ foam.CLASS({
             })
           .end()
         .end();
+        var ele;
+        function checkCardsOverflow(evt) {
+          if ( ! ele.el() ) return;
+          self.cardsOverflow = ele.el().scrollWidth > ele.el().clientWidth;
+        }
         spot.add(self.slot(
           function(carouselCounter, totalNumCards) {
-            var ele = self.E().addClass(self.myClass('feature-column-grid'));
+            ele = self.E().addClass(self.myClass('feature-column-grid'));
             for ( var k = 0 ; k < totalNumCards ; k++ ) {
               let cc = carouselCounter % totalNumCards; // this stops any out of bounds indecies
               let index = ( cc + totalNumCards + k ) % totalNumCards; // this ensures circle indecies
@@ -275,7 +279,11 @@ foam.CLASS({
             })
           .end()
         .end();
-        self.onResize();
+        window.addEventListener('resize', checkCardsOverflow);
+        checkCardsOverflow();
+        self.onDetach(() => {
+          window.removeEventListener('resize', checkCardsOverflow);
+        });
       });
       return spot;
     },
@@ -406,14 +414,6 @@ foam.CLASS({
         // Attempting to reset menuDAO incase of menu permission grantings.
         this.menuDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
         this.menuDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
-      }
-    },
-    {
-      name: 'onResize',
-      code: function() {
-        var scrollWidth = this.document.querySelector(`.foam-u2-crunch-CapabilityStore-feature-column-grid`).scrollWidth;
-        var clientWidth = this.document.querySelector(`.foam-u2-crunch-CapabilityStore-feature-column-grid`).clientWidth;
-        this.cardsOverflow = scrollWidth > clientWidth;
       }
     }
   ]
