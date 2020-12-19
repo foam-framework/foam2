@@ -110,6 +110,12 @@ foam.CLASS({
       `
     },
     {
+      name: 'removeAll_',
+      javaCode: `
+      getDelegate().select_(x, new RemoveAllSink(x, this), skip, limit, order, predicate);
+      `
+    },
+    {
       documentation: `
       1. If primary mediator, then delegate to medusaAdapter, accept result.
       2. If secondary mediator, proxy to next 'server', find result.

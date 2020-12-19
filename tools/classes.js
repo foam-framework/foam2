@@ -420,6 +420,7 @@ var classes = [
   'foam.nanos.medusa.MedusaType',
   'foam.nanos.medusa.PromotedPurgeAgent',
   'foam.nanos.medusa.RegionStatus',
+  'foam.nanos.medusa.RemoveAllSink',
   'foam.nanos.medusa.ReplayCmd',
   'foam.nanos.medusa.ReplayCompleteCmd',
   'foam.nanos.medusa.ReplayDetailsCmd',

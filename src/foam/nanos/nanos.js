@@ -205,6 +205,7 @@ FOAM_FILES([
   { name: 'foam/nanos/medusa/PromotedPurgeAgent' },
   { name: 'foam/nanos/medusa/RegionCView' },
   { name: 'foam/nanos/medusa/RegionStatus' },
+  { name: 'foam/nanos/medusa/RemoveAllSink' },
   { name: 'foam/nanos/medusa/ReplayCmd' },
   { name: 'foam/nanos/medusa/ReplayCompleteCmd' },
   { name: 'foam/nanos/medusa/ReplayDetailsCmd' },
