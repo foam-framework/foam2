@@ -230,23 +230,12 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
         }
       ],
       javaCode: `
-        // Find Group details, by iterating up through group.parent
-        Group group               = this;
-        DAO groupDAO              = (DAO) x.get("groupDAO");
-
-        String configUrl           = "";
-
-        // Get support info and url off group or parents.
-        while ( group != null ) {
-          configUrl = ! SafetyUtil.isEmpty(group.getUrl()) && SafetyUtil.isEmpty(configUrl) ?
-              group.getUrl() : configUrl;
-
-          if ( ! SafetyUtil.isEmpty(group.getUrl()) && ! SafetyUtil.isEmpty(configUrl) ) break;
-          group = (Group) groupDAO.find(group.getParent());
+        AppConfig appConfig = (AppConfig) x.get("appConfig");
+        if ( ! foam.util.SafetyUtil.isEmpty(getUrl()) ) {
+          appConfig = (AppConfig) appConfig.fclone();
+          appConfig.setUrl(getUrl());
         }
-
-        AppConfig config = (AppConfig) x.get("appConfig");
-        return config.configure(x, configUrl);
+        return appConfig;
         `
     },
     {
