@@ -111,12 +111,17 @@ foam.CLASS({
           .limit(1)
           .select();
       let diameter = Math.min(this.height, this.width);
+      // only one zone, use the zone 1 size
+      var radius = diameter;
+      if ( m == 0 ) {
+        radius = radius - (this.zoneRingWidth * 2);
+      }
       sink.array.forEach(function(cc) {
         let zone = this.ZoneCView.create({
           config: cc,
           height: this.height,
           width: this.width,
-          radius: diameter / 2,
+          radius: radius / 2,
           x: diameter / 2,
           y: diameter / 2
         });
