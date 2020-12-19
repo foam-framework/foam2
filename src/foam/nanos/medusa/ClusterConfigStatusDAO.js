@@ -66,20 +66,25 @@ foam.CLASS({
 
         ElectoralService electoralService = (ElectoralService) x.get("electoralService");
         if ( electoralService != null ) {
-          ClusterConfig config = support.getConfig(x, support.getConfigId());
           if ( support.canVote(x, nu) &&
-               support.canVote(x, config) ) {
+               support.canVote(x, myConfig) ) {
             Boolean hasQuorum = support.hasQuorum(x);
             if ( electoralService.getState() == ElectoralServiceState.IN_SESSION ||
                  electoralService.getState() == ElectoralServiceState.ADJOURNED) {
               if ( hadQuorum && ! hasQuorum) {
-                getLogger().warning(this.getClass().getSimpleName(), "mediator quorum lost");
+                getLogger().warning("mediator quorum lost");
+                electoralService.dissolve(x);
               } else if ( ! hadQuorum && hasQuorum) {
-                getLogger().warning(this.getClass().getSimpleName(), "mediator quorum acquired");
+                getLogger().warning("mediator quorum acquired");
+                electoralService.dissolve(x);
               } else {
-                getLogger().info(this.getClass().getSimpleName(), "mediator quorum membership change");
+                getLogger().info("mediator quorum membership change");
+                if ( nu.getIsPrimary() &&
+                     nu.getStatus() == Status.OFFLINE ) {
+                  getLogger().warning("primary OFFLINE");
+                  electoralService.dissolve(x);
+                }
               }
-              electoralService.dissolve(x);
             }
           }
         }
