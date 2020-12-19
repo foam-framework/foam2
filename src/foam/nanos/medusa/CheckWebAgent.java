@@ -29,12 +29,20 @@ public class CheckWebAgent
     ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
 
     if ( support != null ) {
-      ElectoralService electoral = (ElectoralService) x.get("electoralService");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
-      if ( config.getStatus() == Status.ONLINE &&
-           ( config.getZone() > 0 ||
-             ( config.getZone() == 0 &&
-               electoral.getState() == ElectoralServiceState.IN_SESSION ) ) ) {
+      ElectoralService electoral = (ElectoralService) x.get("electoralService");
+      if ( config.getType() == MedusaType.MEDIATOR ) {
+        if ( config.getStatus() == Status.ONLINE &&
+             ( config.getZone() > 0 ||
+               ( config.getZone() == 0 &&
+                 electoral.getState() == ElectoralServiceState.IN_SESSION ) ) ) {
+          response.setStatus(HttpServletResponse.SC_OK);
+          out.println("up\n");
+        } else {
+          response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+          out.println("maint\n");
+        }
+      } else if ( config.getStatus() == Status.ONLINE ) {
         response.setStatus(HttpServletResponse.SC_OK);
         out.println("up\n");
       } else {
