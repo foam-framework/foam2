@@ -7,14 +7,19 @@
 foam.CLASS({
   package: 'com.google.foam.demos.mandelbrot',
   name: 'Mandelbrot',
-  extends: 'foam.graphics.Box',
-//  extends: 'foam.u2.Element',
+  //extends: 'foam.graphics.Box',
+  extends: 'foam.u2.Element',
 
   requires: [
+    'foam.graphics.Box',
     'foam.input.Gamepad'
   ],
 
   properties: [
+    {
+      name: 'canvas',
+      factory: function() { return this.Box.create({width: this.width, height: this.height}); }
+    },
     [ 'width',  1400 ],
     [ 'height', 800 ],
     [ 'x1',      -2 ],
@@ -23,7 +28,7 @@ foam.CLASS({
     [ 'y2',       1.15 ],
     {
       name: 'img',
-      factory: function() { return this.canvas.context.createImageData(this.width, this.height); }
+      factory: function() { return this.canvas.canvas.context.createImageData(this.width, this.height); }
     },
     {
       // Joystick
@@ -33,19 +38,33 @@ foam.CLASS({
   ],
 
   methods: [
-    /*
+
     function initE() {
       this.SUPER();
 
-      // Set focus so keyboard actions work
-      this.focus();
-    },
-    */
+      this.style({outline: 'none'}).focus().add(this.canvas);
 
-    function initCView() {
-      this.SUPER();
-//      this.canvas.style({transform: 'scale(.25,.25)'});
+      this.canvas.paintSelf = (ctx) => {
+        var x1 = this.x1, y1 = this.y1, x2 = this.x2, y2 = this.y2, width = this.width, height = this.height, xd = x2-x1, yd = y2-y1;
+        var v;
+        for ( var i = 0 ; i < width-10 ; i += 10 ) {
+          for ( var j = 0 ; j < height-10 ; j += 10 ) {
+            v = 0;
+            for ( var i2 = i ; i2 < i + 10 ; i2++ ) {
+              for ( var j2 = j ; j2 < j + 10 ; j2++ ) {
+                var x = i2/width*xd+x1;
+                var y = j2/height*yd+y1;
+                v = v || this.calc(x, y);
+                console.log(x,y);
+                this.set(i2, j2, v);
+              }
+            }
+          }
+        }
+        ctx.putImageData(this.img, 0, 0);
+      };
     },
+
 
     function set(x, y, c) {
       this.img.data[(y*this.width+x)*4] = c;
@@ -67,16 +86,8 @@ foam.CLASS({
       return 0;
     },
 
-    function paintSelf(ctx) {
-      var x1 = this.x1, y1 = this.y1, x2 = this.x2, y2 = this.y2, width = this.width, height = this.height, xd = x2-x1, yd = y2-y1;
-      for ( var i = 0 ; i < width-1 ; i++ ) {
-        for ( var j = 0 ; j < height-1 ; j++ ) {
-          var x = i/width*xd+x1;
-          var y = j/height*yd+y1;
-          this.set(i, j, this.calc(x, y));
-        }
-      }
-      ctx.putImageData(this.img, 0, 0);
+    function invalidate() {
+      this.canvas.invalidate();
     }
   ],
 
@@ -110,8 +121,8 @@ foam.CLASS({
       keyboardShortcuts: [ 38 /* up arrow */, 'w' ],
       code: function() {
         var y1 = this.y1, y2 = this.y2, yd = y2-y1;
-        this.y1 += yd/10;
-        this.y2 += yd/10;
+        this.y1 -= yd/10;
+        this.y2 -= yd/10;
         this.invalidate();
       }
     },
@@ -120,8 +131,8 @@ foam.CLASS({
       keyboardShortcuts: [ 40 /* down arrow */, 's' ],
       code: function() {
         var y1 = this.y1, y2 = this.y2, yd = y2-y1;
-        this.y1 -= yd/10;
-        this.y2 -= yd/10;
+        this.y1 += yd/10;
+        this.y2 += yd/10;
         this.invalidate();
       }
     },
@@ -130,8 +141,8 @@ foam.CLASS({
       keyboardShortcuts: [ 37 /* left arrow */, 'a' ],
       code: function() {
         var x1 = this.x1, x2 = this.x2, xd = x2-x1;
-        this.x1 += xd/10;
-        this.x2 += xd/10;
+        this.x1 -= xd/10;
+        this.x2 -= xd/10;
         this.invalidate();
       }
     },
@@ -140,8 +151,8 @@ foam.CLASS({
       keyboardShortcuts: [ 39 /* right arrow */, 'd' ],
       code: function() {
         var x1 = this.x1, x2 = this.x2, xd = x2-x1;
-        this.x1 -= xd/10;
-        this.x2 -= xd/10;
+        this.x1 += xd/10;
+        this.x2 += xd/10;
         this.invalidate();
       }
     },
