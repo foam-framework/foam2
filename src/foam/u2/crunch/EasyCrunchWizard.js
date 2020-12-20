@@ -42,8 +42,6 @@ foam.CLASS({
       if ( this.skipMode )
         sequence.reconfigure('SkipGrantedAgent', {
           mode: this.skipMode });
-      if ( this.statelessWizard )
-        sequence.remove('WizardStateAgent');
     },
     async function execute () {
       // Subclasses which fetch information asynchronously can override this

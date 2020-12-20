@@ -881,7 +881,6 @@ FOAM_FILES([
   { name: "foam/u2/wizard/WizardPosition" },
   { name: "foam/u2/wizard/Wizardlet" },
   { name: "foam/u2/wizard/WizardletSection" },
-  { name: "foam/u2/wizard/WizardletIndicator" },
   { name: "foam/u2/wizard/BaseWizardlet" },
   { name: "foam/u2/wizard/WizardletView" },
   { name: "foam/u2/wizard/StepWizardConfig" },
