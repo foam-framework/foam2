@@ -9,7 +9,9 @@ foam.CLASS({
   extends: 'foam.u2.wizard.BaseWizardlet',
 
   requires: [
+    'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.ui.UserCapabilityJunctionWAO',
+    'foam.u2.wizard.WizardletIndicator'
   ],
 
   properties: [
@@ -49,18 +51,37 @@ foam.CLASS({
       }
     },
     {
+      name: 'isAvailablePromise',
+      factory: () => Promise.resolve(),
+    },
+    {
       name: 'isAvailable',
       class: 'Boolean',
       value: true,
       postSet: function (ol, nu) {
-        if ( nu ) this.save();
-        else this.cancel();
+        if ( nu ) this.isAvailablePromise =
+          this.isAvailablePromise.then(() => this.save());
+        else this.isAvailablePromise =
+          this.isAvailablePromise.then(() => this.cancel());
       }
     },
     {
       name: 'dataController',
       factory: function () {
         return this.UserCapabilityJunctionWAO.create({}, this.__context__);
+      }
+    },
+    {
+      name: 'indicator',
+      expression: function (status) {
+        if (
+          status == this.CapabilityJunctionStatus.GRANTED ||
+          status == this.CapabilityJunctionStatus.PENDING ||
+          status == this.CapabilityJunctionStatus.GRACE_PERIOD
+        ) {
+          return this.WizardletIndicator.COMPLETED;
+        }
+        return this.WizardletIndicator.PLEASE_FILL;
       }
     },
     {

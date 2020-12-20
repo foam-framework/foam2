@@ -24,8 +24,8 @@ foam.CLASS({
       return this.crunchService.updateJunction( null,
         wizardlet.capability.id, wizardlet.data, null
       ).then((ucj) => {
-        this.crunchService.pub('updateJunction');
         this.crunchService.pub('grantedJunction');
+        this.load_(wizardlet, ucj);
         return ucj;
       });
     },
@@ -41,22 +41,25 @@ foam.CLASS({
       return this.crunchService.getJunction(
         null, wizardlet.capability.id
       ).then(ucj => {
-        wizardlet.status = ucj.status;
+        this.load_(wizardlet, ucj);
+      });
+    },
+    function load_(wizardlet, ucj) {
+      wizardlet.status = ucj.status;
 
-        // No 'of'? No problem
-        if ( ! wizardlet.of ) return wizardlet;
+      // No 'of'? No problem
+      if ( ! wizardlet.of ) return;
 
-        // Load UCJ data to wizardlet
-        var loadedData = wizardlet.of.create({}, wizardlet);
-        if ( ucj.data ) loadedData.copyFrom(ucj.data);
+      // Load UCJ data to wizardlet
+      var loadedData = wizardlet.of.create({}, wizardlet);
+      if ( ucj.data ) loadedData.copyFrom(ucj.data);
 
         // Set transient 'capability' property if it exists
         var prop = wizardlet.of.getAxiomByName('capability');
         if ( prop ) prop.set(loadedData, wizardlet.capability);
 
-        // Finally, apply new data to wizardlet
-        wizardlet.data = loadedData;
-      });
+      // Finally, apply new data to wizardlet
+      wizardlet.data = loadedData;
     }
   ]
 });
