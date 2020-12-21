@@ -17,6 +17,7 @@ foam.CLASS({
         cls.extras.push(`
           public DigErrorMessage(String message) {
             super(message);
+            setMessage(message);
           } 
         `
         );

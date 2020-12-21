@@ -21,6 +21,7 @@ foam.CLASS({
         cls.extras.push(`
           public AuthorizationException(String message) {
             super(message);
+            setMessage(message);
           } 
         `
         );

@@ -55,7 +55,14 @@ public class DigUtil {
 
       JSONParser jsonParser = new JSONParser();
       jsonParser.setX(x);
-      Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(x, new PropertyPredicate[] {new NetworkPropertyPredicate(), new PermissionedPropertyPredicate()}));
+      foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(x)
+        .setPropertyPredicate(
+          new foam.lib.AndPropertyPredicate(x, 
+            new foam.lib.PropertyPredicate[] {
+              new foam.lib.ExternalPropertyPredicate(),
+              new foam.lib.NetworkPropertyPredicate(), 
+              new foam.lib.PermissionedPropertyPredicate()}));
+
       outputterJson.setOutputDefaultValues(true);
       outputterJson.setOutputClassNames(true);
       outputterJson.setMultiLine(true);
@@ -96,12 +103,18 @@ public class DigUtil {
 
       JSONParser jsonParser = new JSONParser();
       jsonParser.setX(x);
-      Outputter outputterJson = new Outputter(x).setPropertyPredicate(new AndPropertyPredicate(new PropertyPredicate[] {new StoragePropertyPredicate(), new PermissionedPropertyPredicate()}));
-      outputterJson.setOutputDefaultValues(true);
-      outputterJson.setOutputClassNames(true);
-      outputterJson.setMultiLine(true);
-      outputterJson.outputJSONJFObject(object);
-      out.println(outputterJson.toString());
+      foam.lib.json.Outputter outputterJsonJ = new foam.lib.json.Outputter(x)
+        .setPropertyPredicate(
+          new foam.lib.AndPropertyPredicate(x, 
+            new foam.lib.PropertyPredicate[] {
+              new foam.lib.ExternalPropertyPredicate(),
+              new foam.lib.NetworkPropertyPredicate(),
+              new foam.lib.PermissionedPropertyPredicate()}));
+      outputterJsonJ.setOutputDefaultValues(true);
+      outputterJsonJ.setOutputClassNames(true);
+      outputterJsonJ.setMultiLine(true);
+      outputterJsonJ.outputJSONJFObject(object);
+      out.println(outputterJsonJ.toString());
 
     } else {
       throw new UnsupportedOperationException(

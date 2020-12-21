@@ -79,8 +79,10 @@ foam.CLASS({
     {
       name: 'put',
       args: [ { name: 'x', type: 'X' } ],
+      javaThrows: [
+        'java.lang.Exception'
+      ],
       javaCode: `
-      try {
         DAO dao = getDAO(x);
         if ( dao == null )
           return;
@@ -112,13 +114,6 @@ foam.CLASS({
         
         HttpServletResponse resp = x.get(HttpServletResponse.class);
         resp.setStatus(HttpServletResponse.SC_OK);
-      }
-      catch (RuntimeException re) {
-        throw re;
-      }
-      catch (java.lang.Exception e) {
-        throw new RuntimeException(e);
-      }
       `
     },
     {

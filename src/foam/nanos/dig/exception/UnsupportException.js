@@ -15,6 +15,7 @@ foam.CLASS({
         cls.extras.push(`
           public UnsupportException(String message) {
             super(message);
+            setMessage(message);
           } 
         `
         );

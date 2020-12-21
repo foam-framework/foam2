@@ -44,7 +44,8 @@ foam.CLASS({
     },
     {
       name: 'message_',
-      class: 'String'
+      class: 'String',
+      externalTransient: true
     }
   ],
   

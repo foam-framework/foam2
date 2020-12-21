@@ -17,7 +17,7 @@ import java.io.PrintWriter;
 import javax.servlet.http.HttpServletResponse;
 
 public class DigWebAgent
-  implements WebAgent
+  implements WebAgent, SendErrorHandler
 {
   public DigWebAgent() {}
 
@@ -54,6 +54,8 @@ public class DigWebAgent
           driver.remove(x);
           break;
       }
+    } catch (DigErrorMessage dem) {
+      DigUtil.outputException(x, dem, format);
     } catch (FOAMException fe) {
       DigUtil.outputFOAMException(x, fe, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, format);
     } catch (Throwable t) {
@@ -67,5 +69,18 @@ public class DigWebAgent
     } finally {
       pm.log(x);
     }
+  }
+
+  public void sendError(X x, int status, String message) {
+    DigUtil.outputException(x, 
+      new GeneralException.Builder(x)
+        .setStatus(String.valueOf(status))
+        .setMessage(message)
+        .build(), 
+      Format.JSON);
+  }
+
+  public boolean redirectToLogin(X x) {
+    return false;
   }
 }

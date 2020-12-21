@@ -15,6 +15,7 @@ foam.CLASS({
         cls.extras.push(`
           public DAOPutException(String message) {
             super(message);
+            setMessage(message);
           } 
         `
         );

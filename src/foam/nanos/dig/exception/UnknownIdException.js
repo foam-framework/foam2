@@ -15,6 +15,7 @@ foam.CLASS({
         cls.extras.push(`
           public UnknownIdException(String message) {
             super(message);
+            setMessage(message);
           } 
         `
         );
