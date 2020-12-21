@@ -125,8 +125,10 @@ foam.CLASS({
 
   listeners: [
     function close() {
+      debugger;
       if ( this.onClose ) this.onClose();
       this.remove();
+      debugger;
     }
   ],
 

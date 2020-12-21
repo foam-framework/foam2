@@ -366,6 +366,14 @@ foam.CLASS({
       `
     },
     {
+      type: 'Context',
+      name: 'actionContext',
+      documentation: `
+        Optional. If this is provided alongside an action, the action will be executed
+        using this context.
+      `
+    },
+    {
       class: 'Boolean',
       name: 'allowClearingSelection',
       documentation: `
@@ -524,8 +532,16 @@ foam.CLASS({
                       });
                     });
                   }))
-                  .add(this.slot(function(action) {
-                    if ( action ) {
+                  .add(this.slot(function(action, actionContext) {
+                    if ( action && actionContext) {
+                      return this.E()
+                        .startContext({data: actionContext})
+                        .start(self.DefaultActionView, { action: action })
+                          .addClass(self.myClass('action'))
+                        .end()
+                        .endContext();
+                    }
+                    if ( action && ! actionContext) {
                       return this.E()
                         .start(self.DefaultActionView, { action: action })
                           .addClass(self.myClass('action'))
