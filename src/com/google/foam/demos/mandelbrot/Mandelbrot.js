@@ -7,7 +7,6 @@
 foam.CLASS({
   package: 'com.google.foam.demos.mandelbrot',
   name: 'Mandelbrot',
-  //extends: 'foam.graphics.Box',
   extends: 'foam.u2.Element',
 
   requires: [
@@ -44,7 +43,6 @@ foam.CLASS({
   ],
 
   methods: [
-
     function initE() {
       this.SUPER();
 
@@ -54,15 +52,27 @@ foam.CLASS({
         var start = performance.now();
         var x1 = this.x1, y1 = this.y1, x2 = this.x2, y2 = this.y2, width = this.width, height = this.height, xd = x2-x1, yd = y2-y1;
         var v;
-        for ( var i = 0 ; i < width-20 ; i += 10 ) {
-          for ( var j = 0 ; j < height-20 ; j += 10 ) {
-            v = 0;
-            for ( var i2 = i ; i2 < i + 10 ; i2++ ) {
-              for ( var j2 = j ; j2 < j + 10 ; j2++ ) {
+        var v = [];
+        for ( var i = 0 ; i < width/10 ; i++ ) {
+          v[i] = [];
+          for ( var j = 0 ; j < height/10 ; j++ ) {
+            var x = i*10/width*xd+x1;
+            var y = j*10/height*yd+y1;
+            v[i][j] = this.calc(x, y);
+          }
+        }
+        function eq(c, i, j) {
+          return v[i] == undefined || v[i][j] == undefined || v[i][j] == c;
+        }
+        for ( var i = 0 ; i < width/10; i++ ) {
+          for ( var j = 0 ; j < height/10 ; j++ ) {
+            var c = v[i][j];
+            var same = eq(c, i-1, j) && eq(c, i+1, j) && eq(c, i, j-1) && eq(c, i, j+1);
+            for ( var i2 = i*10 ; i2 < i*10 + 10 ; i2++ ) {
+              for ( var j2 = j*10 ; j2 < j*10 + 10 ; j2++ ) {
                 var x = i2/width*xd+x1;
                 var y = j2/height*yd+y1;
-                v = /*v ||*/ this.calc(x, y);
-                this.set(i2, j2, v);
+                this.set(i2, j2, same ? c : this.calc(x, y));
               }
             }
           }
@@ -87,17 +97,18 @@ foam.CLASS({
         this.img.data[i+2] = c || rgb[2];
         this.img.data[i+3] = 255;
       }
-
     },
 
     function calc(x, y) {
       var zx = 0, zy = 0;
+
       for ( var i = 0 ; i < 255 ; i++ ) {
         var xt = zx*zy;
         zx = zx*zx - zy*zy + x;
         zy = 2*xt + y;
         if ( zx*zx + zy*zy > 4 ) return i;
       }
+
       return 0;
     },
 
@@ -108,23 +119,23 @@ foam.CLASS({
     function hslToRgb(h, s, l){
         var r, g, b;
 
-        if(s == 0){
-            r = g = b = l; // achromatic
-        }else{
-            var hue2rgb = function hue2rgb(p, q, t){
-                if(t < 0) t += 1;
-                if(t > 1) t -= 1;
-                if(t < 1/6) return p + (q - p) * 6 * t;
-                if(t < 1/2) return q;
-                if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-                return p;
-            }
+        if ( s == 0 ) {
+          r = g = b = l; // achromatic
+        } else {
+          var hue2rgb = function hue2rgb(p, q, t) {
+            if ( t < 0 ) t += 1;
+            if ( t > 1 ) t -= 1;
+            if ( t < 1/6 ) return p + (q - p) * 6 * t;
+            if ( t < 1/2 ) return q;
+            if ( t < 2/3 ) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+          }
 
-            var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-            var p = 2 * l - q;
-            r = hue2rgb(p, q, h + 1/3);
-            g = hue2rgb(p, q, h);
-            b = hue2rgb(p, q, h - 1/3);
+          var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+          var p = 2 * l - q;
+          r = hue2rgb(p, q, h + 1/3);
+          g = hue2rgb(p, q, h);
+          b = hue2rgb(p, q, h - 1/3);
         }
 
         return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
@@ -195,9 +206,6 @@ foam.CLASS({
         this.x2 += xd/10;
         this.invalidate();
       }
-    },
+    }
   ]
-
-
-// this.invalidate();
 });
