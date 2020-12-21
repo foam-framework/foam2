@@ -2650,7 +2650,7 @@ return getGroupKeys();`
    group = (foam.dao.Sink) (((foam.core.FObject)getArg2()).fclone());
    getGroups().put(key, group);
    if ( ! this.getGroupKeys().contains(key) )
-    getGroupKeys().add(key);
+     getGroupKeys().add(key);
  }
  group.put(obj, sub);`
     },
