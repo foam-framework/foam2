@@ -68,14 +68,9 @@ foam.CLASS({
                 data.validate(sourceX);
                 ucj.setStatus(CapabilityJunctionStatus.PENDING);
                 ucj.resetRenewalStatus();
-              } catch (foam.core.ValidationException | IllegalStateException e) {
+              } catch (Throwable e) {
                 Logger logger = (Logger) x.get("logger");
                 logger.warning("Validation failed", e.getMessage(), ucj.toString());
-                throw e;
-              } catch (Exception e) {
-                Logger logger = (Logger) x.get("logger");
-                logger.warning("Validation failed", e.getMessage(), ucj.toString());
-                throw new foam.core.ValidationException(e.getMessage(), e);
               }
             }
           }
