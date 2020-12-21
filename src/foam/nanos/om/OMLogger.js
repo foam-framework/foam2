@@ -17,6 +17,17 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'fold',
+      type: 'Void',
+      args: [ 
+        { name: 'value', type: 'Float' },
+        { name: 'args', javaType: 'Object...' } 
+      ],
+      javaCode: `
+        ((FoldManager) getX().get("omFoldManager")).foldForState(combine(args), new Date(), value);
+      `
+    },
+    {
       name: 'log',
       javaCode: `
         ((FoldManager) getX().get("omFoldManager")).foldForState(combine(args), new Date(), 1);
