@@ -16,11 +16,16 @@ foam.CLASS({
   ],
 
   imports: [
-    'data',
-    'openFilteredListView'
+    'data'
   ],
 
   properties: [
+    {
+      name: 'citationView',
+      factory: function() {
+        return this.DashboardCitationView;
+      }
+    },
     {
       name: 'listDaoName'
     },
@@ -76,12 +81,9 @@ foam.CLASS({
               return self.E()
                 .start().addClass('table-row')
                 .start({
-                  class: self.DashboardCitationView,
+                  class: self.citationView,
                   data: obj,
                   of: dao.of
-                })
-                .on('click', function() {
-                  self.openFilteredListView(obj);
                 })
                .end();
            });
@@ -95,8 +97,8 @@ foam.CLASS({
       cursor: pointer;
     }
     ^ .table-row {
-      padding-left: 15px;
-      padding-right: 15px;
+      padding-left: 20px;
+      padding-right: 20px;
     }
   `
 });

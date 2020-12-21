@@ -13,6 +13,10 @@ foam.CLASS({
     foam.pattern.Faceted.create()
   ],
 
+  imports: [
+  'stack'
+  ],
+
   exports: [
     'as rowView'
   ],
@@ -26,7 +30,11 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      var self = this;
       this
+      .on('click', function() {
+        self.openFilteredListView(self.data);
+      })
         .addClass(this.myClass())
         .start()
           .addClass('id')
@@ -36,6 +44,15 @@ foam.CLASS({
           .addClass('value')
           .add(this.data['value'])
         .end()
+    },
+
+    function openFilteredListView(obj) {
+      var dao = this.__subContext__[obj.listDaoName].where(this.EQ(obj.searchKey, obj.id));
+      var config = foam.comics.v2.DAOControllerConfig.create({ dao: dao, hideQueryBar: true });
+      this.stack.push({
+        class: 'foam.comics.v2.DAOBrowserView',
+        config: config
+      });
     }
   ],
 
@@ -56,6 +73,7 @@ foam.CLASS({
 
     ^ .value {
       font-size: 13px;
+      font-weight: 500;
     }
   `
 });
