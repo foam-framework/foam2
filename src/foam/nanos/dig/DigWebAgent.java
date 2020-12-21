@@ -55,10 +55,13 @@ public class DigWebAgent
           break;
       }
     } catch (DigErrorMessage dem) {
+      logger.error(e);
       DigUtil.outputException(x, dem, format);
     } catch (FOAMException fe) {
+      logger.error(fe);
       DigUtil.outputFOAMException(x, fe, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, format);
     } catch (Throwable t) {
+      logger.error(t);
       DigUtil.outputException(x, 
           new GeneralException.Builder(x)
             .setStatus(String.valueOf(HttpServletResponse.SC_INTERNAL_SERVER_ERROR))
