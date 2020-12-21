@@ -7,6 +7,22 @@ foam.CLASS({
   package: 'foam.nanos.dig.exception',
   name: 'DigErrorMessage',
   implements: ['foam.core.Exception'],
+  extends: 'foam.core.FOAMException',
+  javaGenerateConvenienceConstructor: false,
+
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+          public DigErrorMessage(String message) {
+            super(message);
+          } 
+        `
+        );
+      }
+    }
+  ],
 
   properties: [
     {
@@ -32,6 +48,15 @@ foam.CLASS({
     {
       class: 'String',
       name: 'moreInfo'
+    }
+  ],
+
+  methods:  [
+    {
+        name: 'getClientRethrowException',
+        type: 'RuntimeException',
+        visibility: 'public',
+        javaCode: `return this;`
     }
   ]
 });

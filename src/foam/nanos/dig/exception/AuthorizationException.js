@@ -14,6 +14,20 @@ foam.CLASS({
     permission to access.
   `,
 
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+          public AuthorizationException(String message) {
+            super(message);
+          } 
+        `
+        );
+      }
+    }
+  ],
+
   properties: [
     {
       class: 'String',

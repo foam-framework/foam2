@@ -6,6 +6,7 @@
 
 package foam.nanos.dig;
 
+import foam.core.FOAMException;
 import foam.core.FObject;
 import foam.core.X;
 import foam.lib.*;
@@ -35,6 +36,13 @@ public class DigUtil {
 
     resp.setStatus(Integer.parseInt(error.getStatus()));
     outputFObject(x, error, format);
+  }
+
+  public static void outputFOAMException(X x, FOAMException foamException, int status, Format format) {
+    HttpServletResponse resp = x.get(HttpServletResponse.class);
+
+    resp.setStatus(status);
+    outputFObject(x, foamException, format);
   }
 
   public static void outputFObject(X x, FObject object, Format format) {

@@ -54,19 +54,16 @@ public class DigWebAgent
           driver.remove(x);
           break;
       }
+    } catch (FOAMException fe) {
+      DigUtil.outputFOAMException(x, fe, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, format);
     } catch (Throwable t) {
-      PrintWriter out = x.get(PrintWriter.class);
-      out.println("Error " + t.getMessage());
-      out.println("<pre>");
-        t.printStackTrace(out);
-      out.println("</pre>");
-      logger.error(t);
-
-      try {
-        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, t.getMessage());
-      } catch ( java.io.IOException e ) {
-        logger.error("Failed to send HttpServletResponse CODE", e);
-      }
+      DigUtil.outputException(x, 
+          new GeneralException.Builder(x)
+            .setStatus(String.valueOf(HttpServletResponse.SC_INTERNAL_SERVER_ERROR))
+            .setMessage(t.getMessage())
+            .setMoreInfo(t.getClass().getName())
+            .build(), 
+          format);
     } finally {
       pm.log(x);
     }

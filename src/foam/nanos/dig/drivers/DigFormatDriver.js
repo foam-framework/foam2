@@ -113,6 +113,9 @@ foam.CLASS({
         HttpServletResponse resp = x.get(HttpServletResponse.class);
         resp.setStatus(HttpServletResponse.SC_OK);
       }
+      catch (RuntimeException re) {
+        throw re;
+      }
       catch (java.lang.Exception e) {
         throw new RuntimeException(e);
       }

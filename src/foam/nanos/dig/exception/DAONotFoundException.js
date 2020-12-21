@@ -8,6 +8,20 @@ foam.CLASS({
   name: 'DAONotFoundException',
   extends: 'foam.nanos.dig.exception.DigErrorMessage',
 
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+          public DAONotFoundException(String message) {
+            super(message);
+          } 
+        `
+        );
+      }
+    }
+  ],
+
   properties: [
     {
       class: 'String',
