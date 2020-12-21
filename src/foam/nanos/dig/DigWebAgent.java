@@ -55,7 +55,7 @@ public class DigWebAgent
           break;
       }
     } catch (DigErrorMessage dem) {
-      logger.error(e);
+      logger.error(dem);
       DigUtil.outputException(x, dem, format);
     } catch (FOAMException fe) {
       logger.error(fe);
