@@ -34,10 +34,15 @@ foam.CLASS({
           @Override
           public void execute(X x) {
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj; 
+            
+            if ( 
+              ucj.getStatus() != CapabilityJunctionStatus.PENDING && 
+              ucj.getStatus() != CapabilityJunctionStatus.APPROVED && 
+              ucj.getStatus() != CapabilityJunctionStatus.GRANTED 
+            ) 
+              return;
 
             CapabilityJunctionStatus chainedStatus = checkPrereqsChainedStatus(x, ucj);
-            
-            if ( ucj.getStatus() != CapabilityJunctionStatus.PENDING && ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return;
 
             // the following should be checked if the result of previous rule ( validateUCJDataOnPut ) 
             // is not ACTION_REQUIRED. In the ACTION_REQUIRED case, the ucj should be put into the
