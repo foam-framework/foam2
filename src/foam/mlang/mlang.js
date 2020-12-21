@@ -2577,9 +2577,7 @@ foam.CLASS({
       class: 'List',
       hidden: true,
       name: 'groupKeys',
-      javaFactory: `
-        return new java.util.ArrayList(this.getGroups().keySet());
-      `,
+      javaFactory: 'return new java.util.ArrayList();',
       factory: function() {
         return Object.keys(this.groups);
       },
