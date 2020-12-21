@@ -297,6 +297,16 @@ foam.CLASS({
         subject.setUser((User) userDAO.find(ucj.getSourceId()));
         return subject;
       `
+    },
+    {
+      name: 'toString',
+      type: 'String',
+      code: function() {
+        return 'UCJ id: '+this.id+', source: '+this.sourceId+', target: '+this.targetId+', status: '+this.status.name+', data: '+( this.data && this.data.cls_ ? this.data.cls_.id : 'null');
+      },
+      javaCode: `
+      return "UCJ id: "+getId()+", source: "+getSourceId()+", target: "+getTargetId()+", status: "+getStatus().getName()+", data: "+(getData() != null ? getData().getClass().getName() : "null");
+      `
     }
   ]
 });
