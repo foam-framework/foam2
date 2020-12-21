@@ -265,7 +265,7 @@ foam.CLASS({
       var names = [];
       var of = of;
       for ( var i = 0; i < labels.length; i++ ) {
-        var prop = of.getAxioms().find(a => a.label && a.label.toLowerCase() == labels[i].toLowerCase());
+        var prop = of.getAxioms().find(a => a.label && a.label == labels[i]);
         if ( !prop )
           return '';
         names.push(prop.name);
