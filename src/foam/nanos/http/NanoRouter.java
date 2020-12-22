@@ -183,17 +183,10 @@ public class NanoRouter
         if ( spec.getAuthenticate() ) {
           service = new AuthWebAgent("service.run." + spec.getName(), (WebAgent) service, sendErrorHandler);
         }
-      }
 
-      //
-      // NOTE: Authentication must be last as HttpParametersWebAgent will consume the authentication parameters.
-      //
-      if (spec.getAuthenticate() ) {
-        service = new AuthWebAgent("service.run." + spec.getName(), (WebAgent) service);
+        logger.debug(this.getClass().getSimpleName(), "createWebAgent.WebAgent", spec.getName(), "webAgent"/*, service*/);
       }
-
-      logger.debug(this.getClass().getSimpleName(), "createWebAgent.WebAgent", spec.getName(), "webAgent"/*, service*/);
-   }
+    }
 
     if ( service instanceof WebAgent ) return (WebAgent) service;
 
