@@ -45,7 +45,7 @@ foam.CLASS({
     { name: 'ERROR_MSG_DRAFT', message: 'An error occured while saving your progress' },
     { name: 'SUCCESS_MSG', message: 'Information successfully submitted' },
     { name: 'SUCCESS_MSG_DRAFT', message: 'Your progress has been saved' },
-    { name: 'CONFIRM_MSG', message: 'Save and exit' },
+    { name: 'CONFIRM_MSG', message: 'Exit' },
     { name: 'DISMISS_MSG', message: 'Are you sure you want to leave this screen?' },
     { name: 'CONTINUE_MSG', message: 'Go back' }
   ],
@@ -54,7 +54,7 @@ foam.CLASS({
     ^ {
       position: relative;
       height: auto;
-      background-color: %GREY5%;
+      background-color: /*%GREY5%*/ #f5f7fa;
       max-height: 85vh;
       height: 100%;
     }
@@ -75,6 +75,16 @@ foam.CLASS({
     ^status {
       background-color: %WHITE%;
       padding: 50px;
+      padding-top: 100px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    ^hide-X-status {
+      background-color: %WHITE%;
+      padding: 50px;
+      padding-top: 75px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
@@ -84,19 +94,25 @@ foam.CLASS({
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      background-color: %GREY5%;
+      background-color: /*%GREY5%*/ #f5f7fas;
       overflow-y: hidden;
     }
     ^rightside ^entry {
       flex-grow: 1;
       -webkit-mask-image: -webkit-gradient(linear, left 15, left top, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
       overflow-y: auto;
-      padding: 24px 50px 100px 50px;
+      padding: 0px 50px 100px 50px;
+    }
+    ^rightside ^hide-X-entry {
+      flex-grow: 1;
+      -webkit-mask-image: -webkit-gradient(linear, left 15, left top, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
+      overflow-y: auto;
+      padding: 50px 50px 100px 50px;
     }
     ^rightside ^top-buttons {
       text-align: right;
       margin-bottom: 15px;
-      padding: 50px;
+      padding: 25px;
       padding-bottom: 0;
     }
     ^rightside ^bottom-buttons {
@@ -151,7 +167,7 @@ foam.CLASS({
     {
       name: 'hideX',
       class: 'Boolean',
-      value: false
+      value: true
     },
     {
       name: 'backDisabled',
@@ -183,7 +199,7 @@ foam.CLASS({
         .start(this.Grid)
           .addClass(this.myClass('fix-grid'))
           .start(this.GUnit, { columns: 4 })
-            .addClass(this.myClass('status'))
+            .addClass(this.hideX ? this.myClass('hide-X-status') : this.myClass('status'))
             .add(
               this.slot(function (data, data$currentWizardlet) {
                 return this.StepWizardletStepsView.create({
@@ -209,7 +225,7 @@ foam.CLASS({
                 .end();
             }))
             .start()
-              .addClass(this.myClass('entry'))
+              .addClass(this.hideX ? this.myClass('hide-X-entry') : this.myClass('entry'))
               .start()
                 .add(this.slot(function (data, data$currentWizardlet, data$currentSection, isLoading_) {
                   if ( isLoading_ ) {
@@ -290,7 +306,7 @@ foam.CLASS({
     },
     {
       name: 'saveAndClose',
-      label: 'Save & Dismiss',
+      label: 'Save and exit',
       code: function(x) {
         this.data.saveProgress().then(() => {
           this.onClose(x, false);

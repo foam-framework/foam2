@@ -19,6 +19,7 @@ foam.CLASS({
     `Don't register classes globally, register in a subcontext so we can
 have multiple classloaders running alongside eachother`
 ],*/
+
   requires: [
     'foam.classloader.OrDAO',
     'foam.core.Script',
@@ -37,6 +38,7 @@ have multiple classloaders running alongside eachother`
       flags: ['node']
     }
   ],
+
   properties: [
     {
       class: 'Map',
@@ -51,6 +53,7 @@ have multiple classloaders running alongside eachother`
       name: 'modelDAO'
     }
   ],
+
   methods: [
     {
       name: 'addClassPath',
@@ -110,8 +113,8 @@ have multiple classloaders running alongside eachother`
       args: [ { name: 'json' } ],
       code: function(json) {
         var id = json.package ?
-            json.package + '.' + json.name :
-            json.name;
+          json.package + '.' + json.name :
+          json.name;
 
         this.latched[id] = json;
       }
@@ -201,7 +204,7 @@ have multiple classloaders running alongside eachother`
     {
       name: 'buildClass_',
       args: [ { name: 'model', type: 'Model' },
-              { name: 'path', type: 'String[]' } ],
+              { name: 'path',  type: 'String[]' } ],
       code: function(model, path) {
         var self = this;
 

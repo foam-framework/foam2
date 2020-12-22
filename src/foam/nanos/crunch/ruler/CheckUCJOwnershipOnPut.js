@@ -38,8 +38,8 @@ foam.CLASS({
             boolean isOwner = ucj.getSourceId() == user.getId() || ucj.getSourceId() == realUser.getId();
             if ( isOwner ) return;
 
-            boolean isAdmin = user.getId() == foam.nanos.auth.User.SYSTEM_USER_ID || user.getGroup().equals("admin") || user.getGroup().equals("system");
-            if ( isAdmin ) return;
+            // TODO: check permission for global UCJ updates instead?
+            if ( user.isAdmin() ) return;
 
             throw new AuthorizationException("Cannot add UserCapabilityJunction. Not an admin or owner.");
           }

@@ -39,7 +39,7 @@ foam.CLASS({
       if ( userPath.size() < 2 || val != (User) userPath.get(userPath.size() - 1) ) {
         userPath.add(val);
       } else {
-        userPath.remove(userPath.size());
+        userPath.remove(userPath.size() - 1);
       }
       userIsSet_ = true;
       user_      = val;
@@ -64,7 +64,18 @@ foam.CLASS({
         ret += " >> " + user.getFirstName() + " " + user.getLastName();
       }
       return ret;
-`
-     }
+      `,
+      code: function() {
+        // Question: should we use u.toSummary() instead?
+        return ['user path', ...this.userPath.map(u => u.firstName + ' ' + u.lastName)].join(' >> ');
+      }
+    },
+    {
+      name: 'isAgent',
+      type: 'Boolean',
+      javaCode: `
+        return getUser().getId() != getRealUser().getId();
+      `
+    }
   ]
 })

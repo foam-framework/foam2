@@ -43,7 +43,7 @@ foam.CLASS({
       name: 'wizardlets',
       documentation: 'wizardlets for capable payloads',
       postSet: function() {
-        this.addListeners();
+        this.listenOnPayloads();
       }
     },
     {
@@ -72,42 +72,33 @@ foam.CLASS({
 
       const self = this;
 
-      // set capable payloads for capabilities if they don't already exist
-      if ( ! this.capableObj.capablePayloads ||
-        Object.keys(this.capableObj.capablePayloads).length === 0 ) {
-          try {
-            await this.capableObj.setRequirements(this.capableObj.capableRequirements);
-          } catch (e) {
-            this.notify(e.message, '', this.LogLevel.ERROR, true);
-          }
-      }
+      // a flag for checking if the capable object has payloads
+      const hasPayloads = this.capableObj.capablePayloads &&
+        Object.keys(this.capableObj.capablePayloads).length > 0;
 
       // set wizardlets based on the capableObj
-      if ( this.capableObj != undefined ) {
-        this.wizardlets = await this.crunchController.getWizardletsFromCapable(this.capableObj);
-      } else {
-        this.wizardlets = [];
-      }
+      // note: payloads data are also set from getWizardletsFromCapable
+      //       this is why we add listeners to payloads data after wizardlets are set
+      this.wizardlets = this.capableObj ?
+        await this.crunchController.getWizardletsFromCapable(this.capableObj) : [];
 
       this.start().addClass(this.myClass())
-        .add(self.slot(function(wizardletSectionsList) {
-          return this.E().forEach(wizardletSectionsList, function(sections, index) {
-            sections.map(section => (
-              this.tag(self.SectionView, {
-                section,
-                data: self.wizardlets[index].data,
-                showTitle: self.showTitle
-              })
-            ));
-          });
-        }))
+        .forEach(this.wizardletSectionsList, function(sections, index) {
+          sections.map(section => (
+            this.tag(self.SectionView, {
+              section,
+              data: self.wizardlets[index].data,
+              showTitle: self.showTitle
+            })
+          ));
+        }).end()
       .end();
     },
 
-    // add listeners to payloads
-    function addListeners() {
-      for ( payload of this.capableObj.capablePayloads ) {
-        payload.data.sub(this.clonePayloads);
+    // add listeners to payload data
+    function listenOnPayloads() {
+      for ( const payload of this.capableObj.capablePayloads ) {
+        if ( payload.data ) payload.data.sub(this.clonePayloads);
       }
     }
   ],

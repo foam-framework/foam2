@@ -32,19 +32,25 @@ foam.CLASS({
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.u2.crunch.wizardflow.ConfigureFlowAgent',
     'foam.u2.crunch.wizardflow.CapabilityAdaptAgent',
+    'foam.u2.crunch.wizardflow.CheckRootIdAgent',
     'foam.u2.crunch.wizardflow.CheckPendingAgent',
     'foam.u2.crunch.wizardflow.CheckNoDataAgent',
     'foam.u2.crunch.wizardflow.LoadCapabilitiesAgent',
     'foam.u2.crunch.wizardflow.CreateWizardletsAgent',
+    'foam.u2.crunch.wizardflow.LoadWizardletsAgent',
     'foam.u2.crunch.wizardflow.FilterWizardletsAgent',
+    'foam.u2.crunch.wizardflow.FilterGrantModeAgent',
+    'foam.u2.crunch.wizardflow.WizardStateAgent',
     'foam.u2.crunch.wizardflow.RequirementsPreviewAgent',
     'foam.u2.crunch.wizardflow.StepWizardAgent',
     'foam.u2.crunch.wizardflow.PutFinalJunctionsAgent',
+    'foam.u2.crunch.wizardflow.PutFinalPayloadsAgent',
     'foam.u2.crunch.wizardflow.TestAgent',
     'foam.u2.crunch.wizardflow.LoadTopConfig',
     'foam.u2.crunch.wizardflow.CapableDefaultConfigAgent',
-    'foam.u2.crunch.wizardflow.CapableCreateWizardletsAgent',
+    'foam.u2.crunch.wizardflow.SkipGrantedAgent',
     'foam.u2.crunch.wizardflow.MaybeDAOPutAgent',
+    'foam.u2.crunch.wizardflow.ShowPreexistingAgent',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
     'foam.u2.crunch.CapabilityInterceptView',
@@ -78,38 +84,63 @@ foam.CLASS({
   ],
 
   methods: [
-    function createWizardSequence(capabilityOrId, x) {
-      if ( ! x ) x = this.__subContext__;
-      return this.Sequence.create(null, x.createSubContext({
-        rootCapability: capabilityOrId
-      }))
-        .add(this.ConfigureFlowAgent)
-        .add(this.CapabilityAdaptAgent)
-        .add(this.LoadCapabilitiesAgent)
-        .add(this.CheckPendingAgent)
-        .add(this.CheckNoDataAgent)
-        .add(this.CreateWizardletsAgent)
-        .add(this.FilterWizardletsAgent)
-        .add(this.RequirementsPreviewAgent)
-        .add(this.LoadTopConfig)
-        .add(this.StepWizardAgent)
-        .add(this.PutFinalJunctionsAgent)
-        // .add(this.TestAgent)
-        ;
+    {
+      name: 'createWizardSequence',
+      documentation: `
+        Create the default wizard sequence for the specified capability in
+        association with the user. The wizard can be
+      `,
+      code: function createWizardSequence(capabilityOrId, x) {
+        if ( ! x ) x = this.__subContext__;
+        return this.Sequence.create(null, x.createSubContext({
+          rootCapability: capabilityOrId
+        }))
+          .add(this.ConfigureFlowAgent)
+          .add(this.CapabilityAdaptAgent)
+          .add(this.LoadTopConfig)
+          .add(this.LoadCapabilitiesAgent)
+          // TODO: remove CheckRootIdAgent after phase 2 fix on PENDING
+          .add(this.CheckRootIdAgent)
+          .add(this.CheckPendingAgent)
+          .add(this.CheckNoDataAgent)
+          .add(this.CreateWizardletsAgent)
+          .add(this.WizardStateAgent)
+          .add(this.FilterGrantModeAgent)
+          .add(this.LoadWizardletsAgent)
+          .add(this.SkipGrantedAgent)
+          .add(this.RequirementsPreviewAgent)
+          .add(this.StepWizardAgent)
+          .add(this.PutFinalPayloadsAgent)
+          // .add(this.TestAgent)
+          ;
+      }
     },
+    {
+      name: 'createCapableWizardSequence',
+      documentation: `
+        Create the default wizard sequence for the specified Capable object
+        intercept.
 
-    // Excludes UCJ-related logic
-    function createCapableWizardSequence(intercept, capable) {
-      return this.Sequence.create(null, this.__subContext__.createSubContext({
-        intercept: intercept,
-        capable: capable
-      }))
-        .add(this.ConfigureFlowAgent)
-        .add(this.CapableDefaultConfigAgent)
-        .add(this.CapableCreateWizardletsAgent)
-        .add(this.StepWizardAgent)
-        .add(this.MaybeDAOPutAgent)
-        ;
+        A Capable object intercept occurs when the server replies with an object
+        implementing Capable. These objects can have data requirements in the
+        form of capabilities that are stored object-locally rather than in
+        association with a user.
+      `,
+      code: function createCapableWizardSequence(intercept, capable) {
+        let x = this.__subContext__.createSubContext({
+          intercept: intercept,
+          capable: capable
+        });
+        return this.createWizardSequence(capable.capabilityIds[0], x)
+          .reconfigure('LoadCapabilitiesAgent', {
+            waoSetting: this.LoadCapabilitiesAgent.WAOSetting.CAPABLE })
+          .addBefore('SkipGrantedAgent',this.ShowPreexistingAgent)
+          .remove('CheckRootIdAgent')
+          .remove('CheckPendingAgent')
+          .remove('CheckNoDataAgent')
+          .add(this.MaybeDAOPutAgent)
+          ;
+      }
     },
 
     function handleIntercept(intercept) {
@@ -148,17 +179,17 @@ foam.CLASS({
           return x;
         });
       }
-      
+
       p = p.then(x => {
         var isCompleted = x.submitted || x.cancelled;
 
         if ( isCapable ) {
-          intercept.capables[0].isWizardCompleted = isCompleted;
+          intercept.capables[0].isWizardIncomplete = ! isCompleted;
           if ( ! isCompleted ) {
             intercept.resolve(intercept.capables[0]);
             return;
           }
-          intercept.returnCapable.isWizardCompleted = isCompleted;
+          intercept.returnCapable.isWizardIncomplete = ! isCompleted;
           intercept.resolve(intercept.returnCapable);
           return;
         }
@@ -166,6 +197,7 @@ foam.CLASS({
       })
 
       p.catch(err => {
+        console.error(err); // do not remove
         intercept.reject(err.data);
       })
 
@@ -211,23 +243,6 @@ foam.CLASS({
       });
     },
 
-    function save(wizardlet) {
-      if ( ! wizardlet.isAvailable ) return Promise.resolve();
-      return this.crunchService.updateJunction(
-        null, wizardlet.capability.id, wizardlet.data, null
-      ).then((ucj) => {
-        this.crunchService.pub('updateJunction');
-        return ucj;
-      });
-    },
-    async function updateUCJ(wizardlet, associatedEntity) {
-      return this.crunchService.getJunction(
-        null, wizardlet.capability.id
-      ).then(ucj => {
-        wizardlet.ucj = ucj;
-        return wizardlet;
-      })
-    },
     function purgeCachedCapabilityDAOs() {
       this.capabilityDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
       this.capabilityDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
@@ -256,8 +271,17 @@ foam.CLASS({
     // This function is only called by CapableView
     function getWizardletsFromCapable(capable) {
       return this.Sequence.create(null, this.__subContext__.createSubContext({
-        capable: capable
-      })).add(this.CapableCreateWizardletsAgent).execute().then(x => x.wizardlets);
+        capable: capable,
+        rootCapability: capable.capabilityIds[0]
+      }))
+        .add(this.CapabilityAdaptAgent)
+        .add(this.LoadCapabilitiesAgent, {
+          waoSetting: this.LoadCapabilitiesAgent.WAOSetting.CAPABLE })
+        .add(this.CreateWizardletsAgent)
+        .add(this.LoadWizardletsAgent)
+        .execute().then(x => {
+          return x.wizardlets
+        })
     }
   ]
 });

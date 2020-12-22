@@ -115,9 +115,11 @@ Later themes:
           }
         }
         if ( theme ) {
+          if ( theme.customRefinement ) await x.__subContext__.classloader.load(theme.customRefinement, []);
           return theme;
         }
-        return foam.nanos.theme.Theme.create({ 'name': 'foam', 'appName': 'FOAM' });
+
+        foam.nanos.theme.Theme.create({ 'name': 'foam', 'appName': 'FOAM' });
       },
       javaCode: `
       DAO themeDAO = ((DAO) x.get("themeDAO"));
@@ -184,6 +186,7 @@ Later themes:
             if ( ! SafetyUtil.isEmpty(group.getDefaultMenu()) ) {
               theme.setDefaultMenu(group.getDefaultMenu());
             }
+            break;
           }
           group = (Group) groupDAO.find(group.getParent());
         }
@@ -194,33 +197,6 @@ Later themes:
       }
 
       return theme;
-      `
-    },
-    {
-      name: 'findThemeBySpid',
-      args: [ 
-        { name: 'x', type: 'Context' }
-      ],
-      type: 'foam.nanos.theme.Theme',
-      javaCode: `
-        User user = ((Subject) x.get("subject")).getUser();
-        DAO themeDAO = (DAO) x.get("themeDAO");
-        var spid = user.getSpid();
-        Theme theme = null;
-        while ( ! SafetyUtil.isEmpty(spid) ) {
-          theme = (Theme) themeDAO.find(
-            MLang.AND(
-              MLang.EQ(Theme.SPID, spid),
-              MLang.EQ(Theme.ENABLED, true)
-            )
-          );
-          if ( theme != null ) return theme;
-
-          var pos = spid.lastIndexOf(".");
-          spid = spid.substring(0, pos > 0 ? pos : 0);
-        }
-
-        return theme;
       `
     }
   ]

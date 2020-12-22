@@ -306,53 +306,64 @@ public class JSONFObjectFormatter
     return true;
   }
 
-  public List getDelta(FObject oldFObject, FObject newFObject) {
-    return delta_ == null ? super.getDelta(oldFObject, newFObject) : delta_;
+  public boolean maybeOutputDelta(FObject oldFObject, FObject newFObject) {
+    return maybeOutputDelta(oldFObject, newFObject, null);
   }
 
-  public void outputDelta(FObject oldFObject, FObject newFObject) {
-    outputDelta(oldFObject, newFObject, null);
-  }
+  public boolean maybeOutputDelta(FObject oldFObject, FObject newFObject, ClassInfo defaultClass) {
+    ClassInfo newInfo   = newFObject.getClassInfo();
+    String    of        = newInfo.getObjClass().getSimpleName().toLowerCase();
+    List      axioms    = getProperties(newInfo);
+    int       size      = axioms.size();
+    int       delta     = 0;
+    int       ids       = 0;
+    int       optional  = 0;
 
-  public void outputDelta(FObject oldFObject, FObject newFObject, ClassInfo defaultClass) {
-    ClassInfo info = newFObject.getClassInfo();
+    String before = builder().toString();
+    reset();
+    for ( int i = 0; i < size; i++ ) {
+      PropertyInfo prop = (PropertyInfo) axioms.get(i);
+      if ( prop.includeInID() || prop.compare(oldFObject, newFObject) != 0 ) {
+        if ( delta > 0 ) {
+          append(',');
+          addInnerNewline();
+        }
+        outputProperty(newFObject, prop);
 
-    boolean outputClass = outputClassNames_ && ( info != defaultClass || outputDefaultClassNames_ );
-
-    ClassInfo newInfo        = newFObject.getClassInfo();
-    boolean   outputComma    = true;
-    List      delta          = getDelta(oldFObject, newFObject);
-    int       size           = delta.size();
-
-    if ( size == 0 ) {
-      return;
+        delta += 1;
+        if ( prop.includeInID() )
+          ids += 1;
+        else if ( optionalPredicate_.propertyPredicateCheck(getX(), of, prop) )
+          optional += 1;
+      }
     }
+    String output = builder().toString();
+    reset();
 
-    append('{');
-    addInnerNewline();
-    if ( outputClass ) {
-      //output Class name
-      outputKey("class");
-      append(':');
-      output(newInfo.getId());
-      append(',');
-    }
-    addInnerNewline();
-    PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
-    boolean outputId = ! id.getStorageTransient();
-    if ( outputId ) outputProperty(newFObject, id);
+    if ( delta > 0 && delta > ids + optional ) {
+      boolean outputClass = outputClassNames_ && ( newInfo != defaultClass || outputDefaultClassNames_ );
 
-    for ( int i = 0 ; i < size ; i++ ) {
-      if ( i > 0 || outputId ) {
+      append(before);
+      append('{');
+      addInnerNewline();
+      if ( outputClass ) {
+        //output Class name
+        outputKey("class");
+        append(':');
+        output(newInfo.getId());
         append(',');
         addInnerNewline();
       }
-      PropertyInfo prop = (PropertyInfo) delta.get(i);
-      outputProperty(newFObject, prop);
+      append(output);
+      addInnerNewline();
+      append('}');
+
+      return true;
     }
 
-    addInnerNewline();
-    append('}');
+    // Return false when either no delta or the delta are from ids and storage
+    // optional properties
+    return false;
   }
 
   protected void addInnerNewline() {

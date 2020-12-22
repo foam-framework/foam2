@@ -50,36 +50,38 @@ public class EmailsUtility {
 
     String group = user != null ? user.getGroup() : "";
     AppConfig appConfig = (AppConfig) x.get("appConfig");
+    if ( user != null ) {
+      appConfig = user.findGroup(x).getAppConfig(x);
+    }
     Theme theme = (Theme) x.get("theme");
+    X userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
     if ( theme == null ) {
-      Subject subject = new Subject.Builder(x).setUser(user).build();
-      theme = ((Themes) x.get("themes")).findTheme(x.put("subject", subject));
+      theme = ((Themes) x.get("themes")).findTheme(userX);
       if ( theme.getAppConfig() != null ) {
         appConfig.copyFrom(theme.getAppConfig());
       }
     }
+    userX = userX.put("appConfig", appConfig);
 
     SupportConfig supportConfig = theme.getSupportConfig();
-
-    // Set ReplyTo, From, DisplayName in emailMessage 
-    EmailConfig emailConfig = (EmailConfig) ((EmailConfig) x.get("emailConfig")).fclone();
     EmailConfig supportEmailConfig = supportConfig.getEmailConfig();
+
+    // Set ReplyTo, From, DisplayName from support email config
     if ( supportEmailConfig != null ) {
-      emailConfig.copyFrom(supportEmailConfig);
-    }
-    // REPLY TO:
-    if ( ! SafetyUtil.isEmpty(emailConfig.getReplyTo()) ) {
-      emailMessage.setReplyTo(emailConfig.getReplyTo());
-    }
+      // REPLY TO:
+      if ( ! SafetyUtil.isEmpty(supportEmailConfig.getReplyTo()) ) {
+        emailMessage.setReplyTo(supportEmailConfig.getReplyTo());
+      }
 
-    // DISPLAY NAME:
-    if ( ! SafetyUtil.isEmpty(emailConfig.getDisplayName()) ) {
-      emailMessage.setDisplayName(emailConfig.getDisplayName());
-    }
+      // DISPLAY NAME:
+      if ( ! SafetyUtil.isEmpty(supportEmailConfig.getDisplayName()) ) {
+        emailMessage.setDisplayName(supportEmailConfig.getDisplayName());
+      }
 
-    // FROM:
-    if ( ! SafetyUtil.isEmpty(emailConfig.getFrom()) ) {
-      emailMessage.setFrom(emailConfig.getFrom());
+      // FROM:
+      if ( ! SafetyUtil.isEmpty(supportEmailConfig.getFrom()) ) {
+        emailMessage.setFrom(supportEmailConfig.getFrom());
+      }
     }
 
     // Add template name to templateArgs, to avoid extra parameter passing
@@ -111,7 +113,7 @@ public class EmailsUtility {
     // SERVICE CALL: to fill in email properties.
     EmailPropertyService cts = (EmailPropertyService) x.get("emailPropertyService");
     try {
-      cts.apply(x, group, emailMessage, templateArgs);
+      cts.apply(userX, group, emailMessage, templateArgs);
     } catch (Exception e) {
       logger.error(e);
       return;

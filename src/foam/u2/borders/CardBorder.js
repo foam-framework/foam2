@@ -11,20 +11,23 @@ foam.CLASS({
 
   css: `
     ^ {
-      border-radius: 6px;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
-      border: solid 1px #e7eaec;
+      min-height: 60px;
+
       background-color: #ffffff;
+      border: solid 1px #e7eaec;
+      border-radius: 5px;
+
+      padding: 16px;
+      
+      transition: all 0.2s linear;
     }
   `,
 
-  documentation: `
-    A stylized border. Intended for use when creating cards.
-  `,
+  documentation: 'A stylized border. Intended for use when creating cards.',
 
   methods: [
     function initE() {
-      this.addClass(this.myClass())
+      this.addClass(this.myClass());
     }
   ]
 });

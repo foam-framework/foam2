@@ -13,18 +13,21 @@ foam.CLASS({
     'foam.comics.SearchMode',
     'foam.comics.DAOController',
     'foam.comics.DAOUpdateControllerView',
-    'foam.u2.view.ScrollTableView',
+    'foam.nanos.controller.Memento',
     'foam.nanos.u2.navigation.IFrameTopNavigation',
-    'foam.u2.dialog.Popup'
+    'foam.u2.dialog.Popup',
+    'foam.u2.view.ScrollTableView'
   ],
 
   imports: [
     'createControllerView? as importedCreateControllerView',
     'data? as importedData',
+    'memento',
     'stack',
     'summaryView? as importedSummaryView',
     'updateView? as importedUpdateView',
-    'window'
+    'window',
+    'translationService'
   ],
 
   exports: [
@@ -114,9 +117,10 @@ foam.CLASS({
     },
     {
       name: 'createControllerView',
-      expression: function() {
+      expression: function(data) {
         return this.importedCreateControllerView || {
-          class: 'foam.comics.DAOCreateControllerView'
+          class: 'foam.comics.DAOCreateControllerView',
+          detailView: data.detailView
         };
       }
     },
@@ -140,7 +144,6 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-
       this.data.border.add(
         this.E()
           .addClass(this.myClass())
@@ -151,15 +154,15 @@ foam.CLASS({
             .start()
               .addClass(this.myClass('title-container'))
               .start('h1')
-                .add(this.data.title$)
+                .translate(this.data.title, this.data.title)
               .end()
               .start()
-                .add(this.data.subtitle$)
+                .translate(this.data.subtitle, this.data.subtitle)
               .end()
             .end()
             .callIfElse(self.data.createLabel, function() {
               this.tag(self.data.primaryAction, {
-                label$: self.data.createLabel$,
+                label: self.translationService.getTranslation(foam.locale, `${self.parentNode.createControllerView.menu}.createLabel`, self.data.createLabel),
                 size: 'LARGE'
               });
             }, function() {
@@ -173,7 +176,10 @@ foam.CLASS({
                 .hide(self.data.searchHidden$)
                 .addClass(self.myClass('full-search-container'))
                 .add(self.cls.PREDICATE.clone().copyFrom({
-                  view: { class: 'foam.u2.view.ReciprocalSearch' }
+                  view: {
+                    class: 'foam.u2.view.ReciprocalSearch',
+                    searchValue: self.memento && self.memento.paramsObj.search
+                  }
                 }))
               .end();
             })
@@ -184,7 +190,10 @@ foam.CLASS({
                   this
                     .start()
                       .add(self.cls.PREDICATE.clone().copyFrom({
-                        view: { class: 'foam.u2.view.SimpleSearch' }
+                        view: { 
+                          class: 'foam.u2.view.SimpleSearch',
+                          searchValue: self.memento && self.memento.paramsObj.search
+                        }
                       }))
                     .end();
                 })
@@ -229,10 +238,7 @@ foam.CLASS({
 
   listeners: [
     function onCreate() {
-      this.stack.push({
-        class: this.createControllerView.class,
-        detailView: this.data.detailView
-      }, this.__subContext__);
+      this.stack.push(this.createControllerView, this.__subContext__);
     },
 
     function onEdit(s, edit, id) {

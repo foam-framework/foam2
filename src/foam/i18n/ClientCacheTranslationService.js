@@ -28,7 +28,7 @@ foam.CLASS({
   properties: [
     {
       name: 'initLatch',
-      documentatin: 'Latch to denote cache has been loaded and service is ready',
+      documentation: 'Latch to denote cache has been loaded and service is ready',
       factory: function() { return this.Latch.create(); }
     },
     {
@@ -62,6 +62,22 @@ foam.CLASS({
           this.initLatch.resolve();
         }
       });
+    },
+
+    function maybeReload() {
+      /**
+        Reload locales if foam.locale has changed since this class was
+        initially init()-ed.
+      **/
+      var originalLocale = this.locale;
+      if ( this.variant ) originalLocale = originalLocale + '-' + this.variant;
+      if ( foam.locale != originalLocale ) {
+        this.locale = this.variant = undefined;
+        this.initLatch = this.Latch.create();
+        this.localeEntries = {};
+        this.init();
+      }
+      return this.initLatch;
     },
 
     function loadLanguageLocales() {

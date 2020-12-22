@@ -95,6 +95,10 @@ foam.CLASS({
 
   requires: [ 'foam.box.SessionReplyBox' ],
 
+  imports: [
+    'sessionID as jsSessionID'
+  ],
+
   constants: [
     {
       name: 'SESSION_KEY',
@@ -106,12 +110,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'sessionName',
-      value: 'defaultSession'
-    },
-    {
-      class: 'foam.box.SessionIDProperty',
-      name: 'sessionID'
+      name: 'sessionID',
+      factory: function() { return this.jsSessionID; }
     }
   ],
 
@@ -119,9 +119,7 @@ foam.CLASS({
     {
       name: 'send',
       code: function send(msg) {
-        msg.attributes[this.SESSION_KEY] = this.sessionID;
-
-        // console.log('***** SEND SESSION ID: ', this.sessionID/*foam.json.stringify(msg)*/);
+        msg.attributes[this.SESSION_KEY] = this.jsSessionID;
 
         msg.attributes.replyBox.localBox = this.SessionReplyBox.create({
           msg:       msg,

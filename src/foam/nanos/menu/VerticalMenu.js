@@ -75,8 +75,8 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'dao_',
-      factory: function() {
-        return this.menuDAO;
+      expression: function(menuDAO) {
+        return menuDAO.orderBy(this.Menu.ORDER);
       }
     },
     {
@@ -109,13 +109,15 @@ foam.CLASS({
             .addClass('tree-view-height-manager')
             .tag({
               class: 'foam.u2.view.TreeView',
-              data: self.dao_,
+              data$: self.dao_$,
               relationship: foam.nanos.menu.MenuMenuChildrenRelationship,
               startExpanded: true,
               query: self.menuSearch$,
               onClickAddOn: function(data) { self.openMenu(data); },
               selection$: self.currentMenu$,
-              formatter: function(data) { this.add({ data : data, clsInfo : data.cls_.LABEL.name, default : data.label }); }
+              formatter: function(data) {
+                this.translate(data.id + '.label', data.label);
+              }
             })
           .end()
         .end()

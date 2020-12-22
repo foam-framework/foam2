@@ -8,6 +8,10 @@ foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'Capability',
 
+  implements: [
+    'foam.nanos.auth.EnabledAware'
+  ],
+
   imports: [
     'capabilityDAO',
     'prerequisiteCapabilityJunctionDAO'
@@ -27,8 +31,8 @@ foam.CLASS({
     'static foam.mlang.MLang.*'
   ],
 
-  implements: [
-    'foam.nanos.auth.EnabledAware'
+  requires: [
+    'foam.u2.crunch.EasyCrunchWizard'
   ],
 
   tableColumns: [
@@ -121,12 +125,6 @@ foam.CLASS({
       user will lose permissions implied by this capability and upper level capabilities will ignore this prerequisite`
     },
     {
-      name: 'visible',	
-      class: 'Boolean',	
-      documentation: `Hide sub-capabilities which aren't top-level and individually selectable. when true, capability is visible to the user`,	
-      section: 'uiSettings'	
-    },
-    {
       name: 'expiry',
       class: 'DateTime',
       documentation: `Datetime of when capability is no longer valid`
@@ -198,6 +196,18 @@ foam.CLASS({
       documentation: 'Predicate used to omit or include capabilities from capabilityDAO'
     },
     {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'visibilityPredicate',
+      javaFactory: 'return foam.mlang.MLang.FALSE;',
+      documentation: 'Predicate of the visibility for capabilities in the capability store/keyword sections'
+    },
+    {
+      name: 'grantMode',
+      class: 'Enum',
+      of: 'foam.nanos.crunch.CapabilityGrantMode',
+      value: foam.nanos.crunch.CapabilityGrantMode.AUTOMATIC
+    },
+    {
       name: 'reviewRequired',
       class: 'Boolean',
       permissionRequired: true
@@ -222,7 +232,8 @@ foam.CLASS({
       class: 'Object',
       name: 'wizardlet',
       documentation: `
-        Defines a wizardlet used when displaying this capability on related client crunch wizards.
+        Defines a wizardlet to display this capability in a wizard. This
+        wizardlet will display after this capability's prerequisites.
       `,
       factory: function() {
         return foam.nanos.crunch.ui.CapabilityWizardlet.create({}, this);
@@ -230,12 +241,23 @@ foam.CLASS({
     },
     {
       class: 'Object',
-      name: 'wizardletConfig',
+      name: 'beforeWizardlet',
       documentation: `
-        Configuration placed on top level capabilities defining various configuration options supported by client capability wizards.
+        A wizardlet to display before this capability's prerequisites, and only
+        if this capability is at the end of a prerequisite group returned by
+        CrunchService's getCapabilityPath method.
+      `
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.u2.crunch.EasyCrunchWizard',
+      name: 'wizardConfig',
+      documentation: `
+        Configuration placed on top level capabilities defining various
+        configuration options supported by client capability wizards.
       `,
       factory: function() {
-        return foam.u2.wizard.StepWizardConfig.create({}, this);
+        return this.EasyCrunchWizard.create({}, this);
       }
     },
     {
@@ -377,29 +399,70 @@ foam.CLASS({
         }
 
         var prereqs = crunchService.getPrereqs(getId());
+        CapabilityJunctionStatus prereqChainedStatus = null;
         if ( prereqs != null ) {
           for ( var capId : prereqs ) {
             var cap = (Capability) capabilityDAO.find(capId);
             if ( cap == null || ! cap.getEnabled() ) continue;
-            
-            X subjectContext = x.put("subject", subject);
-            UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(subjectContext, capId, subject);
 
-            if ( ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) {
-              continue;
-            }
+            UserCapabilityJunction prereqUcj = crunchService.getJunctionForSubject(x, capId, subject);
 
-            if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING
-              || ucJunction.getStatus() == CapabilityJunctionStatus.APPROVED
-            ) {
-              allGranted = false;
-            } else {
-              return CapabilityJunctionStatus.ACTION_REQUIRED;
-            }
+            prereqChainedStatus = getPrereqChainedStatus(x, ucj, prereqUcj);
+            if ( prereqChainedStatus == CapabilityJunctionStatus.ACTION_REQUIRED ) return CapabilityJunctionStatus.ACTION_REQUIRED;
+            if ( prereqChainedStatus != CapabilityJunctionStatus.GRANTED ) allGranted = false;
           }
         }
         return allGranted ? CapabilityJunctionStatus.GRANTED : CapabilityJunctionStatus.PENDING;
       `,
+    },
+    {
+      name: 'getPrereqChainedStatus',
+      args: [
+        { name: 'x', javaType: 'foam.core.X' },
+        { name: 'ucj', javaType: 'foam.nanos.crunch.UserCapabilityJunction' },
+        { name: 'prereq', javaType: 'foam.nanos.crunch.UserCapabilityJunction' }
+      ],
+      static: true,
+      javaType: 'foam.nanos.crunch.CapabilityJunctionStatus',
+      javaCode: `
+        CapabilityJunctionStatus status = ucj.getStatus();
+
+        boolean reviewRequired = getReviewRequired();
+        CapabilityJunctionStatus prereqStatus = prereq.getStatus();
+
+        switch ( (CapabilityJunctionStatus) prereqStatus ) {
+          case AVAILABLE :
+            status = CapabilityJunctionStatus.ACTION_REQUIRED;
+            break;
+          case ACTION_REQUIRED :
+            status = CapabilityJunctionStatus.ACTION_REQUIRED;
+            break;
+          case PENDING :
+            status = reviewRequired &&
+              ( status == CapabilityJunctionStatus.APPROVED ||
+                status == CapabilityJunctionStatus.GRANTED
+              ) ?
+                CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
+            break;
+          case APPROVED :
+            status = reviewRequired &&
+              ( status == CapabilityJunctionStatus.APPROVED ||
+                status == CapabilityJunctionStatus.GRANTED
+              ) ?
+                CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
+              break;
+          case EXPIRED :
+            status = CapabilityJunctionStatus.ACTION_REQUIRED;
+            break;
+          case PENDING_REVIEW :
+            status = CapabilityJunctionStatus.ACTION_REQUIRED;
+            break;
+          default :
+            status = CapabilityJunctionStatus.GRANTED;
+        }
+        return status;
+
+      `
     }
   ]
 });
@@ -410,21 +473,14 @@ foam.RELATIONSHIP({
   extends:'foam.nanos.crunch.Renewable',
   sourceModel: 'foam.nanos.auth.User',
   targetModel: 'foam.nanos.crunch.Capability',
+  ids: [ 'id' ],
   cardinality: '*:*',
   forwardName: 'capabilities',
   inverseName: 'users',
   sourceProperty: {
-    section: 'capabilities',
+    section: 'systemInformation',
     updateVisibility: 'RO'
   }
-});
-
-
-foam.CLASS({
-  package: 'foam.nanos.crunch',
-  name: 'CRUNCHUserRefinement',
-  refines: 'foam.nanos.auth.User',
-  sections: [{ name: 'capabilities' }]
 });
 
 

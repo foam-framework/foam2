@@ -13,9 +13,11 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.dao.DAO',
     'foam.util.SafetyUtil',
+    'foam.nanos.crunch.CapabilityIntercept',
     'foam.nanos.crunch.lite.Capable',
-    'foam.nanos.crunch.lite.CapablePayload',
+    'foam.nanos.crunch.CapabilityJunctionPayload',
     'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
     'java.util.Arrays',
     'java.util.ArrayList',
     'java.util.List'
@@ -42,66 +44,70 @@ foam.CLASS({
         Capable toPutCapableObj =  (Capable) obj;
         DAO toPutCapablePayloadDAO = toPutCapableObj.getCapablePayloadDAO(x);
 
-        CapablePayload[] toPutCapablePayloadArray = (CapablePayload[]) toPutCapableObj.getCapablePayloads();
+        CapabilityJunctionPayload[] toPutCapablePayloadArray =
+          (CapabilityJunctionPayload[]) toPutCapableObj.getCapablePayloads();
 
         // For both create and update,
         // we need to handle the cleaning of data if it is from the client
-        // and we also need to populate the CapablePayload.daoKey and 
+        // and we also need to populate the CapablePayload.daoKey and
         // CapablePayload.objId fields since they don't get filled out by client
         if ( currentObjectInDao == null ) {
           for (int i = 0; i < toPutCapablePayloadArray.length; i++){
-        
-            CapablePayload currentCapablePayload = toPutCapablePayloadArray[i];
+
+            toPutCapableObj.setDAOKey(getDaoKey());
+
+            CapabilityJunctionPayload currentCapablePayload = toPutCapablePayloadArray[i];
 
             if ( ! currentCapablePayload.getHasSafeStatus() ){
               currentCapablePayload.setStatus(getDefaultStatus());
             }
-
-            currentCapablePayload.setDaoKey(getDaoKey());
-            currentCapablePayload.setObjId(obj.getProperty("id"));
-          }          
+          }
         } else {
           Capable storedCapableObj = (Capable) currentObjectInDao;
+
+          toPutCapableObj.setDAOKey(storedCapableObj.getDAOKey());
+
+          // should always be sync'd with whatever is on the backend
+          if (
+            SafetyUtil.isEmpty(String.valueOf(storedCapableObj.getDAOKey()))
+          ) {
+            toPutCapableObj.setDAOKey(getDaoKey());
+          }
 
           DAO storedCapablePayloadDAO = storedCapableObj.getCapablePayloadDAO(x);
 
           for ( int i = 0; i < toPutCapablePayloadArray.length; i++ ){
-            CapablePayload toPutCapablePayload = (CapablePayload) toPutCapablePayloadArray[i];
+            CapabilityJunctionPayload toPutCapablePayload =
+              (CapabilityJunctionPayload) toPutCapablePayloadArray[i];
 
             if ( ! toPutCapablePayload.getHasSafeStatus() ){
 
               DAO capabilityDAO = (DAO) x.get("capabilityDAO");
               Capability capability = (Capability) capabilityDAO.find(toPutCapablePayload.getCapability());
 
-              CapablePayload storedCapablePayload = (CapablePayload) storedCapablePayloadDAO.find(capability.getId());
+              CapabilityJunctionPayload storedCapablePayload = (CapabilityJunctionPayload) storedCapablePayloadDAO.find(capability.getId());
 
               if ( storedCapablePayload != null ){
                 toPutCapablePayload.setStatus(storedCapablePayload.getStatus());
-                toPutCapablePayload.setDaoKey(storedCapablePayload.getDaoKey());
-                toPutCapablePayload.setObjId(storedCapablePayload.getObjId());
               }
-            }
-
-            if ( 
-              toPutCapablePayload.getDaoKey() == null || 
-              SafetyUtil.isEmpty(toPutCapablePayload.getDaoKey()) 
-            ) {
-              toPutCapablePayload.setDaoKey(getDaoKey());
-            }
-
-            if ( 
-              toPutCapablePayload.getObjId() == null || 
-              SafetyUtil.isEmpty(String.valueOf(toPutCapablePayload.getObjId())) 
-            ) {
-              toPutCapablePayload.setObjId(obj.getProperty("id"));
             }
           }
         }
 
-        List<CapablePayload> capablePayloads = new ArrayList<CapablePayload>(Arrays.asList(toPutCapablePayloadArray));
+        List<CapabilityJunctionPayload> capablePayloads = new ArrayList<CapabilityJunctionPayload>(Arrays.asList(toPutCapablePayloadArray));
 
-        for ( CapablePayload currentPayload : capablePayloads ){
+        for ( CapabilityJunctionPayload currentPayload : capablePayloads ){
           toPutCapablePayloadDAO.put(currentPayload);
+        }
+
+        if ( 
+          ! toPutCapableObj.checkRequirementsStatusNoThrow(x, toPutCapableObj.getCapabilityIds(), CapabilityJunctionStatus.GRANTED) &&
+          ! toPutCapableObj.checkRequirementsStatusNoThrow(x, toPutCapableObj.getCapabilityIds(), CapabilityJunctionStatus.PENDING)
+        ) {
+          CapabilityIntercept cre = new CapabilityIntercept();
+          cre.setDaoKey(getDaoKey());
+          cre.addCapable(toPutCapableObj);
+          throw cre;
         }
 
         return super.put_(x, obj);

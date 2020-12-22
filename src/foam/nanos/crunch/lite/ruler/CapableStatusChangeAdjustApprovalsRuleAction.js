@@ -26,7 +26,7 @@ foam.CLASS({
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CrunchService',
     'foam.nanos.crunch.lite.Capable',
-    'foam.nanos.crunch.lite.CapablePayload',
+    'foam.nanos.crunch.CapabilityJunctionPayload',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.approval.ApprovalStatus',
     'foam.nanos.ruler.Operations',
@@ -53,10 +53,10 @@ foam.CLASS({
         Capable capableNewObj = (Capable) obj;
         Capable capableOldObj = (Capable) oldObj;
 
-        CapablePayload[] newCapablePayloads = capableNewObj.getCapablePayloads();
-        CapablePayload[] oldCapablePayloads = capableOldObj.getCapablePayloads();
+        CapabilityJunctionPayload[] newCapablePayloads = capableNewObj.getCapablePayloads();
+        CapabilityJunctionPayload[] oldCapablePayloads = capableOldObj.getCapablePayloads();
 
-        List<CapablePayload> updatedApprovalPayloads = new ArrayList<>();
+        List<CapabilityJunctionPayload> updatedApprovalPayloads = new ArrayList<>();
 
         if ( newCapablePayloads.length != oldCapablePayloads.length ){
           logger.error("capableOldObj and capableNewObj have different capable payloads lengths");
@@ -67,12 +67,12 @@ foam.CLASS({
         Map<String,CapabilityJunctionStatus> capabilityIdToStatus = new HashMap<>();
 
         for ( int i = 0; i < oldCapablePayloads.length; i++ ){
-          CapablePayload oldCapablePayload = oldCapablePayloads[i];
+          CapabilityJunctionPayload oldCapablePayload = oldCapablePayloads[i];
           capabilityIdToStatus.put(oldCapablePayload.getCapability(),oldCapablePayload.getStatus());
         }
 
         for ( int i = 0; i < newCapablePayloads.length; i++ ){
-          CapablePayload newCapablePayload = newCapablePayloads[i];
+          CapabilityJunctionPayload newCapablePayload = newCapablePayloads[i];
 
           CapabilityJunctionStatus oldStatus = capabilityIdToStatus.get(newCapablePayload.getCapability());
 
@@ -99,14 +99,15 @@ foam.CLASS({
                 String[] prereqIds = prereqIdsList.toArray(new String[prereqIdsList.size()]);
 
                 ((ArraySink) payloadDAO.select(new ArraySink())).getArray().stream()
-                .filter(cp -> Arrays.stream(prereqIds).anyMatch(((CapablePayload) cp).getCapability()::equals))
+                .filter(cp -> Arrays.stream(prereqIds).anyMatch(((CapabilityJunctionPayload) cp).getCapability()::equals))
                 .forEach(cp -> {
-                  CapablePayload capableCp = (CapablePayload) cp;
+                  CapabilityJunctionPayload capableCp =
+                    (CapabilityJunctionPayload) cp;
                   if  ( capableCp.getStatus() == CapabilityJunctionStatus.PENDING ) {
                     updatedApprovalPayloads.add(capableCp);
                   }
                 });
-              }    
+              }
             }
           }
         }
@@ -117,13 +118,13 @@ foam.CLASS({
             DAO approvalRequestDAO = (DAO) getX().get("approvalRequestDAO");
             DAO approvableDAO = (DAO) getX().get("approvableDAO");
 
-            for ( CapablePayload capablePayload : updatedApprovalPayloads ){
+            for ( CapabilityJunctionPayload capablePayload : updatedApprovalPayloads ){
               Capability capability = (Capability) capabilityDAO.find(capablePayload.getCapability());
 
               String hashedId = new StringBuilder("d")
-                .append(capablePayload.getDaoKey())
+                .append(capableNewObj.getDAOKey())
                 .append(":o")
-                .append(String.valueOf(capablePayload.getObjId()))
+                .append(String.valueOf(obj.getProperty("id")))
                 .append(":c")
                 .append(capability.getId())
                 .toString();
@@ -135,17 +136,18 @@ foam.CLASS({
                 ));
 
               List<Approvable> approvablesPending = ((ArraySink) approvablesPendingDAO.inX(getX()).select(new ArraySink())).getArray();
-              
+
               for ( Approvable approvable : approvablesPending ){
                 approvalRequestDAO.where(
                   foam.mlang.MLang.AND(
                     foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, approvable.getId()),
-                    foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, "approvableDAO")
+                    foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, "approvableDAO"),
+                    foam.mlang.MLang.EQ(Approvable.STATUS, ApprovalStatus.REQUESTED)
                   )
                 ).removeAll();
               }
 
-              approvablesPendingDAO.removeAll();              
+              approvablesPendingDAO.removeAll();
             }
           }
         }, "Adjusted approvals after the capable payload status changed");

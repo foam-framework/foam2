@@ -26,12 +26,14 @@ foam.CLASS({
 
   exports: [
     'allowRemoval',
-    'removeFile'
+    'removeFile',
+    'highlight'
   ],
 
   css: `
     ^ {
       box-sizing: border-box;
+      max-width: 365px;
       padding: 16px;
       border: 2px dashed #8e9090;
       border-radius: 3px;
@@ -85,11 +87,11 @@ foam.CLASS({
   `,
 
   messages: [
-    { name: 'LABEL_DEFAULT_TITLE', message: 'DRAG & DROP YOUR FILE HERE' },
+    { name: 'LABEL_DEFAULT_TITLE', message: 'Drag your file here' },
     { name: 'LABEL_OR',            message: 'or' },
-    { name: 'LABEL_BROWSE',        message: 'browse' },
+    { name: 'LABEL_BROWSE',        message: 'select from your device' },
     { name: 'LABEL_SUPPORTED',     message: 'Supported file types:' },
-    { name: 'LABEL_MAX_SIZE',      message: 'Max Size:' },
+    { name: 'LABEL_MAX_SIZE',      message: 'Max size:' },
     { name: 'ERROR_FILE_TYPE',     message: 'Invalid file type' },
     { name: 'ERROR_FILE_SIZE',     message: 'File size exceeds 15MB' }
   ],
@@ -130,6 +132,9 @@ foam.CLASS({
     {
       name: 'onFilesChanged',
       documentation: 'When a file has been selected/changed/removed, this function will be called. (OPTIONAL)'
+    },
+    {
+      name: 'selected'
     }
   ],
 
@@ -172,6 +177,7 @@ foam.CLASS({
             e.tag({
               class: 'foam.nanos.fs.fileDropZone.FileCard',
               data: files[i],
+              selected: this.selected,
               index: i
             });
           }
@@ -267,6 +273,7 @@ foam.CLASS({
           });
         }
       }
+      this.selected = this.files.length - 1;
       this.files = Array.from(this.files);
     },
 
@@ -277,8 +284,16 @@ foam.CLASS({
     function removeFile(atIndex) {
       var files = Array.from(this.files);
       files.splice(atIndex, 1);
+      if ( this.selected === files.length )
+              this.selected = files.length - 1;
       this.files = files;
       this.document.querySelector('.' + this.instanceClass(`input`)).value = null;
+
+    },
+
+    function highlight(atIndex) {
+      this.selected = atIndex;
+      this.files = this.files;
     }
   ],
 

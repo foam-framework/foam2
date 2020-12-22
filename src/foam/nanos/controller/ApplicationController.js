@@ -54,7 +54,8 @@ foam.CLASS({
     'foam.u2.stack.StackView',
     'foam.u2.dialog.NotificationMessage',
     'foam.nanos.session.SessionTimer',
-    'foam.u2.dialog.Popup'
+    'foam.u2.dialog.Popup',
+    'foam.core.Latch'
   ],
 
   imports: [
@@ -77,11 +78,12 @@ foam.CLASS({
     'lastMenuLaunchedListener',
     'loginSuccess',
     'loginVariables',
-    'mementoTail as memento',
+    'memento',
     'menuListener',
     'notify',
     'pushMenu',
     'requestLogin',
+    'sessionID',
     'sessionTimer',
     'signUpEnabled',
     'stack',
@@ -168,12 +170,28 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'memento',
+      class: 'String',
+      name: 'sessionName',
+      value: 'defaultSession'
+    },
+    {
+      name: 'sessionID',
       factory: function() {
-        return this.Memento.create({tail$: this.mementoTail$});
+        var urlSession = "";
+        try {
+          urlSession = window.location.search.substring(1).split('&')
+           .find(element => element.startsWith("sessionId")).split('=')[1];
+        } catch { };
+        return urlSession !== "" ? urlSession : localStorage[this.sessionName] ||
+          ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
       }
     },
-    'mementoTail',
+    {
+      name: 'memento',
+      factory: function() {
+        return this.Memento.create();
+      }
+    },
     {
       name: 'loginVariables',
       expression: function(client$userDAO) {
@@ -195,11 +213,16 @@ foam.CLASS({
       name: 'clientPromise',
       factory: function() {
         var self = this;
-        return self.ClientBuilder.create().promise.then(function(cls) {
+        return self.ClientBuilder.create({}, this).promise.then(function(cls) {
           self.client = cls.create(null, self);
           return self.client;
         });
       }
+    },
+    {
+      name: 'languageInstalled',
+      documentation: 'Latch to denote language has been installed',
+      factory: function() { return this.Latch.create(); }
     },
     {
       name: 'client',
@@ -295,9 +318,21 @@ foam.CLASS({
         return this.FooterView;
       }
     },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.Language',
+      name: 'defaultLanguage',
+      factory: function() {
+        return foam.nanos.auth.Language.create({code: 'en'})
+      }
+    },
     'currentMenu',
     'lastMenuLaunched',
-    'webApp'
+    'webApp',
+    {
+      name: 'languageDefaults_',
+      factory: function() { return []; }
+    }
   ],
 
   methods: [
@@ -312,16 +347,31 @@ foam.CLASS({
       // Start Memento Support
       this.WindowHash.create({value$: this.memento.value$});
 
-      this.memento.head$.sub(this.mementoChange);
-      this.mementoChange();
+      this.onDetach(this.memento.changeIndicator$.sub(function () {
+        self.memento.value = self.memento.combine();
+
+        if ( ! self.memento.feedback_ )
+          self.mementoChange();
+      }));
+
+      this.onDetach(this.memento.value$.sub(function () {
+        self.memento.parseValue();
+
+        if ( ! self.memento.feedback_ )
+          self.mementoChange();
+      }));
       // End Memento Support
 
       this.clientPromise.then(async function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
 
-        await self.fetchSubject();
         await client.translationService.initLatch;
         self.installLanguage();
+
+        await self.fetchSubject();
+
+        await self.maybeReinstallLanguage(client)
+        self.languageInstalled.resolve();
 
         // add user and agent for backward compatibility
         Object.defineProperty(self, 'user', {
@@ -346,6 +396,7 @@ foam.CLASS({
         await self.fetchGroup();
         await self.fetchTheme();
         self.onUserAgentAndGroupLoaded();
+        self.mementoChange();
       });
     },
 
@@ -397,13 +448,49 @@ foam.CLASS({
     },
 
     function installLanguage() {
+      for ( var i = 0 ; i < this.languageDefaults_.length ; i++ ) {
+        var ld = this.languageDefaults_[i];
+        ld[0][ld[1]] = ld[2];
+      }
+      this.languageDefaults_ = undefined;
+
       var map = this.__subContext__.translationService.localeEntries;
       for ( var key in map ) {
         var node = global;
         var path = key.split('.');
 
         for ( var i = 0 ; node && i < path.length-1 ; i++ ) node = node[path[i]];
-        if ( node ) node[path[path.length-1]] = map[key];
+        if ( node ) {
+          this.languageDefaults_.push([node, path[path.length-1], node[path[path.length-1]]]);
+          node[path[path.length-1]] = map[key];
+        }
+      }
+    },
+
+    async function maybeReinstallLanguage(client) {
+      if (
+        this.subject &&
+        this.subject.realUser &&
+        this.subject.realUser.language.toString() != foam.locale
+      ) {
+        let languages = (await client.languageDAO
+          .where(foam.mlang.predicate.Eq.create({
+            arg1: foam.nanos.auth.Language.ENABLED,
+            arg2: true
+          })).select()).array;
+
+        let userPreferLanguage = languages.find( e => e.id.compareTo(this.subject.realUser.language) === 0 )
+        if ( ! userPreferLanguage ) {
+          foam.locale = this.defaultLanguage.toString()
+          let user = this.subject.realUser
+          user.language = this.defaultLanguage.id
+          await client.userDAO.put(user)
+        } else if ( foam.locale != userPreferLanguage.toString() ) {
+          foam.locale = userPreferLanguage.toString()
+        }
+        client.translationService.maybeReload()
+        await client.translationService.initLatch
+        this.installLanguage()
       }
     },
 
@@ -427,6 +514,7 @@ foam.CLASS({
 
         this.subject = result;
       } catch (err) {
+        this.languageInstalled.resolve();
         await this.requestLogin();
         return await this.fetchSubject();
       }
@@ -445,18 +533,18 @@ foam.CLASS({
       // then we don't want this method to expand the commented portion of that
       // CSS because it's already in long form. By checking if */ follows the
       // macro, we can tell if it's already in long form and skip it.
-      return css.replace(
+      return this.theme[m] ? css.replace(
         new RegExp('%' + M + '%(?!\\*/)', 'g'),
-        '/*%' + M + '%*/ ' + this.theme[m]);
+        '/*%' + M + '%*/ ' + this.theme[m]) : css;
     },
 
     function expandLongFormMacro(css, m) {
       // A long-form macros is of the form "/*%PRIMARY_COLOR%*/ blue".
       var M = m.toUpperCase();
 
-      return css.replace(
+      return this.theme[m] ? css.replace(
         new RegExp('/\\*%' + M + '%\\*/[^;!]*', 'g'),
-        '/*%' + M + '%*/ ' + this.theme[m]);
+        '/*%' + M + '%*/ ' + this.theme[m]) : css;
     },
 
     function wrapCSS(text, id) {
@@ -490,7 +578,7 @@ foam.CLASS({
       }
       /** Use to load a specific menu. **/
       // Do it this way so as to not reset mementoTail if set
-      if ( this.memento.head != menu || opt_forceReload ) {
+      if ( this.memento.head !== menu || opt_forceReload ) {
         this.memento.value = menu;
       }
     },

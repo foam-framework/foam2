@@ -2577,8 +2577,11 @@ foam.CLASS({
       class: 'List',
       hidden: true,
       name: 'groupKeys',
-      javaFactory: 'return new java.util.ArrayList();',
-      factory: function() { return []; }
+      transient: true,
+      javaFactory: 'return new java.util.ArrayList(this.getGroups().keySet());',
+      factory: function() {
+        return Object.keys(this.groups);
+      },
     },
     {
       class: 'Boolean',
@@ -2635,7 +2638,8 @@ return getGroupKeys();`
         if ( ! group ) {
           group = this.arg2.clone();
           this.groups[key] = group;
-          this.groupKeys.push(key);
+          if ( ! this.groupKeys.includes(key) )
+            this.groupKeys.push(key);
         }
         group.put(obj, sub);
         this.pub('propertyChange', 'groups');
@@ -2645,7 +2649,8 @@ return getGroupKeys();`
  if ( group == null ) {
    group = (foam.dao.Sink) (((foam.core.FObject)getArg2()).fclone());
    getGroups().put(key, group);
-   getGroupKeys().add(key);
+   if ( ! this.getGroupKeys().contains(key) )
+     getGroupKeys().add(key);
  }
  group.put(obj, sub);`
     },
@@ -3148,7 +3153,7 @@ foam.CLASS({
     },
     {
       name: 'createStatement',
-      javaCode: `return null;`
+      javaCode: `return getHead().createStatement() + ", " + getTail().createStatement();`
     },
     {
       name: 'prepareStatement',
