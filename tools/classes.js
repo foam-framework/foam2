@@ -333,6 +333,7 @@ var classes = [
   'foam.nanos.auth.EnabledCheckAuthService',
   'foam.nanos.http.HttpParameters',
   'foam.nanos.http.DefaultHttpParameters',
+  'foam.nanos.http.SendErrorHandler',
   'foam.nanos.session.LocalSetting',
   'foam.nanos.session.LocalSettingSessionDAO',
   'foam.nanos.session.Session',
@@ -716,6 +717,7 @@ var classes = [
   'foam.support.model.SupportEmail',
   'foam.support.model.Ticket',
 
+  'foam.nanos.dig.exception.ExternalAPIException',
   'foam.nanos.dig.exception.EmptyParameterException',
   'foam.nanos.dig.exception.GeneralException',
 

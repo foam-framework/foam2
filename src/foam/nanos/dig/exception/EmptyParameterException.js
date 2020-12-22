@@ -8,6 +8,21 @@ foam.CLASS({
   name: 'EmptyParameterException',
   extends: 'foam.nanos.dig.exception.DigErrorMessage',
 
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+          public EmptyParameterException(String message) {
+            super(message);
+            setMessage(message);
+          } 
+        `
+        );
+      }
+    }
+  ],
+
   properties: [
     {
       class: 'String',

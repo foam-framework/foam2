@@ -5,7 +5,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.dig.exception',
-  name: 'DAONotFoundException',
+  name: 'ExternalAPIException',
   extends: 'foam.nanos.dig.exception.DigErrorMessage',
 
   axioms: [
@@ -13,7 +13,7 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
-          public DAONotFoundException(String message) {
+          public ExternalAPIException(String message) {
             super(message);
             setMessage(message);
           } 
@@ -27,17 +27,22 @@ foam.CLASS({
     {
       class: 'String',
       name: 'status',
-      value: '404'
+      value: '500'
     },
     {
       class: 'Int',
       name: 'code',
-      value: 1000
+      value: 1010
     },
     {
       class: 'String',
       name: 'type',
-      value: 'NotFound'
+      value: 'External API Failure'
+    },
+    {
+      class: 'String',
+      name: 'message',
+      value: 'External API Failure'
     }
   ]
 });

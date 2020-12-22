@@ -166,6 +166,10 @@ public class NanoRouter
       if ( service instanceof WebAgent ) {
         WebAgent pmService = (WebAgent) service;
 
+        SendErrorHandler sendErrorHandler = null;
+        if ( service instanceof SendErrorHandler )
+          sendErrorHandler = (SendErrorHandler) service;
+
         if ( spec.getParameters() ) {
           service = new HttpParametersWebAgent((WebAgent) service);
         }
@@ -177,7 +181,7 @@ public class NanoRouter
         // NOTE: Authentication must be last as HttpParametersWebAgent will consume the authentication parameters.
         //
         if ( spec.getAuthenticate() ) {
-          service = new AuthWebAgent("service.run." + spec.getName(), (WebAgent) service);
+          service = new AuthWebAgent("service.run." + spec.getName(), (WebAgent) service, sendErrorHandler);
         }
       }
 
