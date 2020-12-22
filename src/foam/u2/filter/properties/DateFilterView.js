@@ -17,7 +17,7 @@ foam.CLASS({
 
   messages: [
     { name: 'LABEL_ALL',    message: 'Search' },
-    { name: 'LABEL_AFTER',    message: 'Search' },
+    { name: 'LABEL_AFTER',    message: 'After' },
     { name: 'LABEL_BEFORE',    message: 'Before' },
     { name: 'LABEL_BETWEEN',    message: 'Search' }
   ],
