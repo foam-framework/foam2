@@ -53,76 +53,53 @@ p({
   "action":{"class":"foam.nanos.crunch.ruler.ValidateUCJDataOnPut"},
   "lifecycleState":1,
   "predicate":{
-    "class":"foam.mlang.predicate.And",
+    "class":"foam.mlang.predicate.Or",
     "args":[
-      {
-        class: "foam.mlang.predicate.Not",
-        arg1: {
-          class: "foam.nanos.crunch.predicate.StatusChangedTo",
-          status: 4
-        }
-      },
-      {
-        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
+      { 
+        "class":"foam.nanos.ruler.predicate.PropertyEQValue",
         "propName":"status",
-        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":0}
+        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":3},
+        "documentation":"""
+          When the ucj status is in ACTION_REQUIRED its data should always be validated to try to put it
+          into pending status so that subsequent rules may try to grant it.
+          see comment above
+        """
       },
       {
-        "class":"foam.mlang.predicate.Or",
+        "class":"foam.mlang.predicate.And",
         "args":[
+          { 
+            "class": "foam.nanos.ruler.predicate.PropertyChangePredicate",
+            "propName":"data",
+            "documentation":"Only perform data validation when the data has been updated"
+          },
           {
             "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
             "propName":"status",
-            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1}
+            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":0},
+            "documentation":"""
+              When the ucj is PENDING, it implies that there is an approval request pending action. 
+              Thus the ucj becomes uneditable until acted on by agent to avoid inconsistencies between
+              the approvable obj and the ucj.
+            """
           },
-          { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isRenewable","propValue":true }
-        ]
-      },
-      {
-        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
-        "propName":"status",
-        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":6}
-      },
-      {
-        "class":"foam.mlang.predicate.Or",
-        "args":[
           {
             "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
             "propName":"status",
-            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1},
-            "isNew":false
-          },
-          { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isRenewable","propValue":true,"isNew":false }
+            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":6},
+            "documentation":"""
+              When the ucj is PENDING, it implies that there is an approval request pending action. 
+              Thus the ucj becomes uneditable until acted on by agent to avoid inconsistencies between
+              the approvable obj and the ucj.
+            """
+          }
         ]
-      },
-      {
-        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
-        "propName":"status",
-        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":6},
-        "isNew":false
-      },
-      {
-        "class":"foam.mlang.predicate.Not",
-        "arg1":{
-          "class":"foam.mlang.predicate.And",
-          "args":[
-            { "class":"foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate" },
-            {
-              "class":"foam.mlang.predicate.Or",
-              "args":[
-                { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isInRenewalPeriod","propValue":true },
-                { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isInGracePeriod","propValue":true },
-                { "class":"foam.nanos.ruler.predicate.PropertyEQValue", "propName":"isExpired", "propValue":true }
-              ]
-            }
-          ]
-        }
-
       }
     ]
   }
 })
 
+// removed predicate isRenewable || status not granted for ticket
 p({
   "class":"foam.nanos.ruler.Rule",
   "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-2",
@@ -134,18 +111,7 @@ p({
   "after":false,
   "enabled":true,
   "action":{"class":"foam.nanos.crunch.ruler.SetUCJStatusOnPut"},
-  "lifecycleState":1,
-  "predicate":{
-    "class":"foam.mlang.predicate.Or",
-    "args":[
-      {
-        "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
-        "propName":"status",
-        "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1}
-      },
-      { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isRenewable","propValue":true }
-    ]
-  }
+  "lifecycleState":1
 })
 
 p({
@@ -176,19 +142,21 @@ p({
   "predicate":{
     "class":"foam.mlang.predicate.Or",
     "args":[
-      {
-        "class":"foam.mlang.predicate.Or",
-        "args":[
-          {
-            "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
-            "propName":"status",
-            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1},
-            "isNew":false
-          },
-          { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isRenewable","propValue":true,"isNew":false }
-        ]
+      { 
+        "class": "foam.nanos.ruler.predicate.PropertyChangePredicate",
+        "propName":"data",
       },
-      { "class":"foam.nanos.ruler.predicate.PropertyChangePredicate", "propName":"data" }
+      {
+        "class":"foam.mlang.predicate.And",
+        "args":[
+          {"class":"foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate","includeRenewalStatus":true},
+          { 
+            "class":"foam.nanos.ruler.predicate.PropertyEQValue", 
+            "propName":"status",
+            "propValue":{ "class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1 }
+          }
+        ]
+      }
     ]
   },
   "lifecycleState":1
@@ -207,6 +175,7 @@ p({
   "lifecycleState":1
 })
 
+// removed or(or(old not granted, old is renewable), current pred) for ticket
 p({
   "class":"foam.nanos.ruler.Rule",
   "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-4-u",
@@ -222,19 +191,53 @@ p({
     "class":"foam.mlang.predicate.Or",
     "args":[
       {
-        "class":"foam.mlang.predicate.Or",
-        "args":[
-          {
-            "class":"foam.nanos.ruler.predicate.PropertyNEQValue",
-            "propName":"status",
-            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1},
-            "isNew":false
-          },
-          { "class":"foam.nanos.ruler.predicate.PropertyEQValue","propName":"isRenewable","propValue":true,"isNew":false }
-        ]
+        "class": "foam.nanos.ruler.predicate.PropertyChangePredicate",
+        "propName":"data",
       },
-      { "class":"foam.nanos.ruler.predicate.PropertyChangePredicate", "propName":"data" }
+      {
+        "class":"foam.mlang.predicate.And",
+        "args":[
+          {"class":"foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate","includeRenewalStatus":true},
+          { 
+            "class":"foam.nanos.ruler.predicate.PropertyEQValue", 
+            "propName":"status",
+            "propValue":{ "class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1 }
+          }
+        ]
+      }
     ]
   },
+  "lifecycleState":1
+})
+
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e9-crunch2-create",
+  "name":"Reput Dependents Rule - on create",
+  "priority":1,
+  "ruleGroup":"ucjDAO",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":0,
+  "after":true,
+  "enabled":true,
+  "action":{"class":"foam.nanos.crunch.ReputDependentUCJs"},
+  "lifecycleState":1
+})
+
+
+// this rule should run whenever the status of a ucj changes
+// the logic inside the rule should take care of determining what to do
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75e9-crunch2-update",
+  "name":"Reput Dependents Rule - on update",
+  "priority":1,
+  "ruleGroup":"ucjDAO",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":1,
+  "after":true,
+  "enabled":true,
+  "predicate":{"class":"foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate","includeRenewalStatus":true},
+  "action":{"class":"foam.nanos.crunch.ReputDependentUCJs"},
   "lifecycleState":1
 })
