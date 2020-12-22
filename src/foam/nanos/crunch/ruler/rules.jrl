@@ -77,7 +77,6 @@ p({
         "documentation":"""
           When the ucj status is in ACTION_REQUIRED its data should always be validated to try to put it
           into pending status so that subsequent rules may try to grant it.
-          see comment above
         """
       },
       {
