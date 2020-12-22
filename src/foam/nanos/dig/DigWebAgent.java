@@ -17,7 +17,7 @@ import java.io.PrintWriter;
 import javax.servlet.http.HttpServletResponse;
 
 public class DigWebAgent
-  implements WebAgent
+  implements WebAgent, SendErrorHandler
 {
   public DigWebAgent() {}
 
@@ -54,21 +54,36 @@ public class DigWebAgent
           driver.remove(x);
           break;
       }
+    } catch (DigErrorMessage dem) {
+      logger.error(dem);
+      DigUtil.outputException(x, dem, format);
+    } catch (FOAMException fe) {
+      logger.error(fe);
+      DigUtil.outputFOAMException(x, fe, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, format);
     } catch (Throwable t) {
-      PrintWriter out = x.get(PrintWriter.class);
-      out.println("Error " + t.getMessage());
-      out.println("<pre>");
-        t.printStackTrace(out);
-      out.println("</pre>");
       logger.error(t);
-
-      try {
-        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, t.getMessage());
-      } catch ( java.io.IOException e ) {
-        logger.error("Failed to send HttpServletResponse CODE", e);
-      }
+      DigUtil.outputException(x, 
+          new GeneralException.Builder(x)
+            .setStatus(String.valueOf(HttpServletResponse.SC_INTERNAL_SERVER_ERROR))
+            .setMessage(t.getMessage())
+            .setMoreInfo(t.getClass().getName())
+            .build(), 
+          format);
     } finally {
       pm.log(x);
     }
+  }
+
+  public void sendError(X x, int status, String message) {
+    DigUtil.outputException(x, 
+      new GeneralException.Builder(x)
+        .setStatus(String.valueOf(status))
+        .setMessage(message)
+        .build(), 
+      Format.JSON);
+  }
+
+  public boolean redirectToLogin(X x) {
+    return false;
   }
 }

@@ -86,10 +86,11 @@ foam.CLASS({
         if ( !n ){
           this.choiceWizardlets.forEach(cw => {
             cw.isAvailable = false
-            cw.cancel();
           });
 
-          this.cancel();
+          this.isAvailablePromise =
+            Promise.all(this.choiceWizardlets.map(cw => cw.isAvailablePromise))
+              .then(() => { this.cancel(); });
         } else {
           this.save();
         }
@@ -121,15 +122,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function createView(data) {
-      return this.MultiChoiceView.create({
-        choices$: this.choices$,
-        booleanView: this.CardSelectView,
-        isValidNumberOfChoices$: this.isValid$,
-        minSelected$: this.min$,
-        maxSelected$: this.max$
-      });
-    },
     function addPrerequisite(wizardlet) {
       wizardlet.isAvailable = false;
       this.choiceWizardlets.push(wizardlet);

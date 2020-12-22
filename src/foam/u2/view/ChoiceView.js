@@ -258,7 +258,6 @@ foam.CLASS({
       for ( var i = 0 ; i < choices.length ; i++ ) {
         if ( foam.util.equals(choices[i][0], data) ) return choices[i];
       }
-      return null;
     },
 
     function findChoiceByText(text) {
@@ -266,7 +265,6 @@ foam.CLASS({
       for ( var i = 0 ; i < choices.length ; i++ ) {
         if ( choices[i][1] === text ) return choices[i];
       }
-      return null;
     },
 
     function fromProperty(p) {

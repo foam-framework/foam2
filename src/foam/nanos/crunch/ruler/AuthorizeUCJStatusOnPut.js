@@ -45,15 +45,15 @@ foam.CLASS({
             var nu = (UserCapabilityJunction) obj;
             var auth = (AuthService) x.get("auth");
 
-            if ( ol == null ) {
-              if ( ! auth.check(x, PERMISSION) ) nu.setStatus(ACTION_REQUIRED);
-              return;
-            }
-
             if ( nu.getStatus() == AVAILABLE ||
               nu.getStatus() == ACTION_REQUIRED
             ) {
               // TODO: Update code when decision is made about isRenewable
+              return;
+            }
+
+            if ( ol == null ) {
+              if ( ! auth.check(x, PERMISSION) ) nu.setStatus(ACTION_REQUIRED);
               return;
             }
 

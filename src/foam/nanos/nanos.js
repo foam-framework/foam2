@@ -263,6 +263,7 @@ FOAM_FILES([
   { name: 'foam/nanos/http/WebAgent' },
   { name: "foam/nanos/http/ProxyWebAgent" },
   { name: "foam/nanos/http/HttpParameters" },
+  { name: 'foam/nanos/http/SendErrorHandler' },
   { name: "foam/nanos/http/DefaultHttpParameters" },
   { name: "foam/nanos/doc/DocumentationView" },
   { name: 'foam/nanos/demo/relationship/CourseType' },
@@ -407,6 +408,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ReputDependentUCJs" },
   //predicates
   { name: 'foam/nanos/crunch/predicate/CapabilityGranted' },
+  { name: 'foam/nanos/crunch/predicate/CapabilityPrerequisitesGranted' },
   { name: 'foam/nanos/crunch/predicate/StatusChangedTo' },
   { name: 'foam/nanos/crunch/predicate/IsAgent' },
   //spid
