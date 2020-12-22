@@ -31,7 +31,7 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
-        data: `
+          data: `
     public ValidationException(String message) {
       super(message);
     }
