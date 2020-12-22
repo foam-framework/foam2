@@ -23,7 +23,7 @@ foam.CLASS({
     },
     {
       name: 'key',
-      class: 'String',
+      class: 'Object',
       documentation: `key is the value by which the result would be grouped`
     }
   ]

@@ -69,7 +69,7 @@ foam.CLASS({
     }
 
     ^header {
-      padding-left: 24px;
+      padding-left: 20px;
       padding-right: 16px;
       padding-top: 20px;
       padding-bottom: 20px;
