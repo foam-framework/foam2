@@ -79,6 +79,36 @@ p({
           into pending status so that subsequent rules may try to grant it.
         """
       },
+      { 
+        "class":"foam.mlang.predicate.And",
+        "args":[
+          {
+            "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+            "propName":"status",
+            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":2}
+          },
+          {
+            "class":"foam.mlang.predicate.Or",
+            "args":[
+              {
+                "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+                "propName":"status",
+                "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":2},
+                "isNew":false
+              },
+              {
+                "class":"foam.nanos.ruler.predicate.PropertyChangePredicate",
+                "propName":"data"
+              }
+            ]
+          }
+        ],
+        "documentation":"""
+          When the ucj status is in EXPIRED its data should be validated only when the data has changed
+          OR if it is a reput ( i.e., old is also EXPIRED ) so that the ucj won't be re-granted right after
+          changing to EXPIRED
+        """
+      },
       {
         "class":"foam.mlang.predicate.And",
         "args":[
