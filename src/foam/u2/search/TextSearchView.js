@@ -86,7 +86,7 @@ foam.CLASS({
     {
       name: 'label',
       expression: function(property) {
-        return property && property.label ? property.label : this.LABEL_SEARCH ;
+        return property && property.label ? property.label : this.LABEL_SEARCH;
       }
     },
     {
