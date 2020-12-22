@@ -84,16 +84,16 @@ p({
         "args":[
           {
             "class":"foam.nanos.ruler.predicate.PropertyEQValue",
-            "propName":"status",
-            "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":2}
+            "propName":"isRenewable",
+            "propValue":true
           },
           {
             "class":"foam.mlang.predicate.Or",
             "args":[
               {
                 "class":"foam.nanos.ruler.predicate.PropertyEQValue",
-                "propName":"status",
-                "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":2},
+                "propName":"isRenewable",
+                "propValue":true,
                 "isNew":false
               },
               {
@@ -104,7 +104,7 @@ p({
           }
         ],
         "documentation":"""
-          When the ucj status is in EXPIRED its data should be validated only when the data has changed
+          When the ucj status is in a renewable state its data should be validated only when the data has changed
           OR if it is a reput ( i.e., old is also EXPIRED ) so that the ucj won't be re-granted right after
           changing to EXPIRED
         """
@@ -196,29 +196,16 @@ p({
   "enabled":true,
   "action":{"class":"foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted"},
   "predicate":{
-    "class":"foam.mlang.predicate.Or",
-    "args":[
-      { 
-        "class": "foam.nanos.ruler.predicate.PropertyChangePredicate",
-        "propName":"data",
-      },
-      {
-        "class":"foam.mlang.predicate.And",
-        "args":[
-          {"class":"foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate","includeRenewalStatus":true},
-          { 
-            "class":"foam.nanos.ruler.predicate.PropertyEQValue", 
-            "propName":"status",
-            "propValue":{ "class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1 }
-          }
-        ]
-      }
-    ]
+    "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+    "propName":"status",
+    "propValue":{ "class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1 }
   },
   "lifecycleState":1,
   "documentation":"""
     On update of a UCJ, if the ucj data has been updated or if the ucj underwent a status change to GRANTED
     configure the expiry info based on the duration and expiry properties of the target capability
+    this check is implemented in the ruleaction due to updating of the renewal status no occuring
+    at the time the predicate is checked
   """
 })
 p({
@@ -251,29 +238,16 @@ p({
   "enabled":true,
   "action":{"class":"foam.nanos.crunch.ruler.SaveUCJDataOnGranted"},
   "predicate":{
-    "class":"foam.mlang.predicate.Or",
-    "args":[
-      {
-        "class": "foam.nanos.ruler.predicate.PropertyChangePredicate",
-        "propName":"data",
-      },
-      {
-        "class":"foam.mlang.predicate.And",
-        "args":[
-          {"class":"foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate","includeRenewalStatus":true},
-          { 
-            "class":"foam.nanos.ruler.predicate.PropertyEQValue", 
-            "propName":"status",
-            "propValue":{ "class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1 }
-          }
-        ]
-      }
-    ]
+    "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+    "propName":"status",
+    "propValue":{ "class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1 }
   },
   "lifecycleState":1,
   "documentation":"""
     On update of a UCJ, if the ucj data has been updated or if the ucj underwent a status change to GRANTED,
     save the data of the ucj to a DAO based on wether target capability specifies a daoKey or contextDAOFindKey
+    this check is implemented in the ruleaction due to updating of the renewal status no occuring
+    at the time the predicate is checked
   """
 })
 
