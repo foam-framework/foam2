@@ -15,6 +15,13 @@ foam.CLASS({
     'foam.mlang.Expressions'
   ],
 
+  messages: [
+    { name: 'LABEL_ALL',    message: 'Search' },
+    { name: 'LABEL_AFTER',    message: 'Search' },
+    { name: 'LABEL_BEFORE',    message: 'Search' },
+    { name: 'LABEL_BETWEEN',    message: 'Search' }
+  ],
+
   css: `
     ^ {
       padding: 24px 16px;
@@ -58,10 +65,10 @@ foam.CLASS({
       view: {
         class: 'foam.u2.view.ChoiceView',
         choices: [
-          ['True', 'All Time'],
-          ['Gt', 'After'],
-          ['Lt', 'Before'],
-          ['Bt', 'Between']
+          ['True', this.LABEL_ALL],
+          ['Gt', this.LABEL_AFTER],
+          ['Lt', this.LABEL_BEFORE],
+          ['Bt', this.LABEL_BETWEEN]
         ],
         defaultValue: 'True'
       }
