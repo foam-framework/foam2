@@ -25,7 +25,7 @@ foam.CLASS({
   ],
 
   css: `
-    input[type="wtf"] {
+    input[type="search"] {
       -webkit-appearance: textfield !important;
     }
 
