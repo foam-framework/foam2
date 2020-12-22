@@ -9,7 +9,11 @@ p({
   "after":false,
   "enabled":true,
   "action":{"class":"foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut"},
-  "lifecycleState":1
+  "lifecycleState":1,
+  "documentation":"""
+    On every ucjDAO put, check that the context user is either an admin user,
+    or is the source user of the ucj
+  """
 })
 
 p({
@@ -23,7 +27,13 @@ p({
   "after":false,
   "enabled":true,
   "action":{"class":"foam.nanos.crunch.ruler.AuthorizeUCJStatusOnPut"},
-  "lifecycleState":1
+  "lifecycleState":1,
+  "documentation":"""
+    On every ucjDAO put where the ucj is in a status above ACION_REQUIRED, 
+    check that the context user has the permission to set the unsafe status,
+    otherwise, set the status to ACTION_REQUIRED, or fallback to the previous status,
+    if applicable
+  """
 })
 
 p({
@@ -38,6 +48,11 @@ p({
   "enabled":true,
   "action":{"class":"foam.nanos.crunch.ruler.ValidateUCJDataOnPut"},
   "lifecycleState":1,
+  "documentation":"""
+    On put of a new UCJ, validate the data of the ucj and set the ucj
+    to ACTION_REQUIRED if the data is invalid, or PENDING if the data is valid, so that 
+    subsequent rules can set the ucj to an appropiate status, or send out an approvalrequest if required
+  """
 })
 
 p({
@@ -79,7 +94,7 @@ p({
             "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":0},
             "documentation":"""
               When the ucj is PENDING, it implies that there is an approval request pending action. 
-              Thus the ucj becomes uneditable until acted on by agent to avoid inconsistencies between
+              Thus the ucj becomes uneditable until the request is acted on by agent to avoid inconsistencies between
               the approvable obj and the ucj.
             """
           },
@@ -89,17 +104,20 @@ p({
             "propValue":{"class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":6},
             "documentation":"""
               When the ucj is PENDING, it implies that there is an approval request pending action. 
-              Thus the ucj becomes uneditable until acted on by agent to avoid inconsistencies between
+              Thus the ucj becomes uneditable until the request is acted on by agent to avoid inconsistencies between
               the approvable obj and the ucj.
             """
           }
         ]
       }
     ]
-  }
+  },
+  "documentation":"""
+    On update of an UCJ, if the ucj is in the status ACTION_REQUIRED, or if the data of the ucj
+    has changed and the ucj is NOT in PENDING or APPROVED, try to validate the data of the ucj.
+  """
 })
 
-// removed predicate isRenewable || status not granted for ticket
 p({
   "class":"foam.nanos.ruler.Rule",
   "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-2",
@@ -111,7 +129,12 @@ p({
   "after":false,
   "enabled":true,
   "action":{"class":"foam.nanos.crunch.ruler.SetUCJStatusOnPut"},
-  "lifecycleState":1
+  "lifecycleState":1,
+  "documentation":"""
+    On every ucjDAO put, set the appropriate status based on the capability, 
+    current state of the ucj, as well as the state of its prerequisites.
+    Note: this rule is only ran if ucj is GRANTED, APPROVED, and PENDING
+  """
 })
 
 p({
@@ -125,7 +148,11 @@ p({
   "after":false,
   "enabled":true,
   "action":{"class":"foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted"},
-  "lifecycleState":1
+  "lifecycleState":1,
+  "documentation":"""
+    On put of a new UCJ that has been GRANTED, configure the expiry info of the
+    ucj based on the duration and expiry properties of the target capability
+  """
 })
 
 p({
@@ -159,7 +186,11 @@ p({
       }
     ]
   },
-  "lifecycleState":1
+  "lifecycleState":1,
+  "documentation":"""
+    On update of a UCJ, if the ucj data has been updated or if the ucj underwent a status change to GRANTED
+    configure the expiry info based on the duration and expiry properties of the target capability
+  """
 })
 p({
   "class":"foam.nanos.ruler.Rule",
@@ -172,10 +203,13 @@ p({
   "after":false,
   "enabled":true,
   "action":{"class":"foam.nanos.crunch.ruler.SaveUCJDataOnGranted"},
-  "lifecycleState":1
+  "lifecycleState":1,
+  "documentation":"""
+    On put of a new UCJ that has been GRANTED, save the data of the ucj to a DAO based on whether the 
+    target capability specifies a daoKey or contextDAOFindKey
+  """
 })
 
-// removed or(or(old not granted, old is renewable), current pred) for ticket
 p({
   "class":"foam.nanos.ruler.Rule",
   "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-4-u",
@@ -207,7 +241,11 @@ p({
       }
     ]
   },
-  "lifecycleState":1
+  "lifecycleState":1,
+  "documentation":"""
+    On update of a UCJ, if the ucj data has been updated or if the ucj underwent a status change to GRANTED,
+    save the data of the ucj to a DAO based on wether target capability specifies a daoKey or contextDAOFindKey
+  """
 })
 
 p({
@@ -221,12 +259,13 @@ p({
   "after":true,
   "enabled":true,
   "action":{"class":"foam.nanos.crunch.ReputDependentUCJs"},
-  "lifecycleState":1
+  "lifecycleState":1,
+  "documentation":"""
+    On put of a new UCJ, find the dependent capabilities of this ucj that the user has a junction with,
+    and reput them in order to update the status appropriately
+  """
 })
 
-
-// this rule should run whenever the status of a ucj changes
-// the logic inside the rule should take care of determining what to do
 p({
   "class":"foam.nanos.ruler.Rule",
   "id":"68afcf0c-c718-98f8-0841-75e9-crunch2-update",
@@ -239,5 +278,9 @@ p({
   "enabled":true,
   "predicate":{"class":"foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate","includeRenewalStatus":true},
   "action":{"class":"foam.nanos.crunch.ReputDependentUCJs"},
-  "lifecycleState":1
+  "lifecycleState":1,
+  "documentation":"""
+    On update of a UCJ where the status of the ucj has changed, find the dependent capabilities of this ucj that the 
+    user has a junction with, and reput them in order to update the status appropriately
+  """
 })

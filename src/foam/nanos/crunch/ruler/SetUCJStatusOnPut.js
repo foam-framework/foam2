@@ -35,6 +35,10 @@ foam.CLASS({
           public void execute(X x) {
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj; 
             
+            // other relevant possibilities for ucj statuses are EXPIRED, ACTION_REQUIRED.
+            // However, if the ucj is in either of these two statuses, it implies that the data
+            // was not validated in previous ruleaction. Thus we know that it is in the correct status
+            // already and do not need to go through this step
             if ( 
               ucj.getStatus() != CapabilityJunctionStatus.PENDING && 
               ucj.getStatus() != CapabilityJunctionStatus.APPROVED && 
