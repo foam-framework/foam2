@@ -19,7 +19,7 @@ foam.CLASS({
     { name: 'LABEL_ALL',    message: 'All Time' },
     { name: 'LABEL_AFTER',    message: 'After' },
     { name: 'LABEL_BEFORE',    message: 'Before' },
-    { name: 'LABEL_BETWEEN',    message: 'Search' }
+    { name: 'LABEL_BETWEEN',    message: 'Between' }
   ],
 
   css: `
