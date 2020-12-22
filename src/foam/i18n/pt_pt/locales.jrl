@@ -311,3 +311,39 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.SendNotificati
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.EMail.EMAIL_REQUIRED",target:"Endereço de email necessário"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.EMail.VALID_EMAIL_REQUIRED",target:"Endereço de email válido necessário"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.FilterView.LABEL_CLEAR",target:"Limpe o filtro"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.FilterView.LINK_ADVANCED",target:"Filtros avançados"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.FilterView.LINK_SIMPLE",target:"Filtros simples"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.FilterView.LABEL_FILTER",target:"Filtros"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.FilterView.LABEL_RESULTS",target:"Resultados do filtro"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.FilterView.MESSAGE_ADVANCEDMODE",target:"Usando filtros avançados"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.FilterView.MESSAGE_VIEWADVANCED",target:"Usando filtros simples"})
+
+p({class:"foam.i18n.Locale",locale:"en",source:"net.nanopay.contacts.Contact.ORGANIZATION.label",target:"Nome da empresa"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.BooleanFilterView.BOOL_T.label",target:"Verdadeiro"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.BooleanFilterView.BOOL_F.label",target:"Falso"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.property.PropertyFilterView.LABEL_PROPERTY_ALL",target:"Todos"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.property.PropertyFilterView.LABEL_PROPERTY_FILTER",target:"Filtrando"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.DateFilterView.LABEL_ALL",target:"Todos"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.DateFilterView.LABEL_AFTER",target:"Depois de"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.DateFilterView.LABEL_BEFORE",target:"Antes"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.DateFilterView.LABEL_BETWEEN",target:"Entre"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.ReferenceFilterView.LABEL_PLACEHOLDER",target:"Pesquisa"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.ReferenceFilterView.LABEL_LIMIT_REACHED",target:"Refine sua pesquisa para ver mais opções"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.ReferenceFilterView.LABEL_LOADING",target:"Opções de Carregamento"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.ReferenceFilterView.LABEL_NO_OPTIONS",target:"- Sem Opções Disponíveis -"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.ReferenceFilterView.LABEL_SELECTED",target:"Opções Selecionadas"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.ReferenceFilterView.LABEL_FILTERED",target:"Opções"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.StringFilterView.LABEL_PLACEHOLDER",target:"Pesquisa"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.StringFilterView.LABEL_LIMIT_REACHED",target:"Refine sua pesquisa para ver mais opções"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.StringFilterView.LABEL_LOADING",target:"Opções de Carregamento"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.StringFilterView.LABEL_NO_OPTIONS",target:"- Sem Opções Disponíveis -"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.StringFilterView.LABEL_SELECTED",target:"Opções Selecionadas"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.StringFilterView.LABEL_FILTERED",target:"Opções"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.search.TextSearchView.LABEL_SEARCH",target:"Pesquisa"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.CriteriaView.LABEL_SEARCH",target:"Pesquisa"})
