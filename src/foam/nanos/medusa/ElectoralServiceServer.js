@@ -180,7 +180,7 @@ foam.CLASS({
       `
     },
     {
-      documentation: 'Intended for Agency submission, so dissolve can run with own thread.',
+      documentation: 'Force an election, if one not already in progress.',
       name: 'dissolve',
       synchronized: true,
       javaCode: `
