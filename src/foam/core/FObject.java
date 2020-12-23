@@ -436,6 +436,10 @@ public interface FObject
         exception.setPropName(prop.getName());
         exception.setErrorMessage(e.getMessage());
         exceptions.add(exception);
+      } catch (ValidationException e) {
+        e.setPropertyInfo(prop);
+        e.setPropName(prop.getName());
+        exceptions.add(e);
       }
     }
     if ( exceptions.size() > 0 ) {

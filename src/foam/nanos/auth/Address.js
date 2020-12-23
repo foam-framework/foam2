@@ -31,6 +31,7 @@ foam.CLASS({
     { name: 'REGION_REQUIRED', message: 'Region required' },
     { name: 'INVALID_ADDRESS_1', message: 'Invalid value for address line 1' },
     { name: 'INVALID_POSTAL_CODE', message: 'Valid Postal Code or ZIP Code required' },
+    { name: 'POSTAL_CODE_REQUIRE', message: 'Postal Code required' },
     { name: 'STREET_NAME_REQUIRED', message: 'Street name required' },
     { name: 'STREET_NUMBER_REQUIRED', message: 'Street number required' }
   ],
@@ -219,6 +220,16 @@ foam.CLASS({
       },
       gridColumns: 6,
       validationPredicates: [
+        {
+          args: ['postalCode'],
+          predicateFactory: function(e) {
+            return e.GT(
+              foam.mlang.StringLength.create({
+                arg1: foam.nanos.auth.Address.POSTAL_CODE
+              }), 0);
+          },
+          errorMessage: 'POSTAL_CODE_REQUIRE'
+        },
         {
           args: ['postalCode', 'countryId'],
           predicateFactory: function(e) {
