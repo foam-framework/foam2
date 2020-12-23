@@ -114,6 +114,7 @@ foam.CLASS({
       setter: function (nu) { this.payload.status = nu },
       javaSetter: `
         getPayload().setStatus(val);
+        if ( val == CapabilityJunctionStatus.EXPIRED && ! getIsExpired() ) setIsExpired(true);
       `
     },
     {
@@ -130,7 +131,15 @@ foam.CLASS({
     {
       name: 'isExpired',
       includeInDigest: true,
-      section: 'ucjExpirySection'
+      section: 'ucjExpirySection',
+      javaSetter: `
+        isExpired_ = val;
+        isExpiredIsSet_ = true;
+        if ( isExpired_ ) {
+          if ( getStatus() != CapabilityJunctionStatus.EXPIRED ) setStatus(CapabilityJunctionStatus.EXPIRED); 
+          isInGracePeriod_ = false;
+        }
+      `
     },
     {
       name: 'isRenewable',
@@ -160,7 +169,6 @@ foam.CLASS({
   ],
 
   methods: [
-
     {
       name: 'saveDataToDAO',
       args: [
