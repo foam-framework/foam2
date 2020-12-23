@@ -181,6 +181,20 @@ foam.CLASS({
     },
     {
       documentation: 'Force an election, if one not already in progress.',
+      name: 'register',
+      synchronized: true,
+      javaCode: `
+      getLogger().debug("dissolve", getState().getLabel());
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      ClusterConfig config = support.getConfig(x, id);
+      if ( config.getStatus() == Status.ONLINE &&
+           support.hasQuorum(x) ) {
+        setState(ElectoralServiceState.IN_SESSION);
+      }
+      `
+    },
+    {
+      documentation: 'Force an election, if one not already in progress.',
       name: 'dissolve',
       synchronized: true,
       javaCode: `

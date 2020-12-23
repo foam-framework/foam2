@@ -83,6 +83,9 @@ foam.CLASS({
                      nu.getStatus() == Status.OFFLINE ) {
                   getLogger().warning("primary OFFLINE");
                   electoralService.dissolve(x);
+                } else if ( electoralService.getState() != ElectoralServiceState.IN_SESSION ) {
+                  // When cluster has quorum, the last mediator may not be in-session.
+                  electoralService.register(x, myConfig.getId());
                 }
               }
             }
