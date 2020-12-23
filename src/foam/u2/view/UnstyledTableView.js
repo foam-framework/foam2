@@ -286,7 +286,7 @@ foam.CLASS({
       var newMementoColumns = [];
 
       for ( var s of this.selectedColumnNames ) {
-        if ( ! this.memento.paramsObj.columns ) 
+        if ( ! this.memento.paramsObj.columns )
           this.memento.paramsObj.columns = [];
         var label = this.columnConfigToPropertyConverter.returnPropertyLabelForName(this.of, s);
         var col = this.memento.paramsObj.columns.find(c => c.name === label);
@@ -386,7 +386,11 @@ foam.CLASS({
                   addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + prop.name))
                   .style({ flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0', 'word-wrap' : 'break-word', 'white-space' : 'normal'})
-                  .add(view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col)).
+                  .add(view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col))./*
+                  .forEach(
+                    view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col),
+                    function(c, i) { if ( i ) this.add(' / '); this.add(c); }
+                  ).*/
                   callIf(isFirstLevelProperty && prop.sortable, function() {
                     this.on('click', function(e) {
                       view.sortBy(prop);
