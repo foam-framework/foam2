@@ -11,7 +11,10 @@ foam.CLASS({
     Allows filtering or skipping of granted capabilities. Also exports a wizard
     position in case wizardlets are to be skipped.
   `,
-  imports: [ 'wizardlets' ],
+  imports: [ 
+    'crunchService',
+    'wizardlets'
+  ],
   exports: [ 'initialPosition' ],
   requires: [
     'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -52,7 +55,9 @@ foam.CLASS({
         if ( ! this.CapabilityWizardlet.isInstance(wizardlet) ) continue;
         let isGranted = ['GRANTED','PENDING'].some(status =>
           this.CapabilityJunctionStatus[status] == wizardlet.status);
-        if ( ! isGranted ) {
+        if ( ! isGranted ||  
+          await this.crunchService.isRenewable(this.__subContext__, wizardlet.capability.id)
+        ) {
           foundFirstWizardlet = true;
           continue;
         }
