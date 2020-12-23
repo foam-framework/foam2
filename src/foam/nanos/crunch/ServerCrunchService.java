@@ -89,9 +89,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
       if ( filterGrantedUCJ ) {
         UserCapabilityJunction ucj = getJunction(x, sourceCapabilityId);
-        if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED 
-          && ! maybeReopen(x, ucj.getTargetId()) 
-        ) {
+        if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
           continue;
         }
       }
