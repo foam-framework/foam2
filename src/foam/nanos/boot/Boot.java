@@ -43,6 +43,8 @@ public class Boot {
     Logger logger = new ProxyLogger(new StdoutLogger());
     root_.put("logger", logger);
 
+    boolean cluster = SafetyUtil.equals("true", System.getProperty("CLUSTER", "false"));
+
     if ( SafetyUtil.isEmpty(datadir) ) {
       datadir = System.getProperty("JOURNAL_HOME");
     }
@@ -51,7 +53,9 @@ public class Boot {
         new foam.nanos.fs.FileSystemStorage(datadir));
 
     // Used for all the services that will be required when Booting
-    serviceDAO_ = new foam.nanos.auth.PermissionedPropertyDAO(root_, new JDAO(((foam.core.ProxyX) root_).getX(), NSpec.getOwnClassInfo(), "services"));
+    serviceDAO_ = new JDAO(((foam.core.ProxyX) root_).getX(), new foam.dao.MDAO(NSpec.getOwnClassInfo()), "services", cluster);
+
+    serviceDAO_ = new foam.nanos.auth.PermissionedPropertyDAO(root_, serviceDAO_);
 
     installSystemUser();
 
@@ -103,10 +107,19 @@ public class Boot {
       }
     });
 
-
     // Revert root_ to non ProxyX to avoid letting children add new bindings.
     root_ = ((ProxyX) root_).getX();
     XLocator.set(root_);
+
+    if ( cluster ) {
+      // On startup, select() above will be against repo services.0.
+      // Mediator/Node replay put()s will hit the serviceDAO_ above,
+      // which has a listener to Reload the service on change.
+      serviceDAO_ = new foam.nanos.medusa.MedusaAdapterDAO.Builder(root_)
+        .setNSpec(new NSpec.Builder(root_).setName("nSpecDAO").build())
+        .setDelegate(serviceDAO_)
+        .build();
+    }
 
     // Export the ServiceDAO
     ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(

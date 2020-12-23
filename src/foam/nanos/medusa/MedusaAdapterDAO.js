@@ -236,8 +236,7 @@ foam.CLASS({
       javaCode: `
       getLogger().debug("cmd");
       if ( foam.dao.MDAO.GET_MDAO_CMD.equals(obj) ) {
-        return this;
-        // return getDelegate().cmd_(x, obj);
+        return getDelegate();
       }
       if ( obj instanceof ClusterCommand ) {
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
