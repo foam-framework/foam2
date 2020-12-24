@@ -30,7 +30,7 @@ foam.CLASS({
     },
     {
       name: 'canvas',
-      factory: function() { return this.Box.create({width: this.width, height: this.height}); }
+      factory: function() { return this.Box.create({width$: this.width$, height$: this.height$}); }
     },
     [ 'width',  1400 ],
     [ 'height', 800 ],
@@ -41,7 +41,8 @@ foam.CLASS({
     { class: 'Double', name: 'y2', value: 1.15 },
     {
       name: 'img',
-      factory: function() { return this.canvas.canvas.context.createImageData(this.width, this.height); }
+      hidden: true,
+      expression: function(width, height) { return this.canvas.canvas.context.createImageData(this.width, this.height); }
     },
     {
       // Joystick
@@ -60,6 +61,8 @@ foam.CLASS({
     function initE() {
       this.SUPER();
 
+      this.propertyChange.sub(this.invalidate);
+
       var h = this.WindowHash.create();
       this.memento = h.value;
       h.value$.follow(this.memento$);
@@ -74,7 +77,13 @@ foam.CLASS({
         }
       }
 
-      this.style({outline: 'none'}).focus().start(this.canvas).on('click', this.onClick).end();
+      this.
+        style({outline: 'none'}).
+        focus().
+        start(this.canvas).
+          on('click', this.onClick).
+        end().
+        tag({class: 'foam.u2.DetailView', data: this, properties: [ 'width', 'height', 'x1', 'y1', 'x2', 'y2', 'maxIterations' ]});
 
       this.canvas.paintSelf = (ctx) => {
 
@@ -139,11 +148,6 @@ foam.CLASS({
       }
 
       return 0;
-    },
-
-    function invalidate() {
-      this.canvas.invalidate();
-      this.memento = [this.x1, this.y1, this.x2, this.y2].join('/');
     },
 
     function hslToRgb(h, s, l){
@@ -256,6 +260,15 @@ foam.CLASS({
   ],
 
   listeners: [
+    {
+      name: 'invalidate',
+      isFramed: true,
+      code: function() {
+        this.canvas.invalidate();
+        this.memento = [this.x1, this.y1, this.x2, this.y2].join('/');
+      }
+    },
+
     function onClick(evt) {
       var x = evt.clientX, y = evt.clientY;
       var x1 = this.x1, y1 = this.y1, x2 = this.x2, y2 = this.y2, xd = x2-x1, yd = y2-y1;
