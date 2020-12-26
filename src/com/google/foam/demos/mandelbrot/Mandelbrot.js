@@ -20,11 +20,12 @@ foam.CLASS({
       name: 'memento',
       xxxpostSet: function(_, n) {
         var a = n.split('/');
-        if ( a.length != 4 ) return;
+        if ( a.length != 5 ) return;
         this.x1 = a[0];
         this.y1 = a[1];
         this.x2 = a[2];
         this.y2 = a[3];
+        this.maxIterations = a[4];
         this.invalidate();
       }
     },
@@ -37,7 +38,7 @@ foam.CLASS({
     { class: 'Int', name: 'maxIterations', value: 1024 },
     { class: 'Double', name: 'x1', value: -2 },
     { class: 'Double', name: 'y1', value: -1.15 },
-    { class: 'Double', name: 'x2', value: -0.5 },
+    { class: 'Double', name: 'x2', value: 0.5 },
     { class: 'Double', name: 'y2', value: 1.15 },
     {
       name: 'img',
@@ -69,11 +70,12 @@ foam.CLASS({
 
       if ( this.memento ) {
         var a = this.memento.split('/');
-        if ( a.length == 4 ) {
+        if ( a.length == 5 ) {
           this.x1 = a[0];
           this.y1 = a[1];
           this.x2 = a[2];
           this.y2 = a[3];
+          this.maxIterations = a[4];
         }
       }
 
@@ -265,7 +267,7 @@ foam.CLASS({
       isFramed: true,
       code: function() {
         this.canvas.invalidate();
-        this.memento = [this.x1, this.y1, this.x2, this.y2].join('/');
+        this.memento = [this.x1, this.y1, this.x2, this.y2, this.maxIterations].join('/');
       }
     },
 
