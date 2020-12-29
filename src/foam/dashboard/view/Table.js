@@ -88,7 +88,7 @@ foam.CLASS({
                     data: obj,
                     of: dao.of
                   })
-                 .end()
+                  .end()
                 .end();
            });
        }))

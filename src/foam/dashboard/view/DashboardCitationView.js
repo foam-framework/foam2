@@ -37,11 +37,11 @@ foam.CLASS({
         })
         .addClass(this.myClass())
         .start()
-          .addClass('id')
+          .addClass(this.myClass('id'))
           .add(this.data['id'])
         .end()
         .start()
-          .addClass('value')
+          .addClass(this.myClass('value'))
           .add(this.data['value'])
         .end()
     },
@@ -65,13 +65,13 @@ foam.CLASS({
       border-bottom: 1px solid #e4e3e3;
     }
 
-    ^.id {
+    ^.foam-dashboard-view-DashboardCitationView-id {
       font-weight: 300;
       font-size: 13px;
       color: gray;
     }
 
-    ^.value {
+    ^.foam-dashboard-view-DashboardCitationView-value {
       font-size: 13px;
       font-weight: 500;
     }

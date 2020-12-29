@@ -1148,6 +1148,7 @@ p({
     dao = new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
       .setSeqNo(true)
+      .setCreatedAware(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("counters")
       .setOf(foam.counter.Counter.getOwnClassInfo())
