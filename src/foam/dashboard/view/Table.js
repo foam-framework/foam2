@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -27,10 +27,13 @@ foam.CLASS({
       }
     },
     {
-      name: 'listDaoName'
+      name: 'listDAOName'
     },
     {
       name: 'searchKey'
+    },
+    {
+      name: 'dao'
     },
     {
       name: 'tableCls',
@@ -48,7 +51,7 @@ foam.CLASS({
               label: data$data$arg2.label || data$data$arg2.cls_.name,
             },
             {
-              name: 'listDaoName'
+              name: 'listDAOName'
             },
             {
               name: 'searchKey'
@@ -65,14 +68,14 @@ foam.CLASS({
     var self = this;
       this.
         addClass(this.myClass()).
-        add(this.slot(function(tableCls, data$data$groups, data$data) {
-          var dao = this.ArrayDAO.create({ of: tableCls });
+        add(this.slot(function(data$data$groups, data$data) {
+          var dao = this.ArrayDAO.create({ of: self.tableCls });
           data$data.sortedKeys().forEach(function(k) {
-            dao.put(tableCls.create({
+            dao.put(self.tableCls.create({
               id: '' + k,
               value: data$data$groups[k].value,
               searchKey: self.searchKey,
-              listDaoName: self.listDaoName
+              listDAOName: self.listDAOName
             }));
           })
           return self.E()
@@ -80,12 +83,13 @@ foam.CLASS({
             .select(dao, function(obj) {
               return self.E()
                 .start().addClass('table-row')
-                .start({
-                  class: self.citationView,
-                  data: obj,
-                  of: dao.of
-                })
-               .end();
+                  .start({
+                    class: self.citationView,
+                    data: obj,
+                    of: dao.of
+                  })
+                 .end()
+                .end();
            });
        }))
     }

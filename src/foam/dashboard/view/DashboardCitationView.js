@@ -32,9 +32,9 @@ foam.CLASS({
     function initE() {
       var self = this;
       this
-      .on('click', function() {
-        self.openFilteredListView(self.data);
-      })
+        .on('click', function() {
+          self.openFilteredListView(self.data);
+        })
         .addClass(this.myClass())
         .start()
           .addClass('id')
@@ -47,8 +47,8 @@ foam.CLASS({
     },
 
     function openFilteredListView(obj) {
-      var dao = this.__subContext__[obj.listDaoName].where(this.EQ(obj.searchKey, obj.id));
-      var config = foam.comics.v2.DAOControllerConfig.create({ dao: dao, hideQueryBar: true });
+      var dao = this.__subContext__[obj.listDAOName].where(this.EQ(obj.searchKey, obj.id));
+      var config = foam.comics.v2.DAOControllerConfig.create({ dao: dao, hideQueryBar: false });
       this.stack.push({
         class: 'foam.comics.v2.DAOBrowserView',
         config: config
@@ -65,13 +65,13 @@ foam.CLASS({
       border-bottom: 1px solid #e4e3e3;
     }
 
-    ^ .id {
+    ^.id {
       font-weight: 300;
       font-size: 13px;
       color: gray;
     }
 
-    ^ .value {
+    ^.value {
       font-size: 13px;
       font-weight: 500;
     }

@@ -10,31 +10,50 @@ foam.CLASS({
   extends: 'foam.u2.Element',
   requires: [
     'foam.u2.view.TableView',
+    'foam.dashboard.view.DashboardCitationView'
   ],
   imports: [ 'data' ],
-  css: `
-^ {
-  overflow: auto;
-}
 
-^ table {
- width: 100%;
-}
-  `,
+  properties: [
+    {
+      name: 'citationView',
+      factory: function() {
+        return this.DashboardCitationView;
+      }
+    }
+  ],
+
   methods: [
     function initE() {
+    var self = this;
       this.
         addClass(this.myClass()).
-        add(this.slot(function(data$dao, data$limit, data$columns) {
-          var view = this.TableView.create({
-            data: data$dao.limit(data$limit),
-          });
+        add(this.slot(function(data$dao, data$limit) {
 
-          if ( data$columns && data$columns.length )
-            view.columns = data$columns;
-
-          return view;
+          return self.E()
+            .addClass(this.myClass())
+            .select(data$dao.limit(data$limit), function(obj) {
+              return self.E()
+                .start().addClass('table-row')
+                .start({
+                  class: self.citationView,
+                  data: obj,
+                  of: data$dao.of
+                })
+               .end();
+           });
         }));
     }
-  ]
+  ],
+
+  css: `
+    ^ .table-row:hover {
+      background: /*%GREY5%*/ #f5f7fa;
+      cursor: pointer;
+    }
+    ^ .table-row {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+  `
 });
