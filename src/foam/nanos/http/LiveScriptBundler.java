@@ -30,6 +30,9 @@ public class LiveScriptBundler
   // Caching
   protected String javascriptBuffer_;
 
+  // Debounce
+  protected boolean scheduled_;
+
   // Configuration
   protected static final String FOAM_BIN_PATH = "./tools/js_build/foam-bin.js";
   protected static final String JS_BUILD_PATH = "./tools/js_build/build.js";
@@ -54,9 +57,12 @@ public class LiveScriptBundler
     fileNames_ = new HashSet<>();
     path_ = path;
 
+    System.out.println("=== LSB DEBUG ===");
+    System.out.println(path);
+
     try {
       // Create list of files.js locations
-      ArrayList<Pair<String, String>> filesPaths = new ArrayList<>();
+      var filesPaths = new HashSet<String>();
 
       // Walk through the project directory to find files.js files
       Files.walkFileTree(Paths.get(path_), new SimpleFileVisitor<Path>() {
@@ -86,10 +92,10 @@ public class LiveScriptBundler
             }
 
             // Add this file if it was found inside a `src` folder
-            if ( sourcePath != null ) {
-              filesPaths.add(new Pair<>(
-                sourcePath.toString(), path.toString()
-              ));
+            if ( sourcePath != null && filePaths.contains(sourcePath) ) {
+              System.out.println("--- Another Debug ---");
+              System.out.println(sourcePath.toString());
+              filesPaths.add(sourcePath.toString());
             }
           }
           return CONTINUE;
@@ -99,12 +105,17 @@ public class LiveScriptBundler
       doRebuildJavascript();
 
       // Read each files.js file
-      for ( Pair<String,String> currentFilesPath : filesPaths ) {
+      for ( String currentFilesPath : filesPaths ) {
+        System.out.println("--- Watcher Debug ---");
+        System.out.println(currentFilesPath);
         DirectoryWatcher.builder()
-          .path(Paths.get(path_, currentFilesPath.getKey()))
+          .path(Paths.get(path_, currentFilesPath))
           .listener(event -> {
+            System.out.println("--- Boop ---");
+            System.out.println(event.path());
+            System.out.println(event.path().getFileName());
             if ( event.path().getFileName().toString().endsWith(".js") ) {
-              this.doRebuildJavascript();
+              scheduleRebuild();
             }
           })
           .build().watchAsync();
@@ -114,6 +125,21 @@ public class LiveScriptBundler
       System.err.println("Failed to initialize filesystem watcher! :(");
       System.exit(1);
     }
+  }
+
+  private synchronized void scheduleRebuild() {
+    if ( scheduled_ ) return;
+    scheduled_ = true;
+    new Thread(() -> {
+      try {
+        Thread.sleep(20);
+        scheduled_ = false;
+        doRebuildJavascript();
+      }
+      catch (Exception e){
+        System.err.println(e);
+      }
+    }).start();
   }
 
   private synchronized void doRebuildJavascript() {
@@ -141,7 +167,7 @@ public class LiveScriptBundler
     HttpServletResponse r  = x.get(HttpServletResponse.class);
     r.setHeader("Content-Type", "application/javascript");
 
-    synchronized (this) { /* Wait for build to finish before serving */ } 
+    synchronized (this) { /* Wait for build to finish before serving */ }
     pw.println(javascriptBuffer_);
   }
 
