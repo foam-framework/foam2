@@ -263,8 +263,13 @@ foam.CLASS({
       args: [ { name: 'dao', type: 'DAO' }, { name: 'obj', type: 'FObject' } ],
       synchronized: true,
       javaCode: `
-      FObject oldObj = dao.find(obj);
-      return dao.put(oldObj == null ? obj : oldObj.copyFrom(obj));
+      FObject nu = obj;
+      FObject old = dao.find(obj);
+      if ( old != null ) {
+        nu = old.fclone();
+        nu.copyFrom(obj);
+      }
+      return dao.put(nu);
       `
     }
   ]
