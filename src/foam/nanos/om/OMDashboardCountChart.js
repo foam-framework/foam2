@@ -67,7 +67,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'hasDatapoints',
       expression: function(config) {
-        if ( ! config.data ) return false;
+        if ( ! config.data || ! config.data.datasets ) return false;
         return config.data.datasets.length > 0 ? true : false;
       }
     },
