@@ -10,24 +10,40 @@ foam.CLASS({
   extends: 'foam.u2.Element',
 
   requires: [
+    'foam.nanos.controller.WindowHash',
     'foam.graphics.Box',
     'foam.input.Gamepad'
   ],
 
   properties: [
     {
+      name: 'memento',
+      xxxpostSet: function(_, n) {
+        var a = n.split('/');
+        if ( a.length != 5 ) return;
+        this.x1 = a[0];
+        this.y1 = a[1];
+        this.x2 = a[2];
+        this.y2 = a[3];
+        this.maxIterations = a[4];
+        this.invalidate();
+      }
+    },
+    {
       name: 'canvas',
-      factory: function() { return this.Box.create({width: this.width, height: this.height}); }
+      factory: function() { return this.Box.create({width$: this.width$, height$: this.height$}); }
     },
     [ 'width',  1400 ],
     [ 'height', 800 ],
-    [ 'x1',      -2 ],
-    [ 'y1',      -1.15 ],
-    [ 'x2',       0.5 ],
-    [ 'y2',       1.15 ],
+    { class: 'Int', name: 'maxIterations', value: 1024 },
+    { class: 'Double', name: 'x1', value: -2 },
+    { class: 'Double', name: 'y1', value: -1.15 },
+    { class: 'Double', name: 'x2', value: 0.5 },
+    { class: 'Double', name: 'y2', value: 1.15 },
     {
       name: 'img',
-      factory: function() { return this.canvas.canvas.context.createImageData(this.width, this.height); }
+      hidden: true,
+      expression: function(width, height) { return this.canvas.canvas.context.createImageData(this.width, this.height); }
     },
     {
       // Joystick
@@ -46,9 +62,33 @@ foam.CLASS({
     function initE() {
       this.SUPER();
 
-      this.style({outline: 'none'}).focus().add(this.canvas);
+      this.propertyChange.sub(this.invalidate);
+
+      var h = this.WindowHash.create();
+      this.memento = h.value;
+      h.value$.follow(this.memento$);
+
+      if ( this.memento ) {
+        var a = this.memento.split('/');
+        if ( a.length == 5 ) {
+          this.x1 = a[0];
+          this.y1 = a[1];
+          this.x2 = a[2];
+          this.y2 = a[3];
+          this.maxIterations = a[4];
+        }
+      }
+
+      this.
+        style({outline: 'none'}).
+        focus().
+        start(this.canvas).
+          on('click', this.onClick).
+        end().
+        tag({class: 'foam.u2.DetailView', data: this, properties: [ 'width', 'height', 'x1', 'y1', 'x2', 'y2', 'maxIterations' ]});
 
       this.canvas.paintSelf = (ctx) => {
+
         var start = performance.now();
         var x1 = this.x1, y1 = this.y1, x2 = this.x2, y2 = this.y2, width = this.width, height = this.height, xd = x2-x1, yd = y2-y1;
         var v;
@@ -102,18 +142,14 @@ foam.CLASS({
     function calc(x, y) {
       var zx = 0, zy = 0;
 
-      for ( var i = 0 ; i < 255 ; i++ ) {
+      for ( var i = 0 ; i < this.maxIterations ; i++ ) {
         var xt = zx*zy;
         zx = zx*zx - zy*zy + x;
         zy = 2*xt + y;
-        if ( zx*zx + zy*zy > 4 ) return i;
+        if ( zx*zx + zy*zy > 4 ) return 2 * i * 255 / this.maxIterations;
       }
 
       return 0;
-    },
-
-    function invalidate() {
-      this.canvas.invalidate();
     },
 
     function hslToRgb(h, s, l){
@@ -143,6 +179,22 @@ foam.CLASS({
     ],
 
   actions: [
+    {
+      name: 'increaseMaxIterations',
+      keyboardShortcuts: [ 'e' ],
+      code: function() {
+        this.maxIterations *= 2;
+        this.invalidate();
+      }
+    },
+    {
+      name: 'decreaseMaxIterations',
+      keyboardShortcuts: [ 'q' ],
+      code: function() {
+        this.maxIterations /= 2;
+        this.invalidate();
+      }
+    },
     {
       name: 'zoomIn',
       keyboardShortcuts: [ '+', '=' ],
@@ -206,6 +258,27 @@ foam.CLASS({
         this.x2 += xd/10;
         this.invalidate();
       }
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'invalidate',
+      isFramed: true,
+      code: function() {
+        this.canvas.invalidate();
+        this.memento = [this.x1, this.y1, this.x2, this.y2, this.maxIterations].join('/');
+      }
+    },
+
+    function onClick(evt) {
+      var x = evt.clientX, y = evt.clientY;
+      var x1 = this.x1, y1 = this.y1, x2 = this.x2, y2 = this.y2, xd = x2-x1, yd = y2-y1;
+      this.x1 = x / this.width * xd + x1 - xd / 2;
+      this.x2 = x / this.width * xd + x1 + xd / 2;
+      this.y1 = y / this.height * yd + y1 - yd / 2;
+      this.y2 = y / this.height * yd + y1 + yd / 2;
+      this.invalidate();
     }
   ]
 });

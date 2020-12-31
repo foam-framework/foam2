@@ -11,18 +11,20 @@ import foam.mlang.order.Desc;
 import foam.mlang.predicate.Predicate;
 import foam.mlang.sink.GroupBy;
 
-public class GroupByPlan implements SelectPlan {
+public class GroupByPlan
+  implements SelectPlan
+{
 
-  protected Object state_;
-  protected long cost_;
-  protected Index tail_;
+  protected Object  state_;
+  protected long    cost_;
+  protected Index   tail_;
   protected boolean reverseSort_ = false;
   protected boolean needGroupBy = true;
 
   public GroupByPlan(Object state, Sink sink, Predicate predicate, PropertyInfo propertyInfo, Index tail) {
     state_ = state;
-    cost_ = calculateCost(propertyInfo);
-    tail_ = tail;
+    cost_  = calculateCost(propertyInfo);
+    tail_  = tail;
   }
 
   public long calculateCost(PropertyInfo propertyInfo) {
@@ -39,13 +41,14 @@ public class GroupByPlan implements SelectPlan {
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( state_ == null )
       return;
-    ( (TreeNode) state ).groupBy((TreeNode) state_, sink, tail_);
+    ((TreeNode) state).groupBy((TreeNode) state_, sink, tail_);
   }
 
   @Override
   public String toString() {
-    var size = state_ == null ? 0
-                : state_ instanceof TreeNode ? ((TreeNode) state_).size : 1;
+    var size = state_ == null ?
+      0 :
+      state_ instanceof TreeNode ? ((TreeNode) state_).size : 1;
     return "group-by(size:" + size + ", cost:" + cost() + ")";
   }
 }
