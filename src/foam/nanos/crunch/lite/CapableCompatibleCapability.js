@@ -10,7 +10,8 @@ foam.INTERFACE({
 
   javaImports: [
     'foam.dao.DAO',
-    'foam.nanos.crunch.CapabilityJunctionStatus'
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.crunch.CapabilityJunctionPayload'
   ],
 
   documentation: `
@@ -35,7 +36,7 @@ foam.INTERFACE({
         },
         {
           name: 'payload',
-          type: 'CapablePayload'
+          type: 'CapabilityJunctionPayload'
         }
       ],
     }

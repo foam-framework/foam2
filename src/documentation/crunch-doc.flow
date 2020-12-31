@@ -68,13 +68,13 @@ The `contextDAOFindKey` property allows an object in the context to be used as a
 
 <p>
 Whenever a CRUNCH wizard is started, the root capability is able to configure
-global behaviour of the wizard by providing its own StepWizardConfig object. It
+global behaviour of the wizard by providing its own EasyCrunchWizard object. It
 is important to note that a capability will only configure the wizard if it is
 the root capability - usually the most dependant capability in a tree invoked by
 the intercept.
 </p>
 
-<foam class="foam.flow.widgets.PropertyShortSummary" of="foam.nanos.crunch.Capability" whitelist="['wizardletConfig']" />
+<foam class="foam.flow.widgets.PropertyShortSummary" of="foam.nanos.crunch.Capability" whitelist="['wizardConfig']" />
 
 <p>
 The options available for StepWizardConfig are in the scope of wizard documentation.
@@ -93,8 +93,8 @@ p({
   "id": "4EB60BAE-E915-4464-9D1B-4099F22E9144",
   "name": "Example Capability",
   "of": "foam.nanos.crunch.example.ExampleData",
-  "wizardletConfig": {
-    "class": "foam.u2.wizard.StepWizardConfig",
+  "wizardConfig": {
+    "class": "foam.u2.crunch.EasyCrunchWizard",
     "allowSkipping": false
   }
 })

@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'ObjAltView',
   extends: 'foam.u2.View',
 
+  imports: [ 'memento' ],
+
   documentation: "Like AltView, but for Objects instead of DAO's.",
 
   css: `
@@ -32,6 +34,15 @@ foam.CLASS({
           {choices: X.data.views},
           X.createSubContext({controllerMode: foam.u2.ControllerMode.EDIT})
         );
+      },
+      postSet: function() {
+        var view = this.views.find(v => v[0] === this.selectedView);
+        if ( view ) {
+          this.memento.paramsObj.selectedView = view[1];
+        } else {
+          delete this.memento.paramsObj.selectedView;
+        }
+        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
       }
     },
     {
@@ -44,7 +55,16 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-     this.selectedView = this.views[0][0];
+      if ( this.memento && this.memento.paramsObj.selectedView ) {
+        var view = this.views.find(v => v[1] === this.memento.paramsObj.selectedView);
+        if ( view ) {
+          this.selectedView = view[0];
+        } else {
+          this.selectedView = this.views[0][0];
+        }
+      } else {
+        this.selectedView = this.views[0][0];
+      }
 
       this.addClass(this.myClass())
       this.startContext({data: this})

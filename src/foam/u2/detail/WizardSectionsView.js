@@ -25,7 +25,7 @@ foam.CLASS({
 
     ^footer {
       min-height: 75px;
-      border-top: solid 1px /*%GREY5%*/ #edf0f5;
+      border-top: solid 1px /*%GREY5%*/ #f5f7fa;
       padding: 0px 128px;
     }
 

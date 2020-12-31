@@ -16,41 +16,55 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.nanos.crunch.CapabilityJunctionPayload',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.ui.CapabilityWizardlet'
-  ],
-
-  properties: [
-    {
-      name: 'targetPayload',
-      class: 'FObjectProperty',
-      of: 'foam.nanos.crunch.lite.CapablePayload'
-    },
   ],
 
   methods: [
     async function save(wizardlet) {
       if ( wizardlet.isAvailable ){
+
+        if ( wizardlet.status === this.CapabilityJunctionStatus.AVAILABLE ) {
+          wizardlet.status = this.CapabilityJunctionStatus.ACTION_REQUIRED;
+        }
+
         return this.capable.getCapablePayloadDAO().put(
-          this.targetPayload
-        );
+          this.makePayload(wizardlet)
+        ).then(payload => {
+          this.load_(wizardlet, payload);
+          if ( wizardlet.isValid ) {
+            wizardlet.status = this.CapabilityJunctionStatus.PENDING;
+          }
+          return payload;
+        });
       }
     },
     async function cancel(wizardlet) {
+      if ( ! wizardlet.isLoaded ) return;
       return this.capable.getCapablePayloadDAO().remove(
-        this.targetPayload
+        this.makePayload(wizardlet)
       );
     },
     async function load(wizardlet) {
-      wizardlet.status = this.targetPayload.status;
+      var targetPayload = await this.capable.getCapablePayloadDAO().find(
+        wizardlet.capability.id ) || this.targetPayload;
+      this.load_(wizardlet, targetPayload);
+    },
+    async function load_(wizardlet, payload) {
+      wizardlet.isLoaded = true;
+
+      wizardlet.status = this.CapabilityJunctionStatus.AVAILABLE;
+
+      if ( payload ) wizardlet.status = payload.status;
 
       // No 'of'? No problem
-      if ( ! wizardlet.of ) return wizardlet;
+      if ( ! wizardlet.of ) return;
 
       // Load CapablePayload data to wizardlet
       var loadedData = wizardlet.of.create({}, wizardlet);
-      if ( this.targetPayload.data ) {
-        loadedData.copyFrom(this.targetPayload.data);
-      }
+      if ( payload && payload.data )
+        loadedData.copyFrom(payload.data);
 
       // Set transient 'capability' property if it exists
       var prop = wizardlet.of.getAxiomByName('capability');
@@ -58,7 +72,12 @@ foam.CLASS({
 
       // Finally, apply new data to wizardlet
       wizardlet.data = loadedData;
-      return;
+    },
+    function makePayload(wizardlet) {
+      return this.CapabilityJunctionPayload.create({
+        capability: wizardlet.capability,
+        data: wizardlet.data
+      });
     }
   ]
 });

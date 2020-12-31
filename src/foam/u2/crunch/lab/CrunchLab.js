@@ -23,7 +23,7 @@ foam.CLASS({
   `,
 
   imports: [
-    'memento',
+//    'memento',
     'userCapabilityJunctionDAO'
   ],
 
@@ -59,9 +59,9 @@ foam.CLASS({
           ]
         };
       },
-      postSet: function(_, n) {
-        this.memento = n;
-      }
+      // postSet: function(_, n) {
+      //   this.memento = n;
+      // }
     },
     {
       name: 'crunchUser',
@@ -109,8 +109,8 @@ foam.CLASS({
           .end()
         .end()
         ;
-      this.memento$.sub(this.mementoChange);
-      this.mementoChange();
+      // this.memento$.sub(this.mementoChange);
+      // this.mementoChange();
     },
     function getGraphSlot(replaceWithUCJ) {
       var self = this;
@@ -171,10 +171,10 @@ foam.CLASS({
     }
   ],
 
-  listeners: [
-    function mementoChange() {
-      var m = this.memento;
-      if ( m && this.rootCapability != m ) this.rootCapability = m;
-    }
-  ]
+  // listeners: [
+  //   function mementoChange() {
+  //     var m = this.memento;
+  //     if ( m && this.rootCapability != m ) this.rootCapability = m;
+  //   }
+  // ]
 });

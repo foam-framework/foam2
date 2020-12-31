@@ -25,13 +25,15 @@ foam.CLASS({
           return self.E()
             .start(self.Rows)
               .forEach(sections, function(s) {
-                this
-                  .start(self.SectionView, {
+                var slot = s.createIsAvailableFor(self.data$).map(function(isAvailable) {
+                  if ( ! isAvailable ) return self.E().style({ display: 'none' });
+                  return self.E().start(self.SectionView, {
                     data$: self.data$,
                     section: s
                   })
-                    .show(s.createIsAvailableFor(self.data$))
                   .end();
+                })
+                this.add(slot);
               })
             .end();
         }));

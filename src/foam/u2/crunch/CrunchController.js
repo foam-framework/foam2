@@ -39,14 +39,18 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.CreateWizardletsAgent',
     'foam.u2.crunch.wizardflow.LoadWizardletsAgent',
     'foam.u2.crunch.wizardflow.FilterWizardletsAgent',
+    'foam.u2.crunch.wizardflow.FilterGrantModeAgent',
+    'foam.u2.crunch.wizardflow.WizardStateAgent',
     'foam.u2.crunch.wizardflow.RequirementsPreviewAgent',
     'foam.u2.crunch.wizardflow.StepWizardAgent',
     'foam.u2.crunch.wizardflow.PutFinalJunctionsAgent',
+    'foam.u2.crunch.wizardflow.PutFinalPayloadsAgent',
     'foam.u2.crunch.wizardflow.TestAgent',
     'foam.u2.crunch.wizardflow.LoadTopConfig',
     'foam.u2.crunch.wizardflow.CapableDefaultConfigAgent',
-    'foam.u2.crunch.wizardflow.CapableCreateWizardletsAgent',
+    'foam.u2.crunch.wizardflow.SkipGrantedAgent',
     'foam.u2.crunch.wizardflow.MaybeDAOPutAgent',
+    'foam.u2.crunch.wizardflow.ShowPreexistingAgent',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
     'foam.u2.crunch.CapabilityInterceptView',
@@ -84,7 +88,7 @@ foam.CLASS({
       name: 'createWizardSequence',
       documentation: `
         Create the default wizard sequence for the specified capability in
-        association with the user. The wizard can be 
+        association with the user. The wizard can be
       `,
       code: function createWizardSequence(capabilityOrId, x) {
         if ( ! x ) x = this.__subContext__;
@@ -93,18 +97,20 @@ foam.CLASS({
         }))
           .add(this.ConfigureFlowAgent)
           .add(this.CapabilityAdaptAgent)
+          .add(this.LoadTopConfig)
           .add(this.LoadCapabilitiesAgent)
           // TODO: remove CheckRootIdAgent after phase 2 fix on PENDING
           .add(this.CheckRootIdAgent)
           .add(this.CheckPendingAgent)
           .add(this.CheckNoDataAgent)
           .add(this.CreateWizardletsAgent)
+          .add(this.WizardStateAgent)
+          .add(this.FilterGrantModeAgent)
           .add(this.LoadWizardletsAgent)
-          .add(this.FilterWizardletsAgent)
+          .add(this.SkipGrantedAgent)
           .add(this.RequirementsPreviewAgent)
-          .add(this.LoadTopConfig)
           .add(this.StepWizardAgent)
-          .add(this.PutFinalJunctionsAgent)
+          .add(this.PutFinalPayloadsAgent)
           // .add(this.TestAgent)
           ;
       }
@@ -114,22 +120,24 @@ foam.CLASS({
       documentation: `
         Create the default wizard sequence for the specified Capable object
         intercept.
-        
+
         A Capable object intercept occurs when the server replies with an object
         implementing Capable. These objects can have data requirements in the
         form of capabilities that are stored object-locally rather than in
         association with a user.
       `,
       code: function createCapableWizardSequence(intercept, capable) {
-        return this.Sequence.create(null, this.__subContext__.createSubContext({
+        let x = this.__subContext__.createSubContext({
           intercept: intercept,
           capable: capable
-        }))
-          .add(this.ConfigureFlowAgent)
-          .add(this.CapableDefaultConfigAgent)
-          .add(this.CapableCreateWizardletsAgent)
-          .add(this.LoadWizardletsAgent)
-          .add(this.StepWizardAgent)
+        });
+        return this.createWizardSequence(capable.capabilityIds[0], x)
+          .reconfigure('LoadCapabilitiesAgent', {
+            waoSetting: this.LoadCapabilitiesAgent.WAOSetting.CAPABLE })
+          .addBefore('SkipGrantedAgent',this.ShowPreexistingAgent)
+          .remove('CheckRootIdAgent')
+          .remove('CheckPendingAgent')
+          .remove('CheckNoDataAgent')
           .add(this.MaybeDAOPutAgent)
           ;
       }
@@ -171,7 +179,7 @@ foam.CLASS({
           return x;
         });
       }
-      
+
       p = p.then(x => {
         var isCompleted = x.submitted || x.cancelled;
 
@@ -189,6 +197,7 @@ foam.CLASS({
       })
 
       p.catch(err => {
+        console.error(err); // do not remove
         intercept.reject(err.data);
       })
 
@@ -262,11 +271,17 @@ foam.CLASS({
     // This function is only called by CapableView
     function getWizardletsFromCapable(capable) {
       return this.Sequence.create(null, this.__subContext__.createSubContext({
-        capable: capable
+        capable: capable,
+        rootCapability: capable.capabilityIds[0]
       }))
-        .add(this.CapableCreateWizardletsAgent)
+        .add(this.CapabilityAdaptAgent)
+        .add(this.LoadCapabilitiesAgent, {
+          waoSetting: this.LoadCapabilitiesAgent.WAOSetting.CAPABLE })
+        .add(this.CreateWizardletsAgent)
         .add(this.LoadWizardletsAgent)
-        .execute().then(x => x.wizardlets);
+        .execute().then(x => {
+          return x.wizardlets
+        })
     }
   ]
 });

@@ -37,6 +37,7 @@ foam.CLASS({
     'dblclick?',
     'editRecord?',
     'filteredTableColumns?',
+    'memento',
     'selection? as importSelection',
     'stack?'
   ],
@@ -95,8 +96,8 @@ foam.CLASS({
     },
     {
       name: 'selectedColumnNames',
-      expression: function(columns, of) {
-        var ls = JSON.parse(localStorage.getItem(of.id));
+      expression: function(columns, of, memento) {
+        var ls =  memento && memento.paramsObj.columns ? memento.paramsObj.columns : JSON.parse(localStorage.getItem(of.id));
         return ls || columns;
       }
     },
@@ -262,16 +263,54 @@ foam.CLASS({
       this.order = this.order === column ?
         this.DESC(column) :
         column;
+
+      if ( this.memento ) {
+        if ( ! this.memento.paramsObj.columns ) {
+          this.memento.paramsObj.columns = [];
+        }
+        var mementoColumn = this.memento.paramsObj.columns.find(c => c.name === column.name);
+        var orderLetter = this.order === column ? 'D' : 'A';
+        if ( ! mementoColumn ) {
+          this.memento.paramsObj.columns.push({ name: column.name,  order: orderLetter });
+        } else {
+          mementoColumn.order = orderLetter;
+        }
+        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
+      }
     },
 
     function updateColumns() {
       localStorage.removeItem(this.of.id);
       localStorage.setItem(this.of.id, JSON.stringify(this.selectedColumnNames.map(c => foam.String.isInstance(c) ? c : c.name )));
+
+      var newMementoColumns = [];
+
+      for ( var s of this.selectedColumnNames ) {
+        if ( ! this.memento.paramsObj.columns )
+          this.memento.paramsObj.columns = [];
+        var col = this.memento.paramsObj.columns.find(c => c.name === s);
+        if ( ! col ) {
+          newMementoColumns.push({ name: label });
+        } else {
+          newMementoColumns.push(col);
+        }
+      }
+      this.memento.paramsObj.columns = newMementoColumns;
+      this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj)
+
       this.isColumnChanged = ! this.isColumnChanged;
     },
 
     async function initE() {
       var view = this;
+
+      //set memento's selected columns
+      if ( ! this.memento.paramsObj.columns ) {
+        this.memento.paramsObj.columns = this.columns_.map(c => {
+          return { name: this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c) }
+        });
+        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj)
+      }
 
       //otherwise on adding new column creating new EditColumnsView, which is closed by default
       if (view.editColumnsEnabled)
@@ -346,7 +385,11 @@ foam.CLASS({
                   addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + prop.name))
                   .style({ flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0', 'word-wrap' : 'break-word', 'white-space' : 'normal'})
-                  .add(view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col)).
+                  .add(view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col))./*
+                  .forEach(
+                    view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col),
+                    function(c, i) { if ( i ) this.add(' / '); this.add(c); }
+                  ).*/
                   callIf(isFirstLevelProperty && prop.sortable, function() {
                     this.on('click', function(e) {
                       view.sortBy(prop);
@@ -404,6 +447,21 @@ foam.CLASS({
          * writing.
          */
           var view = this;
+          view.props = this.returnPropertiesForColumns(view, view.columns_);
+
+          if ( this.memento && this.memento.paramsObj.columns ) {
+            for ( var c of this.memento.paramsObj.columns ) {
+              if ( c.order && ! c.name.includes(' / ')) {
+                var prop = view.props.find(p => p.fullPropertyName === this.columnConfigToPropertyConverter.returnPropertyNameForLabel(view.of, c.name));
+                if ( prop ) {
+                  if ( c.order.toLowerCase() === 'd' )
+                    dao = dao.orderBy(this.DESC(prop.property));
+                  else
+                    dao = dao.orderBy(prop.property);
+                }
+              }
+            }
+          }
 
           var actions = {};
           var actionsMerger = action => { actions[action.name] = action; };
@@ -421,7 +479,6 @@ foam.CLASS({
             if ( this.order ) dao = dao.orderBy(this.order);
             var proxy = view.ProxyDAO.create({ delegate: dao });
 
-            view.props = this.returnPropertiesForColumns(view, view.columns_);
             var canObjBeBuildFromProjection = true;
 
             for ( var p of view.props ) {

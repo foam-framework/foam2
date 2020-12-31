@@ -14,6 +14,16 @@ foam.CLASS({
   static: [
     function OPEN() {
       var w      = global.window.open("", 'Translation Console', "width=800,height=800,scrollbars=no", true);
+
+      // I would like to close 'w' when the parent window is reloaded, but it doesn't work.
+      document.body.addEventListener('beforeunload', () => w.close());
+
+      // Reset the document to remove old content and styles
+      // Reset $UID so that new styles will be re-installed
+      w.document.body.innerText = '';
+      w.document.head.innerHTML = '<title>Translation Console</title>';
+      w.document.$UID = foam.next$UID();
+
       var window = foam.core.Window.create({window: w}, ctrl);
       var v      = this.create({}, window);
       v.write(window.document);
@@ -41,7 +51,8 @@ foam.CLASS({
       background: rgb(238, 238, 238);
       overflow: none;
     }
-    button { padding: 6px; background: white; }
+    button { padding: 6px; background: white !important; }
+    button span { background: white; }
     .foam-u2-ActionView-medium { height: 34px !important; background: pink; }
     .foam-u2-view-TableView-th-editColumns { display: none; }
     .foam-u2-view-TableView-td[name="contextMenuCell"] { display: none; }
@@ -53,9 +64,9 @@ foam.CLASS({
     {
       name: 'Row',
 
-      imports: [ 'locale', 'localeDAO', 'search', 'translationService' ],
-
       requires: [ 'foam.i18n.Locale' ],
+
+      imports: [ 'locale', 'localeDAO', 'translationService' ],
 
       tableColumns: [ 'source', 'defaultText', 'text', 'update' ],
 
@@ -65,12 +76,12 @@ foam.CLASS({
         {
           class: 'String',
           name: 'source',
-          tableWidth: 350
+          tableWidth: 380
         },
         {
           class: 'String',
           name: 'defaultText',
-          displayWidth: 250
+          displayWidth: 300
         },
         {
           class: 'String',
@@ -78,12 +89,9 @@ foam.CLASS({
           tableCellFormatter: function(val, obj, prop) {
             this.startContext({data: obj}).add(prop).endContext();
           },
-          displayWidth: 65,
-          tableWidth: 300
+          displayWidth: 50,
+          tableWidth: 400
         }
-      ],
-
-      methods: [
       ],
 
       actions: [
@@ -107,7 +115,7 @@ foam.CLASS({
     'translationService'
   ],
 
-  exports: [ 'locale', 'search' ],
+  exports: [ 'locale' ],
 
   requires: [
     'foam.dao.MDAO',
@@ -121,6 +129,7 @@ foam.CLASS({
       view: {
         class: 'foam.u2.TextField',
         type: 'search',
+        placeholder: 'Search',
         onKey: true
       }
     },
@@ -146,7 +155,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'locale',
-      factory: function() { return foam.locale; }
+      factory: function() { return foam.locale.substring(0,2); }
 //          view: 'net.nanopay.ui.topNavigation.LanguageChoiceView'
     }
   ],
@@ -167,7 +176,9 @@ foam.CLASS({
           end().
           start('div').
             style({float: 'right'}).
-            add('Search: ', this.SEARCH, '  Locale: ', this.LOCALE, ' ' , this.CLEAR).
+            add(this.SEARCH, '  Locale: ').
+            tag({class: 'foam.u2.TextField', data$: this.locale$, size: 10}).
+            add(' ' , this.CLEAR).
           end().
         end().
         start(this.CardBorder, {}, this.content$).
@@ -179,15 +190,12 @@ foam.CLASS({
   ],
 
   actions: [
-    function clear() {
-      this.dao.removeAll();
-    }
+    function clear() { this.dao.removeAll(); }
   ],
 
   listeners: [
     function onTranslation(_, __, locale, source, txt, defaultText) {
       this.dao.put(this.Row.create({
-        locale:      locale,
         source:      source,
         text:        txt,
         defaultText: defaultText

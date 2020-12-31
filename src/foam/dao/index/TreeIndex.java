@@ -104,23 +104,24 @@ public class TreeIndex
 
   public Object put(Object state, FObject value) {
     if ( state == null ) state = TreeNode.getNullNode();
-    Object key;
-    try {
-      key = prop_.f(value);
-    } catch (ClassCastException e) {
-      return state;
-    }
-
+    Object key = returnKeyForValue(value);
     return ((TreeNode) state).putKeyValue((TreeNode)state,
       prop_, key, value, tail_);
   }
 
   public Object remove(Object state, FObject value) {
+    Object key = returnKeyForValue(value);
+    return ((TreeNode) state).removeKeyValue((TreeNode) state, prop_, key, value, tail_);
+  }
+
+  public Object returnKeyForValue(FObject value) {
+    Object key;
     try {
-      return ((TreeNode) state).removeKeyValue((TreeNode) state, prop_, prop_.f(value), value, tail_);
+      key = prop_.f(value);
     } catch (ClassCastException e) {
-      return state;
+      key = null;
     }
+    return key;
   }
 
   public Object removeAll() {
@@ -153,7 +154,7 @@ public class TreeIndex
 
       // We return a groupByPlan only if no order, no limit, no skip, no predicate
       if ( sink instanceof GroupBy
-          && ( (GroupBy) sink ).getArg1().toString().equals(prop_.toString())
+          && ((GroupBy) sink).getArg1().toString().equals(prop_.toString())
           && order == null && skip == 0 && limit == AbstractDAO.MAX_SAFE_INTEGER )
       {
         return new GroupByPlan(state, sink, predicate, prop_, tail_);

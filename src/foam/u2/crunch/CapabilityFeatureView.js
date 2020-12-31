@@ -133,6 +133,7 @@ foam.CLASS({
     {
       name: 'daoUpdate',
       code: function() {
+        // This code looks hardcorded - why aren't the statuses being set and shown using ucj data status?
         this.crunchService.getJunction(null, this.data.id).then(ucj => {
           if ( ucj ) {
             this.cjStatus = ucj.status === this.CapabilityJunctionStatus.APPROVED ?
@@ -174,11 +175,14 @@ foam.CLASS({
     {
       name: 'statusUpdate',
       code: function() {
-        if ( this.cjStatus != this.CapabilityJunctionStatus.PENDING ) {
+        if ( this.cjStatus != this.CapabilityJunctionStatus.PENDING &&
+              this.cjStatus != this.CapabilityJunctionStatus.PENDING_REVIEW ) {
           return;
         }
         this.crunchService.getJunction(null, this.data.id).then(ucj => {
           if ( ucj && ucj.status === this.CapabilityJunctionStatus.GRANTED ) {
+            this.auth.cache = {};
+            this.crunchService.pub('grantedJunction');
             this.cjStatus = this.CapabilityJunctionStatus.GRANTED;
           } else {
             this.window.setTimeout(this.statusUpdate, 2000);

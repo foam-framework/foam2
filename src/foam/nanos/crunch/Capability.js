@@ -8,6 +8,10 @@ foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'Capability',
 
+  implements: [
+    'foam.nanos.auth.EnabledAware'
+  ],
+
   imports: [
     'capabilityDAO',
     'prerequisiteCapabilityJunctionDAO'
@@ -27,8 +31,8 @@ foam.CLASS({
     'static foam.mlang.MLang.*'
   ],
 
-  implements: [
-    'foam.nanos.auth.EnabledAware'
+  requires: [
+    'foam.u2.crunch.EasyCrunchWizard'
   ],
 
   tableColumns: [
@@ -198,6 +202,12 @@ foam.CLASS({
       documentation: 'Predicate of the visibility for capabilities in the capability store/keyword sections'
     },
     {
+      name: 'grantMode',
+      class: 'Enum',
+      of: 'foam.nanos.crunch.CapabilityGrantMode',
+      value: foam.nanos.crunch.CapabilityGrantMode.AUTOMATIC
+    },
+    {
       name: 'reviewRequired',
       class: 'Boolean',
       permissionRequired: true
@@ -222,7 +232,8 @@ foam.CLASS({
       class: 'Object',
       name: 'wizardlet',
       documentation: `
-        Defines a wizardlet used when displaying this capability on related client crunch wizards.
+        Defines a wizardlet to display this capability in a wizard. This
+        wizardlet will display after this capability's prerequisites.
       `,
       factory: function() {
         return foam.nanos.crunch.ui.CapabilityWizardlet.create({}, this);
@@ -230,13 +241,23 @@ foam.CLASS({
     },
     {
       class: 'Object',
-      // TODO: rename to wizardConfig; wizardlet config is the property above
-      name: 'wizardletConfig',
+      name: 'beforeWizardlet',
       documentation: `
-        Configuration placed on top level capabilities defining various configuration options supported by client capability wizards.
+        A wizardlet to display before this capability's prerequisites, and only
+        if this capability is at the end of a prerequisite group returned by
+        CrunchService's getCapabilityPath method.
+      `
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.u2.crunch.EasyCrunchWizard',
+      name: 'wizardConfig',
+      documentation: `
+        Configuration placed on top level capabilities defining various
+        configuration options supported by client capability wizards.
       `,
       factory: function() {
-        return foam.u2.wizard.StepWizardConfig.create({}, this);
+        return this.EasyCrunchWizard.create({}, this);
       }
     },
     {
@@ -383,7 +404,7 @@ foam.CLASS({
           for ( var capId : prereqs ) {
             var cap = (Capability) capabilityDAO.find(capId);
             if ( cap == null || ! cap.getEnabled() ) continue;
-            
+
             UserCapabilityJunction prereqUcj = crunchService.getJunctionForSubject(x, capId, subject);
 
             prereqChainedStatus = getPrereqChainedStatus(x, ucj, prereqUcj);
@@ -410,30 +431,33 @@ foam.CLASS({
         CapabilityJunctionStatus prereqStatus = prereq.getStatus();
 
         switch ( (CapabilityJunctionStatus) prereqStatus ) {
-          case AVAILABLE : 
+          case AVAILABLE :
             status = CapabilityJunctionStatus.ACTION_REQUIRED;
             break;
-          case ACTION_REQUIRED : 
+          case ACTION_REQUIRED :
             status = CapabilityJunctionStatus.ACTION_REQUIRED;
             break;
-          case PENDING : 
-            status = reviewRequired && 
-              ( status == CapabilityJunctionStatus.APPROVED || 
+          case PENDING :
+            status = reviewRequired &&
+              ( status == CapabilityJunctionStatus.APPROVED ||
                 status == CapabilityJunctionStatus.GRANTED
-              ) ? 
+              ) ?
                 CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
             break;
-          case APPROVED : 
-            status = reviewRequired && 
-              ( status == CapabilityJunctionStatus.APPROVED || 
+          case APPROVED :
+            status = reviewRequired &&
+              ( status == CapabilityJunctionStatus.APPROVED ||
                 status == CapabilityJunctionStatus.GRANTED
-              ) ? 
+              ) ?
                 CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
               break;
           case EXPIRED :
             status = CapabilityJunctionStatus.ACTION_REQUIRED;
             break;
-          default : 
+          case PENDING_REVIEW :
+            status = CapabilityJunctionStatus.ACTION_REQUIRED;
+            break;
+          default :
             status = CapabilityJunctionStatus.GRANTED;
         }
         return status;

@@ -20,6 +20,7 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CapabilityGrantMode',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.logger.Logger'
@@ -36,14 +37,15 @@ foam.CLASS({
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
 
             boolean isRenewable = ucj.getIsRenewable(); // ucj either expired, in grace period, or in renewal period
-            
-            if ( ( ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ! isRenewable ) || 
-              ucj.getStatus() == CapabilityJunctionStatus.PENDING || 
-              ucj.getStatus() == CapabilityJunctionStatus.APPROVED ) 
+
+            if ( ( ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ! isRenewable ) ||
+              ucj.getStatus() == CapabilityJunctionStatus.PENDING ||
+              ucj.getStatus() == CapabilityJunctionStatus.APPROVED )
               return;
 
             Capability capability = (Capability) ucj.findTargetId(systemX);
 
+            if ( capability.getGrantMode() != CapabilityGrantMode.AUTOMATIC ) return;
             if ( ! isRenewable ) ucj.setStatus(CapabilityJunctionStatus.ACTION_REQUIRED);
 
             if ( capability.getOf() == null ) {
@@ -66,10 +68,9 @@ foam.CLASS({
                 data.validate(sourceX);
                 ucj.setStatus(CapabilityJunctionStatus.PENDING);
                 ucj.resetRenewalStatus();
-              } catch (IllegalStateException e) {
+              } catch (Throwable e) {
                 Logger logger = (Logger) x.get("logger");
-                logger.error("ERROR IN UCJ DATA VALIDATION : ", e);
-                return;
+                logger.warning("Validation failed", e.getMessage(), ucj.toString());
               }
             }
           }

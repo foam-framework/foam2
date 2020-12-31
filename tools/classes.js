@@ -5,6 +5,7 @@
  */
 
 var classes = [
+  'foam.core.Action',
   'foam.core.Axiom',
   'foam.core.Detachable',
   'foam.core.Serializable',
@@ -105,6 +106,9 @@ var classes = [
   'foam.box.HTTPReplyBox',
   'foam.box.AuthServiceClientBox',
   'foam.box.ExportBox',
+  'foam.nanos.iban.IBANInfo',
+  'foam.nanos.iban.ValidationIBAN',
+  'foam.nanos.iban.test.ValidationIBANTest',
   'foam.nanos.app.AppConfig',
   'foam.nanos.app.ContextLookupAppConfigService',
   'foam.nanos.http.WebAgent',
@@ -310,6 +314,7 @@ var classes = [
   'foam.nanos.auth.EnabledCheckAuthService',
   'foam.nanos.http.HttpParameters',
   'foam.nanos.http.DefaultHttpParameters',
+  'foam.nanos.http.SendErrorHandler',
   'foam.nanos.session.LocalSetting',
   'foam.nanos.session.LocalSettingSessionDAO',
   'foam.nanos.session.Session',
@@ -367,6 +372,7 @@ var classes = [
   'foam.nanos.notification.email.EmailTemplate',
   'foam.nanos.notification.email.EmailPropertyService',
   'foam.nanos.notification.email.Status',
+  'foam.nanos.notification.email.EmailTemplateEngine',
   // Email service Files
   'foam.nanos.notification.email.SMTPConfig',
   'foam.nanos.notification.email.SMTPEmailService',
@@ -439,6 +445,8 @@ var classes = [
   'foam.u2.DefaultValidator',
   'foam.u2.DisplayMode',
   'foam.u2.wizard.StepWizardConfig',
+  'foam.u2.crunch.wizardflow.SkipMode',
+  'foam.u2.crunch.EasyCrunchWizard',
   'foam.nanos.export.ClientGoogleSheetsExportService',
   'foam.nanos.export.ExportDriverRegistry',
   'foam.nanos.export.GoogleSheetsBasedExportDriver',
@@ -509,6 +517,7 @@ var classes = [
   'foam.nanos.demo.relationship.CourseType',
   'foam.nanos.demo.relationship.StudentCourseJunction',
   'foam.nanos.fs.File',
+  'foam.nanos.fs.FileDataDAO',
   'foam.nanos.fs.FileType',
   'foam.nanos.fs.SupportFileTypeDAO',
   'foam.crypto.hash.Hasher',
@@ -537,6 +546,11 @@ var classes = [
   'foam.lib.query.FooEnum',
 
   'foam.parse.QueryParserUserTest',
+  'foam.parse.PSymbol',
+  'foam.lib.parse.Grammar',
+  'foam.lib.parse.Action',
+  'foam.lib.parse.ActionParser',
+  'foam.lib.parse.SymbolParser',
   'foam.util.EmailTest',
   'foam.util.PasswordTest',
   'foam.util.SecurityUtilTest',
@@ -563,7 +577,12 @@ var classes = [
   'foam.flow.DocumentMenu',
 
   'foam.nanos.ruler.RuleGroup',
+  'foam.nanos.ruler.FindRuledCommand',
+  'foam.nanos.ruler.Ruled',
   'foam.nanos.ruler.Rule',
+  'foam.nanos.ruler.RuledDAO',
+  'foam.nanos.ruler.test.RuledDAOTest',
+  'foam.nanos.ruler.test.RuledDummy',
   'foam.nanos.ruler.RulerDAO',
   'foam.nanos.ruler.Operations',
   'foam.nanos.ruler.RulerProbe',
@@ -610,6 +629,7 @@ var classes = [
   'foam.support.model.SupportEmail',
   'foam.support.model.Ticket',
 
+  'foam.nanos.dig.exception.ExternalAPIException',
   'foam.nanos.dig.exception.EmptyParameterException',
   'foam.nanos.dig.exception.GeneralException',
 
@@ -659,13 +679,14 @@ var classes = [
   'foam.nanos.crunch.crunchtest.TestCapable',
   //models
   'foam.nanos.crunch.Renewable',
+  'foam.nanos.crunch.CapabilityGrantMode',
   'foam.nanos.crunch.Capability',
   'foam.nanos.crunch.CapabilityIntercept',
   'foam.nanos.crunch.MinMaxCapability',
+  'foam.nanos.crunch.CapabilityJunctionPayload',
   'foam.nanos.crunch.lite.Capable',
   'foam.nanos.crunch.lite.CapableDAO',
   'foam.nanos.crunch.lite.CapableAdapterDAO',
-  'foam.nanos.crunch.lite.CapablePayload',
   'foam.nanos.crunch.lite.CapablePayloadStatusDAO',
   'foam.nanos.crunch.lite.CapableCompatibleCapability',
   'foam.nanos.crunch.CapabilityAvailabilityDAO',
@@ -681,9 +702,12 @@ var classes = [
   'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
   'foam.nanos.crunch.CapabilityJunctionStatus',
   'foam.nanos.crunch.UserCapabilityJunction',
+  'foam.nanos.crunch.ui.WizardState',
+  // 'foam.nanos.crunch.ui.UserCapabilityWizardState',
   'foam.nanos.crunch.ui.CapabilityWizardlet',
   'foam.nanos.crunch.ui.ReviewCapabilityWizardlet',
   'foam.nanos.crunch.ui.MinMaxCapabilityWizardlet',
+  'foam.nanos.crunch.ui.PrerequisiteAwareWizardlet',
   'foam.nanos.crunch.AgentCapabilityJunction',
   'foam.nanos.crunch.CapabilityCapabilityJunction',
   'foam.nanos.crunch.AssociatedEntity',
@@ -707,6 +731,7 @@ var classes = [
   'foam.nanos.auth.SetUserServiceProviderJunctionRuleAction',
 
   //ucjdao rules
+  'foam.nanos.crunch.ruler.AuthorizeUCJStatusOnPut',
   'foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut',
   'foam.nanos.crunch.ruler.ValidateUCJDataOnPut',
   'foam.nanos.crunch.ruler.SetUCJStatusOnPut',
@@ -721,6 +746,8 @@ var classes = [
 
   //crunch predicates
   'foam.nanos.crunch.predicate.CapabilityGranted',
+  'foam.nanos.crunch.predicate.CapabilityPrerequisitesGranted',
+  'foam.nanos.crunch.predicate.StatusChangedTo',
   'foam.nanos.crunch.predicate.IsAgent',
 
   //authservice

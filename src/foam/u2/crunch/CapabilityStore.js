@@ -39,6 +39,7 @@ foam.CLASS({
     'capabilityDAO',
     'crunchController',
     'crunchService',
+    'menuDAO',
     'registerElement'
   ],
 
@@ -77,8 +78,8 @@ foam.CLASS({
 
     ^feature-column-grid {
       display: inline-flex;
-      width: 94%;
-      overflow: hidden;
+      width: calc(100% - 48px);
+      overflow-x: scroll;
     }
 
     ^featureSection {
@@ -92,7 +93,8 @@ foam.CLASS({
     }
 
     ^left-arrow {
-      width: 3%;
+      width: 24px;
+      height: 24px;
       float: left;
       display: flex;
       cursor: pointer;
@@ -101,7 +103,8 @@ foam.CLASS({
     }
 
     ^right-arrow {
-      width: 3%;
+      width: 24px;
+      height: 24px;
       float: right;
       display: flex;
       cursor: pointer;
@@ -120,10 +123,6 @@ foam.CLASS({
       margin-top: 24px;
     }
   `,
-  
-  constants: {
-    MAX_NUM_DISPLAYBLE_CARDS: 4
-  },
 
   properties: [
     {
@@ -173,6 +172,10 @@ foam.CLASS({
       value: [],
       documentation: 'stores the styling of each featureCapability'
     },
+    {
+      name: 'cardsOverflow',
+      class: 'Boolean'
+    },
     'wizardOpened'
   ],
 
@@ -189,7 +192,7 @@ foam.CLASS({
     },
     function initE() {
       this.SUPER();
-      this.onDetach(this.crunchService.sub('updateJunction', this.onChange));
+      this.onDetach(this.crunchService.sub('grantedJunction', this.onChange));
       var self = this;
       window.cstore = self;
 
@@ -245,19 +248,23 @@ foam.CLASS({
               })
             .end());
         }
-        self.callIf(self.totalNumCards > self.MAX_NUM_DISPLAYBLE_CARDS, function() {
-          return spot.start('span')
-            .start('img').addClass(self.myClass('left-arrow'))
-              .attr('src', 'images/arrow-back-24px.svg')
-              .on('click', function() {
-                self.carouselCounter--;
-              })
-            .end()
-          .end();
-        });
+
+        spot.start().start('span')
+          .start('img').addClass(self.myClass('left-arrow')).show(this.cardsOverflow$)
+            .attr('src', 'images/arrow-back-24px.svg')
+            .on('click', function() {
+              self.carouselCounter--;
+            })
+          .end()
+        .end();
+        var ele;
+        function checkCardsOverflow(evt) {
+          if ( ! ele.el() ) return;
+          self.cardsOverflow = ele.el().scrollWidth > ele.el().clientWidth;
+        }
         spot.add(self.slot(
           function(carouselCounter, totalNumCards) {
-            var ele = self.E().addClass(self.myClass('feature-column-grid'));
+            ele = self.E().addClass(self.myClass('feature-column-grid'));
             for ( var k = 0 ; k < totalNumCards ; k++ ) {
               let cc = carouselCounter % totalNumCards; // this stops any out of bounds indecies
               let index = ( cc + totalNumCards + k ) % totalNumCards; // this ensures circle indecies
@@ -265,16 +272,20 @@ foam.CLASS({
             }
             return ele;
           }));
-        self.callIf(self.totalNumCards > self.MAX_NUM_DISPLAYBLE_CARDS, function() {
-          return spot.start('span')
-            .start('img').addClass(self.myClass('right-arrow'))
-              .attr('src', 'images/arrow-forward-24px.svg')
-              .on('click', function() {
-                self.carouselCounter++;
-              })
-            .end()
-          .end();
-        })
+        spot.start('span')
+          .start('img').addClass(self.myClass('right-arrow')).show(this.cardsOverflow$)
+            .attr('src', 'images/arrow-forward-24px.svg')
+            .on('click', function() {
+              self.carouselCounter++;
+            })
+          .end()
+        .end();
+
+        window.addEventListener('resize', checkCardsOverflow);
+        checkCardsOverflow();
+        self.onDetach(() => {
+          window.removeEventListener('resize', checkCardsOverflow);
+        });
       });
       return spot;
     },
@@ -387,7 +398,6 @@ foam.CLASS({
         .createWizardSequence(cap).execute().then(() => {
           this.wizardOpened = false;
         });
-      
     }
   ],
 
@@ -395,8 +405,17 @@ foam.CLASS({
     {
       name: 'onChange',
       isMerged: true,
-      code: function() {
-        this.init();
+      mergeDelay: 2000,
+      code: async function() {
+        let a = await this.crunchService.getEntryCapabilities();
+        this.visibleCapabilityDAO = this.ArrayDAO.create({
+          array: a.array
+        });
+        await this.crunchService.getAllJunctionsForUser();
+        this.daoUpdate();
+        // Attempting to reset menuDAO incase of menu permission grantings.
+        this.menuDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
+        this.menuDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
       }
     }
   ]

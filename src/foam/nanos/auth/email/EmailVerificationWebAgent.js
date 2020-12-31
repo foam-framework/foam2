@@ -13,19 +13,17 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
+    'foam.i18n.TranslationService',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
     'foam.nanos.notification.email.DAOResourceLoader',
     'foam.nanos.notification.email.EmailTemplate',
+    'foam.nanos.notification.email.EmailTemplateEngine',
     'java.io.PrintWriter',
-    'java.util.Collections',
+    'java.util.HashMap',
     'javax.servlet.http.HttpServletRequest',
     'javax.servlet.http.HttpServletResponse',
-    'org.apache.commons.lang3.StringUtils',
-    'org.jtwig.environment.EnvironmentConfigurationBuilder',
-    'org.jtwig.JtwigModel',
-    'org.jtwig.JtwigTemplate',
-    'org.jtwig.resource.loader.TypedResourceLoader'
+    'org.apache.commons.lang3.StringUtils'
   ],
 
   messages: [
@@ -36,14 +34,6 @@ foam.CLASS({
     { name: 'EMAIL_ALREADY_VERIFIED', message: 'Email already verified.' }
   ],
 
-  properties: [
-    {
-      name: 'config',
-      class: 'Object',
-      javaType: 'org.jtwig.environment.EnvironmentConfiguration'
-    }
-  ],
-
   methods: [
     {
       name: 'execute',
@@ -51,9 +41,6 @@ foam.CLASS({
         { name: 'x', javaType: 'foam.core.X' }
       ],
       javaCode: `
-        String             message          = this.EMAIL_VERIFIED_SUCCESS;
-        PrintWriter        out              = x.get(PrintWriter.class);
-    
         DAO                userDAO          = (DAO) x.get("localUserDAO");
         EmailTokenService  emailToken       = (EmailTokenService) x.get("emailToken");
     
@@ -65,17 +52,27 @@ foam.CLASS({
         String             redirect         = request.getParameter("redirect");
         User               user             = (User) userDAO.find(Long.valueOf(userId));
 
+        TranslationService ts = (TranslationService) x.get("translationService");
+        String local = user.getLanguage().getCode().toString();
+        String translatedMsg = "";
+
+        String             message          = ts.getTranslation(local, getClassInfo().getId()+ ".EMAIL_VERIFIED_SUCCESS", this.EMAIL_VERIFIED_SUCCESS);
+        PrintWriter        out              = x.get(PrintWriter.class);
+
         try {
           if ( token == null || "".equals(token) ) {
-            throw new Exception(this.TOKEN_NOT_FOUND);
+            translatedMsg = ts.getTranslation(local, getClassInfo().getId()+ ".TOKEN_NOT_FOUND", this.TOKEN_NOT_FOUND);
+            throw new Exception(translatedMsg);
           }
     
           if ( "".equals(userId) || ! StringUtils.isNumeric(userId) ) {
-            throw new Exception(this.USER_NOT_FOUND);
+            translatedMsg = ts.getTranslation(local, getClassInfo().getId()+ ".USER_NOT_FOUND", this.USER_NOT_FOUND);
+            throw new Exception(translatedMsg);
           }
     
           if ( user.getEmailVerified() ) {
-            throw new Exception(this.EMAIL_ALREADY_VERIFIED);
+            translatedMsg = ts.getTranslation(local, getClassInfo().getId()+ ".EMAIL_ALREADY_VERIFIED", this.EMAIL_ALREADY_VERIFIED);
+            throw new Exception(translatedMsg);
           }
           user = (User) user.fclone();
           emailToken.processToken(x, user, token);
@@ -83,22 +80,15 @@ foam.CLASS({
           String msg = t.getMessage();
           ((Logger) x.get("logger")).error(msg);
           t.printStackTrace();
-          message = this.EMAIL_VERIFIED_ERROR + "<br>" + msg;
+          translatedMsg = ts.getTranslation(local, getClassInfo().getId()+ ".EMAIL_VERIFIED_ERROR", this.EMAIL_VERIFIED_ERROR);
+          message = translatedMsg + "<br>" + msg;
         } finally {
-          if ( getConfig() == null ) {
-            setConfig(EnvironmentConfigurationBuilder
-                .configuration()
-                .resources()
-                .resourceLoaders()
-                .add(new TypedResourceLoader("dao", new DAOResourceLoader(x, (String) user.getGroup())))
-                .and().and()
-                .build());
-          }
-    
+          EmailTemplateEngine templateEngine = (EmailTemplateEngine) x.get("templateEngine");
+          HashMap args = new HashMap();
+          args.put("msg", message);
           EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(x, "verify-email-link", (String) user.getGroup());
-          JtwigTemplate template = JtwigTemplate.inlineTemplate(emailTemplate.getBody(), getConfig());
-          JtwigModel model = JtwigModel.newModel(Collections.<String, Object>singletonMap("msg", message));
-          out.write(template.render(model));
+          StringBuilder templateBody = templateEngine.renderTemplate(x, emailTemplate.getBody(), args);
+          out.write(templateBody.toString());
           if ( ! redirect.equals("null") ){
             try {
               response.addHeader("REFRESH","2;URL="+redirect);
