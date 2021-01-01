@@ -15,19 +15,13 @@ foam.CLASS({
     'foam.input.Gamepad'
   ],
 
+  constants: {
+    MEMENTO_PROPERTIES: [ 'x1', 'y1', 'x2', 'y2', 'maxIterations' ]
+  },
+
   properties: [
     {
-      name: 'memento',
-      xxxpostSet: function(_, n) {
-        var a = n.split('/');
-        if ( a.length != 5 ) return;
-        this.x1 = a[0];
-        this.y1 = a[1];
-        this.x2 = a[2];
-        this.y2 = a[3];
-        this.maxIterations = a[4];
-        this.invalidate();
-      }
+      name: 'memento'
     },
     {
       name: 'canvas',
@@ -69,14 +63,8 @@ foam.CLASS({
       h.value$.follow(this.memento$);
 
       if ( this.memento ) {
-        var a = this.memento.split('/');
-        if ( a.length == 5 ) {
-          this.x1 = a[0];
-          this.y1 = a[1];
-          this.x2 = a[2];
-          this.y2 = a[3];
-          this.maxIterations = a[4];
-        }
+        var a = this.memento.split(',');
+        a.forEach((v, i) => this[this.MEMENTO_PROPERTIES[i]] = v);
       }
 
       this.
@@ -267,7 +255,7 @@ foam.CLASS({
       isFramed: true,
       code: function() {
         this.canvas.invalidate();
-        this.memento = [this.x1, this.y1, this.x2, this.y2, this.maxIterations].join('/');
+        this.memento = this.MEMENTO_PROPERTIES.map(p => this[p]);
       }
     },
 
