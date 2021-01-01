@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.notification.email;
 
 import com.google.common.base.Optional;
@@ -27,14 +33,15 @@ public class DAOResourceLoader
     DAO emailTemplateDAO = (DAO) x.get("localEmailTemplateDAO");
 
     do {
-      Sink sink = emailTemplateDAO.where(AND(
-          EQ(EmailTemplate.NAME, name),
-          EQ(EmailTemplate.GROUP, ! SafetyUtil.isEmpty(groupId) ? groupId : "*")
-      )).limit(1).select(null);
+      EmailTemplate emailTemplate = (EmailTemplate) emailTemplateDAO
+        .find(
+              AND(
+                  EQ(EmailTemplate.NAME, name),
+                  EQ(EmailTemplate.GROUP, ! SafetyUtil.isEmpty(groupId) ? groupId : "*")
+                  ));
 
-      List data = ((ArraySink) sink).getArray();
-      if ( data != null && data.size() == 1 ) {
-        return (EmailTemplate) data.get(0);
+      if ( emailTemplate != null ) {
+        return emailTemplate;
       }
 
       // exit condition, no emails even with wildcard group so return null
