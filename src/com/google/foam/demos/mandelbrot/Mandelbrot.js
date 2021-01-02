@@ -144,7 +144,7 @@ foam.CLASS({
         var xt = zx*zy;
         zx = zx*zx - zy*zy + x;
         zy = 2*xt + y;
-        if ( zx*zx + zy*zy > 4 ) return 2 * 255 * i / this.maxIterations;
+        if ( zx*zx + zy*zy > 4 ) return 2 * 255 * Math.pow(i / this.maxIterations, 0.8);
       }
 
       return 0;
@@ -271,11 +271,12 @@ foam.CLASS({
 
     function onClick(evt) {
       var x = evt.clientX, y = evt.clientY;
+      console.log(x,y);
       var x1 = this.x1, y1 = this.y1, x2 = this.x2, y2 = this.y2, xd = x2-x1, yd = y2-y1;
-      this.x1 = x / this.width * xd + x1 - xd / 2;
-      this.x2 = x / this.width * xd + x1 + xd / 2;
-      this.y1 = y / this.height * yd + y1 - yd / 2;
-      this.y2 = y / this.height * yd + y1 + yd / 2;
+      this.x1 = x * xd / this.width  + x1 - xd / 2;
+      this.x2 = x * xd / this.width  + x1 + xd / 2;
+      this.y1 = y * yd / this.height + y1 - yd / 2;
+      this.y2 = y * yd / this.height + y1 + yd / 2;
       this.invalidate();
     }
   ]
