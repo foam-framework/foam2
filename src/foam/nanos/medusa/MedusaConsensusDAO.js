@@ -540,7 +540,7 @@ foam.CLASS({
                 .select(COUNT());
               Long lookAheadThreshold = 1L;
               if ( ((Long)dependencies.getValue()).intValue() == 0 &&
-                   ((Long)lookAhead.getValue()).intValue() > lookAheadTheshold ) { // REVIEW: How far to look ahead?
+                   ((Long)lookAhead.getValue()).intValue() > lookAheadThreshold ) { // REVIEW: How far to look ahead?
                 // Recovery - set global index to the gap index. Then
                 // the promoter will look for the entry after the gap.
                 getLogger().info("gap", "recovery", index);
