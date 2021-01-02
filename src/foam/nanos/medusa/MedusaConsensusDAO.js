@@ -257,7 +257,10 @@ foam.CLASS({
       getLogger().debug("promoter", "execute");
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       Long nextIndexSince = System.currentTimeMillis();
-      Alarm alarm = new Alarm.Builder(x).setName("Medusa Consensus").build();
+      Alarm alarm = new Alarm.Builder(x)
+        .setName("Medusa Consensus")
+        .setClusterable(false)
+        .build();
       try {
         while ( true ) {
           ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
@@ -515,7 +518,7 @@ foam.CLASS({
               alarm.setClusterable(false);
               alarm.setName("Medusa Gap");
               alarm.setIsActive(true);
-              alarm.setNote("Index: "+index+"\\n"+"Dependecies: UNKNOWN");
+              alarm.setNote("Index: "+index+"\\n"+"Dependencies: UNKNOWN");
               alarm = (Alarm) ((DAO) x.get("alarmDAO")).put(alarm);
               config.setErrorMessage("gap detected, investigating...");
               ((DAO) x.get("clusterConfigDAO")).put(config);
@@ -535,8 +538,9 @@ foam.CLASS({
                     EQ(MedusaEntry.INDEX2, index)
                   ))
                 .select(COUNT());
+              Long lookAheadThreshold = 1L;
               if ( ((Long)dependencies.getValue()).intValue() == 0 &&
-                   ((Long)lookAhead.getValue()).intValue() > 10 ) { // REVIEW: How far to look ahead?
+                   ((Long)lookAhead.getValue()).intValue() > lookAheadTheshold ) { // REVIEW: How far to look ahead?
                 // Recovery - set global index to the gap index. Then
                 // the promoter will look for the entry after the gap.
                 getLogger().info("gap", "recovery", index);
@@ -544,13 +548,13 @@ foam.CLASS({
                 replaying.updateIndex(x, index);
 
                 alarm.setIsActive(false);
-                alarm.setNote("Index: "+index+"\\n"+"Dependecies: NO");
+                alarm.setNote("Index: "+index+"\\n"+"Dependencies: NO");
                 ((DAO) x.get("alarmDAO")).put(alarm);
                 config.setErrorMessage("");
                 ((DAO) x.get("clusterConfigDAO")).put(config);
               } else {
-                getLogger().error("gap", "dependencies", index);
-                alarm.setNote("Index: "+index+"\\n"+"Dependecies: YES");
+                getLogger().error("gap", "index", index, "dependencies", dependencies.getValue(), "lookAhead", lookAhead.getValue(), "lookAhead threshold",lookAheadThreshold);
+                alarm.setNote("Index: "+index+"\\n"+"Dependencies: YES");
                 alarm.setSeverity(foam.log.LogLevel.ERROR);
                 ((DAO) x.get("alarmDAO")).put(alarm);
                 config.setErrorMessage("gap with dependencies");

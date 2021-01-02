@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'NotificationLogMessageDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: ``,
+  documentation: `Generate Notification for particular log messages.  NOTE do not use in combination with alarming/AlarmNotificationDAO. `,
 
   implements: [
     'foam.nanos.auth.EnabledAware'
