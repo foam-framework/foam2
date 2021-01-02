@@ -29,11 +29,11 @@ foam.CLASS({
     },
     [ 'width',  1400 ],
     [ 'height', 800 ],
-    { class: 'Int', name: 'maxIterations', value: 1024 },
-    { class: 'Double', name: 'x1', value: -2 },
-    { class: 'Double', name: 'y1', value: -1.15 },
-    { class: 'Double', name: 'x2', value: 0.5 },
-    { class: 'Double', name: 'y2', value: 1.15 },
+    { class: 'Int',    name: 'maxIterations', value: 1024 },
+    { class: 'Double', name: 'x1',            value: -2 },
+    { class: 'Double', name: 'y1',            value: -1.15 },
+    { class: 'Double', name: 'x2',            value: 0.5 },
+    { class: 'Double', name: 'y2',            value: 1.15 },
     {
       name: 'img',
       hidden: true,
@@ -76,10 +76,8 @@ foam.CLASS({
         tag({class: 'foam.u2.DetailView', data: this, properties: [ 'width', 'height', 'x1', 'y1', 'x2', 'y2', 'maxIterations' ]});
 
       this.canvas.paintSelf = (ctx) => {
-
         var start = performance.now();
         var x1 = this.x1, y1 = this.y1, x2 = this.x2, y2 = this.y2, width = this.width, height = this.height, xd = x2-x1, yd = y2-y1;
-        var v;
         var v = [];
         for ( var i = 0 ; i < width/10 ; i++ ) {
           v[i] = [];
@@ -144,7 +142,7 @@ foam.CLASS({
         var r, g, b;
 
         if ( s == 0 ) {
-          r = g = b = l; // achromatic
+          r = g = b = l;
         } else {
           var hue2rgb = function hue2rgb(p, q, t) {
             if ( t < 0 ) t += 1;
@@ -164,7 +162,7 @@ foam.CLASS({
 
         return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
     }
-    ],
+  ],
 
   actions: [
     {
