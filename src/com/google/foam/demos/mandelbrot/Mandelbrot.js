@@ -49,14 +49,14 @@ foam.CLASS({
       value: foam.Function.memoize1(function(h) {
         return 'hsl(' + h + ',100%,50%)';
       })
-    }
+    },
+    //'pass',
+    //'v'
   ],
 
   methods: [
     function initE() {
       this.SUPER();
-
-      this.propertyChange.sub(this.invalidate);
 
       var h = this.WindowHash.create();
       this.memento = h.value;
@@ -67,24 +67,31 @@ foam.CLASS({
         a.forEach((v, i) => this[this.MEMENTO_PROPERTIES[i]] = v);
       }
 
+      this.MEMENTO_PROPERTIES.forEach(p => this.propertyChange.sub(p, this.invalidate));
+
       this.
         style({outline: 'none'}).
         focus().
         start(this.canvas).
           on('click', this.onClick).
         end().
-        tag({class: 'foam.u2.DetailView', data: this, properties: [ 'width', 'height', 'x1', 'y1', 'x2', 'y2', 'maxIterations' ]});
+        tag({
+          class: 'foam.u2.DetailView',
+          data: this,
+          properties: [ 'width', 'height', 'x1', 'y1', 'x2', 'y2', 'maxIterations' ]});
 
       this.canvas.paintSelf = (ctx) => {
         var start = performance.now();
         var x1 = this.x1, y1 = this.y1, x2 = this.x2, y2 = this.y2, width = this.width, height = this.height, xd = x2-x1, yd = y2-y1;
-        var v = [];
-        for ( var i = 0 ; i < width/10 ; i++ ) {
-          v[i] = [];
-          for ( var j = 0 ; j < height/10 ; j++ ) {
-            var x = i*10/width*xd+x1;
-            var y = j*10/height*yd+y1;
-            v[i][j] = this.calc(x, y);
+        var v = this.pass ? this.v : [];
+        if ( ! this.pass ) {
+          for ( var i = 0 ; i < width/10 ; i++ ) {
+            v[i] = [];
+            for ( var j = 0 ; j < height/10 ; j++ ) {
+              var x = i*10/width*xd+x1;
+              var y = j*10/height*yd+y1;
+              v[i][j] = this.calc(x, y);
+            }
           }
         }
         function eq(c, i, j) {
@@ -93,7 +100,7 @@ foam.CLASS({
         for ( var i = 0 ; i < width/10; i++ ) {
           for ( var j = 0 ; j < height/10 ; j++ ) {
             var c = v[i][j];
-            var same = eq(c, i-1, j) && eq(c, i+1, j) && eq(c, i, j-1) && eq(c, i, j+1);
+            var same = ! this.pass || eq(c, i-1, j) && eq(c, i+1, j) && eq(c, i, j-1) && eq(c, i, j+1);
             for ( var i2 = i*10 ; i2 < i*10 + 10 ; i2++ ) {
               for ( var j2 = j*10 ; j2 < j*10 + 10 ; j2++ ) {
                 var x = i2/width*xd+x1;
@@ -103,7 +110,12 @@ foam.CLASS({
             }
           }
         }
-        console.log('paint', performance.now() - start);
+        console.log('paint', Math.round(performance.now() - start));
+        this.pass = ! this.pass;
+        if ( this.pass ) {
+          this.v = v;
+          this.invalidate();
+        }
         ctx.putImageData(this.img, 0, 0);
       };
     },
@@ -132,7 +144,7 @@ foam.CLASS({
         var xt = zx*zy;
         zx = zx*zx - zy*zy + x;
         zy = 2*xt + y;
-        if ( zx*zx + zy*zy > 4 ) return 2 * i * 255 / this.maxIterations;
+        if ( zx*zx + zy*zy > 4 ) return 2 * 255 * i / this.maxIterations;
       }
 
       return 0;
@@ -252,8 +264,8 @@ foam.CLASS({
       name: 'invalidate',
       isFramed: true,
       code: function() {
-        this.canvas.invalidate();
         this.memento = this.MEMENTO_PROPERTIES.map(p => this[p]);
+        this.canvas.invalidate();
       }
     },
 
