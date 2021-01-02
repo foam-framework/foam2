@@ -249,13 +249,12 @@ foam.CLASS({
       label: 'Resend Notification',
       availablePermissions:['notification.notify'],
       code: function(X) {
-        try {
-          X.resendNotificationService.resend(X, this.userId, this);
-          X.notify(this.SEND_SUCCESS, '', this.LogLevel.INFO, true);
-        } catch(e) {
-          X.notify(this.SEND_FAILED, '', this.LogLevel.ERROR, true);
-        }
-
+        var self = this;
+        X.resendNotificationService.resend(X, this.userId, this).then(function() {
+          X.notify(self.SEND_SUCCESS, '', self.LogLevel.INFO, true);
+        }).catch(function(e) {
+          X.notify(self.SEND_FAILED, '', self.LogLevel.ERROR, true);
+        });
       }
     }
   ]

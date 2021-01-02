@@ -80,7 +80,7 @@ foam.CLASS({
             }}
           userX.put("appConfig", appConfig);
         }
-        // Proxy to sendNotificaiton method
+        // Proxy to sendNotification method
         sendNotification(userX, user, notification);
       `
     },
