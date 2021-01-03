@@ -37,7 +37,7 @@ foam.CLASS({
     },
     {
       name: 'width',
-      value: 2000
+      value: 1000
     },
     {
       name: 'height',
@@ -95,9 +95,15 @@ foam.CLASS({
       let sink = await this.dao.limit(1).select();
       let config = sink.array[0];
       let groupBy = await this.dao
+          .orderBy(this.DESC(this.ClusterConfig.REGION_STATUS))
           .select(this.GROUP_BY(this.ClusterConfig.REGION));
+      let groups = groupBy.groupKeys.length;
+      this.canvas.width = this.width * groups;
       var offset = this.canvas.x;
-      for ( let [k, _] of Object.entries(groupBy.groups) ) {
+      // REVIEW: I can't get orderBy to work - Joel
+      // for ( let [k, _] of Object.entries(groupBy.groups) ) {
+      for ( var i = groups -1; i >= 0; i-- ) {
+        let k = groupBy.groupKeys[i];
         let cc = this.ClusterConfig.create({
           realm: config.realm,
           region: k
@@ -109,13 +115,13 @@ foam.CLASS({
           x: offset
         });
         this.canvas.add(region);
-        offset += 1000;
+        offset += this.width;
       }
 
       this.
         addClass(this.myClass()).
         start('center').
-        add('Cluster Topology').
+        add('Medusa Topology - '+config.realm).
         tag('br').
         start(this.canvas).
         on('click', this.onClick).

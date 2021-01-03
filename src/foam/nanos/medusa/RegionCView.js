@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'RegionCView',
-  extends: 'foam.graphics.CView',
+  extends: 'foam.graphics.Box',
 
   implements: [ 'foam.mlang.Expressions' ],
 
@@ -19,10 +19,11 @@ foam.CLASS({
   exports: [
     'zoneRingWidth'
   ],
-
   requires: [
+    'foam.graphics.Box',
     'foam.graphics.Label',
     'foam.nanos.medusa.ClusterConfig',
+    'foam.nanos.medusa.RegionStatus',
     'foam.nanos.medusa.ZoneCView',
   ],
 
@@ -41,16 +42,29 @@ foam.CLASS({
   methods: [
     async function initCView() {
       this.SUPER();
+      this.config = await this.dao.find(
+        this.AND(
+          this.EQ(this.ClusterConfig.REALM, this.config.realm),
+          this.EQ(this.ClusterConfig.REGION, this.config.region)
+        )
+      );
+
+      this.color$ = this.config$.map(function(c) {
+        if ( c.regionStatus == this.RegionStatus.ACTIVE ) {
+          return 'lightgreen';
+        }
+        return 'lightyellow';
+      }.bind(this));
 
       var label = this.Label.create({
-        text: 'Realm' + ' ' + this.config.realm,
+        text: 'Region' + ' ' + this.config.region,
         align: 'left',
         y: 10,
         x: 10
       });
       this.add(label);
-      var label = this.Label.create({
-        text: 'Region' + ' ' + this.config.region,
+      label = this.Label.create({
+        text: 'Status' + ' ' + this.config.regionStatus,
         align: 'left',
         y: 20,
         x: 10
@@ -133,7 +147,13 @@ foam.CLASS({
       code: async function(self = this) {
         console.log('RegionCView.refresh '+self.children.length);
         if ( self.config ) {
-          self.config = await self.dao.find(self.config.id);
+          // self.config = await self.dao.find(self.config.id);
+          self.config = await self.dao.find(
+            self.AND(
+              self.EQ(self.ClusterConfig.REALM, self.config.realm),
+              self.EQ(self.ClusterConfig.REGION, self.config.region)
+            )
+          );
           for ( var i = 0; i < self.children.length; i++ ) {
             let child = self.children[i];
             child.refresh && child.refresh(child);
