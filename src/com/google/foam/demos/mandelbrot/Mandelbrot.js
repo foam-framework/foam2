@@ -4,6 +4,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+// http://davidbau.com/mandelbrot/?grid=1&s=3&c=-0.5+0i
+// https://math.hws.edu/eck/js/mandelbrot/MB.html
 foam.CLASS({
   package: 'com.google.foam.demos.mandelbrot',
   name: 'Mandelbrot',
