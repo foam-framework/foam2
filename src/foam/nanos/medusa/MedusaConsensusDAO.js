@@ -511,7 +511,10 @@ foam.CLASS({
           }
           if ( entry != null ) {
             getLogger().warning("gap", "investigating", index);
-            long nodeCount = support.countEntryOnNodes(x, index);
+            // REVIEW: countEntryOnNodes no longer available as
+            // nodes don't keep an mdao of entries.
+            // long nodeCount = support.countEntryOnNodes(x, index);
+            long nodeCount = 0L;
             if ( nodeCount == 0L ) {
               getLogger().warning("gap", "found", index);
               Alarm alarm = new Alarm();
@@ -538,7 +541,7 @@ foam.CLASS({
                     EQ(MedusaEntry.INDEX2, index)
                   ))
                 .select(COUNT());
-              Long lookAheadThreshold = 1L;
+              Long lookAheadThreshold = 4L;
               if ( ((Long)dependencies.getValue()).intValue() == 0 &&
                    ((Long)lookAhead.getValue()).intValue() > lookAheadThreshold ) { // REVIEW: How far to look ahead?
                 // Recovery - set global index to the gap index. Then

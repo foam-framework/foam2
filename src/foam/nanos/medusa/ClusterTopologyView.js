@@ -37,7 +37,7 @@ foam.CLASS({
     },
     {
       name: 'width',
-      value: 1000
+      value: 2000
     },
     {
       name: 'height',
@@ -96,6 +96,7 @@ foam.CLASS({
       let config = sink.array[0];
       let groupBy = await this.dao
           .select(this.GROUP_BY(this.ClusterConfig.REGION));
+      var offset = this.canvas.x;
       for ( let [k, _] of Object.entries(groupBy.groups) ) {
         let cc = this.ClusterConfig.create({
           realm: config.realm,
@@ -104,9 +105,11 @@ foam.CLASS({
         let region = this.RegionCView.create({
           config: cc,
           width: this.width,
-          height: this.height
+          height: this.height,
+          x: offset
         });
         this.canvas.add(region);
+        offset += 1000;
       }
 
       this.

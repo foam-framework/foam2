@@ -32,7 +32,9 @@ public class CheckWebAgent
       ClusterConfig config = support.getConfig(x, support.getConfigId());
       ElectoralService electoral = (ElectoralService) x.get("electoralService");
       if ( config.getType() == MedusaType.MEDIATOR ) {
-        if ( config.getStatus() == Status.ONLINE &&
+        if ( config.getEnabled() &&
+             config.getStatus() == Status.ONLINE &&
+             config.getRegionStatus() == RegionStatus.ACTIVE &&
              ( config.getZone() > 0 ||
                ( config.getZone() == 0 &&
                  electoral.getState() == ElectoralServiceState.IN_SESSION ) ) ) {
@@ -42,7 +44,9 @@ public class CheckWebAgent
           response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
           out.println("maint\n");
         }
-      } else if ( config.getStatus() == Status.ONLINE ) {
+      } else if ( config.getEnabled() &&
+                  config.getStatus() == Status.ONLINE &&
+                  config.getRegionStatus() == RegionStatus.ACTIVE ) {
         response.setStatus(HttpServletResponse.SC_OK);
         out.println("up\n");
       } else {

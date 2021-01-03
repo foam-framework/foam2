@@ -130,13 +130,14 @@ foam.CLASS({
           DAO dao = (DAO) x.get("internalMedusaDAO");
           dao = dao.where(EQ(MedusaEntry.PROMOTED, false));
           Min min = (Min) dao.select(MIN(MedusaEntry.INDEX));
-
+          Long minIndex = 0L;
           ReplayDetailsCmd details = new ReplayDetailsCmd();
           details.setRequester(myConfig.getId());
           details.setResponder(config.getId());
           if ( min != null &&
                min.getValue() != null ) {
             details.setMinIndex((Long) min.getValue());
+            minIndex = details.getMinIndex();
           }
           getLogger().info("ReplayDetailsCmd", "from", myConfig.getId(), "to", config.getId(), "request");
           details = (ReplayDetailsCmd) clientDAO.cmd_(x, details);
@@ -170,7 +171,8 @@ foam.CLASS({
             }
           }
 
-          if ( details.getMaxIndex() > 0 ) {
+          // if ( details.getMaxIndex() > minIndex ) {
+          if ( details.getMaxIndex() > 0L ) {
             ReplayCmd cmd = new ReplayCmd();
             cmd.setDetails(details);
             cmd.setServiceName("medusaMediatorDAO"); // TODO: configuration

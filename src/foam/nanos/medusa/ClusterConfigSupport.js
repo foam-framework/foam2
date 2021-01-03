@@ -320,6 +320,32 @@ configuration for contacting the primary node.`,
       `
     },
     {
+      documentation: 'Primary Mediators in Non-Active Regions to broadcast to. See ClusterConfigStatusDAO',
+      name: 'broadcastNARegionMediators',
+      class: 'FObjectArray',
+      of: 'foam.nanos.medusa.ClusterConfig',
+      javaFactory: `
+      ClusterConfig myConfig = getConfig(getX(), getConfigId());
+      List<ClusterConfig> arr = (ArrayList) ((ArraySink) ((DAO) getX().get("localClusterConfigDAO"))
+        .where(
+          AND(
+            EQ(ClusterConfig.ZONE, 0),
+            EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+            EQ(ClusterConfig.IS_PRIMARY, true),
+            EQ(ClusterConfig.ENABLED, true),
+            EQ(ClusterConfig.STATUS, Status.ONLINE),
+            NEQ(ClusterConfig.REGION, myConfig.getRegion()),
+            EQ(ClusterConfig.REGION_STATUS, RegionStatus.STANDBY),
+            EQ(ClusterConfig.REALM, myConfig.getRealm())
+          )
+        )
+        .select(new ArraySink())).getArray();
+      ClusterConfig[] configs = new ClusterConfig[arr.size()];
+      arr.toArray(configs);
+      return configs;
+      `
+    },
+    {
       documentation: 'Any active region in realm.',
       name: 'nextZone',
       class: 'FObjectProperty',
@@ -596,6 +622,7 @@ configuration for contacting the primary node.`,
             EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
             EQ(ClusterConfig.ZONE, 0L),
             EQ(ClusterConfig.STATUS, Status.ONLINE),
+            EQ(ClusterConfig.REGION_STATUS, RegionStatus.ACTIVE),
             EQ(ClusterConfig.ENABLED, true)
           ))
         .select(new ArraySink())).getArray();
@@ -862,6 +889,7 @@ configuration for contacting the primary node.`,
           }
           if ( config.getIsPrimary() &&
                config.getStatus() == Status.ONLINE &&
+               config.getRegionStatus() == RegionStatus.ACTIVE &&
                config.getZone() == 0L ) {
             return true;
           }
@@ -1009,7 +1037,8 @@ configuration for contacting the primary node.`,
                 AND(
                     EQ(ClusterConfig.TYPE, MedusaType.NODE),
                     EQ(ClusterConfig.ZONE, 0L),
-                    EQ(ClusterConfig.ENABLED, true)
+                    EQ(ClusterConfig.ENABLED, true),
+                    EQ(ClusterConfig.STATUS, Status.ONLINE)
                 )
             )
             .select(new ArraySink())).getArray();
