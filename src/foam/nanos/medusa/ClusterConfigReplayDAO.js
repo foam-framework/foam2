@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'ClusterConfigReplayDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: `On status change to ONLINE initiate replay`,
+  documentation: `On status change to ONLINE initiate replay, in Active Region.`,
 
   javaImports: [
     'foam.dao.DAO',
@@ -51,15 +51,18 @@ foam.CLASS({
       ClusterConfig nu = (ClusterConfig) obj;
       ClusterConfig old = (ClusterConfig) find_(x, nu.getId());
       nu = (ClusterConfig) getDelegate().put_(x, nu);
+
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
       if ( old != null &&
            old.getStatus() != nu.getStatus() &&
-           nu.getStatus() == Status.ONLINE ) {
+           nu.getStatus() == Status.ONLINE &&
+           nu.getRealm() == myConfig.getRealm() &&
+           nu.getRegion() == myConfig.getRegion() ) {
 
         getLogger().info(nu.getName(), old.getStatus().getLabel(), "->", nu.getStatus().getLabel().toUpperCase());
 
         ClusterConfig config = nu;
-        ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-        ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
         if ( support.getStandAlone() &&
              nu.getType() == MedusaType.NODE ) {
@@ -97,9 +100,7 @@ foam.CLASS({
             replaying.setReplaying(false);
             replaying.setEndTime(new java.util.Date());
           }
-        } else if ( config.getRegion() == myConfig.getRegion() &&
-                    config.getRealm() == myConfig.getRealm() &&
-
+        } else if (
                       // replay from NODE to zone and zone + 1
                     ( config.getType() == MedusaType.NODE &&
                       ( ( myConfig.getType() == MedusaType.MEDIATOR &&

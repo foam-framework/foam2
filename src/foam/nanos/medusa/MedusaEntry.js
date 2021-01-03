@@ -157,12 +157,14 @@ foam.CLASS({
       documentation: 'Set when journal on the Node. Used to distinguish unique entries during consensus determination.',
       name: 'node',
       class: 'String',
-      visibility: 'RO'
+      visibility: 'RO',
+      includeInDigest: false, // REVIEW: false to deal with node change (at the moment) when sent to STANDBY Region, but believe this a security hole; without node in digest, one could send the same entry quorum times with a different node set. Also see comments in MedusaSetNodeDAO - Joel
     },
     {
       name: 'created',
       class: 'DateTime',
       visibility: 'RO',
+      storageOptional: true,
       includeInDigest: false,
     },
     {
@@ -172,6 +174,7 @@ foam.CLASS({
       of: 'foam.nanos.auth.User',
       visibility: 'HIDDEN',
       value: 2,
+      storageOptional: true,
       includeInDigest: false,
     },
     {
@@ -180,6 +183,7 @@ foam.CLASS({
       class: 'DateTime',
       visibility: 'RO',
       tableWidth: 150,
+      storageOptional: true,
       includeInDigest: false,
     }
   ],

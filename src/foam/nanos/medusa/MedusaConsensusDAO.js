@@ -456,7 +456,7 @@ foam.CLASS({
                   break;
                 }
               } else {
-                getLogger().error("getConsensusEntry", next, "Multiple consensus detected", hashes.size(), next.toSummary(), next.getConsensusCount(), support.getNodeQuorum());
+                getLogger().error("getConsensusEntry", next, "Multiple consensus detected", hashes.size(), next.toSummary(), next.getConsensusCount(), support.getNodeQuorum(), next.getConsensusHashes());
                 throw new MedusaException("Multiple consensus detected. "+next.toSummary());
               }
             }

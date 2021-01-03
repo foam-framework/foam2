@@ -67,10 +67,12 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
-      entry = (MedusaEntry) getDelegate().put_(x, entry).fclone();
+      entry = (MedusaEntry) getDelegate().put_(x, entry);
 
       if ( myConfig.getType() == MedusaType.NODE &&
-           myConfig.getStatus() == Status.ONLINE ) {
+           myConfig.getStatus() == Status.ONLINE &&
+           myConfig.getRegionStatus() == RegionStatus.ACTIVE &&
+           myConfig.getZone() == 0L ) {
         entry = (MedusaEntry) submit(x, entry, DOP.PUT);
       }
       return entry;

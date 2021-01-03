@@ -57,29 +57,29 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
-      if ( ! (
-           myConfig.getType() == MedusaType.MEDIATOR &&
-           myConfig.getRegionStatus() == RegionStatus.STANDBY &&
-           myConfig.getStatus() == Status.ONLINE &&
-           myConfig.getRealm() == nu.getRealm()
-         ) ) {
-        return nu;
-      }
-
       if ( old != null &&
            old.getStatus() != nu.getStatus() &&
-           nu.getStatus() == Status.ONLINE ) {
+           nu.getStatus() == Status.ONLINE &&
+           nu.getRealm() == myConfig.getRealm() ) {
+
+        if ( ! (
+             myConfig.getType() == MedusaType.MEDIATOR &&
+             myConfig.getRegionStatus() == RegionStatus.STANDBY &&
+             myConfig.getStatus() == Status.ONLINE
+           ) ) {
+          return nu;
+        }
 
         getLogger().info(nu.getName(), old.getStatus().getLabel(), "->", nu.getStatus().getLabel().toUpperCase());
 
         if ( nu.getType() == MedusaType.NODE &&
              nu.getRegionStatus() == RegionStatus.ACTIVE &&
              nu.getZone() == 0L ) {
-          // NODE ONLINE - replay
+          // Self already ONLINE, replay from Active Node
           replay(x, myConfig, nu);
         } else if ( nu.getType() == MedusaType.MEDIATOR &&
                     nu.getId().equals(myConfig.getId()) ) {
-          // Self ONLINE - replay from all Nodes
+          // Self ONLINE, replay from all Active Nodes
           List<ClusterConfig> configs = ((ArraySink) ((DAO) x.get("clusterConfigDAO"))
             .where(
                 AND(

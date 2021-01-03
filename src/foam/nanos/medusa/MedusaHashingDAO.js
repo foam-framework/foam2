@@ -35,18 +35,21 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      // TODO:
       MedusaEntry entry = (MedusaEntry) obj;
-      getLogger().debug("put", entry.getIndex());
-      DaggerService dagger = (DaggerService) x.get("daggerService");
-      try {
-        entry = dagger.hash(x, entry);
-        return getDelegate().put_(x, entry);
-      } catch ( Exception e ) {
-        getLogger().error("put", e.getMessage(), entry, e);
-        // TODO: Alarm
-        throw new RuntimeException(e);
+      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
+      if ( myConfig.getRegionStatus() == RegionStatus.ACTIVE ) {
+        getLogger().debug("put", entry.getIndex());
+        DaggerService dagger = (DaggerService) x.get("daggerService");
+        try {
+          entry = dagger.hash(x, entry);
+        } catch ( Exception e ) {
+          getLogger().error("put", e.getMessage(), entry, e);
+          // TODO: Alarm
+          throw new RuntimeException(e);
+        }
       }
+      return getDelegate().put_(x, entry);
       `
     }
   ]

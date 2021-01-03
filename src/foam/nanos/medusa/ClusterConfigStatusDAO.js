@@ -61,7 +61,9 @@ foam.CLASS({
            old.getStatus() != nu.getStatus() &&
            myConfig.getType() == MedusaType.MEDIATOR &&
            myConfig.getZone() == 0 &&
-           nu.getType() == MedusaType.MEDIATOR ) {
+           nu.getType() == MedusaType.MEDIATOR &&
+           myConfig.getRegion() == nu.getRegion() &&
+           nu.getZone() == 0 ) {
         getLogger().info(nu.getName(), old.getStatus().getLabel(), "->", nu.getStatus().getLabel().toUpperCase());
 
         ElectoralService electoralService = (ElectoralService) x.get("electoralService");
