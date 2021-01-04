@@ -451,8 +451,8 @@ foam.CLASS({
 
           if ( this.memento && this.memento.paramsObj.c ) {
             for ( var c of this.memento.paramsObj.c ) {
-              if ( c.order && ! c.name.includes(' / ')) {
-                var prop = view.props.find(p => p.fullPropertyName === this.columnConfigToPropertyConverter.returnPropertyNameForLabel(view.of, c.name));
+              if ( c.order && ! c.n.includes('.')) {
+                var prop = view.props.find(p => p.fullPropertyName === c.n );
                 if ( prop ) {
                   if ( c.order.toLowerCase() === 'd' )
                     dao = dao.orderBy(this.DESC(prop.property));
