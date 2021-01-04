@@ -320,7 +320,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.FilterView.LABEL_
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.FilterView.MESSAGE_ADVANCEDMODE",target:"Usando filtros avançados"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.FilterView.MESSAGE_VIEWADVANCED",target:"Usando filtros simples"})
 
-p({class:"foam.i18n.Locale",locale:"en",source:"net.nanopay.contacts.Contact.ORGANIZATION.label",target:"Nome da empresa"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"net.nanopay.contacts.Contact.ORGANIZATION.label",target:"Nome da empresa"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.BooleanFilterView.BOOL_T.label",target:"Verdadeiro"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.BooleanFilterView.BOOL_F.label",target:"Falso"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.property.PropertyFilterView.LABEL_PROPERTY_ALL",target:"Todos"})
