@@ -28,12 +28,15 @@ foam.LIB({
   name: 'foam.i18n.Lib',
   methods: [
     function createText(source, text, defaultText) {
+      if ( ! foam.xmsg ) return text;
       return {
         __proto__: text,
+//        asJavaValue: function() { return foam.java.AsJavaValue(text); },
+        toString: function() { return defaultText || text; },
         toE: function(_, X) {
           return foam.i18n.InlineLocaleEditor.create({
             source:      source,
-            defaultText: defaultText,
+            defaultText: defaultText || text,
             data:        text},
             X);
         }

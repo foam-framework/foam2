@@ -272,7 +272,8 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.
 p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.REGION.label",target:"Região"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.REGION.error",target:"Região requerido"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.POSTAL_CODE.label",target:"CEP"})
-p({class:"foam.i18n.Locale"locale:"pt",source:"*.foam.nanos.auth.Address.POSTAL_CODE.error",target:"CEP requerido"})
+p({class:"foam.i18n.Locale"locale:"pt",source:"*.foam.nanos.auth.Address.POSTAL_CODE.error",target:"CEP válido necessário"})
+p({class:"foam.i18n.Locale"locale:"pt",source:"*.foam.nanos.auth.Address.POSTAL_CODE_REQUIRE",target:"CEP requerido"})
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.OPTIONS_MSG",target:"opções"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHOOSE_AT_LEAST_1_OPTION",target:"Escolha pelo menos uma opção"})

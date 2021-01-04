@@ -14,12 +14,16 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.X',
     'foam.dao.DAO',
+    'foam.nanos.app.AppConfig',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
+    'foam.nanos.theme.Theme',
+    'foam.nanos.theme.Themes',
     'java.util.HashSet'
   ],
 
@@ -63,8 +67,21 @@ foam.CLASS({
         { name: 'notification', type: 'foam.nanos.notification.Notification' }
       ],
       javaCode: `
-        // Proxy to sendNotificaiton method
-        sendNotification(x, user, notification);
+        X userX = x;
+        Subject subject = (Subject) x.get("subject");
+        if ( subject.getRealUser().getId() != user.getId() ) {
+          userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
+          AppConfig appConfig = user.findGroup(x).getAppConfig(x);
+          Theme theme = (Theme) x.get("theme");
+          if ( theme == null ) {
+            theme = ((Themes) x.get("themes")).findTheme(userX);
+            if ( theme.getAppConfig() != null ) {
+              appConfig.copyFrom(theme.getAppConfig());
+            }}
+          userX.put("appConfig", appConfig);
+        }
+        // Proxy to sendNotification method
+        sendNotification(userX, user, notification);
       `
     },
     {
