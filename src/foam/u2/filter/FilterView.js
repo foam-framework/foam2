@@ -280,9 +280,9 @@ foam.CLASS({
     function initE() {
       var self = this;
 
-      if ( this.memento && this.memento.paramsObj.filters ) {
-        this.memento.paramsObj.filters.forEach(f => {
-          self.filterController.setExistingPredicate(f.criteria, f.name, foam.json.parseString(f.pred, this.__subContext__));
+      if ( this.memento && this.memento.paramsObj.f ) {
+        this.memento.paramsObj.f.forEach(f => {
+          self.filterController.setExistingPredicate(f.criteria, f.n, foam.json.parseString(f.pred, this.__subContext__));
         });
       }
 

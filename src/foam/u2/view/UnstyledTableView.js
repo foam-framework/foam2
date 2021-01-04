@@ -97,7 +97,7 @@ foam.CLASS({
     {
       name: 'selectedColumnNames',
       expression: function(columns, of, memento) {
-        var ls =  memento && memento.paramsObj.columns ? memento.paramsObj.columns : JSON.parse(localStorage.getItem(of.id));
+        var ls =  memento && memento.paramsObj.c ? memento.paramsObj.c.map(c => c.n) : JSON.parse(localStorage.getItem(of.id));
         return ls || columns;
       }
     },
@@ -265,13 +265,13 @@ foam.CLASS({
         column;
 
       if ( this.memento ) {
-        if ( ! this.memento.paramsObj.columns ) {
-          this.memento.paramsObj.columns = [];
+        if ( ! this.memento.paramsObj.c ) {
+          this.memento.paramsObj.c = [];
         }
-        var mementoColumn = this.memento.paramsObj.columns.find(c => c.name === column.name);
+        var mementoColumn = this.memento.paramsObj.c.find(c => c.n === column.name);
         var orderLetter = this.order === column ? 'D' : 'A';
         if ( ! mementoColumn ) {
-          this.memento.paramsObj.columns.push({ name: column.name,  order: orderLetter });
+          this.memento.paramsObj.c.push({ n: column.name,  order: orderLetter });
         } else {
           mementoColumn.order = orderLetter;
         }
@@ -286,16 +286,16 @@ foam.CLASS({
       var newMementoColumns = [];
 
       for ( var s of this.selectedColumnNames ) {
-        if ( ! this.memento.paramsObj.columns )
-          this.memento.paramsObj.columns = [];
-        var col = this.memento.paramsObj.columns.find(c => c.name === s);
+        if ( ! this.memento.paramsObj.c )
+          this.memento.paramsObj.c = [];
+        var col = this.memento.paramsObj.c.find(c => c.n === s);
         if ( ! col ) {
-          newMementoColumns.push({ name: label });
+          newMementoColumns.push({ n: s });
         } else {
           newMementoColumns.push(col);
         }
       }
-      this.memento.paramsObj.columns = newMementoColumns;
+      this.memento.paramsObj.c = newMementoColumns;
       this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj)
 
       this.isColumnChanged = ! this.isColumnChanged;
@@ -305,9 +305,9 @@ foam.CLASS({
       var view = this;
 
       //set memento's selected columns
-      if ( ! this.memento.paramsObj.columns ) {
-        this.memento.paramsObj.columns = this.columns_.map(c => {
-          return { name: this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c) }
+      if ( ! this.memento.paramsObj.c ) {
+        this.memento.paramsObj.c = this.columns_.map(c => {
+          return { n: this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c) }
         });
         this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj)
       }
@@ -449,8 +449,8 @@ foam.CLASS({
           var view = this;
           view.props = this.returnPropertiesForColumns(view, view.columns_);
 
-          if ( this.memento && this.memento.paramsObj.columns ) {
-            for ( var c of this.memento.paramsObj.columns ) {
+          if ( this.memento && this.memento.paramsObj.c ) {
+            for ( var c of this.memento.paramsObj.c ) {
               if ( c.order && ! c.name.includes(' / ')) {
                 var prop = view.props.find(p => p.fullPropertyName === this.columnConfigToPropertyConverter.returnPropertyNameForLabel(view.of, c.name));
                 if ( prop ) {
