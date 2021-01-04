@@ -16,6 +16,15 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'outputter',
+      factory: function() {
+        return foam.json.Outputter.create({
+          strict: false,
+          pretty: false
+        });
+      }
+    },
+    {
       class: 'Boolean',
       name: 'feedback_',
       documentation: 'Internal flag to prevent feedback loops'
@@ -75,7 +84,7 @@ foam.CLASS({
         var obj = {};
         if ( this.params ) {
           this.params = decodeURI(this.params);
-          obj = JSON.parse(this.params);
+          obj = foam.json.parseString(this.params);
         }
         this.paramsObj = obj;
         this.feedback_ = false;
@@ -90,7 +99,7 @@ foam.CLASS({
         }
         this.feedback_ = true;
         if ( Object.keys(this.paramsObj).length !== 0 ) {
-          this.params = JSON.stringify(this.paramsObj);
+          this.params = this.outputter.stringify(this.paramsObj);
         } else {
           this.params = '';
         }
