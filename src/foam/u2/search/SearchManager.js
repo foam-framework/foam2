@@ -61,8 +61,8 @@ foam.CLASS({
 
   methods: [
     function init() {
-      if ( this.memento && this.memento.paramsObj.filters && this.memento.paramsObj.filters.length > 0 ) {
-        var predicates = this.memento.paramsObj.filters.map(f => foam.json.parseString(f.pred, this.__subContext__));
+      if ( this.memento && this.memento.paramsObj.f && this.memento.paramsObj.f.length > 0 ) {
+        var predicates = this.memento.paramsObj.f.map(f => foam.json.parseString(f.pred, this.__subContext__));
         this.predicate = this.And.create({
           args: predicates
         }).partialEval();
@@ -139,7 +139,7 @@ foam.CLASS({
         var searches = [];
         var keys = Object.keys(this.views);
         if ( keys.length == 0 ) {
-          delete this.memento.paramsObj.filters;
+          delete this.memento.paramsObj.f;
         } else {
           var outputter = foam.json.Outputter.create({
             strict: true
@@ -150,9 +150,9 @@ foam.CLASS({
             }
           }
           if ( searches.length > 0 ) {
-            this.memento.paramsObj.filters = searches;
+            this.memento.paramsObj.f = searches;
           } else {
-            delete this.memento.paramsObj.filters;
+            delete this.memento.paramsObj.f;
           }
           
           this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);

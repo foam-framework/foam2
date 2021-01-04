@@ -304,14 +304,14 @@ foam.CLASS({
                         this.tag(self.SimpleSearch, {
                           showCount: false,
                           data$: self.searchPredicate$,
-                          searchValue: self.memento && self.memento.paramsObj.search
+                          searchValue: self.memento && self.memento.paramsObj.s
                         });
                       })
                       .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
                         this.tag(self.FilterView, {
                           dao$: self.searchFilterDAO$,
                           data$: self.searchPredicate$,
-                          searchValue: self.memento && self.memento.paramsObj.search
+                          searchValue: self.memento && self.memento.paramsObj.s
                         });
                     })
                     .endContext()
