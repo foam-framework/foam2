@@ -346,3 +346,10 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.properties.String
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.search.TextSearchView.LABEL_SEARCH",target:"Pesquisa"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.CriteriaView.LABEL_SEARCH",target:"Pesquisa"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.search.IntegerSearchView.LABEL_EQ",target:"é igual a"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.search.IntegerSearchView.LABEL_NEQ",target:"não é igual a"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.search.IntegerSearchView.LABEL_GT",target:"é melhor que"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.search.IntegerSearchView.LABEL_LT",target:"é menos do que"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.search.IntegerSearchView.LABEL_GTE",target:"é maior que ou igual a"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.search.IntegerSearchView.LABEL_LTE",target:"é menor ou igual a"})
