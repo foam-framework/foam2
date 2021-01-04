@@ -24,6 +24,44 @@ foam.SCRIPT({
 });
 
 
+foam.LIB({
+  name: 'foam.i18n.Lib',
+  methods: [
+    function createText(source, text, defaultText) {
+      if ( ! foam.xmsg ) return text;
+      return {
+        __proto__: text,
+//        asJavaValue: function() { return foam.java.AsJavaValue(text); },
+        toString: function() { return defaultText || text; },
+        toE: function(_, X) {
+          return foam.i18n.InlineLocaleEditor.create({
+            source:      source,
+            defaultText: defaultText || text,
+            data:        text},
+            X);
+        }
+      };
+      /*
+      return {
+        asJavaValue: function() {
+          return foam.java.asJavaValue(text);
+        },
+        toE: (_, X) => {
+          return foam.i18n.InlineLocaleEditor.create({
+            source:      source,
+            defaultText: defaultText,
+            data:        text}, X);
+        },
+        toString: function() {
+          return text;
+        }
+      };
+      */
+    }
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.i18n',
   name: 'MessageAxiom',
@@ -48,7 +86,7 @@ foam.CLASS({
       class: 'String',
       name: 'message',
       getter: function() {
-        var msg  = this.message_;
+        var msg = this.message_;
         if ( foam.Undefined.isInstance(msg) ) {
           if ( foam.locale )
             msg = this.messageMap[foam.locale] || this.messageMap[foam.lang];
@@ -56,27 +94,9 @@ foam.CLASS({
           msg = msg || this.messageMap.en;
 
           // While booting, foam.i18n may not have loaded yet
-          if ( foam.i18n && foam.xmsg ) {
-            let msg_ = msg;
-            // Create an object which can be used to call toString() on, but
-            // also has a toE() method.
-            msg = {
-              asJavaValue: function() {
-                return foam.java.asJavaValue(msg_);
-              },
-              toE: (_, X) => {
-                return foam.i18n.InlineLocaleEditor.create({
-                  source: this.sourceCls_.id + '.' + this.name,
-                  defaultText: msg_,
-                  data: msg_}, X);
-              },
-              toString: function() {
-                return msg_;
-              }
-            };
-          }
-
-          this.message_ = msg;
+          msg = this.message_ = foam.i18n && foam.xmsg ?
+            foam.i18n.Lib.createText(this.sourceCls_.id + '.' + this.name, msg, msg) :
+            msg ;
         }
 
         return msg;

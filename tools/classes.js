@@ -209,15 +209,17 @@ var classes = [
   'foam.mlang.sink.Map',
   'foam.nanos.alarming.AddAlarmNameDAO',
   'foam.nanos.alarming.Alarm',
+  'foam.nanos.alarming.AlarmAndMonitoring',
   'foam.nanos.alarming.AlarmConfig',
   'foam.nanos.alarming.AlarmConfigOMNameDAO',
   'foam.nanos.alarming.AlarmConfigOMNameSink',
   'foam.nanos.alarming.AlarmHostnameRuleAction',
-  'foam.nanos.alarming.AlarmLoggingDAO',
-  'foam.nanos.alarming.AlarmReason',
-  'foam.nanos.alarming.AlarmAndMonitoring',
+  'foam.nanos.alarming.AlarmIdRefines',
   'foam.nanos.alarming.Alarming',
   'foam.nanos.alarming.AlarmingUniqueNameDAO',
+  'foam.nanos.alarming.AlarmLoggingDAO',
+  'foam.nanos.alarming.AlarmNotificationDAO',
+  'foam.nanos.alarming.AlarmReason',
   'foam.nanos.alarming.MonitoringReport',
   'foam.nanos.alarming.MonitorType',
   'foam.nanos.alarming.OMName',
@@ -314,6 +316,7 @@ var classes = [
   'foam.nanos.auth.EnabledCheckAuthService',
   'foam.nanos.http.HttpParameters',
   'foam.nanos.http.DefaultHttpParameters',
+  'foam.nanos.http.SendErrorHandler',
   'foam.nanos.session.LocalSetting',
   'foam.nanos.session.LocalSettingSessionDAO',
   'foam.nanos.session.Session',
@@ -628,6 +631,7 @@ var classes = [
   'foam.support.model.SupportEmail',
   'foam.support.model.Ticket',
 
+  'foam.nanos.dig.exception.ExternalAPIException',
   'foam.nanos.dig.exception.EmptyParameterException',
   'foam.nanos.dig.exception.GeneralException',
 
@@ -744,6 +748,7 @@ var classes = [
 
   //crunch predicates
   'foam.nanos.crunch.predicate.CapabilityGranted',
+  'foam.nanos.crunch.predicate.CapabilityPrerequisitesGranted',
   'foam.nanos.crunch.predicate.StatusChangedTo',
   'foam.nanos.crunch.predicate.IsAgent',
 

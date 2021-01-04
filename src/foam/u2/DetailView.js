@@ -60,10 +60,17 @@ foam.CLASS({
       preSet: function(_, ps) {
         foam.assert(ps, 'Properties required.');
         for ( var i = 0; i < ps.length; i++ ) {
-          foam.assert(
-              foam.core.Property.isInstance(ps[i]),
-              `Non-Property in 'properties' list:`,
-              ps);
+          if ( ! foam.core.Property.isInstance(ps[i]) ) {
+            var p = this.of.getAxiomByName(ps[i]);
+            if ( ! foam.core.Property.isInstance(p) ) {
+              foam.assert(
+                false,
+                `Non-Property in 'properties' list:`,
+                ps);
+            } else {
+              ps[i] = p;
+            }
+          }
         }
         return ps;
       },
@@ -101,6 +108,7 @@ foam.CLASS({
   css: `
     /* Temporary fix until we refactor DetailView to not use a table. */
     ^ {
+      display: block;
       margin: auto;
       width: 100%;
     }

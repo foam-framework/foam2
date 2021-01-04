@@ -97,7 +97,7 @@ foam.CLASS({
     {
       name: 'selectedColumnNames',
       expression: function(columns, of, memento) {
-        var ls =  memento && memento.paramsObj.columns ? memento.paramsObj.columns.map(c => this.columnConfigToPropertyConverter.returnPropertyNameForLabel(of, c.name)) : JSON.parse(localStorage.getItem(of.id));
+        var ls =  memento && memento.paramsObj.columns ? memento.paramsObj.columns : JSON.parse(localStorage.getItem(of.id));
         return ls || columns;
       }
     },
@@ -268,10 +268,10 @@ foam.CLASS({
         if ( ! this.memento.paramsObj.columns ) {
           this.memento.paramsObj.columns = [];
         }
-        var mementoColumn = this.memento.paramsObj.columns.find(c => c.name === column.label);
+        var mementoColumn = this.memento.paramsObj.columns.find(c => c.name === column.name);
         var orderLetter = this.order === column ? 'D' : 'A';
         if ( ! mementoColumn ) {
-          this.memento.paramsObj.columns.push({ name: column.label,  order: orderLetter });
+          this.memento.paramsObj.columns.push({ name: column.name,  order: orderLetter });
         } else {
           mementoColumn.order = orderLetter;
         }
@@ -286,11 +286,10 @@ foam.CLASS({
       var newMementoColumns = [];
 
       for ( var s of this.selectedColumnNames ) {
-        if ( ! this.memento.paramsObj.columns ) 
+        if ( ! this.memento.paramsObj.columns )
           this.memento.paramsObj.columns = [];
-        var label = this.columnConfigToPropertyConverter.returnPropertyLabelForName(this.of, s);
-        var col = this.memento.paramsObj.columns.find(c => c.name === label);
-        if ( !col ) {
+        var col = this.memento.paramsObj.columns.find(c => c.name === s);
+        if ( ! col ) {
           newMementoColumns.push({ name: label });
         } else {
           newMementoColumns.push(col);
@@ -304,6 +303,14 @@ foam.CLASS({
 
     async function initE() {
       var view = this;
+
+      //set memento's selected columns
+      if ( ! this.memento.paramsObj.columns ) {
+        this.memento.paramsObj.columns = this.columns_.map(c => {
+          return { name: this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c) }
+        });
+        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj)
+      }
 
       //otherwise on adding new column creating new EditColumnsView, which is closed by default
       if (view.editColumnsEnabled)
@@ -378,7 +385,11 @@ foam.CLASS({
                   addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + prop.name))
                   .style({ flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0', 'word-wrap' : 'break-word', 'white-space' : 'normal'})
-                  .add(view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col)).
+                  .add(view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col))./*
+                  .forEach(
+                    view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col),
+                    function(c, i) { if ( i ) this.add(' / '); this.add(c); }
+                  ).*/
                   callIf(isFirstLevelProperty && prop.sortable, function() {
                     this.on('click', function(e) {
                       view.sortBy(prop);

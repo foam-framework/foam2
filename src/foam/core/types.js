@@ -78,8 +78,10 @@ foam.CLASS({
      name: 'getter_',
      value: function(proto, prop, obj, key) {
        if ( foam.core.I18NString.GETTER__ ) return foam.core.I18NString.GETTER__(proto, prop, obj, key);
-       return obj.instance_[key];
-     }
+       var msg_ = obj.instance_[key];
+       if ( ! foam.i18n || ! foam.xmsg ) return msg_;
+       return foam.i18n.Lib.createText(prop.sourceCls_.id + '.' + this.name, msg_, msg_);
+      }
    }
   ]
 });
