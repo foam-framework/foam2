@@ -131,6 +131,17 @@ foam.CLASS({
           .build();
         user3 = (User) userDAO.put_(y, user3);
 
+        User user4 = new User.Builder(y)
+        .setId(89993)
+        .setFirstName("user_four")
+        .setLastName("lastname")
+        .setEmail("user4@example.com")
+        .setGroup("test")
+        .setLifecycleState(LifecycleState.ACTIVE)
+        .setSpid("other")
+        .build();
+        user4 = (User) userDAO.put_(y, user4);
+
         DummySp ns1 = new DummySp.Builder(y).setOwner(user1.getId()).build();
         ns1 = (DummySp) dao.put(ns1).fclone();
         DummySp ns2 = new DummySp.Builder(y).setOwner(user2.getId()).build();
@@ -139,8 +150,7 @@ foam.CLASS({
         ns3 = (DummySp) dao.put(ns3);
 
         groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("service.DummySpDAO").build());
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("dummysp.read.*").build());
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("user.read."+user1.getId()).build());
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("dummysp.read." + ns1.getId()).build());
 
         y = Auth.sudo(y, user1);
         dao = dao.inX(y);
@@ -161,7 +171,7 @@ foam.CLASS({
         nss = sink.getArray();
         test (nss.size() == 1, "ReferenceTest DAO select filtered on spid. expected: 1, found: "+nss.size());
 
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("user.read."+user2.getId()).build());
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("dummysp.read." + ns2.getId()).build());
 
         y = Auth.sudo(y, user1);
         dao = dao.inX(y);
@@ -178,7 +188,7 @@ foam.CLASS({
         nss = sink.getArray();
         test (nss.size() == 1, "ReferenceTest DAO select filtered on predicate. expected: 1, found: "+nss.size());
 
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("user.read."+user3.getId()).build());
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("dummysp.read." + ns3.getId()).build());
 
         // select before changing spid
         sink = new ArraySink();
@@ -194,10 +204,12 @@ foam.CLASS({
         test (nss.size() == 1, "ReferenceTest DAO select filtered on predicate. expected: 1, found: "+nss.size());
 
         // change spid
-        user3 = (User) user3.fclone();
-        user3.setSpid("other");
-        y = Auth.sudo(y, ctxUser);
-        user3 = (User) userDAO.put_(y, user3);
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("dummysp.update." + ns3.getId()).build());
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("serviceprovider.update.spid").build());
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("serviceprovider.update.other").build());
+        ns3 = (DummySp) ns3.fclone();
+        ns3.setSpid("other"); 
+        dao.put(ns3);
 
         y = Auth.sudo(y, user1);
         dao = dao.inX(y);
