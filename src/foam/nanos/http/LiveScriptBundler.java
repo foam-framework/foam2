@@ -57,9 +57,6 @@ public class LiveScriptBundler
     fileNames_ = new HashSet<>();
     path_ = path;
 
-    System.out.println("=== LSB DEBUG ===");
-    System.out.println(path);
-
     try {
       // Create list of files.js locations
       var filesPaths = new HashSet<String>();
@@ -92,9 +89,7 @@ public class LiveScriptBundler
             }
 
             // Add this file if it was found inside a `src` folder
-            if ( sourcePath != null && filePaths.contains(sourcePath) ) {
-              System.out.println("--- Another Debug ---");
-              System.out.println(sourcePath.toString());
+            if ( sourcePath != null ) {
               filesPaths.add(sourcePath.toString());
             }
           }
@@ -106,14 +101,9 @@ public class LiveScriptBundler
 
       // Read each files.js file
       for ( String currentFilesPath : filesPaths ) {
-        System.out.println("--- Watcher Debug ---");
-        System.out.println(currentFilesPath);
         DirectoryWatcher.builder()
           .path(Paths.get(path_, currentFilesPath))
           .listener(event -> {
-            System.out.println("--- Boop ---");
-            System.out.println(event.path());
-            System.out.println(event.path().getFileName());
             if ( event.path().getFileName().toString().endsWith(".js") ) {
               scheduleRebuild();
             }
