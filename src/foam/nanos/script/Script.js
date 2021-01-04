@@ -18,7 +18,9 @@ foam.CLASS({
   requires: [
     'foam.nanos.script.Language',
     'foam.nanos.script.ScriptStatus',
-    'foam.nanos.notification.ScriptRunNotification'
+    'foam.nanos.notification.Notification',
+    'foam.nanos.notification.ScriptRunNotification',
+    'foam.nanos.notification.ToastState'
   ],
 
   imports: [
@@ -332,6 +334,36 @@ foam.CLASS({
       `
     },
     {
+      name: 'canRun',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      type: 'Boolean',
+      javaCode: `
+        // Run on all instances if:
+        // - startup "main" script, or
+        // - not-clusterable, or
+        // - a suitable cluster configuration
+
+        String startScript = System.getProperty("foam.main", "main");
+        if ( this instanceof foam.nanos.cron.Cron &&
+             getStatus() == ScriptStatus.SCHEDULED &&
+             ! getId().equals(startScript) &&
+             getClusterable() ) {
+          foam.nanos.medusa.ClusterConfigSupport support = (foam.nanos.medusa.ClusterConfigSupport) x.get("clusterConfigSupport");
+          if ( support != null &&
+               ! support.cronEnabled(x) ) {
+            ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Cron execution disabled.", getId(), getDescription());
+            throw new ClientRuntimeException("Cron execution disabled");
+          }
+        }
+        return true;
+      `
+    },
+    {
       name: 'runScript',
       code: function() {
         var log = function() {
@@ -351,25 +383,11 @@ foam.CLASS({
         }
       ],
       javaCode: `
+        canRun(x);
+
         PM               pm          = new PM.Builder(x).setKey(Script.getOwnClassInfo().getId()).setName(getId()).build();
         RuntimeException thrown      = null;
         Language         l           = getLanguage();
-        String           startScript = System.getProperty("foam.main", "main");
-        // Run on all instances if:
-        // - startup "main" script, or
-        // - not-clusterable, or
-        // - a suitable cluster configuration
-
-        if ( ! getId().equals(startScript) &&
-             getClusterable() ) {
-          foam.nanos.medusa.ClusterConfigSupport support = (foam.nanos.medusa.ClusterConfigSupport) x.get("clusterConfigSupport");
-          if ( support != null &&
-               this instanceof foam.nanos.cron.Cron &&
-               ! support.cronEnabled(x) ) {
-            ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Cron execution disabled", getId(), getDescription());
-            return;
-          }
-        }
 
         Thread.currentThread().setPriority(getPriority());
 
@@ -489,6 +507,15 @@ foam.CLASS({
             if ( script.status === self.ScriptStatus.SCHEDULED ) {
               self.poll();
             }
+          }).catch(function(e) {
+            var notification = self.Notification.create();
+            notification.userId = self.subject && self.subject.realUser ?
+              self.subject.realUser.id : self.user.id;
+            notification.toastMessage = e.message || e;
+            notification.toastState = self.ToastState.REQUESTED;
+            notification.severity = foam.log.LogLevel.WARN;
+            notification.transient = true;
+            self.__subContext__.notificationDAO.put(notification);
           });
         } else {
           this.status = this.ScriptStatus.RUNNING;

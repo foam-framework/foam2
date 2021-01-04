@@ -55,10 +55,14 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-        Script script = (Script) getDelegate().put_(x, obj);
-        getLogger().debug("put", script.getId(), script.getStatus());
+        Script script = (Script) obj;
         if ( script.getStatus() == ScriptStatus.SCHEDULED ) {
-          this.runScript(x, script);
+          if ( script.canRun(x) ) {
+            script = (Script) getDelegate().put_(x, script);
+            runScript(x, script);
+          } 
+        } else {
+          script = (Script) getDelegate().put_(x, script);
         }
         return script;
       `
@@ -88,7 +92,7 @@ foam.CLASS({
                 s.setStatus(ScriptStatus.ERROR);
                 getDelegate().put_(x, s);
                 getLogger().error("agency", s.getId(), t);
-              }
+             }
             }
           }, "Run script: " + script.getId());
         return script;
