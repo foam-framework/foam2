@@ -147,7 +147,6 @@ foam.CLASS({
       code: async function(self = this) {
         console.log('RegionCView.refresh '+self.children.length);
         if ( self.config ) {
-          // self.config = await self.dao.find(self.config.id);
           self.config = await self.dao.find(
             self.AND(
               self.EQ(self.ClusterConfig.REALM, self.config.realm),
