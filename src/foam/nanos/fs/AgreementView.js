@@ -37,7 +37,7 @@ foam.CLASS({
   methods: [
     async function initE() {
       this.SUPER();
-      let file = await ctrl.__subContext__.fileDAO.find(this.fileId);
+      let file = await this.fileDAO.find(this.fileId);
       if ( file ) {
         if ( file.mimeType === "application/pdf" ) {
           this
