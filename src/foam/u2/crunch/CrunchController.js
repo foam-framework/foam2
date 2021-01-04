@@ -110,7 +110,7 @@ foam.CLASS({
           .add(this.SkipGrantedAgent)
           .add(this.RequirementsPreviewAgent)
           .add(this.StepWizardAgent)
-          .add(this.PutFinalJunctionsAgent)
+          .add(this.PutFinalPayloadsAgent)
           // .add(this.TestAgent)
           ;
       }

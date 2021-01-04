@@ -31,7 +31,13 @@ foam.CLASS({
 
         return this.capable.getCapablePayloadDAO().put(
           this.makePayload(wizardlet)
-        );
+        ).then(payload => {
+          this.load_(wizardlet, payload);
+          if ( wizardlet.isValid ) {
+            wizardlet.status = this.CapabilityJunctionStatus.PENDING;
+          }
+          return payload;
+        });
       }
     },
     async function cancel(wizardlet) {
@@ -41,22 +47,24 @@ foam.CLASS({
       );
     },
     async function load(wizardlet) {
-      wizardlet.isLoaded = true;
-
       var targetPayload = await this.capable.getCapablePayloadDAO().find(
         wizardlet.capability.id ) || this.targetPayload;
+      this.load_(wizardlet, targetPayload);
+    },
+    async function load_(wizardlet, payload) {
+      wizardlet.isLoaded = true;
 
       wizardlet.status = this.CapabilityJunctionStatus.AVAILABLE;
 
-      if ( targetPayload ) wizardlet.status = targetPayload.status;
+      if ( payload ) wizardlet.status = payload.status;
 
       // No 'of'? No problem
       if ( ! wizardlet.of ) return;
 
       // Load CapablePayload data to wizardlet
       var loadedData = wizardlet.of.create({}, wizardlet);
-      if ( targetPayload && targetPayload.data )
-        loadedData.copyFrom(targetPayload.data);
+      if ( payload && payload.data )
+        loadedData.copyFrom(payload.data);
 
       // Set transient 'capability' property if it exists
       var prop = wizardlet.of.getAxiomByName('capability');

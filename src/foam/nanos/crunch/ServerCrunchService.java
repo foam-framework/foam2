@@ -28,6 +28,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static foam.mlang.MLang.*;
+import static foam.nanos.crunch.CapabilityJunctionStatus.*;
 
 public class ServerCrunchService extends ContextAwareSupport implements CrunchService, NanoService {
   private Map<String, List<String>> prereqsCache_ = null;
@@ -324,6 +325,10 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     Subject subject = (Subject) x.get("subject");
     UserCapabilityJunction ucj = this.getJunction(x, capabilityId);
 
+    if ( ucj.getStatus() == AVAILABLE && status == null ) {
+      ucj.setStatus(ACTION_REQUIRED);
+    }
+
     if ( data != null ) {
       ucj.setData(data);
     }
@@ -349,8 +354,9 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     X x, Subject subject, String capabilityId, FObject data,
     CapabilityJunctionStatus status
   ) {
-    UserCapabilityJunction ucj = this.getJunction(x, capabilityId);
-    
+    UserCapabilityJunction ucj = this.getJunctionForSubject(
+      x, capabilityId, subject);
+
     if ( data != null ) {
       ucj.setData(data);
     }
@@ -358,17 +364,8 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       ucj.setStatus(status);
     }
 
-    if (
-      subject.getRealUser().isAdmin()
-      && subject.getRealUser() != subject.getUser()
-    ) {
-      var logger = (Logger) x.get("logger");
-      // This may be correct when testing features as an admin user
-      logger.warning(
-        "admin user is lastUpdatedRealUser on an agent-associated UCJ");
-    }
-    ucj.setLastUpdatedRealUser(subject.getRealUser().getId());
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+    var subjectX = x.put("subject", subject);
     return (UserCapabilityJunction) userCapabilityJunctionDAO.inX(x).put(ucj);
   }
 

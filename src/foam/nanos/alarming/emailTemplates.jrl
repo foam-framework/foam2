@@ -1,0 +1,14 @@
+p({
+  "class": "foam.nanos.notification.email.EmailTemplate",
+  "id": "490ACA59-6329-433A-8A4E-62997E2D2152",
+  "name": "alarm",
+  "subject": "Alarm {{alarm.status}} - {{alarm.name}}",
+  "body": """name: {{alarm.name}}
+status: {{alarm.status}}
+host: {{alar.host}}
+started: {{alarm.started}}
+cleared: {{alarm.cleared}}
+severity: {{alarm.severity}}
+info: {{alarm.note}}
+  """
+})
