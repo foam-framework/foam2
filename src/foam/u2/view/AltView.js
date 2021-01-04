@@ -91,8 +91,8 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      if ( this.memento && this.memento.paramsObj.selectedView )
-        this.selectedView = this.memento.paramsObj.selectedView;
+      if ( this.memento && this.memento.paramsObj.sV )
+        this.selectedView = this.memento.paramsObj.sV;
       else {
         self.setMementoWithSelectedView();
       }
@@ -119,9 +119,9 @@ foam.CLASS({
     function setMementoWithSelectedView() {
       var view = this.views.find(v => v[0] == this.selectedView);
       if ( view )
-        this.memento.paramsObj.selectedView = view[1];
+        this.memento.paramsObj.sV = view[1];
       else
-        delete this.memento.paramsObj.selectedView;
+        delete this.memento.paramsObj.sV;
 
       this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
     }
