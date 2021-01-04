@@ -19,7 +19,6 @@ foam.CLASS({
     ^pdf embed {
       width: 100%;
       height: 500px;
-
     }
   `,
 
@@ -28,7 +27,6 @@ foam.CLASS({
       name: 'fileId'
     }
   ],
-
 
   methods: [
     async function initE() {
@@ -44,8 +42,6 @@ foam.CLASS({
                 'type': file.mimeType
               })
             .end();
-
-
         } else if ( file.mimeType === "plain/text" ) {
           let text = await file.getText();
           this
@@ -57,5 +53,4 @@ foam.CLASS({
       }
     }
   ]
-
 })
