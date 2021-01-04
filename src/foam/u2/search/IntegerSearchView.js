@@ -18,6 +18,16 @@ foam.CLASS({
 
   requires: [
     'foam.mlang.predicate.True',
+    'foam.u2.view.ChoiceView'
+  ],
+
+  messages: [
+    { name: 'LABEL_EQ',    message: 'is equal to' },
+    { name: 'LABEL_NEQ',    message: 'is not equal to' },
+    { name: 'LABEL_GT',    message: 'is greater than' },
+    { name: 'LABEL_LT',    message: 'is less than' },
+    { name: 'LABEL_GTE',    message: 'is greater than or equal to' },
+    { name: 'LABEL_LTE',    message: 'is less than or equal to' }
   ],
 
   properties: [
@@ -31,19 +41,6 @@ foam.CLASS({
       class: 'String',
       name: 'qualifier',
       documentation: `Lets the user choose an MLang predicate to filter by.`,
-      view: {
-        class: 'foam.u2.view.ChoiceView',
-        choices: [
-          ['True', '--'],
-          ['Eq', 'is equal to'],
-          ['Neq', 'is not equal to'],
-          ['Gt', 'is greater than'],
-          ['Lt', 'is less than'],
-          ['Gte', 'is greater than or equal to'],
-          ['Lte', 'is less than or equal to'],
-        ],
-        defaultValue: 'True'
-      }
     },
     {
       class: 'Float',
@@ -81,7 +78,19 @@ foam.CLASS({
     function initE() {
       this
         .addClass(this.myClass())
-        .start(this.QUALIFIER)
+        .start(this.ChoiceView, {
+              data$: this.qualifier$,
+              choices: [
+                ['True', '--'],
+                ['Eq', this.LABEL_EQ],
+                ['Neq', this.LABEL_NEQ],
+                ['Gt', this.LABEL_GT],
+                ['Lt', this.LABEL_LT],
+                ['Gte', this.LABEL_GTE],
+                ['Lte', this.LABEL_LTE],
+              ],
+              defaultValue: 'True'
+            })
           .start('div').addClass(this.myClass('carrot')).end()
         .end()
         .add(this.AMOUNT);
