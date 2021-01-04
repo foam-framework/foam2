@@ -133,9 +133,9 @@ foam.CLASS({
 
         if (  this.memento ) {
           if ( value ) {
-            this.memento.paramsObj.search = value;
+            this.memento.paramsObj.s = value;
           } else {
-            delete this.memento.paramsObj.search;
+            delete this.memento.paramsObj.s;
           }
           this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
         }
