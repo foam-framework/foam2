@@ -233,6 +233,14 @@ foam.CLASS({
         nss = sink.getArray();
         test (nss.size() == 0, "ReferenceTest DAO select filtered on spid. expected: 0, found: "+nss.size());
 
+        // test that it is found by a user on the new spid
+        y = Auth.sudo(y, user4);
+        dao = dao.inX(y);
+        sink = new ArraySink();
+        dao.select(sink);
+        nss = sink.getArray();
+        test (nss.size() == 1, "ReferenceTest DAO select filtered on spid. expected: 1, found: "+nss.size());
+
         // delete/remove
      `
     }
