@@ -353,3 +353,5 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.search.IntegerSearchView
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.search.IntegerSearchView.LABEL_LT",target:"é menos do que"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.search.IntegerSearchView.LABEL_GTE",target:"é maior que ou igual a"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.search.IntegerSearchView.LABEL_LTE",target:"é menor ou igual a"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.FilterView.LABEL_SEARCH",target:"Pesquisa"})
