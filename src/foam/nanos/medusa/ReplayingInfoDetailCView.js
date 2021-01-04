@@ -163,6 +163,18 @@ foam.CLASS({
           return '';
         }
       });
+      label.color = 'red';
+      this.add(label);
+
+      label = this.makeLabel();
+      label.text$ = this.config$.map(function(c) {
+        if ( c.alarms && c.alarms > 0 ) {
+          return 'Alarms: '+c.alarms;
+        } else {
+          return '';
+        }
+      });
+      label.color = 'red';
       this.add(label);
     },
     {

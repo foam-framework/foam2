@@ -153,6 +153,11 @@ foam.CLASS({
       storageTransient: true
     },
     {
+      name: 'alarms',
+      class: 'Int',
+      value: 0
+    },
+    {
       name: 'replayingInfo',
       class: 'FObjectProperty',
       of: 'foam.nanos.medusa.ReplayingInfo',
