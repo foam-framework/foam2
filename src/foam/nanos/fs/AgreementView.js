@@ -1,11 +1,17 @@
+/**
+ * @license
+ * Copyright 2021 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
-  package: 'foam.u2.view',
-  name: 'agreementView',
+  package: 'foam.nanos.fs',
+  name: 'AgreementView',
   extends: 'foam.u2.Controller',
 
   imports: [
-      'fileDAO'
-    ],
+    'fileDAO'
+  ],
 
   css: `
     ^text {
