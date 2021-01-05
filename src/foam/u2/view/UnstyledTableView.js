@@ -271,9 +271,9 @@ foam.CLASS({
         var mementoColumn = this.memento.paramsObj.c.find(c => c.n === column.name);
         var orderLetter = this.order === column ? 'D' : 'A';
         if ( ! mementoColumn ) {
-          this.memento.paramsObj.c.push({ n: column.name,  order: orderLetter });
+          this.memento.paramsObj.c.push({ n: column.name,  o: orderLetter });
         } else {
-          mementoColumn.order = orderLetter;
+          mementoColumn.o = orderLetter;
         }
         this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
       }
@@ -451,10 +451,10 @@ foam.CLASS({
 
           if ( this.memento && this.memento.paramsObj.c ) {
             for ( var c of this.memento.paramsObj.c ) {
-              if ( c.order && ! c.n.includes('.')) {
+              if ( c.o && ! c.n.includes('.')) {
                 var prop = view.props.find(p => p.fullPropertyName === c.n );
                 if ( prop ) {
-                  if ( c.order.toLowerCase() === 'd' )
+                  if ( c.o.toLowerCase() === 'd' )
                     dao = dao.orderBy(this.DESC(prop.property));
                   else
                     dao = dao.orderBy(prop.property);
