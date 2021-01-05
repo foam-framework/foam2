@@ -93,6 +93,17 @@ foam.CLASS({
     },
     {
       name: 'paramsObj',
+      documentation: `
+        paramsObj short names:
+          c  for columns
+          f  for filters
+          n  for name
+          o  for order as in orderBy
+          r  for number of record to which table will be scrolled to
+          s  for search
+          sT for selected tab
+          sV for selected view
+      `,
       postSet: function() {
         if ( this.feedback_ ) {
           return;
