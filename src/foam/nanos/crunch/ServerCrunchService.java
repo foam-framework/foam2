@@ -19,6 +19,7 @@ import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.crunch.lite.Capable;
 import foam.nanos.crunch.CapabilityJunctionPayload;
+import foam.nanos.crunch.ui.PrerequisiteAwareWizardlet;
 import foam.nanos.crunch.ui.WizardState;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
@@ -109,7 +110,11 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
           .filter(c -> ! alreadyListed.contains(c))
           .toArray(String[]::new);
 
-      if ( cap instanceof MinMaxCapability && ! rootId.equals(sourceCapabilityId) ) {
+      var prereqAware = cap.getWizardlet() instanceof PrerequisiteAwareWizardlet || (
+        cap.getBeforeWizardlet() != null &&
+        cap.getBeforeWizardlet() instanceof PrerequisiteAwareWizardlet
+      );
+      if ( prereqAware && ! rootId.equals(sourceCapabilityId) ) {
         List minMaxArray = new ArrayList<>();
 
         // Manually grab the direct  prereqs to the  MinMaxCapability
