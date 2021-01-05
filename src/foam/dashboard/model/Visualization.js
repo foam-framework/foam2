@@ -19,7 +19,6 @@ foam.CLASS({
     'foam.mlang.predicate.False',
     'foam.mlang.predicate.True',
   ],
-
   properties: [
     {
       class: 'String',
@@ -131,8 +130,6 @@ foam.CLASS({
       name: 'views',
       hidden: true,
       factory: function() {
-
-
         return [
           [ this.DetailView, 'Configuration' ]
         ]
@@ -173,7 +170,6 @@ foam.CLASS({
     [ '', 'propertyChange.sink', 'update' ],
     [ '', 'propertyChange.dao', 'update' ],
   ],
-
   listeners: [
     function update() {
       var sink = this.sink.clone();
