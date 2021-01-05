@@ -79,8 +79,10 @@ foam.CLASS({
     {
       name: 'put',
       args: [ { name: 'x', type: 'X' } ],
+      javaThrows: [
+        'java.lang.Exception'
+      ],
       javaCode: `
-      try {
         DAO dao = getDAO(x);
         if ( dao == null )
           return;
@@ -112,10 +114,6 @@ foam.CLASS({
         
         HttpServletResponse resp = x.get(HttpServletResponse.class);
         resp.setStatus(HttpServletResponse.SC_OK);
-      }
-      catch (java.lang.Exception e) {
-        throw new RuntimeException(e);
-      }
       `
     },
     {
@@ -265,8 +263,13 @@ foam.CLASS({
       args: [ { name: 'dao', type: 'DAO' }, { name: 'obj', type: 'FObject' } ],
       synchronized: true,
       javaCode: `
-      FObject oldObj = dao.find(obj);
-      return dao.put(oldObj == null ? obj : oldObj.copyFrom(obj));
+      FObject nu = obj;
+      FObject old = dao.find(obj);
+      if ( old != null ) {
+        nu = old.fclone();
+        nu.copyFrom(obj);
+      }
+      return dao.put(nu);
       `
     }
   ]

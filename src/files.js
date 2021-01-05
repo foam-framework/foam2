@@ -870,6 +870,7 @@ FOAM_FILES([
   { name: "foam/u2/wizard/WizardPosition" },
   { name: "foam/u2/wizard/Wizardlet" },
   { name: "foam/u2/wizard/WizardletSection" },
+  { name: "foam/u2/wizard/WizardletIndicator" },
   { name: "foam/u2/wizard/BaseWizardlet" },
   { name: "foam/u2/wizard/WizardletView" },
   { name: "foam/u2/wizard/StepWizardConfig" },
@@ -995,9 +996,9 @@ FOAM_FILES([
   { name: 'foam/nanos/fs/fileDropZone/FilePreview', flags: ['web'] },
   { name: 'foam/nanos/fs/TextSaveView' },
 
-
   { name: 'foam/counter/Counter' },
   { name: 'foam/dashboard/view/DashboardCitationView' },
   { name: 'foam/dashboard/view/DateRangeChoiceView' },
+  { name: 'foam/nanos/fs/AgreementView' }
 
 ])
