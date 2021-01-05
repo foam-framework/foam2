@@ -52,7 +52,6 @@ foam.CLASS({
 
       var addPrerequisite = (wizardlet) => {
         var defaultPrerequisiteHandling = true;
-        var preventPush = false;
 
         if ( this.isPrerequisiteAware(rootWizardlet) ) {
           rootWizardlet.addPrerequisite(wizardlet);
@@ -60,27 +59,24 @@ foam.CLASS({
         }
 
         if ( beforeWizardlet && this.isPrerequisiteAware(beforeWizardlet) ) {
-          preventPush = beforeWizardlet.addPrerequisite(wizardlet);
+          beforeWizardlet.addPrerequisite(wizardlet);
           defaultPrerequisiteHandling = false;
         }
 
         if ( defaultPrerequisiteHandling )
           wizardlet.isAvailable$.follow(rootWizardlet.isAvailable$);
-
-        return preventPush;
       }
 
       for ( let capability of capabilityPrereqs ) {
         if ( Array.isArray(capability) ) {
           let subWizardlets = await this.parseArrayToWizardlets(capability);
-          let preventPush =
-            addPrerequisite(subWizardlets[subWizardlets.length - 1]);
-          if ( ! preventPush ) wizardlets.push(...subWizardlets);
+          addPrerequisite(subWizardlets[subWizardlets.length - 1]);
+          wizardlets.push(...subWizardlets);
           continue;
         }
         let wizardlet = this.getWizardlet(capability);
-        let preventPush = addPrerequisite(wizardlet);
-        if ( ! preventPush ) wizardlets.push(wizardlet);
+        addPrerequisite(wizardlet);
+        wizardlets.push(wizardlet);
       }
 
       if ( beforeWizardlet ) wizardlets.unshift(beforeWizardlet);
