@@ -36,12 +36,17 @@ foam.CLASS({
       name: 'config',
       class: 'FObjectProperty',
       of: 'foam.nanos.medusa.ClusterConfig'
+    },
+    {
+      name: 'since',
+      class: 'Date'
     }
   ],
 
   methods: [
     async function initCView() {
       this.SUPER();
+
       this.config = await this.dao.find(
         this.AND(
           this.EQ(this.ClusterConfig.REALM, this.config.realm),
@@ -56,17 +61,31 @@ foam.CLASS({
         return 'lightyellow';
       }.bind(this));
 
+      // TODO: put in center of circle
       var label = this.Label.create({
-        text: 'Region' + ' ' + this.config.region,
+        text: 'Region ' + this.config.region,
         align: 'left',
         y: 10,
         x: 10
       });
       this.add(label);
       label = this.Label.create({
-        text: 'Status' + ' ' + this.config.regionStatus,
+        text$: this.config$.map(function(c) {
+          return 'Status ' + c.regionStatus;
+        }),
         align: 'left',
-        y: 20,
+        y: 30,
+        x: 10
+      });
+      this.add(label);
+
+      this.since = Date.now();
+      label = this.Label.create({
+        text$: this.since$.map(function(s) {
+          return 'Since '+s;
+        }),
+        align: 'left',
+        y: 50,
         x: 10
       });
       this.add(label);
@@ -146,6 +165,7 @@ foam.CLASS({
       name: 'refresh',
       code: async function(self = this) {
         console.log('RegionCView.refresh '+self.children.length);
+        self.since = Date.now();
         if ( self.config ) {
           self.config = await self.dao.find(
             self.AND(
