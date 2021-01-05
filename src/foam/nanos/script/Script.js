@@ -131,10 +131,10 @@ foam.CLASS({
       name: 'enabled',
       includeInDigest: true,
       documentation: 'Enables script.',
-      tableCellFormatter: function(value) {
+      tableCellFormatter: function(value, obj) {
         this.start()
-          .style({ color: value ? 'green' : 'gray' })
-          .add(value ? this.ENABLED_YES : this.ENABLED_NO )
+          .style({ color: value ? /*%APPROVAL3*/ 'green' : /*%GREY2%*/ 'grey' })
+          .add(value ? obj.ENABLED_YES : obj.ENABLED_NO )
         .end();
       },
       tableWidth: 90,
@@ -153,13 +153,15 @@ foam.CLASS({
       value: 5,
       javaValue: 5,
       includeInDigest: false,
-      view: {
-        class: 'foam.u2.view.ChoiceView',
-        choices: [
-          [4, this.PRIORITY_LOW],
-          [5, this.PRIORITY_MEDIUM],
-          [6, this.PRIORITY_HIGH]
-        ]
+      view: function(_, X ) {
+        return {
+          class: 'foam.u2.view.ChoiceView',
+          choices: [
+            [4, X.data.PRIORITY_LOW],
+            [5, X.data.PRIORITY_MEDIUM],
+            [6, X.data.PRIORITY_HIGH]
+          ]
+        };
       }
     },
     {
@@ -517,7 +519,7 @@ foam.CLASS({
             var notification = self.Notification.create();
             notification.userId = self.subject && self.subject.realUser ?
               self.subject.realUser.id : self.user.id;
-            notification.toastMessage = self.cls_.name + ' ' + EXECUTION_INVOKED;
+            notification.toastMessage = self.cls_.name + ' ' + self.EXECUTION_INVOKED;
             notification.toastState = self.ToastState.REQUESTED;
             notification.severity = foam.log.LogLevel.INFO;
             notification.transient = true;
@@ -530,7 +532,7 @@ foam.CLASS({
             var notification = self.Notification.create();
             notification.userId = self.subject && self.subject.realUser ?
               self.subject.realUser.id : self.user.id;
-            notification.toastMessage = self.cls_.name + ' ' + EXECUTION_FAILED;
+            notification.toastMessage = self.cls_.name + ' ' + self.EXECUTION_FAILED;
             notification.toastSubMessage = e.message || e;
             notification.toastState = self.ToastState.REQUESTED;
             notification.severity = foam.log.LogLevel.WARN;
@@ -544,7 +546,7 @@ foam.CLASS({
               var notification = this.Notification.create();
               notification.userId = this.subject && this.subject.realUser ?
                 this.subject.realUser.id : this.user.id;
-              notification.toastMessage = this.cls_.name + ' ' + EXECUTION_INVOKED;
+              notification.toastMessage = this.cls_.name + ' ' + this.EXECUTION_INVOKED;
               notification.toastState = this.ToastState.REQUESTED;
               notification.severity = foam.log.LogLevel.INFO;
               notification.transient = true;
@@ -557,7 +559,7 @@ foam.CLASS({
               var notification = this.Notification.create();
               notification.userId = this.subject && this.subject.realUser ?
                 this.subject.realUser.id : this.user.id;
-              notification.toastMessage = this.cls_.name + ' ' + EXECUTION_FAILED;
+              notification.toastMessage = this.cls_.name + ' ' + this.EXECUTION_FAILED;
               notification.toastSubMessage = e.message || e;
               notification.toastState = this.ToastState.REQUESTED;
               notification.severity = foam.log.LogLevel.WARN;
