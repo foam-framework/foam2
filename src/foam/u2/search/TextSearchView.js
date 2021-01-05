@@ -33,6 +33,10 @@ foam.CLASS({
     'foam.mlang.Expressions'
   ],
 
+  messages: [
+    { name: 'LABEL_SEARCH',    message: 'Search' }
+  ],
+
   properties: [
     {
       class: 'Class',
@@ -82,7 +86,7 @@ foam.CLASS({
     {
       name: 'label',
       expression: function(property) {
-        return property && property.label ? property.label : 'Search';
+        return property && property.label ? property.label : this.LABEL_SEARCH;
       }
     },
     {
@@ -133,9 +137,9 @@ foam.CLASS({
 
         if (  this.memento ) {
           if ( value ) {
-            this.memento.paramsObj.search = value;
+            this.memento.paramsObj.s = value;
           } else {
-            delete this.memento.paramsObj.search;
+            delete this.memento.paramsObj.s;
           }
           this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
         }

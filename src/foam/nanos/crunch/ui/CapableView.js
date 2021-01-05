@@ -42,7 +42,10 @@ foam.CLASS({
       of: 'foam.u2.wizard.BaseWizardlet',
       name: 'wizardlets',
       documentation: 'wizardlets for capable payloads',
-      postSet: function() {
+      postSet: function(_, n) {
+        var promises = [];
+        n.forEach(wizard => promises.push(wizard.save()))
+        Promise.all(promises).then(cps => console.log(cps))
         this.listenOnPayloads();
       }
     },
