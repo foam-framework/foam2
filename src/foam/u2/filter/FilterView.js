@@ -182,6 +182,7 @@ foam.CLASS({
     { name: 'LINK_SIMPLE', message: 'Switch to simple filters'},
     { name: 'MESSAGE_ADVANCEDMODE', message: 'Advanced filters are currently being used.'},
     { name: 'MESSAGE_VIEWADVANCED', message: 'View filters'},
+    { name: 'LABEL_SEARCH', message: 'Search'},
   ],
 
   properties: [
@@ -305,7 +306,7 @@ foam.CLASS({
               searchValue: self.searchValue,
               viewSpec: {
                 class: 'foam.u2.tag.Input',
-                placeholder: 'Search'
+                placeholder: this.LABEL_SEARCH
               }
             }, self.generalSearchField$)
               .addClass(self.myClass('general-field'))
