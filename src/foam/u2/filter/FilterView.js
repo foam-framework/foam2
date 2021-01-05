@@ -182,6 +182,7 @@ foam.CLASS({
     { name: 'LINK_SIMPLE', message: 'Switch to simple filters'},
     { name: 'MESSAGE_ADVANCEDMODE', message: 'Advanced filters are currently being used.'},
     { name: 'MESSAGE_VIEWADVANCED', message: 'View filters'},
+    { name: 'LABEL_SEARCH', message: 'Search'},
   ],
 
   properties: [
@@ -280,9 +281,9 @@ foam.CLASS({
     function initE() {
       var self = this;
 
-      if ( this.memento && this.memento.paramsObj.filters ) {
-        this.memento.paramsObj.filters.forEach(f => {
-          self.filterController.setExistingPredicate(f.criteria, f.name, foam.json.parseString(f.pred, this.__subContext__));
+      if ( this.memento && this.memento.paramsObj.f ) {
+        this.memento.paramsObj.f.forEach(f => {
+          self.filterController.setExistingPredicate(f.criteria, f.n, foam.json.parseString(f.pred, this.__subContext__));
         });
       }
 
@@ -305,7 +306,7 @@ foam.CLASS({
               searchValue: self.searchValue,
               viewSpec: {
                 class: 'foam.u2.tag.Input',
-                placeholder: 'Search'
+                placeholder: this.LABEL_SEARCH
               }
             }, self.generalSearchField$)
               .addClass(self.myClass('general-field'))

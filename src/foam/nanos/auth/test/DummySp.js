@@ -10,6 +10,15 @@ foam.CLASS({
 
   documentation: 'A fake/mock/dummy model just to test ServiceProvideAware',
 
+  implements: [
+    'foam.nanos.auth.ServiceProviderAware'
+  ],
+
+  javaImports: [
+    'foam.nanos.auth.ServiceProviderAware',
+    'foam.nanos.auth.ServiceProviderAwareSupport'
+  ],
+
   properties: [
     {
       name: 'id',
@@ -19,6 +28,20 @@ foam.CLASS({
       name: 'owner',
       class: 'Reference',
       of: 'foam.nanos.auth.User'
+    },
+    {
+      name: 'spid',
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
+      storageTransient: true,
+      javaFactory: `
+        var map = foam.util.Arrays.asMap(new Object[]
+          {
+            DummySp.class.getName(),
+            new foam.core.PropertyInfo[] { DummySp.OWNER }
+          });
+        return new ServiceProviderAwareSupport().findSpid(getX(), map, this);
+      `
     }
   ]
 });
