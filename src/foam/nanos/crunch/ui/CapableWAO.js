@@ -34,7 +34,7 @@ foam.CLASS({
         ).then(payload => {
           this.load_(wizardlet, payload);
           if ( wizardlet.isValid ) {
-            wizardlet.status = this.CapabilityJunctionStatus.PENDING;
+            wizardlet.status = this.CapabilityJunctionStatus.ACTION_REQUIRED;
           }
           return payload;
         });
