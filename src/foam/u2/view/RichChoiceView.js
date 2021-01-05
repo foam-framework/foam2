@@ -366,11 +366,11 @@ foam.CLASS({
       `
     },
     {
-      type: 'Context',
-      name: 'actionContext',
+      class: 'FObjectProperty',
+      name: 'actionData',
       documentation: `
         Optional. If this is provided alongside an action, the action will be executed
-        using this context.
+        with this data in the context.
       `
     },
     {
@@ -532,10 +532,10 @@ foam.CLASS({
                       });
                     });
                   }))
-                  .add(this.slot(function(action, actionContext) {
-                    if ( action && actionContext) {
+                  .add(this.slot(function(action, actionData) {
+                    if ( action && actionData) {
                       return this.E()
-                        .startContext({data: actionContext})
+                        .startContext({ data: actionData })
                         .start(self.DefaultActionView, { action: action })
                           .addClass(self.myClass('action'))
                         .end()
