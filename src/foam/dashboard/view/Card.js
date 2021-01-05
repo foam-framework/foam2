@@ -18,7 +18,7 @@ foam.CLASS({
     'contentWidth as visualizationWidth',
     'contentHeight as visualizationHeight',
     'data.colors as visualizationColors',
-    'data.dao.of as of'
+    'data.dao.of as of',
   ],
   constants: [
     {
@@ -75,7 +75,10 @@ foam.CLASS({
       padding-bottom: 20px;
       font-weight: 500;
       height: 20px;
+      display: flex;
+      align-items: center;
       font-size: 17px;
+      justify-content: space-between;
     }
   `,
   methods: [

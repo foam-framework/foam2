@@ -25,11 +25,10 @@ foam.CLASS({
 
   methods: [
     function initE() {
-    var self = this;
-      this.
-        addClass(this.myClass()).
-        add(this.slot(function(data$dao, data$limit) {
-
+      var self = this;
+      this
+        .addClass(this.myClass())
+        .add(this.slot(function(data$dao, data$limit) {
           return self.E()
             .addClass(this.myClass())
             .select(data$dao.limit(data$limit), function(obj) {

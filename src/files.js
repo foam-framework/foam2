@@ -998,5 +998,6 @@ FOAM_FILES([
 
   { name: 'foam/counter/Counter' },
   { name: 'foam/dashboard/view/DashboardCitationView' },
+  { name: 'foam/dashboard/view/DateRangeChoiceView' },
 
 ])
