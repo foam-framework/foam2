@@ -37,8 +37,35 @@ foam.CLASS({
     }
   ],
   methods: [
-    function set(o, val) {
-      o.cls_.getAxiomByName(this.nestedProperty).set(o, val);
+    {
+      name: 'set',
+      args: [
+        {
+          name: 'o',
+          type: 'Object'
+        },
+        {
+          name: 'value',
+          type: 'Object'
+        }
+      ],
+      code: function(o, val) {
+        if ( this.nestedProperty.includes('.') ) return; 
+        o.cls_.getAxiomByName(this.nestedProperty).set(o, val);
+      },
+      javaCode: `
+        if ( getNestedProperty().contains(".") )
+          return;
+        Class cls = o.getClass();
+        try {
+          ClassInfo ci = (ClassInfo)cls.getField("classInfo_").get(o);
+          PropertyInfo pi = (PropertyInfo)ci.getAxiomByName(getNestedProperty());
+          pi.set(o, value);
+        } catch ( Throwable t ) {
+          Logger logger = (Logger) getX().get("logger");
+          logger.error(t);
+        }
+      `
     },
     {
       name: 'toString',
@@ -117,6 +144,8 @@ foam.CLASS({
           ClassInfo ci = getPropertyClassInfo(prop);
           return returnDotExprForNestedProperty(ci, propName, ++i, propExpr);
         } catch ( Throwable t ) {
+          Logger logger = (Logger) getX().get("logger");
+          logger.error(t);
           return null;
         }
       `
@@ -198,6 +227,8 @@ foam.CLASS({
         try {
           return prop.getClassInfo().getObjClass().getMethod("find" + StringUtil.capitalize(prop.getName()), foam.core.X.class);
         } catch( Throwable t ) {
+          Logger logger = (Logger) getX().get("logger");
+          logger.error(t);
           return null;
         }
       `
@@ -285,8 +316,8 @@ foam.CLASS({
           class: 'StringArray'
         }
       ],
-      code: function(of, propNames) {
-        return foam.mlang.sink.Projection.create({ exprs: this.returnArrayOfExprForArrayOfProperties(of, propNames) });
+      code: function(of, propNames, useProjection) {
+        return foam.mlang.sink.Projection.create({ exprs: this.returnArrayOfExprForArrayOfProperties(of, propNames), useProjection: useProjection });
       },
       javaCode: `
         Expr[] exprs = returnArrayOfExprForArrayOfProperties(x, of, propNames);

@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'foam.u2.detail',
   name: 'AbstractSectionedDetailView',
   extends: 'foam.u2.View',
+  flags: ['web'],
 
   documentation: `
     The abstract for property-sheet style Views with sections for editing an FObject.

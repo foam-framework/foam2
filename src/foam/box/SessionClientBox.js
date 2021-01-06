@@ -47,7 +47,10 @@ foam.CLASS({
       name: 'send',
       code: function send(msg) {
         var self = this;
-        if ( this.RPCErrorMessage.isInstance(msg.object) && msg.object.data.id === 'foam.nanos.auth.AuthenticationException' ) {
+        if (
+          this.RPCErrorMessage.isInstance(msg.object) &&
+          msg.object.data.id === 'foam.nanos.auth.AuthenticationException'
+        ) {
           // If the user is already logged in when this happens, then we know
           // that something occurred on the backend to destroy this user's
           // session. Therefore we reset the client state and ask them to log
@@ -92,6 +95,10 @@ foam.CLASS({
 
   requires: [ 'foam.box.SessionReplyBox' ],
 
+  imports: [
+    'sessionID as jsSessionID'
+  ],
+
   constants: [
     {
       name: 'SESSION_KEY',
@@ -103,33 +110,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'sessionName',
-      value: 'defaultSession'
-    },
-    {
-      class: 'String',
       name: 'sessionID',
-      factory: function() {
-        return localStorage[this.sessionName] ||
-            ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
-      },
-      swiftExpressionArgs: [ 'sessionName' ],
-      swiftExpression: `
-let defaults = UserDefaults.standard // TODO allow us to configure?
-if let id = defaults.string(forKey: sessionName) {
-  return id
-}
-let id = UUID().uuidString
-defaults.set(id, forKey: sessionName)
-return id
-      `,
-      javaFactory:
-`String uuid = (String) getX().get(getSessionName());
-if ( "".equals(uuid) ) {
-  uuid = java.util.UUID.randomUUID().toString();
-  getX().put(getSessionName(), uuid);
-}
-return uuid;`
+      factory: function() { return this.jsSessionID; }
     }
   ],
 
@@ -137,9 +119,7 @@ return uuid;`
     {
       name: 'send',
       code: function send(msg) {
-        msg.attributes[this.SESSION_KEY] = this.sessionID;
-
-        // console.log('***** SEND SESSION ID: ', this.sessionID/*foam.json.stringify(msg)*/);
+        msg.attributes[this.SESSION_KEY] = this.jsSessionID;
 
         msg.attributes.replyBox.localBox = this.SessionReplyBox.create({
           msg:       msg,

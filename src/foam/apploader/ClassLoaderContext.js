@@ -7,13 +7,16 @@
 foam.CLASS({
   package: "foam.apploader",
   name: "ClassLoaderContext",
+
   requires: [
     "foam.apploader.ClassLoader",
     "foam.apploader.WebModelFileDAO"
   ],
+
   exports: [
     'classloader'
   ],
+
   properties: [
     {
       name: "classloader",
@@ -22,12 +25,15 @@ foam.CLASS({
   ]
 });
 
+
 foam.SCRIPT({
   package: 'foam.apploader',
   name: 'ClassLoaderContextScript',
+
   requires: [
     'foam.apploader.ClassLoaderContext',
   ],
+
   code: function() {
     var classLoaderContext = foam.apploader.ClassLoaderContext.create(
         null, foam.__context__);
@@ -39,5 +45,5 @@ foam.SCRIPT({
       foam.__context__.classloader.latch(m);
       CLASS(m);
     };
-  },
+  }
 });

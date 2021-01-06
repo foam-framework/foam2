@@ -394,6 +394,11 @@ foam.CLASS({
       }
     },
 
+    function outputRegExp(o) {
+      // These methods happen to have identical implementation
+      this.outputFunction(o);
+    },
+
     function outputFObject(o, opt_cls) {
       if ( o.outputJSON ) {
         o.outputJSON(this);
@@ -474,6 +479,7 @@ foam.CLASS({
         Boolean:   function(o) { this.out(o); },
         Date:      function(o) { this.outputDate(o); },
         Function:  function(o) { this.outputFunction(o); },
+        RegExp:  function(o) { this.outputRegExp(o); },
         FObject: function(o, opt_cls) { this.outputFObject(o, opt_cls); },
         Array: function(o, opt_cls) {
           this.start('[');
@@ -681,6 +687,17 @@ foam.LIB({
       propertyPredicate: function(o, p) { return ! p.networkTransient; }
     }),
 
+    // Short, but exclude network-transient properties.
+    Dig: foam.json.Outputter.create({
+      pretty: true,
+      strict: false,
+      formatDatesAsNumbers: false,
+      outputDefaultValues: true,
+      useShortNames: false,
+      convertUnserializableToStubs: true,
+      propertyPredicate: function(o, p) { return ! p.externalTransient && ! p.networkTransient; }
+    }),
+
     // Short, but exclude storage-transient properties.
     Storage: foam.json.Outputter.create({
       pretty: false,
@@ -710,8 +727,8 @@ foam.LIB({
     {
       name: 'parse',
       args: [
-        { type: 'Any', name: 'o' },
-        { type: 'Class', name: 'opt_class' },
+        { type: 'Any',     name: 'o' },
+        { type: 'Class',   name: 'opt_class' },
         { type: 'Context', name: 'opt_ctx' },
       ],
       code: foam.mmethod({
@@ -798,12 +815,12 @@ foam.LIB({
               })
               continue;
             }
-            if ( ( key === 'of' ||
-                   key === 'class' ||
-                   key === 'view' ||
+            if ( ( key === 'of'          ||
+                   key === 'class'       ||
+                   key === 'view'        ||
                    key === 'sourceModel' ||
                    key === 'targetModel' ||
-                   key === 'refines' ) &&
+                   key === 'refines' )   &&
                  foam.String.isInstance(o[key]) ) {
               r.push(x.classloader.maybeLoad(o[key]));
               continue;

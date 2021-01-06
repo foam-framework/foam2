@@ -88,7 +88,6 @@ foam.CLASS({
       class: 'Boolean',
       name: 'overlayInitialized_'
     },
-    'objId',
     'dao'
   ],
 
@@ -110,6 +109,7 @@ foam.CLASS({
       background-size: 24px;
       width: 24px;
       height: 24px;
+      right: 20;
     }
 
     ^icon:hover {
@@ -123,6 +123,28 @@ foam.CLASS({
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
+    }
+
+    ^disabled-button-container>button {
+      background-color: white!important;
+      color: grey;
+      border-color: white!important;
+      box-shadow: none!important;
+    }
+
+    ^button-container>button {
+      background-color: white!important;
+      color: /*%BLACK%*/ #1e1f21;
+      border-color: white!important;
+      box-shadow: none!important;
+    }
+
+    ^button-container>button:hover {
+      border-color: white!important;
+    }
+
+    ^disabled-button-container>button:hover {
+      border-color: white!important;
     }
   `,
 
@@ -155,8 +177,8 @@ foam.CLASS({
     async function initializeOverlay() {
       var self = this;
 
-      if ( ! this.obj ) {
-        this.obj = await this.dao.inX(ctrl.__subContext__).find(this.objId);
+      if ( this.obj ) {
+        this.obj = await this.dao.inX(this.__context__).find(this.obj.id);
       }
 
       this.onDetach(this.disabled_$.follow(this.ExpressionSlot.create({
@@ -164,25 +186,25 @@ foam.CLASS({
         code: (...rest) => ! rest.reduce((l, r) => l || r, false)
       })));
 
-      this.overlay_.add(this.slot(function() {
-        return this.E().forEach(this.data, function(action) {
-          this.
-            start().
-              show(action.createIsAvailable$(self.__context__, self.obj)).
-              addClass(self.myClass('action')).
-              add(action.label).
-              on('click', function(evt) {
-                self.overlay_.close();
-                action.maybeCall(self.__subContext__, self.obj);
-              }).
-              attrs({
+
+      self.obj.sub(function() {
+        self.overlay_.close();
+      });
+
+      this.overlay_.startContext({ data: self.obj })
+      .forEach(self.data, function(action) {
+        this
+            .start()
+              .addClass(action.createIsEnabled$(self.__context__, self.obj).map( e => e ? self.myClass('button-container') : self.myClass('disabled-button-container')))
+              .add(action)
+              .attrs({
                 disabled: action.createIsEnabled$(self.__context__, self.obj).map(function(e) {
-                  return e ? false : 'disabled';
+                  return ! e;
                 })
-              }).
-            end();
-        });
-      }));
+              })
+            .end();
+        })
+        .endContext();
 
       // Add the overlay to the controller so if the table is inside a container
       // with `overflow: hidden` then this overlay won't be cut off.

@@ -9,7 +9,11 @@
   name: 'TableColumnOutputter',
 
   javaImports: [
-    'java.util.ArrayList'
+    'java.util.ArrayList',
+    'java.util.List',
+    'java.util.StringJoiner',
+    'org.apache.commons.lang.ArrayUtils',
+    'org.apache.commons.lang3.StringUtils'
   ], 
 
   documentation: 'Class for returning 2d-array ( ie table ) for array of values ',
@@ -19,7 +23,7 @@
       name: 'returnStringValueForProperty',
       type: 'String',
       documentation: 'Method that converts value to string',
-      code: async function(x, prop, val, unitPropName) {
+      code: async function(x, prop, val, unitPropName, addUnitPropValueToStr) {
         if ( val == 0 || val ) {
           if ( foam.Array.isInstance(val) ) {
             var stringArr = [];
@@ -29,11 +33,13 @@
             return stringArr.join(' ');
           }
           if ( foam.core.UnitValue.isInstance(prop) ) {
-            if ( unitPropName ) {
-              if ( prop.unitPropValueToString ) {
-                return await prop.unitPropValueToString(x, val, unitPropName);
+            if ( addUnitPropValueToStr ) {
+              if ( unitPropName ) {
+                if ( prop.unitPropValueToString ) {
+                  return await prop.unitPropValueToString(x, val, unitPropName);
+                }
+                return unitPropName + ' ' + ( val / 100 ).toString();
               }
-              return unitPropName + ' ' + ( val / 100 ).toString();
             }
             return ( val / 100 ).toString();
           }
@@ -61,11 +67,18 @@
     },
     {
       name: 'arrayOfValuesToArrayOfStrings',
-      code: async function(x, props, values) {
+      code: async function(x, props, values, lengthOfPrimaryPropsRequested, addUnitPropValueToStr) {
         var stringValues = [];
         for ( var value of values ) {
           var stringArrayForValue = [];
-          for ( var i = 0 ; i < value.length ; i++ ) {
+          for ( var i = 0 ; i < lengthOfPrimaryPropsRequested ; i++ ) {
+            if ( foam.core.UnitValue.isInstance(props[i]) ) {
+              var indexOfUnitProp = props.findIndex(p => p.name === props[i].unitPropName);
+              if ( indexOfUnitProp !== -1 ) {
+                stringArrayForValue.push(await this.returnStringValueForProperty(x, props[i], value[i], value[indexOfUnitProp], addUnitPropValueToStr));
+                continue;
+              }
+            }
             stringArrayForValue.push(await this.returnStringValueForProperty(x, props[i], value[i]));
           }
           stringValues.push(stringArrayForValue);
@@ -83,20 +96,18 @@
     },
     {
       name: 'objectToTable',
-      code: async function(x, of, propNames, obj) {
-        var columnConfig = x.columnConfigToPropertyConverter;
-        var filteredPropNames = columnConfig.filterExportedProps(obj.cls_, propNames);
-        var values = await this.objToArrayOfStringValues(x, of, filteredPropNames, obj);
-        return this.returnTable(x, of, filteredPropNames, values);
+      code: async function(x, of, propNames, obj, lengthOfPrimaryPropsRequested) {
+        var values = await this.objToArrayOfStringValues(x, of, propNames, obj);
+        return this.returnTable(x, of, propNames, values, lengthOfPrimaryPropsRequested);
       }
     },
     {
       name: 'returnTable',
-      code: async function(x, of, propNames, values) {
+      code: async function(x, of, propNames, values, lengthOfPrimaryPropsRequested, addUnitPropValueToStr) {
         var columnConfig = x.columnConfigToPropertyConverter;
         var props = columnConfig.returnProperties(of, propNames);
-        var table =  [ this.getColumnHeaders(x, of, propNames) ];
-        var values = await this.arrayOfValuesToArrayOfStrings(x, props, values);
+        var table =  [ this.getColumnHeaders(x, of, propNames.slice(0, lengthOfPrimaryPropsRequested)) ];
+        var values = await this.arrayOfValuesToArrayOfStrings(x, props, values, lengthOfPrimaryPropsRequested, addUnitPropValueToStr);
         table = table.concat(values);
         return table;
       }
@@ -156,7 +167,7 @@
         for ( int i = 0 ; i < arrOfObjectValues.size() ; i++ ) {
           java.util.List<Object> row = new ArrayList<>();
           for ( int j = 0 ; j < metadata.length ; j++ ) {
-            row.add(returnStringValueForMetadata(x, metadata[j], arrOfObjectValues.get(i)[j], null));
+            row.add(returnStringValueForMetadata(x, metadata[j], arrOfObjectValues.get(i)[metadata[j].getProjectionIndex()], null));
           }
           result.add(row);
         }
@@ -204,6 +215,17 @@
           return obj.toString().substring(0, 8);
         case "ENUM":
           return obj.toString();
+        case "ARRAY":
+          StringJoiner strJ = new StringJoiner(", ");
+          Object[] arr = (Object[])obj;
+          for ( int i = 0; i < arr.length; i++ ) {
+            if ( arr[i] == null ) {
+              strJ.add("");
+              continue;
+            }
+            strJ.add(arr[i].toString());
+          }
+          return strJ.toString();
         default:
           return ((foam.core.FObject)obj).toSummary();
       }

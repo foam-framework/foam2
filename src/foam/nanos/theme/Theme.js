@@ -20,6 +20,7 @@ foam.CLASS({
 //    'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.EnabledAware',
     'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.auth.ServiceProviderAware',
 //    'foam.nanos.auth.LastModifiedByAware'
   ],
 
@@ -93,8 +94,8 @@ foam.CLASS({
       section: 'infoSection',
     },
     {
-      name: 'enabled',
       class: 'Boolean',
+      name: 'enabled',
       value: true,
       includeInDigest: true,
       section: 'administration'
@@ -120,8 +121,8 @@ foam.CLASS({
       },
     },
     {
-      name: 'domains',
       class: 'Array',
+      name: 'domains',
       of: 'String',
       factory: function(){
         return  ['localhost'];
@@ -422,8 +423,8 @@ foam.CLASS({
       section: 'inputs'
     },
     {
-      name: 'appConfig',
       class: 'foam.core.FObjectProperty',
+      name: 'appConfig',
       of: 'foam.nanos.app.AppConfig',
       section: 'applicationSection',
       factory: function() { return foam.nanos.app.AppConfig.create({}); }
@@ -494,25 +495,24 @@ foam.CLASS({
       section: 'administration'
     },
     {
-      class: 'String',
-      name: 'supportPhone'
-    },
-    {
-      class: 'String',
-      name: 'supportEmail'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Address',
-      name: 'supportAddress',
-      factory: function() {
-        return foam.nanos.auth.Address.create({});
-      }
-    },
-    {
+      name: 'spid',
       class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'personalSupportUser'
+      of: 'foam.nanos.auth.ServiceProvider',
+      value: foam.nanos.auth.ServiceProviderAware.GLOBAL_SPID
+    },
+    {
+      class: 'foam.core.FObjectProperty',
+      of:'foam.nanos.app.SupportConfig',
+      name: 'supportConfig',
+      factory: function() { return foam.nanos.app.SupportConfig.create({},this)},
+      javaFactory: `
+        return new foam.nanos.app.SupportConfig();
+      `
+    },
+    {
+      class: 'String',
+      name: 'customRefinement',
+      displayWidth: 80
     }
   ],
 

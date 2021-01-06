@@ -13,26 +13,17 @@ foam.CLASS({
   ],
 
   imports: [
-    'capabilities'
-  ],
-
-  exports: [
-    'config as wizardConfig'
-  ],
-
-  properties: [
-    {
-      class: 'FObjectProperty',
-      of: 'foam.u2.wizard.StepWizardConfig',
-      name: 'config'
-    }
+    'capabilities',
+    'rootCapability',
+    'sequence'
   ],
 
   methods: [
     async function execute() {
-      let topCap = this.capabilities.slice(-1)[0];
-      this.config = topCap.wizardletConfig.cls_.create({ ...topCap.wizardletConfig.instance_ }, this);
-      return this.config.execute();
+      if ( this.rootCapability.wizardConfig ) {
+        await this.rootCapability.wizardConfig.clone(this).execute();
+        this.rootCapability.wizardConfig.applyTo(this.sequence);
+      }
     }
   ]
 });

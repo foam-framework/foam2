@@ -3,7 +3,6 @@
  * Copyright 2017,2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-
 foam.INTERFACE({
   package: 'foam.lib.csv',
   name: 'FromCSVSetter',
@@ -54,6 +53,7 @@ foam.LIB({
         },
         Null: function(n) { return "null"; },
         Object: function(o) {
+          if ( o.asJavaValue ) return o.asJavaValue.call(o, o);
           return `foam.util.Arrays.asMap(new Object[] {
 ${Object.keys(o).map(function(k, i, a) {
   return `  ${foam.java.asJavaValue(k)}, ${foam.java.asJavaValue(o[k])}` + ((i == a.length-1) ? '' : ',')
@@ -238,11 +238,12 @@ foam.CLASS({
       expression: function(validationPredicates) {
         return validationPredicates
           .map((vp) => {
-            return `
-              if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
-                throw new IllegalStateException(${foam.java.asJavaValue(vp.errorString)});
-              }
-            `;
+            var exception = vp.errorMessage ?
+              `throw new IllegalStateException(((${this.forClass_}) obj).${vp.errorMessage});` :
+              `throw new IllegalStateException(${foam.java.asJavaValue(vp.errorString)});`
+            return `if ( ! ${foam.java.asJavaValue(vp.predicate)}.f(obj) ) {
+              ${exception}
+            }`;
           })
           .join('');
       }
@@ -279,6 +280,23 @@ foam.CLASS({
       }
     },
     function createJavaPropertyInfo_(cls) {
+      var isID = false;
+
+      // sourceCls_ isn't set for Proxy delegate properties
+      if ( this.sourceCls_ ) {
+        if ( this.sourceCls_.model_.ids ) {
+          var ids = this.sourceCls_.model_.ids;
+          for ( var i = 0 ; i < ids.length ; i++ ) {
+            if ( ids[i] == this.name ) {
+              isID = true;
+              break;
+            }
+          }
+        } else {
+          if ( this.name == 'id' ) isID = true;
+        }
+      }
+
       return foam.java.PropertyInfo.create({
         sourceCls:               cls,
         propName:                this.name,
@@ -297,6 +315,7 @@ foam.CLASS({
         csvParser:               this.javaCSVParser,
         extends:                 this.javaInfoType,
         networkTransient:        this.networkTransient,
+        externalTransient:       this.externalTransient,
         readPermissionRequired:  this.readPermissionRequired,
         writePermissionRequired: this.writePermissionRequired,
         storageTransient:        this.storageTransient,
@@ -304,6 +323,7 @@ foam.CLASS({
         xmlAttribute:            this.xmlAttribute,
         xmlTextNode:             this.xmlTextNode,
         sqlType:                 this.sqlType,
+        includeInID:             isID,
         includeInDigest:         this.includeInDigest,
         includeInSignature:      this.includeInSignature,
         containsPII:             this.containsPII,
@@ -311,7 +331,8 @@ foam.CLASS({
         validateObj:             this.javaValidateObj,
         toCSV:                   this.javaToCSV,
         toCSVLabel:              this.javaToCSVLabel,
-        fromCSVLabelMapping:     this.javaFromCSVLabelMapping
+        fromCSVLabelMapping:     this.javaFromCSVLabelMapping,
+        sheetsOutput:            this.sheetsOutput
       });
     },
 
@@ -376,7 +397,7 @@ foam.CLASS({
           name: isSet,
           type: 'boolean',
           visibility: 'private',
-          initializer: 'false'
+          initializer: 'false;'
         }).
         method({
           name: 'get' + capitalized,
@@ -409,10 +430,8 @@ foam.CLASS({
           name: 'clear' + capitalized,
           visibility: 'public',
           type: 'void',
-          body: `
-          assertNotFrozen();
-          ${isSet} = false;
-          `
+          body: `assertNotFrozen();
+${isSet} = false;`
         });
 
       if ( this.javaFactory ) {
@@ -571,7 +590,7 @@ foam.LIB({
           static: false,
           final: false,
           type: 'foam.core.X',
-          initializer: "foam.core.EmptyX.instance()"
+          initializer: "foam.core.EmptyX.instance();"
         });
 
         cls.method({
@@ -601,7 +620,7 @@ foam.LIB({
           static: false,
           final: false,
           type: 'boolean',
-          initializer: "false"
+          initializer: "false;"
         });
 
         if ( ! this.hasOwnAxiom('freeze') ) {
@@ -609,11 +628,9 @@ foam.LIB({
             name: 'freeze',
             type: 'foam.core.FObject',
             visibility: 'public',
-            body: `
-              beforeFreeze();
-              __frozen__ = true;
-              return this;
-            `
+            body: `beforeFreeze();
+__frozen__ = true;
+return this;`
           });
         }
 
@@ -622,9 +639,7 @@ foam.LIB({
             name: 'isFrozen',
             type: 'boolean',
             visibility: 'public',
-            body: `
-              return __frozen__;
-            `
+            body: `return __frozen__;`
           });
         }
 
@@ -634,11 +649,9 @@ foam.LIB({
             name: 'toString',
             type: 'String',
             visibility: 'public',
-            body: `
-              StringBuilder sb = new StringBuilder();
-              append(sb);
-              return sb.toString();
-            `
+            body: `StringBuilder sb = new StringBuilder();
+append(sb);
+return sb.toString();`
           });
         }
 
@@ -653,9 +666,7 @@ foam.LIB({
                 type: 'Object'
               }
             ],
-            body: `
-              return compareTo(o) == 0;
-            `
+            body: `return compareTo(o) == 0;`
           });
         }
 
@@ -679,22 +690,28 @@ foam.LIB({
       if ( cls.name ) {
         var props = cls.allProperties;
 
-        // No-arg constructor
-        cls.method({
-          visibility: 'public',
-          name: cls.name,
-          type: '',
-          body: ''
-        });
+        if ( ! this.model_.hasOwnProperty('javaGenerateDefaultConstructor') ) {
+          this.model_.javaGenerateDefaultConstructor = true;
+        }
 
-        // Context-oriented constructor
-        cls.method({
-          visibility: 'public',
-          name: cls.name,
-          type: '',
-          args: [{ type: 'foam.core.X', name: 'x' }],
-          body: 'setX(x);'
-        });
+        if ( this.model_.javaGenerateDefaultConstructor ) {
+          // No-arg constructor
+          cls.method({
+            visibility: 'public',
+            name: cls.name,
+            type: '',
+            body: ''
+          });
+
+          // Context-oriented constructor
+          cls.method({
+            visibility: 'public',
+            name: cls.name,
+            type: '',
+            args: [{ type: 'foam.core.X', name: 'x' }],
+            body: 'setX(x);'
+          });
+        }
 
         cls.method({
           visibility: 'public',
@@ -729,7 +746,12 @@ foam.LIB({
           });
         }
 
-        if ( props.length && props.length < 7 ) {
+        // If the model doesn't explicitly define a value, then compute based
+        // on number of properties.
+        if ( ! this.model_.hasOwnProperty('javaGenerateConvenienceConstructor') )
+          this.model_.javaGenerateConvenienceConstructor = props.length && props.length < 7;
+
+        if ( this.model_.javaGenerateConvenienceConstructor ) {
           // All-property constructor
           cls.method({
             visibility: 'public',
@@ -818,21 +840,21 @@ foam.CLASS({
     function buildMethodInfoInitializer(cls) {
       // Add MethodInfo field for each method
       initializerString = `new foam.core.MethodInfo(){
-        @Override
-        public String getName(){
-          return "${this.name}";
-        }
-        @Override
-        public Object call(foam.core.X x, Object receiver, Object[] args){
-      `;
+@Override
+public String getName(){
+  return "${this.name}";
+}
+@Override
+public Object call(foam.core.X x, Object receiver, Object[] args){
+`;
       // See if call needs try catch block
       var exceptions = this.javaThrows.length > 0;
       if ( exceptions ) initializerString += `    try {
         `;
 
-      if ( this.javaType != 'void' ) initializerString += '    return ';
+      if ( this.javaType != 'void' ) initializerString += '  return ';
       // Use ((typeCast)receiver).methodName() to call method because of rare collisions between inner and outer class method names
-      initializerString += `    ((${cls.name})receiver).${this.name}(`;
+      initializerString += `((${cls.name})receiver).${this.name}(`;
       argsString = '';
       for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
         if ( this.args[i].javaType )
@@ -861,8 +883,8 @@ foam.CLASS({
       }
 
       initializerString += `}
-      }
-      `;
+};
+`;
       return initializerString;
     },
 
@@ -889,7 +911,6 @@ foam.CLASS({
         }),
         body: this.javaCode ? this.javaCode : ''
       });
-
 
       var initializerString = this.buildMethodInfoInitializer(cls);
 
@@ -2079,6 +2100,16 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
+     {
+      class: 'Boolean',
+      name: 'javaGenerateDefaultConstructor',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'javaGenerateConvenienceConstructor',
+      value: true
+    },
     {
       class: 'AxiomArray',
       of: 'foam.java.JavaImport',
@@ -2232,15 +2263,15 @@ foam.CLASS({
       name: 'javaCode',
       getter: function() {
         return `
-try {
-  synchronized ( getDelegate() ) {
-    while ( ! getDelegate().isPropertySet("${this.property}") ) getDelegate().wait();
-  }
-} catch (Exception e) {
-  throw new RuntimeException(e);
-}
-${this.javaType != 'void' ? 'return ' : ''}getDelegate()
-    .${this.name}(${this.args.map(a => a.name).join(', ')});
+          try {
+            synchronized ( getDelegate() ) {
+              while ( ! getDelegate().isPropertySet("${this.property}") ) getDelegate().wait();
+            }
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+          ${this.javaType != 'void' ? 'return ' : ''}getDelegate()
+              .${this.name}(${this.args.map(a => a.name).join(', ')});
         `;
       }
     }
@@ -2289,6 +2320,37 @@ foam.CLASS({
       var compare = info.getMethod('compare');
       compare.body = 'return 0;';
       return info;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'TemplateAxiomJavaRefinement',
+  refines: 'foam.templates.TemplateAxiom',
+  flags: ['java'],
+
+  requires: [
+    'foam.parse.Grammar',
+    'foam.templates.TemplateUtil'
+  ],
+
+  methods: [
+
+    function buildJavaClass(cls) {
+    var result = this.TemplateUtil.create().compileJava(this.template, this.name, this.args || []);
+      var args = [{ type: 'java.lang.StringBuilder', name: 'builder' }];
+      args.push()
+      this.args.forEach(a => args.push({type: a.type, name: a.name}));
+      cls.method({
+        name: 'build' + this.name.charAt(0).toUpperCase() + this.name.slice(1),
+        type: 'void',
+        args: args,
+        body: `
+          ${result};
+        `
+      });
+      return;
     }
   ]
 });

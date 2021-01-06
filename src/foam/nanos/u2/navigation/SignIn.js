@@ -17,7 +17,8 @@ foam.CLASS({
     'loginSuccess',
     'stack',
     'user',
-    'menuDAO'
+    'menuDAO',
+    'memento'
   ],
 
   requires: [
@@ -30,7 +31,7 @@ foam.CLASS({
     { name: 'FOOTER_TXT', message: 'Not a user yet?' },
     { name: 'FOOTER_LINK', message: 'Create an account' },
     { name: 'SUB_FOOTER_LINK', message: 'Forgot password?' },
-    { name: 'ERROR_MSG', message: 'There was an issue with logging in.' },
+    { name: 'ERROR_MSG', message: 'There was an issue logging in' },
     { name: 'ERROR_MSG2', message: 'Please enter email or username' }
   ],
 
@@ -104,7 +105,8 @@ foam.CLASS({
             });
           } else {
             this.menuDAO.cmd_(X, foam.dao.CachingDAO.PURGE);
-            window.location.hash = '';
+            if ( ! this.memento || this.memento.value.length === 0 )
+              window.location.hash = '';
             this.loginSuccess = !! this.user;
           }
         }
@@ -121,15 +123,15 @@ foam.CLASS({
       code: async function(X) {
         if ( this.identifier.length > 0 ) {
           this.auth.login(X, this.identifier, this.password).then(
-            (logedInUser) => {
+            logedInUser => {
               if ( ! logedInUser ) return;
               if ( this.token_ ) {
                 logedInUser.signUpToken = this.token_;
                 this.dao_.put(logedInUser)
-                  .then((updatedUser) => {
+                  .then(updatedUser => {
                     this.user.copyFrom(updatedUser);
                     this.nextStep();
-                  }).catch((err) => {
+                  }).catch(err => {
                     this.ctrl.add(this.NotificationMessage.create({
                       message: err.message || this.ERROR_MSG,
                       type: this.LogLevel.ERROR
@@ -141,7 +143,7 @@ foam.CLASS({
               }
             }
           ).catch(
-            (err) => {
+            err => {
               this.ctrl.add(this.NotificationMessage.create({
                 message: err.message || this.ERROR_MSG,
                 type: this.LogLevel.ERROR

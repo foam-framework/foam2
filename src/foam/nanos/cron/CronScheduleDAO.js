@@ -12,6 +12,7 @@ foam.CLASS({
   documentation: 'Update cron scheduledTime on schedule changed',
 
   javaImports: [
+    'foam.nanos.script.ScriptStatus',
     'foam.util.SafetyUtil'
   ],
 
@@ -22,12 +23,13 @@ foam.CLASS({
         Cron newCron = (Cron) obj;
         Cron oldCron = (Cron) getDelegate().find_(x, obj);
 
-        if ( oldCron == null
-          || ! SafetyUtil.equals(oldCron.getSchedule(), newCron.getSchedule())
+        if ( oldCron == null ||
+             newCron.getStatus() == ScriptStatus.SCHEDULED ||
+             ! SafetyUtil.equals(oldCron.getSchedule(), newCron.getSchedule())
         ) {
-          newCron.setScheduledTime(newCron.getNextScheduledTime());
+          newCron.setScheduledTime(newCron.getNextScheduledTime(x));
         }
-        return getDelegate().put_(x, obj);
+        return getDelegate().put_(x, newCron);
       `
     }
   ]

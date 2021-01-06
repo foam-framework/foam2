@@ -104,7 +104,7 @@ foam.INTERFACE({
         },
         {
           name: 'potentialPassword',
-          type: 'String',
+          type: 'String'
         }
       ]
     },

@@ -1,0 +1,79 @@
+<title>CRUNCH Developer Documentation</title>
+
+<h2>Purpose of this Document</h2>
+This document aims to describe CRUNCH internals and interfaces, but is not
+intended as a user guide. To get started with CRUNCH, see the documentation
+in `src/documentation/crunch-doc.flow`.
+
+<h2>CrunchController</h2>
+
+CrunchController contains logic for handling CRUNCH intercepts and
+creating CRUNCH-specific wizard sequences. It should be provided by
+the application's main controller in an exported property named
+`crunchController`.
+
+<h3>CrunchController methods</h3>
+
+<foam class="foam.flow.widgets.MethodShortSummary" of="foam.u2.crunch.CrunchController" />
+
+<h2>CapabilityIntercept</h2>
+
+Capability intercepts (AKA CRUNCH intercepts) allow a server to abort
+a request and provide the client a list of capability IDs describing
+capabilities the current subject must have. It may also return a
+Capable object describing additional information the the object must
+have to complete the request.
+
+<h3>Important Source Locations</h3>
+- `foam.nanos.crunch.CapabilityIntercept` is an exception thrown
+  when an action cannot be completed without CRUNCH requirements.
+  When this exceptiono is thrown by the server, it results in an
+  intercept which may re-send the failed request.
+- `foam.nanos.crunch.box.CrunchClientReplyBox`
+  handles an error response from the server
+  iff it contains a CapabilityIntercept instance.
+- `foam.box.Message` contains the check that a throwable is a
+  RemoteException, which prevents the CrunchIntercept (which is one)
+  from being double-wrapped.
+
+<h3>Example</h3>
+
+<h2>Server-Side: Throwing Intercept for Subject Capabilities</h2>
+
+The following is a typical example of throwing an intercept for a
+capability required by the `subject`. (note that `subject` has a
+distinction from `user` - CRUNCH is capable or providing capabilities
+for a user when "acting as" another user)
+
+The following snippet will not invoke an intercept because it is run
+as a script. If this code existed in a DAO decorator or a synchronous rule
+it would result in the client handling the intercept for you before
+re-sending (or aborting) the request.
+
+<foam class="foam.flow.widgets.TryItSnippet" server="true">
+import foam.nanos.crunch.CapabilityIntercept;
+var ex = new CapabilityIntercept();
+ex.addCapabilityId("4EB60BAE-E915-4464-9D1B-4099F22E9144");
+throw ex;
+</foam>
+
+<h2>Client-Side: Handling a CapabilityIntercept</h2>
+
+If a capability is thrown on the server it will usually be handled by
+the client opaquely - that is, if you called `myDAO.put(...)` from the
+client and it resulted in an intercept, the code calling `myDAO.put` is
+oblivious to the intercept by design. Either the `put` will succeed
+because required capabilities were satisfied by the user, or it will
+fail because the user decided to abort the operation.
+
+To better understand how intercepts work, this is how one would be
+invoked manually on the client. Running this code snippet will result
+in a wizard requesting the example capability, unless your current
+user already has it granted.
+
+<foam class="foam.flow.widgets.TryItSnippet" server="true">
+var intercept = foam.nanos.crunch.CapabilityIntercept.create({
+  capabilities: ['4EB60BAE-E915-4464-9D1B-4099F22E9144']
+});
+x.crunchController.handleIntercept(intercept);
+</foam>

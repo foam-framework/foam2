@@ -9,7 +9,10 @@ foam.CLASS({
   name: 'CSVTableExportDriver',
   implements: [ 'foam.nanos.export.ExportDriver' ],
 
+  extends: 'foam.nanos.export.TableExportDriver',
+
   requires: [
+    'foam.nanos.column.CSVTableOutputter',
     'foam.nanos.column.TableColumnOutputter'
   ],
 
@@ -18,36 +21,39 @@ foam.CLASS({
       name: 'outputter',
       hidden: true,
       factory: function() {
-        return this.TableColumnOutputter.create();
+        return this.CSVTableOutputter.create();
+      }
+    },
+    {
+      name: 'columnHandler',
+      hidden: true,
+      class: 'FObjectProperty',
+      of: 'foam.nanos.column.CommonColumnHandler',
+      factory: function() {
+        return foam.nanos.column.CommonColumnHandler.create();
+      }
+    },
+    {
+      name: 'columnConfigToPropertyConverter',
+      hidden: true,
+      factory: function() {
+        if ( ! this.__context__.columnConfigToPropertyConverter )
+          return foam.nanos.column.ColumnConfigToPropertyConverter.create();
+        return this.__context__.columnConfigToPropertyConverter;
       }
     }
   ],
 
   methods: [
     async function exportFObject(X, obj) {
-      var columnConfig = X.columnConfigToPropertyConverter;
-
-      var props = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(obj.cls);
-      props = columnConfig.filterExportedProps(obj.cls_, props);
-
-      return this.outputter.objectToTable(X, obj.cls_, columnConfig.returnProperties(obj.cls_, props), obj).then( ( values ) => {
-        var ouputter = foam.nanos.column.CSVTableOutputter.create();
-        return ouputter.arrayToCSV(values);
-      });
+      var propNames = this.getPropName(X, obj.cls_);
+      var objToTable = await this.exportFObjectAndReturnTable(X, obj, propNames);
+      return this.outputter.arrayToCSV(objToTable);
     },
     async function exportDAO(X, dao) {
-      var columnConfig = X.columnConfigToPropertyConverter;
-
-      var propNames = X.filteredTableColumns ? X.filteredTableColumns : this.outputter.getAllPropertyNames(dao.of);
-      propNames = columnConfig.filterExportedProps(dao.of, propNames);
-
-      var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, propNames);
-      return dao.select(expr).then( (values) => {
-        return this.outputter.returnTable(X, dao.of, propNames, values.projection).then( values => {
-          var ouputter = foam.nanos.column.CSVTableOutputter.create();
-          return ouputter.arrayToCSV(values);
-        });
-      });
+      var propName = this.getPropName(X, dao.of);
+      var daoToTable = await this.exportDAOAndReturnTable(X, dao, propName);
+      return this.outputter.arrayToCSV(daoToTable);
     }
   ]
 });

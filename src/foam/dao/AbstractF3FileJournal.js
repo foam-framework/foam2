@@ -15,6 +15,7 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.ProxyX',
+    'foam.core.X',
     'foam.lib.formatter.FObjectFormatter',
     'foam.lib.formatter.JSONFObjectFormatter',
     'foam.lib.json.ExprParser',
@@ -62,6 +63,12 @@ foam.CLASS({
             }
           };
 
+          protected JSONFObjectFormatter getFormatter(X x) {
+            JSONFObjectFormatter f = formatter.get();
+            f.setX(x);
+            return f;
+          }
+
           protected static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
             @Override
             protected StringBuilder initialValue() {
@@ -84,11 +91,17 @@ foam.CLASS({
               return new JSONParser();
             }
             @Override
-            public JSONParser get() {
-              JSONParser parser = super.get();
+            public foam.lib.json.JSONParser get() {
+              foam.lib.json.JSONParser parser = super.get();
               return parser;
             }
           };
+
+          protected foam.lib.json.JSONParser getParser(X x) {
+            foam.lib.json.JSONParser p = jsonParser.get();
+            p.setX(x);
+            return p;
+          }
         `);
       }
     }
@@ -144,7 +157,7 @@ foam.CLASS({
 try {
   InputStream is = getX().get(foam.nanos.fs.Storage.class).getInputStream(getFilename());
   if ( is == null ) {
-    getLogger().error("File not found - journal: " + getFilename());
+    getLogger().warning("File not found", getFilename());
   }
   return (is == null) ? null : new BufferedReader(new InputStreamReader(is));
 } catch ( Throwable t ) {
@@ -162,7 +175,7 @@ try {
 try {
   OutputStream os = getX().get(foam.nanos.fs.Storage.class).getOutputStream(getFilename());
   if ( os == null ) {
-    getLogger().error("File not found - journal: " + getFilename());
+    getLogger().warning("File not found", getFilename());
   }
   return (os == null) ? null : new BufferedWriter(new OutputStreamWriter(os));
 } catch ( Throwable t ) {
@@ -189,7 +202,7 @@ try {
       javaCode: `
         final Object               id  = obj.getProperty("id");
         final ClassInfo            of  = dao.getOf();
-        final JSONFObjectFormatter fmt = formatter.get();
+        final JSONFObjectFormatter fmt = getFormatter(x);
 
         getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
           FObject old;
@@ -206,7 +219,7 @@ try {
           public void executeJob() {
             try {
               if ( old != null ) {
-                fmt.outputDelta(old, obj, of);
+                fmt.maybeOutputDelta(old, obj, of);
               } else {
                 fmt.output(obj, of);
               }
@@ -259,7 +272,7 @@ try {
       args: [ 'Context x', 'String prefix', 'DAO dao', 'foam.core.FObject obj' ],
       javaCode: `
       final Object id = obj.getProperty("id");
-      JSONFObjectFormatter fmt = formatter.get();
+      JSONFObjectFormatter fmt = getFormatter(x);
       getLine().enqueue(new foam.util.concurrent.AbstractAssembly() {
 
         public Object[] requestLocks() {

@@ -32,66 +32,80 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
+      generateJava: false,
       name: 'name',
       required: true
     },
     {
       class: 'String',
+      generateJava: false,
       name: 'documentation'
     },
     {
       class: 'String',
+      generateJava: false,
       name: 'label',
       expression: function(name) { return foam.String.labelize(name); }
     },
     {
       class: 'String',
+      generateJava: false,
       name: 'speechLabel',
       expression: function(label) { return label; }
     },
     {
       documentation: 'displayed on :hover',
+      generateJava: false,
       class: 'String',
       name: 'toolTip'
     },
     {
-      name: 'icon'
+      name: 'icon',
+      generateJava: false
     },
     {
       class: 'Boolean',
+      generateJava: false,
       name: 'confirmationRequired',
       documentation: 'If confirmation is required. Recommended for destructive actions.'
     },
     {
       class: 'String',
+      generateJava: false,
       name: 'iconFontFamily',
       value: 'Material Icons'
     },
     {
       class: 'String',
+      generateJava: false,
       name: 'iconFontClass',
       value: 'material-icons'
     },
     {
       class: 'String',
+      generateJava: false,
       name: 'iconFontName'
     },
     {
       class: 'Array',
+      generateJava: false,
       name: 'keyboardShortcuts'
     },
     {
       class: 'String',
+      generateJava: false,
       name: 'help'
     },
     {
       class: 'Boolean',
+      generateJava: false,
       name: 'isDefault',
       help: 'Indicates if this is the default action.',
       value: false
     },
     {
       class: 'Function',
+      generateJava: false,
       name: 'isAvailable',
       label: 'Available',
       help: 'Function to determine if action is available.',
@@ -99,6 +113,7 @@ foam.CLASS({
     },
     {
       class: 'Function',
+      generateJava: false,
       name: 'isEnabled',
       label: 'Enabled',
       help: 'Function to determine if action is enabled.',
@@ -111,27 +126,38 @@ foam.CLASS({
       value: null
     },
     {
+      class: 'Function',
+      generateJava: false,
+      name: 'confirmationView',
+      value: null
+    },
+    {
       class: 'StringArray',
+      generateJava: false,
       name: 'availablePermissions',
       documentation: `Permissions required for the action to be available.
 If empty than no permissions are required.`
     },
     {
       class: 'StringArray',
+      generateJava: false,
       name: 'enabledPermissions',
       documentation: `Permissions required for the action to be enabled.
 If empty than no permissions are required.`,
     },
     {
       name: 'enabledPermissionsSlot_',
+      generateJava: false,
       transient: true
     },
     {
       name: 'availablePermissionsSlot_',
+      generateJava: false,
       transient: true
     },
     {
       name: 'runningMap',
+      generateJava: false,
       factory: function() {
         return new WeakMap();
       },
@@ -286,6 +312,7 @@ foam.CLASS({
       class: 'AxiomArray',
       of: 'Action',
       name: 'actions',
+      generateJava: false,
       adaptArrayElement: function(o, prop) {
         return typeof o === 'function' ?
             foam.core.Action.create({name: o.name, code: o}) :

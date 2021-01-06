@@ -77,6 +77,12 @@ foam.CLASS({
       type: 'Regex',
       name: 'restrictedCharacters',
       documentation: `Optional regular expression used to prevent restricted characters from being typed.`
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
+      name: 'displayMode',
+      value: foam.u2.DisplayMode.RW
     }
   ],
 
@@ -96,7 +102,8 @@ foam.CLASS({
           type: this.type,
           data$: this.data$,
           placeholder: this.placeholder,
-          onKey: this.onKey
+          onKey: this.onKey,
+          mode: this.displayMode
         })
           .addClass(this.myClass('input'))
           .attr('name', this.fromPropertyName + 'Input')

@@ -41,3 +41,22 @@ p({
     }
   """
 })
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"translationService",
+  "description":"Translation Service",
+  "serve":true,
+  "authenticate":false,
+  "serviceScript":
+  """
+    return new foam.i18n.LocaleTranslationService.Builder(x).build();
+  """,
+  "client":
+  """
+  {
+      "class":"foam.i18n.ClientCacheTranslationService",
+      "delegate":"foam.i18n.ClientTranslationService"
+  }
+  """
+})

@@ -60,6 +60,7 @@ foam.CLASS({
         show(prop.createVisibilityFor(this.__context__.data$, this.controllerMode$).map(function(m) {
           return m != foam.u2.DisplayMode.HIDDEN;
         })).
+        addClass(this.myClass()).
         addClass('foam-u2-PropertyView').
         addClass('foam-u2-PropertyView-prop-' + prop.name).
         start('td').addClass('foam-u2-PropertyView-label').add(this.label).end().

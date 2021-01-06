@@ -7,6 +7,7 @@
  foam.CLASS({
   package: 'foam.nanos.ruler',
   name: 'Rule',
+  extends: 'foam.nanos.ruler.Ruled',
 
   documentation: 'Rule model represents rules(actions) that need to be applied in case passed object satisfies provided predicate.',
 
@@ -80,13 +81,7 @@
       section: 'basicInfo'
     },
     {
-      class: 'Int',
       name: 'priority',
-      documentation: 'Priority defines the order in which rules are to be applied.'+
-      'Rules with a higher priority are to be applied first.'+
-      'The convention for values is ints that are multiple of 10.',
-      readPermissionRequired: true,
-      writePermissionRequired: true,
       tableWidth: 66,
       section: 'basicInfo'
     },
@@ -139,18 +134,7 @@
       documentation: 'Defines if the rule needs to be applied before or after operation is completed'+
       'E.g. on dao.put: before object was stored in a dao or after.'
     },
-    {
-      class: 'foam.mlang.predicate.PredicateProperty',
-      name: 'predicate',
-      factory: function () {
-        return foam.mlang.predicate.True.create();
-      },
-      javaFactory: `
-      return foam.mlang.MLang.TRUE;
-      `,
-      documentation: 'predicate is checked against an object; if returns true, the action is executed.'+
-      'Defaults to return true.'
-    },
+    'predicate',
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.ruler.RuleAction',
@@ -166,12 +150,7 @@
       documentation: 'The action to be executed asynchronously if predicates returns true for passed object.'
     },
     {
-      class: 'Boolean',
       name: 'enabled',
-      value: true,
-      documentation: 'Enables the rule.',
-      readPermissionRequired: true,
-      writePermissionRequired: true,
       tableWidth: 70,
       section: 'basicInfo'
     },
@@ -439,7 +418,7 @@
       javaCode: `
         var auth = (AuthService) x.get("auth");
         if ( ! auth.check(x, "rule.read." + getId())
-          && ! auth.check(x, "spid.read." + getSpid())
+          && ! auth.check(x, "serviceprovider.read." + getSpid())
         ) {
           throw new AuthorizationException("You do not have permission to read the rule.");
         }
@@ -459,11 +438,28 @@
       javaCode: `
         var auth = (AuthService) x.get("auth");
         if ( ! auth.check(x, "rule.remove." + getId())
-          && ! auth.check(x, "spid.update." + getSpid())
+          && ! auth.check(x, "serviceprovider.update." + getSpid())
         ) {
           throw new AuthorizationException("You do not have permission to delete the rule.");
         }
       `
+    },
+    {
+      name: 'getUser',
+      type: 'foam.nanos.auth.User',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'obj', type: 'FObject' }
+      ],
+      documentation: `Return user extracted from obj to be used for checking the
+        user permission to access (i.e. execute) the rule.
+
+        Return null (default) to skip access permission check on the rule.
+
+        Subclasses of Rule should override "getUser" method to return the
+        appropriate user for which the permission is checked.
+      `,
+      javaCode: 'return null;'
     }
   ],
 

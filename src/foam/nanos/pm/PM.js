@@ -39,15 +39,15 @@ foam.CLASS({
     },
     {
       name: 'startTime',
-      class: 'DateTime',
+      class: 'Long',
       factory: function() {
-        return new Date();
+        return Date.now();
       },
-      javaFactory: `return new java.util.Date();`
+      javaFactory: `return System.currentTimeMillis();`
     },
     {
       name: 'endTime',
-      class: 'DateTime'
+      class: 'Long'
     },
     {
       name: 'isError',
@@ -84,7 +84,9 @@ foam.CLASS({
       javaCode: `
     if ( x == null ) return;
     if ( getIsError() ) return;
-    setEndTime(new java.util.Date());
+    if ( getEndTime() == 0L ) {
+      setEndTime(System.currentTimeMillis());
+    }
     PMLogger pmLogger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
     if ( pmLogger != null ) {
       pmLogger.log(this);
@@ -95,13 +97,13 @@ foam.CLASS({
       name: 'getTime',
       type: 'Long',
       javaCode: `
-    return getEndTime().getTime() - getStartTime().getTime();
+    return getEndTime() - getStartTime();
       `
     },
     {
       name: 'doFolds',
       javaCode: `
-    fm.foldForState(getKey()+":"+getName(), getStartTime(), getTime());
+    fm.foldForState(getKey()+":"+getName(), new java.util.Date(getStartTime()), getTime());
       `
     },
     {
@@ -112,7 +114,7 @@ foam.CLASS({
       ],
       javaCode: `
         setIsError(true);
-        setEndTime(new java.util.Date());
+        setEndTime(System.currentTimeMillis());
         StringBuilder sb = new StringBuilder();
         for (Object obj: args) {
           if ( obj instanceof Exception ) {
@@ -145,33 +147,7 @@ foam.CLASS({
               if ( ! pm.getIsError() ) {
                 return;
               }
-              DAO configDAO = (DAO) x.get("alarmConfigDAO");
-
-              AlarmConfig config = (AlarmConfig) configDAO.find(EQ(AlarmConfig.NAME, pm.getKey()));
-              String name = pm.getKey();
-              if ( config != null ) {
-                if ( ! config.getEnabled() ) {
-                  return;
-                }
-                name = config.getName();
-              }
-              DAO alarmDAO = (DAO) x.get("alarmDAO");
-              Alarm alarm = (Alarm) alarmDAO.find(EQ(Alarm.NAME, name));
-              if ( alarm != null &&
-                   alarm.getIsActive() ) {
-                return;
-              }
-              alarm = new Alarm.Builder(x)
-                .setName(name)
-                .setIsActive(true)
-                .build();
-              alarmDAO.put(alarm);
-
-              AlarmConfig alarmConfig = new AlarmConfig.Builder(x)
-                .setName(pm.getKey())
-                .setSendEmail(false)
-                .build();
-              configDAO.put(alarmConfig);
+              ((DAO) x.get("alarmDAO")).put(new Alarm(pm.getKey(), true));
             }
           }, "PM alarm");
      `
@@ -207,12 +183,12 @@ foam.CLASS({
               return pm;
             }
 
-            public static PM create(X x, String key, String... args) {
+            public static PM create(X x, Object key, Object... args) {
               PM pm = (PM) x.get("PM");
 
               if ( pm == null ) return new PM(key, args);
 
-              pm.setKey(key);
+              pm.setKey(key.toString());
               pm.setName(combine((Object[]) args));
               pm.init_();
 
@@ -258,10 +234,10 @@ foam.CLASS({
               init_();
             }
 
-            private static String combine(Object... args) {
-              if ( args == null ) {
-                return "";
-              }
+            public static String combine(Object... args) {
+              if ( args == null ) return "";
+              if ( args.length == 0 || args[0] == null ) return "";
+              if ( args.length == 1 ) return args[0].toString();
               StringBuilder sb = new StringBuilder();
               for ( Object o: args) {
                 sb.append(o).append(":");

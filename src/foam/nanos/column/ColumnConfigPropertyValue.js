@@ -65,7 +65,7 @@ foam.CLASS({
         if ( foam.String.isInstance(propName) ) {
           var propNames = propName.split('.');
           for ( var i = 0 ; i < propNames.length ; i++ ) {
-            axiom = cls.getAxiomByName(this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(this, propNames[i]));
+            axiom = cls.getAxiomByName(this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(propNames[i]));
             if ( ! axiom )
               return '';
             columnHeader.push(axiom.tableHeader ? axiom.tableHeader() : axiom.label || foam.String.labelize(axiom.name) );
@@ -80,13 +80,13 @@ foam.CLASS({
             else {
               axiom = cls.getAxiomByName(propName.name);
               if ( axiom )
-                columnHeader.push(propName.tableHeader());
+                columnHeader.push(axiom.tableHeader());
               else
                 columnHeader.push('-');
             }
           }
         }
-        return columnHeader.join('/');
+        return columnHeader.join(' / ');
       }
     },
     {
@@ -252,6 +252,39 @@ foam.CLASS({
         arr.push(this.returnProperty(of, prop));
       }
       return arr;
+    },
+    function returnPropertyColumnMappings(of, propertyNamesToQuery) {
+      var result = [];
+      for ( var propName of propertyNamesToQuery ) {
+        result.push(foam.u2.view.PropertyColumnMapping.create({ fullPropertyName: propName, property: this.returnProperty(of, propName) }));
+      }
+      return result;
+    },
+    function returnPropertyNameForLabel(of, label) {
+      var labels = label.split(' / ');
+      var names = [];
+      var of = of;
+      for ( var i = 0; i < labels.length; i++ ) {
+        var prop = of.getAxioms().find(a => a.label && a.label == labels[i]);
+        if ( !prop )
+          return '';
+        names.push(prop.name);
+        of = prop.of;
+      }
+      return names.join('.');
+    },
+    function returnPropertyLabelForName(of, name) {
+      var names = name.split('.');
+      var labels = [];
+      var of = of;
+      for ( var i = 0; i < names.length; i++ ) {
+        var prop = of.getAxioms().find(a => a.name && a.name == names[i]);
+        if ( !prop )
+          return '';
+        labels.push(prop.label);
+        of = prop.of;
+      }
+      return labels.join(' / ');
     }
   ]
 });

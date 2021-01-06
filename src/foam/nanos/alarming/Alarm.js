@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.alarming',
   name: 'Alarm',
@@ -13,6 +19,7 @@ foam.CLASS({
   tableColumns: [
     'name',
     'hostname',
+    'severity',
     'lastModified',
     'isActive',
     'stop',
@@ -30,15 +37,41 @@ foam.CLASS({
     'monitoringReportDAO'
   ],
 
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data: `
+  public Alarm(String name) {
+    this(name, true);
+  }
+
+  public Alarm(String name, boolean isActive) {
+    setName(name);
+    setIsActive(isActive);
+  }
+
+  public Alarm(String name, AlarmReason reason) {
+    setName(name);
+    setIsActive(true);
+    setReason(reason);
+  }
+          `
+        }));
+      }
+    }
+  ],
+
+  ids: [
+    'name',
+    'hostname'
+  ],
+
   properties: [
     {
-      class: 'Long',
-      name: 'id',
-      visibility: 'RO',
-    },
-    {
       class: 'String',
-      name: 'name',
+      name: 'name'
     },
     {
       class: 'String',
@@ -47,13 +80,21 @@ foam.CLASS({
       javaFactory: 'return System.getProperty("hostname", "localhost");'
     },
     {
+      class: 'Enum',
+      of: 'foam.log.LogLevel',
+      name: 'severity',
+      value: 'WARN',
+      visibility: 'RO'
+    },
+    {
       class: 'Boolean',
       name: 'isActive'
     },
     {
       class: 'Enum',
       of: 'foam.nanos.alarming.AlarmReason',
-      name: 'reason'
+      name: 'reason',
+      value: 'UNSPECIFIED'
     },
     {
       class: 'DateTime',

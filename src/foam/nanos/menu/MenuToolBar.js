@@ -26,7 +26,7 @@ foam.CLASS({
 
   css: `
     ^ {
-      width: 504px;
+      width: auto;
     }
     ^title {
       margin: 24px;
@@ -36,9 +36,9 @@ foam.CLASS({
     ^options {
       display: flex;
       flex-direction: row;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
-      padding: 0 36px 32px 36px;
+      padding: 0 26px 32px 26px;
     }
     ^option {
       display: flex;
@@ -100,15 +100,28 @@ foam.CLASS({
               this.EQ(this.Menu.PARENT, this.parent),
               this.NEQ(this.Menu.ID, `${this.classification}.toolbar`)
             )
-          )
-          .orderBy(this.Menu.ORDER);
+          );
+      }
+    },
+    {
+      class: 'Int',
+      name: 'availableMenuCount',
+      expression: async function(dao) {
+        let count = await dao.select(this.Count.create());
+        return count.value;
       }
     }
   ],
 
   methods: [
-    function initE() {
+    async function initE() {
       var self = this;
+      if ( await this.availableMenuCount === 1 ) {
+        this.dao.select().then( (res) => {
+          self.pushMenu(res.array[0].id);
+        });
+        return;
+      }
       this
         .addClass(this.myClass())
         .start()
@@ -119,7 +132,9 @@ foam.CLASS({
         .start()
           .addClass(this.myClass('options'))
           .select(this.dao$proxy, function(menu) {
-            return this.E().start()
+            return this.E().style({
+              padding: '0 8px 0'
+            }).start()
               .addClass(self.myClass('option'))
               .on('click', function() {
                 self.pushMenu(menu.id);

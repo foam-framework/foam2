@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.u2',
   name: 'CheckBox',
-  extends: 'foam.u2.tag.Input',
+  extends: 'foam.u2.property.AbstractCheckBox',
 
   documentation: 'Checkbox View.',
 
@@ -27,44 +27,7 @@ foam.CLASS({
       margin: 8px 0;
       padding: 8px;
     }
-
-    ^label {
-      color: #444;
-      flex-grow: 1;
-      margin-left: 12px;
-      overflow: hidden;
-      white-space: nowrap;
-      display: inline;
-    }
-
-    ^noselect {
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      -khtml-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-    }
   `,
-
-  properties: [
-    {
-      class: 'Boolean',
-      name: 'data'
-    },
-    {
-      class: 'Boolean',
-      name: 'showLabel',
-      factory: function() { return this.label || this.labelFormatter },
-    },
-    {
-      class: 'String',
-      name: 'label'
-    },
-    {
-      name: 'labelFormatter'
-    }
-  ],
 
   methods: [
     function initE() {
@@ -86,16 +49,6 @@ foam.CLASS({
           }.bind(this))
         .end();
       }
-    },
-
-    function updateMode_(mode) {
-      var disabled = mode === foam.u2.DisplayMode.RO ||
-                     mode === foam.u2.DisplayMode.DISABLED;
-      this.setAttribute('disabled', disabled);
-    },
-
-    function link() {
-      this.data$.linkTo(this.attrSlot('checked'));
     }
   ]
 });

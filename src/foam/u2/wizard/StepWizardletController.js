@@ -58,12 +58,7 @@ foam.CLASS({
         to foam.layout.Section object.
       `,
       expression: function(wizardlets) {
-        return wizardlets.map(wizardlet => {
-          // TODO: If no of and if createView DNE null, then we need to spoof a section
-          return this.AbstractSectionedDetailView.create({
-            of: wizardlet.of,
-          }).sections;
-        });
+        return wizardlets.map(w => w.sections);
       }
     },
     {
@@ -97,36 +92,18 @@ foam.CLASS({
         Array format is similar to sections.
       `,
       expression: function(sections) {
-        var availableSlots = [...sections.keys()].map(w => sections[w].map(
-          section => section.createIsAvailableFor(
-            this.wizardlets[w].data$
-          )
-        ));
+        var availableSlots = [...sections.keys()]
+          .map(w => sections[w].map(section => section.isAvailable$));
+
         availableSlots.forEach((sections, wizardletIndex) => {
           sections.forEach((availableSlot, sectionIndex) => {
+            var listenerPos = this.WizardPosition.create({
+              wizardletIndex: wizardletIndex,
+              sectionIndex: sectionIndex,
+            });
             availableSlot.sub(() => {
-              var val = availableSlot.get();
-              this.sectionAvailableSlots = this.sectionAvailableSlots;
-              let name = 'sectionAvailableSlots';
-              this.propertyChange.pub(name, this.slot(name));
-
-              if ( val ) {
-                // If this is a previous position, move the wizard back
-                var maybeNewPos = this.WizardPosition.create({
-                  wizardletIndex: wizardletIndex,
-                  sectionIndex: sectionIndex,
-                });
-                if ( maybeNewPos.compareTo(this.wizardPosition) < 0 ) {
-                  this.wizardPosition = maybeNewPos;
-                }
-              }
-
-              // Invoke a wizard position update (even if position didn't change)
-              // to re-render steps
-              this.wizardPosition = this.WizardPosition.create({
-                wizardletIndex: this.wizardPosition.wizardletIndex,
-                sectionIndex: this.wizardPosition.sectionIndex
-              });
+              this.onWizardPositionAvailabilityUpdate(
+                listenerPos, availableSlot.get());
             });
           });
         });
@@ -165,6 +142,9 @@ foam.CLASS({
           if ( subSi == 0 ) {
             if ( subWi == 0 ) return null;
             subWi--;
+            // Skip past steps with no sections
+            while ( sectionAvailableSlots[subWi].length < 1 ) subWi--;
+            if ( subWi < 0 ) return null;
             subSi = sectionAvailableSlots[subWi].length - 1;
           } else {
             subSi--;
@@ -176,16 +156,18 @@ foam.CLASS({
         };
 
         for ( let p = decr(wizardPosition) ; p != null ; p = decr(p) ) {
-          if ( ! this.wizardlets[p.wizardletIndex].isAvailable ) {
+          if ( ! this.wizardlets[p.wizardletIndex].isVisible ) {
             continue;
           }
 
-          if ( 
-            sectionAvailableSlots[p.wizardletIndex].length > 0 && 
-            sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() 
+          if (
+            sectionAvailableSlots[p.wizardletIndex].length > 0 &&
+            sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get()
             ) {
             return p;
           }
+
+          if ( p.sectionIndex < -1 ) return null;
         }
 
         return null;
@@ -211,15 +193,15 @@ foam.CLASS({
         };
 
         for ( let p = incr(wizardPosition) ; p != null ; p = incr(p) ) {
-          // Skip unavailable wizardlets
-          if ( ! this.wizardlets[p.wizardletIndex].isAvailable ) {
+          // Skip invisible wizardlets
+          if ( ! this.wizardlets[p.wizardletIndex].isVisible ) {
             continue;
           }
 
           // Land on an available section
-          if ( 
-            sectionAvailableSlots[p.wizardletIndex].length > 0 && 
-            sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get() 
+          if (
+            sectionAvailableSlots[p.wizardletIndex].length > 0 &&
+            sectionAvailableSlots[p.wizardletIndex][p.sectionIndex].get()
             ) {
             return p;
           }
@@ -255,16 +237,27 @@ foam.CLASS({
     {
       name: 'availabilityInvalidate',
       class: 'Int'
+    },
+    {
+      name: 'submitted',
+      class: 'Boolean'
     }
   ],
 
   methods: [
     function init() {
-      return this.wizardlets.forEach(wizardlet => {
+      console.log('stepWizardlet', this);
+      this.wizardlets.forEach(wizardlet => {
         wizardlet.isAvailable$.sub(() => {
           this.availabilityInvalidate++;
         })
-      })
+      });
+
+      // Force update of first section in current wizardlet
+      this.onWizardPositionAvailabilityUpdate(
+        this.wizardPosition,
+        this.wizardPosition.apply(this.sectionAvailableSlots).get()
+      );
     },
     function saveProgress() {
       var p = Promise.resolve();
@@ -283,7 +276,10 @@ foam.CLASS({
         var nextScreen = this.nextScreen;
 
         if ( nextScreen == null ) {
-          return this.currentWizardlet.save().then(() => true);
+          return this.currentWizardlet.save().then(() => {
+            this.submitted = true;
+            return true;
+          });
         }
 
         // number of unsaved wizardlets
@@ -294,7 +290,12 @@ foam.CLASS({
         // Save wizardlets
         return [...Array(N).keys()].map(v => S + v)
           .reduce(
-            (p, i) => p.then(() => this.wizardlets[i].save()),
+            (p, i) => p.then(
+              () => {
+                if ( this.wizardlets[i].isAvailable ) {
+                  return this.wizardlets[i].save();
+                }
+              }),
             Promise.resolve()
           ).then(() => {
             this.wizardPosition = nextScreen;
@@ -326,6 +327,38 @@ foam.CLASS({
       let previousScreen = this.previousScreen;
       if ( previousScreen !== null ) {
         this.wizardPosition = previousScreen;
+      }
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'onWizardPositionAvailabilityUpdate',
+      code: function onWizardPositionAvailabilityUpdate(listenerPos, val) {
+        this.sectionAvailableSlots = this.sectionAvailableSlots;
+        let name = 'sectionAvailableSlots';
+        this.propertyChange.pub(name, this.slot(name));
+
+        console.log('here', listenerPos, val);
+
+        if ( val ) {
+          // If this is a previous position, move the wizard back
+          if ( listenerPos.compareTo(this.wizardPosition) < 0 ) {
+            this.wizardPosition = listenerPos;
+          }
+        }
+
+        // Trigger "next screen" if the current wizard position is gone
+        if ( ! val && listenerPos.compareTo(this.wizardPosition) == 0 ) {
+          this.wizardPosition = this.nextScreen;
+        } else {
+          // Invoke a wizard position update (even if position didn't change)
+          // to re-render steps
+          this.wizardPosition = this.WizardPosition.create({
+            wizardletIndex: this.wizardPosition.wizardletIndex,
+            sectionIndex: this.wizardPosition.sectionIndex
+          });
+        }
       }
     }
   ]

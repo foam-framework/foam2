@@ -11,21 +11,28 @@ foam.CLASS({
 
   css: `
     ^item {
-      margin-bottom: 15px;
+      margin-bottom: 24px;
     }
-    ^item > .circle {
+    ^step-number-and-title {
+      display: flex;
+      align-items: center;
+    }
+    ^step-number-and-title > .circle {
       display: inline-block;
-      margin-right: 15px;
+      margin-right: 24px;
       vertical-align: middle;
+      min-width: 24px;
+      line-height: 26px !important;
     }
     ^sub-item {
-      padding-left: calc(24px + 15px + 4px);
-      padding-top: 8px;
-      font-style: italic;
+      padding-left: calc(24px + 24px + 4px);
+      padding-top: 2px;
+      padding-bottom: 8px;
+      color: /*%GREY2%*/ #9ba1a6;
     }
     ^sub-item:hover {
       cursor: pointer;
-      font-weight: bold;
+      color: /*%GREY1%*/ #5e6061 !important;
     }
     ^sub-item:first-child {
       padding-top: 16px;
@@ -34,6 +41,7 @@ foam.CLASS({
       display: inline-block;
       margin: 0;
       vertical-align: middle;
+      text-transform: uppercase;
     }
   `,
 
@@ -44,7 +52,12 @@ foam.CLASS({
   requires: [
     'foam.u2.detail.AbstractSectionedDetailView',
     'foam.u2.tag.CircleIndicator',
-    'foam.u2.wizard.WizardPosition'
+    'foam.u2.wizard.WizardPosition',
+    'foam.u2.wizard.WizardletIndicator'
+  ],
+
+  messages: [
+    { name: 'PART_LABEL', message: 'Part ' }
   ],
 
   methods: [
@@ -70,49 +83,31 @@ foam.CLASS({
             if (
               this.data.countAvailableSections(w) < 1
               || ! wizardlet.isAvailable
+              || ! wizardlet.isVisible
             ) {
-              console.log('skip');
               wSkipped++;
               continue;
             }
 
-            let baseCircleIndicator = {
-              size: 24,
-              borderThickness: 2,
-              label: '' + (1 + w - wSkipped),
-            };
             elem = elem
               .start()
                 .addClass(self.myClass('item'))
+                .start().addClass(self.myClass('step-number-and-title'))
 
-                // Render circle indicator
-                .start(this.CircleIndicator, {
-                  ...baseCircleIndicator,
-                  ...(isCurrent ? {
-                    borderColor: this.theme.primary1
-                  } : afterCurrent ? {
-                    borderColor: this.theme.grey2,
-                  } : wizardlet.validate() ? {
-                    borderColor: this.theme.approval3,
-                    backgroundColor: this.theme.approval3,
-                    icon: this.theme.glyphs.checkmark.getDataUrl({
-                      fill: this.theme.white
-                    }),
-                    label: ''
-                  } : {
-                    borderColor: this.theme.warning2
-                  })
-                })
-                  .addClass('circle')
-                .end()
+                  // Render circle indicator
+                  .start(this.CircleIndicator, this.configureIndicator(
+                    wizardlet, isCurrent, (1 + w - wSkipped)
+                  ))
+                    .addClass('circle')
+                  .end()
 
-                // Render title
-                .start('p').addClass(self.myClass('title'))
-                  .add(wizardlet.title)
-                  .style({
-                    'font-weight': isCurrent ? 'bold' : 'normal',
-                    'color': isCurrent || ! afterCurrent ? this.theme.primary1 : this.theme.grey2
-                  })
+                  // Render title
+                  .start('p').addClass(self.myClass('title'))
+                    .translate(wizardlet.capability.id+'.name', wizardlet.capability.name)
+                    .style({
+                      'color': isCurrent ? this.theme.black : this.theme.grey2
+                    })
+                  .end()
                 .end();
 
             // Get section index to highlight current section
@@ -132,15 +127,11 @@ foam.CLASS({
               let isBeforeCurrentSection = w < wi || isCurrent && s < si;
 
               let allowedToSkip = self.data.canSkipTo(pos);
-              let slot = section.createIsAvailableFor(
-                wizardlet.data$
-              ).map(function (isAvailable) {
+              let slot = section.isAvailable$.map(function (isAvailable) {
                 return isAvailable ? self.renderSectionLabel(
                   self.E().addClass(self.myClass('sub-item')),
                   section, s+1,
-                  isCurrentSection,
-                  isBeforeCurrentSection,
-                  allowedToSkip
+                  isCurrentSection
                 ).on('click', () => {
                   if ( isCurrentSection ) return;
                   if ( allowedToSkip ) {
@@ -158,24 +149,77 @@ foam.CLASS({
             if ( isCurrent ) afterCurrent = true;
           }
 
+          elem.onload.sub(self.setScrollPos);
           return elem;
         }))
     },
-    function renderSectionLabel(elem, section, index, isCurrent, isBeforeCurrentSection, isClickable) {
+    function renderSectionLabel(elem, section, index, isCurrent) {
       let title = section.title;
-      if ( ! title || ! title.trim() ) title = "Part " + index;
+      if ( ! title || ! foam.Function.isInstance(title) && ! title.trim() ) title = this.PART_LABEL + index;
+
+      title = foam.Function.isInstance(title) ?
+      foam.core.ExpressionSlot.create({
+        obj$: section.data$,
+        code: title
+      }) : title;
+
       return elem
-        .start()
-          .style({
-            'color': isCurrent || isBeforeCurrentSection
-              ? this.theme.primary1
-              : isClickable
-                ? this.theme.grey2
-                : this.theme.grey3,
-            'font-weight': isCurrent ? 'bold' : 'inherit'
-          })
-          .add(title)
-        .end();
+        .style({
+          'color': isCurrent
+            ? this.theme.black
+            : this.theme.grey2
+        })
+        .translate(title, title);
+    },
+    function configureIndicator(wizardlet, isCurrent, number) {
+      var args = {
+        size: 24, borderThickness: 2,
+      };
+      if ( wizardlet.indicator == this.WizardletIndicator.COMPLETED ) {
+        args = {
+          ...args,
+          borderColor: this.theme.approval3,
+          backgroundColor: this.theme.approval3,
+          borderColorHover: this.theme.approval3,
+          icon: this.theme.glyphs.checkmark.getDataUrl({
+            fill: this.theme.white
+          }),
+        };
+      } else {
+        args = {
+          ...args,
+          borderColor: this.theme.grey2,
+          borderColorHover: this.theme.grey2,
+          label: '' + number
+        };
+      }
+      if ( isCurrent ) {
+        args = {
+          ...args,
+          borderColor: this.theme.black,
+          borderColorHover: this.theme.black
+        };
+      }
+      return args;
     }
+  ],
+
+  listeners: [
+    {
+      name: 'setScrollPos',
+      code: function() {
+        let currI = 0;
+        for ( let w = 0 ; w < this.data.wizardlets.length ; w++ ) {
+          let wizardlet = this.data.wizardlets[w];
+          if (wizardlet === this.data.currentWizardlet){
+            currI = Math.max(w - 1, 0);
+          }
+        }
+
+        var padding = this.childNodes[0].childNodes[0].el().offsetTop;
+        var scrollTop = this.childNodes[0].childNodes[currI].el().offsetTop;
+        this.parentNode.el().scrollTop = scrollTop - padding;
+      }
+    },
   ]
 });

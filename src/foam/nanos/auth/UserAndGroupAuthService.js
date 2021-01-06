@@ -38,6 +38,7 @@ foam.CLASS({
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
+    'foam.nanos.notification.Notification',
     'foam.nanos.session.Session',
     'foam.util.Email',
     'foam.util.Password',
@@ -72,7 +73,7 @@ foam.CLASS({
         Session session = x.get(Session.class);
         // fetch context and check if not null or user id is 0
         if ( session == null || session.getUserId() == 0 ) {
-          throw new AuthenticationException("Not logged in");
+          throw new AuthenticationException();
         }
         // get user from session id
         User user = (User) ((DAO) getLocalUserDAO()).find(session.getUserId());
@@ -106,6 +107,7 @@ foam.CLASS({
       ],
       javaThrows: ['foam.nanos.auth.AuthenticationException'],
       javaCode: `
+      try {
         if ( user == null ) {
           throw new AuthenticationException("User not found");
         }
@@ -124,7 +126,8 @@ foam.CLASS({
         }
 
         // check if group enabled
-        Group group = user.findGroup(x);
+        X userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
+        Group group = user.findGroup(userX);
         if ( group != null && ! group.getEnabled() ) {
           throw new AuthenticationException("Group disabled");
         }
@@ -133,16 +136,35 @@ foam.CLASS({
           throw new AuthenticationException("Invalid Password");
         }
 
+        try {
+          group.validateCidrWhiteList(x);
+        } catch (foam.core.ValidationException e) {
+          throw new AuthenticationException("Access Denied");
+        }
+
         // Freeze user
         user = (User) user.fclone();
         user.freeze();
 
         Session session = x.get(Session.class);
         session.setUserId(user.getId());
+
+        if ( check(userX, "*") ) {
+          String msg = "Admin login for " + user.getId() + " succeeded on " + System.getProperty("hostname", "localhost");
+          ((foam.nanos.logger.Logger) x.get("logger")).warning(msg);
+        }
+
         ((DAO) getLocalSessionDAO()).inX(x).put(session);
         session.setContext(session.applyTo(session.getContext()));
-
         return user;
+      } catch ( AuthenticationException e ) {
+        if ( user != null &&
+             ( check(x.put("subject", new Subject.Builder(x).setUser(user).build()), "*") ) ) {
+          String msg = "Admin login for " + user.getId() + " failed on " + System.getProperty("hostname", "localhost");
+          ((foam.nanos.logger.Logger) x.get("logger")).warning(msg);
+        }
+        throw e;
+      }
       `
     },
     {
@@ -382,6 +404,7 @@ foam.CLASS({
       javaCode: `
         Session session = x.get(Session.class);
         if ( session != null && session.getUserId() != 0 ) {
+((foam.nanos.logger.Logger) x.get("logger")).info(this.getClass().getSimpleName(), "logout", session.getId());
           ((DAO) getLocalSessionDAO()).remove(session);
         }
       `
@@ -413,6 +436,7 @@ foam.CLASS({
             );
 
             if ( junction == null ) {
+              ((foam.nanos.logger.Logger) x.get("logger")).warning("There was a user and an agent in the context, but a junction between them was not found.", "user", user.getId(), "agent", agent.getId());
               throw new RuntimeException("There was a user and an agent in the context, but a junction between them was not found.");
             }
 

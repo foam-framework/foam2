@@ -10,31 +10,31 @@ foam.ENUM({
     {
       name: 'PENDING',
       label: { en: 'pending', pt: 'pendente'},
-      documentation: `This is for capabilities that are waiting verification. Capability access may take upto 24hrs.`,
+      documentation: 'Our team is currently reviewing. Approvals may take up to 24 hours',
       background: '#bfae32'
     },
     {
       name: 'GRANTED',
       label: { en: 'granted', pt: 'concedida'},
-      documentation: `This is for capabilities that have passed all checks. Capabilities in this status have their features unlocked.`,
+      documentation: 'The information you provided has been approved',
       background: '#32bf5e'
     },
     {
       name: 'EXPIRED',
       label: { en: 'expired', pt: 'expirada'},
-      documentation: `A capability can expire due to a number of factors. The data that was previously collected will be removed or reset and must be re-added or re-approved to gain access.`,
+      documentation: 'The information required has changed, or your inputs are no longer valid',
       background: '#bf3232'
     },
     {
       name: 'ACTION_REQUIRED',
       label: { en: 'action required', pt: 'ação requerida'},
-      documentation: `A capability started and requires further action to complete.`,
+      documentation: 'Information is missing for required fields',
       background: '#cf6f0a'
     },
     {
       name: 'AVAILABLE',
       label: { en: 'available', pt: 'acessível'},
-      documentation: `This status is used when a capability has had no previous actions and is accessible if you so choose.`,
+      documentation: 'You are ready to get started',
       background: '#604aff'
     },
     {
@@ -44,6 +44,20 @@ foam.ENUM({
       being set to granted.`,
       background: '#bfae32',
       ordinal: 6
+    },
+    {
+      name: 'PENDING_REVIEW',
+      label: { en: 'pending review', pt: 'revisão pendente' },
+      documentation: 'The information you provided is pending review',
+      background: '#bfae32'
+    },
+    {
+      name: 'REJECTED',
+      label: { en: 'rejected', pt: 'rejeitada'},
+      documentation: `- not seen by users - Denoting a junction requiring review has been rejected. Meant to mark items in a FINAL rejected state where it is not 
+      expected to go to EXPIRED and have the user fill out more info. Used in the 
+      Capable object junctions.`,
+      background: '#bfae32'
     },
   ]
 });

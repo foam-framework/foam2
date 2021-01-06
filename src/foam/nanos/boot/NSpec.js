@@ -15,16 +15,20 @@ foam.CLASS({
     {
       path: 'foam.comics.BrowserView',
       flags: ['web']
-    }
+    },
+    'foam.nanos.script.Language'
   ],
 
   javaImports: [
-    'bsh.EvalError',
-    'bsh.Interpreter',
-    'foam.dao.DAO',
-    'foam.core.FObject',
+    'java.io.IOException',
+    'java.io.PrintStream',
+
+    'foam.core.X',
+    'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
-    'foam.nanos.auth.AuthService'
+    'foam.nanos.script.BeanShellExecutor',
+    'foam.nanos.script.JShellExecutor',
+    'foam.nanos.script.Language'
   ],
 
   ids: [ 'name' ],
@@ -43,6 +47,13 @@ foam.CLASS({
       name: 'description',
       shortName: 'd',
       width: 120
+    },
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      value: true,
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'Boolean',
@@ -141,6 +152,12 @@ foam.CLASS({
       writePermissionRequired: true
     },
     {
+      class: 'Enum',
+      of: 'foam.nanos.script.Language',
+      name: 'language',
+      value: 'BEANSHELL'
+    },
+    {
       class: 'Code',
       name: 'serviceScript',
       shortName: 'ss',
@@ -177,13 +194,6 @@ foam.CLASS({
       writePermissionRequired: true
     },
     {
-      class: 'Boolean',
-      name: 'enabled',
-      value: true,
-      readPermissionRequired: true,
-      writePermissionRequired: true
-    },
-    {
       class: 'StringArray',
       name: 'keywords',
       shortName: 'ks'
@@ -200,60 +210,34 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'saveService',
-      args: [
-        { name: 'x', type: 'Context' },
-        { name: 'service', type: 'Any' }
-      ],
-      javaCode: `
-      /*
-        System.err.println("saveService: " + this.getName());
-        if ( service instanceof FObject ) {
-          setService((FObject) service);
-          DAO dao = (DAO) x.get("nSpecDAO");
-          dao.put(this);
-        }
-        */
-      `
-    },
-    {
       name: 'createService',
       args: [
-        { name: 'x', type: 'Context' }
+        { name: 'x', type: 'Context' },
+        { name: 'ps', type: 'PrintStream' }
       ],
       javaType: 'java.lang.Object',
       javaCode: `
         if ( getService() != null ) return getService();
 
-        if ( getServiceClass().length() > 0 ) {
-          Object service = Class.forName(getServiceClass()).newInstance();
-          // TODO: doesn't work with DAO's, fix
-          // saveService(x, service);
-          return service;
-        }
+        if ( getServiceClass().length() > 0 )
+          return Class.forName(getServiceClass()).newInstance();
 
-        Interpreter shell = new Interpreter();
-        try {
-          shell.set("x", x);
-          Object service = shell.eval(getServiceScript());
-          saveService(x, service);
-          return service;
-        } catch (EvalError e) {
-          foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
-          if ( logger != null ) {
-            logger.error("NSpec serviceScript error", getServiceScript(), e);
-          } else {
-            System.err.println("NSpec serviceScript error: " + getServiceScript());
-            e.printStackTrace();
-          }
-        }
-
-        return null;
+        Language l = getLanguage();
+        if ( l == foam.nanos.script.Language.JSHELL )
+          return new JShellExecutor().runExecutor(x, ps, getServiceScript());
+        else if ( l == foam.nanos.script.Language.BEANSHELL )
+          return new BeanShellExecutor(this).execute(x, ps, getServiceScript());
+        else
+          throw new RuntimeException("Script language not supported");
       `,
       javaThrows: [
         'java.lang.ClassNotFoundException',
         'java.lang.InstantiationException',
-        'java.lang.IllegalAccessException'
+        'java.lang.IllegalAccessException',
+        'SecurityException',
+        'NoSuchFieldException',
+        'IOException',
+        'Exception'
       ],
     },
     {
@@ -292,11 +276,14 @@ foam.CLASS({
         var service = this.__context__[this.name];
         if ( foam.dao.DAO.isInstance(service) ) {
           this.__context__.stack.push({
-            class: 'foam.comics.BrowserView',
-            createEnabled: true,
-            editEnabled: true,
-            exportEnabled: true,
-            data: service
+            class: 'foam.comics.v2.DAOBrowseControllerView',
+            data: service,
+            config: {
+              class: 'foam.comics.v2.DAOControllerConfig',
+              dao: service,
+              createPredicate: foam.mlang.predicate.True,
+              editPredicate: foam.mlang.predicate.True
+            }
           });
         }
       }

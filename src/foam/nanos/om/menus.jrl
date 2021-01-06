@@ -1,3 +1,52 @@
-p({"class":"foam.nanos.menu.Menu","id":"admin.o1m","label":"Operation Measures - 1 Minute","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"om1minDAO"},"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.o1h","label":"Operation Measures - 1 Hour","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"omHourlyDAO"},"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"admin.o1d","label":"Operation Measures - 1 Day","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"omDailyDAO"},"parent":"admin"})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.o1m",
+  "label":"Operation Measures - 1 Minute",
+  "handler":{
+  "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"om1minuteDAO"
+    }
+  },
+  "parent":"admin"
+})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.o5m",
+  "label":"Operation Measures - 5 Minute",
+  "handler":{
+  "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"om5minuteDAO"
+    }
+  },
+  "parent":"admin"
+})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.o1h",
+  "label":"Operation Measures - Hour",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"omHourlyDAO"
+    }
+  },
+  "parent":"admin"
+})
+p({
+  "class":"foam.nanos.menu.Menu",
+  "id":"admin.o1d",
+  "label":"Operation Measures - Day",
+  "handler":{
+    "class":"foam.nanos.menu.DAOMenu2",
+    "config":{
+      "class":"foam.comics.v2.DAOControllerConfig",
+      "daoKey":"omDailyDAO"
+    }
+  },
+  "parent":"admin"
+})

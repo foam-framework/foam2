@@ -12,7 +12,21 @@ foam.CLASS({
     'foam.u2.wizard.Wizardlet'
   ],
 
+  requires: [
+    'foam.u2.detail.AbstractSectionedDetailView',
+    'foam.u2.wizard.WizardletIndicator',
+    'foam.u2.wizard.WizardletSection',
+    'foam.u2.wizard.WAO'
+  ],
+
   properties: [
+    {
+      name: 'id',
+      class: 'String',
+      factory: function () {
+        return foam.uuid.randomGUID();
+      }
+    },
     {
       name: 'of',
       class: 'Class'
@@ -31,14 +45,21 @@ foam.CLASS({
       class: 'Boolean',
       expression: function (of, data, currentSection, data$errors_) {
         let sectionErrors = [];
-        if ( currentSection && data$errors_ ) {
+        if ( currentSection && currentSection.section && data$errors_ ) {
           sectionErrors = data$errors_.filter(error =>
-            currentSection.properties.includes(error[0])
+            currentSection.section.properties.includes(error[0])
           );
         }
 
         if ( ! this.of ) return true;
-        if ( ( ! data ) || currentSection ? sectionErrors.length > 0 : data$errors_) return false;
+        if (
+          ( ! data ) ||
+          ( currentSection && currentSection.section )
+            ? sectionErrors.length > 0
+            : data$errors_
+        ) {
+          return false;
+        }
         return true;
       }
     },
@@ -51,6 +72,52 @@ foam.CLASS({
         available iff at least one section is available. If false, wizardlet
         does not display even if some sections are available.
       `,
+    },
+    {
+      name: 'isVisible',
+      class: 'Boolean',
+      expression: function (of, isAvailable) {
+        return isAvailable && of;
+      }
+    },
+    {
+      name: 'sections',
+      flags: ['web'],
+      transient: true,
+      class: 'FObjectArray',
+      of: 'foam.u2.wizard.WizardletSection',
+      factory: function () {
+        return foam.u2.detail.AbstractSectionedDetailView.create({
+          of: this.of,
+        }, this).sections.map(section => this.WizardletSection.create({
+          section: section,
+          data$: this.data$,
+          isAvailable$: section.createIsAvailableFor(
+            this.data$,
+          )
+        }));
+      }
+    },
+    {
+      name: 'dataController',
+      class: 'FObjectProperty',
+      of: 'foam.u2.wizard.WAO',
+      flags: ['web'],
+      factory: function () {
+        this.WAO.create();
+      }
+    },
+    {
+      name: 'indicator',
+      class: 'Enum',
+      of: 'foam.u2.wizard.WizardletIndicator',
+      documentation: `
+        Describes how this wizardlet will appear in the list of steps.
+      `,
+      expression: function (isValid) {
+        return isValid ? this.WizardletIndicator.COMPLETED
+          : this.WizardletIndicator.PLEASE_FILL;
+      }
     }
   ],
 
@@ -60,6 +127,16 @@ foam.CLASS({
     },
     function createView(data) {
       return null;
+    },
+    async function save() {
+      return await this.dataController.save(this);
+    },
+    async function cancel() {
+      return await this.dataController.cancel(this);
+    },
+    async function load() {
+      await this.dataController.load(this);
+      return this;
     }
   ]
 });

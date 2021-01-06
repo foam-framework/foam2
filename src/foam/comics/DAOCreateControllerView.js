@@ -136,7 +136,7 @@ foam.CLASS({
     },
     function onThrowError() {
       var self = this;
-      self.notify(self.data.exception.message, '', self.ToastState.REQUESTED, self.LogLevel.ERROR, true);
+      self.notify(self.data.exception.message, '', self.LogLevel.ERROR, true);
     }
   ]
 });

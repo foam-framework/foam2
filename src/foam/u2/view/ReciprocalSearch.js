@@ -18,6 +18,7 @@ foam.CLASS({
 
   imports: [
     'dao',
+    'memento',
     'searchColumns'
   ],
 
@@ -142,7 +143,8 @@ foam.CLASS({
         }
         return `${selectedCount.toLocaleString()} of ${totalCount.toLocaleString()} selected`;
       }
-    }
+    },
+    'searchValue'
   ],
 
   methods: [
@@ -150,6 +152,10 @@ foam.CLASS({
       var self = this;
 
       this.dao.on.sub(this.updateTotalCount);
+      this.dao.on.sub(function() {
+        self.updateSelectedCount(0, 0, 0, self.searchManager.filteredDAO$);
+      });
+
       this.updateTotalCount();
 
       this.
@@ -171,7 +177,8 @@ foam.CLASS({
                 viewSpec: {
                   class: 'foam.u2.tag.Input',
                   focused: true
-                }
+                },
+                searchValue: this.searchValue
             }, slot)
             .addClass('general-query')
           .end();

@@ -14,10 +14,12 @@ foam.CLASS({
   ],
 
   imports: [
+    'auth',
     'crunchService',
     'ctrl',
     'subject',
-    'userCapabilityJunctionDAO'
+    'userCapabilityJunctionDAO',
+    'window'
   ],
 
   requires: [
@@ -71,14 +73,20 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isRenewable'
+    },
+    {
+      class: 'Boolean',
+      name: 'tooltipEnabled',
+      value: true
     }
   ],
 
   methods: [
     function init() {
        this.SUPER();
-       this.onDetach(this.userCapabilityJunctionDAO.on.put.sub(this.daoUpdate));
+       this.onDetach(this.crunchService.sub('updateJunction', this.daoUpdate));
        this.daoUpdate();
+       this.onDetach(this.cjStatus$.sub(this.statusUpdate));
     },
 
     function initE() {
@@ -89,7 +97,7 @@ foam.CLASS({
       // Methods of Style all return the first argument for chaining
       var style = self.Style.create();
       style.addBinds(self);
-      
+
       self
         .addClass(style.myClass())
         .addClass(style.myClass(), 'mode-card')
@@ -99,34 +107,24 @@ foam.CLASS({
             'background-image': "url('" + self.data.icon + "')"
           })
           .add(this.slot(function(cjStatus, isRenewable) {
-            return this.E('span')
-              .style({ 'float' : 'right' })
+            return this.E().addClass(style.myClass('tooltip'))
+              .start('span')
+                .addClass(style.myClass('tooltiptext'))
+                .addClass(style.myClass('tooltip-bottom'))
+                .enableClass(style.myClass('tooltipDisabled'), self.tooltipEnabled, true)
+                .add(cjStatus.documentation)
+              .end()
               .start()
                 .addClass(style.myClass('renewable-description'))
                 .add(isRenewable ? "Capability is renewable" : "")
               .end()
-              .start(self.ReadOnlyEnumView, { data : cjStatus, clsInfo : cjStatus.cls_.LABEL.name, default : cjStatus.label })
-                .addClass(style.myClass('badge'))
-                .style({ 'background-color': cjStatus.background })
-              .end();
+              .add(cjStatus.label).addClass(style.myClass('badge'))
+              .style({ 'background-color': cjStatus.background });
           }))
         .end()
         .start()
           .addClass(style.myClass('card-title'))
           .add(( self.data.name != '') ?  { data : self.data, clsInfo : self.data.cls_.NAME.name, default : self.data.name }  : self.data.id)
-        .end()
-        .start()
-          .addClass(style.myClass('card-subtitle'))
-          .select(self.data.categories.dao
-            .where(this.EQ(foam.nanos.crunch.CapabilityCategory.VISIBLE, true)), function (category) {
-              return this.E('span')
-                .addClass(style.myClass('category'))
-                .add({ data : category, clsInfo : category.cls_.NAME.name, default : category.name });
-          })
-        .end()
-        .start()
-          .addClass(style.myClass('card-description'))
-          .add({ data : self.data, clsInfo : self.data.cls_.DESCRIPTION.name, default : self.data.description } || 'no description')
         .end();
     }
   ],
@@ -135,29 +133,61 @@ foam.CLASS({
     {
       name: 'daoUpdate',
       code: function() {
-        this.userCapabilityJunctionDAO.find(
-          this.AND(
-            this.EQ(this.UserCapabilityJunction.TARGET_ID, this.data.id),
-            this.EQ(this.UserCapabilityJunction.SOURCE_ID, this.associatedEntity.id),
-            this.OR(
-              this.NOT(this.INSTANCE_OF(this.AgentCapabilityJunction)),
-              this.AND(
-                this.INSTANCE_OF(this.AgentCapabilityJunction),
-                this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, this.subject.user.id)
-              )
-            )
-          )
-        ).then(ucj => {
+        // This code looks hardcorded - why aren't the statuses being set and shown using ucj data status?
+        this.crunchService.getJunction(null, this.data.id).then(ucj => {
           if ( ucj ) {
-            this.cjStatus = ucj.status === this.CapabilityJunctionStatus.APPROVED ? 
+            this.cjStatus = ucj.status === this.CapabilityJunctionStatus.APPROVED ?
               this.CapabilityJunctionStatus.PENDING : ucj.status;
           }
-          if ( this.cjStatus === this.CapabilityJunctionStatus.GRANTED ){
+          if ( this.cjStatus === this.CapabilityJunctionStatus.GRANTED ) {
             this.crunchService.isRenewable(this.ctrl.__subContext__, ucj.targetId).then(
               isRenewable => this.isRenewable = isRenewable
             );
           }
+          if ( this.cjStatus === this.CapabilityJunctionStatus.ACTION_REQUIRED ) {
+            this.auth.check(this.ctrl.__subContext__, 'certifydatareviewed.rw.reviewed').then(result => {
+              if ( ! result &&
+                ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-49' ||
+                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-13' ||
+                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-12' ||
+                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-11'
+                ) ) {
+                this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
+              }
+            }).catch(err => {
+              if ( err.data && err.data.id === 'foam.nanos.crunch.CapabilityIntercept' &&
+                ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-49' ||
+                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-13' ||
+                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-12' ||
+                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-11'
+                ) ) {
+                this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
+              } else throw err;
+            });
+
+            if ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-20' ) {
+              this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
+            }
+          }
         });
+      }
+    },
+    {
+      name: 'statusUpdate',
+      code: function() {
+        if ( this.cjStatus != this.CapabilityJunctionStatus.PENDING &&
+              this.cjStatus != this.CapabilityJunctionStatus.PENDING_REVIEW ) {
+          return;
+        }
+        this.crunchService.getJunction(null, this.data.id).then(ucj => {
+          if ( ucj && ucj.status === this.CapabilityJunctionStatus.GRANTED ) {
+            this.auth.cache = {};
+            this.crunchService.pub('grantedJunction');
+            this.cjStatus = this.CapabilityJunctionStatus.GRANTED;
+          } else {
+            this.window.setTimeout(this.statusUpdate, 2000);
+          }
+        })
       }
     }
   ]

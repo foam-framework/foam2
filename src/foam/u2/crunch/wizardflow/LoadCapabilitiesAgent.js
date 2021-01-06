@@ -14,12 +14,33 @@ foam.CLASS({
     'crunchService',
     'rootCapability'
   ],
-  exports: [ 'capabilities' ],
+  exports: [
+    'capabilities',
+    'getWAO'
+  ],
+
+  requires: [
+    'foam.nanos.crunch.ui.UserCapabilityJunctionWAO',
+    'foam.nanos.crunch.ui.CapableWAO',
+  ],
+
+  enums: [
+    {
+      name: 'WAOSetting',
+      values: ['UCJ','CAPABLE']
+    }
+  ],
 
   properties: [
     {
       name: 'capabilities',
       class: 'Array'
+    },
+    {
+      name: 'waoSetting',
+      factory: function () {
+        return this.WAOSetting.UCJ;
+      }
     }
   ],
 
@@ -28,6 +49,16 @@ foam.CLASS({
     function execute() {
       return this.crunchService.getCapabilityPath(null, this.rootCapability.id, false)
         .then(capabilities => { this.capabilities = capabilities });
+    },
+    function getWAO() {
+      switch ( this.waoSetting ) {
+        case this.WAOSetting.UCJ:
+          return this.UserCapabilityJunctionWAO.create({}, this.__context__);
+        case this.WAOSetting.CAPABLE:
+          return this.CapableWAO.create({}, this.__context__);
+        default:
+          throw new Error('WAOSetting is unrecognized: ' + this.waoSetting);
+      }
     }
   ]
 });

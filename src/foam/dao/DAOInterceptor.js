@@ -175,7 +175,7 @@ foam.CLASS({
     {
       name: 'put_',
       code: function(x, obj) {
-        // TODO: obj.id can generate garbase, would be
+        // TODO: obj.id can generate garbage, would be
         // slightly faster if DAO.find() could take an object
         // as well.
         var self = this;

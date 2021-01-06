@@ -19,6 +19,14 @@ foam.CLASS({
   package: 'foam.u2.stack',
   name: 'Stack',
 
+  imports: [
+    'memento'
+  ],
+
+  requires: [
+    'foam.nanos.controller.Memento'
+  ],
+
   properties: [
     {
       name: 'stack_',
@@ -82,6 +90,34 @@ foam.CLASS({
       this.stack_.length = this.depth;
       this.stack_[pos] = [v, parent, opt_id];
       this.pos = pos;
+    },
+    function setToNullCurrentMemento() {
+      /** setting the last not null memento in memento chain to null to update application controller memento value on stack.back **/
+      var m = this.memento;
+      var tail = this.memento.tail;
+      
+      if ( tail == null ) {
+        this.memento.value$.set('');
+        return;
+      }
+
+      while ( true ) {
+        if ( tail.tail == null ) {
+          m.tail$.set(null);
+          return;
+        }
+        m = tail;
+        tail = tail.tail;
+      }
+    },
+    function findCurrentMemento() {
+      var tail = this.memento;
+      while ( true ) {
+        if ( tail.tail == null ) {
+          return tail;
+        }
+        tail = tail.tail;
+      }
     }
   ],
 
@@ -90,7 +126,32 @@ foam.CLASS({
       name: 'back',
       // icon: 'arrow_back',
       isEnabled: function(pos) { return pos > 0; },
-      code: function() { this.pos--; }
+      code: function() {
+        var isMementoSetWithView = false;
+
+        //check if the class of the view to which current position points has property MEMENTO_HEAD
+        //or if the view is object and it has mementoHead set
+        //if so we need to set last not-null memento in the memento chain to null as we're going back
+        if ( this.stack_[this.pos][0].class ) {
+          var classObj = this.stack_[this.pos][0].class;
+          if ( foam.String.isInstance(classObj) ) {
+            classObj = foam.lookup(this.stack_[this.pos][0].class);
+          }
+          var obj = classObj.create(this.stack_[this.pos][0]);
+          if ( obj && obj.mementoHead ) {
+            isMementoSetWithView = true;
+          }
+        } else {
+          if ( this.stack_[this.pos][0].mementoHead ) {
+            isMementoSetWithView = true;
+          }
+        }
+
+        this.pos--;
+
+        if ( isMementoSetWithView )
+          this.setToNullCurrentMemento();
+      }
     },
     {
       name: 'forward',

@@ -113,7 +113,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function open() {
+    function init() {
       this.add(this.dialog_);
       this.SUPER();
     }

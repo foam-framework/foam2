@@ -9,17 +9,16 @@ foam.CLASS({
   name: 'ServiceProviderAwareSupport',
 
   documentation: `Support methods for ServiceProviderAware DAOs and Sinks.
-Use: see ServiceProviderAwareTest
-        DAO dao = (DAO) new ServiceProviderAwareDAO.Builder(x)
-                            .setDelegate(delegate)
-                            .setPropertyInfos(
-                              new HashMap<String, PropertyInfo[]>() {{
-                                put(NotificationSetting.class.getName(), new PropertyInfo[] { NotificationSetting.OWNER });
-                              }}
-                            )
-                            .build();
-
-`,
+    Use: see ServiceProviderAwareTest
+    DAO dao = (DAO) new ServiceProviderAwareDAO.Builder(x)
+      .setDelegate(delegate)
+      .setPropertyInfos(
+        new HashMap<String, PropertyInfo[]>() {{
+          put(NotificationSetting.class.getName(), new PropertyInfo[] { NotificationSetting.OWNER });
+        }}
+      )
+      .build();
+  `,
 
   // TODO: ServiceProviderAwareMLang(property) performs EQ on getSpid on both objs.
   // and add to generation where 'findFoo' is available to avoid reflection.,
@@ -64,9 +63,10 @@ Use: see ServiceProviderAwareTest
 
   methods: [
     {
-      documentation: `Using Relationship findFoo(x), traverse relationships,
-returning true if the spid or context users spid matches the current object.`,
       name: 'match',
+      documentation: `Using Relationship findFoo(x), traverse relationships,
+        returning true if the spid or context users spid matches the current object.`,
+      type: 'Boolean',
       args: [
         {
           name: 'x',
@@ -81,67 +81,69 @@ returning true if the spid or context users spid matches the current object.`,
           type: 'Object'
         }
       ],
-      type: 'Boolean',
       javaCode: `
-      var isUserSpid = false;
-      var spid = getSpid();
+        var isUserSpid = false;
+        var spid = getSpid();
 
-      if ( SafetyUtil.isEmpty(spid) ) {
-        var user = ((Subject) x.get("subject")).getUser();
-        if ( user == null ) {
-          // TODO/REVIEW: occurs during login. See AuthenticationApiTest
-          return true;
+        if ( SafetyUtil.isEmpty(spid) ) {
+          var user = ((Subject) x.get("subject")).getUser();
+          if ( user == null ) {
+            // TODO/REVIEW: occurs during login. See AuthenticationApiTest
+            return true;
+          }
+          spid = user.getSpid();
+          isUserSpid = true;
         }
-        spid = user.getSpid();
-        isUserSpid = true;
-      }
 
-      var auth = (AuthService) x.get("auth");
+        var auth = (AuthService) x.get("auth");
 
-      if ( obj != null &&
-           obj instanceof ServiceProviderAware ) {
-        ServiceProviderAware sp = (ServiceProviderAware) obj;
-        return spid.equals(sp.getSpid()) ||
-                 isUserSpid && auth.check(x, "spid.read." + sp.getSpid());
-      }
-
-      Object result = obj;
-      while ( result != null &&
-              properties != null ) {
-        PropertyInfo pInfos[] = (PropertyInfo[]) getProperties(x, properties, result);
-        if ( pInfos == null ) {
-          return false;
+        if ( obj != null &&
+            obj instanceof ServiceProviderAware ) {
+          ServiceProviderAware sp = (ServiceProviderAware) obj;
+          return sp.getSpid().startsWith(spid) || sp.getSpid().equals("*") ||
+                  isUserSpid && auth.check(x, getSpidReadPermission(sp.getSpid()));
         }
-        for ( int i = 0; i < pInfos.length; i++ ) {
-          foam.core.PropertyInfo pInfo = pInfos[i];
-          try {
-            Method method = (Method) getFindMethods().get(pInfo.getName());
-            if ( method == null ) {
-              method = getFindMethod(x, pInfo.getName(), result);
-            }
-            result = invokeMethod(x, method, result);
-            if ( result != null &&
-                 result instanceof ServiceProviderAware ) {
-              ServiceProviderAware sp = (ServiceProviderAware) result;
-              return spid.equals(sp.getSpid()) ||
-                       isUserSpid && auth.check(x, "spid.read." + sp.getSpid());
-            } else {
-              break;
-            }
-          } catch (NoSuchMethodException e) {
-            ((Logger) x.get("logger")).warning("ServiceProviderAwareSupport.match", result.getClass().getSimpleName(), pInfo.getName(), "NoSuchMethodException");
+
+        Object result = obj;
+        while ( result != null && properties != null ) {
+          PropertyInfo pInfos[] = (PropertyInfo[]) getProperties(x, properties, result);
+          if ( pInfos == null ) {
             return false;
           }
+          for ( int i = 0; i < pInfos.length; i++ ) {
+            foam.core.PropertyInfo pInfo = pInfos[i];
+            try {
+              Method method = (Method) getFindMethods().get(pInfo.getName());
+              if ( method == null ) {
+                method = getFindMethod(x, pInfo.getName(), result);
+              }
+              result = invokeMethod(x, method, result);
+              if ( result != null &&
+                  result instanceof ServiceProviderAware ) {
+                ServiceProviderAware sp = (ServiceProviderAware) result;
+                return sp.getSpid().startsWith(spid) || sp.getSpid().equals("*") ||
+                        isUserSpid && auth.check(x, getSpidReadPermission(sp.getSpid()));
+              } else {
+                break;
+              }
+            } catch (NoSuchMethodException e) {
+              Logger logger = (Logger) x.get("logger");
+              if ( logger == null ) {
+                logger = new foam.nanos.logger.StdoutLogger();
+              }
+              logger.warning("ServiceProviderAwareSupport.match", result.getClass().getSimpleName(), pInfo.getName(), "NoSuchMethodException");
+              return false;
+            }
+          }
         }
-      }
-      return false;
-     `
+        return false;
+      `
     },
     {
-      documentation: `Search for obj class name in property info map.
-If not found, test if argument obj is assignable from map class, and
-store the result for subsequent lookups. `,
-      name: 'getProperties',
+      name: 'findSpid',
+      documentation: `Using Relationship findFoo(x), traverse relationships,
+        returning the spid or context users spid matches the current object.`,
+      type: 'String',
       args: [
         {
           name: 'x',
@@ -156,7 +158,61 @@ store the result for subsequent lookups. `,
           type: 'Object'
         }
       ],
+      javaCode: `
+        Object result = obj;
+        while ( result != null && properties != null ) {
+          PropertyInfo pInfos[] = (PropertyInfo[]) getProperties(x, properties, result);
+          if ( pInfos == null ) {
+            return "";
+          }
+          for ( int i = 0; i < pInfos.length; i++ ) {
+            foam.core.PropertyInfo pInfo = pInfos[i];
+            try {
+              Method method = (Method) getFindMethods().get(pInfo.getName());
+              if ( method == null ) {
+                method = getFindMethod(x, pInfo.getName(), result);
+              }
+              result = invokeMethod(x, method, result);
+              if ( result != null &&
+                  result instanceof ServiceProviderAware ) {
+                ServiceProviderAware sp = (ServiceProviderAware) result;
+                return sp.getSpid();
+              } else {
+                break;
+              }
+            } catch (NoSuchMethodException e) {
+              Logger logger = (Logger) x.get("logger");
+              if ( logger == null ) {
+                logger = new foam.nanos.logger.StdoutLogger();
+              }
+              logger.warning("ServiceProviderAwareSupport.findSpid", result.getClass().getSimpleName(), pInfo.getName(), "NoSuchMethodException");
+              return "";
+            }
+          }
+        }
+        return "";
+      `
+    },
+    {
+      name: 'getProperties',
+      documentation: `Search for obj class name in property info map.
+        If not found, test if argument obj is assignable from map class, and
+        store the result for subsequent lookups. `,
       type: 'foam.core.PropertyInfo[]',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'properties',
+          type: 'Map'
+        },
+        {
+          name: 'obj',
+          type: 'Object'
+        }
+      ],
       javaCode: `
       String name = obj.getClass().getName();
       PropertyInfo[] pInfos = (PropertyInfo[]) getPropertyInfos().get(name);
@@ -234,15 +290,29 @@ store the result for subsequent lookups. `,
           while ( cause.getCause() != null ) {
             cause = cause.getCause();
           }
+          Logger logger = (Logger) x.get("logger");
+          if ( logger == null ) {
+            logger = new foam.nanos.logger.StdoutLogger();
+          }
           if ( cause != null &&
                cause instanceof AuthorizationException ) {
-            ((Logger) x.get("logger")).debug("ServiceProviderAwareSupport.invokeMethod", obj.getClass().getSimpleName(), method.getName(), "AuthorizationException", cause.getMessage(), cause);
+            logger.debug("ServiceProviderAwareSupport.invokeMethod", obj.getClass().getSimpleName(), method.getName(), "AuthorizationException", cause.getMessage(), cause);
             return null;
           } else {
-            ((Logger) x.get("logger")).error("ServiceProviderAwareSupport.invokeMethod", obj.getClass().getSimpleName(), method.getName(), e.getMessage(), e);
+            logger.error("ServiceProviderAwareSupport.invokeMethod", obj.getClass().getSimpleName(), method.getName(), e.getMessage(), e);
           }
         }
         return null;
+      `
+    },
+    {
+      name: 'getSpidReadPermission',
+      type: 'String',
+      args: [
+        { name: 'spid', type: 'String' }
+      ],
+      javaCode: `
+        return "serviceprovider.read." + (SafetyUtil.isEmpty(spid) ? "*" : spid);
       `
     }
   ],
@@ -260,3 +330,4 @@ store the result for subsequent lookups. `,
     }
   ]
 });
+

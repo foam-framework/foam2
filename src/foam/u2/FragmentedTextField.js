@@ -21,8 +21,6 @@ foam.CLASS({
     ^symbol {
       display: flex;
       align-items: center;
-      background: %GREY5%;
-      border: 1px solid %GREY3%;
       margin-left: -1px;
       margin-right: -1px;
       line-height: 100%;
@@ -42,6 +40,9 @@ foam.CLASS({
       border-top-left-radius: 0 !important;
       border-bottom-left-radius: 0 !important;
     }
+    ^fragment {
+      text-align: center;
+    }
   `,
 
   properties: [
@@ -49,6 +50,21 @@ foam.CLASS({
       name: 'delegates',
       class: 'Array'
     },
+    {
+      class: 'Int',
+      name: 'currentIndex',
+      value: 0,
+      preSet: function(old, nu) {
+        if ( nu > this.numOfParts - 1 ) return this.numOfParts - 1;
+        if ( nu < 1 ) return 0;
+        return nu;
+      }
+    },
+    {
+      class: 'Int',
+      name: 'numOfParts',
+      value: 0
+    }
   ],
 
   methods: [
@@ -65,16 +81,59 @@ foam.CLASS({
           this.start().addClass(this.myClass('symbol'))
             .add(e).end();
           continue;
+        } else if ( e.cls_ === foam.u2.FragmentedTextFieldFragment ) {
+          e = e.view;
         }
         var u2Elem = this.start(e)
+          .style({ width: this.delegates[i].maxLength * 10 })
+          .addClass(this.myClass('fragment'))
+        u2Elem.on('focus', () => {
+          this.currentIndex = i;
+        })
         slots.push(u2Elem.data$)
       }
 
       this.data$ = this.ArraySlot.create({ slots }).map(arr => {
         return '' + arr.join('');
       });
+      this.data$.sub(this.onDataUpdate);
+      this.numOfParts = this.delegates.length;
 
       return this;
+    },
+    function processData(data, index, arr) {
+      // returns an array of data chunks in the size of the delegates
+      var currentElement = this.childNodes[index];
+      if ( ! data || ! currentElement ) return arr;
+
+      var maxLength = this.delegates[index].maxLength;
+      arr.push(data.substring(0, maxLength));
+      return this.processData(data.substring(maxLength), index + 2, arr);
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'onDataUpdate',
+      code: function() {
+        var arr = this.processData(this.childNodes[this.currentIndex].data, this.currentIndex, []);
+        for ( var i = 0; i < arr.length; i++ ) {
+          var nextIndex = this.currentIndex + 1;
+          while ( this.childNodes[nextIndex] && ! foam.u2.TextField.isInstance(this.childNodes[nextIndex]) ) {
+            nextIndex++;
+          }
+          this.childNodes[this.currentIndex].data = arr[i];
+          if ( next = this.childNodes[nextIndex] ) {
+            if ( this.delegates[this.currentIndex].maxLength > arr[i].length ) break;
+
+            if ( ! ( next && next.data ) ) {
+              this.currentIndex = nextIndex;
+              next.focus();
+            } else break;
+          }
+        }
+        this.childNodes[this.currentIndex].focus();
+      }
     }
   ]
 });

@@ -14,15 +14,20 @@ foam.CLASS({
   ],
 
   imports: [
-    'capabilities',
     'wizardlets',
-    'wizardConfig',
+    // 'wizardConfig',
     'pushView',
-    'popView'
+    'popView',
+    'initialPosition?'
+  ],
+
+  exports: [
+    'submitted'
   ],
 
   requires: [
     'foam.u2.dialog.Popup',
+    'foam.u2.wizard.StepWizardConfig',
     'foam.u2.wizard.StepWizardletController'
   ],
 
@@ -31,29 +36,49 @@ foam.CLASS({
       name: 'config',
       class: 'FObjectProperty',
       of: 'foam.u2.wizard.StepWizardConfig',
-      factory: function() { return null; }
+      factory: function() {
+        return this.StepWizardConfig.create();
+      }
     },
     {
       name: 'view',
       value: {
         class: 'foam.u2.wizard.StepWizardletView',
       }
+    },
+    {
+      name: 'submitted',
+      class: 'Boolean'
     }
   ],
 
   methods: [
     function execute() {
-      return new Promise((resolve, _) => {
+      return new Promise((resolve, reject) => {
+        var data = this.StepWizardletController.create({
+          wizardlets: this.wizardlets,
+          config: this.config,
+          submitted$: this.submitted$,
+          ...(this.initialPosition ? {
+            wizardPosition: this.initialPosition
+          } : {})
+        })
+
         this.pushView({
           ...this.view,
-          data: this.StepWizardletController.create({
-            wizardlets: this.wizardlets,
-            config: this.wizardConfig
-          }),
+          data: data,
+          closeable: true,
           onClose: (x) => {
             this.popView(x)
             resolve();
           }
+        }, (x) => {
+          data.saveProgress().then(() => {
+            resolve();
+          }).catch(e => {
+            console.error(e);
+            x.ctrl.notify(this.ERROR_MSG_DRAFT, '', this.LogLevel.ERROR, true);
+          });
         });
       });
     }

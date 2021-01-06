@@ -12,8 +12,7 @@ foam.CLASS({
   documentation: 'Modal Container close/title use in modal class to append title & close buttons.',
 
   imports: [
-    'stack',
-    'closeDialog'
+    'stack'
   ],
 
   properties: [
@@ -27,25 +26,17 @@ foam.CLASS({
       align-items: center;
 
       width: 100%; /* This is to fit the width of its parent container */
-      padding: 16px 24px;
+      padding: 24px 24px 20px;
       box-sizing: border-box;
       border-bottom: solid 1px #CBCFD4;
     }
     ^title{
-      font-family: /*%FONT1%*/, Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 18px;
       font-weight: 600;
       color: #1E1F21;
       margin: 0;
       flex: 1;
-    }
-    ^close{
-      background: 0;
-      width: 24px;
-      height: 24px;
-      padding: 0 !important;
-      cursor: pointer;
-      margin: 0 8px;
     }
     ^ .foam-u2-ActionView-closeModal{
       background: transparent !important;
@@ -60,19 +51,7 @@ foam.CLASS({
 
     this
       .addClass(this.myClass())
-      .start().addClass(this.myClass('title')).add(this.title).end()
-      .start(this.CLOSE_MODAL).addClass(this.myClass('close')).end();
-    }
-  ],
-
-  actions: [
-    {
-      name: 'closeModal',
-      icon: 'images/ic-cancelgray.svg',
-      label: '',
-      code: function(X) {
-        X.closeDialog();
-      }
+      .start().addClass(this.myClass('title')).add(this.title).end();
     }
   ]
 });

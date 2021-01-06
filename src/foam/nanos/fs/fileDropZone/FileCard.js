@@ -18,7 +18,8 @@ foam.CLASS({
 
   imports: [
     'allowRemoval',
-    'removeFile'
+    'removeFile',
+    'highlight'
   ],
 
   exports: [
@@ -97,12 +98,20 @@ foam.CLASS({
     },
     {
       name: 'index'
+    },
+    {
+      name: 'selected'
     }
   ],
 
   methods: [
     function initE() {
       this.SUPER();
+      if ( this.selected == this.index ) {
+        this.style({
+          "border-color": "/*%PRIMARY1%*/ #604aff"
+        })
+      }
       this.addClass(this.myClass())
         .start({ class: 'foam.u2.tag.Image', data: 'images/attach-icon.svg' }).end()
         .start('p').addClass(this.myClass('name'))
@@ -116,7 +125,9 @@ foam.CLASS({
         .start(this.REMOVE_FILE_X, {
           buttonStyle: foam.u2.ButtonStyle.TERTIARY,
           icon: 'images/cancel-x.png'
-        }).show(this.allowRemoval && this.canBeRemoved).addClass(this.myClass('close-action')).end()
+        }).show(this.allowRemoval && this.canBeRemoved).addClass(this.myClass('close-action')).end();
+
+      this.on('click', this.pick);
     }
   ],
 
@@ -138,9 +149,15 @@ foam.CLASS({
         if ( this.BlobBlob.isInstance(blob) ) {
           window.open(URL.createObjectURL(blob.blob));
         } else {
-          var url = '/service/httpFileService/' + this.data.id;
+          var url = this.data.address;
           window.open(url);
         }
+      }
+    },
+    {
+      name: 'pick',
+      code: function(X) {
+        this.highlight(this.index);
       }
     }
   ]

@@ -8,18 +8,20 @@ foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOBrowserView',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.comics.SearchMode',
     'foam.comics.v2.DAOControllerConfig',
     'foam.log.LogLevel',
+    'foam.nanos.controller.Memento',
     'foam.u2.ActionView',
     'foam.u2.dialog.Popup',
+    'foam.u2.filter.FilterView',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
-    'foam.u2.filter.FilterView',
     'foam.u2.view.ScrollTableView',
     'foam.u2.view.SimpleSearch',
-    'foam.u2.view.TabChoiceView',
+    'foam.u2.view.TabChoiceView'
   ],
 
   implements: [
@@ -33,7 +35,30 @@ foam.CLASS({
 
   css: `
     ^export {
+      background-image: linear-gradient(to bottom, #ffffff, #e7eaec);
+      border: 1px solid /*%GREY3%*/ #CBCFD4;
       margin-left: 16px;
+    }
+
+    ^export:hover {
+      border: 1px solid /*%BLACK%*/ #1E1F21;
+    }
+
+    ^export:focus:not(:hover) {
+      border: 1px solid /*%GREY3%*/ #CBCFD4;
+    }
+
+    ^refresh {
+      background-image: linear-gradient(to bottom, #ffffff, #e7eaec);
+      border: 1px solid /*%GREY3%*/ #CBCFD4;
+    }
+
+    ^refresh:hover {
+      border: 1px solid /*%BLACK%*/ #1E1F21;
+    }
+
+    ^refresh:focus:not(:hover) {
+      border: 1px solid /*%GREY3%*/ #CBCFD4;
     }
 
     ^export img {
@@ -61,9 +86,7 @@ foam.CLASS({
     }
 
     ^browse-view-container {
-      margin: auto;
       border-bottom: solid 1px #e7eaec;
-      margin: 0px 0px 72px 0px;
       box-sizing: border-box;
       padding: 0 16px;
     }
@@ -94,14 +117,16 @@ foam.CLASS({
   ],
 
   imports: [
-    'stack?',
-    'ctrl'
+    'ctrl',
+    'memento',
+    'stack?'
   ],
 
   exports: [
     'dblclick',
     'filteredTableColumns',
-    'serviceName'
+    'serviceName',
+    'config'
   ],
 
   properties: [
@@ -171,9 +196,20 @@ foam.CLASS({
       name: 'serviceName',
       class: 'String',
       factory: function() {
-        return this.data.serviceName;
+        return this.data && this.data.serviceName ? this.data.serviceName : this.config.daoKey;
       }
-    }
+    },
+    {
+      name: 'importModal',
+      factory: function() {
+        return {
+          class: 'foam.nanos.google.api.sheets.ImportFromGoogleSheetsForm',
+          of: this.config.of,
+          dao: this.serviceName
+        };
+      }
+    },
+    'currentMemento'
   ],
 
   actions: [
@@ -200,6 +236,16 @@ foam.CLASS({
         this.config.dao.cmd_(X, foam.dao.AbstractDAO.RESET_CMD);
         this.ctrl.notify(this.REFRESH_MSG, '', this.LogLevel.INFO, true);
       }
+    },
+    {
+      name: 'import',
+      label: '',
+      availablePermissions: [ "data.import.googleSheets" ],
+      toolTip: 'Import From Google Sheet',
+      // icon: 'images/export-arrow-icon.svg',//need find out where we're getting the icons
+      code: function() {
+        this.add(this.Popup.create().tag(this.importModal));
+      }
     }
   ],
 
@@ -209,15 +255,17 @@ foam.CLASS({
       this.onDetach(this.cannedPredicate$.sub(() => {
         this.searchPredicate = foam.mlang.predicate.True.create();
       }));
+
+      this.currentMemento$ = this.memento.tail$;
     },
     function dblclick(obj, id) {
       if ( ! this.stack ) return;
+
       this.stack.push({
         class: 'foam.comics.v2.DAOSummaryView',
         data: obj,
         config: this.config,
-        of: this.config.of,
-        id: id
+        idOfRecord: id
       }, this.__subContext__);
     },
     function initE() {
@@ -255,18 +303,23 @@ foam.CLASS({
                       .callIf(self.config.searchMode === self.SearchMode.SIMPLE, function() {
                         this.tag(self.SimpleSearch, {
                           showCount: false,
-                          data$: self.searchPredicate$
+                          data$: self.searchPredicate$,
+                          searchValue: self.memento && self.memento.paramsObj.s
                         });
                       })
                       .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
                         this.tag(self.FilterView, {
                           dao$: self.searchFilterDAO$,
-                          data$: self.searchPredicate$
+                          data$: self.searchPredicate$,
+                          searchValue: self.memento && self.memento.paramsObj.s
                         });
-                      })
+                    })
                     .endContext()
                     .startContext({ data: self })
                       .start(self.EXPORT, { buttonStyle: 'SECONDARY' })
+                        .addClass(self.myClass('export'))
+                      .end()
+                      .start(self.IMPORT, { buttonStyle: 'SECONDARY', icon: 'images/export-arrow-icon.svg', css: {'transform': 'rotate(180deg)'} })
                         .addClass(self.myClass('export'))
                       .end()
                       .start(self.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })

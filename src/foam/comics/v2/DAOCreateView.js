@@ -50,11 +50,13 @@ foam.CLASS({
     'foam.u2.dialog.NotificationMessage'
   ],
   imports: [
-    'stack',
-    'ctrl'
+    'ctrl',
+    'memento',
+    'stack'
   ],
   exports: [
-    'controllerMode'
+    'controllerMode',
+    'currentMemento as memento'
   ],
   properties: [
     {
@@ -78,7 +80,13 @@ foam.CLASS({
       expression: function() {
         return foam.u2.detail.SectionedDetailView;
       }
-    }
+    },
+    {
+      class: 'String',
+      name: 'mementoHead',
+      value: 'Create'
+    },
+    'currentMemento'
   ],
   actions: [
     {
@@ -127,6 +135,9 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.SUPER();
+
+      this.currentMemento$ = this.memento.tail$;
+
       this
         .addClass(this.myClass())
         .add(self.slot(function(config$viewBorder) {

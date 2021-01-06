@@ -19,10 +19,6 @@ foam.CLASS({
   package: 'foam.box',
   name: 'Message',
 
-  javaImports: [
-    'foam.nanos.crunch.CapabilityRuntimeException'
-  ],
-
   properties: [
     {
       class: 'Map',
@@ -57,24 +53,7 @@ foam.CLASS({
         wrapper.setId(t.getClass().getName());
         wrapper.setMessage(t.getMessage());
         if ( t instanceof foam.core.Exception ) {
-          var fe = (foam.core.Exception) t;
-          wrapper.setException(t);
-        }
-        
-        // Special case for CapabilityRuntimeException
-        if (
-          "foam.nanos.crunch.CapabilityRuntimeException"
-          .equals(t.getClass().getName())
-        ) {
-          CapabilityRuntimeException tCapability =
-            (CapabilityRuntimeException) t;
-          CapabilityRequiredRemoteException wrapperCapability =
-            new CapabilityRequiredRemoteException();
-          wrapperCapability.setId(t.getClass().getName());
-          wrapperCapability.setMessage(t.getMessage());
-          wrapperCapability.setCapabilityOptions(
-            tCapability.getCapabilities());
-          wrapper = wrapperCapability;
+          wrapper.setException((foam.core.Exception) t);
         }
 
         RPCErrorMessage reply = new RPCErrorMessage();

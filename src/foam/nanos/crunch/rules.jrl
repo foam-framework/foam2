@@ -1,5 +1,35 @@
 p({
   "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-75afsbdkjfbsk-c",
+  "name":"Set up User Spid On User Create and Update",
+  "priority":100,
+  "ruleGroup":"spidCapability",
+  "documentation":"On user create or update, if spid is set, remove old spids and create UserCapabilityJunction between User/Spid",
+  "daoKey":"localUserDAO",
+  "operation":3,
+  "after":true,
+  "enabled":true,
+  "action":{ "class":"foam.nanos.auth.CreateUserCapabilityJunctionOnSpidSet" },
+  "lifecycleState":1
+})
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"68afcf0c-c718-98f8-0841-afdsgk-sd212",
+  "name":"Update User Spid On UCJ Update",
+  "priority":100,
+  "ruleGroup":"spidCapability",
+  "documentation":"Re-assign user spid on CREATE of User-ServiceProvider junction",
+  "daoKey":"userCapabilityJunctionDAO",
+  "operation":0,
+  "after":true,
+  "enabled":true,
+  "action":{
+    "class":"foam.nanos.auth.SetUserServiceProviderJunctionRuleAction"
+  },
+  "lifecycleState":1
+})
+p({
+  "class":"foam.nanos.ruler.Rule",
   "id":"68afcf0c-c718-98f8-0841-75e9-crunch0",
   "name":"Notify User On Top Level Capability Status Update",
   "priority":100,
@@ -9,7 +39,6 @@ p({
   "operation":3,
   "after":true,
   "enabled":true,
-  "saveHistory":false,
   "predicate":{"class":"foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate","includeRenewalStatus":false},
   "action":{"class":"foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate"},
   "lifecycleState":1
@@ -24,7 +53,6 @@ p({
   "daoKey":"localUserDAO",
   "operation":2,
   "after":true,
-  "saveHistory":false,
   "action":{"class":"foam.nanos.crunch.RemoveJunctionsOnUserRemoval"},
   "lifecycleState":1
 })
@@ -38,7 +66,6 @@ p({
   "daoKey":"userCapabilityJunctionDAO",
   "operation":1,
   "after":true,
-  "saveHistory":true,
   "enabled":true,
   "predicate":{
     "class":"foam.mlang.predicate.Or",
@@ -120,7 +147,6 @@ p({
   "daoKey":"bareUserCapabilityJunctionDAO",
   "operation":1,
   "after":true,
-  "saveHistory":true,
   "enabled":true,
   "predicate":{
     "class":"foam.mlang.predicate.And",

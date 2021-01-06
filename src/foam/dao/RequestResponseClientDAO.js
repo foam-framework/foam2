@@ -97,6 +97,7 @@ Suitable for usage against backends that don't support listen(), such as plain H
       return this.__context__.lookup('foam.dao.AbstractDAO').
         prototype.listen_.call(this, x, sink, predicate);
     },
+
     {
       name: 'cmd_',
       code: function cmd_(x, obj) {

@@ -126,8 +126,7 @@ foam.LIB({
 
       if ( this.refines ) {
         // TODO This should probably live elsewhere.
-        if ( this.flags &&
-             global.FOAM_FLAGS ) {
+        if ( this.flags && global.FOAM_FLAGS ) {
           var flagged = false;
           for ( var i = 0 ; i < this.flags.length ; i++ ) {
             if ( global.FOAM_FLAGS[this.flags[i]] ) {
@@ -209,7 +208,24 @@ foam.LIB({
         return cls;
       };
       let l = global.localStorage && global.localStorage.getItem('localeLanguage');
-      if ( l !== undefined ) foam.locale = l;
+      var locale_;
+
+      // Update foam.lang and foam.variant whenever foam.locale is set
+      Object.defineProperty(
+        foam,
+        'locale',
+        {
+          get: function() { return locale_; },
+          set: function(l) {
+            locale_ = l;
+            foam.lang    = l.substring(0,2);
+            foam.variant = l.substring(3);
+          },
+          configurable: false
+        }
+      );
+      foam.locale = l || 'en';
+      foam.xmsg = global.window && ( global.window.location.href.indexOf('XMSG') != -1 );
     },
 
     /** Start second phase of bootstrap process. */

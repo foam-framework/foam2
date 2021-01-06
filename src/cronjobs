@@ -46,50 +46,6 @@ p({
   "class": "foam.nanos.cron.Cron",
   "schedule": {
     "class": "foam.nanos.cron.CronSchedule",
-    "minute": 0,
-    "hour": -1,
-    "dayOfMonth": -1,
-    "month": -1,
-    "dayOfWeek": -1,
-    "second": 0
-  },
-  "scheduledTime": "2019-09-09T17:00:00.000Z",
-  "id": "PMHourlyReduce",
-  "description": "",
-  "code": 
-  """
-    rm = x.get("pmHourlyReduceManager");
-    rm.doReduce();
-    x.get("pm1MinuteDAO").removeAll();
-    x.get("logger").info(new String[] {"Hourly PM Reduce Complete"});
-  """
-})
-p({
-  "class": "foam.nanos.cron.Cron",
-  "schedule": {
-    "class": "foam.nanos.cron.CronSchedule",
-    "minute": -1,
-    "hour": 0,
-    "dayOfMonth": -1,
-    "month": -1,
-    "dayOfWeek": -1,
-    "second": 0
-  },
-  "scheduledTime": "2019-09-10T04:00:00.000Z",
-  "id": "PMDailyReduce",
-  "description": "",
-  "code": 
-  """
-    rm = x.get("pmDailyReduceManager");
-    rm.doReduce();
-    x.get("pmHourlyDAO").removeAll();
-    x.get("logger").info(new String[] {"Daily PM Reduce Complete"});
-  """
-})
-p({
-  "class": "foam.nanos.cron.Cron",
-  "schedule": {
-    "class": "foam.nanos.cron.CronSchedule",
     "minute": -1,
     "hour": -1,
     "dayOfMonth": -1,

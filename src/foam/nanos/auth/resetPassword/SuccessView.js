@@ -37,7 +37,7 @@ foam.CLASS({
     ^ .Reset-Password{
       width: 225;
       height: 30px;
-      font-family: /*%FONT1%*/, Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 30px;
       font-weight: bold;
       line-height: 1;
@@ -55,7 +55,7 @@ foam.CLASS({
     ^ .success-Text{
       width: 450px;
       height: 16px;
-      font-family: /*%FONT1%*/, Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       font-weight: 300;
       letter-spacing: 0.2px;
@@ -83,7 +83,7 @@ foam.CLASS({
   `,
 
   messages: [
-    { name: 'Instructions', message: 'Successfully reset password!' }
+    { name: 'Instructions', message: 'Successfully reset password' }
   ],
 
   methods: [

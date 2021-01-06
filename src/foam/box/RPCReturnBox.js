@@ -21,10 +21,6 @@ foam.CLASS({
 
   implements: [ 'foam.box.Box' ],
 
-  imports: [
-    'requestCapability'
-  ],
-
   requires: [
     'foam.box.RPCReturnMessage',
     'foam.box.RPCErrorMessage'
@@ -36,10 +32,7 @@ foam.CLASS({
       factory: function() {
         return new Promise(function(resolve, reject) {
           this.resolve_ = resolve;
-          this.reject_ = function(obj) {
-            if ( obj.id === 'foam.nanos.crunch.CapabilityRuntimeException' ) return;
-            reject(obj);
-          };
+          this.reject_ = reject;
         }.bind(this));
       },
       swiftType: 'Future<Any?>',
@@ -70,15 +63,6 @@ foam.CLASS({
       code: function send(msg) {
         if ( this.RPCReturnMessage.isInstance(msg.object) ) {
           this.resolve_(msg.object.data);
-          return;
-        }
-        if ( this.RPCErrorMessage.isInstance(msg.object) ) {
-          if ( msg.object.data.id === 'foam.nanos.crunch.CapabilityRuntimeException' ) {
-            this.requestCapability(msg.object.data).then(function() {
-              self.clientBox.send(self.msg);
-            });
-          } 
-          this.reject_(msg.object.data);
           return;
         }
         if ( foam.core.Exception.isInstance(msg.object) ) {

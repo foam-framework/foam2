@@ -3,6 +3,8 @@ package foam.util.Emails;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.app.AppConfig;
+import foam.nanos.app.EmailConfig;
+import foam.nanos.app.SupportConfig;
 import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
@@ -47,9 +49,40 @@ public class EmailsUtility {
     }
 
     String group = user != null ? user.getGroup() : "";
-    Subject subject = new Subject.Builder(x).setUser(user).build();
-    Theme theme = ((Themes) x.get("themes")).findTheme(x.put("subject", subject));
     AppConfig appConfig = (AppConfig) x.get("appConfig");
+    if ( user != null ) {
+      appConfig = user.findGroup(x).getAppConfig(x);
+    }
+    Theme theme = (Theme) x.get("theme");
+    X userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
+    if ( theme == null ) {
+      theme = ((Themes) x.get("themes")).findTheme(userX);
+      if ( theme.getAppConfig() != null ) {
+        appConfig.copyFrom(theme.getAppConfig());
+      }
+    }
+    userX = userX.put("appConfig", appConfig);
+
+    SupportConfig supportConfig = theme.getSupportConfig();
+    EmailConfig supportEmailConfig = supportConfig.getEmailConfig();
+
+    // Set ReplyTo, From, DisplayName from support email config
+    if ( supportEmailConfig != null ) {
+      // REPLY TO:
+      if ( ! SafetyUtil.isEmpty(supportEmailConfig.getReplyTo()) ) {
+        emailMessage.setReplyTo(supportEmailConfig.getReplyTo());
+      }
+
+      // DISPLAY NAME:
+      if ( ! SafetyUtil.isEmpty(supportEmailConfig.getDisplayName()) ) {
+        emailMessage.setDisplayName(supportEmailConfig.getDisplayName());
+      }
+
+      // FROM:
+      if ( ! SafetyUtil.isEmpty(supportEmailConfig.getFrom()) ) {
+        emailMessage.setFrom(supportEmailConfig.getFrom());
+      }
+    }
 
     // Add template name to templateArgs, to avoid extra parameter passing
     if ( ! SafetyUtil.isEmpty(templateName) ) {
@@ -59,17 +92,17 @@ public class EmailsUtility {
         templateArgs = new HashMap<>();
         templateArgs.put("template", templateName);
       }
-      templateArgs.put("supportPhone", (theme.getSupportPhone()));
-      templateArgs.put("supportEmail", (theme.getSupportEmail()));
+      templateArgs.put("supportPhone", (supportConfig.getSupportPhone()));
+      templateArgs.put("supportEmail", (supportConfig.getSupportEmail()));
 
       // personal support user
-      User psUser = theme.findPersonalSupportUser(x);
+      User psUser = supportConfig.findPersonalSupportUser(x);
       templateArgs.put("personalSupportPhone", psUser == null ? "" : psUser.getPhoneNumber());
       templateArgs.put("personalSupportEmail", psUser == null ? "" : psUser.getEmail());
       templateArgs.put("personalSupportFirstName", psUser == null ? "" : psUser.getFirstName());
       templateArgs.put("personalSupportFullName", psUser == null ? "" : psUser.getLegalName());
 
-      foam.nanos.auth.Address address = theme.getSupportAddress();
+      foam.nanos.auth.Address address = supportConfig.getSupportAddress();
       templateArgs.put("supportAddress", address == null ? "" : address.toSummary());
       templateArgs.put("appName", (theme.getAppName()));
       templateArgs.put("logo", (appConfig.getUrl() + "/" + theme.getLogo()));
@@ -80,7 +113,7 @@ public class EmailsUtility {
     // SERVICE CALL: to fill in email properties.
     EmailPropertyService cts = (EmailPropertyService) x.get("emailPropertyService");
     try {
-      cts.apply(x, group, emailMessage, templateArgs);
+      cts.apply(userX, group, emailMessage, templateArgs);
     } catch (Exception e) {
       logger.error(e);
       return;

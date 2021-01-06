@@ -32,14 +32,17 @@ foam.CLASS({
       class: 'String',
       name: 'objectClass',
       label: '',
-      visibility: function(allowCustom, classIsFinal, choices, data) {
-        if ( ! allowCustom && choices.length <= 1  ) return foam.u2.DisplayMode.HIDDEN;
+      visibility: function(allowCustom, classIsFinal, choices, data, placeholder) {
+        if ( ! allowCustom && choices.length <= 1 && ! placeholder ) return foam.u2.DisplayMode.HIDDEN;
         if ( classIsFinal && this.dataWasProvided_ ) return foam.u2.DisplayMode.HIDDEN;
         return foam.u2.DisplayMode.RW;
       },
       view: function(args, X) {
         return {
           class: X.data.allowCustom ? 'foam.u2.TextField' : 'foam.u2.view.ChoiceView',
+          displayWidth: 60,
+          placeholder: X.data.placeholder,
+          header: X.data.header,
           choices$: X.data.choices$
         };
       }
@@ -95,6 +98,16 @@ foam.CLASS({
       class: 'Boolean',
       name: 'dataWasProvided_',
       documentation: 'Set to true if data was initially provided. Used to implement classIsFinal.'
+    },
+    {
+      class: 'String',
+      name: 'placeholder',
+      documentation: 'If no placeholder, the choiceView will select the first element',
+    },
+    {
+      class: 'String',
+      name: 'header',
+      documentation: 'The heading text for the choices',
     },
     {
       class: 'Array',
@@ -202,7 +215,7 @@ foam.CLASS({
       );
 
       if ( this.data ) { this.objectClass = dataToClass(this.data); }
-      if ( ! this.data && ! this.objectClass && this.choices.length ) this.objectClass = this.choices[0][0];
+      if ( ! this.data && ! this.objectClass && this.choices.length && !this.placeholder ) this.objectClass = this.choices[0][0];
 
       this.
         start(this.OBJECT_CLASS).

@@ -41,12 +41,12 @@ foam.CLASS({
     {
       name: 'outputStringForProperties',
       type: 'StringArray',
-      code: async function(x, cls, obj, columnMetadata) {
+      code: async function(x, cls, obj, columnMetadata, lengthOfPrimaryPropsRequested) {
         var values = [];
         var columnConfig = x.columnConfigToPropertyConverter;
 
         var props = columnConfig.returnProperties(cls, columnMetadata.map(m => m.propName));
-        values.push(await this.arrayOfValuesToArrayOfStrings(x, obj, props));
+        values.push(await this.arrayOfValuesToArrayOfStrings(x, obj, props, lengthOfPrimaryPropsRequested));
         return values;
       }
     },
@@ -61,7 +61,8 @@ foam.CLASS({
           if ( foam.core.UnitValue.isInstance(prop) ) {
             cellType = 'CURRENCY';
             pattern = '\"$\"#0.00\" CAD\"';
-            unitProp = of.getAxiomByName(prop.unitPropName).name;
+            if ( prop.unitPropName )
+              unitProp = of.getAxiomByName(prop.unitPropName).name;
           } else if ( foam.core.Date.isInstance(prop) ) {
             cellType = 'DATE';
             pattern = 'yyyy-mm-dd';
@@ -79,7 +80,9 @@ foam.CLASS({
             cellType = 'BOOLEAN';
           } else if ( foam.core.String.isInstance(prop) ) {
             cellType = 'STRING';
-          }
+          } else if ( foam.core.StringArray.isInstance(prop) || foam.core.Array.isInstance(prop) ) {
+            cellType = 'ARRAY';
+          } 
 
           return this.GoogleSheetsPropertyMetadata.create({
             columnName: prop.name,
@@ -91,6 +94,27 @@ foam.CLASS({
             prop: prop,
             unitPropName: unitProp
           });
+      }
+    },
+    {
+      name: 'setUnitValueMetadata',
+      code: function(metadata, propNames, stringArray) {
+        for ( var i = 0; i < metadata.length; i++ ) {
+          if ( foam.core.UnitValue.isInstance(metadata[i].prop) ) {
+            var indexOfUnitProp = propNames.indexOf(metadata[i].unitPropName);
+            metadata[i].perValuePatternSpecificValues = stringArray.slice(1).map(a => a[indexOfUnitProp]);
+          }
+        }
+      }
+    },
+    {
+      name: 'setUnitValueMetadataForObj',
+      code: function(metadata, obj) {
+        for ( var i = 0; i < metadata.length; i++ ) {
+          if ( foam.core.UnitValue.isInstance(metadata[i].prop) ) {
+            metadata[i].perValuePatternSpecificValues = [ obj[metadata[i].unitPropName].toString() ];
+          }
+        }
       }
     }
   ]

@@ -33,6 +33,9 @@ foam.CLASS({
     ^ select {
       min-width: 220px;
     }
+    ^ .foam-u2-tag-Select {
+      height: auto;
+    }
   `,
 
   properties: [
@@ -119,6 +122,7 @@ foam.CLASS({
         })
         .on('mouseover', function(e) {
           try {
+
             var data = self.view.choices[e.target.value][0];
 
             if ( ! self.previewMode ) {
@@ -145,7 +149,7 @@ foam.CLASS({
     },
 
     function updatePredicate_(choice) {
-      var exists = typeof choice !== 'undefined' && choice !== '';
+      var exists = foam.Undefined.isInstance(choice) && choice !== '';
       this.predicate = exists ? this.op.create({
         arg1: this.property,
         arg2: this.Constant.create({ value: choice })

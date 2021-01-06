@@ -13,7 +13,8 @@
       'foam.log.LogLevel',
       'foam.nanos.auth.User',
       'foam.nanos.notification.NotificationCitationView',
-      'foam.u2.view.OverlayActionListView'
+      'foam.u2.view.OverlayActionListView',
+      'foam.u2.dialog.Popup'
     ],
 
     imports: [
@@ -69,6 +70,7 @@
       ^ .notificationDiv {
         display: flex;
         flex-direction: row;
+        justify-content: space-between;
       }
     `,
 
@@ -80,9 +82,16 @@
 
     methods: [
       function initE() {
+        var self = this;
         this
           .addClass(this.myClass())
           .start().addClass('notificationDiv')
+            .on('dblclick', function() {
+              self.ctrl.add(self.Popup.create().tag({
+                class: 'foam.nanos.notification.NotificationMessageModal',
+                data: self.data
+              }));    
+            })
             .tag(this.NotificationCitationView, {
               of: this.data.cls_,
               data: this.data
@@ -94,7 +103,8 @@
                 this.HIDE_NOTIFICATION_TYPE,
                 this.REMOVE_NOTIFICATION
               ],
-              obj: this.data
+              obj: this.data,
+              dao: this.notificationDAO
             })
           .end();
       }

@@ -28,7 +28,7 @@ foam.INTERFACE({
         Specify the availability of this wizardlet. If true, wizardlet is
         available iff at least one section is available. If false, wizardlet
         does not display even if some sections are available.
-      `,
+      `
     }
   ],
 

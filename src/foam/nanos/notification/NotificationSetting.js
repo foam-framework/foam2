@@ -14,31 +14,35 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.X',
     'foam.dao.DAO',
+    'foam.nanos.app.AppConfig',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
+    'foam.nanos.theme.Theme',
+    'foam.nanos.theme.Themes',
     'java.util.HashSet'
   ],
 
   messages: [
     {
       name: 'LACKS_CREATE_PERMISSION',
-      message: 'You don\'t have permission to create this notification setting.'
+      message: 'You don\'t have permission to create this notification setting'
     },
     {
       name: 'LACKS_UPDATE_PERMISSION',
-      message: 'You don\'t have permission to update notification settings you do not own.'
+      message: 'You don\'t have permission to update notification settings you do not own'
     },
     {
       name: 'LACKS_DELETE_PERMISSION',
-      message: 'You don\'t have permission to delete notification settings you do not own.'
+      message: 'You don\'t have permission to delete notification settings you do not own'
     },
     {
       name: 'LACKS_READ_PERMISSION',
-      message: 'You don\'t have permission to read notification settings you do not own.'
+      message: 'You don\'t have permission to read notification settings you do not own'
     }
   ],
 
@@ -58,20 +62,33 @@ foam.CLASS({
     {
       name: 'doNotify',
       args: [
-        { name: 'x', type: 'Context' },
-        { name: 'user', type: 'foam.nanos.auth.User' },
+        { name: 'x',            type: 'Context' },
+        { name: 'user',         type: 'foam.nanos.auth.User' },
         { name: 'notification', type: 'foam.nanos.notification.Notification' }
       ],
       javaCode: `
-        // Proxy to sendNotificaiton method
-        sendNotification(x, user, notification);
+        X userX = x;
+        Subject subject = (Subject) x.get("subject");
+        if ( subject.getRealUser().getId() != user.getId() ) {
+          userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
+          AppConfig appConfig = user.findGroup(x).getAppConfig(x);
+          Theme theme = (Theme) x.get("theme");
+          if ( theme == null ) {
+            theme = ((Themes) x.get("themes")).findTheme(userX);
+            if ( theme.getAppConfig() != null ) {
+              appConfig.copyFrom(theme.getAppConfig());
+            }}
+          userX.put("appConfig", appConfig);
+        }
+        // Proxy to sendNotification method
+        sendNotification(userX, user, notification);
       `
     },
     {
       name: 'sendNotification',
       args: [
-        { name: 'x', type: 'Context' },
-        { name: 'user', type: 'foam.nanos.auth.User' },
+        { name: 'x',            type: 'Context' },
+        { name: 'user',         type: 'foam.nanos.auth.User' },
         { name: 'notification', type: 'foam.nanos.notification.Notification' }
       ],
       javaCode: `
@@ -84,8 +101,7 @@ foam.CLASS({
         // We cannot permanently disable in-app notifications, so mark them read automatically
         if ( ! getEnabled() ) {
           notification.setRead(true);
-        }
-        else if ( user.getDisabledTopicSet() != null ) {
+        } else if ( user.getDisabledTopicSet() != null ) {
           HashSet<String> disabledTopicsSet = (HashSet<String>) user.getDisabledTopicSet();
           if ( disabledTopicsSet.contains(notification.getNotificationType()) ) {
             notification.setRead(true);
@@ -98,7 +114,7 @@ foam.CLASS({
         } catch (Throwable t) {
           Logger logger = (Logger) x.get("logger");
           logger.error("Failed to send notification: " + t, t);
-        };
+        }
       `
     },
     {

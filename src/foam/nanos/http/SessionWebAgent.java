@@ -70,11 +70,11 @@ public class SessionWebAgent
       if ( req.getQueryString().contains("sessionId") ) {
         if ( ! req.getRequestURI().contains("httpFileService") ) {
           logger.warning(
-                         "\033[31;1m" +
-                         req.getRequestURI() +
-                         " contains 'sessionId'! Please inform the security team!" +
-                         "\033[0m"
-                         );
+            "\033[31;1m" +
+            req.getRequestURI() +
+            " contains 'sessionId'! Please inform the security team!" +
+            "\033[0m"
+            );
         }
       }
 

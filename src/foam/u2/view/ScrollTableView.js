@@ -10,24 +10,28 @@
   extends: 'foam.u2.Element',
 
   imports: [
+    'memento',
     'stack'
   ],
 
   exports: [
     'as summaryView',
-    'dblclick'
+    'dblclick',
+    'memento'
   ],
 
   requires: [
     'foam.dao.FnSink',
     'foam.mlang.sink.Count',
     'foam.u2.view.TableView',
-    'foam.comics.v2.DAOControllerConfig'
+    'foam.comics.v2.DAOControllerConfig',
+    'foam.nanos.controller.Memento'
   ],
 
   css: `
     ^ {
       overflow: scroll;
+      padding-bottom: 20px;
     }
     ^table {
       position: relative;
@@ -80,6 +84,7 @@
       name: 'daoCount'
     },
     'selection',
+    'disableUserSelection',
     {
       class: 'Boolean',
       name: 'editColumnsEnabled',
@@ -165,22 +170,74 @@
       factory: function() {
         return this.DAOControllerConfig.create({ dao: this.data });
       }
+    },
+    {
+      name: 'dblClickListenerAction',
+      factory: () => {
+        return function(obj, id) {
+          if ( ! this.stack ) return;
+
+          this.stack.push({
+            class: 'foam.comics.v2.DAOSummaryView',
+            data: obj,
+            config: this.config,
+            idOfRecord: id
+          }, this);
+        }
+      }
+    },
+    'currentMemento',
+    {
+      class: 'Boolean',
+      name: 'isInit'
     }
   ],
 
   reactions: [
     ['', 'propertyChange.currentTopPage_', 'updateRenderedPages_'],
-    ['', 'propertyChange.table_', 'updateRenderedPages_'],
-    ['', 'propertyChange.daoCount', 'refresh'],
+    ['', 'propertyChange.table_',          'updateRenderedPages_']
   ],
 
   methods: [
     function init() {
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.updateCount })));
       this.updateCount();
+
+      if ( this.memento )
+        this.currentMemento$ = this.memento.tail$;
+      else
+        this.currentMemento$ = this.memento$;
     },
 
     function initE() {
+      if ( this.currentMemento ) {
+        var mementoHead = this.currentMemento.head;
+
+        var of = this.data.of || this.config.of;
+        if ( mementoHead === 'Create' && of ) {
+          this.stack.push({
+            class: 'foam.comics.v2.DAOCreateView',
+            data: ((this.config.factory && this.config.factory$cls) ||  this.data.of).create({ mode: 'create'}, this),
+            config$: this.config$,
+            of: of
+          }, this.__subContext__);
+          return;
+        }
+
+        var id = mementoHead;
+        if ( of ) {
+          id = of.ID.fromString(mementoHead);
+        }
+
+        this.stack.push({
+          class: 'foam.comics.v2.DAOSummaryView',
+          data: null,
+          config: this.config,
+          idOfRecord: id
+        }, this);
+        return;
+      }
+
       this.
         addClass(this.myClass()).
         on('scroll', this.onScroll).
@@ -190,6 +247,7 @@
           contextMenuActions: this.contextMenuActions,
           selection$: this.selection$,
           editColumnsEnabled: this.editColumnsEnabled,
+          disableUserSelection: this.disableUserSelection,
           multiSelectEnabled: this.multiSelectEnabled,
           selectedObjects$: this.selectedObjects$
         }, this.table_$).
@@ -204,7 +262,7 @@
         take the whole page (i.e. we need multiple tables)
         and enableDynamicTableHeight can be switched off
       */
-      if (this.enableDynamicTableHeight) {
+      if ( this.enableDynamicTableHeight ) {
         this.onDetach(this.onload.sub(this.updateTableHeight));
         window.addEventListener('resize', this.updateTableHeight);
         this.onDetach(() => {
@@ -224,7 +282,14 @@
           delete this.renderedPages_[i];
         });
         this.updateRenderedPages_();
-        if ( this.el() ) this.el().scrollTop = 0;
+        if ( this.el() && ! this.isInit && this.memento.paramsObj.r ) {
+          var scroll = this.memento.paramsObj.r * this.rowHeight;
+          scroll = scroll >= this.rowHeight && scroll < this.scrollHeight ? scroll : 0;
+
+          document.getElementById(this.id).scrollTop = scroll;
+
+          this.isInit = true;
+        } else if ( this.el() ) this.el().scrollTop = 0;
       }
     },
     {
@@ -233,6 +298,7 @@
       code: function() {
         return this.data$proxy.select(this.Count.create()).then((s) => {
           this.daoCount = s.value;
+          this.refresh();
         });
       }
     },
@@ -271,6 +337,8 @@
       isFramed: true,
       code: function(e) {
         this.scrollPos_ = e.target.scrollTop;
+        this.memento.paramsObj.r = this.scrollPos_ >= this.rowHeight && this.scrollPos_ < this.scrollHeight ? Math.floor( this.scrollPos_  / this.rowHeight) : 0;
+        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
       }
     },
     {
@@ -290,14 +358,7 @@
       }
     },
     function dblclick(obj, id) {
-      if ( ! this.stack ) return;
-      this.stack.push({
-        class: 'foam.comics.v2.DAOSummaryView',
-        data: obj,
-        config: this.config,
-        of: this.config.of,
-        id: id
-      }, this);
-    },
+      this.dblClickListenerAction(obj, id);
+    }
   ]
 });

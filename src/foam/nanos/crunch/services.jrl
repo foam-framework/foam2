@@ -39,9 +39,11 @@ p({
   "lazy":true,
   "serve":true,
   "serviceScript":"""
+    dec = new foam.dao.NullDAO(x, foam.nanos.crunch.Capability.getOwnClassInfo());
+    dec = new foam.nanos.crunch.CapabilityAvailabilityDAO(x, dec);
     return new foam.dao.EasyDAO.Builder(x)
       .setInnerDAO(x.get("localCapabilityDAO"))
-      .setDecorator(new foam.nanos.crunch.CapabilityAvailabilityDAO(x, new foam.dao.NullDAO(x, foam.nanos.crunch.Capability.getOwnClassInfo())))
+      .setDecorator(dec)
       .setOf(foam.nanos.crunch.Capability.getOwnClassInfo())
       .build();
   """,
@@ -74,7 +76,7 @@ p({
   "class":"foam.nanos.boot.NSpec",
   "name":"userCapabilityJunctionDAO",
   "serve":true,
-  "serviceScript":"""    
+  "serviceScript":"""
     dao = new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(false)
       .setInnerDAO(x.get("bareUserCapabilityJunctionDAO"))
@@ -89,8 +91,7 @@ p({
 p({
   "class":"foam.nanos.boot.NSpec",
   "name":"bareUserCapabilityJunctionDAO",
-  "serve":true,
-  "serviceScript":"""    
+  "serviceScript":"""
     decorator = new foam.dao.history.HistoryDAO(x, "userCapabilityJunctionHistoryDAO", new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo()).build());
     dao = new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(false)
@@ -131,13 +132,18 @@ p({
   "name":"prerequisiteCapabilityJunctionDAO",
   "serve":true,
   "serviceScript":"""
-    return new foam.dao.EasyDAO.Builder(x)
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setPipelinePm(true)
       .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("prerequisiteCapabilityJunction"))
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("prerequisiteCapabilityJunctions")
       .setOf(foam.nanos.crunch.CapabilityCapabilityJunction.getOwnClassInfo())
       .setOrder(new foam.core.PropertyInfo[] {foam.nanos.crunch.CapabilityCapabilityJunction.PRIORITY})
       .build();
+    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.crunch.CapabilityCapabilityJunction.SOURCE_ID });
+
+    return dao;
   """,
   "client":"{\"of\":\"foam.nanos.crunch.CapabilityCapabilityJunction\", \"remoteListenerSupport\": false}"
 })
@@ -204,4 +210,17 @@ p({
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.crunch.Capability\"}"
+})
+
+p({
+  class: "foam.nanos.boot.NSpec",
+  name: "wizardStateDAO",
+  lazy: true,
+  serve: true,
+  serviceScript: `
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.crunch.ui.WizardState.getOwnClassInfo())
+      .build();
+  `,
+  client: "{\"of\":\"foam.nanos.crunch.ui.WizardState\"}"
 })

@@ -12,6 +12,7 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.X',
     'java.util.Calendar'
   ],
 
@@ -61,13 +62,17 @@ foam.CLASS({
       value: 0,
       documentation: `Second to execute the script.
            Ranges from 0 - 59. -1 for wildcard`
-    },
+    }
   ],
 
   methods: [
     {
       name: 'getNextScheduledTime',
       args: [
+        {
+          name: 'x',
+          type: 'X'
+        },
         {
           name: 'from',
           type: 'java.util.Date'

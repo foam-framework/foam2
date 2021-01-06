@@ -11,9 +11,9 @@ import foam.core.FObject;
 import foam.lib.Outputter;
 import foam.lib.json.OutputterMode;
 import foam.lib.NetworkPropertyPredicate;
+import foam.lib.PropertyPredicate;
 import foam.nanos.http.Format;
 import foam.util.SafetyUtil;
-import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -27,15 +27,19 @@ public class HTTPSink
   protected String url_;
   protected String bearerToken_;
   protected Format format_;
+  protected PropertyPredicate propertyPredicate_;
+  protected boolean outputDefaultValues_;
 
   public HTTPSink(String url, Format format) {
-    this(url, "", format);
+    this(url, "", format, null, false);
   }
 
-  public HTTPSink(String url, String bearerToken, Format format) {
+  public HTTPSink(String url, String bearerToken, Format format, PropertyPredicate propertyPredicate, boolean outputDefaultValues) {
     url_ = url;
     bearerToken_ = bearerToken;
     format_ = format;
+    propertyPredicate_ = propertyPredicate;
+    outputDefaultValues_ = outputDefaultValues;
   }
 
   @Override
@@ -52,7 +56,10 @@ public class HTTPSink
       conn.setDoInput(true);
       conn.setDoOutput(true);
       if ( format_ == Format.JSON ) {
-        outputter = new foam.lib.json.Outputter(getX()).setPropertyPredicate(new NetworkPropertyPredicate());
+        outputter = 
+          propertyPredicate_ == null ?
+          new foam.lib.json.Outputter(getX()).setOutputDefaultValues(outputDefaultValues_).setPropertyPredicate(new NetworkPropertyPredicate()) :
+          new foam.lib.json.Outputter(getX()).setOutputDefaultValues(outputDefaultValues_).setPropertyPredicate(propertyPredicate_);
         conn.addRequestProperty("Accept", "application/json");
         conn.addRequestProperty("Content-Type", "application/json");
       } else if ( format_ == Format.XML ) {

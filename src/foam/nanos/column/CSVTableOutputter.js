@@ -7,10 +7,15 @@
 foam.CLASS({
   package: 'foam.nanos.column',
   name: 'CSVTableOutputter',
+  extends: 'foam.nanos.column.TableColumnOutputter',
+
   methods: [
     function arrayToCSV(arrayOfValues) {
       var output = [];
       for ( var row of arrayOfValues ) {
+        row = row.map(v =>  {
+          return '"' + v.replaceAll('"', '""') + '"' ;
+        });
         output.push(row.join(','));
       }
       return output.join('\n');

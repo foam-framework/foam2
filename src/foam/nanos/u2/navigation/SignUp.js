@@ -30,15 +30,16 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'TITLE', message: 'Create a free account' },
+    { name: 'TITLE', message: 'Create an account' },
     { name: 'FOOTER_TXT', message: 'Already have an account?' },
     { name: 'FOOTER_LINK', message: 'Sign in' },
-    { name: 'ERROR_MSG', message: 'There was a problem creating your account.' },
-    { name: 'EMAIL_EMPTY_ERR', message: 'Please enter email' },
-    { name: 'EMAIL_SYNTAX_ERR', message: 'Please enter valid email' },
-    { name: 'EMAIL_AVAILABILITY_ERR', message: 'This email is taken. Please try another.' },
-    { name: 'USERNAME_EMPTY_ERR', message: 'Please enter username' },
-    { name: 'USERNAME_AVAILABILITY_ERR', message: 'This username is taken. Please try another.' }
+    { name: 'ERROR_MSG', message: 'There was a problem creating your account' },
+    { name: 'EMAIL_ERR', message: 'Valid email required' },
+    { name: 'EMAIL_AVAILABILITY_ERR', message: 'This email is already in use. Please sign in or use a different email' },
+    { name: 'USERNAME_EMPTY_ERR', message: 'Username required' },
+    { name: 'USERNAME_AVAILABILITY_ERR', message: 'This username is taken. Please try another.' },
+    //TODO: Find out better way to deal with PASSWORD_ERR
+    { name: 'PASSWORD_ERR', message: 'Password should be at least 6 characters.' }
   ],
 
   properties: [
@@ -89,20 +90,15 @@ foam.CLASS({
           isAvailable$: X.data.emailAvailable$,
           targetProperty: foam.nanos.auth.User.EMAIL,
           inputValidation: /\S+@\S+\.\S+/,
-          restrictedCharacters: /^[^\s]$/
+          restrictedCharacters: /^[^\s]$/,
+          displayMode: X.data.disableEmail_ ? foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW
         };
       },
       validateObj: function(email, emailAvailable) {
         // Empty Check
-        if ( email.length === 0 ) return this.EMAIL_EMPTY_ERR;
-        // Syntax Check
-        if ( ! /\S+@\S+\.\S+/.test(email) ) return this.EMAIL_SYNTAX_ERR;
+        if ( email.length === 0 || ! /\S+@\S+\.\S+/.test(email) ) return this.EMAIL_ERR;
         // Availability Check
         if ( ! emailAvailable ) return this.EMAIL_AVAILABILITY_ERR;
-      },
-      visibility: function(disableEmail_) {
-        return disableEmail_ ?
-          foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW;
       },
       required: true
     },
@@ -145,7 +141,10 @@ foam.CLASS({
         class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
-      minLength: 6
+      validateObj: function(desiredPassword) {
+        if ( ! desiredPassword || desiredPassword.length < 6 ) return this.PASSWORD_ERR;
+      },
+      required: true
     }
   ],
 
@@ -165,23 +164,35 @@ foam.CLASS({
     },
     {
       name: 'updateUser',
-      code: function(x) {
-        this.finalRedirectionCall();
+      code: async function(x) {
+        await this.finalRedirectionCall(x);
       }
     },
     {
       name: 'finalRedirectionCall',
-      code: function() {
+      code: async function(x) {
         if ( this.user.emailVerified ) {
           // When a link was sent to user to SignUp, they will have already verified thier email,
           // thus thier user.emailVerified should be true and they can simply login from here.
           window.history.replaceState(null, null, window.location.origin);
           location.reload();
         } else {
+          await this.auth.login(x, this.email, this.desiredPassword);
           this.stack.push({
             class: 'foam.nanos.auth.ResendVerificationEmail'
           });
         }
+      }
+    },
+    {
+      name: 'defaultUserLanguage',
+      code: function() {
+        let l = foam.locale.split("-");
+        let code = l[0];
+        let variant = l[1];
+        let language = foam.nanos.auth.Language.create({code: code});
+        if ( variant ) language.variant = variant;
+        return language;
       }
     }
   ],
@@ -189,7 +200,7 @@ foam.CLASS({
   actions: [
     {
       name: 'login',
-      label: 'Get Started',
+      label: 'Get started',
       isEnabled: function(errors_, isLoading_) {
         return ! errors_ && ! isLoading_;
       },
@@ -201,11 +212,12 @@ foam.CLASS({
             email: this.email,
             desiredPassword: this.desiredPassword,
             signUpToken: this.token_,
-            group: this.group_
+            group: this.group_,
+            language: this.defaultUserLanguage()
           }))
-          .then((user) => {
+          .then(async (user) => {
             this.user.copyFrom(user);
-            this.updateUser(x);
+            await this.updateUser(x);
           }).catch((err) => {
             this.ctrl.add(this.NotificationMessage.create({
               message: err.message || this.ERROR_MSG,

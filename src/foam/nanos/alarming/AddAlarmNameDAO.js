@@ -12,32 +12,36 @@ foam.CLASS({
   newly added alarms.`,
 
   javaImports: [
-    "foam.dao.DAO",
-    "foam.nanos.alarming.Alarm",
-    "foam.nanos.logger.Logger",
-    "static foam.mlang.MLang.EQ"
+    'foam.dao.DAO',
+    'foam.nanos.alarming.Alarm',
+    'foam.nanos.logger.Logger',
+    'static foam.mlang.MLang.EQ'
   ],
 
   methods: [
     {
       name: 'put_',
       javaCode: `
-        Alarm alarm = (Alarm) obj;
-        Logger logger = (Logger) x.get("logger");
-        DAO alarmConfigDAO = (DAO) x.get("alarmConfigDAO");
-        AlarmConfig config = (AlarmConfig) alarmConfigDAO.find(EQ(AlarmConfig.NAME, alarm.getName()));
-        try {
-          if ( config == null ) {
-            AlarmConfig alarmConfig = new AlarmConfig.Builder(x)
-              .setName(alarm.getName())
-              .build();
-            alarmConfigDAO.put(alarmConfig);
-          }
-        } catch ( Exception e ) {
-          logger.error("Error adding new alarm config" + e);
+      Alarm alarm = (Alarm) obj;
+      DAO configDAO = (DAO) x.get("alarmConfigDAO");
+      AlarmConfig config = (AlarmConfig) configDAO.find(alarm.getName());
+      if ( config != null ) {
+        if ( ! config.getEnabled() ) {
+          return alarm;
         }
-        return super.put_(x, obj);
+      } else {
+        config = new AlarmConfig();
+        config.setName(alarm.getName());
+        config.setSeverity(alarm.getSeverity());
+        try {
+          configDAO.put(config);
+        } catch ( Exception e ) {
+          ((Logger) x.get("logger")).error(e);
+        }
+      }
+      alarm.setSeverity(config.getSeverity());
+      return getDelegate().put_(x, alarm);
       `
     }
   ]
-})
+});

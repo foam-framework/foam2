@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'Topic',
 
   documentation: `
-  Topics delcare the types of events that an object publishes.
+  Topics declare the types of events that an object publishes.
   <pre>
     Ex.
     foam.CLASS({

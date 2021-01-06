@@ -124,7 +124,7 @@ foam.CLASS({
 
   methods: [
     function asKey(document, cls) {
-      return this.expands_ ? document.$UID + "." + cls.id : document.$UID;
+      return this.expands_ ? document.$UID + '.' + cls.id : document.$UID;
     },
 
     function installInClass(cls) {
@@ -656,7 +656,8 @@ foam.CLASS({
     'document',
     'elementValidator',
     'framed',
-    'getElementById'
+    'getElementById',
+    'translationService?'
   ],
 
   implements: [
@@ -1012,6 +1013,10 @@ foam.CLASS({
 
   methods: [
     function init() {
+      /*
+      if ( ! this.translationService )
+        console.warn('Element ' + this.cls_.name + ' created with globalContext');
+      */
       this.onDetach(this.visitChildren.bind(this, 'detach'));
     },
 
@@ -1175,6 +1180,10 @@ foam.CLASS({
       }
 
       return f(opt_extra);
+    },
+
+    function instanceClass(opt_extra) {
+      return this.myClass(this.id + '-' + opt_extra);
     },
 
     function visitChildren(methodName) {
@@ -1582,6 +1591,21 @@ foam.CLASS({
       return this.parentNode;
     },
 
+    function translate(source, opt_default) {
+      var translationService = this.translationService;
+      if ( translationService ) {
+        /* Add the translation of the supplied source to the Element as a String */
+        var translation = this.translationService.getTranslation(foam.locale, source, opt_default);
+        if ( foam.xmsg ) {
+          return this.tag({class: 'foam.i18n.InlineLocaleEditor', source: source, defaultText: opt_default, data: translation});
+        }
+        return this.add(translation);
+      }
+      console.warn('Missing Translation Service in ', this.cls_.name);
+      opt_default = opt_default || 'NO TRANSLATION SERVICE OR DEFAULT';
+      return this.add(opt_default);
+    },
+
     function add() {
       if ( this.content ) {
         this.content.add_(arguments, this);
@@ -1591,9 +1615,7 @@ foam.CLASS({
       return this;
     },
 
-    function toE() {
-      return this;
-    },
+    function toE() { return this; },
 
     function add_(cs, parentNode) {
       /* Add Children to this Element. */
@@ -1631,30 +1653,14 @@ foam.CLASS({
           this.add(this.PromiseSlot.create({ promise: c }));
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
+        } else if ( this.translationService && c && c.data && c.data.id ) {
+          // TODO: remove
+          var key = c.data.id + '.' + c.clsInfo;
+          console.log('DEPRECATED, use translate() instead ******************* add translate ', key, c.default);
+          var translation = this.translationService.getTranslation(foam.locale, key, c.default);
+          return this.add(translation);
         } else {
-          if ( typeof c === 'object' && c.data !== undefined && c.data.id !== undefined ) {
-            var self = this;
-            var expr = foam.mlang.Expressions.create();
-            let d =  this.__subContext__.localeDAO;
-            this.add(this.PromiseSlot.create({
-              promise://TODO support more that one language (add language to the id)
-                d.where(
-                  expr.AND(
-                    expr.OR(
-                      expr.EQ(foam.i18n.Locale.LOCALE, foam.locale),
-                      expr.EQ(foam.i18n.Locale.LOCALE, foam.locale.substring(0,foam.locale.indexOf('-')))),
-                    expr.EQ(foam.i18n.Locale.ID, c.data.id+'.'+c.clsInfo)))
-                .select().then(function(a){
-                  let arr = a.array;
-                  if ( arr.length > 0 ) {
-                    let ea = arr[0];
-                    return ea.target;
-                  }
-                  return c.default || 'no value';
-                })
-            }))
-          } else
-            es.push(c);
+          es.push(c);
         }
       }
 
@@ -1822,7 +1828,11 @@ foam.CLASS({
      * @param {Function} fn A function to call for each item in the given array.
      */
     function forEach(array, fn) {
-      array.forEach(fn.bind(this));
+      if ( foam.core.Slot.isInstance(array) ) {
+        this.add(array.map(a => this.E().forEach(a, fn)));
+      } else {
+        array.forEach(fn.bind(this));
+      }
       return this;
     },
 
@@ -2042,7 +2052,7 @@ foam.CLASS({
     function output_(out) {
       /** Output the element without transitioning to the OUTPUT state. **/
       out('<', this.nodeName);
-      if ( this.id !== null ) out(' id="', this.id, '"');
+      if ( this.id !== null ) out(' id="', this.id.replace ? this.id.replace(/"/g, "&quot;") : this.id, '"');
 
       var first = true;
       if ( this.hasOwnProperty('classes') ) {
@@ -2280,20 +2290,24 @@ foam.CLASS({
     },
     {
       name: 'visibility',
+      adapt: function(o, n) { if ( foam.Object.isInstance(n) ) return foam.u2.DisplayMode.create(n); return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'Exists for backwards compatability. You should set createVisibility, updateVisibility, or readVisibility instead. If this property is set, it will override the other three.'
     },
     {
       name: 'createVisibility',
+      adapt: function(o, n) { if ( foam.Object.isInstance(n) ) return foam.u2.DisplayMode.create(n); return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'The display mode for this property when the controller mode is CREATE.',
       value: 'RW'
     },
     {
       name: 'readVisibility',
+      adapt: function(o, n) { if ( foam.Object.isInstance(n) ) return foam.u2.DisplayMode.create(n); return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'The display mode for this property when the controller mode is VIEW.',
       value: 'RO'
     },
     {
       name: 'updateVisibility',
+      adapt: function(o, n) { if ( foam.Object.isInstance(n) ) return foam.u2.DisplayMode.create(n); return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'The display mode for this property when the controller mode is EDIT.',
       value: 'RW'
     },

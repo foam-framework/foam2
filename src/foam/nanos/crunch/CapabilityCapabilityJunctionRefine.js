@@ -34,11 +34,21 @@ foam.CLASS({
       tableCellFormatter: function(value, obj, axiom) {
         this.__subSubContext__.capabilityDAO
           .find(value)
-          .then((capability) => this.add(capability.name))
+          .then((capability) => this.add(capability.name || capability.id))
           .catch((error) => {
             this.add(value);
           });
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'precondition',
+      documentation: `
+        This property applies to prerequisite capability junctions.
+
+        If a prerequisite is considered a "precondition", it must be granted
+        before the corresponding dependant is shown in the capability store.
+      `
     }
   ]
 });

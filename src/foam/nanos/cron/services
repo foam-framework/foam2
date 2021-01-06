@@ -1,0 +1,57 @@
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"cronDAO",
+  "serve":true,
+  "serviceScript":"""
+    mdao = new foam.dao.MDAO(foam.nanos.cron.Cron.getOwnClassInfo());
+    mdao.addIndex(new foam.core.PropertyInfo[] {foam.nanos.cron.Cron.LAST_RUN});
+    mdao.addIndex(new foam.core.PropertyInfo[] {foam.nanos.cron.Cron.ENABLED});
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.cron.Cron.getOwnClassInfo())
+      .setMdao(mdao)
+      .setInnerDAO(new foam.dao.java.JDAO(x, mdao, "cronjobs"))
+      .setGuid(true)
+      .setDecorator(new foam.nanos.cron.CronScheduleDAO.Builder(x)
+        .setDelegate(new foam.nanos.script.ScriptRunnerDAO(null))
+        .build())
+      .setPm(true)
+      .setOrder(new foam.mlang.order.Comparator[] { new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.cron.Cron.LAST_RUN).build() })
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.cron.Cron\"}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"cronEventDAO",
+  "serve":true,
+  "serviceScript":"""
+    mdao = new foam.dao.MDAO(foam.nanos.script.ScriptEvent.getOwnClassInfo());
+    mdao.addIndex(new foam.core.PropertyInfo[] {foam.nanos.script.ScriptEvent.OWNER});
+    mdao.addIndex(new foam.core.PropertyInfo[] {foam.nanos.script.ScriptEvent.LAST_RUN});
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.script.ScriptEvent.getOwnClassInfo())
+      .setMdao(mdao)
+      .setGuid(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("cronEvents")
+      .setWriteOnly(true)
+      .setFixedSize(new foam.dao.FixedSizeDAO.Builder(x)
+        .setComparator(foam.mlang.MLang.DESC(foam.nanos.script.ScriptEvent.LAST_RUN))
+        .setSize(10000)
+        .build())
+      .setOrder(new foam.mlang.order.Comparator[] { new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.script.ScriptEvent.LAST_RUN).build() })
+      .setRuler(false)
+      .build();
+  """,
+  "client":"{\"of\":\"foam.nanos.script.ScriptEvent\"}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"cronScheduler",
+  "lazy":false,
+  "serviceScript":"""
+    return new foam.nanos.cron.CronScheduler();
+  """
+})

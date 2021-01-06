@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.comics.v2',
   name: 'DAOControllerConfig',
+
   documentation: `
     A customizable model to configure any DAOController
   `,
@@ -51,6 +52,21 @@ foam.CLASS({
       }
     },
     {
+      class: 'foam.dao.DAOProperty',
+      name: 'unfilteredDAO',
+      hidden: true,
+      expression: function(dao) {
+        var delegate = dao;
+        while ( delegate && foam.dao.ProxyDAO.isInstance(delegate) ) {
+          if ( foam.dao.FilteredDAO.isInstance(delegate) ) {
+            return delegate.delegate;
+          }
+          delegate = delegate.delegate;
+        }
+        return dao;
+      }
+    },
+    {
       class: 'Class',
       name: 'of',
       expression: function(dao$of) { return dao$of; }
@@ -66,17 +82,26 @@ foam.CLASS({
       factory: function() { return 'View all ' + this.browseTitle.toLowerCase() + '.' }
     },
     {
+      class: 'FObjectProperty',
+      name: 'primaryAction',
+      documentation: `
+        The most important action on the page. The view for this controller may
+        choose to display this action prominently.
+      `,
+      value: null
+    },
+    {
       // TODO: Make ViewSpecWithJava a refinement to ViewSpec and change below to a ViewSpec
       class: 'foam.u2.ViewSpecWithJava',
       name: 'summaryView',
       expression: function(defaultColumns) {
         return {
           class: 'foam.u2.view.ScrollTableView',
-          enableDynamicTableHeight: false,
+          enableDynamicTableHeight: true,
           columns: defaultColumns,
           css: {
             width: '100%',
-            height: '424px'
+            'min-height': '424px'
           }
         };
       }
@@ -94,8 +119,8 @@ foam.CLASS({
         var tableColumns = of.getAxiomByName('tableColumns');
 
         return tableColumns
-                ? tableColumns.columns
-                : of.getAxiomsByClass(foam.core.Property).map(p => p.name);
+          ? tableColumns.columns
+          : of.getAxiomsByClass(foam.core.Property).map(p => p.name);
       }
     },
     {

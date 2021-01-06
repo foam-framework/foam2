@@ -39,7 +39,6 @@ foam.CLASS({
       preSet: function(old, nu) {
         // TODO: Try to detect CPF-1625
         if ( nu < 5000 ) {
-          debugger;
           console.warn("Setting timeout to low value", nu);
           return 5000;
         }

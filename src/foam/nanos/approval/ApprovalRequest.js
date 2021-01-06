@@ -64,17 +64,19 @@
 
   sections: [
     {
-      name: 'basicInformation',
-      permissionRequired: true
+      name: 'requestDetails',
+      title: 'Approval Request Information',
+      order: 0
     },
     {
-      name: 'requestDetails'
+      name: 'complianceInformation',
+      title: 'Compliance',
+      order: 1
     },
     {
-      name: 'supportDetails'
-    },
-    {
-      name: '_defaultSection',
+      name: 'systemInformation',
+      title: 'System Information',
+      order: 2,
       permissionRequired: true
     }
   ],
@@ -139,7 +141,7 @@
     {
       class: 'Long',
       name: 'id',
-      section: '_defaultSection',
+      section: 'requestDetails',
       visibility: 'RO',
       documentation: 'Sequence number.'
     },
@@ -147,7 +149,7 @@
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'approver',
-      section: 'requestDetails',
+      section: 'systemInformation',
       documentation: `The user that is requested for approval. When set, "group" property is ignored.`,
       view: function(_, X) {
         let slot = foam.core.SimpleSlot.create();
@@ -169,7 +171,7 @@
             slot.set(`User #${approver}`);
           }
         });
-        
+
         return {
           class: 'foam.u2.view.ValueView',
           data$: slot
@@ -199,6 +201,7 @@
       class: 'Object',
       javaType: 'Object',
       name: 'objId',
+      section: 'requestDetails',
       documentation: 'id of the object that needs approval.',
       tableWidth: 150,
       tableCellFormatter: function(objId) {
@@ -206,7 +209,6 @@
         var userId = parseInt(objId);
         if ( !! userId ) {
           this.__subSubContext__.userDAO.find(userId).then(function(a) {
-
           if ( a != undefined ) {
             self.add(a.toSummary());
           } else {
@@ -221,6 +223,7 @@
     {
       class: 'String',
       name: 'daoKey',
+      section: 'systemInformation',
       documentation: `Used internally in approvalDAO to point where requested object can be found.
       Should not be used to retrieve approval requests for a given objects
       since an object can have multiple requests of different nature. When used in conjunction with serverDaoKey,
@@ -229,6 +232,7 @@
     {
       class: 'String',
       name: 'serverDaoKey',
+      section: 'systemInformation',
       documentation: `Used internally in approvalDAO if an approval request concerns both a clientDAO and
       a server side dao. The server dao key is mainly used for backend actions that get executed on
       the object as a cause of the approval request being approved or rejected.`
@@ -261,7 +265,7 @@
       Future: populated in approvalRequestDAO pipeline based on configurations.
       Currentely populated as 1.`,
       gridColumns: 4,
-      section: 'basicInformation',
+      section: 'systemInformation',
       visibility: function(points) {
         return points ?
           foam.u2.DisplayMode.RO :
@@ -273,7 +277,7 @@
       name: 'requiredPoints',
       value: 1,
       gridColumns: 4,
-      section: 'basicInformation',
+      section: 'requestDetails',
       documentation: `Defines how many approvers required and approvers' ranks.
       E.g. when set to 10:
       1) 10 approval requests with "points" set to 1.
@@ -291,7 +295,7 @@
       name: 'requiredRejectedPoints',
       value: 1,
       gridColumns: 4,
-      section: 'basicInformation',
+      section: 'requestDetails',
       visibility: function(requiredRejectedPoints) {
         return requiredRejectedPoints ?
           foam.u2.DisplayMode.RO :
@@ -304,7 +308,7 @@
       name: 'group',
       documentation: `When set, each user in the group will receive a request for approval.
       If "approver" property is set, "group" property is ignored.`,
-      section: 'supportDetails',
+      section: 'requestDetails',
       visibility: function(group) {
         return group ?
           foam.u2.DisplayMode.RO :
@@ -325,7 +329,7 @@
       name: 'memo',
       view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 80 },
       documentation: 'Meant to be used for explanation on why request was approved/rejected',
-      section: 'supportDetails',
+      section: 'requestDetails',
       visibility: function(memo) {
         if ( memo ) {
           return foam.u2.DisplayMode.RO;
@@ -350,14 +354,14 @@
       class: 'String',
       name: 'token',
       documentation: 'token in email for ‘click to approve’.',
-      section: 'basicInformation',
+      section: 'systemInformation',
       readPermissionRequired: true,
       writePermissionRequired: true
     },
     {
       class: 'DateTime',
       name: 'created',
-      section: 'supportDetails',
+      section: 'requestDetails',
       gridColumns: 6,
       visibility: function(created) {
         return created ?
@@ -369,7 +373,7 @@
       class: 'DateTime',
       name: 'lastModified',
       gridColumns: 6,
-      section: 'supportDetails',
+      section: 'requestDetails',
       visibility: function(lastModified) {
         return lastModified ?
           foam.u2.DisplayMode.RO :
@@ -380,7 +384,7 @@
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
-      section: 'supportDetails',
+      section: 'requestDetails',
       tableCellFormatter: function(initiatingUser) {
         let self = this;
         this.__subSubContext__.userDAO.find(initiatingUser).then(user => {
@@ -392,7 +396,7 @@
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdByAgent',
-      section: 'supportDetails',
+      section: 'requestDetails',
       readPermissionRequired: true,
       writePermissionRequired: true
     },
@@ -400,27 +404,40 @@
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
-      section: 'supportDetails',
+      section: 'requestDetails',
       readPermissionRequired: true,
       writePermissionRequired: true
     },
     {
-      class: 'String',
-      name: 'refObj',
-      transient: true,
-      expression: function(daoKey, objId) {
-        return daoKey + ':' + objId;
-      },
-      javaGetter: `
-        return getDaoKey() + ": " + getObjId();
-      `,
+      class: 'Object',
+      name: 'refObjId',
+      hidden: true,
       readPermissionRequired: true,
-      writePermissionRequired: true
+      writePermissionRequired: true,
+      documentation: `
+        ID of obj displayed in view reference
+        To be used in view reference action when the approvalrequest
+        needs to specify its own reference, for example in the case of 
+        UserCapabilityJunctions where data is null.
+      `
+    },
+    {
+      class: 'String',
+      name: 'refDaoKey',
+      hidden: true,
+      readPermissionRequired: true,
+      writePermissionRequired: true,
+      documentation: `
+        Daokey of obj displayed in view reference.
+        To be used in view reference action when the approvalrequest
+        needs to specify its own reference, for example in the case of 
+        UserCapabilityJunctions where data is null.
+      `
     },
     {
       class: 'Boolean',
       name: 'isTrackingRequest',
-      value: false
+      section: 'systemInformation'
     },
     {
       class: 'Boolean',
@@ -449,15 +466,15 @@
   messages: [
     {
       name: 'SUCCESS_APPROVED',
-      message: 'You have successfully approved this request.'
+      message: 'You have successfully approved this request'
     },
     {
       name: 'SUCCESS_REJECTED',
-      message: 'You have successfully rejected this request.'
+      message: 'You have successfully rejected this request'
     },
     {
       name: 'SUCCESS_CANCELLED',
-      message: 'You have successfully cancelled this request.'
+      message: 'You have successfully cancelled this request'
     },
     {
       name: 'PENDING',
@@ -504,48 +521,6 @@
       javaCode: `
         return foam.util.SafetyUtil.isEmpty(getClassification()) ? "" : "(" + getClassification() + ")" + getOperation().toString();
       `
-    },
-    {
-      name: 'approveWithMemo',
-      code: function(memo) {
-        var approvedApprovalRequest = this.clone();
-        approvedApprovalRequest.status = this.ApprovalStatus.APPROVED;
-        approvedApprovalRequest.memo = memo;
-
-        this.approvalRequestDAO.put(approvedApprovalRequest).then((req) => {
-          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
-          this.finished.pub();
-          this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
-
-          if ( this.stack.top.length > 0 ) {
-            this.stack.back();
-          }
-        }, (e) => {
-          this.throwError.pub(e);
-          this.notify(e.message, '', this.LogLevel.ERROR, true);
-        });
-      }
-    },
-    {
-      name: 'rejectWithMemo',
-      code: function(memo) {
-        var rejectedApprovalRequest = this.clone();
-        rejectedApprovalRequest.status = this.ApprovalStatus.REJECTED;
-        rejectedApprovalRequest.memo = memo;
-
-        this.approvalRequestDAO.put(rejectedApprovalRequest).then((o) => {
-          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
-          this.finished.pub();
-          this.notify(this.SUCCESS_REJECTED, '', this.LogLevel.INFO, true);
-
-          if ( this.stack.top.length > 0 ) {
-            this.stack.back();
-          }
-        }, (e) => {
-          this.throwError.pub(e);
-          this.notify(e.message, '', this.LogLevel.ERROR, true);
-        });
-      }
     }
   ],
 
@@ -553,44 +528,55 @@
     {
       name: 'approve',
       section: 'requestDetails',
-      isAvailable: (isTrackingRequest, status) => {
-        if (
-          status === foam.nanos.approval.ApprovalStatus.REJECTED ||
-          status === foam.nanos.approval.ApprovalStatus.APPROVED ||
-          status === foam.nanos.approval.ApprovalStatus.CANCELLED
-        ) {
-          return false;
-        }
+      isAvailable: function(isTrackingRequest, status) {
+        if ( status !== this.ApprovalStatus.REQUESTED ) return false;
         return ! isTrackingRequest;
       },
       code: function(X) {
-        var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
+        var approvedApprovalRequest = this.clone();
+        approvedApprovalRequest.status = this.ApprovalStatus.APPROVED;
 
+        this.approvalRequestDAO.put(approvedApprovalRequest).then(req => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
+          X.stack.back();
+        }, e => {
+          this.throwError.pub(e);
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
+        });
+      }
+    },
+    {
+      name: 'approveWithMemo',
+      section: 'requestDetails',
+      isAvailable: function(isTrackingRequest, status) {
+        if ( status !== this.ApprovalStatus.REQUESTED ) return false;
+        return ! isTrackingRequest;
+      },
+      code: function(X) {
+        var objToAdd = X.objectSummaryView ?
+          X.objectSummaryView : X.summaryView;
         objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
-          class: "foam.u2.MemoModal",
-          onExecute: this.approveWithMemo.bind(this)
+          class: 'foam.u2.MemoModal',
+          onExecute: this.approveWithMemoL.bind(this, X)
         }));
       }
     },
     {
       name: 'reject',
       section: 'requestDetails',
-      isAvailable: (isTrackingRequest, status) => {
-        if (
-          status === foam.nanos.approval.ApprovalStatus.REJECTED ||
-          status === foam.nanos.approval.ApprovalStatus.APPROVED ||
-          status === foam.nanos.approval.ApprovalStatus.CANCELLED
-        ) {
-          return false;
-        }
+      isAvailable: function(isTrackingRequest, status) {
+        if ( status !== this.ApprovalStatus.REQUESTED ) return false;
         return ! isTrackingRequest;
       },
       code: function(X) {
-        var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
+        var objToAdd = X.objectSummaryView ?
+          X.objectSummaryView : X.summaryView;
 
         objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
-          class: "foam.u2.MemoModal",
-          onExecute: this.rejectWithMemo.bind(this),
+          class: 'foam.u2.MemoModal',
+          onExecute: this.rejectWithMemo.bind(this, X),
           isMemoRequired: true
         }));
       }
@@ -598,21 +584,15 @@
     {
       name: 'cancel',
       section: 'requestDetails',
-      isAvailable: (isTrackingRequest, status) => {
-        if (
-          status === foam.nanos.approval.ApprovalStatus.REJECTED ||
-          status === foam.nanos.approval.ApprovalStatus.APPROVED ||
-          status === foam.nanos.approval.ApprovalStatus.CANCELLED
-        ) {
-          return false;
-        }
+      isAvailable: function(isTrackingRequest, status) {
+        if ( status !== this.ApprovalStatus.REQUESTED ) return false;
         return isTrackingRequest;
       },
       code: function(X) {
         var cancelledApprovalRequest = this.clone();
         cancelledApprovalRequest.status = this.ApprovalStatus.CANCELLED;
 
-        X.approvalRequestDAO.put(cancelledApprovalRequest).then((o) => {
+        X.approvalRequestDAO.put(cancelledApprovalRequest).then(o => {
           X.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
           this.finished.pub();
 
@@ -621,7 +601,7 @@
           if ( X.currentMenu.id !== X.stack.top[2] ) {
             X.stack.back();
           }
-        }, (e) => {
+        }, e => {
           this.throwError.pub(e);
           X.notify(e.message, '', this.LogLevel.ERROR, true);
         });
@@ -629,6 +609,7 @@
     },
     {
       name: 'viewReference',
+      section: 'requestDetails',
       isDefault: true,
       isAvailable: function() {
         var self = this;
@@ -636,8 +617,9 @@
         // TODO: To consider in new approval system rework: should we allow people to view reference for a deleted or rejected object
         // since it will now just be stored in the approvable dao
         // Do not show the action if the request was reject or approved and removed
-        if (self.status == foam.nanos.approval.ApprovalStatus.REJECTED ||
-           (self.status == foam.nanos.approval.ApprovalStatus.APPROVED && self.operation == foam.nanos.ruler.Operations.REMOVE)) {
+        if ( self.status == foam.nanos.approval.ApprovalStatus.REJECTED ||
+            ( self.status == foam.nanos.approval.ApprovalStatus.APPROVED &&
+              self.operation == foam.nanos.ruler.Operations.REMOVE) ) {
              return false;
         }
 
@@ -646,55 +628,74 @@
           var objId = property.adapt.call(property, self.objId, self.objId, property);
           return self.__subContext__[this.daoKey]
             .find(objId)
-            .then((obj) => {
-              return !! obj;
-            })
-            .catch((err) => {
+            .then(obj => !! obj)
+            .catch(err => {
               console.warn(err.message || err);
-              return false;
+              if ( self.refObjId && self.refDaoKey && self.__subContext__[self.refDaoKey_] ) {
+                property = self.__subContext__[self.refDaoKey].of.ID;
+                objId = property.adapt.call(property, self.refObjId, self.refObjId, property);
+                return self.__subContext__[self.refDaoKey]
+                  .find(objId)
+                  .then(obj => !! obj)
+                  .catch(err => {
+                    console.warn(err.message || err);
+                    return false;
+                  });
+              } else {
+                return false;
+              }
             });
-          }
+        }
       },
       code: function(X) {
         var self = this;
 
         // This should already be filtered out by the isAvailable, but adding here as duplicate protection
-        if (self.status == foam.nanos.approval.ApprovalStatus.REJECTED ||
-           (self.status == foam.nanos.approval.ApprovalStatus.APPROVED && self.operation == foam.nanos.ruler.Operations.REMOVE)) {
+        if ( self.status == foam.nanos.approval.ApprovalStatus.REJECTED ||
+           (self.status == foam.nanos.approval.ApprovalStatus.APPROVED && self.operation == foam.nanos.ruler.Operations.REMOVE) ) {
              console.warn('Object is inaccessible')
              return;
         }
 
-        var objId = X[self.daoKey].of.ID.type === 'Long' ? parseInt(this.objId) : this.objId;
-
-        return X[this.daoKey]
+        var objId, daoKey, property;
+        if ( self.refObjId && self.refDaoKey ) {
+          daoKey = self.refDaoKey;
+          property = X[daoKey].of.ID;
+          objId = property.adapt.call(property, self.refObjId, self.refObjId, property);
+        } else {
+          daoKey = self.daoKey_;
+          property = X[daoKey].of.ID;
+          objId = property.adapt.call(property, self.objId, self.objId, property);
+        }
+        
+        return X[daoKey]
           .find(objId)
-          .then((obj) => {
+          .then(obj => {
             var of = obj.cls_;
 
             // If the dif of objects is calculated and stored in Map(obj.propertiesToUpdate),
             // this is for updating object approvals
             if ( obj.propertiesToUpdate ) {
-              if ( obj.operation === foam.nanos.ruler.Operations.CREATE ){
+              if ( obj.operation === foam.nanos.ruler.Operations.CREATE ) {
                 var temporaryNewObject = obj.of.create({}, X);
 
                 var propsToUpdate = obj.propertiesToUpdate;
 
                 var keyArray = Object.keys(propsToUpdate);
 
-                for ( var i = 0; i < keyArray.length; i++ ){
+                for ( var i = 0; i < keyArray.length; i++ ) {
                   var propObj = temporaryNewObject.cls_.getAxiomByName(keyArray[i]);
                   if (
                     ! propObj ||
                     propObj.transient ||
                     propObj.storageTransient ||
-                    propObj.networkTransient 
+                    propObj.networkTransient
                   ) continue;
 
                   temporaryNewObject[keyArray[i]] = propsToUpdate[keyArray[i]];
                 }
 
-                of =  temporaryNewObject.cls_;
+                of = temporaryNewObject.cls_;
 
                 X.stack.push({
                   class: 'foam.comics.v2.DAOSummaryView',
@@ -707,6 +708,8 @@
                     createPredicate: foam.mlang.predicate.False.create(),
                     deletePredicate: foam.mlang.predicate.False.create()
                   }),
+                  mementoHead: null,
+                  backLabel: 'Back'
                 });
               } else {
                 of = obj.of;
@@ -731,19 +734,61 @@
               data: obj,
               of: of,
               config: foam.comics.v2.DAOControllerConfig.create({
-                daoKey: this.daoKey,
+                daoKey: daoKey,
                 of: of,
                 editPredicate: foam.mlang.predicate.False.create(),
                 createPredicate: foam.mlang.predicate.False.create(),
                 deletePredicate: foam.mlang.predicate.False.create()
-              })
+              }),
+              mementoHead: null,
+              backLabel: 'Back'
             });
           })
-          .catch((err) => {
+          .catch(err => {
             console.warn(err.message || err);
           });
       },
       tableWidth: 100
+    }
+  ],
+  listeners: [
+    {
+      name: 'approveWithMemoL',
+      code: function(X, memo) {
+        var approvedApprovalRequest = this.clone();
+        approvedApprovalRequest.status = this.ApprovalStatus.APPROVED;
+        approvedApprovalRequest.memo = memo;
+
+        this.approvalRequestDAO.put(approvedApprovalRequest).then(req => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
+
+          X.stack.back();
+        }, e => {
+          this.throwError.pub(e);
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
+        });
+      }
+    },
+    {
+      name: 'rejectWithMemo',
+      code: function(X, memo) {
+        var rejectedApprovalRequest = this.clone();
+        rejectedApprovalRequest.status = this.ApprovalStatus.REJECTED;
+        rejectedApprovalRequest.memo = memo;
+
+        this.approvalRequestDAO.put(rejectedApprovalRequest).then(o => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.notify(this.SUCCESS_REJECTED, '', this.LogLevel.INFO, true);
+
+          X.stack.back();
+        }, e => {
+          this.throwError.pub(e);
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
+        });
+      }
     }
   ]
 });

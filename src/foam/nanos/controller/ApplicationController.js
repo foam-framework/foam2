@@ -46,7 +46,7 @@ foam.CLASS({
     'foam.nanos.theme.ThemeDomain',
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.u2.navigation.FooterView',
-    'foam.u2.crunch.CapabilityIntercept',
+    'foam.nanos.crunch.CapabilityIntercept',
     'foam.u2.crunch.CapabilityInterceptView',
     'foam.u2.crunch.CrunchController',
     'foam.u2.borders.MarginBorder',
@@ -54,7 +54,8 @@ foam.CLASS({
     'foam.u2.stack.StackView',
     'foam.u2.dialog.NotificationMessage',
     'foam.nanos.session.SessionTimer',
-    'foam.u2.dialog.Popup'
+    'foam.u2.dialog.Popup',
+    'foam.core.Latch'
   ],
 
   imports: [
@@ -66,32 +67,31 @@ foam.CLASS({
   ],
 
   exports: [
-    'displayWidth',
     'agent',
     'appConfig',
     'as ctrl',
+    'crunchController',
     'currentMenu',
+    'displayWidth',
     'group',
     'lastMenuLaunched',
     'lastMenuLaunchedListener',
     'loginSuccess',
-    'mementoTail as memento',
-    'theme',
+    'loginVariables',
+    'memento',
     'menuListener',
     'notify',
     'pushMenu',
-    'requestCapability',
-    'capabilityCache',
     'requestLogin',
+    'sessionID',
+    'sessionTimer',
     'signUpEnabled',
-    'loginVariables',
     'stack',
     'subject',
+    'theme',
     'user',
     'webApp',
-    'wrapCSS as installCSS',
-    'sessionTimer',
-    'crunchController'
+    'wrapCSS as installCSS'
   ],
 
   constants: {
@@ -139,7 +139,7 @@ foam.CLASS({
   messages: [
     { name: 'GROUP_FETCH_ERR', message: 'Error fetching group' },
     { name: 'GROUP_NULL_ERR', message: 'Group was null' },
-    { name: 'LOOK_AND_FEEL_NOT_FOUND', message: 'Could not fetch look and feel object.' },
+    { name: 'LOOK_AND_FEEL_NOT_FOUND', message: 'Could not fetch look and feel object' },
     { name: 'LANGUAGE_FETCH_ERR', message: 'Error fetching language' },
   ],
 
@@ -147,7 +147,7 @@ foam.CLASS({
     body {
       background: /*%GREY5%*/ #f5f7fa;
       color: #373a3c;
-      font-family: /*%FONT1%*/, Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       letter-spacing: 0.2px;
       margin: 0;
@@ -170,12 +170,28 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'memento',
+      class: 'String',
+      name: 'sessionName',
+      value: 'defaultSession'
+    },
+    {
+      name: 'sessionID',
       factory: function() {
-        return this.Memento.create({tail$: this.mementoTail$});
+        var urlSession = "";
+        try {
+          urlSession = window.location.search.substring(1).split('&')
+           .find(element => element.startsWith("sessionId")).split('=')[1];
+        } catch { };
+        return urlSession !== "" ? urlSession : localStorage[this.sessionName] ||
+          ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
       }
     },
-    'mementoTail',
+    {
+      name: 'memento',
+      factory: function() {
+        return this.Memento.create();
+      }
+    },
     {
       name: 'loginVariables',
       expression: function(client$userDAO) {
@@ -197,11 +213,16 @@ foam.CLASS({
       name: 'clientPromise',
       factory: function() {
         var self = this;
-        return self.ClientBuilder.create().promise.then(function(cls) {
+        return self.ClientBuilder.create({}, this).promise.then(function(cls) {
           self.client = cls.create(null, self);
           return self.client;
         });
       }
+    },
+    {
+      name: 'languageInstalled',
+      documentation: 'Latch to denote language has been installed',
+      factory: function() { return this.Latch.create(); }
     },
     {
       name: 'client',
@@ -279,13 +300,6 @@ foam.CLASS({
       }
     },
     {
-      class: 'Map',
-      name: 'capabilityCache',
-      factory: function() {
-        return new Map();
-      }
-    },
-    {
       class: 'FObjectProperty',
       of: 'foam.nanos.theme.Theme',
       name: 'theme'
@@ -304,9 +318,21 @@ foam.CLASS({
         return this.FooterView;
       }
     },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.Language',
+      name: 'defaultLanguage',
+      factory: function() {
+        return foam.nanos.auth.Language.create({code: 'en'})
+      }
+    },
     'currentMenu',
     'lastMenuLaunched',
-    'webApp'
+    'webApp',
+    {
+      name: 'languageDefaults_',
+      factory: function() { return []; }
+    }
   ],
 
   methods: [
@@ -319,17 +345,33 @@ foam.CLASS({
       var self = this;
 
       // Start Memento Support
-      var hash = this.WindowHash.create();
-      this.memento.value$ = hash.value$
+      this.WindowHash.create({value$: this.memento.value$});
 
-      this.memento.head$.sub(this.mementoChange);
-      this.mementoChange();
+      this.onDetach(this.memento.changeIndicator$.sub(function () {
+        self.memento.value = self.memento.combine();
+
+        if ( ! self.memento.feedback_ )
+          self.mementoChange();
+      }));
+
+      this.onDetach(this.memento.value$.sub(function () {
+        self.memento.parseValue();
+
+        if ( ! self.memento.feedback_ )
+          self.mementoChange();
+      }));
       // End Memento Support
 
       this.clientPromise.then(async function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
 
+        await client.translationService.initLatch;
+        self.installLanguage();
+
         await self.fetchSubject();
+
+        await self.maybeReinstallLanguage(client)
+        self.languageInstalled.resolve();
 
         // add user and agent for backward compatibility
         Object.defineProperty(self, 'user', {
@@ -353,8 +395,8 @@ foam.CLASS({
         // the line above before executing this one.
         await self.fetchGroup();
         await self.fetchTheme();
-        await self.fetchLanguage();
         self.onUserAgentAndGroupLoaded();
+        self.mementoChange();
       });
     },
 
@@ -362,23 +404,22 @@ foam.CLASS({
       window.addEventListener('resize', this.updateDisplayWidth);
       this.updateDisplayWidth();
 
-      var userNotificationQueryId = this.subject && this.subject.realUser ?
-      this.subject.realUser.id : this.user.id;
 
-      this.__subSubContext__.notificationDAO.where(
-        this.EQ(this.Notification.USER_ID, userNotificationQueryId)
-      ).on.put.sub((sub, on, put, obj) => {
-        if ( obj.toastState == this.ToastState.REQUESTED ) {
-          this.add(this.NotificationMessage.create({
-            message: obj.toastMessage,
-            type: obj.severity,
-            description: obj.toastSubMessage
-          }));
-          var clonedNotification = obj.clone();
-          clonedNotification.toastState = this.ToastState.DISPLAYED;
-          this.__subSubContext__.notificationDAO.put(clonedNotification);
-        }
-      });
+
+//      this.__subSubContext__.notificationDAO.where(
+//        this.EQ(this.Notification.USER_ID, userNotificationQueryId)
+//      ).on.put.sub((sub, on, put, obj) => {
+//        if ( obj.toastState == this.ToastState.REQUESTED ) {
+//          this.add(this.NotificationMessage.create({
+//            message: obj.toastMessage,
+//            type: obj.severity,
+//            description: obj.toastSubMessage
+//          }));
+//          var clonedNotification = obj.clone();
+//          clonedNotification.toastState = this.ToastState.DISPLAYED;
+//          this.__subSubContext__.notificationDAO.put(clonedNotification);
+//        }
+//      });
 
       this.clientPromise.then(() => {
         this.fetchTheme().then(() => {
@@ -406,49 +447,50 @@ foam.CLASS({
       });
     },
 
-    async function fetchLanguage() {
-      try {
-        let l = localStorage.getItem('localeLanguage');
-        if ( l !== undefined ) foam.locale = l;
-        //TODO manage more complicated language. 'en-CA'
-        if ( foam.locale !== 'en' && foam.locale !== 'en-US' ) {
-          let ctx = this.__subContext__;
-          let d = await  this.__subContext__.localeDAO;
-          d.select().then(e => {
-            var expr = foam.mlang.Expressions.create();
-            d.where(
-              expr.OR(
-                expr.EQ(foam.i18n.Locale.LOCALE, foam.locale),
-                expr.EQ(foam.i18n.Locale.LOCALE, foam.locale.substring(0,foam.locale.indexOf('-')))
-              )
-            ).select().then(e => {
-              let arr = e.array;
-              arr.forEach(ea =>
-                {
-                  let s = null;
-                  try {
-                    let i, obj;
-                    do {
-                      i = ea.source.indexOf('.',++i);
-                      if (i != -1) {
-                        s = eval(ea.source.substring(0,i))
-                      }
-                    } while (i > 0 && !!s);
-                  }
-                  catch(err) {
-                    console.log(ea.source)
-                    console.log(err)
-                  }
-                  if (!!s) {
-                    s[ea.source.substring(ea.source.lastIndexOf('.')+1)] = ea.target;
-                  }
-                })
-            })
-          })
+    function installLanguage() {
+      for ( var i = 0 ; i < this.languageDefaults_.length ; i++ ) {
+        var ld = this.languageDefaults_[i];
+        ld[0][ld[1]] = ld[2];
+      }
+      this.languageDefaults_ = undefined;
+
+      var map = this.__subContext__.translationService.localeEntries;
+      for ( var key in map ) {
+        var node = global;
+        var path = key.split('.');
+
+        for ( var i = 0 ; node && i < path.length-1 ; i++ ) node = node[path[i]];
+        if ( node ) {
+          this.languageDefaults_.push([node, path[path.length-1], node[path[path.length-1]]]);
+          node[path[path.length-1]] = map[key];
         }
-      } catch (err) {//TODO
-        this.notify(this.LANGUAGE_FETCH_ERR, 'error');
-        console.error(err.message || this.LANGUAGE_FETCH_ERR);
+      }
+    },
+
+    async function maybeReinstallLanguage(client) {
+      if (
+        this.subject &&
+        this.subject.realUser &&
+        this.subject.realUser.language.toString() != foam.locale
+      ) {
+        let languages = (await client.languageDAO
+          .where(foam.mlang.predicate.Eq.create({
+            arg1: foam.nanos.auth.Language.ENABLED,
+            arg2: true
+          })).select()).array;
+
+        let userPreferLanguage = languages.find( e => e.id.compareTo(this.subject.realUser.language) === 0 )
+        if ( ! userPreferLanguage ) {
+          foam.locale = this.defaultLanguage.toString()
+          let user = this.subject.realUser
+          user.language = this.defaultLanguage.id
+          await client.userDAO.put(user)
+        } else if ( foam.locale != userPreferLanguage.toString() ) {
+          foam.locale = userPreferLanguage.toString()
+        }
+        client.translationService.maybeReload()
+        await client.translationService.initLatch
+        this.installLanguage()
       }
     },
 
@@ -472,6 +514,7 @@ foam.CLASS({
 
         this.subject = result;
       } catch (err) {
+        this.languageInstalled.resolve();
         await this.requestLogin();
         return await this.fetchSubject();
       }
@@ -490,18 +533,18 @@ foam.CLASS({
       // then we don't want this method to expand the commented portion of that
       // CSS because it's already in long form. By checking if */ follows the
       // macro, we can tell if it's already in long form and skip it.
-      return css.replace(
+      return this.theme[m] ? css.replace(
         new RegExp('%' + M + '%(?!\\*/)', 'g'),
-        '/*%' + M + '%*/ ' + this.theme[m]);
+        '/*%' + M + '%*/ ' + this.theme[m]) : css;
     },
 
     function expandLongFormMacro(css, m) {
       // A long-form macros is of the form "/*%PRIMARY_COLOR%*/ blue".
       var M = m.toUpperCase();
 
-      return css.replace(
+      return this.theme[m] ? css.replace(
         new RegExp('/\\*%' + M + '%\\*/[^;!]*', 'g'),
-        '/*%' + M + '%*/ ' + this.theme[m]);
+        '/*%' + M + '%*/ ' + this.theme[m]) : css;
     },
 
     function wrapCSS(text, id) {
@@ -535,7 +578,7 @@ foam.CLASS({
       }
       /** Use to load a specific menu. **/
       // Do it this way so as to not reset mementoTail if set
-      if ( this.memento.head != menu || opt_forceReload ) {
+      if ( this.memento.head !== menu || opt_forceReload ) {
         this.memento.value = menu;
       }
     },
@@ -558,20 +601,6 @@ foam.CLASS({
         self.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, self);
         self.loginSuccess$.sub(resolve);
       });
-    },
-
-    function requestCapability(capabilityInfo) {
-      var self = this;
-
-      capabilityInfo.capabilityOptions.forEach((c) => {
-        self.capabilityCache.set(c, false);
-      });
-
-      let intercept = self.CapabilityIntercept.create({
-        capabilityOptions: capabilityInfo.capabilityOptions
-      });
-
-      return self.crunchController.maybeLaunchInterceptView(intercept);
     },
 
     function notify(toastMessage, toastSubMessage, severity, transient) {
@@ -608,6 +637,23 @@ foam.CLASS({
        *   - Update the look and feel of the app based on the group or user
        *   - Go to a menu based on either the hash or the group
        */
+       var userNotificationQueryId = this.subject && this.subject.realUser ?
+             this.subject.realUser.id : this.user.id;
+      this.__subSubContext__.notificationDAO.where(
+        this.EQ(this.Notification.USER_ID, userNotificationQueryId)
+      ).on.put.sub((sub, on, put, obj) => {
+        if ( obj.toastState == this.ToastState.REQUESTED ) {
+          this.add(this.NotificationMessage.create({
+            message: obj.toastMessage,
+            type: obj.severity,
+            description: obj.toastSubMessage
+          }));
+          var clonedNotification = obj.clone();
+          clonedNotification.toastState = this.ToastState.DISPLAYED;
+          this.__subSubContext__.notificationDAO.put(clonedNotification);
+        }
+      });
+
       this.fetchTheme();
 
       var hash = this.window.location.hash;
@@ -619,7 +665,7 @@ foam.CLASS({
         this.window.location.hash = this.theme.defaultMenu;
       }
 
-      this.__subContext__.localSettingDAO.put(foam.nanos.session.LocalSetting.create({id: 'homeDenomination', value: localStorage.getItem("homeDenomination")}));
+//      this.__subContext__.localSettingDAO.put(foam.nanos.session.LocalSetting.create({id: 'homeDenomination', value: localStorage.getItem("homeDenomination")}));
     },
 
     function menuListener(m) {

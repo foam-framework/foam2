@@ -46,8 +46,7 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(_, a, p) {
-        if ( foam.Object.isInstance(a) )
-        {
+        if ( foam.Object.isInstance(a) ) {
           if ( a[foam.locale] !== undefined )
             return a[foam.locale];
           if ( a[foam.locale.substring(0, foam.locale.indexOf('-'))] !== undefined )
@@ -63,6 +62,27 @@ foam.CLASS({
     },
     [ 'type', 'String' ],
     [ 'value', '' ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'I18NString',
+  extends: 'String',
+
+  documentation: 'A String which needs to be internationalized before being displayed to users.',
+
+  properties: [
+   {
+     name: 'getter_',
+     value: function(proto, prop, obj, key) {
+       if ( foam.core.I18NString.GETTER__ ) return foam.core.I18NString.GETTER__(proto, prop, obj, key);
+       var msg_ = obj.instance_[key];
+       if ( ! foam.i18n || ! foam.xmsg ) return msg_;
+       return foam.i18n.Lib.createText(prop.sourceCls_.id + '.' + this.name, msg_, msg_);
+      }
+   }
   ]
 });
 
@@ -296,17 +316,20 @@ foam.CLASS({
     function installInProto(proto) {
       this.SUPER(proto);
       var self = this;
-      Object.defineProperty(proto, self.name + '$push', {
-        get: function classGetter() {
-          return function (v) {
-            // Push value
-            this[self.name].push(v);
-            // Force property update
-            this.propertyChange.pub(self.name, this.slot(self.name));
-          }
-        },
-        configurable: true
-      });
+      ['push','splice','unshift'].forEach(func => {
+        Object.defineProperty(proto, self.name + '$' + func, {
+          get: function classGetter() {
+            return function (...args) {
+              // Push value
+              let val = this[self.name][func](...args);
+              // Force property update
+              this.propertyChange.pub(self.name, this.slot(self.name));
+              return val;
+            }
+          },
+          configurable: true
+        });
+      })
       Object.defineProperty(proto, self.name + '$remove', {
         get: function classGetter() {
           return function (predicate) {
@@ -318,7 +341,17 @@ foam.CLASS({
                 newArry.push(oldArry[i]);
               }
             }
-            this.propertyChange.pub(self.name, this.slot(self.name));
+            this[self.name] = newArry;
+          }
+        },
+        configurable: true
+      });
+      // Does not modify the original array; returns an array containing all
+      //   elements that satisfy the provided predicate.
+      Object.defineProperty(proto, self.name + '$filter', {
+        get: function classGetter() {
+          return function (predicate) {
+            return foam.Array.filter(this[self.name], predicate);
           }
         },
         configurable: true
@@ -333,7 +366,11 @@ foam.CLASS({
   name: 'List',
   extends: 'foam.core.Object',
   properties: [
-    [ 'type', 'List' ]
+    [ 'type', 'List' ],
+    [
+      'factory',
+      function() { return []; }
+    ]
   ]
 });
 
@@ -534,7 +571,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'unitPropName',
-      value: 'denomination',
       documentation: `
         The name of the property of a model that contains the denomination String.
       `
@@ -757,6 +793,37 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'PropertyShortNameRefinement',
+  refines: 'Property',
+
+  properties: [
+    /**
+      A short-name is an optional shorter name for a property.
+      It is used by JSON and XML support when 'useShortNames'
+      is enabled. Short-names enable output to be smaller,
+      which can save disk space and/or network bandwidth.
+      Ex.
+    <pre>
+      properties: [
+        { name: 'firstName', shortName: 'fn' },
+        { name: 'lastName',  shortName: 'ln' }
+      ]
+    </pre>
+    */
+    { class: 'String', name: 'name', required: true },
+    {
+      class: 'I18NString',
+      name: 'label',
+      expression: function(name) { return foam.String.labelize(name); }
+    },
+    { class: 'String', name: 'shortName' }
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.core',
   name: 'ModelUpgradeTypesRefinement',
@@ -767,7 +834,7 @@ foam.CLASS({
   properties: [
     { class: 'String',  name: 'name' },
     {
-      class: 'String',
+      class: 'I18NString',
       name: 'label',
       expression: function(name) { return foam.String.labelize(name); }
     },
@@ -792,35 +859,6 @@ foam.CLASS({
   ]
 });
 
-
-foam.CLASS({
-  package: 'foam.core',
-  name: 'PropertyShortNameRefinement',
-  refines: 'Property',
-
-  properties: [
-    /**
-      A short-name is an optional shorter name for a property.
-      It is used by JSON and XML support when 'useShortNames'
-      is enabled. Short-names enable output to be smaller,
-      which can save disk space and/or network bandwidth.
-      Ex.
-    <pre>
-      properties: [
-        { name: 'firstName', shortName: 'fn' },
-        { name: 'lastName',  shortName: 'ln' }
-      ]
-    </pre>
-    */
-    { class: 'String',  name: 'name', required: true },
-    {
-      class: 'String',
-      name: 'label',
-      expression: function(name) { return foam.String.labelize(name); }
-    },
-    { class: 'String', name: 'shortName' }
-  ]
-});
 
 // Upgrade async property to a real boolean property.
 foam.CLASS({

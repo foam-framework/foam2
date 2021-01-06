@@ -13,10 +13,25 @@ foam.INTERFACE({
   `,
 
   javaImports: [
-    'foam.nanos.crunch.lite.CapablePayload'
+    'foam.dao.ArraySink',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.crunch.CapabilityJunctionPayload',
+    'foam.nanos.crunch.ui.WizardState'
+  ],
+
+  topics: [
+    'updateJunction'
   ],
 
   methods: [
+    {
+      name: 'getPrereqs',
+      type: 'java.util.List<String>',
+      args: [
+        { name: 'capId', type: 'String' }
+      ],
+      flags: ['java']
+    },
     {
       name: 'getGrantPath',
       documentation: `
@@ -56,6 +71,20 @@ foam.INTERFACE({
         {
           name: 'filterGrantedUCJ',
           type: 'boolean'
+        }
+      ]
+    },
+    {
+      name: 'getDependantIds',
+      type: 'String[]',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
         }
       ]
     },
@@ -102,6 +131,24 @@ foam.INTERFACE({
       ],
     },
     {
+      name: 'atLeastOneInCategory',
+      documentation: `
+        Returns true if the user has a capability in a category.
+      `,
+      async: true,
+      type: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'categoryName',
+          type: 'String'
+        }
+      ],
+    },
+    {
       name: 'getJunctionForSubject',
       documentation: `
         getJunction provides the correct UserCapabilityJunction based on the
@@ -126,6 +173,8 @@ foam.INTERFACE({
     },
     {
       name: 'updateJunction',
+      async: true,
+      type: 'UserCapabilityJunction',
       args: [
         {
           name: 'x',
@@ -138,6 +187,37 @@ foam.INTERFACE({
         {
           name: 'data',
           type: 'foam.core.FObject'
+        },
+        {
+          name: 'status',
+          type: 'foam.nanos.crunch.CapabilityJunctionStatus'
+        }
+      ],
+    },
+    {
+      name: 'updateUserJunction',
+      async: true,
+      type: 'UserCapabilityJunction',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'subject',
+          type: 'foam.nanos.auth.Subject'
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        },
+        {
+          name: 'data',
+          type: 'foam.core.FObject'
+        },
+        {
+          name: 'status',
+          type: 'foam.nanos.crunch.CapabilityJunctionStatus'
         }
       ],
     },
@@ -195,18 +275,71 @@ foam.INTERFACE({
       ]
     },
     {
-      name: 'getCapableObjectPayloads',
+      name: 'hasPreconditionsMet',
       async: true,
-      type: 'CapablePayload[]',
+      type: 'Boolean',
+      args: [
+        {
+          name: 'sessionX',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        }
+      ],
+      documentation: `
+        Check if preconditions are met for capabilityId with respect
+        to the subject of sessionX.
+
+        Preconditions are defined by setting precondition=true on a
+        capability junction. This method will return true only if all
+        prerequisites marked as preconditions are satisfied by the
+        provided subject.
+      `
+    },
+    {
+      name: 'getEntryCapabilities',
+      async: true,
+      type: 'ArraySink',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      documentation: `
+        Query capabilities to be presented in the capability store.
+
+        A capability is an "entry capability" if its visibilityPredicate
+        evaluates true and it has all preconditions met. This is the
+        case when a capability appears in the Capability Store.
+      `
+    },
+    {
+      name: 'getAllJunctionsForUser',
+      async: true,
+      type: 'UserCapabilityJunction[]',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ]
+    },
+    {
+      name: 'getWizardState',
+      async: true,
+      type: 'WizardState',
       args: [
         {
           name: 'x',
           type: 'Context'
         },
         {
-          name: 'capabilityIds',
-          type: 'String[]'
-        },
+          name: 'capabilityId',
+          type: 'String'
+        }
       ]
     }
   ]

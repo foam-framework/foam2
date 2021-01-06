@@ -12,21 +12,25 @@ foam.CLASS({
     'omNameDAO'
   ],
 
+  ids: ['name'],
+
   properties: [
     {
-      class: 'String',
-      name: 'id',
-      visibility: 'RO',
-    },
-    {
+      documentation: 'What this alarm config is for',
       class: 'String',
       name: 'name',
-      documentation: 'What this alarm config is for'
+      visibility: 'RO',
     },
     {
       class: 'Boolean',
       name: 'enabled',
       value: true
+    },
+    {
+      class: 'Enum',
+      of: 'foam.log.LogLevel',
+      name: 'severity',
+      value: 'WARN'
     },
     {
       class: 'String',
@@ -104,6 +108,7 @@ foam.CLASS({
       name: 'alertUser'
     },
     {
+      // deprecated.
       class: 'Boolean',
       name: 'sendEmail',
       label: 'Notify',

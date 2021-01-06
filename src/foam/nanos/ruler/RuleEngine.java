@@ -8,10 +8,7 @@ package foam.nanos.ruler;
 
 import foam.core.*;
 import foam.dao.DAO;
-import foam.nanos.auth.LastModifiedAware;
-import foam.nanos.auth.LastModifiedByAware;
-import foam.nanos.auth.LifecycleAware;
-import foam.nanos.auth.LifecycleState;
+import foam.nanos.auth.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
@@ -66,6 +63,7 @@ public class RuleEngine extends ContextAwareSupport {
     for (Rule rule : rules) {
       try {
         if ( stops_.get() ) break;
+        if ( ! checkPermission(rule, obj) ) continue;
         if ( ! isRuleApplicable(rule, obj, oldObj)) continue;
         PM pm = (PM) x_.get("PM");
         pm.setKey(RulerDAO.getOwnClassInfo().getId());
@@ -83,6 +81,17 @@ public class RuleEngine extends ContextAwareSupport {
     try {
       compoundAgency.execute(x_);
     } catch (Exception e) {
+      // Allow network exceptions to pass through
+      // TODO: use foam.core.Exception when interface properties
+      //       are supported in Java generation
+      if ( e instanceof foam.core.ExceptionInterface ) {
+        RuntimeException clientE = (RuntimeException)
+          ((ExceptionInterface) e).getClientRethrowException();
+        if ( clientE != null ) {
+          throw clientE;
+        }
+      }
+
       // This should never happen.
       // It means there's a bug in a Rule agent and it should be fixed.
       var message = "CRITICAL UNEXPECTED EXCEPTION EXECUTING RULE";
@@ -180,6 +189,15 @@ public class RuleEngine extends ContextAwareSupport {
       && rule.f(userX_, obj, oldObj);
   }
 
+  private boolean checkPermission(Rule rule, FObject obj) {
+    var user = rule.getUser(getX(), obj);
+    if ( user != null ) {
+      var auth = (AuthService) getX().get("auth");
+      return auth.checkUser(getX(), user, "rule.read." + rule.getId());
+    }
+    return true;
+  }
+
   private void asyncApplyRules(List<Rule> rules, FObject obj, FObject oldObj) {
     if (rules.isEmpty()) return;
     ((Agency) getX().get("threadPool")).submit(userX_, x -> {
@@ -188,7 +206,8 @@ public class RuleEngine extends ContextAwareSupport {
         if ( stops_.get() ) return;
 
         currentRule_ = rule;
-        if ( rule.getAsyncAction() != null
+        if ( checkPermission(rule, obj)
+          && rule.getAsyncAction() != null
           && rule.f(x, obj, oldObj)
         ) {
           // We assume the original object `obj` is stale when running after rules.
@@ -268,6 +287,7 @@ public class RuleEngine extends ContextAwareSupport {
       } catch (Exception e) {
         // Object instantiation should not fail but if it does fail then return
         // the original object as the reloaded object.
+        // REVIEW: this may result in Object is Frozen assertion errors
         return obj;
       }
     }
@@ -288,7 +308,7 @@ public class RuleEngine extends ContextAwareSupport {
 
     // Return the original object as the reloaded object if nu == old or nu == obj.
     if ( nu.equals(old) || nu.equals(cloned) ) {
-      return obj;
+      return cloned;
     }
 
     // For greedy mode, return the reloaded object `nu` as is. Otherwise,

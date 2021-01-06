@@ -19,8 +19,11 @@ foam.CLASS({
     'foam.dao.EasyDAO',
     'foam.dao.RequestResponseClientDAO',
     'foam.nanos.app.ClientAppConfigService',
-    'foam.nanos.boot.NSpec'
+    'foam.nanos.boot.NSpec',
+    'foam.nanos.crunch.box.CrunchClientBox'
   ],
+
+  imports: [ 'error' ],
 
   properties: [
     {
@@ -31,11 +34,13 @@ foam.CLASS({
         return this.RequestResponseClientDAO.create({
           of: this.NSpec,
           delegate: this.SessionClientBox.create({
-            delegate: this.RetryBox.create({
-              maxAttempts: -1,
-              delegate: this.HTTPBox.create({
-                method: 'POST',
-                url: 'service/nSpecDAO'
+            delegate: this.CrunchClientBox.create({
+              delegate: this.RetryBox.create({
+                maxAttempts: -1,
+                delegate: this.HTTPBox.create({
+                  method: 'POST',
+                  url: 'service/nSpecDAO'
+                })
               })
             })
           })
@@ -101,6 +106,10 @@ foam.CLASS({
                   factory: function() {
                     if ( ! json.class ) json.class = 'foam.dao.EasyDAO';
                     var cls = foam.lookup(json.class);
+                    if ( cls == null ) {
+                      self.error('Uknown Client class:', json.class, 'for service:', spec.name);
+                      return null;
+                    }
                     var defaults = {
                       serviceName: 'service/' + spec.name,
                       retryBoxMaxAttempts: 0

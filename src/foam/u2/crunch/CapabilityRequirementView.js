@@ -42,7 +42,7 @@ foam.CLASS({
       display: inline-block;
       padding-bottom: 4vh;
     }
-    
+
     ^ p {
       display: inline-block;
       position: relative;
@@ -60,6 +60,7 @@ foam.CLASS({
     }
 
     ^ .circle-center {
+      padding-top: 3vh;
       padding-bottom: 2vh;
       text-align: center;
       height: 80px;
@@ -83,9 +84,7 @@ foam.CLASS({
   messages: [
     {
       name: 'INTRO_TEXT',
-      message: `Before you get started,
-      here is a list of helpful items to have on hand that will assist you
-      in answering the questions in the following step`
+      message: `In this section, we ask you to enter some details relating to your business.`
     }
   ],
 
@@ -134,27 +133,12 @@ foam.CLASS({
 
         .start().addClass('titles')
           // title
-          .start().addClass('makeBold').add(mainCapability[0].name).end()
+          .start().addClass('makeBold').translate(mainCapability[0].id+'.name', mainCapability[0].name).end()
           // subTitle
-          .start().addClass('subTitle').add(this.INTRO_TEXT).end()
+          .start().addClass('subTitle')
+            .translate(mainCapability[0].id + '.requirementViewTitle' , mainCapability[0].requirementViewTitle || this.INTRO_TEXT)
+          .end()
         .end()
-        .start()
-          .add(this.slot(
-            arrayRequirement => {
-              return this.E().forEach(arrayRequirement,
-                helpString => {
-                  return this.start().addClass('list-position')
-                    .start('img').addClass('img-position').attrs({ src: 'images/checkmark-small-green.svg' }).end()
-                    .start()
-                      .addClass('table-content')
-                      .add(helpString)
-                    .end()
-                  .end();
-                }
-              );
-            }
-          ))
-      .end()
       .start().addClass('actionPosition')
         .startContext({ data: this })
           .start(this.GET_STARTED).end()
@@ -166,6 +150,7 @@ foam.CLASS({
   actions: [
     {
       name: 'getStarted',
+      label: 'Get started',
       code: function(x) {
         x.closeDialog();
         this.onClose(x, true);

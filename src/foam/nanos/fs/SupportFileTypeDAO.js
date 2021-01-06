@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.fs',
   name: 'SupportFileTypeDAO',
   extends: 'foam.dao.ProxyDAO',
-  documentation: ` A fileDAO decorator use to store the file type`,
+  documentation: 'A fileDAO decorator use to store the file type',
 
   javaImports: [
     'foam.comics.v2.userfeedback.UserFeedback',
@@ -37,24 +37,22 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'FILE_TYPE_NOT_SUPPORT', message: 'File type not supported.' },
+    { name: 'FILE_TYPE_NOT_SUPPORT', message: 'File type not supported' }
   ],
 
   methods: [
     {
       name: 'put_',
       javaCode: `
-      if (!(obj instanceof File)) {
+      if ( ! (obj instanceof File) ) {
         return obj;
       }
 
-      File file = (File) obj;
-      DAO fileTypeDAO = (DAO) x.get("fileTypeDAO");
-      String mimeType = file.getMimeType();
-      String subType = mimeType.substring(mimeType.indexOf("/") + 1);
-      FileType fileType = (FileType) fileTypeDAO.find(
-        EQ(FileType.SUB_TYPE, subType)
-      );
+      File     file        = (File) obj;
+      DAO      fileTypeDAO = (DAO) x.get("fileTypeDAO");
+      String   mimeType    = file.getMimeType();
+      String   subType     = mimeType.substring(mimeType.indexOf("/") + 1);
+      FileType fileType    = (FileType) fileTypeDAO.find(EQ(FileType.SUB_TYPE, subType));
 
       if ( fileType == null ) {
         throw new UserFeedbackException.Builder(x)
@@ -64,6 +62,7 @@ foam.CLASS({
           .build()
         ).build();
       }
+
       return super.put_(x, obj);
       `
     }

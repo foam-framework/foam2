@@ -85,6 +85,11 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdByAgent'
+    },
+    {
+      class: 'Boolean',
+      name: 'isUsingNestedJournal',
+      section: 'admin'
     }
   ],
 

@@ -217,6 +217,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'ExprArrayProperty',
@@ -423,7 +424,7 @@ foam.CLASS({
     {
       name: 'toString',
       code: function toString() { return this.cls_.name; },
-      javaCode: 'return classInfo_.getId();'
+      javaCode: 'return getClass().getName();'
     },
     {
       name: 'createStatement',
@@ -626,8 +627,10 @@ foam.CLASS({
     {
       name: 'put',
       code: function(obj, s) {
-        if ( this.cond.f(obj) ) this.a.put(obj, s)
-        else this.b.put(obj, s);
+        if ( this.cond.f(obj) )
+          this.a.put(obj, s)
+        else
+          this.b.put(obj, s);
       }
     }
   ]
@@ -764,6 +767,7 @@ getArg2().prepareStatement(stmt);`
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
@@ -1236,6 +1240,7 @@ return this;`
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Contains',
@@ -1452,6 +1457,12 @@ foam.CLASS({
 
   documentation: 'Binary predicate that accepts an array in "arg2".',
 
+  javaImports: [
+    'foam.mlang.ArrayConstant',
+    'foam.mlang.Constant',
+    'java.util.List'
+  ],
+
   properties: [
     {
       name: 'arg2',
@@ -1482,6 +1493,43 @@ foam.CLASS({
       name: 'valueSet_',
       hidden: true
     }
+  ],
+
+  methods: [
+    {
+      name: 'toString',
+      code: function() {
+        return foam.String.constantize(this.cls_.name) + '(' +
+            this.arg1.toString() + ', ' +
+            this.arg2.toString() + ')';
+      },
+      javaCode: `
+        StringBuilder b = new StringBuilder();
+        if ( getArg2() instanceof ArrayBinary || getArg2() instanceof Constant ) {
+          Object[] a = null;
+          Object arg2 = getArg2().f(null);
+
+          if ( arg2 instanceof List ) {
+            a = ((List) arg2).toArray();
+          } else if ( arg2 instanceof Object[] ) {
+            a = (Object[]) arg2;
+          } else if ( arg2 != null ) {
+            b.append(arg2.toString());
+          }
+
+          if ( a != null ) {
+            b.append("len: " + a.length + ",");
+            for ( int i = 0 ; i < a.length ; i++ ) {
+              b.append(a[i]);
+              if ( i < a.length -1 ) b.append(',');
+            }
+          }
+        } else {
+          b.append(getArg2().toString());
+        }
+        return String.format("%s(%s, %s)", getClass().getSimpleName(), getArg1().toString(), b.toString());
+      `
+    }
   ]
 });
 
@@ -1500,9 +1548,9 @@ foam.CLASS({
   requires: [ 'foam.mlang.Constant' ],
 
   javaImports: [
-    'java.util.List',
     'foam.mlang.ArrayConstant',
-    'foam.mlang.Constant'
+    'foam.mlang.Constant',
+    'java.util.List',
   ],
 
   properties: [
@@ -1624,19 +1672,28 @@ return false
             this.FALSE : this;
       },
       javaCode: `
-        if ( ! (getArg2() instanceof ArrayConstant) ) return this;
+        if ( getArg2() instanceof ArrayBinary || getArg2() instanceof Constant ) {
+          Object[] arr = null;
+          Object arg2 = getArg2().f(null);
 
-        Object[] arr = ((ArrayConstant) getArg2()).getValue();
+          if ( arg2 instanceof List ) {
+            arr = ((List) arg2).toArray();
+          } else if ( arg2 instanceof Object[] ) {
+            arr = (Object[]) arg2;
+          } else {
+            return this;
+          }
 
-        if ( arr.length == 0 ) {
-          return new False();
-        } else if ( arr.length == 1 ) {
-          return new Eq.Builder(getX())
-            .setArg1(getArg1())
-            .setArg2(new Constant(arr[0]))
-            .build();
+          if ( arr.length == 0 ) {
+            return foam.mlang.MLang.FALSE;
+          }
+          if ( arr.length == 1 ) {
+            return new Eq.Builder(getX())
+              .setArg1(getArg1())
+              .setArg2(new Constant(arr[0]))
+              .build();
+          }
         }
-
         return this;
       `
     }
@@ -1729,6 +1786,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang',
@@ -2139,9 +2197,12 @@ foam.CLASS({
       javaCode: 'return ! getArg1().f(obj);'
     },
 
-    function toString() {
-      return foam.String.constantize(this.cls_.name) +
-          '(' + this.arg1.toString() + ')';
+    {
+      name: 'toString',
+      code: function() {
+        return foam.String.constantize(this.cls_.name) + '(' + this.arg1.toString() + ')';
+      },
+      javaCode: 'return String.format("Not(%s)", getArg1().toString());'
     },
     {
       name: 'partialEval',
@@ -2357,10 +2418,10 @@ foam.CLASS({
               s = prop.f(obj).toString().toLowerCase();
             } else if ( this.Date.isInstance(prop) ) {
               s = prop.f(obj).toISOString().toLowerCase();
-            } else if ( ! this.String.isInstance(prop) ) {
-              continue;
             } else {
-              s = prop.f(obj).toLowerCase();
+              s = prop.f(obj);
+
+              s = String(s);
             }
           } catch (err) {}
           if ( s.toLowerCase().includes(arg) ) return true;
@@ -2516,8 +2577,11 @@ foam.CLASS({
       class: 'List',
       hidden: true,
       name: 'groupKeys',
-      javaFactory: 'return new java.util.ArrayList();',
-      factory: function() { return []; }
+      transient: true,
+      javaFactory: 'return new java.util.ArrayList(this.getGroups().keySet());',
+      factory: function() {
+        return Object.keys(this.groups);
+      },
     },
     {
       class: 'Boolean',
@@ -2574,7 +2638,8 @@ return getGroupKeys();`
         if ( ! group ) {
           group = this.arg2.clone();
           this.groups[key] = group;
-          this.groupKeys.push(key);
+          if ( ! this.groupKeys.includes(key) )
+            this.groupKeys.push(key);
         }
         group.put(obj, sub);
         this.pub('propertyChange', 'groups');
@@ -2584,7 +2649,8 @@ return getGroupKeys();`
  if ( group == null ) {
    group = (foam.dao.Sink) (((foam.core.FObject)getArg2()).fclone());
    getGroups().put(key, group);
-   getGroupKeys().add(key);
+   if ( ! this.getGroupKeys().contains(key) )
+     getGroupKeys().add(key);
  }
  group.put(obj, sub);`
     },
@@ -2689,6 +2755,19 @@ foam.CLASS({
     'java.util.StringJoiner'
   ],
 
+  constants: [
+    {
+      name: 'CLS_OR_OBJ_INDEX',
+      type: 'Integer',
+      value: 0
+    },
+    {
+      name: 'PROJECTION_VALUES_OFFSET',
+      type: 'Integer',
+      value: 1
+    }
+  ],
+
   properties: [
     {
       class: 'Array',
@@ -2697,9 +2776,15 @@ foam.CLASS({
       documentation: 'The expressions to be evaluated and returned in the projection. Typically are Properties.',
     },
     {
+      class: 'Boolean',
+      name: 'useProjection',
+      documentation: 'if objects should be build from projectionWithClass (and they will not be retrieved with select)',
+      value: true
+    },
+    {
       class: 'List',
       name: 'projectionWithClass',
-      documentation: 'The projection but with the class in position 0 with all other values offset by 1.',
+      documentation: 'The projection but with the class or full object in position 0 with all other values offset by 1.',
       factory: function() { return []; },
       javaFactory: `return new java.util.ArrayList();`
     },
@@ -2708,12 +2793,12 @@ foam.CLASS({
       documentation: 'The projection with the class removed and all values in the same position as in "exprs".',
       name: 'projection',
       transient: true,
-      getter: function() { return this.projectionWithClass.map(p => p.slice(1)); },
+      getter: function() { return this.projectionWithClass.map(p => p.slice(this.PROJECTION_VALUES_OFFSET)); },
       javaFactory: `
         List result = new ArrayList();
         if ( getProjectionWithClass() != null ) {
           for ( Object list: (ArrayList)getProjectionWithClass() ) {
-            Object[] obj1 = Arrays.copyOfRange((Object[])list, 1, ((Object[])list).length);
+            Object[] obj1 = Arrays.copyOfRange((Object[])list, PROJECTION_VALUES_OFFSET, ((Object[])list).length);
             result.add(obj1);
           }
         }
@@ -2723,18 +2808,21 @@ foam.CLASS({
     {
       class: 'List',
       name: 'array',
-      transient: true,
+      // transient: true,
       documentation: 'An array of full objects created from the projection. Only properties included in exprs/the-projection will be set.',
       factory: function() {
         return this.projectionWithClass.map(p => {
-          var o = foam.lookup(p[0]).create();
-          for ( var i = 0 ; i < this.exprs.length ; i++ ) {
-            try {
-              this.exprs[i].set(o, p[i+1]);
-            } catch (x) {
+          if ( this.useProjection ) {
+            var o = foam.lookup(p[this.CLS_OR_OBJ_INDEX]).create(null, this);
+            for ( var i = 0 ; i < this.exprs.length ; i++ ) {
+              try {
+                this.exprs[i].set(o, p[i+this.PROJECTION_VALUES_OFFSET]);
+              } catch (x) {
+              }
             }
+            return o;
           }
-          return o;
+          return p[this.CLS_OR_OBJ_INDEX];
         });
       },
       javaFactory: `
@@ -2742,18 +2830,27 @@ foam.CLASS({
         var es = getExprs();
         var p  = getProjectionWithClass();
         for ( int i = 0 ; i < p.size() ; i++ ) {
-          try {
-            Object[]  arr = (Object[]) p.get(i);
-            ClassInfo ci  = (ClassInfo) arr[0];
-            Object    o   = ci.newInstance();
-
-            for ( int j = 0 ; j < es.length ; j++ ) {
-              PropertyInfo e = (PropertyInfo) es[j];
-              e.set(o, arr[i]);
-            }
-
-            a.set(i, o);
-          } catch (Throwable t) {}
+          if ( getUseProjection() )  {
+            try {
+              Object[]  arr = (Object[]) p.get(i);
+              ClassInfo ci  = (ClassInfo) arr[CLS_OR_OBJ_INDEX];
+              Object    o   = ci.newInstance();
+  
+              for ( int j = 0 ; j < es.length ; j++ ) {
+                if ( es[j] instanceof PropertyInfo ) {
+                  PropertyInfo e = (PropertyInfo) es[j];
+                  e.set(o, arr[i]);
+                } else if ( es[j] instanceof foam.nanos.column.NestedPropertiesExpression ) {
+                  foam.nanos.column.NestedPropertiesExpression e = (foam.nanos.column.NestedPropertiesExpression) es[j];
+                  e.set(o, arr[i]);
+                }
+              }
+  
+              a.set(i, o);
+            } catch (Throwable t) {}
+          } else {
+            a.set(i, p.get(0));
+          }
         }
         return a;
       `
@@ -2764,18 +2861,25 @@ foam.CLASS({
     {
       name: 'put',
       code: function put(o, sub) {
-        var a = [o.cls_];
-        for ( var i = 0 ; i < this.exprs.length ; i++ )
-          a[i+1] = this.exprs[i].f(o);
+        var a;
+        if ( this.useProjection ) {
+          a = [o.cls_.id];
+          for ( var i = 0 ; i < this.exprs.length ; i++ )
+            a[i+this.PROJECTION_VALUES_OFFSET] = this.exprs[i].f(o);
+        } else
+          a = [o];
         this.projectionWithClass.push(a);
       },
 // TODO:      swiftCode: 'array.append(obj)',
       javaCode: `
-        Object[] a = new Object[getExprs().length+1];
-
-        a[0] = ((FObject) obj).getClassInfo();
+        Object[] a = new Object[getExprs().length+PROJECTION_VALUES_OFFSET];
+        if ( ! getUseProjection() ) {
+          a[CLS_OR_OBJ_INDEX] = obj;
+        } else {
+          a[CLS_OR_OBJ_INDEX] = ((FObject) obj).getClassInfo();
+        }
         for ( int i = 0 ; i < getExprs().length ; i++ )
-          a[i+1] = getExprs()[i].f(obj);
+          a[i+this.PROJECTION_VALUES_OFFSET] = getExprs()[i].f(obj);
 
         getProjectionWithClass().add(a);
       `
@@ -3049,7 +3153,7 @@ foam.CLASS({
     },
     {
       name: 'createStatement',
-      javaCode: `return null;`
+      javaCode: `return getHead().createStatement() + ", " + getTail().createStatement();`
     },
     {
       name: 'prepareStatement',
@@ -3274,6 +3378,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.sink',
@@ -3694,6 +3799,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'OlderThan',
@@ -3723,6 +3829,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'CurrentTime',
@@ -3748,6 +3855,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'StringLength',
@@ -3767,6 +3875,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'IdentityExpr',
@@ -3783,10 +3892,14 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'IsValid',
   extends: 'foam.mlang.AbstractExpr',
+  javaImports: [
+    'foam.core.XLocator'
+  ],
   properties: [
     {
       class: 'foam.mlang.ExprProperty',
@@ -3801,7 +3914,7 @@ foam.CLASS({
       },
       javaCode: `
 try {
-  ((foam.core.FObject) getArg1().f(obj)).validate(getX());
+  ((foam.core.FObject) getArg1().f(obj)).validate(XLocator.get());
 } catch(Exception e) {
   return false;
 }
@@ -3810,6 +3923,7 @@ return true;
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
@@ -3866,6 +3980,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'isAuthorizedToDelete',
@@ -3920,6 +4035,7 @@ foam.CLASS({
     },
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang',
@@ -4030,6 +4146,7 @@ foam.CLASS({
   ]
 })
 
+
 foam.CLASS({
   package: 'foam.mlang.expr',
   name: 'Add',
@@ -4045,6 +4162,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.expr',
@@ -4062,6 +4180,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.expr',
   name: 'Multiply',
@@ -4077,6 +4196,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.expr',
@@ -4094,6 +4214,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.expr',
   name: 'MinFunc',
@@ -4109,6 +4230,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.expr',

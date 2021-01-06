@@ -12,14 +12,27 @@ foam.CLASS({
     Provides model data sectioned viewing when using section views.
     Used for sectioning/grouping model properties and actions.
 
+    Section title and subtitle functions have a helper method (1st arg)
+    to evaluate messages or values that are template literals.
+
+    Template literal messages should be considered over constructing strings
+    within these functions. Locale translation support will have an easier time
+    understanding and applying the appropriate translations.
+
+    These functions are also executed when model data changes,
+    supporting dynamic section labeling and data awareness.
+
     Example:
     foam.CLASS({
       name: 'myModel',
+      messages: [
+        { name: 'myMessage', message: 'This message will evaluate a template literal \${myProp}' }
+      ],
       sections: [
         {
           name: 'mainSection'
-          title: function(myProp) {
-            return myProp ? 'Set this title if myProp true' : 'Set this title if myProp false';
+          title: function(evaluateMessage, data) {
+            return data.myProp ? evaluateMessage(data.myMessage) : 'Set this title if myProp false';
           }
           isAvailable: function(myProp) {
             return ! myProp;
@@ -55,7 +68,13 @@ foam.CLASS({
       name: 'subTitle'
     },
     {
-      class: 'String',
+      name: 'navTitle',
+      expression: function (title) {
+        return title;
+      }
+    },
+    {
+      documentation: 'function and string',
       name: 'help'
     },
     {

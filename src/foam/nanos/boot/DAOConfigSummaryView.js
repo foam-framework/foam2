@@ -13,6 +13,52 @@ foam.CLASS({
 
   classes: [
     {
+      name: 'CustomDAOUpdateView',
+      extends: 'foam.comics.v2.DAOUpdateView',
+
+      properties: [
+        {
+          class: 'foam.u2.ViewSpecWithJava',
+          name: 'viewView',
+          factory: function() {
+            return {
+              class: 'foam.u2.view.ObjAltView',
+              views: [
+                [ {class: 'foam.u2.DetailView'},                 'Detail' ],
+                [ {class: 'foam.u2.detail.TabbedDetailView'},    'Tabbed' ],
+                [ {class: 'foam.u2.detail.SectionedDetailView'}, 'Sectioned' ],
+                [ {class: 'foam.u2.md.DetailView'},              'Material' ]
+              ]
+            };
+          }
+        }
+      ]
+    },
+
+    // TODO: replace with UpdateView
+    {
+      name: 'CustomDAOSummaryView',
+      extends: 'foam.comics.v2.DAOSummaryView',
+
+      properties: [
+        {
+          class: 'foam.u2.ViewSpecWithJava',
+          name: 'viewView',
+          factory: function() {
+            return {
+              class: 'foam.u2.view.ObjAltView',
+              views: [
+                [ {class: 'foam.u2.DetailView'},                 'Detail' ],
+                [ {class: 'foam.u2.detail.TabbedDetailView'},    'Tabbed' ],
+                [ {class: 'foam.u2.detail.SectionedDetailView'}, 'Sectioned' ]
+              ]
+            };
+          }
+        }
+      ]
+    },
+
+    {
       name: 'DAOUpdateControllerView',
       extends: 'foam.comics.DAOUpdateControllerView',
 
@@ -34,6 +80,10 @@ foam.CLASS({
 
       imports: [ 'memento', 'stack' ],
 
+      exports: [
+        'currentMemento as memento'
+      ],
+
       css: `
         ^title {
           padding: 25px;
@@ -50,18 +100,24 @@ foam.CLASS({
         {
           class: 'foam.u2.ViewSpec',
           name: 'inner'
-        }
+        },
+        'currentMemento'
       ],
 
       methods: [
         function initE() {
           this.SUPER();
 
+          this.currentMemento$ = this.memento.tail$;
+
           this.
             start().
               addClass(this.myClass('title')).
               start('a').
-                add('Data Management').on('click', () => { this.memento = ''; }).
+                add('Data Management').on('click', () => { 
+                  this.memento.tail$.set(null);
+                  this.stack.back();
+                }).
               end().
               add(' / ', this.title).
             end().
@@ -98,13 +154,27 @@ foam.CLASS({
       color: white;
       font-weight: 800;
     }
+    /* TODO: scope this better so it doesn't affect nested AltViews also */
+    .foam-u2-view-AltView .property-selectedView {
+      margin-left: 24px;
+    }
   `,
 
-  requires: [ 'foam.comics.BrowserView', 'foam.nanos.boot.NSpec' ],
+  requires: [
+    'foam.comics.BrowserView',
+    'foam.comics.v2.DAOBrowseControllerView',
+    'foam.nanos.boot.NSpec',
+    'foam.nanos.controller.Memento'
+  ],
 
   implements: [ 'foam.mlang.Expressions' ],
 
   imports: [ 'memento', 'nSpecDAO', 'stack' ],
+
+
+  exports: [
+    'memento'
+  ],
 
   properties: [
     {
@@ -143,6 +213,8 @@ foam.CLASS({
       var currentLetter = '';
       var section;
 
+      this.currentMemento_$ = self.memento.tail$;
+
       this.addClass(this.myClass()).
       start().
         style({ 'height': '56px'}).
@@ -151,7 +223,7 @@ foam.CLASS({
           add('Data Management').
         end()
         .start()
-        .style({ 'width': 'fit-content', 'float': 'right', 'margin-right': '4%', 'margin-top': '6px' })
+        .style({ 'width': 'fit-content', 'float': 'right', 'margin-right': '40px', 'margin-top': '6px' })
             .start(this.SEARCH).focus().end()
             .addClass('foam-u2-search-TextSearchView')
             .addClass(this.myClass('foam-u2-search-TextSearchView'))
@@ -208,7 +280,10 @@ foam.CLASS({
               .addClass(self.myClass('dao'))
               .add(label)
               .attrs({title: spec.description})
-              .on('click', function() { self.memento = spec.id; });
+              .on('click', function() {
+                self.memento.tail = self.Memento.create({ head: spec.id });
+                self.memento.tail.parent = self.memento;
+              });
 
               self.search$.sub(function() {
                 var contains = false;
@@ -231,8 +306,7 @@ foam.CLASS({
         });
       });
 
-//      this.onDetach(this.memento$.sub(this.mementoChange));
-      this.memento$.sub(this.mementoChange);
+      this.onDetach(this.memento.tail$.sub(this.mementoChange)); 
       this.mementoChange();
     }
   ],
@@ -241,24 +315,39 @@ foam.CLASS({
     function mementoChange() {
       var m = this.memento;
 
-      if ( ! m ) {
+      if ( ! m || ! m.tail ) {
         if ( this.currentMemento_ ) this.stack.back();
-        this.currentMemento_ = '';
         return;
       }
 
-      this.currentMemento_ = m;
-
       var x = this.__subContext__.createSubContext();
       x.register(this.DAOUpdateControllerView, 'foam.comics.DAOUpdateControllerView');
+      x.register(this.CustomDAOSummaryView,    'foam.comics.v2.DAOSummaryView');
+      x.register(this.CustomDAOUpdateView,     'foam.comics.v2.DAOUpdateView');
+      x.register(foam.u2.DetailView,           'foam.u2.DetailView');
 
       this.stack.push({
         class: this.BackBorder,
-        title: m,
+        title: m.tail.head,
         inner: {
-          class: this.BrowserView,
-          data:  this.__context__[m],
-          stack: this.stack
+          class: 'foam.u2.view.AltView',
+          data: this.__context__[m.tail.head],
+          views: [
+            [
+              {
+                class: this.DAOBrowseControllerView,
+                stack: this.stack
+              },
+              'New Controller'
+            ],
+            [
+              {
+                class: this.BrowserView,
+                stack: this.stack
+              },
+              'Old Controller'
+            ]
+          ]
         }
       }, x);
     }

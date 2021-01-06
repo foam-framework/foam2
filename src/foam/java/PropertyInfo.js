@@ -45,6 +45,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'externalTransient'
+    },
+    {
+      class: 'Boolean',
       name: 'storageTransient'
     },
     {
@@ -93,6 +97,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'includeInID'
+    },
+    {
+      class: 'Boolean',
       name: 'includeInDigest'
     },
     {
@@ -121,8 +129,15 @@ foam.CLASS({
     'toCSVLabel',
     'fromCSVLabelMapping',
     {
+      class: 'Boolean',
+      name: 'sheetsOutput',
+      documentation: 'The sheetsOutput specifies if property shoud be written to Google Sheet on import. eg on Transaction import in case there is Status column transaction\'s status will be written there'
+    },
+    {
       name: 'methods',
       factory: function() {
+        var fullName = this.sourceCls.package ? this.sourceCls.package + '.' + this.sourceCls.name : this.sourceCls.name;
+
         var m = [
           {
             name: 'getName',
@@ -135,28 +150,28 @@ foam.CLASS({
             type: this.propType,
             visibility: 'public',
             args: [{ name: 'o', type: 'Object' }],
-            body: 'return ((' + this.sourceCls.name + ') o).' + this.getterName + '();'
+            body: 'return ((' + fullName + ') o).' + this.getterName + '();'
           },
           {
             name: 'set',
             type: 'void',
             visibility: 'public',
             args: [{ name: 'o', type: 'Object' }, { name: 'value', type: 'Object' }],
-            body: '((' + this.sourceCls.name + ') o).' + this.setterName + '(cast(value));'
+            body: '((' + fullName + ') o).' + this.setterName + '(cast(value));'
           },
           {
             name: 'clear',
             type: 'void',
             visibility: 'public',
             args: [{ name: 'o', type: 'Object' }],
-            body: '((' + this.sourceCls.name + ') o).' + this.clearName + '();'
+            body: '((' + fullName + ') o).' + this.clearName + '();'
           },
           {
             name: 'isSet',
             visibility: 'public',
             type: 'boolean',
             args: [{ name: 'o', type: 'Object' }],
-            body: `return ((${this.sourceCls.name}) o).${this.propName}IsSet_;`
+            body: `return ((${fullName}) o).${this.propName}IsSet_;`
           }
         ];
         var primitiveType = ['boolean', 'long', 'byte', 'double','float','short','int'];
@@ -299,6 +314,15 @@ foam.CLASS({
           });
         }
 
+        if ( this.externalTransient ) {
+          m.push({
+            name: 'getExternalTransient',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.externalTransient + ';'
+          });
+        }
+
         if ( this.storageTransient ) {
           m.push({
             name: 'getStorageTransient',
@@ -429,6 +453,15 @@ foam.CLASS({
           });
         }
 
+        if ( this.includeInID ) {
+          m.push({
+            name:       'includeInID',
+            visibility: 'public',
+            type:       'boolean',
+            body:       'return true;'
+          });
+        }
+
         // default value is true, only generate if value is false
         if ( ! this.includeInSignature ) {
           m.push({
@@ -454,6 +487,15 @@ foam.CLASS({
             visibility: 'public',
             type:       'boolean',
             body:       `return ${this.containsDeletablePII};`
+          });
+        }
+
+        if ( this.sheetsOutput ) {
+          m.push({
+            name: 'getSheetsOutput',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.sheetsOutput + ';'
           });
         }
 

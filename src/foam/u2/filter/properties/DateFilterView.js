@@ -15,6 +15,17 @@ foam.CLASS({
     'foam.mlang.Expressions'
   ],
 
+  requires: [
+    'foam.u2.view.ChoiceView'
+  ],
+
+  messages: [
+    { name: 'LABEL_ALL',    message: 'All Time' },
+    { name: 'LABEL_AFTER',    message: 'After' },
+    { name: 'LABEL_BEFORE',    message: 'Before' },
+    { name: 'LABEL_BETWEEN',    message: 'Between' }
+  ],
+
   css: `
     ^ {
       padding: 24px 16px;
@@ -55,16 +66,6 @@ foam.CLASS({
       class: 'String',
       name: 'qualifier',
       documentation: 'Lets the user choose a predicate to filter the view by.',
-      view: {
-        class: 'foam.u2.view.ChoiceView',
-        choices: [
-          ['True', 'All Time'],
-          ['Gt', 'After'],
-          ['Lt', 'Before'],
-          ['Bt', 'Between']
-        ],
-        defaultValue: 'True'
-      }
     },
     {
       class: 'Date',
@@ -116,7 +117,16 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.addClass(this.myClass())
-        .start(this.QUALIFIER)
+        .start(this.ChoiceView, {
+              data$: this.qualifier$,
+              choices: [
+                ['True', this.LABEL_ALL],
+                ['Gt', this.LABEL_AFTER],
+                ['Lt', this.LABEL_BEFORE],
+                ['Bt', this.LABEL_BETWEEN]
+              ],
+              defaultValue: 'True'
+            })
           .start('div').addClass(this.myClass('carrot')).end()
         .end()
         .add(this.onDetach(this.slot(function(qualifier) {

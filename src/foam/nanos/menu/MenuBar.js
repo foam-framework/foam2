@@ -58,7 +58,7 @@ foam.CLASS({
           .start('ul')
             .select(this.menuDAO
                 .where(this.EQ(this.Menu.ENABLED, true))
-                .orderBy(this.Menu.ORDER).where(this.EQ(this.Menu.PARENT, this.menuName)), function(menu) {
+                .where(this.EQ(this.Menu.PARENT, this.menuName)), function(menu) {
               return this.E('li')
                 .call(function() {
                   var e = this;

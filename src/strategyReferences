@@ -36,7 +36,22 @@ p({"class":"foam.strategy.StrategyReference","id":"3fdc341c-3393-44f2-8969-3a11a
 p({"class":"foam.strategy.StrategyReference","id":"14f95d35-3208-4e16-860d-db30910ae2ff","desiredModelId":"foam.mlang.Expr","strategy":"foam.mlang.IdentityExpr"})
 p({"class":"foam.strategy.StrategyReference","id":"7cb4fa28-5ab3-42f1-8e25-ce375f3f1688","desiredModelId":"foam.mlang.Expr","strategy":"foam.mlang.IsValid"})
 p({"class":"foam.strategy.StrategyReference","id":"19ec535a-f4a6-0cce-98c2-91ebd72a14ea","desiredModelId":"foam.mlang.Expr","strategy":"foam.mlang.expr.Dot"})
+p({"class":"foam.strategy.StrategyReference","id":"44a6686e-00cc-410a-88cf-97aa7d70ed27","desiredModelId":"foam.mlang.Expr","strategy":"foam.mlang.expr.Add"})
+p({"class":"foam.strategy.StrategyReference","id":"50e1aea1-6c37-4dfe-ab47-572aeac712f4","desiredModelId":"foam.mlang.Expr","strategy":"foam.mlang.expr.Subtract"})
+p({"class":"foam.strategy.StrategyReference","id":"f5eac520-5516-4879-afce-5cb395db69eb","desiredModelId":"foam.mlang.Expr","strategy":"foam.mlang.expr.Divide"})
+p({"class":"foam.strategy.StrategyReference","id":"2eaf4759-51da-4fb4-8aaa-7d614493cf80","desiredModelId":"foam.mlang.Expr","strategy":"foam.mlang.expr.Multiply"})
+p({"class":"foam.strategy.StrategyReference","id":"c2d5dddc-4dba-4386-9762-c25ec408143e","desiredModelId":"foam.mlang.Expr","strategy":"foam.mlang.expr.TimeOfDay"})
 
 // foam.Class
 p({"class":"foam.strategy.StrategyReference","id":"b0d7bed9-a82e-478b-a0f8-a2d1d2d2d031","desiredModelId":"foam.Class","strategy":"foam.nanos.auth.User"})
 p({"class":"foam.strategy.StrategyReference","id":"20c2262d-4d0b-47a4-9389-b7e6867d894b","desiredModelId":"foam.Class","strategy":"foam.nanos.auth.Group"})
+
+// ruler
+p({"class":"foam.strategy.StrategyReference","id":"f6a04c4d-0c1d-ca3e-9945-1e531bc1a3b4","desiredModelId":"foam.mlang.predicate.Predicate","strategy":"foam.nanos.ruler.predicate.IsInstancePredicate"})
+p({"class":"foam.strategy.StrategyReference","id":"a1f3c02c-00b6-54d3-d749-e2ec7e8aced0","desiredModelId":"foam.mlang.predicate.Predicate","strategy":"foam.nanos.ruler.predicate.PropertyChangePredicate"})
+p({"class":"foam.strategy.StrategyReference","id":"fb203bdd-6ef7-aa56-ddc2-0a8ae09f938e","desiredModelId":"foam.mlang.predicate.Predicate","strategy":"foam.nanos.ruler.predicate.PropertyEQProperty"})
+p({"class":"foam.strategy.StrategyReference","id":"84862e1d-e28b-5d61-4105-e737a97b3897","desiredModelId":"foam.mlang.predicate.Predicate","strategy":"foam.nanos.ruler.predicate.PropertyEQValue"})
+p({"class":"foam.strategy.StrategyReference","id":"cbed81bd-5940-eab8-fa6f-308da5f6aa48","desiredModelId":"foam.mlang.predicate.Predicate","strategy":"foam.nanos.ruler.predicate.PropertyHasValue"})
+p({"class":"foam.strategy.StrategyReference","id":"e6114803-8fb4-1b0d-1664-6bac4c82f6a0","desiredModelId":"foam.mlang.predicate.Predicate","strategy":"foam.nanos.ruler.predicate.PropertyIsClass"})
+p({"class":"foam.strategy.StrategyReference","id":"954fa0e4-fc9d-f32f-213c-17c318c4d365","desiredModelId":"foam.mlang.predicate.Predicate","strategy":"foam.nanos.ruler.predicate.PropertyIsInstance"})
+p({"class":"foam.strategy.StrategyReference","id":"7472978d-cab7-9de4-7305-08d5068d5026","desiredModelId":"foam.mlang.predicate.Predicate","strategy":"foam.nanos.ruler.predicate.PropertyNEQValue"})

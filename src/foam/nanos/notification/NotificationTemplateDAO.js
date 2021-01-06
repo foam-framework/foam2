@@ -70,7 +70,7 @@ the notification will be handled. `,
             template.setId(notification.getId());
             template.setBody(notification.getBody());
             template.setRead(notification.getRead());
-            template.clearTemplate();
+            template.setTemplate(notification.getToastMessage());
 
             // Notify a user directly
             DAO userDAO = (DAO) x.get("localUserDAO");

@@ -1,0 +1,5 @@
+p({
+  class: "foam.nanos.auth.Permission",
+  id: "service.crunchService.unsafeSetStatus",
+  description: "Permission to set UCJ status above ACTION_REQUIRED explicitly"
+})

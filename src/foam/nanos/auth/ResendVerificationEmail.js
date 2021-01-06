@@ -58,10 +58,10 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'Title', message: 'You\'re almost there...' },
-    { name: 'Instructions1', message: 'We have sent you an email.' },
-    { name: 'Instructions2', message: 'Please go to your inbox to confirm your email address.' },
-    { name: 'Instructions3', message: 'Your email address needs to be verified before getting started.' }
+    { name: 'Title', message: `You're almost there...` },
+    { name: 'Instructions1', message: `We've sent you an email` },
+    { name: 'Instructions2', message: 'Please go to your inbox to confirm your email address' },
+    { name: 'Instructions3', message: 'Your email address needs to be verified before getting started' }
   ],
 
   methods: [
@@ -107,6 +107,7 @@ foam.CLASS({
         this.auth.logout().then(function() {
           this.window.location.hash = '';
           this.window.location.reload();
+          localStorage.removeItem('defaultSession');
         });
       }
     }

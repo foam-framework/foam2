@@ -771,6 +771,13 @@ foam.LIB({
 
         return acc;
       }, []);
+    },
+    function filter(a, p) {
+      let filtered = [];
+      for ( var i = 0 ; i < a.length ; i++ ) {
+        if ( p.f(a[i]) ) filtered.push(a[i]);
+      }
+      return filtered;
     }
   ]
 });
@@ -799,7 +806,11 @@ foam.LIB({
     function isInstance(o) { return o instanceof Date; },
     function is(a, b) { return a === b; },
     function clone(o) { return new Date(o); },
-    function getTime(d) { return ! d ? 0 : d.getTime ? d.getTime() : d ; },
+    function getTime(d) {
+      // if d is null we should return null instead of 0
+      // since 0 is also the value returned when d == 1970/01/01
+      return d && d.getTime ? d.getTime() : d;
+    },
     function equals(a, b) { return this.getTime(a) === this.getTime(b); },
     function compare(a, b) {
       if ( ! foam.Date.isInstance(b) ) return 1;

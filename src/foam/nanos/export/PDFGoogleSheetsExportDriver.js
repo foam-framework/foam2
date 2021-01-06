@@ -7,7 +7,6 @@
 foam.CLASS({
   package: 'foam.nanos.export',
   name: 'PDFGoogleSheetsExportDriver',
-
   extends: 'foam.nanos.export.GoogleSheetsBasedExportDriver',
 
   documentation: `

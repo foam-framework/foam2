@@ -36,6 +36,7 @@ public class DecrementGraceDaysLeftCron implements ContextAgent {
       .getArray();
 
     for ( UserCapabilityJunction ucj : junctions ) {
+      ucj = (UserCapabilityJunction) ucj.fclone();
       ucj.setGracePeriod(ucj.getGracePeriod() - 1);
       logger.debug("Decrementing grace days left for UserCapabilityJunction : " + ucj.getId());
       userCapabilityJunctionDAO.put(ucj);

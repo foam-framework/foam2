@@ -24,11 +24,11 @@ foam.CLASS({
     ^top-bar {
       background: /*%LOGOBACKGROUNDCOLOUR%*/ #202341;
       width: 100%;
-      height: 8vh;
+      height: 12vh;
       border-bottom: solid 1px #e2e2e3;
     }
     ^top-bar img {
-      height: 4vh;
+      height: 8vh;
       padding-top: 2vh;
       display: block;
       margin: 0 auto;
@@ -44,6 +44,7 @@ foam.CLASS({
       width: 30vw;
     }
     ^section {
+      margin-bottom: 10%;
     }
     /* title  */
     ^ ^section h2 {
@@ -55,7 +56,7 @@ foam.CLASS({
     /* subtitle */
     /* using nested CSS selector to give a higher sepcificy and prevent being overriden  */
     ^ ^section .subtitle {
-      color: /*%GREY2%*/ #8e9090;
+      color: /*%GREY2%*/ #9ba1a6;
       font-size: 1rem;
       margin-top: 0;
       margin-bottom: 3vh;

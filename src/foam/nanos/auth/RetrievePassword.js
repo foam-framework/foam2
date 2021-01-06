@@ -11,19 +11,20 @@ foam.CLASS({
   documentation: 'Forgot Password Resend Model',
 
   imports: [
-    'notify',
+    'ctrl',
     'resetPasswordToken',
     'stack'
   ],
 
   requires: [
     'foam.log.LogLevel',
-    'foam.nanos.auth.User'
+    'foam.nanos.auth.User',
+    'foam.u2.dialog.NotificationMessage'
   ],
 
   messages: [
     { name: 'INSTRUC_ONE', message: 'Password reset instructions were sent to' },
-    { name: 'INSTRUC_TWO', message: 'Please check your inbox to continue.' },
+    { name: 'INSTRUC_TWO', message: 'Please check your inbox to continue' },
     { name: 'REDIRECTION_TO', message: 'Back to Sign in' }
   ],
 
@@ -35,6 +36,33 @@ foam.CLASS({
       help: 'Enter your account email and we will send you an email with a link to create a new one.'
     }
   ],
+
+  css: `
+    .foam-nanos-auth-ChangePasswordView .foam-u2-layout-Grid {
+      width: 75%;
+      display: inline-block;
+      vertical-align: bottom;
+    }
+
+    .foam-nanos-auth-ChangePasswordView .foam-u2-layout-Cols {
+      width: auto;
+      display: inline-block;
+      margin-left: 5%;
+      vertical-align: bottom;
+      margin-bottom: 2px;
+    }
+
+    .foam-nanos-auth-ChangePasswordView .foam-u2-layout-Rows {
+      display: block;
+
+    }
+
+    .foam-nanos-auth-ChangePasswordView .foam-u2-detail-SectionedDetailPropertyView-validation-container {
+      position: absolute;
+      margin-left: 0px;
+      display: flex;
+    }
+  `,
 
   properties: [
     {
@@ -64,11 +92,19 @@ foam.CLASS({
       code: function(X) {
         const user = this.User.create({ email: this.email });
         this.resetPasswordToken.generateToken(null, user).then((_) => {
-          this.notify(`${this.INSTRUC_ONE} ${this.email}. ${this.INSTRUC_TWO}`, '', this.LogLevel.INFO, true);
+          this.ctrl.add(this.NotificationMessage.create({
+            message: `${this.INSTRUC_ONE} ${this.email}. ${this.INSTRUC_TWO}`,
+            type: this.LogLevel.INFO,
+            transient: true
+          }));
           this.stack.push({ class: 'foam.u2.view.LoginView', mode_: 'SignIn' }, this);
         })
         .catch((err) => {
-          this.notify(err.message, '', this.LogLevel.ERROR, true);
+          this.ctrl.add(this.NotificationMessage.create({
+            message: err.message || this.ERROR_MSG,
+            type: this.LogLevel.ERROR,
+            transient: true
+          }));
         });
       }
     }

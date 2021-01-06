@@ -8,8 +8,10 @@ foam.CLASS({
   name: 'CapabilityWizardlet',
   extends: 'foam.u2.wizard.BaseWizardlet',
 
-  imports: [
-    'crunchController'
+  requires: [
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.crunch.ui.UserCapabilityJunctionWAO',
+    'foam.u2.wizard.WizardletIndicator'
   ],
 
   properties: [
@@ -18,7 +20,13 @@ foam.CLASS({
       name: 'capability'
     },
     {
-      name: 'ucj'
+      name: 'status'
+    },
+    {
+      name: 'id',
+      expression: function (capability) {
+        return 'capability,' + capability.id;
+      }
     },
 
     // Properties for WizardSection interface
@@ -32,19 +40,7 @@ foam.CLASS({
     },
     {
       name: 'data',
-      flags: ['web'],
-      factory: function() {
-        if ( ! this.of ) return null;
-
-        var ret = this.of.getAxiomByName('capability') ?
-          this.of.create({ capability: this.capability }, this) :
-          this.of.create({}, this);
-
-        if ( this.ucj === null ) return ret;
-
-        ret = Object.assign(ret, this.ucj.data);
-        return ret;
-      }
+      flags: ['web']
     },
     {
       name: 'title',
@@ -53,15 +49,47 @@ foam.CLASS({
         if ( ! capability || ! capability.name ) return '';
         return capability.name;
       }
-    }
-  ],
-
-  methods: [
+    },
     {
-      name: 'save',
-      code: function() {
-        return this.crunchController && this.crunchController.save(this);
+      name: 'isAvailablePromise',
+      factory: () => Promise.resolve(),
+    },
+    {
+      name: 'isAvailable',
+      class: 'Boolean',
+      value: true,
+      postSet: function (ol, nu) {
+        if ( nu ) this.isAvailablePromise =
+          this.isAvailablePromise.then(() => this.save());
+        else this.isAvailablePromise =
+          this.isAvailablePromise.then(() => this.cancel());
       }
+    },
+    {
+      name: 'dataController',
+      factory: function () {
+        return this.UserCapabilityJunctionWAO.create({}, this.__context__);
+      }
+    },
+    {
+      name: 'indicator',
+      expression: function (status) {
+        if (
+          status == this.CapabilityJunctionStatus.GRANTED ||
+          status == this.CapabilityJunctionStatus.PENDING ||
+          status == this.CapabilityJunctionStatus.GRACE_PERIOD
+        ) {
+          return this.WizardletIndicator.COMPLETED;
+        }
+        return this.WizardletIndicator.PLEASE_FILL;
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'isLoaded',
+      documentation: `
+        True if CapabilityJunctionData is loaded - currently used only in Capable
+      `
     }
   ]
 });

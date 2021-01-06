@@ -87,14 +87,14 @@ foam.CLASS({
     ^content {
       display: inline-block;
       vertical-align: middle;
-      font-family: /*%FONT1%*/, Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 16px;
       font-weight: 600;
       color: #19402e;
       letter-spacing: normal;
     }
     ^description {
-      font-family: /*%FONT1%*/, Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       font-weight: normal;
       line-height: 1.43;
@@ -159,6 +159,7 @@ foam.CLASS({
 
       var indicator;
       if ( this.type == this.LogLevel.ERROR ) {
+        console.error('notification: ' + this.message);
         indicator = {
           size: 18,
           backgroundColor: this.theme.destructive3,
@@ -168,11 +169,13 @@ foam.CLASS({
           })
         };
       } else if ( this.type == this.LogLevel.WARN ) {
+        console.warn('notification: ' + this.message);
         indicator = {
           size: 18,
           icon: 'images/baseline-warning-yellow.svg'
         };
       } else {
+        console.info('notification: ' + this.message);
         indicator = {
           size: 18,
           backgroundColor: this.theme.approval3,

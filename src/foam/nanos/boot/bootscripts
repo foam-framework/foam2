@@ -1,0 +1,29 @@
+p({
+  "class":"foam.nanos.script.Script",
+  "id":"main",
+  "clusterable":false,
+  "code":"""
+  /* Set AppConfig version from jar manifest*/
+  import foam.nanos.app.Mode;
+  import foam.nanos.app.AppConfig;
+
+  logger = (foam.nanos.logger.Logger) x.get("logger");
+  version = foam.nanos.app.AppConfig.class.getPackage().getImplementationVersion();
+  appConfig = x.get("appConfig");
+  if ( ! foam.util.SafetyUtil.isEmpty(version) ) {
+    appConfig.setVersion(version);
+  } else if ( foam.util.SafetyUtil.isEmpty(appConfig.getVersion()) ) {
+    appConfig.setVersion("1.0.0");
+  }
+  mode = System.getProperty("appconfig.mode");
+  if ( ! foam.util.SafetyUtil.isEmpty(mode) ) {
+    mode = mode.substring(0,1).toUpperCase() + mode.substring(1).toLowerCase();
+    m = Mode.forLabel(mode);
+    appConfig.setMode(m);
+  }
+
+  logger.log(new Object[] {"AppConfig", appConfig});
+  print(appConfig);
+  """
+})
+p({"class": "foam.nanos.script.TestRunnerScript", "id":"testRunnerScript"})

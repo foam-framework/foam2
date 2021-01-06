@@ -83,46 +83,43 @@ foam.CLASS({
       name: 'data',
       javaGetter:`
         if ( dataIsSet_ ) return data_;
+
         if ( ! SafetyUtil.isEmpty(this.getDataString()) ) {
-          String encodedString = this.getDataString().split(",")[1];
-          BlobService blobStore = new foam.blob.BlobStore();
-          byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
-          InputStream is = new ByteArrayInputStream(decodedBytes);
-          InputStreamBlob blob = new foam.blob.InputStreamBlob(is, decodedBytes.length);
+          String          encodedString = this.getDataString().split(",")[1];
+          byte[]          decodedBytes  = Base64.getDecoder().decode(encodedString);
+          InputStream     is            = new ByteArrayInputStream(decodedBytes);
+          InputStreamBlob blob          = new foam.blob.InputStreamBlob(is, decodedBytes.length);
+
           return blob;
-        } else {
-          return null;
         }
+
+        return null;
       `,
       getter: function() {
         if ( this.dataString ) {
           let b64Data = this.dataString.split(',')[1];
-          const b64toBlob = (b64Data, contentType=this.mimeType, sliceSize=512) => {
+          const b64toBlob = (b64Data, contentType = this.mimeType, sliceSize = 512) => {
             const byteCharacters = atob(b64Data);
             const byteArrays = [];
 
-            for ( let offset = 0; offset < byteCharacters.length; offset += sliceSize ) {
+            for ( let offset = 0 ; offset < byteCharacters.length ; offset += sliceSize ) {
               const slice = byteCharacters.slice(offset, offset + sliceSize);
 
               const byteNumbers = new Array(slice.length);
-              for ( let i = 0; i < slice.length; i++ ) {
+              for ( let i = 0 ; i < slice.length ; i++ ) {
                 byteNumbers[i] = slice.charCodeAt(i);
               }
 
-              const byteArray = new Uint8Array(byteNumbers);
-              byteArrays.push(byteArray);
+              byteArrays.push(new Uint8Array(byteNumbers));
             }
 
-            const blob = new Blob(byteArrays, {type: contentType});
-            return  blob;
+            return new Blob(byteArrays, {type: contentType});
           }
-          return this.BlobBlob.create({
-            blob: b64toBlob(b64Data)
-          });
-        } else {
-          var v = this.instance_["data"];
-          return v !== undefined ? v : null ;
+
+          return this.BlobBlob.create({blob: b64toBlob(b64Data)});
         }
+
+        return this.instance_.data || null;
       },
       /**
        * When we export this as the CSV, we are trying to create a new object if this property is undefined.
@@ -164,6 +161,32 @@ foam.CLASS({
         if ( ! auth.check(x, "file.remove." + getId()) ) {
           throw new AuthorizationException();
         }
+      `
+    },
+    {
+      type: 'String',
+      name: 'getText',
+      code: function() {
+        return new Promise((resolve, reject) => {
+          let reader = new FileReader();
+
+          reader.onload = () => {
+            resolve(reader.result);
+          };
+
+          reader.onerror = reject;
+
+          reader.readAsText(this.data.blob);
+        });
+      },
+      javaCode: `
+        if ( ! SafetyUtil.isEmpty(this.getDataString()) ) {
+          String encodedString = this.getDataString().split(",")[1];
+          byte[] decodedBytes  = Base64.getDecoder().decode(encodedString);
+          String decodedString = new String(decodedBytes);
+          return decodedString;
+        }
+        return "";
       `
     }
   ]
