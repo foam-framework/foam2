@@ -287,6 +287,7 @@ foam.CLASS({
             .put("appConfig", group.getAppConfig(rtn));
         }
         rtn = rtn.put("theme", ((Themes) x.get("themes")).findTheme(rtn));
+        setContext(rtn);
 
         return rtn;
       `
