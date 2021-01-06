@@ -223,10 +223,18 @@ foam.CLASS({
         {
           args: ['postalCode'],
           predicateFactory: function(e) {
-            return e.GT(
-              foam.mlang.StringLength.create({
-                arg1: foam.nanos.auth.Address.POSTAL_CODE
-              }), 0);
+            return e.OR(
+              e.EQ(foam.nanos.auth.Address.COUNTRY_ID, 'ZA'),
+              e.EQ(foam.nanos.auth.Address.COUNTRY_ID, 'TT'),
+              e.EQ(foam.nanos.auth.Address.COUNTRY_ID, 'MY'),
+              e.EQ(foam.nanos.auth.Address.COUNTRY_ID, 'MX'),
+              e.EQ(foam.nanos.auth.Address.COUNTRY_ID, 'JM'),
+              e.EQ(foam.nanos.auth.Address.COUNTRY_ID, 'LB'),
+              e.GT(
+                foam.mlang.StringLength.create({
+                  arg1: foam.nanos.auth.Address.POSTAL_CODE
+                }), 0)
+            )
           },
           errorMessage: 'POSTAL_CODE_REQUIRE'
         },
