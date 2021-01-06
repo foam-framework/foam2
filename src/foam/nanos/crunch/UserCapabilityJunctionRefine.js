@@ -55,6 +55,18 @@ foam.CLASS({
       name: 'sourceId',
       label: 'User',
       includeInDigest: true,
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          search: true,
+          sections: [
+            {
+              heading: 'Users',
+              dao: X.userDAO
+            }
+          ]
+        };
+      }
     },
     {
       class: 'Reference',
@@ -62,6 +74,18 @@ foam.CLASS({
       name: 'targetId',
       label: 'Capability',
       includeInDigest: true,
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          search: true,
+          sections: [
+            {
+              heading: 'Capabilities',
+              dao: X.capabilityDAO
+            }
+          ]
+        };
+      },
       tableCellFormatter: function(value, obj, axiom) {
         this.__subSubContext__.capabilityDAO
           .find(value)
