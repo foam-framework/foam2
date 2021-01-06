@@ -263,11 +263,7 @@ foam.CLASS({
         }
 
         if ( getServiceProviderAware() ) {
-          foam.nanos.auth.ServiceProviderAwareDAO dao = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX()).setDelegate(delegate).build();
-          if ( getServiceProviderAwarePropertyInfos() != null ) {
-            dao.setPropertyInfos(getServiceProviderAwarePropertyInfos());
-          }
-          delegate = dao;
+          delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX()).setDelegate(delegate).build();
         }
 
         if ( getLifecycleAware() ) {

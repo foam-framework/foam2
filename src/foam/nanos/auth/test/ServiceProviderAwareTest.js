@@ -25,6 +25,7 @@ foam.CLASS({
     'foam.util.Auth',
     'foam.util.SafetyUtil',
     'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.ServiceProvider',
     'foam.nanos.auth.ServiceProviderAware',
     'foam.nanos.auth.ServiceProviderAwareDAO',
     'foam.nanos.auth.ServiceProviderAwareSink',
@@ -42,9 +43,14 @@ foam.CLASS({
       name: 'runTest',
       javaCode: `
         AuthService auth = (AuthService) x.get("auth");
+        ((DAO) x.get("localServiceProviderDAO")).put(new ServiceProvider.Builder(x).setId("spid").build());
         ((DAO) x.get("localGroupDAO")).put(new Group.Builder(x).setId("test").build());
         ((DAO) x.get("localGroupDAO")).put(new Group.Builder(x).setId("test2").build());
         ((DAO) x.get("localGroupDAO")).put(new Group.Builder(x).setId("fail").build());
+
+        DAO groupPermissionJunctionDAO = (DAO) x.get("localGroupPermissionJunctionDAO");
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("serviceprovider.read.spid").build());
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test2").setTargetId("serviceprovider.read.spid").build());
 
         foam.nanos.app.AppConfig appConfig = (foam.nanos.app.AppConfig) ((FObject) x.get("appConfig")).fclone();
         appConfig.setDefaultSpid("spid");
