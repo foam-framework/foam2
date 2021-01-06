@@ -819,6 +819,9 @@ var classes = [
   'foam.nanos.crunch.CrunchService',
   'foam.nanos.crunch.ReputDependentUCJs',
 
+  //u2 additions
+  'foam.u2.crunch.FlatteningCapabilityWizardlet',
+
   // spid
   'foam.nanos.auth.CreateUserCapabilityJunctionOnSpidSet',
   'foam.nanos.auth.SetUserServiceProviderJunctionRuleAction',
