@@ -230,8 +230,18 @@ foam.CLASS({
     {
       name: 'canGoNext',
       class: 'Boolean',
-      expression: function(currentWizardlet$isValid, config$allowSkipping) {
-        return currentWizardlet$isValid || config$allowSkipping;
+      expression: function(
+        currentSection, currentWizardlet,
+        currentSection$isValid, currentWizardlet$isValid,
+        config$allowSkipping
+      ) {
+        if (
+          ! this.nextScreen ||
+          this.wizardPosition.wizardletIndex != this.nextScreen.wizardletIndex
+        ) {
+          if ( ! this.currentWizardlet.isValid ) return false;
+        }
+        return currentSection$isValid || config$allowSkipping;
       }
     },
     {

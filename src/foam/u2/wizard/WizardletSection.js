@@ -32,14 +32,38 @@ foam.CLASS({
       }
     },
     {
+      name: 'wizardlet',
+      class: 'FObjectProperty',
+      of: 'foam.u2.wizard.Wizardlet'
+    },
+    {
       name: 'data',
       documentation: `
         This property will be set by the aggregating wizardlet.
-      `
+      `,
+      expression: function (wizardlet$data) {
+        return wizardlet$data;
+      }
     },
     {
       name: 'isAvailable',
       class: 'Boolean'
+    },
+    {
+      name: 'isValid',
+      class: 'Boolean',
+      expression: function (wizardlet$of, data, data$errors_) {
+        if ( ! wizardlet$of ) return true;
+        if ( ! data ) return false;
+
+        let sectionErrors = [];
+        if ( data$errors_ ) {
+          sectionErrors = data$errors_.filter(error =>
+            this.section.properties.includes(error[0])
+          );
+        }
+        return ! sectionErrors.length > 0;
+      }
     },
     {
       name: 'customView',
