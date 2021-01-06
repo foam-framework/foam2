@@ -16,7 +16,8 @@ foam.CLASS({
     'java.util.List',
     'static foam.mlang.MLang.*',
     'foam.nanos.auth.Subject',
-    'foam.nanos.auth.User'
+    'foam.nanos.auth.User',
+    'foam.nanos.crunch.ui.MinMaxCapabilityWizardlet'
   ],
 
   properties: [
@@ -38,7 +39,10 @@ foam.CLASS({
       `,
       factory: function() {
         return foam.nanos.crunch.ui.MinMaxCapabilityWizardlet.create({}, this);
-      }
+      },
+      javaFactory: `
+        return new MinMaxCapabilityWizardlet();
+      `
     },
   ],
 
