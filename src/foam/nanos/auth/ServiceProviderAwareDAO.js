@@ -55,10 +55,8 @@ foam.CLASS({
       ],
       type: 'foam.mlang.predicate.Predicate',
       javaCode: `
-      Logger logger = (Logger) x.get("logger");
       AuthService auth = (AuthService) x.get("auth");
       ArrayList<ServiceProvider> serviceProviders = (ArrayList) ((ArraySink) ((DAO) getX().get("localServiceProviderDAO")).select(new ArraySink())).getArray();
-logger.info(this.getClass().getSimpleName(), "serviceproviders found", serviceProviders.size());
       List<String> ids = serviceProviders.stream()
                             .map(ServiceProvider::getId)
                             .filter(id -> auth.check(x, "serviceprovider.read."+id))
@@ -72,13 +70,12 @@ logger.info(this.getClass().getSimpleName(), "serviceproviders found", servicePr
           spid = user.getSpid();
         }
       }
-logger.info(this.getClass().getSimpleName(), "serviceproviders read", ids.size(), getPropertyInfo(), spid);
       if ( ids.size() == 1 ) {
         return MLang.EQ(getPropertyInfo(), ids.get(0));
       } else if ( ids.size() > 1 ) {
         return MLang.IN(getPropertyInfo(), ids.toArray(new String[0]));
       }
-      logger.error(this.getClass().getSimpleName(), "Permission denied");
+      ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "sps", serviceProviders.stream().map(ServiceProvider::getId).collect(Collectors.joining(",")), "ids", ids.stream().collect(Collectors.joining(",")), "spid", spid);
       throw new AuthorizationException();
       `
     },
@@ -91,25 +88,31 @@ logger.info(this.getClass().getSimpleName(), "serviceproviders read", ids.size()
         }
       ],
       type: 'String',
+      javaThrows: ['AuthorizationException'],
       javaCode: `
+      String spid = (String) x.get("spid");
       Subject subject = (Subject) x.get("subject");
       if ( subject != null ) {
         User user = subject.getUser();
         if ( user != null &&
              ! SafetyUtil.isEmpty(user.getSpid()) ) {
-          return user.getSpid();
+          spid = user.getSpid();
         }
       }
-      String spid = (String) x.get("spid");
-      if ( ! SafetyUtil.isEmpty(spid) ) {
-       return spid;
+      if ( SafetyUtil.isEmpty(spid) ) {
+        Theme theme = ((Themes) x.get("themes")).findTheme(x);
+        if ( theme != null &&
+             ! SafetyUtil.isEmpty(theme.getSpid()) ) {
+          spid = theme.getSpid();
+        }
       }
-      Theme theme = ((Themes) x.get("themes")).findTheme(x);
-      if ( theme != null &&
-           ! SafetyUtil.isEmpty(theme.getSpid()) ) {
-        return theme.getSpid();
+      if ( SafetyUtil.isEmpty(spid) ) {
+        spid = ((AppConfig) x.get("appConfig")).getDefaultSpid();
       }
-      return ((AppConfig) x.get("appConfig")).getDefaultSpid();
+      if ( SafetyUtil.isEmpty(spid) ) {
+        throw new AuthorizationException();
+      }
+      return spid;
       `
     },
     {
@@ -122,18 +125,33 @@ logger.info(this.getClass().getSimpleName(), "serviceproviders read", ids.size()
 
       Object id = obj.getProperty("id");
       FObject oldObj = getDelegate().inX(x).find(id);
-      boolean isCreate = id == null || oldObj == null;
+      boolean isCreate = id == null ||
+                         oldObj == null ||
+                         SafetyUtil.isEmpty(String.valueOf(id)) ||
+                         new Long(0L).equals(id);
 
       ServiceProviderAware sp = (ServiceProviderAware) obj;
       ServiceProviderAware oldSp = (ServiceProviderAware) oldObj;
       AuthService auth = (AuthService) x.get("auth");
 
       if ( isCreate ) {
-        sp.setSpid(getSpid(x));
+        if ( SafetyUtil.isEmpty(sp.getSpid()) ) {
+          sp.setSpid(getSpid(x));
+        } else if ( ! sp.getSpid().equals(getSpid(x)) &&
+                    ! auth.check(x, "serviceprovider.create." + sp.getSpid()) ) {
+          // net.nanopay.auth.UserCreateServiceProviderURLRule may have set the spid.
+          Subject subject = (Subject) x.get("subject");
+          User user = null;
+          if ( subject != null ) {
+            user = subject.getUser();
+          }
+          ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "put_", "context.spid", getSpid(x), "obj.spid", sp.getSpid(), "user", (user == null ? "null" : user.getLegalName()+", group"+user.getGroup()));
+          throw new AuthorizationException();
+        }
       } else if ( ! sp.getSpid().equals(oldSp.getSpid()) &&
                   ! (auth.check(x, "serviceprovider.update." + oldSp.getSpid()) &&
                      auth.check(x, "serviceprovider.update." + sp.getSpid())) ) {
-        throw new AuthorizationException("You do not have permission to update ServiceProvider (spid) property.");
+        throw new AuthorizationException();
       } else if ( sp.getSpid().equals(oldSp.getSpid()) &&
                   ! auth.check(x, "serviceprovider.read." + sp.getSpid()) ) {
         throw new AuthorizationException();

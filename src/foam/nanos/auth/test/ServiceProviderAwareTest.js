@@ -44,11 +44,14 @@ foam.CLASS({
       javaCode: `
         AuthService auth = (AuthService) x.get("auth");
         ((DAO) x.get("localServiceProviderDAO")).put(new ServiceProvider.Builder(x).setId("spid").build());
+        ((DAO) x.get("localServiceProviderDAO")).put(new ServiceProvider.Builder(x).setId("other").build());
         ((DAO) x.get("localGroupDAO")).put(new Group.Builder(x).setId("test").build());
         ((DAO) x.get("localGroupDAO")).put(new Group.Builder(x).setId("test2").build());
+        ((DAO) x.get("localGroupDAO")).put(new Group.Builder(x).setId("other").build());
         ((DAO) x.get("localGroupDAO")).put(new Group.Builder(x).setId("fail").build());
 
         DAO groupPermissionJunctionDAO = (DAO) x.get("localGroupPermissionJunctionDAO");
+        groupPermissionJunctionDAO.where(EQ(GroupPermissionJunction.SOURCE_ID, "test")).removeAll();
         groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("serviceprovider.read.spid").build());
         groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test2").setTargetId("serviceprovider.read.spid").build());
 
@@ -67,7 +70,6 @@ foam.CLASS({
       javaCode: `
         AuthService auth = (AuthService) x.get("auth");
         DAO groupPermissionJunctionDAO = (DAO) x.get("localGroupPermissionJunctionDAO");
-        groupPermissionJunctionDAO.where(EQ(GroupPermissionJunction.SOURCE_ID, "test")).removeAll();
 
         DAO userDAODelegate = new MDAO(User.getOwnClassInfo());
         DAO userDAO = new foam.nanos.auth.AuthorizationDAO.Builder(x)
@@ -103,6 +105,7 @@ foam.CLASS({
           .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         ctxUser = (User) userDAODelegate.put(ctxUser);
+        test(ctxUser.getSpid().equals("spid"), "admin.spid = "+ctxUser.getSpid());
         y = Auth.sudo(y, ctxUser);
         userDAO = userDAO.inX(y);
         dao = dao.inX(y);
@@ -116,6 +119,7 @@ foam.CLASS({
           .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         user1 = (User) userDAO.put_(y, user1);
+        test(user1.getSpid().equals("spid"), "user1.spid = "+user1.getSpid());
 
         User user2 = new User.Builder(y)
           .setId(89995)
@@ -126,6 +130,7 @@ foam.CLASS({
           .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         user2 = (User) userDAO.put_(y, user2);
+        test(user2.getSpid().equals("spid"), "user2.spid = "+user2.getSpid());
 
         User user3 = new User.Builder(y)
           .setId(89994)
@@ -136,17 +141,19 @@ foam.CLASS({
           .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         user3 = (User) userDAO.put_(y, user3);
+        test(user3.getSpid().equals("spid"), "user3.spid = "+user3.getSpid());
 
         User user4 = new User.Builder(y)
         .setId(89993)
         .setFirstName("user_four")
         .setLastName("lastname")
         .setEmail("user4@example.com")
-        .setGroup("test")
+        .setGroup("other")
         .setLifecycleState(LifecycleState.ACTIVE)
         .setSpid("other")
         .build();
         user4 = (User) userDAO.put_(y, user4);
+        test(user4.getSpid().equals("other"), "user4.spid = "+user4.getSpid());
 
         DummySp ns1 = new DummySp.Builder(y).setOwner(user1.getId()).build();
         ns1 = (DummySp) dao.put(ns1).fclone();
@@ -239,9 +246,22 @@ foam.CLASS({
         nss = sink.getArray();
         test (nss.size() == 0, "ReferenceTest DAO select filtered on spid. expected: 0, found: "+nss.size());
 
-        // test that it is found by a user on the new spid
+        // test user in spid 'other' can't select it's own members as it's group does not have read permission
         y = Auth.sudo(y, user4);
         dao = dao.inX(y);
+        sink = new ArraySink();
+        try {
+          dao.select(sink);
+          nss = sink.getArray();
+          test (false, "ReferenceTest DAO select filtered on spid. expected: AuthorizationException, found: "+nss.size());
+        } catch (AuthorizationException e) {
+          test (true, "ReferenceTest DAO select filtered on spid.");
+        }
+
+        // test that it is found by a user on the new spid 
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("other").setTargetId("serviceprovider.read.other").build());
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("other").setTargetId("service.DummySpDAO").build());
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("other").setTargetId("dummysp.read.*").build());
         sink = new ArraySink();
         dao.select(sink);
         nss = sink.getArray();
