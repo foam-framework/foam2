@@ -300,7 +300,7 @@ foam.CLASS({
       for ( var s of this.selectedColumnNames ) {
         if ( ! this.memento.paramsObj.c )
           this.memento.paramsObj.c = [];
-        var col = this.memento.paramsObj.c.find(c => c.substr(0, c.length - 1) === s);
+        var col = this.memento.paramsObj.c.find(c => this.returnMementoColumnNameDisragardSorting(c) === s);
         if ( ! col ) {
           newMementoColumns.push( s );
         } else {
