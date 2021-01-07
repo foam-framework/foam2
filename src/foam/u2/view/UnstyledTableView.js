@@ -260,7 +260,8 @@ foam.CLASS({
 
   methods: [
     function sortBy(column) {
-      this.order = this.order === column ?
+      var isNewOrderDesc = this.order === column;
+      this.order = isNewOrderDesc ?
         this.DESC(column) :
         column;
 
@@ -269,7 +270,7 @@ foam.CLASS({
           this.memento.paramsObj.c = [];
         }
         var mementoColumn = this.memento.paramsObj.c.find(c => this.returnMementoColumnNameDisragardSorting(c) === column.name)
-        var orderChar = this.order === column ? '-' : '+';
+        var orderChar = isNewOrderDesc ? '-' : '+';
         if ( ! mementoColumn ) {
           this.memento.paramsObj.c.push(column.name + orderChar);
         } else {
