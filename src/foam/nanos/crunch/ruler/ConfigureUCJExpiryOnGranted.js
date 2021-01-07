@@ -48,9 +48,8 @@ foam.CLASS({
               )
             ));
 
-            if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED || ucj.getIsRenewable() 
-              || ( old != null && ! old.getIsRenewable() && old.getStatus() == CapabilityJunctionStatus.GRANTED ) ) 
-              return;
+            if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED || ucj.getIsRenewable() ) return;
+            if ( old != null && ! old.getIsRenewable() && old.getData().equals(ucj.getData()) ) return;
               
             Capability capability = (Capability) ucj.findTargetId(x);
             if ( capability == null ) {

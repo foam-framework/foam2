@@ -13,7 +13,6 @@ foam.CLASS({
   ],
 
   imports: [
-    'capabilities',
     'rootCapability',
     'sequence'
   ],
