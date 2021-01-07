@@ -107,7 +107,7 @@ foam.CLASS({
     {
       name: 'selectedColumnNames',
       expression: function(columns, of, memento) {
-        var ls =  memento && memento.paramsObj.c ? memento.paramsObj.c.map(c => this.returnMementoColumnNameDisragardSorting(c)) : JSON.parse(localStorage.getItem(of.id));
+        var ls =  memento && memento.paramsObj.c ? memento.paramsObj.c.map(c => this.returnMementoColumnNameDisregardSorting(c)) : JSON.parse(localStorage.getItem(of.id));
         return ls || columns;
       }
     },
@@ -279,7 +279,7 @@ foam.CLASS({
         if ( ! this.memento.paramsObj.c ) {
           this.memento.paramsObj.c = [];
         }
-        var mementoColumn = this.memento.paramsObj.c.find(c => this.returnMementoColumnNameDisragardSorting(c) === column.name)
+        var mementoColumn = this.memento.paramsObj.c.find(c => this.returnMementoColumnNameDisregardSorting(c) === column.name)
         var orderChar = isNewOrderDesc ? this.DESCENDING_ORDER_CHAR : this.ASCENDING_ORDER_CHAR;
         if ( ! mementoColumn ) {
           this.memento.paramsObj.c.push(column.name + orderChar);
@@ -300,7 +300,7 @@ foam.CLASS({
       for ( var s of this.selectedColumnNames ) {
         if ( ! this.memento.paramsObj.c )
           this.memento.paramsObj.c = [];
-        var col = this.memento.paramsObj.c.find(c => this.returnMementoColumnNameDisragardSorting(c) === s);
+        var col = this.memento.paramsObj.c.find(c => this.returnMementoColumnNameDisregardSorting(c) === s);
         if ( ! col ) {
           newMementoColumns.push( s );
         } else {
@@ -688,7 +688,7 @@ foam.CLASS({
       function shouldColumnBeSorted(c) {
         return c[c.length - 1] === this.DESCENDING_ORDER_CHAR || c[c.length - 1] === this.ASCENDING_ORDER_CHAR;
       },
-      function returnMementoColumnNameDisragardSorting(c) {
+      function returnMementoColumnNameDisregardSorting(c) {
         return c && this.shouldColumnBeSorted(c) ? c.substr(0, c.length - 1) : c;
       }
   ]
