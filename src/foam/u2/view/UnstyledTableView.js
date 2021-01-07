@@ -453,7 +453,7 @@ foam.CLASS({
 
           if ( this.memento && this.memento.paramsObj.c ) {
             for ( var c of this.memento.paramsObj.c ) {
-              if ( ( c[c.length - 1] == '+' || c[c.length - 1] == '-') && ! c.includes('.')) {
+              if ( ( this.shouldColumnBeSorted(c) ) && ! c.includes('.')) {
                 var prop = view.props.find(p => p.fullPropertyName === c.substr(0, c.length - 1) );
                 if ( prop ) {
                   if ( c[c.length - 1] === '-' )
@@ -676,7 +676,7 @@ foam.CLASS({
         return obj.columnConfigToPropertyConverter.returnPropertyColumnMappings(obj.of, propertyNamesToQuery);
       },
       function shouldColumnBeSorted(c) {
-        return c[c.length - 1] == '-' || c[c.length - 1] == '+';
+        return c[c.length - 1] === '-' || c[c.length - 1] === '+';
       },
       function returnMementoColumnNameDisragardSorting(c) {
         return c && this.shouldColumnBeSorted(c) ? c.substr(0, c.length - 1) : c;
