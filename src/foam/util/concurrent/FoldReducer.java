@@ -12,7 +12,7 @@ import java.util.*;
 /** Thread(Local) state information. **/
 class LocalState {
   FoldReducer fr_;
-  State       state_;
+  Object      state_;
   boolean     connected_ = false;
 
   public LocalState(FoldReducer fr) {
@@ -55,8 +55,8 @@ class LocalState {
    * However, this lock should rarely be contested so the
    * overhead is very small.
    **/
-  public synchronized State resetState() {
-    State ret = state_;
+  public synchronized Object resetState() {
+    Object ret = state_;
 
     state_ = fr_.initialState();
 
@@ -80,7 +80,7 @@ public abstract class FoldReducer {
 
   protected final ThreadLocal local__;
   protected final List        states_       = new ArrayList();
-  protected       State       state_        = null;
+  protected       Object      state_        = null;
   /** Number of LocalState objects connected since last FoldReduce. **/
   protected       int         connectCount_ = 0;
 
@@ -98,13 +98,13 @@ public abstract class FoldReducer {
 
 
   /** Template method to Create initial state. **/
-  public abstract State initialState();
+  public abstract Object initialState();
 
   /** Template method to Fold a new update into a state. **/
-  public abstract void fold(State state, Object op);
+  public abstract void fold(Object state, Object op);
 
   /** Template method to Merge two states. **/
-  public abstract State reduce(State state1, State state2);
+  public abstract Object reduce(Object state1, Object state2);
 
 
   protected synchronized void connect(LocalState local) {
@@ -132,7 +132,7 @@ public abstract class FoldReducer {
     getLocalState().fold(op);
 	}
 
-  public synchronized void setState(State state) {
+  public synchronized void setState(Object state) {
     state_ = state;
   }
 
@@ -142,8 +142,8 @@ public abstract class FoldReducer {
    *
    * @return the state just prior to being reset
    **/
-  public synchronized State resetState() {
-    State ret = getState();
+  public synchronized Object resetState() {
+    Object ret = getState();
 
     setState(initialState());
 
@@ -154,7 +154,7 @@ public abstract class FoldReducer {
   /**
    * Reduce all ThreadLocal States into a single State
    **/
-	public synchronized State getState() {
+	public synchronized Object getState() {
     try {
       for ( Iterator i = states_.iterator() ; i.hasNext() ; ) {
         state_ = reduce(state_, ((LocalState) i.next()).resetState());
