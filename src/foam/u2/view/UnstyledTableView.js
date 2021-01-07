@@ -309,7 +309,7 @@ foam.CLASS({
       //set memento's selected columns
       if ( ! this.memento.paramsObj.c ) {
         this.memento.paramsObj.c = this.columns_.map(c => {
-          return  this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c)
+          return this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c);
         });
         this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj)
       }
@@ -456,7 +456,7 @@ foam.CLASS({
               if ( ( c[c.length - 1] == '+' || c[c.length - 1] == '-') && ! c.includes('.')) {
                 var prop = view.props.find(p => p.fullPropertyName === c.substr(0, c.length - 1) );
                 if ( prop ) {
-                  if ( c[c.length - 1].toLowerCase() === '-' )
+                  if ( c[c.length - 1] === '-' )
                     dao = dao.orderBy(this.DESC(prop.property));
                   else
                     dao = dao.orderBy(prop.property);
