@@ -13,8 +13,12 @@ foam.CLASS({
     foam.pattern.Faceted.create()
   ],
 
+  requires: [
+    'foam.comics.v2.DAOControllerConfig'
+  ],
+
   imports: [
-  'stack'
+    'stack'
   ],
 
   exports: [
@@ -48,7 +52,7 @@ foam.CLASS({
 
     function openFilteredListView(obj) {
       var dao = this.__subContext__[obj.listDAOName].where(this.EQ(obj.searchKey, obj.id));
-      var config = foam.comics.v2.DAOControllerConfig.create({ dao: dao, hideQueryBar: false });
+      var config = this.DAOControllerConfig.create({ dao: dao, hideQueryBar: false });
       this.stack.push({
         class: 'foam.comics.v2.DAOBrowserView',
         config: config
@@ -65,13 +69,13 @@ foam.CLASS({
       border-bottom: 1px solid #e4e3e3;
     }
 
-    ^.foam-dashboard-view-DashboardCitationView-id {
+    ^id {
       font-weight: 300;
       font-size: 13px;
       color: gray;
     }
 
-    ^.foam-dashboard-view-DashboardCitationView-value {
+    ^value {
       font-size: 13px;
       font-weight: 500;
     }
