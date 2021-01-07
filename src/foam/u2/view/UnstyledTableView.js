@@ -302,7 +302,7 @@ foam.CLASS({
           this.memento.paramsObj.c = [];
         var col = this.memento.paramsObj.c.find(c => this.returnMementoColumnNameDisregardSorting(c) === s);
         if ( ! col ) {
-          newMementoColumns.push( s );
+          newMementoColumns.push(s);
         } else {
           newMementoColumns.push(col);
         }
@@ -463,7 +463,7 @@ foam.CLASS({
 
           if ( this.memento && this.memento.paramsObj.c ) {
             for ( var c of this.memento.paramsObj.c ) {
-              if ( ( this.shouldColumnBeSorted(c) ) && ! c.includes('.')) {
+              if ( this.shouldColumnBeSorted(c) && ! c.includes('.')) {
                 var prop = view.props.find(p => p.fullPropertyName === c.substr(0, c.length - 1) );
                 if ( prop ) {
                   if ( c[c.length - 1] === this.DESCENDING_ORDER_CHAR )
