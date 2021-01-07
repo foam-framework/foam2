@@ -384,7 +384,7 @@ foam.CLASS({
         return n
       },
       expression: function(type) {
-        return type && foam.lookup(type).VALUES[0];
+        return type && ( foam.lookup(type).forOrdinal(0) || foam.lookup(type).VALUES[0] );
       }
     },
     {
