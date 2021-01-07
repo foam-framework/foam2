@@ -131,7 +131,7 @@ foam.CLASS({
           TranslationService ts = (TranslationService) x.get("translationService");
           Subject subject = (Subject) x.get("subject");
           User user = subject.getRealUser();
-          String locale = user.getLanguage().toString();
+          String locale = ((User) subject.getRealUser()).getLanguage().getCode().toString();
           String source = getId() + ".subject";
           String translatedSubject = ts.getTranslation(locale, source, getSubject());
           emailMessage.setSubject(templateEngine.renderTemplate(x, translatedSubject, templateArgs).toString());

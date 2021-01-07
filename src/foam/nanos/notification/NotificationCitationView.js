@@ -13,6 +13,10 @@ foam.CLASS({
     foam.pattern.Faceted.create()
   ],
 
+  imports: [
+    'translationService'
+  ],
+
   css: `
     ^ {
       width: 90%;
@@ -49,6 +53,8 @@ foam.CLASS({
 
       this.created = this.data.created.toUTCString();
       this.description = this.data.body;
+
+      //this.translationService.getTranslation(foam.locale, `${}.name`,);
 
       this
         .addClass(this.myClass())
