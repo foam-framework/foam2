@@ -18,14 +18,15 @@ foam.CLASS({
     'contentWidth as visualizationWidth',
     'contentHeight as visualizationHeight',
     'data.colors as visualizationColors',
-    'data.dao.of as of'
+    'data.dao.of as of',
   ],
   constants: [
     {
       name: 'SIZES',
       value: {
         TINY:   [176, 358],
-        SMALL:  [312, 358],
+        SMALL:  [312, '-'],
+        SMEDIUM:  [312, 358],
         MEDIUM: [624, 528],
         LARGE:  [936, 528],
         XLARGE: [1580, 698],
@@ -61,23 +62,23 @@ foam.CLASS({
   ],
   css: `
     ^ {
-      border: 2px solid #dae1e9;
-      border-radius: 2px;
+      border-radius: 10px;
       background: white;
       margin: 8px;
-      padding-bottom: 20px;
+      box-shadow: 3px 8px 6px -2px #cccccc;
     }
 
     ^header {
-      padding-left: 24px;
+      padding-left: 20px;
       padding-right: 16px;
       padding-top: 20px;
       padding-bottom: 20px;
-      margin-bottom: 16px;
-      border-bottom: 1px solid #ccc;
-      font-weight: bold;
+      font-weight: 500;
       height: 20px;
-      font-size: 20px;
+      display: flex;
+      align-items: center;
+      font-size: 17px;
+      justify-content: space-between;
     }
   `,
   methods: [
@@ -99,14 +100,6 @@ foam.CLASS({
           })
         }).
         addClass(this.myClass()).
-        // addClass(this.dot('data').dot('mode').map(function(m){
-        //   return m == 'config' ?
-        //     view.myClass('config') :
-        //     view.myClass('display');
-        // })).
-        // addClass(this.dot('data').dot('size').map(function(s) {
-        //   return view.myClass(s.name);
-        // })).
         start('div').
         addClass(this.myClass('header')).
         start().
@@ -124,9 +117,6 @@ foam.CLASS({
           return foam.u2.ViewSpec.createView(data$currentView, null, this, this.__subSubContext__);
         })).
         end('div');
-//        tag(this.SimpleAltView, {
-//          choices$: this.dot('data').dot('views'),
-//        });
     }
   ]
 });
