@@ -52,6 +52,16 @@ foam.CLASS({
       type: 'Int',
       name: 'EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH',
       value: 60
+    },
+    {
+      type: 'Char',
+      name: 'DESCENDING_ORDER_CHAR',
+      value: '-'
+    },
+    {
+      type: 'Char',
+      name: 'ASCENDING_ORDER_CHAR',
+      value: '+'
     }
   ],
 
@@ -270,7 +280,7 @@ foam.CLASS({
           this.memento.paramsObj.c = [];
         }
         var mementoColumn = this.memento.paramsObj.c.find(c => this.returnMementoColumnNameDisragardSorting(c) === column.name)
-        var orderChar = isNewOrderDesc ? '-' : '+';
+        var orderChar = isNewOrderDesc ? this.DESCENDING_ORDER_CHAR : this.ASCENDING_ORDER_CHAR;
         if ( ! mementoColumn ) {
           this.memento.paramsObj.c.push(column.name + orderChar);
         } else {
@@ -456,7 +466,7 @@ foam.CLASS({
               if ( ( this.shouldColumnBeSorted(c) ) && ! c.includes('.')) {
                 var prop = view.props.find(p => p.fullPropertyName === c.substr(0, c.length - 1) );
                 if ( prop ) {
-                  if ( c[c.length - 1] === '-' )
+                  if ( c[c.length - 1] === this.DESCENDING_ORDER_CHAR )
                     dao = dao.orderBy(this.DESC(prop.property));
                   else
                     dao = dao.orderBy(prop.property);
@@ -676,7 +686,7 @@ foam.CLASS({
         return obj.columnConfigToPropertyConverter.returnPropertyColumnMappings(obj.of, propertyNamesToQuery);
       },
       function shouldColumnBeSorted(c) {
-        return c[c.length - 1] === '-' || c[c.length - 1] === '+';
+        return c[c.length - 1] === this.DESCENDING_ORDER_CHAR || c[c.length - 1] === this.ASCENDING_ORDER_CHAR;
       },
       function returnMementoColumnNameDisragardSorting(c) {
         return c && this.shouldColumnBeSorted(c) ? c.substr(0, c.length - 1) : c;
