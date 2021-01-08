@@ -72,5 +72,35 @@ foam.CLASS({
       readPermissionRequired: true,
       writePermissionRequired: true
     }
+  ],
+
+  methods: [
+    {
+      name: 'fold',
+      type: 'void',
+      args: [ 'PM pm' ],
+      javaCode: `
+      if ( pm.getTime() < getMinTime() ) setMinTime(pm.getTime());
+      if ( pm.getTime() > getMaxTime() ) setMaxTime(pm.getTime());
+
+      setCount(getCount() + 1);
+      setTotalTime(getTotalTime() + pm.getTime());
+      `
+    },
+    {
+      name: 'reduce',
+      type: 'void',
+      args: [ 'PMInfo other' ],
+      javaCode: `
+        setCount(getCount() + other.getCount());
+        setTotalTime(getTotalTime() + other.getTotalTime());
+        setMinTime(Math.min(getMinTime(), other.getMinTime()));
+        setMinTime(Math.max(getMaxTime(), other.getMaxTime()));
+        if ( foam.util.SafetyUtil.isEmpty(other.getCaptureTrace()) ) {
+          setCaptureTrace(other.getCaptureTrace());
+          setCapture(false);
+        }
+      `
+    }
   ]
 });

@@ -224,7 +224,7 @@ foam.CLASS({
         if ( contextDAOFindKey != null && ! contextDAOFindKey.isEmpty() ) {
           if ( contextDAOFindKey.toLowerCase().contains("subject") ) {         // 1- Case if subject lookup
             String[] words = foam.util.StringUtil.split(contextDAOFindKey, '.');
-            objectToSave = (FObject) x.get("subject");
+            objectToSave = getSubject(x);
 
             if ( objectToSave == null || words.length < 2 )
               throw new RuntimeException("@UserCapabilityJunction capability.contextDAOFindKey not found in context. Please check capability: " + getTargetId() + " and its contextDAOFindKey: " + contextDAOFindKey);

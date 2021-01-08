@@ -50,7 +50,7 @@ foam.CLASS({
 
           if ( ! cap.getVisibilityPredicate().f(subjectX) ) return;
 
-          User user = (User) subject.getUser();
+          User user = (User) subject.getRealUser();
 
           TranslationService ts = (TranslationService) x.get("translationService");
           String locale = user.getLanguage().getCode().toString();
