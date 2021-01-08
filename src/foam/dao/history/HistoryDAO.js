@@ -135,7 +135,7 @@ foam.CLASS({
       FObject current = this.find_(x, obj);
       Object objectId = obj.getProperty("id");
 
-      if ( current == nul ) {
+      if ( current == null ) {
         // do "put" first if it is "create" action.
         FObject persistObject = super.put_(x, obj);
         objectId = persistObject.getProperty("id");
