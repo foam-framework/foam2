@@ -286,10 +286,11 @@ foam.CLASS({
           var parser = foam.parse.QueryParser.create({ of: self.dao.of.id });
           var pred = parser.parseString(f.pred);
 
-          if ( foam.mlang.predicate.Or.isInstance(pred) && pred.args && pred.args.length == 1 ) {
+          while ( ( foam.mlang.predicate.Or.isInstance(pred) && pred.args && pred.args.length == 1 ) ||
+            ( foam.mlang.predicate.And.isInstance(pred) && pred.args && pred.args.length == 1 ) ) {
             pred = pred.args[0];
           }
-          
+
           self.filterController.setExistingPredicate(f.criteria, f.n, pred);
         });
       }
