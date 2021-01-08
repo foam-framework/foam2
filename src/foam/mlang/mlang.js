@@ -883,7 +883,7 @@ foam.CLASS({
     {
       name: 'MQL_KEY',
       type: 'String',
-      value: 'OR'
+      value: ' OR '
     }
   ],
 
@@ -1040,7 +1040,7 @@ foam.CLASS({
     {
       name: 'MQL_KEY',
       type: 'String',
-      value: 'AND'
+      value: ' AND '
     }
   ],
 
