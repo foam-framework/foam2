@@ -18,10 +18,6 @@ public class FoldReducePMLogger
   extends    FoldReducer
   implements PMLogger
 {
-  public final static String SERVICE_NAME      = "pmLogger";
-  public final static String PM_DAO_NAME       = "pmDAO";
-  public final static String PM_INFO_DAO_NAME  = "pmInfoDAO";
-
 
   public FoldReducePMLogger() {
   }
@@ -75,11 +71,10 @@ public class FoldReducePMLogger
     Map<PMInfo,PMInfo> m1 = (Map<PMInfo,PMInfo>) state1;
     Map<PMInfo,PMInfo> m2 = (Map<PMInfo,PMInfo>) state2;
 
-    for ( Map.Entry<PMInfo,PMInfo> e : m2.entrySet() ) {
-      PMInfo pi1 = (PMInfo) m1.get(e.getKey());
-      PMInfo pi2 = (PMInfo) e.getValue();
+    for ( PMInfo pi2 : m2.values() ) {
+      PMInfo pi1 = m1.get(pi2);
 
-      if ( pi2 == null ) {
+      if ( pi1 == null ) {
         m1.put(pi2, pi2);
       } else {
         pi1.reduce(pi2);
@@ -93,8 +88,6 @@ public class FoldReducePMLogger
   @Override
   public void log(PM pm) {
     if (
-      // TODO: maybe an exclusion list for names in this package instead
-      //       of an inclusion list for names in outside packages
       ! pm.getKey().equals("foam.dao.PMDAO") &&
       ! pm.getKey().equals("foam.dao.PipelinePMDAO") &&
       ! pm.getKey().equals("foam.nanos.auth.PMAuthService")
