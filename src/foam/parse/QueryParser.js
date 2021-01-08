@@ -515,7 +515,7 @@ foam.CLASS({
   methods: [
     function parseString(str, opt_name) {
       var query = this.grammar_.parseString(str, opt_name);
-      return query;
+      return query && query.partialEval ? query.partialEval() : query;
     }
   ]
 });
