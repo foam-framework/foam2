@@ -92,14 +92,15 @@ p({
   "class":"foam.nanos.boot.NSpec",
   "name":"bareUserCapabilityJunctionDAO",
   "serviceScript":"""
-    decorator = new foam.dao.history.HistoryDAO(x, "userCapabilityJunctionHistoryDAO", new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo()).build());
+    // disable ucj historydao for now
+    // decorator = new foam.dao.history.HistoryDAO(x, "userCapabilityJunctionHistoryDAO", new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo()).build());
     dao = new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(false)
       .setGuid(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("userCapabilityJunctions")
       .setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo())
-      .setDecorator(decorator)
+      // .setDecorator(decorator)
       .build();
     return dao;
   """,
