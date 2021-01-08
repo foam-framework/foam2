@@ -105,8 +105,9 @@ public class EmailsUtility {
       foam.nanos.auth.Address address = supportConfig.getSupportAddress();
       templateArgs.put("supportAddress", address == null ? "" : address.toSummary());
       templateArgs.put("appName", (theme.getAppName()));
-      templateArgs.put("logo", (appConfig.getUrl() + "/" + theme.getLogo()));
-      templateArgs.put("appLink", (appConfig.getUrl()));
+      String url = appConfig.getUrl().replaceAll("/$", "");
+      templateArgs.put("logo", (url + "/" + theme.getLogo()));
+      templateArgs.put("appLink", url);
       emailMessage.setTemplateArguments(templateArgs);
     }
 
