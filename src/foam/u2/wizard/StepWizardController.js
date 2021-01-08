@@ -227,7 +227,8 @@ foam.CLASS({
       // Save current wizardlet, and any save-able (isAvailable) but invisible
       // wizardlets that may exist in between this one and the next.
       var start = this.wizardPosition.wizardletIndex;
-      var end = this.nextScreen.wizardletIndex;
+      var end = this.nextScreen ?
+        this.nextScreen.wizardletIndex : this.wizardlets.length;
       var p = Promise.resolve();
       for ( let i = start ; i < end ; i++ ) {
         if ( ! this.wizardlets[i].isAvailable ) continue;
@@ -260,7 +261,7 @@ foam.CLASS({
       if ( diff == 0 ) return true;
       if ( this.nextScreen && pos.compareTo(this.nextScreen) == 0 )
         return this.canGoNext;
-      if ( pos.compareTo(this.previousScreen) == 0 ) return this.canGoBack;
+      if ( this.previousScreen && pos.compareTo(this.previousScreen) == 0 ) return this.canGoBack;
       if ( diff < 0 ) return this.allowBacktracking;
       if ( this.allowSkipping ) return true;
 
