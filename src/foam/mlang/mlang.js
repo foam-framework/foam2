@@ -764,6 +764,20 @@ getArg2().prepareStatement(stmt);`
         getArg1().authorize(x);
         getArg2().authorize(x);
       `
+    },
+    function arg2ToMQL() {
+      if ( this.arg2 && this.arg2.value && foam.Date.isInstance(this.arg2.value) ) {
+        return new Date(this.arg2.value).toISOString();
+      }
+      return this.arg2 && this.arg2.value;
+    },
+    function toMQL() {
+      if ( ! this.MQL_KEY  )
+        return null;
+      var arg2 = this.arg2ToMQL();
+      if ( ! arg2 )
+        return null; 
+      return this.arg1.name + this.MQL_KEY + arg2;
     }
   ]
 });
@@ -836,6 +850,20 @@ foam.CLASS({
           predicate.authorize(x);
         }
       `
+    },
+    function toMQL() {
+      if ( ! this.MQL_KEY )
+        return null;
+
+      var mqlStringsArr = [];
+      for ( var a in this.args ) {
+        if ( ! this.args[a].toMQL )
+          throw new Error( 'Argument does not support toMQL' );
+        var mql = this.args[a].toMQL();
+        if ( mql )
+          mqlStringsArr.push(mql); 
+      }
+      return mqlStringsArr.join(this.MQL_KEY);
     }
   ]
 });
@@ -852,6 +880,14 @@ foam.CLASS({
   requires: [
     'foam.mlang.predicate.False',
     'foam.mlang.predicate.True'
+  ],
+
+  constants: [
+    {
+      name: 'MQL_KEY',
+      type: 'String',
+      value: 'OR'
+    }
   ],
 
   methods: [
@@ -1001,6 +1037,14 @@ foam.CLASS({
 
   requires: [
     'foam.mlang.predicate.Or'
+  ],
+
+  constants: [
+    {
+      name: 'MQL_KEY',
+      type: 'String',
+      value: 'AND'
+    }
   ],
 
   methods: [
@@ -1934,6 +1978,14 @@ foam.CLASS({
 
   documentation: 'Binary Predicate returns true iff arg1 EQUALS arg2.',
 
+  constants: [
+    {
+      name: 'MQL_KEY',
+      type: 'String',
+      value: '='
+    }
+  ],
+
   methods: [
     {
       name: 'f',
@@ -2032,6 +2084,14 @@ foam.CLASS({
 
   documentation: 'Binary Predicate returns true iff arg1 is LESS THAN arg2.',
 
+  constants: [
+    {
+      name: 'MQL_KEY',
+      type: 'String',
+      value: '<'
+    }
+  ],
+
   methods: [
     {
       name: 'f',
@@ -2057,6 +2117,14 @@ foam.CLASS({
 
   documentation: 'Binary Predicate returns true iff arg1 is LESS THAN or EQUAL to arg2.',
 
+  constants: [
+    {
+      name: 'MQL_KEY',
+      type: 'String',
+      value: '<='
+    }
+  ],
+
   methods: [
     {
       name: 'f',
@@ -2081,6 +2149,14 @@ foam.CLASS({
   implements: [ 'foam.core.Serializable' ],
 
   documentation: 'Binary Predicate returns true iff arg1 is GREATER THAN arg2.',
+  
+  constants: [
+    {
+      name: 'MQL_KEY',
+      type: 'String',
+      value: '>'
+    }
+  ],
 
   methods: [
     {
@@ -2107,6 +2183,13 @@ foam.CLASS({
 
   documentation: 'Binary Predicate returns true iff arg1 is GREATER THAN or EQUAL to arg2.',
 
+  constants: [
+    {
+      name: 'MQL_KEY',
+      type: 'String',
+      value: '>='
+    }
+  ],
 
   methods: [
     {
