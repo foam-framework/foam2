@@ -78,9 +78,7 @@ foam.CLASS({
 
           and: repeat(
               sym('expr'),
-              alt(literalIC(' AND '),
-                  not(alt(literalIC(' OR'), literal(' |')), literal(' '))),
-              1),
+              literalIC(' AND '), 1),
 
           expr: alt(
               sym('paren'),
@@ -517,7 +515,7 @@ foam.CLASS({
   methods: [
     function parseString(str, opt_name) {
       var query = this.grammar_.parseString(str, opt_name);
-      return query && query.partialEval ? query.partialEval() : query;
+      return query;
     }
   ]
 });

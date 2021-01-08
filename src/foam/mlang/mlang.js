@@ -767,14 +767,6 @@ getArg2().prepareStatement(stmt);`
     },
     function arg2ToMQL() {
       return this.arg2 && this.arg2.toMQL ? this.arg2.toMQL() : this.arg2;
-    },
-    function toMQL() {
-      if ( ! this.MQL_KEY  )
-        return null;
-      var arg2 = this.arg2ToMQL();
-      if ( ! arg2 )
-        return null; 
-      return this.arg1.name + this.MQL_KEY + arg2;
     }
   ]
 });
@@ -847,20 +839,6 @@ foam.CLASS({
           predicate.authorize(x);
         }
       `
-    },
-    function toMQL() {
-      if ( ! this.MQL_KEY )
-        return null;
-
-      var mqlStringsArr = [];
-      for ( var a in this.args ) {
-        if ( ! this.args[a].toMQL )
-          throw new Error( 'Predicate\'s argument does not support toMQL' );
-        var mql = this.args[a].toMQL();
-        if ( mql )
-          mqlStringsArr.push(mql); 
-      }
-      return mqlStringsArr.join(this.MQL_KEY);
     }
   ]
 });
@@ -877,14 +855,6 @@ foam.CLASS({
   requires: [
     'foam.mlang.predicate.False',
     'foam.mlang.predicate.True'
-  ],
-
-  constants: [
-    {
-      name: 'MQL_KEY',
-      type: 'String',
-      value: ' OR '
-    }
   ],
 
   methods: [
@@ -1019,6 +989,18 @@ return this;`
       }
 
       return self;
+    },
+
+    function toMQL() {
+      var mqlStringsArr = [];
+      for ( var a in this.args ) {
+        if ( ! this.args[a].toMQL )
+          throw new Error( 'Predicate\'s argument does not support toMQL' );
+        var mql = this.args[a].toMQL();
+        if ( mql )
+          mqlStringsArr.push(mql); 
+      }
+      return mqlStringsArr.join(' OR ');
     }
   ]
 });
@@ -1034,14 +1016,6 @@ foam.CLASS({
 
   requires: [
     'foam.mlang.predicate.Or'
-  ],
-
-  constants: [
-    {
-      name: 'MQL_KEY',
-      type: 'String',
-      value: ' AND '
-    }
   ],
 
   methods: [
@@ -1277,6 +1251,18 @@ return this;`
         // no OR args, no DNF transform needed
         return this;
       }
+    },
+
+    function toMQL() {
+      var mqlStringsArr = [];
+      for ( var a in this.args ) {
+        if ( ! this.args[a].toMQL )
+          throw new Error( 'Predicate\'s argument does not support toMQL' );
+        var mql = this.args[a].toMQL();
+        if ( mql )
+          mqlStringsArr.push(mql); 
+      }
+      return mqlStringsArr.join(' AND ');
     }
   ]
 });
@@ -1980,14 +1966,6 @@ foam.CLASS({
 
   documentation: 'Binary Predicate returns true iff arg1 EQUALS arg2.',
 
-  constants: [
-    {
-      name: 'MQL_KEY',
-      type: 'String',
-      value: '='
-    }
-  ],
-
   methods: [
     {
       name: 'f',
@@ -2038,6 +2016,12 @@ return FOAM_utils.equals(v1, v2)
       var otherConst = otherArg1IsConst ? otherArg1 : otherArg2;
 
       return equals(myConst, otherConst) ? this.SUPER(other) : this.FALSE;
+    },
+    function toMQL() {
+      var arg2 = this.arg2ToMQL();
+      if ( ! arg2 )
+        return null; 
+      return this.arg1.name + '=' + arg2;
     }
   ]
 });
@@ -2086,14 +2070,6 @@ foam.CLASS({
 
   documentation: 'Binary Predicate returns true iff arg1 is LESS THAN arg2.',
 
-  constants: [
-    {
-      name: 'MQL_KEY',
-      type: 'String',
-      value: '<'
-    }
-  ],
-
   methods: [
     {
       name: 'f',
@@ -2105,6 +2081,12 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaCode: 'return " " + getArg1().createStatement() + " < " + getArg2().createStatement() + " ";'
+    },
+    function toMQL() {
+      var arg2 = this.arg2ToMQL();
+      if ( ! arg2 )
+        return null; 
+      return this.arg1.name + '<' + arg2;
     }
   ]
 });
@@ -2119,14 +2101,6 @@ foam.CLASS({
 
   documentation: 'Binary Predicate returns true iff arg1 is LESS THAN or EQUAL to arg2.',
 
-  constants: [
-    {
-      name: 'MQL_KEY',
-      type: 'String',
-      value: '<='
-    }
-  ],
-
   methods: [
     {
       name: 'f',
@@ -2138,6 +2112,12 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaCode: 'return " " + getArg1().createStatement() + " <= " + getArg2().createStatement() + " ";'
+    },
+    function toMQL() {
+      var arg2 = this.arg2ToMQL();
+      if ( ! arg2 )
+        return null; 
+      return this.arg1.name + '<=' + arg2;
     }
   ]
 });
@@ -2151,14 +2131,6 @@ foam.CLASS({
   implements: [ 'foam.core.Serializable' ],
 
   documentation: 'Binary Predicate returns true iff arg1 is GREATER THAN arg2.',
-  
-  constants: [
-    {
-      name: 'MQL_KEY',
-      type: 'String',
-      value: '>'
-    }
-  ],
 
   methods: [
     {
@@ -2171,6 +2143,12 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaCode: 'return " " + getArg1().createStatement() + " > " + getArg2().createStatement() + " ";'
+    },
+    function toMQL() {
+      var arg2 = this.arg2ToMQL();
+      if ( ! arg2 )
+        return null; 
+      return this.arg1.name + '>' + arg2;
     }
   ]
 });
@@ -2185,14 +2163,6 @@ foam.CLASS({
 
   documentation: 'Binary Predicate returns true iff arg1 is GREATER THAN or EQUAL to arg2.',
 
-  constants: [
-    {
-      name: 'MQL_KEY',
-      type: 'String',
-      value: '>='
-    }
-  ],
-
   methods: [
     {
       name: 'f',
@@ -2204,6 +2174,12 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaCode: 'return " " + getArg1().createStatement() + " >= " + getArg2().createStatement() + " ";'
+    },
+    function toMQL() {
+      var arg2 = this.arg2ToMQL();
+      if ( ! arg2 )
+        return null; 
+      return this.arg1.name + '>=' + arg2;
     }
   ]
 });
