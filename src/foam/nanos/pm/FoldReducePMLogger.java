@@ -10,6 +10,7 @@ import foam.core.ContextAwareSupport;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.MDAO;
+import foam.dao.ProxyDAO;
 import foam.util.concurrent.FoldReducer;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,22 +36,18 @@ public class FoldReducePMLogger
     PM  pm  = (PM) op;
 
     // Regular PMInfo
-    PMInfo pi = new PMInfo();
-    pi.setKey(pm.getKey());
-    pi.setName(pm.getName());
+    Object key = pm.getKey() + ":" + pm.getName();
+    PMInfo pi  = (PMInfo) map.get(key);
 
-    PMInfo pi2 = (PMInfo) map.get(pi);
-    if ( pi2 != null ) {
-      pi = pi2;
-      pi.fold(pm);
-      if ( pi.getCapture() ) capture(pi);
-    } else {
-      pi.setMinTime(pm.getTime());
-      pi.setMaxTime(pm.getTime());
-      pi.setTotalTime(pm.getTime());
-      pi.setCount(1);
-      map.put(pi, pi);
+    if ( pi == null ) {
+      pi = new PMInfo();
+      pi.setKey(pm.getKey());
+      pi.setName(pm.getName());
+      map.put(key, pi);
     }
+
+    pi.fold(pm);
+    if ( pi.getCapture() ) capture(pi);
   }
 
 
@@ -68,14 +65,14 @@ public class FoldReducePMLogger
 
   /** Template method to Merge two states. **/
   public Object reduce(Object state1, Object state2) {
-    Map<PMInfo,PMInfo> m1 = (Map<PMInfo,PMInfo>) state1;
-    Map<PMInfo,PMInfo> m2 = (Map<PMInfo,PMInfo>) state2;
+    Map<String,PMInfo> m1 = (Map<String,PMInfo>) state1;
+    Map<String,PMInfo> m2 = (Map<String,PMInfo>) state2;
 
     for ( PMInfo pi2 : m2.values() ) {
       PMInfo pi1 = m1.get(pi2);
 
       if ( pi1 == null ) {
-        m1.put(pi2, pi2);
+        m1.put(pi2.getKey() + ":" + pi2.getName(), pi2);
       } else {
         pi1.reduce(pi2);
       }
@@ -104,12 +101,18 @@ public class FoldReducePMLogger
 
 
   public synchronized DAO asDAO() {
-    Map  m   = (Map) getState();
-    MDAO dao = new MDAO(foam.nanos.pm.PMInfo.getOwnClassInfo());
+    return new ProxyDAO() {
+      public DAO getDelegate() {
+        synchronized ( FoldReducePMLogger.this ) {
+          Map  m   = (Map) getState();
+          MDAO dao = new MDAO(foam.nanos.pm.PMInfo.getOwnClassInfo());
 
-    for ( Object pi : m.values() ) dao.put((PMInfo) pi);
+          for ( Object pi : m.values() ) dao.put((PMInfo) pi);
 
-    return dao;
+          return dao;
+        }
+      }
+    };
   }
 
 }
