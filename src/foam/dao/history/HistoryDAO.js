@@ -134,9 +134,8 @@ foam.CLASS({
       User agent = subject.getRealUser();
       FObject current = this.find_(x, obj);
       Object objectId = obj.getProperty("id");
-      boolean isCreate = current == null;
 
-      if ( isCreate ) {
+      if ( current == nul ) {
         // do "put" first if it is "create" action.
         FObject persistObject = super.put_(x, obj);
         objectId = persistObject.getProperty("id");
