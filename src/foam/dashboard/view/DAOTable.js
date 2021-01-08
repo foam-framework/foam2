@@ -54,5 +54,8 @@ foam.CLASS({
       padding-left: 20px;
       padding-right: 20px;
     }
+//    ^ .table-row:last-child > *{
+//      border-bottom: none;
+//    }
   `
 });
