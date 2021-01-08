@@ -990,7 +990,6 @@ return this;`
 
       return self;
     },
-
     function toMQL() {
       var mqlStringsArr = [];
       for ( var a in this.args ) {
@@ -1252,7 +1251,6 @@ return this;`
         return this;
       }
     },
-
     function toMQL() {
       var mqlStringsArr = [];
       for ( var a in this.args ) {
