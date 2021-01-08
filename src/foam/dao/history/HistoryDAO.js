@@ -24,7 +24,8 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'java.util.ArrayList',
     'java.util.Date',
-    'static foam.mlang.MLang.EQ'
+    'static foam.mlang.MLang.EQ',
+    'foam.util.SafetyUtil'
   ],
 
   messages: [
@@ -128,34 +129,46 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-        Subject subject = (Subject) x.get("subject");
-        User user = subject.getUser();
-        User agent = subject.getRealUser();
-        FObject current = this.find_(x, obj);
-    
+      Subject subject = (Subject) x.get("subject");
+      User user = subject.getUser();
+      User agent = subject.getRealUser();
+      FObject current = this.find_(x, obj);
+      Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
+      boolean isCreate = objectId == null || 
+                          current == null ||
+                          SafetyUtil.isEmpty(String.valueOf(objectId)) ||
+                          new Long(0L).equals(objectId);
+      if ( isCreate ) {
+        // do "put" first if it is "create" action.
+        FObject persistObject = super.put_(x, obj);
+        objectId = ((PropertyInfo) persistObject.getClassInfo().getAxiomByName("id")).f(obj);
+        HistoryRecord historyRecord = new HistoryRecord();
+        historyRecord.setObjectId(objectId);
+        historyRecord.setUser(formatUserName(user));
+        historyRecord.setAgent(formatUserName(agent));
+        historyRecord.setTimestamp(new Date());
+        getHistoryDAO().put_(x, historyRecord);
+        return persistObject;
+      } else {
         try {
           // add new history record
-          Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
           HistoryRecord historyRecord = new HistoryRecord();
           historyRecord.setObjectId(objectId);
           historyRecord.setUser(formatUserName(user));
           historyRecord.setAgent(formatUserName(agent));
           historyRecord.setTimestamp(new Date());
-          if ( current != null ) {
-            FObjectFormatter formatter = formatter__.get();
-            if ( ! formatter.maybeOutputDelta(current, obj) ) {
-              return super.put_(x, obj);
-            }
-            historyRecord.setUpdates(getUpdatedProperties(x, current, obj));
+          FObjectFormatter formatter = formatter__.get();
+          if ( ! formatter.maybeOutputDelta(current, obj) ) {
+            return super.put_(x, obj);
           }
-    
+          historyRecord.setUpdates(getUpdatedProperties(x, current, obj));
           getHistoryDAO().put_(x, historyRecord);
         } catch (Throwable t) {
           Logger l = (Logger) x.get("logger");
           l.error(CREATE_ERROR_MSG, obj.getClassInfo().getId(), t);
         }
-    
         return super.put_(x, obj);
+      }
       `
     },
     {
