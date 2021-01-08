@@ -133,7 +133,7 @@ foam.CLASS({
       User user = subject.getUser();
       User agent = subject.getRealUser();
       FObject current = this.find_(x, obj);
-      Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
+      Object objectId = obj.getProperty("id");
       boolean isCreate = objectId == null || 
                           current == null ||
                           SafetyUtil.isEmpty(String.valueOf(objectId)) ||
@@ -141,7 +141,7 @@ foam.CLASS({
       if ( isCreate ) {
         // do "put" first if it is "create" action.
         FObject persistObject = super.put_(x, obj);
-        objectId = ((PropertyInfo) persistObject.getClassInfo().getAxiomByName("id")).f(obj);
+        objectId = persistObject.getProperty("id");
         HistoryRecord historyRecord = new HistoryRecord();
         historyRecord.setObjectId(objectId);
         historyRecord.setUser(formatUserName(user));
