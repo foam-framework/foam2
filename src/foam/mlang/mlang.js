@@ -766,10 +766,7 @@ getArg2().prepareStatement(stmt);`
       `
     },
     function arg2ToMQL() {
-      if ( this.arg2 && this.arg2.value && foam.Date.isInstance(this.arg2.value) ) {
-        return new Date(this.arg2.value).toISOString();
-      }
-      return this.arg2 && this.arg2.value;
+      return this.arg2 && this.arg2.toMQL ? this.arg2.toMQL() : this.arg2;
     },
     function toMQL() {
       if ( ! this.MQL_KEY  )
@@ -1827,6 +1824,11 @@ foam.CLASS({
     // TODO(adamvy): Re-enable when we can parse this in java more correctly.
     function xxoutputJSON(os) {
       os.output(this.value);
+    },
+    function toMQL() {
+      if ( this.value && foam.Date.isInstance(this.value) )
+        return new Date(this.value).toISOString();
+      return this.value;
     }
   ]
 });
