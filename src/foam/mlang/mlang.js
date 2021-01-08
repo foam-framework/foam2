@@ -1812,8 +1812,10 @@ foam.CLASS({
       os.output(this.value);
     },
     function toMQL() {
-      if ( this.value && foam.Date.isInstance(this.value) )
-        return new Date(this.value).toISOString();
+      if ( this.value && foam.Date.isInstance(this.value) ) {
+        var isoDateString = this.value.toISOString();
+        return isoDateString.substr(0, isoDateString.indexOf(':', isoDateString.indexOf(':') + 1));
+      }
       return this.value;
     }
   ]
