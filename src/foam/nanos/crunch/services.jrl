@@ -177,6 +177,7 @@ p({
   "description": "DAO containing any modifications made to userCapabilityJunctions",
   "serve": true,
   "lazy": false,
+  "enabled":false,
   "authNotes": "Protected by service-level access control. This service requires the 'service.userCapabilityJunctionHistoryDAO' permission to access.",
   "serviceScript":
   """
