@@ -95,7 +95,7 @@ foam.CLASS({
               ucj = new UserCapabilityJunction.Builder(x).setSourceId(user.getId()).setTargetId(capability.getId()).build();
             ucj.setStatus(CapabilityJunctionStatus.GRANTED);
             ucj = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, ucj);
-            if ( ucj == null || ucj.getStatus() !=foam.nanos.crunch.CapabilityJunctionStatus.GRANTED )
+            if ( ucj == null || ucj.getStatus() != CapabilityJunctionStatus.GRANTED )
               throw new RuntimeException("Error setting up UserCapabilityJunction for user: " + user.getId() + " and spid: " + getId());
           }
         } catch (Exception e) {

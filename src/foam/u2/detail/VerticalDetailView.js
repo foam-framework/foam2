@@ -14,6 +14,14 @@ foam.CLASS({
     'foam.u2.layout.Rows'
   ],
 
+  properties: [
+    {
+      name: 'config'
+      // Map of property-name: {map of property overrides} for configuring properties
+      // values include 'label', 'units', and 'view'
+    },
+  ],
+
   methods: [
     function initE() {
       var self = this;
@@ -29,7 +37,8 @@ foam.CLASS({
                   if ( ! isAvailable ) return self.E().style({ display: 'none' });
                   return self.E().start(self.SectionView, {
                     data$: self.data$,
-                    section: s
+                    section: s,
+                    config: self.config
                   })
                   .end();
                 })

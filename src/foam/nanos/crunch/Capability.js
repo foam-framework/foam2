@@ -480,6 +480,9 @@ foam.CLASS({
             status = CapabilityJunctionStatus.ACTION_REQUIRED;
             break;
           case PENDING_REVIEW :
+            // note: this shouldn't happen since PENDING_REVIEW is
+            // only used for UI purposes, and ucjs are never stored
+            // in this status
             status = CapabilityJunctionStatus.ACTION_REQUIRED;
             break;
           default :

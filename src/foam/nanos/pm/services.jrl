@@ -1,4 +1,4 @@
-p({"class":"foam.nanos.boot.NSpec", "name":"pmLogger","lazy":true,"serve":false,"serviceClass":"foam.nanos.pm.DAOPMLogger"})
+p({"class":"foam.nanos.boot.NSpec", "name":"pmLogger","lazy":true,"serve":false,"serviceClass":"foam.nanos.pm.FoldReducePMLogger"})
 
 p({"class":"foam.nanos.boot.NSpec", "name":"pm1MinuteDAO","lazy":true,"serve":true,"serviceScript":"return new foam.dao.MDAO(foam.nanos.analytics.Candlestick.getOwnClassInfo());","client":"{\"of\":\"foam.nanos.analytics.Candlestick\"}" })
 
@@ -47,7 +47,7 @@ p({
   "name":"pmInfoDAO",
   "serve":true,
   "serviceScript":`
-    return new foam.nanos.pm.PMInfoMDAO().orderBy(foam.mlang.MLang.DESC(foam.nanos.pm.PMInfo.TOTAL_TIME));
+    return x.get("pmLogger").asDAO().orderBy(foam.mlang.MLang.DESC(foam.nanos.pm.PMInfo.TOTAL_TIME));
   `,
   "client":"{\"of\":\"foam.nanos.pm.PMInfo\", \"remoteListenerSupport\": false}"
 })
@@ -68,5 +68,3 @@ p({
   """,
   "client":"{\"of\":\"foam.nanos.pm.PM\", \"remoteListenerSupport\": false}"
 })
-
-p({class:"foam.nanos.boot.NSpec",name:"PM",description:"Configurable PM Factory",authenticate:false,pm:false,service:{class:"foam.nanos.pm.PMFactory",percentage:1}})
