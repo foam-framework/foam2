@@ -223,8 +223,7 @@ foam.CLASS({
       writePermissionRequired: true,
       documentation: `
         Need to override getter to return "" because its trying to
-        return null (probably as a result of moving order of files
-        in nanos), which breaks tests
+        return null which breaks tests
       `,
       javaGetter: `
         if ( ! spidIsSet_ ) {

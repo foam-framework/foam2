@@ -16,12 +16,16 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.auth.CreatedAware',
-// REVIEW: implementation properties are class: 'Long' as we have a cyclic reference with User, and hence can't use class: 'Reference'. But even as Long, enable these interfaces causes genjava failures: ERROR: Unhandled promise rejection TypeError: Cannot read property 'id' of null
-//    'foam.nanos.auth.CreatedByAware',
+    // REVIEW: implementation properties are class: 'Long' as we have a cyclic reference with User, and hence can't use class: 'Reference'. But even as Long, enable these interfaces causes genjava failures: ERROR: Unhandled promise rejection TypeError: Cannot read property 'id' of null
+    // 'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.EnabledAware',
     'foam.nanos.auth.LastModifiedAware',
-//    'foam.nanos.auth.ServiceProviderAware',
-//    'foam.nanos.auth.LastModifiedByAware'
+    // 'foam.nanos.auth.LastModifiedByAware',
+
+    // NOTE: this class cannot implement ServiceProviderAware as it itself is used
+    // during ServiceProviderAwareDAO operations as a fallback to determine the
+    // spid based on url and theme.
+    // 'foam.nanos.auth.ServiceProviderAware'
   ],
 
   requires: [

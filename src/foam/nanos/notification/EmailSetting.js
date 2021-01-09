@@ -75,8 +75,6 @@ foam.CLASS({
         }
 
         EmailMessage message = new EmailMessage();
-        Logger logger = (Logger) x.get("logger");
-        logger.info("EmailSetting", "spid from user", user.getSpid());
         message.setSpid(user.getSpid());
         message.setTo(new String[] { user.getEmail() });
         notification = (Notification) notification.fclone();
@@ -104,7 +102,7 @@ foam.CLASS({
             EmailsUtility.sendEmailFromTemplate(x, user, message, notification.getEmailName(), notification.getEmailArgs());
           }
         } catch(Throwable t) {
-          //Logger logger = (Logger) x.get("logger");
+          Logger logger = (Logger) x.get("logger");
           logger.error("Error sending notification email message: " + message + ". Error: " + t);
         }
       `
