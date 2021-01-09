@@ -14,6 +14,10 @@ foam.CLASS({
     capability to user.
   `,
 
+  implements: [
+    'foam.nanos.auth.LifecycleAware'
+  ],
+
   requires: [
     'foam.nanos.crunch.CapabilityJunctionPayload'
   ],
@@ -115,6 +119,14 @@ foam.CLASS({
       javaSetter: `
         getPayload().setStatus(val);
       `
+    },
+    {
+      name: 'lifecycleState',
+      class: 'Enum',
+      of: 'foam.nanos.auth.LifecycleState',
+      value: 'ACTIVE',
+      visibility: 'RO',
+      includeInDigest: true,
     },
     {
       class: 'Reference',

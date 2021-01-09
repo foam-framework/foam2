@@ -24,6 +24,7 @@ foam.CLASS({
     'foam.mlang.predicate.Predicate',
     'foam.nanos.app.AppConfig',
     'foam.nanos.logger.Logger',
+    'foam.nanos.session.Session',
     'foam.nanos.theme.Theme',
     'foam.nanos.theme.Themes',
     'foam.util.SafetyUtil',
@@ -61,22 +62,33 @@ foam.CLASS({
                             .map(ServiceProvider::getId)
                             .filter(id -> auth.check(x, "serviceprovider.read."+id))
                             .collect(Collectors.toList());
-      String spid = (String) x.get("spid");
-      Subject subject = (Subject) x.get("subject");
-      if ( subject != null ) {
-        User user = subject.getUser();
-        if ( user != null &&
-             ! SafetyUtil.isEmpty(user.getSpid()) ) {
-          spid = user.getSpid();
-        }
-      }
       if ( ids.size() == 1 ) {
         return MLang.EQ(getPropertyInfo(), ids.get(0));
       } else if ( ids.size() > 1 ) {
         return MLang.IN(getPropertyInfo(), ids.toArray(new String[0]));
       }
-      ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "sps", serviceProviders.stream().map(ServiceProvider::getId).collect(Collectors.joining(",")), "ids", ids.stream().collect(Collectors.joining(",")), "spid", spid);
       throw new AuthorizationException();
+      `
+    },
+    {
+      description: `Return true if system/admin context`,
+      name: 'isAdmin',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      type: 'Boolean',
+      javaCode: `
+      Subject subject = (Subject) x.get("subject");
+      if ( subject != null ) {
+        User user = subject.getRealUser();
+        if ( user != null ) {
+          return user.isAdmin();
+        }
+      }
+      return false;
       `
     },
     {
@@ -93,10 +105,11 @@ foam.CLASS({
       String spid = (String) x.get("spid");
       Subject subject = (Subject) x.get("subject");
       if ( subject != null ) {
-        User user = subject.getUser();
-        if ( user != null &&
-             ! SafetyUtil.isEmpty(user.getSpid()) ) {
-          spid = user.getSpid();
+        User user = subject.getRealUser();
+        if ( user != null ) {
+          if ( ! SafetyUtil.isEmpty(user.getSpid()) ) {
+             spid = user.getSpid();
+          }
         }
       }
       if ( SafetyUtil.isEmpty(spid) ) {
@@ -125,10 +138,7 @@ foam.CLASS({
 
       Object id = obj.getProperty("id");
       FObject oldObj = getDelegate().inX(x).find(id);
-      boolean isCreate = id == null ||
-                         oldObj == null ||
-                         SafetyUtil.isEmpty(String.valueOf(id)) ||
-                         new Long(0L).equals(id);
+      boolean isCreate = id == null || oldObj == null;
 
       ServiceProviderAware sp = (ServiceProviderAware) obj;
       ServiceProviderAware oldSp = (ServiceProviderAware) oldObj;
@@ -139,13 +149,6 @@ foam.CLASS({
           sp.setSpid(getSpid(x));
         } else if ( ! sp.getSpid().equals(getSpid(x)) &&
                     ! auth.check(x, "serviceprovider.create." + sp.getSpid()) ) {
-          // net.nanopay.auth.UserCreateServiceProviderURLRule may have set the spid.
-          Subject subject = (Subject) x.get("subject");
-          User user = null;
-          if ( subject != null ) {
-            user = subject.getUser();
-          }
-          ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "put_", "context.spid", getSpid(x), "obj.spid", sp.getSpid(), "user", (user == null ? "null" : user.getLegalName()+", group"+user.getGroup()));
           throw new AuthorizationException();
         }
       } else if ( ! sp.getSpid().equals(oldSp.getSpid()) &&
@@ -163,37 +166,53 @@ foam.CLASS({
     {
       name: 'find_',
       javaCode: `
-      if ( ((AuthService) x.get("auth")).check(x, "serviceprovider.read."+ServiceProviderAware.GLOBAL_SPID) ) {
+      if ( isAdmin(x) ) {
         return getDelegate().find_(x, id);
       }
+
       return getDelegate().where(getPredicate(x)).find_(x, id);
       `
     },
     {
       name: 'remove_',
       javaCode: `
-      if ( ((AuthService) x.get("auth")).check(x, "serviceprovider.delete."+ServiceProviderAware.GLOBAL_SPID) ||
-           ((AuthService) x.get("auth")).check(x, "serviceprovider.delete."+((ServiceProviderAware) obj).getSpid()) ) {
+      if ( isAdmin(x) ||
+           getPredicate(x).f(obj) ) {
         return getDelegate().remove_(x, obj);
       }
+
       throw new AuthorizationException();
       `
     },
     {
       name: 'select_',
       javaCode: `
-      if ( ((AuthService) x.get("auth")).check(x, "serviceprovider.read."+ServiceProviderAware.GLOBAL_SPID) ) {
-        return super.select_(x, sink, skip, limit, order, predicate);
+      Predicate spidPredicate = predicate;
+      if ( ! isAdmin(x) ) {
+        try {
+          spidPredicate = getPredicate(x);
+        } catch ( AuthorizationException e ) {
+          // NOTE: On Login, context is empty of subject and spid
+          Subject subject = (Subject) x.get("subject");
+          if ( ( subject == null ||
+                 subject.getRealUser() == null ) &&
+               x.get("spid") == null ) {
+            spidPredicate = null;
+            ((Logger) x.get("logger")).debug(this.getClass().getSimpleName(), "select", "login", "spid restrictions disabled.");
+          } else {
+            throw e;
+          }
+        }
+        if ( predicate != null &&
+             spidPredicate != null ) {
+          spidPredicate = MLang.AND(
+            spidPredicate,
+            predicate
+          );
+        } else if ( spidPredicate == null ) {
+          spidPredicate = predicate;
+        }
       }
-
-      Predicate spidPredicate = getPredicate(x);
-      if ( predicate != null ) {
-        spidPredicate = MLang.AND(
-          spidPredicate,
-          predicate
-        );
-      }
-
       return getDelegate().select_(x, sink, skip, limit, order, spidPredicate);
       `
     }

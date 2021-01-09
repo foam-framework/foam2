@@ -125,9 +125,7 @@ public class SessionServerBox
           // Allow admin to login in locally during startup
           if ( session.getUserId() > 0 ) {
             User user = (User) ((DAO) getX().get("localUserDAO")).find_(getX(), session.getUserId());
-            if ( user != null &&
-                 ( user.getGroup() == "system" ||
-                   user.getGroup() == "admin" ) ) {
+            if ( user.isAdmin() ) {
               session.setClusterable(false);
               session = (Session) sessionDAO.put(session);
             }
