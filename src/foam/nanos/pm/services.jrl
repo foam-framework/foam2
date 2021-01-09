@@ -68,3 +68,14 @@ p({
   """,
   "client":"{\"of\":\"foam.nanos.pm.PM\", \"remoteListenerSupport\": false}"
 })
+
+p({
+  class:"foam.nanos.boot.NSpec",
+  name:"PM",description:"Configurable PM Factory",
+  authenticate:false,
+  pm:false,
+  service:{
+    class:"foam.nanos.pm.PMFactory",
+    percentage:100
+  }
+})
