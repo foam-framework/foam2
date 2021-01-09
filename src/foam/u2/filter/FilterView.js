@@ -283,7 +283,10 @@ foam.CLASS({
 
       if ( this.memento && this.memento.paramsObj.f ) {
         this.memento.paramsObj.f.forEach(f => {
-          self.filterController.setExistingPredicate(f.criteria, f.n, foam.json.parseString(f.pred, this.__subContext__));
+          var parser = foam.parse.QueryParser.create({ of: self.dao.of.id });
+          var pred = parser.parseString(f.pred);
+
+          self.filterController.setExistingPredicate(f.criteria, f.n, pred);
         });
       }
 
