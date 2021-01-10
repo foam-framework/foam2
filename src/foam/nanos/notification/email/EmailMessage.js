@@ -13,7 +13,8 @@ foam.CLASS({
   implements: [
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
-    'foam.nanos.auth.LastModifiedByAware'
+    'foam.nanos.auth.LastModifiedByAware',
+    'foam.nanos.auth.ServiceProviderAware'
   ],
 
   tableColumns: [
@@ -33,7 +34,14 @@ foam.CLASS({
       name: 'templateInformation',
       title: 'Template Arguments',
       order: 2
-    }
+    },
+    {
+      name: 'systemInformation',
+      help: 'Properties that are used internally by the system.',
+      title: 'System Information',
+      order: 3,
+      permissionRequired: true
+    },
   ],
 
   properties: [
@@ -149,6 +157,26 @@ foam.CLASS({
       includeInDigest: true,
       section: 'templateInformation',
       view: { class: 'foam.u2.view.MapView' }
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
+      name: 'spid',
+      includeInDigest: true,
+      tableWidth: 120,
+      section: 'systemInformation',
+      writePermissionRequired: true,
+      documentation: `
+        Need to override getter to return "" because its trying to
+        return null (probably as a result of moving order of files
+        in nanos), which breaks tests
+      `,
+      javaGetter: `
+        if ( ! spidIsSet_ ) {
+          return "";
+        }
+        return spid_;
+      `
     }
   ]
 });

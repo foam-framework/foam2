@@ -76,13 +76,14 @@ p({
   "name":"userCapabilityJunctionDAO",
   "serve":true,
   "serviceScript":"""
-    dao = new foam.dao.EasyDAO.Builder(x)
+    return new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(false)
       .setInnerDAO(x.get("bareUserCapabilityJunctionDAO"))
       .setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo())
+      .setDecorator(new foam.nanos.crunch.UserCapabilityJunctionDAO.Builder(x)
+        .setDelegate(new foam.dao.NullDAO(x, foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo()))
+        .build())
       .build();
-    userCap =  new foam.nanos.crunch.UserCapabilityJunctionDAO.Builder(x).setDelegate(dao).build();
-    return userCap;
   """,
   "client":"{\"of\":\"foam.nanos.crunch.UserCapabilityJunction\", \"remoteListenerSupport\": false}"
 })

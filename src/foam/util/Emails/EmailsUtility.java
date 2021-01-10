@@ -63,6 +63,10 @@ public class EmailsUtility {
     }
     userX = userX.put("appConfig", appConfig);
 
+    if ( SafetyUtil.isEmpty(emailMessage.getSpid()) ) {
+      emailMessage.setSpid(user.getSpid());
+    }
+
     SupportConfig supportConfig = theme.getSupportConfig();
     EmailConfig supportEmailConfig = supportConfig.getEmailConfig();
 

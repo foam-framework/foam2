@@ -262,14 +262,6 @@ foam.CLASS({
             delegate = new foam.dao.ValidatingDAO(getX(), delegate, foam.core.ValidatableValidator.instance());
         }
 
-        if ( getServiceProviderAware() ) {
-          foam.nanos.auth.ServiceProviderAwareDAO dao = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX()).setDelegate(delegate).build();
-          if ( getServiceProviderAwarePropertyInfos() != null ) {
-            dao.setPropertyInfos(getServiceProviderAwarePropertyInfos());
-          }
-          delegate = dao;
-        }
-
         if ( getLifecycleAware() ) {
           delegate = new foam.nanos.auth.LifecycleAwareDAO.Builder(getX())
             .setDelegate(delegate)
@@ -279,6 +271,12 @@ foam.CLASS({
 
         if ( getDeletedAware() ) {
           System.out.println("DEPRECATED: Will be completely removed after services journal migration script. No functionality as of now.");
+        }
+
+        if ( getServiceProviderAware() ) {
+          delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX())
+            .setDelegate(delegate)
+            .build();
         }
 
         if ( getRuler() ) {

@@ -647,8 +647,7 @@ foam.CLASS({
 
         // Prevent privilege escalation by only allowing a user's group to be
         // set to one that the user doing the put has permission to update.
-        boolean hasGroupUpdatePermission = auth.check(x, "group.update." + this.getGroup());
-        if ( ! hasGroupUpdatePermission ) {
+        if ( ! auth.check(x, "group.update." + this.getGroup()) ) {
           throw new AuthorizationException("You do not have permission to set that user's group to '" + this.getGroup() + "'.");
         }
       `
