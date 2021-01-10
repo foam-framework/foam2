@@ -117,7 +117,7 @@ foam.CLASS({
 
         // REPLY TO:
         if ( ! emailMessage.isPropertySet("replyTo") && ! SafetyUtil.isEmpty(getReplyTo()) ) {
-            emailMessage.setReplyTo(templateEngine.renderTemplate(x, getReplyTo(), templateArgs).toString());
+          emailMessage.setReplyTo(templateEngine.renderTemplate(x, getReplyTo(), templateArgs).toString());
         }
 
         // DISPLAY NAME:
