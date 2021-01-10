@@ -212,7 +212,11 @@ foam.CLASS({
         entry.setPromoted(true);
         entry = (MedusaEntry) getDelegate().put_(x, entry);
 
-        entry = mdao(x, entry);
+        try {
+          entry = mdao(x, entry);
+        } catch( IllegalArgumentException e ) {
+          // nop - already reported - occurs when a DAO is removed.
+        }
 
         // Notify any blocked Primary puts
         MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
@@ -417,6 +421,9 @@ foam.CLASS({
         }
 
         return entry;
+      } catch (IllegalArgumentException e) {
+        pm.error(x, e);
+        throw e;
       } catch (Throwable t) {
         pm.error(x, t);
         getLogger().error(t);

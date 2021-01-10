@@ -38,6 +38,7 @@ configuration for contacting the primary node.`,
     'static foam.mlang.MLang.COUNT',
     'foam.mlang.sink.Count',
     'foam.mlang.predicate.Predicate',
+    'foam.nanos.alarming.Alarm',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
@@ -990,6 +991,7 @@ configuration for contacting the primary node.`,
       } finally {
         pm.log(x);
       }
+      ((DAO) x.get("alarmDAO")).put(new Alarm("Medusa MDAO not found: "+serviceName));
       throw new IllegalArgumentException("MDAO not found: "+serviceName);
       `
     },
