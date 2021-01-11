@@ -13,6 +13,7 @@ import java.util.*;
 class LocalState {
   FoldReducer fr_;
   Object      state_;
+  /** True iff this LocalState is currently known to the FoldReducer. **/
   boolean     connected_ = false;
 
   public LocalState(FoldReducer fr) {

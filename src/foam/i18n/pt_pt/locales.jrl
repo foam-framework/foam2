@@ -356,3 +356,13 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.search.IntegerSearchView
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.search.IntegerSearchView.LABEL_LTE",target:"é menor ou igual a"})
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.FilterView.LABEL_SEARCH",target:"Pesquisa"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.AdvancedFilterView.TITLE_HEADER",target:"Filtros Avançados"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.AdvancedFilterView.LABEL_CRITERIA",target:"Critério"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.AdvancedFilterView.LABEL_REMOVE",target:"Retirar"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.AdvancedFilterView.LABEL_RESULTS",target:"Visualização dos resultados do filtro: "})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.AdvancedFilterView.LABEL_INSTRUCTION",target:"No Modo Avançado, os resultados são uma acumulação de cada critério. Dentro de cada critério, os resultados serão um reflexo que corresponde totalmente à sua seleção"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.AdvancedFilterView.ADD_CRITERIA.label",target:"Adicionar outro critério"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.AdvancedFilterView.CLOSE_MODAL.label",target:"Cancelar"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.AdvancedFilterView.CLEAR_ALL.label",target:"Limpar mudanças"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.AdvancedFilterView.FILTER.label",target:"Aplicar filtros"})

@@ -491,6 +491,53 @@ foam.CLASS({
         return status;
 
       `
+    },
+    {
+      name: 'maybeReopen',
+      type: 'Boolean',
+      args: [
+        { name: 'x', javaType: 'foam.core.X' },
+        { name: 'ucj', javaType: 'foam.nanos.crunch.UserCapabilityJunction' }
+      ],
+      documentation: `
+        Returns true if the ucj or one of its prerequistite ucjs of the target capability
+        are granted but not in an reopenable state
+      `,
+      javaCode: `
+        if ( ! getEnabled() ) return false; 
+
+        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+        CrunchService crunchService = (CrunchService) x.get("crunchService");
+
+        boolean shouldReopenTopLevel = shouldReopenUserCapabilityJunction(ucj);
+        if ( shouldReopenTopLevel ) return true;
+
+        var prereqs = crunchService.getPrereqs(getId());
+        if ( prereqs == null || prereqs.size() == 0 ) return false;
+
+        for ( var capId : prereqs ) {
+          Capability cap = (Capability) capabilityDAO.find(capId);
+          if ( cap == null ) throw new RuntimeException("Cannot find prerequisite capability");
+          UserCapabilityJunction prereq = crunchService.getJunction(x, capId);
+          if ( cap.maybeReopen(x, prereq) ) return true;
+        }
+        return false;
+      `
+    },
+    {
+      name: 'shouldReopenUserCapabilityJunction',
+      type: 'Boolean',
+      args: [
+        { name: 'ucj', javaType: 'foam.nanos.crunch.UserCapabilityJunction' }
+      ],
+      javaCode: `
+        if ( ucj == null ) return true;
+        else if ( ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ucj.getIsRenewable() ) return true;
+        else if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED &&
+                  ucj.getStatus() != CapabilityJunctionStatus.PENDING &&
+                  ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return true;
+        return false;
+      `
     }
   ]
 });
