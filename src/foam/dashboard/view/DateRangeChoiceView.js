@@ -14,6 +14,9 @@ foam.CLASS({
   css: `
     ^ .foam-u2-tag-Select {
       border: none;
+      font-size: 13px;
+      color: gray;
+      padding: 0;
     }
   `,
 
@@ -58,7 +61,6 @@ foam.CLASS({
       var self = this;
       this.addClass(this.myClass())
         .start(this.QUALIFIER)
-          .start('div').addClass(this.myClass('carrot')).end()
         .end();
     }
   ]
