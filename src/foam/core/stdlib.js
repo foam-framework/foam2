@@ -124,6 +124,17 @@ foam.LIB({
 
 
 foam.LIB({
+  name: 'foam.Promise',
+  methods: [
+    function reduce(arry, fn, parentPromise) {
+      parentPromise = parentPromise || Promise.resolve();
+      return arry.reduce((p, v) => p.then(() => fn(v)), parentPromise);
+    },
+  ]
+});
+
+
+foam.LIB({
   name: 'foam.Function',
   methods: [
     function isInstance(o) { return typeof o === 'function'; },
