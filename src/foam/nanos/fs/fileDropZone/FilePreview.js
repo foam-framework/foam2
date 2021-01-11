@@ -38,15 +38,14 @@ foam.CLASS({
               'max-height': '100%'
             })
           .end()
-          .start('iframe')
-            .addClass('file-iframe' + this.id)
-            .style({
-              'visibility': 'hidden',
-              'height': '100%',
-              'width': '100%',
-              'position': 'absolute'
-            })
-          .end()
+        .end()
+        .start('iframe')
+          .addClass('file-iframe' + this.id)
+          .style({
+            'visibility': 'hidden',
+            'height': '0px',
+            'width': '0px'
+          })
         .end();
       this.data$.sub(() => this.showData());
     },
@@ -81,6 +80,8 @@ foam.CLASS({
         iFrame.src = url;
         iFrame.style.visibility = 'visible';
         iFrame.style.display = 'block';
+        iFrame.style.height = '100%';
+        iFrame.style.width = '100%';
       }
     }
   ]
