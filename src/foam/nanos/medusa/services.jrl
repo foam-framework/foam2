@@ -10,10 +10,10 @@ p({
 
 p({
   "class": "foam.nanos.boot.NSpec",
-  "name": "check",
+  "name": "health",
   "lazy": false,
   "authenticate": false,
-  "serviceClass": "foam.nanos.medusa.CheckWebAgent"
+  "serviceClass": "foam.nanos.medusa.HealthCheckWebAgent"
 })
 
 p({

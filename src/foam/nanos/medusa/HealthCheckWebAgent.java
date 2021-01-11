@@ -16,7 +16,7 @@ import java.io.PrintWriter;
    to add/remove targets from target group.
    Responses from haproxy.org
  */
-public class CheckWebAgent
+public class HealthCheckWebAgent
   implements WebAgent
 {
   @Override
