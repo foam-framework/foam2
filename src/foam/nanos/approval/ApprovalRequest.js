@@ -631,7 +631,7 @@
             .then(obj => !! obj)
             .catch(err => {
               console.warn(err.message || err);
-              if ( self.refObjId && self.refDaoKey && self.__subContext__[self.refDaoKey_] ) {
+              if ( self.refObjId && self.refDaoKey && self.__subContext__[self.refDaoKey] ) {
                 property = self.__subContext__[self.refDaoKey].of.ID;
                 objId = property.adapt.call(property, self.refObjId, self.refObjId, property);
                 return self.__subContext__[self.refDaoKey]
@@ -663,7 +663,7 @@
           property = X[daoKey].of.ID;
           objId = property.adapt.call(property, self.refObjId, self.refObjId, property);
         } else {
-          daoKey = self.daoKey_;
+          daoKey = self.daoKey;
           property = X[daoKey].of.ID;
           objId = property.adapt.call(property, self.objId, self.objId, property);
         }
