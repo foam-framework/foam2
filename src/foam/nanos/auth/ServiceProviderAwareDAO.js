@@ -102,17 +102,19 @@ foam.CLASS({
       type: 'String',
       javaThrows: ['AuthorizationException'],
       javaCode: `
+      User user = null;
       String spid = (String) x.get("spid");
       Subject subject = (Subject) x.get("subject");
       if ( subject != null ) {
-        User user = subject.getRealUser();
+        user = subject.getRealUser();
         if ( user != null ) {
           if ( ! SafetyUtil.isEmpty(user.getSpid()) ) {
              spid = user.getSpid();
           }
         }
       }
-      if ( SafetyUtil.isEmpty(spid) ) {
+      if ( SafetyUtil.isEmpty(spid) ||
+           user != null && user.isAdmin() ) {
         Theme theme = ((Themes) x.get("themes")).findTheme(x);
         if ( theme != null &&
              ! SafetyUtil.isEmpty(theme.getSpid()) ) {
