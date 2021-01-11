@@ -91,7 +91,7 @@ foam.CLASS({
           of: this.of,
         }, this).sections.map(section => this.WizardletSection.create({
           section: section,
-          data$: this.data$,
+          wizardlet: this,
           isAvailable$: section.createIsAvailableFor(
             this.data$,
           )
