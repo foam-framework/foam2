@@ -47,10 +47,7 @@ foam.CLASS({
             getApprovalRequestDAO().where(
               AND(
                 EQ(ApprovalRequest.OBJ_ID, result.getProperty("id")),
-                OR(
-                  EQ(ApprovalRequest.DAO_KEY, getDaoKey()),
-                  EQ(ApprovalRequest.SERVER_DAO_KEY, getDaoKey())
-                )
+                EQ(ApprovalRequest.DAO_KEY, getDaoKey())
               )
             ).select(new ArraySink())).getArray();
 
