@@ -635,6 +635,7 @@ FOAM_FILES([
   { name: "foam/u2/crunch/CapabilityStore", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityInterceptView", flags: ['web'] },
   { name: "foam/u2/crunch/PermissionsStringArrayView", flags: ['web'] },
+  { name: "foam/u2/crunch/FlatteningCapabilityWizardlet" },
   { name: "foam/u2/crunch/lab/CapabilityGraphNodeView", flags: ['web'] },
   { name: "foam/u2/crunch/lab/CrunchLab", flags: ['web'] },
   { name: "foam/apploader/ModelRefines" },
@@ -995,6 +996,10 @@ FOAM_FILES([
   { name: 'foam/nanos/fs/fileDropZone/FileCard', flags: ['web'] },
   { name: 'foam/nanos/fs/fileDropZone/FilePreview', flags: ['web'] },
   { name: 'foam/nanos/fs/TextSaveView' },
+
+  { name: 'foam/counter/Counter' },
+  { name: 'foam/dashboard/view/DashboardCitationView' },
+  { name: 'foam/dashboard/view/DateRangeChoiceView' },
   { name: 'foam/nanos/fs/AgreementView' }
 
 ])

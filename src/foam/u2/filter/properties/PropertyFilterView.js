@@ -199,9 +199,7 @@ foam.CLASS({
 
         var pred;
         if ( Object.keys(this.view_.predicate).length > 0 && ! foam.mlang.predicate.True.isInstance(this.view_.predicate) )
-          pred =  foam.json.Outputter.create({
-            strict: true
-          }).stringify(this.view_.predicate);
+        pred =  this.view_.predicate.toMQL && this.view_.predicate.toMQL();
 
         if ( pred ) {
           var newFilterValue = { criteria: this.criteria, n: this.property.name, pred: pred }

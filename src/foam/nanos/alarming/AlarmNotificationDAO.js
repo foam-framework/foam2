@@ -14,7 +14,8 @@ foam.CLASS({
   javaImports: [
     'foam.dao.DAO',
     'foam.log.LogLevel',
-    'foam.nanos.notification.Notification'
+    'foam.nanos.notification.Notification',
+    'java.util.HashMap'
   ],
 
   properties: [
@@ -59,19 +60,20 @@ foam.CLASS({
       body.append("\\ninfo: ");
       body.append(alarm.getNote());
 
+      HashMap args = new HashMap();
+      args.put("alarm.name", alarm.getName());
+      args.put("alarm.status", alarm.getIsActive() ? "Active" : "Cleared");
+      args.put("alarm.severity", alarm.getSeverity().getLabel());
+      args.put("alarm.host", alarm.getHostname());
+      args.put("alarm.started", alarm.getCreated().toString());
+      args.put("alarm.cleared", alarm.getIsActive() ? "" : alarm.getLastModified().toString());
+      args.put("alarm.note", alarm.getNote());
+
       Notification notification = new Notification.Builder(x)
         .setGroupId(getGroup())
         .setSeverity(alarm.getSeverity())
         .setEmailName("alarm")
-        .setEmailArgs(java.util.Map.of(
-                         "alarm.name", alarm.getName(),
-                         "alarm.status", alarm.getIsActive() ? "Active" : "Cleared",
-                         "alarm.severity", alarm.getSeverity().getLabel(),
-                         "alarm.host", alarm.getHostname(),
-                         "alarm.started", alarm.getCreated().toString(), // TODO format
-                         "alarm.cleared", alarm.getIsActive() ? "" : alarm.getLastModified().toString(),
-                         "alarm.note", alarm.getNote()
-                       ))
+        .setEmailArgs(args)
         .setBody(body.toString())
         .build();
      ((DAO) x.get("localNotificationDAO")).put(notification);

@@ -728,6 +728,9 @@ var classes = [
   'foam.nanos.crunch.CrunchService',
   'foam.nanos.crunch.ReputDependentUCJs',
 
+  //u2 additions
+  'foam.u2.crunch.FlatteningCapabilityWizardlet',
+
   // spid
   'foam.nanos.auth.CreateUserCapabilityJunctionOnSpidSet',
   'foam.nanos.auth.SetUserServiceProviderJunctionRuleAction',
@@ -797,7 +800,10 @@ var classes = [
   'foam.i18n.Locale',
   'foam.i18n.TranslationService',
   'foam.i18n.ProxyTranslationService',
-  'foam.i18n.LocaleTranslationService'
+  'foam.i18n.LocaleTranslationService',
+
+
+  'foam.counter.Counter'
 ];
 
 var abstractClasses = [
