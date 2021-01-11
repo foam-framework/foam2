@@ -12,6 +12,10 @@ foam.CLASS({
     Capable object.
   `,
 
+  imports: [
+    'capabilityDAO'
+  ],
+
   javaImports: [
     'foam.core.ClassInfo',
     'foam.core.FObject',
@@ -85,8 +89,7 @@ foam.CLASS({
     {
       name: 'toSummary',
       code: function(){
-        // TODO: need to update this;
-        return `${this.capability}`
+        return this.capabilityDAO.find(this.capability).then(capability => `${capability.name}`);
       }
     }
   ],

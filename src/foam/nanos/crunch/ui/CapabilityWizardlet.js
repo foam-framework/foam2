@@ -66,7 +66,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'dataController',
+      name: 'wao',
       factory: function () {
         return this.UserCapabilityJunctionWAO.create({}, this.__context__);
       }

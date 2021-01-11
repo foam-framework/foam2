@@ -56,6 +56,18 @@ foam.CLASS({
 
       // Return true to prevent wizardlet from being pushed normally
       return true;
+    },
+    async function save() {
+      await foam.Promise.inOrder(this.delegates, d => d.save());
+      return await this.wao.save(this);
+    },
+    async function cancel() {
+      await foam.Promise.inOrder(this.delegates, d => d.cancel());
+      return await this.wao.cancel(this);
+    },
+    async function load() {
+      await Promise.all(this.delegates.map(d => d.load()));
+      return await this.wao.load(this);
     }
   ]
 });

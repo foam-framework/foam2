@@ -104,5 +104,8 @@ foam.CLASS({
       padding-left: 20px;
       padding-right: 20px;
     }
+    ^ div div:last-child div.table-row div {
+      border-bottom: none;
+    }
   `
 });
