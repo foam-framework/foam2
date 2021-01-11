@@ -482,7 +482,6 @@ foam.CLASS({
         if ( ! getEnabled() ) return false; 
 
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-        DAO prerequisiteCapabilityJunctionDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
         CrunchService crunchService = (CrunchService) x.get("crunchService");
 
         boolean shouldReopenTopLevel = shouldReopenUserCapabilityJunction(ucj);
