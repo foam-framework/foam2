@@ -113,40 +113,7 @@ foam.CLASS({
     {
       class: 'Map',
       name: 'rulesList',
-      synchronized: true,
-      visibility: 'HIDDEN',
-      javaFactory: `
-    ((foam.nanos.logger.Logger) getX().get("logger")).debug("RulerDAO", "initializing rules for", getDaoKey(), getOf().getId());
-    DAO ruleDAO = ((DAO) getX().get("ruleDAO")).where(
-      EQ(Rule.DAO_KEY, getDaoKey())
-    );
-   ruleDAO = ruleDAO.where(
-      EQ(Rule.ENABLED, true)
-    ).orderBy(new Desc(Rule.PRIORITY));
-    ruleDAO.select(new AbstractSink(new ReadOnlyDAOContext(getX())) {
-      @Override
-      public void put(Object obj, Detachable sub) {
-        Rule rule = (Rule) obj;
-        rule.setX(getX());
-      }
-    });
-    java.util.HashMap list = new java.util.HashMap<Predicate, GroupBy>();
-    addRule(ruleDAO, getCreateBefore(), list);
-    addRule(ruleDAO, getUpdateBefore(), list);
-    addRule(ruleDAO, getRemoveBefore(), list);
-    addRule(ruleDAO, getCreateAfter(), list);
-    addRule(ruleDAO, getUpdateAfter(), list);
-    addRule(ruleDAO, getRemoveAfter(), list);
-
-    ruleDAO.listen(
-      new UpdateRulesListSink.Builder(getX())
-        .setDao(this)
-        .build()
-      , null
-    );
-
-    return list;
-     `
+      javaFactory: `return new java.util.HashMap<Predicate, GroupBy>();`
     }
   ],
 
@@ -327,31 +294,12 @@ for ( Object key : groups.getGroupKeys() ) {
           type: 'foam.mlang.predicate.Predicate'
         }
       ],
-      javaCode: `addRule(dao, predicate, getRulesList());`
-    },
-    {
-      name: 'addRule',
-      args: [
-        {
-          name: 'dao',
-          type: 'foam.dao.DAO'
-        },
-        {
-          name: 'predicate',
-          type: 'foam.mlang.predicate.Predicate'
-        },
-        {
-          name: 'map',
-          type: 'java.util.Map'
-        }
-      ],
-      javaCode: `map.put(
+      javaCode: `getRulesList().put(
      predicate,
      dao.where(predicate)
        .select(GROUP_BY(Rule.RULE_GROUP, new ArraySink()))
    );`
     }
-
   ],
 
   axioms: [
