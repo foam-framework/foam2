@@ -55,6 +55,18 @@ foam.CLASS({
       name: 'sourceId',
       label: 'User',
       includeInDigest: true,
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          search: true,
+          sections: [
+            {
+              heading: 'Users',
+              dao: X.userDAO
+            }
+          ]
+        };
+      }
     },
     {
       class: 'Reference',
@@ -62,6 +74,18 @@ foam.CLASS({
       name: 'targetId',
       label: 'Capability',
       includeInDigest: true,
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          search: true,
+          sections: [
+            {
+              heading: 'Capabilities',
+              dao: X.capabilityDAO
+            }
+          ]
+        };
+      },
       tableCellFormatter: function(value, obj, axiom) {
         this.__subSubContext__.capabilityDAO
           .find(value)
@@ -114,6 +138,7 @@ foam.CLASS({
       setter: function (nu) { this.payload.status = nu },
       javaSetter: `
         getPayload().setStatus(val);
+        if ( val == CapabilityJunctionStatus.EXPIRED && ! getIsExpired() ) setIsExpired(true);
       `
     },
     {
@@ -130,7 +155,15 @@ foam.CLASS({
     {
       name: 'isExpired',
       includeInDigest: true,
-      section: 'ucjExpirySection'
+      section: 'ucjExpirySection',
+      javaSetter: `
+        isExpired_ = val;
+        isExpiredIsSet_ = true;
+        if ( isExpired_ ) {
+          if ( getStatus() != CapabilityJunctionStatus.EXPIRED ) setStatus(CapabilityJunctionStatus.EXPIRED); 
+          isInGracePeriod_ = false;
+        }
+      `
     },
     {
       name: 'isRenewable',
@@ -160,7 +193,6 @@ foam.CLASS({
   ],
 
   methods: [
-
     {
       name: 'saveDataToDAO',
       args: [
@@ -200,7 +232,7 @@ foam.CLASS({
         if ( contextDAOFindKey != null && ! contextDAOFindKey.isEmpty() ) {
           if ( contextDAOFindKey.toLowerCase().contains("subject") ) {         // 1- Case if subject lookup
             String[] words = foam.util.StringUtil.split(contextDAOFindKey, '.');
-            objectToSave = (FObject) x.get("subject");
+            objectToSave = getSubject(x);
 
             if ( objectToSave == null || words.length < 2 )
               throw new RuntimeException("@UserCapabilityJunction capability.contextDAOFindKey not found in context. Please check capability: " + getTargetId() + " and its contextDAOFindKey: " + contextDAOFindKey);

@@ -19,7 +19,6 @@ public class PMBenchmark
 
   @Override
   public void setup(X x) {
-    System.err.println("*************************************** setup: " + x.get("pmLogger"));
   }
 
   @Override
@@ -28,12 +27,7 @@ public class PMBenchmark
 
   @Override
   public void execute(X x) {
-    PMLogger pmLogger = (PMLogger) x.get("pmLogger");
-    PM pm = new PM(Object.class, "def");
-//    pm.log(x);
-pmLogger.log(pm);
-    PM pm2 = new PM(foam.nanos.bench.Benchmark.class, "def");
-    pmLogger.log(pm2);
-//    pm2.log(x);
+    PM pm = new PM(foam.nanos.bench.Benchmark.class, "abc");
+    pm.log(x);
   }
 }
