@@ -124,6 +124,24 @@ foam.LIB({
 
 
 foam.LIB({
+  name: 'foam.Promise',
+  methods: [
+    {
+      name: 'inOrder',
+      documentation: `
+        Performs fn for each value in arry, adding each return value of fn to a
+        Promise chain.
+      `,
+      code: function inOrder(arry, fn, opt_parentPromise) {
+        parentPromise = parentPromise || Promise.resolve();
+        return arry.reduce((p, v) => p.then(() => fn(v)), opt_parentPromise);
+      }
+    }
+  ]
+});
+
+
+foam.LIB({
   name: 'foam.Function',
   methods: [
     function isInstance(o) { return typeof o === 'function'; },
