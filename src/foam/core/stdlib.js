@@ -126,7 +126,7 @@ foam.LIB({
 foam.LIB({
   name: 'foam.Promise',
   methods: [
-    function reduce(arry, fn, parentPromise) {
+    function inOrder(arry, fn, parentPromise) {
       parentPromise = parentPromise || Promise.resolve();
       return arry.reduce((p, v) => p.then(() => fn(v)), parentPromise);
     },

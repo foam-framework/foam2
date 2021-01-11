@@ -58,11 +58,11 @@ foam.CLASS({
       return true;
     },
     async function save() {
-      await foam.Promise.reduce(this.delegates, d => d.save());
+      await foam.Promise.inOrder(this.delegates, d => d.save());
       return await this.wao.save(this);
     },
     async function cancel() {
-      await foam.Promise.reduce(this.delegates, d => d.cancel());
+      await foam.Promise.inOrder(this.delegates, d => d.cancel());
       return await this.wao.cancel(this);
     },
     async function load() {
