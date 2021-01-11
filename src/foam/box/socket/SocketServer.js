@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.box.socket',
   name: 'SocketServer',
 
-  documentation: `Waits on the socket connection for requests, passing them off to a SocketServerProcessor.`,
+  documentation: 'Waits on the socket connection for requests, passing them off to a SocketServerProcessor.',
 
   implements: [
     'foam.nanos.NanoService'

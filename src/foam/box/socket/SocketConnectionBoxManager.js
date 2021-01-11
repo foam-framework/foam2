@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.box.socket',
   name: 'SocketConnectionBoxManager',
 
-  documentation: `Manages Socket boxes, providing reuse of established connections for send and recieve.`,
+  documentation: 'Manages Socket boxes, providing reuse of established connections for send and recieve.',
   
   implements: [
     'foam.nanos.NanoService'
@@ -160,8 +160,8 @@ foam.CLASS({
           agency.submit(x, (ContextAgent) box, socket.getRemoteSocketAddress().toString());
           return box;
         } catch ( IOException e ) {
-          getLogger().error(host, port, e.getClass().getSimpleName(), e.getMessage());
           remove(box);
+          getLogger().error(host, port, e.getClass().getSimpleName(), e.getMessage());
           throw new RuntimeException(e);
         } catch ( Throwable t ) {
           remove(box);
