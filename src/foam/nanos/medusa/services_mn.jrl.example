@@ -1,23 +1,39 @@
 p({
   "class":"foam.nanos.boot.NSpec",
   "name":"medusaNodeDAO",
+  "lazy":false,
   "serve":true,
   "serviceScript":`
-    mdao = new foam.dao.MDAO(foam.nanos.medusa.MedusaEntry.getOwnClassInfo());
+    mdao = new foam.nanos.medusa.ReplayingInfoDAO.Builder(x)
+      .setUpdateIndex(true)
+      .setDelegate(new foam.dao.NullDAO(x, foam.nanos.medusa.MedusaEntry.getOwnClassInfo()))
+      .build();
+    mdao = new foam.nanos.medusa.MedusaUniqueDAO.Builder(x)
+      .setDelegate(mdao)
+      .build();
     dao = new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.medusa.MedusaEntry.getOwnClassInfo())
       .setMdao(mdao)
-      .setInnerDAO(new net.nanopay.security.HashingJDAO(x, mdao, "ledger"))
+      .setInnerDAO(new net.nanopay.security.HashingJDAO(x, "SHA-256", true, true, mdao, "ledger"))
       .setRuler(false)
       .setCluster(false)
       .setPm(true)
       .setPipelinePm(true)
-      .setDecorator(new foam.nanos.medusa.ReplayDAO.Builder(x)
-      .setDelegate(new foam.nanos.medusa.MedusaUniqueDAO.Builder(x)
+      .setDecorator(new foam.nanos.medusa.ReplayNodeDAO.Builder(x)
+        .setJournal(new net.nanopay.security.HashingReplayJournal.Builder(x)
+          .setFilename("ledger")
+          .setDigestRequired(true)
+          .setCreateFile(false)
+          .setMessageDigest(new net.nanopay.security.MessageDigest.Builder(x)
+            .setAlgorithm("SHA-256")
+            .setRollDigests(true)
+            .build())
+          .build())
       .setDelegate(new foam.nanos.medusa.MedusaSetNodeDAO.Builder(x)
       .setDelegate(new foam.nanos.medusa.MedusaHashingDAO.Builder(x)
       .setDelegate(new foam.nanos.medusa.MedusaSigningDAO.Builder(x)
       .setDelegate(new foam.nanos.medusa.MedusaBroadcastDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.MedusaBroadcastNARegionDAO.Builder(x)
         .setDelegate(new foam.dao.NullDAO(x, foam.nanos.medusa.MedusaEntry.getOwnClassInfo()))
         .build())
       .build())
@@ -26,12 +42,6 @@ p({
       .build())
       .build())
       .build();
-    dao.addPropertyIndex(new foam.core.PropertyInfo[] {
-      foam.nanos.medusa.MedusaEntry.INDEX
-    });
-    dao.addPropertyIndex(new foam.core.PropertyInfo[] {
-      foam.nanos.medusa.MedusaEntry.HASH
-    });
     return dao;
   `,
   "client":"{\"of\":\"foam.nanos.medusa.MedusaEntry\", \"remoteListenerSupport\": false}"

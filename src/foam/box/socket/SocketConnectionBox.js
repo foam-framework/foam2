@@ -7,6 +7,8 @@ foam.CLASS({
   package: 'foam.box.socket',
   name: 'SocketConnectionBox',
 
+  documentation: `Establishes a socket connection managed by the SocketConnectionBoxManager, with synchronous 'send' and asychronous 'receive'.`,
+  
   implements: [
     'foam.box.Box',
     'foam.core.ContextAgent'

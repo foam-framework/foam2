@@ -8,14 +8,15 @@ foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'MedusaEntry',
 
+  documentation: `A Medusa journal entry. Each DAO put or remove operation resulting in a change is captured by a MedusaEntry.
+The data of a MedusaEntry is the json delta of the original put or remove DAO operation. For example, if a User's lastName was modified, the corresponding MedusaEntry would have a data of the json of just the lastName change.`,
+
   implements: [
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.LastModifiedAware',
     'foam.nanos.auth.LastModifiedByAware',
     'foam.nanos.medusa.DaggerLink'
   ],
-
-  documentation: `Ledger entry.`,
 
   ids: [
     'index'

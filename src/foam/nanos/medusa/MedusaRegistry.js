@@ -8,6 +8,8 @@ foam.INTERFACE({
   package: 'foam.nanos.medusa',
   name: 'MedusaRegistry',
 
+  documentation: `The MedusaAdapter can register and then wait for the completion of an async MedusaEntry 'put' operation.`,
+
   javaImports: [
     'foam.core.FObject',
     'foam.core.X'

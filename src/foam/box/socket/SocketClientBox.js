@@ -8,12 +8,10 @@ foam.CLASS({
   package: 'foam.box.socket',
   name: 'SocketClientBox',
 
+  documentation: `Provides for 'send' socket box reuse via the SocketConnectionBoxManager.`,
+
   implements: [
     'foam.box.Box'
-  ],
-
-  javaImports: [
-    'java.util.concurrent.atomic.AtomicLong',
   ],
 
   properties: [

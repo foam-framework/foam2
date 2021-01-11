@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'ClusterTopology',
   extends: 'foam.u2.Controller',
 
+  documentation: `Controller for CView of Medusa network topology map.`,
+
   requires: [
     'foam.nanos.medusa.ClusterTopologyView'
   ],

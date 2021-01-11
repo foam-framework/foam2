@@ -8,8 +8,11 @@ foam.INTERFACE({
   package: 'foam.nanos.medusa',
   name: 'DaggerService',
 
+  documentation: `Directed Acyclic Graph (DAG) service which manages indexes and hashes for the Medusa block chain.`,
+
   methods: [
     {
+      documentation: `Initial hash to prime the system.`,
       name: 'getBootstrapHash',
       args: [
         {
@@ -20,6 +23,7 @@ foam.INTERFACE({
       type: 'String'
     },
     {
+      documentation: `Return the next available index and the two index/hash pairs used to calculate the next index hash.`,
       name: 'getNextLinks',
       args: [
         {
@@ -30,6 +34,7 @@ foam.INTERFACE({
       type: 'foam.nanos.medusa.DaggerLinks'
     },
     {
+      documentation: `Inform the DAG service that this link is available for hashing against.`,
       name: 'updateLinks',
       synchronized: true,
       args: [
@@ -44,6 +49,7 @@ foam.INTERFACE({
       ]
     },
     {
+      documentation: `Generate a link in the DAG for a medusa entry.`,
       name: 'link',
       args: [
         {
@@ -58,6 +64,7 @@ foam.INTERFACE({
       type: 'foam.nanos.medusa.MedusaEntry'
     },
     {
+      documentation: `Calculate the hash of a medusa entry.`,
       name: 'hash',
       type: 'foam.nanos.medusa.MedusaEntry',
       javaThrows: ['java.security.NoSuchAlgorithmException'],
@@ -73,6 +80,7 @@ foam.INTERFACE({
       ]
     },
     {
+      documentation: `Verify the hash of a medusa entry`,
       name: 'verify',
       args: [
         {
@@ -86,6 +94,7 @@ foam.INTERFACE({
       ]
     },
     {
+      documentation: `Sign a medusa entry`,
       name: 'sign',
       type: 'String',
       javaThrows: ['java.security.DigestException',
@@ -102,6 +111,7 @@ foam.INTERFACE({
       ]
     },
     {
+      documentation: `Update the next available index.`,
       name: 'setGlobalIndex',
       synchronized: true,
       args: [
@@ -117,6 +127,7 @@ foam.INTERFACE({
       type: 'Long'
     },
     {
+      documentation: `Retrieve the current global index.`,
       name: 'getGlobalIndex',
       args: [
         {
@@ -127,6 +138,7 @@ foam.INTERFACE({
       type: 'Long'
     },
     {
+      documentation: `Retrieve the next available global index.`,
       name: 'getNextGlobalIndex',
       args: [
         {

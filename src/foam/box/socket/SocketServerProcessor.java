@@ -39,6 +39,9 @@ public class SocketServerProcessor
   protected DataOutputStream out_;
   protected Logger logger_;
 
+  /**
+   * Decode the socket request stream, and pass to a SocketRouter.
+   */
   public SocketServerProcessor(X x, Socket socket)
     throws IOException
   {

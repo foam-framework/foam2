@@ -184,7 +184,7 @@ public class NanoRouter
           service = new AuthWebAgent("service.run." + spec.getName(), (WebAgent) service, sendErrorHandler);
         }
 
-        logger.debug(this.getClass().getSimpleName(), "createWebAgent.WebAgent", spec.getName(), "webAgent"/*, service*/);
+        logger.debug(this.getClass().getSimpleName(), "createWebAgent.WebAgent", spec.getName(), "webAgent");
       }
     }
 

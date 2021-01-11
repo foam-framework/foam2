@@ -37,6 +37,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Handle socket recieve events.
+ * Determine the appropriate SocketWebAgent and route them
+ * through the SessionServerBox 
+ */
 public class SocketRouter
   extends NanoRouter
   implements ContextAware

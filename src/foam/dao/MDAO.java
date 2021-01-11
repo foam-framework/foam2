@@ -236,6 +236,7 @@ public class MDAO
   }
 
   public Object cmd_(X x, Object cmd) {
+    // Used by Medusa to get the real MDAO to update.
     if ( MDAO.GET_MDAO_CMD.equals(cmd) ) {
       return this;
     }

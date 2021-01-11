@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'SocketClientReplyBox',
   extends: 'foam.box.ReplyBox',
 
+  documentation: `Provides for 'reply' socket box reuse via the SocketConnectionBoxManager.`,
+
   javaImports: [
     'foam.box.Box',
     'foam.core.X',

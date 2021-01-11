@@ -7,9 +7,7 @@ foam.ENUM({
   package: 'foam.nanos.medusa',
   name: 'AccessMode',
 
-  documentation: `
-      Mode of a node in a cluster.
-    `,
+  documentation: `When a medusa node is full it will be marked Read-Only`,
 
   values: [
     {

@@ -9,15 +9,14 @@ foam.CLASS({
   name: 'MedusaAdapterDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  implements: [
-//    'foam.nanos.boot.NSpecAware',
-  ],
-
-  documentation: `Create a medusa entry for argument model.`,
+  documentation: `Entry point into the Medusa system.
+This DAO intercepts MDAO 'put' operations and creates a medusa entry for argument model.
+It then marshalls it to the primary mediator, and waits on a response.`,
 
   javaImports: [
     'foam.core.FObject',
     'foam.dao.DOP',
+    'foam.dao.RemoveSink',
     'foam.lib.formatter.FObjectFormatter',
     'foam.lib.formatter.JSONFObjectFormatter',
     'foam.nanos.logger.PrefixLogger',
@@ -112,7 +111,7 @@ foam.CLASS({
     {
       name: 'removeAll_',
       javaCode: `
-      getDelegate().select_(x, new RemoveAllSink(x, this), skip, limit, order, predicate);
+      getDelegate().select_(x, new RemoveSink(x, this), skip, limit, order, predicate);
       `
     },
     {

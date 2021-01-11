@@ -18,6 +18,13 @@ p({
   "service": {"class":"foam.nanos.medusa.MedusaRegistryService"}
 })
 
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"promotedPurgeAgent",
+  "lazy": false,
+  "serviceClass":"foam.nanos.medusa.PromotedPurgeAgent"
+})
+
 // NOTE: see MedusaInternalDAO for access to this DAO.
 p({
   "class": "foam.nanos.boot.NSpec",
@@ -69,7 +76,7 @@ p({
       .setRuler(false)
       .setPm(true)
       .setEnableInterfaceDecorators(false)
-      .setDecorator(new foam.nanos.medusa.ReplayDAO.Builder(x)
+      .setDecorator(new foam.nanos.medusa.ReplayMediatorDAO.Builder(x)
         .setDelegate(new foam.dao.NullDAO(x, foam.nanos.medusa.MedusaEntry.getOwnClassInfo()))
       .build())
       .setOrder(new foam.mlang.order.Comparator[] {
@@ -115,8 +122,10 @@ p({
       .setDecorator(new foam.nanos.medusa.MedusaConsensusDAO.Builder(x)
       .setDelegate(new foam.nanos.medusa.MedusaSetNodeDAO.Builder(x)
       .setDelegate(new foam.nanos.medusa.MedusaBroadcastDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.MedusaBroadcastNARegionNodesDAO.Builder(x)
       .setDelegate(new foam.nanos.medusa.MedusaInternalDAO.Builder(x)
       .setDelegate(new foam.dao.NullDAO(x, foam.nanos.medusa.MedusaEntry.getOwnClassInfo()))
+      .build())
       .build())
       .build())
       .build())

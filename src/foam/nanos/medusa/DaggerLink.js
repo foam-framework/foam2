@@ -8,6 +8,8 @@ foam.INTERFACE({
   package: 'foam.nanos.medusa',
   name: 'DaggerLink',
 
+  documentation: `Each medusa entry has a unique index and hash. This interface captures that pairing.`,
+
   methods: [
     {
       name: 'index',

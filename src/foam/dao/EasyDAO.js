@@ -1124,6 +1124,7 @@ model from which to test ServiceProvider ID (spid)`,
         return this.delegate.cmd_(x, obj);
       },
       javaCode: `
+      // Used by Medusa to get the real MDAO to update
       if ( foam.dao.MDAO.GET_MDAO_CMD.equals(obj) ) {
         DAO dao = getMdao();
         if ( dao != null ) {

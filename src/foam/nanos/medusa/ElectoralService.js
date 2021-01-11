@@ -8,6 +8,8 @@ foam.INTERFACE({
   package: 'foam.nanos.medusa',
   name: 'ElectoralService',
 
+  documentation: `Coordinate a single primary medusa mediator. When a quorum of mediators are ONLINE, initiate a vote to determine the primary.`,
+
   methods: [
     {
       documentation: `Inform the Electoral Service that a Mediator can vote. A mediator changing status cannot adjust the ElectorService state. This method allows the Electoral Service to change it's state to IN_SESSION if cluster already has Mediator quorum when this mediator came ONLINE.`,

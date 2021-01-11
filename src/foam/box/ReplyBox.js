@@ -53,8 +53,7 @@ foam.CLASS({
     {
       name: 'delegate',
       class: 'FObjectProperty',
-      of: 'foam.box.Box',
-//      transient: true
+      of: 'foam.box.Box'
     }
   ],
 

@@ -16,7 +16,7 @@ p({
     cron.execute(x);
     print("done");
   """,
-  "enabled":false
+  "enabled":true
 })
 
 p({
@@ -37,6 +37,6 @@ p({
     cron.execute(x);
     print("done");
   """,
-  "enabled":false
+  "enabled":true
 })
 

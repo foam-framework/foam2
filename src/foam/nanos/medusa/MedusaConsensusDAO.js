@@ -14,7 +14,9 @@ foam.CLASS({
     'foam.nanos.NanoService'
   ],
 
-  documentation: `Receive Entry's from the Nodes. Test for consensus on hash, cleanup, and notify.`,
+  documentation: `Receive entries from the Nodes.
+Test for consensus on hash, promote to mdao, cleanup, and notify.
+This is the heart of Medusa.`,
 
   javaImports: [
     'foam.core.Agency',
