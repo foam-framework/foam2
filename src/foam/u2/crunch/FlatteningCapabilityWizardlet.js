@@ -59,15 +59,15 @@ foam.CLASS({
     },
     async function save() {
       await foam.Promise.reduce(this.delegates, d => d.save());
-      return await this.dataController.save(this);
+      return await this.wao.save(this);
     },
     async function cancel() {
       await foam.Promise.reduce(this.delegates, d => d.cancel());
-      return await this.dataController.cancel(this);
+      return await this.wao.cancel(this);
     },
     async function load() {
       await Promise.all(this.delegates.map(d => d.load()));
-      return await this.dataController.load(this);
+      return await this.wao.load(this);
     }
   ]
 });

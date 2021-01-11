@@ -99,7 +99,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'dataController',
+      name: 'wao',
       class: 'FObjectProperty',
       of: 'foam.u2.wizard.WAO',
       flags: ['web'],
@@ -129,13 +129,13 @@ foam.CLASS({
       return null;
     },
     async function save() {
-      return await this.dataController.save(this);
+      return await this.wao.save(this);
     },
     async function cancel() {
-      return await this.dataController.cancel(this);
+      return await this.wao.cancel(this);
     },
     async function load() {
-      await this.dataController.load(this);
+      await this.wao.load(this);
       return this;
     }
   ]

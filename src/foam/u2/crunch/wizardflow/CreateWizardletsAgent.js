@@ -91,7 +91,7 @@ foam.CLASS({
         let wizardlet = capability[isBefore ? 'beforeWizardlet' : 'wizardlet'];
         return wizardlet && wizardlet.clone().copyFrom({
           capability: capability,
-          dataController: this.getWAO()
+          wao: this.getWAO()
         }, this.__subContext__);
     },
     function isPrerequisiteAware(wizardlet) {
