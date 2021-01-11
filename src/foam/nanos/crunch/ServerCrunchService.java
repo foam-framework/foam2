@@ -466,26 +466,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
     Capability capability = (Capability) capabilityDAO.find(capabilityId);
     UserCapabilityJunction ucj = crunchService.getJunction(x, capabilityId);
-      if ( ! capability.getEnabled() ) return false;
-
-    var prereqs = getPrereqs(capabilityId);
-    boolean shouldReopenTopLevel = shouldReopenUserCapabilityJunction(ucj);
-
-    if ( prereqs == null || prereqs.size() == 0 || shouldReopenTopLevel ) return shouldReopenTopLevel;
-
-    for ( var capId : prereqs ) {
-      if ( maybeReopen(x, capId.toString())  ) return true;
-    }
-    return false;
-  }
-
-  public boolean shouldReopenUserCapabilityJunction(UserCapabilityJunction ucj) {
-    if ( ucj == null ) return true;
-    else if ( ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ucj.getIsRenewable() ) return true;
-    else if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED &&
-              ucj.getStatus() != CapabilityJunctionStatus.PENDING &&
-              ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return true;
-    return false;
+    return capability.maybeReopen(x, ucj);
   }
 
   public WizardState getWizardState(X x, String capabilityId) {
