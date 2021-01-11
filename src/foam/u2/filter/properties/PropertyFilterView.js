@@ -191,24 +191,22 @@ foam.CLASS({
         if ( ! this.view_ )
           return;
 
-        if ( ! this.memento.paramsObj.filters ) {
-          this.memento.paramsObj.filters = [];
+        if ( ! this.memento.paramsObj.f ) {
+          this.memento.paramsObj.f = [];
         }
 
-        this.memento.paramsObj.filters = this.memento.paramsObj.filters.filter(f => f.name !== this.property.name || f.criteria !== this.criteria );
+        this.memento.paramsObj.f = this.memento.paramsObj.f.filter(f => f.n !== this.property.name || f.criteria !== this.criteria );
 
         var pred;
         if ( Object.keys(this.view_.predicate).length > 0 && ! foam.mlang.predicate.True.isInstance(this.view_.predicate) )
-          pred =  foam.json.Outputter.create({
-            strict: true
-          }).stringify(this.view_.predicate);
+        pred =  this.view_.predicate.toMQL && this.view_.predicate.toMQL();
 
         if ( pred ) {
-          var newFilterValue = { criteria: this.criteria, name: this.property.name, pred: pred }
-          this.memento.paramsObj.filters.push(newFilterValue);
+          var newFilterValue = { criteria: this.criteria, n: this.property.name, pred: pred }
+          this.memento.paramsObj.f.push(newFilterValue);
         }
-        if ( this.memento && this.memento.paramsObj.filters && this.memento.paramsObj.filters.length === 0 ) {
-          delete this.memento.paramsObj.filters;
+        if ( this.memento && this.memento.paramsObj.f && this.memento.paramsObj.f.length === 0 ) {
+          delete this.memento.paramsObj.f;
         }
 
         this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);

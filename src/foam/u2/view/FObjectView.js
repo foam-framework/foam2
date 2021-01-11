@@ -48,6 +48,11 @@ foam.CLASS({
       }
     },
     {
+      name: 'config'
+      // Map of property-name: {map of property overrides} for configuring properties
+      // values include 'label', 'units', and 'view'
+    },
+    {
       class: 'FObjectProperty',
       name: 'data',
       label: '',
@@ -226,7 +231,8 @@ foam.CLASS({
           })).
         end().
         tag(foam.u2.detail.VerticalDetailView, {
-          data$: this.data$
+          data$: this.data$,
+          config: this.config
         });
     },
 

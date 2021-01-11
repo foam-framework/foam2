@@ -19,6 +19,7 @@ import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.crunch.lite.Capable;
 import foam.nanos.crunch.CapabilityJunctionPayload;
+import foam.nanos.crunch.ui.PrerequisiteAwareWizardlet;
 import foam.nanos.crunch.ui.WizardState;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
@@ -28,6 +29,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static foam.mlang.MLang.*;
+import static foam.nanos.crunch.CapabilityJunctionStatus.*;
 
 public class ServerCrunchService extends ContextAwareSupport implements CrunchService, NanoService {
   private Map<String, List<String>> prereqsCache_ = null;
@@ -88,7 +90,9 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
       if ( filterGrantedUCJ ) {
         UserCapabilityJunction ucj = getJunction(x, sourceCapabilityId);
-        if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
+        if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED 
+          && ! maybeReopen(x, ucj.getTargetId()) 
+        ) {
           continue;
         }
       }
@@ -108,7 +112,11 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
           .filter(c -> ! alreadyListed.contains(c))
           .toArray(String[]::new);
 
-      if ( cap instanceof MinMaxCapability && ! rootId.equals(sourceCapabilityId) ) {
+      var prereqAware = cap.getWizardlet() instanceof PrerequisiteAwareWizardlet || (
+        cap.getBeforeWizardlet() != null &&
+        cap.getBeforeWizardlet() instanceof PrerequisiteAwareWizardlet
+      );
+      if ( prereqAware && ! rootId.equals(sourceCapabilityId) ) {
         List minMaxArray = new ArrayList<>();
 
         // Manually grab the direct  prereqs to the  MinMaxCapability
@@ -324,6 +332,10 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     Subject subject = (Subject) x.get("subject");
     UserCapabilityJunction ucj = this.getJunction(x, capabilityId);
 
+    if ( ucj.getStatus() == AVAILABLE && status == null ) {
+      ucj.setStatus(ACTION_REQUIRED);
+    }
+
     if ( data != null ) {
       ucj.setData(data);
     }
@@ -349,8 +361,9 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     X x, Subject subject, String capabilityId, FObject data,
     CapabilityJunctionStatus status
   ) {
-    UserCapabilityJunction ucj = this.getJunction(x, capabilityId);
-    
+    UserCapabilityJunction ucj = this.getJunctionForSubject(
+      x, capabilityId, subject);
+
     if ( data != null ) {
       ucj.setData(data);
     }
@@ -358,17 +371,8 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       ucj.setStatus(status);
     }
 
-    if (
-      subject.getRealUser().isAdmin()
-      && subject.getRealUser() != subject.getUser()
-    ) {
-      var logger = (Logger) x.get("logger");
-      // This may be correct when testing features as an admin user
-      logger.warning(
-        "admin user is lastUpdatedRealUser on an agent-associated UCJ");
-    }
-    ucj.setLastUpdatedRealUser(subject.getRealUser().getId());
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+    var subjectX = x.put("subject", subject);
     return (UserCapabilityJunction) userCapabilityJunctionDAO.inX(x).put(ucj);
   }
 

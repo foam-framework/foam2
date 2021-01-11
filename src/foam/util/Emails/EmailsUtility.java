@@ -50,6 +50,9 @@ public class EmailsUtility {
 
     String group = user != null ? user.getGroup() : "";
     AppConfig appConfig = (AppConfig) x.get("appConfig");
+    if ( user != null ) {
+      appConfig = user.findGroup(x).getAppConfig(x);
+    }
     Theme theme = (Theme) x.get("theme");
     X userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
     if ( theme == null ) {
@@ -58,6 +61,7 @@ public class EmailsUtility {
         appConfig.copyFrom(theme.getAppConfig());
       }
     }
+    userX = userX.put("appConfig", appConfig);
 
     SupportConfig supportConfig = theme.getSupportConfig();
     EmailConfig supportEmailConfig = supportConfig.getEmailConfig();

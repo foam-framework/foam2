@@ -16,8 +16,15 @@ public class ResendNotificationService extends ContextAwareSupport implements Re
 
   @Override
   public void resend(X x, long userId, Notification notification) {
-    DAO userDAO = (DAO) x.get("userDAO");
-    User user = (User) userDAO.find(userId);
-    user.doNotify(x, notification);
+    if ( userId > 0L ) {
+      DAO userDAO = (DAO) x.get("userDAO");
+      User user = (User) userDAO.find(userId);
+      if ( user != null ) {
+        user.doNotify(x, notification);
+        return;
+      }
+    }
+    ((foam.nanos.logger.Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "User not found", userId);
+    throw new foam.core.ClientRuntimeException("User not found");
   }
 }

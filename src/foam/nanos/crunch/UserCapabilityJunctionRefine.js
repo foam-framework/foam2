@@ -53,13 +53,39 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'sourceId',
-      label: 'User'
+      label: 'User',
+      includeInDigest: true,
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          search: true,
+          sections: [
+            {
+              heading: 'Users',
+              dao: X.userDAO
+            }
+          ]
+        };
+      }
     },
     {
       class: 'Reference',
       of: 'foam.nanos.crunch.Capability',
       name: 'targetId',
       label: 'Capability',
+      includeInDigest: true,
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          search: true,
+          sections: [
+            {
+              heading: 'Capabilities',
+              dao: X.capabilityDAO
+            }
+          ]
+        };
+      },
       tableCellFormatter: function(value, obj, axiom) {
         this.__subSubContext__.capabilityDAO
           .find(value)
@@ -112,6 +138,7 @@ foam.CLASS({
       setter: function (nu) { this.payload.status = nu },
       javaSetter: `
         getPayload().setStatus(val);
+        if ( val == CapabilityJunctionStatus.EXPIRED && ! getIsExpired() ) setIsExpired(true);
       `
     },
     {
@@ -121,19 +148,51 @@ foam.CLASS({
       documentation: `
         This property is helpful when it's necessary to know which real
         user last changed a capability of an effective user.
-      `
+      `,
+      includeInDigest: true,
     },
     // renewable
-    { name: 'isExpired', section: 'ucjExpirySection' },
-    { name: 'isRenewable', section: 'ucjExpirySection' },
-    { name: 'isInRenewablePeriod', section: 'ucjExpirySection' },
-    { name: 'isInGracePeriod', section: 'ucjExpirySection' },
-    { name: 'expiry', section: 'ucjExpirySection' },
-    { name: 'gracePeriod', section: 'ucjExpirySection' }
+    {
+      name: 'isExpired',
+      includeInDigest: true,
+      section: 'ucjExpirySection',
+      javaSetter: `
+        isExpired_ = val;
+        isExpiredIsSet_ = true;
+        if ( isExpired_ ) {
+          if ( getStatus() != CapabilityJunctionStatus.EXPIRED ) setStatus(CapabilityJunctionStatus.EXPIRED); 
+          isInGracePeriod_ = false;
+        }
+      `
+    },
+    {
+      name: 'isRenewable',
+      includeInDigest: true,
+      section: 'ucjExpirySection'
+    },
+    {
+      name: 'isInRenewablePeriod',
+      includeInDigest: true,
+      section: 'ucjExpirySection'
+    },
+    {
+      name: 'isInGracePeriod',
+      includeInDigest: true,
+      section: 'ucjExpirySection'
+    },
+    {
+      name: 'expiry',
+      includeInDigest: true,
+      section: 'ucjExpirySection'
+    },
+    {
+      name: 'gracePeriod',
+      includeInDigest: true,
+      section: 'ucjExpirySection'
+    }
   ],
 
   methods: [
-
     {
       name: 'saveDataToDAO',
       args: [
@@ -173,7 +232,7 @@ foam.CLASS({
         if ( contextDAOFindKey != null && ! contextDAOFindKey.isEmpty() ) {
           if ( contextDAOFindKey.toLowerCase().contains("subject") ) {         // 1- Case if subject lookup
             String[] words = foam.util.StringUtil.split(contextDAOFindKey, '.');
-            objectToSave = (FObject) x.get("subject");
+            objectToSave = getSubject(x);
 
             if ( objectToSave == null || words.length < 2 )
               throw new RuntimeException("@UserCapabilityJunction capability.contextDAOFindKey not found in context. Please check capability: " + getTargetId() + " and its contextDAOFindKey: " + contextDAOFindKey);
@@ -269,6 +328,16 @@ foam.CLASS({
         subject.setUser((User) userDAO.find(ucj.getSourceId()));
         subject.setUser((User) userDAO.find(ucj.getSourceId()));
         return subject;
+      `
+    },
+    {
+      name: 'toString',
+      type: 'String',
+      code: function() {
+        return 'UCJ id: '+this.id+', source: '+this.sourceId+', target: '+this.targetId+', status: '+this.status.name+', data: '+( this.data && this.data.cls_ ? this.data.cls_.id : 'null');
+      },
+      javaCode: `
+      return "UCJ id: "+getId()+", source: "+getSourceId()+", target: "+getTargetId()+", status: "+getStatus().getName()+", data: "+(getData() != null ? getData().getClass().getName() : "null");
       `
     }
   ]

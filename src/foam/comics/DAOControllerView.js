@@ -178,7 +178,7 @@ foam.CLASS({
                 .add(self.cls.PREDICATE.clone().copyFrom({
                   view: {
                     class: 'foam.u2.view.ReciprocalSearch',
-                    searchValue: self.memento && self.memento.paramsObj.search
+                    searchValue: self.memento && self.memento.paramsObj.s
                   }
                 }))
               .end();
@@ -192,7 +192,7 @@ foam.CLASS({
                       .add(self.cls.PREDICATE.clone().copyFrom({
                         view: { 
                           class: 'foam.u2.view.SimpleSearch',
-                          searchValue: self.memento && self.memento.paramsObj.search
+                          searchValue: self.memento && self.memento.paramsObj.s
                         }
                       }))
                     .end();

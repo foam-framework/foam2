@@ -135,8 +135,8 @@ foam.CLASS({
         this.checkbox.data = true;
     },
     function getPredicateFromMemento() {
-      if ( this.memento && this.memento.paramsObj.filters && this.memento.paramsObj.filters.length > 0 ) {
-        var f = this.memento.paramsObj.filters.find(f => f.name === this.property.name && f.criteria === 0);
+      if ( this.memento && this.memento.paramsObj.f && this.memento.paramsObj.f.length > 0 ) {
+        var f = this.memento.paramsObj.f.find(f => f.n === this.property.name && f.criteria === 0);
         if ( f ) {
           var predicate = foam.json.parseString(f.pred, this.__context__);
           return predicate;

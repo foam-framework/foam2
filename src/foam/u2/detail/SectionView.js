@@ -54,6 +54,11 @@ foam.CLASS({
       value: true
     },
     {
+      name: 'config'
+      // Map of property-name: {map of property overrides} for configuring properties
+      // values include 'label', 'units', and 'view'
+    },
+    {
       class: 'Function',
       name: 'evaluateMessage',
       documentation: `Evaluates model messages without executing potentially harmful values`,
@@ -141,6 +146,16 @@ foam.CLASS({
               
               if ( loadLatch ) {
                 view.forEach(section.properties, function(p, index) {
+                  var config = self.config && self.config[p.name];
+
+                  if ( config ) {
+                    p = p.clone();
+                    for ( var key in config ) {
+                      if ( config.hasOwnProperty(key) ) {
+                        p[key] = config[key];
+                      }
+                    }
+                  }
                   this.start(self.GUnit, { columns: p.gridColumns })
                     .show(p.createVisibilityFor(self.data$, self.controllerMode$).map(mode => mode !== self.DisplayMode.HIDDEN))
                     .tag(self.SectionedDetailPropertyView, {
