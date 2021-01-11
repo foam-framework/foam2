@@ -28,7 +28,6 @@ foam.CLASS({
   requires: [
     'foam.u2.dialog.Popup',
     'foam.u2.wizard.StepWizardConfig',
-    // 'foam.u2.wizard.StepWizardletController'
     'foam.u2.wizard.StepWizardController'
   ],
 
