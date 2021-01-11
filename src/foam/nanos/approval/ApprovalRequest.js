@@ -435,40 +435,6 @@
       `
     },
     {
-      class: 'String',
-      name: 'daoKey_',
-      section: 'systemInformation',
-      readPermissionRequired: true,
-      writePermissionRequired: true,
-      javaFactory: `
-        String key = getDaoKey().toString();
-
-        // TODO: we need to phase this out for the old compliance approval requests
-        // and use serverDaoKey for the local daos
-        if ( getX().get(key) != null ) {
-          if ( key.startsWith("local") ) {
-            key = key.replace("local", "");
-            key = Character.toString(key.charAt(0)).toLowerCase() + key.substring(1);
-          }
-        }
-        return key;
-      `,
-      factory: function() {
-        var key = this.daoKey;
-        var X = this.ctrl.__subContext__;
-
-        // TODO: we need to phase this out for the old compliance approval requests
-        // and use serverDaoKey for the local daos
-        if ( ! X[key] ) {
-          if ( key.startsWith('local') ) {
-            key = key.replace('local', '');
-            key = key.charAt(0).toLowerCase() + key.slice(1);
-          }
-        }
-        return key;
-      }
-    },
-    {
       class: 'Boolean',
       name: 'isTrackingRequest',
       section: 'systemInformation'
@@ -657,15 +623,15 @@
              return false;
         }
 
-        if ( self.__subContext__[self.daoKey_] ) {
-          var property = self.__subContext__[self.daoKey_].of.ID;
+        if ( self.__subContext__[self.daoKey] ) {
+          var property = self.__subContext__[self.daoKey].of.ID;
           var objId = property.adapt.call(property, self.objId, self.objId, property);
-          return self.__subContext__[this.daoKey_]
+          return self.__subContext__[this.daoKey]
             .find(objId)
             .then(obj => !! obj)
             .catch(err => {
               console.warn(err.message || err);
-              if ( self.refObjId && self.refDaoKey && self.__subContext__[self.refDaoKey_] ) {
+              if ( self.refObjId && self.refDaoKey && self.__subContext__[self.refDaoKey] ) {
                 property = self.__subContext__[self.refDaoKey].of.ID;
                 objId = property.adapt.call(property, self.refObjId, self.refObjId, property);
                 return self.__subContext__[self.refDaoKey]
@@ -697,7 +663,7 @@
           property = X[daoKey].of.ID;
           objId = property.adapt.call(property, self.refObjId, self.refObjId, property);
         } else {
-          daoKey = self.daoKey_;
+          daoKey = self.daoKey;
           property = X[daoKey].of.ID;
           objId = property.adapt.call(property, self.objId, self.objId, property);
         }
