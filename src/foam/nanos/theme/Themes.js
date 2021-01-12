@@ -122,9 +122,7 @@ Later themes:
         foam.nanos.theme.Theme.create({ 'name': 'foam', 'appName': 'FOAM' });
       },
       javaCode: `
-      // NOTE: using localThemeDAO to bypass ServiceProviderAwareDAO, as
-      // ServiceProviderAwareDAO falls back to Themes.findTheme
-      DAO themeDAO = ((DAO) x.get("localThemeDAO"));
+      DAO themeDAO = ((DAO) x.get("themeDAO"));
       Theme theme = null;
       ThemeDomain td = null;
       String domain = null;
@@ -195,7 +193,7 @@ Later themes:
       if ( theme == null ) {
         var themeDomain = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find("localhost");
         if ( themeDomain != null ) {
-          theme = (Theme) ((DAO) x.get("localThemeDAO")).find(themeDomain.getTheme());
+          theme = (Theme) ((DAO) x.get("themeDAO")).find(themeDomain.getTheme());
         }
       }
       if ( theme == null ) {

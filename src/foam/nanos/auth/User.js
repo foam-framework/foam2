@@ -886,7 +886,6 @@ foam.RELATIONSHIP({
   cardinality: '1:*',
   forwardName: 'users',
   inverseName: 'theme',
-  sourceDAOKey: 'localThemeDAO',
   sourceProperty: {
     hidden: true,
     visibility: 'HIDDEN',

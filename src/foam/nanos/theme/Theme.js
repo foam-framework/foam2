@@ -22,7 +22,7 @@ foam.CLASS({
     'foam.nanos.auth.LastModifiedAware',
     // 'foam.nanos.auth.LastModifiedByAware',
 
-    // NOTE: this class cannot implement ServiceProviderAware as it itself is used
+    // NOTE: nSpec for this DAO disables ServiceProviderAware as it itself is used
     // during ServiceProviderAwareDAO operations as a fallback to determine the
     // spid based on url and theme.
     'foam.nanos.auth.ServiceProviderAware'

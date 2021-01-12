@@ -495,7 +495,6 @@ foam.RELATIONSHIP({
   targetModel: 'foam.nanos.auth.Group',
   forwardName: 'groups',
   inverseName: 'theme',
-  sourceDAOKey: 'localThemeDAO',
   sourceProperty: {
     hidden: true
   },
