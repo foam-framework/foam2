@@ -83,17 +83,10 @@ Later themes:
             var pos = spid.lastIndexOf('.');
             spid = spid.substring(0, pos > 0 ? pos : 0);
           }
-
-          if ( ! theme ) {
-            theme = await this.themeDAO.find(
-              this.AND(
-                this.EQ(foam.nanos.theme.Theme.SPID, '*'),
-                this.EQ(foam.nanos.theme.Theme.ENABLED, true)));
-          }
         }
 
         if ( ! theme ) {
-          console && console.warn('Theme not found: '+ domain);
+          console && console.warn('Theme not found', domain);
         }
 
         var group = x.group;
@@ -130,7 +123,7 @@ Later themes:
       HttpServletRequest req = x.get(HttpServletRequest.class);
       if ( req != null ) {
         domain = req.getServerName();
-      }
+     }
 
       // Find theme from themeDomain via domain
       if ( domain != null ) {
@@ -191,13 +184,7 @@ Later themes:
       }
 
       if ( theme == null ) {
-        var themeDomain = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find("localhost");
-        if ( themeDomain != null ) {
-          theme = (Theme) ((DAO) x.get("themeDAO")).find(themeDomain.getTheme());
-        }
-      }
-      if ( theme == null ) {
-        ((foam.nanos.logger.Logger) x.get("logger")).debug("Themes", "fallback", "localhost", "not found");
+        ((foam.nanos.logger.Logger) x.get("logger")).debug("Themes", "fallback", "localhost", "not found", "domain", domain);
         theme = new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
       }
 

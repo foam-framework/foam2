@@ -124,7 +124,7 @@ public class EmailsUtility {
     }
 
     // SERVICE CALL: passing emailMessage through to actual email service.
-    DAO email = (DAO) x.get("localEmailMessageDAO");
+    DAO email = ((DAO) x.get("localEmailMessageDAO")).inX(x);
     emailMessage.setStatus(foam.nanos.notification.email.Status.UNSENT);
     email.put(emailMessage);
   }
