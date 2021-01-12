@@ -55,7 +55,7 @@ foam.CLASS({
     {
       type: 'Function',
       name: 'dateFormatter',
-      value: function(date) { return date.toLocaleDateString(); }
+      value: function(date) { return date.toLocaleDateString(foam.locale); }
     },
     'dialog_',
     'datePicker_'
