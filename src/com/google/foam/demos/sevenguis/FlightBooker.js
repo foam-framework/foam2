@@ -92,10 +92,10 @@ foam.CLASS({
       name: 'book',
       isEnabled: function(errors_) { return ! errors_; },
       code: function() {
-        var depart = this.departDate.toLocaleDateString();
+        var depart = this.departDate.toLocaleDateString(foam.locale);
 
         this.window.alert('You have booked a ' + (this.isReturn ?
-          'flight departing on ' + depart + ' and returning ' + this.returnDate.toLocaleDateString():
+          'flight departing on ' + depart + ' and returning ' + this.returnDate.toLocaleDateString(foam.locale):
           'one-way flight on ' + depart) + '.');
       }
     }
