@@ -274,9 +274,6 @@ foam.CLASS({
             return false;
           }
         }
-        if ( typeof p.compareTo != 'function' ) {
-          debugger;
-        }
         if ( p.compareTo(pos) == 0 ) return true;
         let wizardlet = this.wizardlets[p.wizardletIndex];
         let section = this.wizardlets[p.sectionIndex];
