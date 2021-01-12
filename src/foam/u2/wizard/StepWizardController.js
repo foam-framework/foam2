@@ -136,7 +136,8 @@ foam.CLASS({
 
   methods: [
     function setupWizardletListeners(wizardlets) {
-      console.log('step wizard', this, wizardlets);
+      console.debug('step wizard', this);
+
       if ( this.wsub ) this.wsub.detach();
       this.wsub = this.FObject.create();
 
@@ -147,7 +148,6 @@ foam.CLASS({
         var isAvailable$ = w.isAvailable$;
         console.log(wizardletIndex, w, w.isAvailable$, isAvailable$);
         this.wsub.onDetach(isAvailable$.sub(() => {
-          console.log('X');
           this.onWizardletAvailability(wizardletIndex, isAvailable$.get());
         }));
 
@@ -159,8 +159,7 @@ foam.CLASS({
           });
           var isAvailable$ = section.isAvailable$;
           this.wsub.onDetach(isAvailable$.sub(() => {
-            console.log('Y');
-            this.onWizardPositionAvailabilityUpdate(
+            this.onSectionAvailability(
               sectionPosition, isAvailable$.get());
           }));
         });
@@ -275,9 +274,6 @@ foam.CLASS({
             return false;
           }
         }
-        if ( typeof p.compareTo != 'function' ) {
-          debugger;
-        }
         if ( p.compareTo(pos) == 0 ) return true;
         let wizardlet = this.wizardlets[p.wizardletIndex];
         let section = this.wizardlets[p.sectionIndex];
@@ -290,7 +286,6 @@ foam.CLASS({
 
   listeners: [
     function onWizardletAvailability(wizardletIndex, value) {
-      console.log('A');
       // Force a position update so views recalculate state
       this.wizardPosition = this.WizardPosition.create({
         wizardletIndex: this.wizardPosition.wizardletIndex,
@@ -298,7 +293,6 @@ foam.CLASS({
       });
     },
     function onSectionAvailability(sectionPosition, value) {
-      console.log('B');
       // If a previous position became available, move the wizard back
       if ( value && sectionPosition.compareTo(this.wizardPosition) < 0 ) {
         this.wizardPosition = sectionPosition;

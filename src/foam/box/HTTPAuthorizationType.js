@@ -25,6 +25,11 @@ foam.ENUM({
       name: 'BEARER',
       label: 'Bearer',
       ordinal: 2
+    },
+    {
+      name: 'OAUTH',
+      label: 'OAuth',
+      ordinal: 3
     }
   ]
 });
