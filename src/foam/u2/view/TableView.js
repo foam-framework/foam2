@@ -44,10 +44,10 @@ foam.CLASS({
 
     ^td,
     ^th {
-      align-items: center;
+      align-self: center;
       box-sizing: border-box;
       color: /*%BLACK%*/ #1e1f21;
-      display: flex;
+      display: block;
       font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 14px;
       line-height: 1.5;
