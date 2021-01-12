@@ -1,8 +1,8 @@
 p({
   "class": "foam.nanos.boot.NSpec",
-  "name": "themeDAO",
+  "name": "localThemeDAO",
   "description": "Stores Themes, which are used to style the application.",
-  "serve": true,
+  "serve": false,
   "authenticate": false,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
@@ -14,6 +14,21 @@ p({
       .setDecorator(new foam.nanos.theme.ThemeDomainsDAO.Builder(x).setDelegate(new foam.dao.NullDAO(x, foam.nanos.theme.Theme.getOwnClassInfo())).build())
       .setIndex(new foam.core.PropertyInfo[] {foam.nanos.theme.Theme.NAME, foam.nanos.auth.GroupPermissionJunction.TARGET_ID})
       .setPm(true)
+      .setServiceProviderAware(false)
+      .build()
+  """
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "themeDAO",
+  "description": "Stores Themes, which are used to style the application.",
+  "serve": true,
+  "authenticate": false,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.theme.Theme.getOwnClassInfo())
+      .setInnerDAO(x.get("localThemeDAO"))
       .build()
   """,
   "client": "{\"of\":\"foam.nanos.theme.Theme\"}",

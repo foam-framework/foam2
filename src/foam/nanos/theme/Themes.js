@@ -122,7 +122,9 @@ Later themes:
         foam.nanos.theme.Theme.create({ 'name': 'foam', 'appName': 'FOAM' });
       },
       javaCode: `
-      DAO themeDAO = ((DAO) x.get("themeDAO"));
+      // NOTE: using localThemeDAO to bypass ServiceProviderAwareDAO, as
+      // ServiceProviderAwareDAO falls back to Themes.findTheme
+      DAO themeDAO = ((DAO) x.get("localThemeDAO"));
       Theme theme = null;
       ThemeDomain td = null;
       String domain = null;
@@ -168,15 +170,9 @@ Later themes:
         }
       }
 
-      if ( theme == null ) {
-        // ((foam.nanos.logger.Logger) x.get("logger")).debug("Theme not found.",
-        //   "domain", (req != null ? req.getServerName() : ""),
-        //   "user", user.getId());
-        theme = new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
-      }
-
       // Augment the theme with group and user themes
-      if ( user != null ) {
+      if ( user != null &&
+           theme != null ) {
         DAO groupDAO = (DAO) x.get("groupDAO");
         Group group = user.findGroup(x);
         while ( group != null ) {
@@ -194,6 +190,17 @@ Later themes:
         if ( userTheme != null ) {
           theme = (Theme) theme.fclone().copyFrom(userTheme);
         }
+      }
+
+      if ( theme == null ) {
+        var themeDomain = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find("localhost");
+        if ( themeDomain != null ) {
+          theme = (Theme) ((DAO) x.get("localThemeDAO")).find(themeDomain.getTheme());
+        }
+      }
+      if ( theme == null ) {
+        ((foam.nanos.logger.Logger) x.get("logger")).debug("Themes", "fallback", "localhost", "not found");
+        theme = new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
       }
 
       return theme;

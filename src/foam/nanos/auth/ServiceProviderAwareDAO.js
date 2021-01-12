@@ -114,11 +114,15 @@ foam.CLASS({
         }
       }
       if ( SafetyUtil.isEmpty(spid) ||
-           user != null && user.isAdmin() ) {
+           user != null &&
+           user.isAdmin() &&
+           SafetyUtil.isEmpty(user.getSpid()) ) {
         Theme theme = ((Themes) x.get("themes")).findTheme(x);
         if ( theme != null &&
              ! SafetyUtil.isEmpty(theme.getSpid()) ) {
           spid = theme.getSpid();
+        } else {
+          ((foam.nanos.logger.Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Theme not found", ( theme != null ? theme.getId() : "null"));
         }
       }
       if ( SafetyUtil.isEmpty(spid) ) {

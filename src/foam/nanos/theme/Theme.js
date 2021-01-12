@@ -25,7 +25,7 @@ foam.CLASS({
     // NOTE: this class cannot implement ServiceProviderAware as it itself is used
     // during ServiceProviderAwareDAO operations as a fallback to determine the
     // spid based on url and theme.
-    // 'foam.nanos.auth.ServiceProviderAware'
+    'foam.nanos.auth.ServiceProviderAware'
   ],
 
   requires: [
@@ -502,7 +502,7 @@ foam.CLASS({
       name: 'spid',
       class: 'Reference',
       of: 'foam.nanos.auth.ServiceProvider',
-      value: foam.nanos.auth.ServiceProviderAware.GLOBAL_SPID
+      writePermissionRequired: true
     },
     {
       class: 'foam.core.FObjectProperty',

@@ -69,11 +69,11 @@ System.out.println("UUID: "+getSpid1());
         groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("serviceprovider.read."+getSpid1()).build());
         groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test2").setTargetId("serviceprovider.read."+getSpid1()).build());
 
-        foam.nanos.app.AppConfig appConfig = (foam.nanos.app.AppConfig) ((FObject) x.get("appConfig")).fclone();
-        appConfig.setDefaultSpid(getSpid1());
-        X y = x.put("appConfig", appConfig);
+        // foam.nanos.app.AppConfig appConfig = (foam.nanos.app.AppConfig) ((FObject) x.get("appConfig")).fclone();
+        // appConfig.setDefaultSpid(getSpid1());
+        // X y = x.put("appConfig", appConfig);
 
-        testReference(y);
+        testReference(x);
       `
     },
     {
