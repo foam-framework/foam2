@@ -133,8 +133,8 @@ foam.LIB({
         Promise chain.
       `,
       code: function inOrder(arry, fn, opt_parentPromise) {
-        parentPromise = parentPromise || Promise.resolve();
-        return arry.reduce((p, v) => p.then(() => fn(v)), opt_parentPromise);
+        var parentPromise = opt_parentPromise || Promise.resolve();
+        return arry.reduce((p, v) => p.then(() => fn(v)), parentPromise);
       }
     }
   ]
