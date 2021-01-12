@@ -35,6 +35,7 @@ foam.CLASS({
         agency.submit(x, new ContextAgent() {
           @Override
           public void execute(X x) {
+            CrunchService crunchService = (CrunchService) x.get("crunchService");
             DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
             UserCapabilityJunction old = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
@@ -42,11 +43,6 @@ foam.CLASS({
               EQ(UserCapabilityJunction.TARGET_ID, ucj.getTargetId())
             ));
 
-            // boolean isInvalidate = ucj.getStatus() != old.getStatus() && ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED ||
-            //   ( ucj.getStatus() == CapabilityJunctionStatus.APPROVED && (
-            //     old.getStatus() != CapabilityJunctionStatus.APPROVED ||
-            //     old.getStatus() != CapabilityJunctionStatus.GRANTED ) ) );
-            
             Long effectiveUserId = ( ucj instanceof AgentCapabilityJunction ) ? ((AgentCapabilityJunction) ucj).getEffectiveUser() : null;
             DAO filteredUserCapabilityJunctionDAO = (DAO) userCapabilityJunctionDAO
               .where(OR(
@@ -62,18 +58,14 @@ foam.CLASS({
                   // EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId())
                 // )
               ));
-            DAO filteredPrerequisiteCapabilityJunctionDAO = (DAO) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
-              .where(EQ(CapabilityCapabilityJunction.TARGET_ID, ucj.getTargetId()));
-            
-            List<CapabilityCapabilityJunction> ccjs = ((ArraySink) filteredPrerequisiteCapabilityJunctionDAO
-              .select(new ArraySink()))
-              .getArray();
+
+            String[] dependentIds = crunchService.getDependentIds(x, ucj.getTargetId());
 
             List<UserCapabilityJunction> ucjsToReput = new ArrayList<UserCapabilityJunction>();
 
-            for ( CapabilityCapabilityJunction ccj : ccjs ) {
+            for ( String dependentId : dependentIds ) {
               UserCapabilityJunction ucjToReput = (UserCapabilityJunction) filteredUserCapabilityJunctionDAO
-                .find(EQ(UserCapabilityJunction.TARGET_ID, ccj.getSourceId()));
+                .find(EQ(UserCapabilityJunction.TARGET_ID, dependentId));
 
               // Skip null and AVAILABLE UCJs
               if (
@@ -85,16 +77,8 @@ foam.CLASS({
             }
 
             X effectiveX = x;
-            if ( effectiveUserId != null && effectiveUserId > 0 ) {
-              DAO userDAO = (DAO) x.get("localUserDAO");
-              User effectiveUser = (User) userDAO.find(effectiveUserId);
-              Subject subject = (Subject) x.get("subject");
-              if ( effectiveUser != null && subject.getUser().getId() != effectiveUser.getId() ) {
-                subject = new Subject.Builder(x).setUser(subject.getUser()).build();
-                subject.setUser(effectiveUser);
-                effectiveX = x.put("subject", subject);
-              }
-            }
+            Subject junctionSubject = ucj.getSubject(x);
+            effectiveX = x.put("subject", junctionSubject);
 
             Capability dependent = null;
             for ( UserCapabilityJunction ucjToReput : ucjsToReput ) {

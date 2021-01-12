@@ -75,7 +75,7 @@ foam.INTERFACE({
       ]
     },
     {
-      name: 'getDependantIds',
+      name: 'getDependentIds',
       type: 'String[]',
       args: [
         {

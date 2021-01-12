@@ -155,7 +155,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return grantPath;
   }
 
-  public String[] getDependantIds(X x, String capabilityId) {
+  public String[] getDependentIds(X x, String capabilityId) {
     return Arrays.stream(((CapabilityCapabilityJunction[]) ((ArraySink) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
       .where(EQ(CapabilityCapabilityJunction.TARGET_ID, capabilityId))
       .select(new ArraySink())).getArray()
