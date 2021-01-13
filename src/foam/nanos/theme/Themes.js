@@ -31,6 +31,7 @@ foam.CLASS({
     'foam.nanos.auth.Group',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
+    'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil',
     'javax.servlet.http.HttpServletRequest',
     'org.eclipse.jetty.server.Request'
@@ -115,6 +116,8 @@ Later themes:
         foam.nanos.theme.Theme.create({ 'name': 'foam', 'appName': 'FOAM' });
       },
       javaCode: `
+      // TODO:  cache domain/theme and update on ThemeDAO changes.
+      Logger logger = (Logger) x.get("logger");
       DAO themeDAO = ((DAO) x.get("themeDAO"));
       Theme theme = null;
       ThemeDomain td = null;
@@ -123,15 +126,22 @@ Later themes:
       HttpServletRequest req = x.get(HttpServletRequest.class);
       if ( req != null ) {
         domain = req.getServerName();
+        // logger.debug("Themes", "domain", domain);
      }
 
       // Find theme from themeDomain via domain
       if ( domain != null ) {
         var themeDomainDAO = (DAO) x.get("themeDomainDAO");
         td = (ThemeDomain) themeDomainDAO.find(domain);
+        // if ( td == null ) {
+        //   logger.debug("Themes", "ThemeDomain not found", domain);
+        // }
         if ( td == null &&
              ! "localhost".equals(domain) ) {
           td = (ThemeDomain) themeDomainDAO.find("localhost");
+          // if ( td == null ) {
+          //   logger.debug("Themes", "ThemeDomain not found", "localhost");
+          // }
         }
         if ( td != null ) {
           theme = (Theme) themeDAO.find(
@@ -139,13 +149,15 @@ Later themes:
               MLang.EQ(Theme.ID, td.getTheme()),
               MLang.EQ(Theme.ENABLED, true)
             ));
+          // if ( theme == null ) {
+          //   logger.debug("Themes", "Theme not found", td.getTheme());
+          // }
         }
       }
 
       // Find theme from user via SPID
       if ( user != null
-        && ( theme == null || ! domain.equals(td.getId()) )
-      ) {
+        && ( theme == null || ! td.getId().equals(domain)) ) {
         var spid = user.getSpid();
         while ( ! SafetyUtil.isEmpty(spid) ) {
           theme = (Theme) themeDAO.find(
@@ -184,13 +196,7 @@ Later themes:
       }
 
       if ( theme == null ) {
-        var themeDomain = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find("localhost");
-        if ( themeDomain != null ) {
-          theme = (Theme) ((DAO) x.get("themeDAO")).find(themeDomain.getTheme());
-        }
-      }
-      if ( theme == null ) {
-        ((foam.nanos.logger.Logger) x.get("logger")).debug("Themes", "fallback", "localhost", "not found");
+        // logger.debug("Themes", "fallback");
         theme = new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
       }
 
