@@ -1,0 +1,76 @@
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"medusaNodeDAO",
+  "lazy":false,
+  "serve":true,
+  "serviceScript":`
+    mdao = new foam.nanos.medusa.ReplayingInfoDAO.Builder(x)
+      .setUpdateIndex(true)
+      .setDelegate(new foam.dao.NullDAO(x, foam.nanos.medusa.MedusaEntry.getOwnClassInfo()))
+      .build();
+    mdao = new foam.nanos.medusa.MedusaUniqueDAO.Builder(x)
+      .setDelegate(mdao)
+      .build();
+    dao = new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.medusa.MedusaEntry.getOwnClassInfo())
+      .setMdao(mdao)
+      .setInnerDAO(new net.nanopay.security.HashingJDAO(x, "SHA-256", true, true, mdao, "ledger"))
+      .setRuler(false)
+      .setCluster(false)
+      .setPm(true)
+      .setPipelinePm(true)
+      .setDecorator(new foam.nanos.medusa.ReplayNodeDAO.Builder(x)
+        .setJournal(new net.nanopay.security.HashingReplayJournal.Builder(x)
+          .setFilename("ledger")
+          .setDigestRequired(true)
+          .setCreateFile(false)
+          .setMessageDigest(new net.nanopay.security.MessageDigest.Builder(x)
+            .setAlgorithm("SHA-256")
+            .setRollDigests(true)
+            .build())
+          .build())
+      .setDelegate(new foam.nanos.medusa.MedusaSetNodeDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.MedusaHashingDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.MedusaSigningDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.MedusaBroadcastDAO.Builder(x)
+      .setDelegate(new foam.nanos.medusa.MedusaBroadcastNARegionDAO.Builder(x)
+        .setDelegate(new foam.dao.NullDAO(x, foam.nanos.medusa.MedusaEntry.getOwnClassInfo()))
+        .build())
+      .build())
+      .build())
+      .build())
+      .build())
+      .build())
+      .build();
+    return dao;
+  `,
+  "client":"{\"of\":\"foam.nanos.medusa.MedusaEntry\", \"remoteListenerSupport\": false}"
+})
+
+// Menus entry point
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "medusaEntryDAO",
+  "serve": true,
+  "serviceScript": `
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.medusa.MedusaEntry.getOwnClassInfo())
+      .setInnerDAO(x.get("medusaNodeDAO"))
+      .setCluster(false)
+      .setRuler(false)
+      .setEnableInterfaceDecorators(false)
+      .build();
+  `,
+  "client": "{\"of\":\"foam.nanos.medusa.MedusaEntry\"}"
+})
+
+// disable cron scheduler
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"cronScheduler",
+  "lazy":false,
+  "enabled":false,
+  "serviceScript":"""
+    return new foam.nanos.cron.CronScheduler();
+  """
+})

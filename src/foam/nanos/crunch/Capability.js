@@ -82,19 +82,22 @@ foam.CLASS({
       name: 'name',
       class: 'String',
       displayWidth: 70,
-      section: 'basicInfo'
+      section: 'basicInfo',
+      includeInDigest: false
     },
     {
       name: 'icon',
       class: 'Image',
       documentation: `Path to capability icon`,
-      section: 'uiSettings'
+      section: 'uiSettings',
+      includeInDigest: false
     },
     {
       name: 'description',
       class: 'String',
       documentation: `Description of capability`,
-      section: 'uiSettings'
+      section: 'uiSettings',
+      includeInDigest: false
     },
     {
       name: 'notes',
@@ -103,37 +106,44 @@ foam.CLASS({
         class: 'foam.u2.tag.TextArea',
         rows: 12,
         cols: 120
-      }
+      },
+      includeInDigest: false
     },
     {
       name: 'price',
-      class: 'Long'
+      class: 'Long',
+      includeInDigest: true
     },
     {
       name: 'keywords',
-      class: 'StringArray'
+      class: 'StringArray',
+      includeInDigest: false
     },
     {
       name: 'version',
-      class: 'String'
+      class: 'String',
+      includeInDigest: true,
     },
     {
       name: 'enabled',
       class: 'Boolean',
       value: true,
+      includeInDigest: true,
       documentation: `Capability is ignored by system when enabled is false.
       user will lose permissions implied by this capability and upper level capabilities will ignore this prerequisite`
     },
     {
       name: 'expiry',
       class: 'DateTime',
-      documentation: `Datetime of when capability is no longer valid`
+      documentation: `Datetime of when capability is no longer valid`,
+      includeInDigest: true,
     },
     {
       name: 'duration',
       class: 'Int',
       documentation: `To be used in the case where expiry is duration-based, represents the number of DAYS a junction is valid for before expiring.
-      The UserCapabilityJunction object will have its expiry configured to a DateTime based on the lower value of the two, expiry and duration`
+      The UserCapabilityJunction object will have its expiry configured to a DateTime based on the lower value of the two, expiry and duration`,
+      includeInDigest: true,
     },
     {
       name: 'gracePeriod',
@@ -143,18 +153,21 @@ foam.CLASS({
       granted by this capability after the duration runs out.
       If the gracePeriod is greater than 0, the UserCapabilityJunction will set isInGracePeriod property to true
       and set gracePeriod property to be equals to this. Otherwise, the UserCapabilityJunction will
-      go into EXPIRED status.`
+      go into EXPIRED status.`,
+      includeInDigest: true,
     },
     {
       name: 'of',
       class: 'Class',
       displayWidth: 70,
-      documentation: `Model used to store information required by this credential`
+      documentation: `Model used to store information required by this credential`,
+      includeInDigest: true,
     },
     {
       name: 'inherentPermissions',
       class: 'StringArray',
       documentation: `List of inherent permissions provided by this capability`,
+      includeInDigest: true,
       storageTransient: true,
       visibility: 'HIDDEN'
     },
@@ -162,11 +175,13 @@ foam.CLASS({
       name: 'permissionsGranted',
       class: 'StringArray',
       documentation: `List of permissions granted by this capability`,
+      includeInDigest: true,
       view: 'foam.u2.crunch.PermissionsStringArrayView'
     },
     {
       name: 'permissionsIntercepted',
       class: 'StringArray',
+      includeInDigest: true,
       documentation: `List of permissions intercepted by this capability`
     },
     {
@@ -174,32 +189,37 @@ foam.CLASS({
       class: 'String',
       documentation: `
       daoKey.put() done in UserCapabilityJunctionDAO.
-      Uses contextDAOFindKey to find object to update/put.`
+      Uses contextDAOFindKey to find object to update/put.`,
+      includeInDigest: true
     },
     {
       name: 'contextDAOFindKey',
       class: 'String',
-      documentation: 'need to find things dynamically, thus have a string here to specify the object in context to look up.'
+      documentation: 'need to find things dynamically, thus have a string here to specify the object in context to look up.',
+      includeInDigest: true
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'interceptIf',
       networkTransient: true,
       javaFactory: 'return foam.mlang.MLang.TRUE;',
-      documentation: 'condition under which the permissions that may be intercepted by this capability will be intercepted.'
+      documentation: 'condition under which the permissions that may be intercepted by this capability will be intercepted.',
+      includeInDigest: false
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'availabilityPredicate',
       networkTransient: true,
       javaFactory: 'return foam.mlang.MLang.TRUE;',
-      documentation: 'Predicate used to omit or include capabilities from capabilityDAO'
+      documentation: 'Predicate used to omit or include capabilities from capabilityDAO',
+      includeInDigest: true
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'visibilityPredicate',
       javaFactory: 'return foam.mlang.MLang.FALSE;',
-      documentation: 'Predicate of the visibility for capabilities in the capability store/keyword sections'
+      documentation: 'Predicate of the visibility for capabilities in the capability store/keyword sections',
+      includeInDigest: true
     },
     {
       name: 'grantMode',
@@ -210,6 +230,7 @@ foam.CLASS({
     {
       name: 'reviewRequired',
       class: 'Boolean',
+      includeInDigest: true,
       permissionRequired: true
     },
     {
@@ -218,6 +239,7 @@ foam.CLASS({
       of: 'foam.nanos.crunch.AssociatedEntity',
       hidden: true,
       permissionRequired: true,
+      includeInDigest: true,
       documentation: `
         Denotes which entity in the context subject the capability should be saved to when there are mutiple.
       `,
@@ -237,7 +259,8 @@ foam.CLASS({
       `,
       factory: function() {
         return foam.nanos.crunch.ui.CapabilityWizardlet.create({}, this);
-      }
+      },
+      includeInDigest: false,
     },
     {
       class: 'Object',
@@ -256,6 +279,7 @@ foam.CLASS({
         Configuration placed on top level capabilities defining various
         configuration options supported by client capability wizards.
       `,
+      includeInDigest: false,
       factory: function() {
         return this.EasyCrunchWizard.create({}, this);
       }
@@ -264,7 +288,8 @@ foam.CLASS({
       name: 'requirementViewTitle',
       class: 'String',
       documentation: `A short introduction displayed as subtitle in CapabilityRequirementView`,
-      section: 'uiSettings'
+      section: 'uiSettings',
+      includeInDigest: false,
     }
   ],
 

@@ -224,11 +224,6 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'includeInDigest',
-      value: false
-    },
-    {
-      class: 'Boolean',
       name: 'synchronized',
       value: false
     },
@@ -320,6 +315,7 @@ foam.CLASS({
         writePermissionRequired: this.writePermissionRequired,
         storageTransient:        this.storageTransient,
         storageOptional:         this.storageOptional,
+        clusterTransient:        this.clusterTransient,
         xmlAttribute:            this.xmlAttribute,
         xmlTextNode:             this.xmlTextNode,
         sqlType:                 this.sqlType,
@@ -353,7 +349,7 @@ foam.CLASS({
       // add pre-set function
       if ( this.javaPreSet ) {
         setter += this.javaPreSet;
-      };
+      }
 
       // set value
       // Don't include oldVal if not used

@@ -25,6 +25,14 @@ foam.CLASS({
 
   searchColumns: [ 'id', 'description' ],
 
+  constants: [
+    {
+      name: 'ADMIN_GROUP',
+      value: 'admin',
+      type: 'String'
+    }
+  ],
+  
   properties: [
     {
       class: 'String',
@@ -64,27 +72,32 @@ foam.CLASS({
       targetDAOKey: 'menuDAO',
       of: 'foam.nanos.menu.Menu',
       name: 'rootMenu',
-      value: ''
+      value: '',
+      includeInDigest: false
     },
     {
       class: 'String',
       name: 'url',
-      value: null
+      value: null,
+      includeInDigest: false
     },
     {
       class: 'String',
       name: 'from',
-      value: null
+      value: null,
+      includeInDigest: false
     },
     {
       class: 'String',
       name: 'displayName',
-      value: null
+      value: null,
+      includeInDigest: false
     },
     {
       class: 'String',
       name: 'replyTo',
-      value: null
+      value: null,
+      includeInDigest: false
     },
     {
       class: 'Long',
@@ -97,15 +110,18 @@ foam.CLASS({
           600000 = 1000 * 60 * 10.
 
         Set the value to 0 to turn off this feature.
-      `
+      `,
+      includeInDigest: false
     },
     {
       class: 'String',
-      name: 'supportEmail'
+      name: 'supportEmail',
+      includeInDigest: false
     },
     {
       class: 'String',
-      name: 'supportPhone'
+      name: 'supportPhone',
+      includeInDigest: false
     },
     {
       class: 'FObjectProperty',
@@ -121,7 +137,8 @@ foam.CLASS({
       view: {
         class: 'foam.u2.view.FObjectPropertyView',
         readView: { class: 'foam.u2.detail.VerticalDetailView' }
-      }
+      },
+      includeInDigest: true
     },
     {
       documentation: `Restrict members of this group to particular IP address range.

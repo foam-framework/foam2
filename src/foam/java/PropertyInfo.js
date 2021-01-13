@@ -57,6 +57,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'clusterTransient'
+    },
+    {
+      class: 'Boolean',
       name: 'readPermissionRequired'
     },
     {
@@ -101,11 +105,13 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'includeInDigest'
+      name: 'includeInDigest',
+      value: true
     },
     {
       class: 'Boolean',
-      name: 'includeInSignature'
+      name: 'includeInSignature',
+      value: true
     },
     {
       class: 'Boolean',
@@ -338,6 +344,15 @@ foam.CLASS({
             type: 'boolean',
             visibility: 'public',
             body: 'return ' + this.storageOptional + ';'
+          });
+        }
+
+        if ( this.clusterTransient ) {
+          m.push({
+            name: 'getClusterTransient',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.clusterTransient + ';'
           });
         }
 
