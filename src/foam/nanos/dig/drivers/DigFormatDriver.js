@@ -263,7 +263,7 @@ foam.CLASS({
       synchronized: true,
       javaCode: `
       FObject nu = obj;
-      FObject old = dao.find(obj);
+      FObject old = dao.inX(getX()).find(obj);
       if ( old != null ) {
         nu = old.fclone();
         nu.copyFrom(obj);
