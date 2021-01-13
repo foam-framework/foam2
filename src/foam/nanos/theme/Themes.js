@@ -58,6 +58,7 @@ Later themes:
         var domain = window && window.location.hostname || 'localhost';
         var user = x.subject.user;
         if ( domain ) {
+          console.debug('domain', domain);
           themeDomain = await this.themeDomainDAO.find(domain);
           if ( ! themeDomain &&
                'localhost' != domain ) {
@@ -196,8 +197,14 @@ Later themes:
       }
 
       if ( theme == null ) {
-        // logger.debug("Themes", "fallback");
-        theme = new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
+        logger.debug("Themes", "fallback");
+        theme = (Theme) themeDAO.find(
+          MLang.AND(
+            MLang.EQ(Theme.NAME, "foam")
+          ));
+        if ( theme == null ) {
+          theme = new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
+        }
       }
 
       return theme;
