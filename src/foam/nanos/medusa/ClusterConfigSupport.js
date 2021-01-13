@@ -1031,6 +1031,7 @@ configuration for contacting the primary node.`,
       javaType: 'Long',
       javaCode: `
       PM pm = PM.create(x, this.getClass().getSimpleName(), "countEntryOnNodes");
+      ClusterConfig myConfig = getConfig(getX(), getConfigId());
 
       Long count = 0L;
       try {
@@ -1040,7 +1041,10 @@ configuration for contacting the primary node.`,
                     EQ(ClusterConfig.TYPE, MedusaType.NODE),
                     EQ(ClusterConfig.ZONE, 0L),
                     EQ(ClusterConfig.ENABLED, true),
-                    EQ(ClusterConfig.STATUS, Status.ONLINE)
+                    EQ(ClusterConfig.STATUS, Status.ONLINE),
+                    NEQ(ClusterConfig.ID, myConfig.getId()),
+//                    NEQ(ClusterConfig.REGION, myConfig.getRegion()),
+                    EQ(ClusterConfig.REALM, myConfig.getRealm())
                 )
             )
             .select(new ArraySink())).getArray();
@@ -1060,6 +1064,59 @@ configuration for contacting the primary node.`,
         pm.log(x);
       }
       getLogger().info("countEntryOnNodes", "index", index, "count", count);
+      return count;
+      `
+    },
+     {
+      documentation: 'Determine the number of mediators, in another region, which contain and entry. Used during mediator gap testing to determine if the gap is local to this region.',
+      name: 'countEntryOnMediators',
+      args: [
+        {
+          name: 'x',
+          type: 'X'
+        },
+        {
+          name: 'index',
+          type: 'Long'
+        }
+      ],
+      javaType: 'Long',
+      javaCode: `
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "countEntryOnMediators");
+
+      ClusterConfig myConfig = getConfig(getX(), getConfigId());
+
+      Long count = 0L;
+      try {
+        List<ClusterConfig> configs = ((ArraySink) ((DAO) x.get("clusterConfigDAO"))
+            .where(
+                AND(
+                    EQ(ClusterConfig.TYPE, MedusaType.MEDIATOR),
+                    EQ(ClusterConfig.ZONE, 0L),
+                    EQ(ClusterConfig.ENABLED, true),
+//                    EQ(ClusterConfig.STATUS, Status.ONLINE),
+                    NEQ(ClusterConfig.ID, myConfig.getId()),
+//                    NEQ(ClusterConfig.REGION, myConfig.getRegion()),
+                    EQ(ClusterConfig.REALM, myConfig.getRealm())
+                )
+            )
+            .select(new ArraySink())).getArray();
+        for ( ClusterConfig config : configs ) {
+          DAO client = getClientDAO(x, "medusaEntryDAO", config, config);
+          MedusaEntry found = (MedusaEntry) client.find(index);
+          if ( found != null ) {
+            count++;
+            getLogger().debug("countEntryOnMediators", config.getId(), index);
+          }
+        }
+      } catch (Throwable t) {
+        pm.error(x, t);
+        getLogger().error(t);
+        throw t;
+      } finally {
+        pm.log(x);
+      }
+      getLogger().info("countEntryOnMediators", "index", index, "count", count);
       return count;
       `
     },

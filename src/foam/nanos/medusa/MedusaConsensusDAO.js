@@ -30,9 +30,11 @@ This is the heart of Medusa.`,
     'static foam.mlang.MLang.EQ',
     'static foam.mlang.MLang.GT',
     'static foam.mlang.MLang.MAX',
+    'static foam.mlang.MLang.MIN',
     'static foam.mlang.MLang.OR',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Max',
+    'foam.mlang.sink.Min',
     'foam.nanos.alarming.Alarm',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
@@ -330,8 +332,7 @@ This is the heart of Medusa.`,
               // If stalled on nextIndex and nextIndex + 1 exists and has conenssus, test if nextIndex exists in nodes, if not, skip.
               if ( nextIndex == replaying.getIndex() + 1 &&
                    ( System.currentTimeMillis() - nextIndexSince ) > 10000 ) {
-                gap(x, nextIndex);
-                nextIndexSince = System.currentTimeMillis();
+                gap(x, nextIndex, nextIndexSince);
               }
             }
           } finally {
@@ -497,6 +498,11 @@ This is the heart of Medusa.`,
         {
           name: 'index',
           type: 'Long'
+        },
+        {
+          documentation: 'milliseconds since epoch at this gap index',
+          name: 'since',
+          type: 'Long'
         }
       ],
       javaCode: `
@@ -512,6 +518,16 @@ This is the heart of Medusa.`,
         ClusterConfig config = support.getConfig(x, support.getConfigId());
         getLogger().debug("gap", "testing", index);
         MedusaEntry entry = (MedusaEntry) getDelegate().find_(x, index + 1);
+        if ( entry == null ) {
+          Min min = (Min) getDelegate().where(
+            EQ(MedusaEntry.PROMOTED, false)
+          ).select(MIN(MedusaEntry.INDEX));
+          if ( min != null &&
+               min.getValue() != null &&
+              ((Long) min.getValue()) > index ) {
+            entry = (MedusaEntry) getDelegate().find_(x, (Long) min.getValue());
+          }
+        }
         if ( entry != null ) {
           try {
             entry = getConsensusEntry(x, entry);
@@ -523,6 +539,7 @@ This is the heart of Medusa.`,
             // REVIEW: countEntryOnNodes no longer available as
             // nodes don't keep an mdao of entries.
             // long nodeCount = support.countEntryOnNodes(x, index);
+            long mediatorCount = support.countEntryOnMediators(x, index);
             long nodeCount = 0L;
             if ( nodeCount == 0L ) {
               getLogger().warning("gap", "found", index);
@@ -550,9 +567,15 @@ This is the heart of Medusa.`,
                     EQ(MedusaEntry.INDEX2, index)
                   ))
                 .select(COUNT());
-              Long lookAheadThreshold = 4L;
+
+              // REVIEW: This is quick and dirty.
+              // look ahead, keep reducing threshold over time
+              Long lookAheadThreshold = 5L;
+              Long minutes = (long) (System.currentTimeMillis() - since) / (1000 * 60);
+              lookAheadThreshold = Math.max(1, lookAheadThreshold - minutes);
+
               if ( ((Long)dependencies.getValue()).intValue() == 0 &&
-                   ((Long)lookAhead.getValue()).intValue() > lookAheadThreshold ) { // REVIEW: How far to look ahead?
+                   ((Long)lookAhead.getValue()).intValue() > lookAheadThreshold ) {
                 // Recovery - set global index to the gap index. Then
                 // the promoter will look for the entry after the gap.
                 getLogger().info("gap", "recovery", index);
