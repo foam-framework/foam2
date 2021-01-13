@@ -28,7 +28,6 @@ public class PreventPrivilegeEscalationTest
   User testUser = null;
   Logger logger_;
   String TEST_MESSAGE = "";
-  String spid_;
 
   @Override
   public void runTest(X x) {
@@ -41,9 +40,6 @@ public class PreventPrivilegeEscalationTest
     testGroup = null;
     testUser = null;
     logger_ = new foam.nanos.logger.PrefixLogger(new Object[] {"PreventPriviledgeEscalation"}, (Logger) x.get("logger"));
-    spid_ = generateId();
-
-    ((DAO) x.get("localServiceProviderDAO")).put(new ServiceProvider.Builder(x).setId(spid_).build());
 
     // Run the tests.
     try {
@@ -64,12 +60,12 @@ public class PreventPrivilegeEscalationTest
     } catch (Throwable e) {
       logger_.error(e);
       e.printStackTrace();
-      test(false, "An unexpected exception was thrown. Some tests might not have been executed. "+e.getMessage());
+      test(false, "An unexpected exception was thrown. Some tests might not have been executed.");
     }
   }
 
   String generateId() {
-    return java.util.UUID.randomUUID().toString().split("-")[0];
+    return java.util.UUID.randomUUID().toString();
   }
 
   // Generate a test user and a group with the given permissions for them to be in.
@@ -84,8 +80,6 @@ public class PreventPrivilegeEscalationTest
     groupDAO.put(testGroup);
 
     groupPermissionJunctionDAO.where(foam.mlang.MLang.EQ(GroupPermissionJunction.SOURCE_ID, groupId)).removeAll();
-
-    permissionIds.add("serviceprovider.read."+spid_);
 
     for ( String id : permissionIds ) {
       localPermissionDAO.where(foam.mlang.MLang.EQ(Permission.ID, id)).removeAll();
@@ -103,7 +97,7 @@ public class PreventPrivilegeEscalationTest
       .setId(999999999L)
       .setEmail("ppet@example.com")
       .setGroup(groupId)
-      .setSpid(spid_)
+      .setSpid("spid")
       .setLifecycleState(foam.nanos.auth.LifecycleState.ACTIVE)
       .build();
     testUser = (User) bareUserDAO.put(testUser);
@@ -280,7 +274,7 @@ public class PreventPrivilegeEscalationTest
     // Create a user for the test user to put.
     User u = new User.Builder(x)
       .setGroup("admin")
-      .setSpid(spid_)
+      .setSpid("spid")
       .setEmail("ppet+admin@example.com")
       .setDesiredPassword("!@#$ppet1234")
       .build();
@@ -321,7 +315,7 @@ public class PreventPrivilegeEscalationTest
     // Create a user for the test user to put.
     User u = new User.Builder(x)
       .setGroup("basicUser")
-      .setSpid(spid_)
+      .setSpid("spid")
       .setEmail("ppet1+admin@example.com")
       .setFirstName("ppet")
       .setLastName("ppet")

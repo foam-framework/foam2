@@ -136,11 +136,8 @@ class XI
     return getRightChild().get(x, skey);
   }
 
-  /**
-   * Replaces toString(), otherwise the entire context is printed (I believe
-   * mistakenly) if someone happens to log a context.
-   */
-  public String toDebugString() {
+  @Override
+  public String toString() {
     return getLeftChild().toString() + ( "{Key: " + key_ + ", Object: "  + value_ + "}\n" ) + getRightChild().toString();
   }
 }

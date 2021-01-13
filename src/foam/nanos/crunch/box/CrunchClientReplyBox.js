@@ -50,7 +50,7 @@ foam.CLASS({
           var intercept = msg.object.data.exception;
           intercept.message = msg.object.data.message;
 
-          // Configure events CapabilityIntercept completion
+          // Configure events CapabilityIntercept comopletion
           intercept.resolve = function (value) {
             var newMsg = msg.clone();
             newMsg.object = self.RPCReturnMessage.create({

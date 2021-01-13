@@ -10,216 +10,147 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   documentation: `A DAO decorator which:
+- filters find and select by the 'owning' ServiceProvider ID (spid),
 - enforces spid permissions on update and create,
-- filters find, remove, and select by spids the caller has read permission on.
-`,
+- restricts or filters by spid on remove.
+The DAO can act on models which explicitly implement ServiceProviderAware,
+or where a Reference/Relationship model implements ServiceProviderAware.
+Where the ServiceProviderAware is found through a Reference or Relationship,
+the DAO uses a Map of class and PropertyInfos to traverse the Reference,
+Relationship hierarchy.`,
 
   javaImports: [
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.X',
     'foam.dao.DAO',
-    'foam.dao.ArraySink',
+    'foam.dao.ProxyDAO',
+    'foam.dao.ProxySink',
+    'foam.dao.Sink',
     'foam.mlang.MLang',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.app.AppConfig',
-    'foam.nanos.logger.Logger',
-    'foam.nanos.session.Session',
-    'foam.nanos.theme.Theme',
-    'foam.nanos.theme.Themes',
-    'foam.util.SafetyUtil',
-    'java.util.ArrayList',
-    'java.util.Arrays',
-    'java.util.List',
-    'java.util.stream.Collectors',
+    'foam.util.SafetyUtil'
   ],
 
   properties: [
     {
-      name: 'propertyInfo',
-      class: 'Object',
-      of: 'foam.core.PropertyInfo',
-      javaFactory: `
-      return (PropertyInfo) getOf().getAxiomByName("spid");
-      `
-    },
+      documentation: `A Map propertyInfo[] key on class name.  For some class,
+the propertyInfos are the Reference or Relationship property from which to find
+the next step in the hierachy on route the instance which implements
+ServiceProviderAware`,
+      name: 'propertyInfos',
+      class: 'Map'
+    }
   ],
 
   methods: [
     {
-      name: 'getPredicate',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      type: 'foam.mlang.predicate.Predicate',
-      javaCode: `
-      AuthService auth = (AuthService) x.get("auth");
-      ArrayList<ServiceProvider> serviceProviders = (ArrayList) ((ArraySink) ((DAO) getX().get("localServiceProviderDAO")).select(new ArraySink())).getArray();
-      List<String> ids = serviceProviders.stream()
-                            .map(ServiceProvider::getId)
-                            .filter(id -> auth.check(x, "serviceprovider.read."+id))
-                            .collect(Collectors.toList());
-      if ( ids.size() == 1 ) {
-        return MLang.EQ(getPropertyInfo(), ids.get(0));
-      } else if ( ids.size() > 1 ) {
-        return MLang.IN(getPropertyInfo(), ids.toArray(new String[0]));
-      }
-      throw new AuthorizationException();
-      `
-    },
-    {
-      description: `Return true if system/admin context`,
-      name: 'isAdmin',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      type: 'Boolean',
-      javaCode: `
-      Subject subject = (Subject) x.get("subject");
-      if ( subject != null ) {
-        User user = subject.getRealUser();
-        if ( user != null ) {
-          return user.isAdmin();
-        }
-      }
-      return false;
-      `
-    },
-    {
-      name: 'getSpid',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      type: 'String',
-      javaThrows: ['AuthorizationException'],
-      javaCode: `
-      User user = null;
-      String spid = (String) x.get("spid");
-      Subject subject = (Subject) x.get("subject");
-      if ( subject != null ) {
-        user = subject.getRealUser();
-        if ( user != null ) {
-          if ( ! SafetyUtil.isEmpty(user.getSpid()) ) {
-             spid = user.getSpid();
-          }
-        }
-      }
-      if ( SafetyUtil.isEmpty(spid) ||
-           user != null &&
-           user.isAdmin() &&
-           SafetyUtil.isEmpty(user.getSpid()) ) {
-        Theme theme = ((Themes) x.get("themes")).findTheme(x);
-        if ( theme != null &&
-             ! SafetyUtil.isEmpty(theme.getSpid()) ) {
-          spid = theme.getSpid();
-        } else {
-          ((foam.nanos.logger.Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Theme not found", ( theme != null ? theme.getId()+":"+theme.getName() : "null"));
-        }
-      }
-      if ( SafetyUtil.isEmpty(spid) ) {
-        spid = ((AppConfig) x.get("appConfig")).getDefaultSpid();
-      }
-      if ( SafetyUtil.isEmpty(spid) ) {
-        throw new AuthorizationException();
-      }
-      return spid;
-      `
-    },
-    {
       name: 'put_',
       javaThrows: ['AuthorizationException'],
       javaCode: `
-      if ( ! ( obj instanceof ServiceProviderAware ) ) {
-        return super.put_(x, obj);
-      }
-
-      Object id = obj.getProperty("id");
-      FObject oldObj = getDelegate().inX(x).find(id);
-      boolean isCreate = id == null || oldObj == null;
-
-      ServiceProviderAware sp = (ServiceProviderAware) obj;
-      ServiceProviderAware oldSp = (ServiceProviderAware) oldObj;
-      AuthService auth = (AuthService) x.get("auth");
-
-      if ( isCreate ) {
-        if ( SafetyUtil.isEmpty(sp.getSpid()) ) {
-          sp.setSpid(getSpid(x));
-        } else if ( ! sp.getSpid().equals(getSpid(x)) &&
-                    ! auth.check(x, "serviceprovider.create." + sp.getSpid()) ) {
-          throw new AuthorizationException();
-        }
-      } else if ( ! sp.getSpid().equals(oldSp.getSpid()) &&
-                  ! (auth.check(x, "serviceprovider.update." + oldSp.getSpid()) &&
-                     auth.check(x, "serviceprovider.update." + sp.getSpid())) ) {
-        throw new AuthorizationException();
-      } else if ( sp.getSpid().equals(oldSp.getSpid()) &&
-                  ! auth.check(x, "serviceprovider.read." + sp.getSpid()) ) {
-        throw new AuthorizationException();
-      }
-
+    if ( ! ( obj instanceof ServiceProviderAware ) ) {
       return super.put_(x, obj);
+    }
+
+    Object id = obj.getProperty("id");
+    FObject oldObj = getDelegate().inX(x).find(id);
+    boolean isCreate = id == null || oldObj == null;
+
+    ServiceProviderAware sp = (ServiceProviderAware) obj;
+    ServiceProviderAware oldSp = (ServiceProviderAware) oldObj;
+    AuthService auth = (AuthService) x.get("auth");
+
+    if ( isCreate ) {
+      if ( SafetyUtil.isEmpty(sp.getSpid()) ||
+           ( ! SafetyUtil.isEmpty(sp.getSpid()) &&
+             ! auth.check(x, "serviceprovider.create." + sp.getSpid()) ) ) {
+        User user = ((Subject) x.get("subject")).getUser();
+        if ( user != null &&
+             ! SafetyUtil.isEmpty(user.getSpid()) ) {
+          sp.setSpid(user.getSpid());
+        } else {
+          sp.setSpid(((AppConfig) x.get("appConfig")).getDefaultSpid());
+        }
+      }
+    } else if ( ! sp.getSpid().equals(oldSp.getSpid()) &&
+                ! (auth.check(x, "serviceprovider.update." + oldSp.getSpid()) &&
+                   auth.check(x, "serviceprovider.update." + sp.getSpid())) ) {
+      throw new AuthorizationException("You do not have permission to update ServiceProvider (spid) property.");
+    } else if ( sp.getSpid().equals(oldSp.getSpid()) &&
+                ! auth.check(x, "serviceprovider.read." + sp.getSpid()) ) {
+      throw new AuthorizationException("You do not have permission to update data on other ServiceProvider.");
+    }
+
+    return super.put_(x, obj);
       `
     },
     {
       name: 'find_',
       javaCode: `
-      if ( isAdmin(x) ) {
-        return getDelegate().find_(x, id);
-      }
+    FObject result = getDelegate().find_(x, id);
+    if ( result == null ||
+         ((AuthService) x.get("auth")).check(x, "*") ) {
+      return result;
+    }
 
-      return getDelegate().where(getPredicate(x)).find_(x, id);
-      `
-    },
-    {
-      name: 'remove_',
-      javaCode: `
-      if ( isAdmin(x) ||
-           getPredicate(x).f(obj) ) {
-        return getDelegate().remove_(x, obj);
-      }
+    if ( new ServiceProviderAwareSupport().match(x, getPropertyInfos(), result) ) {
+      return result;
+    }
 
-      throw new AuthorizationException();
+    return null;
       `
     },
     {
       name: 'select_',
       javaCode: `
-      Predicate spidPredicate = predicate;
-      if ( ! isAdmin(x) ) {
-        try {
-          spidPredicate = getPredicate(x);
-        } catch ( AuthorizationException e ) {
-          // NOTE: On Login, context is empty of subject and spid
-          Subject subject = (Subject) x.get("subject");
-          if ( ( subject == null ||
-                 subject.getRealUser() == null ) &&
-               x.get("spid") == null ) {
-            spidPredicate = null;
-            ((Logger) x.get("logger")).debug(this.getClass().getSimpleName(), "select", "login", "spid restrictions disabled.");
-          } else {
-            throw e;
-          }
-        }
-        if ( predicate != null &&
-             spidPredicate != null ) {
+    if ( ((AuthService) x.get("auth")).check(x, "*") ) {
+      return super.select_(x, sink, skip, limit, order, predicate);
+    }
+
+    Predicate spidPredicate = predicate;
+
+    String spid = (String) x.get("spid");
+    if ( spid != null ) { // spid may be null during account creation.
+      if ( ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass()) ) {
+
+        PropertyInfo spidProperty = ((PropertyInfo) getOf().getAxiomByName("spid"));
+        spidPredicate = MLang.OR(
+          MLang.EQ(spidProperty, spid),
+          new ServiceProviderAwarePredicate(x, null, getPropertyInfos())
+        );
+
+        if ( predicate != null ) {
           spidPredicate = MLang.AND(
             spidPredicate,
             predicate
           );
-        } else if ( spidPredicate == null ) {
-          spidPredicate = predicate;
         }
+      } else if ( getPropertyInfos() != null &&
+                  getPropertyInfos().size() > 0 ) {
+        spidPredicate = new ServiceProviderAwarePredicate(x, predicate, getPropertyInfos());
       }
-      return getDelegate().select_(x, sink, skip, limit, order, spidPredicate);
+    }
+
+    return getDelegate().select_(
+      x,
+      sink,
+      skip,
+      limit,
+      order,
+      spidPredicate
+    );
+     `
+    },
+    {
+      name: 'cmd_',
+      documentation: 'Process ServiceProviderAwareSupport action which performs spid matching on "OBJ" in the context.',
+      javaCode: `
+        if ( obj instanceof ServiceProviderAwareSupport ) {
+          return ((ServiceProviderAwareSupport) obj).match(x, getPropertyInfos(), x.get("OBJ"));
+        }
+
+        return getDelegate().cmd_(x, obj);
       `
     }
   ]

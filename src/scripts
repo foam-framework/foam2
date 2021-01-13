@@ -16,13 +16,13 @@ p({
     });
 
     x.serviceProviderDAO.select(function (s) {
-      perm = 'serviceprovider.read.' + s.id;
+      perm = 'spid.read.' + s.id;
       p = foam.nanos.auth.Permission.create({ id: perm });
       x.permissionDAO.put(p);
-      perm = 'serviceprovider.update.' + s.id;
+      perm = 'spid.update.' + s.id;
       p = foam.nanos.auth.Permission.create({ id: perm });
       x.permissionDAO.put(p);
-      perm = 'serviceprovider.remove.' + s.id;
+      perm = 'spid.remove.' + s.id;
       p = foam.nanos.auth.Permission.create({ id: perm });
       x.permissionDAO.put(p);
     });

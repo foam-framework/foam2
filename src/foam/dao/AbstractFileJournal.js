@@ -75,10 +75,8 @@ foam.CLASS({
       name: 'outputter',
       javaType: 'foam.lib.json.Outputter',
       javaFactory: `
-        foam.lib.json.Outputter outputter = new Outputter(getX());
-        outputter.setPropertyPredicate(new StoragePropertyPredicate());
+        foam.lib.json.Outputter outputter = new Outputter(getX()).setPropertyPredicate(new StoragePropertyPredicate());
         outputter.setMultiLine(getMultiLineOutput());
-        outputter.setOutputClassNames(getOutputClassNames());
         return outputter;
         `
     },
@@ -115,11 +113,6 @@ foam.CLASS({
       class: 'Boolean',
       name: 'multiLineOutput',
       value: false
-    },
-    {
-      name: 'outputClassNames',
-      class: 'Boolean',
-      value: true
     },
     {
       class: 'Boolean',

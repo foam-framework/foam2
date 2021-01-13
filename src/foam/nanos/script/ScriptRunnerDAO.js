@@ -12,9 +12,8 @@ foam.CLASS({
   javaImports: [
     'foam.core.*',
     'foam.dao.*',
-    'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.logger.StdoutLogger'
+    'foam.nanos.logger.Logger'
   ],
 
   axioms: [
@@ -33,20 +32,15 @@ foam.CLASS({
   ],
 
   properties: [
-    {
+        {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
       visibility: 'HIDDEN',
-      transient: true,
       javaFactory: `
-        Logger logger = (Logger) getX().get("logger");
-        if ( logger == null ) {
-          logger = new StdoutLogger();
-        }
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
-        }, logger);
+        }, (Logger) getX().get("logger"));
       `
     }
   ],
@@ -55,14 +49,10 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-        Script script = (Script) obj;
+        Script script = (Script) getDelegate().put_(x, obj);
+        getLogger().debug("put", script.getId(), script.getStatus());
         if ( script.getStatus() == ScriptStatus.SCHEDULED ) {
-          if ( script.canRun(x) ) {
-            script = (Script) getDelegate().put_(x, script);
-            runScript(x, script);
-          } 
-        } else {
-          script = (Script) getDelegate().put_(x, script);
+          this.runScript(x, script);
         }
         return script;
       `
@@ -86,13 +76,13 @@ foam.CLASS({
                 s.runScript(x);
                 getLogger().debug("agency", s.getId(), "end");
                 s.setStatus(ScriptStatus.UNSCHEDULED);
-                getDelegate().put_(x, s);
               } catch(Throwable t) {
                 t.printStackTrace();
                 s.setStatus(ScriptStatus.ERROR);
-                getDelegate().put_(x, s);
                 getLogger().error("agency", s.getId(), t);
-             }
+              } finally {
+                getDelegate().put_(x, s);
+              }
             }
           }, "Run script: " + script.getId());
         return script;

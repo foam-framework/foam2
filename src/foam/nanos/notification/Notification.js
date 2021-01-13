@@ -11,9 +11,7 @@ foam.CLASS({
   implements: [
     'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
-    'foam.nanos.auth.CreatedByAware',
-    'foam.nanos.medusa.Clusterable',
-    'foam.nanos.auth.ServiceProviderAware'
+    'foam.nanos.auth.CreatedByAware'
   ],
 
   documentation: 'Notification model responsible for system and integrated messaging notifications.',
@@ -34,28 +32,7 @@ foam.CLASS({
     'foam.log.LogLevel'
   ],
 
-  tableColumns: [
-    'id',
-    'body',
-    'notificationType',
-    'broadcasted',
-    'userId.id',
-    'groupId.id'
-  ],
-
-  sections: [
-    {
-      name: 'default_',
-      order: 1
-    },
-    {
-      name: 'systemInformation',
-      help: 'Properties that are used internally by the system.',
-      title: 'System Information',
-      order: 2,
-      permissionRequired: true
-    },
-  ],
+  tableColumns: ['id', 'body', 'notificationType', 'broadcasted', 'userId.id', 'groupId.id' ],
 
   axioms: [
     {
@@ -206,31 +183,6 @@ foam.CLASS({
       class: 'String',
       name: 'slackMessage',
       documentation: 'Message to be sent to Slack.'
-    },
-    {
-      class: 'Boolean',
-      name: 'clusterable',
-      value: true,
-      includeInDigest: false
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.ServiceProvider',
-      name: 'spid',
-      includeInDigest: true,
-      tableWidth: 120,
-      section: 'systemInformation',
-      writePermissionRequired: true,
-      documentation: `
-        Need to override getter to return "" because its trying to
-        return null which breaks tests
-      `,
-      javaGetter: `
-        if ( ! spidIsSet_ ) {
-          return "";
-        }
-        return spid_;
-      `
     }
   ],
 

@@ -28,7 +28,7 @@ import java.net.URL;
 
 @SuppressWarnings("serial")
 public class ServiceWebAgent
-  implements WebAgent
+    implements WebAgent
 {
   public static final int BUFFER_SIZE = 4096;
 
@@ -54,13 +54,23 @@ public class ServiceWebAgent
     authenticate_ = authenticate;
   }
 
-  public Box getSkeletonBox() {
-    return skeleton_;
+/*
+  public X    getX() { return x_; }
+  public void setX(X x) {
+    x_ = x;
+    if ( skeleton_ instanceof ContextAware )
+      ((ContextAware) skeleton_).setX(x);
   }
+*/
 
-  public Boolean getAuthenticate() {
-    return authenticate_;
+/*
+  @Override
+  public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    resp.setHeader("Access-Control-Allow-Origin", "*");
+    resp.setStatus(resp.SC_OK);
+    resp.flushBuffer();
   }
+*/
 
   public void execute(X x) {
     try {
@@ -74,19 +84,10 @@ public class ServiceWebAgent
 
       if ( ((AppConfig) x.get("appConfig")).getMode() != Mode.PRODUCTION ) {
         resp.setHeader("Access-Control-Allow-Origin", "*");
-      } else if ( ! foam.util.SafetyUtil.isEmpty(req.getHeader("Origin")) &&
-                  ! "null".equals(req.getHeader("Origin")) ) {
+      } else if ( ! req.getHeader("Origin").equals("null") ){
         URL url = new URL(req.getHeader("Origin"));
         if ( http.containsHostDomain(url.getHost()) )
           resp.setHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));
-      }
-
-      if ( req.getMethod() == "OPTIONS" ) {
-        resp.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS, POST, PUT");
-        resp.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Cache-Control, Origin, Pragma");
-        resp.setStatus(resp.SC_OK);
-        out.flush();
-        return;
       }
 
       int read   = 0;
@@ -102,10 +103,9 @@ public class ServiceWebAgent
 
       FObject result;
       try {
-        // logger.debug("parseString", builder.toString());
         result = requestContext.create(JSONParser.class).parseString(builder.toString());
       } catch (Throwable t) {
-        logger.error("Unable to parse", builder.toString());
+        System.err.println("Unable to parse: " + builder.toString());
         throw t;
       }
 
@@ -149,4 +149,15 @@ public class ServiceWebAgent
     ps = eps.apply(parser, psx);
     return eps.getMessage();
   }
+
+/*
+  public void doOptions(HttpServletRequest req, HttpServletResponse resp)
+    throws IOException, ServletException
+  {
+    resp.setHeader("Access-Control-Allow-Origins", "*");
+    resp.setHeader("Access-Control-Allow-Methods", "GET POST");
+    resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    super.doOptions(req, resp);
+  }
+  */
 }

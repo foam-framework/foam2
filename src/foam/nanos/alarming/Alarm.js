@@ -11,18 +11,17 @@ foam.CLASS({
   documentation: 'A config for OM on when an alarm should be raised',
 
   implements: [
-    'foam.mlang.Expressions',
     'foam.nanos.auth.CreatedAware',
+    'foam.mlang.Expressions',
     'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.medusa.Clusterable'
   ],
 
   tableColumns: [
     'name',
     'hostname',
     'severity',
-    'isActive',
     'lastModified',
+    'isActive',
     'stop',
     'start'
   ],
@@ -72,10 +71,7 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'name',
-      createVisibility: 'RW',
-      updateVisibility: 'RO',
-      tableWidth: 150
+      name: 'name'
     },
     {
       class: 'String',
@@ -87,7 +83,8 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.log.LogLevel',
       name: 'severity',
-      value: 'WARN'
+      value: 'WARN',
+      visibility: 'RO'
     },
     {
       class: 'Boolean',
@@ -97,9 +94,7 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.alarming.AlarmReason',
       name: 'reason',
-      value: 'UNSPECIFIED',
-      createVisibility: 'RW',
-      updateVisibility: 'RO'
+      value: 'UNSPECIFIED'
     },
     {
       class: 'DateTime',
@@ -109,23 +104,12 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'lastModified',
-      label: 'Since',
-      visibility: 'RO',
-      tableWidth: 150,
-      storageOptional: true
+      visibility: 'RO'
     },
     {
       class: 'String',
       name: 'note',
-      view: { class: 'foam.u2.tag.TextArea' },
-      createVisibility: 'RW',
-      updateVisibility: 'RO'
-    },
-    {
-      class: 'Boolean',
-      name: 'clusterable',
-      value: false,
-      includeInDigest: false
+      view: { class: 'foam.u2.tag.TextArea' }
     }
   ],
 

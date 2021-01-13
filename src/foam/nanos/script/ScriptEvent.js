@@ -8,11 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.script',
   name: 'ScriptEvent',
 
-  documenation: `Captures the running of a Script.  The associate DAO is not clustered, but the event carries the hostname of the instance it ran on to distinguish when DAOs from many instances are collected by the NOC for example.`,
-
-  implements: [
-    'foam.nanos.medusa.Clusterable'
-  ],
+  documenation: `Captures the running of a Script.  The event carries the hostname of the instance it ran on to distinguish when DAOs from many instances are collected by the NOC for example.`,
 
   tableColumns: [
     'scriptType',
@@ -71,13 +67,6 @@ foam.CLASS({
       name: 'hostname',
       class: 'String',
       javaFactory: 'return System.getProperty("hostname", "localhost");'
-    },
-    {
-      documentation: 'A non-clusterable script can run on all instances, and any run info will be stored locally',
-      name: 'clusterable',
-      class: 'Boolean',
-      value: true,
-      includeInDigest: false
     }
   ]
 });

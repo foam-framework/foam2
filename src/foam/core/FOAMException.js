@@ -19,19 +19,16 @@ foam.CLASS({
   public FOAMException(String message) {
     super(message);
     setMessage_(message);
-    getHostname();
   }
 
   public FOAMException(Throwable cause) {
     super(cause);
     setMessage_(cause.getMessage());
-    getHostname();
   }
 
   public FOAMException(String message, Throwable cause) {
     super(message, cause);
     setMessage_(message);
-    getHostname();
   }
         `);
       }
@@ -47,14 +44,7 @@ foam.CLASS({
     },
     {
       name: 'message_',
-      class: 'String',
-      visibility: 'RO'
-    },
-    {
-      name: 'hostname',
-      class: 'String',
-      javaFactory: 'return System.getProperty("hostname", "localhost");',
-      visibilty: 'RO'
+      class: 'String'
     }
   ],
   
@@ -68,13 +58,6 @@ foam.CLASS({
         return super.getMessage();
       }
       return msg;
-      `
-    },
-    {
-      name: 'toString',
-      type: 'String',
-      javaCode: `
-      return "["+getHostname()+"],"+this.getClass().getName()+","+super.getMessage();
       `
     }
   ]

@@ -31,7 +31,6 @@ foam.CLASS({
     'foam.nanos.auth.Group',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
-    'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil',
     'javax.servlet.http.HttpServletRequest',
     'org.eclipse.jetty.server.Request'
@@ -58,7 +57,6 @@ Later themes:
         var domain = window && window.location.hostname || 'localhost';
         var user = x.subject.user;
         if ( domain ) {
-          console.debug('domain', domain);
           themeDomain = await this.themeDomainDAO.find(domain);
           if ( ! themeDomain &&
                'localhost' != domain ) {
@@ -85,10 +83,17 @@ Later themes:
             var pos = spid.lastIndexOf('.');
             spid = spid.substring(0, pos > 0 ? pos : 0);
           }
+
+          if ( ! theme ) {
+            theme = await this.themeDAO.find(
+              this.AND(
+                this.EQ(foam.nanos.theme.Theme.SPID, '*'),
+                this.EQ(foam.nanos.theme.Theme.ENABLED, true)));
+          }
         }
 
         if ( ! theme ) {
-          console && console.warn('Theme not found', domain);
+          console && console.warn('Theme not found: '+ domain);
         }
 
         var group = x.group;
@@ -117,8 +122,6 @@ Later themes:
         foam.nanos.theme.Theme.create({ 'name': 'foam', 'appName': 'FOAM' });
       },
       javaCode: `
-      // TODO:  cache domain/theme and update on ThemeDAO changes.
-      Logger logger = (Logger) x.get("logger");
       DAO themeDAO = ((DAO) x.get("themeDAO"));
       Theme theme = null;
       ThemeDomain td = null;
@@ -127,22 +130,15 @@ Later themes:
       HttpServletRequest req = x.get(HttpServletRequest.class);
       if ( req != null ) {
         domain = req.getServerName();
-        // logger.debug("Themes", "domain", domain);
-     }
+      }
 
       // Find theme from themeDomain via domain
       if ( domain != null ) {
         var themeDomainDAO = (DAO) x.get("themeDomainDAO");
         td = (ThemeDomain) themeDomainDAO.find(domain);
-        // if ( td == null ) {
-        //   logger.debug("Themes", "ThemeDomain not found", domain);
-        // }
         if ( td == null &&
              ! "localhost".equals(domain) ) {
           td = (ThemeDomain) themeDomainDAO.find("localhost");
-          // if ( td == null ) {
-          //   logger.debug("Themes", "ThemeDomain not found", "localhost");
-          // }
         }
         if ( td != null ) {
           theme = (Theme) themeDAO.find(
@@ -150,15 +146,13 @@ Later themes:
               MLang.EQ(Theme.ID, td.getTheme()),
               MLang.EQ(Theme.ENABLED, true)
             ));
-          // if ( theme == null ) {
-          //   logger.debug("Themes", "Theme not found", td.getTheme());
-          // }
         }
       }
 
       // Find theme from user via SPID
       if ( user != null
-        && ( theme == null || ! td.getId().equals(domain)) ) {
+        && ( theme == null || ! domain.equals(td.getId()) )
+      ) {
         var spid = user.getSpid();
         while ( ! SafetyUtil.isEmpty(spid) ) {
           theme = (Theme) themeDAO.find(
@@ -174,9 +168,15 @@ Later themes:
         }
       }
 
+      if ( theme == null ) {
+        ((foam.nanos.logger.Logger) x.get("logger")).warning("Theme not found.",
+          "domain:" + (req != null ? req.getServerName() : ""),
+          "user:" + user.getId());
+        theme = new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
+      }
+
       // Augment the theme with group and user themes
-      if ( user != null &&
-           theme != null ) {
+      if ( user != null ) {
         DAO groupDAO = (DAO) x.get("groupDAO");
         Group group = user.findGroup(x);
         while ( group != null ) {
@@ -193,17 +193,6 @@ Later themes:
         Theme userTheme = user.findTheme(x);
         if ( userTheme != null ) {
           theme = (Theme) theme.fclone().copyFrom(userTheme);
-        }
-      }
-
-      if ( theme == null ) {
-        logger.debug("Themes", "fallback");
-        theme = (Theme) themeDAO.find(
-          MLang.AND(
-            MLang.EQ(Theme.NAME, "foam")
-          ));
-        if ( theme == null ) {
-          theme = new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
         }
       }
 

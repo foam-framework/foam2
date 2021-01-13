@@ -720,19 +720,7 @@ foam.LIB({
       //      useShortNames: true,
       useShortNames: false,
       propertyPredicate: function(o, p) { return ! p.storageTransient; }
-    }),
-
-    // Short, but exclude cluster-transient properties.
-    Cluster: foam.json.Outputter.create({
-      pretty: false,
-      strict: false,
-      formatDatesAsNumbers: true,
-      outputDefaultValues: false,
-      // TODO: No deserialization support for shortnames yet.
-      //      useShortNames: true,
-      useShortNames: false,
-      propertyPredicate: function(o, p) { return ! p.clusterTransient; }
-    }),
+    })
   },
 
   methods: [
