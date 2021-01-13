@@ -87,9 +87,7 @@ foam.CLASS({
           UserCapabilityJunction ucj;
           Subject subject = new Subject.Builder(x).setUser(user).build();
           for ( Capability capability : grantPath ) {
-            ucj = crunchService.getJunctionForSubject(x, capability.getId(), subject);
-            ucj.setStatus(CapabilityJunctionStatus.GRANTED);
-            ucj = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, ucj);
+            ucj = crunchService.updateUserJunction(x, subject, capability.getId(), null, CapabilityJunctionStatus.GRANTED);
             if ( ucj == null || ucj.getStatus() != CapabilityJunctionStatus.GRANTED )
               throw new RuntimeException("Error setting up UserCapabilityJunction for user: " + user.getId() + " and spid: " + getId());
           }
