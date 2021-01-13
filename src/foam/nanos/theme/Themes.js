@@ -184,7 +184,13 @@ Later themes:
       }
 
       if ( theme == null ) {
-        ((foam.nanos.logger.Logger) x.get("logger")).debug("Themes", "fallback", "localhost", "not found", "domain", domain);
+        var themeDomain = (ThemeDomain) ((DAO) x.get("themeDomainDAO")).find("localhost");
+        if ( themeDomain != null ) {
+          theme = (Theme) ((DAO) x.get("themeDAO")).find(themeDomain.getTheme());
+        }
+      }
+      if ( theme == null ) {
+        ((foam.nanos.logger.Logger) x.get("logger")).debug("Themes", "fallback", "localhost", "not found");
         theme = new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
       }
 
