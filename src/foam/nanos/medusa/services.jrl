@@ -112,15 +112,6 @@ p({
 
 p({
   "class": "foam.nanos.boot.NSpec",
-  "name": "clusterConfigSupport",
-  "serviceScript":"""
-    return new foam.nanos.medusa.ClusterConfigSupport.Builder(x)
-      .build();
-  """
-})
-
-p({
-  "class": "foam.nanos.boot.NSpec",
   "name": "cluster",
   "serve": true,
   "serviceScript": """
@@ -196,11 +187,20 @@ p({
   "service": {"class":"foam.nanos.medusa.DefaultDaggerService"}
 })
 
-p({
-  "class":"foam.nanos.boot.NSpec",
-  "name":"clusterConfigMonitor",
-  "lazy": false,
-  "serviceClass":"foam.nanos.medusa.ClusterConfigMonitor"
-})
-
 // See deployment/mm and mn for type specific setup
+
+// p({
+//   "class": "foam.nanos.boot.NSpec",
+//   "name": "clusterConfigSupport",
+//   "serviceScript":"""
+//     return new foam.nanos.medusa.ClusterConfigSupport.Builder(x)
+//       .build();
+//   """
+// })
+
+// p({
+//   "class":"foam.nanos.boot.NSpec",
+//   "name":"clusterConfigMonitor",
+//   "lazy": false,
+//   "serviceClass":"foam.nanos.medusa.ClusterConfigMonitor"
+// })

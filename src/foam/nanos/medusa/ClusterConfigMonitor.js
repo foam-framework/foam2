@@ -112,7 +112,7 @@ foam.CLASS({
       javaCode: `
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
         ClusterConfig config = support.getConfig(x, support.getConfigId());
-        // getLogger().debug("execute", config.getId(), config.getType().getLabel(), config.getStatus().getLabel());
+
         if ( config.getType() == MedusaType.NODE ) {
            if ( config.getEnabled() &&
                 config.getStatus() == Status.OFFLINE ) {
