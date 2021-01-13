@@ -16,7 +16,7 @@ foam.INTERFACE({
         Restricted use for Email and Username.
       `,
       async: true,
-      javaThrows: ['java.lang.RuntimeException'],
+      javaThrows: ['AuthorizationException'],
       type: 'Boolean',
       args: [
         {

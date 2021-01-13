@@ -37,7 +37,7 @@ foam.CLASS({
         DAO userDAO = (DAO) getX().get("localUserDAO");
 
         if ( ! targetProperty.equals("userName") && ! targetProperty.equals("email") ) {
-          throw new RuntimeException("Unsupported use of UserPropertyAvailabilityService.");
+          throw new AuthorizationException();
         }
 
         ArraySink select = (ArraySink) userDAO.inX(x).where(MLang.EQ(targetProperty.equals("userName") ? User.USER_NAME : User.EMAIL, value)).select(new ArraySink());
