@@ -122,7 +122,7 @@ foam.CLASS({
              ! SafetyUtil.isEmpty(theme.getSpid()) ) {
           spid = theme.getSpid();
         } else {
-          ((foam.nanos.logger.Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Theme not found", ( theme != null ? theme.getId() : "null"));
+          ((foam.nanos.logger.Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "Theme not found", ( theme != null ? theme.getId()+":"+theme.getName() : "null"));
         }
       }
       if ( SafetyUtil.isEmpty(spid) ) {
