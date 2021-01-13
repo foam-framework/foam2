@@ -11,8 +11,12 @@ foam.INTERFACE({
   methods: [
     {
       name: 'checkAvailability',
-      documentation: `Checks whether a user that satisfies the predicate already exists.`,
+      documentation: `
+        Checks whether a user that has targetProperty set to value already exists.
+        Restricted use for Email and Username.
+      `,
       async: true,
+      javaThrows: ['java.lang.RuntimeException'],
       type: 'Boolean',
       args: [
         {
@@ -20,7 +24,12 @@ foam.INTERFACE({
           type: 'Context'
         },
         {
-          name: 'predicate'
+          name: 'targetProperty',
+          type: 'String'
+        },
+        {
+          name: 'value',
+          type: 'String'
         }
       ]
     }

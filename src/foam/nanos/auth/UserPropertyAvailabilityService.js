@@ -10,7 +10,7 @@ foam.CLASS({
 
   documentation: 
     `This is a service that checks whether a user with matching values for a unique given property
-    (ie. Username/Email) already exists in the system. Thus, this service allows the client to check
+    (restricted use for Username and Email) already exists in the system. Thus, this service allows the client to check
     the availability of these property values.
     `,
 
@@ -25,7 +25,9 @@ foam.CLASS({
   javaImports: [
     'foam.dao.ArraySink',
     'foam.dao.DAO',
-    'foam.mlang.predicate.Predicate'
+    'foam.mlang.MLang',
+    'foam.mlang.MLang.*',
+    'foam.nanos.auth.User'
   ],
 
   methods: [
@@ -33,8 +35,12 @@ foam.CLASS({
       name: 'checkAvailability',
       javaCode: `
         DAO userDAO = (DAO) getX().get("localUserDAO");
-        
-        ArraySink select = (ArraySink) userDAO.inX(x).where((Predicate) predicate).select(new ArraySink());
+
+        if ( ! targetProperty.equals("userName") && ! targetProperty.equals("email") ) {
+          throw new RuntimeException("Unsupported use of UserPropertyAvailabilityService.");
+        }
+
+        ArraySink select = (ArraySink) userDAO.inX(x).where(MLang.EQ(targetProperty.equals("userName") ? User.USER_NAME : User.EMAIL, value)).select(new ArraySink());
         
         if ( select.getArray().size() != 0 ) {
           return false;
