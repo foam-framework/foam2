@@ -14,7 +14,7 @@ foam.CLASS({
   ],
 
   ids: [ 'code', 'variant' ],
-  
+
   properties: [
     {
       class: "String",

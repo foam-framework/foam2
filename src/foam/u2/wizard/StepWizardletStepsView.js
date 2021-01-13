@@ -115,7 +115,7 @@ foam.CLASS({
             let si = data$wizardPosition.sectionIndex;
 
             // Render section labels
-            let sections = this.data.sections[w];
+            let sections = this.data.wizardlets[w].sections;
 
             for ( let s = 0 ; s < sections.length ; s++ ) {
               let pos = this.WizardPosition.create({

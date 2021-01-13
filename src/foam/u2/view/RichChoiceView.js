@@ -366,6 +366,14 @@ foam.CLASS({
       `
     },
     {
+      class: 'FObjectProperty',
+      name: 'actionData',
+      documentation: `
+        Optional. If this is provided alongside an action, the action will be executed
+        with this data in the context.
+      `
+    },
+    {
       class: 'Boolean',
       name: 'allowClearingSelection',
       documentation: `
@@ -524,7 +532,15 @@ foam.CLASS({
                       });
                     });
                   }))
-                  .add(this.slot(function(action) {
+                  .add(this.slot(function(action, actionData) {
+                    if ( action && actionData) {
+                      return this.E()
+                        .startContext({ data: actionData })
+                        .start(self.DefaultActionView, { action: action })
+                          .addClass(self.myClass('action'))
+                        .end()
+                        .endContext();
+                    }
                     if ( action ) {
                       return this.E()
                         .start(self.DefaultActionView, { action: action })

@@ -19,6 +19,7 @@ import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.crunch.lite.Capable;
 import foam.nanos.crunch.CapabilityJunctionPayload;
+import foam.nanos.crunch.ui.PrerequisiteAwareWizardlet;
 import foam.nanos.crunch.ui.WizardState;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
@@ -89,7 +90,9 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
       if ( filterGrantedUCJ ) {
         UserCapabilityJunction ucj = getJunction(x, sourceCapabilityId);
-        if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
+        if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED 
+          && ! maybeReopen(x, ucj.getTargetId()) 
+        ) {
           continue;
         }
       }
@@ -109,7 +112,11 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
           .filter(c -> ! alreadyListed.contains(c))
           .toArray(String[]::new);
 
-      if ( cap instanceof MinMaxCapability && ! rootId.equals(sourceCapabilityId) ) {
+      var prereqAware = cap.getWizardlet() instanceof PrerequisiteAwareWizardlet || (
+        cap.getBeforeWizardlet() != null &&
+        cap.getBeforeWizardlet() instanceof PrerequisiteAwareWizardlet
+      );
+      if ( prereqAware && ! rootId.equals(sourceCapabilityId) ) {
         List minMaxArray = new ArrayList<>();
 
         // Manually grab the direct  prereqs to the  MinMaxCapability
@@ -459,26 +466,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
     Capability capability = (Capability) capabilityDAO.find(capabilityId);
     UserCapabilityJunction ucj = crunchService.getJunction(x, capabilityId);
-      if ( ! capability.getEnabled() ) return false;
-
-    var prereqs = getPrereqs(capabilityId);
-    boolean shouldReopenTopLevel = shouldReopenUserCapabilityJunction(ucj);
-
-    if ( prereqs == null || prereqs.size() == 0 || shouldReopenTopLevel ) return shouldReopenTopLevel;
-
-    for ( var capId : prereqs ) {
-      if ( maybeReopen(x, capId.toString())  ) return true;
-    }
-    return false;
-  }
-
-  public boolean shouldReopenUserCapabilityJunction(UserCapabilityJunction ucj) {
-    if ( ucj == null ) return true;
-    else if ( ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ucj.getIsRenewable() ) return true;
-    else if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED &&
-              ucj.getStatus() != CapabilityJunctionStatus.PENDING &&
-              ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return true;
-    return false;
+    return capability.maybeReopen(x, ucj);
   }
 
   public WizardState getWizardState(X x, String capabilityId) {

@@ -17,7 +17,7 @@ p({
   "class":"foam.nanos.boot.NSpec",
   "name":"localCapabilityDAO",
   "lazy":true,
-  "serve":true,
+  "serve":false,
   "serviceScript":"""
     dao = new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(false)
@@ -29,8 +29,7 @@ p({
     dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.crunch.Capability.NAME });
 
     return dao;
-  """,
-  "client":"{\"of\":\"foam.nanos.crunch.Capability\"}"
+  """
 })
 
 p({
@@ -77,13 +76,14 @@ p({
   "name":"userCapabilityJunctionDAO",
   "serve":true,
   "serviceScript":"""
-    dao = new foam.dao.EasyDAO.Builder(x)
+    return new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(false)
       .setInnerDAO(x.get("bareUserCapabilityJunctionDAO"))
       .setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo())
+      .setDecorator(new foam.nanos.crunch.UserCapabilityJunctionDAO.Builder(x)
+        .setDelegate(new foam.dao.NullDAO(x, foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo()))
+        .build())
       .build();
-    userCap =  new foam.nanos.crunch.UserCapabilityJunctionDAO.Builder(x).setDelegate(dao).build();
-    return userCap;
   """,
   "client":"{\"of\":\"foam.nanos.crunch.UserCapabilityJunction\", \"remoteListenerSupport\": false}"
 })
@@ -92,14 +92,15 @@ p({
   "class":"foam.nanos.boot.NSpec",
   "name":"bareUserCapabilityJunctionDAO",
   "serviceScript":"""
-    decorator = new foam.dao.history.HistoryDAO(x, "userCapabilityJunctionHistoryDAO", new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo()).build());
+    // disable ucj historydao for now
+    // decorator = new foam.dao.history.HistoryDAO(x, "userCapabilityJunctionHistoryDAO", new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo()).build());
     dao = new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(false)
       .setGuid(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("userCapabilityJunctions")
       .setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo())
-      .setDecorator(decorator)
+      // .setDecorator(decorator)
       .build();
     return dao;
   """,
@@ -170,30 +171,31 @@ p({
     """
 })
 
-p({
-  "class": "foam.nanos.boot.NSpec",
-  "name": "userCapabilityJunctionHistoryDAO",
-  "description": "DAO containing any modifications made to userCapabilityJunctions",
-  "serve": true,
-  "lazy": false,
-  "authNotes": "Protected by service-level access control. This service requires the 'service.userCapabilityJunctionHistoryDAO' permission to access.",
-  "serviceScript":
-  """
-    return new foam.dao.EasyDAO.Builder(x)
-      .setAuthorize(false)
-      .setSeqNo(true)
-      .setSeqPropertyName("seqNo")
-      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
-      .setJournalName("userCapabilityJunctionHistory")
-      .setOf(foam.dao.history.HistoryRecord.getOwnClassInfo())
-      .build()
-      .orderBy(foam.mlang.MLang.DESC(foam.dao.history.HistoryRecord.TIMESTAMP));
-  """,
-  "client":
-  """
-    { "of": "foam.dao.history.HistoryRecord" }
-  """
-})
+// p({
+//   "class": "foam.nanos.boot.NSpec",
+//   "name": "userCapabilityJunctionHistoryDAO",
+//   "description": "DAO containing any modifications made to userCapabilityJunctions",
+//   "serve": true,
+//   "lazy": false,
+//   "enabled":false,
+//   "authNotes": "Protected by service-level access control. This service requires the 'service.userCapabilityJunctionHistoryDAO' permission to access.",
+//   "serviceScript":
+//   """
+//     return new foam.dao.EasyDAO.Builder(x)
+//       .setAuthorize(false)
+//       .setSeqNo(true)
+//       .setSeqPropertyName("seqNo")
+//       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+//       .setJournalName("userCapabilityJunctionHistory")
+//       .setOf(foam.dao.history.HistoryRecord.getOwnClassInfo())
+//       .build()
+//       .orderBy(foam.mlang.MLang.DESC(foam.dao.history.HistoryRecord.TIMESTAMP));
+//   """,
+//   "client":
+//   """
+//     { "of": "foam.dao.history.HistoryRecord" }
+//   """
+// })
 
 p({
   "class":"foam.nanos.boot.NSpec",
