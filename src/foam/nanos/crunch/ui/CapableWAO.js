@@ -17,35 +17,54 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.crunch.CapabilityJunctionPayload',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.ui.CapabilityWizardlet'
   ],
 
   methods: [
     async function save(wizardlet) {
       if ( wizardlet.isAvailable ){
+
+        if ( wizardlet.status === this.CapabilityJunctionStatus.AVAILABLE ) {
+          wizardlet.status = this.CapabilityJunctionStatus.ACTION_REQUIRED;
+        }
+
         return this.capable.getCapablePayloadDAO().put(
           this.makePayload(wizardlet)
-        );
+        ).then(payload => {
+          this.load_(wizardlet, payload);
+          if ( wizardlet.isValid ) {
+            wizardlet.status = this.CapabilityJunctionStatus.ACTION_REQUIRED;
+          }
+          return payload;
+        });
       }
     },
     async function cancel(wizardlet) {
+      if ( ! wizardlet.isLoaded ) return;
       return this.capable.getCapablePayloadDAO().remove(
         this.makePayload(wizardlet)
       );
     },
     async function load(wizardlet) {
       var targetPayload = await this.capable.getCapablePayloadDAO().find(
-        wizardlet.capability) || this.targetPayload;
+        wizardlet.capability.id ) || this.targetPayload;
+      this.load_(wizardlet, targetPayload);
+    },
+    async function load_(wizardlet, payload) {
+      wizardlet.isLoaded = true;
 
-      if ( targetPayload ) wizardlet.status = targetPayload.status;
+      wizardlet.status = this.CapabilityJunctionStatus.AVAILABLE;
+
+      if ( payload ) wizardlet.status = payload.status;
 
       // No 'of'? No problem
       if ( ! wizardlet.of ) return;
 
       // Load CapablePayload data to wizardlet
       var loadedData = wizardlet.of.create({}, wizardlet);
-      if ( targetPayload && targetPayload.data )
-        loadedData.copyFrom(targetPayload.data);
+      if ( payload && payload.data )
+        loadedData.copyFrom(payload.data);
 
       // Set transient 'capability' property if it exists
       var prop = wizardlet.of.getAxiomByName('capability');

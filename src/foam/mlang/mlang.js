@@ -764,6 +764,9 @@ getArg2().prepareStatement(stmt);`
         getArg1().authorize(x);
         getArg2().authorize(x);
       `
+    },
+    function arg2ToMQL() {
+      return this.arg2 && this.arg2.toMQL ? this.arg2.toMQL() : this.arg2;
     }
   ]
 });
@@ -986,6 +989,17 @@ return this;`
       }
 
       return self;
+    },
+    function toMQL() {
+      var mqlStringsArr = [];
+      for ( var a in this.args ) {
+        if ( ! this.args[a].toMQL )
+          throw new Error( 'Predicate\'s argument does not support toMQL' );
+        var mql = this.args[a].toMQL();
+        if ( mql )
+          mqlStringsArr.push(mql); 
+      }
+      return mqlStringsArr.join(' OR ');
     }
   ]
 });
@@ -1236,6 +1250,17 @@ return this;`
         // no OR args, no DNF transform needed
         return this;
       }
+    },
+    function toMQL() {
+      var mqlStringsArr = [];
+      for ( var a in this.args ) {
+        if ( ! this.args[a].toMQL )
+          throw new Error( 'Predicate\'s argument does not support toMQL' );
+        var mql = this.args[a].toMQL();
+        if ( mql )
+          mqlStringsArr.push(mql); 
+      }
+      return mqlStringsArr.join(' AND ');
     }
   ]
 });
@@ -1783,6 +1808,13 @@ foam.CLASS({
     // TODO(adamvy): Re-enable when we can parse this in java more correctly.
     function xxoutputJSON(os) {
       os.output(this.value);
+    },
+    function toMQL() {
+      if ( this.value && foam.Date.isInstance(this.value) ) {
+        var isoDateString = this.value.toISOString();
+        return isoDateString.substr(0, isoDateString.indexOf(':', isoDateString.indexOf(':') + 1));
+      }
+      return this.value;
     }
   ]
 });
@@ -1984,6 +2016,12 @@ return FOAM_utils.equals(v1, v2)
       var otherConst = otherArg1IsConst ? otherArg1 : otherArg2;
 
       return equals(myConst, otherConst) ? this.SUPER(other) : this.FALSE;
+    },
+    function toMQL() {
+      var arg2 = this.arg2ToMQL();
+      if ( ! arg2 )
+        return null; 
+      return this.arg1.name + '=' + arg2;
     }
   ]
 });
@@ -2043,6 +2081,12 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaCode: 'return " " + getArg1().createStatement() + " < " + getArg2().createStatement() + " ";'
+    },
+    function toMQL() {
+      var arg2 = this.arg2ToMQL();
+      if ( ! arg2 )
+        return null; 
+      return this.arg1.name + '<' + arg2;
     }
   ]
 });
@@ -2068,6 +2112,12 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaCode: 'return " " + getArg1().createStatement() + " <= " + getArg2().createStatement() + " ";'
+    },
+    function toMQL() {
+      var arg2 = this.arg2ToMQL();
+      if ( ! arg2 )
+        return null; 
+      return this.arg1.name + '<=' + arg2;
     }
   ]
 });
@@ -2093,6 +2143,12 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaCode: 'return " " + getArg1().createStatement() + " > " + getArg2().createStatement() + " ";'
+    },
+    function toMQL() {
+      var arg2 = this.arg2ToMQL();
+      if ( ! arg2 )
+        return null; 
+      return this.arg1.name + '>' + arg2;
     }
   ]
 });
@@ -2107,7 +2163,6 @@ foam.CLASS({
 
   documentation: 'Binary Predicate returns true iff arg1 is GREATER THAN or EQUAL to arg2.',
 
-
   methods: [
     {
       name: 'f',
@@ -2119,6 +2174,12 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaCode: 'return " " + getArg1().createStatement() + " >= " + getArg2().createStatement() + " ";'
+    },
+    function toMQL() {
+      var arg2 = this.arg2ToMQL();
+      if ( ! arg2 )
+        return null; 
+      return this.arg1.name + '>=' + arg2;
     }
   ]
 });
@@ -2577,8 +2638,11 @@ foam.CLASS({
       class: 'List',
       hidden: true,
       name: 'groupKeys',
-      javaFactory: 'return new java.util.ArrayList();',
-      factory: function() { return []; }
+      transient: true,
+      javaFactory: 'return new java.util.ArrayList(this.getGroups().keySet());',
+      factory: function() {
+        return Object.keys(this.groups);
+      },
     },
     {
       class: 'Boolean',
@@ -2635,7 +2699,8 @@ return getGroupKeys();`
         if ( ! group ) {
           group = this.arg2.clone();
           this.groups[key] = group;
-          this.groupKeys.push(key);
+          if ( ! this.groupKeys.includes(key) )
+            this.groupKeys.push(key);
         }
         group.put(obj, sub);
         this.pub('propertyChange', 'groups');
@@ -2645,7 +2710,8 @@ return getGroupKeys();`
  if ( group == null ) {
    group = (foam.dao.Sink) (((foam.core.FObject)getArg2()).fclone());
    getGroups().put(key, group);
-   getGroupKeys().add(key);
+   if ( ! this.getGroupKeys().contains(key) )
+     getGroupKeys().add(key);
  }
  group.put(obj, sub);`
     },

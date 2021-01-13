@@ -154,7 +154,7 @@ public class TreeIndex
 
       // We return a groupByPlan only if no order, no limit, no skip, no predicate
       if ( sink instanceof GroupBy
-          && ( (GroupBy) sink ).getArg1().toString().equals(prop_.toString())
+          && ((GroupBy) sink).getArg1().toString().equals(prop_.toString())
           && order == null && skip == 0 && limit == AbstractDAO.MAX_SAFE_INTEGER )
       {
         return new GroupByPlan(state, sink, predicate, prop_, tail_);

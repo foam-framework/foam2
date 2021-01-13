@@ -19,6 +19,8 @@ import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.nanos.crunch.lite.Capable;
 import foam.nanos.crunch.CapabilityJunctionPayload;
+import foam.nanos.crunch.ui.PrerequisiteAwareWizardlet;
+import foam.nanos.crunch.ui.WizardState;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 
@@ -27,6 +29,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static foam.mlang.MLang.*;
+import static foam.nanos.crunch.CapabilityJunctionStatus.*;
 
 public class ServerCrunchService extends ContextAwareSupport implements CrunchService, NanoService {
   private Map<String, List<String>> prereqsCache_ = null;
@@ -87,7 +90,9 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
       if ( filterGrantedUCJ ) {
         UserCapabilityJunction ucj = getJunction(x, sourceCapabilityId);
-        if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
+        if ( ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED 
+          && ! maybeReopen(x, ucj.getTargetId()) 
+        ) {
           continue;
         }
       }
@@ -107,7 +112,11 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
           .filter(c -> ! alreadyListed.contains(c))
           .toArray(String[]::new);
 
-      if ( cap instanceof MinMaxCapability && ! rootId.equals(sourceCapabilityId) ) {
+      var prereqAware = cap.getWizardlet() instanceof PrerequisiteAwareWizardlet || (
+        cap.getBeforeWizardlet() != null &&
+        cap.getBeforeWizardlet() instanceof PrerequisiteAwareWizardlet
+      );
+      if ( prereqAware && ! rootId.equals(sourceCapabilityId) ) {
         List minMaxArray = new ArrayList<>();
 
         // Manually grab the direct  prereqs to the  MinMaxCapability
@@ -322,9 +331,11 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
   ) {
     Subject subject = (Subject) x.get("subject");
     UserCapabilityJunction ucj = this.getJunction(x, capabilityId);
-    if ( ucj.getStatus() == CapabilityJunctionStatus.AVAILABLE ) {
-      ucj = buildAssociatedUCJ(x, capabilityId, subject);
+
+    if ( ucj.getStatus() == AVAILABLE && status == null ) {
+      ucj.setStatus(ACTION_REQUIRED);
     }
+
     if ( data != null ) {
       ucj.setData(data);
     }
@@ -343,6 +354,25 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     }
     ucj.setLastUpdatedRealUser(subject.getRealUser().getId());
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+    return (UserCapabilityJunction) userCapabilityJunctionDAO.inX(x).put(ucj);
+  }
+
+  public UserCapabilityJunction updateUserJunction(
+    X x, Subject subject, String capabilityId, FObject data,
+    CapabilityJunctionStatus status
+  ) {
+    UserCapabilityJunction ucj = this.getJunctionForSubject(
+      x, capabilityId, subject);
+
+    if ( data != null ) {
+      ucj.setData(data);
+    }
+    if ( status != null ) {
+      ucj.setStatus(status);
+    }
+
+    DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
+    var subjectX = x.put("subject", subject);
     return (UserCapabilityJunction) userCapabilityJunctionDAO.inX(x).put(ucj);
   }
 
@@ -436,26 +466,80 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
     Capability capability = (Capability) capabilityDAO.find(capabilityId);
     UserCapabilityJunction ucj = crunchService.getJunction(x, capabilityId);
-      if ( ! capability.getEnabled() ) return false;
-
-    var prereqs = getPrereqs(capabilityId);
-    boolean shouldReopenTopLevel = shouldReopenUserCapabilityJunction(ucj);
-
-    if ( prereqs == null || prereqs.size() == 0 || shouldReopenTopLevel ) return shouldReopenTopLevel;
-
-    for ( var capId : prereqs ) {
-      if ( maybeReopen(x, capId.toString())  ) return true;
-    }
-    return false;
+    return capability.maybeReopen(x, ucj);
   }
 
-  public boolean shouldReopenUserCapabilityJunction(UserCapabilityJunction ucj) {
-    if ( ucj == null ) return true;
-    else if ( ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ucj.getIsRenewable() ) return true;
-    else if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED &&
-              ucj.getStatus() != CapabilityJunctionStatus.PENDING &&
-              ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return true;
-    return false;
+  public WizardState getWizardState(X x, String capabilityId) {
+    var subject = (Subject) x.get("subject");
+
+    if ( ! subject.isAgent() ) {
+      return getWizardStateFor_(x, subject, capabilityId);
+    }
+
+    { // Save unassociated wizard states if none exist yet
+      var realUser = new Subject();
+      realUser.setUser(subject.getRealUser());
+      realUser.setUser(subject.getRealUser());
+      getWizardStateFor_(x, realUser, capabilityId);
+      var effectiveUser = new Subject();
+      effectiveUser.setUser(subject.getUser());
+      effectiveUser.setUser(subject.getUser());
+      getWizardStateFor_(x, effectiveUser, capabilityId);
+    }
+
+    return getWizardStateFor_(x, subject, capabilityId);
+  }
+
+  private WizardState getWizardStateFor_(X x, Subject s, String capabilityId) {
+    var wizardStateDAO = (DAO) x.get("wizardStateDAO");
+
+    var wizardState = new WizardState.Builder(x)
+      .setRealUser(s.getRealUser().getId())
+      .setEffectiveUser(s.getUser().getId())
+      .setCapability(capabilityId)
+      .build();
+
+    var wizardStateFind = wizardStateDAO.find(wizardState);
+
+    if ( wizardStateFind != null ) return (WizardState) wizardStateFind;
+
+    wizardState.setIgnoreList(getGrantedFor_(x, s, capabilityId));
+    wizardStateDAO.put(wizardState);
+    return wizardState;
+  }
+
+  private String[] getGrantedFor_(X x, Subject s, String capabilityId) {
+    x = x.put("subject", s);
+    var capsOrLists = getCapabilityPath(x, capabilityId, false);
+    var granted = (List<String>) new ArrayList<String>();
+
+    var grantedStatuses = new CapabilityJunctionStatus[] {
+      CapabilityJunctionStatus.GRANTED,
+      CapabilityJunctionStatus.PENDING,
+      CapabilityJunctionStatus.APPROVED,
+    };
+
+    for ( Object obj : capsOrLists ) {
+      Capability cap;
+      if ( obj instanceof List ) {
+        var list = (List) obj;
+        cap = (Capability) list.get(list.size() - 1);
+      } else {
+        cap = (Capability) obj;
+      }
+
+      try {
+        var ucj = getJunction(x, cap.getId());
+        if ( IN(UserCapabilityJunction.STATUS, grantedStatuses).f(ucj) ) {
+          granted.add(cap.getId());
+        }
+      } catch ( RuntimeException e ) {
+        // This happens if getJunction was called with an unavailabile
+        // capability, which is fine here.
+      }
+    }
+
+    return granted.toArray(new String[0]);
   }
 
   private Predicate getAssociationPredicate_(X x) {

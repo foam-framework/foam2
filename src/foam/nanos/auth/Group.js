@@ -25,6 +25,14 @@ foam.CLASS({
 
   searchColumns: [ 'id', 'description' ],
 
+  constants: [
+    {
+      name: 'ADMIN_GROUP',
+      value: 'admin',
+      type: 'String'
+    }
+  ],
+  
   properties: [
     {
       class: 'String',
@@ -64,27 +72,32 @@ foam.CLASS({
       targetDAOKey: 'menuDAO',
       of: 'foam.nanos.menu.Menu',
       name: 'rootMenu',
-      value: ''
+      value: '',
+      includeInDigest: false
     },
     {
       class: 'String',
       name: 'url',
-      value: null
+      value: null,
+      includeInDigest: false
     },
     {
       class: 'String',
       name: 'from',
-      value: null
+      value: null,
+      includeInDigest: false
     },
     {
       class: 'String',
       name: 'displayName',
-      value: null
+      value: null,
+      includeInDigest: false
     },
     {
       class: 'String',
       name: 'replyTo',
-      value: null
+      value: null,
+      includeInDigest: false
     },
     {
       class: 'Long',
@@ -97,15 +110,18 @@ foam.CLASS({
           600000 = 1000 * 60 * 10.
 
         Set the value to 0 to turn off this feature.
-      `
+      `,
+      includeInDigest: false
     },
     {
       class: 'String',
-      name: 'supportEmail'
+      name: 'supportEmail',
+      includeInDigest: false
     },
     {
       class: 'String',
-      name: 'supportPhone'
+      name: 'supportPhone',
+      includeInDigest: false
     },
     {
       class: 'FObjectProperty',
@@ -121,7 +137,8 @@ foam.CLASS({
       view: {
         class: 'foam.u2.view.FObjectPropertyView',
         readView: { class: 'foam.u2.detail.VerticalDetailView' }
-      }
+      },
+      includeInDigest: true
     },
     {
       documentation: `Restrict members of this group to particular IP address range.
@@ -213,23 +230,10 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
         }
       ],
       javaCode: `
-        // Find Group details, by iterating up through group.parent
-        Group group               = this;
-        DAO groupDAO              = (DAO) x.get("groupDAO");
-
-        String configUrl           = "";
-
-        // Get support info and url off group or parents.
-        while ( group != null ) {
-          configUrl = ! SafetyUtil.isEmpty(group.getUrl()) && SafetyUtil.isEmpty(configUrl) ?
-              group.getUrl() : configUrl;
-
-          if ( ! SafetyUtil.isEmpty(group.getUrl()) && ! SafetyUtil.isEmpty(configUrl) ) break;
-          group = (Group) groupDAO.find(group.getParent());
-        }
-
-        AppConfig config = (AppConfig) x.get("appConfig");
-        return config.configure(x, configUrl);
+        AppConfig appConfig = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
+        String url = ! foam.util.SafetyUtil.isEmpty(getUrl()) ? getUrl() : appConfig.getUrl();
+        appConfig.setUrl(url.replaceAll("/$", ""));
+        return appConfig;
         `
     },
     {

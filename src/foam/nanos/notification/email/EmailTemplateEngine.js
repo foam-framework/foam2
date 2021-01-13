@@ -53,15 +53,20 @@ foam.CLASS({
         grammar.addAction("ANY_CHAR", anyCharAction);
 
         // simple value syntax: "qwerty {{ simple_value }} qwerty"
-        grammar.addSymbol("SIMPLE_VAL", new Seq1(2, Literal.create("{{"), Whitespace.instance(),
-          new Repeat0(new AnyKeyParser()), Whitespace.instance() ,Literal.create("}}") ));
+        grammar.addSymbol("SIMPLE_VAL", new Seq1(1, Literal.create("{{"), new Until(Literal.create("}}") )));
         Action simpleValAction = new Action() {
           @Override
           public Object execute(Object val, ParserContext x) {
-            String value = (String) ((Map) x.get("values")).get(val);
+            Object[] valArr  = (Object[]) val;
+            Object[] val0    = (Object[]) valArr[0];
+            StringBuilder v = new StringBuilder();
+            for ( int i = 0 ; i < val0.length ; i++ ) {
+              if ( ! Character.isWhitespace((char) val0[i]) ) v.append(val0[i]);
+            }
+            String value = (String) ((Map) x.get("values")).get(v.toString());
             if ( value == null ) {
               value = "";
-              foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x_.get("logger");
+              foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
               logger.error("No value provided for variable " + val);
             }
             ((StringBuilder) x.get("sb")).append(value);
@@ -94,9 +99,9 @@ foam.CLASS({
         Action ifElseAction  = new Action() {
           @Override
           public Object execute(Object val, foam.lib.parse.ParserContext x) {
-            Object[] valArr = (Object[]) val;
+            Object[] valArr  = (Object[]) val;
             Object[] tempVal = (Object[]) valArr[0];
-            Object[] val0 = (Object[]) tempVal[0];
+            Object[] val0    = (Object[]) tempVal[0];
             StringBuilder ifCond = new StringBuilder();
             for ( int i = 0 ; i < val0.length ; i++ ) {
               if ( ! Character.isWhitespace((char)val0[i]) ) ifCond.append(val0[i]);
@@ -144,9 +149,9 @@ foam.CLASS({
         Action ifAction  = new Action() {
           @Override
           public Object execute(Object val, foam.lib.parse.ParserContext x) {
-            Object[] valArr = (Object[]) val;
+            Object[] valArr  = (Object[]) val;
             Object[] tempVal = (Object[]) valArr[0];
-            Object[] val0 = (Object[]) tempVal[0];
+            Object[] val0    = (Object[]) tempVal[0];
             StringBuilder ifCond = new StringBuilder();
             for ( int i = 0 ; i < val0.length ; i++ ) {
               if ( ! Character.isWhitespace((char) val0[i]) ) ifCond.append(val0[i]);
@@ -259,16 +264,16 @@ foam.CLASS({
         Action includeContentAction  = new Action() {
           @Override
           public Object execute(Object val, foam.lib.parse.ParserContext x) {
-            Object[] valArr = (Object[]) val;
+            Object[] valArr  = (Object[]) val;
             Object[] tempVal = (Object[]) valArr[0];
-            Object[] val0 = (Object[]) tempVal[0];
+            Object[] val0    = (Object[]) tempVal[0];
             StringBuilder templateName = new StringBuilder();
             for ( int i = 0 ; i < val0.length ; i++ ) {
               templateName.append(val0[i]);
             }
             EmailTemplate extendedEmailTemplate = ((EmailTemplate) ((DAO) x.get("emailTemplateDAO")).find(EQ(EmailTemplate.NAME,templateName.toString())));
             if ( extendedEmailTemplate == null ) {
-              foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x_.get("logger");
+              foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
               logger.error("Extended template not found " + val);
               return val;
             }
@@ -294,21 +299,21 @@ foam.CLASS({
     {
       name: 'renderTemplateById',
       args: [
-        { name: 'x', type: 'Context' },
-        { name: 'id', type: 'String' },
+        { name: 'x',      type: 'Context' },
+        { name: 'id',     type: 'String' },
         { name: 'values', type: 'Map' }
       ],
       type: 'StringBuilder',
       javaCode: `
-      EmailTemplate template = (EmailTemplate) ((DAO) x_.get("emailTemplateDAO")).find(id);
+      EmailTemplate template = (EmailTemplate) ((DAO) x.get("emailTemplateDAO")).find(id);
       return renderTemplate(x, template.getBody(), values);
       `
     },
     {
       name: 'renderTemplate',
       args: [
-        { name: 'x', type: 'Context' },
-        { name: 'str', type: 'String' },
+        { name: 'x',      type: 'Context' },
+        { name: 'str',    type: 'String' },
         { name: 'values', type: 'Map' }
       ],
       type: 'StringBuilder',
@@ -321,6 +326,7 @@ foam.CLASS({
       StringBuilder sb = sb_.get();
       parserX.set("sb", sb);
       parserX.set("values", values);
+      parserX.set("logger", x.get("logger"));
       getGrammar().parse(ps, parserX, "");
       if (sb.length() == 0 ) {
         throw new RuntimeException("Wrong template format");
@@ -331,7 +337,7 @@ foam.CLASS({
     {
       name: 'outputContent',
       args: [
-        { name: 'body', type: 'String' },
+        { name: 'body',    type: 'String' },
         { name: 'content', type: 'String' }
       ],
       type: 'StringBuilder',
@@ -350,7 +356,7 @@ foam.CLASS({
     {
       name: 'joinTemplates',
       args: [
-        { name: 'x', type: 'Context' },
+        { name: 'x',    type: 'Context' },
         { name: 'body', type: 'CharSequence' }
       ],
       type: 'StringBuilder',
@@ -373,6 +379,7 @@ foam.CLASS({
       `
     }
   ],
+
   axioms: [
     {
       name: 'javaExtras',
@@ -390,6 +397,7 @@ foam.CLASS({
               return b;
             }
           };
+
           protected static ThreadLocal<StringBuilder> sbContent_ = new ThreadLocal<StringBuilder>() {
             @Override
             protected StringBuilder initialValue() {
@@ -402,6 +410,7 @@ foam.CLASS({
               return b;
             }
           };
+
           protected static ThreadLocal<StringBuilder> sbJoin_ = new ThreadLocal<StringBuilder>() {
             @Override
             protected StringBuilder initialValue() {

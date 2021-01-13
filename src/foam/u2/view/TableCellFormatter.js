@@ -37,6 +37,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'TableCellPropertyRefinement',
@@ -101,6 +102,7 @@ foam.CLASS({
   properties: [
     {
       tags: ['web'],
+      generateJava: false,
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(_, obj, axiom) {
@@ -115,6 +117,7 @@ foam.CLASS({
     },
     {
       tags: ['web'],
+      generateJava: false,
       name: 'tableHeaderFormatter',
       value: function(axiom) {
         this.add(axiom.label);
@@ -252,7 +255,7 @@ foam.CLASS({
       value: function(date) {
         // allow the browser to deal with this since we are technically using the user's preference
         if ( date ) {
-          var formattedDate = date.toLocaleDateString();
+          var formattedDate = date.toLocaleDateString(foam.locale);
           this.add(formattedDate);
           this.tooltip = formattedDate;
         }
@@ -275,7 +278,7 @@ foam.CLASS({
         // allow the browser to deal with this since we are technically using the user's preference
         if ( date ) {
           // toLocaleString includes date and time
-          var formattedDate = date.toLocaleString();
+          var formattedDate = date.toLocaleString(foam.locale);
           this.add(formattedDate);
           this.tooltip = formattedDate;
         }

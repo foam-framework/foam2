@@ -19,21 +19,24 @@ foam.CLASS({
   package: 'foam.apploader',
   name: 'WebModelFileDAO',
   extends: 'foam.dao.ProxyDAO',
+
   requires: [
     'foam.apploader.ModelFileDAO',
     'foam.apploader.WebModelFileFetcher',
     'foam.net.HTTPRequest',
   ],
+
   imports: [
     'window',
   ],
+
   properties: [
     'root',
     {
       name: 'delegate',
       expression: function(root) {
         return this.ModelFileDAO.create({
-          fetcher: this.WebModelFileFetcher.create({root: root}), });
+          fetcher: this.WebModelFileFetcher.create({root: root})});
       },
     },
   ],

@@ -58,8 +58,8 @@ public class AsyncAssemblyLine
         }
         throw t;
       }
-    }
 
+    }
     pool_.submit(x_, new ContextAgent() { public void execute(X x) {
       try {
         job.executeJob();

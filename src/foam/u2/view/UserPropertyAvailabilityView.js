@@ -64,11 +64,6 @@ foam.CLASS({
       value: false
     },
     {
-      class: 'FObjectProperty',
-      name: 'targetProperty',
-      documentation: `The property on the User model that the availability check will operate on.`,
-    },
-    {
       type: 'Regex',
       name: 'inputValidation',
       documentation: `Optional regular expression used to prevent invalid inputs from making network calls.`
@@ -138,12 +133,7 @@ foam.CLASS({
         return;
       }
 
-      var pred = foam.mlang.predicate.Eq.create({
-        arg1: this.targetProperty,
-        arg2: this.data
-      });
-
-      this.userPropertyAvailabilityService.checkAvailability(this, pred)
+      this.userPropertyAvailabilityService.checkAvailability(this, this.fromPropertyName, this.data)
         .then(( isAvailable ) => {
           this.isAvailable = isAvailable;
           this.showIcon = isAvailable;

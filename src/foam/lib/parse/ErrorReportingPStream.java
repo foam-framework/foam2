@@ -14,13 +14,11 @@ import java.util.Set;
 public class ErrorReportingPStream
     extends ProxyPStream
 {
-
-  protected Parser errParser = null;
-  protected ParserContext errContext = null;
+  protected Parser                    errParser = null;
+  protected ParserContext             errContext = null;
   protected ErrorReportingNodePStream errStream = null;
-
   protected ErrorReportingNodePStream tail_ = null;
-  protected Set<String> validCharacters = new HashSet<>();
+  protected Set<String>               validCharacters = new HashSet<>();
 
   public ErrorReportingPStream(PStream delegate) {
     setDelegate(delegate);
@@ -68,15 +66,15 @@ public class ErrorReportingPStream
 
     // get a list of valid characters
     TrapPStream trap = new TrapPStream(this);
-    for ( int i = 0; i <= 255; i++ ) {
+    for ( int i = 0 ; i <= 255 ; i++ ) {
       trap.setHead((char) i);
       trap.apply(errParser, errContext);
     }
 
     return "Invalid character '" + invalid +
-        "' found at " + errStream.pos_ + "\n" +
-        "Valid characters include: " +
-        StringUtils.join(validCharacters, ",");
+      "' found at " + errStream.pos_ + "\n" +
+      "Valid characters include: " +
+      StringUtils.join(validCharacters, ",");
   }
 
   public String getPrintableCharacter(Character ch) {

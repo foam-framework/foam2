@@ -210,22 +210,19 @@ foam.CLASS({
         DAO        themeDAO       = (DAO)        x.get("themeDAO");
         Logger     logger         = (Logger)     x.get("logger");
 
-        if ( ! server.containsHostDomain(vhost) ) {
-          vhost = getDefaultHost();
-        }
-
         ThemeDomain themeDomain = (ThemeDomain) themeDomainDAO.find(vhost);
         if ( themeDomain == null ) {
           themeDomain = (ThemeDomain) themeDomainDAO.find(getDefaultHost());
           if ( themeDomain == null ) {
             themeDomain = (ThemeDomain) themeDomainDAO.find("localhost");
-            logger.warning("No theme domain found for default host " + getDefaultHost()+". Falling back to localhost");
+            logger.debug("No theme domain found for default host " + getDefaultHost()+". Falling back to 'localhost'");
           }
         }
 
         Theme theme = (Theme) themeDAO.find(themeDomain.getTheme());
         if ( theme == null ) {
-          throw new RuntimeException("No theme found for theme domain " + themeDomain.getId());
+          logger.error("No theme found for domain " + themeDomain);
+          theme = new Theme(x);
         }
 
         response.setContentType("text/html; charset=UTF-8");

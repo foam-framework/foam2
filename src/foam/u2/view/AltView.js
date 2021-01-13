@@ -13,6 +13,10 @@ foam.CLASS({
   "Takes a views property which should be the value of an array containing arrays that contain desired views, and label." +
   "Ex. views: [[ { class: 'foam.u2.view.TableView' }, 'Table' ]]",
 
+  imports: [
+    'memento'
+  ],
+
   css: `
     ^ { margin: auto; }
     ^ select { height: 26px }
@@ -87,6 +91,12 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
+      if ( this.memento && this.memento.paramsObj.sV )
+        this.selectedView = this.memento.paramsObj.sV;
+      else {
+        self.setMementoWithSelectedView();
+      }
+
       this.addClass(this.myClass())
       this.startContext({data: this})
         this.start()
@@ -98,6 +108,22 @@ foam.CLASS({
           return self.E().tag(v, {data: self.data$proxy});
         }))
       .end();
+
+      this.onDetach(this.selectedView$.sub(function() {
+        self.setMementoWithSelectedView();
+      }));
+    }
+  ],
+
+  actions: [
+    function setMementoWithSelectedView() {
+      var view = this.views.find(v => v[0] == this.selectedView);
+      if ( view )
+        this.memento.paramsObj.sV = view[1];
+      else
+        delete this.memento.paramsObj.sV;
+
+      this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
     }
   ]
 });

@@ -27,7 +27,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'searchColumns'
+    'searchColumns',
+    'memento'
   ],
 
   exports: [
@@ -181,6 +182,7 @@ foam.CLASS({
     { name: 'LINK_SIMPLE', message: 'Switch to simple filters'},
     { name: 'MESSAGE_ADVANCEDMODE', message: 'Advanced filters are currently being used.'},
     { name: 'MESSAGE_VIEWADVANCED', message: 'View filters'},
+    { name: 'LABEL_SEARCH', message: 'Search'},
   ],
 
   properties: [
@@ -205,10 +207,14 @@ foam.CLASS({
 
         if ( searchColumns ) return searchColumns;
 
-        if ( of.model_.searchColumns ) return of.model_.searchColumns;
+        var columns = of.getAxiomByName('searchColumns');
+        columns = columns && columns.columns;
+        if ( columns ) return columns;
 
-        if ( of.model_.tableColumns ) {
-          return of.model_.tableColumns.filter(function(c) {
+        columns = of.getAxiomByName('tableColumns');
+        columns = columns && columns.columns;
+        if ( columns ) {
+          return columns.filter(function(c) {
             var axiom = of.getAxiomByName(c);
             return axiom && axiom.searchView;
           });
@@ -267,12 +273,23 @@ foam.CLASS({
       expression: function(filterController$isAdvanced) {
         return filterController$isAdvanced ? this.LINK_SIMPLE : this.LINK_ADVANCED;
       }
-    }
+    },
+    'searchValue'
   ],
 
   methods: [
     function initE() {
       var self = this;
+
+      if ( this.memento && this.memento.paramsObj.f ) {
+        this.memento.paramsObj.f.forEach(f => {
+          var parser = foam.parse.QueryParser.create({ of: self.dao.of.id });
+          var pred = parser.parseString(f.pred);
+
+          self.filterController.setExistingPredicate(f.criteria, f.n, pred);
+        });
+      }
+
       this.onDetach(this.filterController$.dot('isAdvanced').sub(this.isAdvancedChanged));
       this.addClass(self.myClass())
         .add(this.slot(function(filters) {
@@ -289,9 +306,10 @@ foam.CLASS({
               richSearch: true,
               of: self.dao.of.id,
               onKey: true,
+              searchValue: self.searchValue,
               viewSpec: {
                 class: 'foam.u2.tag.Input',
-                placeholder: 'Search'
+                placeholder: this.LABEL_SEARCH
               }
             }, self.generalSearchField$)
               .addClass(self.myClass('general-field'))

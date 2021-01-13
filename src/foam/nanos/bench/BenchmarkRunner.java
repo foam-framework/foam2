@@ -170,7 +170,7 @@ public class BenchmarkRunner
     int run = 1;
     int threads = 1;
     if ( reverseThreads_ ) {
-        threads = availableThreads;
+      threads = availableThreads;
     }
 
     try {
@@ -203,7 +203,7 @@ public class BenchmarkRunner
                   } catch (Throwable t) {
                     fail.incrementAndGet();
                     Throwable e = t;
-                    if ( t instanceof RuntimeException ) {
+                    if ( t instanceof RuntimeException && t.getCause() != null ) {
                       e = t.getCause();
                     }
                     logger.error(e.getMessage());

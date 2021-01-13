@@ -23,20 +23,22 @@ foam.CLASS({
   requires: [
     'foam.comics.DAOUpdateController',
     'foam.log.LogLevel',
+    'foam.nanos.controller.Memento',
     'foam.u2.ControllerMode',
     'foam.u2.DisplayMode'
-    
   ],
 
   imports: [
-    'stack',
+    'dao? as importedDAO',
     'notify',
-    'dao? as importedDAO'
+    'memento',
+    'stack'
   ],
 
   exports: [
     'controllerMode',
-    'data'
+    'data',
+    'memento'
   ],
 
   css: `
@@ -109,6 +111,12 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.u2.Element',
       name: 'detailViewElement_'
+    },
+    'currentMemento',
+    {
+      class: 'String',
+      name: 'mementoHead',
+      value: 'Edit'
     }
   ],
 
@@ -119,6 +127,9 @@ foam.CLASS({
 
   methods: [
     function initE() {
+
+      this.currentMemento$ = this.memento.tail$;
+
       /* Doesn't work because obj isn't known yet.
       this.startContext({data: this.data.obj})
         .add(this.data.dao.of.getAxiomsByClass(foam.core.Action))

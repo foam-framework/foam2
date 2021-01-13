@@ -24,6 +24,44 @@ foam.SCRIPT({
 });
 
 
+foam.LIB({
+  name: 'foam.i18n.Lib',
+  methods: [
+    function createText(source, text, defaultText) {
+      if ( ! foam.xmsg ) return text;
+      return {
+        __proto__: text,
+//        asJavaValue: function() { return foam.java.AsJavaValue(text); },
+        toString: function() { return defaultText || text; },
+        toE: function(_, X) {
+          return foam.i18n.InlineLocaleEditor.create({
+            source:      source,
+            defaultText: defaultText || text,
+            data:        text},
+            X);
+        }
+      };
+      /*
+      return {
+        asJavaValue: function() {
+          return foam.java.asJavaValue(text);
+        },
+        toE: (_, X) => {
+          return foam.i18n.InlineLocaleEditor.create({
+            source:      source,
+            defaultText: defaultText,
+            data:        text}, X);
+        },
+        toString: function() {
+          return text;
+        }
+      };
+      */
+    }
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.i18n',
   name: 'MessageAxiom',
@@ -49,18 +87,23 @@ foam.CLASS({
       name: 'message',
       getter: function() {
         var msg = this.message_;
-        if ( foam.locale ) {
-          msg = msg || this.messageMap[foam.locale];
-          if ( ! msg && foam.locale ) {
-            var i = foam.locale.indexOf('-');
-            var lang = ( i == -1 ) ? foam.locale : foam.locale.substring(0, 2);
-            msg = msg || this.messageMap[foam.lang];
-          }
+        if ( foam.Undefined.isInstance(msg) ) {
+          if ( foam.locale )
+            msg = this.messageMap[foam.locale] || this.messageMap[foam.lang];
+
+          msg = msg || this.messageMap.en;
+
+          // While booting, foam.i18n may not have loaded yet
+          msg = this.message_ = foam.i18n && foam.xmsg ?
+            foam.i18n.Lib.createText(this.sourceCls_.id + '.' + this.name, msg, msg) :
+            msg ;
         }
-        return msg || this.messageMap.en;
+
+        return msg;
       },
       setter: function(m) {
-        this.message_ = this.messageMap[foam.locale] = m;
+        this.messageMap[foam.locale] = m;
+        this.message_ = undefined;
       }
     },
     {
@@ -71,16 +114,15 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) {
-      cls[this.name] = this.message;
-      /*
+      var self = this;
       Object.defineProperty(
         cls,
         this.name,
         {
-          value: this.message,
+          get: function() { return self.message; },
+          set: function(v) { self.messageMap[foam.locale] = v; self.message_ = undefined; },
           configurable: false
         });
-        */
     },
 
     function installInProto(proto) {

@@ -20,6 +20,10 @@ foam.CLASS({
   name: 'TextSearchView',
   extends: 'foam.u2.View',
 
+  imports: [
+    'memento'
+  ],
+
   requires: [
     'foam.parse.QueryParser',
     'foam.u2.tag.Input'
@@ -27,6 +31,10 @@ foam.CLASS({
 
   implements: [
     'foam.mlang.Expressions'
+  ],
+
+  messages: [
+    { name: 'LABEL_SEARCH',    message: 'Search' }
   ],
 
   properties: [
@@ -78,7 +86,7 @@ foam.CLASS({
     {
       name: 'label',
       expression: function(property) {
-        return property && property.label ? property.label : 'Search';
+        return property && property.label ? property.label : this.LABEL_SEARCH;
       }
     },
     {
@@ -90,7 +98,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'onKey'
-    }
+    },
+    'searchValue'
   ],
 
   methods: [
@@ -106,6 +115,10 @@ foam.CLASS({
 
       this.view.data$.sub(this.updateValue);
       this.updateValue();
+
+      if ( this.searchValue ) {
+        this.view.data = this.searchValue;
+      }
     },
 
     function clear() {
@@ -121,6 +134,16 @@ foam.CLASS({
       mergeDelay: 500,
       code: function() {
         var value = this.view.data;
+
+        if (  this.memento ) {
+          if ( value ) {
+            this.memento.paramsObj.s = value;
+          } else {
+            delete this.memento.paramsObj.s;
+          }
+          this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
+        }
+        
         this.predicate = ! value ?
           this.True.create() :
           this.richSearch ?

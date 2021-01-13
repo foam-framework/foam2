@@ -149,6 +149,7 @@
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'approver',
+      includeInDigest: true,
       section: 'systemInformation',
       documentation: `The user that is requested for approval. When set, "group" property is ignored.`,
       view: function(_, X) {
@@ -201,6 +202,7 @@
       class: 'Object',
       javaType: 'Object',
       name: 'objId',
+      includeInDigest: true,
       section: 'requestDetails',
       documentation: 'id of the object that needs approval.',
       tableWidth: 150,
@@ -227,7 +229,8 @@
       documentation: `Used internally in approvalDAO to point where requested object can be found.
       Should not be used to retrieve approval requests for a given objects
       since an object can have multiple requests of different nature. When used in conjunction with serverDaoKey,
-      the daoKey is mainly used for interaction on the client such as view reference and the properties to update view.`
+      the daoKey is mainly used for interaction on the client such as view reference and the properties to update view.`,
+      includeInDigest: true,
     },
     {
       class: 'String',
@@ -242,6 +245,7 @@
       name: 'classification',
       label: 'Approval Type',
       section: 'requestDetails',
+      includeInDigest: false,
       tableWidth: 450,
       documentation: `Should be unique to a certain type of requests and created within a single rule.
       For example "IdentityMind Business approval".
@@ -264,6 +268,7 @@
       Determines the weight of the approved request depending on the approver's role.
       Future: populated in approvalRequestDAO pipeline based on configurations.
       Currentely populated as 1.`,
+      includeInDigest: false,
       gridColumns: 4,
       section: 'systemInformation',
       visibility: function(points) {
@@ -276,6 +281,7 @@
       class: 'Int',
       name: 'requiredPoints',
       value: 1,
+      includeInDigest: false,
       gridColumns: 4,
       section: 'requestDetails',
       documentation: `Defines how many approvers required and approvers' ranks.
@@ -294,6 +300,7 @@
       class: 'Int',
       name: 'requiredRejectedPoints',
       value: 1,
+      includeInDigest: false,
       gridColumns: 4,
       section: 'requestDetails',
       visibility: function(requiredRejectedPoints) {
@@ -308,6 +315,7 @@
       name: 'group',
       documentation: `When set, each user in the group will receive a request for approval.
       If "approver" property is set, "group" property is ignored.`,
+      includeInDigest: false,
       section: 'requestDetails',
       visibility: function(group) {
         return group ?
@@ -320,6 +328,7 @@
       of: 'foam.nanos.approval.ApprovalStatus',
       name: 'status',
       value: 'REQUESTED',
+      includeInDigest: true,
       section: 'requestDetails',
       javaFactory: 'return foam.nanos.approval.ApprovalStatus.REQUESTED;',
       visibility: 'RO'
@@ -329,6 +338,7 @@
       name: 'memo',
       view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 80 },
       documentation: 'Meant to be used for explanation on why request was approved/rejected',
+      includeInDigest: true,
       section: 'requestDetails',
       visibility: function(memo) {
         if ( memo ) {
@@ -342,6 +352,7 @@
       class: 'String',
       name: 'description',
       documentation: `Approval request description.`,
+      includeInDigest: false,
       tableWidth: 200,
       section: 'requestDetails',
       visibility: function(description) {
@@ -354,6 +365,7 @@
       class: 'String',
       name: 'token',
       documentation: 'token in email for ‘click to approve’.',
+      includeInDigest: true,
       section: 'systemInformation',
       readPermissionRequired: true,
       writePermissionRequired: true
@@ -362,6 +374,7 @@
       class: 'DateTime',
       name: 'created',
       section: 'requestDetails',
+      includeInDigest: true,
       gridColumns: 6,
       visibility: function(created) {
         return created ?
@@ -373,6 +386,7 @@
       class: 'DateTime',
       name: 'lastModified',
       gridColumns: 6,
+      includeInDigest: true,
       section: 'requestDetails',
       visibility: function(lastModified) {
         return lastModified ?
@@ -384,6 +398,7 @@
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
+      includeInDigest: true,
       section: 'requestDetails',
       tableCellFormatter: function(initiatingUser) {
         let self = this;
@@ -396,6 +411,7 @@
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdByAgent',
+      includeInDigest: true,
       section: 'requestDetails',
       readPermissionRequired: true,
       writePermissionRequired: true
@@ -404,6 +420,7 @@
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
+      includeInDigest: true,
       section: 'requestDetails',
       readPermissionRequired: true,
       writePermissionRequired: true
@@ -411,6 +428,7 @@
     {
       class: 'Object',
       name: 'refObjId',
+      includeInDigest: true,
       hidden: true,
       readPermissionRequired: true,
       writePermissionRequired: true,
@@ -424,6 +442,7 @@
     {
       class: 'String',
       name: 'refDaoKey',
+      includeInDigest: true,
       hidden: true,
       readPermissionRequired: true,
       writePermissionRequired: true,
@@ -435,34 +454,15 @@
       `
     },
     {
-      class: 'String',
-      name: 'daoKey_',
-      section: 'systemInformation',
-      readPermissionRequired: true,
-      writePermissionRequired: true,
-      factory: function() {
-        var key = this.daoKey;
-        var X = this.ctrl.__subContext__;
-
-        // TODO: we need to phase this out for the old compliance approval requests
-        // and use serverDaoKey for the local daos
-        if ( ! X[key] ) {
-          if ( key.startsWith('local') ) {
-            key = key.replace('local', '');
-            key = key.charAt(0).toLowerCase() + key.slice(1);
-          }
-        }
-        return key;
-      }
-    },
-    {
       class: 'Boolean',
       name: 'isTrackingRequest',
+      includeInDigest: true,
       section: 'systemInformation'
     },
     {
       class: 'Boolean',
       name: 'isFulfilled',
+      includeInDigest: false,
       visibility: 'HIDDEN'
     },
     {
@@ -470,6 +470,7 @@
       of: 'foam.nanos.ruler.Operations',
       name: 'operation',
       label: 'Action',
+      includeInDigest: false,
       section: 'requestDetails',
       visibility: function(operation) {
         return operation ?
@@ -480,6 +481,7 @@
     {
       class: 'String',
       name: 'approvableHashKey',
+      includeInDigest: true,
       hidden: true
     }
   ],
@@ -644,15 +646,15 @@
              return false;
         }
 
-        if ( self.__subContext__[self.daoKey_] ) {
-          var property = self.__subContext__[self.daoKey_].of.ID;
+        if ( self.__subContext__[self.daoKey] ) {
+          var property = self.__subContext__[self.daoKey].of.ID;
           var objId = property.adapt.call(property, self.objId, self.objId, property);
-          return self.__subContext__[this.daoKey_]
+          return self.__subContext__[this.daoKey]
             .find(objId)
             .then(obj => !! obj)
             .catch(err => {
               console.warn(err.message || err);
-              if ( self.refObjId && self.refDaoKey && self.__subContext__[self.refDaoKey_] ) {
+              if ( self.refObjId && self.refDaoKey && self.__subContext__[self.refDaoKey] ) {
                 property = self.__subContext__[self.refDaoKey].of.ID;
                 objId = property.adapt.call(property, self.refObjId, self.refObjId, property);
                 return self.__subContext__[self.refDaoKey]
@@ -684,7 +686,7 @@
           property = X[daoKey].of.ID;
           objId = property.adapt.call(property, self.refObjId, self.refObjId, property);
         } else {
-          daoKey = self.daoKey_;
+          daoKey = self.daoKey;
           property = X[daoKey].of.ID;
           objId = property.adapt.call(property, self.objId, self.objId, property);
         }
@@ -729,6 +731,8 @@
                     createPredicate: foam.mlang.predicate.False.create(),
                     deletePredicate: foam.mlang.predicate.False.create()
                   }),
+                  mementoHead: null,
+                  backLabel: 'Back'
                 });
               } else {
                 of = obj.of;
@@ -758,7 +762,9 @@
                 editPredicate: foam.mlang.predicate.False.create(),
                 createPredicate: foam.mlang.predicate.False.create(),
                 deletePredicate: foam.mlang.predicate.False.create()
-              })
+              }),
+              mementoHead: null,
+              backLabel: 'Back'
             });
           })
           .catch(err => {

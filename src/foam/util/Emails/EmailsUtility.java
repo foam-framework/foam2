@@ -50,6 +50,9 @@ public class EmailsUtility {
 
     String group = user != null ? user.getGroup() : "";
     AppConfig appConfig = (AppConfig) x.get("appConfig");
+    if ( user != null ) {
+      appConfig = user.findGroup(x).getAppConfig(x);
+    }
     Theme theme = (Theme) x.get("theme");
     X userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
     if ( theme == null ) {
@@ -57,6 +60,11 @@ public class EmailsUtility {
       if ( theme.getAppConfig() != null ) {
         appConfig.copyFrom(theme.getAppConfig());
       }
+    }
+    userX = userX.put("appConfig", appConfig);
+
+    if ( SafetyUtil.isEmpty(emailMessage.getSpid()) ) {
+      emailMessage.setSpid(user.getSpid());
     }
 
     SupportConfig supportConfig = theme.getSupportConfig();
@@ -101,8 +109,9 @@ public class EmailsUtility {
       foam.nanos.auth.Address address = supportConfig.getSupportAddress();
       templateArgs.put("supportAddress", address == null ? "" : address.toSummary());
       templateArgs.put("appName", (theme.getAppName()));
-      templateArgs.put("logo", (appConfig.getUrl() + "/" + theme.getLogo()));
-      templateArgs.put("appLink", (appConfig.getUrl()));
+      String url = appConfig.getUrl().replaceAll("/$", "");
+      templateArgs.put("logo", (url + "/" + theme.getLogo()));
+      templateArgs.put("appLink", url);
       emailMessage.setTemplateArguments(templateArgs);
     }
 
@@ -116,7 +125,7 @@ public class EmailsUtility {
     }
 
     // SERVICE CALL: passing emailMessage through to actual email service.
-    DAO email = (DAO) x.get("localEmailMessageDAO");
+    DAO email = ((DAO) x.get("localEmailMessageDAO")).inX(x);
     emailMessage.setStatus(foam.nanos.notification.email.Status.UNSENT);
     email.put(emailMessage);
   }

@@ -23,7 +23,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'percentage',
-      value: 1,
+      value: 100,
       help: '0 - never generate PMs, 100 - always generate PMs',
       view: {
         class: 'foam.u2.MultiView',
@@ -40,9 +40,12 @@ foam.CLASS({
       ],
       type: 'Object',
       javaCode: `
-        return ThreadLocalRandom.current().nextInt(0, 100) < getPercentage() ?
-          new PM() :
-          NULLPM__ ;
+        if ( getPercentage() != 100 ) {
+          return ThreadLocalRandom.current().nextInt(0, 100) < getPercentage() ?
+            new PM() :
+            NULLPM__ ;
+        }
+        return new PM();
       `
     }
   ],

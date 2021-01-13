@@ -9,18 +9,19 @@ foam.CLASS({
   name: 'Sequence',
 
   implements: [
-    'foam.core.ContextAgent'
+    'foam.core.ContextAgent',
+    'foam.mlang.Expressions'
   ],
 
   exports: [
-    'endSequence'
+    'as sequence'
   ],
 
   properties: [
     {
       name: 'contextAgentSpecs',
       class: 'FObjectArray',
-      of: 'Object'
+      of: 'FObject'
     },
     {
       name: 'halted_',
@@ -29,13 +30,60 @@ foam.CLASS({
   ],
 
   methods: [
+    // Sequence DSL
+
     function add(spec, args) {
-      this.contextAgentSpecs.push({
+      return this.addAs(spec.name, spec, args);
+    },
+    function addAs(name, spec, args) {
+      this.contextAgentSpecs$push(this.Step.create({
+        name: spec.name,
         spec: spec,
         args: args
-      });
+      }));
       return this;
     },
+    function addBefore(name, spec, args) {
+      for ( var i = 0; i < this.contextAgentSpecs.length; i++ ){
+        let ca = this.contextAgentSpecs[i];
+        if ( name == ca.name ) {
+          break;
+        }
+      }
+
+      var firstHalf = this.contextAgentSpecs.slice(0, i);
+      var secondHalf = this.contextAgentSpecs.slice(i);
+
+      this.contextAgentSpecs = [
+        ...firstHalf,
+        this.Step.create({
+          name: spec.name,
+          spec: spec,
+          args: args
+        }),
+        ...secondHalf
+      ]
+
+      return this;
+    },
+
+    function reconfigure(name, args) {
+      for ( let ca of this.contextAgentSpecs ) {
+        if ( name == ca.name ) {
+          ca.args = { ...ca.args, ...args };
+          break;
+        }
+      }
+      return this;
+    },
+    function remove(name) {
+      this.contextAgentSpecs$remove(this.EQ(
+        this.Step.NAME, name));
+      return this;
+    },
+
+    // Launching a sequence
+
     function execute() {
       // Call ContextAgents sequentially while reducing to a Promise
       var p = Promise.resolve(this.__subContext__);
@@ -63,8 +111,22 @@ foam.CLASS({
         })
       }, p);
     },
+
+    // Sequence runtime commands
+
     function endSequence() {
       this.halted_ = true;
-    }
+    },
   ],
+
+  classes: [
+    {
+      name: 'Step',
+      properties: [
+        { name: 'name', class: 'String' },
+        { name: 'spec', class: 'Class' },
+        { name: 'args', class: 'Object' }
+      ],
+    }
+  ]
 });

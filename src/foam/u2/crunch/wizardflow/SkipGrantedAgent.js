@@ -11,43 +11,16 @@ foam.CLASS({
     Allows filtering or skipping of granted capabilities. Also exports a wizard
     position in case wizardlets are to be skipped.
   `,
-  imports: [ 'wizardlets' ],
+  imports: [ 
+    'crunchService',
+    'wizardlets'
+  ],
   exports: [ 'initialPosition' ],
   requires: [
     'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.u2.crunch.wizardflow.SkipMode',
     'foam.nanos.crunch.ui.CapabilityWizardlet',
     'foam.u2.wizard.WizardPosition'
-  ],
-
-  enums: [
-    {
-      name: 'SkipMode',
-      values: [
-        {
-          name: 'HIDE',
-          label: 'hide',
-          documentation: `
-            Hides all wizardlets that are PENDING or GRANTED
-          `
-        },
-        {
-          name: 'SHOW',
-          label: 'show',
-          documentation: `
-            Shows all wizardlets regardless of PENDING or GRANTED and starts at the 
-            first-indexed wizard regardless of status
-          `
-        },
-        {
-          name: 'SKIP',
-          label: 'skip',
-          documentation: `
-            Show all wizardlets regardless of PENDING or GRANTED and starts at the
-            first wizard that is NOT PENDING or GRANTED
-          `
-        }
-      ]
-    }
   ],
 
   properties: [
@@ -64,6 +37,8 @@ foam.CLASS({
     },
     {
       name: 'mode',
+      class: 'Enum',
+      of: 'foam.u2.crunch.wizardflow.SkipMode',
       factory: function () {
         return this.SkipMode.SKIP;
       }
@@ -80,12 +55,16 @@ foam.CLASS({
         if ( ! this.CapabilityWizardlet.isInstance(wizardlet) ) continue;
         let isGranted = ['GRANTED','PENDING'].some(status =>
           this.CapabilityJunctionStatus[status] == wizardlet.status);
-        if ( ! isGranted ) {
+        if ( ! isGranted ||  
+          await this.crunchService.isRenewable(this.__subContext__, wizardlet.capability.id)
+        ) {
           foundFirstWizardlet = true;
           continue;
         }
         if ( ! foundFirstWizardlet ) passedAtBeginning++;
-        if ( this.mode == this.SkipMode.HIDE ) wizardlet.isAvailable = false;
+        if ( this.mode == this.SkipMode.HIDE ) {
+          wizardlet.isVisible = false;
+        }
       }
 
       this.initialPosition.wizardletIndex = passedAtBeginning;

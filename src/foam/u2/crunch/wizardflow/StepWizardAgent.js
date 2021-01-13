@@ -15,7 +15,7 @@ foam.CLASS({
 
   imports: [
     'wizardlets',
-    'wizardConfig',
+    // 'wizardConfig',
     'pushView',
     'popView',
     'initialPosition?'
@@ -27,7 +27,8 @@ foam.CLASS({
 
   requires: [
     'foam.u2.dialog.Popup',
-    'foam.u2.wizard.StepWizardletController'
+    'foam.u2.wizard.StepWizardConfig',
+    'foam.u2.wizard.StepWizardController'
   ],
 
   properties: [
@@ -35,7 +36,9 @@ foam.CLASS({
       name: 'config',
       class: 'FObjectProperty',
       of: 'foam.u2.wizard.StepWizardConfig',
-      factory: function() { return null; }
+      factory: function() {
+        return this.StepWizardConfig.create();
+      }
     },
     {
       name: 'view',
@@ -52,15 +55,15 @@ foam.CLASS({
   methods: [
     function execute() {
       return new Promise((resolve, reject) => {
-        var data = this.StepWizardletController.create({
+        var data = this.StepWizardController.create({
           wizardlets: this.wizardlets,
-          config: this.wizardConfig,
+          config: this.config,
           submitted$: this.submitted$,
           ...(this.initialPosition ? {
             wizardPosition: this.initialPosition
           } : {})
         })
-        
+
         this.pushView({
           ...this.view,
           data: data,

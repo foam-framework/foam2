@@ -37,6 +37,7 @@ foam.CLASS({
     'dblclick?',
     'editRecord?',
     'filteredTableColumns?',
+    'memento',
     'selection? as importSelection',
     'stack?'
   ],
@@ -51,6 +52,16 @@ foam.CLASS({
       type: 'Int',
       name: 'EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH',
       value: 60
+    },
+    {
+      type: 'Char',
+      name: 'DESCENDING_ORDER_CHAR',
+      value: '-'
+    },
+    {
+      type: 'Char',
+      name: 'ASCENDING_ORDER_CHAR',
+      value: '+'
     }
   ],
 
@@ -95,8 +106,8 @@ foam.CLASS({
     },
     {
       name: 'selectedColumnNames',
-      expression: function(columns, of) {
-        var ls = JSON.parse(localStorage.getItem(of.id));
+      expression: function(columns, of, memento) {
+        var ls =  memento && memento.paramsObj.c ? memento.paramsObj.c.map(c => this.returnMementoColumnNameDisregardSorting(c)) : JSON.parse(localStorage.getItem(of.id));
         return ls || columns;
       }
     },
@@ -259,19 +270,59 @@ foam.CLASS({
 
   methods: [
     function sortBy(column) {
-      this.order = this.order === column ?
+      var isNewOrderDesc = this.order === column;
+      this.order = isNewOrderDesc ?
         this.DESC(column) :
         column;
+
+      if ( this.memento ) {
+        if ( ! this.memento.paramsObj.c ) {
+          this.memento.paramsObj.c = [];
+        }
+        var mementoColumn = this.memento.paramsObj.c.find(c => this.returnMementoColumnNameDisregardSorting(c) === column.name)
+        var orderChar = isNewOrderDesc ? this.DESCENDING_ORDER_CHAR : this.ASCENDING_ORDER_CHAR;
+        if ( ! mementoColumn ) {
+          this.memento.paramsObj.c.push(column.name + orderChar);
+        } else {
+          var index = this.memento.paramsObj.c.indexOf(mementoColumn);
+          this.memento.paramsObj.c[index] = column.name + orderChar;
+        }
+        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
+      }
     },
 
     function updateColumns() {
       localStorage.removeItem(this.of.id);
       localStorage.setItem(this.of.id, JSON.stringify(this.selectedColumnNames.map(c => foam.String.isInstance(c) ? c : c.name )));
+
+      var newMementoColumns = [];
+
+      for ( var s of this.selectedColumnNames ) {
+        if ( ! this.memento.paramsObj.c )
+          this.memento.paramsObj.c = [];
+        var col = this.memento.paramsObj.c.find(c => this.returnMementoColumnNameDisregardSorting(c) === s);
+        if ( ! col ) {
+          newMementoColumns.push(s);
+        } else {
+          newMementoColumns.push(col);
+        }
+      }
+      this.memento.paramsObj.c = newMementoColumns;
+      this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj)
+
       this.isColumnChanged = ! this.isColumnChanged;
     },
 
     async function initE() {
       var view = this;
+
+      //set memento's selected columns
+      if ( ! this.memento.paramsObj.c ) {
+        this.memento.paramsObj.c = this.columns_.map(c => {
+          return this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c);
+        });
+        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj)
+      }
 
       //otherwise on adding new column creating new EditColumnsView, which is closed by default
       if (view.editColumnsEnabled)
@@ -346,7 +397,11 @@ foam.CLASS({
                   addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + prop.name))
                   .style({ flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0', 'word-wrap' : 'break-word', 'white-space' : 'normal'})
-                  .add(view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col)).
+                  .add(view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col))./*
+                  .forEach(
+                    view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col),
+                    function(c, i) { if ( i ) this.add(' / '); this.add(c); }
+                  ).*/
                   callIf(isFirstLevelProperty && prop.sortable, function() {
                     this.on('click', function(e) {
                       view.sortBy(prop);
@@ -404,6 +459,21 @@ foam.CLASS({
          * writing.
          */
           var view = this;
+          view.props = this.returnPropertiesForColumns(view, view.columns_);
+
+          if ( this.memento && this.memento.paramsObj.c ) {
+            for ( var c of this.memento.paramsObj.c ) {
+              if ( this.shouldColumnBeSorted(c) && ! c.includes('.')) {
+                var prop = view.props.find(p => p.fullPropertyName === c.substr(0, c.length - 1) );
+                if ( prop ) {
+                  if ( c[c.length - 1] === this.DESCENDING_ORDER_CHAR )
+                    dao = dao.orderBy(this.DESC(prop.property));
+                  else
+                    dao = dao.orderBy(prop.property);
+                }
+              }
+            }
+          }
 
           var actions = {};
           var actionsMerger = action => { actions[action.name] = action; };
@@ -421,7 +491,6 @@ foam.CLASS({
             if ( this.order ) dao = dao.orderBy(this.order);
             var proxy = view.ProxyDAO.create({ delegate: dao });
 
-            view.props = this.returnPropertiesForColumns(view, view.columns_);
             var canObjBeBuildFromProjection = true;
 
             for ( var p of view.props ) {
@@ -615,6 +684,12 @@ foam.CLASS({
       function returnPropertiesForColumns(obj, columns_) {
         var propertyNamesToQuery = columns_.length === 0 ? columns_ : [ 'id' ].concat(obj.filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(obj, columns_).filter(c => ! foam.core.Action.isInstance(obj.of.getAxiomByName(obj.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c)))).map(c => obj.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c)));
         return obj.columnConfigToPropertyConverter.returnPropertyColumnMappings(obj.of, propertyNamesToQuery);
+      },
+      function shouldColumnBeSorted(c) {
+        return c[c.length - 1] === this.DESCENDING_ORDER_CHAR || c[c.length - 1] === this.ASCENDING_ORDER_CHAR;
+      },
+      function returnMementoColumnNameDisregardSorting(c) {
+        return c && this.shouldColumnBeSorted(c) ? c.substr(0, c.length - 1) : c;
       }
   ]
 });

@@ -50,7 +50,7 @@ foam.CLASS({
 
           if ( ! cap.getVisibilityPredicate().f(subjectX) ) return;
 
-          User user = (User) subject.getUser();
+          User user = (User) subject.getRealUser();
 
           TranslationService ts = (TranslationService) x.get("translationService");
           String locale = user.getLanguage().getCode().toString();
@@ -69,7 +69,7 @@ foam.CLASS({
           HashMap<String, Object> args = new HashMap<>();
             args.put("capNameEn", cap.getName());
             args.put("capName", capabilityName);
-            args.put("junctionStatusEn", junction.getStatus());
+            args.put("junctionStatusEn", junction.getStatus().getName());
             args.put("junctionStatus", junctionStatus);
 
           Notification notification = new Notification();

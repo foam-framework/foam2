@@ -41,7 +41,7 @@ foam.CLASS({
     },
     async function parseArrayToWizardlets(array, parent) {
       var capabilityDesired = array[array.length - 1];
-      var capabilityPrereqs = array.slice(0, array.length - 1);
+      var capabilityPrereqs = array.slice(0, -1);
       var wizardlets = [];
 
       var rootWizardlet = this.getWizardlet(capabilityDesired);
@@ -52,31 +52,35 @@ foam.CLASS({
 
       var addPrerequisite = (wizardlet) => {
         var defaultPrerequisiteHandling = true;
+        var preventPush = false;
 
         if ( this.isPrerequisiteAware(rootWizardlet) ) {
-          rootWizardlet.addPrerequisite(wizardlet);
+          preventPush = rootWizardlet.addPrerequisite(wizardlet);
           defaultPrerequisiteHandling = false;
         }
 
         if ( beforeWizardlet && this.isPrerequisiteAware(beforeWizardlet) ) {
-          beforeWizardlet.addPrerequisite(wizardlet);
+          preventPush = beforeWizardlet.addPrerequisite(wizardlet);
           defaultPrerequisiteHandling = false;
         }
 
         if ( defaultPrerequisiteHandling )
           wizardlet.isAvailable$.follow(rootWizardlet.isAvailable$);
+
+        return preventPush;
       }
 
       for ( let capability of capabilityPrereqs ) {
         if ( Array.isArray(capability) ) {
           let subWizardlets = await this.parseArrayToWizardlets(capability);
-          addPrerequisite(subWizardlets[subWizardlets.length - 1]);
-          wizardlets.push(...subWizardlets);
+          let preventPush =
+            addPrerequisite(subWizardlets[subWizardlets.length - 1]);
+          if ( ! preventPush ) wizardlets.push(...subWizardlets);
           continue;
         }
         let wizardlet = this.getWizardlet(capability);
-        addPrerequisite(wizardlet);
-        wizardlets.push(wizardlet);
+        let preventPush = addPrerequisite(wizardlet);
+        if ( ! preventPush ) wizardlets.push(wizardlet);
       }
 
       if ( beforeWizardlet ) wizardlets.unshift(beforeWizardlet);
@@ -87,7 +91,7 @@ foam.CLASS({
         let wizardlet = capability[isBefore ? 'beforeWizardlet' : 'wizardlet'];
         return wizardlet && wizardlet.clone().copyFrom({
           capability: capability,
-          dataController: this.getWAO()
+          wao: this.getWAO()
         }, this.__subContext__);
     },
     function isPrerequisiteAware(wizardlet) {

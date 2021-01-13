@@ -10,7 +10,6 @@ import foam.core.ContextAgent;
 import foam.core.X;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
-import foam.nanos.crunch.CapabilityJunctionStatus;
 import foam.nanos.crunch.UserCapabilityJunction;
 import foam.nanos.logger.Logger;
 import java.util.List;

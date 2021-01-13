@@ -11,6 +11,7 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
       .setAuthorize(false)
+      .setCluster(false)
       .build();
   """
 })
@@ -25,7 +26,11 @@ p({
       .setOrder(new foam.mlang.order.Comparator[] { foam.mlang.MLang.DESC(foam.nanos.analytics.Candlestick.COUNT) })
       .build();
   """,
-  "client": "{\"of\":\"foam.nanos.analytics.Candlestick\"}"
+  "client": """
+    {
+      "of":"foam.nanos.analytics.Candlestick"
+    }
+  """
 })
 
 p({
@@ -35,6 +40,7 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
       .setAuthorize(false)
+      .setCluster(false)
       .build();
   """
 })
@@ -59,6 +65,7 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.analytics.Candlestick.getOwnClassInfo())
       .setAuthorize(false)
+      .setCluster(false)
       .build();
   """
 })
@@ -85,6 +92,7 @@ p({
       .setAuthorize(false)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("omDaily")
+      .setCluster(false)
       .build();
   """
 })

@@ -78,8 +78,10 @@ foam.CLASS({
      name: 'getter_',
      value: function(proto, prop, obj, key) {
        if ( foam.core.I18NString.GETTER__ ) return foam.core.I18NString.GETTER__(proto, prop, obj, key);
-       return obj.instance_[key];
-     }
+       var msg_ = obj.instance_[key];
+       if ( ! foam.i18n || ! foam.xmsg ) return msg_;
+       return foam.i18n.Lib.createText(prop.sourceCls_.id + '.' + this.name, msg_, msg_);
+      }
    }
   ]
 });
@@ -314,17 +316,20 @@ foam.CLASS({
     function installInProto(proto) {
       this.SUPER(proto);
       var self = this;
-      Object.defineProperty(proto, self.name + '$push', {
-        get: function classGetter() {
-          return function (v) {
-            // Push value
-            this[self.name].push(v);
-            // Force property update
-            this.propertyChange.pub(self.name, this.slot(self.name));
-          }
-        },
-        configurable: true
-      });
+      ['push','splice','unshift'].forEach(func => {
+        Object.defineProperty(proto, self.name + '$' + func, {
+          get: function classGetter() {
+            return function (...args) {
+              // Push value
+              let val = this[self.name][func](...args);
+              // Force property update
+              this.propertyChange.pub(self.name, this.slot(self.name));
+              return val;
+            }
+          },
+          configurable: true
+        });
+      })
       Object.defineProperty(proto, self.name + '$remove', {
         get: function classGetter() {
           return function (predicate) {
@@ -336,7 +341,17 @@ foam.CLASS({
                 newArry.push(oldArry[i]);
               }
             }
-            this.propertyChange.pub(self.name, this.slot(self.name));
+            this[self.name] = newArry;
+          }
+        },
+        configurable: true
+      });
+      // Does not modify the original array; returns an array containing all
+      //   elements that satisfy the provided predicate.
+      Object.defineProperty(proto, self.name + '$filter', {
+        get: function classGetter() {
+          return function (predicate) {
+            return foam.Array.filter(this[self.name], predicate);
           }
         },
         configurable: true

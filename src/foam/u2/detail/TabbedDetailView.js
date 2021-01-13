@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'TabbedDetailView',
   extends: 'foam.u2.detail.AbstractSectionedDetailView',
 
+  imports: [
+    'memento'
+  ],
+
   requires: [
     'foam.core.ArraySlot',
     'foam.u2.borders.CardBorder',
@@ -44,7 +48,8 @@ foam.CLASS({
       class: 'String',
       name: 'defaultSectionLabel',
       value: 'Uncategorized'
-    }
+    },
+    'tabs'
   ],
 
   methods: [
@@ -63,8 +68,8 @@ foam.CLASS({
 
           return self.E()
             .add(arraySlot.map((visibilities) => {
-              return this.E()
-                .start(self.Tabs)
+              var e = this.E()
+                .start(self.Tabs, {}, self.tabs$)
                   .forEach(sections, function(s, i) {
                     if ( ! visibilities[i] ) return;
                     var title$ = foam.Function.isInstance(s.title) ?
@@ -73,18 +78,23 @@ foam.CLASS({
                         code: s.title
                       }) :
                       s.title$;
+
+                    var tab = foam.core.SimpleSlot.create();
                     this
-                      .start(self.Tab, { label$: title$ || self.defaultSectionLabel })
+                      .start(self.Tab, { label$: title$ || self.defaultSectionLabel, selected: self.memento && self.memento.paramsObj.sT && self.memento.paramsObj.sT === s.title }, tab)
                         .call(function() {
                           this.tag(self.SectionView, {
                             data$: self.data$,
                             section: s,
-                            showTitle: false
+                            showTitle: false,
+                            selected$: tab.value.selected$
                           })
                         })
                       .end();
                   })
                 .end();
+              self.tabs.updateMemento = true;
+              return e;
             }))
         }));
     }

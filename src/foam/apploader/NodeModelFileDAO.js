@@ -8,10 +8,12 @@ foam.CLASS({
   package: 'foam.apploader',
   name: 'NodeModelFileDAO',
   extends: 'foam.dao.ProxyDAO',
+
   requires: [
     'foam.apploader.ModelFileDAO',
     'foam.apploader.NodeModelFileFetcher',
   ],
+
   properties: [
     'root',
     {
@@ -19,7 +21,7 @@ foam.CLASS({
       factory: function() {
         return this.ModelFileDAO.create({
           fetcher: this.NodeModelFileFetcher.create({root: this.root}), });
-      },
-    },
-  ],
+      }
+    }
+  ]
 });

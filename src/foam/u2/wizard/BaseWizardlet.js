@@ -14,8 +14,9 @@ foam.CLASS({
 
   requires: [
     'foam.u2.detail.AbstractSectionedDetailView',
+    'foam.u2.wizard.WizardletIndicator',
     'foam.u2.wizard.WizardletSection',
-    'foam.u2.wizard.WAO',
+    'foam.u2.wizard.WAO'
   ],
 
   properties: [
@@ -90,7 +91,7 @@ foam.CLASS({
           of: this.of,
         }, this).sections.map(section => this.WizardletSection.create({
           section: section,
-          data$: this.data$,
+          wizardlet: this,
           isAvailable$: section.createIsAvailableFor(
             this.data$,
           )
@@ -98,12 +99,24 @@ foam.CLASS({
       }
     },
     {
-      name: 'dataController',
+      name: 'wao',
       class: 'FObjectProperty',
       of: 'foam.u2.wizard.WAO',
       flags: ['web'],
       factory: function () {
         this.WAO.create();
+      }
+    },
+    {
+      name: 'indicator',
+      class: 'Enum',
+      of: 'foam.u2.wizard.WizardletIndicator',
+      documentation: `
+        Describes how this wizardlet will appear in the list of steps.
+      `,
+      expression: function (isValid) {
+        return isValid ? this.WizardletIndicator.COMPLETED
+          : this.WizardletIndicator.PLEASE_FILL;
       }
     }
   ],
@@ -116,13 +129,13 @@ foam.CLASS({
       return null;
     },
     async function save() {
-      return await this.dataController.save(this);
+      return await this.wao.save(this);
     },
     async function cancel() {
-      return await this.dataController.cancel(this);
+      return await this.wao.cancel(this);
     },
     async function load() {
-      await this.dataController.load(this);
+      await this.wao.load(this);
       return this;
     }
   ]

@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
- foam.CLASS({
+foam.CLASS({
   package: 'foam.nanos.column',
   name: 'TableColumnOutputter',
 
@@ -43,8 +43,8 @@
             }
             return ( val / 100 ).toString();
           }
-          if ( foam.core.Date.isInstance(prop) && val.toISOString ) {
-            return val.toISOString().substring(0, 10);
+          if ( foam.core.Date.isInstance(prop) ) {
+            return val.toLocaleDateString(foam.locale);
           }
           if ( foam.core.DateTime.isInstance(prop) ) {
             return val.toString().substring(0, 24);
