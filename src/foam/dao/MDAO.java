@@ -74,8 +74,6 @@ public class MDAO
   protected Object   writeLock_ = new Object();
   protected Set      unindexed_ = new HashSet();
 
-  public final static String GET_MDAO_CMD = "GET_MDAO_CMD"; 
-  
   public MDAO(ClassInfo of) {
     setOf(of);
     index_ = new AltIndex(new TreeIndex((PropertyInfo) this.of_.getAxiomByName("id")));
@@ -233,13 +231,5 @@ public class MDAO
     } else {
       super.removeAll_(x, skip, limit, order, predicate);
     }
-  }
-
-  public Object cmd_(X x, Object cmd) {
-    // Used by Medusa to get the real MDAO to update.
-    if ( MDAO.GET_MDAO_CMD.equals(cmd) ) {
-      return this;
-    }
-    return super.cmd_(x, cmd);
   }
 }

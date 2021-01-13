@@ -65,21 +65,12 @@ public class RulerDAOTest extends Test {
     test(executeRule != null, "Test rule from executor was added successfully");
     test(executeRule.getRuleGroup().equals("fake test group"), "Test rule's group name is fake test group.");
 
-    int i = 0;
-    while ( i < 10 ) {
-      // wait for async
-      try {
-        Thread.sleep(asyncWait + 100);
-      } catch (InterruptedException e) {
-        break;
-      }
-
-      user1 = (User) userDAO.find(user1.getId());
-      if ( user1.getLastName().equals("Smith") ) {
-        break;
-      }
-    }
-    test(user1.getLastName().equals("Smith"), "user's lastName is 'Smith': async update rule was executed. "+user1.getLastName());
+    // wait for async
+    try {
+      Thread.sleep(asyncWait + 100);
+    } catch (InterruptedException e) { }
+    user1 = (User) userDAO.find(user1.getId());
+    test(user1.getLastName().equals("Smith"), "user's lastName is 'Smith': async update rule was executed");
   }
 
   public void testRuleHistory(X x) {

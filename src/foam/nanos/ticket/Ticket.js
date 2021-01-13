@@ -16,8 +16,7 @@ foam.CLASS({
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.auth.LastModifiedByAware',
-    'foam.nanos.auth.ServiceProviderAware'
+    'foam.nanos.auth.LastModifiedByAware'
   ],
 
   requires: [
@@ -260,24 +259,6 @@ foam.CLASS({
       tableCellFormatter: function(value, obj) {
         this.add(obj.title);
       }
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.ServiceProvider',
-      name: 'spid',
-      includeInDigest: true,
-      section: 'systemInformation',
-      writePermissionRequired: true,
-      documentation: `
-        Need to override getter to return "" because its trying to
-        return null which breaks tests
-      `,
-      javaGetter: `
-        if ( ! spidIsSet_ ) {
-          return "";
-        }
-        return spid_;
-      `
     }
   ],
 

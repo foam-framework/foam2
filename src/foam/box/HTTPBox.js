@@ -218,6 +218,7 @@ protected class ResponseThread implements Runnable {
         if ( this.authorizationType === foam.box.HTTPAuthorizationType.BEARER ) {
           headers['Authorization'] = 'BEARER ' + this.jsSessionID;
         }
+
         var req = this.HTTPRequest.create({
           url:     this.prepareURL(this.url),
           method: this.method,

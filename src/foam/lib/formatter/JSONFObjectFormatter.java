@@ -105,7 +105,6 @@ public class JSONFObjectFormatter
   }
 
   public void escapeAppend(String s) {
-    if ( s == null ) return;
     StringBuilder sb = new StringBuilder();
     foam.lib.json.Util.escape(s, sb);
     append(sb.toString());

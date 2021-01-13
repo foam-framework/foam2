@@ -33,8 +33,7 @@ foam.CLASS({
       javaCode: `
       Alarm old = (Alarm) getDelegate().find_(x, ((Alarm)obj).getId());
       Alarm alarm = (Alarm) getDelegate().put_(x, obj);
-      if ( ! alarm.getClusterable() ||
-           ( old != null &&
+      if ( ( old != null &&
              old.getIsActive() == alarm.getIsActive() ) ||
            ( ( old == null ||
                old.getSeverity().getOrdinal() < LogLevel.WARN.getOrdinal() ) &&

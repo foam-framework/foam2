@@ -80,7 +80,7 @@ foam.CLASS({
   methods: [
     {
       name: 'put_',
-      code: function put_(x, obj) {
+      code:     function put_(x, obj) {
         return this.SUPER(null, obj);
       },
       javaCode: 'return super.put_(null, obj);',
@@ -96,7 +96,7 @@ foam.CLASS({
     },
     {
       name: 'find_',
-      code: function find_(x, key) {
+      code:     function find_(x, key) {
         return this.SUPER(null, key);
       },
       javaCode: 'return super.find_(null, id);',
@@ -151,6 +151,7 @@ sink?.eof()
 return sink
 `
     },
+
     {
       name: 'removeAll_',
       code: function removeAll_(x, skip, limit, order, predicate) {
@@ -163,14 +164,7 @@ return sink
       javaCode: 'super.removeAll_(null, skip, limit, order, predicate);',
       swiftCode: 'try super.removeAll_(nil, skip, limit, order, predicate)'
     },
-    {
-      name: 'cmd_',
-      code: function cmd_(x, obj) {
-        return this.SUPER(null, obj);
-      },
-      javaCode: 'return super.cmd_(null, obj);',
-      swiftCode: 'return try super.cmd_(nil, obj)'
-    },
+
     {
       name: 'listen_',
       code: function listen_(x, sink, predicate) {

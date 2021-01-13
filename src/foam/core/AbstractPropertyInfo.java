@@ -57,10 +57,6 @@ public abstract class AbstractPropertyInfo
     return false;
   }
 
-  public boolean getClusterTransient() {
-    return false;
-  }
-
   public boolean getReadPermissionRequired() {
     return false;
   }
@@ -206,10 +202,6 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public boolean includeInDigest() {
-    if ( getStorageTransient() ||
-         getClusterTransient() ) {
-      return false;
-    }
     return true;
   }
 
@@ -220,7 +212,7 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public boolean includeInSignature() {
-    return includeInDigest();
+    return true;
   }
 
   @Override

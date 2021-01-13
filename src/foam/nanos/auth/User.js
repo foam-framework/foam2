@@ -148,7 +148,6 @@ foam.CLASS({
       name: 'enabled',
       documentation: 'Determines whether the User is permitted certain actions.',
       value: true,
-      includeInDigest: true,
       section: 'systemInformation',
       gridColumns: 6
     },
@@ -157,7 +156,6 @@ foam.CLASS({
       name: 'loginEnabled',
       documentation: 'Determines whether the User can login to the platform.',
       writePermissionRequired: true,
-      includeInDigest: false,
       value: true,
       section: 'systemInformation',
       order: 30,
@@ -166,7 +164,6 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'lastLogin',
-      includeInDigest: false,
       documentation: 'The date and time of last login by User.',
       section: 'operationsInformation',
       order: 30,
@@ -182,8 +179,7 @@ foam.CLASS({
       gridColumns: 6,
       section: 'userInformation',
       order: 2,
-      includeInDigest: true,
-      containsPII: true
+      includeInDigest: true
    },
     {
       class: 'String',
@@ -192,8 +188,7 @@ foam.CLASS({
       gridColumns: 6,
       section: 'userInformation',
       order: 3,
-      includeInDigest: true,
-      containsPII: true
+      includeInDigest: true
     },
     {
       class: 'String',
@@ -203,8 +198,7 @@ foam.CLASS({
       gridColumns: 6,
       section: 'userInformation',
       order: 4,
-      includeInDigest: true,
-      containsPII: true
+      includeInDigest: true
     },
     {
       name: 'legalName',
@@ -212,15 +206,11 @@ foam.CLASS({
       updateVisibility: 'RO',
       section: 'userInformation',
       order: 5,
-      gridColumns: 6,
-      includeInDigest: false,
-      containsPII: true
+      gridColumns: 6
     },
-    {
+   {
       class: 'String',
       name: 'jobTitle',
-      includeInDigest: false,
-      containsPII: false,
       documentation: 'The job title of the individual person, or real user.',
       section: 'ownerInformation',
       gridColumns: 6,
@@ -242,8 +232,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'organization',
-      includeInDigest: false,
-      containsPII: false,
       documentation: 'The organization/business associated with the User.',
       displayWidth: 80,
       width: 100,
@@ -254,8 +242,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'department',
-      includeInDigest: false,
-      containsPII: false,
       documentation: `The department associated with the organization/business
         of the User.`,
       width: 50,
@@ -267,8 +253,6 @@ foam.CLASS({
       class: 'String',
       name: 'userName',
       label: 'Username',
-      includeInDigest: true,
-      containsPII: false,
       documentation: 'The username of the User.',
       section: 'userInformation',
       order: 7,
@@ -281,11 +265,10 @@ foam.CLASS({
         'en' :'Email Address',
         'fr' :'Adresse e-mail'
       },
-      includeInDigest: true,
-      containsPII: true,
       documentation: 'The email address of the User.',
       displayWidth: 80,
       width: 100,
+      includeInDigest: true,
       javaSetter:
       `email_ = val.toLowerCase();
        emailIsSet_ = true;`,
@@ -296,7 +279,6 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'emailVerified',
-      includeInDigest: false,
       documentation: 'Determines whether the email address of the User is valid.',
       writePermissionRequired: true,
       section: 'operationsInformation',
@@ -306,8 +288,6 @@ foam.CLASS({
     {
       class: 'PhoneNumber',
       name: 'phoneNumber',
-      includeInDigest: false,
-      containsPII: true,
       documentation: 'Personal phone number.',
       section: 'userInformation',
       gridColumns: 6
@@ -315,7 +295,6 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'phoneNumberVerified',
-      includeInDigest: false,
       writePermissionRequired: true,
       section: 'operationsInformation',
       gridColumns: 6,
@@ -324,7 +303,6 @@ foam.CLASS({
     {
       class: 'PhoneNumber',
       name: 'mobileNumber',
-      includeInDigest: false,
       documentation: 'Returns the mobile phone number of the User from the Phone model.',
       createVisibility: 'HIDDEN',
       section: 'userInformation',
@@ -333,7 +311,6 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'mobileNumberVerified',
-      includeInDigest: false,
       writePermissionRequired: true,
       section: 'operationsInformation',
       gridColumns: 6,
@@ -360,8 +337,6 @@ foam.CLASS({
     {
       class: 'Date',
       name: 'birthday',
-      includeInDigest: false,
-      containsPII: false,
       documentation: 'The date of birth of the individual person, or real user.',
       section: 'userInformation',
       gridColumns: 6
@@ -369,8 +344,6 @@ foam.CLASS({
     {
       class: 'foam.nanos.fs.FileProperty',
       name: 'profilePicture',
-      includeInDigest: false,
-      containsPII: true,
       documentation: `The profile picture of the individual user, initially
         defaulting to a placeholder picture.`,
       view: {
@@ -382,8 +355,6 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Address',
-      includeInDigest: false,
-      containsPII: true,
       name: 'address',
       documentation: 'Returns the postal address from the Address model.',
       factory: function() {
@@ -394,8 +365,6 @@ foam.CLASS({
     {
       class: 'Reference',
       name: 'language',
-      includeInDigest: false,
-      containsPII: false,
       documentation: 'The default language preferred by the User.',
       of: 'foam.nanos.auth.Language',
       createVisibility: 'HIDDEN',
@@ -411,7 +380,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'timeZone',
-      includeInDigest: false,
       documentation: 'The preferred time zone of the User.',
       width: 5,
       createVisibility: 'HIDDEN',
@@ -443,17 +411,16 @@ foam.CLASS({
     {
       class: 'Password',
       name: 'password',
-      includeInDigest: true,
       documentation: 'The password that is currently active with the User.',
       hidden: true,
       networkTransient: true,
-      section: 'systemInformation'
+      section: 'systemInformation',
+      includeInDigest: true
     },
     {
       name: 'passwordHistory',
       class: 'FObjectArray',
       of: 'foam.nanos.auth.PriorPassword',
-      includeInDigest: false,
       javaFactory: `
         foam.nanos.auth.PriorPassword[] priorPasswords = new foam.nanos.auth.PriorPassword[1];
         priorPasswords[0] = new foam.nanos.auth.PriorPassword();
@@ -470,7 +437,6 @@ foam.CLASS({
     {
       class: 'Password',
       name: 'previousPassword',
-      includeInDigest: false,
       documentation: 'The password that was previously active with the User.',
       hidden: true,
       networkTransient: true,
@@ -479,7 +445,6 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'passwordLastModified',
-      includeInDigest: false,
       documentation: 'The date and time that the password was last modified.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
@@ -490,7 +455,6 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'passwordExpiry',
-      includeInDigest: false,
       documentation: `The date and time that the current password of the User
         will expire.`,
       section: 'systemInformation',
@@ -500,7 +464,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'businessName',
-      includeInDigest: false,
       documentation: 'The name of the business associated with the User.',
       width: 50,
       section: 'businessInformation',
@@ -510,7 +473,6 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'disabledTopics',
-      includeInDigest: false,
       documentation: 'Disables types for notifications.',
       createVisibility: 'HIDDEN',
       section: 'operationsInformation',
@@ -537,7 +499,6 @@ foam.CLASS({
     {
       class: 'URL',
       name: 'website',
-      includeInDigest: false,
       documentation: 'A URL link to the website of the User.',
       displayWidth: 80,
       width: 2048,
@@ -563,7 +524,6 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'created',
-      includeInDigest: true,
       documentation: 'The date and time of when the User was created in the system.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
@@ -574,11 +534,9 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'lastModified',
-      includeInDigest: true,
       documentation: 'The date and time the User was last modified.',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      storageOptional: true,
       section: 'userInformation',
       gridColumns: 6
     },
@@ -586,7 +544,6 @@ foam.CLASS({
       class: 'foam.core.Enum',
       of: 'foam.nanos.auth.LifecycleState',
       name: 'lifecycleState',
-      includeInDigest: true,
       section: 'systemInformation',
       order: 20,
       gridColumns: 6,
@@ -597,7 +554,6 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.ServiceProvider',
       name: 'spid',
-      includeInDigest: true,
       tableWidth: 120,
       section: 'systemInformation',
       order: 15,
@@ -647,7 +603,8 @@ foam.CLASS({
 
         // Prevent privilege escalation by only allowing a user's group to be
         // set to one that the user doing the put has permission to update.
-        if ( ! auth.check(x, "group.update." + this.getGroup()) ) {
+        boolean hasGroupUpdatePermission = auth.check(x, "group.update." + this.getGroup());
+        if ( ! hasGroupUpdatePermission ) {
           throw new AuthorizationException("You do not have permission to set that user's group to '" + this.getGroup() + "'.");
         }
       `

@@ -111,7 +111,7 @@ foam.CLASS({
       name: 'message',
       class: 'String',
       label: 'Log Message',
-      view: { class: 'foam.u2.tag.TextArea', rows: 10, cols: 100 },
+      view: { class: 'foam.u2.view.PreView' },
       updateVisibility: 'RO'
     },
     // TODO: implement via an additional method on Logger logger.flag(x, y).log(message)

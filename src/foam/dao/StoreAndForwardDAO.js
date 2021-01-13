@@ -127,11 +127,11 @@ foam.CLASS({
   ],
 
   methods: [
-    function put_() { return this.store_(foam.dao.DOP.PUT_.label, arguments); },
-    function remove_() { return this.store_(foam.dao.DOP.REMOVE_.label, arguments); },
-    function find_() { return this.store_(foam.dao.DOP.FIND_.label, arguments); },
-    function select_() { return this.store_(foam.dao.DOP.SELECT_.label, arguments); },
-    function removeAll_() { return this.store_(foam.dao.DOP.REMOVE_ALL_.label, arguments); },
+    function put_() { return this.store_('put_', arguments); },
+    function remove_() { return this.store_('remove_', arguments); },
+    function find_() { return this.store_('find_', arguments); },
+    function select_() { return this.store_('select_', arguments); },
+    function removeAll_() { return this.store_('removeAll_', arguments); },
 
     function store_(methodName, args) {
       // Store DAO operations in order.

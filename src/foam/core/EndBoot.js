@@ -195,9 +195,6 @@ foam.boot.end();
   A storageOptional field is not stored to persistent storage if
   if it is the only field to be persisted, or the only fields to
   be persisted are all storageOptional.
-
-  A clusterTransient field is not marshalled over the network to the primary/master node.
-  foam.json.Cluster does not encode clusterTransient fields.
  */
 foam.CLASS({
   refines: 'foam.core.Property',
@@ -231,13 +228,6 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'storageOptional'
-    },
-    {
-      class: 'Boolean',
-      name: 'clusterTransient',
-      expression: function(transient) {
-        return transient;
-      }
     }
   ]
 });

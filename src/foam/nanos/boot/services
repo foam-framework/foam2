@@ -7,7 +7,6 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.script.Script.getOwnClassInfo())
       .setGuid(true)
-      .setCluster(false)
       .setRuler(false)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("bootscripts")

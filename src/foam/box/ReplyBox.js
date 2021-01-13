@@ -28,12 +28,6 @@ foam.CLASS({
     }
   ],
 
-  javaImports: [
-    'java.util.concurrent.ThreadLocalRandom',
-    'java.util.Random',
-    'java.util.UUID'
-  ],
-
   properties: [
     {
       class: 'String',
@@ -45,15 +39,10 @@ foam.CLASS({
         return foam.next$UID();
       },
       swiftFactory: 'return UUID().uuidString',
-      javaFactory: `
-      java.util.Random r = ThreadLocalRandom.current();
-      return new UUID(r.nextLong(), r.nextLong()).toString();
-      `
     },
     {
       name: 'delegate',
-      class: 'FObjectProperty',
-      of: 'foam.box.Box'
+      transient: true
     }
   ],
 
