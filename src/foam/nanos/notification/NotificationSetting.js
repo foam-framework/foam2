@@ -67,21 +67,8 @@ foam.CLASS({
         { name: 'notification', type: 'foam.nanos.notification.Notification' }
       ],
       javaCode: `
-        X userX = x;
-        Subject subject = (Subject) x.get("subject");
-        if ( subject.getRealUser().getId() != user.getId() ) {
-          userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
-          AppConfig appConfig = user.findGroup(x).getAppConfig(x);
-          Theme theme = (Theme) x.get("theme");
-          if ( theme == null ) {
-            theme = ((Themes) x.get("themes")).findTheme(userX);
-            if ( theme.getAppConfig() != null ) {
-              appConfig.copyFrom(theme.getAppConfig());
-            }}
-          userX.put("appConfig", appConfig);
-        }
         // Proxy to sendNotification method
-        sendNotification(userX, user, notification);
+        sendNotification(x, user, notification);
       `
     },
     {
