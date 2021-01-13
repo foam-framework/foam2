@@ -13,7 +13,8 @@ foam.CLASS({
   implements: [
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
-    'foam.nanos.auth.LastModifiedByAware'
+    'foam.nanos.auth.LastModifiedByAware',
+    'foam.nanos.auth.ServiceProviderAware'
   ],
 
   tableColumns: [
@@ -33,18 +34,27 @@ foam.CLASS({
       name: 'templateInformation',
       title: 'Template Arguments',
       order: 2
-    }
+    },
+    {
+      name: 'systemInformation',
+      help: 'Properties that are used internally by the system.',
+      title: 'System Information',
+      order: 3,
+      permissionRequired: true
+    },
   ],
 
   properties: [
     {
       class: 'Long',
       name: 'id',
+      includeInDigest: true,
       section: 'emailInformation'
     },
     {
       class: 'DateTime',
       name: 'created',
+      includeInDigest: true,
       section: 'emailInformation',
       tableWidth: 170
     },
@@ -54,6 +64,7 @@ foam.CLASS({
       name: 'createdBy',
       section: 'emailInformation',
       documentation: 'User who created the entry',
+      includeInDigest: true,
     },
     {
       class: 'Reference',
@@ -61,30 +72,36 @@ foam.CLASS({
       name: 'createdByAgent',
       section: 'emailInformation',
       documentation: 'User who created the entry',
+      includeInDigest: true,
     },
     {
       class: 'StringArray',
       name: 'to',
+      includeInDigest: true,
       section: 'emailInformation'
     },
     {
       class: 'StringArray',
       name: 'cc',
+      includeInDigest: true,
       section: 'emailInformation'
     },
     {
       class: 'StringArray',
       name: 'bcc',
+      includeInDigest: true,
       section: 'emailInformation'
     },
     {
       class: 'String',
       name: 'subject',
+      includeInDigest: true,
       section: 'emailInformation'
     },
     {
       class: 'String',
       name: 'body',
+      includeInDigest: true,
       section: 'emailInformation',
       view: {
         class: 'foam.u2.MultiView',
@@ -97,18 +114,21 @@ foam.CLASS({
     {
       class: 'String',
       name: 'from',
+      includeInDigest: true,
       section: 'emailInformation',
       value: null
     },
     {
       class: 'String',
       name: 'displayName',
+      includeInDigest: true,
       section: 'emailInformation',
       value: null
     },
     {
       class: 'String',
       name: 'replyTo',
+      includeInDigest: true,
       section: 'emailInformation',
       value: null
     },
@@ -127,14 +147,36 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.notification.email.Status',
       name: 'status',
+      includeInDigest: false,
       section: 'emailInformation',
       tableWidth: 100
     },
     {
       class: 'Map',
       name: 'templateArguments',
+      includeInDigest: true,
       section: 'templateInformation',
       view: { class: 'foam.u2.view.MapView' }
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
+      name: 'spid',
+      includeInDigest: true,
+      tableWidth: 120,
+      section: 'systemInformation',
+      writePermissionRequired: true,
+      documentation: `
+        Need to override getter to return "" because its trying to
+        return null (probably as a result of moving order of files
+        in nanos), which breaks tests
+      `,
+      javaGetter: `
+        if ( ! spidIsSet_ ) {
+          return "";
+        }
+        return spid_;
+      `
     }
   ]
 });

@@ -124,7 +124,7 @@ foam.CLASS({
         // find self
         try {
           user = (User) dao.find(user1.getId());
-          test (user != null, "find self");
+          test (user != null, "find self, spid: "+user.getSpid());
         } catch (AuthorizationException e) {
           test(false, "find self should not throw AuthorizationException: "+e.getMessage());
         }
@@ -211,6 +211,8 @@ foam.CLASS({
         DAO groupPermissionJunctionDAO = (DAO) x.get("localGroupPermissionJunctionDAO");
         groupPermissionJunctionDAO.where(EQ(GroupPermissionJunction.SOURCE_ID, "test")).removeAll();
 
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("serviceprovider.read.other").build());
+
         DAO delegate = new MDAO(User.getOwnClassInfo());
         DAO dao = new foam.nanos.auth.AuthorizationDAO.Builder(x)
           .setAuthorizer(new foam.nanos.auth.AuthorizableAuthorizer(User.class.getSimpleName().toLowerCase()))
@@ -241,6 +243,7 @@ foam.CLASS({
           .setLastName("last")
           .setEmail("99999@test.com")
           .setGroup("test")
+          .setSpid("other")
           .setLifecycleState(LifecycleState.ACTIVE)
           .build();
 
@@ -254,6 +257,7 @@ foam.CLASS({
           .setLastName("last_two")
           .setEmail("99998@test.com")
           .setGroup("test")
+          .setSpid("other")
           .setLifecycleState(LifecycleState.ACTIVE)
           .build();
         user2 = (User) dao.put(user2);
@@ -282,7 +286,7 @@ foam.CLASS({
 
         // find self
         user = (User) dao.find(user1.getId());
-        test (user != null, "find self");
+        test (user != null, "find self, spid: "+user.getSpid());
 
         // filter by user.read.id
         sink = new ArraySink();
@@ -323,7 +327,7 @@ foam.CLASS({
           .setLastName("last")
           .setEmail("four@test.com")
           .setGroup("test")
-          .setSpid("other")
+          // don't set spid, will set to match creator - user1
           .setLifecycleState(LifecycleState.ACTIVE)
           .build();
 
@@ -336,34 +340,40 @@ foam.CLASS({
 
         groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("user.create").build());
         groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("group.update.test").build());
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("user.update.*").build());
         try {
           user4 = (User) dao.put(user4);
-          test("spid".equals(user4.getSpid()), "put without spid.create sets spid to context user");
+          test(user != null && user.getSpid().equals("other"), "put without explicit spid.create but created by same spid should not throw AuthorizationException");
         } catch (AuthorizationException e) {
-          test(false, "put without spid.create should not throw AuthorizationException: "+e.getMessage());
+          test(false, "put without explicit spid.create but created by same spid should throw AuthorizationException: "+e.getMessage());
         }
 
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("serviceprovider.update.spid").build());
-        // with ServiceProviderAwareDAO without spid.update the put returns null rather
-        // than throwing the exception - not yet sure if this is the correct/expected behaviour
-        // as not sure where the return of null is occuring.
-        try {
-          user4 = (User) user4.fclone();
-          user4.setSpid("other");
-          user4 = (User) dao.put(user4);
-          test(user4 != null && user4.getSpid().equals("other"), "put with spid.update.*");
-        } catch (AuthorizationException e) {
-          test(true, "put without spid.update.target_spid threw AuthorizationException: "+e.getMessage());
-        }
-
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("serviceprovider.update.spid").build());
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("serviceprovider.update.other").build());
-
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("serviceprovider.create.other").build());
         try {
           user4 = (User) dao.put(user4);
           test(true, "put with all permissions should not throw AuthorizationException");
         } catch (AuthorizationException e) {
           test(false, "put with all permissions should not throw AuthorizationException: "+e.getMessage());
+        }
+
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("serviceprovider.update.spid").build());
+        try {
+          user4 = (User) user4.fclone();
+          user4.setSpid("spid");
+          user4 = (User) dao.put(user4);
+          test(false, "put without both update spids should throw an AuthorizationException");
+        } catch (AuthorizationException e) {
+          test(true, "put without serviceprovider.update.target_spid and source_spid threw AuthorizationException: "+e.getMessage());
+        }
+
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("serviceprovider.update.other").build());
+        try {
+          user4 = (User) user4.fclone();
+          user4.setSpid("spid");
+          user4 = (User) dao.put(user4);
+          test(user4 != null && user4.getSpid().equals("spid"), "put with serviceprovider.update.source_spid and target_spid");
+        } catch (AuthorizationException e) {
+          test(false, "put with serviceprovider.update.source_spid and target_spid should not throw an AuthorizationException: "+e.getMessage());
         }
 
        // find other
@@ -380,11 +390,11 @@ foam.CLASS({
         test (users.size() == 2, "select with user.read.1&&2 found self and id. expected: 2, found: "+users.size());
         groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("user.read.*").build());
 
-        // should not return user 4 and user 3
+        // should not return user 4 (different spid and no read on 'spid' spid)
         sink = new ArraySink();
         dao.select(sink);
         users = sink.getArray();
-        test (users.size() == 2, "select with user.read.*. expected: 2, found: "+users.size());
+        test (users.size() == 3, "select with user.read.*. expected: 3, found: "+users.size());
 
         try {
           user4 = (User) user4.fclone();
@@ -394,8 +404,8 @@ foam.CLASS({
         } catch (AuthorizationException e) {
           test(true, "put without spid.update.target_spid threw AuthorizationException: "+e.getMessage());
         }
-        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("serviceprovider.update.another").build());
 
+        groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(y).setSourceId("test").setTargetId("serviceprovider.update.another").build());
         try {
           user4 = (User) dao.put(user4);
           test(user4 != null, "put with spid.update.target_spid should not throw AuthorizationException");
@@ -410,7 +420,7 @@ foam.CLASS({
         users = sink.getArray();
         test (users.size() == 1, "ReferenceTest DAO select filtered on spid predicate and where. expected: 1, found: "+users.size());
 
-        where = dao.where(EQ(User.ID, user3.getId()));
+        where = dao.where(EQ(User.ID, user4.getId()));
         sink = new ArraySink();
         where.select(sink);
         users = sink.getArray();
