@@ -186,32 +186,6 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return prereqsCache_.get(capId);
   }
 
-  // Return capability path for multiple prerequisites without duplicates.
-  public List getMultipleCapabilityPath(
-    X x, String[] capabilityIds, boolean filterGrantedUCJ
-  ) {
-    Set alreadyListed = new HashSet<String>();
-
-    List multiplePath = new ArrayList();
-
-    for ( String capId : capabilityIds ) {
-      List crunchyPath = getCapabilityPath(x, capId, filterGrantedUCJ);
-      for ( Object obj : crunchyPath ) {
-        Capability cap = null;
-        if ( obj instanceof List ) {
-          List list = (List) obj;
-          cap = (Capability) list.get(list.size() - 1);
-        } else {
-          cap = (Capability) obj;
-        }
-        if ( alreadyListed.contains(cap.getId()) ) continue;
-        multiplePath.add(obj);
-      }
-    }
-
-    return multiplePath;
-  }
-
   public UserCapabilityJunction getJunction(X x, String capabilityId) {
     Subject subject = (Subject) x.get("subject");
     return this.getJunctionForSubject(x, capabilityId, subject);
