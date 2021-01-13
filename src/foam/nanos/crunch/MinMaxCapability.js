@@ -58,9 +58,6 @@ foam.CLASS({
         // Required services and DAOs
         CrunchService crunchService = (CrunchService) x.get("crunchService");
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-        DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-        DAO userDAO = (DAO) x.get("userDAO");
-        Subject currentSubject = (Subject) x.get("subject");
         Subject junctionSubject = (Subject) ucj.getSubject(x);
 
         // Prepare to count statuses

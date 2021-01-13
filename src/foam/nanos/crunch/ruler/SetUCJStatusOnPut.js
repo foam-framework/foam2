@@ -15,14 +15,10 @@ foam.CLASS({
   javaImports: [
     'foam.core.ContextAgent',
     'foam.core.X',
-    'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.CapabilityCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
-    'foam.nanos.crunch.UserCapabilityJunction',
-    'java.util.List',
-    'static foam.mlang.MLang.*'
+    'foam.nanos.crunch.UserCapabilityJunction'
   ],
 
   methods: [
@@ -89,7 +85,6 @@ foam.CLASS({
         ACTION_REQUIRED: If not any of the above
       `,
       javaCode: `
-        DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         Capability cap = (Capability) capabilityDAO.find(ucj.getTargetId());
         return cap.getPrereqsChainedStatus(x, ucj);
