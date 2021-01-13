@@ -41,7 +41,7 @@ foam.CLASS({
     },
     async function parseArrayToWizardlets(array, parent) {
       var capabilityDesired = array[array.length - 1];
-      var capabilityPrereqs = array.slice(0, array.length - 1);
+      var capabilityPrereqs = array.slice(0, -1);
       var wizardlets = [];
 
       var rootWizardlet = this.getWizardlet(capabilityDesired);
@@ -55,7 +55,7 @@ foam.CLASS({
         var preventPush = false;
 
         if ( this.isPrerequisiteAware(rootWizardlet) ) {
-          rootWizardlet.addPrerequisite(wizardlet);
+          preventPush = rootWizardlet.addPrerequisite(wizardlet);
           defaultPrerequisiteHandling = false;
         }
 
@@ -91,7 +91,7 @@ foam.CLASS({
         let wizardlet = capability[isBefore ? 'beforeWizardlet' : 'wizardlet'];
         return wizardlet && wizardlet.clone().copyFrom({
           capability: capability,
-          dataController: this.getWAO()
+          wao: this.getWAO()
         }, this.__subContext__);
     },
     function isPrerequisiteAware(wizardlet) {

@@ -117,29 +117,29 @@ foam.CLASS({
 
         // check if user enabled
         if ( ! user.getEnabled() ) {
-          throw new AuthenticationException("User disabled");
+          throw new AccessDeniedException();
         }
 
         // check if user login enabled
         if ( ! user.getLoginEnabled() ) {
-          throw new AuthenticationException("Login disabled");
+          throw new AccessDeniedException();
         }
 
         // check if group enabled
         X userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
         Group group = user.findGroup(userX);
         if ( group != null && ! group.getEnabled() ) {
-          throw new AuthenticationException("Group disabled");
+          throw new AccessDeniedException();
         }
 
         if ( ! Password.verify(password, user.getPassword()) ) {
-          throw new AuthenticationException("Invalid Password");
+          throw new InvalidPasswordException();
         }
 
         try {
           group.validateCidrWhiteList(x);
         } catch (foam.core.ValidationException e) {
-          throw new AuthenticationException("Access Denied");
+          throw new AccessDeniedException(e);
         }
 
         // Freeze user

@@ -141,7 +141,7 @@ foam.CLASS({
         if ( loadingRequests > 0 ) {
           return 'Loading...';
         }
-        return `${selectedCount.toLocaleString()} of ${totalCount.toLocaleString()} selected`;
+        return `${selectedCount.toLocaleString(foam.locale)} of ${totalCount.toLocaleString(foam.locale)} selected`;
       }
     },
     'searchValue'

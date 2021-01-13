@@ -41,6 +41,7 @@ foam.CLASS({
       flex-wrap: wrap;
       align-items: stretch;
       text-align: center;
+      justify-content:flex-start;
     }
     ^innerFlexer {
       display: inline-flex;

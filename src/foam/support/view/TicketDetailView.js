@@ -207,7 +207,7 @@ foam.CLASS({
     },
 
     function formatDate(date) {
-      return date.toLocaleString('en-us', { month: 'short' }) + ' ' +
+      return date.toLocaleString(foam.locale, { month: 'short' }) + ' ' +
         date.getDate() + ' ' +
         date.getHours() + ':' +
         date.getMinutes();

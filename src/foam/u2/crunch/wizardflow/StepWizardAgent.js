@@ -28,7 +28,7 @@ foam.CLASS({
   requires: [
     'foam.u2.dialog.Popup',
     'foam.u2.wizard.StepWizardConfig',
-    'foam.u2.wizard.StepWizardletController'
+    'foam.u2.wizard.StepWizardController'
   ],
 
   properties: [
@@ -55,7 +55,7 @@ foam.CLASS({
   methods: [
     function execute() {
       return new Promise((resolve, reject) => {
-        var data = this.StepWizardletController.create({
+        var data = this.StepWizardController.create({
           wizardlets: this.wizardlets,
           config: this.config,
           submitted$: this.submitted$,

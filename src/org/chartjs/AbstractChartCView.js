@@ -11,7 +11,7 @@ foam.CLASS({
   properties: [
     {
       name: 'chartJsFormatter',
-      value: function(v) { return v.toLocaleString() },
+      value: function(v) { return v.toLocaleString(foam.locale) },
     },
   ]
 });
@@ -80,7 +80,7 @@ foam.CLASS({
       name: 'xFormatter',
       expression: function(dataProperties_) {
         return dataProperties_[dataProperties_.length - 2].chartJsFormatter ||
-          function(v) { return v.toLocaleString() }
+          function(v) { return v.toLocaleString(foam.locale) }
       },
     },
     {
@@ -93,7 +93,7 @@ foam.CLASS({
       name: 'yFormatter',
       expression: function(dataProperties_) {
         return dataProperties_[dataProperties_.length - 1].chartJsFormatter ||
-          function(v) { return v.toLocaleString() }
+          function(v) { return v.toLocaleString(foam.locale) }
       },
     },
     {
