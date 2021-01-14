@@ -281,6 +281,9 @@ rpc.setArgs(args);
 message.setObject(rpc);
 get${boxPropName}().send(message);
 `;
+        if ( this.javaType && this.javaType !== 'void' ) {
+          code += `return null;`;
+        }
 
         this.javaCode = code;
 

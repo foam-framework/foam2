@@ -9,6 +9,7 @@ p({
       .setAuthorize(false)
       .setSeqNo(true)
       .setRuler(false)
+      .setCluster(false)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("../logs/logs")
       .setWriteOnly(true)

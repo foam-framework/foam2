@@ -88,7 +88,6 @@ foam.CLASS({
           icon: 'images/checkmark-small-green.svg',
           onKey: true,
           isAvailable$: X.data.emailAvailable$,
-          targetProperty: foam.nanos.auth.User.EMAIL,
           inputValidation: /\S+@\S+\.\S+/,
           restrictedCharacters: /^[^\s]$/,
           displayMode: X.data.disableEmail_ ? foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW
@@ -120,7 +119,6 @@ foam.CLASS({
           icon: 'images/checkmark-small-green.svg',
           onKey: true,
           isAvailable$: X.data.usernameAvailable$,
-          targetProperty: foam.nanos.auth.User.USER_NAME,
           inputValidation: /^[^\s\/]+$/,
           restrictedCharacters: /^[^\s\/]$/
         };

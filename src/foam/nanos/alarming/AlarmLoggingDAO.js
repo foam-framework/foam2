@@ -46,6 +46,7 @@ foam.CLASS({
               .setTemplate("NOC")
               .setToastMessage(alarm.getName())
               .setBody(alarm.getNote())
+              .setClusterable(alarm.getClusterable())
               .build();
               ((DAO) x.get("localNotificationDAO")).put(notification);
           }

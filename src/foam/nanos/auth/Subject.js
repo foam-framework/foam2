@@ -54,6 +54,19 @@ foam.CLASS({
     },
   ],
 
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+      public Subject(User user) {
+        setUser(user);
+      }
+        `);
+      }
+    }
+  ],
+
   methods: [
     {
       name: 'toString',
