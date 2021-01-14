@@ -71,7 +71,7 @@ Later themes:
           }
         }
 
-        if ( user && ( ! theme || domain !== themeDomain.id ) ) {
+        if ( user && ( ! theme || domain !== themeDomain.id || user.spid !== theme.spid ) ) {
           var spid = user.spid;
           while ( spid ) {
             theme = await this.themeDAO.find(
@@ -151,7 +151,7 @@ Later themes:
 
       // Find theme from user via SPID
       if ( user != null
-        && ( theme == null || ! domain.equals(td.getId()) )
+        && ( theme == null || ! domain.equals(td.getId()) || ! user.getSpid().equals(theme.getSpid()) )
       ) {
         var spid = user.getSpid();
         while ( ! SafetyUtil.isEmpty(spid) ) {
