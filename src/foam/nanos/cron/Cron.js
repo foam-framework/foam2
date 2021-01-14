@@ -24,7 +24,7 @@ foam.CLASS({
   documentation: 'FOAM class that models a Cron script',
 
   tableColumns: [
-    'description',
+    'id',
     'enabled',
     'lastDuration',
     'lastRun',
@@ -86,6 +86,7 @@ foam.CLASS({
       documentation: 'Scheduled time to run Cron script.',
       visibility: 'RO',
       javaFactory: `return getNextScheduledTime(getX());`,
+      tableWidth: 170,
       storageTransient: true
     },
     {

@@ -1,0 +1,17 @@
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "socketConnectionBoxManager",
+  "lazy": false,
+  "service": {
+    "class": "foam.box.socket.SocketConnectionBoxManager",
+  }
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "socketServer",
+  "lazy": false,
+  "service": {
+    "class": "foam.box.socket.SocketServer"
+  }
+})

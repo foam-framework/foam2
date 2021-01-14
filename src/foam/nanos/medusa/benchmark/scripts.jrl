@@ -1,0 +1,86 @@
+p({
+  "class":"foam.nanos.script.Script",
+  "id":"DaggerLinkBenchmark",
+  "description":"DaggerLinkBenchmark",
+  "code":`
+    import foam.nanos.bench.*;
+    import foam.nanos.medusa.benchmark.*;
+    lc = x.get("logLevelFilterLogger");
+    lc.setLogInfo(true);
+    savedDebug = lc.getLogDebug();
+    lc.setLogDebug(false);
+    b = new DaggerLinkBenchmark.Builder(x).build();
+    builder = new BenchmarkRunner.Builder(x)
+      .setInvocationCount(1000)
+      .setThreadCount(2)
+      .setRunPerThread(false)
+      .setBenchmark(b);
+    runner = builder.build();
+    runner.execute(x);
+    print("done");
+    print(runner.getResult());
+    l = x.get("logger");
+    lc.setLogInfo(true);
+    lc.setLogDebug(savedDebug);
+    l.info(new Object[] {runner.getResult()});
+  `,
+  "output":""
+})
+
+p({
+  "class":"foam.nanos.script.Script",
+  "id":"DaggerVerifyBenchmark",
+  "description":"DaggerVerifyBenchmark",
+  "code":`
+    import foam.nanos.bench.*;
+    import foam.nanos.medusa.benchmark.*;
+    lc = x.get("logLevelFilterLogger");
+    lc.setLogInfo(true);
+    savedDebug = lc.getLogDebug();
+    lc.setLogDebug(false);
+    b = new DaggerVerifyBenchmark.Builder(x).build();
+    builder = new BenchmarkRunner.Builder(x)
+      .setInvocationCount(1000)
+      .setThreadCount(2)
+      .setRunPerThread(false)
+      .setBenchmark(b);
+    runner = builder.build();
+    runner.execute(x);
+    print("done");
+    print(runner.getResult());
+    l = x.get("logger");
+    lc.setLogInfo(true);
+    lc.setLogDebug(savedDebug);
+    l.info(new Object[] {runner.getResult()});
+  `,
+  "output":""
+})
+
+p({
+  "class":"foam.nanos.script.Script",
+  "id":"MedusaBenchmark",
+  "description":"MedusaBenchmark",
+  "code":`
+    import foam.nanos.bench.*;
+    import foam.nanos.medusa.benchmark.*;
+    lc = x.get("logLevelFilterLogger");
+    lc.setLogInfo(true);
+    savedDebug = lc.getLogDebug();
+    lc.setLogDebug(false);
+    b = new MedusaBenchmark.Builder(x).build();
+    builder = new BenchmarkRunner.Builder(x)
+      .setInvocationCount(1000)
+      .setThreadCount(2)
+      .setRunPerThread(true)
+      .setBenchmark(b);
+    runner = builder.build();
+    runner.execute(x);
+    print("done");
+    print(runner.getResult());
+    l = x.get("logger");
+    lc.setLogInfo(true);
+    lc.setLogDebug(savedDebug);
+    l.info(new Object[] {runner.getResult()});
+  `,
+  "output":""
+})

@@ -12,8 +12,9 @@ foam.CLASS({
   javaImports: [
     'foam.core.*',
     'foam.dao.*',
+    'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.StdoutLogger'
   ],
 
   axioms: [
@@ -32,15 +33,20 @@ foam.CLASS({
   ],
 
   properties: [
-        {
+    {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
       visibility: 'HIDDEN',
+      transient: true,
       javaFactory: `
+        Logger logger = (Logger) getX().get("logger");
+        if ( logger == null ) {
+          logger = new StdoutLogger();
+        }
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
-        }, (Logger) getX().get("logger"));
+        }, logger);
       `
     }
   ],
@@ -49,10 +55,14 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-        Script script = (Script) getDelegate().put_(x, obj);
-        getLogger().debug("put", script.getId(), script.getStatus());
+        Script script = (Script) obj;
         if ( script.getStatus() == ScriptStatus.SCHEDULED ) {
-          this.runScript(x, script);
+          if ( script.canRun(x) ) {
+            script = (Script) getDelegate().put_(x, script);
+            runScript(x, script);
+          } 
+        } else {
+          script = (Script) getDelegate().put_(x, script);
         }
         return script;
       `
@@ -76,13 +86,13 @@ foam.CLASS({
                 s.runScript(x);
                 getLogger().debug("agency", s.getId(), "end");
                 s.setStatus(ScriptStatus.UNSCHEDULED);
+                getDelegate().put_(x, s);
               } catch(Throwable t) {
                 t.printStackTrace();
                 s.setStatus(ScriptStatus.ERROR);
-                getLogger().error("agency", s.getId(), t);
-              } finally {
                 getDelegate().put_(x, s);
-              }
+                getLogger().error("agency", s.getId(), t);
+             }
             }
           }, "Run script: " + script.getId());
         return script;

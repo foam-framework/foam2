@@ -63,6 +63,10 @@ public class EmailsUtility {
     }
     userX = userX.put("appConfig", appConfig);
 
+    if ( SafetyUtil.isEmpty(emailMessage.getSpid()) ) {
+      emailMessage.setSpid(user.getSpid());
+    }
+
     SupportConfig supportConfig = theme.getSupportConfig();
     EmailConfig supportEmailConfig = supportConfig.getEmailConfig();
 
@@ -105,8 +109,9 @@ public class EmailsUtility {
       foam.nanos.auth.Address address = supportConfig.getSupportAddress();
       templateArgs.put("supportAddress", address == null ? "" : address.toSummary());
       templateArgs.put("appName", (theme.getAppName()));
-      templateArgs.put("logo", (appConfig.getUrl() + "/" + theme.getLogo()));
-      templateArgs.put("appLink", (appConfig.getUrl()));
+      String url = appConfig.getUrl().replaceAll("/$", "");
+      templateArgs.put("logo", (url + "/" + theme.getLogo()));
+      templateArgs.put("appLink", url);
       emailMessage.setTemplateArguments(templateArgs);
     }
 
@@ -120,7 +125,7 @@ public class EmailsUtility {
     }
 
     // SERVICE CALL: passing emailMessage through to actual email service.
-    DAO email = (DAO) x.get("localEmailMessageDAO");
+    DAO email = ((DAO) x.get("localEmailMessageDAO")).inX(x);
     emailMessage.setStatus(foam.nanos.notification.email.Status.UNSENT);
     email.put(emailMessage);
   }

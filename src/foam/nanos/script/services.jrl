@@ -5,6 +5,7 @@ p({
   "serviceScript":"""
     mdao = new foam.dao.MDAO(foam.nanos.script.Script.getOwnClassInfo());
     mdao.addIndex(new foam.core.PropertyInfo[] {foam.nanos.script.Script.LAST_RUN});
+    mdao.addIndex(new foam.core.PropertyInfo[] {foam.nanos.script.Script.ENABLED});
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.script.Script.getOwnClassInfo())
       .setMdao(mdao)
@@ -13,7 +14,10 @@ p({
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("scripts")
       .setDecorator(new foam.nanos.script.ScriptRunnerDAO(new foam.dao.NullDAO(x, foam.nanos.script.Script.getOwnClassInfo())))
-      .setOrder(new foam.mlang.order.Comparator[] { new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.script.Script.LAST_RUN).build() })
+      .setOrder(new foam.mlang.order.Comparator[] {
+        new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.script.Script.ENABLED).build(),
+        new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.script.Script.LAST_RUN).build()
+      })
       .build();
   """,
   "client":"""
@@ -45,6 +49,7 @@ p({
         .build())
       .setOrder(new foam.mlang.order.Comparator[] { new foam.mlang.order.Desc.Builder(x).setArg1(foam.nanos.script.ScriptEvent.LAST_RUN).build() })
       .setRuler(false)
+      .setCluster(false)
       .build();
   """,
   "client":"{\"of\":\"foam.nanos.script.ScriptEvent\"}"
