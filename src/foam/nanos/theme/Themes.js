@@ -85,13 +85,6 @@ Later themes:
             var pos = spid.lastIndexOf('.');
             spid = spid.substring(0, pos > 0 ? pos : 0);
           }
-
-          if ( ! theme ) {
-            theme = await this.themeDAO.find(
-              this.AND(
-                this.EQ(foam.nanos.theme.Theme.SPID, '*'),
-                this.EQ(foam.nanos.theme.Theme.ENABLED, true)));
-          }
         }
 
         if ( ! theme ) {
@@ -104,7 +97,7 @@ Later themes:
           while ( group ) {
             var groupTheme = await group.theme$find;
             if ( groupTheme ) {
-              theme = theme && theme.copyFrom(groupTheme) || theme;
+              theme = theme && theme.copyFrom(groupTheme) || groupTheme;
               if ( !! group.defaultMenu ) {
                 theme.defaultMenu = group.defaultMenu;
               }
@@ -121,7 +114,7 @@ Later themes:
           return theme;
         }
 
-        foam.nanos.theme.Theme.create({ 'name': 'foam', 'appName': 'FOAM' });
+        return foam.nanos.theme.Theme.create({ 'name': 'foam', 'appName': 'FOAM' });
       },
       javaCode: `
       // TODO:  cache domain/theme and update on ThemeDAO changes.
