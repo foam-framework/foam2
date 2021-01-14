@@ -67,6 +67,10 @@ foam.CLASS({
         // Get list of prerequisite capability ids
         List<String> prereqCapabilityIds = crunchService.getPrereqs(getId());
 
+        // this is under the assumption that minmaxCapabilities should always have prerequisites
+        // and that min is never less than 1
+        if ( prereqCapabilityIds == null || prereqCapabilityIds.size() == 0 ) return CapabilityJunctionStatus.ACTION_REQUIRED;
+
         // Count junction statuses
         for ( String capId : prereqCapabilityIds ) {
           Capability cap = (Capability) capabilityDAO.find(capId);
