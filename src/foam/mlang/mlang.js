@@ -1815,7 +1815,7 @@ foam.CLASS({
         return isoDateString.substr(0, isoDateString.indexOf(':', isoDateString.indexOf(':') + 1));
       }
 
-      if ( foam.String.isInstance(this.value) && this.value.includes(' ') )
+      if ( foam.String.isInstance(this.value) )
         return '\"' + this.value + '\"';
       return this.value;
     }
