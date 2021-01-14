@@ -58,11 +58,14 @@ public class EmailsUtility {
     }
 
     Theme theme = (Theme) x.get("theme");
-    if ( theme == null ) {
+    if ( theme == null
+      || ( user != null && ! user.getSpid().equals(x.get("spid")) )
+    ) {
       theme = ((Themes) x.get("themes")).findTheme(userX);
-      if ( theme.getAppConfig() != null ) {
-        appConfig.copyFrom(theme.getAppConfig());
-      }
+    }
+
+    if ( theme.getAppConfig() != null ) {
+      appConfig.copyFrom(theme.getAppConfig());
     }
     userX = userX.put("appConfig", appConfig);
 
