@@ -176,10 +176,14 @@ Later themes:
       }
 
       if ( theme == null ) {
-        ((foam.nanos.logger.Logger) x.get("logger")).warning("Theme not found.",
-          "domain:" + (req != null ? req.getServerName() : ""),
-          "user:" + user.getId());
-        theme = new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
+        logger.debug("Themes", "fallback");
+        theme = (Theme) themeDAO.find(
+          MLang.AND(
+            MLang.EQ(Theme.NAME, "foam")
+          ));
+        if ( theme == null ) {
+          theme = new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
+        }
       }
 
       // Augment the theme with group and user themes
