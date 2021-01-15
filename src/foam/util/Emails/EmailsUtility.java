@@ -48,18 +48,24 @@ public class EmailsUtility {
       emailMessage = new EmailMessage();
     }
 
-    String group = user != null ? user.getGroup() : "";
+    X userX = x;
+    String group = "";
     AppConfig appConfig = (AppConfig) x.get("appConfig");
     if ( user != null ) {
+      userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
+      group = user.getGroup();
       appConfig = user.findGroup(x).getAppConfig(x);
     }
+
     Theme theme = (Theme) x.get("theme");
-    X userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
-    if ( theme == null ) {
+    if ( theme == null
+      || ( user != null && ! user.getSpid().equals(x.get("spid")) )
+    ) {
       theme = ((Themes) x.get("themes")).findTheme(userX);
-      if ( theme.getAppConfig() != null ) {
-        appConfig.copyFrom(theme.getAppConfig());
-      }
+    }
+
+    if ( theme.getAppConfig() != null ) {
+      appConfig.copyFrom(theme.getAppConfig());
     }
     userX = userX.put("appConfig", appConfig);
 
