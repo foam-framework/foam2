@@ -16,6 +16,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.mlang.predicate.AbstractPredicate',
     'foam.mlang.predicate.Predicate',
+    'foam.nanos.auth.Subject',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.CrunchService',
@@ -84,17 +85,9 @@ foam.CLASS({
           // find the ucj and update its status to granted, or create a ucj none found
           
           UserCapabilityJunction ucj;
+          Subject subject = new Subject(user);
           for ( Capability capability : grantPath ) {
-            ucj = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
-              EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
-              EQ(UserCapabilityJunction.TARGET_ID, capability.getId())
-            ));
-            if ( ucj != null ) 
-              ucj = (UserCapabilityJunction) ucj.fclone();
-            else 
-              ucj = new UserCapabilityJunction.Builder(x).setSourceId(user.getId()).setTargetId(capability.getId()).build();
-            ucj.setStatus(CapabilityJunctionStatus.GRANTED);
-            ucj = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, ucj);
+            ucj = crunchService.updateUserJunction(x, subject, capability.getId(), null, CapabilityJunctionStatus.GRANTED);
             if ( ucj == null || ucj.getStatus() != CapabilityJunctionStatus.GRANTED )
               throw new RuntimeException("Error setting up UserCapabilityJunction for user: " + user.getId() + " and spid: " + getId());
           }
