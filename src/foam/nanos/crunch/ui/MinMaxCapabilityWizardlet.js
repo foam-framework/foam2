@@ -122,11 +122,19 @@ foam.CLASS({
     },
     {
       name: 'consumePrerequisites',
+      documentation: `
+        When true, report 'true' on calls to addPrerequisite to indicate that
+        prerequisite wizardlets were handled by this wizardlet. This effectively
+        prevents prerequisite wizardlets from displaying in a CRUNCH wizard.
+      `,
       class: 'Boolean'
     },
     {
       name: 'hideChoiceView',
-      class: 'Boolean'
+      documentation: `
+        When true, do not display the choice selection section.
+      `,
+      class: 'Boolean
     }
   ],
 
