@@ -85,7 +85,7 @@ foam.CLASS({
           // find the ucj and update its status to granted, or create a ucj none found
           
           UserCapabilityJunction ucj;
-          Subject subject = new Subject.Builder(x).setUser(user).build();
+          Subject subject = new Subject(user);
           for ( Capability capability : grantPath ) {
             ucj = crunchService.updateUserJunction(x, subject, capability.getId(), null, CapabilityJunctionStatus.GRANTED);
             if ( ucj == null || ucj.getStatus() != CapabilityJunctionStatus.GRANTED )
