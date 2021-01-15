@@ -3,7 +3,7 @@ package foam.util.Emails;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.app.AppConfig;
-import foam.nanos.app.EmailConfig;
+import foam.nanos.notification.email.EmailConfig;
 import foam.nanos.app.SupportConfig;
 import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
