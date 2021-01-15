@@ -126,9 +126,6 @@ foam.CLASS({
         }
       }
       if ( SafetyUtil.isEmpty(spid) ) {
-        spid = ((AppConfig) x.get("appConfig")).getDefaultSpid();
-      }
-      if ( SafetyUtil.isEmpty(spid) ) {
         throw new AuthorizationException();
       }
       return spid;
