@@ -73,7 +73,7 @@ Later themes:
           }
         }
 
-        if ( user && ( ! theme || domain !== themeDomain.id ) ) {
+        if ( user && ( ! theme || domain !== themeDomain.id || user.spid !== theme.spid ) ) {
           var spid = user.spid;
           while ( spid ) {
             theme = await this.themeDAO.find(
@@ -97,7 +97,7 @@ Later themes:
           while ( group ) {
             var groupTheme = await group.theme$find;
             if ( groupTheme ) {
-              theme = theme && theme.copyFrom(groupTheme) || theme;
+              theme = theme && theme.copyFrom(groupTheme) || groupTheme;
               if ( !! group.defaultMenu ) {
                 theme.defaultMenu = group.defaultMenu;
               }
@@ -114,7 +114,7 @@ Later themes:
           return theme;
         }
 
-        foam.nanos.theme.Theme.create({ 'name': 'foam', 'appName': 'FOAM' });
+        return foam.nanos.theme.Theme.create({ 'name': 'foam', 'appName': 'FOAM' });
       },
       javaCode: `
       // TODO:  cache domain/theme and update on ThemeDAO changes.
@@ -158,7 +158,8 @@ Later themes:
 
       // Find theme from user via SPID
       if ( user != null
-        && ( theme == null || ! td.getId().equals(domain)) ) {
+        && ( theme == null || ! td.getId().equals(domain) || ! user.getSpid().equals(theme.getSpid()) )
+      ) {
         var spid = user.getSpid();
         while ( ! SafetyUtil.isEmpty(spid) ) {
           theme = (Theme) themeDAO.find(
@@ -174,9 +175,19 @@ Later themes:
         }
       }
 
+      if ( theme == null ) {
+        logger.debug("Themes", "fallback");
+        theme = (Theme) themeDAO.find(
+          MLang.AND(
+            MLang.EQ(Theme.NAME, "foam")
+          ));
+        if ( theme == null ) {
+          theme = new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
+        }
+      }
+
       // Augment the theme with group and user themes
-      if ( user != null &&
-           theme != null ) {
+      if ( user != null ) {
         DAO groupDAO = (DAO) x.get("groupDAO");
         Group group = user.findGroup(x);
         while ( group != null ) {
@@ -193,17 +204,6 @@ Later themes:
         Theme userTheme = user.findTheme(x);
         if ( userTheme != null ) {
           theme = (Theme) theme.fclone().copyFrom(userTheme);
-        }
-      }
-
-      if ( theme == null ) {
-        logger.debug("Themes", "fallback");
-        theme = (Theme) themeDAO.find(
-          MLang.AND(
-            MLang.EQ(Theme.NAME, "foam")
-          ));
-        if ( theme == null ) {
-          theme = new Theme.Builder(x).setName("foam").setAppName("FOAM").build();
         }
       }
 
