@@ -100,6 +100,7 @@ foam.CLASS({
         }
       ],
       type: 'String',
+      javaThrows: ['AuthorizationException'],
       javaCode: `
       User user = null;
       String spid = (String) x.get("spid");
@@ -126,6 +127,9 @@ foam.CLASS({
       }
       if ( SafetyUtil.isEmpty(spid) ) {
         spid = ((AppConfig) x.get("appConfig")).getDefaultSpid();
+      }
+      if ( SafetyUtil.isEmpty(spid) ) {
+        throw new AuthorizationException();
       }
       return spid;
       `
@@ -159,10 +163,6 @@ foam.CLASS({
         throw new AuthorizationException();
       } else if ( sp.getSpid().equals(oldSp.getSpid()) &&
                   ! auth.check(x, "serviceprovider.read." + sp.getSpid()) ) {
-        throw new AuthorizationException();
-      }
-
-      if ( SafetyUtil.isEmpty(sp.getSpid()) ) {
         throw new AuthorizationException();
       }
 
