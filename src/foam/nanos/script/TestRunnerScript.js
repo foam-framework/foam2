@@ -74,9 +74,9 @@ foam.CLASS({
       javaCode: `
         // turn off logging to get rid of clutter.
         LogLevelFilterLogger loggerFilter = (LogLevelFilterLogger) x.get("logger");
-        loggerFilter.setLogDebug(false);
-        loggerFilter.setLogInfo(false);
-        loggerFilter.setLogWarning(false);
+        loggerFilter.setLogDebug(true);
+        loggerFilter.setLogInfo(true);
+        loggerFilter.setLogWarning(true);
 
         TestRunnerConfig config = (TestRunnerConfig) x.get("testRunnerConfig");
         String testSuite = config != null ? config.getTestSuite() : null;

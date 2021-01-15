@@ -5,10 +5,19 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.app',
+  package: 'foam.nanos.notification.email',
   name: 'EmailConfig',
 
+  implements: [
+    'foam.nanos.auth.ServiceProviderAware'
+  ],
+
   properties: [
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
+      name: 'spid'
+    },
     {
       class: 'String',
       name: 'from'
