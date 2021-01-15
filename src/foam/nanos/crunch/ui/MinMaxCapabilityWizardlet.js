@@ -103,7 +103,8 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.u2.wizard.WizardletSection',
       factory: function() {
-        return [
+        // TODO: If 'of' is set for a MinMax it should be added as a section
+        return this.hideChoiceView ? [] : [
           this.WizardletSection.create({
             isAvailable: true,
             title: this.capability.name,
@@ -118,6 +119,22 @@ foam.CLASS({
           })
         ];
       }
+    },
+    {
+      name: 'consumePrerequisites',
+      documentation: `
+        When true, report 'true' on calls to addPrerequisite to indicate that
+        prerequisite wizardlets were handled by this wizardlet. This effectively
+        prevents prerequisite wizardlets from displaying in a CRUNCH wizard.
+      `,
+      class: 'Boolean'
+    },
+    {
+      name: 'hideChoiceView',
+      documentation: `
+        When true, do not display the choice selection section.
+      `,
+      class: 'Boolean'
     }
   ],
 
@@ -125,6 +142,7 @@ foam.CLASS({
     function addPrerequisite(wizardlet) {
       wizardlet.isAvailable = false;
       this.choiceWizardlets.push(wizardlet);
+      return this.consumePrerequisites;
     }
   ]
 });

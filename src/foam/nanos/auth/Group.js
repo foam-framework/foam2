@@ -230,11 +230,9 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
         }
       ],
       javaCode: `
-        AppConfig appConfig = (AppConfig) x.get("appConfig");
-        if ( ! foam.util.SafetyUtil.isEmpty(getUrl()) ) {
-          appConfig = (AppConfig) appConfig.fclone();
-          appConfig.setUrl(getUrl());
-        }
+        AppConfig appConfig = (AppConfig) ((AppConfig) x.get("appConfig")).fclone();
+        String url = ! foam.util.SafetyUtil.isEmpty(getUrl()) ? getUrl() : appConfig.getUrl();
+        appConfig.setUrl(url.replaceAll("/$", ""));
         return appConfig;
         `
     },

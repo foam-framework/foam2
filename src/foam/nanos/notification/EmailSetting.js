@@ -87,7 +87,7 @@ foam.CLASS({
         if ( "notification".equals(notification.getEmailName()) ) {
           notification.getEmailArgs().put("type", notification.getNotificationType());
 
-          AppConfig config = (AppConfig) x.get("appConfig");
+          AppConfig config = user.findGroup(x).getAppConfig(x);
           if ( config != null ) {
             notification.getEmailArgs().put("link", config.getUrl());
           }

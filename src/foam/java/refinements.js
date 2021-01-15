@@ -1251,8 +1251,8 @@ foam.CLASS({
   flags: ['java'],
 
   properties: [
-    ['javaType',       'float'],
-    ['javaInfoType',   'foam.core.AbstractFloatPropertyInfo']
+    ['javaType',     'float'],
+    ['javaInfoType', 'foam.core.AbstractFloatPropertyInfo']
   ]
 });
 
