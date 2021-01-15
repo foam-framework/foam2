@@ -198,8 +198,7 @@ foam.CLASS({
         return {
           dao_: client$userDAO || null,
           imgPath: '',
-          group: 'system',
-          countryChoices_: [] // empty defaults to entire countryDAO
+          group: 'system'
         };
       }
     },
