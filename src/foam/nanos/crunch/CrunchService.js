@@ -75,7 +75,7 @@ foam.INTERFACE({
       ]
     },
     {
-      name: 'getDependantIds',
+      name: 'getDependentIds',
       type: 'String[]',
       args: [
         {
@@ -85,29 +85,6 @@ foam.INTERFACE({
         {
           name: 'capabilityId',
           type: 'String'
-        }
-      ]
-    },
-    {
-      name: 'getMultipleCapabilityPath',
-      documentation: `
-        getGrantPath provides an array of capability objects representing
-        the list of capabilities required to grant the desired capability.
-      `,
-      async: true,
-      type: 'List',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'capabilityIds',
-          type: 'String[]'
-        },
-        {
-          name: 'filterGrantedUCJ',
-          type: 'boolean'
         }
       ]
     },

@@ -13,8 +13,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'capabilityDAO',
-    'prerequisiteCapabilityJunctionDAO'
+    'capabilityDAO'
   ],
 
   javaImports: [
