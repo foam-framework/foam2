@@ -56,13 +56,7 @@ foam.CLASS({
             FObject data = ucj.getData();
             if ( data != null ) {
               try {
-                Subject subject = new Subject.Builder(x).build();
-                User user = (User) ucj.findSourceId(systemX);
-                subject.setUser(user);
-                if ( ucj instanceof AgentCapabilityJunction ) {
-                  User effectiveUser = (User) ((AgentCapabilityJunction) ucj).findEffectiveUser(systemX);
-                  subject.setUser(effectiveUser);
-                }
+                Subject subject = ucj.getSubject(x);
                 X sourceX = (X) x.put("subject", subject);
 
                 data.validate(sourceX);
