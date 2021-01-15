@@ -12,6 +12,8 @@ foam.CLASS({
     'foam.nanos.auth.ServiceProviderAware'
   ],
 
+  ids: ['spid'],
+
   properties: [
     {
       class: 'Reference',
