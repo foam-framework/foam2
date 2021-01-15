@@ -8,6 +8,10 @@ foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'HumanNameTrait',
 
+  javaImports: [
+    'foam.util.SafetyUtil'
+  ],
+
   properties: [
     {
       class: 'String',
@@ -32,12 +36,33 @@ foam.INTERFACE({
       documentation: 'Full legal name of user. Appends first, middle & last name.',
       transient: true,
       expression: function(firstName, middleName, lastName) {
-        return middleName != '' ? firstName + ' ' + middleName + ' ' + lastName : firstName + ' ' + lastName;
+        if ( firstName && middleName && lastName ) {
+          return `${firstName} ${middleName} ${lastName}`;
+        }
+
+        if ( firstName && lastName ) {
+          return `${firstName} ${lastName}`;
+        }
+
+        return '';
       },
       javaGetter: `
-        return ! getMiddleName().equals("")
-          ? getFirstName() + " " + getMiddleName() + " " + getLastName()
-          : getFirstName() + " " + getLastName();
+        String firstName = this.getFirstName();
+        String middleName = this.getMiddleName();
+        String lastName = this.getLastName();
+
+        if ( ! SafetyUtil.isEmpty(firstName) && 
+             ! SafetyUtil.isEmpty(middleName) &&
+             ! SafetyUtil.isEmpty(lastName) ) {
+
+          return firstName + " " + middleName + " " + lastName;
+        }
+
+        if ( ! SafetyUtil.isEmpty(firstName) && ! SafetyUtil.isEmpty(lastName) ) {
+          return firstName + " " + lastName;
+        }
+
+        return "";
       `,
     }
   ]
