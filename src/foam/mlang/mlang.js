@@ -1814,6 +1814,9 @@ foam.CLASS({
         var isoDateString = this.value.toISOString();
         return isoDateString.substr(0, isoDateString.indexOf(':', isoDateString.indexOf(':') + 1));
       }
+
+      if ( foam.String.isInstance(this.value) )
+        return '\"' + this.value + '\"';
       return this.value;
     }
   ]
