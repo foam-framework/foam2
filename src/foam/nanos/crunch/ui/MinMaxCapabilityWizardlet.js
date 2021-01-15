@@ -103,7 +103,8 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.u2.wizard.WizardletSection',
       factory: function() {
-        return [
+        // TODO: If 'of' is set for a MinMax it should be added as a section
+        return this.hideChoiceView ? [] : [
           this.WizardletSection.create({
             isAvailable: true,
             title: this.capability.name,
@@ -118,6 +119,14 @@ foam.CLASS({
           })
         ];
       }
+    },
+    {
+      name: 'consumePrerequisites',
+      class: 'Boolean'
+    },
+    {
+      name: 'hideChoiceView',
+      class: 'Boolean'
     }
   ],
 
@@ -125,6 +134,7 @@ foam.CLASS({
     function addPrerequisite(wizardlet) {
       wizardlet.isAvailable = false;
       this.choiceWizardlets.push(wizardlet);
+      return this.consumePrerequisites;
     }
   ]
 });
