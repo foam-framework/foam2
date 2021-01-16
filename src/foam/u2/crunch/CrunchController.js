@@ -20,7 +20,6 @@ foam.CLASS({
     'capabilityCategoryDAO',
     'crunchService',
     'ctrl',
-    'prerequisiteCapabilityJunctionDAO',
     'stack',
     'subject',
     'userCapabilityJunctionDAO'

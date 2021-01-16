@@ -60,7 +60,7 @@ foam.CLASS({
             payload.setStatus(newStatus);
             // TODO Maybe use projection MLang
             var crunchService = (CrunchService) agencyX.get("crunchService");
-            var depIds = crunchService.getDependantIds(agencyX, payload.getCapability());
+            var depIds = crunchService.getDependentIds(agencyX, payload.getCapability());
 
             ((ArraySink) payloadDAO.select(new ArraySink())).getArray().stream()
             .filter(cp -> Arrays.stream(depIds).anyMatch(((CapabilityJunctionPayload) cp).getCapability()::equals))

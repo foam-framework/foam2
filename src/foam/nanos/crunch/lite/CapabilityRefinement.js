@@ -12,6 +12,7 @@ foam.CLASS({
   javaImports: [
     'foam.dao.DAO',
     'foam.nanos.crunch.CapabilityJunctionPayload',
+    'foam.nanos.crunch.CrunchService',
     'static foam.nanos.crunch.CapabilityJunctionStatus.*'
   ],
 
@@ -23,21 +24,17 @@ foam.CLASS({
     {
       name: 'getCapableChainedStatus',
       javaCode: `
-        // These two statements duplicate getPrereqsChainedStatus
-        DAO myPrerequisitesDAO = ((DAO)
-          x.get("prerequisiteCapabilityJunctionDAO"))
-            .where(
-              EQ(CapabilityCapabilityJunction.SOURCE_ID, getId()));
-        List<CapabilityCapabilityJunction> ccJunctions =
-          ((ArraySink) myPrerequisitesDAO.select(new ArraySink()))
-          .getArray();
+        CrunchService crunchService = (CrunchService) x.get("crunchService");
+        List<String> prereqCapIds = crunchService.getPrereqs(getId());
+
+        if ( prereqCapIds == null || prereqCapIds.size() == 0 ) return GRANTED;
 
         boolean isPending = false;
         boolean isRejected = false;
 
-        for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
+        for ( String capId : prereqCapIds ) {
           CapabilityJunctionPayload prereqPayload = (CapabilityJunctionPayload)
-            capablePayloadDAO.find(ccJunction.getTargetId());
+            capablePayloadDAO.find(capId);
 
           if ( prereqPayload == null ) {
             return ACTION_REQUIRED;

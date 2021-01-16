@@ -15,7 +15,7 @@ foam.CLASS({
     'com.google.common.io.BaseEncoding',
 
     'foam.dao.DAO',
-    'foam.nanos.app.EmailConfig',
+    'foam.nanos.notification.email.EmailConfig',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.session.Session',
@@ -67,7 +67,7 @@ foam.CLASS({
         userDAO.put_(getX(), user);
 
         try {
-          EmailConfig service = (EmailConfig) x.get("emailConfig");
+          EmailConfig service = (EmailConfig) ((DAO)x.get("emailConfigDAO")).find(user.getSpid());
           String name = service == null ? "FOAM" : service.getDisplayName();
           String path = String.format("/%s:%s", name, user.getEmail());
           String query = String.format("secret=%s&issuer=%s&algorithm=%s", key, name, getAlgorithm());

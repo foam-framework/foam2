@@ -15,7 +15,8 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.nanos.app.EmailConfig',
+    'foam.dao.DAO',
+    'foam.nanos.notification.email.EmailConfig',
     'foam.nanos.logger.Logger'
   ],
 
@@ -25,11 +26,11 @@ foam.CLASS({
       type: 'foam.nanos.notification.email.EmailMessage',
       javaCode: `
         Logger logger = (Logger) x.get("logger");
-        EmailConfig emailConfig = (EmailConfig) x.get("emailConfig");
+        EmailConfig emailConfig = (EmailConfig) ((DAO) x.get("emailConfigDAO")).find(emailMessage.getSpid());
 
         // Service property check
         if ( emailConfig == null ) {
-          logger.error( "EmailConfig service has invalid property settings.");
+          logger.error( "EmailConfigDAO missing spid for email message.");
           return emailMessage;
         }
 

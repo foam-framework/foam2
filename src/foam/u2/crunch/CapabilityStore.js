@@ -40,13 +40,14 @@ foam.CLASS({
     'crunchController',
     'crunchService',
     'menuDAO',
-    'registerElement'
+    'registerElement',
+    'theme'
   ],
 
   messages: [
     { name: 'TAB_ALL', message: 'All' },
-    { name: 'TITLE', message: 'Registration' },
-    { name: 'SUBTITLE', message: 'To complete the registration, follow the steps below' }
+    { name: 'TITLE', message: 'Features' },
+    { name: 'SUBTITLE', message: 'Unlock more features on {appName}' }
   ],
 
   css: `
@@ -202,7 +203,7 @@ foam.CLASS({
           .add(this.TITLE)
         .end()
         .start('p').addClass(this.myClass('label-subtitle'))
-          .add(this.SUBTITLE)
+          .add(this.SUBTITLE.replace('{appName}', this.theme.appName))
         .end()
         .add(this.slot(function(featuredCapabilities){
           return self.renderFeatured();
