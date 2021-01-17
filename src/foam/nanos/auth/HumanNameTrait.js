@@ -8,10 +8,6 @@ foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'HumanNameTrait',
 
-  javaImports: [
-    'foam.util.SafetyUtil'
-  ],
-
   properties: [
     {
       class: 'String',
@@ -36,34 +32,17 @@ foam.INTERFACE({
       documentation: 'Full legal name of user. Appends first, middle & last name.',
       transient: true,
       expression: function(firstName, middleName, lastName) {
-        if ( firstName && middleName && lastName ) {
-          return `${firstName} ${middleName} ${lastName}`;
-        }
-
-        if ( firstName && lastName ) {
-          return `${firstName} ${lastName}`;
-        }
-
-        return '';
+        return [firstName, middleName, lastName].filter(name => name).join(' ');
       },
       javaGetter: `
-        String firstName = this.getFirstName();
-        String middleName = this.getMiddleName();
-        String lastName = this.getLastName();
-
-        if ( ! SafetyUtil.isEmpty(firstName) && 
-             ! SafetyUtil.isEmpty(middleName) &&
-             ! SafetyUtil.isEmpty(lastName) ) {
-
-          return firstName + " " + middleName + " " + lastName;
-        }
-
-        if ( ! SafetyUtil.isEmpty(firstName) && ! SafetyUtil.isEmpty(lastName) ) {
-          return firstName + " " + lastName;
-        }
-
-        return "";
-      `,
+        java.util.List<String> filteredNameList = java.util.Arrays
+          .asList(this.getFirstName(), this.getMiddleName(), this.getLastName())
+          .stream()
+          .filter(name -> !name.isEmpty())
+          .collect(java.util.stream.Collectors.toList());
+            
+        return String.join(" ", filteredNameList);
+      `
     }
   ]
 });
