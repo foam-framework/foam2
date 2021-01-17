@@ -18,6 +18,7 @@ foam.CLASS({
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest',
     'org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse',
     'org.eclipse.jetty.websocket.servlet.WebSocketCreator',
+    'static foam.mlang.MLang.EQ',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.jetty.JettyThreadPoolConfig',
@@ -122,7 +123,7 @@ foam.CLASS({
             port = getPort();
           }
         }
-        getLogger().info("Starting Jetty http server. port", port);
+        // getLogger().info("Starting Jetty http server. port", port);
 
         JettyThreadPoolConfig jettyThreadPoolConfig = (JettyThreadPoolConfig) getX().get("jettyThreadPoolConfig");
         QueuedThreadPool threadPool = new QueuedThreadPool();
@@ -249,7 +250,8 @@ foam.CLASS({
 
         server.start();
       } catch(Exception e) {
-        getLogger().error(e);
+        System.out.println(e);
+        // getLogger().error(e);
       }
       `
     },
@@ -291,6 +293,9 @@ foam.CLASS({
       ],
       javaCode: `
       foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+      foam.dao.DAO fileDAO = ((foam.dao.DAO) getX().get("fileDAO"));
+
+      foam.dao.ArraySink select = (foam.dao.ArraySink) fileDAO.select(new foam.dao.ArraySink());
 
       if ( this.getEnableHttps() ) {
 
