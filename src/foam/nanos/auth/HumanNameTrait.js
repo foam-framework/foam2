@@ -41,11 +41,17 @@ foam.INTERFACE({
 
         StringBuilder sb = new StringBuilder();
 
-        if ( ! firstName.isEmpty() ) sb.append(firstName + " ");
-        if ( ! middleName.isEmpty() ) sb.append(middleName + " ");
-        if ( ! lastName.isEmpty() ) sb.append(lastName);
+        if ( ! firstName.isEmpty() ) sb.append(firstName);
+        if ( ! middleName.isEmpty() ) {
+          if ( sb.length() > 0 ) sb.append(" ");
+          sb.append(middleName);
+        }
+        if ( ! lastName.isEmpty() ) {
+          if( sb.length() > 0 ) sb.append(" ");
+          sb.append(lastName);
+        }
             
-        return sb.toString().trim();
+        return sb.toString();
       `
     }
   ]
