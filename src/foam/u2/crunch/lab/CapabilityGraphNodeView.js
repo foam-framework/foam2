@@ -102,13 +102,16 @@ foam.CLASS({
             .addClass(this.myClass('segment')).addClass('title')
             .add(foam.String.labelize(capability.name))
           .end()
-          .start()
+          .start('button')
             .addClass(this.myClass('segment')).addClass('tiny')
             .add(capability.id)
+            .on('click', function() { 
+              window.location.href = `http://${location.host}/#admin.data:capabilityDAO:{sV:%22New%20Controller%22,c:[%22id%22,%22name%22,%22description%22]}:${capability.id}:{sV:%22Detail%22,c:[%22granted%22,%22id%22,%22description%22]}`;
+            })
           .end()
           .callIf(ucj !== null, function () {
             this
-              .start()
+              .start('button')
                 .addClass(self.myClass('segment'))
                 .callIf(ucj.status.background, function () {
                   this.style({
@@ -118,9 +121,13 @@ foam.CLASS({
                 .callIf(ucj.status.color, function () {
                   this.style({
                     'color': ucj.status.color,
+                    'width': 'inherit'
                   })
                 })
                 .add(ucj.status.label)
+                .on('click', function() {
+                  window.location.href = `http://${location.host}/#admin.data:userCapabilityJunctionDAO:{sV:%22New%20Controller%22}:${ucj.id}:{sV:%22Detail%22}`;
+                })
               .end()
               ;
           })
