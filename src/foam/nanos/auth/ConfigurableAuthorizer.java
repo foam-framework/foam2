@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * Copyright 2021 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -22,7 +22,6 @@ public class ConfigurableAuthorizer implements Authorizer {
   // Allows for grouped object access based on object values and templates configured.
   // Please see PermissionTemplateReference.js for additional documentation
 
-  protected String permissionPrefix_ = "";
   protected String daoKey_ = "";
 
   public ConfigurableAuthorizer(String daoKey) {
@@ -55,50 +54,23 @@ public class ConfigurableAuthorizer implements Authorizer {
   },
 
   public void authorizeOnCreate(X x, FObject obj) throws AuthorizationException {
-
-    String permission = createPermission("create");
-    AuthService authService = (AuthService) x.get("auth");
-    if ( ! authService.check(x, permission) ) {
-      ((foam.nanos.logger.Logger) x.get("logger")).debug("StanardAuthorizer", "Permission denied", permission);
-      throw new AuthorizationException();
-    }
+    checkPermissionTemplates(x, "create", obj);
   }
 
   public void authorizeOnRead(X x, FObject obj) throws AuthorizationException {
-
-    String permission = createPermission("read", obj.getProperty("id"));
-    AuthService authService = (AuthService) x.get("auth");
-
-    if ( ! authService.check(x, permission) ) {
-      ((foam.nanos.logger.Logger) x.get("logger")).debug("StandardAuthorizer", "Permission denied", permission);
-      throw new AuthorizationException();
-    }
+    checkPermissionTemplates(x, "read", obj);
   }
 
   public void authorizeOnUpdate(X x, FObject oldObj, FObject obj) throws AuthorizationException {
-
-    String permission = createPermission("update", obj.getProperty("id"));
-    AuthService authService = (AuthService) x.get("auth");
-
-    if ( ! authService.check(x, permission) ) {
-      ((foam.nanos.logger.Logger) x.get("logger")).debug("StandardAuthorizer", "Permission denied", permission);
-      throw new AuthorizationException();
-    }
+    checkPermissionTemplates(x, "update", oldObj);
   }
 
   public void authorizeOnDelete(X x, FObject obj) throws AuthorizationException {
-
-    String permission  = createPermission("remove", obj.getProperty("id"));
-    AuthService authService = (AuthService) x.get("auth");
-
-    if ( ! authService.check(x, permission) ) {
-      ((foam.nanos.logger.Logger) x.get("logger")).debug("StandardAuthorizer", "Permission denied", permission);
-      throw new AuthorizationException();
-    }
+    checkPermissionTemplates(x, "remove", obj);
   }
 
   public boolean checkGlobalRead(X x, Predicate predicate) {
-    String permission = createPermission("read", "*");
+    String permission = daoKey + ".read.*";
     AuthService authService = (AuthService) x.get("auth");
     try {
       return authService.check(x, permission);
@@ -108,7 +80,7 @@ public class ConfigurableAuthorizer implements Authorizer {
   }
 
   public boolean checkGlobalRemove(X x) {
-    String permission = createPermission("remove", "*");
+    String permission = daoKey + ".remove.*";
     AuthService authService = (AuthService) x.get("auth");
     try {
       return authService.check(x, permission);
