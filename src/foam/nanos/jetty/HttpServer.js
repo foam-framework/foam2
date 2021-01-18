@@ -13,25 +13,29 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'org.eclipse.jetty.http.pathmap.ServletPathSpec',
-    'org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter',
-    'org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest',
-    'org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse',
-    'org.eclipse.jetty.websocket.servlet.WebSocketCreator',
-    'static foam.mlang.MLang.EQ',
+    'foam.blob.Blob',
+    'foam.nanos.fs.File',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.jetty.JettyThreadPoolConfig',
+    'java.io.ByteArrayInputStream',
+    'java.io.ByteArrayOutputStream',
+    'java.io.FileInputStream',
+    'java.security.KeyStore',
     'java.util.Set',
     'java.util.HashSet',
     'java.util.Arrays',
+    'org.apache.commons.io.IOUtils',
+    'org.eclipse.jetty.http.pathmap.ServletPathSpec',
     'org.eclipse.jetty.server.*',
     'org.eclipse.jetty.server.handler.StatisticsHandler',
     'org.eclipse.jetty.util.ssl.SslContextFactory',
     'org.eclipse.jetty.util.thread.QueuedThreadPool',
-    'java.io.FileInputStream',
-    'java.security.KeyStore',
-    'org.apache.commons.io.IOUtils'
+    'org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter',
+    'org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest',
+    'org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse',
+    'org.eclipse.jetty.websocket.servlet.WebSocketCreator',
+    'static foam.mlang.MLang.EQ'
   ],
 
   properties: [
@@ -105,6 +109,11 @@ foam.CLASS({
           this.getClass().getSimpleName()
         }, (Logger) getX().get("logger"));
       `
+    },
+    {
+      name: 'keyCertificateFileName',
+      class: 'String',
+      value: 'jetty'
     }
   ],
   methods: [
@@ -295,15 +304,20 @@ foam.CLASS({
       foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
       foam.dao.DAO fileDAO = ((foam.dao.DAO) getX().get("fileDAO"));
 
-      foam.dao.ArraySink select = (foam.dao.ArraySink) fileDAO.select(new foam.dao.ArraySink());
-
       if ( this.getEnableHttps() ) {
 
-        FileInputStream is = null;
+        ByteArrayOutputStream os = null;
+        ByteArrayInputStream is = null;
         try {
+          File file = (File) fileDAO.find(getKeyCertificateFileName());
           // 1. load the keystore to verify the keystore path and password.
           KeyStore keyStore = KeyStore.getInstance("JKS");
-          is = new FileInputStream(this.getKeystorePath());
+
+          Blob blob = file.getData();
+          os = new ByteArrayOutputStream((int) file.getFilesize());
+          blob.read(os, 0, file.getFilesize());
+          is = new ByteArrayInputStream(os.toByteArray());
+
           keyStore.load(is, this.getKeystorePassword().toCharArray());
 
           // 2. enable https
@@ -330,6 +344,7 @@ foam.CLASS({
           logger.error("Error when enable the https.");
         } finally {
           IOUtils.closeQuietly(is);
+          IOUtils.closeQuietly(os);
         }
 
       }
