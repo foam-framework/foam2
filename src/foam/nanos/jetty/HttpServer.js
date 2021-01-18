@@ -128,7 +128,7 @@ foam.CLASS({
             port = getPort();
           }
         }
-        // getLogger().info("Starting Jetty http server. port", port);
+        getLogger().info("Starting Jetty http server. port", port);
 
         JettyThreadPoolConfig jettyThreadPoolConfig = (JettyThreadPoolConfig) getX().get("jettyThreadPoolConfig");
         QueuedThreadPool threadPool = new QueuedThreadPool();
@@ -255,8 +255,7 @@ foam.CLASS({
 
         server.start();
       } catch(Exception e) {
-        System.out.println(e);
-        // getLogger().error(e);
+        getLogger().error(e);
       }
       `
     },
