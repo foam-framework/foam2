@@ -35,13 +35,17 @@ foam.INTERFACE({
         return [firstName, middleName, lastName].filter(name => name).join(' ');
       },
       javaGetter: `
-        java.util.List<String> filteredNameList = java.util.Arrays
-          .asList(this.getFirstName(), this.getMiddleName(), this.getLastName())
-          .stream()
-          .filter(name -> !name.isEmpty())
-          .collect(java.util.stream.Collectors.toList());
+        String firstName = this.getFirstName();
+        String middleName = this.getMiddleName();
+        String lastName = this.getLastName();
+
+        StringBuilder sb = new StringBuilder();
+
+        if ( ! firstName.isEmpty() ) sb.append(firstName + " ");
+        if ( ! middleName.isEmpty() ) sb.append(middleName + " ");
+        if ( ! lastName.isEmpty() ) sb.append(lastName);
             
-        return String.join(" ", filteredNameList);
+        return sb.toString().trim();
       `
     }
   ]
