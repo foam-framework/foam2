@@ -55,10 +55,6 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'keystorePath'
-    },
-    {
-      class: 'String',
       name: 'keystorePassword'
     },
     {
@@ -309,11 +305,17 @@ foam.CLASS({
         ByteArrayOutputStream os = null;
         ByteArrayInputStream is = null;
         try {
-          File file = (File) fileDAO.find(getKeyCertificateFileName());
           // 1. load the keystore to verify the keystore path and password.
           KeyStore keyStore = KeyStore.getInstance("JKS");
 
+          File file = (File) fileDAO.find(getKeyCertificateFileName());
+          if ( file == null )
+            throw new java.io.FileNotFoundException();
+
           Blob blob = file.getData();
+          if ( blob == null )
+            throw new java.io.FileNotFoundException();
+
           os = new ByteArrayOutputStream((int) file.getFilesize());
           blob.read(os, 0, file.getFilesize());
           is = new ByteArrayInputStream(os.toByteArray());
@@ -324,7 +326,7 @@ foam.CLASS({
           HttpConfiguration https = new HttpConfiguration();
           https.addCustomizer(new SecureRequestCustomizer());
           SslContextFactory sslContextFactory = new SslContextFactory();
-          sslContextFactory.setKeyStorePath(this.getKeystorePath());
+          sslContextFactory.setKeyStore(keyStore);
           sslContextFactory.setKeyStorePassword(this.getKeystorePassword());
 
           ServerConnector sslConnector = new ServerConnector(server,
@@ -335,7 +337,7 @@ foam.CLASS({
           server.addConnector(sslConnector);
 
         } catch ( java.io.FileNotFoundException e ) {
-          logger.error("No KeyStore file found at path: " + this.getKeystorePath(),
+          logger.error("No KeyStore file found " + this.getKeyCertificateFileName(),
                        "Please see: https://docs.google.com/document/d/1hXVdHjL8eASG2AG2F7lPwpO1VmcW2PHnAW7LuDC5xgA/edit?usp=sharing", e);
         } catch ( java.io.IOException e ) {
           logger.error("Invalid KeyStore file password, please make sure you have set the correct password.",
