@@ -107,6 +107,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'placeholder',
+      value: 'select...',
       documentation: 'If no placeholder, the choiceView will select the first element',
     },
     {
