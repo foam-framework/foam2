@@ -31,6 +31,10 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
+      name: 'id'
+    },
+    {
       class: 'StringArray',
       name: 'daoKeys',
       documentation: `References dao keys used by services using the ConfigurableAuthorizer as their authorizer.`
@@ -47,17 +51,6 @@ foam.CLASS({
       documentation: `Furthur defines object properties to construct authorization permissions.
           If an object satisfies all property conditions it is authorized for the corresponding operation.
           Permission property segments are constructed in order of the values index.`,
-    },
-    {
-      class: 'StringArray',
-      name: 'constructedString',
-      expression: function(daoKeys, operation, properties) {
-        let arr = [];
-        daoKeys.forEach(dao => {
-          arr.push(`${dao}.${operation}.${properties.join('.')}`);
-        });
-        return arr;
-      }
     }
   ],
 

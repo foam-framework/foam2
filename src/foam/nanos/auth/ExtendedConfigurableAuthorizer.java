@@ -6,15 +6,15 @@
 
 package foam.nanos.auth;
 
+import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.X;
+import foam.dao.AbstractSink;
 import foam.dao.DAO;
+import foam.mlang.predicate.Predicate;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.AuthorizationException;
-import foam.mlang.predicate.Predicate;
-import foam.dao.AbstractSink;
-import foam.core.Detachable;
-import foam.dao.ArraySink;
+import foam.nanos.ruler.Operations;
 import java.util.ArrayList;
 
 import static foam.mlang.MLang.AND;
@@ -36,23 +36,23 @@ public class ExtendedConfigurableAuthorizer implements Authorizer {
 
   public String createPermission(PermissionTemplateReference permissionTemplate, FObject obj) {
     // Construct permission from permission template reference.
-    String permission = daoKey_ + "." + permissionTemplate.getOperation();
+    String permission = daoKey_ + "." + ((Operations) permissionTemplate.getOperation()).getLabel();
     for (String prop : permissionTemplate.getProperties()) {
       permission += "." + obj.getProperty(prop);
     }
-    return permission;
+    return permission.toLowerCase();
   }
 
-  public void checkPermissionTemplates(X x, String op, FObject obj) {
+  public void checkPermissionTemplates(X x, Operations op, FObject obj) {
     AuthService authService = (AuthService) x.get("auth");
-    DAO permissionTemplateDAO = (DAO) x.get("permissionTemplateReferenceDAO");
+    DAO permissionTemplateDAO = (DAO) x.get("localPermissionTemplateReferenceDAO");
 
     Predicate predicate = (Predicate) AND(
       IN(daoKey_, PermissionTemplateReference.DAO_KEYS),
       EQ(PermissionTemplateReference.OPERATION, op)
     );
 
-    ArraySink permissionTemplates = (ArraySink) permissionTemplateDAO.where(predicate).select(new AbstractSink(){
+    permissionTemplateDAO.where(predicate).select(new AbstractSink(){
       public void put(Object o, Detachable d) {
         String permission = createPermission((PermissionTemplateReference) o, obj);
         if ( ! authService.check(x, permission) ) {
@@ -64,19 +64,19 @@ public class ExtendedConfigurableAuthorizer implements Authorizer {
   }
 
   public void authorizeOnCreate(X x, FObject obj) throws AuthorizationException {
-    checkPermissionTemplates(x, "create", obj);
+    checkPermissionTemplates(x, Operations.CREATE, obj);
   }
 
   public void authorizeOnRead(X x, FObject obj) throws AuthorizationException {
-    checkPermissionTemplates(x, "read", obj);
+    checkPermissionTemplates(x, Operations.READ, obj);
   }
 
   public void authorizeOnUpdate(X x, FObject oldObj, FObject obj) throws AuthorizationException {
-    checkPermissionTemplates(x, "update", oldObj);
+    checkPermissionTemplates(x, Operations.UPDATE, oldObj);
   }
 
   public void authorizeOnDelete(X x, FObject obj) throws AuthorizationException {
-    checkPermissionTemplates(x, "remove", obj);
+    checkPermissionTemplates(x, Operations.REMOVE, obj);
   }
 
   public boolean checkGlobalRead(X x, Predicate predicate) {

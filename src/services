@@ -593,7 +593,8 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.auth.PermissionTemplateReference.getOwnClassInfo())
       .setGuid(true)
-      .setPM(true)
+      .setPm(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("permissionTemplateReferences")
       .build();
   """
@@ -609,10 +610,14 @@ p({
       .setOf(foam.nanos.auth.PermissionTemplateReference.getOwnClassInfo())
       .setInnerDAO(x.get("localPermissionTemplateReferenceDAO"))
       .setAuthorize(true)
-      .setPM(true)
+      .setPm(true)
       .build();
   """,
-  "client":"{\"of\":\"foam.nanos.auth.PermissionTemplateReferenceDAO\"}"
+  "client":"""
+    {
+      "of":"foam.nanos.auth.PermissionTemplateReference"
+    }
+  """
 })
 
 p({
