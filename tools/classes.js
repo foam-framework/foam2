@@ -255,6 +255,7 @@ var classes = [
   'foam.nanos.auth.GroupPermissionJunction',
   'foam.nanos.auth.GroupPermissionJunctionRefinement',
   'foam.nanos.auth.CheckPermissionsSink',
+  'foam.nanos.auth.PermissionTemplateReference',
   'foam.nanos.auth.Group',
   'foam.nanos.auth.PasswordPolicy',
   'foam.nanos.auth.CreatedAware',

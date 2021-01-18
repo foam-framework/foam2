@@ -15,7 +15,7 @@ import foam.dao.AbstractSink;
 import foam.core.Detachable;
 import foam.dao.ArraySink;
 
-public class ConfigurableAuthorizer implements Authorizer {
+public class ExtendedConfigurableAuthorizer implements Authorizer {
 
   // Configurable authorizer allowing the use of configurable permissions templates defined in permissionTemplateReferenceDAO. 
   // Template reference a DAOKey array detailing when to apply to authorizer.
@@ -24,7 +24,7 @@ public class ConfigurableAuthorizer implements Authorizer {
 
   protected String daoKey_ = "";
 
-  public ConfigurableAuthorizer(String daoKey) {
+  public ExtendedConfigurableAuthorizer(String daoKey) {
     daoKey_ = daoKey;
   }
 
@@ -46,7 +46,7 @@ public class ConfigurableAuthorizer implements Authorizer {
       public void put(Object o, Detachable d) {
         Permission permission = (Permission) createPermission(o, obj);
         if ( ! authService.check(x, permission) ) {
-          ((foam.nanos.logger.Logger) x.get("logger")).debug("ConfigurableAuthorizer", "Permission denied", permission);
+          ((foam.nanos.logger.Logger) x.get("logger")).debug("ExtendedConfigurableAuthorizer", "Permission denied", permission);
           throw new AuthorizationException();
         }
       }

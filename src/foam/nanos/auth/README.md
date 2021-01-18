@@ -85,9 +85,9 @@ There are several different implementations of the `Authorizer` interface:
 * `StandardAuthorizer`
   * Generates permissions in the conventional form `"<model name>.<operation>.<object id>"` (eg: `"user.read.42"`) and uses permission checks to determine whether the user has access or not.
   * `StandardAuthorizer` is useful when you don't have any complex authorization requirements and you would like to use a simple group and permission system to manage access to a DAO. It doesn't require any additional configuration and works out of the box for any model.
-* `ConfigurableAuthorizer`
+* `ExtendedConfigurableAuthorizer`
   * Allows for grouped object access based on object values and templates configured. Templates reference a DAOKey array detailing when to apply to an authorizer, which also defines a DAOKey. A permission template further defines properties used to construct the permission string.
-  * `ConfigurableAuthorizer` Provides runtime authorization updates through updates to PermissionTemplateReferences. This implementation requires configuration however out of the box its functionality is identical to the StandardAuthorizer.
+  * `ExtendedConfigurableAuthorizer` Provides runtime authorization updates through updates to PermissionTemplateReferences.
 * `GlobalReadAuthorizer`
   * Almost identical to `StandardAuthorizer`, but performs no authorization checks to read data.
   * Useful when you have a DAO that contains data that should be readable by any user without permission, but you still want users to need permissions to create, update, or delete data.
