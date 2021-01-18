@@ -14,6 +14,7 @@ import foam.mlang.predicate.Predicate;
 import foam.dao.AbstractSink;
 import foam.core.Detachable;
 import foam.dao.ArraySink;
+import java.util.ArrayList;
 
 public class ExtendedConfigurableAuthorizer implements Authorizer {
 
@@ -28,9 +29,13 @@ public class ExtendedConfigurableAuthorizer implements Authorizer {
     daoKey_ = daoKey;
   }
 
-  public String createPermission(PermissionTemplateReference obj, Object obj) {
+  public String createPermission(PermissionTemplateReference permissionTemplate, Object object) {
     // Construct permission from permission template reference.
-    return permissionPrefix_ + "." + op + "." + id.toString();
+    String permission = daoKey_ + "." + permissionTemplate.getOperation();
+    for (String prop : permissionTemplate.getProperties()) {
+      permission += "." + obj.getProperty(prop);
+    }
+    return permission;
   }
 
   public String checkPermissionTemplates(X x, String op, Object obj) {

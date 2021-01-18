@@ -8,6 +8,8 @@ foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'PermissionTemplateReference',
 
+  requires: ['java.util.ArrayList'],
+
   documentation: `Used to construct permission templates for services using the ExtendedConfigurableAuthorizer.
     Also facilitates the use of the authorizer using references to values defined on the authorizer.
     Services using the ExtendedConfigurableAuthorizer will be able to adjust authorization permissions on runtime.
@@ -34,17 +36,10 @@ foam.CLASS({
       documentation: `References dao keys used by services using the ConfigurableAuthorizer as their authorizer.`
     },
     {
-      class: 'String',
+      class: 'Enum',
       name: 'operation',
-      documentation: `Reference operation type of permission. Includes read, update and remove.`,
-      view: {
-        class: 'foam.u2.view.ChoiceView',
-        choices: [
-          'read',
-          'update',
-          'remove'
-        ]
-      }
+      of: 'foam.nanos.ruler.Operations',
+      documentation: `Reference operation type of permission. Includes read, update and remove.`
     },
     {
       class: 'StringArray',
@@ -54,8 +49,29 @@ foam.CLASS({
           Permission property segments are constructed in order of the values index.`,
     },
     {
-      class: 'String',
-      name: ''
+      class: 'StringArray',
+      name: 'constructedString',
+      expression: function(daoKeys, operation, properties) {
+        let arr = [];
+        daoKeys.forEach(dao => {
+          arr.push(`${dao}.${operation}.${properties.join('.')}`);
+        });
+        return arr;
+      }
+    }
+  ],
+
+  methods: [
+    {
+      name: 'getPermissions',
+      type: 'ArrayList<String>',
+      code: `
+        ArrayList<String> arr = new ArrayList();
+        for ( String daoKey : getDaoKeys() ) {
+          arr.add(daoKey, ".",getOperation(), String.join(".", getProperties()));
+        }
+        return arr;
+      `
     }
   ]
 });
