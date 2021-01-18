@@ -108,8 +108,9 @@ foam.CLASS({
     },
     {
       name: 'keyCertificateFileName',
+      documentation: 'id of the keystore file in fileDAO',
       class: 'String',
-      value: 'jetty'
+      value: 'jetty_pkcs12'
     }
   ],
   methods: [
