@@ -43,14 +43,14 @@ foam.INTERFACE({
 
         if ( ! firstName.isEmpty() ) sb.append(firstName);
         if ( ! middleName.isEmpty() ) {
-          if ( sb.length() > 0 ) sb.append(" ");
+          if ( sb.length() > 0 ) sb.append(' ');
           sb.append(middleName);
         }
         if ( ! lastName.isEmpty() ) {
-          if( sb.length() > 0 ) sb.append(" ");
+          if( sb.length() > 0 ) sb.append(' ');
           sb.append(lastName);
         }
-            
+
         return sb.toString();
       `
     }
