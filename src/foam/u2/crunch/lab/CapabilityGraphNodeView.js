@@ -44,6 +44,7 @@ foam.CLASS({
     }
     ^segment.tiny {
       font-size: 9px;
+      width: inherit;
     }
   `,
 
@@ -116,12 +117,12 @@ foam.CLASS({
                 .callIf(ucj.status.background, function () {
                   this.style({
                     'background-color': ucj.status.background,
+                    'width': 'inherit'
                   })
                 })
                 .callIf(ucj.status.color, function () {
                   this.style({
                     'color': ucj.status.color,
-                    'width': 'inherit'
                   })
                 })
                 .add(ucj.status.label)
