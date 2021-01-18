@@ -134,7 +134,7 @@ foam.CLASS({
       documentation: `
         When true, do not display the choice selection section.
       `,
-      class: 'Boolean
+      class: 'Boolean'
     }
   ],
 
