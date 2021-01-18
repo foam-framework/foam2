@@ -626,14 +626,14 @@ foam.CLASS({
         if ( this.lastName && this.firstName ) return this.firstName + ' ' + this.lastName;
         if ( this.lastName ) return this.lastName;
         if ( this.firstName ) return this.firstName;
-        return '';
+        return this.userName;
       },
       javaCode: `
         if ( ! SafetyUtil.isEmpty(this.getLegalName()) ) return this.getLegalName();
         if ( ! SafetyUtil.isEmpty(this.getLastName()) && ! SafetyUtil.isEmpty(this.getFirstName()) ) return this.getFirstName() + " " + this.getLastName();
         if ( ! SafetyUtil.isEmpty(this.getLastName()) ) return this.getLastName();
         if ( ! SafetyUtil.isEmpty(this.getFirstName()) ) return this.getFirstName();
-        return "";
+        return this.getUserName();
       `
     },
     {

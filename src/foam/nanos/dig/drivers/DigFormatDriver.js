@@ -263,7 +263,9 @@ foam.CLASS({
       synchronized: true,
       javaCode: `
       FObject nu = obj;
-      FObject old = dao.find(obj);
+      
+      // adding system context in case if user has permission to update but not to read
+      FObject old = dao.inX(getX()).find(obj);
       if ( old != null ) {
         nu = old.fclone();
         nu.copyFrom(obj);
