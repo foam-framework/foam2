@@ -35,9 +35,9 @@ foam.INTERFACE({
         return [firstName, middleName, lastName].filter(name => name).join(' ');
       },
       javaGetter: `
-        String firstName = this.getFirstName();
-        String middleName = this.getMiddleName();
-        String lastName = this.getLastName();
+        String firstName = getFirstName();
+        String middleName = getMiddleName();
+        String lastName = getLastName();
 
         StringBuilder sb = new StringBuilder();
 
