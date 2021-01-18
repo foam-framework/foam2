@@ -310,11 +310,11 @@ foam.CLASS({
 
           File file = (File) fileDAO.find(getKeyCertificateFileName());
           if ( file == null )
-            throw new java.io.FileNotFoundException("No key-certificate pairs file found in fileDAO");
+            throw new java.io.FileNotFoundException("No keystore file found in fileDAO");
 
           Blob blob = file.getData();
           if ( blob == null )
-            throw new java.io.FileNotFoundException("The key-certificate pairs file is empty");
+            throw new java.io.FileNotFoundException("The keystore file is empty");
 
           os = new ByteArrayOutputStream((int) file.getFilesize());
           blob.read(os, 0, file.getFilesize());
