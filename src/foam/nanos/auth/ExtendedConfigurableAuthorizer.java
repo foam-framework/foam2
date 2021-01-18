@@ -8,6 +8,7 @@ package foam.nanos.auth;
 
 import foam.core.FObject;
 import foam.core.X;
+import foam.dao.DAO;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.AuthorizationException;
 import foam.mlang.predicate.Predicate;
@@ -16,10 +17,14 @@ import foam.core.Detachable;
 import foam.dao.ArraySink;
 import java.util.ArrayList;
 
+import static foam.mlang.MLang.AND;
+import static foam.mlang.MLang.EQ;
+import static foam.mlang.MLang.IN;
+
 public class ExtendedConfigurableAuthorizer implements Authorizer {
 
   // Configurable authorizer allowing the use of configurable permissions templates defined in permissionTemplateReferenceDAO. 
-  // Template reference a DAOKey array detailing when to apply to authorizer.
+  // Template references a DAOKey array detailing when to apply to authorizer.
   // Allows for grouped object access based on object values and templates configured.
   // Please see PermissionTemplateReference.js for additional documentation
 
@@ -29,7 +34,7 @@ public class ExtendedConfigurableAuthorizer implements Authorizer {
     daoKey_ = daoKey;
   }
 
-  public String createPermission(PermissionTemplateReference permissionTemplate, Object object) {
+  public String createPermission(PermissionTemplateReference permissionTemplate, FObject obj) {
     // Construct permission from permission template reference.
     String permission = daoKey_ + "." + permissionTemplate.getOperation();
     for (String prop : permissionTemplate.getProperties()) {
@@ -38,7 +43,7 @@ public class ExtendedConfigurableAuthorizer implements Authorizer {
     return permission;
   }
 
-  public String checkPermissionTemplates(X x, String op, Object obj) {
+  public void checkPermissionTemplates(X x, String op, FObject obj) {
     AuthService authService = (AuthService) x.get("auth");
     DAO permissionTemplateDAO = (DAO) x.get("permissionTemplateReferenceDAO");
 
@@ -49,14 +54,14 @@ public class ExtendedConfigurableAuthorizer implements Authorizer {
 
     ArraySink permissionTemplates = (ArraySink) permissionTemplateDAO.where(predicate).select(new AbstractSink(){
       public void put(Object o, Detachable d) {
-        Permission permission = (Permission) createPermission(o, obj);
+        String permission = createPermission((PermissionTemplateReference) o, obj);
         if ( ! authService.check(x, permission) ) {
           ((foam.nanos.logger.Logger) x.get("logger")).debug("ExtendedConfigurableAuthorizer", "Permission denied", permission);
           throw new AuthorizationException();
         }
       }
     });
-  },
+  }
 
   public void authorizeOnCreate(X x, FObject obj) throws AuthorizationException {
     checkPermissionTemplates(x, "create", obj);
@@ -75,7 +80,7 @@ public class ExtendedConfigurableAuthorizer implements Authorizer {
   }
 
   public boolean checkGlobalRead(X x, Predicate predicate) {
-    String permission = daoKey + ".read.*";
+    String permission = daoKey_ + ".read.*";
     AuthService authService = (AuthService) x.get("auth");
     try {
       return authService.check(x, permission);
@@ -85,7 +90,7 @@ public class ExtendedConfigurableAuthorizer implements Authorizer {
   }
 
   public boolean checkGlobalRemove(X x) {
-    String permission = daoKey + ".remove.*";
+    String permission = daoKey_ + ".remove.*";
     AuthService authService = (AuthService) x.get("auth");
     try {
       return authService.check(x, permission);

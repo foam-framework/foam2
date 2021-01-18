@@ -8,8 +8,6 @@ foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'PermissionTemplateReference',
 
-  requires: ['java.util.ArrayList'],
-
   documentation: `Used to construct permission templates for services using the ExtendedConfigurableAuthorizer.
     Also facilitates the use of the authorizer using references to values defined on the authorizer.
     Services using the ExtendedConfigurableAuthorizer will be able to adjust authorization permissions on runtime.
@@ -28,6 +26,8 @@ foam.CLASS({
   imports: [
     'nSpecDAO'
   ],
+
+  javaImports: ['java.util.ArrayList'],
 
   properties: [
     {
