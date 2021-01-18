@@ -546,9 +546,9 @@ foam.CLASS({
       transient: true,
       documentation: 'Directory of where files are stored after hashing',
       expression: function(root) {
-        return root + '/files';
+        return root + '/largefiles';
       },
-      javaFactory: 'return File.separator + "files";'
+      javaFactory: 'return File.separator + "largefiles";'
     },
     {
       class: 'Boolean',
