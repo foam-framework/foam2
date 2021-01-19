@@ -122,6 +122,9 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
         // Manually grab the direct  prereqs to the  MinMaxCapability
         for ( int i = prereqs.length - 1 ; i >= 0 ; i-- ) {
           var prereqGrantPath = this.getCapabilityPath(x, prereqs[i], filterGrantedUCJ);
+          
+          // remove prereqs that are already listed
+          prereqGrantPath.removeIf(c -> { return alreadyListed.contains(((Capability) c).getId()); });
 
           // Essentially we reserve arrays to denote  ANDs and ORs, must be at least 2  elements
           if ( prereqGrantPath.size() > 1 ) minMaxArray.add(prereqGrantPath);
