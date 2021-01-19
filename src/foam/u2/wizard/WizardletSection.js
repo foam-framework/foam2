@@ -86,7 +86,7 @@ foam.CLASS({
         var isAvailable$ = this.section.createIsAvailableFor(this.data$);
         proxy$.delegate = isAvailable$;
       };
-      this.data$.sub(f);
+      this.onDetach(this.data$.sub(f));
       f();
       return this;
     },
