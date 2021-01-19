@@ -10,18 +10,18 @@ foam.CLASS({
 
   documentation: `Used to construct permission templates for services using the ExtendedConfigurableAuthorizer.
     Also facilitates the use of the authorizer using references to values defined on the authorizer.
-    Services using the ExtendedConfigurableAuthorizer will be able to adjust authorization permissions on runtime.
+    Services using the ExtendedConfigurableAuthorizer will be able to adjust authorization permissions on runtime using these class objects.
     The authorizer constructs a permission using this class object to check against the object attempting to be authorized.
-    properties defined on this class object allows for grouped permissioning. 
+    Properties defined on this class object allows for grouped permissioning. 
 
     Example:
-      A PermissionTemplateReference with a daokey of ['userDAO'], operation 'read' and properties ['language', 'firstName'] would check those properties 
+      A PermissionTemplateReference with a daokey of ['userDAO'], operation "read" and properties ['language', 'firstName'] would check those properties 
       against an object attempting to be authorized.
-      In this case the userDAO would permit the user to the mentioned permission access to all users that reference the properties defined on the template.
-      The requestor may have the following permission 'userDAO.read.en.john' granting access to users with the values defined in the permissions brackets.
+      In this case the userDAO would permit the user access to all users that match its property values to the permissions available to the requestor.
+      The requestor may have the following permission 'userDAO.read.en.john' granting access to users with the values defined on the permission.
 
-      ** Ranges are not currently supported, conflicts arise if property values conflict. Can be resolved by extended both the granted permission and template reference
-      to account for the property and value.
+      ** Ranges are not supported, conflicts arise if property values conflict. Can be resolved by extending both permission segments to include expected permissions and template reference
+      to account for the objects property and value. Currently only the property is referenced and is translated to a value which constructs the permission to check against the requestors permission list.
   `,
 
   imports: [

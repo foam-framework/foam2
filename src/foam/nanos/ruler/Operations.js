@@ -33,7 +33,7 @@ foam.ENUM({
     {
       name: 'READ',
       label: 'Read',
-      documentation: 'Opertaion to read on dao.find'
+      documentation: 'Operation to read on dao.find'
     }
   ]
 });

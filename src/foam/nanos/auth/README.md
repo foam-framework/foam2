@@ -88,6 +88,15 @@ There are several different implementations of the `Authorizer` interface:
 * `ExtendedConfigurableAuthorizer`
   * Allows for grouped object access based on object values and templates configured. Templates reference a DAOKey array detailing when to apply to an authorizer, which also defines a DAOKey. A permission template further defines properties used to construct the permission string.
   * `ExtendedConfigurableAuthorizer` Provides runtime authorization updates through updates to PermissionTemplateReferences.
+  * The Authorizer requires configuration, if no permissionTemplateReferences are attributed to the authorizer, all requests to the service will be permitted.
+  * Example:
+    A PermissionTemplateReference with a daokey of [`"userDAO"`], operation `"read"` and properties [`"language"`, `"firstName"`] would construct a permission using the object attempting to be authorized.
+    In this case the userDAO would permit the requestor access to all users that match their property values to the permissions available to the requestor, in the form of the constructed permission.
+    The requestor may have the following permission `"userDAO.read.en.john"` granting access to users with the values en as their language and john as their firstName.
+  * Ranges are not supported. 
+  * Conflicts arise if property values can be the same. Example: firstName and lastName being defined as properties on a templateReference, there is no distinction between them when constructing the permission and may lead to unintentional authorization. 
+  
+  This can be resolved by extending both permission segments to expect object properties along with a value. Currently only the property is referenced and is translated to a value which constructs the permission to check against the requestors permission list.
 * `GlobalReadAuthorizer`
   * Almost identical to `StandardAuthorizer`, but performs no authorization checks to read data.
   * Useful when you have a DAO that contains data that should be readable by any user without permission, but you still want users to need permissions to create, update, or delete data.

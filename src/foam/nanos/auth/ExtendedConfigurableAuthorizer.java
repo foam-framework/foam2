@@ -10,12 +10,13 @@ import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.X;
 import foam.dao.AbstractSink;
+import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.AuthorizationException;
 import foam.nanos.ruler.Operations;
-import java.util.ArrayList;
+import java.util.List;
 
 import static foam.mlang.MLang.AND;
 import static foam.mlang.MLang.EQ;
@@ -24,8 +25,8 @@ import static foam.mlang.MLang.IN;
 public class ExtendedConfigurableAuthorizer implements Authorizer {
 
   // Configurable authorizer allowing the use of configurable permissions templates defined in permissionTemplateReferenceDAO. 
-  // Template references a DAOKey array detailing when to apply to authorizer.
-  // Allows for grouped object access based on object values and templates configured.
+  // Templates reference DAOKeys detailing when to apply to an authorizer. An authorizer must define its own daoKey.
+  // Allows for grouped object access based on object values and template configuration.
   // Please see PermissionTemplateReference.js for additional documentation
 
   protected String daoKey_ = "";
@@ -52,15 +53,12 @@ public class ExtendedConfigurableAuthorizer implements Authorizer {
       EQ(PermissionTemplateReference.OPERATION, op)
     );
 
-    permissionTemplateDAO.where(predicate).select(new AbstractSink(){
-      public void put(Object o, Detachable d) {
-        String permission = createPermission((PermissionTemplateReference) o, obj);
-        if ( ! authService.check(x, permission) ) {
-          ((foam.nanos.logger.Logger) x.get("logger")).debug("ExtendedConfigurableAuthorizer", "Permission denied", permission);
-          throw new AuthorizationException();
-        }
-      }
-    });
+    // Check if user permissions match any of the template and object constructed permissions
+    List<PermissionTemplateReference> templates = ((ArraySink) permissionTemplateDAO.where(predicate).select(new ArraySink())).getArray();
+    if ( ! templates.stream().anyMatch(t -> authService.check(x, createPermission((PermissionTemplateReference) t, obj))) ) {
+      ((foam.nanos.logger.Logger) x.get("logger")).debug("ExtendedConfigurableAuthorizer", "Permission denied");
+      throw new AuthorizationException();
+    }
   }
 
   public void authorizeOnCreate(X x, FObject obj) throws AuthorizationException {
