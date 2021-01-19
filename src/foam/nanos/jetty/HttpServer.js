@@ -107,15 +107,10 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
       visibility: 'HIDDEN',
-      javaGetter: `
-        Logger logger = (Logger) getX().get("logger");
-        if ( logger == null ) {
-          logger = new StdoutLogger();
-        }
-
+      javaFactory: `
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
-        }, logger);
+        }, (Logger) getX().get("logger"));
       `
     }
   ],
@@ -123,6 +118,8 @@ foam.CLASS({
     {
       name: 'start',
       javaCode: `
+      clearLogger();
+
       try {
         int port = getPort();
         String portStr = System.getProperty("http.port");
