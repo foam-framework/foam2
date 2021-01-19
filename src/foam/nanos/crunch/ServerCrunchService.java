@@ -155,7 +155,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return grantPath;
   }
 
-  public String[] getDependantIds(X x, String capabilityId) {
+  public String[] getDependentIds(X x, String capabilityId) {
     return Arrays.stream(((CapabilityCapabilityJunction[]) ((ArraySink) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
       .where(EQ(CapabilityCapabilityJunction.TARGET_ID, capabilityId))
       .select(new ArraySink())).getArray()
@@ -184,32 +184,6 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       }
     }
     return prereqsCache_.get(capId);
-  }
-
-  // Return capability path for multiple prerequisites without duplicates.
-  public List getMultipleCapabilityPath(
-    X x, String[] capabilityIds, boolean filterGrantedUCJ
-  ) {
-    Set alreadyListed = new HashSet<String>();
-
-    List multiplePath = new ArrayList();
-
-    for ( String capId : capabilityIds ) {
-      List crunchyPath = getCapabilityPath(x, capId, filterGrantedUCJ);
-      for ( Object obj : crunchyPath ) {
-        Capability cap = null;
-        if ( obj instanceof List ) {
-          List list = (List) obj;
-          cap = (Capability) list.get(list.size() - 1);
-        } else {
-          cap = (Capability) obj;
-        }
-        if ( alreadyListed.contains(cap.getId()) ) continue;
-        multiplePath.add(obj);
-      }
-    }
-
-    return multiplePath;
   }
 
   public UserCapabilityJunction getJunction(X x, String capabilityId) {

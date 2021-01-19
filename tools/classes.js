@@ -471,6 +471,7 @@ var classes = [
   'foam.nanos.notification.email.ChainedPropertyService',
   'foam.nanos.notification.email.EmailTemplateApplyEmailPropertyService',
   'foam.nanos.notification.email.GroupEmailTemplateService',
+  'foam.nanos.notification.email.EmailConfig',
   'foam.nanos.notification.email.EmailConfigEmailPropertyService',
   // EmailMessageDAO(service) decorator
   'foam.nanos.notification.email.EmailServiceDAO',
@@ -724,7 +725,6 @@ var classes = [
   'foam.nanos.dig.exception.EmptyParameterException',
   'foam.nanos.dig.exception.GeneralException',
 
-  'foam.nanos.app.EmailConfig',
   'foam.nanos.app.SupportConfig',
 
   'foam.nanos.test.StockSnapshot',

@@ -218,6 +218,12 @@ foam.CLASS({
           }
         }
 
+        if ( getServiceProviderAware() ) {
+          delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX())
+            .setDelegate(delegate)
+            .build();
+        }
+
         delegate = getOuterDAO(delegate);
 
         if ( getDecorator() != null ) {
@@ -271,12 +277,6 @@ foam.CLASS({
 
         if ( getDeletedAware() ) {
           System.out.println("DEPRECATED: Will be completely removed after services journal migration script. No functionality as of now.");
-        }
-
-        if ( getServiceProviderAware() ) {
-          delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX())
-            .setDelegate(delegate)
-            .build();
         }
 
         if ( getRuler() ) {
