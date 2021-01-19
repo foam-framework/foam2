@@ -58,8 +58,8 @@ foam.CLASS({
       postSet: function(old, nu) {
         if ( ! nu ) return;
         foam.assert(
-            nu.of === this.to,
-            'Expect AdapterDAO.delegate.of === AdapterDAO.to');
+          nu.of === this.to,
+          'Expect AdapterDAO.delegate.of === AdapterDAO.to');
       }
     },
     {

@@ -16,7 +16,7 @@ import foam.nanos.pm.PM;
 import java.io.PrintWriter;
 import javax.servlet.http.HttpServletResponse;
 
-public class DigWebAgent
+public class DigWebAgent extends ContextAwareSupport
   implements WebAgent, SendErrorHandler
 {
   public DigWebAgent() {}
@@ -33,7 +33,7 @@ public class DigWebAgent
 
     try {
       // Find the operation
-      DigFormatDriver driver = DigFormatDriverFactory.create(x, format);
+      DigFormatDriver driver = DigFormatDriverFactory.create(getX(), format);
 
       if ( driver == null ) {
         DigUtil.outputException(x, new ParsingErrorException.Builder(x)
