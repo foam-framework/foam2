@@ -15,12 +15,13 @@ foam.CLASS({
     properties defined on this class object allows for grouped permissioning. 
 
     Example:
-      A PermissionTemplateReference with a daokey of ['userDAO'], operation 'read' and properties ['enabled','birthday'] would check those properties 
+      A PermissionTemplateReference with a daokey of ['userDAO'], operation 'read' and properties ['language', 'firstName'] would check those properties 
       against an object attempting to be authorized.
       In this case the userDAO would permit the user to the mentioned permission access to all users that reference the properties defined on the template.
-      The requestor may have the following permission 'userDAO.read.enabled{true}.language{en}' granting access to users with the values defined in the permissions brackets.
+      The requestor may have the following permission 'userDAO.read.en.john' granting access to users with the values defined in the permissions brackets.
 
-    ** Ranges are not currently supported.
+      ** Ranges are not currently supported, conflicts arise if property values conflict. Can be resolved by extended both the granted permission and template reference
+      to account for the property and value.
   `,
 
   imports: [
