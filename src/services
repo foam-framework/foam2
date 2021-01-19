@@ -118,6 +118,7 @@ p({
       .setPm(true)
       .setInnerDAO(x.get("localUserDAO"))
       .setOf(foam.nanos.auth.User.getOwnClassInfo())
+      .setPermissioned(true)
       .setDecorator(
         new foam.dao.ValidatingDAO(x,
           new foam.nanos.auth.UserPasswordHashingDAO(x, new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.auth.User.getOwnClassInfo()).build()),
