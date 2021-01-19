@@ -95,7 +95,7 @@ foam.CLASS({
           isAvailable$: section.createIsAvailableFor(
             this.data$,
           )
-        }));
+        }).activateProxySlot());
       }
     },
     {
