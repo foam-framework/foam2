@@ -17,6 +17,7 @@ foam.CLASS({
     'foam.nanos.fs.File',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'foam.nanos.logger.StdoutLogger',
     'foam.nanos.jetty.JettyThreadPoolConfig',
     'java.io.ByteArrayInputStream',
     'java.io.ByteArrayOutputStream',
@@ -106,10 +107,15 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
       visibility: 'HIDDEN',
-      javaFactory: `
+      javaGetter: `
+        Logger logger = (Logger) getX().get("logger");
+        if ( logger == null ) {
+          logger = new StdoutLogger();
+        }
+
         return new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
-        }, (Logger) getX().get("logger"));
+        }, logger);
       `
     }
   ],
