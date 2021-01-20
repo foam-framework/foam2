@@ -324,6 +324,8 @@ foam.CLASS({
         this.dao.select(this.COUNT()).then((count) => {
           // This will need scalability testing (eg: 1mil items)
           this.totalCount = count.value;
+          //to init resultsCount
+          this.resultsCount = count.value;
         });
       }
     },
