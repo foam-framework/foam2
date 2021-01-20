@@ -464,21 +464,6 @@ foam.CLASS({
           var view = this;
           view.props = this.returnPropertiesForColumns(view, view.columns_);
 
-          if ( this.memento && this.memento.paramsObj.c ) {
-            var columns = this.memento.paramsObj.c.split(',');
-            for ( var c of columns ) {
-              if ( this.shouldColumnBeSorted(c) && ! c.includes('.')) {
-                var prop = view.props.find(p => p.fullPropertyName === c.substr(0, c.length - 1) );
-                if ( prop ) {
-                  if ( c[c.length - 1] === this.DESCENDING_ORDER_CHAR )
-                    dao = dao.orderBy(this.DESC(prop.property));
-                  else
-                    dao = dao.orderBy(prop.property);
-                }
-              }
-            }
-          }
-
           var actions = {};
           var actionsMerger = action => { actions[action.name] = action; };
 
@@ -489,7 +474,7 @@ foam.CLASS({
 
           //with this code error created  slot.get cause promise return
           //FIX ME
-          return this.slot(function(data, data$delegate, order, updateValues) {
+          var slot = this.slot(function(data, data$delegate, order, updateValues) {
             // Make sure the DAO set here responds to ordering when a user clicks
             // on a table column header to sort by that column.
             if ( this.order ) dao = dao.orderBy(this.order);
@@ -673,6 +658,22 @@ foam.CLASS({
 
               return tbodyElement;
             });
+
+            if ( this.memento && this.memento.paramsObj.c ) {
+              var columns = this.memento.paramsObj.c.split(',');
+              for ( var c of columns ) {
+                if ( this.shouldColumnBeSorted(c) && ! c.includes('.')) {
+                  var prop = view.props.find(p => p.fullPropertyName === c.substr(0, c.length - 1) );
+                  if ( prop ) {
+                    if ( c[c.length - 1] === this.DESCENDING_ORDER_CHAR )
+                      dao = dao.orderBy(this.DESC(prop.property));
+                    else
+                      dao = dao.orderBy(prop.property);
+                  }
+                }
+              }
+            }
+          return slot;
         }
       },
       function returnRecords(of, dao, propertyNamesToQuery, useProjection) {
