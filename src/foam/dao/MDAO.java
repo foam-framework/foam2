@@ -242,4 +242,14 @@ public class MDAO
     }
     return super.cmd_(x, cmd);
   }
+
+  synchronized Object now() {
+    return state_;
+  }
+
+  Object when(Object state) {
+    MDAO newMDAO = new MDAO(getOf());
+    newMDAO.setState(state);
+    return newMDAO;
+  }
 }
