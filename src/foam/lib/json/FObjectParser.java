@@ -17,7 +17,7 @@ public class FObjectParser
   private final static Map    map__      = new ConcurrentHashMap();
   private final static Parser instance__ = new FObjectParser();
 
-  public static Parser instance() { return instance__ == null  ? new ProxyParser() { public Parser getDelegate() { return instance__; } } : instance__; }
+  public static Parser instance() { return instance__ == null ? new ProxyParser() { public Parser getDelegate() { return instance__; } } : instance__; }
 
   /**
    * Implement the multiton pattern so we don't create the same

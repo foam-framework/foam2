@@ -79,8 +79,10 @@ foam.CLASS({
   imports: [ 'document', 'log' ],
 
   javaImports: [
+    'foam.core.PropertyInfo',
     'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'java.util.List'
   ],
 
   constants: [
@@ -455,7 +457,17 @@ foam.CLASS({
     {
       documentation: 'Wrap in PermissionedPropertiesDAO',
       class: 'Boolean',
-      name: 'permissioned'
+      name: 'permissioned',
+      javaFactory: `
+      List<PropertyInfo> props = this.getOf().getAxiomsByClass(PropertyInfo.class);
+      for ( PropertyInfo info : props ) {
+        if ( info.getWritePermissionRequired() ||
+             info.getReadPermissionRequired() ) {
+          return true;
+        }
+      }
+      return false;
+     `
     },
     {
       documentation: 'Add a validatingDAO decorator',
@@ -656,6 +668,7 @@ foam.CLASS({
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
+      /* deprecated */
       documentation: `More documentation in ServiceProviderAwareDAO.
 A map of class and PropertyInfos used by the ServiceProviderAwareDAO
 to traverse a hierarchy of models in search of a ServiceProviderAware

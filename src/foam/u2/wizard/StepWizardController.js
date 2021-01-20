@@ -205,6 +205,7 @@ foam.CLASS({
       });
     },
     function nextAvailable(pos, iter) {
+      if ( ! pos || ! iter ) return null;
       for ( let p = iter(pos) ; p != null ; p = iter(p) ) {
         let wizardlet = this.wizardlets[p.wizardletIndex]
         if ( ! wizardlet.isVisible ) continue;

@@ -87,7 +87,7 @@ foam.CLASS({
 
   /* ON MODEL */
   ^ .content-form {
-    width: 32vw;
+    width: 25vw;
   }
 
   /* ON ALL FOOTER TEXT */
