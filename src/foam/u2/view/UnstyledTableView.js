@@ -406,14 +406,19 @@ foam.CLASS({
                     function(c, i) { if ( i ) this.add(' / '); this.add(c); }
                   ).*/
                   callIf(isFirstLevelProperty && prop.sortable, function() {
+                    var currArrow = view.restingIcon;
                     this.on('click', function(e) {
                       view.sortBy(prop);
                       }).
                       callIf(prop.label !== '', function() {
                         this.start('img').attr('src', this.slot(function(order) {
-                          return prop === order ? view.ascIcon :
-                              ( view.Desc.isInstance(order) && order.arg1 === prop )
-                              ? view.descIcon : view.restingIcon;
+                          if ( prop === order ) {
+                            currArrow = view.ascIcon;
+                          } else {
+                            if ( view.Desc.isInstance(order) && order.arg1 === prop )
+                            currArrow = view.descIcon;
+                          }
+                          return currArrow;
                         }, view.order$)).end();
                     });
                   }).
@@ -666,9 +671,10 @@ foam.CLASS({
                   var prop = view.props.find(p => p.fullPropertyName === c.substr(0, c.length - 1) );
                   if ( prop ) {
                     if ( c[c.length - 1] === this.DESCENDING_ORDER_CHAR )
-                      dao = dao.orderBy(this.DESC(prop.property));
+                      this.order = this.DESC(prop.property);
                     else
-                      dao = dao.orderBy(prop.property);
+                      this.order = prop.property;
+                    dao = dao.orderBy(this.order);
                   }
                 }
               }
