@@ -77,7 +77,7 @@ foam.CLASS({
 
     ^query-bar {
       padding: 40px 16px;
-      align-items: flex-start;
+      align-items: flex-end;
       justify-content: flex-end;
     }
 
@@ -109,6 +109,9 @@ foam.CLASS({
 
     ^ .foam-u2-view-SimpleSearch .foam-u2-search-TextSearchView .foam-u2-tag-Input {
       width: 100%;
+      height: 34px;
+      border-radius: 0 5px 5px 0;
+      border: 1px solid;
     }
   `,
 
