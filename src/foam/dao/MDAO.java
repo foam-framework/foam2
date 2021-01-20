@@ -248,10 +248,8 @@ public class MDAO
   }
 
   Object when(Object state) {
-    synchronized ( state ) {
-      MDAO newMDAO = new MDAO(getOf());
-      newMDAO.setState(state);
-      return newMDAO;
-    }
+    MDAO newMDAO = new MDAO(getOf());
+    newMDAO.setState(state);
+    return newMDAO;
   }
 }
