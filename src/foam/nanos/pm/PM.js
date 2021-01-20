@@ -39,14 +39,12 @@ foam.CLASS({
     },
     {
       name: 'startTime',
-      class: 'Long',
-      factory: function() {
-        return Date.now();
-      },
-      javaFactory: `return System.currentTimeMillis();`
+      documentation: 'Start time of PM in milliseconds',
+      class: 'Long'
     },
     {
       name: 'endTime',
+      documentation: 'End time of PM in milliseconds',
       class: 'Long'
     },
     {
@@ -91,6 +89,26 @@ foam.CLASS({
     if ( pmLogger != null ) {
       pmLogger.log(this);
     }
+      `
+    },
+    {
+      name: 'logWithError',
+      documentation: 'Logs the PM after setting error status to true, and message to the provided message',
+      type: 'Void',
+      args: [
+        {
+          name: 'x',
+          type: 'X'
+        },
+        {
+          name: 'message',
+          type: 'String'
+        }
+      ],
+      javaCode: `
+      setIsError(true);
+      setErrorMessage(message);
+      log(x);
       `
     },
     {

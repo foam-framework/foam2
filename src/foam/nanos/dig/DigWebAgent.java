@@ -29,6 +29,8 @@ public class DigWebAgent extends ContextAwareSupport
     Logger              logger  = (Logger) x.get("logger");
     PM                  pm      = new PM(getClass(), command.getName() + '/' + format.getName());
 
+    pm.setStartTime(System.currentTimeMillis());
+
     logger = new PrefixLogger(new Object[] { this.getClass().getSimpleName() }, logger);
 
     try {
@@ -57,29 +59,35 @@ public class DigWebAgent extends ContextAwareSupport
     } catch (DigErrorMessage dem) {
       logger.error(dem);
       DigUtil.outputException(x, dem, format);
+      pm.setErrorMessage(dem.getMessage());
+      pm.setIsError(true);
     } catch (FOAMException fe) {
       logger.error(fe);
       DigUtil.outputFOAMException(x, fe, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, format);
+      pm.setErrorMessage(fe.getMessage());
+      pm.setIsError(true);
     } catch (Throwable t) {
       logger.error(t);
-      DigUtil.outputException(x, 
+      DigUtil.outputException(x,
           new GeneralException.Builder(x)
             .setStatus(String.valueOf(HttpServletResponse.SC_INTERNAL_SERVER_ERROR))
             .setMessage(t.getMessage())
             .setMoreInfo(t.getClass().getName())
-            .build(), 
+            .build(),
           format);
+      pm.setErrorMessage(t.getMessage());
+      pm.setIsError(true);
     } finally {
       pm.log(x);
     }
   }
 
   public void sendError(X x, int status, String message) {
-    DigUtil.outputException(x, 
+    DigUtil.outputException(x,
       new GeneralException.Builder(x)
         .setStatus(String.valueOf(status))
         .setMessage(message)
-        .build(), 
+        .build(),
       Format.JSON);
   }
 

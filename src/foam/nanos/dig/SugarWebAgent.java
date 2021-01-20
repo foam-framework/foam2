@@ -41,6 +41,7 @@ import foam.nanos.http.Format;
 import foam.nanos.http.HttpParameters;
 import foam.nanos.http.WebAgent;
 import foam.nanos.logger.Logger;
+import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
 
 public class SugarWebAgent
@@ -55,6 +56,9 @@ public class SugarWebAgent
     HttpParameters      p              = x.get(HttpParameters.class);
     String              data           = p.getParameter("data");
 
+    var pm = new PM(SugarWebAgent.class.getSimpleName(), "");
+    pm.setStartTime(System.currentTimeMillis());
+
     try {
       if ( SafetyUtil.isEmpty(data) ) {
         DigErrorMessage error = new GeneralException.Builder(x)
@@ -63,7 +67,7 @@ public class SugarWebAgent
         DigUtil.outputException(x, error, Format.JSON);
         return;
       }
-      
+
       PStream ps = new StringPStream(data);
       ParserContext psx = new ParserContextImpl();
       psx.set("X", x);
@@ -74,33 +78,22 @@ public class SugarWebAgent
       Map mapPostParam = (Map) psParse.value();
 
       String serviceName = (String) mapPostParam.get("service");
+      pm.setName("sugar" + serviceName);
       if ( SafetyUtil.isEmpty(serviceName) ) {
-        DigErrorMessage error = new GeneralException.Builder(x)
-          .setMessage("Empty Service Key")
-          .build();
-        DigUtil.outputException(x, error, Format.JSON);
-        return;
+        throw new RuntimeException("Empty Service Key");
       }
-      
+
       String methodName = (String) mapPostParam.get("method");
       if ( SafetyUtil.isEmpty(methodName) ) {
-        DigErrorMessage error = new GeneralException.Builder(x)
-          .setMessage("Empty Method Name")
-          .build();
-        DigUtil.outputException(x, error, Format.JSON);
-        return;
+        throw new RuntimeException("Empty Method Name");
       }
 
       String interfaceName = (String) mapPostParam.get("interfaceName");
-      Class class_ = null;
+      Class class_;
       try {
         class_ = Class.forName(interfaceName);
       } catch (Exception e) {
-          DigErrorMessage error = new GeneralException.Builder(x)
-            .setMessage("Can not find out service interface")
-            .build();
-          DigUtil.outputException(x, error, Format.JSON);
-          return;
+          throw new RuntimeException("Can not find out service interface");
       }
 
       // Check if the user is authorized to access the DAO.
@@ -109,73 +102,54 @@ public class SugarWebAgent
 
       // Check if service exists and is served.
       if ( nspec == null || ! nspec.getServe() ) {
-        DigErrorMessage error = new GeneralException.Builder(x)
-          .setMessage(String.format("Could not find service named '%s'", serviceName))
-          .build();
-        DigUtil.outputException(x, error, Format.JSON);
-        return;
+        throw new RuntimeException(String.format("Could not find service named '%s'", serviceName));
       }
 
       try {
         nspec.checkAuthorization(x);
       } catch (foam.nanos.auth.AuthorizationException e) {
-        DigUtil.outputException(x,
-          new foam.nanos.dig.exception.AuthorizationException.Builder(x)
-            .setMessage(e.getMessage())
-            .build(),
-          Format.JSON);
-        return;
+        throw new RuntimeException(e.getMessage());
       }
 
-      Class[] paramTypes = null; // for picked Method's parameters' types
-      Object  arglist[]  = null; // to store each parameters' values
-      String  paramName  = null;
+      Class[] paramTypes; // for picked Method's parameters' types
+      Object[] arglist; // to store each parameters' values
+      String  paramName;
 
-      if ( class_ != null ) {
-        Method method_[] = class_.getMethods();  // get Methods' List from the class
+      Method[] method_ = class_.getMethods();  // get Methods' List from the class
 
-        for ( int k = 0 ; k < method_.length ; k++ ) {
-          if ( method_[k].getName().equals(methodName) ) { //found picked Method
+      for (var method : method_) {
+        if (method.getName().equals(methodName)) { //found picked Method
 
-            logger.debug("service : " + serviceName);
-            logger.debug("methodName : " + method_[k].getName());
+          logger.debug("service : " + serviceName);
+          logger.debug("methodName : " + method.getName());
 
-            Parameter[] pArray = method_[k].getParameters();
-            paramTypes = new Class[pArray.length];
-            arglist    = new Object[pArray.length];
+          Parameter[] pArray = method.getParameters();
+          paramTypes = new Class[pArray.length];
+          arglist = new Object[pArray.length];
 
-            for ( int j = 0 ; j < pArray.length ; j++ ) { // checking the method's each parameter
-              paramTypes[j] = pArray[j].getType();
+          for (int j = 0; j < pArray.length; j++) { // checking the method's each parameter
+            paramTypes[j] = pArray[j].getType();
 
-              if ( ! pArray[j].isNamePresent() ) {
-                DigErrorMessage error = new GeneralException.Builder(x)
-                  .setMessage("IllegalArgumentException : Add a compiler argument (use javac -parameters)")
-                  .build();
-                DigUtil.outputException(x, error, Format.JSON);
-                return;
-              }
-              // the post method
-              paramName = pArray[j].getName();
-              logger.debug(pArray[j].getName() + " :   " + paramName);
-
-              // casting and setting according to parameters type
-              String typeName = pArray[j].getType().getCanonicalName();
-
-              if ( typeName.equals("foam.core.X") ) {
-                arglist[j] = x;
-              } else if ( paramName != null ) {
-                //post method
-                arglist[j] = mapPostParam.get(paramName);
-              } else {
-                DigErrorMessage error = new GeneralException.Builder(x)
-                  .setMessage("Empty Parameter values : " + pArray[j].getName())
-                  .build();
-                DigUtil.outputException(x, error, Format.JSON);
-                return;
-              }
+            if (!pArray[j].isNamePresent()) {
+              throw new RuntimeException("IllegalArgumentException : Add a compiler argument (use javac -parameters)");
             }
-            executeMethod(x, resp, out, class_, serviceName, methodName, paramTypes, arglist);
+            // the post method
+            paramName = pArray[j].getName();
+            logger.debug(pArray[j].getName() + " :   " + paramName);
+
+            // casting and setting according to parameters type
+            String typeName = pArray[j].getType().getCanonicalName();
+
+            if (typeName.equals("foam.core.X")) {
+              arglist[j] = x;
+            } else if (paramName != null) {
+              //post method
+              arglist[j] = mapPostParam.get(paramName);
+            } else {
+              throw new RuntimeException("Empty Parameter values : " + pArray[j].getName());
+            }
           }
+          executeMethod(x, resp, out, class_, serviceName, methodName, paramTypes, arglist);
         }
       }
 
@@ -184,6 +158,10 @@ public class SugarWebAgent
         .setMessage(e.toString())
         .build();
       DigUtil.outputException(x, error, Format.JSON);
+      pm.setIsError(true);
+      pm.setErrorMessage(e.getMessage());
+    } finally {
+      pm.log(x);
     }
   }
 
@@ -200,7 +178,7 @@ public class SugarWebAgent
       Outputter outputterJson = new Outputter(x).setPropertyPredicate(
         new AndPropertyPredicate(x, new PropertyPredicate[] {
           new ExternalPropertyPredicate(),
-          new NetworkPropertyPredicate(), 
+          new NetworkPropertyPredicate(),
           new PermissionedPropertyPredicate()}));
       outputterJson.setOutputDefaultValues(true);
       outputterJson.setOutputClassNames(true);
