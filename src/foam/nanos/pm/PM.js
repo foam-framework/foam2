@@ -40,7 +40,11 @@ foam.CLASS({
     {
       name: 'startTime',
       documentation: 'Start time of PM in milliseconds',
-      class: 'Long'
+      class: 'Long',
+      factory: function() {
+        return Date.now();
+      },
+      javaFactory: `return System.currentTimeMillis();`
     },
     {
       name: 'endTime',
