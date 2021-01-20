@@ -39,7 +39,7 @@ foam.CLASS({
             UserCapabilityJunction old = (UserCapabilityJunction) userCapabilityJunctionDAO.find(ucj.getId());
 
             if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED || ucj.getIsRenewable() ) return;
-            if ( old != null && ! old.getIsRenewable() && 
+            if ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && ! old.getIsRenewable() && 
               ( ( old.getData() == null && ucj.getData() == null ) || old.getData().equals(ucj.getData()) ) 
             ) return;
               
