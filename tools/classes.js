@@ -249,6 +249,7 @@ var classes = [
   'foam.nanos.auth.AccessDeniedException',
   'foam.nanos.auth.Authorizer',
   'foam.nanos.auth.AuthorizationDAO',
+  'foam.nanos.auth.ExtendedConfigurableAuthorizer',
   'foam.nanos.auth.AuthenticationException',
   'foam.nanos.auth.EnabledAware',
   'foam.nanos.auth.EnabledAwareDummy',
