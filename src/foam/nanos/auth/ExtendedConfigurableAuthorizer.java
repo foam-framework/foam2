@@ -6,10 +6,8 @@
 
 package foam.nanos.auth;
 
-import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.X;
-import foam.dao.AbstractSink;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.mlang.predicate.Predicate;

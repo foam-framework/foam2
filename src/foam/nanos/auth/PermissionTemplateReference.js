@@ -24,10 +24,6 @@ foam.CLASS({
       to account for the objects property and value. Currently only the property is referenced and is translated to a value which constructs the permission to check against the requestors permission list.
   `,
 
-  imports: [
-    'nSpecDAO'
-  ],
-
   javaImports: ['java.util.ArrayList'],
 
   properties: [
