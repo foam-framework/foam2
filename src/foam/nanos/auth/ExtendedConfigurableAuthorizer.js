@@ -35,6 +35,39 @@ foam.CLASS({
       name: 'DAOKey',
       documentation: `Defines the daokey segment of the permission pertaining to your service.
           Checked in permission templates and applied in authorizer.`
+    },
+    {
+      class: 'Boolean',
+      name: 'defaultAuthorization',
+      documentation: `Setting this to true will include daokey.read, daokey.update, daokey.remove 
+          permission checks in their respective operation call to maintain standard authorization logic.`
+    }
+  ],
+
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+          public ExtendedConfigurableAuthorizer(X x) {
+            setX(x);
+            DAO permissionTemplateDAO = (DAO) x.get("localPermissionTemplateReferenceDAO");
+            PermissionTemplateCache permissionTemplateCache = (PermissionTemplateCache) x.get("permissionTemplateCache");
+
+            Map<String, List> cachedTemplates = (Map<String, List>) permissionTemplateCache.getCache();
+
+            Predicate predicate = (Predicate) AND(
+              IN(getDAOKey(), PermissionTemplateReference.DAO_KEYS)
+            );
+    
+            List<PermissionTemplateReference> templates = ((ArraySink) permissionTemplateDAO.where(predicate).select(new ArraySink())).getArray();
+            cachedTemplates.put(getDAOKey(), templates);
+            permissionTemplateCache.setCache(cachedTemplates);
+            x.put("permissionTemplateCache", permissionTemplateCache);
+          }
+        `
+        );
+      }
     }
   ],
 
@@ -65,21 +98,41 @@ foam.CLASS({
       ],
       documentation: `Check if user permissions match any of the template and object constructed permissions`,
       javaCode:  `
+        PermissionTemplateCache permissionTemplateCache = (PermissionTemplateCache) x.get("permissionTemplateCache");
         AuthService authService = (AuthService) x.get("auth");
-        DAO permissionTemplateDAO = (DAO) x.get("localPermissionTemplateReferenceDAO");
 
-        Predicate predicate = (Predicate) AND(
-          IN(getDAOKey(), PermissionTemplateReference.DAO_KEYS),
-          EQ(PermissionTemplateReference.OPERATION, op)
-        );
-
-        List<PermissionTemplateReference> templates = ((ArraySink) permissionTemplateDAO.where(predicate).select(new ArraySink())).getArray();
+        List<PermissionTemplateReference> templates = (List<PermissionTemplateReference>) permissionTemplateCache.getPermissionListOf(getDAOKey());
         if ( ! templates.stream().anyMatch(t -> authService.check(x, createPermission((PermissionTemplateReference) t, obj))) ) {
           ((foam.nanos.logger.Logger) x.get("logger")).debug("ExtendedConfigurableAuthorizer", "Permission denied");
           throw new AuthorizationException();
         }
       `
     },
+    // {
+    //   name: 'checkPermissionTemplates',
+    //   type: 'Void',
+    //   args: [
+    //     { type: 'X', name: 'x' },
+    //     { type: 'Operations', name: 'op' },
+    //     { type: 'FObject', name: 'obj' }
+    //   ],
+    //   documentation: `Check if user permissions match any of the template and object constructed permissions`,
+    //   javaCode:  `
+    //     AuthService authService = (AuthService) x.get("auth");
+    //     DAO permissionTemplateDAO = (DAO) x.get("localPermissionTemplateReferenceDAO");
+
+    //     Predicate predicate = (Predicate) AND(
+    //       IN(getDAOKey(), PermissionTemplateReference.DAO_KEYS),
+    //       EQ(PermissionTemplateReference.OPERATION, op)
+    //     );
+
+    //     List<PermissionTemplateReference> templates = ((ArraySink) permissionTemplateDAO.where(predicate).select(new ArraySink())).getArray();
+    //     if ( ! templates.stream().anyMatch(t -> authService.check(x, createPermission((PermissionTemplateReference) t, obj))) ) {
+    //       ((foam.nanos.logger.Logger) x.get("logger")).debug("ExtendedConfigurableAuthorizer", "Permission denied");
+    //       throw new AuthorizationException();
+    //     }
+    //   `
+    // },
     {
       name: 'authorizeOnCreate',
       javaCode: `

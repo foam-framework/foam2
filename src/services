@@ -595,6 +595,8 @@ p({
       .setOf(foam.nanos.auth.PermissionTemplateReference.getOwnClassInfo())
       .setGuid(true)
       .setPm(true)
+      .setDecorator(new foam.nanos.auth.CachePermissionTemplateDAO.Builder(x)
+          .setDelegate(new foam.dao.NullDAO(x, foam.nanos.auth.PermissionTemplateReference.getOwnClassInfo())))
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("permissionTemplateReferences")
       .build();
@@ -619,6 +621,15 @@ p({
       "of":"foam.nanos.auth.PermissionTemplateReference"
     }
   """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"permissionTemplateCache",
+  "lazy":false,
+  "service": { 
+    "class":"foam.nanos.auth.PermissionTemplateCache"
+  }
 })
 
 p({
