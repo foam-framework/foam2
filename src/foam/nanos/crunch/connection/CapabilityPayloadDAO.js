@@ -245,8 +245,7 @@ foam.CLASS({
         var ret =  find_(x, receivingCapPayload.getId());
         return ret;
       } catch(Throwable t) {
-        pm.setErrorMessage(t.getMessage());
-        pm.setIsError(true);
+        pm.error(x, t.getMessage());
         throw t;
       } finally {
         pm.log(x);

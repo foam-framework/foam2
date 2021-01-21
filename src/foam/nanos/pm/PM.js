@@ -54,7 +54,8 @@ foam.CLASS({
     {
       name: 'isError',
       class: 'Boolean',
-      value: false
+      value: false,
+      documentation: 'When true it marks this PM as already having been logged, subsequent logs with be ignored'
     },
     {
       name: 'errorMessage',

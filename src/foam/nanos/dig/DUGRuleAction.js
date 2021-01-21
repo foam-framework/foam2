@@ -61,8 +61,7 @@ foam.CLASS({
               sink.setX(x);
               sink.put(obj, null);
             } catch(Throwable t) {
-              pm.setErrorMessage(t.getMessage());
-              pm.setIsError(true);
+              pm.error(x, t.getMessage());
             } finally {
               pm.log(x);
             }

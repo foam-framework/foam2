@@ -57,13 +57,11 @@ public class DigWebAgent extends ContextAwareSupport
     } catch (DigErrorMessage dem) {
       logger.error(dem);
       DigUtil.outputException(x, dem, format);
-      pm.setErrorMessage(dem.getMessage());
-      pm.setIsError(true);
+      pm.error(x, dem.getMessage());
     } catch (FOAMException fe) {
       logger.error(fe);
       DigUtil.outputFOAMException(x, fe, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, format);
-      pm.setErrorMessage(fe.getMessage());
-      pm.setIsError(true);
+      pm.error(x, fe.getMessage());
     } catch (Throwable t) {
       logger.error(t);
       DigUtil.outputException(x,
@@ -73,8 +71,7 @@ public class DigWebAgent extends ContextAwareSupport
             .setMoreInfo(t.getClass().getName())
             .build(),
           format);
-      pm.setErrorMessage(t.getMessage());
-      pm.setIsError(true);
+      pm.error(x, t.getMessage());
     } finally {
       pm.log(x);
     }

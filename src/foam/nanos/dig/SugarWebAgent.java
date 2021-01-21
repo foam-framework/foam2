@@ -157,8 +157,7 @@ public class SugarWebAgent
         .setMessage(e.toString())
         .build();
       DigUtil.outputException(x, error, Format.JSON);
-      pm.setIsError(true);
-      pm.setErrorMessage(e.getMessage());
+      pm.error(x, e.getMessage());
     } finally {
       pm.log(x);
     }
