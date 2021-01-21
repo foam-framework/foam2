@@ -41,6 +41,11 @@ foam.CLASS({
     'data'
   ],
 
+  messages: [
+    { name: 'VIEW_TITLE_USER', message: 'Users' },
+    { name: 'VIEW_TITLE_CAP', message: 'Capabilities' }
+  ],
+
   sections: [
     { name: 'ucjExpirySection' }
   ],
@@ -59,16 +64,23 @@ foam.CLASS({
       name: 'sourceId',
       label: 'User',
       includeInDigest: true,
-      view: function(_, X) {
+      view: function(_, x) {
         return {
-          class: 'foam.u2.view.RichChoiceView',
-          search: true,
-          sections: [
-            {
-              heading: 'Users',
-              dao: X.userDAO
-            }
-          ]
+          class: 'foam.u2.view.ModeAltView',
+          readView: {
+            class: 'foam.u2.view.ReadReferenceView',
+            of: 'foam.nanos.auth.User'
+          },
+          writeView: {
+            class: 'foam.u2.view.RichChoiceView',
+            search: true,
+            sections: [
+              {
+                heading: x.data.VIEW_TITLE_USER,
+                dao: x.userDAO
+              }
+            ]
+          }
         };
       }
     },
@@ -80,14 +92,21 @@ foam.CLASS({
       includeInDigest: true,
       view: function(_, X) {
         return {
-          class: 'foam.u2.view.RichChoiceView',
-          search: true,
-          sections: [
-            {
-              heading: 'Capabilities',
-              dao: X.capabilityDAO
-            }
-          ]
+          class: 'foam.u2.view.ModeAltView',
+          readView: {
+            class: 'foam.u2.view.ReadReferenceView',
+            of: 'foam.nanos.crunch.Capability'
+          },
+          writeView: {
+            class: 'foam.u2.view.RichChoiceView',
+            search: true,
+            sections: [
+              {
+                heading: X.data.VIEW_TITLE_CAP,
+                dao: X.capabilityDAO
+              }
+            ]
+          }
         };
       },
       tableCellFormatter: function(value, obj, axiom) {
