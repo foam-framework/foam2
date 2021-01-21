@@ -124,7 +124,12 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
           var prereqGrantPath = this.getCapabilityPath(x, prereqs[i], filterGrantedUCJ);
           
           // remove prereqs that are already listed
-          prereqGrantPath.removeIf(c -> { return alreadyListed.contains(((Capability) c).getId()); });
+          prereqGrantPath.removeIf(c -> {
+            if (  c instanceof List ){
+              return false;
+            }       
+            return alreadyListed.contains(((Capability) c).getId());
+          });
 
           // Essentially we reserve arrays to denote  ANDs and ORs, must be at least 2  elements
           if ( prereqGrantPath.size() > 1 ) minMaxArray.add(prereqGrantPath);

@@ -47,8 +47,8 @@ public class DAOPMLogger
     }
 
     // Candlestick, too slow
-    // foam.dao.DAO dao = (foam.dao.DAO) getX().get(PM_DAO_NAME);
-    // dao.put(pm);
+     foam.dao.DAO dao = (foam.dao.DAO) getX().get(PM_DAO_NAME);
+     dao.put(pm);
 
     // Regular PMInfo
     // TODO: could reuse the PMInfo by also using it as the lock object

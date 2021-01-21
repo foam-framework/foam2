@@ -39,6 +39,7 @@ foam.CLASS({
     },
     {
       name: 'startTime',
+      documentation: 'Start time of PM in milliseconds',
       class: 'Long',
       factory: function() {
         return Date.now();
@@ -47,12 +48,14 @@ foam.CLASS({
     },
     {
       name: 'endTime',
+      documentation: 'End time of PM in milliseconds',
       class: 'Long'
     },
     {
       name: 'isError',
       class: 'Boolean',
-      value: false
+      value: false,
+      documentation: 'When true it marks this PM as already having been logged, subsequent logs with be ignored'
     },
     {
       name: 'errorMessage',

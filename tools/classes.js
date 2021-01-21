@@ -950,9 +950,10 @@ var proxies = [
 var blacklist = [
   'foam.core.Property',
   'foam.mlang.predicate.Func',
+  'foam.nanos.controller.Memento',
   'foam.u2.AttrSlot',
   'foam.u2.RenderSink',
-  'foam.u2.ViewSpec',
+  'foam.u2.ViewSpec'
 ];
 
 module.exports = {
