@@ -13,24 +13,30 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'org.eclipse.jetty.http.pathmap.ServletPathSpec',
-    'org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter',
-    'org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest',
-    'org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse',
-    'org.eclipse.jetty.websocket.servlet.WebSocketCreator',
+    'foam.blob.Blob',
+    'foam.nanos.fs.File',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'foam.nanos.logger.StdoutLogger',
     'foam.nanos.jetty.JettyThreadPoolConfig',
+    'java.io.ByteArrayInputStream',
+    'java.io.ByteArrayOutputStream',
+    'java.io.FileInputStream',
+    'java.security.KeyStore',
     'java.util.Set',
     'java.util.HashSet',
     'java.util.Arrays',
+    'org.apache.commons.io.IOUtils',
+    'org.eclipse.jetty.http.pathmap.ServletPathSpec',
     'org.eclipse.jetty.server.*',
     'org.eclipse.jetty.server.handler.StatisticsHandler',
     'org.eclipse.jetty.util.ssl.SslContextFactory',
     'org.eclipse.jetty.util.thread.QueuedThreadPool',
-    'java.io.FileInputStream',
-    'java.security.KeyStore',
-    'org.apache.commons.io.IOUtils'
+    'org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter',
+    'org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest',
+    'org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse',
+    'org.eclipse.jetty.websocket.servlet.WebSocketCreator',
+    'static foam.mlang.MLang.EQ'
   ],
 
   properties: [
@@ -49,8 +55,10 @@ foam.CLASS({
       value: 443
     },
     {
+      name: 'keystoreFileName',
+      documentation: 'id of the keystore file in fileDAO',
       class: 'String',
-      name: 'keystorePath'
+      value: 'keystore'
     },
     {
       class: 'String',
@@ -110,6 +118,8 @@ foam.CLASS({
     {
       name: 'start',
       javaCode: `
+      clearLogger();
+
       try {
         int port = getPort();
         String portStr = System.getProperty("http.port");
@@ -291,21 +301,35 @@ foam.CLASS({
       ],
       javaCode: `
       foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+      foam.dao.DAO fileDAO = ((foam.dao.DAO) getX().get("fileDAO"));
 
       if ( this.getEnableHttps() ) {
 
-        FileInputStream is = null;
+        ByteArrayOutputStream os = null;
+        ByteArrayInputStream is = null;
         try {
           // 1. load the keystore to verify the keystore path and password.
           KeyStore keyStore = KeyStore.getInstance("JKS");
-          is = new FileInputStream(this.getKeystorePath());
+
+          File file = (File) fileDAO.find(getKeystoreFileName());
+          if ( file == null )
+            throw new java.io.FileNotFoundException("No keystore file is found in fileDAO");
+
+          Blob blob = file.getData();
+          if ( blob == null )
+            throw new java.io.FileNotFoundException("The keystore file is empty");
+
+          os = new ByteArrayOutputStream((int) file.getFilesize());
+          blob.read(os, 0, file.getFilesize());
+          is = new ByteArrayInputStream(os.toByteArray());
+
           keyStore.load(is, this.getKeystorePassword().toCharArray());
 
           // 2. enable https
           HttpConfiguration https = new HttpConfiguration();
           https.addCustomizer(new SecureRequestCustomizer());
           SslContextFactory sslContextFactory = new SslContextFactory();
-          sslContextFactory.setKeyStorePath(this.getKeystorePath());
+          sslContextFactory.setKeyStore(keyStore);
           sslContextFactory.setKeyStorePassword(this.getKeystorePassword());
 
           ServerConnector sslConnector = new ServerConnector(server,
@@ -316,15 +340,16 @@ foam.CLASS({
           server.addConnector(sslConnector);
 
         } catch ( java.io.FileNotFoundException e ) {
-          logger.error("No KeyStore file found at path: " + this.getKeystorePath(),
+          logger.error("Failed reading keystore", this.getKeystoreFileName(), e.getMessage(), 
                        "Please see: https://docs.google.com/document/d/1hXVdHjL8eASG2AG2F7lPwpO1VmcW2PHnAW7LuDC5xgA/edit?usp=sharing", e);
         } catch ( java.io.IOException e ) {
           logger.error("Invalid KeyStore file password, please make sure you have set the correct password.",
                        "Please see: https://docs.google.com/document/d/1hXVdHjL8eASG2AG2F7lPwpO1VmcW2PHnAW7LuDC5xgA/edit?usp=sharing", e);
         } catch ( Exception e ) {
-          logger.error("Error when enable the https.");
+          logger.error("Failed configuring https", e);
         } finally {
           IOUtils.closeQuietly(is);
+          IOUtils.closeQuietly(os);
         }
 
       }

@@ -541,4 +541,7 @@ FOAM_FILES([
   { name: "foam/nanos/iban/IBANInfo" },
   { name: "foam/nanos/iban/ValidationIBAN" },
   { name: "foam/nanos/iban/test/ValidationIBANTest" },
+
+  //notification
+  { name: "foam/nanos/crunch/TopLevelCapabilityStatusUpdateNotification" },
 ]);
