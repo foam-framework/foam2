@@ -8,16 +8,19 @@ foam.CLASS({
   package: 'foam.nanos.controller',
   name: 'Memento',
 
-  constants: {
-    SEPARATOR:    ':',
-    PARAMS_BEGIN: '{',
-    PARAMS_END:   '}',
+  constants: [
+    { name: 'SEPARATOR',    value: ':'},
+    { name: 'PARAMS_BEGIN', value: '{'},
+    { name: 'PARAMS_END',   value: '}'},
 
-    OUTPUTTER: foam.json.Outputter.create({
-      strict: false,
-      pretty: false
-    })
-  },
+    {
+      name: 'OUTPUTTER',
+      factory: function() { return foam.json.Outputter.create({
+        strict: false,
+        pretty: false
+      });}
+    }
+  ],
 
   properties: [
     {
