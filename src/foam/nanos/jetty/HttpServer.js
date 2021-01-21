@@ -186,9 +186,8 @@ foam.CLASS({
 
         String root = System.getProperty("nanos.webroot");
         if ( root == null ) {
-          root = "/webroot";
-          // root = this.getClass().getResource("/webroot/index.html").toExternalForm();
-          // root = root.substring(0, root.lastIndexOf("/"));
+          root = this.getClass().getResource("/webroot/error.html").toExternalForm();
+          root = root.substring(0, root.lastIndexOf("/"));
         }
 
         handler.setResourceBase(root);
