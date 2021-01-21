@@ -891,8 +891,6 @@ var classes = [
   'foam.i18n.ProxyTranslationService',
   'foam.i18n.LocaleTranslationService',
 
-  // Notification
-  'foam.nanos.crunch.TopLevelCapabilityStatusUpdateNotification',
 
   'foam.counter.Counter'
 ];
