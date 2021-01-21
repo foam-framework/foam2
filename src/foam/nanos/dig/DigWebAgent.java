@@ -29,8 +29,6 @@ public class DigWebAgent extends ContextAwareSupport
     Logger              logger  = (Logger) x.get("logger");
     PM                  pm      = new PM(getClass(), command.getName() + '/' + format.getName());
 
-    pm.setStartTime(System.currentTimeMillis());
-
     logger = new PrefixLogger(new Object[] { this.getClass().getSimpleName() }, logger);
 
     try {

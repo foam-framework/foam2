@@ -96,26 +96,6 @@ foam.CLASS({
       `
     },
     {
-      name: 'logWithError',
-      documentation: 'Logs the PM after setting error status to true, and message to the provided message',
-      type: 'Void',
-      args: [
-        {
-          name: 'x',
-          type: 'X'
-        },
-        {
-          name: 'message',
-          type: 'String'
-        }
-      ],
-      javaCode: `
-      setIsError(true);
-      setErrorMessage(message);
-      log(x);
-      `
-    },
-    {
       name: 'getTime',
       type: 'Long',
       javaCode: `

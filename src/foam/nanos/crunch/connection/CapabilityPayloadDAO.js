@@ -229,8 +229,7 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      var pm = new PM(CapabilityPayloadDAO.getOwnClassInfo().getId(), "capabilityPayloads.put");
-      pm.setStartTime(System.currentTimeMillis());
+      var pm = new PM(CapabilityPayloadDAO.getOwnClassInfo().getId(), "put");
 
       try {
         CapabilityPayload receivingCapPayload = (CapabilityPayload) obj;
@@ -244,7 +243,6 @@ foam.CLASS({
         processCapabilityList(x, grantPath, capabilityDataObjects, currentCapabilityDataObjects);
 
         var ret =  find_(x, receivingCapPayload.getId());
-        pm.setEndTime(System.currentTimeMillis());
         return ret;
       } catch(Throwable t) {
         pm.setErrorMessage(t.getMessage());

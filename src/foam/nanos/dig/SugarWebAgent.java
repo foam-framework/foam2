@@ -57,7 +57,6 @@ public class SugarWebAgent
     String              data           = p.getParameter("data");
 
     var pm = new PM(SugarWebAgent.class.getSimpleName(), "");
-    pm.setStartTime(System.currentTimeMillis());
 
     try {
       if ( SafetyUtil.isEmpty(data) ) {

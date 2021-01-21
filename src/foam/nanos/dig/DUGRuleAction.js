@@ -44,7 +44,7 @@ foam.CLASS({
         agency.submit(x, new ContextAgent() {
           @Override
           public void execute(X x) {
-            var pm = new PM(DUGRuleAction.getOwnClassInfo().getId(), "dugrule." + dugRule.getId() + "." + dugRule.getName());
+            var pm = new PM(DUGRuleAction.getOwnClassInfo().getId(), dugRule.getId(), dugRule.getName());
             try {
               HTTPSink sink = new HTTPSink(
                 dugRule.getUrl(),
