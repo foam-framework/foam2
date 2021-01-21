@@ -28,6 +28,7 @@ foam.CLASS({
     'foam.nanos.crunch.CrunchService',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.logger.Logger',
+    'foam.nanos.pm.PM',
     'foam.util.SafetyUtil',
     'java.util.ArrayList',
     'java.util.HashMap',
@@ -228,6 +229,9 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
+      var pm = new PM(CapabilityPayloadDAO.getOwnClassInfo().getId(), "put");
+
+      try {
         CapabilityPayload receivingCapPayload = (CapabilityPayload) obj;
         Map<String,FObject> capabilityDataObjects = (Map<String,FObject>) receivingCapPayload.getCapabilityDataObjects();
 
@@ -238,7 +242,14 @@ foam.CLASS({
         List grantPath = ((CrunchService) x.get("crunchService")).getGrantPath(x, receivingCapPayload.getId());
         processCapabilityList(x, grantPath, capabilityDataObjects, currentCapabilityDataObjects);
 
-        return find_(x, receivingCapPayload.getId());
+        var ret =  find_(x, receivingCapPayload.getId());
+        return ret;
+      } catch(Throwable t) {
+        pm.error(x, t.getMessage());
+        throw t;
+      } finally {
+        pm.log(x);
+      }
       `
     },
     {
