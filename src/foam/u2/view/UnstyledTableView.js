@@ -435,6 +435,7 @@ foam.CLASS({
                         editColumnView.selectColumnsExpanded = ! editColumnView.selectColumnsExpanded;
                     }).
                     tag(view.Image, { data: '/images/Icon_More_Resting.svg' }).
+                    addClass(view.myClass('vertDots')).
                     addClass(view.myClass('noselect'))
                     ;
                   }).
