@@ -38,5 +38,9 @@ foam.RELATIONSHIP({
   targetModel: 'foam.support.model.SupportEmail',
   forwardName: 'supportEmails',
   inverseName: 'user',
-  sourceProperty: { section: 'operationsInformation' }
+  sourceProperty: { 
+    section: 'operationsInformation',
+    order: 70,
+    gridColumns:6
+  }
 });
