@@ -44,6 +44,11 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Boolean',
+      name: 'enableHttp',
+      value: true
+    },
+    {
       class: 'Int',
       name: 'port',
       value: 8080
@@ -148,11 +153,13 @@ foam.CLASS({
         ConnectorStatistics stats = new ConnectorStatistics();
         org.eclipse.jetty.server.Server server =
           new org.eclipse.jetty.server.Server(threadPool);
-        ServerConnector connector = new ServerConnector(server);
-        connector.setPort(port);
-        connector.addBean(stats);
-        server.addConnector(connector);
 
+        if ( getEnableHttp() ) {
+          ServerConnector connector = new ServerConnector(server);
+          connector.setPort(port);
+          connector.addBean(stats);
+          server.addConnector(connector);
+        }
         StatisticsHandler statisticsHandler = new StatisticsHandler();
         statisticsHandler.setServer(server);
 
@@ -331,21 +338,22 @@ foam.CLASS({
             X resourceStorageX = getX().put(foam.nanos.fs.Storage.class,
               new ResourceStorage(System.getProperty("resource.journals.dir")));
             InputStream is = resourceStorageX.get(foam.nanos.fs.Storage.class).getInputStream(getKeystoreFileName());
-            if ( is == null ) {
-              throw new java.io.FileNotFoundException("Keystore not found. Resource: "+getKeystoreFileName());
-            }
-            baos = new ByteArrayOutputStream();
+            if ( is != null ) {
+              baos = new ByteArrayOutputStream();
  
-            byte[] buffer = new byte[8192];
-            int len;
- 
-            // read bytes from the input stream and store them in buffer
-            while ((len = is.read(buffer)) != -1) {
-              // write bytes from the buffer into output stream
-              baos.write(buffer, 0, len);
+              byte[] buffer = new byte[8192];
+              int len;
+              while ((len = is.read(buffer)) != -1) {
+                baos.write(buffer, 0, len);
+              }
+              bais = new ByteArrayInputStream(baos.toByteArray());
+            } else {
+              getLogger().warning("Keystore not found. Resource: "+getKeystoreFileName());
             }
-            bais = new ByteArrayInputStream(baos.toByteArray());
-          } else {
+          }
+          // Fall back to fileDAO if resource not found, this will
+          // occur when keystore updated/replaced in production.
+          if ( bais == null ) {
             File file = (File) fileDAO.find(getKeystoreFileName());
             if ( file == null ) {
               throw new java.io.FileNotFoundException("Keystore not found. File: "+getKeystoreFileName());
@@ -369,8 +377,9 @@ foam.CLASS({
           SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
           sslContextFactory.setKeyStore(keyStore);
           sslContextFactory.setKeyStorePassword(this.getKeystorePassword());
-          sslContextFactory.setWantClientAuth(true);
-          sslContextFactory.setNeedClientAuth(true);
+          // NOTE: Enabling these will fail self-signed certificate use.
+          // sslContextFactory.setWantClientAuth(true);
+          // sslContextFactory.setNeedClientAuth(true);
 
           ServerConnector sslConnector = new ServerConnector(server,
             new SslConnectionFactory(sslContextFactory, "http/1.1"),
