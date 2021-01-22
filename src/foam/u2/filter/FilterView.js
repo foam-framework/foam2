@@ -172,6 +172,11 @@ foam.CLASS({
       height: 80%;
       border-radius: 5px;
     }
+
+    ^float-result-count {
+      float: right;
+      padding-top: 8px;
+    }
   `,
 
   messages: [
@@ -314,7 +319,12 @@ foam.CLASS({
             }, self.generalSearchField$)
               .addClass(self.myClass('general-field'))
             .end()
-
+          .end()
+          .start()
+            .style({overflow: 'hidden'})
+            .add(this.filterController.slot(function (totalCount, resultsCount) {
+              return self.E().addClass(self.myClass('float-result-count')).add(`${resultsCount.toLocaleString(foam.locale)} of ${totalCount.toLocaleString(foam.locale)} selected`);
+            }))
           .end()
           .add(this.filterController.slot(function (criterias) {
             return self.E().start().addClass(self.myClass('container-drawer'))

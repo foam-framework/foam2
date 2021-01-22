@@ -10,7 +10,7 @@
   extends: 'foam.u2.Element',
 
   imports: [
-    'memento',
+    'memento?',
     'stack'
   ],
 
@@ -205,7 +205,7 @@
 
       if ( this.memento )
         this.currentMemento$ = this.memento.tail$;
-      else
+      else if ( this.memento != undefined )
         this.currentMemento$ = this.memento$;
     },
 

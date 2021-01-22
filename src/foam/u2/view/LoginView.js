@@ -87,7 +87,7 @@ foam.CLASS({
 
   /* ON MODEL */
   ^ .content-form {
-    width: 32vw;
+    width: 25vw;
   }
 
   /* ON ALL FOOTER TEXT */
@@ -211,8 +211,6 @@ foam.CLASS({
     function init() {
       // Use passed in values or default loginVariables defined on ApplicationControllers
       this.param.dao_ = !! this.param.dao_ ? this.param.dao_ : this.loginVariables.dao_;
-      this.param.group_ = !! this.param.group_ ? this.param.group_ : this.loginVariables.group_;
-      this.param.countryChoices_ = !! this.param.countryChoices_ ? this.param.countryChoices_ : this.loginVariables.countryChoices_;
       // Instantiating model based on mode_
       if ( this.mode_ === this.MODE1 ) {
         this.model = this.SignUp.create(this.param, this);

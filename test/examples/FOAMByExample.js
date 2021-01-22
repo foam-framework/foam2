@@ -1293,13 +1293,12 @@ var examples = [
       // In addition to class-inheritance, FOAM also supports
       // interfaces, which are a form of multiple-inheritance which
       // copy Axioms from another model.
-      var callOrder = '';
       foam.CLASS({
         name: 'SampleI',
         properties: [ 't1', 't2', 't3' ],
         methods: [
-          function tfoo() { console.log('ffoo'); callOrder += 'tfoo'; },
-          function tbar() { console.log('tbar'); callOrder += 'tbar'; }
+          function tfoo() { console.log('tfoo'); },
+          function tbar() { console.log('tbar'); }
         ]
       });
       foam.CLASS({
@@ -1307,8 +1306,8 @@ var examples = [
         implements: ['SampleI'],
         properties: [ 'p1', 'p2', 'p3' ],
         methods: [
-          function foo() { console.log('foo'); callOrder += 'foo'; },
-          function bar() { console.log('bar'); callOrder += 'bar'; }
+          function foo() { console.log('foo'); },
+          function bar() { console.log('bar'); }
         ]
       });
       var tt = ImplementsTest.create({p1:1, t1:2});
@@ -1317,7 +1316,6 @@ var examples = [
       console.log("Properties p1:", tt.p1, "t1:", tt.t1);
     },
     postTestCode: function() {
-      //toBeAssertedThat(callOrder).toEqual('tfoofoo');
     }
   },
   {

@@ -264,6 +264,16 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'choiceViewWithPlaceholder',
+      value: 'Yes',
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+        placeholder: 'placeholder',
+        choices: ['Yes', 'No', 'Maybe']
+      }
+    },
+    {
+      class: 'String',
       name: 'choiceViewWithValues',
       view: {
         class: 'foam.u2.view.ChoiceView',

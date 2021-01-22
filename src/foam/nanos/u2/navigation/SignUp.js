@@ -48,12 +48,6 @@ foam.CLASS({
       hidden: true
     },
     {
-      class: 'String',
-      name: 'group_',
-      documentation: `Group this user is going to be apart of.`,
-      hidden: true
-    },
-    {
       class: 'Boolean',
       name: 'isLoading_',
       documentation: `Condition to synchronize code execution and user response.`,
@@ -210,7 +204,6 @@ foam.CLASS({
             email: this.email,
             desiredPassword: this.desiredPassword,
             signUpToken: this.token_,
-            group: this.group_,
             language: this.defaultUserLanguage()
           }))
           .then(async (user) => {

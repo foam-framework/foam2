@@ -7,8 +7,9 @@
 foam.CLASS({
   package: 'foam.nanos.column',
   name: 'ColumnConfigToPropertyConverter',
-  documentation: `ColumnConfigToPropertyConverter gathers methods for converting (or mapping) property name to property if required 
+  documentation: `ColumnConfigToPropertyConverter gathers methods for converting (or mapping) property name to property if required
       and returns property and obj, which will return the proprty value on f function call`,
+
   javaImports: [
     'foam.core.ClassInfo',
     'foam.core.FObject',
@@ -19,6 +20,7 @@ foam.CLASS({
     'foam.util.StringUtil',
     'java.lang.reflect.Method'
   ],
+
   properties: [
     {
       name: 'columnHandler',
@@ -37,9 +39,11 @@ foam.CLASS({
       code: function(of, propNames) {
         var props = of.getAxiomsByClass(foam.core.Property);
         var allColumnNames = props.map(p => p.name);
+
         if ( ! propNames )
           return props.filter(p => ! p.networkTransient ).map(p => p.name);
-        return propNames.filter(n => { 
+
+        return propNames.filter(n => {
           return allColumnNames.includes(n.split('.')[0]) && ! this.returnProperty(of, n).networkTransient;
         });
       }
@@ -111,14 +115,15 @@ foam.CLASS({
           for ( var i = 0 ; i < propNames.length ; i++ ) {
             property = foam.String.isInstance(propNames[i])
             ? cls.getAxiomByName(propNames[i])
-            :  foam.Array.isInstance(propNames[i]) ? 
+            :  foam.Array.isInstance(propNames[i]) ?
             cls.getAxiomByName(propNames[i]) : propNames[i];
             if ( ! property )
               break;
             cls = property.of;
           }
-        } else
+        } else {
           property = propName;
+        }
         return property;
       },
       javaCode: `
@@ -185,7 +190,7 @@ foam.CLASS({
           for ( var i = 0 ; i < propNames.length ; i++ ) {
             property = foam.String.isInstance(propNames[i])
             ? cls.getAxiomByName(propNames[i])
-            :  foam.Array.isInstance(propNames[i]) ? 
+            :  foam.Array.isInstance(propNames[i]) ?
             cls.getAxiomByName(propNames[i]) : propNames[i];
             if ( ! property )
               break;
@@ -241,8 +246,10 @@ foam.CLASS({
     async function returnValueForPropertyName(x, of, propName, obj) {
       //returns property and value of the obj that corresponds to the property
       var columnPropertyVal = await this.returnPropertyAndObject(x, of, propName, obj);
+
       if ( foam.core.Reference.isInstance(columnPropertyVal.propertyValue) )
         return foam.nanos.column.ColumnPropertyValue.create({ propertyValue:columnPropertyVal.propertyValue, objValue: await columnPropertyVal.objValue[columnPropertyVal.propertyValue.name + '$find']});
+
       return foam.nanos.column.ColumnPropertyValue.create({ propertyValue:columnPropertyVal.propertyValue, objValue: columnPropertyVal.propertyValue.f(columnPropertyVal.objValue)});
     },
     function returnProperties(of, propNames) {
@@ -264,10 +271,9 @@ foam.CLASS({
       var labels = label.split(' / ');
       var names = [];
       var of = of;
-      for ( var i = 0; i < labels.length; i++ ) {
+      for ( var i = 0 ; i < labels.length ; i++ ) {
         var prop = of.getAxioms().find(a => a.label && a.label == labels[i]);
-        if ( !prop )
-          return '';
+        if ( ! prop ) return '';
         names.push(prop.name);
         of = prop.of;
       }
@@ -277,10 +283,9 @@ foam.CLASS({
       var names = name.split('.');
       var labels = [];
       var of = of;
-      for ( var i = 0; i < names.length; i++ ) {
+      for ( var i = 0 ; i < names.length ; i++ ) {
         var prop = of.getAxioms().find(a => a.name && a.name == names[i]);
-        if ( !prop )
-          return '';
+        if ( ! prop ) return '';
         labels.push(prop.label);
         of = prop.of;
       }
@@ -288,6 +293,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.nanos.column',

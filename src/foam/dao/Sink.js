@@ -553,15 +553,14 @@ for obj in array {
   delegate.put(obj as! foam_core_FObject, sub)
   if detached { break }
 }`,
-      javaCode: 'if ( getArray() == null ) setArray(new java.util.ArrayList());\n'
-        + 'java.util.Collections.sort(getArray(), getComparator());\n'
-        + 'foam.dao.Subscription sub = new foam.dao.Subscription();\n'
-        + 'for ( Object o : getArray() ) {\n'
-        + '  if ( sub.getDetached() ) {\n'
-        + '    break;\n'
-        + '  }\n'
-        + '  getDelegate().put(o, sub);\n'
-        + '}'
+      javaCode: `
+      if ( getArray() == null ) setArray(new java.util.ArrayList());
+      java.util.Collections.sort(getArray(), getComparator());
+      foam.dao.Subscription sub = new foam.dao.Subscription();
+      for ( Object o : getArray() ) {
+        if ( sub.getDetached() ) break;
+        getDelegate().put(o, sub);
+      }`
     },
     {
       name: 'remove',
