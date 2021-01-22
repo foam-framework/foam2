@@ -177,10 +177,6 @@ foam.CLASS({
       float: right;
       padding-top: 8px;
     }
-
-    ^hide-overflow {
-      overflow: hidden;
-    }
   `,
 
   messages: [
@@ -325,7 +321,7 @@ foam.CLASS({
             .end()
           .end()
           .start()
-            .addClass(this.myClass('hide-overflow'))
+            .style({overflow: 'hidden'})
             .add(this.filterController.slot(function (totalCount, resultsCount) {
               return self.E().addClass(self.myClass('float-result-count')).add(`${resultsCount.toLocaleString(foam.locale)} of ${totalCount.toLocaleString(foam.locale)} selected`);
             }))
