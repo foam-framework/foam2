@@ -85,8 +85,15 @@ foam.CLASS({
       `,
       postSet: function(_,n){
         if ( !n ){
-          // to cascade hiding all descendent wizardlets
           this.selectedData = [];
+
+          // to cascade hiding all descendent wizardlets
+          // TODO: investigate why this is still needed, 
+          // setting data to empty array should have made isAvailable automatically evaluate to false
+          this.choiceWizardlets.forEach(cw => {
+            cw.isAvailable = false
+          });
+
           this.isAvailablePromise =
             Promise.all(this.choiceWizardlets.map(cw => cw.isAvailablePromise))
               .then(() => { this.cancel(); });
