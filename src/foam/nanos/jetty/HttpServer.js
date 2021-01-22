@@ -128,7 +128,6 @@ foam.CLASS({
       javaCode: `
       clearLogger();
 
-      // TODO: don't listen on non-https port if https enabled.
       try {
         int port = getPort();
         String portStr = System.getProperty("http.port");
