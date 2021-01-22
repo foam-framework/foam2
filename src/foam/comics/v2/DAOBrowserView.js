@@ -77,8 +77,6 @@ foam.CLASS({
 
     ^query-bar {
       padding: 40px 16px;
-      align-items: flex-end;
-      justify-content: flex-end;
     }
 
     ^toolbar {
@@ -318,17 +316,19 @@ foam.CLASS({
                         });
                     })
                     .endContext()
-                    .startContext({ data: self })
-                      .start(self.EXPORT, { buttonStyle: 'SECONDARY' })
-                        .addClass(self.myClass('export'))
-                      .end()
-                      .start(self.IMPORT, { buttonStyle: 'SECONDARY', icon: 'images/export-arrow-icon.svg', css: {'transform': 'rotate(180deg)'} })
-                        .addClass(self.myClass('export'))
-                      .end()
-                      .start(self.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })
-                        .addClass(self.myClass('refresh'))
-                      .end()
-                    .endContext()
+                    .start()
+                      .startContext({ data: self })
+                        .start(self.EXPORT, { buttonStyle: 'SECONDARY' })
+                          .addClass(self.myClass('export'))
+                        .end()
+                        .start(self.IMPORT, { buttonStyle: 'SECONDARY', icon: 'images/export-arrow-icon.svg', css: {'transform': 'rotate(180deg)'} })
+                          .addClass(self.myClass('export'))
+                        .end()
+                        .start(self.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })
+                          .addClass(self.myClass('refresh'))
+                        .end()
+                      .endContext()
+                    .end()
                   .end();
               })
               .start(self.summaryView,{
