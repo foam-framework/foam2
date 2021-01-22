@@ -13,7 +13,8 @@ foam.CLASS({
     'foam.core.X',
     'foam.core.Detachable',
     'foam.core.X',
-    'foam.dao.AbstractSink'
+    'foam.dao.AbstractSink',
+    'foam.nanos.ruler.Operations'
   ],
 
   methods: [
@@ -32,11 +33,18 @@ foam.CLASS({
             PermissionTemplateReference[] references = (permissionTemplateReference[]) cache.get(obj.getDAOKey()); 
             PermissionTemplateReference reference = references.stream().filter(reference -> ((String) reference.getId()).equals(obj.getId())).findAny();
             if ( reference != null ) {
+              if ( reference.getOperation().equals(Operations.REMOVE) ) {
+                references.remove(reference);
+              } else {
+                references.remove(reference);
+                references.add(obj);
+              }
+            } else {
               references.add(obj);
-            } else if ( ! reference.equal(obj) ) {
-              // TODO:  Remove item from list and replace. 
             }
           }
+          cache.set(obj.getDAOKey(), references);
+          x.set("permissionTemplateCache", cache);
         } else {
           PermissionTemplateReference[] templates = (PermissionTemplateReferences[]) ((ArraySink) getDelegate().select(new ArraySink())).getArray();
           for ( PermissionTemplateReference template : templates ) {
@@ -47,8 +55,8 @@ foam.CLASS({
               newTemplateList.set(template.getDAOKey(), new PermissionTemplateReference[] { template });
             }
           }
+          x.set("permissionTemplateCache", newTemplateList);
         }
-        List<String, List> cache = (List<String, List>) permissionTemplateCache.getCache();
 
       `
     },
