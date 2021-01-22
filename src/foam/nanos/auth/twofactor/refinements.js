@@ -24,6 +24,7 @@ foam.CLASS({
       documentation: 'Two factor secret',
       networkTransient: true,
       section: 'systemInformation',
+      order: 80,
       gridColumns: 6
     }
   ]

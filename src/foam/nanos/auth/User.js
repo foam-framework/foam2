@@ -442,6 +442,17 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'businessName',
+      includeInDigest: false,
+      documentation: 'The name of the business associated with the User.',
+      width: 50,
+      section: 'businessInformation',
+      order: 15,
+      gridColumns: 6,
+      tableWidth: 170
+    },
+    {
+      class: 'String',
       name: 'department',
       includeInDigest: false,
       containsPII: false,
@@ -477,11 +488,52 @@ foam.CLASS({
         };
       }
     },
-
-
-
-
-
+    {
+      class: 'StringArray',
+      name: 'disabledTopics',
+      includeInDigest: false,
+      documentation: 'Disables types for notifications.',
+      createVisibility: 'HIDDEN',
+      section: 'operationsInformation',
+      order: 80,
+      gridColumns: 6,
+      javaPostSet: `
+        clearDisabledTopicSet();
+      `
+    },
+    {
+      class: 'foam.core.Enum',
+      of: 'foam.nanos.auth.LifecycleState',
+      name: 'lifecycleState',
+      includeInDigest: true,
+      section: 'systemInformation',
+      order: 40,
+      gridColumns: 6,
+      value: foam.nanos.auth.LifecycleState.PENDING,
+      writePermissionRequired: true
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
+      name: 'spid',
+      includeInDigest: true,
+      tableWidth: 120,
+      section: 'systemInformation',
+      order: 50,
+      gridColumns: 6,
+      writePermissionRequired:true,
+      documentation: `
+        Need to override getter to return "" because its trying to
+        return null (probably as a result of moving order of files
+        in nanos), which breaks tests
+      `,
+      javaGetter: `
+        if ( ! spidIsSet_ ) {
+          return "";
+        }
+        return spid_;
+      `
+    },
     {
       class: 'Boolean',
       name: 'enabled',
@@ -489,6 +541,7 @@ foam.CLASS({
       value: true,
       includeInDigest: true,
       section: 'systemInformation',
+      order: 90,
       gridColumns: 6
     },
     {
@@ -506,25 +559,10 @@ foam.CLASS({
       `,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'userInformation',
+      section: 'systemInformation',
+      order: 100,
       gridColumns: 6
     },
-    {
-      class: 'StringArray',
-      name: 'disabledTopics',
-      includeInDigest: false,
-      documentation: 'Disables types for notifications.',
-      createVisibility: 'HIDDEN',
-      section: 'operationsInformation',
-      order: 80,
-      gridColumns: 6,
-      javaPostSet: `
-        clearDisabledTopicSet();
-      `
-    },
-    
-    
-    
     {
       class: 'Password',
       name: 'desiredPassword',
@@ -545,6 +583,7 @@ foam.CLASS({
       updateVisibility: 'RW',
       readVisibility: 'HIDDEN',
       section: 'systemInformation',
+      order: 110,
       gridColumns: 6
     },
     {
@@ -553,8 +592,17 @@ foam.CLASS({
       includeInDigest: true,
       documentation: 'The password that is currently active with the User.',
       hidden: true,
+      networkTransient: true
+    },
+    {
+      class: 'Password',
+      name: 'previousPassword',
+      includeInDigest: false,
+      documentation: 'The password that was previously active with the User.',
+      hidden: true,
       networkTransient: true,
-      section: 'systemInformation'
+      section: 'systemInformation',
+      order: 120
     },
     {
       name: 'passwordHistory',
@@ -570,29 +618,10 @@ foam.CLASS({
       `,
       hidden: true,
       networkTransient: true,
-      section: 'systemInformation',
       createVisibility: 'HIDDEN',
+      section: 'systemInformation',
+      order: 130,
       updateVisibility: 'RO'
-    },
-    {
-      class: 'Password',
-      name: 'previousPassword',
-      includeInDigest: false,
-      documentation: 'The password that was previously active with the User.',
-      hidden: true,
-      networkTransient: true,
-      section: 'systemInformation'
-    },
-    
-    {
-      class: 'String',
-      name: 'businessName',
-      includeInDigest: false,
-      documentation: 'The name of the business associated with the User.',
-      width: 50,
-      section: 'businessInformation',
-      gridColumns: 6,
-      tableWidth: 170
     },
     {
       class: 'Object',
@@ -608,40 +637,6 @@ foam.CLASS({
           set.add(s);
         }
         return set;
-      `
-    },
-    
-    {
-      class: 'foam.core.Enum',
-      of: 'foam.nanos.auth.LifecycleState',
-      name: 'lifecycleState',
-      includeInDigest: true,
-      section: 'systemInformation',
-      order: 20,
-      gridColumns: 6,
-      value: foam.nanos.auth.LifecycleState.PENDING,
-      writePermissionRequired: true
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.ServiceProvider',
-      name: 'spid',
-      includeInDigest: true,
-      tableWidth: 120,
-      section: 'systemInformation',
-      order: 15,
-      gridColumns: 6,
-      writePermissionRequired:true,
-      documentation: `
-        Need to override getter to return "" because its trying to
-        return null (probably as a result of moving order of files
-        in nanos), which breaks tests
-      `,
-      javaGetter: `
-        if ( ! spidIsSet_ ) {
-          return "";
-        }
-        return spid_;
       `
     }
   ],
@@ -856,7 +851,7 @@ foam.RELATIONSHIP({
   targetProperty: {
     hidden: false,
     section: 'systemInformation',
-    order: 10,
+    order: 30,
     gridColumns: 6
   }
 });
@@ -885,15 +880,13 @@ foam.RELATIONSHIP({
     createVisibility: 'HIDDEN',
     label: 'Businesses',
     section: 'businessInformation',
-    order: 50,
-    gridColumns: 6
+    order: 50
   },
   targetProperty: {
     createVisibility: 'HIDDEN',
     label: 'Agents of Business',
     section: 'businessInformation',
-    order: 40,
-    gridColumns: 6
+    order: 40
   }
 });
 
@@ -923,6 +916,7 @@ foam.RELATIONSHIP({
   },
   targetProperty: {
     section: 'systemInformation',
+    order: 60,
     gridColumns: 6
   }
 });
