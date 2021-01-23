@@ -515,11 +515,9 @@ foam.CLASS({
       view: {
         class: 'foam.u2.view.FObjectView',
         choices: [
-          [ 'foam.util.Timer', 'Timer' ],
-          [ 'foam.core.Property', 'Property' ],
-          [ 'foam.nanos.menu.DAOMenu',  'DAO'     ],
-          [ 'foam.nanos.menu.SubMenu',  'SubMenu' ],
-          [ 'foam.nanos.menu.TabsMenu', 'Tabs'    ]
+          [ 'foam.util.Timer',         'Timer' ],
+          [ 'foam.core.Property',      'Property' ],
+          [ 'foam.nanos.menu.DAOMenu', 'DAO' ]
         ]
       }
     },
