@@ -17,6 +17,10 @@ foam.CLASS({
     foam.pattern.Faceted.create()
   ],
 
+  topics: [
+    'clicked'
+  ],
+
   css: `
     ^selected {
       border-color: /*%PRIMARY3%*/ #406dea !important;
@@ -61,7 +65,12 @@ foam.CLASS({
       }
     },
     {
-      name: 'obj'
+      class: 'Boolean',
+      name: 'isSelected'
+    },
+    {
+      class: 'Boolean',
+      name: 'isDisabled'
     }
   ],
 
@@ -71,14 +80,10 @@ foam.CLASS({
       .addClass(this.myClass())
       .addClass(this.myClass('innerFlexer'))
       .start(this.CardBorder)
-        .enableClass(this.myClass('selected'), this.slot((data, mode) => {
-          return data && mode !== foam.u2.DisplayMode.DISABLED;
-        }))
-        .enableClass(this.myClass('disabled'), this.slot((data, mode) => {
-          return ! data && mode === foam.u2.DisplayMode.DISABLED;
-        }))
-        .enableClass(this.myClass('selected-disabled'), this.slot((data, mode) => {
-          return data && mode === foam.u2.DisplayMode.DISABLED;
+        .enableClass(this.myClass('selected'), this.isSelected$)
+        .enableClass(this.myClass('disabled'), this.isDisabled$)
+        .enableClass(this.myClass('selected-disabled'), this.slot((isSelected, isDisabled) => {
+          return isSelected  && isDisabled;
         }))
         .on('click', this.onClick)
         .add(this.label)
@@ -88,9 +93,7 @@ foam.CLASS({
 
   listeners: [
     function onClick() {
-      if ( this.mode !== foam.u2.DisplayMode.DISABLED ) {
-        this.data = ! this.data;
-      }
+      this.clicked.pub();
     }
   ]
 });
