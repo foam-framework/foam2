@@ -4,6 +4,11 @@ p({
   "lazy": false,
   "service": {
     "class": "foam.box.socket.SocketConnectionBoxManager",
+    "keyStorePath": "nanopay.jks",
+    "keyStorePass": "nanopay",
+    "trustStorePath": "nanopay.jks",
+    "trustStorePass": "nanopay",
+    "enableSSL": false
   }
 })
 
@@ -12,6 +17,11 @@ p({
   "name": "socketServer",
   "lazy": false,
   "service": {
-    "class": "foam.box.socket.SocketServer"
+    "class": "foam.box.socket.SocketServer",
+    "keyStorePath": "nanopay.jks",
+    "keyStorePass": "nanopay",
+    "trustStorePath": "nanopay.jks",
+    "trustStorePass": "nanopay",
+    "enableSSL": false
   }
 })
