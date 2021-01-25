@@ -400,8 +400,7 @@ foam.CLASS({
       displayWidth: 70,
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 },
       section: 'userInformation',
-      order: 240,
-      gridColumns: 6
+      order: 240
     },
     {
       class: 'DateTime',
