@@ -13,6 +13,10 @@ foam.CLASS({
     'foam.u2.crunch.CapabilityFeatureView'
   ],
 
+  imports: [
+    'memento'
+  ],
+
   css: `
     ^div {
       position: relative;
@@ -106,8 +110,11 @@ foam.CLASS({
           .start('button')
             .addClass(this.myClass('segment')).addClass('tiny')
             .add(capability.id)
-            .on('click', function() { 
-              window.location.href = `http://${location.host}/#admin.data:capabilityDAO:{sV:%22New%20Controller%22,c:[%22id%22,%22name%22,%22description%22]}:${capability.id}:{sV:%22Detail%22,c:[%22granted%22,%22id%22,%22description%22]}`;
+            .on('click', function() {
+              var menu = 'admin.data';
+              var dao = 'capabilityDAO';
+              var seperator = foam.nanos.controller.Memento.SEPARATOR;
+              self.memento.value = `${menu}${seperator}${dao}${seperator}${capability.id}`;
             })
           .end()
           .callIf(ucj !== null, function () {
@@ -127,7 +134,10 @@ foam.CLASS({
                 })
                 .add(ucj.status.label)
                 .on('click', function() {
-                  window.location.href = `http://${location.host}/#admin.data:userCapabilityJunctionDAO:{sV:%22New%20Controller%22}:${ucj.id}:{sV:%22Detail%22}`;
+                  var menu = 'admin.data';
+                  var dao = 'userCapabilityJunctionDAO';
+                  var seperator = foam.nanos.controller.Memento.SEPARATOR;
+                  self.memento.value = `${menu}${seperator}${dao}${seperator}${ucj.id}`;
                 })
               .end()
               ;
