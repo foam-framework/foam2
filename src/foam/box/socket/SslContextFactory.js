@@ -19,7 +19,8 @@ foam.CLASS({
     'java.io.IOException',
     'java.io.InputStream',
     'java.security.*',
-    'java.security.cert.CertificateException'
+    'java.security.cert.CertificateException',
+    'foam.nanos.fs.ResourceStorage'
   ],
   
   properties: [
@@ -149,7 +150,11 @@ foam.CLASS({
         KeyStore keyStore = null;
         try {
           //InputStream is = new FileInputStream(storePath);
-          InputStream is = getClass().getResourceAsStream(storePath);
+          //InputStream is = getClass().getResourceAsStream(storePath);
+          X resourceStorageX = getX().put(foam.nanos.fs.Storage.class,
+            new ResourceStorage(System.getProperty("resource.journals.dir")));
+          InputStream is = resourceStorageX.get(foam.nanos.fs.Storage.class).getInputStream(storePath);
+          
           keyStore = KeyStore.getInstance(getStoreType());
           keyStore.load(is, storePass == null ? null : storePass.toCharArray());
           is.close();

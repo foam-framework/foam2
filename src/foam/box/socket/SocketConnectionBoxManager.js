@@ -28,7 +28,11 @@ foam.CLASS({
     'java.net.Socket',
     'java.net.SocketAddress',
     'java.net.SocketException',
-    'java.net.SocketTimeoutException'
+    'java.net.SocketTimeoutException',
+    'javax.net.ssl.SSLSocket',
+    'javax.net.ssl.SSLSocketFactory',
+    'javax.net.ssl.SSLContext',
+    'javax.net.ssl.SSLSocket'
   ],
 
   properties: [
@@ -61,6 +65,27 @@ foam.CLASS({
           this.getClass().getSimpleName()
         }, (Logger) getX().get("logger"));
       `
+    },
+    {
+      class: 'String',
+      name: 'keyStorePath'
+    },
+    {
+      class: 'String',
+      name: 'keyStorePass'
+    },
+    {
+      class: 'String',
+      name: 'trustStorePath'
+    },
+    {
+      class: 'String',
+      name: 'trustStorePass'
+    },
+    {
+      class: 'Boolean',
+      name: 'enableSSL',
+      value: false
     }
   ],
 
@@ -150,7 +175,22 @@ foam.CLASS({
         }
 
         try {
-          Socket socket = new Socket();
+          Socket socket = null;
+          if ( getEnableSSL() ) {
+            SslContextFactory contextFactory = new SslContextFactory
+                                                    .Builder(x)
+                                                    .setKeyStorePath(getKeyStorePath())
+                                                    .setKeyStorePass(getKeyStorePass())
+                                                    .setTrustStorePath(getTrustStorePath())
+                                                    .setTrustStorePass(getTrustStorePass())
+                                                    .build();
+
+            SSLContext sslContext = contextFactory.getSSLContext();
+            socket = (SSLSocket)sslContext.getSocketFactory().createSocket(host, port);
+          } else {
+            socket = new Socket();
+          }
+          
           socket.setSoTimeout(getSoTimeout());
           SocketAddress address = new InetSocketAddress(host, port);
           socket.connect(address, getConnectTimeout());
