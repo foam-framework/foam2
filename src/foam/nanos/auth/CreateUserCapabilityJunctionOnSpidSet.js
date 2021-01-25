@@ -28,7 +28,13 @@ foam.CLASS({
     'foam.nanos.ruler.RuleAction'
   ],
 
-  documentation: 'Create a UserCapabilityJunction between User and ServiceProvider when spid is set on user create or update',
+  documentation: `
+    Create a UserCapabilityJunction between User and ServiceProvider when spid
+    is set on user create or update.
+
+    CreateUserCapabilityJunctionOnSpidSet should only be used with after rules
+    so the user object is saved before ucjs are created/updated.
+  `,
 
   javaImports: [
     'foam.core.ContextAgent',
@@ -42,6 +48,7 @@ foam.CLASS({
       name: 'applyAction',
       javaCode: `
         agency.submit(x, new ContextAgent() {
+          X systemX = ruler.getX();
           @Override
           public void execute(X x) {
             Logger logger = (Logger) x.get("logger");
@@ -59,8 +66,8 @@ foam.CLASS({
               return;
             }
 
-            sp.removeSpid(x, user);
-            sp.setupSpid(x, user);
+            sp.removeSpid(systemX, user);
+            sp.setupSpid(systemX, user);
           }
         }, "Create ucj on user spid set");
       `
