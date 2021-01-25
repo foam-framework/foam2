@@ -15,7 +15,7 @@ foam.CLASS({
       name: 'twoFactorEnabled',
       documentation: 'Two factor enabled flag',
       section: 'operationsInformation',
-      order: 15,
+      order: 50,
       gridColumns: 6
     },
     {
@@ -24,6 +24,7 @@ foam.CLASS({
       documentation: 'Two factor secret',
       networkTransient: true,
       section: 'systemInformation',
+      order: 80,
       gridColumns: 6
     }
   ]
