@@ -553,6 +553,7 @@ foam.RELATIONSHIP({
   inverseName: 'users',
   sourceProperty: {
     section: 'systemInformation',
+    order: 20,
     updateVisibility: 'RO'
   }
 });

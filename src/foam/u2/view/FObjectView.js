@@ -198,6 +198,7 @@ foam.CLASS({
       }
 
       var classToData = function(c) {
+        if ( ! c ) return undefined;
         var m = c && this.__context__.lookup(c, true);
         return m.create(this.data ? this.copyOldData(this.data) : null, this);
       }.bind(this);
@@ -230,10 +231,13 @@ foam.CLASS({
             return m != foam.u2.DisplayMode.HIDDEN;
           })).
         end().
-        tag(foam.u2.detail.VerticalDetailView, {
-          data$: this.data$,
-          config: this.config
-        });
+        start().
+          show(this.objectClass$).
+          tag(foam.u2.detail.VerticalDetailView, {
+            data$: this.data$,
+            config: this.config
+          }).
+        end();
     },
 
     function choicesFallback(of) {
