@@ -16,17 +16,25 @@ foam.CLASS({
     Please see PermissionTemplateReference.js for additional documentation`,
 
   javaImports: [
+  'foam.core.Detachable',
   'foam.core.FObject',
   'foam.core.X',
   'foam.dao.ArraySink',
   'foam.dao.DAO',
+  'foam.dao.Sink',
   'foam.mlang.predicate.Predicate',
   'foam.nanos.ruler.Operations',
+  'foam.nanos.session.Session',
+  'java.util.ArrayList',
   'java.util.List',
+  'java.util.Map',
+  'java.util.concurrent.ConcurrentHashMap',
 
-  'static foam.mlang.MLang.AND',
-  'static foam.mlang.MLang.EQ',
-  'static foam.mlang.MLang.IN'
+  'static foam.mlang.MLang.TRUE'
+  ],
+
+  constants: [
+    { name: 'CACHE_KEY', value: 'permissionTemplateCache' }
   ],
 
   properties: [
@@ -35,39 +43,6 @@ foam.CLASS({
       name: 'DAOKey',
       documentation: `Defines the daokey segment of the permission pertaining to your service.
           Checked in permission templates and applied in authorizer.`
-    },
-    {
-      class: 'Boolean',
-      name: 'defaultAuthorization',
-      documentation: `Setting this to true will include daokey.read, daokey.update, daokey.remove 
-          permission checks in their respective operation call to maintain standard authorization logic.`
-    }
-  ],
-
-  axioms: [
-    {
-      name: 'javaExtras',
-      buildJavaClass: function(cls) {
-        cls.extras.push(`
-          public ExtendedConfigurableAuthorizer(X x) {
-            setX(x);
-            DAO permissionTemplateDAO = (DAO) x.get("localPermissionTemplateReferenceDAO");
-            PermissionTemplateCache permissionTemplateCache = (PermissionTemplateCache) x.get("permissionTemplateCache");
-
-            Map<String, List> cachedTemplates = (Map<String, List>) permissionTemplateCache.getCache();
-
-            Predicate predicate = (Predicate) AND(
-              IN(getDAOKey(), PermissionTemplateReference.DAO_KEYS)
-            );
-    
-            List<PermissionTemplateReference> templates = ((ArraySink) permissionTemplateDAO.where(predicate).select(new ArraySink())).getArray();
-            cachedTemplates.put(getDAOKey(), templates);
-            permissionTemplateCache.setCache(cachedTemplates);
-            x.put("permissionTemplateCache", permissionTemplateCache);
-          }
-        `
-        );
-      }
     }
   ],
 
@@ -89,6 +64,62 @@ foam.CLASS({
       `
     },
     {
+      name: 'purgeCache',
+      args: [ {type: 'X', name: 'x' } ],
+      type: 'Void',
+      javaCode: `
+        Session session = x.get(Session.class);
+        session.setContext(session.getContext().put(CACHE_KEY, null));
+      `
+    },
+    {
+      name: 'getTemplateCache',
+      type: 'Map<String,List>',
+      args: [
+        { type: 'X', name: 'x' }
+      ],
+      javaCode:  `
+        Session session = x.get(Session.class);
+        Map<String, List> cache = (Map) session.getContext().get(CACHE_KEY);
+
+        if ( cache == null ) {
+          Sink purgeSink = new Sink() {
+            public void put(Object obj, Detachable sub) {
+              purgeCache(x);
+              sub.detach();
+            }
+            public void remove(Object obj, Detachable sub) {
+              purgeCache(x);
+              sub.detach();
+            }
+            public void eof() {
+            }
+            public void reset(Detachable sub) {
+              purgeCache(x);
+              sub.detach();
+            }
+          };
+
+          DAO permissionTemplateReferenceDAO = (DAO) x.get("localPermissionTemplateReferenceDAO");
+          permissionTemplateReferenceDAO.listen(purgeSink, TRUE);
+          cache = new ConcurrentHashMap<String, List>();
+          List<PermissionTemplateReference> templates = ((ArraySink) permissionTemplateReferenceDAO.select(new ArraySink())).getArray();
+          for ( var template : templates ) {
+            String[] daoKeys = template.getDaoKeys();
+            for ( var daoKey : daoKeys ) {
+              List<PermissionTemplateReference> references = cache.containsKey(daoKey) ?
+              cache.get(daoKey) : new ArrayList<PermissionTemplateReference>();
+              references.add(template);
+              cache.put(daoKey, references);
+            }
+          }
+          session.setContext(session.getContext().putFactory(CACHE_KEY, new SessionContextCacheFactory(cache)));
+        }
+    
+        return cache;
+      `
+    },
+    {
       name: 'checkPermissionTemplates',
       type: 'Void',
       args: [
@@ -98,41 +129,15 @@ foam.CLASS({
       ],
       documentation: `Check if user permissions match any of the template and object constructed permissions`,
       javaCode:  `
-        PermissionTemplateCache permissionTemplateCache = (PermissionTemplateCache) x.get("permissionTemplateCache");
         AuthService authService = (AuthService) x.get("auth");
-
-        List<PermissionTemplateReference> templates = (List<PermissionTemplateReference>) permissionTemplateCache.getPermissionListOf(getDAOKey());
+        Map<String,List> cache = (Map<String,List>) getTemplateCache(x);
+        List<PermissionTemplateReference> templates = (List<PermissionTemplateReference>) cache.get(getDAOKey());
         if ( ! templates.stream().anyMatch(t -> authService.check(x, createPermission((PermissionTemplateReference) t, obj))) ) {
           ((foam.nanos.logger.Logger) x.get("logger")).debug("ExtendedConfigurableAuthorizer", "Permission denied");
           throw new AuthorizationException();
         }
       `
     },
-    // {
-    //   name: 'checkPermissionTemplates',
-    //   type: 'Void',
-    //   args: [
-    //     { type: 'X', name: 'x' },
-    //     { type: 'Operations', name: 'op' },
-    //     { type: 'FObject', name: 'obj' }
-    //   ],
-    //   documentation: `Check if user permissions match any of the template and object constructed permissions`,
-    //   javaCode:  `
-    //     AuthService authService = (AuthService) x.get("auth");
-    //     DAO permissionTemplateDAO = (DAO) x.get("localPermissionTemplateReferenceDAO");
-
-    //     Predicate predicate = (Predicate) AND(
-    //       IN(getDAOKey(), PermissionTemplateReference.DAO_KEYS),
-    //       EQ(PermissionTemplateReference.OPERATION, op)
-    //     );
-
-    //     List<PermissionTemplateReference> templates = ((ArraySink) permissionTemplateDAO.where(predicate).select(new ArraySink())).getArray();
-    //     if ( ! templates.stream().anyMatch(t -> authService.check(x, createPermission((PermissionTemplateReference) t, obj))) ) {
-    //       ((foam.nanos.logger.Logger) x.get("logger")).debug("ExtendedConfigurableAuthorizer", "Permission denied");
-    //       throw new AuthorizationException();
-    //     }
-    //   `
-    // },
     {
       name: 'authorizeOnCreate',
       javaCode: `

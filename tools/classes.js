@@ -251,8 +251,6 @@ var classes = [
   'foam.nanos.auth.AuthorizationDAO',
   'foam.nanos.auth.PermissionTemplateReference',
   'foam.nanos.auth.ExtendedConfigurableAuthorizer',
-  'foam.nanos.auth.PermissionTemplateCache',
-  'foam.nanos.auth.CachePermissionTemplateDAO',
   'foam.nanos.auth.AuthenticationException',
   'foam.nanos.auth.EnabledAware',
   'foam.nanos.auth.EnabledAwareDummy',
