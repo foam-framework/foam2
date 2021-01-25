@@ -112,14 +112,60 @@ foam.CLASS({
       return null;
     },
     async function save() {
-      return await this.wao.save(this);
+      this.indicator = this.WizardletIndicator.SAVING;
+      var ret = await this.wao.save(this);
+      this.clearProperty('indicator');
+      return ret;
     },
     async function cancel() {
-      return await this.wao.cancel(this);
+      this.indicator = this.WizardletIndicator.SAVING;
+      var ret = await this.wao.cancel(this);
+      this.clearProperty('indicator');
+      return ret;
     },
     async function load() {
       await this.wao.load(this);
       return this;
+    },
+    {
+      name: 'getDataUpdateSub',
+      documentation: `
+        Returns a subscription that publishes whenever the wizardlet's data or
+        any property of the wizardlet's data - recursively - is updated.
+
+        This is useful for checking if a wizardlet has unsaved changes.
+      `,
+      code: function (o$) {
+        if ( ! o$ ) o$ = this.data$;
+
+        var s = foam.core.FObject.create();
+
+        var bindProps = (sub1, o) => {
+          if ( ! (o && o.cls_) ) return;
+          var props = o.cls_.getAxiomsByClass(foam.core.Property);
+          for ( let prop of props ) {
+            let prop$ = prop.toSlot(o);
+            sub1.onDetach(this.getDataUpdateSub(prop$).sub(() => {
+              s.pub(o);
+            }));
+          }
+        };
+
+        var sub1 = foam.core.FObject.create();
+        s.onDetach(o$.sub(o => {
+          sub1.detach();
+          sub1 = foam.core.FObject.create();
+          s.onDetach(sub1);
+
+          bindProps(sub1, o);
+          s.pub(o);
+        }));
+
+        s.onDetach(sub1);
+        bindProps(sub1, o$.get());
+
+        return s;
+      }
     }
   ]
 });

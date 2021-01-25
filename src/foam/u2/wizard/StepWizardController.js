@@ -174,6 +174,7 @@ foam.CLASS({
       this.SUPER();
     },
     function positionAfter(pos) {
+      console.log('positionAfter: in');
       let subWi = pos.wizardletIndex
       let subSi = pos.sectionIndex;
       if ( subSi >= this.wizardlets[subWi].sections.length - 1 ) {
@@ -183,6 +184,7 @@ foam.CLASS({
       } else {
         subSi++;
       }
+      console.log('positionAfter: out');
       return this.WizardPosition.create({
         wizardletIndex: subWi,
         sectionIndex: subSi,

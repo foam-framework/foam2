@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.u2.wizard',
-  name: 'StepWizardletView',
+  name: 'IncrementalStepWizardView',
   extends: 'foam.u2.View',
 
   documentation: `Displays wizardlets in individual screens.`,
