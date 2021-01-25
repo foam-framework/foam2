@@ -8,7 +8,7 @@ p({
     "keyStorePass": "nanopay",
     "trustStorePath": "nanopay.jks",
     "trustStorePass": "nanopay",
-    "enableSSL": false
+    "enableSSL": true
   }
 })
 
@@ -22,6 +22,6 @@ p({
     "keyStorePass": "nanopay",
     "trustStorePath": "nanopay.jks",
     "trustStorePass": "nanopay",
-    "enableSSL": false
+    "enableSSL": true
   }
 })
