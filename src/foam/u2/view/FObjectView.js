@@ -48,6 +48,13 @@ foam.CLASS({
       }
     },
     {
+      class: 'Boolean',
+      name: 'choiceSelected',
+      expression: function(objectClass) {
+        return !! objectClass;
+      }
+    },
+    {
       name: 'config'
       // Map of property-name: {map of property overrides} for configuring properties
       // values include 'label', 'units', and 'view'
@@ -230,10 +237,13 @@ foam.CLASS({
             return m != foam.u2.DisplayMode.HIDDEN;
           })).
         end().
-        tag(foam.u2.detail.VerticalDetailView, {
-          data$: this.data$,
-          config: this.config
-        });
+        start().
+          show(this.choiceSelected$).
+          tag(foam.u2.detail.VerticalDetailView, {
+            data$: this.data$,
+            config: this.config
+          }).
+        end();
     },
 
     function choicesFallback(of) {
