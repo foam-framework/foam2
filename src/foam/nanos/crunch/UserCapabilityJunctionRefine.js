@@ -35,7 +35,6 @@ foam.CLASS({
     'sourceId',
     'targetId',
     'status',
-    // 'created', todo, use createaware instead
     'expiry',
     'gracePeriod',
     'data'
