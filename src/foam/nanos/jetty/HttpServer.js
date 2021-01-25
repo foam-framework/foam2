@@ -14,7 +14,9 @@ foam.CLASS({
 
   javaImports: [
     'foam.blob.Blob',
+    'foam.core.X',
     'foam.nanos.fs.File',
+    'foam.nanos.fs.ResourceStorage',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.StdoutLogger',
@@ -22,6 +24,7 @@ foam.CLASS({
     'java.io.ByteArrayInputStream',
     'java.io.ByteArrayOutputStream',
     'java.io.FileInputStream',
+    'java.io.InputStream',
     'java.security.KeyStore',
     'java.util.Set',
     'java.util.HashSet',
@@ -40,6 +43,11 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      class: 'Boolean',
+      name: 'enableHttp',
+      value: true
+    },
     {
       class: 'Int',
       name: 'port',
@@ -132,7 +140,7 @@ foam.CLASS({
             port = getPort();
           }
         }
-        getLogger().info("Starting Jetty http server. port", port);
+        getLogger().info("Starting Jetty http server on port", port);
 
         JettyThreadPoolConfig jettyThreadPoolConfig = (JettyThreadPoolConfig) getX().get("jettyThreadPoolConfig");
         QueuedThreadPool threadPool = new QueuedThreadPool();
@@ -144,11 +152,13 @@ foam.CLASS({
         ConnectorStatistics stats = new ConnectorStatistics();
         org.eclipse.jetty.server.Server server =
           new org.eclipse.jetty.server.Server(threadPool);
-        ServerConnector connector = new ServerConnector(server);
-        connector.setPort(port);
-        connector.addBean(stats);
-        server.addConnector(connector);
 
+        if ( getEnableHttp() ) {
+          ServerConnector connector = new ServerConnector(server);
+          connector.setPort(port);
+          connector.addBean(stats);
+          server.addConnector(connector);
+        }
         StatisticsHandler statisticsHandler = new StatisticsHandler();
         statisticsHandler.setServer(server);
 
@@ -182,7 +192,7 @@ foam.CLASS({
 
         String root = System.getProperty("nanos.webroot");
         if ( root == null ) {
-          root = this.getClass().getResource("/webroot/index.html").toExternalForm();
+          root = this.getClass().getResource("/webroot/error.html").toExternalForm();
           root = root.substring(0, root.lastIndexOf("/"));
         }
 
@@ -304,43 +314,81 @@ foam.CLASS({
       foam.dao.DAO fileDAO = ((foam.dao.DAO) getX().get("fileDAO"));
 
       if ( this.getEnableHttps() ) {
+        int port = getHttpsPort();
+        String portStr = System.getProperty("https.port");
+        if ( portStr != null && ! portStr.isEmpty() ) {
+          try {
+            port = Integer.parseInt(portStr);
+            setPort(port);
+          } catch ( NumberFormatException e ) {
+            getLogger().error("invalid port", portStr);
+            port = getHttpsPort();
+          }
+        }
+        getLogger().info("Starting Jetty https server on port", port);
 
-        ByteArrayOutputStream os = null;
-        ByteArrayInputStream is = null;
+        ByteArrayOutputStream baos = null;
+        ByteArrayInputStream bais = null;
         try {
           // 1. load the keystore to verify the keystore path and password.
           KeyStore keyStore = KeyStore.getInstance("JKS");
 
-          File file = (File) fileDAO.find(getKeystoreFileName());
-          if ( file == null )
-            throw new java.io.FileNotFoundException("No keystore file is found in fileDAO");
+          if ( System.getProperty("resource.journals.dir") != null ) {
+            X resourceStorageX = getX().put(foam.nanos.fs.Storage.class,
+              new ResourceStorage(System.getProperty("resource.journals.dir")));
+            InputStream is = resourceStorageX.get(foam.nanos.fs.Storage.class).getInputStream(getKeystoreFileName());
+            if ( is != null ) {
+              baos = new ByteArrayOutputStream();
+ 
+              byte[] buffer = new byte[8192];
+              int len;
+              while ((len = is.read(buffer)) != -1) {
+                baos.write(buffer, 0, len);
+              }
+              bais = new ByteArrayInputStream(baos.toByteArray());
+            } else {
+              getLogger().warning("Keystore not found. Resource: "+getKeystoreFileName());
+            }
+          }
+          // Fall back to fileDAO if resource not found, this will
+          // occur when keystore updated/replaced in production.
+          if ( bais == null ) {
+            File file = (File) fileDAO.find(getKeystoreFileName());
+            if ( file == null ) {
+              throw new java.io.FileNotFoundException("Keystore not found. File: "+getKeystoreFileName());
+            }
 
-          Blob blob = file.getData();
-          if ( blob == null )
-            throw new java.io.FileNotFoundException("The keystore file is empty");
+            Blob blob = file.getData();
+            if ( blob == null ) {
+              throw new java.io.FileNotFoundException("Keystore empty");
+            }
 
-          os = new ByteArrayOutputStream((int) file.getFilesize());
-          blob.read(os, 0, file.getFilesize());
-          is = new ByteArrayInputStream(os.toByteArray());
+            baos = new ByteArrayOutputStream((int) file.getFilesize());
+            blob.read(baos, 0, file.getFilesize());
+            bais = new ByteArrayInputStream(baos.toByteArray());
+          }
 
-          keyStore.load(is, this.getKeystorePassword().toCharArray());
+          keyStore.load(bais, this.getKeystorePassword().toCharArray());
 
           // 2. enable https
           HttpConfiguration https = new HttpConfiguration();
           https.addCustomizer(new SecureRequestCustomizer());
-          SslContextFactory sslContextFactory = new SslContextFactory();
+          SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
           sslContextFactory.setKeyStore(keyStore);
           sslContextFactory.setKeyStorePassword(this.getKeystorePassword());
+          // NOTE: Enabling these will fail self-signed certificate use.
+          // sslContextFactory.setWantClientAuth(true);
+          // sslContextFactory.setNeedClientAuth(true);
 
           ServerConnector sslConnector = new ServerConnector(server,
             new SslConnectionFactory(sslContextFactory, "http/1.1"),
             new HttpConnectionFactory(https));
-          sslConnector.setPort(this.getHttpsPort());
+          sslConnector.setPort(port);
 
           server.addConnector(sslConnector);
 
         } catch ( java.io.FileNotFoundException e ) {
-          logger.error("Failed reading keystore", this.getKeystoreFileName(), e.getMessage(), 
+          logger.error(e.getMessage(), 
                        "Please see: https://docs.google.com/document/d/1hXVdHjL8eASG2AG2F7lPwpO1VmcW2PHnAW7LuDC5xgA/edit?usp=sharing", e);
         } catch ( java.io.IOException e ) {
           logger.error("Invalid KeyStore file password, please make sure you have set the correct password.",
@@ -348,10 +396,9 @@ foam.CLASS({
         } catch ( Exception e ) {
           logger.error("Failed configuring https", e);
         } finally {
-          IOUtils.closeQuietly(is);
-          IOUtils.closeQuietly(os);
+          IOUtils.closeQuietly(bais);
+          IOUtils.closeQuietly(baos);
         }
-
       }
       `
     },

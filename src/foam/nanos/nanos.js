@@ -499,6 +499,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ui/CapableWAO" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
   { name: "foam/nanos/crunch/ui/MinMaxCapabilityWizardlet" },
+  { name: "foam/nanos/crunch/ui/MinMaxCapabilityWizardletSection" },
   { name: "foam/nanos/crunch/ui/ReviewCapabilityWizardlet" },
   { name: "foam/nanos/crunch/ui/ReviewCapabilityView" },
   { name: "foam/nanos/crunch/ui/CapableView" },
@@ -541,4 +542,7 @@ FOAM_FILES([
   { name: "foam/nanos/iban/IBANInfo" },
   { name: "foam/nanos/iban/ValidationIBAN" },
   { name: "foam/nanos/iban/test/ValidationIBANTest" },
+
+  //notification
+  { name: "foam/nanos/crunch/TopLevelCapabilityStatusUpdateNotification" },
 ]);
