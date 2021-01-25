@@ -15,7 +15,8 @@ foam.CLASS({
   flags: ['web'],
 
   requires: [
-    'foam.core.ExpressionSlot'
+    'foam.core.ExpressionSlot',
+    'foam.u2.LoadingSpinner'
   ],
 
   css: `
@@ -85,8 +86,11 @@ foam.CLASS({
     },
     {
       name: 'clickable',
-      class: 'Boolean',
-      value: false
+      class: 'Boolean'
+    },
+    {
+      name: 'indicateProcessing',
+      class: 'Boolean'
     }
   ],
 
@@ -122,6 +126,15 @@ foam.CLASS({
       if ( this.icon ) {
         this.start('img')
           .attr('src', this.icon$)
+          .style({
+            'width': '' + this.size + 'px',
+            'height': '' + this.size + 'px',
+          })
+        .end();
+      }
+
+      if ( this.indicateProcessing ) {
+        this.start(this.LoadingSpinner)
           .style({
             'width': '' + this.size + 'px',
             'height': '' + this.size + 'px',
