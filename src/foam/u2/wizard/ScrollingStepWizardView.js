@@ -36,11 +36,17 @@ foam.CLASS({
         for ( let hash in wizardPositionElements ) {
           let el = wizardPositionElements[hash].section.el();
           let pos = wizardPositionElements[hash].position;
+          if ( ! el ) {
+            console.error('missing element', wizardPositionElements[hash]);
+            continue;
+          }
           if ( test_visible(el) ) {
             if ( ! minTopPosition || pos.compareTo(minTopPosition) < 0 )
               minTopPosition = pos;
           }
         }
+
+        console.log(minTopPosition.instance_)
 
         return minTopPosition;
       }
@@ -55,7 +61,6 @@ foam.CLASS({
       this.scrollWizardPosition$.sub(() => {
         this.data.wizardPosition = this.scrollWizardPosition;
       });
-      this.scrollWizardPosition$.get();
       this
         .start(this.Grid)
           .addClass(this.myClass('fix-grid'))
@@ -77,6 +82,7 @@ foam.CLASS({
                   console.log('state', this.state)
                   if ( this.state.cls_ == foam.u2.LoadedElementState ) {
                     self.mainScrollElement = this.el();
+                    self.scrollWizardPosition$.get();
                   }
                 }));
               })
@@ -109,10 +115,14 @@ foam.CLASS({
           sectionIndex: si,
         });
         this.add(section.createView().call(function () {
-          self.wizardPositionElements$set(position.hash(), {
-            section: this,
-            position: position
-          });
+          this.onDetach(this.state$.sub(() => {
+            if ( this.state.cls_ == foam.u2.LoadedElementState ) {
+              self.wizardPositionElements$set(position.hash(), {
+                section: this,
+                position: position
+              });
+            }
+          }));
         }));
       });
     }
