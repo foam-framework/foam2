@@ -64,6 +64,10 @@ foam.CLASS({
       }
     },
     {
+      name: 'loading',
+      class: 'Boolean'
+    },
+    {
       name: 'sections',
       flags: ['web'],
       transient: true,
@@ -140,13 +144,22 @@ foam.CLASS({
 
         var s = foam.core.FObject.create();
 
+        var self = this;
+
         var bindProps = (sub1, o) => {
           if ( ! (o && o.cls_) ) return;
           var props = o.cls_.getAxiomsByClass(foam.core.Property);
+
+          // Some wizardlet data objects have a "capability" property, and
+          // Capability has a wizardlet property. This causes errors.
+          if ( this.data && o.cls_.id == this.data.cls_.id ) {
+            props = props.filter(p => p.name != 'capability')
+          }
+
           for ( let prop of props ) {
             let prop$ = prop.toSlot(o);
             sub1.onDetach(this.getDataUpdateSub(prop$).sub(() => {
-              s.pub(o);
+              if ( ! self.loading ) s.pub(o);
             }));
           }
         };
@@ -158,7 +171,7 @@ foam.CLASS({
           s.onDetach(sub1);
 
           bindProps(sub1, o);
-          s.pub(o);
+          if ( ! self.loading ) s.pub(o);
         }));
 
         s.onDetach(sub1);

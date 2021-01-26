@@ -110,7 +110,7 @@ foam.CLASS({
           .add(this.LoadWizardletsAgent)
           .add(this.SkipGrantedAgent)
           .add(this.RequirementsPreviewAgent)
-          // .add(this.AutoSaveWizardletsAgent)
+          .add(this.AutoSaveWizardletsAgent)
           .add(this.StepWizardAgent)
           .add(this.PutFinalPayloadsAgent)
           // .add(this.TestAgent)
