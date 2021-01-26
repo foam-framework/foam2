@@ -508,9 +508,9 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
     for ( Object obj : capsOrLists ) {
       Capability cap;
-      boolean isMinmax = false;
+      boolean isPrereqAware = false;
       if ( obj instanceof List ) {
-        isMinmax = true;
+        isPrereqAware = true;
         var list = (List) obj;
         cap = (Capability) list.get(list.size() - 1);
       } else {
@@ -522,7 +522,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
         if ( IN(UserCapabilityJunction.STATUS, grantedStatuses).f(ucj) ) {
           // if a minmax capability is in GRANTED status, its prerequisites should also be added
           // as a part of granted list, so the wizrd will know to ignore the prerequisites
-          if ( isMinmax ) {
+          if ( isPrereqAware ) {
             for ( var c : (List) obj ) {
               granted.add(((Capability) c).getId());
             }
