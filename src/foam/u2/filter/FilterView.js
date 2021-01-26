@@ -321,6 +321,7 @@ foam.CLASS({
             .end()
           .end()
           .start()
+            .style({overflow: 'hidden'})
             .add(this.filterController.slot(function (totalCount, resultsCount) {
               return self.E().addClass(self.myClass('float-result-count')).add(`${resultsCount.toLocaleString(foam.locale)} of ${totalCount.toLocaleString(foam.locale)} selected`);
             }))
