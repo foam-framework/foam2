@@ -224,11 +224,14 @@ foam.CLASS({
 
           v[i] = def;
 
-          if ( def.ordinal || def.ordinal === 0 ) {
-            next = def.ordinal + 1;
+          if ( def.hasOwnProperty('ordinal') ) {
+            next = Math.max(def.ordinal + 1, next);
           } else {
             def.ordinal = next++;
           }
+
+          if ( ! def.hasOwnProperty('priority') )
+            def.priority = def.ordinal;
 
           if ( used[def.ordinal] ) {
             throw this.id +
