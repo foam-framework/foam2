@@ -224,14 +224,21 @@ foam.CLASS({
 
           v[i] = def;
 
-          if ( def.hasOwnProperty('ordinal') ) {
-            next = Math.max(def.ordinal + 1, next);
+          // REVIEW: Potential fix for ordinal default ordering
+          // if ( def.hasOwnProperty('ordinal') ) {
+          //   next = Math.max(def.ordinal + 1, next);
+          // } else {
+          //   def.ordinal = next++;
+          // }
+
+          // if ( ! def.hasOwnProperty('priority') )
+          //   def.priority = def.ordinal;
+
+          if ( def.ordinal || def.ordinal === 0 ) {
+            next = def.ordinal + 1;
           } else {
             def.ordinal = next++;
           }
-
-          if ( ! def.hasOwnProperty('priority') )
-            def.priority = def.ordinal;
 
           if ( used[def.ordinal] ) {
             throw this.id +
