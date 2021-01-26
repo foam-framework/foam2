@@ -14,10 +14,14 @@ foam.CLASS({
   javaImports: [
     'foam.core.FObject',
     'foam.core.X',
+    'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.Journal',
+    'foam.dao.MDAO',
+    'foam.dao.Sink',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'java.util.List'
   ],
 
   properties: [
@@ -71,6 +75,23 @@ foam.CLASS({
       }
 
       return getDelegate().cmd_(x, obj);
+      `
+    },
+    {
+      name: 'select_',
+      javaCode: `
+        DAO tempMDAO = new MDAO(getOf());
+        getJournal().replay(x, tempMDAO);
+
+        Sink tempSink = new ArraySink();
+        tempMDAO.select_(x, tempSink, skip, limit, order, predicate);
+        List array = ((ArraySink)tempSink).getArray();
+
+        for ( Object o: array ) {
+          sink.put(o, null);
+        }
+        
+        return sink;
       `
     }
   ]
