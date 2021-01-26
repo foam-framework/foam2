@@ -46,7 +46,7 @@ foam.CLASS({
       text-align: center;
     }
     ^ select {
-      height: 42px;
+      height: 44px;
     }
   `,
   methods: [
@@ -83,7 +83,6 @@ foam.CLASS({
         .endContext();
 
       let dateFromProps = () => {
-        debugger;
         if (!/^\d{4}$/.exec(this.year)) return null;
 
         if (!/^\d{1,2}$/.exec(this.month)) return null;
