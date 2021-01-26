@@ -41,12 +41,13 @@ foam.CLASS({
   css: `
     ^ {
       display: flex;
+      align-items: flex-end;
     }
     ^label {
       text-align: center;
     }
-    ^ select {
-      height: 44px;
+    ^ > div {
+      margin-right: 4px;
     }
   `,
   methods: [
