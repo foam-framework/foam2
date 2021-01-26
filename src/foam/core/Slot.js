@@ -607,6 +607,8 @@ foam.CLASS({
     'foam.core.ExpressionSlot'
   ],
 
+  documentation: "An expression slot which supports 'obj' changing.",
+
   properties: [
     {
       name: 'obj',
@@ -631,10 +633,11 @@ foam.CLASS({
   methods: [
     function update() {
       if ( ! this.code || ! this.obj ) return;
+
       this.delegate = this.ExpressionSlot.create({
         args: this.args,
         code: this.code,
-        obj: this.obj
+        obj:  this.obj
       })
     }
   ]
