@@ -454,22 +454,27 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
   public WizardState getWizardState(X x, String capabilityId) {
     var subject = (Subject) x.get("subject");
 
+    DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+    Capability capability = (Capability) capabilityDAO.find(capabilityId);
+
     if ( ! subject.isAgent() ) {
       return getWizardStateFor_(x, subject, capabilityId);
     }
 
-    { // Save unassociated wizard states if none exist yet
-      var realUser = new Subject();
-      realUser.setUser(subject.getRealUser());
-      realUser.setUser(subject.getRealUser());
-      getWizardStateFor_(x, realUser, capabilityId);
-      var effectiveUser = new Subject();
-      effectiveUser.setUser(subject.getUser());
-      effectiveUser.setUser(subject.getUser());
-      getWizardStateFor_(x, effectiveUser, capabilityId);
-    }
+    var realUser = new Subject();
+    realUser.setUser(subject.getRealUser());
+    realUser.setUser(subject.getRealUser());
+    var realUserWizardState = getWizardStateFor_(x, realUser, capabilityId);
+    var effectiveUser = new Subject();
+    effectiveUser.setUser(subject.getUser());
+    effectiveUser.setUser(subject.getUser());
+    var userWizardState = getWizardStateFor_(x, effectiveUser, capabilityId);
 
-    return getWizardStateFor_(x, subject, capabilityId);
+    var subjectWizardState = getWizardStateFor_(x, subject, capabilityId);
+
+    return capability.getAssociatedEntity() == AssociatedEntity.USER ? userWizardState : 
+      capability.getAssociatedEntity() == AssociatedEntity.REAL_USER ? realUserWizardState :
+      subjectWizardState;
   }
 
   private WizardState getWizardStateFor_(X x, Subject s, String capabilityId) {
@@ -503,7 +508,9 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
     for ( Object obj : capsOrLists ) {
       Capability cap;
+      boolean isMinmax = false;
       if ( obj instanceof List ) {
+        isMinmax = true;
         var list = (List) obj;
         cap = (Capability) list.get(list.size() - 1);
       } else {
@@ -513,7 +520,14 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       try {
         var ucj = getJunction(x, cap.getId());
         if ( IN(UserCapabilityJunction.STATUS, grantedStatuses).f(ucj) ) {
-          granted.add(cap.getId());
+          // if a minmax capability is in GRANTED status, its prerequisites should also be added
+          // as a part of granted list, so the wizrd will know to ignore the prerequisites
+          if ( isMinmax ) {
+            for ( var c : (List) obj ) {
+              granted.add(((Capability) c).getId());
+            }
+          }
+          else granted.add(cap.getId());
         }
       } catch ( RuntimeException e ) {
         // This happens if getJunction was called with an unavailabile
