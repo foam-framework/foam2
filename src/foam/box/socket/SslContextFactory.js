@@ -149,8 +149,6 @@ foam.CLASS({
       javaCode: `
         KeyStore keyStore = null;
         try {
-          //InputStream is = new FileInputStream(storePath);
-          //InputStream is = getClass().getResourceAsStream(storePath);
           X resourceStorageX = getX().put(foam.nanos.fs.Storage.class,
             new ResourceStorage(System.getProperty("resource.journals.dir")));
           InputStream is = resourceStorageX.get(foam.nanos.fs.Storage.class).getInputStream(storePath);
