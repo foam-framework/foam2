@@ -93,8 +93,7 @@ foam.CLASS({
           : this.DAOBrowserView
           ;
       }
-    },
-    'mementoHead'
+    }
   ],
 
   actions: [
