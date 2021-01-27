@@ -69,11 +69,11 @@ foam.CLASS({
             if ( value == null ) {
               value = "";
               foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
-              logger.warning("No value provided for variable " + val);
+              logger.warning("No value provided for variable " + v.toString());
               Alarm alarm = new Alarm();
               alarm.setName("Email template config");
               alarm.setReason(AlarmReason.CONFIGURATION);
-              alarm.setNote("No value provided for variable " + val);
+              alarm.setNote("No value provided for variable " + v.toString());
               ((DAO) x.get("alarmDAO")).put(alarm);
             }
             ((StringBuilder) x.get("sb")).append(value);
@@ -281,11 +281,11 @@ foam.CLASS({
             EmailTemplate extendedEmailTemplate = ((EmailTemplate) ((DAO) x.get("emailTemplateDAO")).find(EQ(EmailTemplate.NAME,templateName.toString())));
             if ( extendedEmailTemplate == null ) {
               foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
-              logger.warning("Extended template not found " + val);
+              logger.warning("Extended template not found " + templateName.toString());
               Alarm alarm = new Alarm();
               alarm.setName("Email template config");
               alarm.setReason(AlarmReason.CONFIGURATION);
-              alarm.setNote("No value provided for variable " + val);
+              alarm.setNote("Extended template not found " + templateName.toString());
               ((DAO) x.get("alarmDAO")).put(alarm);
               return val;
             }
@@ -381,6 +381,8 @@ foam.CLASS({
       ParserContext parserX = new ParserContextImpl();
       parserX.set("sb", sbJoin);
       parserX.set("emailTemplateDAO", x.get("emailTemplateDAO"));
+      parserX.set("logger", x.get("logger"));
+      parserX.set("alarmDAO", x.get("alarmDAO"));
       parserX.set("isNextTemplateExtending", false);
       getIncludeGrammar().parse(ps, parserX, "");
 
