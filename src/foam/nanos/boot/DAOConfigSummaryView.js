@@ -27,7 +27,9 @@ foam.CLASS({
                 [ {class: 'foam.u2.DetailView'},                 'Detail' ],
                 [ {class: 'foam.u2.detail.TabbedDetailView'},    'Tabbed' ],
                 [ {class: 'foam.u2.detail.SectionedDetailView'}, 'Sectioned' ],
-                [ {class: 'foam.u2.md.DetailView'},              'Material' ]
+                [ {class: 'foam.u2.detail.MDDetailView'},        'Material' ],
+                [ {class: 'foam.u2.detail.WizardSectionsView'},  'Wizard' ],
+                [ {class: 'foam.u2.detail.VerticalDetailView'},  'Vertical' ]
               ]
             };
           }
@@ -50,7 +52,10 @@ foam.CLASS({
               views: [
                 [ {class: 'foam.u2.DetailView'},                 'Detail' ],
                 [ {class: 'foam.u2.detail.TabbedDetailView'},    'Tabbed' ],
-                [ {class: 'foam.u2.detail.SectionedDetailView'}, 'Sectioned' ]
+                [ {class: 'foam.u2.detail.SectionedDetailView'}, 'Sectioned' ],
+                [ {class: 'foam.u2.detail.MDDetailView'},        'Material' ],
+                [ {class: 'foam.u2.detail.WizardSectionsView'},  'Wizard' ],
+                [ {class: 'foam.u2.detail.VerticalDetailView'},  'Vertical' ]
               ]
             };
           }

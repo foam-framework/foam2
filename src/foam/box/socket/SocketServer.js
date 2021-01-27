@@ -24,6 +24,8 @@ foam.CLASS({
     'java.io.IOException',
     'java.net.ServerSocket',
     'java.net.Socket',
+    'javax.net.ssl.SSLContext',
+    'javax.net.ssl.SSLServerSocket'
   ],
 
   constants: [
@@ -64,6 +66,11 @@ foam.CLASS({
           this.getClass().getSimpleName()
         }, (Logger) getX().get("logger"));
       `
+    },
+    {
+      class: 'Boolean',
+      name: 'enableSSL',
+      value: false
     }
   ],
 
@@ -73,7 +80,18 @@ foam.CLASS({
       javaCode: `
         try {
           getLogger().info("Starting,port", getPort());
-          ServerSocket serverSocket = new ServerSocket(getPort());
+          ServerSocket serverSocket0 = null;
+          
+          if ( getEnableSSL() ) {
+            SslContextFactory contextFactory = (SslContextFactory) getX().get("sslContextFactory");
+            SSLServerSocket sslServerSocket = (SSLServerSocket) contextFactory.getSSLContext().getServerSocketFactory().createServerSocket(getPort());
+            sslServerSocket.setNeedClientAuth(true);
+            serverSocket0 = sslServerSocket;
+          } else {
+            serverSocket0 = new ServerSocket(getPort());
+          }
+
+          final ServerSocket serverSocket = serverSocket0;
 
           Agency agency = (Agency) getX().get(getThreadPoolName());
           agency.submit(

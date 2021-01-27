@@ -73,6 +73,12 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'skipBaseClass',
+      documentation: 'If true, skips of base-class as a choice when no strategies fetched.',
+      value: false
+    },
+    {
+      class: 'Boolean',
       name: 'allowCustom',
       expression: function(choices) {
         return choices.length == 0;
@@ -163,7 +169,7 @@ foam.CLASS({
       if ( this.strategizer != null ) {
         this.strategizer.query(null, this.of.id, null, this.predicate).then((strategyReferences) => {
           if ( ! Array.isArray(strategyReferences) || strategyReferences.length === 0 ) {
-            this.choices = [[this.of.id, this.of.model_.label]];
+            this.choices = this.skipBaseClass ? [] : [[this.of.id, this.of.model_.label]];
             this.choicesLoaded.resolve();
             return;
           }
@@ -198,6 +204,7 @@ foam.CLASS({
       }
 
       var classToData = function(c) {
+        if ( ! c ) return undefined;
         var m = c && this.__context__.lookup(c, true);
         return m.create(this.data ? this.copyOldData(this.data) : null, this);
       }.bind(this);
@@ -230,10 +237,13 @@ foam.CLASS({
             return m != foam.u2.DisplayMode.HIDDEN;
           })).
         end().
-        tag(foam.u2.detail.VerticalDetailView, {
-          data$: this.data$,
-          config: this.config
-        });
+        start().
+          show(this.objectClass$).
+          tag(foam.u2.detail.VerticalDetailView, {
+            data$: this.data$,
+            config: this.config
+          }).
+        end();
     },
 
     function choicesFallback(of) {
