@@ -95,8 +95,8 @@ public class SessionServerBox
         return;
       }
 
-      // test and use non-clustered medusa sessions
-      DAO internalSessionDAO = (DAO) getX().get("internalSessionDAO");
+      // test and use non-clustered sessions
+      DAO internalSessionDAO = (DAO) getX().get("localInternalSessionDAO");
       if ( internalSessionDAO != null ) {
         session = (Session) internalSessionDAO.find(sessionID);
         if ( session != null ) {
