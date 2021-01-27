@@ -61,7 +61,7 @@ foam.CLASS({
   methods: [
     function createIsAvailableFor(data$) {
       var self = this;
-      var slot = foam.core.ExpressionSlot.create({
+      var slot = foam.core.ProxyExpressionSlot.create({
         obj$: data$,
         code: this.isAvailable
       });
