@@ -3,8 +3,7 @@ p({
   "name": "socketConnectionBoxManager",
   "lazy": false,
   "service": {
-    "class": "foam.box.socket.SocketConnectionBoxManager",
-    "enableSSL": true
+    "class": "foam.box.socket.SocketConnectionBoxManager"
   }
 })
 
@@ -13,8 +12,7 @@ p({
   "name": "socketServer",
   "lazy": false,
   "service": {
-    "class": "foam.box.socket.SocketServer",
-    "enableSSL": true
+    "class": "foam.box.socket.SocketServer"
   }
 })
 
@@ -24,10 +22,6 @@ p({
   "description": "ssl context factory for creating ssl socket",
   "lazy":false,
   "service": {
-    "class": "foam.box.socket.SslContextFactory",
-    "keyStorePath": "nanopay.jks",
-    "keyStorePass": "nanopay",
-    "trustStorePath": "nanopay.jks",
-    "trustStorePass": "nanopay"
+    "class": "foam.box.socket.SslContextFactory"
   }
 })

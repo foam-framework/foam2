@@ -66,11 +66,6 @@ foam.CLASS({
           this.getClass().getSimpleName()
         }, (Logger) getX().get("logger"));
       `
-    },
-    {
-      class: 'Boolean',
-      name: 'enableSSL',
-      value: false
     }
   ],
 
@@ -81,9 +76,9 @@ foam.CLASS({
         try {
           getLogger().info("Starting,port", getPort());
           ServerSocket serverSocket0 = null;
-          
-          if ( getEnableSSL() ) {
-            SslContextFactory contextFactory = (SslContextFactory) getX().get("sslContextFactory");
+          SslContextFactory contextFactory = (SslContextFactory) getX().get("sslContextFactory");
+
+          if ( contextFactory != null && contextFactory.getEnableSSL() ) {
             SSLServerSocket sslServerSocket = (SSLServerSocket) contextFactory.getSSLContext().getServerSocketFactory().createServerSocket(getPort());
             sslServerSocket.setNeedClientAuth(true);
             serverSocket0 = sslServerSocket;
