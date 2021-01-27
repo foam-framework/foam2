@@ -67,22 +67,6 @@ foam.CLASS({
       `
     },
     {
-      class: 'String',
-      name: 'keyStorePath'
-    },
-    {
-      class: 'String',
-      name: 'keyStorePass'
-    },
-    {
-      class: 'String',
-      name: 'trustStorePath'
-    },
-    {
-      class: 'String',
-      name: 'trustStorePass'
-    },
-    {
       class: 'Boolean',
       name: 'enableSSL',
       value: false
@@ -177,13 +161,7 @@ foam.CLASS({
         try {
           Socket socket = null;
           if ( getEnableSSL() ) {
-            SslContextFactory contextFactory = new SslContextFactory
-                                                    .Builder(x)
-                                                    .setKeyStorePath(getKeyStorePath())
-                                                    .setKeyStorePass(getKeyStorePass())
-                                                    .setTrustStorePath(getTrustStorePath())
-                                                    .setTrustStorePass(getTrustStorePass())
-                                                    .build();
+            SslContextFactory contextFactory = (SslContextFactory) getX().get("sslContextFactory");
 
             SSLContext sslContext = contextFactory.getSSLContext();
             socket = (SSLSocket)sslContext.getSocketFactory().createSocket();
