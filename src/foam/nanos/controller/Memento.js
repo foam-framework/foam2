@@ -33,10 +33,7 @@ foam.CLASS({
       value: '',
       postSet: function(o, n) {
         //to update parent on value change but not on value set first time 
-        var doesChangeIndicatorUpdateRequired = ! this.feedback_ && o;
         this.parseValue();
-        if ( doesChangeIndicatorUpdateRequired )
-          this.changeIndicator = ! this.changeIndicator;
       }
     },
     {
@@ -148,6 +145,8 @@ foam.CLASS({
             this.feedback_ = true;
             if ( paramEndIndex !== -1 && paramEndIndex !== tailStr.length ) {
               this.tail = this.cls_.create({ value: tailStr.substring(paramEndIndex + 1), parent: this });
+            } else {
+              this.tail = null;
             }
           } else {
             this.tail = this.cls_.create({ value: tailStr, parent: this });
