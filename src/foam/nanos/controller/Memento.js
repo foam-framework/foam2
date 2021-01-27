@@ -32,7 +32,11 @@ foam.CLASS({
       name: 'value',
       value: '',
       postSet: function(o, n) {
+        //to update parent on value change but not on value set first time 
+        var doesChangeIndicatorUpdateRequired = ! this.feedback_ && o;
         this.parseValue();
+        if ( doesChangeIndicatorUpdateRequired )
+          this.changeIndicator = ! this.changeIndicator;
       }
     },
     {
