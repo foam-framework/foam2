@@ -60,6 +60,11 @@ foam.CLASS({
         this.getClass().getSimpleName()
       }, (Logger) getX().get("logger"));
       `
+    },
+    {
+      class: 'Boolean',
+      name: 'enableSSL',
+      value: false
     }
   ],
   
