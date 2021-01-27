@@ -69,11 +69,11 @@ foam.CLASS({
             if ( value == null ) {
               value = "";
               foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
-              logger.warning("No value provided for variable " + v.toString());
+              logger.warning("No value provided for variable " + v);
               Alarm alarm = new Alarm();
               alarm.setName("Email template config");
               alarm.setReason(AlarmReason.CONFIGURATION);
-              alarm.setNote("No value provided for variable " + v.toString());
+              alarm.setNote("No value provided for variable " + v);
               ((DAO) x.get("alarmDAO")).put(alarm);
             }
             ((StringBuilder) x.get("sb")).append(value);
@@ -281,11 +281,11 @@ foam.CLASS({
             EmailTemplate extendedEmailTemplate = ((EmailTemplate) ((DAO) x.get("emailTemplateDAO")).find(EQ(EmailTemplate.NAME,templateName.toString())));
             if ( extendedEmailTemplate == null ) {
               foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
-              logger.warning("Extended template not found " + templateName.toString());
+              logger.warning("Extended template not found " + templateName);
               Alarm alarm = new Alarm();
               alarm.setName("Email template config");
               alarm.setReason(AlarmReason.CONFIGURATION);
-              alarm.setNote("Extended template not found " + templateName.toString());
+              alarm.setNote("Extended template not found " + templateName);
               ((DAO) x.get("alarmDAO")).put(alarm);
               return val;
             }
@@ -318,6 +318,7 @@ foam.CLASS({
       type: 'StringBuilder',
       javaCode: `
       EmailTemplate template = (EmailTemplate) ((DAO) x.get("emailTemplateDAO")).find(id);
+      if ( template == null ) throw new RuntimeException("no template found with id " + id);
       return renderTemplate(x, template.getBody(), values);
       `
     },
