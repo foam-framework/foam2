@@ -297,6 +297,9 @@ foam.CLASS({
       localStorage.removeItem(this.of.id);
       localStorage.setItem(this.of.id, JSON.stringify(this.selectedColumnNames.map(c => foam.String.isInstance(c) ? c : c.name )));
 
+      if ( ! this.memento )
+        return;
+
       var newMementoColumns = [];
 
       for ( var s of this.selectedColumnNames ) {
@@ -320,7 +323,7 @@ foam.CLASS({
       var view = this;
 
       //set memento's selected columns
-      if ( ! this.memento.paramsObj.c ) {
+      if ( this.memento && ! this.memento.paramsObj.c ) {
         this.memento.paramsObj.c = this.columns_.map(c => {
           return this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c);
         }).join(',');
