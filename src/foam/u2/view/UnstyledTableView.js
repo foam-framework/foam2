@@ -136,7 +136,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'inheritModelActions',
+      name: 'useModelActions',
       value: true,
       documentation: 'Set this to true to have the context menu actions inherit data model actions.'
     },
@@ -480,7 +480,7 @@ foam.CLASS({
 
           var modelActions = view.of.getAxiomsByClass(foam.core.Action);
           var actions = Array.isArray(view.contextMenuActions)
-            ? view.inheritModelActions
+            ? view.useModelActions
             ? view.contextMenuActions.concat(modelActions)
             : view.contextMenuActions
             : modelActions;
@@ -654,7 +654,7 @@ foam.CLASS({
 
                   // Object actions - Accounts for actions on subclassed objects.
                   // data.of || view.of reference the base classes unless otherwise stated. 
-                  if ( view.inheritModelActions ) obj.cls_.getOwnAxiomsByClass(foam.core.Action).forEach(actionsMerger);
+                  if ( view.useModelActions ) obj.cls_.getOwnAxiomsByClass(foam.core.Action).forEach(actionsMerger);
                   tableRowElement
                     .start()
                       .addClass(view.myClass('td')).
