@@ -9,7 +9,7 @@ foam.CLASS({
     name: 'LiteralValueView',
     extends: 'foam.u2.View',
   
-    documentation: 'Just shows the value of data as a string.',
+    documentation: 'A ValueView that can display a value that is different than the value of the property.',
   
     properties: [
         {
