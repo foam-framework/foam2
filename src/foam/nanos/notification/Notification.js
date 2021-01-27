@@ -11,7 +11,9 @@ foam.CLASS({
   implements: [
     'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
-    'foam.nanos.auth.CreatedByAware'
+    'foam.nanos.auth.CreatedByAware',
+    'foam.nanos.medusa.Clusterable',
+    'foam.nanos.auth.ServiceProviderAware'
   ],
 
   documentation: 'Notification model responsible for system and integrated messaging notifications.',
@@ -32,7 +34,28 @@ foam.CLASS({
     'foam.log.LogLevel'
   ],
 
-  tableColumns: ['id', 'body', 'notificationType', 'broadcasted', 'userId.id', 'groupId.id' ],
+  tableColumns: [
+    'id',
+    'body',
+    'notificationType',
+    'broadcasted',
+    'userId.id',
+    'groupId.id'
+  ],
+
+  sections: [
+    {
+      name: 'default_',
+      order: 1
+    },
+    {
+      name: 'systemInformation',
+      help: 'Properties that are used internally by the system.',
+      title: 'System Information',
+      order: 2,
+      permissionRequired: true
+    },
+  ],
 
   axioms: [
     {
@@ -183,6 +206,31 @@ foam.CLASS({
       class: 'String',
       name: 'slackMessage',
       documentation: 'Message to be sent to Slack.'
+    },
+    {
+      class: 'Boolean',
+      name: 'clusterable',
+      value: true,
+      includeInDigest: false
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
+      name: 'spid',
+      includeInDigest: true,
+      tableWidth: 120,
+      section: 'systemInformation',
+      writePermissionRequired: true,
+      documentation: `
+        Need to override getter to return "" because its trying to
+        return null which breaks tests
+      `,
+      javaGetter: `
+        if ( ! spidIsSet_ ) {
+          return "";
+        }
+        return spid_;
+      `
     }
   ],
 
@@ -200,7 +248,7 @@ foam.CLASS({
       ],
       type: 'Boolean',
       javaCode: `
-        User user = ((Subject) x.get("subject")).getUser();
+        User user = ((Subject) x.get("subject")).getRealUser();
         return user != null && getUserId() == user.getId();
       `
     },
@@ -249,13 +297,12 @@ foam.CLASS({
       label: 'Resend Notification',
       availablePermissions:['notification.notify'],
       code: function(X) {
-        try {
-          X.resendNotificationService.resend(X, this.userId, this);
-          X.notify(this.SEND_SUCCESS, '', this.LogLevel.INFO, true);
-        } catch(e) {
-          X.notify(this.SEND_FAILED, '', this.LogLevel.ERROR, true);
-        }
-
+        var self = this;
+        X.resendNotificationService.resend(X, this.userId, this).then(function() {
+          X.notify(self.SEND_SUCCESS, '', self.LogLevel.INFO, true);
+        }).catch(function(e) {
+          X.notify(self.SEND_FAILED, '', self.LogLevel.ERROR, true);
+        });
       }
     }
   ]

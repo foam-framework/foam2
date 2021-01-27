@@ -39,7 +39,9 @@ foam.CLASS({
       class: 'Boolean',
       name: 'liveScriptBundlerDisabled',
       documentation: `If set to true, generate index file with live script bundler disabled.`,
-      value: false
+      javaFactory: `
+        return getX().get("liveScriptBundler") == null;
+      `
     },
     {
       class: 'Boolean',
@@ -80,7 +82,7 @@ foam.CLASS({
       name: 'populateHead',
       type: 'Void',
       documentation: `Generates the index file's head content based on theme and prints it to the response writer.`,
-      args: [ 
+      args: [
         { name: 'x', javaType: 'X'},
         { name: 'theme', javaType: 'Theme'},
         { name: 'logger', javaType: 'Logger'},
@@ -175,7 +177,7 @@ foam.CLASS({
           String[] fontTags = (String[]) headConfig.get("customFonts");
           for ( String tag : fontTags ) {
             out.println(tag);
-          } 
+          }
         }
         catch ( Exception e ) {
           logger.error(e);
@@ -198,7 +200,7 @@ foam.CLASS({
       javaThrows: [ 'ServletException', 'IOException' ],
       javaCode: `
         String vhost = request.getServerName();
-        
+
         if ( getCustomHostMapping().containsKey(vhost) ) {
           request.getRequestDispatcher((String) getCustomHostMapping().get(vhost)).forward(request, response);
           return;
@@ -210,22 +212,19 @@ foam.CLASS({
         DAO        themeDAO       = (DAO)        x.get("themeDAO");
         Logger     logger         = (Logger)     x.get("logger");
 
-        if ( ! server.containsHostDomain(vhost) ) {
-          vhost = getDefaultHost();
-        }
-
         ThemeDomain themeDomain = (ThemeDomain) themeDomainDAO.find(vhost);
         if ( themeDomain == null ) {
           themeDomain = (ThemeDomain) themeDomainDAO.find(getDefaultHost());
           if ( themeDomain == null ) {
             themeDomain = (ThemeDomain) themeDomainDAO.find("localhost");
-            logger.warning("No theme domain found for default host " + getDefaultHost()+". Falling back to localhost");
+            logger.debug("No theme domain found for default host " + getDefaultHost()+". Falling back to 'localhost'");
           }
         }
 
         Theme theme = (Theme) themeDAO.find(themeDomain.getTheme());
         if ( theme == null ) {
-          throw new RuntimeException("No theme found for theme domain " + themeDomain.getId());
+          logger.error("No theme found for domain " + themeDomain);
+          theme = new Theme(x);
         }
 
         response.setContentType("text/html; charset=UTF-8");

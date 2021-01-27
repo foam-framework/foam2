@@ -13,7 +13,7 @@ process.on('unhandledRejection', function(e) {
 });
 
 // enable FOAM java support.
-global.FOAM_FLAGS = { 'java': true, 'debug': true, 'js': false, 'swift': true };
+global.FOAM_FLAGS = { 'java': true, 'debug': true, 'js': false, 'swift': false };
 
 // Enable FOAMLink mode but only if FOAMLINK_DATA is set in environment
 var foamlinkMode = process.env.hasOwnProperty('FOAMLINK_DATA');
@@ -159,7 +159,6 @@ function ensurePath(p) {
   }
 }
 
-var loading = {};
 function loadClass(c) {
   var path = srcPath;
 
@@ -167,10 +166,6 @@ function loadClass(c) {
     path = path + c[0];
     c = c[1];
   }
-  if ( loading[c] ) {
-    console.log('******************************** call/loadClass:cls', c);
-  }
-  loading[c] = true;
 
   if ( ! foam.lookup(c, true) ) {
     console.warn("Using fallback model loading; " +

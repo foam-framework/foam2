@@ -55,7 +55,18 @@ foam.CLASS({
       border-top-right-radius: 0px;
       direction: ltr;
       padding: 2px;
-      text-align: center;
+      max-height: 100px;
+      overflow: hidden;
+    }
+
+    ^helper-text p {
+      padding: 3px;
+      margin: 0;
+      /* css trick for hiding scroll bar in all browsers */
+      margin-right: -50px; /* Maximum width of scrollbar */
+      padding-right: 50px; /* Maximum width of scrollbar */
+      height: 100%;
+      overflow-y: scroll;
     }
 
     ^arrow-right {
@@ -86,16 +97,13 @@ foam.CLASS({
       cursor: pointer;
     }
 
-    ^flex {
-      display: flex;
-    }
-
     ^error .foam-u2-tag-TextArea,
     ^error .foam-u2-tag-Select,
     ^error .foam-u2-TextField,
     ^error .foam-u2-IntView,
     ^error .foam-u2-FloatView,
     ^error .foam-u2-DateView,
+    ^error .foam-u2-CurrencyView,
     ^error .foam-u2-view-date-DateTimePicker .date-display-box,
     ^error .foam-u2-view-RichChoiceView-selection-view,
     ^error .foam-u2-view-RichChoiceView-clear-btn
@@ -235,23 +243,15 @@ foam.CLASS({
         .addClass(`sectioned-detail-property-${this.prop.name}`)
         .add(this.slot(function(mode, prop, prop$label) {
 
-          var isCheckBox = false;
-          if ( foam.Function.isInstance(prop.view) ) {
-            isCheckBox = prop.view.class === 'foam.u2.CheckBox' || ( prop.view.cls_ && prop.view.cls_.id === 'foam.u2.CheckBox' );
-          }
-          else {
-            isCheckBox = prop.view.class === 'foam.u2.CheckBox';
-          }
-
           var errorSlot = prop.validateObj && prop.validationTextVisible ?
             this.data.slot(prop.validateObj) :
             foam.core.ConstantSlot.create({ value: null });
 
           return self.E()
             .start(self.Rows)
-              .callIf(prop$label && ! isCheckBox, function() {
+              .callIf(prop$label && prop.view.class != 'foam.u2.CheckBox', function() {
                 this.start('m3')
-                  .add(prop$label)
+                  .add(prop.label)
                   .style({ 'line-height': '2' })
                 .end();
               })
@@ -259,7 +259,6 @@ foam.CLASS({
                 .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                 .start()
                   .style({ 'flex-grow': 1, 'max-width': '100%' })
-                  .enableClass(self.myClass('flex'), isCheckBox)
                   .tag(prop, { mode$: self.mode$ })
                   .callIf(prop.validationStyleEnabled, function() {
                     this.enableClass(self.myClass('error'), errorSlot);
@@ -276,7 +275,7 @@ foam.CLASS({
                       .addClass(self.myClass('tooltip-container'))
                       .start()
                         .addClass(self.myClass('helper-text'))
-                        .start('p').style({ 'padding': '3px' })
+                        .start('p')
                           .add(prop.help)
                         .end()
                       .end()

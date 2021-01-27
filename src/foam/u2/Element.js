@@ -1013,6 +1013,10 @@ foam.CLASS({
 
   methods: [
     function init() {
+      /*
+      if ( ! this.translationService )
+        console.warn('Element ' + this.cls_.name + ' created with globalContext');
+      */
       this.onDetach(this.visitChildren.bind(this, 'detach'));
     },
 
@@ -1588,9 +1592,18 @@ foam.CLASS({
     },
 
     function translate(source, opt_default) {
-      /* Add the translation of the supplied source to the Element as a String */
-      var translation = this.translationService.getTranslation(foam.locale, source);
-      return this.add(translation || opt_default || 'no value');
+      var translationService = this.translationService;
+      if ( translationService ) {
+        /* Add the translation of the supplied source to the Element as a String */
+        var translation = this.translationService.getTranslation(foam.locale, source, opt_default);
+        if ( foam.xmsg ) {
+          return this.tag({class: 'foam.i18n.InlineLocaleEditor', source: source, defaultText: opt_default, data: translation});
+        }
+        return this.add(translation);
+      }
+      console.warn('Missing Translation Service in ', this.cls_.name);
+      opt_default = opt_default || 'NO TRANSLATION SERVICE OR DEFAULT';
+      return this.add(opt_default);
     },
 
     function add() {
@@ -1641,9 +1654,11 @@ foam.CLASS({
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
         } else if ( this.translationService && c && c.data && c.data.id ) {
+          // TODO: remove
           var key = c.data.id + '.' + c.clsInfo;
-          var translation = this.translationService.getTranslation(foam.locale, key);
-          return this.add(translation || c.default || 'no value');
+          console.log('DEPRECATED, use translate() instead ******************* add translate ', key, c.default);
+          var translation = this.translationService.getTranslation(foam.locale, key, c.default);
+          return this.add(translation);
         } else {
           es.push(c);
         }
@@ -1813,7 +1828,11 @@ foam.CLASS({
      * @param {Function} fn A function to call for each item in the given array.
      */
     function forEach(array, fn) {
-      array.forEach(fn.bind(this));
+      if ( foam.core.Slot.isInstance(array) ) {
+        this.add(array.map(a => this.E().forEach(a, fn)));
+      } else {
+        array.forEach(fn.bind(this));
+      }
       return this;
     },
 

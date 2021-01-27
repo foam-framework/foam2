@@ -14,6 +14,8 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.dao.ArrayDAO',
+    'foam.dao.NullDAO',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityCategory',
     'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
@@ -37,13 +39,15 @@ foam.CLASS({
     'capabilityDAO',
     'crunchController',
     'crunchService',
-    'registerElement'
+    'menuDAO',
+    'registerElement',
+    'theme'
   ],
 
   messages: [
     { name: 'TAB_ALL', message: 'All' },
-    { name: 'TITLE', message: 'Registration' },
-    { name: 'SUBTITLE', message: 'To complete the registration, follow the steps below' }
+    { name: 'TITLE', message: 'Features' },
+    { name: 'SUBTITLE', message: 'Unlock more features on {appName}' }
   ],
 
   css: `
@@ -75,8 +79,8 @@ foam.CLASS({
 
     ^feature-column-grid {
       display: inline-flex;
-      width: 94%;
-      overflow: hidden;
+      width: calc(100% - 48px);
+      overflow-x: scroll;
     }
 
     ^featureSection {
@@ -86,11 +90,12 @@ foam.CLASS({
 
     ^perFeature {
       display: flex;
-      padding-bottom: 10px;
+      padding-bottom: 55px;
     }
 
     ^left-arrow {
-      width: 3%;
+      width: 24px;
+      height: 24px;
       float: left;
       display: flex;
       cursor: pointer;
@@ -99,7 +104,8 @@ foam.CLASS({
     }
 
     ^right-arrow {
-      width: 3%;
+      width: 24px;
+      height: 24px;
       float: right;
       display: flex;
       cursor: pointer;
@@ -121,28 +127,13 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'hideGrantedCapabilities',
-      class: 'Boolean'
-    },
-    {
-      name: 'grantedCapabilities',
-      class: 'StringArray'
-    },
-    {
       name: 'visibleCapabilityDAO',
       class: 'foam.dao.DAOProperty',
       documentation: `
         DAO with only visible capabilities.
       `,
-      expression: function(hideGrantedCapabilities, grantedCapabilities) {
-        var predicate = this.EQ(this.Capability.VISIBLE, true);
-        if ( hideGrantedCapabilities )
-          predicate = this.AND(
-            predicate,
-            this.NOT(this.IN(this.Capability.ID, grantedCapabilities))
-          );
-        return this.capabilityDAO
-          .where(predicate);
+      factory: function() {
+        return this.NullDAO.create();
       }
     },
     {
@@ -151,8 +142,8 @@ foam.CLASS({
       documentation: `
         DAO Property to find capabilities to feature.
       `,
-      factory: function() {
-        return this.visibleCapabilityDAO
+      expression: function(visibleCapabilityDAO) {
+        return visibleCapabilityDAO
           .where(this.IN('featured', this.Capability.KEYWORDS));
       }
     },
@@ -181,23 +172,28 @@ foam.CLASS({
       name: 'featureCardArray',
       value: [],
       documentation: 'stores the styling of each featureCapability'
-    }
+    },
+    {
+      name: 'cardsOverflow',
+      class: 'Boolean'
+    },
+    'wizardOpened'
   ],
 
   methods: [
     function init() {
       this.crunchService.getAllJunctionsForUser().then(juncs => {
-        this.grantedCapabilities = juncs
-          .filter(
-            junc => junc.status == this.CapabilityJunctionStatus.GRANTED
-          )
-          .map(junc => junc.targetId);
         this.daoUpdate();
-      })
+      });
+      this.crunchService.getEntryCapabilities().then(a => {
+        this.visibleCapabilityDAO = this.ArrayDAO.create({
+          array: a.array
+        });
+      });
     },
     function initE() {
       this.SUPER();
-
+      this.onDetach(this.crunchService.sub('grantedJunction', this.onChange));
       var self = this;
       window.cstore = self;
 
@@ -207,9 +203,11 @@ foam.CLASS({
           .add(this.TITLE)
         .end()
         .start('p').addClass(this.myClass('label-subtitle'))
-          .add(this.SUBTITLE)
+          .add(this.SUBTITLE.replace('{appName}', this.theme.appName))
         .end()
-        .add(self.renderFeatured())
+        .add(this.slot(function(featuredCapabilities){
+          return self.renderFeatured();
+        }))
         // NOTE: TEMPORARILY REMOVED
         // .add(self.accountAndAccountingCard())
         // .start(self.Tabs)
@@ -235,51 +233,62 @@ foam.CLASS({
     function renderFeatured() { // Featured Capabilities in carousel view
       var self = this;
       var spot = self.E();
-      return this.E().start()// .style({ 'height': 'fit-content', 'overflow-y': 'visible' })
-        .addClass(this.myClass('container'))
-        .add(this.slot(function(featuredCapabilities) {
-          featuredCapabilities.select().then(result => {
-            var arr = result.array;
-            self.totalNumCards = arr.length;
-            self.featureCardArray = [];
-            for ( let i = 0 ; i < self.totalNumCards ; i++ ) { // build featured cards as elements
-              self.featureCardArray.push(
-                () => self.Element.create().start()
-                  .addClass(self.myClass('perFeature'))
-                  .start(self.CapabilityFeatureView, { data: arr[i] })
-                    .addClass(self.myClass('featureSection'))
-                  .end()
-                  .on('click', () => {
-                    self.crunchController
-                      .createWizardSequence(arr[i].id).execute();
-                  })
-                .end());
-            }
-            spot.start('span').start('img').addClass(self.myClass('left-arrow'))
-                .attr('src', 'images/arrow-back-24px.svg')
-                .on('click', function() {
-                  self.carouselCounter--;
-                })
-              .end().end();
-            spot.add(self.slot(
-              function(carouselCounter, totalNumCards) {
-                var ele = self.E().addClass(self.myClass('feature-column-grid'));
-                for ( var k = 0 ; k < totalNumCards ; k++ ) {
-                  let cc = carouselCounter % totalNumCards; // this stops any out of bounds indecies
-                  let index = ( cc + totalNumCards + k ) % totalNumCards; // this ensures circle indecies
-                  ele = ele.add(self.featureCardArray[index].call(self));
-                }
-                return ele;
-              }));
-            spot.start('span').start('img').addClass(self.myClass('right-arrow'))
-              .attr('src', 'images/arrow-forward-24px.svg')
-              .on('click', function() {
-                self.carouselCounter++;
+      this.featuredCapabilities.select().then(result => {
+        var arr = result.array;
+        self.totalNumCards = arr.length;
+        self.featureCardArray = [];
+        for ( let i = 0 ; i < self.totalNumCards ; i++ ) { // build featured cards as elements
+          self.featureCardArray.push(
+            () => self.Element.create().start()
+              .addClass(self.myClass('perFeature'))
+              .start(self.CapabilityFeatureView, { data: arr[i] })
+                .addClass(self.myClass('featureSection'))
+              .end()
+              .on('click', () => {
+                self.openWizard(arr[i].id);
               })
-            .end().end();
-          });
-          return spot;
-       })).end();
+            .end());
+        }
+
+        spot.start().start('span')
+          .start('img').addClass(self.myClass('left-arrow')).show(this.cardsOverflow$)
+            .attr('src', 'images/arrow-back-24px.svg')
+            .on('click', function() {
+              self.carouselCounter--;
+            })
+          .end()
+        .end();
+        var ele;
+        function checkCardsOverflow(evt) {
+          if ( ! ele.el() ) return;
+          self.cardsOverflow = ele.el().scrollWidth > ele.el().clientWidth;
+        }
+        spot.add(self.slot(
+          function(carouselCounter, totalNumCards) {
+            ele = self.E().addClass(self.myClass('feature-column-grid'));
+            for ( var k = 0 ; k < totalNumCards ; k++ ) {
+              let cc = carouselCounter % totalNumCards; // this stops any out of bounds indecies
+              let index = ( cc + totalNumCards + k ) % totalNumCards; // this ensures circle indecies
+              ele = ele.add(self.featureCardArray[index].call(self));
+            }
+            return ele;
+          }));
+        spot.start('span')
+          .start('img').addClass(self.myClass('right-arrow')).show(this.cardsOverflow$)
+            .attr('src', 'images/arrow-forward-24px.svg')
+            .on('click', function() {
+              self.carouselCounter++;
+            })
+          .end()
+        .end();
+
+        window.addEventListener('resize', checkCardsOverflow);
+        checkCardsOverflow();
+        self.onDetach(() => {
+          window.removeEventListener('resize', checkCardsOverflow);
+        });
+      });
+      return spot;
     },
 
     function accountAndAccountingCard() {
@@ -308,8 +317,7 @@ foam.CLASS({
                   .start(self.GUnit, { columns: 4 })
                     .tag(self.CapabilityCardView, { data: cap })
                     .on('click', () => {
-                      self.crunchController
-                        .createWizardSequence(cap).execute();
+                      self.openWizard(cap);
                     })
                   .end();
               }
@@ -342,8 +350,7 @@ foam.CLASS({
               .start(self.GUnit, { columns: 4 })
                 .tag(self.CapabilityCardView, { data: cap })
                 .on('click', () => {
-                  self.crunchController
-                    .createWizardSequence(cap).execute();
+                  self.openWizard(cap);
                 })
               .end();
           }
@@ -381,10 +388,36 @@ foam.CLASS({
           )).select())
         .then(sink => {
           if ( sink.array.length == 1 ) {
-            this.crunchController
-              .createWizardSequence(sink.array[0]).execute();
+            this.openWizard(sink.array[0]);
           }
         })
+    },
+    function openWizard(cap) {
+      if ( this.wizardOpened ) return;
+      this.wizardOpened = true;
+      this.crunchController
+        .createWizardSequence(cap).execute().then(() => {
+          this.wizardOpened = false;
+        });
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'onChange',
+      isMerged: true,
+      mergeDelay: 2000,
+      code: async function() {
+        let a = await this.crunchService.getEntryCapabilities();
+        this.visibleCapabilityDAO = this.ArrayDAO.create({
+          array: a.array
+        });
+        await this.crunchService.getAllJunctionsForUser();
+        this.daoUpdate();
+        // Attempting to reset menuDAO incase of menu permission grantings.
+        this.menuDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
+        this.menuDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
+      }
     }
   ]
 });

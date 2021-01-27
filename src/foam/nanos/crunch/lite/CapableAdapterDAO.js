@@ -14,7 +14,10 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.dao.MDAO',
     'java.util.Arrays',
-    'foam.dao.ArraySink'
+    'java.util.ArrayList',
+    'java.util.List',
+    'foam.dao.ArraySink',
+    'foam.nanos.crunch.CapabilityJunctionPayload'
   ],
 
   documentation: `
@@ -37,13 +40,13 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-        CapablePayload payload = (CapablePayload) obj;
+        CapabilityJunctionPayload payload = (CapabilityJunctionPayload) obj;
 
-        CapablePayload[] payloads = getCapable().getCapablePayloads();
+        CapabilityJunctionPayload[] payloads = getCapable().getCapablePayloads();
         for ( int i = 0 ; i < payloads.length ; i++ ) {
           if (
-            payload.getCapability().getId().equals(
-              payloads[i].getCapability().getId()
+            payload.getCapability().equals(
+              payloads[i].getCapability()
             )
           ) {
             payloads[i] = payload;
@@ -58,20 +61,40 @@ foam.CLASS({
       `,
       code: async function (x, obj) {
         return this.ifFoundElseIfNotFound_(
-          obj,
+          obj.capability,
           (payloads, i) => { payloads[i] = obj; return obj; },
-          (payloads) => { payloads.push(obj); }
+          (payloads) => { payloads.push(obj); return obj; }
         );
       }
     },
     {
       name: 'remove_',
       javaCode: `
-        return obj; // TODO
+        CapabilityJunctionPayload payload = (CapabilityJunctionPayload) obj;
+
+        CapabilityJunctionPayload[] payloads = getCapable().getCapablePayloads();
+
+        List<CapabilityJunctionPayload> newPayloadsList = new ArrayList<>();
+
+        for ( int i = 0; i < payloads.length; i++ ){
+          if ( ! payload.getCapability().equals(payloads[i].getCapability()) ){
+            newPayloadsList.add(payloads[i]);
+          }
+        }
+
+        if ( payloads.length == newPayloadsList.size() ){
+          return null;
+        }
+
+        CapabilityJunctionPayload[] newPayloads =
+          newPayloadsList.toArray(new CapabilityJunctionPayload[0]);
+        getCapable().setCapablePayloads(newPayloads);
+
+        return obj;
       `,
       code: async function (x, obj) {
         return this.ifFoundElseIfNotFound_(
-          obj,
+          obj.capability,
           (payloads, i) => { payloads.splice(i, 1); return obj },
           (payloads) => obj
         );
@@ -81,21 +104,30 @@ foam.CLASS({
       name: 'find_',
       javaCode: `
         String idString = null;
-        if ( id instanceof CapablePayload ) {
-          idString = ((CapablePayload) id).getCapability().getId();
+        if ( id instanceof CapabilityJunctionPayload ) {
+          idString = ((CapabilityJunctionPayload) id).getCapability();
         } else {
           idString = (String) id;
         }
-        CapablePayload[] payloads = getCapable().getCapablePayloads();
+        CapabilityJunctionPayload[] payloads = getCapable().getCapablePayloads();
         for ( int i = 0 ; i < payloads.length ; i++ ) {
           if (
-            payloads[i].getCapability().getId().equals(idString)
+            payloads[i].getCapability().equals(idString)
           ) {
             return payloads[i];
           }
         }
         return null;
-      `
+      `,
+      code: async function (x, obj) {
+        let capability = typeof obj == 'string'
+          ? obj : obj.capability ;
+        return this.ifFoundElseIfNotFound_(
+          capability,
+          (payloads, i) => { return payloads[i] },
+          (payloads) => null
+        );
+      }
     },
     {
       name: 'select_',
@@ -110,12 +142,12 @@ foam.CLASS({
     {
       name: 'ifFoundElseIfNotFound_',
       flags: ['web'],
-      code: function (payload, ifFound, ifNotFound) {
+      code: function (capability, ifFound, ifNotFound) {
         var found = false;
         var foundReturn = null;
         payloads = this.capable.capablePayloads;
         for ( var i = 0 ; i < payloads.length ; i++ ) {
-          if ( payload.capability.id == payloads[i].capability.id ) {
+          if ( capability == payloads[i].capability ) {
             foundReturn = ifFound(payloads, i);
             found = true;
           }

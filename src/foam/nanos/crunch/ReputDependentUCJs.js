@@ -21,6 +21,8 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.auth.User',
     'java.util.ArrayList',
     'java.util.List',
     'static foam.mlang.MLang.*'
@@ -33,95 +35,61 @@ foam.CLASS({
         agency.submit(x, new ContextAgent() {
           @Override
           public void execute(X x) {
+            CrunchService crunchService = (CrunchService) x.get("crunchService");
             DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
-            UserCapabilityJunction old = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
-              EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
-              EQ(UserCapabilityJunction.TARGET_ID, ucj.getTargetId())
-            ));
+            UserCapabilityJunction old = (UserCapabilityJunction) userCapabilityJunctionDAO.find(ucj.getId());
 
-            boolean isInvalidate = ucj.getStatus() != CapabilityJunctionStatus.GRANTED || 
-              ( ucj.getStatus() == CapabilityJunctionStatus.APPROVED && (
-                 old.getStatus() != CapabilityJunctionStatus.APPROVED ||
-                 old.getStatus() != CapabilityJunctionStatus.GRANTED ) );
-            
-            Long effectiveUser = ( ucj instanceof AgentCapabilityJunction ) ? ((AgentCapabilityJunction) ucj).getEffectiveUser() : null;
+            Long effectiveUserId = ( ucj instanceof AgentCapabilityJunction ) ? ((AgentCapabilityJunction) ucj).getEffectiveUser() : null;
             DAO filteredUserCapabilityJunctionDAO = (DAO) userCapabilityJunctionDAO
-              .where(AND(
+              .where(OR(
                 EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
-                OR(
-                  NOT(INSTANCE_OF(foam.nanos.crunch.AgentCapabilityJunction.class)),
-                  EQ(AgentCapabilityJunction.EFFECTIVE_USER, effectiveUser)
-                )
+                // TODO: is it really a good idea to update capabilities of a
+                //   business when a user's business-associated capability has
+                //   a change in status?
+                EQ(UserCapabilityJunction.SOURCE_ID, effectiveUserId),
+                EQ(AgentCapabilityJunction.EFFECTIVE_USER, ucj.getSourceId()),
+                // TODO: consider this new (commented) code for not being commented
+                // AND(
+                  EQ(AgentCapabilityJunction.EFFECTIVE_USER, effectiveUserId)
+                  // EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId())
+                // )
               ));
-            DAO filteredPrerequisiteCapabilityJunctionDAO = (DAO) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
-              .where(EQ(CapabilityCapabilityJunction.TARGET_ID, ucj.getTargetId()));
-            
-            List<CapabilityCapabilityJunction> ccjs = ((ArraySink) filteredPrerequisiteCapabilityJunctionDAO
-              .select(new ArraySink()))
-              .getArray();
+
+            String[] dependentIds = crunchService.getDependentIds(x, ucj.getTargetId());
 
             List<UserCapabilityJunction> ucjsToReput = new ArrayList<UserCapabilityJunction>();
 
-            for ( CapabilityCapabilityJunction ccj : ccjs ) {
+            for ( String dependentId : dependentIds ) {
               UserCapabilityJunction ucjToReput = (UserCapabilityJunction) filteredUserCapabilityJunctionDAO
-                .find(EQ(UserCapabilityJunction.TARGET_ID, ccj.getSourceId()));
-              if ( ucjToReput != null ) ucjsToReput.add(ucjToReput);
+                .find(EQ(UserCapabilityJunction.TARGET_ID, dependentId));
+
+              // Skip null and AVAILABLE UCJs
+              if (
+                ucjToReput == null
+                || ucjToReput.getStatus() == CapabilityJunctionStatus.AVAILABLE
+              ) continue;
+
+              ucjsToReput.add((UserCapabilityJunction) ucjToReput.fclone());
             }
 
+            X effectiveX = x;
+            Subject junctionSubject = ucj.getSubject(x);
+            effectiveX = x.put("subject", junctionSubject);
+
             for ( UserCapabilityJunction ucjToReput : ucjsToReput ) {
-              if ( isInvalidate ) ucjToReput.setStatus(cascadeInvalidateStatus(x, ucjToReput, ucj));
-              userCapabilityJunctionDAO.inX(x).put(ucjToReput);
+              if ( ucjToReput.getStatus() == CapabilityJunctionStatus.GRANTED ) {
+                if ( ucj.getIsInGracePeriod() ) ucjToReput.setIsInGracePeriod(true);
+                if ( ucj.getIsRenewable() ) ucjToReput.setIsRenewable(true);
+              }
+              if ( effectiveUserId != null && effectiveX != null &&
+                   ucjToReput.getSourceId() == effectiveUserId )
+                userCapabilityJunctionDAO.inX(effectiveX).put(ucjToReput);
+              else
+                userCapabilityJunctionDAO.inX(x).put(ucjToReput);
             }
           }
         }, "Reput the UCJs of dependent capabilities");
-      `
-    },
-    {
-      name: 'cascadeInvalidateStatus',
-      args: [
-        { name: 'x', javaType: 'foam.core.X' },
-        { name: 'ucj', javaType: 'foam.nanos.crunch.UserCapabilityJunction' },
-        { name: 'prereq', javaType: 'foam.nanos.crunch.UserCapabilityJunction' }
-      ],
-      javaType: 'foam.nanos.crunch.CapabilityJunctionStatus',
-      javaCode: `
-        CapabilityJunctionStatus newStatus = ucj.getStatus();
-
-        Capability capability = (Capability) ucj.findTargetId(x);
-        boolean reviewRequired = capability.getReviewRequired();
-        CapabilityJunctionStatus prereqStatus = prereq.getStatus();
-
-        switch ( (CapabilityJunctionStatus) prereqStatus ) {
-          case AVAILABLE : 
-            newStatus = CapabilityJunctionStatus.ACTION_REQUIRED;
-            break;
-          case ACTION_REQUIRED : 
-            newStatus = CapabilityJunctionStatus.ACTION_REQUIRED;
-            break;
-          case PENDING : 
-            newStatus = reviewRequired && 
-              ( newStatus == CapabilityJunctionStatus.APPROVED || 
-                newStatus == CapabilityJunctionStatus.GRANTED
-              ) ? 
-                CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
-            break;
-          case APPROVED : 
-            newStatus = reviewRequired && 
-            ( newStatus == CapabilityJunctionStatus.APPROVED || 
-              newStatus == CapabilityJunctionStatus.GRANTED
-            ) ? 
-              CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
-            break;
-          case EXPIRED :
-            newStatus = CapabilityJunctionStatus.ACTION_REQUIRED;
-            break;
-          default : // GRANTED
-            if ( prereq.getIsInGracePeriod() ) ucj.setIsInGracePeriod(true);
-            if ( prereq.getIsRenewable() ) ucj.setIsRenewable(true);
-        }
-        return newStatus;
-
       `
     }
   ]

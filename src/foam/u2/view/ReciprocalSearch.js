@@ -18,6 +18,7 @@ foam.CLASS({
 
   imports: [
     'dao',
+    'memento',
     'searchColumns'
   ],
 
@@ -140,9 +141,10 @@ foam.CLASS({
         if ( loadingRequests > 0 ) {
           return 'Loading...';
         }
-        return `${selectedCount.toLocaleString()} of ${totalCount.toLocaleString()} selected`;
+        return `${selectedCount.toLocaleString(foam.locale)} of ${totalCount.toLocaleString(foam.locale)} selected`;
       }
-    }
+    },
+    'searchValue'
   ],
 
   methods: [
@@ -175,7 +177,8 @@ foam.CLASS({
                 viewSpec: {
                   class: 'foam.u2.tag.Input',
                   focused: true
-                }
+                },
+                searchValue: this.searchValue
             }, slot)
             .addClass('general-query')
           .end();

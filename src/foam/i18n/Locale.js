@@ -8,11 +8,14 @@ foam.CLASS({
   package: 'foam.i18n',
   name: 'Locale',
 
+  ids: ['locale', 'variant', 'source'],
+
+  implements: [
+    'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.auth.LastModifiedByAware'
+  ],
+
   properties: [
-    {
-      class: 'String',
-      name: 'id',
-    },
     {
       class: 'String',
       name: 'locale',
@@ -25,14 +28,6 @@ foam.CLASS({
       class: 'String',
       name: 'variant',
       documentation: 'Locale variation (CA for en-CA, CA for fr-CA, AT for de_AT …etc)'
-    },
-    {
-      class: 'String',
-      name: 'locale_variant',
-      documentation: 'complete culture code, return locale and variant. (`en-CA`, ‘fr-CA’, ‘de_AT’ …etc)',
-      //factory: function() { return this.locale + '-' + this.variant ; },
-      //value: 'en-CA'
-      value: foam.language
     },
 //     {
 //       class: 'Map',
@@ -60,6 +55,26 @@ foam.CLASS({
       class: 'String',
       name: 'note',
       documentation: 'Provided hint to translators. Ex. ( if label is `rad` hint: calculator radian.)'
+    },
+    {
+      class: 'DateTime',
+      name: 'lastModified',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedBy',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      tableCellFormatter: function(value, obj) {
+        this.__subSubContext__.userDAO.find(value).then(function(user) {
+          if ( user ) {
+            this.add(user.legalName);
+          }
+        }.bind(this));
+      }
     }
   ]
 });

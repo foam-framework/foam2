@@ -44,6 +44,7 @@ foam.CLASS({
       javaCode:
 `
 AppConfig appConfig = (AppConfig) x.get("appConfig");
+String url = appConfig.getUrl().replaceAll("/$", "");
 
 // The context passed to us won't have a user in it because obviously the user
 // isn't logged in if they're resetting their password. However, decorators on
@@ -88,7 +89,7 @@ message.setTo(new String[] { user.getEmail() });
 
 HashMap<String, Object> args = new HashMap<>();
 args.put("name", String.format("%s %s", user.getFirstName(), user.getLastName()));
-args.put("link", appConfig.getUrl() +"?token=" + token.getData() + "#reset");
+args.put("link", url +"?token=" + token.getData() + "#reset");
 
 EmailsUtility.sendEmailFromTemplate(x, user, message, "reset-password", args);
 

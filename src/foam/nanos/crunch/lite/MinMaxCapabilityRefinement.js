@@ -14,35 +14,48 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.nanos.crunch.lite.CapablePayload',
-
+    'foam.nanos.crunch.CapabilityJunctionPayload',
+    'foam.nanos.crunch.CrunchService',
     'static foam.nanos.crunch.CapabilityJunctionStatus.*'
   ],
 
   methods: [
     {
       name: 'getCapableChainedStatus',
+      documentation: `
+        numberGrantedOrPending are  the available CapablePayloads which are GRANTED or can eventually be turned into
+        GRANTED from PENDING state. If  MinMaxCapability.min is greater than the number of available payloads which are GRANTED or
+        can eventually be turned into GRANTED, then it is impossible for the total amount of GRANTED payloads to be greater than the MIN,
+        thereby fulfilling the minimum requirement.
+
+        For example, let there be a min max capablity which has 10 prerequisites and a min of 2.
+
+        If the user selected only 3 of those prereqs in the wizard, then the CapablePayload.status for those 3 will each be in PENDING
+        state with approvals generated for each one. Note, there will only be these 3 CapablePayloads out of the 10 Prereqs avaliable on the
+        Capable object since the user only selected 3.
+
+        If 1 of those 3 CapablePayloads get rejected. Then there will be 2 numberGrantedOrPending which could still potentially satisfy
+        the min requirement of 2 if those 2 CapablePayloads get set to GRANTED.
+
+        If 2 of those 3 CapablePayloads get rejected. Then there will be 1 numberGrantedOrPending which would be impossible to satisfy the
+        MinMaxCapability.min requirement of 2 even if that 1 CapablePayload is GRANTED.
+      `,
       javaCode: `
-        // These two statements duplicate getPrereqsChainedStatus
-        DAO myPrerequisitesDAO = ((DAO)
-          x.get("prerequisiteCapabilityJunctionDAO"))
-            .where(
-              EQ(CapabilityCapabilityJunction.SOURCE_ID, getId()));
-        List<CapabilityCapabilityJunction> ccJunctions =
-          ((ArraySink) myPrerequisitesDAO.select(new ArraySink()))
-          .getArray();
-        
+        CrunchService crunchService = (CrunchService) x.get("crunchService");
+        List<String> prereqCapIds = crunchService.getPrereqs(getId());
+
         int numberGranted = 0;
         int numberPending = 0;
+        int numberRejected = 0;
 
-        for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
-          CapablePayload prereqPayload = (CapablePayload)
-            capablePayloadDAO.find(ccJunction.getTargetId());
-          
+        for ( String capId : prereqCapIds ) {
+          CapabilityJunctionPayload prereqPayload = (CapabilityJunctionPayload)
+            capablePayloadDAO.find(capId);
+
           if ( prereqPayload == null ) {
             continue;
           }
-          
+
           switch ( prereqPayload.getStatus() ) {
             case GRANTED:
               numberGranted++;
@@ -51,15 +64,30 @@ foam.CLASS({
             case APPROVED:
               numberPending++;
               continue;
+            case REJECTED:
+              numberRejected++;
+              continue;
           }
         }
 
+        int numberTotal = numberGranted + numberPending + numberRejected;
+
+        int numberGrantedOrPending = numberGranted + numberPending;
+
+        if ( numberTotal == 0 ){
+          return CapabilityJunctionStatus.ACTION_REQUIRED;
+        }
+
+        if ( getMin() > numberGrantedOrPending ){
+          return CapabilityJunctionStatus.REJECTED;
+        }
         if ( numberGranted >= getMin() ) {
           return CapabilityJunctionStatus.GRANTED;
         }
-        if ( numberGranted + numberPending >= getMin() ) {
+        if ( numberTotal >= getMin() ) {
           return CapabilityJunctionStatus.PENDING;
         }
+
         return CapabilityJunctionStatus.ACTION_REQUIRED;
       `
     }

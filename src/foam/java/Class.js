@@ -252,7 +252,7 @@ foam.CLASS({
       this.extras.forEach(function(c) { o.out(c, '\n'); });
       o.decreaseIndent();
       o.indent();
-      o.out('}');
+      o.out('};');
 
     },
 

@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'EasyDAO',
   extends: 'foam.dao.ProxyDAO',
+
   implements: [
     'foam.mlang.Expressions',
     'foam.nanos.boot.NSpecAware'
@@ -78,8 +79,10 @@ foam.CLASS({
   imports: [ 'document', 'log' ],
 
   javaImports: [
+    'foam.core.PropertyInfo',
     'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'java.util.List'
   ],
 
   constants: [
@@ -187,40 +190,9 @@ foam.CLASS({
               if ( getWriteOnly() ) {
                 delegate = new foam.dao.WriteOnlyJDAO(getX(), getMdao(), getOf(), getJournalName());
               } else {
-                delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName());
+                delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName(), getCluster());
               }
             }
-          }
-        }
-
-        delegate = getOuterDAO(delegate);
-
-        if ( getDecorator() != null ) {
-          if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
-            logger.error(getName(), "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
-            System.exit(1);
-          }
-          // The decorator dao may be a proxy chain
-          ProxyDAO proxy = (ProxyDAO) getDecorator();
-          while ( proxy.getDelegate() != null && proxy.getDelegate() instanceof ProxyDAO )
-            proxy = (ProxyDAO) proxy.getDelegate();
-          proxy.setDelegate(delegate);
-          delegate = (ProxyDAO) getDecorator();
-        }
-
-        if ( getApprovableAware() ) {
-          var delegateBuilder = new foam.nanos.approval.ApprovableAwareDAO
-            .Builder(getX())
-            .setDaoKey(getName())
-            .setOf(getOf())
-            .setDelegate(delegate);
-          if(approvableAwareServiceNameIsSet_)
-            delegateBuilder.setServiceName(getApprovableAwareServiceName());
-
-          delegate = delegateBuilder.build();
-
-          if ( getApprovableAwareEnabled() ) {
-            logger.warning("DEPRECATED: EasyDAO", getName(), "'approvableAwareEnabled' is deprecated. Please remove it from the nspec.");
           }
         }
 
@@ -238,19 +210,64 @@ foam.CLASS({
         if ( getGuid() )
           delegate = new foam.dao.GUIDDAO.Builder(getX()).setDelegate(delegate).build();
 
+        if ( getCluster() ) {
+          if ( getMdao() != null ) {
+            logger.debug(getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
+            delegate = new foam.nanos.medusa.MedusaAdapterDAO.Builder(getX())
+              .setNSpec(getNSpec())
+              .setDelegate(delegate)
+              .build();
+          }
+        }
+
+        if ( getServiceProviderAware() ) {
+          delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX())
+            .setDelegate(delegate)
+            .build();
+        }
+
+        delegate = getOuterDAO(delegate);
+
+        if ( getDecorator() != null ) {
+          if ( ! ( getDecorator() instanceof ProxyDAO ) ) {
+            logger.error(getName(), "delegateDAO", getDecorator(), "not instanceof ProxyDAO");
+            System.exit(1);
+          }
+          // The decorator dao may be a proxy chain
+          ProxyDAO proxy = (ProxyDAO) getDecorator();
+          while ( proxy.getDelegate() != null && proxy.getDelegate() instanceof ProxyDAO )
+            proxy = (ProxyDAO) proxy.getDelegate();
+          proxy.setDelegate(delegate);
+          delegate = (ProxyDAO) getDecorator();
+        }
+
+        // set inner delegate_ to handle reentrant
+        // DelegateFactory calls from subsequent DAOs which may
+        // have init_ methods which in turn call getDelegate().
+        delegateIsSet_ = true;
+        delegate_ = new ProxyDAO.Builder(getX()).setDelegate(delegate).build();
+
+        if ( getApprovableAware() ) {
+          var delegateBuilder = new foam.nanos.approval.ApprovableAwareDAO
+            .Builder(getX())
+            .setDaoKey(getName())
+            .setOf(getOf())
+            .setDelegate(delegate);
+          if(approvableAwareServiceNameIsSet_)
+            delegateBuilder.setServiceName(getApprovableAwareServiceName());
+
+          delegate = delegateBuilder.build();
+
+          if ( getApprovableAwareEnabled() ) {
+            logger.warning("DEPRECATED: EasyDAO", getName(), "'approvableAwareEnabled' is deprecated. Please remove it from the nspec.");
+          }
+        }
+
         if ( getValidated() ) {
           if ( getValidator() != null )
             delegate = new foam.dao.ValidatingDAO(getX(), delegate, getValidator());
           else
             delegate = new foam.dao.ValidatingDAO(getX(), delegate, foam.core.ValidatableValidator.instance());
-        }
-
-        if ( getServiceProviderAware() ) {
-          foam.nanos.auth.ServiceProviderAwareDAO dao = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX()).setDelegate(delegate).build();
-          if ( getServiceProviderAwarePropertyInfos() != null ) {
-            dao.setPropertyInfos(getServiceProviderAwarePropertyInfos());
-          }
-          delegate = dao;
         }
 
         if ( getLifecycleAware() ) {
@@ -326,13 +343,18 @@ foam.CLASS({
         if ( getPm() )
           delegate = new foam.dao.PMDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(delegate).build();
 
-        return delegate;
+        // reset logger
+        EasyDAO.LOGGER.clear(this);
+
+        // see comments above regarding DAOs with init_
+        ((ProxyDAO)delegate_).setDelegate(delegate);
+        return delegate_;
       `
     },
     {
       class: 'Object',
       type: 'foam.dao.DAO',
-      name: 'innerDAO',
+      name: 'innerDAO'
     },
     {
       class: 'Object',
@@ -342,14 +364,12 @@ foam.CLASS({
     {
       class: 'Boolean',
       documentation: 'Creates pipelinePMDAOs around each decorator to measure their performance',
-      name: 'pipelinePm',
-      value: false
+      name: 'pipelinePm'
     },
     {
       documentation: 'Have EasyDAO use a sequence number to index items. Note that .seqNo and .guid features are mutuallyexclusive.',
       class: 'Boolean',
-      name: 'seqNo',
-      value: false
+      name: 'seqNo'
     },
     {
       class: 'Long',
@@ -360,8 +380,7 @@ foam.CLASS({
       documentation: 'Have EasyDAO generate guids to index items. Note that .seqNo and .guid features are mutually exclusive',
       class: 'Boolean',
       name: 'guid',
-      label: 'GUID',
-      value: false
+      label: 'GUID'
     },
     {
       class: 'String',
@@ -378,7 +397,6 @@ foam.CLASS({
       documentation: 'Enable local in-memory caching of the DAO',
       class: 'Boolean',
       name: 'cache',
-      value: false,
       generateJava: false
     },
     {
@@ -425,25 +443,31 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'readOnly',
-      value: false
+      name: 'readOnly'
     },
     {
       class: 'Boolean',
-      name: 'writeOnly',
-      value: false
+      name: 'writeOnly'
     },
     {
       documentation: 'Sets the inner dao to a nullDAO',
       class: 'Boolean',
-      name: 'nullify',
-      value: false
+      name: 'nullify'
     },
     {
       documentation: 'Wrap in PermissionedPropertiesDAO',
       class: 'Boolean',
       name: 'permissioned',
-      value: true
+      javaFactory: `
+      List<PropertyInfo> props = this.getOf().getAxiomsByClass(PropertyInfo.class);
+      for ( PropertyInfo info : props ) {
+        if ( info.getWritePermissionRequired() ||
+             info.getReadPermissionRequired() ) {
+          return true;
+        }
+      }
+      return false;
+     `
     },
     {
       documentation: 'Add a validatingDAO decorator',
@@ -460,8 +484,7 @@ foam.CLASS({
       documentation: 'Enable value de-duplication to save memory when caching',
       class: 'Boolean',
       name: 'dedup',
-      generateJava: false,
-      value: false,
+      generateJava: false
     },
     {
       documentation: 'Keep a history of all state changes to the DAO',
@@ -483,25 +506,21 @@ foam.CLASS({
     {
       documentation: 'Enable logging on the DAO',
       class: 'Boolean',
-      name: 'logging',
-      value: false,
+      name: 'logging'
     },
     {
       documentation: 'Enable time tracking for concurrent DAO operations',
       class: 'Boolean',
-      name: 'timing',
-      value: false
+      name: 'timing'
     },
     {
       class: 'Boolean',
-      name: 'pm',
-      value: false
+      name: 'pm'
     },
     {
       documentation: 'Contextualize objects on .find, re-creating them with this EasyDAO\'s exports, as if they were children of this EasyDAO.',
       class: 'Boolean',
-      name: 'contextualize',
-      value: false
+      name: 'contextualize'
     },
     {
       class: 'Boolean',
@@ -537,22 +556,19 @@ foam.CLASS({
       class: 'Boolean',
       generateJava: false,
       name: 'autoIndex',
-      documentation: 'not currently supported',
-      value: false
+      documentation: 'not currently supported'
     },
     {
       documentation: 'Turn on to activate synchronization with a server. Specify serverUri and syncProperty as well',
       class: 'Boolean',
       name: 'syncWithServer',
-      generateJava: false,
-      value: false
+      generateJava: false
     },
     {
       documentation: 'Turn on to enable remote listener support. Only useful with daoType = CLIENT',
       class: 'Boolean',
       generateJava: false,
-      name: 'remoteListenerSupport',
-      value: false
+      name: 'remoteListenerSupport'
     },
     {
       documentation: 'Setting to true activates polling, periodically checking in with the server. If sockets are used, polling is optional as the server can push changes to this client',
@@ -565,8 +581,7 @@ foam.CLASS({
       documentation: 'Set to true if you are running this on a server, and clients will synchronize with this DAO',
       class: 'Boolean',
       generateJava: false,
-      name: 'isServer',
-      value: false
+      name: 'isServer'
     },
     {
       documentation: 'The property to synchronize on. This is typically an integer value indicating the version last seen on the remote',
@@ -575,6 +590,7 @@ foam.CLASS({
     },
     {
       name: 'retryBoxMaxAttempts',
+      class: 'Boolean',
       generateJava: false,
     },
     {
@@ -606,8 +622,17 @@ foam.CLASS({
       }
     },
     {
-      /** Simpler alternative than providing serverBox. */
+      documentation: 'Cluster this DAO',
+      name: 'cluster',
+      class: 'Boolean',
+      javaFactory: `
+      return foam.util.SafetyUtil.equals("true", System.getProperty("CLUSTER", "false"));
+      `
+    },
+    {
+      documentation: 'Simpler alternative than providing serverBox.',
       name: 'serviceName',
+      class: 'String',
       generateJava: false
     },
     {
@@ -643,6 +668,7 @@ foam.CLASS({
       javaFactory: 'return getEnableInterfaceDecorators() && foam.nanos.auth.ServiceProviderAware.class.isAssignableFrom(getOf().getObjClass());'
     },
     {
+      /* deprecated */
       documentation: `More documentation in ServiceProviderAwareDAO.
 A map of class and PropertyInfos used by the ServiceProviderAwareDAO
 to traverse a hierarchy of models in search of a ServiceProviderAware
@@ -1077,15 +1103,48 @@ model from which to test ServiceProvider ID (spid)`,
       `
     },
     {
-      name: 'printDecorators',
+      name: 'getDecorators',
       documentation: 'Useful for debugging and checking if EasyDAO is being used to correctly set up a decorator chain',
+      type: 'String',
       javaCode: `
+        StringBuilder sb = new StringBuilder();
         foam.dao.DAO delegate = this;
-        while ( delegate instanceof foam.dao.ProxyDAO) {
-          System.out.println(delegate.getClass().getSimpleName());
+        while ( delegate != null &&
+                delegate instanceof foam.dao.ProxyDAO) {
+          sb.append(delegate.getClass().getSimpleName());
+          sb.append(":");
           delegate = ((foam.dao.ProxyDAO) delegate).getDelegate();
         }
-        System.out.println(delegate.getClass().getSimpleName());
+        return sb.toString();
+      `
+    },
+
+    // ProxyDAO operations
+    {
+      name: 'cmd_',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'Object'
+        }
+      ],
+      type: 'Object',
+      code: function cmd_(x, obj) {
+        return this.delegate.cmd_(x, obj);
+      },
+      javaCode: `
+      // Used by Medusa to get the real MDAO to update
+      if ( foam.dao.MDAO.GET_MDAO_CMD.equals(obj) ) {
+        DAO dao = getMdao();
+        if ( dao != null ) {
+          return dao;
+        }
+      }
+      return getDelegate().cmd_(x, obj);
       `
     }
   ]

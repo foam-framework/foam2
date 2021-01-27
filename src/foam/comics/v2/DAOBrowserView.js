@@ -13,6 +13,7 @@ foam.CLASS({
     'foam.comics.SearchMode',
     'foam.comics.v2.DAOControllerConfig',
     'foam.log.LogLevel',
+    'foam.nanos.controller.Memento',
     'foam.u2.ActionView',
     'foam.u2.dialog.Popup',
     'foam.u2.filter.FilterView',
@@ -20,7 +21,7 @@ foam.CLASS({
     'foam.u2.layout.Rows',
     'foam.u2.view.ScrollTableView',
     'foam.u2.view.SimpleSearch',
-    'foam.u2.view.TabChoiceView',
+    'foam.u2.view.TabChoiceView'
   ],
 
   implements: [
@@ -34,7 +35,30 @@ foam.CLASS({
 
   css: `
     ^export {
+      background-image: linear-gradient(to bottom, #ffffff, #e7eaec);
+      border: 1px solid /*%GREY3%*/ #CBCFD4;
       margin-left: 16px;
+    }
+
+    ^export:hover {
+      border: 1px solid /*%BLACK%*/ #1E1F21;
+    }
+
+    ^export:focus:not(:hover) {
+      border: 1px solid /*%GREY3%*/ #CBCFD4;
+    }
+
+    ^refresh {
+      background-image: linear-gradient(to bottom, #ffffff, #e7eaec);
+      border: 1px solid /*%GREY3%*/ #CBCFD4;
+    }
+
+    ^refresh:hover {
+      border: 1px solid /*%BLACK%*/ #1E1F21;
+    }
+
+    ^refresh:focus:not(:hover) {
+      border: 1px solid /*%GREY3%*/ #CBCFD4;
     }
 
     ^export img {
@@ -53,8 +77,6 @@ foam.CLASS({
 
     ^query-bar {
       padding: 40px 16px;
-      align-items: flex-start;
-      justify-content: flex-end;
     }
 
     ^toolbar {
@@ -62,9 +84,7 @@ foam.CLASS({
     }
 
     ^browse-view-container {
-      margin: auto;
       border-bottom: solid 1px #e7eaec;
-      margin: 0px 0px 72px 0px;
       box-sizing: border-box;
       padding: 0 16px;
     }
@@ -87,6 +107,9 @@ foam.CLASS({
 
     ^ .foam-u2-view-SimpleSearch .foam-u2-search-TextSearchView .foam-u2-tag-Input {
       width: 100%;
+      height: 34px;
+      border-radius: 0 5px 5px 0;
+      border: 1px solid;
     }
   `,
 
@@ -95,14 +118,16 @@ foam.CLASS({
   ],
 
   imports: [
-    'stack?',
-    'ctrl'
+    'ctrl',
+    'memento',
+    'stack?'
   ],
 
   exports: [
     'dblclick',
     'filteredTableColumns',
-    'serviceName'
+    'serviceName',
+    'config'
   ],
 
   properties: [
@@ -184,7 +209,8 @@ foam.CLASS({
           dao: this.serviceName
         };
       }
-    }
+    },
+    'currentMemento'
   ],
 
   actions: [
@@ -230,14 +256,17 @@ foam.CLASS({
       this.onDetach(this.cannedPredicate$.sub(() => {
         this.searchPredicate = foam.mlang.predicate.True.create();
       }));
+
+      this.currentMemento$ = this.memento.tail$;
     },
     function dblclick(obj, id) {
       if ( ! this.stack ) return;
+
       this.stack.push({
         class: 'foam.comics.v2.DAOSummaryView',
         data: obj,
         config: this.config,
-        id: id
+        idOfRecord: id
       }, this.__subContext__);
     },
     function initE() {
@@ -275,27 +304,31 @@ foam.CLASS({
                       .callIf(self.config.searchMode === self.SearchMode.SIMPLE, function() {
                         this.tag(self.SimpleSearch, {
                           showCount: false,
-                          data$: self.searchPredicate$
+                          data$: self.searchPredicate$,
+                          searchValue: self.memento && self.memento.paramsObj.s
                         });
                       })
                       .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
                         this.tag(self.FilterView, {
                           dao$: self.searchFilterDAO$,
-                          data$: self.searchPredicate$
+                          data$: self.searchPredicate$,
+                          searchValue: self.memento && self.memento.paramsObj.s
                         });
-                      })
+                    })
                     .endContext()
-                    .startContext({ data: self })
-                      .start(self.EXPORT, { buttonStyle: 'SECONDARY' })
-                        .addClass(self.myClass('export'))
-                      .end()
-                      .start(self.IMPORT, { buttonStyle: 'SECONDARY', icon: 'images/export-arrow-icon.svg', css: {'transform': 'rotate(180deg)'} })
-                        .addClass(self.myClass('export'))
-                      .end()
-                      .start(self.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })
-                        .addClass(self.myClass('refresh'))
-                      .end()
-                    .endContext()
+                    .start()
+                      .startContext({ data: self })
+                        .start(self.EXPORT, { buttonStyle: 'SECONDARY' })
+                          .addClass(self.myClass('export'))
+                        .end()
+                        .start(self.IMPORT, { buttonStyle: 'SECONDARY', icon: 'images/export-arrow-icon.svg', css: {'transform': 'rotate(180deg)'} })
+                          .addClass(self.myClass('export'))
+                        .end()
+                        .start(self.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })
+                          .addClass(self.myClass('refresh'))
+                        .end()
+                      .endContext()
+                    .end()
                   .end();
               })
               .start(self.summaryView,{

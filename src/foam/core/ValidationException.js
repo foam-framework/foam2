@@ -6,8 +6,9 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'ValidationException',
-  javaExtends: 'RuntimeException',
+  extends: 'foam.core.FOAMException',
   implements: ['foam.core.Exception'],
+  javaGenerateConvenienceConstructor: false,
 
   properties: [
     {
@@ -30,7 +31,7 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
-        data: `
+          data: `
     public ValidationException(String message) {
       super(message);
     }
@@ -39,8 +40,16 @@ foam.CLASS({
       super(message, cause);
     }
             `
-          }));
-        }
+        }));
       }
-    ]
+    }
+  ],
+
+  methods: [
+    {
+      name: 'getClientRethrowException',
+      type: 'RuntimeException',
+      javaCode: 'return this;'
+    }
+  ]
 });

@@ -21,8 +21,6 @@ foam.CLASS({
     ^symbol {
       display: flex;
       align-items: center;
-      background: %GREY5%;
-      border: 1px solid %GREY3%;
       margin-left: -1px;
       margin-right: -1px;
       line-height: 100%;
@@ -41,6 +39,9 @@ foam.CLASS({
     ^ > *:last-child {
       border-top-left-radius: 0 !important;
       border-bottom-left-radius: 0 !important;
+    }
+    ^fragment {
+      text-align: center;
     }
   `,
 
@@ -80,8 +81,12 @@ foam.CLASS({
           this.start().addClass(this.myClass('symbol'))
             .add(e).end();
           continue;
+        } else if ( e.cls_ === foam.u2.FragmentedTextFieldFragment ) {
+          e = e.view;
         }
         var u2Elem = this.start(e)
+          .style({ width: this.delegates[i].maxLength * 10 })
+          .addClass(this.myClass('fragment'))
         u2Elem.on('focus', () => {
           this.currentIndex = i;
         })
@@ -95,6 +100,15 @@ foam.CLASS({
       this.numOfParts = this.delegates.length;
 
       return this;
+    },
+    function processData(data, index, arr) {
+      // returns an array of data chunks in the size of the delegates
+      var currentElement = this.childNodes[index];
+      if ( ! data || ! currentElement ) return arr;
+
+      var maxLength = this.delegates[index].maxLength;
+      arr.push(data.substring(0, maxLength));
+      return this.processData(data.substring(maxLength), index + 2, arr);
     }
   ],
 
@@ -102,11 +116,23 @@ foam.CLASS({
     {
       name: 'onDataUpdate',
       code: function() {
-        var currentElement = this.childNodes[this.currentIndex];
-        if ( currentElement.getAttribute('maxlength') <= currentElement.data.length ) {
-          this.currentIndex = this.currentIndex + 2;
-          this.childNodes[this.currentIndex].focus();
+        var arr = this.processData(this.childNodes[this.currentIndex].data, this.currentIndex, []);
+        for ( var i = 0; i < arr.length; i++ ) {
+          var nextIndex = this.currentIndex + 1;
+          while ( this.childNodes[nextIndex] && ! foam.u2.TextField.isInstance(this.childNodes[nextIndex]) ) {
+            nextIndex++;
+          }
+          this.childNodes[this.currentIndex].data = arr[i];
+          if ( next = this.childNodes[nextIndex] ) {
+            if ( this.delegates[this.currentIndex].maxLength > arr[i].length ) break;
+
+            if ( ! ( next && next.data ) ) {
+              this.currentIndex = nextIndex;
+              next.focus();
+            } else break;
+          }
         }
+        this.childNodes[this.currentIndex].focus();
       }
     }
   ]

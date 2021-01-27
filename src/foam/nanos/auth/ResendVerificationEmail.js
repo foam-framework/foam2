@@ -107,6 +107,7 @@ foam.CLASS({
         this.auth.logout().then(function() {
           this.window.location.hash = '';
           this.window.location.reload();
+          localStorage.removeItem('defaultSession');
         });
       }
     }

@@ -26,12 +26,21 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id', 'enabled', /*'description',*/ 'server',
-    'passed', 'failed', 'lastRun', 'lastDuration',
-    /*'status',*/ 'run'
+    'id',
+    'enabled',
+    'server',
+    'passed',
+    'failed',
+    'lastDuration',
+    'lastRun',
+    'run'
   ],
 
-  searchColumns: ['id', 'description', 'server'],
+  searchColumns: [
+    'id',
+    'description',
+    'server'
+  ],
 
   documentation: `
     A scriptable Unit Test.
@@ -185,7 +194,7 @@ foam.CLASS({
 
         ByteArrayOutputStream baos  = new ByteArrayOutputStream();
         PrintStream           ps    = new PrintStream(baos);
-        Interpreter           shell = createInterpreter(x);
+        Interpreter           shell = (Interpreter) createInterpreter(x, null);
         PM                    pm    = new PM(this.getClass(), getId());
 
         try {

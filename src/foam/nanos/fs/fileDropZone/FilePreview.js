@@ -11,24 +11,11 @@ foam.CLASS({
 
   documentation: 'iframe for file preview',
 
-  css: `
-    .file-iframe {
-      height: 100%;
-      width: 100%;
+  properties: [
+    {
+      name: 'selected'
     }
-
-    img {
-      max-width: 100%;
-      max-height: 100%;
-    }
-
-    .file-image-div {
-      height: 100%;
-      width: auto;
-      max-height: 244px;
-      max-width: 300px;
-    }
-  `,
+  ],
 
   methods: [
     function initE() {
@@ -37,48 +24,65 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start('div')
-          .addClass('file-image-div')
+          .addClass('file-image-div' + this.id)
           .style({
-            visibility: 'hidden'
+            'width:': 'auto',
+            'max-height': '244px',
+            'max-width': '300px',
+            'display': 'none'
           })
           .start('img')
-            .addClass('file-image')
+            .addClass('file-image' + this.id)
+            .style({
+              'max-width': '100%',
+              'max-height': '100%'
+            })
           .end()
         .end()
         .start('iframe')
-          .addClass('file-iframe')
+          .addClass('file-iframe' + this.id)
           .style({
-            visibility: 'hidden'
+            'visibility': 'hidden',
+            'height': '0px',
+            'width': '0px'
           })
         .end();
-
       this.data$.sub(() => this.showData());
     },
 
     function showData() {
-      let iFrame = document.getElementsByClassName('file-iframe')[0],
-          image = document.getElementsByClassName('file-image')[0],
-          div = document.getElementsByClassName('file-image-div')[0],
-          url = '';
+      let iFrame = document.getElementsByClassName('file-iframe' + this.id)[0],
+          image = document.getElementsByClassName('file-image' + this.id)[0],
+          div = document.getElementsByClassName('file-image-div' + this.id)[0],
+          url = '',
+          pos;
 
       iFrame.style.visibility = 'hidden';
       div.style.visibility = 'hidden';
       div.style.display = 'none';
 
-      if ( ! this.data[0] ) {
-        return;
+      if ( this.selected == undefined || this.selected == this.data.length ) {
+        pos = this.data.length - 1;
+      } else {
+        pos = this.selected;
       }
 
-      url = URL.createObjectURL(this.data[this.data.length - 1].data.blob);
+      if ( ! this.data[pos] ) {
+        return;
+      }
+      url = URL.createObjectURL(this.data[pos].data.blob);
 
-      if (this.data[this.data.length - 1].mimeType !== "application/pdf") {
+      if ( this.data[pos].mimeType !== 'application/pdf' ) {
         image.src = url;
         div.style.visibility = 'visible';
         div.style.display = 'block';
       } else {
         iFrame.src = url;
         iFrame.style.visibility = 'visible';
+        iFrame.style.display = 'block';
+        iFrame.style.height = '100%';
+        iFrame.style.width = '100%';
       }
     }
   ]
-})
+});

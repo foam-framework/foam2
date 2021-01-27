@@ -17,7 +17,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'searchManager'
+    'searchManager',
+    'memento'
   ],
 
   css: `
@@ -128,6 +129,20 @@ foam.CLASS({
         .end();
 
       this.checkbox.data$.sub(this.checkboxChanged);
+
+      var predicate = this.getPredicateFromMemento();
+      if ( predicate )
+        this.checkbox.data = true;
+    },
+    function getPredicateFromMemento() {
+      if ( this.memento && this.memento.paramsObj.f && this.memento.paramsObj.f.length > 0 ) {
+        var f = this.memento.paramsObj.f.find(f => f.n === this.property.name && f.criteria === 0);
+        if ( f ) {
+          var predicate = foam.json.parseString(f.pred, this.__context__);
+          return predicate;
+        }
+      }
+      return null;
     }
   ],
 
@@ -141,6 +156,12 @@ foam.CLASS({
             property: this.property,
             dao: this.dao
           }, this.view_$);
+
+          var predicate = this.getPredicateFromMemento();
+          if ( predicate ) {
+            this.view_.restoreFromPredicate(predicate);
+          }
+
           this.searchManager.add(this.view_$.get());
           this.firstTime_ = false;
         }

@@ -16,8 +16,8 @@ import foam.nanos.pm.PM;
 import java.io.PrintWriter;
 import javax.servlet.http.HttpServletResponse;
 
-public class DigWebAgent
-  implements WebAgent
+public class DigWebAgent extends ContextAwareSupport
+  implements WebAgent, SendErrorHandler
 {
   public DigWebAgent() {}
 
@@ -33,7 +33,7 @@ public class DigWebAgent
 
     try {
       // Find the operation
-      DigFormatDriver driver = DigFormatDriverFactory.create(x, format);
+      DigFormatDriver driver = DigFormatDriverFactory.create(getX(), format);
 
       if ( driver == null ) {
         DigUtil.outputException(x, new ParsingErrorException.Builder(x)
@@ -54,21 +54,39 @@ public class DigWebAgent
           driver.remove(x);
           break;
       }
+    } catch (DigErrorMessage dem) {
+      logger.error(dem);
+      DigUtil.outputException(x, dem, format);
+      pm.error(x, dem.getMessage());
+    } catch (FOAMException fe) {
+      logger.error(fe);
+      DigUtil.outputFOAMException(x, fe, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, format);
+      pm.error(x, fe.getMessage());
     } catch (Throwable t) {
-      PrintWriter out = x.get(PrintWriter.class);
-      out.println("Error " + t.getMessage());
-      out.println("<pre>");
-        t.printStackTrace(out);
-      out.println("</pre>");
       logger.error(t);
-
-      try {
-        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, t.getMessage());
-      } catch ( java.io.IOException e ) {
-        logger.error("Failed to send HttpServletResponse CODE", e);
-      }
+      DigUtil.outputException(x,
+          new GeneralException.Builder(x)
+            .setStatus(String.valueOf(HttpServletResponse.SC_INTERNAL_SERVER_ERROR))
+            .setMessage(t.getMessage())
+            .setMoreInfo(t.getClass().getName())
+            .build(),
+          format);
+      pm.error(x, t.getMessage());
     } finally {
       pm.log(x);
     }
+  }
+
+  public void sendError(X x, int status, String message) {
+    DigUtil.outputException(x,
+      new GeneralException.Builder(x)
+        .setStatus(String.valueOf(status))
+        .setMessage(message)
+        .build(),
+      Format.JSON);
+  }
+
+  public boolean redirectToLogin(X x) {
+    return false;
   }
 }

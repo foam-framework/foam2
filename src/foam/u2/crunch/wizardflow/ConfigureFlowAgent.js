@@ -44,7 +44,7 @@ foam.CLASS({
           ? function (viewSpec, onClose) {
             ctrl.add(
               self.Popup.create({
-                closable: false,
+                closeable: viewSpec.closeable ? viewSpec.closeable : false,
                 ...(onClose ? { onClose: onClose } : {}),
               })
                 .tag(viewSpec)

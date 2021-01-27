@@ -44,8 +44,10 @@ foam.CLASS({
         o.increaseIndent();
         o.out(' = ', this.initializer);
         o.decreaseIndent();
+      } else {
+        o.out(';');
       }
-      o.out(';\n');
+      o.out('\n');
     }
   ]
 });

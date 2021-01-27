@@ -27,6 +27,7 @@ public interface PropertyInfo
   public boolean getWritePermissionRequired();
   public boolean getStorageTransient();
   public boolean getStorageOptional();
+  public boolean getClusterTransient();
   public boolean getXMLAttribute();
   public boolean getXMLTextNode();
   public boolean getRequired();
@@ -56,6 +57,7 @@ public interface PropertyInfo
   public int comparePropertyToObject(Object key, Object o);
   public int comparePropertyToValue(Object key, Object value);
   public String getSQLType();
+  public boolean includeInID();
   public boolean isSet(Object obj);
   public boolean isDefaultValue(Object obj);
   public void setStatementValue(IndexedPreparedStatement stmt, FObject o) throws java.sql.SQLException;

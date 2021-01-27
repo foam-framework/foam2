@@ -14,17 +14,18 @@ foam.CLASS({
     'foam.core.PropertyInfo',
     'foam.core.X',
     'foam.dao.DAO',
+    'foam.lib.PropertyPredicate',
+    'foam.lib.StorageOptionalPropertyPredicate',
+    'foam.lib.StoragePropertyPredicate',
     'foam.lib.formatter.FObjectFormatter',
     'foam.lib.formatter.JSONFObjectFormatter',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
-    'foam.util.SafetyUtil',
+    'java.util.ArrayList',
     'java.util.Date',
-    'java.util.Iterator',
-    'java.util.List',
-    'java.util.Map',
-    'static foam.mlang.MLang.EQ'
+    'static foam.mlang.MLang.EQ',
+    'foam.util.SafetyUtil'
   ],
 
   messages: [
@@ -43,12 +44,15 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(
-          ` 
-            protected static final ThreadLocal<FObjectFormatter> formatter_ = new ThreadLocal<FObjectFormatter>() {
+          `
+            private static final PropertyPredicate PROPERTY_PREDICATE = new StoragePropertyPredicate();
+            private static final PropertyPredicate OPTIONAL_PREDICATE = new StorageOptionalPropertyPredicate();
+
+            protected static final ThreadLocal<FObjectFormatter> formatter__ = new ThreadLocal<FObjectFormatter>() {
               @Override
               protected JSONFObjectFormatter initialValue() {
                 JSONFObjectFormatter formatter = new JSONFObjectFormatter();
-                formatter.setPropertyPredicate(new foam.lib.StoragePropertyPredicate());
+                formatter.setPropertyPredicate(PROPERTY_PREDICATE);
                 return formatter;
               }
               
@@ -95,56 +99,73 @@ foam.CLASS({
       visibility: 'protected',
       type: 'PropertyUpdate[]',
       args: [
+        { type: 'Context', name: 'x' },
         { type: 'FObject', name: 'currentValue' },
-        { type: 'FObject', name: 'newValue' },
-        { type: 'FObjectFormatter', name: 'formatter' }
+        { type: 'FObject', name: 'newValue' }
       ],
       documentation: 'Returns an array of updated properties',
       javaCode: `
-        List<PropertyInfo> delta = ((JSONFObjectFormatter) formatter).getDelta(currentValue, newValue);
+        var updates = new ArrayList<PropertyUpdate>();
+        var info = newValue.getClassInfo();
+        var of = info.getObjClass().getSimpleName().toLowerCase();
+        var props = info.getAxiomsByClass(PropertyInfo.class);
 
-        int index = 0;
-        PropertyUpdate[] updates = new PropertyUpdate[delta.size()];
-        for ( PropertyInfo prop : delta ) {
-          String propName = prop.getName();
-          updates[index++] = new PropertyUpdate(propName, prop.f(currentValue), prop.f(newValue));
+        for ( var prop : props ) {
+          if ( PROPERTY_PREDICATE.propertyPredicateCheck(x, of, prop)
+            && ! OPTIONAL_PREDICATE.propertyPredicateCheck(x, of, prop)
+            && prop.compare(currentValue, newValue) != 0
+          ) {
+            updates.add(new PropertyUpdate(
+              prop.getName(),
+              prop.f(currentValue),
+              prop.f(newValue)
+            ));
+          }
         }
 
-        return updates;
+        return updates.toArray(new PropertyUpdate[updates.size()]);
       `
     },
     {
       name: 'put_',
       javaCode: `
-        Subject subject = (Subject) x.get("subject");
-        User user = subject.getUser();
-        User agent = subject.getRealUser();
-        FObject current = this.find_(x, obj);
-    
+      Subject subject = (Subject) x.get("subject");
+      User user = subject.getUser();
+      User agent = subject.getRealUser();
+      FObject current = this.find_(x, obj);
+      Object objectId = obj.getProperty("id");
+
+      if ( current == null ) {
+        // do "put" first if it is "create" action.
+        FObject persistObject = super.put_(x, obj);
+        objectId = persistObject.getProperty("id");
+        HistoryRecord historyRecord = new HistoryRecord();
+        historyRecord.setObjectId(objectId);
+        historyRecord.setUser(formatUserName(user));
+        historyRecord.setAgent(formatUserName(agent));
+        historyRecord.setTimestamp(new Date());
+        getHistoryDAO().put_(x, historyRecord);
+        return persistObject;
+      } else {
         try {
           // add new history record
-          Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
           HistoryRecord historyRecord = new HistoryRecord();
           historyRecord.setObjectId(objectId);
           historyRecord.setUser(formatUserName(user));
           historyRecord.setAgent(formatUserName(agent));
           historyRecord.setTimestamp(new Date());
-          if ( current != null ) {
-            FObjectFormatter formatter = formatter_.get();
-            formatter.outputDelta(current, obj);
-            if ( SafetyUtil.isEmpty(formatter.builder().toString().trim()) ) {
-              return super.put_(x, obj);
-            }
-            historyRecord.setUpdates(getUpdatedProperties(current, obj, formatter));
+          FObjectFormatter formatter = formatter__.get();
+          if ( ! formatter.maybeOutputDelta(current, obj) ) {
+            return super.put_(x, obj);
           }
-    
+          historyRecord.setUpdates(getUpdatedProperties(x, current, obj));
           getHistoryDAO().put_(x, historyRecord);
         } catch (Throwable t) {
           Logger l = (Logger) x.get("logger");
           l.error(CREATE_ERROR_MSG, obj.getClassInfo().getId(), t);
         }
-    
         return super.put_(x, obj);
+      }
       `
     },
     {

@@ -1,0 +1,1 @@
+p({class:"foam.nanos.menu.Menu",id:"admin.translationconsole",label:"Translation Console",handler:{class:"foam.nanos.menu.ViewMenu","view":{"class":"foam.i18n.TranslationConsoleMenu"}},parent:"admin"})

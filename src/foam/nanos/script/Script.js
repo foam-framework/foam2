@@ -11,12 +11,16 @@ foam.CLASS({
   implements: [
     'foam.nanos.auth.EnabledAware',
     'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.auth.LastModifiedByAware'
+    'foam.nanos.auth.LastModifiedByAware',
+    'foam.nanos.medusa.Clusterable'
   ],
 
   requires: [
+    'foam.nanos.script.Language',
     'foam.nanos.script.ScriptStatus',
-    'foam.nanos.notification.ScriptRunNotification'
+    'foam.nanos.notification.Notification',
+    'foam.nanos.notification.ScriptRunNotification',
+    'foam.nanos.notification.ToastState'
   ],
 
   imports: [
@@ -27,8 +31,26 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'java.io.BufferedReader',
+    'java.io.ByteArrayOutputStream',
+    'java.io.PrintStream',
+    'java.io.StringReader',
+    'java.util.ArrayList',
+    'java.util.Date',
+    'java.util.List',
+    'java.util.Map',
+
     'bsh.EvalError',
     'bsh.Interpreter',
+
+    'foam.nanos.script.jShell.EvalInstruction',
+    'foam.nanos.script.jShell.InstructionPresentation',
+    'jdk.jshell.JShell',
+    'jdk.jshell.execution.DirectExecutionControl',
+    'jdk.jshell.spi.ExecutionControl',
+    'jdk.jshell.spi.ExecutionControlProvider',
+    'jdk.jshell.spi.ExecutionEnv',
+
     'foam.core.*',
     'foam.dao.*',
     'static foam.mlang.MLang.*',
@@ -45,7 +67,6 @@ foam.CLASS({
   tableColumns: [
     'id',
     'description',
-    'server',
     'lastDuration',
     'lastRun',
     'status'
@@ -53,8 +74,7 @@ foam.CLASS({
 
   searchColumns: [
     'id',
-    'description',
-    'server'
+    'description'
   ],
 
   constants: [
@@ -67,6 +87,11 @@ foam.CLASS({
       name: 'MAX_NOTIFICATION_OUTPUT_CHARS',
       type: 'Integer',
       value: 200
+    },
+    {
+      javaType: 'X[]',
+      name: 'X_HOLDER',
+      javaValue: 'new X[1]'
     }
   ],
 
@@ -83,6 +108,17 @@ foam.CLASS({
     }
   ],
 
+  messages: [
+    { name: 'EXECUTION_DISABLED', message: 'execution disabled' },
+    { name: 'EXECUTION_INVOKED', message: 'execution invoked' },
+    { name: 'EXECUTION_FAILED', message: 'execution failed' },
+    { name: 'ENABLED_YES', message: 'Y' },
+    { name: 'ENABLED_NO', message: 'N' },
+    { name: 'PRIORITY_LOW', message: 'Low' },
+    { name: 'PRIORITY_MEDIUM', message: 'Medium' },
+    { name: 'PRIORITY_HIGH', message: 'High' }
+  ],
+
   properties: [
     {
       class: 'String',
@@ -95,10 +131,10 @@ foam.CLASS({
       name: 'enabled',
       includeInDigest: true,
       documentation: 'Enables script.',
-      tableCellFormatter: function(value) {
+      tableCellFormatter: function(value, obj) {
         this.start()
-          .style({ color: value ? 'green' : 'gray' })
-          .add(value ? 'Y' : 'N')
+          .style({ color: value ? /*%APPROVAL3*/ 'green' : /*%GREY2%*/ 'grey' })
+          .add(value ? obj.ENABLED_YES : obj.ENABLED_NO )
         .end();
       },
       tableWidth: 90,
@@ -117,14 +153,29 @@ foam.CLASS({
       value: 5,
       javaValue: 5,
       includeInDigest: false,
-      view: {
-        class: 'foam.u2.view.ChoiceView',
-        choices: [
-          [ 4, 'Low'    ],
-          [ 5, 'Medium' ],
-          [ 6, 'High'   ]
-        ]
+      view: function(_, X ) {
+        return {
+          class: 'foam.u2.view.ChoiceView',
+          choices: [
+            [4, X.data.PRIORITY_LOW],
+            [5, X.data.PRIORITY_MEDIUM],
+            [6, X.data.PRIORITY_HIGH]
+          ]
+        };
       }
+    },
+    {
+      documentation: 'A non-clusterable script can run on all instances, and any run info will be stored locally',
+      name: 'clusterable',
+      class: 'Boolean',
+      value: true,
+      includeInDigest: false,
+    },
+    {
+      documentation: 'Generate notification on script completion',
+      name: 'notify',
+      class: 'Boolean',
+      value: false
     },
     {
       class: 'DateTime',
@@ -144,28 +195,26 @@ foam.CLASS({
       tableWidth: 125,
       storageTransient: true
     },
-    /*
     {
       class: 'Enum',
       of: 'foam.nanos.script.Language',
       name: 'language',
-      value: foam.nanos.script.Language.BEANSHELL,
-      transient: true
-      // TODO: fix JS support
+      value: 'BEANSHELL'
     },
-    */
     {
+      documentation: 'Legacy support for JS scripts created before JShell',
       class: 'Boolean',
       name: 'server',
-      includeInDigest: false,
-      documentation: 'Runs on server side if enabled.',
-      tableCellFormatter: function(value) {
-        this.start()
-          .add(value ? 'Y' : 'N')
-        .end();
-      },
       value: true,
-      tableWidth: 80
+      transient: true,
+      visibility: 'HIDDEN',
+      javaSetter: `
+        if ( val ) {
+          setLanguage(foam.nanos.script.Language.BEANSHELL);
+        } else {
+          setLanguage(foam.nanos.script.Language.JS);
+        }
+      `,
     },
     {
       class: 'foam.core.Enum',
@@ -266,21 +315,65 @@ foam.CLASS({
     {
       name: 'createInterpreter',
       args: [
-        { name: 'x', type: 'Context' }
+        { name: 'x', type: 'Context' },
+        { name: 'ps', type: 'PrintStream' }
       ],
-      javaType: 'Interpreter',
+      javaType: 'Object',
+      synchronized: true,
       javaCode: `
-        Interpreter shell = new Interpreter();
+        Language l = getLanguage();
+        if ( l == foam.nanos.script.Language.JSHELL ) {
+          JShell jShell = new JShellExecutor().createJShell(ps);
+          Script.X_HOLDER[0] = x.put("out",  ps);
+          jShell.eval("import foam.core.X;");
+          jShell.eval("X x = foam.nanos.script.Script.X_HOLDER[0];");
+          return jShell;
+        } else if ( l == foam.nanos.script.Language.BEANSHELL ) {
+          Interpreter shell = new Interpreter();
+          try {
+            shell.set("currentScript", this);
+            shell.set("x", x);
+            shell.eval("runScript(String name) { script = x.get("+getDaoKey()+").find(name); if ( script != null ) eval(script.code); }");
+            shell.eval("foam.core.X sudo(String user) { foam.util.Auth.sudo(x, (String) user); }");
+            shell.eval("foam.core.X sudo(Object id) { foam.util.Auth.sudo(x, id); }");
+          } catch (EvalError e) {
+            Logger logger = (Logger) x.get("logger");
+            logger.error(this.getClass().getSimpleName(), "createInterpreter", getId(), e);
+          }
+          return shell;
+        } else {
+          throw new RuntimeException("Script language not supported");
+        }
+      `
+    },
+    {
+      name: 'canRun',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      type: 'Boolean',
+      javaCode: `
+        // Run on all instances if:
+        // - startup "main" script, or
+        // - not-clusterable, or
+        // - a suitable cluster configuration
 
-        try {
-          shell.set("currentScript", this);
-          shell.set("x", x);
-          shell.eval("runScript(String name) { script = x.get("+getDaoKey()+").find(name); if ( script != null ) eval(script.code); }");
-          shell.eval("foam.core.X sudo(String user) { return foam.util.Auth.sudo(x, (String) user); }");
-          shell.eval("foam.core.X sudo(Object id) { return foam.util.Auth.sudo(x, id); }");
-        } catch (EvalError e) {}
-
-        return shell;
+        String startScript = System.getProperty("foam.main", "main");
+        if ( this instanceof foam.nanos.cron.Cron &&
+             getStatus() == ScriptStatus.SCHEDULED &&
+             ! getId().equals(startScript) &&
+             getClusterable() ) {
+          foam.nanos.medusa.ClusterConfigSupport support = (foam.nanos.medusa.ClusterConfigSupport) x.get("clusterConfigSupport");
+          if ( support != null &&
+               ! support.cronEnabled(x) ) {
+            ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "execution disabled.", getId(), getDescription());
+            throw new ClientRuntimeException(this.getClass().getSimpleName() + " " + EXECUTION_DISABLED);
+          }
+        }
+        return true;
       `
     },
     {
@@ -303,39 +396,60 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        String startScript = System.getProperty("foam.main", "main");
-        // Run on all instances if:
-        // - startup "main" script
+        canRun(x);
+
+        PM               pm          = new PM.Builder(x).setKey(Script.getOwnClassInfo().getId()).setName(getId()).build();
+        RuntimeException thrown      = null;
+        Language         l           = getLanguage();
 
         Thread.currentThread().setPriority(getPriority());
+
         try {
-          ByteArrayOutputStream baos  = new ByteArrayOutputStream();
-          PrintStream           ps    = new PrintStream(baos);
-          Interpreter           shell = createInterpreter(x);
-          PM                    pm    = new PM.Builder(x).setKey(Script.getOwnClassInfo().getId()).setName(getId()).build();
-          RuntimeException    thrown = null;
+          if ( l == foam.nanos.script.Language.JSHELL ) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PrintStream ps = new PrintStream(baos);
+            String print = null;
+            try {
+              JShell jShell = (JShell) createInterpreter(x,ps);
+              print = new JShellExecutor().execute(x, jShell, getCode());
+              ps.print(print);
+            } catch (Throwable e) {
+              Logger logger = (Logger) x.get("logger");
+              logger.error(this.getClass().getSimpleName(), "runScript", getId(), e);
+            } finally {
+              pm.log(x);
+            }
+            setLastRun(new Date());
+            setLastDuration(pm.getTime());
+            ps.flush();
+            setOutput(baos.toString());
+          } else if ( l == foam.nanos.script.Language.BEANSHELL ) {
+            ByteArrayOutputStream baos  = new ByteArrayOutputStream();
+            PrintStream           ps    = new PrintStream(baos);
+            Interpreter           shell = (Interpreter) createInterpreter(x, null);
 
-          // TODO: import common packages like foam.core.*, foam.dao.*, etc.
-          try {
-            setOutput("");
-            shell.setOut(ps);
-            shell.eval(getCode());
-          } catch (Throwable t) {
-            thrown = new RuntimeException(t);
-            ps.println();
-            t.printStackTrace(ps);
-            Logger logger = (Logger) x.get("logger");
-            logger.error(t);
-            pm.error(x, t);
-          } finally {
-            pm.log(x);
+            try {
+              setOutput("");
+              shell.setOut(ps);
+              shell.eval(getCode());
+            } catch (Throwable t) {
+              thrown = new RuntimeException(t);
+              ps.println();
+              t.printStackTrace(ps);
+              Logger logger = (Logger) x.get("logger");
+              logger.error(this.getClass().getSimpleName(), "runScript", getId(), t);
+              pm.error(x, t);
+            } finally {
+              pm.log(x);
+            }
+
+            setLastRun(new Date());
+            setLastDuration(pm.getTime());
+            ps.flush();
+            setOutput(baos.toString());
+          } else {
+            throw new RuntimeException("Script language not supported");
           }
-
-          setLastRun(new Date());
-          setLastDuration(pm.getTime());
-          ps.flush();
-          setOutput(baos.toString());
-
           ScriptEvent event = new ScriptEvent(x);
           event.setLastRun(this.getLastRun());
           event.setLastDuration(this.getLastDuration());
@@ -344,6 +458,7 @@ foam.CLASS({
           event.setOwner(this.getId());
           event.setScriptId(this.getId());
           event.setHostname(System.getProperty("hostname", "localhost"));
+          event.setClusterable(this.getClusterable());
           ((DAO) x.get(getEventDaoKey())).put(event);
 
           if ( thrown != null) {
@@ -360,22 +475,26 @@ foam.CLASS({
         var self = this;
         var interval = setInterval(function() {
           self.__context__[self.daoKey].find(self.id).then(function(script) {
-            if ( script.status !== self.ScriptStatus.RUNNING ) {
+            if ( script.status === self.ScriptStatus.UNSCHEDULED
+              || script.status === self.ScriptStatus.ERROR
+            ) {
               self.copyFrom(script);
               clearInterval(interval);
 
-              // create notification
-              var notification = self.ScriptRunNotification.create({
-                userId: self.user.id,
-                scriptId: script.id,
-                notificationType: 'Script Execution',
-                body: `Status: ${script.status}
+              if ( self.notify ) {
+                // create notification
+                var notification = self.ScriptRunNotification.create({
+                  userId: self.user.id,
+                  scriptId: script.id,
+                  notificationType: 'Script Execution',
+                  body: `Status: ${script.status}
                     Script Output: ${script.length > self.MAX_NOTIFICATION_OUTPUT_CHARS ?
                       script.output.substring(0, self.MAX_NOTIFICATION_OUTPUT_CHARS) + '...' :
                       script.output }
                     LastDuration: ${script.lastDuration}`
-              });
-              self.notificationDAO.put(notification);
+                });
+                self.notificationDAO.put(notification);
+              }
             }
           }).catch(function() {
             clearInterval(interval);
@@ -394,21 +513,59 @@ foam.CLASS({
         var self = this;
         this.output = '';
         this.status = this.ScriptStatus.SCHEDULED;
-        if ( this.server ) {
+        if ( this.language == this.Language.BEANSHELL ||
+             this.language == this.Language.JSHELL ) {
           this.__context__[this.daoKey].put(this).then(function(script) {
+            var notification = self.Notification.create();
+            notification.userId = self.subject && self.subject.realUser ?
+              self.subject.realUser.id : self.user.id;
+            notification.toastMessage = self.cls_.name + ' ' + self.EXECUTION_INVOKED;
+            notification.toastState = self.ToastState.REQUESTED;
+            notification.severity = foam.log.LogLevel.INFO;
+            notification.transient = true;
+            self.__subContext__.notificationDAO.put(notification);
             self.copyFrom(script);
-            if ( script.status === self.ScriptStatus.RUNNING ) {
+            if ( script.status === self.ScriptStatus.SCHEDULED ) {
               self.poll();
             }
+          }).catch(function(e) {
+            var notification = self.Notification.create();
+            notification.userId = self.subject && self.subject.realUser ?
+              self.subject.realUser.id : self.user.id;
+            notification.toastMessage = self.cls_.name + ' ' + self.EXECUTION_FAILED;
+            notification.toastSubMessage = e.message || e;
+            notification.toastState = self.ToastState.REQUESTED;
+            notification.severity = foam.log.LogLevel.WARN;
+            notification.transient = true;
+            self.__subContext__.notificationDAO.put(notification);
           });
         } else {
           this.status = this.ScriptStatus.RUNNING;
           this.runScript().then(
             () => {
+              var notification = this.Notification.create();
+              notification.userId = this.subject && this.subject.realUser ?
+                this.subject.realUser.id : this.user.id;
+              notification.toastMessage = this.cls_.name + ' ' + this.EXECUTION_INVOKED;
+              notification.toastState = this.ToastState.REQUESTED;
+              notification.severity = foam.log.LogLevel.INFO;
+              notification.transient = true;
+              this.__subContext__.notificationDAO.put(notification);
+
               this.status = this.ScriptStatus.UNSCHEDULED;
               this.__context__[this.daoKey].put(this);
             },
             (err) => {
+              var notification = this.Notification.create();
+              notification.userId = this.subject && this.subject.realUser ?
+                this.subject.realUser.id : this.user.id;
+              notification.toastMessage = this.cls_.name + ' ' + this.EXECUTION_FAILED;
+              notification.toastSubMessage = e.message || e;
+              notification.toastState = this.ToastState.REQUESTED;
+              notification.severity = foam.log.LogLevel.WARN;
+              notification.transient = true;
+              this.__subContext__.notificationDAO.put(notification);
+
               this.output += '\n' + err.stack;
               console.log(err);
               this.status = this.ScriptStatus.ERROR;

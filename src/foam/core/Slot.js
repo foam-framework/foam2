@@ -350,7 +350,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'ConstantSlot',
 
-  implements: [ 'foam.core.Slot' ],
+  extends: 'foam.core.Slot',
 
   documentation: 'An immutable constant valued Slot.',
 
@@ -517,7 +517,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'ArraySlot',
 
-  implements: [ 'foam.core.Slot' ],
+  extends: 'foam.core.Slot',
 
   documentation: `
     A slot that takes an array of Slots and notifies when either changes.
@@ -556,7 +556,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'SimpleSlot',
-  implements: [ 'foam.core.Slot' ],
+  extends: 'foam.core.Slot',
 
   properties: [
     {
@@ -593,6 +593,52 @@ foam.CLASS({
           this.sub_ = this.linkFrom(n);
         }
       }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'ProxyExpressionSlot',
+  extends: 'foam.core.ProxySlot',
+
+  requires: [
+    'foam.core.ExpressionSlot'
+  ],
+
+  documentation: "An expression slot which supports 'obj' changing.",
+
+  properties: [
+    {
+      name: 'obj',
+      postSet: function () {
+        this.update();
+      }
+    },
+    {
+      name: 'code',
+      postSet: function () {
+        this.update();
+      }
+    },
+    {
+      name: 'args',
+      postSet: function () {
+        this.update();
+      }
+    }
+  ],
+
+  methods: [
+    function update() {
+      if ( ! this.code || ! this.obj ) return;
+
+      this.delegate = this.ExpressionSlot.create({
+        args: this.args,
+        code: this.code,
+        obj:  this.obj
+      })
     }
   ]
 });

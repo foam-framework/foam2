@@ -105,8 +105,6 @@ foam.CLASS({
           }
         }
 
-        if ( nu.length == 1 ) this.data = nu[0][0];
-
         if ( this.dynamicSize ) this.size = Math.min(nu.length, this.maxSize);
         return nu;
       }
@@ -166,6 +164,11 @@ foam.CLASS({
       name: 'alwaysFloatLabel'
     },
     {
+      class: 'String',
+      name: 'header',
+      documentation: 'if this is set, a custom header will be add to drop down choices'
+    },
+    {
       name: 'view_'
     },
     'feedback_',
@@ -202,6 +205,8 @@ foam.CLASS({
     function initE() {
       var self = this;
 
+      if ( ! this.choice && this.choices.length == 1 ) this.data = this.choices[0][0];
+
       // If no item is selected, and data has not been provided, select the 0th
       // entry.
       if ( this.data == null && ! this.index ) {
@@ -220,7 +225,8 @@ foam.CLASS({
               choices$:         self.choices$,
               placeholder$:     self.placeholder$,
               mode$:            self.mode$,
-              size$:            self.size$
+              size$:            self.size$,
+              header$:          self.header$
             })
               .attrs({ name: self.name })
               .enableClass('selection-made', self.index$.map((index) => index !== -1))
@@ -252,7 +258,6 @@ foam.CLASS({
       for ( var i = 0 ; i < choices.length ; i++ ) {
         if ( foam.util.equals(choices[i][0], data) ) return choices[i];
       }
-      return null;
     },
 
     function findChoiceByText(text) {
@@ -260,7 +265,6 @@ foam.CLASS({
       for ( var i = 0 ; i < choices.length ; i++ ) {
         if ( choices[i][1] === text ) return choices[i];
       }
-      return null;
     },
 
     function fromProperty(p) {

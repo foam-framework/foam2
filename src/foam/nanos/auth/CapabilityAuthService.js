@@ -29,7 +29,7 @@ foam.CLASS({
     'foam.nanos.auth.Subject',
     'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.CapabilityRuntimeException',
+    'foam.nanos.crunch.CapabilityIntercept',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.logger.Logger',
@@ -241,7 +241,7 @@ foam.CLASS({
     {
       name: 'maybeIntercept',
       documentation: `
-        This method might throw a CapabilityRuntimeException if a capability can intercept.
+        This method might throw a CapabilityIntercept if a capability can intercept.
       `,
       args: [
         {
@@ -264,7 +264,7 @@ foam.CLASS({
         if ( capabilities.size() < 1 ) return;
 
         // Add filteredCapabilities to a runtime exception and throw it
-        CapabilityRuntimeException ex = new CapabilityRuntimeException(
+        CapabilityIntercept ex = new CapabilityIntercept(
           "Permission [" + permission + "] denied. Filtered Capabilities available.");
         for ( Capability cap : capabilities ) {
           if ( cap.getInterceptIf().f(x) ) ex.addCapabilityId(cap.getId());

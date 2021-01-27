@@ -98,7 +98,8 @@ foam.CLASS({
         if( ! map[key] ) {
           map[key] = objsClass.create();
         }
-        objsClass.getAxiomByName(this.getNameOfLastPropertyForNestedProperty(arrayOfNestedPropertiesName[i])).set(map[key], arrayOfValues[i]);
+        if ( arrayOfValues[i] )
+          objsClass.getAxiomByName(this.getNameOfLastPropertyForNestedProperty(arrayOfNestedPropertiesName[i])).set(map[key], arrayOfValues[i]);
       }
       return map;
     },
@@ -129,6 +130,6 @@ foam.CLASS({
         filteredArr.push(valuesArray[indexes[i]]);
       }
       return filteredArr;
-    },
+    }
   ]
 });

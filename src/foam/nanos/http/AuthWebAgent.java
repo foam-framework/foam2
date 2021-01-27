@@ -34,10 +34,12 @@ public class AuthWebAgent
   public final static String SESSION_ID = "sessionId";
 
   protected String permission_;
+  protected SendErrorHandler sendErrorHandler_;
 
-  public AuthWebAgent(String permission, WebAgent delegate) {
+  public AuthWebAgent(String permission, WebAgent delegate, SendErrorHandler sendErrorHandler) {
     setDelegate(delegate);
     permission_ = permission;
+    sendErrorHandler_ = sendErrorHandler;
   }
 
   @Override
@@ -154,13 +156,13 @@ public class AuthWebAgent
                 }
               } else {
                 logger.debug("Invalid authentication credentials. Unable to parse username:password");
-                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid authentication credentials.");
+                sendError(x, resp, HttpServletResponse.SC_UNAUTHORIZED, "Invalid authentication credentials.");
                 return null;
               }
             } catch (UnsupportedEncodingException e) {
               logger.warning(e, "Unsupported authentication encoding, expecting Base64.");
               if ( ! SafetyUtil.isEmpty(authHeader) ) {
-                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Supported Authentication Encodings: Base64");
+                sendError(x, resp, HttpServletResponse.SC_NOT_ACCEPTABLE, "Supported Authentication Encodings: Base64");
                 return null;
               }
             }
@@ -199,23 +201,23 @@ public class AuthWebAgent
                   return (Session) sessionDAO.put(session);
                 } catch ( AuthenticationException e ) {
                   logger.debug("Invalid authentication token. User,Group of Session not found.", e.getMessage());
-                  resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid authentication token.");
+                  sendError(x, resp, HttpServletResponse.SC_UNAUTHORIZED, "Invalid authentication token.");
                   return null;
                 }
               } else {
                 logger.debug("Invalid Source Address.");
-                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Source Address.");
+                sendError(x, resp, HttpServletResponse.SC_UNAUTHORIZED, "Invalid Source Address.");
                 return null;
               }
             } else {
               logger.debug("Invalid authentication token.");
-              resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid authentication token.");
+              sendError(x, resp, HttpServletResponse.SC_UNAUTHORIZED, "Invalid authentication token.");
               return null;
             }
           } else {
             logger.warning("Unsupported authorization type, expecting Basic or Bearer, received: "+authType);
             if ( ! SafetyUtil.isEmpty(authHeader) ) {
-              resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Supported Authorizations: Basic, Bearer");
+              sendError(x, resp, HttpServletResponse.SC_NOT_ACCEPTABLE, "Supported Authorizations: Basic, Bearer");
               return null;
             }
           }
@@ -246,14 +248,14 @@ public class AuthWebAgent
         logger.error("AuthService.login returned null user and did not throw AuthenticationException.");
         // TODO: generate stack trace.
         if ( ! SafetyUtil.isEmpty(authHeader) ) {
-          resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+          sendError(x, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Authentication failure.");
         } else {
           PrintWriter out = x.get(PrintWriter.class);
           out.println("Authentication failure.");
         }
       } catch ( AuthenticationException e ) {
         if ( ! SafetyUtil.isEmpty(authHeader) ) {
-          resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+          sendError(x, resp, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         } else {
           PrintWriter out = x.get(PrintWriter.class);
           out.println("Authentication failure.");
@@ -264,6 +266,16 @@ public class AuthWebAgent
     }
 
     return null;
+  }
+
+  private void sendError(X x, HttpServletResponse resp, int status, String message) throws java.io.IOException
+  {
+    if ( sendErrorHandler_ == null ) {
+      resp.sendError(status, message);
+      return;
+    }
+
+    sendErrorHandler_.sendError(x, status, message);
   }
 
   public Cookie getCookie(HttpServletRequest req) {
@@ -306,6 +318,9 @@ public class AuthWebAgent
   }
 
   public void templateLogin(X x) {
+    // Skip the redirect to login if it is not necessary
+    if ( sendErrorHandler_ != null && !sendErrorHandler_.redirectToLogin(x) ) return;
+
     PrintWriter out = x.get(PrintWriter.class);
 
     out.println("<form method=post>");

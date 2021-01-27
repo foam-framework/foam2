@@ -394,6 +394,11 @@ foam.CLASS({
       }
     },
 
+    function outputRegExp(o) {
+      // These methods happen to have identical implementation
+      this.outputFunction(o);
+    },
+
     function outputFObject(o, opt_cls) {
       if ( o.outputJSON ) {
         o.outputJSON(this);
@@ -474,6 +479,7 @@ foam.CLASS({
         Boolean:   function(o) { this.out(o); },
         Date:      function(o) { this.outputDate(o); },
         Function:  function(o) { this.outputFunction(o); },
+        RegExp:  function(o) { this.outputRegExp(o); },
         FObject: function(o, opt_cls) { this.outputFObject(o, opt_cls); },
         Array: function(o, opt_cls) {
           this.start('[');
@@ -714,7 +720,19 @@ foam.LIB({
       //      useShortNames: true,
       useShortNames: false,
       propertyPredicate: function(o, p) { return ! p.storageTransient; }
-    })
+    }),
+
+    // Short, but exclude cluster-transient properties.
+    Cluster: foam.json.Outputter.create({
+      pretty: false,
+      strict: false,
+      formatDatesAsNumbers: true,
+      outputDefaultValues: false,
+      // TODO: No deserialization support for shortnames yet.
+      //      useShortNames: true,
+      useShortNames: false,
+      propertyPredicate: function(o, p) { return ! p.clusterTransient; }
+    }),
   },
 
   methods: [

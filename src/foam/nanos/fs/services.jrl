@@ -19,23 +19,24 @@ p({
   "class":"foam.nanos.boot.NSpec",
   "name":"fileDAO",
   "serve":true,
-  "serviceScript":
-  """
+  "serviceScript":"""
     dao = new foam.dao.KeyValueDAO.Builder(x)
-      .setDelegate(new foam.dao.NullDAO(x, foam.nanos.fs.File.getOwnClassInfo()))
+      .setDelegate(new foam.nanos.fs.SupportFileTypeDAO(x,
+        new foam.nanos.fs.FileDataDAO.Builder(x)
+          .setDelegate(new foam.dao.NullDAO(x, foam.nanos.fs.File.getOwnClassInfo()))
+          .build()))
       .build();
-    dao = new foam.nanos.fs.SupportFileTypeDAO(x, dao);
+
     return new foam.dao.EasyDAO.Builder(x)
-      .setPm(true)
+      .setOf(foam.nanos.fs.File.getOwnClassInfo())
       .setGuid(true)
       .setDecorator(dao)
-      .setOf(foam.nanos.fs.File.getOwnClassInfo())
       .setJournalName("files")
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setPm(true)
       .build()
   """,
-  "client":
-  """
+  "client":"""
     {
       "of":"foam.nanos.fs.File",
       "cache":false,

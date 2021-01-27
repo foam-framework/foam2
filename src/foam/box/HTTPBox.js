@@ -56,6 +56,7 @@ foam.CLASS({
       key: 'me',
       type: 'foam.box.Box'
     },
+    'sessionID as jsSessionID',
     'window'
   ],
 
@@ -69,12 +70,8 @@ foam.CLASS({
 
   properties: [
     {
+      documentation: `Explicitly set session ID when calling from Java. Use imported sessionID from javascript.`,
       class: 'String',
-      name: 'sessionName',
-      value: 'defaultSession'
-    },
-    {
-      class: 'foam.box.SessionIDProperty',
       name: 'sessionID'
     },
     {
@@ -200,7 +197,7 @@ protected class ResponseThread implements Runnable {
     {
       name: 'send',
       code: function(msg) {
-        msg.attributes[this.SESSION_KEY] = this.sessionID;
+        msg.attributes[this.SESSION_KEY] = this.jsSessionID;
 
         // TODO: We should probably clone here, but often the message
         // contains RPC arguments that don't clone properly.  So
@@ -219,9 +216,8 @@ protected class ResponseThread implements Runnable {
         };
 
         if ( this.authorizationType === foam.box.HTTPAuthorizationType.BEARER ) {
-          headers['Authorization'] = 'BEARER ' + this.sessionID;
+          headers['Authorization'] = 'BEARER ' + this.jsSessionID;
         }
-
         var req = this.HTTPRequest.create({
           url:     this.prepareURL(this.url),
           method: this.method,

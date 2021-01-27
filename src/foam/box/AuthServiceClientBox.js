@@ -11,22 +11,12 @@ foam.CLASS({
 
   documentation: 'ClientBox which does not wrap replyBox in SessionReplyBox',
 
+  imports: [ 'sessionID' ],
+
   constants: [
     {
       name: 'SESSION_KEY',
       value: 'sessionId'
-    }
-  ],
-
-  properties: [
-    {
-      class: 'String',
-      name: 'sessionName',
-      value: 'defaultSession'
-    },
-    {
-      class: 'foam.box.SessionIDProperty',
-      name: 'sessionID'
     }
   ],
 

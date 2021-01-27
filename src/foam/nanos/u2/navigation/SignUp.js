@@ -35,20 +35,16 @@ foam.CLASS({
     { name: 'FOOTER_LINK', message: 'Sign in' },
     { name: 'ERROR_MSG', message: 'There was a problem creating your account' },
     { name: 'EMAIL_ERR', message: 'Valid email required' },
-    { name: 'EMAIL_AVAILABILITY_ERR', message: 'This email is taken. Please try another.' },
+    { name: 'EMAIL_AVAILABILITY_ERR', message: 'This email is already in use. Please sign in or use a different email' },
     { name: 'USERNAME_EMPTY_ERR', message: 'Username required' },
-    { name: 'USERNAME_AVAILABILITY_ERR', message: 'This username is taken. Please try another.' }
+    { name: 'USERNAME_AVAILABILITY_ERR', message: 'This username is taken. Please try another.' },
+    //TODO: Find out better way to deal with PASSWORD_ERR
+    { name: 'PASSWORD_ERR', message: 'Password should be at least 6 characters.' }
   ],
 
   properties: [
     {
       name: 'dao_',
-      hidden: true
-    },
-    {
-      class: 'String',
-      name: 'group_',
-      documentation: `Group this user is going to be apart of.`,
       hidden: true
     },
     {
@@ -86,7 +82,6 @@ foam.CLASS({
           icon: 'images/checkmark-small-green.svg',
           onKey: true,
           isAvailable$: X.data.emailAvailable$,
-          targetProperty: foam.nanos.auth.User.EMAIL,
           inputValidation: /\S+@\S+\.\S+/,
           restrictedCharacters: /^[^\s]$/,
           displayMode: X.data.disableEmail_ ? foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW
@@ -118,7 +113,6 @@ foam.CLASS({
           icon: 'images/checkmark-small-green.svg',
           onKey: true,
           isAvailable$: X.data.usernameAvailable$,
-          targetProperty: foam.nanos.auth.User.USER_NAME,
           inputValidation: /^[^\s\/]+$/,
           restrictedCharacters: /^[^\s\/]$/
         };
@@ -139,7 +133,10 @@ foam.CLASS({
         class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
-      minLength: 6
+      validateObj: function(desiredPassword) {
+        if ( ! desiredPassword || desiredPassword.length < 6 ) return this.PASSWORD_ERR;
+      },
+      required: true
     }
   ],
 
@@ -178,6 +175,17 @@ foam.CLASS({
           });
         }
       }
+    },
+    {
+      name: 'defaultUserLanguage',
+      code: function() {
+        let l = foam.locale.split("-");
+        let code = l[0];
+        let variant = l[1];
+        let language = foam.nanos.auth.Language.create({code: code});
+        if ( variant ) language.variant = variant;
+        return language;
+      }
     }
   ],
 
@@ -196,7 +204,7 @@ foam.CLASS({
             email: this.email,
             desiredPassword: this.desiredPassword,
             signUpToken: this.token_,
-            group: this.group_
+            language: this.defaultUserLanguage()
           }))
           .then(async (user) => {
             this.user.copyFrom(user);

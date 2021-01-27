@@ -23,6 +23,8 @@ foam.CLASS({
     'foam.i18n.Locale'
   ],
 
+  topics: [ 'translation' ],
+
   properties: [
     {
       name: 'initLatch',
@@ -62,6 +64,22 @@ foam.CLASS({
       });
     },
 
+    function maybeReload() {
+      /**
+        Reload locales if foam.locale has changed since this class was
+        initially init()-ed.
+      **/
+      var originalLocale = this.locale;
+      if ( this.variant ) originalLocale = originalLocale + '-' + this.variant;
+      if ( foam.locale != originalLocale ) {
+        this.locale = this.variant = undefined;
+        this.initLatch = this.Latch.create();
+        this.localeEntries = {};
+        this.init();
+      }
+      return this.initLatch;
+    },
+
     function loadLanguageLocales() {
       return this.localeDAO.where(
         this.AND(
@@ -91,10 +109,12 @@ foam.CLASS({
     */
     {
       name: 'getTranslation',
-      args: [ 'String locale', 'String source' ],
+      args: [ 'String locale', 'String source', 'String defaultText' ],
       type: 'String',
-      code: function(locale, source) {
-        return this.localeEntries[source];
+      code: function(locale, source, defaultText) {
+        var txt = this.localeEntries[source];
+        this.translation.pub(locale, source, txt, defaultText);
+        return txt || defaultText;
       }
     }
   ]

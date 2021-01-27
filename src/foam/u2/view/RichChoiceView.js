@@ -101,7 +101,7 @@ foam.CLASS({
   messages: [
     {
       name: 'CHOOSE_FROM',
-      message: 'Choose from '
+      message: 'Choose from'
     },
     {
       name: 'CLEAR_SELECTION',
@@ -354,7 +354,7 @@ foam.CLASS({
       documentation: 'Replaces choose from placeholder with passed in string.',
       expression: function(of) {
         var plural = of.model_.plural.toLowerCase();
-        return this.CHOOSE_FROM + plural + '...';
+        return this.CHOOSE_FROM + ' ' + plural + '...';
       }
     },
     {
@@ -363,6 +363,14 @@ foam.CLASS({
       documentation: `
         Optional. If this is provided, an action will be included at the bottom
         of the dropdown.
+      `
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'actionData',
+      documentation: `
+        Optional. If this is provided alongside an action, the action will be executed
+        with this data in the context.
       `
     },
     {
@@ -503,7 +511,7 @@ foam.CLASS({
                         this.addClass(self.myClass('setAbove'))
                           .start().hide(!! section.hideIfEmpty && resp[index].value <= 0 || ! section.heading)
                             .addClass(self.myClass('heading'))
-                            .add(section.heading)
+                            .translate(section.heading, section.heading)
                           .end()
                           .start()
                             .select(section.filteredDAO$proxy, (obj) => {
@@ -524,7 +532,15 @@ foam.CLASS({
                       });
                     });
                   }))
-                  .add(this.slot(function(action) {
+                  .add(this.slot(function(action, actionData) {
+                    if ( action && actionData) {
+                      return this.E()
+                        .startContext({ data: actionData })
+                        .start(self.DefaultActionView, { action: action })
+                          .addClass(self.myClass('action'))
+                        .end()
+                        .endContext();
+                    }
                     if ( action ) {
                       return this.E()
                         .start(self.DefaultActionView, { action: action })
@@ -609,10 +625,11 @@ foam.CLASS({
 
       methods: [
         function initE() {
+          var summary = this.data.toSummary();
           return this
             .start()
               .addClass(this.myClass('row'))
-              .add(this.data.toSummary())
+              .translate(summary || ('richChoiceSummary.'+this.data.cls_.id+'.'+this.data.id), summary)
             .end();
         }
       ]
@@ -660,9 +677,13 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          return this.add(this.fullObject$.map(o => {
+          var summary = this.fullObject$.map(o => {
             return o ? o.toSummary() : this.defaultSelectionPrompt;
-          }));
+          });
+          var summaryWithoutSlot = this.fullObject && this.fullObject.toSummary()
+            ? this.fullObject.toSummary()
+            : this.defaultSelectionPrompt;
+          return this.translate(summaryWithoutSlot, summary);
         }
       ]
     },

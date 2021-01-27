@@ -31,6 +31,9 @@ foam.CLASS({
       let wizardletDiff = a.wizardletIndex - b.wizardletIndex;
       if ( wizardletDiff != 0 ) return wizardletDiff;
       return a.sectionIndex - b.sectionIndex;
+    },
+    function apply(list) {
+      return list[this.wizardletIndex][this.sectionIndex];
     }
   ]
 });

@@ -34,7 +34,7 @@ foam.CLASS({
       class: 'foam.dao.DAOProperty',
       name: 'dao_',
       factory: function() {
-        return this.menuDAO.orderBy(this.Menu.ORDER);
+        return this.menuDAO;
       }
     },
     {
@@ -121,7 +121,8 @@ foam.CLASS({
         this.auth.logout().then(function() {
           this.window.location.hash = '';
           this.window.location.reload();
-        })
+          localStorage.removeItem('defaultSession');
+        });
       }
     }
   ],

@@ -11,6 +11,7 @@ foam.CLASS({
   implements: [
     'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.EnabledAware',
     'foam.nanos.auth.HumanNameTrait',
     'foam.nanos.auth.LastModifiedAware',
@@ -21,8 +22,7 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.auth.Address',
-    'foam.nanos.auth.PriorPassword',
-    'foam.nanos.auth.Phone'
+    'foam.nanos.auth.PriorPassword'
   ],
 
   javaImports: [
@@ -78,18 +78,46 @@ foam.CLASS({
 
   sections: [
     {
-      name: 'business',
-      title: 'Business Information'
+      name: 'userInformation',
+      title: 'User Information',
+      order: 1
     },
     {
-      name: 'personal',
-      title: 'Personal Information'
+      name: 'businessInformation',
+      title: 'Business Information',
+      order: 2
     },
     {
-      name: 'administrative',
+      name: 'ownerInformation',
+      title: 'Ownership'
+    },
+    {
+      name: 'operationsInformation',
+      title: 'Operations'
+    },
+    {
+      name: 'complianceInformation',
+      title: 'Compliance'
+    },
+    {
+      name: 'accountInformation',
+      title: 'Accounts'
+    },
+    {
+      name: 'contactInformation',
+      title: 'Contacts'
+    },
+    {
+      name: 'systemInformation',
       help: 'Properties that are used internally by the system.',
+      title: 'System Information',
       permissionRequired: true
     },
+    {
+      name: 'deprecatedInformation',
+      title: 'Deprecated',
+      permissionRequired: true
+    }
   ],
 
   // TODO: The following properties don't have to be defined here anymore once
@@ -110,69 +138,340 @@ foam.CLASS({
       tableWidth: 100,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative',
+      section: 'userInformation',
+      order: 10,
+      gridColumns: 6,
       includeInDigest: true,
       sheetsOutput: true
     },
     {
-      class: 'Boolean',
-      name: 'enabled',
-      documentation: 'Determines whether the User is permitted certain actions.',
-      value: true,
-      section: 'administrative'
+      class: 'String',
+      name: 'userName',
+      label: 'Username',
+      includeInDigest: true,
+      containsPII: false,
+      documentation: 'The username of the User.',
+      section: 'userInformation',
+      order: 20,
+      gridColumns: 6
     },
     {
       class: 'Boolean',
       name: 'loginEnabled',
       documentation: 'Determines whether the User can login to the platform.',
       writePermissionRequired: true,
+      includeInDigest: false,
       value: true,
-      section: 'administrative'
+      section: 'userInformation',
+      order: 30,
+      gridColumns: 6,
     },
     {
       class: 'DateTime',
       name: 'lastLogin',
+      includeInDigest: false,
       documentation: 'The date and time of last login by User.',
-      section: 'administrative',
+      section: 'userInformation',
+      order: 40,
+      gridColumns: 6,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO'
+    },
+    {
+      class: 'DateTime',
+      name: 'passwordExpiry',
+      includeInDigest: false,
+      documentation: `The date and time that the current password of the User
+        will expire.`,
+      section: 'userInformation',
+      order: 50,
+      gridColumns: 6
+    },
+    {
+      class: 'DateTime',
+      name: 'passwordLastModified',
+      includeInDigest: false,
+      documentation: 'The date and time that the password was last modified.',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'userInformation',
+      order: 60,
+      gridColumns: 6
     },
     {
       class: 'String',
       name: 'firstName',
       shortName: 'fn',
-      documentation: 'The first name of the User.',
-      gridColumns: 4,
-      section: 'personal',
-      includeInDigest: true
+      documentation: 'The first name of the User.',      
+      section: 'userInformation',
+      order: 70,
+      gridColumns: 6,
+      includeInDigest: true,
+      containsPII: true
    },
     {
       class: 'String',
       name: 'middleName',
       documentation: 'The middle name of the User.',
-      gridColumns: 4,
-      section: 'personal',
-      includeInDigest: true
+      section: 'userInformation',
+      order: 80,
+      gridColumns: 6,
+      includeInDigest: true,
+      containsPII: true
     },
     {
       class: 'String',
       name: 'lastName',
       shortName: 'ln',
       documentation: 'The last name of the User.',
-      gridColumns: 4,
-      section: 'personal',
-      includeInDigest: true
+      section: 'userInformation',
+      order: 90,
+      gridColumns: 6,
+      includeInDigest: true,
+      containsPII: true
     },
     {
       name: 'legalName',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'personal'
+      section: 'userInformation',
+      order: 100,
+      gridColumns: 6,
+      includeInDigest: false,
+      containsPII: true
     },
-   {
+    {
+      class: 'Date',
+      name: 'birthday',
+      includeInDigest: false,
+      containsPII: false,
+      documentation: 'The date of birth of the individual person, or real user.',
+      section: 'userInformation',
+      order: 120,
+      gridColumns: 6
+    },
+    {
+      class: 'Reference',
+      name: 'language',
+      includeInDigest: false,
+      containsPII: false,
+      documentation: 'The default language preferred by the User.',
+      of: 'foam.nanos.auth.Language',
+      createVisibility: 'HIDDEN',
+      section: 'userInformation',
+      order: 130,
+      gridColumns: 6,
+      factory: function() {
+        return foam.nanos.auth.LanguageId.create({code: 'en'})
+      },
+      javaFactory: `
+        return new foam.nanos.auth.LanguageId.Builder(null).setCode("en").build();
+      `
+    },
+    {
+      class: 'String',
+      name: 'timeZone',
+      includeInDigest: false,
+      documentation: 'The preferred time zone of the User.',
+      width: 5,
+      createVisibility: 'HIDDEN',
+      section: 'userInformation',
+      order: 140,
+      gridColumns: 6
+    },
+    {
+      class: 'EMail',
+      name: 'email',
+      label: {
+        'en' :'Email Address',
+        'fr' :'Adresse e-mail'
+      },
+      includeInDigest: true,
+      containsPII: true,
+      documentation: 'The email address of the User.',
+      displayWidth: 80,
+      width: 100,
+      javaSetter:
+      `email_ = val.toLowerCase();
+       emailIsSet_ = true;`,
+      section: 'userInformation',
+      order: 150,
+      gridColumns: 6
+    },
+    {
+      class: 'Boolean',
+      name: 'emailVerified',
+      includeInDigest: false,
+      documentation: 'Determines whether the email address of the User is valid.',
+      writePermissionRequired: true,
+      section: 'userInformation',
+      order: 160,
+      gridColumns: 6
+    },
+    {
+      class: 'URL',
+      name: 'website',
+      includeInDigest: false,
+      documentation: 'A URL link to the website of the User.',
+      displayWidth: 80,
+      width: 2048,
+      validateObj: function(website) {
+        var websiteRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,})/;
+
+        if ( website.length > 0 && ! websiteRegex.test(website) ) {
+          return 'Invalid website';
+        }
+      },
+      createVisibility: 'HIDDEN',
+      section: 'userInformation',
+      order: 170,
+      gridColumns: 6
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.Address',
+      name: 'address',
+      documentation: 'Returns the postal address from the Address model.',
+      includeInDigest: false,
+      containsPII: true,
+      factory: function() {
+        return this.Address.create();
+      },
+      section: 'userInformation',
+      order: 180
+    },
+    {
+      class: 'PhoneNumber',
+      name: 'phoneNumber',
+      includeInDigest: false,
+      containsPII: true,
+      documentation: 'Personal phone number.',
+      section: 'userInformation',
+      order: 190,
+      gridColumns: 6
+    },
+    {
+      class: 'Boolean',
+      name: 'phoneNumberVerified',
+      includeInDigest: false,
+      writePermissionRequired: true,
+      section: 'userInformation',
+      order: 200,
+      gridColumns: 6
+    },
+    {
+      class: 'PhoneNumber',
+      name: 'mobileNumber',
+      includeInDigest: false,
+      documentation: 'Returns the mobile phone number of the User from the Phone model.',
+      createVisibility: 'HIDDEN',
+      section: 'userInformation',
+      order: 210,
+      gridColumns: 6
+    },
+    {
+      class: 'Boolean',
+      name: 'mobileNumberVerified',
+      includeInDigest: false,
+      writePermissionRequired: true,
+      section: 'userInformation',
+      order: 220,
+      gridColumns: 6
+    },
+    {
+      class: 'foam.nanos.fs.FileProperty',
+      name: 'profilePicture',
+      includeInDigest: false,
+      containsPII: true,
+      documentation: `The profile picture of the individual user, initially
+        defaulting to a placeholder picture.`,
+      view: {
+        class: 'foam.nanos.auth.ProfilePictureView',
+        placeholderImage: 'images/ic-placeholder.png'
+      },
+      section: 'userInformation',
+      order: 230,
+      gridColumns: 6
+    },
+    {
+      class: 'String',
+      name: 'note',
+      documentation: 'A field for a note that can be added and appended to the User.',
+      displayWidth: 70,
+      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 },
+      section: 'userInformation',
+      order: 240
+    },
+    {
+      class: 'DateTime',
+      name: 'created',
+      includeInDigest: true,
+      documentation: 'The date and time of when the User was created in the system.',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'userInformation',
+      order: 250,
+      gridColumns: 6,
+      includeInDigest: true
+    },
+    {
+      class: 'DateTime',
+      name: 'lastModified',
+      includeInDigest: true,
+      documentation: 'The date and time the User was last modified.',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      storageOptional: true,
+      section: 'userInformation',
+      order: 260,
+      gridColumns: 6
+    },
+    {
+      class: 'String',
+      name: 'organization',
+      includeInDigest: false,
+      containsPII: false,
+      documentation: 'The organization/business associated with the User.',
+      displayWidth: 80,
+      width: 100,
+      tableWidth: 160,
+      section: 'businessInformation',
+      order: 10,
+      gridColumns: 6
+    },
+    {
+      class: 'String',
+      name: 'businessName',
+      includeInDigest: false,
+      documentation: 'The name of the business associated with the User.',
+      width: 50,
+      section: 'businessInformation',
+      order: 15,
+      gridColumns: 6,
+      tableWidth: 170
+    },
+    {
+      class: 'String',
+      name: 'department',
+      includeInDigest: false,
+      containsPII: false,
+      documentation: `The department associated with the organization/business
+        of the User.`,
+      width: 50,
+      createVisibility: 'HIDDEN',
+      section: 'businessInformation',
+      order: 20,
+      gridColumns: 6
+    },
+    {
       class: 'String',
       name: 'jobTitle',
-      section: 'personal',
+      includeInDigest: false,
+      containsPII: false,
+      documentation: 'The job title of the individual person, or real user.',
+      section: 'businessInformation',
+      order: 30,
+      gridColumns: 6,
       view: function(args, X) {
         return {
           class: 'foam.u2.view.ChoiceWithOtherView',
@@ -189,102 +488,60 @@ foam.CLASS({
       }
     },
     {
-      class: 'String',
-      name: 'organization',
-      documentation: 'The organization/business associated with the User.',
-      displayWidth: 80,
-      width: 100,
-      tableWidth: 160,
-      section: 'business'
-    },
-    {
-      class: 'String',
-      name: 'department',
-      documentation: `The department associated with the organization/business
-        of the User.`,
-      width: 50,
+      class: 'StringArray',
+      name: 'disabledTopics',
+      includeInDigest: false,
+      documentation: 'Disables types for notifications.',
       createVisibility: 'HIDDEN',
-      section: 'business'
+      section: 'operationsInformation',
+      order: 80,
+      gridColumns: 6,
+      javaPostSet: `
+        clearDisabledTopicSet();
+      `
     },
     {
-      class: 'String',
-      name: 'userName',
-      label: 'Username',
-      documentation: 'The username of the User.',
-      section: 'personal'
-    },
-    {
-      class: 'EMail',
-      name: 'email',
-      label: {
-        'en' :'Email Address',
-        'fr' :'Adresse e-mail'
-      },
-      documentation: 'The email address of the User.',
-      displayWidth: 80,
-      width: 100,
+      class: 'foam.core.Enum',
+      of: 'foam.nanos.auth.LifecycleState',
+      name: 'lifecycleState',
       includeInDigest: true,
-      javaSetter:
-      `email_ = val.toLowerCase();
-       emailIsSet_ = true;`,
-      section: 'personal'
+      section: 'systemInformation',
+      order: 40,
+      gridColumns: 6,
+      value: foam.nanos.auth.LifecycleState.PENDING,
+      writePermissionRequired: true
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
+      name: 'spid',
+      includeInDigest: true,
+      tableWidth: 120,
+      section: 'systemInformation',
+      order: 50,
+      gridColumns: 6,
+      writePermissionRequired:true,
+      documentation: `
+        Need to override getter to return "" because its trying to
+        return null (probably as a result of moving order of files
+        in nanos), which breaks tests
+      `,
+      javaGetter: `
+        if ( ! spidIsSet_ ) {
+          return "";
+        }
+        return spid_;
+      `
     },
     {
       class: 'Boolean',
-      name: 'emailVerified',
-      documentation: 'Determines whether the email address of the User is valid.',
-      writePermissionRequired: true,
-      section: 'administrative'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Phone',
-      name: 'phone',
-      documentation: 'Personal phone number.',
-      factory: function() {
-        return this.Phone.create();
-      },
-      view: { class: 'foam.u2.detail.VerticalDetailView' },
-      visibility: 'HIDDEN',
-      section: 'personal'
-    },
-    {
-      class: 'PhoneNumber',
-      name: 'phoneNumber',
-      documentation: 'Personal phone number.',
-      section: 'personal'
-    },
-    {
-      class: 'Boolean',
-      name: 'phoneNumberVerified',
-      writePermissionRequired: true,
-      section: 'personal'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Phone',
-      name: 'mobile',
-      documentation: 'Returns the mobile phone number of the User from the Phone model.',
-      factory: function() {
-        return this.Phone.create();
-      },
-      view: { class: 'foam.u2.detail.VerticalDetailView' },
-      section: 'personal',
-      visibility: 'HIDDEN',
-      includeInDigest: true
-    },
-    {
-      class: 'PhoneNumber',
-      name: 'mobileNumber',
-      documentation: 'Returns the mobile phone number of the User from the Phone model.',
-      createVisibility: 'HIDDEN',
-      section: 'personal'
-    },
-    {
-      class: 'Boolean',
-      name: 'mobileNumberVerified',
-      writePermissionRequired: true,
-      section: 'personal'
+      name: 'enabled',
+      documentation: 'Determines whether the User is permitted certain actions.',
+      value: true,
+      includeInDigest: true,
+      section: 'systemInformation',
+      order: 90,
+      gridColumns: 6
     },
     {
       class: 'String',
@@ -301,61 +558,9 @@ foam.CLASS({
       `,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'administrative'
-    },
-    {
-      class: 'Date',
-      name: 'birthday',
-      documentation: 'The date of birth of the individual person, or real user.',
-      section: 'personal'
-    },
-    {
-      class: 'foam.nanos.fs.FileProperty',
-      name: 'profilePicture',
-      documentation: `The profile picture of the individual user, initially
-        defaulting to a placeholder picture.`,
-      view: {
-        class: 'foam.nanos.auth.ProfilePictureView',
-        placeholderImage: 'images/ic-placeholder.png'
-      },
-      section: 'personal'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Address',
-      name: 'address',
-      documentation: 'Returns the postal address from the Address model.',
-      factory: function() {
-        return this.Address.create();
-      },
-      label: 'Country',
-      tableCellFormatter: function(value, obj, axiom) {
-        let addressString = '';
-        for ( prop in value.instance_ ) if ( prop ) addressString += ` ${value[prop]}`;
-        if ( addressString ) this.setAttribute('title', addressString.trim());
-        return this.__subContext__.countryDAO.find(value.countryId).then((cobj) => {
-          return cobj ? this.add(cobj.name) : this.add(value.countryId);
-        });
-      },
-      section: 'personal'
-    },
-    {
-      class: 'Reference',
-      name: 'language',
-      documentation: 'The default language preferred by the User.',
-      of: 'foam.nanos.auth.Language',
-      value: 'en',
-      createVisibility: 'HIDDEN',
-      section: 'personal'
-    },
-    {
-      class: 'String',
-      name: 'timeZone',
-      documentation: 'The preferred time zone of the User.',
-      width: 5,
-      createVisibility: 'HIDDEN',
-      section: 'personal'
-      // TODO: create custom view or DAO
+      section: 'systemInformation',
+      order: 100,
+      gridColumns: 6
     },
     {
       class: 'Password',
@@ -376,21 +581,33 @@ foam.CLASS({
       createVisibility: 'RW',
       updateVisibility: 'RW',
       readVisibility: 'HIDDEN',
-      section: 'administrative'
+      section: 'systemInformation',
+      order: 110,
+      gridColumns: 6
     },
     {
       class: 'Password',
       name: 'password',
+      includeInDigest: true,
       documentation: 'The password that is currently active with the User.',
       hidden: true,
+      networkTransient: true
+    },
+    {
+      class: 'Password',
+      name: 'previousPassword',
+      includeInDigest: false,
+      documentation: 'The password that was previously active with the User.',
+      hidden: true,
       networkTransient: true,
-      section: 'administrative',
-      includeInDigest: true
+      section: 'systemInformation',
+      order: 120
     },
     {
       name: 'passwordHistory',
       class: 'FObjectArray',
       of: 'foam.nanos.auth.PriorPassword',
+      includeInDigest: false,
       javaFactory: `
         foam.nanos.auth.PriorPassword[] priorPasswords = new foam.nanos.auth.PriorPassword[1];
         priorPasswords[0] = new foam.nanos.auth.PriorPassword();
@@ -400,61 +617,10 @@ foam.CLASS({
       `,
       hidden: true,
       networkTransient: true,
-      section: 'administrative',
       createVisibility: 'HIDDEN',
+      section: 'systemInformation',
+      order: 130,
       updateVisibility: 'RO'
-    },
-    {
-      class: 'Password',
-      name: 'previousPassword',
-      documentation: 'The password that was previously active with the User.',
-      hidden: true,
-      networkTransient: true,
-      section: 'administrative'
-    },
-    {
-      class: 'DateTime',
-      name: 'passwordLastModified',
-      documentation: 'The date and time that the password was last modified.',
-      createVisibility: 'HIDDEN',
-      updateVisibility: 'RO',
-      section: 'administrative'
-    },
-    {
-      class: 'DateTime',
-      name: 'passwordExpiry',
-      documentation: `The date and time that the current password of the User
-        will expire.`,
-      section: 'administrative'
-    },
-    // TODO: startDate, endDate,
-    // TODO: do we want to replace 'note' with a simple ticket system?
-    {
-      class: 'String',
-      name: 'note',
-      documentation: 'A field for a note that can be added and appended to the User.',
-      displayWidth: 70,
-      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 },
-      section: 'administrative'
-    },
-    // TODO: remove after demo
-    {
-      class: 'String',
-      name: 'businessName',
-      documentation: 'The name of the business associated with the User.',
-      width: 50,
-      section: 'business',
-      visibility: 'HIDDEN'
-    },
-    {
-      class: 'StringArray',
-      name: 'disabledTopics',
-      documentation: 'Disables types for notifications.',
-      createVisibility: 'HIDDEN',
-      section: 'administrative',
-      javaPostSet: `
-        clearDisabledTopicSet();
-      `
     },
     {
       class: 'Object',
@@ -471,65 +637,6 @@ foam.CLASS({
         }
         return set;
       `
-    },
-    {
-      class: 'URL',
-      name: 'website',
-      documentation: 'A URL link to the website of the User.',
-      displayWidth: 80,
-      width: 2048,
-      validateObj: function(website) {
-        var websiteRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,})/;
-
-        if ( website.length > 0 && ! websiteRegex.test(website) ) {
-          return 'Invalid website';
-        }
-      },
-      createVisibility: 'HIDDEN',
-      section: 'personal'
-    },
-    {
-      class: 'DateTime',
-      name: 'created',
-      documentation: 'The date and time of when the User was created in the system.',
-      createVisibility: 'HIDDEN',
-      updateVisibility: 'RO',
-      section: 'administrative',
-      includeInDigest: true
-    },
-    {
-      class: 'DateTime',
-      name: 'lastModified',
-      documentation: 'The date and time the User was last modified.',
-      createVisibility: 'HIDDEN',
-      updateVisibility: 'RO',
-      section: 'administrative'
-    },
-    {
-      class: 'foam.core.Enum',
-      of: 'foam.nanos.auth.LifecycleState',
-      name: 'lifecycleState',
-      value: foam.nanos.auth.LifecycleState.PENDING,
-      writePermissionRequired: true
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.ServiceProvider',
-      name: 'spid',
-      tableWidth: 120,
-      section: 'administrative',
-      writePermissionRequired:true,
-      documentation: `
-        Need to override getter to return "" because its trying to
-        return null (probably as a result of moving order of files
-        in nanos), which breaks tests
-      `,
-      javaGetter: `
-        if ( ! spidIsSet_ ) {
-          return "";
-        }
-        return spid_;
-      `
     }
   ],
 
@@ -542,14 +649,14 @@ foam.CLASS({
         if ( this.lastName && this.firstName ) return this.firstName + ' ' + this.lastName;
         if ( this.lastName ) return this.lastName;
         if ( this.firstName ) return this.firstName;
-        return '';
+        return this.userName;
       },
       javaCode: `
         if ( ! SafetyUtil.isEmpty(this.getLegalName()) ) return this.getLegalName();
         if ( ! SafetyUtil.isEmpty(this.getLastName()) && ! SafetyUtil.isEmpty(this.getFirstName()) ) return this.getFirstName() + " " + this.getLastName();
         if ( ! SafetyUtil.isEmpty(this.getLastName()) ) return this.getLastName();
         if ( ! SafetyUtil.isEmpty(this.getFirstName()) ) return this.getFirstName();
-        return "";
+        return this.getUserName();
       `
     },
     {
@@ -563,8 +670,7 @@ foam.CLASS({
 
         // Prevent privilege escalation by only allowing a user's group to be
         // set to one that the user doing the put has permission to update.
-        boolean hasGroupUpdatePermission = auth.check(x, "group.update." + this.getGroup());
-        if ( ! hasGroupUpdatePermission ) {
+        if ( ! auth.check(x, "group.update." + this.getGroup()) ) {
           throw new AuthorizationException("You do not have permission to set that user's group to '" + this.getGroup() + "'.");
         }
       `
@@ -709,6 +815,24 @@ foam.CLASS({
           throw new AuthenticationException("User is not active");
         }
       `
+    },
+    {
+      name: 'isAdmin',
+      type: 'Boolean',
+      documentation: `
+        Returns true if the user has the system user id, or is in either the
+        admin or system group.
+
+        **IMPORTANT**: It is possible to misuse the value from this method.
+        A check on this method should never be used to override behaviour of
+        authorization; in this case it is preferred to create a permission that
+        no other user will have.
+      `,
+      javaCode: `
+        return getId() == foam.nanos.auth.User.SYSTEM_USER_ID
+          || getGroup().equals("admin")
+          || getGroup().equals("system");
+      `
     }
   ]
 });
@@ -725,7 +849,9 @@ foam.RELATIONSHIP({
   },
   targetProperty: {
     hidden: false,
-    section: 'administrative'
+    section: 'systemInformation',
+    order: 30,
+    gridColumns: 6
   }
 });
 
@@ -736,8 +862,8 @@ foam.RELATIONSHIP({
   forwardName: 'files',
   inverseName: 'owner',
   sourceProperty: {
-    hidden: true,
-    transient: true
+    transient: true,
+    section: 'systemInformation'
   }
 });
 
@@ -751,11 +877,15 @@ foam.RELATIONSHIP({
   junctionDAOKey: 'agentJunctionDAO',
   sourceProperty: {
     createVisibility: 'HIDDEN',
-    section: 'business'
+    label: 'Businesses',
+    section: 'businessInformation',
+    order: 50
   },
   targetProperty: {
     createVisibility: 'HIDDEN',
-    section: 'business'
+    label: 'Agents of Business',
+    section: 'businessInformation',
+    order: 40
   }
 });
 
@@ -784,6 +914,8 @@ foam.RELATIONSHIP({
     visibility: 'HIDDEN',
   },
   targetProperty: {
-    section: 'administrative'
+    section: 'systemInformation',
+    order: 60,
+    gridColumns: 6
   }
 });

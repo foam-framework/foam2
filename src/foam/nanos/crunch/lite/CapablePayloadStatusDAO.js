@@ -20,7 +20,7 @@ foam.CLASS({
     'foam.nanos.crunch.CrunchService',
     'foam.nanos.crunch.lite.Capable',
     'foam.nanos.crunch.lite.CapableAdapterDAO',
-    'foam.nanos.crunch.lite.CapablePayload',
+    'foam.nanos.crunch.CapabilityJunctionPayload',
 
     'foam.nanos.logger.Logger',
 
@@ -41,7 +41,7 @@ foam.CLASS({
         Capable capableTarget = tempPayloadDAO.getCapable();
         var payloadDAO = (DAO) capableTarget.getCapablePayloadDAO(x);
 
-        CapablePayload payload = (CapablePayload) obj;
+        CapabilityJunctionPayload payload = (CapabilityJunctionPayload) obj;
 
         CapabilityJunctionStatus defaultStatus = PENDING;
 
@@ -53,19 +53,43 @@ foam.CLASS({
           return obj;
         }
 
-        Capability cap = payload.getCapability();
+        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+        Capability cap = (Capability) capabilityDAO.find(payload.getCapability());
         var oldStatus = payload.getStatus();
         var newStatus = cap.getCapableChainedStatus(x, payloadDAO, payload);
 
         if ( oldStatus == APPROVED && newStatus == PENDING ) {
           newStatus = APPROVED;
         }
-        
-        if ( payload.getCapability().getReviewRequired() ) {
-          if ( oldStatus == PENDING ) {
+
+        if ( oldStatus == REJECTED  ) {
+          if ( newStatus == PENDING ){
+            var crunchService = (CrunchService) x.get("crunchService");
+            payload.setStatus(REJECTED);
+            List<String> prereqIdsList = crunchService.getPrereqs(payload.getCapability());
+
+            if ( prereqIdsList != null && prereqIdsList.size() > 0 ){
+              String[] prereqIds = prereqIdsList.toArray(new String[prereqIdsList.size()]);
+
+              ((ArraySink) payloadDAO.select(new ArraySink())).getArray().stream()
+              .filter(cp -> Arrays.stream(prereqIds).anyMatch(((CapabilityJunctionPayload) cp).getCapability()::equals))
+              .forEach(cp -> {
+                CapabilityJunctionPayload capableCp = (CapabilityJunctionPayload) cp;
+                capableCp.setStatus(REJECTED);
+                capableCp.setHasSafeStatus(true);
+                payloadDAO.put(capableCp);
+              });
+            }
+          }
+
+          newStatus = REJECTED;
+        }
+
+        if ( cap.getReviewRequired() ) {
+          if ( oldStatus == PENDING && newStatus != REJECTED ) {
             return getDelegate().put_(x, obj);
           }
-          if ( oldStatus == ACTION_REQUIRED ) {
+          if ( oldStatus == ACTION_REQUIRED && newStatus == GRANTED ) {
             newStatus = PENDING;
           }
         }
@@ -74,12 +98,12 @@ foam.CLASS({
           payload.setStatus(newStatus);
           // TODO Maybe use projection MLang
           var crunchService = (CrunchService) x.get("crunchService");
-          var depIds = crunchService.getDependantIds(x, payload.getCapability().getId());
+          var depIds = crunchService.getDependentIds(x, payload.getCapability());
 
           ((ArraySink) payloadDAO.select(new ArraySink())).getArray().stream()
-          .filter(cp -> Arrays.stream(depIds).anyMatch(((CapablePayload) cp).getCapability().getId()::equals))
+          .filter(cp -> Arrays.stream(depIds).anyMatch(((CapabilityJunctionPayload) cp).getCapability()::equals))
           .forEach(cp -> {
-            CapablePayload capableCp = (CapablePayload) cp;
+            CapabilityJunctionPayload capableCp = (CapabilityJunctionPayload) cp;
             capableCp.setHasSafeStatus(true);
             payloadDAO.put(capableCp);
           });

@@ -45,10 +45,15 @@ p({
       .setPm(true)
       .setPipelinePm(true)
       .setDecorator(new foam.nanos.alarming.AddAlarmNameDAO.Builder(x)
+        .setDelegate(new foam.nanos.alarming.AlarmLoggingDAO.Builder(x)
+        .setDelegate(new foam.nanos.alarming.AlarmNotificationDAO.Builder(x)
         .setDelegate(new foam.dao.NullDAO(x, foam.nanos.alarming.Alarm.getOwnClassInfo()))
+        .build())
+        .build())
         .build())
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("alarms")
+      .setWriteOnly(true)
       .setOrder(new foam.mlang.order.Comparator[] {
         foam.nanos.alarming.Alarm.LAST_MODIFIED,
         new foam.mlang.order.Desc.Builder(x).setArg1(

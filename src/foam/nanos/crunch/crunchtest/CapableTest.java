@@ -7,7 +7,7 @@ import foam.nanos.crunch.Capability;
 import foam.nanos.crunch.MinMaxCapability;
 import foam.nanos.crunch.CapabilityCapabilityJunction;
 import foam.nanos.crunch.UserCapabilityJunction;
-import foam.nanos.crunch.lite.CapablePayload;
+import foam.nanos.crunch.CapabilityJunctionPayload;
 import foam.nanos.crunch.lite.Capable;
 import foam.nanos.test.Test;
 import foam.test.TestUtils;
@@ -33,39 +33,39 @@ public class CapableTest extends Test {
     Capable capable = new TestCapable();
     capable.setRequirements(x, new String[]{"A", "B"});
     DAO capablePayloadDAO = capable.getCapablePayloadDAO(x);
-    CapablePayload payload = null;
+    CapabilityJunctionPayload payload = null;
 
     // Default capability tests
-    payload = (CapablePayload) capablePayloadDAO.find("AA");
+    payload = (CapabilityJunctionPayload) capablePayloadDAO.find("AA");
     payload.setStatus(GRANTED);
     capablePayloadDAO.put(payload);
-    payload = (CapablePayload) capablePayloadDAO.find("AB");
+    payload = (CapabilityJunctionPayload) capablePayloadDAO.find("AB");
     payload.setStatus(GRANTED);
     capablePayloadDAO.put(payload);
-    payload = (CapablePayload) capablePayloadDAO.find("A");
+    payload = (CapabilityJunctionPayload) capablePayloadDAO.find("A");
     test(payload.getStatus() == ACTION_REQUIRED,
       "Dependant capability should be ACTION_REQUIRED"
     );
-    payload = (CapablePayload) capablePayloadDAO.find("AC");
+    payload = (CapabilityJunctionPayload) capablePayloadDAO.find("AC");
     payload.setStatus(PENDING);
     capablePayloadDAO.put(payload);
-    payload = (CapablePayload) capablePayloadDAO.find("A");
+    payload = (CapabilityJunctionPayload) capablePayloadDAO.find("A");
     test(payload.getStatus() == ACTION_REQUIRED,
       "Dependant capability should be PENDING"
     );
-    payload = (CapablePayload) capablePayloadDAO.find("AC");
+    payload = (CapabilityJunctionPayload) capablePayloadDAO.find("AC");
     payload.setStatus(GRANTED);
     capablePayloadDAO.put(payload);
-    payload = (CapablePayload) capablePayloadDAO.find("A");
+    payload = (CapabilityJunctionPayload) capablePayloadDAO.find("A");
     test(payload.getStatus() == GRANTED,
       "Dependant capability should be GRANTED"
     );
 
     // MinMaxCapability tests
-    payload = (CapablePayload) capablePayloadDAO.find("BA");
+    payload = (CapabilityJunctionPayload) capablePayloadDAO.find("BA");
     payload.setStatus(PENDING);
     capablePayloadDAO.put(payload);
-    payload = (CapablePayload) capablePayloadDAO.find("B");
+    payload = (CapabilityJunctionPayload) capablePayloadDAO.find("B");
     test(payload.getStatus() == PENDING,
       "Dependant MinMax capability should be PENDING"
     );
@@ -75,10 +75,10 @@ public class CapableTest extends Test {
     Capable capable = new TestCapable();
     capable.setRequirements(x, new String[]{"A", "B"});
     DAO capablePayloadDAO = capable.getCapablePayloadDAO(x);
-    CapablePayload payload = null;
-    payload = (CapablePayload) capablePayloadDAO.find("AA");
+    CapabilityJunctionPayload payload = null;
+    payload = (CapabilityJunctionPayload) capablePayloadDAO.find("AA");
     test(payload != null, "known payload should not be null");
-    payload = (CapablePayload) capablePayloadDAO.find("NONE");
+    payload = (CapabilityJunctionPayload) capablePayloadDAO.find("NONE");
     test(payload == null, "unknown payload should be null");
   }
 

@@ -17,7 +17,7 @@ public class StandardAuthorizer implements Authorizer {
   // Standard authorizer to be used for authorization on object not implementing the authorizable interface
   // Performs authorization by checking permission generated from permissionPrefix passed in
 
-  protected String permissionPrefix_;
+  protected String permissionPrefix_ = "";
 
   public StandardAuthorizer(String permissionPrefix) {
     permissionPrefix_ = permissionPrefix;
@@ -28,7 +28,7 @@ public class StandardAuthorizer implements Authorizer {
   }
 
   public String createPermission(String op, Object id) {
-    return permissionPrefix_ + "." + op + "." + id;
+    return permissionPrefix_ + "." + op + "." + id.toString();
   }
 
   public void authorizeOnCreate(X x, FObject obj) throws AuthorizationException {
@@ -36,6 +36,7 @@ public class StandardAuthorizer implements Authorizer {
     String permission = createPermission("create");
     AuthService authService = (AuthService) x.get("auth");
     if ( ! authService.check(x, permission) ) {
+      ((foam.nanos.logger.Logger) x.get("logger")).debug("StanardAuthorizer", "Permission denied", permission);
       throw new AuthorizationException();
     }
   }
@@ -46,6 +47,7 @@ public class StandardAuthorizer implements Authorizer {
     AuthService authService = (AuthService) x.get("auth");
 
     if ( ! authService.check(x, permission) ) {
+      ((foam.nanos.logger.Logger) x.get("logger")).debug("StandardAuthorizer", "Permission denied", permission);
       throw new AuthorizationException();
     }
   }
@@ -56,6 +58,7 @@ public class StandardAuthorizer implements Authorizer {
     AuthService authService = (AuthService) x.get("auth");
 
     if ( ! authService.check(x, permission) ) {
+      ((foam.nanos.logger.Logger) x.get("logger")).debug("StandardAuthorizer", "Permission denied", permission);
       throw new AuthorizationException();
     }
   }
@@ -66,6 +69,7 @@ public class StandardAuthorizer implements Authorizer {
     AuthService authService = (AuthService) x.get("auth");
 
     if ( ! authService.check(x, permission) ) {
+      ((foam.nanos.logger.Logger) x.get("logger")).debug("StandardAuthorizer", "Permission denied", permission);
       throw new AuthorizationException();
     }
   }

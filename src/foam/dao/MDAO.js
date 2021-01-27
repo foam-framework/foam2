@@ -262,6 +262,16 @@ foam.CLASS({
 
     function toString() {
       return 'MDAO(' + this.cls_.name + ',' + this.index + ')';
+    },
+
+    function now() {
+      return this.index;
+    },
+
+    function when(then) {
+      var newMDAO = this.cls_.create({ of: this.of });
+      newMDAO.index = then;
+      return newMDAO;
     }
   ]
 });

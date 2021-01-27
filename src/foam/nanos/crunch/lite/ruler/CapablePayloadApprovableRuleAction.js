@@ -20,7 +20,9 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.nanos.approval.Approvable',
     'foam.nanos.crunch.lite.Capable',
-    'foam.nanos.crunch.lite.CapablePayload',
+    'foam.nanos.crunch.CapabilityJunctionPayload',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.approval.ApprovalStatus',
     'foam.nanos.ruler.Operations',
     'foam.nanos.auth.Subject',
     'java.util.Map'
@@ -33,12 +35,12 @@ foam.CLASS({
       name: 'applyAction',
       javaCode: `
         agency.submit(x, new ContextAwareAgent() {
-          
+
           @Override
           public void execute(X x) {
             Approvable approvable = (Approvable) obj;
             DAO dao = (DAO) getX().get(approvable.getServerDaoKey());
-            
+
             FObject objectToReput = dao.find(approvable.getObjId());
 
             Capable capableObjectToReput = (Capable) objectToReput;
@@ -47,7 +49,8 @@ foam.CLASS({
 
             if ( approvable.getOperation() == Operations.CREATE ){
               try {
-                CapablePayload capablePayloadToUpdate =  (CapablePayload) CapablePayload.getOwnClassInfo().newInstance();
+                CapabilityJunctionPayload capablePayloadToUpdate = (CapabilityJunctionPayload)
+                  CapabilityJunctionPayload.getOwnClassInfo().newInstance();
 
                 Map propsToUpdate = approvable.getPropertiesToUpdate();
 
@@ -56,7 +59,11 @@ foam.CLASS({
                   capablePayloadToUpdate.setProperty(propNameString,propsToUpdate.get(propNameString));
                 }
 
-                capablePayloadToUpdate.setStatus(foam.nanos.crunch.CapabilityJunctionStatus.APPROVED);
+                CapabilityJunctionStatus statusToSet = approvable.getStatus() == ApprovalStatus.APPROVED
+                  ? CapabilityJunctionStatus.APPROVED
+                  : CapabilityJunctionStatus.REJECTED;
+
+                capablePayloadToUpdate.setStatus(statusToSet);
                 capablePayloadToUpdate.setHasSafeStatus(true);
 
                 // first update the object's capable payloads

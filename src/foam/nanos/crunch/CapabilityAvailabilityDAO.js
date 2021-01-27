@@ -10,8 +10,15 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
   flags: ['java'],
 
+  imports: [
+    'AuthService auth'
+  ],
+
   javaImports: [
+    'foam.mlang.predicate.AbstractPredicate',
+    'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.Subject',
     'foam.nanos.crunch.Capability',
     'foam.core.X',
     'foam.core.Detachable',
@@ -33,7 +40,7 @@ foam.CLASS({
           public CapabilityAvailabilityDAO(X x, DAO delegate) {
             setX(x);
             setDelegate(delegate);
-          } 
+          }
         `);
       }
     }
@@ -51,29 +58,48 @@ foam.CLASS({
     {
       name: 'find_',
       javaCode: `
-        AuthService auth = (AuthService) x.get("auth");
         Capability capability = (Capability) getDelegate().find_(x, id);
-        if ( capability == null || ( ! capability.getAvailabilityPredicate().f(x) && ! auth.check(x, AVAILABILITY_PERMISSION + id) ) ) {
+        if ( capability == null || ! f(x, capability) ) {
           return null;
         }
-        return getDelegate().find_(x, id);
+        return capability;
       `
     },
     {
       name: 'select_',
       javaCode: `
-        AuthService auth = (AuthService) x.get("auth");
-        Sink s = sink != null ? sink : new ArraySink();
-        ProxySink proxy = new ProxySink(x, s) {
-          public void put(Object o, Detachable d) {
-            Capability capability = (Capability) o;
-            if ( capability.getAvailabilityPredicate().f(x) || auth.check(x, AVAILABILITY_PERMISSION + capability.getId()) ) {
-              getDelegate().put(capability, d);
-            }
+        return getDelegate().select_(x, sink, skip, limit, order, augmentPredicate(x, predicate));
+      `
+    },
+    {
+      name: 'augmentPredicate',
+      type: 'Predicate',
+      args: [
+        { type: 'Context', name: 'x' },
+        { type: 'Predicate', name: 'predicate' }
+      ],
+      javaCode: `
+        return new AbstractPredicate(x) {
+          @Override
+          public boolean f(Object obj) {
+            if ( predicate != null && ! predicate.f(obj) ) return false;
+            if ( ! ( obj instanceof Capability ) ) return false;
+            return CapabilityAvailabilityDAO.this.f(x, (Capability) obj);
           }
         };
-        return getDelegate().select_(x, proxy, skip, limit, order, predicate);
       `
-    }
+    },
+    {
+      name: 'f',
+      type: 'Boolean',
+      args: [
+        { type: 'Context', name: 'x' },
+        { type: 'Capability', name: 'capability' }
+      ],
+      javaCode: `
+        return capability.getAvailabilityPredicate().f(x)
+          || getAuth().check(x, AVAILABILITY_PERMISSION + capability.getId());
+      `
+    },
   ],
 });

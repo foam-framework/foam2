@@ -14,7 +14,6 @@
   ],
   imports: [
     'importConfig',
-    'importServiceName',
     'ctrl'
   ],
   css: `

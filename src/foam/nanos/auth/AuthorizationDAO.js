@@ -30,7 +30,6 @@ foam.CLASS({
           data:`
   public AuthorizationDAO(X x, DAO delegate, Authorizer authorizer) {
     foam.nanos.logger.Logger log = (foam.nanos.logger.Logger) x.get("logger");
-    log.warning("Direct constructor use is deprecated. Use Builder instead. AuthorizationDAO");
     setX(x);
     setDelegate(delegate);
     setAuthorizer(authorizer);
@@ -59,7 +58,7 @@ foam.CLASS({
    if ( obj == null ) throw new RuntimeException("Cannot put null.");
 
     Object id = obj.getProperty("id");
-    FObject oldObj = getDelegate().inX(x).find(id);
+    FObject oldObj = getDelegate().find(id);
     boolean isCreate = id == null || oldObj == null;
 
     if ( isCreate ) {

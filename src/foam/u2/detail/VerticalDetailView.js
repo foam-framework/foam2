@@ -14,6 +14,14 @@ foam.CLASS({
     'foam.u2.layout.Rows'
   ],
 
+  properties: [
+    {
+      name: 'config'
+      // Map of property-name: {map of property overrides} for configuring properties
+      // values include 'label', 'units', and 'view'
+    },
+  ],
+
   methods: [
     function initE() {
       var self = this;
@@ -25,13 +33,16 @@ foam.CLASS({
           return self.E()
             .start(self.Rows)
               .forEach(sections, function(s) {
-                this
-                  .start(self.SectionView, {
+                var slot = s.createIsAvailableFor(self.data$).map(function(isAvailable) {
+                  if ( ! isAvailable ) return self.E().style({ display: 'none' });
+                  return self.E().start(self.SectionView, {
                     data$: self.data$,
-                    section: s
+                    section: s,
+                    config: self.config
                   })
-                    .show(s.createIsAvailableFor(self.data$))
                   .end();
+                })
+                this.add(slot);
               })
             .end();
         }));

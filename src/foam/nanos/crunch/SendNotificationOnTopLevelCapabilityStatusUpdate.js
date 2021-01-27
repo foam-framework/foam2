@@ -18,9 +18,10 @@ foam.CLASS({
     'foam.core.ContextAgent',
     'foam.core.X',
     'foam.dao.DAO',
+    'foam.i18n.TranslationService',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Subject',
-    'foam.nanos.notification.Notification',
+    'foam.nanos.crunch.TopLevelCapabilityStatusUpdateNotification',
     'foam.nanos.theme.Theme',
     'foam.nanos.theme.Themes',
     'java.util.Date',
@@ -35,26 +36,33 @@ foam.CLASS({
         @Override
         public void execute(X x) {
           UserCapabilityJunction junction = (UserCapabilityJunction) obj;
-          Capability cap = (Capability) junction.findTargetId(x);
-          User user = (User) junction.findSourceId(x);
 
-          // visible checks if the capability is a top-level capability
-          // and availabilitypredicate checks if the user has access to the capability
-          if ( cap == null || ! ( cap.getVisible() && cap.getAvailabilityPredicate().f(x) ) ) return;
+          var subject = junction.getSubject(x);
+          var subjectX = x.put("subject", subject);
+          var capabilityDAO = ((DAO) subjectX.get("capabilityDAO")).inX(subjectX);
+          var cap = (Capability) capabilityDAO.find(junction.getTargetId());
+          if ( cap == null ) return;
 
-          DAO notificationDAO = (DAO) x.get("notificationDAO");
+          if ( ! cap.getVisibilityPredicate().f(subjectX) ) return;
 
-          StringBuilder sb = new StringBuilder("The Capability '")
-          .append(cap.getName())
-          .append("' has been set to ")
-          .append(junction.getStatus())
-          .append(".");
+          User user = (User) subject.getRealUser();
+
+          TranslationService ts = (TranslationService) x.get("translationService");
+          String locale = user.getLanguage().getCode().toString();
+          String capabilityName = ts.getTranslation(locale, cap.getId() + ".name", cap.getName());
+          String junctionStatus = ts.getTranslation(locale, "foam.nanos.crunch.CapabilityJunctionStatus." + junction.getStatus().getName() + ".label", junction.getStatus().getLabel());
 
           HashMap<String, Object> args = new HashMap<>();
-            args.put("capName", cap.getName());
-            args.put("junctionStatus", junction.getStatus());
+          args.put("capNameEn", cap.getName());
+          args.put("capName", capabilityName);
+          args.put("junctionStatusEn", junction.getStatus().getName());
+          args.put("junctionStatus", junctionStatus);
 
-          Notification notification = new Notification();
+          TopLevelCapabilityStatusUpdateNotification notification = new TopLevelCapabilityStatusUpdateNotification();
+          notification.setCapabilityName(cap.getName());
+          notification.setCapabilitySource(cap.getId() + ".name");
+          notification.setJunctionStatus(junction.getStatus().getLabel());
+          notification.setJunctionSource("foam.nanos.crunch.CapabilityJunctionStatus." + junction.getStatus().getName() + ".label");
 
           // if the UserCapabilityJunction belongs to an actual user, send the notification to the user.
           // otherwise, send the notification to the group the user is under
@@ -63,15 +71,9 @@ foam.CLASS({
 
           notification.setNotificationType("Capability Status Update");
           notification.setCreated(new Date());
-          notification.setBody(sb.toString());
           notification.setEmailName("top-level-capability-status-update");
           notification.setEmailArgs(args);
-
-          Themes themes = (Themes) x.get("themes");
-          Theme theme = themes.findThemeBySpid(((X) x.put("subject", new Subject.Builder(x).setUser(user).build())));
-          X notificationX = theme != null ? (X) x.put("theme", theme) : x;
-
-          user.doNotify(notificationX, notification);
+          user.doNotify(x, notification);
         }
       }, "Send Notification On Top Level Capability Status Update");
       `

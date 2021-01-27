@@ -10,12 +10,14 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.auth.CreatedAware',
-    'foam.nanos.auth.CreatedByAware'
+    'foam.nanos.auth.CreatedByAware',
+    'foam.nanos.medusa.Clusterable'
   ],
 
   javaImports: [
     'foam.core.X',
     'foam.dao.DAO',
+    'static foam.mlang.MLang.*',
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.*',
     'foam.nanos.auth.Subject',
@@ -27,9 +29,10 @@ foam.CLASS({
     'foam.nanos.theme.Themes',
     'foam.util.SafetyUtil',
     'java.util.Date',
+    'java.util.Random',
+    'java.util.UUID',
     'javax.servlet.http.HttpServletRequest',
-    'org.eclipse.jetty.server.Request',
-    'static foam.mlang.MLang.*'
+    'org.eclipse.jetty.server.Request'
   ],
 
   tableColumns: [
@@ -46,11 +49,13 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
+      includeInDigest: true,
       visibility: 'RO'
     },
     {
       class: 'Long',
       name: 'userId',
+      includeInDigest: true,
       tableCellFormatter: function(value, obj) {
         this.add(value);
         this.__context__.userDAO.find(value).then(function(user) {
@@ -63,6 +68,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'agentId',
+      includeInDigest: true,
       tableCellFormatter: function(value, obj) {
         if ( ! value ) return;
         this.add(value);
@@ -75,18 +81,21 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'created',
+      includeInDigest: true,
       visibility: 'RO'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
+      includeInDigest: true,
       visibility: 'RO'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdByAgent',
+      includeInDigest: true,
       visibility: 'RO'
     },
     {
@@ -101,6 +110,7 @@ foam.CLASS({
       label: 'TTL',
       documentation: 'The "time to live" of the session. The amount of time in milliseconds that the session should be kept alive after its last use before being destroyed. Must be a positive value or zero.',
       value: 28800000, // 1000 * 60 * 60 * 8 = number of milliseconds in 8 hours
+      includeInDigest: true,
       tableWidth: 70,
       validationPredicates: [
         {
@@ -121,21 +131,33 @@ foam.CLASS({
     {
       class: 'String',
       name: 'remoteHost',
+      includeInDigest: true,
       visibility: 'RO',
       tableWidth: 120
     },
     {
       documentation: 'Intended to be used with long TTL sessions, further restricting to a known set of IPs.',
       class: 'StringArray',
-      name: 'remoteHostWhiteList'
+      name: 'remoteHostWhiteList',
+      includeInDigest: true
     },
     {
       class: 'Object',
       name: 'context',
       type: 'Context',
       javaFactory: 'return reset(getX());',
-      hidden: true,
-      transient: true
+      visibility: 'HIDDEN',
+      transient: true,
+      networkTransient: true,
+      clusterTransient: true
+    },
+    {
+      class: 'Boolean',
+      name: 'clusterable',
+      value: true,
+      visibility: 'HIDDEN',
+      storageTransient: true,
+      clusterTransient: true
     }
   ],
 
@@ -198,6 +220,7 @@ foam.CLASS({
       Subject subject = new Subject.Builder(x).setUser(null).build();
         return x
           .put(Session.class, this)
+          .put("spid", null)
           .put("subject", subject)
           .put("group", null)
           .put("twoFactorSuccess", false)
@@ -269,13 +292,10 @@ foam.CLASS({
         subject.setUser(user);
         rtn = rtn
           .put("subject", subject)
+          .put("spid", user.getSpid())
           .put("logger", new PrefixLogger(prefix, (Logger) x.get("logger")))
           .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
           .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
-
-        if ( user != null ) {
-          rtn = rtn.put("spid", user.getSpid());
-        }
 
         // We need to do this after the user and agent have been put since
         // 'getCurrentGroup' depends on them being in the context.
@@ -325,7 +345,8 @@ foam.CLASS({
 
         if ( user == null
          || (user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE)
-        ) {
+       ) {
+          ((Logger) x.get("logger")).warning("Session", "User not found.", userId);
           throw new RuntimeException(String.format("User with id '%d' not found.", userId));
         }
 

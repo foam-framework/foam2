@@ -542,13 +542,13 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'sha256',
+      name: 'directory',
       transient: true,
       documentation: 'Directory of where files are stored after hashing',
       expression: function(root) {
-        return root + '/sha256';
+        return root + '/largefiles';
       },
-      javaFactory: 'return File.separator + "sha256";'
+      javaFactory: 'return File.separator + "largefiles";'
     },
     {
       class: 'Boolean',
@@ -575,19 +575,22 @@ foam.CLASS({
 
         this.ensureDir(this.root);
         this.ensureDir(this.tmp);
-        this.ensureDir(this.sha256);
+        this.ensureDir(this.directory);
 
         this.isSet = true;
       },
-      javaCode:`if ( this.getIsSet() )
-  return;
-ensureDir(x, getTmp());
-ensureDir(x, getSha256());
-setIsSet(true);`
+      javaCode:`
+        if ( this.getIsSet() )
+          return;
+          ensureDir(x, getTmp());
+          ensureDir(x, getDirectory());
+          setIsSet(true);
+      `
     },
     {
       name: 'ensureDir',
       type: 'Void',
+      synchronized: true,
       args: [ { name: 'x', type: 'Context' },
               { name: 'path', type: 'String' } ],
       code: function ensureDir(path) {
@@ -602,14 +605,16 @@ setIsSet(true);`
           throw e;
         }
       },
-      javaCode: `File parsed = x.get(Storage.class).get(path);
-if ( parsed.exists() && parsed.isDirectory() ) {
-  return;
-}
+      javaCode: `
+        File parsed = x.get(Storage.class).get(path);
+        if ( parsed.exists() && parsed.isDirectory() ) {
+          return;
+        }
 
-if ( ! parsed.mkdirs() ) {
-  throw new RuntimeException("Failed to create: " + path);
-}`
+        if ( ! parsed.mkdirs() ) {
+          throw new RuntimeException("Failed to create: " + path);
+        }
+      `
     },
     {
       name: 'allocateTmp',
@@ -714,7 +719,7 @@ return file;`
           return new Promise(function(resolve, reject) {
             require('fs').close(tmp.fd, function() {
               var digest = hash.digest('hex');
-              require('fs').rename(tmp.path, self.sha256 + require('path').sep + digest, function(err) {
+              require('fs').rename(tmp.path, self.directory + require('path').sep + digest, function(err) {
                 if ( err ) {
                   reject(err);
                   return;
@@ -738,7 +743,7 @@ try ( HashingOutputStream os = new HashingOutputStream(new FileOutputStream(tmp)
   os.close();
 
   String digest = new String(Hex.encodeHexString(os.digest()));
-  File dest = x.get(Storage.class).get(getSha256() + File.separator + digest);
+  File dest = x.get(Storage.class).get(getDirectory() + File.separator + digest);
   if ( ! tmp.renameTo(dest) ) {
     // File already exists, so remove tmp version
     try {
@@ -757,7 +762,7 @@ try ( HashingOutputStream os = new HashingOutputStream(new FileOutputStream(tmp)
     function filename(blob) {
       if ( ! foam.blob.IdentifiedBlob.isInstance(blob) ) return null;
 
-      var path = this.sha256 + require('path').sep + blob.id;
+      var path = this.directory + require('path').sep + blob.id;
       try {
         require('fs').statSync(path);
       } catch(e) {
@@ -778,7 +783,7 @@ try ( HashingOutputStream os = new HashingOutputStream(new FileOutputStream(tmp)
         var self = this;
 
         return new Promise(function(resolve, reject) {
-          require('fs').open(self.sha256 + require('path').sep + id, "r", function(err, fd) {
+          require('fs').open(self.directory + require('path').sep + id, "r", function(err, fd) {
             if ( err ) {
               if ( err.code == 'ENOENT' ) {
                 resolve(null);
@@ -798,7 +803,7 @@ try ( HashingOutputStream os = new HashingOutputStream(new FileOutputStream(tmp)
     throw new RuntimeException("Invalid file name");
   }
 
-  File file = x.get(Storage.class).get(getSha256() + File.separator + id);
+  File file = x.get(Storage.class).get(getDirectory() + File.separator + id);
   if ( ! file.exists() ) {
     throw new RuntimeException("File does not exist");
   }

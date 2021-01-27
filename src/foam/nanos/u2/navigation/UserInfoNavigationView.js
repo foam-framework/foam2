@@ -33,12 +33,12 @@ foam.CLASS({
       border-top: 5px solid white;
     }
     ^userName {
-      color: /*%GREY4%*/;
+      color: /*%GREY4%*/ #e7eaec;
       font-weight: 600;
       font-size: 12px;
     }
     ^agentName{
-      color: /*%GREY3%*/;
+      color: /*%GREY3%*/ #cbcfd4;
       font-weight: 400;
       font-size: 11px;
     }

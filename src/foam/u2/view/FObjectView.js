@@ -32,8 +32,8 @@ foam.CLASS({
       class: 'String',
       name: 'objectClass',
       label: '',
-      visibility: function(allowCustom, classIsFinal, choices, data) {
-        if ( ! allowCustom && choices.length <= 1  ) return foam.u2.DisplayMode.HIDDEN;
+      visibility: function(allowCustom, classIsFinal, choices, data, placeholder) {
+        if ( ! allowCustom && choices.length <= 1 && ! placeholder ) return foam.u2.DisplayMode.HIDDEN;
         if ( classIsFinal && this.dataWasProvided_ ) return foam.u2.DisplayMode.HIDDEN;
         return foam.u2.DisplayMode.RW;
       },
@@ -41,9 +41,16 @@ foam.CLASS({
         return {
           class: X.data.allowCustom ? 'foam.u2.TextField' : 'foam.u2.view.ChoiceView',
           displayWidth: 60,
+          placeholder: X.data.placeholder,
+          header: X.data.header,
           choices$: X.data.choices$
         };
       }
+    },
+    {
+      name: 'config'
+      // Map of property-name: {map of property overrides} for configuring properties
+      // values include 'label', 'units', and 'view'
     },
     {
       class: 'FObjectProperty',
@@ -63,6 +70,12 @@ foam.CLASS({
     {
       class: 'Class',
       name: 'of'
+    },
+    {
+      class: 'Boolean',
+      name: 'skipBaseClass',
+      documentation: 'If true, skips of base-class as a choice when no strategies fetched.',
+      value: false
     },
     {
       class: 'Boolean',
@@ -96,6 +109,16 @@ foam.CLASS({
       class: 'Boolean',
       name: 'dataWasProvided_',
       documentation: 'Set to true if data was initially provided. Used to implement classIsFinal.'
+    },
+    {
+      class: 'String',
+      name: 'placeholder',
+      documentation: 'If no placeholder, the choiceView will select the first element',
+    },
+    {
+      class: 'String',
+      name: 'header',
+      documentation: 'The heading text for the choices',
     },
     {
       class: 'Array',
@@ -146,7 +169,7 @@ foam.CLASS({
       if ( this.strategizer != null ) {
         this.strategizer.query(null, this.of.id, null, this.predicate).then((strategyReferences) => {
           if ( ! Array.isArray(strategyReferences) || strategyReferences.length === 0 ) {
-            this.choices = [[this.of.id, this.of.model_.label]];
+            this.choices = this.skipBaseClass ? [] : [[this.of.id, this.of.model_.label]];
             this.choicesLoaded.resolve();
             return;
           }
@@ -181,6 +204,7 @@ foam.CLASS({
       }
 
       var classToData = function(c) {
+        if ( ! c ) return undefined;
         var m = c && this.__context__.lookup(c, true);
         return m.create(this.data ? this.copyOldData(this.data) : null, this);
       }.bind(this);
@@ -203,7 +227,7 @@ foam.CLASS({
       );
 
       if ( this.data ) { this.objectClass = dataToClass(this.data); }
-      if ( ! this.data && ! this.objectClass && this.choices.length ) this.objectClass = this.choices[0][0];
+      if ( ! this.data && ! this.objectClass && this.choices.length && !this.placeholder ) this.objectClass = this.choices[0][0];
 
       this.
         start(this.OBJECT_CLASS).
@@ -213,9 +237,13 @@ foam.CLASS({
             return m != foam.u2.DisplayMode.HIDDEN;
           })).
         end().
-        tag(foam.u2.detail.VerticalDetailView, {
-          data$: this.data$
-        });
+        start().
+          show(this.objectClass$).
+          tag(foam.u2.detail.VerticalDetailView, {
+            data$: this.data$,
+            config: this.config
+          }).
+        end();
     },
 
     function choicesFallback(of) {

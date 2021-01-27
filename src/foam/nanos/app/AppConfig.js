@@ -77,11 +77,6 @@ foam.CLASS({
       value: false
     },
     {
-      class: 'Reference',
-      of: 'foam.nanos.auth.ServiceProvider',
-      name: 'defaultSpid'
-    },
-    {
       class: 'String',
       name: 'externalUrl'
     }
@@ -102,35 +97,7 @@ foam.CLASS({
       ],
       type: 'foam.nanos.app.AppConfig',
       javaCode: `
-      AppConfig appConfig = (AppConfig) this.fclone();
-      Theme theme = ((Themes) x.get("themes")).findTheme(x);
-      AppConfig themeAppConfig = theme.getAppConfig();
-      if ( themeAppConfig != null ) {
-        appConfig.copyFrom(themeAppConfig);
-      }
-
-      String configUrl = url;
-      HttpServletRequest req = x.get(HttpServletRequest.class);
-      if ( req != null ) {
-        configUrl = ((Request) req).getRootURL().toString();
-      }
-      if ( ! foam.util.SafetyUtil.isEmpty(configUrl) ) {
-        if ( appConfig.getForceHttps() ) {
-          if ( configUrl.startsWith("https://") ) {
-             // nop
-          } else if ( configUrl.startsWith("http://") ) {
-            configUrl = "https" + configUrl.substring(4);
-          } else {
-            configUrl = "https://" + configUrl;
-          }
-        }
-        if ( configUrl.endsWith("/") ) {
-          configUrl = configUrl.substring(0, configUrl.length()-1);
-        }
-        appConfig.setUrl(configUrl);
-      }
-
-      return appConfig;
+      return this;
       `
     }
   ]

@@ -1,2 +1,5 @@
 p({"class":"foam.nanos.auth.Language", "code":"en", "name":"English"})
-p({"class":"foam.nanos.auth.Language", "code":"fr", "name":"French"})
+p({"class":"foam.nanos.auth.Language", "code":"en", "name":"English", "variant":"US"})
+p({"class":"foam.nanos.auth.Language", "code":"fr", "name":"French", "nativeName":"Français", "enabled":false})
+p({"class":"foam.nanos.auth.Language", "code":"pt", "name":"Portuguese", "nativeName":"Português", "enabled":false})
+p({"class":"foam.nanos.auth.Language", "code":"pt", "name":"Portuguese", "nativeName":"Português", "variant":"BR"})

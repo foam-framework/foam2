@@ -8,9 +8,12 @@ foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'Capability',
 
+  implements: [
+    'foam.nanos.auth.EnabledAware'
+  ],
+
   imports: [
-    'capabilityDAO',
-    'prerequisiteCapabilityJunctionDAO'
+    'capabilityDAO'
   ],
 
   javaImports: [
@@ -27,8 +30,8 @@ foam.CLASS({
     'static foam.mlang.MLang.*'
   ],
 
-  implements: [
-    'foam.nanos.auth.EnabledAware'
+  requires: [
+    'foam.u2.crunch.EasyCrunchWizard'
   ],
 
   tableColumns: [
@@ -78,19 +81,22 @@ foam.CLASS({
       name: 'name',
       class: 'String',
       displayWidth: 70,
-      section: 'basicInfo'
+      section: 'basicInfo',
+      includeInDigest: false
     },
     {
       name: 'icon',
       class: 'Image',
       documentation: `Path to capability icon`,
-      section: 'uiSettings'
+      section: 'uiSettings',
+      includeInDigest: false
     },
     {
       name: 'description',
       class: 'String',
       documentation: `Description of capability`,
-      section: 'uiSettings'
+      section: 'uiSettings',
+      includeInDigest: false
     },
     {
       name: 'notes',
@@ -99,43 +105,44 @@ foam.CLASS({
         class: 'foam.u2.tag.TextArea',
         rows: 12,
         cols: 120
-      }
+      },
+      includeInDigest: false
     },
     {
       name: 'price',
-      class: 'Long'
+      class: 'Long',
+      includeInDigest: true
     },
     {
       name: 'keywords',
-      class: 'StringArray'
+      class: 'StringArray',
+      includeInDigest: false
     },
     {
       name: 'version',
-      class: 'String'
+      class: 'String',
+      includeInDigest: true,
     },
     {
       name: 'enabled',
       class: 'Boolean',
       value: true,
+      includeInDigest: true,
       documentation: `Capability is ignored by system when enabled is false.
       user will lose permissions implied by this capability and upper level capabilities will ignore this prerequisite`
     },
     {
-      name: 'visible',	
-      class: 'Boolean',	
-      documentation: `Hide sub-capabilities which aren't top-level and individually selectable. when true, capability is visible to the user`,	
-      section: 'uiSettings'	
-    },
-    {
       name: 'expiry',
       class: 'DateTime',
-      documentation: `Datetime of when capability is no longer valid`
+      documentation: `Datetime of when capability is no longer valid`,
+      includeInDigest: true,
     },
     {
       name: 'duration',
       class: 'Int',
       documentation: `To be used in the case where expiry is duration-based, represents the number of DAYS a junction is valid for before expiring.
-      The UserCapabilityJunction object will have its expiry configured to a DateTime based on the lower value of the two, expiry and duration`
+      The UserCapabilityJunction object will have its expiry configured to a DateTime based on the lower value of the two, expiry and duration`,
+      includeInDigest: true,
     },
     {
       name: 'gracePeriod',
@@ -145,23 +152,35 @@ foam.CLASS({
       granted by this capability after the duration runs out.
       If the gracePeriod is greater than 0, the UserCapabilityJunction will set isInGracePeriod property to true
       and set gracePeriod property to be equals to this. Otherwise, the UserCapabilityJunction will
-      go into EXPIRED status.`
+      go into EXPIRED status.`,
+      includeInDigest: true,
     },
     {
       name: 'of',
       class: 'Class',
       displayWidth: 70,
-      documentation: `Model used to store information required by this credential`
+      documentation: `Model used to store information required by this credential`,
+      includeInDigest: true,
+    },
+    {
+      name: 'inherentPermissions',
+      class: 'StringArray',
+      documentation: `List of inherent permissions provided by this capability`,
+      includeInDigest: true,
+      storageTransient: true,
+      visibility: 'HIDDEN'
     },
     {
       name: 'permissionsGranted',
       class: 'StringArray',
       documentation: `List of permissions granted by this capability`,
+      includeInDigest: true,
       view: 'foam.u2.crunch.PermissionsStringArrayView'
     },
     {
       name: 'permissionsIntercepted',
       class: 'StringArray',
+      includeInDigest: true,
       documentation: `List of permissions intercepted by this capability`
     },
     {
@@ -169,30 +188,48 @@ foam.CLASS({
       class: 'String',
       documentation: `
       daoKey.put() done in UserCapabilityJunctionDAO.
-      Uses contextDAOFindKey to find object to update/put.`
+      Uses contextDAOFindKey to find object to update/put.`,
+      includeInDigest: true
     },
     {
       name: 'contextDAOFindKey',
       class: 'String',
-      documentation: 'need to find things dynamically, thus have a string here to specify the object in context to look up.'
+      documentation: 'need to find things dynamically, thus have a string here to specify the object in context to look up.',
+      includeInDigest: true
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'interceptIf',
       networkTransient: true,
       javaFactory: 'return foam.mlang.MLang.TRUE;',
-      documentation: 'condition under which the permissions that may be intercepted by this capability will be intercepted.'
+      documentation: 'condition under which the permissions that may be intercepted by this capability will be intercepted.',
+      includeInDigest: false
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
       name: 'availabilityPredicate',
       networkTransient: true,
       javaFactory: 'return foam.mlang.MLang.TRUE;',
-      documentation: 'Predicate used to omit or include capabilities from capabilityDAO'
+      documentation: 'Predicate used to omit or include capabilities from capabilityDAO',
+      includeInDigest: true
+    },
+    {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'visibilityPredicate',
+      javaFactory: 'return foam.mlang.MLang.FALSE;',
+      documentation: 'Predicate of the visibility for capabilities in the capability store/keyword sections',
+      includeInDigest: true
+    },
+    {
+      name: 'grantMode',
+      class: 'Enum',
+      of: 'foam.nanos.crunch.CapabilityGrantMode',
+      value: foam.nanos.crunch.CapabilityGrantMode.AUTOMATIC
     },
     {
       name: 'reviewRequired',
       class: 'Boolean',
+      includeInDigest: true,
       permissionRequired: true
     },
     {
@@ -201,6 +238,7 @@ foam.CLASS({
       of: 'foam.nanos.crunch.AssociatedEntity',
       hidden: true,
       permissionRequired: true,
+      includeInDigest: true,
       documentation: `
         Denotes which entity in the context subject the capability should be saved to when there are mutiple.
       `,
@@ -215,27 +253,42 @@ foam.CLASS({
       class: 'Object',
       name: 'wizardlet',
       documentation: `
-        Defines a wizardlet used when displaying this capability on related client crunch wizards.
+        Defines a wizardlet to display this capability in a wizard. This
+        wizardlet will display after this capability's prerequisites.
       `,
       factory: function() {
         return foam.nanos.crunch.ui.CapabilityWizardlet.create({}, this);
-      }
+      },
+      includeInDigest: false,
     },
     {
       class: 'Object',
-      name: 'wizardletConfig',
+      name: 'beforeWizardlet',
       documentation: `
-        Configuration placed on top level capabilities defining various configuration options supported by client capability wizards.
+        A wizardlet to display before this capability's prerequisites, and only
+        if this capability is at the end of a prerequisite group returned by
+        CrunchService's getCapabilityPath method.
+      `
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.u2.crunch.EasyCrunchWizard',
+      name: 'wizardConfig',
+      documentation: `
+        Configuration placed on top level capabilities defining various
+        configuration options supported by client capability wizards.
       `,
+      includeInDigest: false,
       factory: function() {
-        return foam.u2.wizard.StepWizardConfig.create({}, this);
+        return this.EasyCrunchWizard.create({}, this);
       }
     },
     {
       name: 'requirementViewTitle',
       class: 'String',
       documentation: `A short introduction displayed as subtitle in CapabilityRequirementView`,
-      section: 'uiSettings'
+      section: 'uiSettings',
+      includeInDigest: false,
     }
   ],
 
@@ -264,6 +317,11 @@ foam.CLASS({
 
         // check if permission is a capability string implied by this permission
         if ( this.stringImplies(this.getName(), permission) ) return true;
+
+        String[] inherentPermissions = this.getInherentPermissions();
+        for ( String permissionName : inherentPermissions ) {
+          if ( this.stringImplies(permissionName, permission) ) return true;
+        }
 
         String[] permissionsGranted = this.getPermissionsGranted();
         for ( String permissionName : permissionsGranted ) {
@@ -365,32 +423,120 @@ foam.CLASS({
         }
 
         var prereqs = crunchService.getPrereqs(getId());
+        CapabilityJunctionStatus prereqChainedStatus = null;
         if ( prereqs != null ) {
           for ( var capId : prereqs ) {
             var cap = (Capability) capabilityDAO.find(capId);
             if ( cap == null || ! cap.getEnabled() ) continue;
-            
-            X subjectContext = x.put("subject", subject);
-            UserCapabilityJunction ucJunction = crunchService.getJunctionForSubject(subjectContext, capId, subject);
-            if ( ucJunction == null ) {
-              return CapabilityJunctionStatus.ACTION_REQUIRED;
-            }
 
-            if ( ucJunction.getStatus() == CapabilityJunctionStatus.GRANTED ) {
-              continue;
-            }
+            UserCapabilityJunction prereqUcj = crunchService.getJunctionForSubject(x, capId, subject);
 
-            if ( ucJunction.getStatus() == CapabilityJunctionStatus.PENDING
-              || ucJunction.getStatus() == CapabilityJunctionStatus.APPROVED
-            ) {
-              allGranted = false;
-            } else {
-              return CapabilityJunctionStatus.ACTION_REQUIRED;
-            }
+            prereqChainedStatus = getPrereqChainedStatus(x, ucj, prereqUcj);
+            if ( prereqChainedStatus == CapabilityJunctionStatus.ACTION_REQUIRED ) return CapabilityJunctionStatus.ACTION_REQUIRED;
+            if ( prereqChainedStatus != CapabilityJunctionStatus.GRANTED ) allGranted = false;
           }
         }
         return allGranted ? CapabilityJunctionStatus.GRANTED : CapabilityJunctionStatus.PENDING;
       `,
+    },
+    {
+      name: 'getPrereqChainedStatus',
+      args: [
+        { name: 'x', javaType: 'foam.core.X' },
+        { name: 'ucj', javaType: 'foam.nanos.crunch.UserCapabilityJunction' },
+        { name: 'prereq', javaType: 'foam.nanos.crunch.UserCapabilityJunction' }
+      ],
+      static: true,
+      javaType: 'foam.nanos.crunch.CapabilityJunctionStatus',
+      javaCode: `
+        CapabilityJunctionStatus status = ucj.getStatus();
+
+        boolean reviewRequired = getReviewRequired();
+        CapabilityJunctionStatus prereqStatus = prereq.getStatus();
+
+        switch ( (CapabilityJunctionStatus) prereqStatus ) {
+          case AVAILABLE :
+            status = CapabilityJunctionStatus.ACTION_REQUIRED;
+            break;
+          case ACTION_REQUIRED :
+            status = CapabilityJunctionStatus.ACTION_REQUIRED;
+            break;
+          case PENDING :
+            status = reviewRequired &&
+              ( status == CapabilityJunctionStatus.APPROVED ||
+                status == CapabilityJunctionStatus.GRANTED
+              ) ?
+                CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
+            break;
+          case APPROVED :
+            status = reviewRequired &&
+              ( status == CapabilityJunctionStatus.APPROVED ||
+                status == CapabilityJunctionStatus.GRANTED
+              ) ?
+                CapabilityJunctionStatus.APPROVED : CapabilityJunctionStatus.PENDING;
+              break;
+          case EXPIRED :
+            status = CapabilityJunctionStatus.ACTION_REQUIRED;
+            break;
+          case PENDING_REVIEW :
+            // note: this shouldn't happen since PENDING_REVIEW is
+            // only used for UI purposes, and ucjs are never stored
+            // in this status
+            status = CapabilityJunctionStatus.ACTION_REQUIRED;
+            break;
+          default :
+            status = CapabilityJunctionStatus.GRANTED;
+        }
+        return status;
+
+      `
+    },
+    {
+      name: 'maybeReopen',
+      type: 'Boolean',
+      args: [
+        { name: 'x', javaType: 'foam.core.X' },
+        { name: 'ucj', javaType: 'foam.nanos.crunch.UserCapabilityJunction' }
+      ],
+      documentation: `
+        Returns true if the ucj or one of its prerequistite ucjs of the target capability
+        are granted but not in an reopenable state
+      `,
+      javaCode: `
+        if ( ! getEnabled() ) return false; 
+
+        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+        CrunchService crunchService = (CrunchService) x.get("crunchService");
+
+        boolean shouldReopenTopLevel = shouldReopenUserCapabilityJunction(ucj);
+        if ( shouldReopenTopLevel ) return true;
+
+        var prereqs = crunchService.getPrereqs(getId());
+        if ( prereqs == null || prereqs.size() == 0 ) return false;
+
+        for ( var capId : prereqs ) {
+          Capability cap = (Capability) capabilityDAO.find(capId);
+          if ( cap == null ) throw new RuntimeException("Cannot find prerequisite capability");
+          UserCapabilityJunction prereq = crunchService.getJunction(x, capId);
+          if ( cap.maybeReopen(x, prereq) ) return true;
+        }
+        return false;
+      `
+    },
+    {
+      name: 'shouldReopenUserCapabilityJunction',
+      type: 'Boolean',
+      args: [
+        { name: 'ucj', javaType: 'foam.nanos.crunch.UserCapabilityJunction' }
+      ],
+      javaCode: `
+        if ( ucj == null ) return true;
+        else if ( ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ucj.getIsRenewable() ) return true;
+        else if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED &&
+                  ucj.getStatus() != CapabilityJunctionStatus.PENDING &&
+                  ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return true;
+        return false;
+      `
     }
   ]
 });
@@ -401,21 +547,15 @@ foam.RELATIONSHIP({
   extends:'foam.nanos.crunch.Renewable',
   sourceModel: 'foam.nanos.auth.User',
   targetModel: 'foam.nanos.crunch.Capability',
+  ids: [ 'id' ],
   cardinality: '*:*',
   forwardName: 'capabilities',
   inverseName: 'users',
   sourceProperty: {
-    section: 'capabilities',
+    section: 'systemInformation',
+    order: 20,
     updateVisibility: 'RO'
   }
-});
-
-
-foam.CLASS({
-  package: 'foam.nanos.crunch',
-  name: 'CRUNCHUserRefinement',
-  refines: 'foam.nanos.auth.User',
-  sections: [{ name: 'capabilities' }]
 });
 
 

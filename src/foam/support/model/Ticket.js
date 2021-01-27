@@ -51,8 +51,7 @@ foam.CLASS({
       javaFactory: 'return new Date();',
       tableCellFormatter: function(state, obj, rel) {
         if ( ! state ) return;
-        var locale = 'en-us';
-        var month = state.toLocaleString(locale, { month: 'short' });
+        var month = state.toLocaleString(foam.locale, { month: 'short' });
         var date = state.getDate();
         var year = state.getFullYear();
         this.start().add(month+' '+date+', '+year).end();
@@ -92,7 +91,7 @@ foam.RELATIONSHIP({
   targetModel: 'foam.support.model.Ticket',
   forwardName: 'tickets',
   inverseName: 'user',
-  sourceProperty: { section: 'administrative' }
+  sourceProperty: { section: 'systemInformation' }
 });
 
 
