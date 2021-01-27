@@ -91,8 +91,13 @@ foam.CLASS({
     {
       name: 'currentSection',
       expression: function(currentWizardlet, wizardPosition$sectionIndex) {
-        return this.currentWizardlet.currentSection = currentWizardlet
-            .sections[wizardPosition$sectionIndex];
+        var maybeCurrentSectionFound = currentWizardlet.sections[wizardPosition$sectionIndex];
+
+        if ( maybeCurrentSectionFound ){
+          this.currentWizardlet.currentSection = maybeCurrentSectionFound;
+        }
+
+        return this.currentWizardlet.currentSection;
       }
     },
     {
