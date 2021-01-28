@@ -152,8 +152,6 @@ foam.CLASS({
     async function initE() {
       var self = this;
       this.onDetach(this.active_$.follow(this.overlay_.opened$));
-      this.data.map((action) => action.createIsAvailable$(this.__context__, this.obj));
-      if ( ! this.data.length > 0 ) return;
 
       this.
         addClass(this.myClass()).
@@ -162,13 +160,16 @@ foam.CLASS({
           start().
             addClass(this.myClass('icon')).
             style({ 'background-image': this.imageURL_$ }).
+            callIf(this.data.length > 0, function() {
+              this.
                 on('mouseover', self.onMouseOver).
                 on('mouseout', self.onMouseOut).
                 on('click', function(evt) {
                   if ( self.disabled_ ) return;
                   if ( ! self.overlayInitialized_ ) self.initializeOverlay();
                   self.overlay_.open(evt.clientX, evt.clientY);
-                }).
+                });
+            }).
           end().
         end();
     },
