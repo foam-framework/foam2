@@ -90,9 +90,12 @@ foam.CLASS({
     },
     {
       name: 'currentSection',
-      expression: function(currentWizardlet, wizardPosition$sectionIndex) {
-        return this.currentWizardlet.currentSection = currentWizardlet
-            .sections[wizardPosition$sectionIndex];
+      expression: function(
+        wizardlets,
+        wizardPosition$wizardletIndex, wizardPosition$sectionIndex
+      ) {
+        return wizardlets[wizardPosition$wizardletIndex]
+          .sections[wizardPosition$sectionIndex];
       }
     },
     {

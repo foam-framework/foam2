@@ -30,6 +30,7 @@ foam.CLASS({
   requires: [
     'foam.graph.GraphBuilder',
     'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.u2.crunch.lab.CapabilityGraphNodeView',
     'foam.u2.svg.graph.RelationshipGridPlacementStrategy',
     'foam.u2.svg.graph.IdPropertyPlacementPlanDecorator',
     'foam.u2.svg.TreeGraph',
@@ -162,11 +163,11 @@ foam.CLASS({
                 nodePlacementPlan: placementPlan,
                 graph: graph,
                 size: 200,
-                nodeView: 'foam.u2.crunch.lab.CapabilityGraphNodeView'
+                nodeView: this.CapabilityGraphNodeView
                 // nodeView: 'foam.u2.svg.graph.ZoomedOutFObjectGraphNodeView'
               })
               ;
-          })
+          });
       });
     }
   ],
