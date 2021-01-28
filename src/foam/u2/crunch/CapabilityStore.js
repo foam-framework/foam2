@@ -395,9 +395,8 @@ foam.CLASS({
     function openWizard(cap, showToast) {
       if ( this.wizardOpened ) return;
       this.wizardOpened = true;
-      this.crunchController
-        .createWizardSequence(cap)
-          .reconfigure('CheckPendingAgent', { showToast: showToast }).execute().then(() => {
+      this.crunchController.createWizardSequence(cap)
+        .reconfigure('CheckPendingAgent', { showToast: showToast }).execute().then(() => {
           this.wizardOpened = false
         });
     }
