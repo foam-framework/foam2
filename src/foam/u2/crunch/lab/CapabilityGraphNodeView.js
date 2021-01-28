@@ -113,8 +113,7 @@ foam.CLASS({
             .on('click', function() {
               var menu = 'admin.data';
               var dao = 'capabilityDAO';
-              var seperator = foam.nanos.controller.Memento.SEPARATOR;
-              self.memento.value = `${menu}${seperator}${dao}${seperator}${capability.id}`;
+              self.memento.value = [menu, dao, capability.id].join(foam.nanos.controller.Memento.SEPARATOR);
             })
           .end()
           .callIf(ucj !== null, function () {
@@ -136,8 +135,7 @@ foam.CLASS({
                 .on('click', function() {
                   var menu = 'admin.data';
                   var dao = 'userCapabilityJunctionDAO';
-                  var seperator = foam.nanos.controller.Memento.SEPARATOR;
-                  self.memento.value = `${menu}${seperator}${dao}${seperator}${ucj.id}`;
+                  self.memento.value = [menu, dao, capability.id].join(foam.nanos.controller.Memento.SEPARATOR);
                 })
               .end()
               ;
