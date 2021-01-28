@@ -188,7 +188,7 @@ foam.CLASS({
 
     function isFiltering() {
       if ( ! this.isInit ) {
-        if ( ! this.view_ )
+        if ( ! this.view_ || ! this.memento )
           return;
 
         if ( ! this.memento.paramsObj.f ) {

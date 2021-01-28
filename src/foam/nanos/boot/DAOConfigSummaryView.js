@@ -113,7 +113,8 @@ foam.CLASS({
         function initE() {
           this.SUPER();
 
-          this.currentMemento$ = this.memento.tail$;
+          if ( this.memento )
+            this.currentMemento$ = this.memento.tail$;
 
           this.
             start().
@@ -210,7 +211,8 @@ foam.CLASS({
     {
       name: 'currentMemento_',
       postSet: function(o, n) {
-        this.memento.tail = n;
+        if ( this.memento )
+          this.memento.tail = n;
       }
     }
   ],
@@ -223,7 +225,8 @@ foam.CLASS({
       var currentLetter = '';
       var section;
 
-      this.currentMemento_$ = self.memento.tail$;
+      if ( self.memento )
+        this.currentMemento_$ = self.memento.tail$;
 
       this.addClass(this.myClass()).
       start().
@@ -291,8 +294,10 @@ foam.CLASS({
               .add(label)
               .attrs({title: spec.description})
               .on('click', function() {
-                self.memento.tail = self.Memento.create({ head: spec.id });
-                self.memento.tail.parent = self.memento;
+                if ( self.memento ) {
+                  self.memento.tail = self.Memento.create({ head: spec.id });
+                  self.memento.tail.parent = self.memento;
+                }
               });
 
               self.search$.sub(function() {
@@ -316,7 +321,8 @@ foam.CLASS({
         });
       });
 
-      this.onDetach(this.memento.tail$.sub(this.mementoChange));
+      if ( this.memento )
+        this.onDetach(this.memento.tail$.sub(this.mementoChange));
       this.mementoChange();
     }
   ],

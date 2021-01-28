@@ -37,6 +37,10 @@ foam.CLASS({
       },
       postSet: function() {
         var view = this.views.find(v => v[0] === this.selectedView);
+
+        if ( ! this.memento )
+          return;
+          
         if ( view ) {
           this.memento.paramsObj.sV = view[1];
         } else {
