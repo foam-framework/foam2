@@ -1726,7 +1726,7 @@ return false
       var arg2 = this.arg2ToMQL();
       if ( ! arg2 )
         return null;
-      return this.arg1.name + ':' + arg2.join(',');;
+      return this.arg1.name + ':' + arg2.join(',');
     }
   ]
 });
