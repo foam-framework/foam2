@@ -136,12 +136,6 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'useModelActions',
-      value: true,
-      documentation: 'Set this to true to have the context menu actions inherit data model actions.'
-    },
-    {
-      class: 'Boolean',
       name: 'editColumnsEnabled',
       value: true,
       documentation: 'Set this to true to let the user select columns.'
@@ -481,12 +475,10 @@ foam.CLASS({
           var actions = {};
           var actionsMerger = action => { actions[action.name] = action; };
 
-          var modelActions = view.of.getAxiomsByClass(foam.core.Action);
-          var actions = Array.isArray(view.contextMenuActions)
-            ? view.useModelActions
-            ? view.contextMenuActions.concat(modelActions)
-            : view.contextMenuActions
-            : modelActions;
+          // Model actions
+          view.of.getAxiomsByClass(foam.core.Action).forEach(actionsMerger);
+          // Context menu actions
+          view.contextMenuActions.forEach(actionsMerger);
 
           //with this code error created  slot.get cause promise return
           //FIX ME
@@ -655,9 +647,8 @@ foam.CLASS({
                     tableRowElement.add(elmt);
                   }
 
-                  // Object actions - Accounts for actions on subclassed objects.
-                  // data.of || view.of reference the base classes unless otherwise stated. 
-                  if ( view.useModelActions ) obj.cls_.getOwnAxiomsByClass(foam.core.Action).forEach(actionsMerger);
+                  // Object actions
+                  obj.cls_.getOwnAxiomsByClass(foam.core.Action).forEach(actionsMerger);
                   tableRowElement
                     .start()
                       .addClass(view.myClass('td')).
