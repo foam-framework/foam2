@@ -245,7 +245,7 @@ foam.CLASS({
                 .addClass(self.myClass('featureSection'))
               .end()
               .on('click', () => {
-                self.openWizard(arr[i].id);
+                self.openWizard(arr[i].id, true);
               })
             .end());
         }
@@ -317,7 +317,7 @@ foam.CLASS({
                   .start(self.GUnit, { columns: 4 })
                     .tag(self.CapabilityCardView, { data: cap })
                     .on('click', () => {
-                      self.openWizard(cap);
+                      self.openWizard(cap, true);
                     })
                   .end();
               }
@@ -350,7 +350,7 @@ foam.CLASS({
               .start(self.GUnit, { columns: 4 })
                 .tag(self.CapabilityCardView, { data: cap })
                 .on('click', () => {
-                  self.openWizard(cap);
+                  self.openWizard(cap, false);
                 })
               .end();
           }
@@ -388,16 +388,17 @@ foam.CLASS({
           )).select())
         .then(sink => {
           if ( sink.array.length == 1 ) {
-            this.openWizard(sink.array[0]);
+            this.openWizard(sink.array[0], false);
           }
         })
     },
-    function openWizard(cap) {
+    function openWizard(cap, showToast) {
       if ( this.wizardOpened ) return;
       this.wizardOpened = true;
       this.crunchController
-        .createWizardSequence(cap).execute().then(() => {
-          this.wizardOpened = false;
+        .createWizardSequence(cap)
+          .reconfigure('CheckPendingAgent', { showToast: showToast }).execute().then(() => {
+          this.wizardOpened = false
         });
     }
   ],
