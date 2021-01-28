@@ -153,7 +153,8 @@ foam.CLASS({
       var self = this;
       this.SUPER();
 
-      this.currentMemento$ = this.memento.tail$;
+      if ( this.memento )
+        this.currentMemento$ = this.memento.tail$;
 
       this
         .addClass(this.myClass())

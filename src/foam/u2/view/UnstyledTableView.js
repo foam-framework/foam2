@@ -275,22 +275,23 @@ foam.CLASS({
         this.DESC(column) :
         column;
 
-      if ( this.memento ) {
-        if ( ! this.memento.paramsObj.c ) {
-          this.memento.paramsObj.c = [];
-        }
-        var columns = this.memento.paramsObj.c.split(',');
-        var mementoColumn = columns.find(c => this.returnMementoColumnNameDisregardSorting(c) === column.name)
-        var orderChar = isNewOrderDesc ? this.DESCENDING_ORDER_CHAR : this.ASCENDING_ORDER_CHAR;
-        if ( ! mementoColumn ) {
-          columns.push(column.name + orderChar);
-        } else {
-          var index = columns.indexOf(mementoColumn);
-          columns[index] = column.name + orderChar;
-        }
-        this.memento.paramsObj.c = columns.join(',');
-        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
+      if ( ! this.memento )
+        return;
+
+      if ( ! this.memento.paramsObj.c ) {
+        this.memento.paramsObj.c = [];
       }
+      var columns = this.memento.paramsObj.c.split(',');
+      var mementoColumn = columns.find(c => this.returnMementoColumnNameDisregardSorting(c) === column.name)
+      var orderChar = isNewOrderDesc ? this.DESCENDING_ORDER_CHAR : this.ASCENDING_ORDER_CHAR;
+      if ( ! mementoColumn ) {
+        columns.push(column.name + orderChar);
+      } else {
+        var index = columns.indexOf(mementoColumn);
+        columns[index] = column.name + orderChar;
+      }
+      this.memento.paramsObj.c = columns.join(',');
+      this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
     },
 
     function updateColumns() {

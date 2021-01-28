@@ -257,7 +257,8 @@ foam.CLASS({
         this.searchPredicate = foam.mlang.predicate.True.create();
       }));
 
-      this.currentMemento$ = this.memento.tail$;
+      if ( this.memento )
+        this.currentMemento$ = this.memento.tail$;
     },
     function dblclick(obj, id) {
       if ( ! this.stack ) return;

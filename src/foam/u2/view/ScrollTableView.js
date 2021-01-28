@@ -205,8 +205,6 @@
 
       if ( this.memento )
         this.currentMemento$ = this.memento.tail$;
-      else if ( this.memento != undefined )
-        this.currentMemento$ = this.memento$;
     },
 
     function initE() {
