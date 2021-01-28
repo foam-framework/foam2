@@ -393,7 +393,8 @@ foam.CLASS({
         })
     },
     function openWizard(cap) {
-      if ( this.wizardOpened ) return;
+      console.log('OPENING WIZARD', cap);
+      // if ( this.wizardOpened ) return;
       this.wizardOpened = true;
       this.crunchController
         .createWizardSequence(cap).execute().then(() => {
