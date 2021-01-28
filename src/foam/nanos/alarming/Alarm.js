@@ -112,6 +112,7 @@ foam.CLASS({
       label: 'Since',
       visibility: 'RO',
       tableWidth: 150,
+      includeInDigest: false,
       storageOptional: true
     },
     {
