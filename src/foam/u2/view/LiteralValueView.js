@@ -5,28 +5,28 @@
  */
 
 foam.CLASS({
-    package: 'foam.u2.view',
-    name: 'LiteralValueView',
-    extends: 'foam.u2.View',
+  package: 'foam.u2.view',
+  name: 'LiteralValueView',
+  extends: 'foam.u2.View',
   
-    documentation: 'A ValueView that can display a value that is different than the value of the property.',
+  documentation: 'A ValueView that can display a value that is different than the value of the property.',
   
-    properties: [
-        {
-            name: 'view',
-            class: 'foam.u2.ViewSpec',
-            value: { class: 'foam.u2.view.ValueView' }
-        },
-        {
-            name: 'value',
-            class: 'Object'
-        }
-    ],
+  properties: [
+    {
+      name: 'view',
+      class: 'foam.u2.ViewSpec',
+      value: { class: 'foam.u2.view.ValueView' }
+    },
+    {
+      name: 'value',
+      class: 'Object'
+    }
+  ],
 
-    methods: [
-        function initE() {
-            this.tag(this.view, { data$: this.value$ })
-        }
-    ],
-  });
+  methods: [
+    function initE() {
+      this.tag(this.view, { data$: this.value$ })
+    }
+  ],
+});
   
