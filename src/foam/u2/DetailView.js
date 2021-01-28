@@ -176,7 +176,8 @@ foam.CLASS({
     function initE() {
       var self = this;
 
-      this.currentMemento$ = this.memento.tail$;
+      if ( this.memento )
+        this.currentMemento$ = this.memento.tail$;
 
       var hasTabs = false;
       this.add(this.slot(function(of, properties, actions) {
