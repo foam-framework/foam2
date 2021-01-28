@@ -14,11 +14,12 @@ foam.CLASS({
     properties: [
         {
             name: 'view',
+            class: 'foam.u2.ViewSpec',
             value: { class: 'foam.u2.view.ValueView' }
         },
         {
-            class: 'Object',
-            name: 'value'
+            name: 'value',
+            class: 'Object'
         }
     ],
 
