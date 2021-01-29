@@ -124,7 +124,7 @@ foam.CLASS({
   ],
 
   exports: [
-    'dblclick',
+    'click',
     'filteredTableColumns',
     'serviceName',
     'config'
@@ -259,7 +259,7 @@ foam.CLASS({
 
       this.currentMemento$ = this.memento.tail$;
     },
-    function dblclick(obj, id) {
+    function click(obj, id) {
       if ( ! this.stack ) return;
 
       this.stack.push({
