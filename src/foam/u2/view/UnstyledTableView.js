@@ -97,7 +97,7 @@ foam.CLASS({
       expression: function(of) {
         return ! of ? [] : [].concat(
           of.getAxiomsByClass(foam.core.Property)
-            .filter(p => ! p.hidden && ! p.networkTransient )
+            .filter(p => ! p.hidden )
             .map(a => a.name),
           of.getAxiomsByClass(foam.core.Action)
             .map(a => a.name)
