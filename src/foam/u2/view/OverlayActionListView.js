@@ -165,6 +165,8 @@ foam.CLASS({
                 on('mouseover', self.onMouseOver).
                 on('mouseout', self.onMouseOut).
                 on('click', function(evt) {
+                  evt.preventDefault();
+                  evt.stopPropagation();
                   if ( self.disabled_ ) return;
                   if ( ! self.overlayInitialized_ ) self.initializeOverlay();
                   self.overlay_.open(evt.clientX, evt.clientY);
