@@ -776,6 +776,10 @@ model from which to test ServiceProvider ID (spid)`,
          }
          System.exit(1);
        }
+
+       if ( getInnerDAO() == null && getMdao() == null ) {
+         setMdao(new foam.dao.MDAO(of_));
+       }
      `
     },
     {
