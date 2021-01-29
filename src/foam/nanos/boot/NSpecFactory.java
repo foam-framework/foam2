@@ -49,10 +49,13 @@ public class NSpecFactory
     try {
       logger.info("Creating Service", spec_.getName());
       var service = spec_.createService(x_.getX().put(NSpec.class, spec_), null);
-      if ( ns_ == null ) {
-        ns_ = service;
-      } else if ( ns_ instanceof ProxyDAO ) {
+      if ( service instanceof DAO ) {
+        if ( ns_ == null ) {
+          ns_ = new ProxyDAO();
+        }
         ((ProxyDAO) ns_).setDelegate((DAO) service);
+      } else {
+        ns_ = service;
       }
 
       Object ns = ns_;
@@ -85,9 +88,8 @@ public class NSpecFactory
   }
 
   public synchronized Object create(X x) {
-    if ( ns_ == null ) {
-      buildService(x);
-    } else if ( ns_ instanceof ProxyDAO && ((ProxyDAO) ns_).getDelegate() == null ) {
+    if ( ns_ == null ||
+         ns_ instanceof ProxyDAO && ((ProxyDAO) ns_).getDelegate() == null ) {
       buildService(x);
     }
 
@@ -98,10 +100,16 @@ public class NSpecFactory
   }
 
   public synchronized void invalidate(NSpec spec) {
+    Logger logger = (Logger) x_.get("logger");
+    if ( logger == null ) {
+      logger = new StdoutLogger();
+    }
+    logger.info("Invalidating Service", spec_.getName());
     if ( ! SafetyUtil.equals(spec.getService(), spec_.getService())
       || ! SafetyUtil.equals(spec.getServiceClass(), spec_.getServiceClass())
       || ! SafetyUtil.equals(spec.getServiceScript(), spec_.getServiceScript())
     ) {
+      logger.info("Invalidated Service", spec_.getName());
       if ( ns_ instanceof ProxyDAO ) {
         ((ProxyDAO) ns_).setDelegate(null);
       } else {
