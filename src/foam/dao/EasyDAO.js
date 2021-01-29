@@ -1163,6 +1163,19 @@ model from which to test ServiceProvider ID (spid)`,
       }
       return getDelegate().cmd_(x, obj);
       `
+    },
+    {
+      name: 'toString',
+      javaCode: `
+        var sb = new StringBuilder();
+        sb.append("EasyDAO");
+        if ( of_ != null ) {
+          sb.append("(of: ")
+            .append(of_.getId())
+            .append(")");
+        }
+        return sb.toString();
+      `
     }
   ]
 });
