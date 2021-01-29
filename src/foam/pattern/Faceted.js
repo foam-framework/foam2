@@ -72,6 +72,13 @@ foam.CLASS({
       cls.create = function(args, X, ignoreFacets) {
         if ( ! ignoreFacets ) {
           var of = args && ( args.of || ( args.data && args.data.of ) );
+          if ( args && ! of ) {
+            let data;
+            if ( args.data ) data = args.data;
+            else if ( args.data$ ) data = args.data$.get();
+
+            if ( data && data.cls_ ) of = data.cls_;
+          }
           var facetCls = this.getFacetOf(of, X);
 
           if ( facetCls !== this ) return facetCls.create(args, X, true);
@@ -84,33 +91,5 @@ foam.CLASS({
 
   properties: [
     ['name', 'foam.pattern.Faceted']
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.pattern',
-  name: 'DataFacetHelper',
-
-  documentation: `
-    Checks for a 'data' or 'data$' argument on object creation and injects the
-    corresponding 'of' argument for faceting.
-  `,
-
-  methods: [
-    function installInClass(cls) {
-      var oldCreate = cls.create;
-      cls.create = function(args, X) {
-        var data;
-        if ( args && args.data ) data = args.data;
-        else if ( args && args.data$ ) data = args.data$.get();
-        if (data && data.cls_ ) {
-          args.of = data.cls_;
-        }
-        return oldCreate.apply(this, arguments);
-      }
-    }
-  ],
-  properties: [
-    ['name', 'foam.pattern.DataFacetHelper']
   ]
 });
