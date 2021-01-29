@@ -202,7 +202,7 @@ foam.CLASS({
         self.currentData = self.data;
 
         var title = self.title && this.E('tr').
-        style({ display: 'grid' }).
+        style({ display: 'contents' }).
           start('td').addClass(this.myClass('title')).attrs({ colspan: 2 }).
             add(self.title$).
           end();
