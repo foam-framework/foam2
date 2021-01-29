@@ -588,13 +588,17 @@ This is the heart of Medusa.`,
                 config.setErrorMessage("");
                 ((DAO) x.get("clusterConfigDAO")).put(config);
               } else {
-                getLogger().error("gap", "index", index, "dependencies", dependencies.getValue(), "lookAhead", lookAhead.getValue(), "lookAhead threshold",lookAheadThreshold);
-                alarm.setNote("Index: "+index+"\\n"+"Dependencies: YES");
-                alarm.setSeverity(foam.log.LogLevel.ERROR);
-                ((DAO) x.get("alarmDAO")).put(alarm);
-                config.setErrorMessage("gap with dependencies");
-                ((DAO) x.get("clusterConfigDAO")).put(config);
-                throw new MedusaException("gap with dependencies");
+                if ( ((Long)lookAhead.getValue()).intValue() > lookAheadThreshold ) {
+                  getLogger().error("gap", "index", index, "dependencies", dependencies.getValue(), "lookAhead", lookAhead.getValue(), "lookAhead threshold",lookAheadThreshold);
+                  alarm.setNote("Index: "+index+"\\n"+"Dependencies: YES");
+                  alarm.setSeverity(foam.log.LogLevel.ERROR);
+                  ((DAO) x.get("alarmDAO")).put(alarm);
+                  config.setErrorMessage("gap with dependencies");
+                  ((DAO) x.get("clusterConfigDAO")).put(config);
+                  throw new MedusaException("gap with dependencies");
+                } else {
+                  getLogger().info("gap", "investigating", index, "dependencies", dependencies.getValue(), "lookAhead", lookAhead.getValue(), "lookAhead threshold",lookAheadThreshold);
+                }
               }
             } else {
               getLogger().info("gap", "not-found", index);
