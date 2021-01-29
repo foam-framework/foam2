@@ -57,7 +57,7 @@ foam.CLASS({
               if ( ! axiom )
                 axiom = data.of.getAxiomByName(data.selectedColumnNames[i]);
             }
-            if ( ! axiom || axiom.networkTransient ) {
+            if ( ! axiom ) {
               continue;
             }
             rootProperty = [ axiom.name, this.columnHandler.returnAxiomHeader(axiom) ];
@@ -101,8 +101,6 @@ foam.CLASS({
           else {
             var axiom =  tableColumns.find(c => c.name === notSelectedColumns[i]);
             axiom = axiom || data.of.getAxiomByName(notSelectedColumns[i]);
-            if ( axiom.networkTransient )
-              continue;
             rootProperty = [ axiom.name, this.columnHandler.returnAxiomHeader(axiom) ];
           }
 

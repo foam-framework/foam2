@@ -119,8 +119,7 @@ foam.CLASS({
         var props = cls.getAxiomsByClass(foam.core.Property);
         var propNames = [];
         for ( var i = 0 ; i < props.length ; i++ ) {
-          if ( ! props[i].networkTransient )
-            propNames.push(props[i].name);
+          propNames.push(props[i].name);
         }
         return propNames;
       }

@@ -35,16 +35,16 @@ foam.CLASS({
   methods: [
     {
       name: 'filterExportedProps',
-      documentation: 'returns propNames that are properties of the class and aren\'t networkTransient',
+      documentation: 'returns propNames that are names of properties of the class',
       code: function(of, propNames) {
         var props = of.getAxiomsByClass(foam.core.Property);
         var allColumnNames = props.map(p => p.name);
 
         if ( ! propNames )
-          return props.filter(p => ! p.networkTransient ).map(p => p.name);
+          return props.map(p => p.name);
 
         return propNames.filter(n => {
-          return allColumnNames.includes(n.split('.')[0]) && ! this.returnProperty(of, n).networkTransient;
+          return allColumnNames.includes(n.split('.')[0]);
         });
       }
     },
