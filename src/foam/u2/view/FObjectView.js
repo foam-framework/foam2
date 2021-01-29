@@ -20,6 +20,10 @@ foam.CLASS({
     'foam.core.Latch'
   ],
 
+  messages: [
+    { name: 'PLACEHOLDER_TEXT', message: 'select...' }
+  ],
+
   properties: [
     {
       class: 'foam.core.FObjectProperty',
@@ -113,6 +117,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'placeholder',
+      factory: function() {
+        return this.PLACEHOLDER_TEXT;
+      },
       documentation: 'If no placeholder, the choiceView will select the first element',
     },
     {
