@@ -109,14 +109,15 @@ public class NSpecFactory
       || ! SafetyUtil.equals(spec.getServiceClass(), spec_.getServiceClass())
       || ! SafetyUtil.equals(spec.getServiceScript(), spec_.getServiceScript())
     ) {
-      logger.info("Invalidated Service", spec_.getName());
-      if ( ns_ instanceof ProxyDAO ) {
-        ((ProxyDAO) ns_).setDelegate(null);
+      if ( ns_ instanceof DAO ) {
+        logger.warning("Invalidation of DAO Service not supported", spec_.getName());
+        return;
+        // ((ProxyDAO) ns_).setDelegate(null);
       } else {
         ns_ = null;
       }
     }
-
+    logger.info("Invalidated Service", spec_.getName());
     spec_ = spec;
     if ( ! spec_.getLazy() ) {
       create(x_);
