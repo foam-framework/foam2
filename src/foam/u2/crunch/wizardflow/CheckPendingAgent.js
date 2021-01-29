@@ -56,27 +56,24 @@ foam.CLASS({
       var ucj = await this.crunchService.getJunction(null, this.rootCapability.id);
 
       var shouldReopen = false;
-      if ( ucj.status !== this.CapabilityJunctionStatus.AVAILABLE ) {
-        var statusPending = ucj.status === this.CapabilityJunctionStatus.PENDING;
+
+      if ( ucj.status == this.CapabilityJunctionStatus.PENDING ) {
         var shouldReopen = await this.crunchService.maybeReopen(this.ctrl.__subContext__, ucj.targetId);
 
-        if ( ! shouldReopen && this.showToast ) {
-          var message = statusPending ? this.CANNOT_OPEN_PENDING : this.CANNOT_OPEN_GRANTED;
-          this.ctrl.notify(message, '', this.LogLevel.INFO, true);
-          this.cancelled = true;
-          this.sequence.endSequence();
-          return;
+        if ( this.showToast ) {
+          if ( ! shouldReopen ) {
+            var message = statusPending ? this.CANNOT_OPEN_PENDING : this.CANNOT_OPEN_GRANTED;
+            this.ctrl.notify(message, '', this.LogLevel.INFO, true);
+          } else if ( shouldReopen && this.capabilities.length < 1 ) {
+            // This is here because of a CertifyDataReviewed capability.
+            this.ctrl.notify(this.CANNOT_OPEN_ACTION_PENDING);
+          }
         }
-      }
-      if ( shouldReopen && this.capabilities.length < 1 && this.showToast ) {
-        // This is here because of a CertifyDataReviewed capability.
-        this.ctrl.notify(this.CANNOT_OPEN_ACTION_PENDING);
+
         this.cancelled = true;
         this.sequence.endSequence();
-      }
-      if ( ! shouldReopen && statusPending ) {
-        this.cancelled = true;
-        this.sequence.endSequence();
+
+        return;
       }
     }
   ]
