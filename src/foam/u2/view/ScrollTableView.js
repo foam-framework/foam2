@@ -205,8 +205,6 @@
 
       if ( this.memento )
         this.currentMemento$ = this.memento.tail$;
-      else if ( this.memento != undefined )
-        this.currentMemento$ = this.memento$;
     },
 
     function initE() {
@@ -282,7 +280,7 @@
           delete this.renderedPages_[i];
         });
         this.updateRenderedPages_();
-        if ( this.el() && ! this.isInit && this.memento.paramsObj.r ) {
+        if ( this.el() && ! this.isInit && this.memento && this.memento.paramsObj.r ) {
           var scroll = this.memento.paramsObj.r * this.rowHeight;
           scroll = scroll >= this.rowHeight && scroll < this.scrollHeight ? scroll : 0;
 
@@ -337,8 +335,10 @@
       isFramed: true,
       code: function(e) {
         this.scrollPos_ = e.target.scrollTop;
-        this.memento.paramsObj.r = this.scrollPos_ >= this.rowHeight && this.scrollPos_ < this.scrollHeight ? Math.floor( this.scrollPos_  / this.rowHeight) : 0;
-        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
+        if ( this.memento ) {
+          this.memento.paramsObj.r = this.scrollPos_ >= this.rowHeight && this.scrollPos_ < this.scrollHeight ? Math.floor( this.scrollPos_  / this.rowHeight) : 0;
+          this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
+        }
       }
     },
     {

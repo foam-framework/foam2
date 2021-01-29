@@ -84,15 +84,19 @@ foam.CLASS({
           //we need to check if memento is already set
           //for example when we copy-paste url
 
-          //X.memento.head is parent view head
-          //so the v view mementoHead is X.memento.tail.head
-          if ( ! X.memento.tail || X.memento.tail.head !== v.mementoHead ) {
-            var m = this.Memento.create();
+          if ( currMemento.value == '' )
+            currMemento.value = v.mementoHead;
+          else {
+            //X.memento.head is parent view head
+            //so the v view mementoHead is X.memento.tail.head
+            if ( ! X.memento.tail || X.memento.tail.head !== v.mementoHead ) {
+              var m = this.Memento.create();
 
-            m.head$ = v.mementoHead$;
-            m.parent = currMemento;
-  
-            currMemento.tail = m;
+              m.value = v.mementoHead;
+              m.parent = currMemento;
+    
+              currMemento.tail = m;
+            }
           }
         }
         return v;

@@ -20,7 +20,12 @@ foam.CLASS({
 
   exports: [
     'currentData as data',
-    'controllerMode'
+    'controllerMode',
+    'currentMemento as memento'
+  ],
+
+  imports: [
+    'memento'
   ],
 
   axioms: [
@@ -102,7 +107,8 @@ foam.CLASS({
         return this.of ? this.of.model_.label : '';
       },
     },
-    ['nodeName', 'DIV']
+    ['nodeName', 'DIV'],
+    'currentMemento'
   ],
 
   css: `
@@ -169,6 +175,10 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
+
+      if ( this.memento )
+        this.currentMemento$ = this.memento.tail$;
+
       var hasTabs = false;
       this.add(this.slot(function(of, properties, actions) {
         if ( ! of ) return '';
