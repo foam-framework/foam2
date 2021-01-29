@@ -1026,8 +1026,14 @@ model from which to test ServiceProvider ID (spid)`,
         return this;
       },
       javaCode: `
-        if ( getMdao() != null ) {
+        if ( getInnerDAO() == null && getMdao() != null ) {
           ((foam.dao.MDAO) getMdao()).addIndex(props);
+        } else {
+          Logger logger = (Logger) getX().get("logger");
+          if ( logger == null ) {
+            logger = new foam.nanos.logger.StdoutLogger();
+          }
+          logger.warning("Cannot addPropertyIndex to wrapper EasyDAO. Please add it on the innerDAO instead.", props);
         }
         return this;
       `
@@ -1049,8 +1055,15 @@ model from which to test ServiceProvider ID (spid)`,
         return this;
       },
       javaCode: `
-        if ( getMdao() != null )
+        if ( getInnerDAO() == null && getMdao() != null ) {
           ((foam.dao.MDAO) getMdao()).addIndex(index);
+        } else {
+          Logger logger = (Logger) getX().get("logger");
+          if ( logger == null ) {
+            logger = new foam.nanos.logger.StdoutLogger();
+          }
+          logger.warning("Cannot addIndex to wrapper EasyDAO. Please add it to the innerDAO instead.", index);
+        }
         return this;
       `
     },
