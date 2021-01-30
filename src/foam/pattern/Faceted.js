@@ -64,7 +64,7 @@ foam.CLASS({
 
         var id = ( pkg ? pkg + '.' : '' ) + name + this.name;
 
-        return X.lookup(id, true) || this;
+        return X.lookup(id, true) || of[this.name] || this;
       };
 
       // ignoreFacets is set to true when called to prevent a second-level
