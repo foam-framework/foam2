@@ -75,7 +75,7 @@ foam.CLASS({
       name: 'name',
       createVisibility: 'RW',
       updateVisibility: 'RO',
-      tableWidth: 150
+      tableWidth: 200
     },
     {
       class: 'String',

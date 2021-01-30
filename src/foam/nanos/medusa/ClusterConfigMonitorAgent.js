@@ -21,9 +21,11 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.X',
     'foam.dao.DAO',
+    'foam.nanos.alarming.Alarm',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
+    'java.util.List',
     'java.util.Timer'
   ],
 
@@ -148,6 +150,13 @@ foam.CLASS({
           if ( cfg != null ) {
             cfg.setPingTime(pm.getEndTime() - pm.getStartTime());
             getDao().put_(x, cfg);
+            List<Alarm> alarms = cfg.getAlarms();
+            if ( alarms != null ) {
+              DAO alarmDAO = (DAO) x.get("alarmDAO");
+              for (Alarm alarm : alarms ) {
+                alarmDAO.put(alarm);
+              }
+            }
           } else {
             getLogger().warning("client,find", cfg.getId(), "null");
           }

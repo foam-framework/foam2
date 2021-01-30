@@ -168,8 +168,9 @@ foam.CLASS({
 
       label = this.makeLabel();
       label.text$ = this.config$.map(function(c) {
-        if ( c.alarms && c.alarms > 0 ) {
-          return 'Alarms: '+c.alarms;
+        if ( c.alarms && c.alarms.length > 0 ) {
+          // TODO: this also includes those recently inactive.
+          return 'Alarms: '+c.alarms.length;
         } else {
           return '';
         }
