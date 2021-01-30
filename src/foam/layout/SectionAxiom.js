@@ -97,9 +97,8 @@ foam.CLASS({
           if ( p.name ) return data.cls_.getAxiomByName(p.name).clone().copyFrom(p);
         });
       }  else {
-        props = data.cls_.getAxiomsByClass(foam.core.Property).filter(p => {    
-          return p.section === this.name;
-        })
+        props = data.cls_.getAxiomsByClass(foam.core.Property)
+          .filter(p => p.section === this.name);
       }
       var propVisSlot = foam.core.ArraySlot.create({
         slots: props.map(
