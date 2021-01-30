@@ -52,7 +52,8 @@ foam.CLASS({
         if ( ! of ) return this;
         X = foam.core.FObject.isInstance(X) ? X.__context__ : foam.__context__;
 
-        var name, pkg;
+        var name;
+        var pkg;
         if ( foam.String.isInstance(of) ) {
           name = of.substring(of.lastIndexOf('.') + 1);
           pkg  = of.substring(0, of.lastIndexOf('.'))
@@ -72,11 +73,12 @@ foam.CLASS({
         if ( ! ignoreFacets ) {
           var of = args && ( args.of || ( args.data && args.data.of ) );
           if ( args && ! of ) {
-            var data = args.data || ( args.data$ && args.data$.get() );
+            let data;
+            if ( args.data ) data = args.data;
+            else if ( args.data$ ) data = args.data$.get();
 
             if ( data && data.cls_ ) of = data.cls_;
           }
-
           var facetCls = this.getFacetOf(of, X);
 
           if ( facetCls !== this ) return facetCls.create(args, X, true);
