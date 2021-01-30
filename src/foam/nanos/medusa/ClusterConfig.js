@@ -154,7 +154,7 @@ foam.CLASS({
     },
     {
       name: 'alarms',
-      class: 'Long',
+      class: 'Int',
       visibility: 'RO',
       storageTransient: true
     },

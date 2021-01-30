@@ -19,7 +19,7 @@ foam.CLASS({
     'static foam.mlang.MLang.EQ',
     'foam.mlang.sink.Count',
     'foam.nanos.alarming.Alarm',
-    'java.lang.Runtime',
+    'java.lang.Runtime'
   ],
 
   methods: [
