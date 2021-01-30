@@ -155,7 +155,8 @@ foam.CLASS({
     {
       name: 'alarms',
       class: 'Int',
-      value: 0
+      visibility: 'RO',
+      storageTransient: true
     },
     {
       name: 'replayingInfo',
