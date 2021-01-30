@@ -188,13 +188,14 @@ foam.CLASS({
             if ( getFixedSize() != null ) {
               foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
               fixedSizeDAO.setDelegate(getMdao());
-              setMdao(fixedSizeDAO);
+              delegate = fixedSizeDAO;
+              //setMdao(fixedSizeDAO);
             }
             if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
               if ( getWriteOnly() ) {
-                delegate = new foam.dao.WriteOnlyJDAO(getX(), getMdao(), getOf(), getJournalName());
+                delegate = new foam.dao.WriteOnlyJDAO(getX(), delegate, getOf(), getJournalName());
               } else {
-                delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName(), getCluster());
+                delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName(), getCluster());
               }
             }
           }
@@ -230,20 +231,17 @@ foam.CLASS({
             .build();
 
           // auto add index on spid
-          DAO dao = getMdao();
-          if ( dao != null ) {
-            dao = (DAO) delegate.cmd(foam.dao.MDAO.GET_MDAO_CMD);
-            if ( dao != null &&
-                 dao instanceof foam.dao.MDAO ) {
-              PropertyInfo pInfo = (PropertyInfo) this.getOf().getAxiomByName("spid");
-              if ( pInfo != null ) {
-                ((foam.dao.MDAO)dao).addIndex(pInfo);
-              } else {
-                logger.warning(getName(), "Index not added. Property not found. spid");
-              }
+          DAO dao = (DAO) getMdao();
+          if ( dao != null &&
+               dao instanceof foam.dao.MDAO ) {
+            PropertyInfo pInfo = (PropertyInfo) this.getOf().getAxiomByName("spid");
+            if ( pInfo != null ) {
+              ((foam.dao.MDAO)dao).addIndex(pInfo);
             } else {
-              logger.warning(getName(), "Index not added on spid, no access to MDAO");
+              logger.warning(getName(), "Index not added. Property not found. spid");
             }
+          } else {
+            logger.warning(getName(), "Index not added on spid, no access to MDAO");
           }
         }
 
@@ -1047,14 +1045,12 @@ model from which to test ServiceProvider ID (spid)`,
         return this;
       },
       javaCode: `
-        if ( getMdao() != null ) {
-          DAO dao = (DAO) getMdao().cmd(foam.dao.MDAO.GET_MDAO_CMD);
-          if ( dao != null &&
-               dao instanceof foam.dao.MDAO ) {
-            ((foam.dao.MDAO)dao).addIndex(props);
-          } else {
-            ((Logger) getX().get("logger")).warning(getName(), "Index not added, no access to MDAO");
-          }
+        DAO dao = (DAO) getMdao();
+        if ( dao != null &&
+             dao instanceof foam.dao.MDAO ) {
+          ((foam.dao.MDAO)dao).addIndex(props);
+        } else {
+          ((Logger) getX().get("logger")).warning(getName(), "Index not added, no access to MDAO");
         }
         return this;
       `
@@ -1076,14 +1072,12 @@ model from which to test ServiceProvider ID (spid)`,
         return this;
       },
       javaCode: `
-         if ( getMdao() != null ) {
-          DAO dao = (DAO) getMdao().cmd(foam.dao.MDAO.GET_MDAO_CMD);
-          if ( dao != null &&
-               dao instanceof foam.dao.MDAO ) {
-            ((foam.dao.MDAO)dao).addIndex(index);
-          } else {
-            ((Logger) getX().get("logger")).warning(getName(), "Index not added, no access to MDAO");
-          }
+        DAO dao = (DAO) getMdao();
+        if ( dao != null &&
+             dao instanceof foam.dao.MDAO ) {
+          ((foam.dao.MDAO)dao).addIndex(index);
+        } else {
+          ((Logger) getX().get("logger")).warning(getName(), "Index not added, no access to MDAO");
         }
         return this;
       `
