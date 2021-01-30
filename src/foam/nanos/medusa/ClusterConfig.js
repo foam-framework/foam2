@@ -154,8 +154,7 @@ foam.CLASS({
     },
     {
       name: 'alarms',
-      class: 'FObjectArray',
-      of: 'foam.nanos.alarming.Alarm',
+      class: 'Long',
       visibility: 'RO',
       storageTransient: true
     },
