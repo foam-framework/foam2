@@ -63,8 +63,8 @@ foam.CLASS({
         }
 
         var id = ( pkg ? pkg + '.' : '' ) + name + this.name;
-
-        return X.lookup(id, true) || this;
+        var cls_ = foam.String.isInstance(of) ? X.lookup(of) : of;
+        return ( cls_ && cls_[this.name] ) || X.lookup(id, true) || this;
       };
 
       // ignoreFacets is set to true when called to prevent a second-level
@@ -72,6 +72,13 @@ foam.CLASS({
       cls.create = function(args, X, ignoreFacets) {
         if ( ! ignoreFacets ) {
           var of = args && ( args.of || ( args.data && args.data.of ) );
+          if ( args && ! of ) {
+            let data;
+            if ( args.data ) data = args.data;
+            else if ( args.data$ ) data = args.data$.get();
+
+            if ( data && data.cls_ ) of = data.cls_;
+          }
           var facetCls = this.getFacetOf(of, X);
 
           if ( facetCls !== this ) return facetCls.create(args, X, true);
