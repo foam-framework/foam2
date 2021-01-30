@@ -179,18 +179,23 @@ foam.CLASS({
             }
             delegate = getMdao();
             if ( getIndex() != null && getIndex().length > 0 ) {
-              ((foam.dao.MDAO) getMdao()).addIndex(getIndex());
+              if ( delegate instanceof foam.dao.MDAO ) {
+                ((foam.dao.MDAO) delegate).addIndex(getIndex());
+              } else {
+                logger.warning(getName(), "Index not added, no access to MDAO");
+              }
             }
             if ( getFixedSize() != null ) {
               foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
               fixedSizeDAO.setDelegate(getMdao());
-              setMdao(fixedSizeDAO);
+              delegate = fixedSizeDAO;
+              //setMdao(fixedSizeDAO);
             }
             if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
               if ( getWriteOnly() ) {
-                delegate = new foam.dao.WriteOnlyJDAO(getX(), getMdao(), getOf(), getJournalName());
+                delegate = new foam.dao.WriteOnlyJDAO(getX(), delegate, getOf(), getJournalName());
               } else {
-                delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName(), getCluster());
+                delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName(), getCluster());
               }
             }
           }
@@ -224,6 +229,20 @@ foam.CLASS({
           delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX())
             .setDelegate(delegate)
             .build();
+
+          // auto add index on spid
+          DAO dao = (DAO) getMdao();
+          if ( dao != null &&
+               dao instanceof foam.dao.MDAO ) {
+            PropertyInfo pInfo = (PropertyInfo) this.getOf().getAxiomByName("spid");
+            if ( pInfo != null ) {
+              ((foam.dao.MDAO)dao).addIndex(pInfo);
+            } else {
+              logger.warning(getName(), "Index not added. Property not found. spid");
+            }
+          } else {
+            logger.warning(getName(), "Index not added on spid, no access to MDAO");
+          }
         }
 
         delegate = getOuterDAO(delegate);
@@ -1026,14 +1045,12 @@ model from which to test ServiceProvider ID (spid)`,
         return this;
       },
       javaCode: `
-        if ( getInnerDAO() == null && getMdao() != null ) {
-          ((foam.dao.MDAO) getMdao()).addIndex(props);
+        DAO dao = (DAO) getMdao();
+        if ( dao != null &&
+             dao instanceof foam.dao.MDAO ) {
+          ((foam.dao.MDAO)dao).addIndex(props);
         } else {
-          Logger logger = (Logger) getX().get("logger");
-          if ( logger == null ) {
-            logger = new foam.nanos.logger.StdoutLogger();
-          }
-          logger.warning("Cannot addPropertyIndex to wrapper EasyDAO. Please add it on the innerDAO instead.", props);
+          ((Logger) getX().get("logger")).warning(getName(), "Index not added, no access to MDAO");
         }
         return this;
       `
@@ -1055,14 +1072,12 @@ model from which to test ServiceProvider ID (spid)`,
         return this;
       },
       javaCode: `
-        if ( getInnerDAO() == null && getMdao() != null ) {
-          ((foam.dao.MDAO) getMdao()).addIndex(index);
+        DAO dao = (DAO) getMdao();
+        if ( dao != null &&
+             dao instanceof foam.dao.MDAO ) {
+          ((foam.dao.MDAO)dao).addIndex(index);
         } else {
-          Logger logger = (Logger) getX().get("logger");
-          if ( logger == null ) {
-            logger = new foam.nanos.logger.StdoutLogger();
-          }
-          logger.warning("Cannot addIndex to wrapper EasyDAO. Please add it to the innerDAO instead.", index);
+          ((Logger) getX().get("logger")).warning(getName(), "Index not added, no access to MDAO");
         }
         return this;
       `
