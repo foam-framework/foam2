@@ -226,7 +226,7 @@ foam.CLASS({
         }
 
         if ( getServiceProviderAware() ) {
-         delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX())
+          delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX())
             .setDelegate(delegate)
             .build();
 
