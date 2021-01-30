@@ -43,7 +43,7 @@ foam.CLASS({
         );
         Count count = (Count) alarmDAO.select(COUNT());
         if ( count != null ) {
-          config.setAlarms((Long) count.getValue());
+          config.setAlarms(((Long) count.getValue()).intValue());
         }
 
         Runtime runtime = Runtime.getRuntime();
