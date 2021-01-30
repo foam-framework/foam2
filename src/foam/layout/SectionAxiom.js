@@ -89,10 +89,19 @@ foam.CLASS({
 
       // Add check for at least one visible property (propVisSlot)
       var data = data$.get();
+ 
+      let props;
+      if ( this.hasOwnProperty('properties') ) {
+        props = this.properties.map(p => {
+          if ( foam.String.isInstance(p) ) return cls.getAxiomByName(p);
+          if ( p.name ) return data.cls_.getAxiomByName(p.name).clone().copyFrom(p);
+        });
+      }  else {
+        props = data.cls_.getAxiomsByClass(foam.core.Property)
+          .filter(p => p.section === this.name);
+      }
       var propVisSlot = foam.core.ArraySlot.create({
-        slots: data.cls_.getAxiomsByClass(foam.core.Property).filter(
-          p => p.section == this.name
-        ).map(
+        slots: props.map(
           p => p.createVisibilityFor(data$,
             data.__subContext__.controllerMode$ ||
             (data.__subContext__.ctrl && data.__subContext__.ctrl.controllerMode$) ||
@@ -144,7 +153,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 foam.CLASS({
   package: 'foam.layout',
