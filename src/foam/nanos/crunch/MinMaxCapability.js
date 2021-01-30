@@ -114,8 +114,9 @@ foam.CLASS({
         is less than 'min'
       `,
       javaCode: `
-        if ( ! getEnabled() ) return false; 
-        
+        if ( ! getEnabled() ) return false;
+        if ( getGrantMode() == CapabilityGrantMode.MANUAL ) return false;
+
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         CrunchService crunchService = (CrunchService) x.get("crunchService");
 
@@ -128,9 +129,13 @@ foam.CLASS({
         int numberGrantedNotReopenable = 0;
         for ( var capId : prereqs ) {
           Capability cap = (Capability) capabilityDAO.find(capId);
+          if ( cap.getGrantMode() == CapabilityGrantMode.MANUAL ) {
+            numberGrantedNotReopenable++;
+            continue;
+          }
           if ( cap == null ) throw new RuntimeException("Cannot find prerequisite capability");
           UserCapabilityJunction prereq = crunchService.getJunction(x, capId);
-          if ( prereq != null && prereq.getStatus() == CapabilityJunctionStatus.GRANTED && ! cap.maybeReopen(x, prereq) )
+          if ( prereq != null && ! cap.maybeReopen(x, prereq) )
             numberGrantedNotReopenable++;
         }
         // if there are at least min number granted not reopenable, then no need to reopen capability

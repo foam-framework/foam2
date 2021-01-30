@@ -513,6 +513,7 @@ FOAM_FILES([
   { name: "foam/u2/view/EnumLegendView", flags: ['web'] },
   { name: "foam/u2/view/LoginView", flags: ['web'] },
   { name: "foam/u2/view/ValueView", flags: ['web'] },
+  { name: "foam/u2/view/LiteralValueView", flags: ['web'] },
   { name: "foam/u2/view/PreView", flags: ['web'] },
   { name: "foam/u2/view/TableCellFormatterReadView", flags: ['web'] },
   { name: "foam/u2/view/MultiBoxInputView", flags: ['web'] },

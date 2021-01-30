@@ -235,7 +235,8 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.SUPER();
-      this.currentMemento$ = this.memento.tail$;
+      if ( this.memento )
+        this.currentMemento$ = this.memento.tail$;
 
       var promise = this.data ? Promise.resolve(this.data) : this.config.unfilteredDAO.inX(this.__subContext__).find(this.idOfRecord);
 

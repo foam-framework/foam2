@@ -776,6 +776,10 @@ model from which to test ServiceProvider ID (spid)`,
          }
          System.exit(1);
        }
+
+       if ( getInnerDAO() == null && getMdao() == null ) {
+         setMdao(new foam.dao.MDAO(of_));
+       }
      `
     },
     {
@@ -1022,8 +1026,14 @@ model from which to test ServiceProvider ID (spid)`,
         return this;
       },
       javaCode: `
-        if ( getMdao() != null ) {
+        if ( getInnerDAO() == null && getMdao() != null ) {
           ((foam.dao.MDAO) getMdao()).addIndex(props);
+        } else {
+          Logger logger = (Logger) getX().get("logger");
+          if ( logger == null ) {
+            logger = new foam.nanos.logger.StdoutLogger();
+          }
+          logger.warning("Cannot addPropertyIndex to wrapper EasyDAO. Please add it on the innerDAO instead.", props);
         }
         return this;
       `
@@ -1045,8 +1055,15 @@ model from which to test ServiceProvider ID (spid)`,
         return this;
       },
       javaCode: `
-        if ( getMdao() != null )
+        if ( getInnerDAO() == null && getMdao() != null ) {
           ((foam.dao.MDAO) getMdao()).addIndex(index);
+        } else {
+          Logger logger = (Logger) getX().get("logger");
+          if ( logger == null ) {
+            logger = new foam.nanos.logger.StdoutLogger();
+          }
+          logger.warning("Cannot addIndex to wrapper EasyDAO. Please add it to the innerDAO instead.", index);
+        }
         return this;
       `
     },
@@ -1145,6 +1162,19 @@ model from which to test ServiceProvider ID (spid)`,
         }
       }
       return getDelegate().cmd_(x, obj);
+      `
+    },
+    {
+      name: 'toString',
+      javaCode: `
+        var sb = new StringBuilder();
+        sb.append("EasyDAO");
+        if ( of_ != null ) {
+          sb.append("(of: ")
+            .append(of_.getId())
+            .append(")");
+        }
+        return sb.toString();
       `
     }
   ]

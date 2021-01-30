@@ -27,6 +27,9 @@ foam.CLASS({
       name: 'navTitle'
     },
     {
+      name: 'properties'
+    },
+    {
       name: 'help'
     },
     {
