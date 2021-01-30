@@ -63,8 +63,8 @@ foam.CLASS({
         }
 
         var id = ( pkg ? pkg + '.' : '' ) + name + this.name;
-
-        return X.lookup(id, true) || this;
+        var cls_ = foam.String.isInstance(of) ? X.lookup(of) : of;
+        return ( cls_ && cls_[this.name] ) || X.lookup(id, true) || this;
       };
 
       // ignoreFacets is set to true when called to prevent a second-level
