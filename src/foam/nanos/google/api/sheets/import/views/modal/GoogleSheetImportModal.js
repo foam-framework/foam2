@@ -62,7 +62,7 @@
           if ( columnHeaders ) {
             var arr = [];
             for ( var columnHeader of columnHeaders ) {
-              var prop = this.importConfig.importClassInfo.getAxiomsByClass(foam.core.Property).find(p => ! p.networkTransient && ! foam.core.FObjectProperty.isInstance(p) && ! foam.Array.isInstance(p) && ! foam.core.StringArray.isInstance(p) && ( ( p.label === columnHeader ) || ( this.isColumnHeaderReferncePropertyId(columnHeader, p) ) ) );
+              var prop = this.importConfig.importClassInfo.getAxiomsByClass(foam.core.Property).find(p => ! foam.core.FObjectProperty.isInstance(p) && ! foam.Array.isInstance(p) && ! foam.core.StringArray.isInstance(p) && ( ( p.label === columnHeader ) || ( this.isColumnHeaderReferncePropertyId(columnHeader, p) ) ) );
               var colHeaderConfig = foam.nanos.google.api.sheets.ColumnHeaderToPropertyMapping.create({ of: this.importConfig.importClassInfo, columnHeader: columnHeader, prop: prop, isUnitValueProperty: foam.core.UnitValue.isInstance(prop) });
 
               if ( prop && prop.cls_.id === "foam.core.UnitValue" && prop.unitPropName ) {

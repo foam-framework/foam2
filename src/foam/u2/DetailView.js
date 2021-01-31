@@ -123,6 +123,17 @@ foam.CLASS({
       display: flex;
       padding-top: 8px;
     }
+    ^ tbody {
+      display: grid;
+    }
+
+    ^ .foam-u2-stack-StackView {
+      padding-left: 0!important;
+    }
+
+    ^ .foam-u2-CheckBox {
+      margin: 0px;
+    }
   `,
 
   /*
@@ -191,6 +202,7 @@ foam.CLASS({
         self.currentData = self.data;
 
         var title = self.title && this.E('tr').
+        style({ display: 'contents' }).
           start('td').addClass(this.myClass('title')).attrs({ colspan: 2 }).
             add(self.title$).
           end();
