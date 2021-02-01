@@ -1,14 +1,6 @@
 package foam.lib.query;
 
-import foam.lib.parse.Alt;
-import foam.lib.parse.Literal;
-import foam.lib.parse.LiteralIC;
-import foam.lib.parse.Not;
-import foam.lib.parse.PStream;
-import foam.lib.parse.Parser;
-import foam.lib.parse.ParserContext;
-import foam.lib.parse.Repeat;
-import foam.lib.parse.Seq0;
+import foam.lib.parse.*;
 
 public class AndParser
   extends foam.lib.parse.ProxyParser {
@@ -35,6 +27,6 @@ public class AndParser
 
     and.setArgs(args);
 
-    return ps.setValue(and);
+    return ps.setValue(and.partialEval());
   }
 }
