@@ -70,6 +70,11 @@ foam.CLASS({
           }
           this.clearProperty('indicator');
         }));
+        for ( let delegate of n ) {
+          this.delegatesSub_.onDetach(delegate.saveEvent.sub(() => {
+            this.save();
+          }));
+        }
       }
     },
     {
@@ -117,6 +122,27 @@ foam.CLASS({
     async function load() {
       await Promise.all(this.delegates.map(d => d.load()));
       return await this.wao.load(this);
+    },
+    {
+      name: 'getDataUpdateSub',
+      code: function (o$) {
+        if ( o$ ) return this.SUPER(o$);
+
+        var s = this.SUPER(o$);
+
+        var ss = foam.core.FObject.create();
+
+        s.sub((...args) => { ss.pub(...args); });
+
+        for ( let wizardlet of this.delegates ) {
+          let subSub = wizardlet.getDataUpdateSub();
+          subSub.sub((...args) => {
+            console.log('subSub->sub', args);
+            ss.pub(...args);
+          });
+        }
+        return ss;
+      }
     }
   ]
 });

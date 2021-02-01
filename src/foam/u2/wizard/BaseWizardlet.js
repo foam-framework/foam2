@@ -8,6 +8,8 @@ foam.CLASS({
   package: 'foam.u2.wizard',
   name: 'BaseWizardlet',
 
+  topics: ['saveEvent'],
+
   implements: [
     'foam.u2.wizard.Wizardlet'
   ],
@@ -119,6 +121,7 @@ foam.CLASS({
       this.indicator = this.WizardletIndicator.SAVING;
       var ret = await this.wao.save(this);
       this.clearProperty('indicator');
+      this.saveEvent.pub(ret);
       return ret;
     },
     async function cancel() {
