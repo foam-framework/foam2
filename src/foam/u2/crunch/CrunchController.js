@@ -41,6 +41,7 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.FilterGrantModeAgent',
     'foam.u2.crunch.wizardflow.WizardStateAgent',
     'foam.u2.crunch.wizardflow.RequirementsPreviewAgent',
+    'foam.u2.crunch.wizardflow.AutoSaveWizardletsAgent',
     'foam.u2.crunch.wizardflow.StepWizardAgent',
     'foam.u2.crunch.wizardflow.PutFinalJunctionsAgent',
     'foam.u2.crunch.wizardflow.PutFinalPayloadsAgent',
@@ -108,6 +109,7 @@ foam.CLASS({
           .add(this.LoadWizardletsAgent)
           .add(this.SkipGrantedAgent)
           .add(this.RequirementsPreviewAgent)
+          .add(this.AutoSaveWizardletsAgent)
           .add(this.StepWizardAgent)
           .add(this.PutFinalPayloadsAgent)
           // .add(this.TestAgent)

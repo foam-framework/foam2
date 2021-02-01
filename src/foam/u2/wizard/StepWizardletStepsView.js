@@ -43,6 +43,11 @@ foam.CLASS({
       vertical-align: middle;
       text-transform: uppercase;
     }
+
+    ^ .foam-u2-LoadingSpinner img {
+      width: 24px;
+      height: 24px;
+    }
   `,
 
   imports: [
@@ -50,6 +55,7 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.core.ExpressionSlot',
     'foam.u2.detail.AbstractSectionedDetailView',
     'foam.u2.tag.CircleIndicator',
     'foam.u2.wizard.WizardPosition',
@@ -64,6 +70,7 @@ foam.CLASS({
     function initE() {
       var self = this;
       this
+        .addClass(this.myClass())
         .add(this.slot(function (
           data$wizardlets,
           data$wizardPosition,
@@ -92,22 +99,29 @@ foam.CLASS({
             elem = elem
               .start()
                 .addClass(self.myClass('item'))
-                .start().addClass(self.myClass('step-number-and-title'))
+                .add(this.ExpressionSlot.create({
+                  args: [wizardlet.indicator$],
+                  code: () => {
+                    return self.E().addClass(self.myClass('step-number-and-title'))
 
-                  // Render circle indicator
-                  .start(this.CircleIndicator, this.configureIndicator(
-                    wizardlet, isCurrent, (1 + w - wSkipped)
-                  ))
-                    .addClass('circle')
-                  .end()
+                      // Render circle indicator
+                      .start(this.CircleIndicator, this.configureIndicator(
+                        wizardlet, isCurrent, (1 + w - wSkipped)
+                      ))
+                        .addClass('circle')
+                      .end()
 
-                  // Render title
-                  .start('p').addClass(self.myClass('title'))
-                    .translate(wizardlet.capability.id+'.name', wizardlet.capability.name)
-                    .style({
-                      'color': isCurrent ? this.theme.black : this.theme.grey2
-                    })
-                  .end()
+                      // Render title
+                      .start('p').addClass(self.myClass('title'))
+                        .translate(wizardlet.capability.id+'.name', wizardlet.capability.name)
+                        .style({
+                          'color': isCurrent ? this.theme.black : this.theme.grey2
+                        })
+                      .end()
+                      ;
+                  }
+                }))
+                .start()
                 .end();
 
             // Get section index to highlight current section
@@ -184,6 +198,14 @@ foam.CLASS({
           icon: this.theme.glyphs.checkmark.getDataUrl({
             fill: this.theme.white
           }),
+        };
+      } else if ( wizardlet.indicator == this.WizardletIndicator.SAVING ) {
+        args = {
+          ...args,
+          indicateProcessing: true,
+          borderColor: this.theme.grey2,
+          borderColorHover: this.theme.grey2,
+          label: '' + number
         };
       } else {
         args = {

@@ -59,7 +59,9 @@ foam.CLASS({
         if ( prop ) prop.set(loadedData, wizardlet.capability);
 
       // Finally, apply new data to wizardlet
+      wizardlet.loading = true;
       wizardlet.data = loadedData;
+      wizardlet.loading = false;
     }
   ]
 });

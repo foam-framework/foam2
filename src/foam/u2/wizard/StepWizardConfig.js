@@ -21,6 +21,11 @@ foam.CLASS({
       class: 'Boolean',
       name: 'allowBacktracking',
       value: true
+    },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'wizardView',
+      value: { class: 'foam.u2.wizard.IncrementalStepWizardView' }
     }
   ],
 

@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.u2.wizard',
-  name: 'StepWizardletView',
+  name: 'IncrementalStepWizardView',
   extends: 'foam.u2.View',
 
   documentation: `Displays wizardlets in individual screens.`,
@@ -211,7 +211,7 @@ foam.CLASS({
           .start(this.GUnit, { columns: 8 })
             .addClass(this.myClass('rightside'))
             .add(this.slot(function(hideX) {
-              return hideX ? 
+              return hideX ?
                 null :
                 this.E().addClass(this.myClass('top-buttons'))
                 .start(this.CircleIndicator, {
