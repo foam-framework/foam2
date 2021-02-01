@@ -7,9 +7,14 @@
 foam.CLASS({
   package: 'foam.flow',
   name: 'DocumentationFolderDAO',
+  extends: 'foam.dao.AbstractDAO',
+
+  documentation: 'Loads/stores documentation models from a directory of HTML markup.  Useful for saving and editing documentation in a version control repository.',
+
   requires: [
     'foam.flow.Document'
   ],
+
   javaImports: [
     'foam.nanos.fs.Storage',
     'java.nio.charset.StandardCharsets',
@@ -17,8 +22,7 @@ foam.CLASS({
     'java.util.Set',
     'java.io.OutputStream'
   ],
-  documentation: 'Loads/stores documentation models from a directory of HTML markup.  Useful for saving and editing documentation in a version control repository.',
-  extends: 'foam.dao.AbstractDAO',
+
   properties: [
     {
       name: 'of',
@@ -46,8 +50,12 @@ return new foam.nanos.fs.FallbackStorage(
 Storage storage = getStorage();
 
 sink = prepareSink(sink);
+// foam.mlang.order.Comparator[] comparator = new foam.mlang.order.Comparator[] {
+//   foam.flow.Document.TITLE),
+//   order
+// })
 
-foam.dao.Sink         decorated = decorateSink_(sink, skip, limit, order, predicate);
+foam.dao.Sink         decorated = decorateSink_(sink, skip, limit, foam.flow.Document.ID, predicate);
 foam.dao.Subscription sub       = new foam.dao.Subscription();
 
 Set<String> paths = null;
