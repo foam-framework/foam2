@@ -96,6 +96,32 @@ It then marshalls it to the primary mediator, and waits on a response.`,
   ],
 
   methods: [
+    // {
+    //   name: 'find_',
+    //   javaCode: `
+    //   ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+    //   ClusterConfig config = support.getConfig(x, support.getConfigId());
+
+
+    //   if ( config.getIsPrimary() ) {
+    //     return getMdao().find_(x, id);
+    //   }
+    //   return getDelegate().find_(x, id);
+    //   `
+    // },
+    // {
+    //   name: 'select_',
+    //   javaCode: `
+    //   ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+    //   ClusterConfig config = support.getConfig(x, support.getConfigId());
+
+
+    //   if ( config.getIsPrimary() ) {
+    //     return getMdao().select_(x, sink, skip, limit, order, predicate);
+    //   }
+    //   return getDelegate().select_(x, sink, skip, limit, order, predicate);
+    //   `
+    // },
     {
       name: 'put_',
       javaCode: `
