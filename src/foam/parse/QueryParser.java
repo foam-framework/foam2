@@ -8,20 +8,9 @@ package foam.parse;
 
 import foam.core.ClassInfo;
 import foam.core.PropertyInfo;
-import foam.lib.parse.Alt;
-import foam.lib.parse.Parser;
-import foam.lib.parse.ParserContext;
-import foam.lib.parse.ProxyParser;
-import foam.lib.parse.PStream;
-import foam.lib.query.AndParser;
-import foam.lib.query.HasParser;
-import foam.lib.query.IsInstanceOfParser;
-import foam.lib.query.IsParser;
-import foam.lib.query.MeParser;
-import foam.lib.query.NegateParser;
-import foam.lib.query.OrParser;
-import foam.lib.query.ParenParser;
-import foam.lib.query.PropertyExpressionParser;
+import foam.lib.parse.*;
+import foam.lib.query.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,10 +42,14 @@ public class QueryParser
     Parser[] parsers = expressions.toArray(new Parser[expressions.size()]);
     Parser altParser = new Alt(parsers);
 
+    var orAnd = new OrParser(new AndParser(altParser));
     setDelegate(new Alt(
-      new ParenParser(new OrParser(new AndParser(altParser))),
-      new ParenParser(new OrParser(new ParenParser(new AndParser(altParser)))),
-      new OrParser(new AndParser(altParser))));
+      new OrParser(new Alt(
+        new AndParser(new Alt(new ParenParser(orAnd), altParser)),
+        new ParenParser(orAnd),
+        orAnd)),
+      new AndParser(new Alt(new ParenParser(orAnd), altParser))
+    ));
   }
 
   @Override
