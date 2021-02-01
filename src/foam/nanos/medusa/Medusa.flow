@@ -1,51 +1,41 @@
 <title>Medusa</title>
+<h1>Medusa</h1>
+<h1>Overview</h1>
+<p>Medusa is nanopay’s high availability system.  Offering fault-tolerance, data redundancy, scalability, data protection.</p>
 
-<h2>Issues</h2>
-<ol>
-  <li></li>
-</ol>
+<p>Why does nanopay have to implement their own high availability system?
+Industry offerings are centered around traditional databases. Since nanopay employs a journal (or blockchain) for all storage, an in-house solution was required. Additionally, order-of-operations is important and it is not possible to order operations when each DAO is stored in it’s own journal.  A single ordered journal is necessary.</p>
 
-<h2>Quirks</h2>
+<p>The Medusa system is composed of Mediators and Nodes.  Nodes are responsible for physical data persistence.  Each Node maintains a unique file based blockchain of entries it has received.  Mediators receive and execute Client requests, store the results via the Nodes, and respond to the Client when the results have been stored by a quorum (majority) of Nodes.</p>
+
+<h1>Setup</h1>
+<p>See deployment/cluster_1/README.txt or deployment/cluster_2/README.txt for instructions deploying a local cluster of 1+1 or 2+2.</p>
+
+<h1>Functional Overview</h1>
+<h2>Replay</h2>
+<h2>DR Sync</h2>
+
+<h1>Implementation Overview</h1>
+<h2>TODO</h2>
 <ul>
-  <li></li>
+<li>Index gap detection and recovery</li>
+<li></li>
 </ul>
 
-<h2>Setup</h2>
-<h3>Development</h3>
-For local development add the following entries to /etc/hosts
-<ul>
-  <li>127.0.0.1  mm1</li>
-  <li>127.0.0.1  mm2</li>
-  <li>127.0.0.1  mm3</li>
-  <li>127.0.0.1  mn1</li>
-  <li>127.0.0.1  mn2</li>
-  <li>127.0.0.1  mn3</li>
-</ul>
+<h1>Terms and Definitions</h1>
+<dl>
+<dt>Replay</dt>
+<dd><p>Replay is the act of loading a journal from the filesystem into memory.  On startup the Nodes will replay once to validate their journal, and to determine the mininum and maximum index they have.  The mediators will request replay from the nodes.</p>
+<p>A Mediator monitors for Nodes on the network and requests Replay when the Node is ONLINE.  The Node then <i>puts</i> it's entries to the Mediator</p>
+<p>Replay is considered completed when a Mediator has reached consensus on all ledger entries from a quorum of Nodes.</p></dd>
 
-<h4>Building and Launching</h4>
-Build and deploy in the following order. The first build in each group must be clean -c, so to assemble the correct journals.  Else you may end up with a Node build with Mediator journals.
-NOTE: using -j will clear the existing ledger. Use with caution.
-<ol>
-  <li>./build.sh -uJcluster,cluster_l,mn -Nmn1 -W8100 -c</li>
-  <li>./build.sh -uJcluster,cluster_l,mn -Nmn2 -W8110</li>
-  <li>./build.sh -uJcluster,cluster_l,mn -Nmn3 -W8120</li>
-  <li>./build.sh -uJcluster,cluster_l,mm -Nmm1 -W8080 -c</li>
-  <li>./build.sh -uJcluster,cluster_l,mn -Nmm2 -W8085</li>
-  <li>./build.sh -uJcluster,cluster_l,mn -Nmm3 -W8090</li>
-</ol>
+<dt>Status</dt>
+<dd><p>There are two <i>status</i> values: <b>ONLINE</b> and <b>OFFLINE</b></p>
+<p>A Mediator is ONLINE when Replay is complete and the electorate Primary is IN-SESSION.</p>
+<p>A Node is ONLINE when it's initial Replay is complete.</p></dd>
+</dl>
 
-<h2>Topics</h2>
-<h3>Replay</h3>
-Replay is the act of loading a ledger into memory. From a file based journal into an MDAO.
-A Mediator monitors for Nodes on the network and requests Replay when the Node is ONLINE.  The Node initiates Batched sending of it's ledger entries to the Mediator.
-Replay is considered completed when a Mediator has reached consensus on all ledger entries from a quorum of Nodes.
 
-<h3>Status: ONLINE | OFFLINE<h3>
-A Mediator is ONLINE when Replay is complete and the electorate Primary is IN-SESSION.
-A Node is ONLINE when it's internal Replay (from ledger to MDAO) is complete.
-
-<h3>Viewing Data</h3>
-Presently both the Nodes and Mediators can be logged into with the admin account.
-<ul>
-  <li>Ledger data is visiable from menu <b>Medusa Entry</b></li>
-</ul>
+<h1>Viewing Data</h1>
+<p>Medusa entries can view from the Mediators.</p>
+<p>Menu <b>Medusa Entry</b></p>
