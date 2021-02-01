@@ -152,8 +152,8 @@ foam.CLASS({
     async function initE() {
       var self = this;
       this.onDetach(this.active_$.follow(this.overlay_.opened$));
-      this.data.map((action) => action.createIsAvailable$(this.__context__, this.obj));
-      if ( ! this.data.length > 0 ) return;
+      var dataSlots = this.data.map((action) => action.createIsAvailable$(this.__context__, this.obj));
+      if  ( ! dataSlots.filter(slot => slot.get()).length > 0 ) return;
 
       this.
         addClass(this.myClass()).
