@@ -205,14 +205,10 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       if ( DOP.PUT == dop ) {
         FObject result = cmd.getData();
         if ( result != null ) {
-          FObject nu = getDelegate().put_(x, result);
+          FObject nu = getDelegate().find_(x, result.getProperty("id"));
           if ( nu == null ) {
-            getLogger().debug("update", dop.getLabel(), "delegate", "put", result.getProperty("id"), "null");
-          } else {
-            FObject f = getDelegate().find_(x, nu.getProperty("id"));
-            if ( f == null ) {
-              getLogger().warning("update", dop.getLabel(), "delegate", "find", result.getProperty("id"), "null");
-            }
+            // Occurs if we've clustered a NullDAO (EasyDAO nullify)
+            getLogger().warning("update", dop.getLabel(), "delegate", "find", result.getProperty("id"), "null");
           }
           return nu;
         }
@@ -220,13 +216,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         getLogger().warning("update", dop.getLabel(), obj.getProperty("id"), "result,null");
         return result;
       } else { // if ( DOP.REMOVE == dop ) {
-        FObject r = getDelegate().remove_(x, obj);
-        FObject f = getDelegate().find_(x, obj.getProperty("id"));
-        if ( f != null ) {
-          // TODO/REVIEW
-          getLogger().warning("update", dop.getLabel(), "delegate", "find", obj.getProperty("id"), "not null");
-        }
-        return r;
+        return getDelegate().remove_(x, obj);
       }
       `
     },
