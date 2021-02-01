@@ -1,28 +1,30 @@
 /**
  * @license
- * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * Copyright 2021 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
   package: 'foam.u2.crunch.wizardflow',
   name: 'AutoSaveWizardletsAgent',
-
-  implements: [
-    'foam.core.ContextAgent',
-  ],
+  documentation: `
+    Binds listeners which automatically save wizardlets when they are modified.
+  `,
 
   imports: [
-    'wizardlets',
+    'wizardlets'
+  ],
+
+  implements: [
+    'foam.core.ContextAgent'
   ],
 
   methods: [
-    // If Property expressions ever unwrap promises this method can be blank.
     async function execute() {
-      for ( let wizardlet of this.wizardlets ) if ( wizardlet.of ) {
+      for ( let wizardlet of this.wizardlets ) {
         wizardlet.getDataUpdateSub().sub(() => {
-          wizardlet.save();
-        });
+          if ( wizardlet.isValid ) wizardlet.save();
+        })
       }
     }
   ]
