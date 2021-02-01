@@ -111,7 +111,8 @@ public class NSpecFactory
     ) {
       logger.info("Invalidated Service", spec_.getName());
       if ( ns_ instanceof DAO ) {
-        ((ProxyDAO) ns_).setDelegate(null);
+        logger.warning("Invalidation of DAO Service not supported.", spec_.getName());
+        // ((ProxyDAO) ns_).setDelegate(null);
       } else {
         ns_ = null;
       }
