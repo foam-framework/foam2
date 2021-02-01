@@ -366,3 +366,5 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.Advanced
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.AdvancedFilterView.CLOSE_MODAL.label",target:"Cancelar"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.AdvancedFilterView.CLEAR_ALL.label",target:"Limpar mudanças"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.AdvancedFilterView.FILTER.label",target:"Aplicar filtros"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.FObjectView.PLACEHOLDER_TEXT",target:"selecionar..."})

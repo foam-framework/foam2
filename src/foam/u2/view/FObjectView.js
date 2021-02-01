@@ -20,6 +20,10 @@ foam.CLASS({
     'foam.core.Latch'
   ],
 
+  messages: [
+    { name: 'PLACEHOLDER_TEXT', message: 'select...' }
+  ],
+
   properties: [
     {
       class: 'foam.core.FObjectProperty',
@@ -73,6 +77,12 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'skipBaseClass',
+      documentation: 'If true, skips of base-class as a choice when no strategies fetched.',
+      value: false
+    },
+    {
+      class: 'Boolean',
       name: 'allowCustom',
       expression: function(choices) {
         return choices.length == 0;
@@ -107,6 +117,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'placeholder',
+      factory: function() {
+        return this.PLACEHOLDER_TEXT;
+      },
       documentation: 'If no placeholder, the choiceView will select the first element',
     },
     {
@@ -163,7 +176,7 @@ foam.CLASS({
       if ( this.strategizer != null ) {
         this.strategizer.query(null, this.of.id, null, this.predicate).then((strategyReferences) => {
           if ( ! Array.isArray(strategyReferences) || strategyReferences.length === 0 ) {
-            this.choices = [[this.of.id, this.of.model_.label]];
+            this.choices = this.skipBaseClass ? [] : [[this.of.id, this.of.model_.label]];
             this.choicesLoaded.resolve();
             return;
           }

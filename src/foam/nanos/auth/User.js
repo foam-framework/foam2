@@ -139,129 +139,10 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       section: 'userInformation',
-      order: 1,
+      order: 10,
+      gridColumns: 6,
       includeInDigest: true,
       sheetsOutput: true
-    },
-    {
-      class: 'Boolean',
-      name: 'enabled',
-      documentation: 'Determines whether the User is permitted certain actions.',
-      value: true,
-      includeInDigest: true,
-      section: 'systemInformation',
-      gridColumns: 6
-    },
-    {
-      class: 'Boolean',
-      name: 'loginEnabled',
-      documentation: 'Determines whether the User can login to the platform.',
-      writePermissionRequired: true,
-      includeInDigest: false,
-      value: true,
-      section: 'systemInformation',
-      order: 30,
-      gridColumns: 6,
-    },
-    {
-      class: 'DateTime',
-      name: 'lastLogin',
-      includeInDigest: false,
-      documentation: 'The date and time of last login by User.',
-      section: 'operationsInformation',
-      order: 30,
-      gridColumns: 6,
-      createVisibility: 'HIDDEN',
-      updateVisibility: 'RO'
-    },
-    {
-      class: 'String',
-      name: 'firstName',
-      shortName: 'fn',
-      documentation: 'The first name of the User.',
-      gridColumns: 6,
-      section: 'userInformation',
-      order: 2,
-      includeInDigest: true,
-      containsPII: true
-   },
-    {
-      class: 'String',
-      name: 'middleName',
-      documentation: 'The middle name of the User.',
-      gridColumns: 6,
-      section: 'userInformation',
-      order: 3,
-      includeInDigest: true,
-      containsPII: true
-    },
-    {
-      class: 'String',
-      name: 'lastName',
-      shortName: 'ln',
-      documentation: 'The last name of the User.',
-      gridColumns: 6,
-      section: 'userInformation',
-      order: 4,
-      includeInDigest: true,
-      containsPII: true
-    },
-    {
-      name: 'legalName',
-      createVisibility: 'HIDDEN',
-      updateVisibility: 'RO',
-      section: 'userInformation',
-      order: 5,
-      gridColumns: 6,
-      includeInDigest: false,
-      containsPII: true
-    },
-    {
-      class: 'String',
-      name: 'jobTitle',
-      includeInDigest: false,
-      containsPII: false,
-      documentation: 'The job title of the individual person, or real user.',
-      section: 'ownerInformation',
-      gridColumns: 6,
-      view: function(args, X) {
-        return {
-          class: 'foam.u2.view.ChoiceWithOtherView',
-          otherKey: 'Other',
-          choiceView: {
-            class: 'foam.u2.view.ChoiceView',
-            placeholder: 'Please select...',
-            dao: X.jobTitleDAO,
-            objToChoice: function(a) {
-              return [a.name, a.label];
-            }
-          }
-        };
-      }
-    },
-    {
-      class: 'String',
-      name: 'organization',
-      includeInDigest: false,
-      containsPII: false,
-      documentation: 'The organization/business associated with the User.',
-      displayWidth: 80,
-      width: 100,
-      tableWidth: 160,
-      section: 'businessInformation',
-      gridColumns: 6
-    },
-    {
-      class: 'String',
-      name: 'department',
-      includeInDigest: false,
-      containsPII: false,
-      documentation: `The department associated with the organization/business
-        of the User.`,
-      width: 50,
-      createVisibility: 'HIDDEN',
-      section: 'ownerInformation',
-      gridColumns: 6
     },
     {
       class: 'String',
@@ -271,7 +152,131 @@ foam.CLASS({
       containsPII: false,
       documentation: 'The username of the User.',
       section: 'userInformation',
-      order: 7,
+      order: 20,
+      gridColumns: 6
+    },
+    {
+      class: 'Boolean',
+      name: 'loginEnabled',
+      documentation: 'Determines whether the User can login to the platform.',
+      writePermissionRequired: true,
+      includeInDigest: false,
+      value: true,
+      section: 'userInformation',
+      order: 30,
+      gridColumns: 6,
+    },
+    {
+      class: 'DateTime',
+      name: 'lastLogin',
+      includeInDigest: false,
+      documentation: 'The date and time of last login by User.',
+      section: 'userInformation',
+      order: 40,
+      gridColumns: 6,
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO'
+    },
+    {
+      class: 'DateTime',
+      name: 'passwordExpiry',
+      includeInDigest: false,
+      documentation: `The date and time that the current password of the User
+        will expire.`,
+      section: 'userInformation',
+      order: 50,
+      gridColumns: 6
+    },
+    {
+      class: 'DateTime',
+      name: 'passwordLastModified',
+      includeInDigest: false,
+      documentation: 'The date and time that the password was last modified.',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'userInformation',
+      order: 60,
+      gridColumns: 6
+    },
+    {
+      class: 'String',
+      name: 'firstName',
+      shortName: 'fn',
+      documentation: 'The first name of the User.',      
+      section: 'userInformation',
+      order: 70,
+      gridColumns: 6,
+      includeInDigest: true,
+      containsPII: true
+   },
+    {
+      class: 'String',
+      name: 'middleName',
+      documentation: 'The middle name of the User.',
+      section: 'userInformation',
+      order: 80,
+      gridColumns: 6,
+      includeInDigest: true,
+      containsPII: true
+    },
+    {
+      class: 'String',
+      name: 'lastName',
+      shortName: 'ln',
+      documentation: 'The last name of the User.',
+      section: 'userInformation',
+      order: 90,
+      gridColumns: 6,
+      includeInDigest: true,
+      containsPII: true
+    },
+    {
+      name: 'legalName',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'userInformation',
+      order: 100,
+      gridColumns: 6,
+      includeInDigest: false,
+      containsPII: true
+    },
+    {
+      class: 'Date',
+      name: 'birthday',
+      includeInDigest: false,
+      containsPII: false,
+      documentation: 'The date of birth of the individual person, or real user.',
+      section: 'userInformation',
+      order: 120,
+      gridColumns: 6
+    },
+    {
+      class: 'Reference',
+      name: 'language',
+      includeInDigest: false,
+      containsPII: false,
+      documentation: 'The default language preferred by the User.',
+      of: 'foam.nanos.auth.Language',
+      createVisibility: 'HIDDEN',
+      section: 'userInformation',
+      order: 130,
+      gridColumns: 6,
+      factory: function() {
+        return foam.nanos.auth.LanguageId.create({code: 'en'})
+      },
+      javaFactory: `
+        return new foam.nanos.auth.LanguageId.Builder(null).setCode("en").build();
+      `
+    },
+    {
+      class: 'String',
+      name: 'timeZone',
+      includeInDigest: false,
+      documentation: 'The preferred time zone of the User.',
+      width: 5,
+      createVisibility: 'HIDDEN',
+      section: 'userInformation',
+      order: 140,
       gridColumns: 6
     },
     {
@@ -290,7 +295,7 @@ foam.CLASS({
       `email_ = val.toLowerCase();
        emailIsSet_ = true;`,
       section: 'userInformation',
-      order: 6,
+      order: 150,
       gridColumns: 6
     },
     {
@@ -299,9 +304,41 @@ foam.CLASS({
       includeInDigest: false,
       documentation: 'Determines whether the email address of the User is valid.',
       writePermissionRequired: true,
-      section: 'operationsInformation',
-      order: 35,
+      section: 'userInformation',
+      order: 160,
       gridColumns: 6
+    },
+    {
+      class: 'URL',
+      name: 'website',
+      includeInDigest: false,
+      documentation: 'A URL link to the website of the User.',
+      displayWidth: 80,
+      width: 2048,
+      validateObj: function(website) {
+        var websiteRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,})/;
+
+        if ( website.length > 0 && ! websiteRegex.test(website) ) {
+          return 'Invalid website';
+        }
+      },
+      createVisibility: 'HIDDEN',
+      section: 'userInformation',
+      order: 170,
+      gridColumns: 6
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.Address',
+      name: 'address',
+      documentation: 'Returns the postal address from the Address model.',
+      includeInDigest: false,
+      containsPII: true,
+      factory: function() {
+        return this.Address.create();
+      },
+      section: 'userInformation',
+      order: 180
     },
     {
       class: 'PhoneNumber',
@@ -310,6 +347,7 @@ foam.CLASS({
       containsPII: true,
       documentation: 'Personal phone number.',
       section: 'userInformation',
+      order: 190,
       gridColumns: 6
     },
     {
@@ -317,9 +355,9 @@ foam.CLASS({
       name: 'phoneNumberVerified',
       includeInDigest: false,
       writePermissionRequired: true,
-      section: 'operationsInformation',
-      gridColumns: 6,
-      order: 40
+      section: 'userInformation',
+      order: 200,
+      gridColumns: 6
     },
     {
       class: 'PhoneNumber',
@@ -328,6 +366,7 @@ foam.CLASS({
       documentation: 'Returns the mobile phone number of the User from the Phone model.',
       createVisibility: 'HIDDEN',
       section: 'userInformation',
+      order: 210,
       gridColumns: 6
     },
     {
@@ -335,9 +374,174 @@ foam.CLASS({
       name: 'mobileNumberVerified',
       includeInDigest: false,
       writePermissionRequired: true,
-      section: 'operationsInformation',
+      section: 'userInformation',
+      order: 220,
+      gridColumns: 6
+    },
+    {
+      class: 'foam.nanos.fs.FileProperty',
+      name: 'profilePicture',
+      includeInDigest: false,
+      containsPII: true,
+      documentation: `The profile picture of the individual user, initially
+        defaulting to a placeholder picture.`,
+      view: {
+        class: 'foam.nanos.auth.ProfilePictureView',
+        placeholderImage: 'images/ic-placeholder.png'
+      },
+      section: 'userInformation',
+      order: 230,
+      gridColumns: 6
+    },
+    {
+      class: 'String',
+      name: 'note',
+      documentation: 'A field for a note that can be added and appended to the User.',
+      displayWidth: 70,
+      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 },
+      section: 'userInformation',
+      order: 240
+    },
+    {
+      class: 'DateTime',
+      name: 'created',
+      includeInDigest: true,
+      documentation: 'The date and time of when the User was created in the system.',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'userInformation',
+      order: 250,
       gridColumns: 6,
-      order: 45
+      includeInDigest: true
+    },
+    {
+      class: 'DateTime',
+      name: 'lastModified',
+      includeInDigest: true,
+      documentation: 'The date and time the User was last modified.',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      storageOptional: true,
+      section: 'userInformation',
+      order: 260,
+      gridColumns: 6
+    },
+    {
+      class: 'String',
+      name: 'organization',
+      includeInDigest: false,
+      containsPII: false,
+      documentation: 'The organization/business associated with the User.',
+      displayWidth: 80,
+      width: 100,
+      tableWidth: 160,
+      section: 'businessInformation',
+      order: 10,
+      gridColumns: 6
+    },
+    {
+      class: 'String',
+      name: 'businessName',
+      includeInDigest: false,
+      documentation: 'The name of the business associated with the User.',
+      width: 50,
+      section: 'businessInformation',
+      order: 15,
+      gridColumns: 6,
+      tableWidth: 170
+    },
+    {
+      class: 'String',
+      name: 'department',
+      includeInDigest: false,
+      containsPII: false,
+      documentation: `The department associated with the organization/business
+        of the User.`,
+      width: 50,
+      createVisibility: 'HIDDEN',
+      section: 'businessInformation',
+      order: 20,
+      gridColumns: 6
+    },
+    {
+      class: 'String',
+      name: 'jobTitle',
+      includeInDigest: false,
+      containsPII: false,
+      documentation: 'The job title of the individual person, or real user.',
+      section: 'businessInformation',
+      order: 30,
+      gridColumns: 6,
+      view: function(args, X) {
+        return {
+          class: 'foam.u2.view.ChoiceWithOtherView',
+          otherKey: 'Other',
+          choiceView: {
+            class: 'foam.u2.view.ChoiceView',
+            placeholder: 'Please select...',
+            dao: X.jobTitleDAO,
+            objToChoice: function(a) {
+              return [a.name, a.label];
+            }
+          }
+        };
+      }
+    },
+    {
+      class: 'StringArray',
+      name: 'disabledTopics',
+      includeInDigest: false,
+      documentation: 'Disables types for notifications.',
+      createVisibility: 'HIDDEN',
+      section: 'operationsInformation',
+      order: 80,
+      gridColumns: 6,
+      javaPostSet: `
+        clearDisabledTopicSet();
+      `
+    },
+    {
+      class: 'foam.core.Enum',
+      of: 'foam.nanos.auth.LifecycleState',
+      name: 'lifecycleState',
+      includeInDigest: true,
+      section: 'systemInformation',
+      order: 40,
+      gridColumns: 6,
+      value: foam.nanos.auth.LifecycleState.PENDING,
+      writePermissionRequired: true
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
+      name: 'spid',
+      includeInDigest: true,
+      tableWidth: 120,
+      section: 'systemInformation',
+      order: 50,
+      gridColumns: 6,
+      writePermissionRequired:true,
+      documentation: `
+        Need to override getter to return "" because its trying to
+        return null (probably as a result of moving order of files
+        in nanos), which breaks tests
+      `,
+      javaGetter: `
+        if ( ! spidIsSet_ ) {
+          return "";
+        }
+        return spid_;
+      `
+    },
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      documentation: 'Determines whether the User is permitted certain actions.',
+      value: true,
+      includeInDigest: true,
+      section: 'systemInformation',
+      order: 90,
+      gridColumns: 6
     },
     {
       class: 'String',
@@ -354,68 +558,8 @@ foam.CLASS({
       `,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      section: 'userInformation',
-      gridColumns: 6
-    },
-    {
-      class: 'Date',
-      name: 'birthday',
-      includeInDigest: false,
-      containsPII: false,
-      documentation: 'The date of birth of the individual person, or real user.',
-      section: 'userInformation',
-      gridColumns: 6
-    },
-    {
-      class: 'foam.nanos.fs.FileProperty',
-      name: 'profilePicture',
-      includeInDigest: false,
-      containsPII: true,
-      documentation: `The profile picture of the individual user, initially
-        defaulting to a placeholder picture.`,
-      view: {
-        class: 'foam.nanos.auth.ProfilePictureView',
-        placeholderImage: 'images/ic-placeholder.png'
-      },
-      section: 'systemInformation'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Address',
-      includeInDigest: false,
-      containsPII: true,
-      name: 'address',
-      documentation: 'Returns the postal address from the Address model.',
-      factory: function() {
-        return this.Address.create();
-      },
-      section: 'userInformation'
-    },
-    {
-      class: 'Reference',
-      name: 'language',
-      includeInDigest: false,
-      containsPII: false,
-      documentation: 'The default language preferred by the User.',
-      of: 'foam.nanos.auth.Language',
-      createVisibility: 'HIDDEN',
-      section: 'userInformation',
-      gridColumns: 6,
-      factory: function() {
-        return foam.nanos.auth.LanguageId.create({code: 'en'})
-      },
-      javaFactory: `
-        return new foam.nanos.auth.LanguageId.Builder(null).setCode("en").build();
-      `
-    },
-    {
-      class: 'String',
-      name: 'timeZone',
-      includeInDigest: false,
-      documentation: 'The preferred time zone of the User.',
-      width: 5,
-      createVisibility: 'HIDDEN',
-      section: 'userInformation',
+      section: 'systemInformation',
+      order: 100,
       gridColumns: 6
     },
     {
@@ -438,6 +582,7 @@ foam.CLASS({
       updateVisibility: 'RW',
       readVisibility: 'HIDDEN',
       section: 'systemInformation',
+      order: 110,
       gridColumns: 6
     },
     {
@@ -446,8 +591,17 @@ foam.CLASS({
       includeInDigest: true,
       documentation: 'The password that is currently active with the User.',
       hidden: true,
+      networkTransient: true
+    },
+    {
+      class: 'Password',
+      name: 'previousPassword',
+      includeInDigest: false,
+      documentation: 'The password that was previously active with the User.',
+      hidden: true,
       networkTransient: true,
-      section: 'systemInformation'
+      section: 'systemInformation',
+      order: 120
     },
     {
       name: 'passwordHistory',
@@ -463,60 +617,10 @@ foam.CLASS({
       `,
       hidden: true,
       networkTransient: true,
-      section: 'systemInformation',
       createVisibility: 'HIDDEN',
+      section: 'systemInformation',
+      order: 130,
       updateVisibility: 'RO'
-    },
-    {
-      class: 'Password',
-      name: 'previousPassword',
-      includeInDigest: false,
-      documentation: 'The password that was previously active with the User.',
-      hidden: true,
-      networkTransient: true,
-      section: 'systemInformation'
-    },
-    {
-      class: 'DateTime',
-      name: 'passwordLastModified',
-      includeInDigest: false,
-      documentation: 'The date and time that the password was last modified.',
-      createVisibility: 'HIDDEN',
-      updateVisibility: 'RO',
-      section: 'systemInformation',
-      order: 40,
-      gridColumns: 6
-    },
-    {
-      class: 'DateTime',
-      name: 'passwordExpiry',
-      includeInDigest: false,
-      documentation: `The date and time that the current password of the User
-        will expire.`,
-      section: 'systemInformation',
-      order: 41,
-      gridColumns: 6
-    },
-    {
-      class: 'String',
-      name: 'businessName',
-      includeInDigest: false,
-      documentation: 'The name of the business associated with the User.',
-      width: 50,
-      section: 'businessInformation',
-      gridColumns: 6,
-      tableWidth: 170
-    },
-    {
-      class: 'StringArray',
-      name: 'disabledTopics',
-      includeInDigest: false,
-      documentation: 'Disables types for notifications.',
-      createVisibility: 'HIDDEN',
-      section: 'operationsInformation',
-      javaPostSet: `
-        clearDisabledTopicSet();
-      `
     },
     {
       class: 'Object',
@@ -532,87 +636,6 @@ foam.CLASS({
           set.add(s);
         }
         return set;
-      `
-    },
-    {
-      class: 'URL',
-      name: 'website',
-      includeInDigest: false,
-      documentation: 'A URL link to the website of the User.',
-      displayWidth: 80,
-      width: 2048,
-      validateObj: function(website) {
-        var websiteRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,})/;
-
-        if ( website.length > 0 && ! websiteRegex.test(website) ) {
-          return 'Invalid website';
-        }
-      },
-      createVisibility: 'HIDDEN',
-      section: 'userInformation',
-      gridColumns: 6
-    },
-    {
-      class: 'String',
-      name: 'note',
-      documentation: 'A field for a note that can be added and appended to the User.',
-      displayWidth: 70,
-      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 },
-      section: 'userInformation'
-    },
-    {
-      class: 'DateTime',
-      name: 'created',
-      includeInDigest: true,
-      documentation: 'The date and time of when the User was created in the system.',
-      createVisibility: 'HIDDEN',
-      updateVisibility: 'RO',
-      section: 'userInformation',
-      gridColumns: 6,
-      includeInDigest: true
-    },
-    {
-      class: 'DateTime',
-      name: 'lastModified',
-      includeInDigest: true,
-      documentation: 'The date and time the User was last modified.',
-      createVisibility: 'HIDDEN',
-      updateVisibility: 'RO',
-      storageOptional: true,
-      section: 'userInformation',
-      gridColumns: 6
-    },
-    {
-      class: 'foam.core.Enum',
-      of: 'foam.nanos.auth.LifecycleState',
-      name: 'lifecycleState',
-      includeInDigest: true,
-      section: 'systemInformation',
-      order: 20,
-      gridColumns: 6,
-      value: foam.nanos.auth.LifecycleState.PENDING,
-      writePermissionRequired: true
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.ServiceProvider',
-      name: 'spid',
-      includeInDigest: true,
-      tableWidth: 120,
-      section: 'systemInformation',
-      order: 15,
-      gridColumns: 6,
-      writePermissionRequired:true,
-      documentation: `
-        Need to override getter to return "" because its trying to
-        return null (probably as a result of moving order of files
-        in nanos), which breaks tests
-      `,
-      javaGetter: `
-        if ( ! spidIsSet_ ) {
-          return "";
-        }
-        return spid_;
       `
     }
   ],
@@ -826,8 +849,8 @@ foam.RELATIONSHIP({
   },
   targetProperty: {
     hidden: false,
-    section: 'systemInformation',
-    order: 10,
+    section: 'administrative',
+    order: 30,
     gridColumns: 6
   }
 });
@@ -855,14 +878,14 @@ foam.RELATIONSHIP({
   sourceProperty: {
     createVisibility: 'HIDDEN',
     label: 'Businesses',
-    section: 'ownerInformation',
-    order: 10
+    section: 'businessInformation',
+    order: 50
   },
   targetProperty: {
     createVisibility: 'HIDDEN',
     label: 'Agents of Business',
-    section: 'ownerInformation',
-    order: 11
+    section: 'businessInformation',
+    order: 40
   }
 });
 
@@ -892,6 +915,7 @@ foam.RELATIONSHIP({
   },
   targetProperty: {
     section: 'systemInformation',
+    order: 60,
     gridColumns: 6
   }
 });

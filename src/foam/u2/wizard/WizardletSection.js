@@ -79,17 +79,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function activateProxySlot() {
-      var proxy$ = foam.core.ProxySlot.create();
-      this.isAvailable$ = proxy$;
-      var f = () => {
-        var isAvailable$ = this.section.createIsAvailableFor(this.data$);
-        proxy$.delegate = isAvailable$;
-      };
-      this.onDetach(this.data$.sub(f));
-      f();
-      return this;
-    },
     function createView() {
       if ( this.customView ) {
         return this.ViewSpec.createView(

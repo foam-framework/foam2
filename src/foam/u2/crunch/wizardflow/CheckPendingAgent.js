@@ -37,6 +37,10 @@ foam.CLASS({
     {
       name: 'cancelled',
       class: 'Boolean'
+    },
+    {
+      name: 'showToast',
+      class: 'Boolean'
     }
   ],
 
@@ -55,7 +59,7 @@ foam.CLASS({
       if ( ucj.status !== this.CapabilityJunctionStatus.AVAILABLE ) {
         var statusPending = ucj.status === this.CapabilityJunctionStatus.PENDING;
         var shouldReopen = await this.crunchService.maybeReopen(this.ctrl.__subContext__, ucj.targetId);
-        if ( ! shouldReopen ) {
+        if ( ! shouldReopen && this.showToast ) {
           var message = statusPending ? this.CANNOT_OPEN_PENDING : this.CANNOT_OPEN_GRANTED;
           this.ctrl.notify(message, '', this.LogLevel.INFO, true);
           this.cancelled = true;
@@ -63,7 +67,7 @@ foam.CLASS({
           return;
         }
       }
-      if ( shouldReopen && this.capabilities.length < 1 ) {
+      if ( shouldReopen && this.capabilities.length < 1 && this.showToast ) {
         // This is here because of a CertifyDataReviewed capability.
         this.ctrl.notify(this.CANNOT_OPEN_ACTION_PENDING);
         this.cancelled = true;

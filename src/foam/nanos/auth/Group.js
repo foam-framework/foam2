@@ -426,6 +426,7 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
 
         if (finalByte != 0) {
           if ( (remote[maskFullBytes] & finalByte) != (required[maskFullBytes] & finalByte) ) {
+            ((foam.nanos.logger.Logger) x.get("logger")).warning(this.getClass().getSimpleName(), getId(), "cidr", "restricted", remoteIp);
             throw new foam.core.ValidationException("Restricted IP");
           }
         }

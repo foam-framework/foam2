@@ -781,10 +781,9 @@ foam.LIB({
       // be used.
 
       var comparator = comparator || foam.util.compare;
-      var sorted =  a.sort(comparator);
+      var sorted     = a.sort(comparator);
       return sorted.reduce(function(acc, value) {
-        if ( ! acc.length ||
-             comparator(acc[acc.length - 1], value) != 0 )
+        if ( ! acc.length || comparator(acc[acc.length - 1], value) != 0 )
           acc.push(value);
 
         return acc;

@@ -25,7 +25,7 @@ foam.CLASS({
     {
       name: 'id',
       expression: function (capability) {
-        return 'capability,' + capability.id;
+        return capability ? capability.id : '';
       }
     },
 

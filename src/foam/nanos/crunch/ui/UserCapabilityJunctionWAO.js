@@ -31,7 +31,7 @@ foam.CLASS({
     },
     function cancel(wizardlet) {
       return this.crunchService.updateJunction( null,
-        wizardlet.capability.id, null, this.CapabilityJunctionStatus.AVAILABLE
+        wizardlet.capability.id, null, null
       ).then((ucj) => {
         this.crunchService.pub('updateJunction');
         return ucj;
