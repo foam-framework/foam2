@@ -142,11 +142,15 @@ foam.CLASS({
           throw new AccessDeniedException(e);
         }
 
+        Session session = x.get(Session.class);
+        if ( session.getUserId() == user.getId() ) {
+          return user;
+        }
+
         // Freeze user
         user = (User) user.fclone();
         user.freeze();
-
-        Session session = x.get(Session.class);
+        
         session.setUserId(user.getId());
 
         if ( check(userX, "*") ) {
