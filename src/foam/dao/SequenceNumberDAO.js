@@ -129,7 +129,7 @@ foam.CLASS({
             getProperty_().set(obj, getValue_());
             setValue_(getValue_() + 1);
           } else if ( id > getValue_() ) {
-            setValue(id + 1);
+            setValue_(id + 1);
           }
         }
         return getDelegate().put_(x, obj);
