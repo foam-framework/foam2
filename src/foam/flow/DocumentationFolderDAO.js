@@ -50,10 +50,6 @@ return new foam.nanos.fs.FallbackStorage(
 Storage storage = getStorage();
 
 sink = prepareSink(sink);
-// foam.mlang.order.Comparator[] comparator = new foam.mlang.order.Comparator[] {
-//   foam.flow.Document.TITLE),
-//   order
-// })
 
 foam.dao.Sink         decorated = decorateSink_(sink, skip, limit, foam.flow.Document.ID, predicate);
 foam.dao.Subscription sub       = new foam.dao.Subscription();
