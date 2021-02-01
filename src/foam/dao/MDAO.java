@@ -74,8 +74,40 @@ public class MDAO
   protected Object   writeLock_ = new Object();
   protected Set      unindexed_ = new HashSet();
 
-  public final static String GET_MDAO_CMD = "GET_MDAO_CMD"; 
-  
+  /**
+   * DAO Command issued on a DAO stack to return the MDAO.
+   * Used by Medusa to directly update the MDAO.
+   */
+  public final static String GET_MDAO_CMD = "GET_MDAO_CMD";
+
+  /**
+   * DAO Command to retrieve current MDAO state. Intented
+   * to be used in Command GetWhenCmd
+   */
+  public final static String GET_STATE_CMD = "GET_STATE_CMD";
+
+  /**
+   * DAO Command to retrieve MDAO at some state.
+   * Request a null state to retrieve 'now' or head of MDAO.
+   */ 
+  public static class GetWhenCmd {
+    protected Object state_ = null;
+    public void setState(Object state) {
+      state_ = state;
+    }
+
+     public Object getState() {
+      return state_;
+    }
+
+    public GetWhenCmd() {
+    }
+
+    public GetWhenCmd(Object state) {
+      setState(state);
+    }
+  }
+
   public MDAO(ClassInfo of) {
     setOf(of);
     index_ = new AltIndex(new TreeIndex((PropertyInfo) this.of_.getAxiomByName("id")));
@@ -238,6 +270,16 @@ public class MDAO
   public Object cmd_(X x, Object cmd) {
     // Used by Medusa to get the real MDAO to update.
     if ( MDAO.GET_MDAO_CMD.equals(cmd) ) {
+      return this;
+    }
+    if ( MDAO.GET_STATE_CMD.equals(cmd) ) {
+      return now();
+    }
+    if ( cmd instanceof MDAO.GetWhenCmd ) {
+      Object state = ((MDAO.GetWhenCmd) cmd).getState();
+      if ( state != null ) {
+        return when(state);
+      }
       return this;
     }
     return super.cmd_(x, cmd);
