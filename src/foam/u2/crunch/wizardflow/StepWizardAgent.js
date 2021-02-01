@@ -66,12 +66,6 @@ foam.CLASS({
       }
     },
     {
-      name: 'view',
-      value: {
-        class: 'foam.u2.wizard.ScrollingStepWizardView',
-      }
-    },
-    {
       name: 'submitted',
       class: 'Boolean'
     }
@@ -90,7 +84,7 @@ foam.CLASS({
         })
 
         this.pushView({
-          ...this.view,
+          ...this.config.wizardView,
           data: data,
           closeable: true,
           onClose: (x) => {
