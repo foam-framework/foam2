@@ -213,14 +213,14 @@ This is the heart of Medusa.`,
           dagger.setGlobalIndex(x, entry.getIndex());
         }
 
-        entry.setPromoted(true);
-        entry = (MedusaEntry) getDelegate().put_(x, entry);
-
         try {
           entry = mdao(x, entry);
         } catch( IllegalArgumentException e ) {
           // nop - already reported - occurs when a DAO is removed.
         }
+
+        entry.setPromoted(true);
+        entry = (MedusaEntry) getDelegate().put_(x, entry);
 
         // Notify any blocked Primary puts
         MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
@@ -420,6 +420,14 @@ This is the heart of Medusa.`,
             } else {
               getLogger().warning("Unsupported operation", entry.getDop().getLabel());
               throw new UnsupportedOperationException(entry.getDop().getLabel());
+            }
+
+            // Secondaries will block on registry
+            if ( ! replaying.getReplaying() &&
+                 ! config.getIsPrimary() ) {
+              MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
+              getLogger().debug("mdao", entry.getDop(), entry.getId(), "registry", "register");
+              registry.register(x, (Long) entry.getId());
             }
           }
         }
