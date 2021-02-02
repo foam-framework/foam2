@@ -1321,7 +1321,7 @@ foam.CLASS({
         var attr  = this.getAttributeNode(name);
 
         if ( attr ) {
-          attr[name] = value;
+          attr.value = value;
         } else {
           attr = { name: name, value: value };
           this.attributes.push(attr);
@@ -2092,8 +2092,10 @@ foam.CLASS({
           var name  = attr.name;
           var value = attr.value;
 
-          out(' ', name);
-          if ( value !== false ) out('="', foam.String.isInstance(value) ? value.replace(/"/g, '&quot;') : value, '"');
+          if ( value !== false ) {
+            out(' ', name);
+            out('="', foam.String.isInstance(value) ? value.replace(/"/g, '&quot;') : value, '"');
+          }
         }
       }
 
