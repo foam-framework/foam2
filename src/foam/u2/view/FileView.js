@@ -14,10 +14,6 @@ foam.CLASS({
     'foam.nanos.fs.File'
   ],
 
-  imports: [
-    'fileTypeDAO'
-  ],
-
   properties: [
     'data'
   ],
@@ -43,15 +39,10 @@ foam.CLASS({
   listeners: [
     async function onChange (e) {
       var file = e.target.files[0];
-      var mimeType = file.type;
-      var fileType = await this.fileTypeDAO.find(mimeType);
-      if ( fileType ) {
-        mimeType = fileType.toSummary();
-      }
       this.data = this.File.create({
         filename: file.name,
         filesize: file.size,
-        mimeType: mimeType,
+        mimeType: file.mimeType,
         data: this.BlobBlob.create({
           blob: file
         })

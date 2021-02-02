@@ -13,7 +13,9 @@ foam.CLASS({
     'foam.blob.*',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
-    'foam.dao.Sink'
+    'foam.dao.Sink',
+    'static foam.mlang.MLang.AND',
+    'static foam.mlang.MLang.EQ',
   ],
 
   properties: [
@@ -47,26 +49,32 @@ foam.CLASS({
           String encodedString = java.util.Base64.getEncoder().encodeToString(os.toByteArray());
           String type = file.getMimeType();
           DAO fileTypeDAO = (DAO) x.get("fileTypeDAO");
-          FileType fileType = (FileType) fileTypeDAO.find(type);
+          FileType fileType = (FileType) fileTypeDAO.find(file.getFileType());
           if ( fileType != null ) {
             type = fileType.toSummary();
+            file.setMimeType(type);
           }
           if ( foam.util.SafetyUtil.isEmpty(type) ) {
+            type = "text";
+            String subType = "html";
             if ( ! foam.util.SafetyUtil.isEmpty(file.getFilename()) &&
                  file.getFilename().lastIndexOf(".") != -1 &&
                  file.getFilename().lastIndexOf(".") != 0 ) {
-              type = "text/" + file.getFilename().substring(file.getFilename().lastIndexOf(".")+1);
-            } else {
-              type = "text/html";
+              subType = file.getFilename().substring(file.getFilename().lastIndexOf(".")+1);
             }
-            fileType = (FileType) fileTypeDAO.find(type);
+
+            fileType = (FileType) fileTypeDAO.find(
+              AND(
+                EQ(FileType.TYPE, type),
+                EQ(FileType.SUB_TYPE, subType)
+              ));
             if ( fileType != null ) {
-              file.setMimeType(fileType.getId());
+              file.setMimeType(fileType.toSummary());
             } else {
-              throw new foam.core.FOAMException("File type not supported. "+type);
+              throw new foam.core.FOAMException("File type not supported. "+type+"/"+subType);
             }
           }
-          file.setDataString("data:"+type+";base64," + encodedString);
+          file.setDataString("data:"+file.getMimeType()+";base64," + encodedString);
           file.setData(null);
           return getDelegate().put_(x, file);
         } catch (Exception e) {

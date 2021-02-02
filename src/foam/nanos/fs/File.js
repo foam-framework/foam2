@@ -72,19 +72,39 @@ foam.CLASS({
       documentation: 'Filesize'
     },
     {
-      class: 'Reference',
-      of: 'foam.nanos.fs.FileType',
+      class: 'String',
       name: 'mimeType',
+      createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       readVisibility: 'RO',
       documentation: 'File mime type'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.fs.FileType',
+      name: 'fileType',
+      label: 'Mime Type',
+      updateVisibility: 'HIDDEN',
+      readVisibility: 'HIDDEN',
+      documentation: 'File mime type',
+      storageTransient: true,
     },
     {
       class: 'String',
       name: 'dataString',
       updateVisibility: 'RO',
       readVisibility: 'RO',
-      documentation: 'File converted to base64 string'
+      documentation: 'File converted to base64 string',
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          {
+            class: 'foam.u2.tag.TextArea',
+            rows: 4, cols: 80
+          },
+          { class: 'foam.u2.view.ImageView' },
+        ]
+      },
     },
     {
       class: 'String',
@@ -107,7 +127,7 @@ foam.CLASS({
       expression: function (id) {
         return window.location.origin + '/service/httpFileService/' + id
       },
-      view: 'foam.u2.view.FileView'
+      view: 'foam.u2.view.ImageView'
     },
     {
       class: 'Blob',
@@ -131,12 +151,7 @@ foam.CLASS({
       getter: async function() {
         if ( this.dataString ) {
           let b64Data = this.dataString.split(',')[1];
-          var mimeType = this.mimeType;
-          var fileType = await this.fileTypeDAO.find(mimeType);
-          if ( fileType ) {
-            mimeType = fileType.toSummary();
-          }
-          const b64toBlob = (b64Data, contentType = mimeType, sliceSize = 512) => {
+          const b64toBlob = (b64Data, contentType = this.mimeType, sliceSize = 512) => {
             const byteCharacters = atob(b64Data);
             const byteArrays = [];
 
@@ -173,6 +188,7 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.ServiceProvider',
       name: 'spid',
+      visibility: 'HIDDEN',
       storageTransient: true,
       section: 'systemInformation',
       javaFactory: `

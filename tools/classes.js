@@ -613,7 +613,6 @@ var classes = [
   'foam.nanos.fs.FileDataClearSink',
   'foam.nanos.fs.FileDataDAO',
   'foam.nanos.fs.FileType',
-  'foam.nanos.fs.SupportFileTypeDAO',
   'foam.crypto.hash.Hasher',
   'foam.crypto.hash.HashableTest',
 

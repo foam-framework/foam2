@@ -31,6 +31,7 @@ foam.CLASS({
       javaCode: `
       File file = (File) ((FObject) obj).fclone();
       File.DATA.clear(file);
+      File.DATA_STRING.clear(file);
       getDelegate().put(file, sub);
       `
     },
