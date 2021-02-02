@@ -20,7 +20,12 @@ foam.CLASS({
 
   exports: [
     'currentData as data',
-    'controllerMode'
+    'controllerMode',
+    'currentMemento as memento'
+  ],
+
+  imports: [
+    'memento'
   ],
 
   axioms: [
@@ -102,7 +107,8 @@ foam.CLASS({
         return this.of ? this.of.model_.label : '';
       },
     },
-    ['nodeName', 'DIV']
+    ['nodeName', 'DIV'],
+    'currentMemento'
   ],
 
   css: `
@@ -116,6 +122,17 @@ foam.CLASS({
     ^toolbar {
       display: flex;
       padding-top: 8px;
+    }
+    ^ tbody {
+      display: grid;
+    }
+
+    ^ .foam-u2-stack-StackView {
+      padding-left: 0!important;
+    }
+
+    ^ .foam-u2-CheckBox {
+      margin: 0px;
     }
   `,
 
@@ -169,6 +186,10 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
+
+      if ( this.memento )
+        this.currentMemento$ = this.memento.tail$;
+
       var hasTabs = false;
       this.add(this.slot(function(of, properties, actions) {
         if ( ! of ) return '';
@@ -181,6 +202,7 @@ foam.CLASS({
         self.currentData = self.data;
 
         var title = self.title && this.E('tr').
+        style({ display: 'contents' }).
           start('td').addClass(this.myClass('title')).attrs({ colspan: 2 }).
             add(self.title$).
           end();

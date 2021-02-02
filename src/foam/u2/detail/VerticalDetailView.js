@@ -20,6 +20,11 @@ foam.CLASS({
       // Map of property-name: {map of property overrides} for configuring properties
       // values include 'label', 'units', and 'view'
     },
+    {
+      class: 'Boolean',
+      name: 'showTitle',
+      value: true
+    },
   ],
 
   methods: [
@@ -38,7 +43,8 @@ foam.CLASS({
                   return self.E().start(self.SectionView, {
                     data$: self.data$,
                     section: s,
-                    config: self.config
+                    config: self.config,
+                    showTitle: self.showTitle
                   })
                   .end();
                 })

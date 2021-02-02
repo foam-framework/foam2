@@ -129,3 +129,25 @@ p({
     }
   """
 })
+
+p({
+  class:"foam.nanos.script.Script",
+  id:"MDAOIndexes",
+  description:"List MDAO Indexes",
+  code:"""
+  import foam.dao.MDAO;
+  import foam.dao.index.AltIndex;
+  import foam.dao.index.Index;
+  
+  daoKey = "localAccountDAO";
+  
+  dao = x.get(daoKey);
+  mdao = dao.cmd(MDAO.GET_MDAO_CMD);
+  print(mdao);
+  altIndex = (AltIndex) mdao.index_;
+  delegates = altIndex.delegates_;
+  for ( TreeIndex i : delegates ) {
+    print(i.prop_);
+  }
+  """
+})

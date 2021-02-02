@@ -28,7 +28,11 @@ foam.CLASS({
     'java.net.Socket',
     'java.net.SocketAddress',
     'java.net.SocketException',
-    'java.net.SocketTimeoutException'
+    'java.net.SocketTimeoutException',
+    'javax.net.ssl.SSLSocket',
+    'javax.net.ssl.SSLSocketFactory',
+    'javax.net.ssl.SSLContext',
+    'javax.net.ssl.SSLSocket'
   ],
 
   properties: [
@@ -150,7 +154,16 @@ foam.CLASS({
         }
 
         try {
-          Socket socket = new Socket();
+          Socket socket = null;
+          SslContextFactory contextFactory = (SslContextFactory) getX().get("sslContextFactory");
+
+          if ( contextFactory != null && contextFactory.getEnableSSL() ) {
+            SSLContext sslContext = contextFactory.getSSLContext();
+            socket = (SSLSocket)sslContext.getSocketFactory().createSocket();
+          } else {
+            socket = new Socket();
+          }
+          
           socket.setSoTimeout(getSoTimeout());
           SocketAddress address = new InetSocketAddress(host, port);
           socket.connect(address, getConnectTimeout());
