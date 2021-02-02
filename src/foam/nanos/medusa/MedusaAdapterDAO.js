@@ -202,27 +202,38 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       pm.log(x);
       cmd.logHops(x);
       getLogger().debug("update", dop.getLabel(), "client", "cmd", obj.getProperty("id"), "receive", cmd.getMedusaEntryId());
+      if ( cmd.getMedusaEntryId() > 0 ) {
+        getLogger().debug("update", dop.getLabel(), cmd.getMedusaEntryId(), "registry", "wait");
+        MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
+        registry.wait(x, (Long) cmd.getMedusaEntryId());
+        getLogger().debug("update", dop.getLabel(), cmd.getMedusaEntryId(), "registry", "unwait");
+      }
+      FObject result = cmd.getData();
       if ( DOP.PUT == dop ) {
-        FObject result = cmd.getData();
         if ( result != null ) {
           FObject nu = getDelegate().find_(x, result.getProperty("id"));
           if ( nu == null ) {
-            // Occurs if we've clustered a NullDAO (EasyDAO nullify)
-            getLogger().warning("update", dop.getLabel(), "cmd", "find", result.getProperty("id"), "null");
+            // REVIEW: Still not clear on the scenario for this.
+            getLogger().error("update", dop.getLabel(), cmd.getMedusaEntryId(), "find", result.getProperty("id"), "null");
+            nu = result;
           } else {
+            // TODO: remove after further testing.
             FObjectFormatter formatter = formatter_.get();
             if ( formatter.maybeOutputDelta(result, nu) ) {
-              getLogger().warning("update", dop.getLabel(), "cmd", "delta", formatter.builder().toString());
+              getLogger().warning("update", dop.getLabel(), cmd.getMedusaEntryId(), "delta", formatter.builder().toString());
             }
           }
           return nu;
         }
         // TODO/REVIEW
-        getLogger().warning("update", dop.getLabel(), obj.getProperty("id"), "result,null");
-        return result;
+        getLogger().error("update", dop.getLabel(), obj.getProperty("id"), "result,null");
       } else { // if ( DOP.REMOVE == dop ) {
-        return getDelegate().remove_(x, obj);
+        if ( getDelegate().find_(x, obj.getProperty("id")) != null ) {
+          getLogger().error("update", dop.getLabel(), obj.getProperty("id"), "not deleted");
+          return getDelegate().remove_(x, obj);
+        }
       }
+      return result;
       `
     },
     {
@@ -257,7 +268,9 @@ It then marshalls it to the primary mediator, and waits on a response.`,
           if ( id != null &&
                id > 0L ) {
             MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
+            getLogger().debug("cmd", id, "registry", "wait");
             registry.wait(x, id);
+            getLogger().debug("cmd", id, "registry", "unwait");
           } else {
             getLogger().debug("cmd", "ClusterCommand", "medusaEntry", "null");
           }
@@ -340,12 +353,15 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         getLogger().debug("submit", entry.getId());
 
         MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
+        getLogger().debug("submit", entry.getId(), "registry", "register");
         registry.register(x, (Long) entry.getId());
         PM pmPut = new PM(this.getClass().getSimpleName(), "submit", "put");
         entry = (MedusaEntry) getMedusaEntryDAO().put_(x, entry);
         pmPut.log(x);
         PM pmWait = new PM(this.getClass().getSimpleName(), "submit", "wait");
+        getLogger().debug("submit", entry.getId(), "registry", "wait");
         registry.wait(x, (Long) entry.getId());
+        getLogger().debug("submit", entry.getId(), "registry", "unwait");
         pmWait.log(x);
         return entry;
       } catch (Throwable t) {
