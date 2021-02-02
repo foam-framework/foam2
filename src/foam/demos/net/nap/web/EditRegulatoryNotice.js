@@ -248,18 +248,10 @@
                               href: this.data_$.map(function (fileData) {
                                 if ( fileData[i] ) {
                                     var blob = fileData[i].data;
-                                    var sessionId = localStorage['defaultSession'];
-
                                     if ( self.BlobBlob.isInstance(blob) ) {
                                       return URL.createObjectURL(blob.blob);
                                     } else {
-                                      var url = '/service/httpFileService/' + fileData[i].id;
-
-                                      // attach session id if available
-                                      if ( sessionId ) {
-                                        url += '?sessionId=' + sessionId;
-                                      }
-                                      return url;
+                                      return '/service/httpFileService/' + fileData[i].id;
                                     }
                                 }
                              }),

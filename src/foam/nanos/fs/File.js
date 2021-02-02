@@ -11,11 +11,16 @@ foam.CLASS({
   documentation: 'Represents a file',
 
   implements: [
-    'foam.nanos.auth.Authorizable'
+    'foam.nanos.auth.Authorizable',
+    'foam.nanos.auth.ServiceProviderAware'
   ],
 
   requires: [
     'foam.blob.BlobBlob'
+  ],
+
+  imports: [
+    'fileTypeDAO'
   ],
 
   javaImports: [
@@ -24,6 +29,7 @@ foam.CLASS({
     'foam.blob.InputStreamBlob',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.ServiceProviderAwareSupport',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.util.SafetyUtil',
@@ -38,10 +44,19 @@ foam.CLASS({
       'mimeType'
     ],
 
+  searchColumns: [
+    'id',
+    'filename',
+    'mimeType'
+  ],
+
   properties: [
     {
       class: 'String',
       name: 'id',
+      createVisibility: 'HIDDEN',
+      updatevisibility: 'RO',
+      readVisibility: 'RO',
       documentation: 'GUID'
     },
     {
@@ -52,35 +67,53 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'filesize',
+      updateVisibility: 'RO',
+      readVisibility: 'RO',
       documentation: 'Filesize'
     },
     {
-      class: 'String',
+      class: 'Reference',
+      of: 'foam.nanos.fs.FileType',
       name: 'mimeType',
+      updateVisibility: 'RO',
+      readVisibility: 'RO',
       documentation: 'File mime type'
     },
     {
       class: 'String',
       name: 'dataString',
+      updateVisibility: 'RO',
+      readVisibility: 'RO',
       documentation: 'File converted to base64 string'
     },
     {
       class: 'String',
       name: 'address',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      readVisibility: 'RO',
       transient: true,
       expression: function (id) {
-        var sessionId = localStorage['defaultSession'];
-        var url = window.location.origin + '/service/httpFileService/' + id
-        // attach session id if available
-        if ( sessionId ) {
-          url += '?sessionId=' + sessionId;
-        }
-        return url;
+        return window.location.origin + '/service/httpFileService/' + id
       }
+    },
+    {
+      class: 'String',
+      name: 'image',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      readVisibility: 'RO',
+      transient: true,
+      expression: function (id) {
+        return window.location.origin + '/service/httpFileService/' + id
+      },
+      view: 'foam.u2.view.FileView'
     },
     {
       class: 'Blob',
       name: 'data',
+      updateVisibility: 'HIDDEN',
+      readVisibility: 'HIDDEN',
       javaGetter:`
         if ( dataIsSet_ ) return data_;
 
@@ -95,10 +128,15 @@ foam.CLASS({
 
         return null;
       `,
-      getter: function() {
+      getter: async function() {
         if ( this.dataString ) {
           let b64Data = this.dataString.split(',')[1];
-          const b64toBlob = (b64Data, contentType = this.mimeType, sliceSize = 512) => {
+          var mimeType = this.mimeType;
+          var fileType = await this.fileTypeDAO.find(mimeType);
+          if ( fileType ) {
+            mimeType = fileType.toSummary();
+          }
+          const b64toBlob = (b64Data, contentType = mimeType, sliceSize = 512) => {
             const byteCharacters = atob(b64Data);
             const byteArrays = [];
 
@@ -130,7 +168,23 @@ foam.CLASS({
       adapt: function(oldObj, newObj) {
         return newObj;
       }
-    }
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
+      name: 'spid',
+      storageTransient: true,
+      section: 'systemInformation',
+      javaFactory: `
+        var map = new java.util.HashMap();
+        map.put(
+          File.class.getName(),
+          new foam.core.PropertyInfo[] { File.OWNER }
+        );
+        return new ServiceProviderAwareSupport()
+          .findSpid(foam.core.XLocator.get(), map, this);
+      `
+    },
   ],
   methods: [
     {

@@ -12,9 +12,8 @@ import foam.blob.IdentifiedBlob;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.app.AppConfig;
-import foam.nanos.auth.AuthService;
-import foam.nanos.auth.User;
 import foam.nanos.fs.File;
+import foam.nanos.fs.FileType;
 import foam.util.SafetyUtil;
 import java.io.OutputStream;
 import java.util.Base64;
@@ -42,7 +41,6 @@ public class FileService
     OutputStream        os        = null;
     HttpServletRequest  req       = x.get(HttpServletRequest.class);
     HttpServletResponse resp      = x.get(HttpServletResponse.class);
-    AuthService         auth      = (AuthService) x.get("auth");
     AppConfig           appConfig = (AppConfig) x.get("appConfig");
 
     // TODO: Add better ACL support for files.  In the meantime,
@@ -56,9 +54,17 @@ public class FileService
       String id   = path.replaceFirst("/service/" + name_ + "/", "");
 
       File file = (File) fileDAO_.find_(x, id);
+      ((foam.nanos.logger.Logger) x.get("logger")).debug("FileService", "id", id, "file", file, "file.id", (file != null ? file.getId() : "null"));
       if ( file == null ) {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         return;
+      }
+
+      // NOTE: File.mimeType transitioning from String to Reference to FileType
+      String mimeType = file.getMimeType();
+      FileType fileType = (FileType) ((DAO) x.get("fileTypeDAO")).find(mimeType);
+      if ( fileType != null ) {
+        mimeType = fileType.toSummary();
       }
 
       if ( SafetyUtil.isEmpty(file.getDataString()) ){
@@ -66,11 +72,11 @@ public class FileService
         blob = store.find(file.getId());
       } else {
         //Replace @version@ with actual foam version
-        if ( "text/html".equals(file.getMimeType()) ) {
+        if ( "text/html".equals(mimeType) ) {
           String fileText = file.getText();
           fileText = fileText.replace("@VERSION@", appConfig.getVersion());
           String encodedString = Base64.getEncoder().encodeToString(fileText.getBytes());
-          file.setDataString("data:"+file.getMimeType()+";base64," + encodedString);
+          file.setDataString("data:"+mimeType+";base64," + encodedString);
         }
 
         blob = file.getData();
@@ -84,7 +90,7 @@ public class FileService
 
       // set response status, content type, content length
       resp.setStatus(HttpServletResponse.SC_OK);
-      resp.setContentType(file.getMimeType());
+      resp.setContentType(mimeType);
       resp.setHeader("Content-Length", Long.toString(size, 10));
       resp.setHeader("Cache-Control", "public");
 

@@ -10,7 +10,10 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   javaImports: [
-    'foam.blob.*'
+    'foam.blob.*',
+    'foam.dao.ArraySink',
+    'foam.dao.DAO',
+    'foam.dao.Sink'
   ],
 
   properties: [
@@ -43,6 +46,11 @@ foam.CLASS({
           blob.read(os, 0, file.getFilesize());
           String encodedString = java.util.Base64.getEncoder().encodeToString(os.toByteArray());
           String type = file.getMimeType();
+          DAO fileTypeDAO = (DAO) x.get("fileTypeDAO");
+          FileType fileType = (FileType) fileTypeDAO.find(type);
+          if ( fileType != null ) {
+            type = fileType.toSummary();
+          }
           if ( foam.util.SafetyUtil.isEmpty(type) ) {
             if ( ! foam.util.SafetyUtil.isEmpty(file.getFilename()) &&
                  file.getFilename().lastIndexOf(".") != -1 &&
@@ -50,6 +58,12 @@ foam.CLASS({
               type = "text/" + file.getFilename().substring(file.getFilename().lastIndexOf(".")+1);
             } else {
               type = "text/html";
+            }
+            fileType = (FileType) fileTypeDAO.find(type);
+            if ( fileType != null ) {
+              file.setMimeType(fileType.getId());
+            } else {
+              throw new foam.core.FOAMException("File type not supported. "+type);
             }
           }
           file.setDataString("data:"+type+";base64," + encodedString);
@@ -60,7 +74,7 @@ foam.CLASS({
             .setName("Failed to encode")
             .setSeverity(foam.log.LogLevel.ERROR)
             .setReason(foam.nanos.alarming.AlarmReason.UNSPECIFIED)
-            .setNote(file.getFilename())
+            .setNote(file.getFilename() + " " + e.getMessage())
             .build());
           throw new foam.core.FOAMException("Failed to encode file", e);
         }
@@ -81,6 +95,17 @@ foam.CLASS({
           .build());
         throw new foam.core.FOAMException("Failed to save file", e);
       }
+      `
+    },
+    {
+      name: 'select_',
+      javaCode: `
+      Sink delegateSink = sink;
+      if ( delegateSink == null ) {
+        delegateSink = new ArraySink();
+      }
+      getDelegate().select_(x, new FileDataClearSink(x, delegateSink), skip, limit, order, predicate);
+      return delegateSink;
       `
     }
   ]

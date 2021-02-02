@@ -18,6 +18,7 @@ foam.CLASS({
     'foam.dao.*',
     'foam.nanos.fs.File',
     'foam.nanos.fs.FileType',
+    'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.EQ'
   ],
 
@@ -49,14 +50,27 @@ foam.CLASS({
       }
 
       File     file        = (File) obj;
-      DAO      fileTypeDAO = (DAO) x.get("fileTypeDAO");
-      String   mimeType    = file.getMimeType();
-      String   subType     = mimeType.substring(mimeType.indexOf("/") + 1);
-      FileType fileType    = (FileType) fileTypeDAO.find(EQ(FileType.SUB_TYPE, subType));
+      DAO     fileTypeDAO = (DAO) x.get("fileTypeDAO");
+      FileType fileType = (FileType) fileTypeDAO.find(file.getMimeType());
+      if ( fileType == null ) {
+        String[] parts = file.getMimeType().split("/");
+        if ( parts.length > 1 ) {
+          fileType = (FileType) fileTypeDAO.find(
+                        AND(
+                          EQ(FileType.TYPE, parts[0]),
+                          EQ(FileType.SUB_TYPE, parts[1])
+                        ));
+          if ( fileType != null ) {
+            file.setMimeType(fileType.getId());
+          }
+        }
+      }
 
       if ( fileType == null ) {
+        ((foam.nanos.logger.Logger) x.get("logger")).warning("FileType not support", file.getMimeType());
+
         throw new UserFeedbackException.Builder(x)
-        .setUserFeedback(new UserFeedback.Builder(x)
+          .setUserFeedback(new UserFeedback.Builder(x)
           .setStatus(UserFeedbackStatus.ERROR)
           .setMessage(FILE_TYPE_NOT_SUPPORT)
           .build()

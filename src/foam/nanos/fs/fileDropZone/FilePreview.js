@@ -11,6 +11,10 @@ foam.CLASS({
 
   documentation: 'iframe for file preview',
 
+  imports: [
+    'fileTypeDAO'
+  ],
+
   properties: [
     {
       name: 'selected'
@@ -50,7 +54,7 @@ foam.CLASS({
       this.data$.sub(() => this.showData());
     },
 
-    function showData() {
+    async function showData() {
       let iFrame = document.getElementsByClassName('file-iframe' + this.id)[0],
           image = document.getElementsByClassName('file-image' + this.id)[0],
           div = document.getElementsByClassName('file-image-div' + this.id)[0],
@@ -72,7 +76,12 @@ foam.CLASS({
       }
       url = URL.createObjectURL(this.data[pos].data.blob);
 
-      if ( this.data[pos].mimeType !== 'application/pdf' ) {
+      var mimeType = this.data[pos].mimeType;
+      var fileType = await this.fileTypeDAO.find(mimeType);
+      if ( fileType ) {
+        mimeType = fileType.toSummary();
+      }
+      if ( mimeType !== 'application/pdf' ) {
         image.src = url;
         div.style.visibility = 'visible';
         div.style.display = 'block';

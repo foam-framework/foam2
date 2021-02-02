@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'FileType',
   documentation: 'type of file such as PDF, JPGE, CSV',
 
+  // TODO: change id to multipart key [ 'type', 'subtype' ]
   properties: [
     {
       class: 'String',
@@ -19,18 +20,26 @@ foam.CLASS({
     {
       class: 'String',
       name: 'type',
+      updateVisibility: 'RO',
     },
     {
       class: 'String',
       name: 'subType',
+      updateVisibility: 'RO',
     },
     {
       class: 'String',
       name: 'abbreviation',
+      updateVisibility: 'RO',
     }
   ],
 
   methods: [
-    function toSummary() { return this.type + '/' + this.subType; }
+    {
+      name: 'toSummary',
+      type: 'String',
+      code: function() { return this.type + '/' + this.subType; },
+      javaCode: `return getType()+"/"+getSubType();`
+    }
   ]
 });
