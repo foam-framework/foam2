@@ -208,7 +208,12 @@ It then marshalls it to the primary mediator, and waits on a response.`,
           FObject nu = getDelegate().find_(x, result.getProperty("id"));
           if ( nu == null ) {
             // Occurs if we've clustered a NullDAO (EasyDAO nullify)
-            getLogger().warning("update", dop.getLabel(), "delegate", "find", result.getProperty("id"), "null");
+            getLogger().warning("update", dop.getLabel(), "cmd", "find", result.getProperty("id"), "null");
+          } else {
+            FObjectFormatter formatter = formatter_.get();
+            if ( formatter.maybeOutputDelta(result, nu) ) {
+              getLogger().warning("update", dop.getLabel(), "cmd", "delta", formatter.builder().toString());
+            }
           }
           return nu;
         }
