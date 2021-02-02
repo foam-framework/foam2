@@ -323,6 +323,7 @@ foam.CLASS({
               choices[i][1] = resolvedChoiceLabels[i];
             }
             this.choices = choices;
+            if ( ! this.choice && this.choices.length == 1 ) this.data = this.choices[0][0];
           });
           if ( this.data == null && this.index === -1 ) this.index = this.placeholder ? -1 : 0;
         });

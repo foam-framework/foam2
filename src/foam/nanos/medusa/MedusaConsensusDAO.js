@@ -391,6 +391,7 @@ This is the heart of Medusa.`,
           String data = entry.getData();
           // getLogger().debug("mdao", entry.getIndex(), entry.getDop().getLabel()); //, data);
           if ( ! SafetyUtil.isEmpty(data) ) {
+            // TODO: cache cls for nspecName
             DAO dao = support.getMdao(x, entry.getNSpecName());
             Class cls = null;
             if ( dao instanceof foam.dao.ProxyDAO ) {

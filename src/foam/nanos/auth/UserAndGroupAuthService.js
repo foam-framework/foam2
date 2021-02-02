@@ -142,11 +142,17 @@ foam.CLASS({
           throw new AccessDeniedException(e);
         }
 
+        Session session = x.get(Session.class);
+
+        // Re use the session context if the current session context's user id matches the id of the user trying to log in
+        if ( session.getUserId() == user.getId() ) {
+          return user;
+        }
+
         // Freeze user
         user = (User) user.fclone();
         user.freeze();
-
-        Session session = x.get(Session.class);
+        
         session.setUserId(user.getId());
 
         if ( check(userX, "*") ) {

@@ -115,6 +115,7 @@ foam.CLASS({
       },
       swiftSynchronized: true,
       swiftCode: `
+        // TODO: update value_ if obj.id is greater.
         if !property_.hasOwnProperty(obj) {
           property_.set(obj, value: value_)
           value_ += 1
@@ -123,9 +124,12 @@ foam.CLASS({
       `,
       javaCode: `
         synchronized (this) {
-          if ( (long) getProperty_().get(obj) == 0 ) {
+          long id = (long) getProperty_().get(obj);
+          if ( id == 0 ) {
             getProperty_().set(obj, getValue_());
             setValue_(getValue_() + 1);
+          } else if ( id > getValue_() ) {
+            setValue_(id + 1);
           }
         }
         return getDelegate().put_(x, obj);
