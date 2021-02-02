@@ -35,9 +35,7 @@ foam.CLASS({
 
           // Safely combine error lists and update error_$
           var setErrors = errorLists => {
-            errors_$.set(errorLists
-              .map(v => v || [])
-              .flat(1));
+            errors_$.set(errorLists.flat(1).filter(v => v));
           };
           // Handle an array property update
           var subToArray = val => {
