@@ -250,8 +250,7 @@ foam.CLASS({
               if ( ax.isDefaultValue(self[prop.name]) ) return '';
               if ( Array.isArray(ax.validateObj) ) 
                 return ax.validateObj[1].apply(self, ax.validateObj[0]);
-              else 
-                return ax.validateObj.apply(self, foam.Function.argNames(ax.validateObj).map(function(arg) { return self[arg]; }));
+              return ax.validateObj.apply(self, foam.Function.argNames(ax.validateObj).map(function(arg) { return self[arg]; }));
             }]) :
             foam.core.ConstantSlot.create({ value: null });
 
