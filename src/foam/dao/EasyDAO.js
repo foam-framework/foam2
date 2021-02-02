@@ -225,26 +225,6 @@ foam.CLASS({
           }
         }
 
-        if ( getServiceProviderAware() ) {
-          delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX())
-            .setDelegate(delegate)
-            .build();
-
-          // auto add index on spid
-          DAO dao = (DAO) getMdao();
-          if ( dao != null &&
-               dao instanceof foam.dao.MDAO ) {
-            PropertyInfo pInfo = (PropertyInfo) this.getOf().getAxiomByName("spid");
-            if ( pInfo != null ) {
-              ((foam.dao.MDAO)dao).addIndex(pInfo);
-            } else {
-              logger.warning(getName(), "Index not added. Property not found. spid");
-            }
-          } else {
-            logger.warning(getName(), "Index not added on spid, no access to MDAO");
-          }
-        }
-
         delegate = getOuterDAO(delegate);
 
         if ( getDecorator() != null ) {
@@ -303,6 +283,26 @@ foam.CLASS({
         if ( getRuler() ) {
           String name = foam.util.SafetyUtil.isEmpty(getRulerDaoKey()) ? getName() : getRulerDaoKey();
           delegate = new foam.nanos.ruler.RulerDAO(getX(), delegate, name);
+        }
+
+        if ( getServiceProviderAware() ) {
+          delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX())
+            .setDelegate(delegate)
+            .build();
+
+          // auto add index on spid
+          DAO dao = (DAO) getMdao();
+          if ( dao != null &&
+               dao instanceof foam.dao.MDAO ) {
+            PropertyInfo pInfo = (PropertyInfo) this.getOf().getAxiomByName("spid");
+            if ( pInfo != null ) {
+              ((foam.dao.MDAO)dao).addIndex(pInfo);
+            } else {
+              logger.warning(getName(), "Index not added. Property not found. spid");
+            }
+          } else {
+            logger.warning(getName(), "Index not added on spid, no access to MDAO");
+          }
         }
 
         if ( getCreatedAware() )
