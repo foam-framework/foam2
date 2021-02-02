@@ -368,3 +368,16 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.Advanced
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.AdvancedFilterView.FILTER.label",target:"Aplicar filtros"})
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.FObjectView.PLACEHOLDER_TEXT",target:"selecionar..."})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UpdatePassword.SUCCESS_MSG",target:"Sua senha foi atualizada com sucesso"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UpdatePassword.SECTION_UPDATE_PASSWORD_SECTION.title",target:"Atualize sua senha"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UpdatePassword.SECTION_UPDATE_PASSWORD_SECTION.subTitle",target:"Crie uma nova senha para sua conta"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.String.SHOULD_BE_LEAST",target:"deve ser pelo menos"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.String.SHOULD_BE_MOST",target:"deve ser no máximo"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.String.CHARACTER",target:"caractere"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UpdatePassword.ORIGINAL_PASSWORD.label",target:"Senha original"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UpdatePassword.UPDATE_PASSWORD.label",target:"Atualizar senha"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UpdatePassword.NEW_PASSWORD.label",target:"Nova Senha"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UpdatePassword.CONFIRMATION_PASSWORD.label",target:"Confirme a Senha"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UpdatePassword.CONFIRMATION_PASSWORD.validationPredicates[0].errorString",target:"As senhas não coincidem."})
