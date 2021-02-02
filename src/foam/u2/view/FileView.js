@@ -37,13 +37,12 @@ foam.CLASS({
   ],
 
   listeners: [
-    function onChange (e) {
+    async function onChange (e) {
       var file = e.target.files[0];
-
       this.data = this.File.create({
         filename: file.name,
         filesize: file.size,
-        mimeType: file.type,
+        mimeType: file.mimeType,
         data: this.BlobBlob.create({
           blob: file
         })
