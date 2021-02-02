@@ -49,7 +49,7 @@ foam.CLASS({
     function sub(l) {
       var self = this;
       const valueUpdateListener = function() {
-        self.value = self.get();
+        self.set(self.get());
       };
 
       if ( ! this.hasListeners() ) {
