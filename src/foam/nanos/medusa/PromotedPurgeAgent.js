@@ -27,6 +27,7 @@ foam.CLASS({
     'static foam.mlang.MLang.EQ',
     'static foam.mlang.MLang.GT',
     'static foam.mlang.MLang.LT',
+    'static foam.mlang.MLang.LTE',
     'foam.mlang.sink.Count',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
@@ -111,20 +112,25 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
 
+      long min = getMinIndex();
+      long max = replaying.getIndex() - getRetain();
+
       try {
         DAO dao = (DAO) x.get("medusaEntryDAO");
         dao = dao.where(
           AND(
-            GT(MedusaEntry.INDEX, getMinIndex()),
-            LT(MedusaEntry.INDEX, replaying.getIndex() - getRetain()),
+            GT(MedusaEntry.INDEX, min),
+            LTE(MedusaEntry.INDEX, max),
             EQ(MedusaEntry.PROMOTED, true)
           )
         );
         Count count = (Count) dao.select(COUNT());
         if ( count.getValue() > 0 ) {
           getLogger().info("purging", count.getValue());
-          dao.removeAll();
+          // dao.removeAll();
+          dao.select(new PurgeSink(x, new foam.dao.RemoveSink(x, dao)));
         }
+        setMinIndex(Math.max(min, max));
       } catch ( Throwable t ) {
         pm.error(x, t);
         getLogger().error(t);
