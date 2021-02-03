@@ -97,7 +97,8 @@ It then marshalls it to the primary mediator, and waits on a response.`,
     {
       documentation: `MDAO state used to calculate 'when' for find and select operations.`,
       name: 'state',
-      class: 'Object'
+      class: 'Object',
+      synchronized: true
     },
     {
       name: 'logger',
@@ -163,8 +164,9 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       ],
       type: 'foam.dao.DAO',
       javaCode: `
-      if ( getState() != null ) {
-        return (DAO) getDelegate().cmd_(x, new MDAO.WhenCmd(getState()));
+      Object state = getState();
+      if ( state != null ) {
+        return (DAO) getDelegate().cmd_(x, new MDAO.WhenCmd(state));
       }
       return getDelegate();
       `
@@ -321,6 +323,8 @@ It then marshalls it to the primary mediator, and waits on a response.`,
             FObjectFormatter formatter = formatter_.get();
             if ( formatter.maybeOutputDelta(result, nu) ) {
               getLogger().warning("update", dop.getLabel(), cmd.getMedusaEntryId(), "delta", formatter.builder().toString());
+              getLogger().warning("update", dop.getLabel(), cmd.getMedusaEntryId(), "delta,result", result);
+              getLogger().warning("update", dop.getLabel(), cmd.getMedusaEntryId(), "delta,nu", nu);
             }
           }
           return nu;
@@ -340,7 +344,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       name: 'cmd_',
       javaCode: `
       getLogger().debug("cmd");
-      if ( foam.dao.MDAO.GET_MDAO_CMD.equals(obj) ) {
+      if ( foam.dao.DAO.LAST_CMD.equals(obj) ) {
         return getDelegate();
       }
       if ( obj instanceof ClusterCommand ) {

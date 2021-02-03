@@ -31,7 +31,6 @@ configuration for contacting the primary node.`,
     'foam.dao.ClientDAO',
     'foam.dao.DAO',
     'foam.dao.EasyDAO',
-    'foam.dao.MDAO',
     'foam.dao.NotificationClientDAO',
     'foam.dao.ProxyDAO',
     'static foam.mlang.MLang.*',
@@ -947,8 +946,14 @@ configuration for contacting the primary node.`,
           getLogger().error("getMdao" ,serviceName, "not instance of dao", obj.getClass().getSimpleName());
         }
         dao = (DAO) x.get(serviceName);
-        // look for 'local' version
-        if ( ! key.startsWith("local") ) {
+        // look for 'bare' and 'local' versions first
+        if ( ! key.startsWith("bare") ) {
+          key = "bare" + serviceName.substring(0,1).toUpperCase()+serviceName.substring(1);
+          if ( x.get(key) != null ) {
+            dao = (DAO) x.get(key);
+            getLogger().debug("mdao", "bare", serviceName, key);
+          }
+        } else if ( ! key.startsWith("local") ) {
           key = "local" + serviceName.substring(0,1).toUpperCase()+serviceName.substring(1);
           if ( x.get(key) != null ) {
             dao = (DAO) x.get(key);
@@ -956,29 +961,29 @@ configuration for contacting the primary node.`,
           }
         }
         if ( dao != null ) {
-          Object result = dao.cmd(MDAO.GET_MDAO_CMD);
+          Object result = dao.cmd(DAO.LAST_CMD);
           if ( result != null &&
                result instanceof DAO ) {
             getLogger().debug("mdao", "cmd", serviceName, dao.getClass().getSimpleName(), dao.getOf().getId());
             dao = (DAO) result;
-          } else {
-            while ( dao != null ) {
-              getLogger().debug("mdao", "while", serviceName, dao.getClass().getSimpleName(), dao.getOf().getId());
-              if ( dao instanceof MDAO ) {
-                break;
-              }
-              if ( dao instanceof EasyDAO ) {
-                dao = ((EasyDAO) dao).getMdao();
-                if ( dao != null ) {
-                  break;
-                }
-              }
-              if ( dao instanceof ProxyDAO ) {
-                dao = ((ProxyDAO) dao).getDelegate();
-              } else {
-                dao = null;
-              }
-            }
+          // } else {
+          //   while ( dao != null ) {
+          //     getLogger().debug("mdao", "while", serviceName, dao.getClass().getSimpleName(), dao.getOf().getId());
+          //     if ( dao instanceof MDAO ) {
+          //       break;
+          //     }
+          //     if ( dao instanceof EasyDAO ) {
+          //       dao = ((EasyDAO) dao).getMdao();
+          //       if ( dao != null ) {
+          //         break;
+          //       }
+          //     }
+          //     if ( dao instanceof ProxyDAO ) {
+          //       dao = ((ProxyDAO) dao).getDelegate();
+          //     } else {
+          //       dao = null;
+          //     }
+          //   }
           }
           if ( dao != null ) {
             getMdaos().put(serviceName, dao);

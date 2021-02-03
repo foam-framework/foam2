@@ -48,6 +48,7 @@ foam.CLASS({
     'foam.dao.ContextualizingDAO',
     'foam.dao.DeDupDAO',
     'foam.dao.InterceptedDAO',
+    'foam.dao.DAO',
     'foam.dao.GUIDDAO',
     'foam.dao.IDBDAO',
     {
@@ -123,36 +124,9 @@ foam.CLASS({
       type: 'foam.nanos.boot.NSpec'
     },
     {
-      /**
-       * TODO: More investigation needed at https://github.com/foam-framework/foam2/pull/4085
-       * Even though this property doesn't get called
-       * If you uncomment the javaFactory it will break debuggers
-       * To reproduce:
-       * 1. Uncomment the javaFactory below
-       * 2. Using intellij, set a breakpoint in a try block within an agency.submit
-       * 3. Trigger the breakpoint
-       * 4. Step over the line
-       * 5. Server should be hanging no threads available to stop the server using Ctrl+C
-       * 6. Intellij should be stuck on "Waiting until last debugger command completes"
-       * 7. Java core dumps should appear as well
-       * 8. Need to resort to using kill -9 on both the server & debugger
-       */
-      name: 'logger',
-      class: 'FObjectProperty',
-      of: 'foam.nanos.logger.Logger',
-      visibility: 'HIDDEN',
-      /*
-      javaFactory: `
-        Logger logger = (Logger) getX().get("logger");
-        if ( logger == null ) {
-          logger = new foam.nanos.logger.StdoutLogger();
-        }
-
-        return new PrefixLogger(new Object[] {
-          this.getClass().getSimpleName()
-        }, logger);
-      `
-      */
+      documentation: 'Hold Last usuable dao in decorator chain. For example, an MDAO wrapped in FixedSizeDAO should always go through the FixedSizeDAO and not update the MDAO directly.',
+      name: 'lastDao',
+      class: 'foam.dao.DAOProperty'
     },
     {
       /** This is set automatically when you create an EasyDAO.
@@ -214,6 +188,10 @@ foam.CLASS({
 
         if ( getGuid() )
           delegate = new foam.dao.GUIDDAO.Builder(getX()).setDelegate(delegate).build();
+
+        if ( getMdao() != null ) {
+          setLastDao(delegate);
+        }
 
         if ( getCluster() ) {
           if ( getMdao() != null ) {
@@ -361,9 +339,6 @@ foam.CLASS({
           */
         if ( getPm() )
           delegate = new foam.dao.PMDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(delegate).build();
-
-        // reset logger
-        EasyDAO.LOGGER.clear(this);
 
         // see comments above regarding DAOs with init_
         ((ProxyDAO)delegate_).setDelegate(delegate);
@@ -1172,8 +1147,8 @@ model from which to test ServiceProvider ID (spid)`,
       },
       javaCode: `
       // Used by Medusa to get the real MDAO to update
-      if ( foam.dao.MDAO.GET_MDAO_CMD.equals(obj) ) {
-        DAO dao = getMdao();
+      if ( foam.dao.DAO.LAST_CMD.equals(obj) ) {
+        DAO dao = getLastDao();
         if ( dao != null ) {
           return dao;
         }

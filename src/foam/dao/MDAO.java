@@ -75,12 +75,6 @@ public class MDAO
   protected Set      unindexed_ = new HashSet();
 
   /**
-   * DAO Command issued on a DAO stack to return the MDAO.
-   * Used by Medusa to directly update the MDAO.
-   */
-  public final static String GET_MDAO_CMD = "GET_MDAO_CMD";
-
-  /**
    * DAO Command to retrieve current MDAO state. Intented
    * to be used in Command WhenCmd
    */
@@ -268,8 +262,7 @@ public class MDAO
   }
 
   public Object cmd_(X x, Object cmd) {
-    // Used by Medusa to get the real MDAO to update.
-    if ( MDAO.GET_MDAO_CMD.equals(cmd) ) {
+    if ( DAO.LAST_CMD.equals(cmd) ) {
       return this;
     }
     if ( MDAO.NOW_CMD.equals(cmd) ) {
