@@ -124,6 +124,14 @@ foam.CLASS({
       display: flex;
       padding-top: 8px;
     }
+    
+    ^ .foam-u2-stack-StackView {
+      padding-left: 0!important;
+    }
+
+    ^ .foam-u2-CheckBox {
+      margin: 0px;
+    }
   `,
 
   /*
