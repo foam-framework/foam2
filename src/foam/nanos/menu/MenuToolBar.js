@@ -127,7 +127,7 @@ foam.CLASS({
         .start()
           .addClass(this.myClass('title'))
           .attr('name', this.myClass('title'))
-          .add(this.title)
+          .translate(this.classification + '.title', this.title)
         .end()
         .start()
           .addClass(this.myClass('options'))
@@ -149,11 +149,11 @@ foam.CLASS({
               .start()
                 .addClass(self.myClass('option-title'))
                 .attr('name', menu.id + 'Label')
-                .add(menu.label)
+                .translate(menu.id + '.label', menu.label)
               .end()
             .end();
           })
-        .end(); 
+        .end();
     }
   ]
 });

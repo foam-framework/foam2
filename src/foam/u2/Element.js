@@ -353,7 +353,7 @@ foam.CLASS({
       this.state = this.LOADED;
       if ( this.tabIndex ) this.setAttribute('tabindex', this.tabIndex);
       // Add a delay before setting the focus in case the DOM isn't visible yet.
-      if ( this.focused ) window.setTimeout(() => this.el().focus(), 50);
+      if ( this.focused ) window.setTimeout(() => this.el().focus(), 70);
       // Allows you to take the DOM element and map it back to a
       // foam.u2.Element object.  This is expensive when building
       // lots of DOM since it adds an extra DOM call per Element.
@@ -508,6 +508,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'RenderSink',
@@ -554,7 +555,8 @@ foam.CLASS({
       class: 'Int',
       name: 'batch',
       documentation: `Used to check whether a paint should be performed or not.`
-    }
+    },
+    'comparator'
   ],
 
   methods: [
@@ -580,14 +582,17 @@ foam.CLASS({
         var self = this;
 
         if ( ! foam.dao.DAO.isInstance(this.dao) ) {
-          throw new Exception(`You must set the 'dao' property of RenderSink.`);
+          throw new Exception("You must set the 'dao' property of RenderSink.");
         }
 
+        var dao = this.dao;
         this.dao.select().then(function(a) {
           // Check if this is a stale render
           if ( self.batch !== batch ) return;
 
           var objs = a.array;
+          if ( self.comparator ) objs.sort(self.comparator.compare.bind(self.comparator));
+
           self.cleanup();
           for ( var i = 0 ; i < objs.length ; i++ ) {
             self.addRow(objs[i]);
@@ -639,11 +644,11 @@ foam.CLASS({
   requires: [
     {
       path: 'foam.core.PromiseSlot',
-      flags: ['js'],
+      flags: ['js']
     },
     {
       path: 'foam.u2.ViewSpec',
-      flags: ['js'],
+      flags: ['js']
     },
     'foam.dao.MergedResetSink',
     'foam.u2.AttrSlot',
@@ -1321,7 +1326,7 @@ foam.CLASS({
         var attr  = this.getAttributeNode(name);
 
         if ( attr ) {
-          attr[name] = value;
+          attr.value = value;
         } else {
           attr = { name: name, value: value };
           this.attributes.push(attr);
@@ -1746,12 +1751,13 @@ foam.CLASS({
      * @param {Boolean} update True if you'd like changes to each record to be put to
      * the DAO
      */
-    function select(dao, f, update) {
+    function select(dao, f, update, opt_comparator) {
       var es   = {};
       var self = this;
 
       var listener = this.RenderSink.create({
         dao: dao,
+        comparator: opt_comparator,
         addRow: function(o) {
           // No use adding new children if the parent has already been removed
           if ( self.state === foam.u2.Element.UNLOADED ) return;
@@ -2092,8 +2098,10 @@ foam.CLASS({
           var name  = attr.name;
           var value = attr.value;
 
-          out(' ', name);
-          if ( value !== false ) out('="', foam.String.isInstance(value) ? value.replace(/"/g, '&quot;') : value, '"');
+          if ( value !== false ) {
+            out(' ', name);
+            out('="', foam.String.isInstance(value) ? value.replace(/"/g, '&quot;') : value, '"');
+          }
         }
       }
 
