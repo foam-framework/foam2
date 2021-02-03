@@ -207,6 +207,8 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
         registry.wait(x, (Long) cmd.getMedusaEntryId());
         getLogger().debug("update", dop.getLabel(), cmd.getMedusaEntryId(), "registry", "unwait");
+      } else {
+        getLogger().debug("update", dop.getLabel(), cmd.getMedusaEntryId(), "promoted");
       }
       FObject result = cmd.getData();
       if ( DOP.PUT == dop ) {

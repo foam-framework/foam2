@@ -425,6 +425,7 @@ var classes = [
   'foam.nanos.medusa.MedusaUniqueDAO',
   'foam.nanos.medusa.MedusaType',
   'foam.nanos.medusa.PromotedPurgeAgent',
+  'foam.nanos.medusa.PurgeSink',
   'foam.nanos.medusa.RegionStatus',
   'foam.nanos.medusa.ReplayCmd',
   'foam.nanos.medusa.ReplayCompleteCmd',
