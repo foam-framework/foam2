@@ -23,7 +23,7 @@ foam.CLASS({
     {
       name: 'MIN_PASSWORD_LENGTH',
       type: 'Long',
-      value: 6
+      value: 10
     }
   ],
 
@@ -36,7 +36,7 @@ foam.CLASS({
       class: 'Long',
       name: 'minLength',
       documentation: 'Minimum length of the password.',
-      min: 6,
+      min: this.MIN_PASSWORD_LENGTH,
       factory: function() {
         return this.MIN_PASSWORD_LENGTH;
       },
