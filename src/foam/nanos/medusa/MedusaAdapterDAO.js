@@ -157,7 +157,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       javaCode: `
       DAO dao = getDelegate();
       if ( getState() != null ) {
-        dao = (DAO) getDelegate().cmd_(x, new MDAO.GetWhenCmd(getState()));
+        dao = (DAO) getDelegate().cmd_(x, new MDAO.WhenCmd(getState()));
       }
       return dao.find_(x, id);
       `
@@ -167,7 +167,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       javaCode: `
       DAO dao = getDelegate();
       if ( getState() != null ) {
-        dao = (DAO) getDelegate().cmd_(x, new MDAO.GetWhenCmd(getState()));
+        dao = (DAO) getDelegate().cmd_(x, new MDAO.WhenCmd(getState()));
       }
       return dao.select_(x, sink, skip, limit, order, predicate);
       `
@@ -244,7 +244,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         FObject nu = null;
         String data = null;
         IndexState indexState = new IndexState();
-        indexState.setState(getDelegate().cmd_(x, MDAO.GET_STATE_CMD));
+        indexState.setState(getDelegate().cmd_(x, MDAO.STATE_CMD));
         if ( DOP.PUT == dop ) {
           nu = getDelegate().put_(x, obj);
           indexState.setObjId(nu.getProperty("id"));

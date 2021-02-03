@@ -82,15 +82,15 @@ public class MDAO
 
   /**
    * DAO Command to retrieve current MDAO state. Intented
-   * to be used in Command GetWhenCmd
+   * to be used in Command WhenCmd
    */
-  public final static String GET_STATE_CMD = "GET_STATE_CMD";
+  public final static String STATE_CMD = "STATE_CMD";
 
   /**
    * DAO Command to retrieve MDAO at some state.
    * Request a null state to retrieve 'now' or head of MDAO.
    */ 
-  public static class GetWhenCmd {
+  public static class WhenCmd {
     protected Object state_ = null;
     public void setState(Object state) {
       state_ = state;
@@ -100,10 +100,10 @@ public class MDAO
       return state_;
     }
 
-    public GetWhenCmd() {
+    public WhenCmd() {
     }
 
-    public GetWhenCmd(Object state) {
+    public WhenCmd(Object state) {
       setState(state);
     }
   }
@@ -272,11 +272,11 @@ public class MDAO
     if ( MDAO.GET_MDAO_CMD.equals(cmd) ) {
       return this;
     }
-    if ( MDAO.GET_STATE_CMD.equals(cmd) ) {
+    if ( MDAO.STATE_CMD.equals(cmd) ) {
       return now();
     }
-    if ( cmd instanceof MDAO.GetWhenCmd ) {
-      Object state = ((MDAO.GetWhenCmd) cmd).getState();
+    if ( cmd instanceof MDAO.WhenCmd ) {
+      Object state = ((MDAO.WhenCmd) cmd).getState();
       if ( state != null ) {
         return when(state);
       }
