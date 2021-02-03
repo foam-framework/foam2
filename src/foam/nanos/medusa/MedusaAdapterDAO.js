@@ -15,6 +15,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
 
   javaImports: [
     'foam.core.FObject',
+    'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.DOP',
@@ -154,6 +155,12 @@ It then marshalls it to the primary mediator, and waits on a response.`,
     },
     {
       name: 'readDelegate',
+      args: [
+        {
+          name: 'x',
+          type: 'X'
+        }
+      ],
       type: 'foam.dao.DAO',
       javaCode: `
       if ( getState() != null ) {
@@ -165,13 +172,13 @@ It then marshalls it to the primary mediator, and waits on a response.`,
     {
       name: 'find_',
       javaCode: `
-      return getReadDelegate().find_(x, id);
+      return readDelegate(x).find_(x, id);
       `
     },
     {
       name: 'select_',
       javaCode: `
-      return getReadDelegate().select_(x, sink, skip, limit, order, predicate);
+      return readDelegate(x).select_(x, sink, skip, limit, order, predicate);
       `
     },
     {
