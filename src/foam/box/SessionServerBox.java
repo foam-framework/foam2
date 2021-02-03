@@ -193,7 +193,7 @@ public class SessionServerBox
     }
   }
 
-  private String getRemoteHost(HttpServletRequest req) {
+  protected String getRemoteHost(HttpServletRequest req) {
     String xForwardedFor = req.getHeader("x-forwarded-for");
     // If server is running in local, then X-Forwarded-For is empty.
     if ( xForwardedFor == null ) return "";
