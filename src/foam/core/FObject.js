@@ -770,6 +770,11 @@ foam.CLASS({
         });
       }
 
+      // Special case: listenable pseudo-prooperties
+      if ( obj.includes('$') && this[obj + '$'] ) {
+        return this[obj + '$'];
+      }
+
       var names = obj.split('$');
       var axiom = this.cls_.getAxiomByName(names.shift());
 
