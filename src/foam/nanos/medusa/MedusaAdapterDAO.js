@@ -15,14 +15,46 @@ It then marshalls it to the primary mediator, and waits on a response.`,
 
   javaImports: [
     'foam.core.FObject',
+    'foam.dao.ArraySink',
+    'foam.dao.DAO',
     'foam.dao.DOP',
+    'foam.dao.MDAO',
     'foam.dao.RemoveSink',
     'foam.lib.formatter.FObjectFormatter',
     'foam.lib.formatter.JSONFObjectFormatter',
+    'static foam.mlang.MLang.AND',
+    'static foam.mlang.MLang.EQ',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
-    'foam.util.SafetyUtil'
+    'foam.util.SafetyUtil',
+    'java.util.List'
+  ],
+
+  classes: [
+    {
+      documentation: `Model and DAO used to control access to the underlying MDAO on find/select calls when a put/remove is in-flight on the primary.`,
+      name: 'IndexState',
+      flags: ['java'],
+      properties: [
+        {
+          name: 'id',
+          class: 'Long'
+        },
+        {
+          name: 'objId',
+          class: 'Object'
+        },
+        {
+          name: 'index',
+          class: 'Long'
+        },
+        {
+          name: 'state',
+          class: 'Object'
+        }
+      ]
+    }
   ],
 
   properties: [
@@ -47,6 +79,24 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         .setDelegate(new foam.dao.NullDAO(getX(), getDelegate().getOf()))
         .build();
       `
+    },
+    {
+      name: 'indexStateDAO',
+      class: 'foam.dao.DAOProperty',
+      javaFactory: `
+      foam.dao.MDAO mdao = new foam.dao.MDAO(IndexState.getOwnClassInfo());
+      mdao.addIndex(IndexState.INDEX);
+      DAO dao = new foam.dao.SequenceNumberDAO.Builder(getX())
+          .setDelegate(mdao)
+          .build();
+      dao = dao.orderBy(IndexState.ID);
+      return dao;
+      `
+    },
+    {
+      documentation: `MDAO state used to calculate 'when' for find and select operations.`,
+      name: 'state',
+      class: 'Object'
     },
     {
       name: 'logger',
@@ -97,29 +147,29 @@ It then marshalls it to the primary mediator, and waits on a response.`,
 
   methods: [
     {
+      name: 'init_',
+      javaCode: `
+      getIndexStateDAO();
+      `
+    },
+    {
       name: 'find_',
       javaCode: `
-      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      ClusterConfig config = support.getConfig(x, support.getConfigId());
-
-
-      if ( config.getIsPrimary() ) {
-        return getMdao().find_(x, id);
+      DAO dao = getDelegate();
+      if ( getState() != null ) {
+        dao = (DAO) getDelegate().cmd_(x, new MDAO.GetWhenCmd(getState()));
       }
-      return getDelegate().find_(x, id);
+      return dao.find_(x, id);
       `
     },
     {
       name: 'select_',
       javaCode: `
-      ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
-      ClusterConfig config = support.getConfig(x, support.getConfigId());
-
-
-      if ( config.getIsPrimary() ) {
-        return getMdao().select_(x, sink, skip, limit, order, predicate);
+      DAO dao = getDelegate();
+      if ( getState() != null ) {
+        dao = (DAO) getDelegate().cmd_(x, new MDAO.GetWhenCmd(getState()));
       }
-      return getDelegate().select_(x, sink, skip, limit, order, predicate);
+      return dao.select_(x, sink, skip, limit, order, predicate);
       `
     },
     {
@@ -193,16 +243,21 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         FObject old = getDelegate().find_(x, obj.getProperty("id"));
         FObject nu = null;
         String data = null;
+        IndexState indexState = new IndexState();
+        indexState.setState(getDelegate().cmd_(x, MDAO.GET_STATE_CMD));
         if ( DOP.PUT == dop ) {
           nu = getDelegate().put_(x, obj);
+          indexState.setObjId(nu.getProperty("id"));
           data = data(x, nu, old, dop);
         } else if ( DOP.REMOVE == dop ) {
+          indexState.setObjId(obj.getProperty("id"));
           getDelegate().remove_(x, obj);
           data = data(x, obj, null, dop);
         }
         if ( SafetyUtil.isEmpty(data) ) {
           getLogger().debug("update", "primary", obj.getProperty("id"), "data", "no delta");
         } else {
+          indexState = (IndexState) getIndexStateDAO().put_(x, indexState).fclone();
           MedusaEntry entry = (MedusaEntry) submit(x, data, dop);
           if ( cmd != null ) {
             getLogger().debug("update", "primary", obj.getProperty("id"), "setMedusaEntryId", entry.toSummary());
@@ -213,6 +268,9 @@ It then marshalls it to the primary mediator, and waits on a response.`,
               cmd.setData(null);
             }
           }
+          indexState.setIndex(entry.getIndex());
+          getIndexStateDAO().put_(x, indexState);
+          promoteIndexState(x);
         }
         if ( cmd != null ) {
           return cmd;
@@ -228,7 +286,12 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       pm.log(x);
       cmd.logHops(x);
       getLogger().debug("update", dop.getLabel(), "client", "cmd", obj.getProperty("id"), "receive", cmd.getMedusaEntryId());
-      if ( cmd.getMedusaEntryId() > 0 ) {
+      if ( cmd.getMedusaEntryId() > 0 &&
+          ((DAO) x.get("internalMedusaDAO")).find_(x,
+              AND(
+                EQ(MedusaEntry.INDEX, cmd.getMedusaEntryId()),
+                EQ(MedusaEntry.PROMOTED, true)
+              )) == null ) {
         getLogger().debug("update", dop.getLabel(), cmd.getMedusaEntryId(), "registry", "wait");
         MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
         registry.wait(x, (Long) cmd.getMedusaEntryId());
@@ -396,6 +459,45 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         pm.error(x, entry.toSummary(), t);
         getLogger().error("submit", entry.toSummary(), t.getMessage(), t);
         throw t;
+      } finally {
+        pm.log(x);
+      }
+      `
+    },
+    {
+      documentation: `Set the next available mdao state to be used for find/select calls`,
+      name: 'promoteIndexState',
+      synchronized: true,
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "promoteIndexState");
+      try {
+        // IndexStateDAO ordered in original 'put' order.
+        // Any entries with an 'index' value can be removed, and
+        // the first entry without an 'index' is the next, in order,
+        // state which can be used for find/select.
+        // If no unfinished entries found, then the find/select state
+        // can be reset.
+
+        Object state = null;
+        List<IndexState> indexStates = (List) ((ArraySink) getIndexStateDAO().select_(x, new ArraySink(), 0, 0, null, null)).getArray();
+        for ( IndexState indexState : indexStates ) {
+          if ( indexState.getIndex() == 0 ) {
+            state = indexState.getState();
+            getLogger().debug("promoteIndexState", "found", indexState.getId());
+            break;
+          } else {
+            getIndexStateDAO().remove_(x, indexState);
+            getLogger().debug("promoteIndexState", "remove", indexState.getIndex());
+          }
+        }
+        getLogger().debug("promoteIndexState", "state", state);
+        setState(state);
       } finally {
         pm.log(x);
       }
