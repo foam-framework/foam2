@@ -279,7 +279,7 @@ foam.CLASS({
       code: function() {
         var service = this.__context__[this.name];
         if ( foam.dao.DAO.isInstance(service) ) {
-          this.ctrl.memento.value$.set('admin.data' + foam.nanos.controller.Memento.SEPARATOR + this.name);
+          this.ctrl.memento.value = 'admin.data' + foam.nanos.controller.Memento.SEPARATOR + this.name;
         }
       }
     }
