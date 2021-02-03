@@ -153,23 +153,25 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       `
     },
     {
+      name: 'readDelegate',
+      type: 'foam.dao.DAO',
+      javaCode: `
+      if ( getState() != null ) {
+        return (DAO) getDelegate().cmd_(x, new MDAO.WhenCmd(getState()));
+      }
+      return getDelegate();
+      `
+    },
+    {
       name: 'find_',
       javaCode: `
-      DAO dao = getDelegate();
-      if ( getState() != null ) {
-        dao = (DAO) getDelegate().cmd_(x, new MDAO.WhenCmd(getState()));
-      }
-      return dao.find_(x, id);
+      return getReadDelegate().find_(x, id);
       `
     },
     {
       name: 'select_',
       javaCode: `
-      DAO dao = getDelegate();
-      if ( getState() != null ) {
-        dao = (DAO) getDelegate().cmd_(x, new MDAO.WhenCmd(getState()));
-      }
-      return dao.select_(x, sink, skip, limit, order, predicate);
+      return getReadDelegate().select_(x, sink, skip, limit, order, predicate);
       `
     },
     {
@@ -244,7 +246,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         FObject nu = null;
         String data = null;
         IndexState indexState = new IndexState();
-        indexState.setState(getDelegate().cmd_(x, MDAO.STATE_CMD));
+        indexState.setState(getDelegate().cmd_(x, MDAO.NOW_CMD));
         if ( DOP.PUT == dop ) {
           nu = getDelegate().put_(x, obj);
           indexState.setObjId(nu.getProperty("id"));

@@ -84,7 +84,7 @@ public class MDAO
    * DAO Command to retrieve current MDAO state. Intented
    * to be used in Command WhenCmd
    */
-  public final static String STATE_CMD = "STATE_CMD";
+  public final static String NOW_CMD = "NOW_CMD";
 
   /**
    * DAO Command to retrieve MDAO at some state.
@@ -272,7 +272,7 @@ public class MDAO
     if ( MDAO.GET_MDAO_CMD.equals(cmd) ) {
       return this;
     }
-    if ( MDAO.STATE_CMD.equals(cmd) ) {
+    if ( MDAO.NOW_CMD.equals(cmd) ) {
       return now();
     }
     if ( cmd instanceof MDAO.WhenCmd ) {
