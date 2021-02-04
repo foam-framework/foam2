@@ -119,15 +119,14 @@ foam.CLASS({
         DAO dao = (DAO) x.get("medusaEntryDAO");
         dao = dao.where(
           AND(
-            GT(MedusaEntry.INDEX, min),
-            LTE(MedusaEntry.INDEX, max),
+            GT(MedusaEntry.INDEX, getMinIndex()),
+            LTE(MedusaEntry.INDEX, replaying.getIndex() - getRetain()),
             EQ(MedusaEntry.PROMOTED, true)
           )
         );
         Count count = (Count) dao.select(COUNT());
         if ( count.getValue() > 0 ) {
           getLogger().info("purging", count.getValue());
-          // dao.removeAll();
           dao.select(new PurgeSink(x, new foam.dao.RemoveSink(x, dao)));
         }
         setMinIndex(Math.max(min, max));
