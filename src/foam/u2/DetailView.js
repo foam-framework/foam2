@@ -117,7 +117,6 @@ foam.CLASS({
       display: block;
       margin: auto;
       width: 100%;
-      overflow-x: scroll;
     }
 
     ^toolbar {
@@ -133,8 +132,17 @@ foam.CLASS({
       margin: 0px;
     }
 
-    ^ .full-width {
+    ^ table {
       width: 100%;
+      table-layout: fixed;
+    }
+
+    ^ table tr td:nth-of-type(1) {
+      width: 30%;
+    }
+
+    ^ table tr td:nth-of-type(2) {
+      width: 70%;
     }
   `,
 
@@ -203,10 +211,7 @@ foam.CLASS({
         // bound to data of a new class, which causes problems.
         self.currentData = self.data;
 
-        var title = self.title && this.E('tr').
-          start('td').addClass(this.myClass('title')).attrs({ colspan: 2 }).
-            add(self.title$).
-          end();
+        self.start().addClass(self.myClass('title')).add(self.title$).end();
 
         var tabs = foam.u2.Tabs.create({}, self);
 
@@ -214,8 +219,6 @@ foam.CLASS({
           this.
             addClass(this.myClass()).
             E('table').
-            addClass('full-width').
-            add(title).
             forEach(properties, function(p) {
               var config = self.config && self.config[p.name];
               var expr = foam.mlang.Expressions.create();

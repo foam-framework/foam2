@@ -64,7 +64,11 @@ foam.CLASS({
         addClass('foam-u2-PropertyView').
         addClass('foam-u2-PropertyView-prop-' + prop.name).
         start('td').addClass('foam-u2-PropertyView-label').add(this.label).end().
-        start('td').addClass('foam-u2-PropertyView-view').add(
+        start('td').addClass('foam-u2-PropertyView-view').
+        callIf( ! this.label, function() {
+          this.style({'width': '100%'});
+        }).
+        add(
           prop,
           prop.units && this.E('span').addClass('foam-u2-PropertyView-units').add(' ', prop.units)).
         end();
