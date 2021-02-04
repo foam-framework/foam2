@@ -15,7 +15,6 @@ foam.CLASS({
   ],
 
   imports: [
-    'memento',
     'stack'
   ],
 
@@ -36,11 +35,17 @@ foam.CLASS({
 
       this.config = this.DAOControllerConfig.create({ dao: this.data.dao.delegate });
 
-      this.tag(this.ScrollTableView, {
+
+      var view = foam.u2.ViewSpec.createView(this.ScrollTableView, {
         data: this.data.dao,
         enableDynamicTableHeight: false,
         config: this.config
-      });
+      },
+      this,
+      this.__subContext__.createSubContext({ memento: null }));
+      
+
+      this.tag(view);
     },
     function click(obj, id) {
       if ( ! this.stack ) return;
@@ -49,8 +54,9 @@ foam.CLASS({
         class: 'foam.comics.v2.DAOSummaryView',
         data: obj,
         config: this.config,
-        idOfRecord: id
-      }, this.__subContext__.createSubContext({memento: this.memento.tail}));
+        idOfRecord: id,
+        backLabel: 'Back'
+      }, this.__subContext__.createSubContext({memento: null}));
     }
   ]
 });

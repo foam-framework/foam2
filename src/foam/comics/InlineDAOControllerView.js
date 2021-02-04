@@ -20,6 +20,15 @@ foam.CLASS({
   name: 'InlineDAOControllerView',
   extends: 'foam.comics.DAOControllerView',
 
+  exports: [
+    'click',
+    'click as dblclick'
+  ],
+
+  imports: [
+    'stack'
+  ],
+
   properties: [
     {
       class: 'foam.u2.ViewSpec',
@@ -33,16 +42,31 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      var view = foam.u2.ViewSpec.createView(this.summaryView, {
+        data$: this.data.filteredDAO$,
+        multiSelectEnabled: !! this.data.relationship,
+        selectedObjects$: this.data.selectedObjects$
+      },
+      this,
+      this.__subContext__.createSubContext({ memento: null }));
+
       this.
-        tag(this.summaryView, {
-          data$: this.data.filteredDAO$,
-          multiSelectEnabled: !! this.data.relationship,
-          selectedObjects$: this.data.selectedObjects$
-        }).
+        tag(view).
         start('span').
           show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
           add(this.cls.getAxiomsByClass(foam.core.Action)).
         end();
+    },
+    function click(obj, id) {
+      if ( ! this.stack ) return;
+
+      this.stack.push({
+        class: 'foam.comics.v2.DAOSummaryView',
+        data: obj,
+        config: foam.comics.v2.DAOControllerConfig.create({ dao: this.__subContext__[this.data.data.targetDAOKey] }),
+        idOfRecord: id,
+        backLabel: 'Back'
+      }, this.__subContext__.createSubContext({ memento: null }));
     }
   ]
 });
