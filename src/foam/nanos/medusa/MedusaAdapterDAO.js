@@ -15,10 +15,13 @@ It then marshalls it to the primary mediator, and waits on a response.`,
 
   javaImports: [
     'foam.core.FObject',
+    'foam.dao.DAO',
     'foam.dao.DOP',
     'foam.dao.RemoveSink',
     'foam.lib.formatter.FObjectFormatter',
     'foam.lib.formatter.JSONFObjectFormatter',
+    'static foam.mlang.MLang.AND',
+    'static foam.mlang.MLang.EQ',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
@@ -154,8 +157,10 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       ClusterConfig config = support.getConfig(x, support.getConfigId());
 
 
+      // Primary
+      // put to MDAO, then submit to nodes
+
       if ( config.getIsPrimary() ) {
-        // Primary instance - put to MDAO (delegate)
 
         ClusterCommand cmd = null;
         if ( obj instanceof ClusterCommand ) {
@@ -164,35 +169,39 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         }
 
         getLogger().debug("update", dop.getLabel(), "primary", obj.getClass().getSimpleName());
-        FObject old = getDelegate().find_(x, obj.getProperty("id"));
-        FObject nu = null;
-        String data = null;
         if ( DOP.PUT == dop ) {
-          nu = getDelegate().put_(x, obj);
-          data = data(x, nu, old, dop);
-        } else if ( DOP.REMOVE == dop ) {
-          getDelegate().remove_(x, obj);
-          data = data(x, obj, null, dop);
-        }
-        if ( SafetyUtil.isEmpty(data) ) {
-          getLogger().debug("update", "primary", obj.getProperty("id"), "data", "no delta");
-        } else {
-          MedusaEntry entry = (MedusaEntry) submit(x, data, dop);
-          if ( cmd != null ) {
-            getLogger().debug("update", "primary", obj.getProperty("id"), "setMedusaEntryId", entry.toSummary());
-            cmd.setMedusaEntryId((Long) entry.getId());
-            if ( DOP.PUT == dop ) {
-              cmd.setData(nu);
-            } else if ( DOP.REMOVE == dop ) {
-              cmd.setData(null);
+          FObject old = getDelegate().find_(x, obj.getProperty("id"));
+          FObject nu = getDelegate().put_(x, obj);
+          String data = data(x, nu, old, dop);
+          // data will be empty if only changes are storageTransient.
+          if ( ! SafetyUtil.isEmpty(data) ) {
+            MedusaEntry entry = (MedusaEntry) submit(x, data, dop);
+            getLogger().debug("update", "primary", obj.getProperty("id"), "entry", entry.toSummary());
+            if ( cmd != null ) {
+              cmd.setMedusaEntryId((Long) entry.getId());
             }
           }
+          if ( cmd != null ) {
+            cmd.setData(nu);
+            return cmd;
+          }
+          return nu;
+        } else if ( DOP.REMOVE == dop ) {
+          FObject result = getDelegate().remove_(x, obj);
+          String data = data(x, obj, null, dop);
+          MedusaEntry entry = (MedusaEntry) submit(x, data, dop);
+          if ( cmd != null ) {
+            cmd.setMedusaEntryId((Long) entry.getId());
+            cmd.setData(result);
+            return cmd;
+          }
+          return result;
         }
-        if ( cmd != null ) {
-          return cmd;
-        }
-        return nu;
       }
+
+
+      // Secondary
+      // send cmd to Primary
 
       ClusterCommand cmd = new ClusterCommand(x, getNSpec().getName(), dop, obj);
       getLogger().debug("update", dop.getLabel(), "client", "cmd", obj.getProperty("id"), "send");
@@ -202,30 +211,22 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       pm.log(x);
       cmd.logHops(x);
       getLogger().debug("update", dop.getLabel(), "client", "cmd", obj.getProperty("id"), "receive", cmd.getMedusaEntryId());
-      if ( cmd.getMedusaEntryId() > 0 ) {
+     if ( cmd.getMedusaEntryId() > 0 ) {
         getLogger().debug("update", dop.getLabel(), cmd.getMedusaEntryId(), "registry", "wait");
         MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
         registry.wait(x, (Long) cmd.getMedusaEntryId());
         getLogger().debug("update", dop.getLabel(), cmd.getMedusaEntryId(), "registry", "unwait");
-      } else {
-        getLogger().debug("update", dop.getLabel(), cmd.getMedusaEntryId(), "promoted");
       }
       FObject result = cmd.getData();
       if ( DOP.PUT == dop ) {
         if ( result != null ) {
           FObject nu = getDelegate().find_(x, result.getProperty("id"));
           if ( nu == null ) {
-            // REVIEW: Still not clear on the scenario for this.
+            // TODO/REVIEW - still occuring?
             getLogger().error("update", dop.getLabel(), cmd.getMedusaEntryId(), "find", result.getProperty("id"), "null");
-            nu = result;
-          } else {
-            // TODO: remove after further testing.
-            FObjectFormatter formatter = formatter_.get();
-            if ( formatter.maybeOutputDelta(result, nu) ) {
-              getLogger().warning("update", dop.getLabel(), cmd.getMedusaEntryId(), "delta", formatter.builder().toString());
-            }
           }
-          return nu;
+          // put again to update storageTransient properties
+          return getDelegate().put_(x, result);
         }
         // TODO/REVIEW
         getLogger().error("update", dop.getLabel(), obj.getProperty("id"), "result,null");
