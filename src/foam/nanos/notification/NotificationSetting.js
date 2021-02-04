@@ -10,7 +10,8 @@ foam.CLASS({
   name: 'NotificationSetting',
 
   implements: [
-    'foam.nanos.auth.Authorizable'
+    'foam.nanos.auth.Authorizable',
+    'foam.nanos.auth.ServiceProviderAware'
   ],
 
   javaImports: [
@@ -19,6 +20,7 @@ foam.CLASS({
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
+    'foam.nanos.auth.ServiceProviderAwareSupport',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
@@ -55,6 +57,20 @@ foam.CLASS({
       class: 'Boolean',
       name: 'enabled',
       value: true
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
+      name: 'spid',
+      javaFactory: `
+        var spidMap = new java.util.HashMap();
+        spidMap.put(
+          NotificationSetting.class.getName(),
+          new foam.core.PropertyInfo[] { NotificationSetting.OWNER }
+        );
+        return new ServiceProviderAwareSupport()
+          .findSpid(foam.core.XLocator.get(), spidMap, this);
+      `
     }
   ],
 
