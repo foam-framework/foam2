@@ -44,6 +44,9 @@ foam.CLASS({
 
             CapabilityJunctionStatus chainedStatus = checkPrereqsChainedStatus(x, ucj);
 
+            // if the ucj is already equal to the chainedStatus, it does not need to be updated
+            if ( chainedStatus == ucj.getStatus() ) return;
+
             // the following should be checked if the result of previous rule ( validateUCJDataOnPut ) 
             // is not ACTION_REQUIRED. In the ACTION_REQUIRED case, the ucj should be put into the
             // dao without any additional checks
