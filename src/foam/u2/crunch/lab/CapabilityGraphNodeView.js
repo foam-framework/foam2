@@ -135,7 +135,7 @@ foam.CLASS({
                 .on('click', function() {
                   var menu = 'admin.data';
                   var dao = 'userCapabilityJunctionDAO';
-                  self.memento.value = [menu, dao, capability.id].join(foam.nanos.controller.Memento.SEPARATOR);
+                  self.memento.value = [menu, dao, ucj.id].join(foam.nanos.controller.Memento.SEPARATOR);
                 })
               .end()
               ;
