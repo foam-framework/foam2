@@ -1,4 +1,4 @@
-p({"class":"foam.nanos.notification.NotificationSetting","id":1,"spid":"*"})
-p({"class":"foam.nanos.notification.EmailSetting","id":2,"spid":"*"})
-p({"class":"foam.nanos.notification.SlackSetting","id":3,"spid":"*"})
-p({"class":"foam.nanos.notification.sms.SMSSetting","id":4,"spid":"*","enabled":false})
+p({"class":"foam.nanos.notification.NotificationSetting","id":"02FB70D9-46CF-417A-A458-5B0DCD4CC464","spid":"*"})
+p({"class":"foam.nanos.notification.EmailSetting","id":"9600DAE7-5AB1-4CBC-82C7-D58598E55EBA","spid":"*"})
+p({"class":"foam.nanos.notification.SlackSetting","id":"FCEEDF3E-63BF-425F-8F64-47C59F2F8016","spid":"*"})
+p({"class":"foam.nanos.notification.sms.SMSSetting","id":"7017E2D8-D8CD-402D-BCCA-ACE01177BD12","spid":"*","enabled":false})
