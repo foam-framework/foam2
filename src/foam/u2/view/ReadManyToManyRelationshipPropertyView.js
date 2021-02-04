@@ -41,7 +41,8 @@ foam.CLASS({
         class: 'foam.comics.v2.DAOSummaryView',
         data: obj,
         config: this.DAOControllerConfig.create({ dao: this.data.dao.delegate }),
-        idOfRecord: id
+        idOfRecord: id,
+        backLabel: 'Back'
       }, this.__subContext__.createSubContext({ memento: null }));
     }
   ]

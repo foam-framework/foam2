@@ -60,7 +60,8 @@ foam.CLASS({
         class: 'foam.comics.v2.DAOSummaryView',
         data: obj,
         config: foam.comics.v2.DAOControllerConfig.create({ dao: this.__subContext__[this.data.data.targetDAOKey] }),
-        idOfRecord: id
+        idOfRecord: id,
+        backLabel: 'Back'
       }, this.__subContext__.createSubContext({ memento: null }));
     }
   ]
