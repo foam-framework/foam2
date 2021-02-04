@@ -15,7 +15,6 @@ foam.CLASS({
   ],
 
   imports: [
-    'memento',
     'stack'
   ],
 
@@ -43,7 +42,7 @@ foam.CLASS({
         data: obj,
         config: this.DAOControllerConfig.create({ dao: this.data.dao.delegate }),
         idOfRecord: id
-      }, this.__subContext__.createSubContext({memento: this.memento.tail}));
+      }, this.__subContext__.createSubContext({ memento: null }));
     }
   ]
 });
