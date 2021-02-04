@@ -44,7 +44,7 @@ foam.CLASS({
         class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
-      minLength: 6
+      minLength: 10
     },
     {
       class: 'Password',
