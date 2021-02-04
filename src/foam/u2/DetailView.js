@@ -124,13 +124,17 @@ foam.CLASS({
       display: flex;
       padding-top: 8px;
     }
-    
+
     ^ .foam-u2-stack-StackView {
       padding-left: 0!important;
     }
 
     ^ .foam-u2-CheckBox {
       margin: 0px;
+    }
+
+    ^ .full-width {
+      width: 100%;
     }
   `,
 
@@ -208,8 +212,9 @@ foam.CLASS({
 
         return self.actionBorder(
           this.
-            E('table').
             addClass(this.myClass()).
+            E('table').
+            addClass('full-width').
             add(title).
             forEach(properties, function(p) {
               var config = self.config && self.config[p.name];
