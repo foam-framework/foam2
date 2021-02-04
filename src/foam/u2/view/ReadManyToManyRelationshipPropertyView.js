@@ -10,7 +10,8 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   exports: [
-    'click'
+    'click',
+    'click as dblclick'
   ],
 
   imports: [
