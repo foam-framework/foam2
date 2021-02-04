@@ -24,7 +24,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'maxStringDataSize',
-      value: 1024 * 3
+      value: 1024 * 3 ** 10
     }
   ],
 
@@ -52,6 +52,10 @@ foam.CLASS({
       });
 
       return Promise.all(promises).then((values) => {
+        values.map(f => f.map(f2 => {
+          f2.dataString = undefined;
+          f2.data = undefined;
+        }));
         props.forEach((prop, i) => {
           prop.set(obj, values[i]);
         });
