@@ -143,7 +143,7 @@ foam.CLASS({
     }
 
     ^ table .foam-u2-tag-TextArea {
-      width: 100%;
+      max-width: 100%;
     }
   `,
 
