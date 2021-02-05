@@ -93,7 +93,7 @@ foam.CLASS({
       let props;
       if ( this.hasOwnProperty('properties') ) {
         props = this.properties.map(p => {
-          if ( foam.String.isInstance(p) ) return cls.getAxiomByName(p);
+          if ( foam.String.isInstance(p) ) return data.cls_.getAxiomByName(p);
           if ( p.name ) return data.cls_.getAxiomByName(p.name).clone().copyFrom(p);
         });
       }  else {
