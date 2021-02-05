@@ -132,7 +132,7 @@ foam.CLASS({
         AuthService authService = (AuthService) x.get("auth");
         Map<String,List> cache = (Map<String,List>) getTemplateCache(x);
         List<PermissionTemplateReference> templates = (List<PermissionTemplateReference>) cache.get(getDAOKey());
-        if ( ! templates.stream().anyMatch(t -> authService.check(x, createPermission((PermissionTemplateReference) t, obj))) ) {
+        if ( templates != null && ! templates.stream().anyMatch(t -> authService.check(x, createPermission((PermissionTemplateReference) t, obj))) ) {
           ((foam.nanos.logger.Logger) x.get("logger")).debug("ExtendedConfigurableAuthorizer", "Permission denied");
           throw new AuthorizationException();
         }
