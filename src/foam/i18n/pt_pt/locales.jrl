@@ -261,7 +261,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.FOOTER_LINK",target:"Iniciar sessão"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.ERROR_MSG",target:"Houve um problema na criação da sua conta"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.EMAIL_ERR",target:"É necessário um email válido"})
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.PASSWORD_ERR",target:"a senha deve ter pelo menos 6 caracteres"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.PASSWORD_ERR",target:"a senha deve ter pelo menos 10 caracteres"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.EMAIL_AVAILABILITY_ERR",target:"Este e-mail foi recebido. Por favor, tente outro."})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.USERNAME_EMPTY_ERR",target:"Nome de usuário"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.USERNAME_AVAILABILITY_ERR",target:"Esse nome de usuário já está em uso. Por favor, tente outro."})

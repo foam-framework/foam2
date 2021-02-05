@@ -144,7 +144,6 @@ foam.CLASS({
                 self.EQ(self.UserCapabilityJunction.SOURCE_ID, crunchUser)
               )).select().then(r => {
                 r.array.forEach(ucj => {
-                  console.log('replacing', ucj.targetId, ucj);
                   let capability = graph.data[ucj.targetId].data;
                   graph.data[ucj.targetId].data = [
                     capability, ucj

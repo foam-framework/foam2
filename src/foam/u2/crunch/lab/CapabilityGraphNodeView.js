@@ -81,7 +81,6 @@ foam.CLASS({
       var capability = this.data;
       var ucj = null;
       if ( Array.isArray(this.data) ) {
-        console.log('YES, ARRY', this.data);
         capability = this.data[0];
         ucj = this.data[1];
       }
