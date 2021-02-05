@@ -425,28 +425,23 @@ public interface FObject
   }
 
   default void validate(foam.core.X x) {
+    CompoundException compoundException = new CompoundException("Failed validation: " + getClassInfo().getId());;
     List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
-    ArrayList<ValidationException> exceptions = new ArrayList<ValidationException>();
     for ( PropertyInfo prop : props ) {
       try {
         prop.validateObj(x, this);
       } catch (IllegalStateException e) {
-        ValidationException exception = new ValidationException();
-        exception.setPropertyInfo(prop);
-        exception.setPropName(prop.getName());
-        exception.setErrorMessage(e.getMessage());
-        exceptions.add(exception);
-      } catch (ValidationException e) {
-        e.setPropertyInfo(prop);
-        e.setPropName(prop.getName());
-        exceptions.add(e);
+        var ve = new ValidationException(e.getMessage());
+        ve.setPropertyInfo(prop);
+        ve.setPropName(prop.getName());
+        compoundException.add(ve);
+      } catch (ValidationException ve) {
+        ve.setPropertyInfo(prop);
+        ve.setPropName(prop.getName());
+        compoundException.add(ve);
       }
     }
-    if ( exceptions.size() > 0 ) {
-      CompoundException compoundException = new CompoundException();
-      compoundException.setExceptions(exceptions);
-      throw compoundException;
-    }
+    compoundException.maybeThrow();
   }
 
   default boolean verify(byte[] signature, java.security.Signature verifier) throws java.security.SignatureException {
