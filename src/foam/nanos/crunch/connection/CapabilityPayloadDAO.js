@@ -11,9 +11,7 @@ foam.CLASS({
   flags: ['java'],
 
   javaImports: [
-    'foam.core.FObject',
-    'foam.core.X',
-    'foam.core.Validatable',
+    'foam.core.*',
     'foam.dao.*',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
@@ -101,7 +99,7 @@ foam.CLASS({
                     data = ( ucj != null ) ? ucj.getData() : null;
                     if ( data == null )
                       data = (FObject) capability.getOf().newInstance();
-                  } catch (Exception e){
+                  } catch (java.lang.Exception e){
                     throw new RuntimeException(e);
                   }
                 }
@@ -211,6 +209,8 @@ foam.CLASS({
                 }
                 catch (IllegalStateException | IllegalArgumentException ie) {
                   validationErrors.put(key, ie.getMessage());
+                } catch (ValidationException ve) {
+                  validationErrors.put(key, ve.getErrorMessage());
                 } catch (Throwable t) {
                   Logger logger = (Logger) x.get("logger");
                   logger.warning("Unexpected exception validating " + key + ": ", t);
