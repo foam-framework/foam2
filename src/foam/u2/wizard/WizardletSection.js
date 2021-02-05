@@ -53,7 +53,6 @@ foam.CLASS({
       name: 'isValid',
       class: 'Boolean',
       expression: function (wizardlet$of, data, data$errors_) {
-        if ( ! wizardlet$of ) return true;
         if ( ! data ) return false;
 
         let sectionErrors = [];
