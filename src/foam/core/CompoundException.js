@@ -97,11 +97,11 @@ foam.CLASS({
       name: 'add',
       args: [{ name: 't', javaType: 'Throwable' }],
       javaCode: `
-        for ( var e : t.getSuppressed() ) {
-          add(e);
-        }
-
-        if ( t.getSuppressed().length == 0 ) {
+        if ( t instanceof CompoundException ) {
+          for ( var e : t.getSuppressed() ) {
+            add(e);
+          }
+        } else {
           addSuppressed(t);
         }
       `
