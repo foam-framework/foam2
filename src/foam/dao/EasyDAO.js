@@ -189,18 +189,18 @@ foam.CLASS({
         if ( getGuid() )
           delegate = new foam.dao.GUIDDAO.Builder(getX()).setDelegate(delegate).build();
 
-        if ( getMdao() != null ) {
+        if ( getMdao() != null &&
+             getLastDao() == null ) {
           setLastDao(delegate);
         }
 
-        if ( getCluster() ) {
-          if ( getMdao() != null ) {
-            logger.debug(getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
-            delegate = new foam.nanos.medusa.MedusaAdapterDAO.Builder(getX())
-              .setNSpec(getNSpec())
-              .setDelegate(delegate)
-              .build();
-          }
+        if ( getCluster() &&
+             getMdao() != null ) {
+          logger.debug(getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
+          delegate = new foam.nanos.medusa.MedusaAdapterDAO.Builder(getX())
+            .setNSpec(getNSpec())
+            .setDelegate(delegate)
+            .build();
         }
 
         if ( getServiceProviderAware() ) {

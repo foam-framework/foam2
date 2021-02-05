@@ -964,28 +964,7 @@ configuration for contacting the primary node.`,
           Object result = dao.cmd(DAO.LAST_CMD);
           if ( result != null &&
                result instanceof DAO ) {
-            getLogger().debug("mdao", "cmd", serviceName, dao.getClass().getSimpleName(), dao.getOf().getId());
             dao = (DAO) result;
-          // } else {
-          //   while ( dao != null ) {
-          //     getLogger().debug("mdao", "while", serviceName, dao.getClass().getSimpleName(), dao.getOf().getId());
-          //     if ( dao instanceof MDAO ) {
-          //       break;
-          //     }
-          //     if ( dao instanceof EasyDAO ) {
-          //       dao = ((EasyDAO) dao).getMdao();
-          //       if ( dao != null ) {
-          //         break;
-          //       }
-          //     }
-          //     if ( dao instanceof ProxyDAO ) {
-          //       dao = ((ProxyDAO) dao).getDelegate();
-          //     } else {
-          //       dao = null;
-          //     }
-          //   }
-          }
-          if ( dao != null ) {
             getMdaos().put(serviceName, dao);
             getLogger().debug("mdao", "found", serviceName, dao.getClass().getSimpleName(), dao.getOf().getId());
             return dao;

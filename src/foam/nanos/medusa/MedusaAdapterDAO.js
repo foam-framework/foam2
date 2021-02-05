@@ -29,30 +29,17 @@ It then marshalls it to the primary mediator, and waits on a response.`,
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
     'foam.util.SafetyUtil',
+    'java.util.concurrent.ConcurrentLinkedDeque',
     'java.util.List'
   ],
 
   classes: [
     {
-      documentation: `Model and DAO used to control access to the underlying MDAO on find/select calls when a put/remove is in-flight on the primary.`,
-      name: 'IndexState',
-      flags: ['java'],
+      name: 'WriteLock',
       properties: [
         {
-          name: 'id',
-          class: 'Long'
-        },
-        {
-          name: 'objId',
-          class: 'Object'
-        },
-        {
-          name: 'index',
-          class: 'Long'
-        },
-        {
-          name: 'state',
-          class: 'Object'
+          name: 'complete',
+          class: 'Boolean'
         }
       ]
     }
@@ -80,25 +67,6 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         .setDelegate(new foam.dao.NullDAO(getX(), getDelegate().getOf()))
         .build();
       `
-    },
-    {
-      name: 'indexStateDAO',
-      class: 'foam.dao.DAOProperty',
-      javaFactory: `
-      foam.dao.MDAO mdao = new foam.dao.MDAO(IndexState.getOwnClassInfo());
-      mdao.addIndex(IndexState.INDEX);
-      DAO dao = new foam.dao.SequenceNumberDAO.Builder(getX())
-          .setDelegate(mdao)
-          .build();
-      dao = dao.orderBy(IndexState.ID);
-      return dao;
-      `
-    },
-    {
-      documentation: `MDAO state used to calculate 'when' for find and select operations.`,
-      name: 'state',
-      class: 'Object',
-      synchronized: true
     },
     {
       name: 'logger',
@@ -141,6 +109,8 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       return formatter;
     }
   };
+
+  protected ConcurrentLinkedDeque writeLocks_ = new ConcurrentLinkedDeque();
           `
         }));
       }
@@ -149,38 +119,43 @@ It then marshalls it to the primary mediator, and waits on a response.`,
 
   methods: [
     {
-      name: 'init_',
-      javaCode: `
-      getIndexStateDAO();
-      `
-    },
-    {
-      name: 'readDelegate',
+      name: 'waitOnWriteLock',
       args: [
         {
           name: 'x',
           type: 'X'
         }
       ],
-      type: 'foam.dao.DAO',
       javaCode: `
-      Object state = getState();
-      if ( state != null ) {
-        return (DAO) getDelegate().cmd_(x, new MDAO.WhenCmd(state));
+      WriteLock lock = (WriteLock) writeLocks_.peekLast();
+      if ( lock != null &&
+           ! lock.getComplete() ) {
+        synchronized ( lock ) {
+          while ( ! lock.getComplete() ) {
+              try {
+                getLogger().debug("waitOnWriteLock", "wait", writeLocks_.size());
+                lock.wait(1000L);
+                getLogger().debug("waitOnWriteLock", "unwait", writeLocks_.size());
+              } catch (InterruptedException e) {
+                break;
+              }
+          }
+        }
       }
-      return getDelegate();
       `
     },
     {
       name: 'find_',
       javaCode: `
-      return readDelegate(x).find_(x, id);
+      waitOnWriteLock(x);
+      return getDelegate().find_(x, id);
       `
     },
     {
       name: 'select_',
       javaCode: `
-      return readDelegate(x).select_(x, sink, skip, limit, order, predicate);
+      waitOnWriteLock(x);
+      return getDelegate().select_(x, sink, skip, limit, order, predicate);
       `
     },
     {
@@ -252,46 +227,44 @@ It then marshalls it to the primary mediator, and waits on a response.`,
           obj = cmd.getData();
         }
 
-        getLogger().debug("update", dop.getLabel(), "primary", obj.getClass().getSimpleName());
-        IndexState indexState = new IndexState();
-        indexState.setState(getDelegate().cmd_(x, MDAO.NOW_CMD));
+        getLogger().debug("update", "primary", dop, obj.getClass().getSimpleName());
+        // TODO: create a pool of WriteLock to reuse
+        WriteLock writeLock = new WriteLock();
+        getLogger().debug("update", "writeLock", "add");
+        writeLocks_.add(writeLock);
+        try {
         if ( DOP.PUT == dop ) {
           FObject old = getDelegate().find_(x, obj.getProperty("id"));
           FObject nu = getDelegate().put_(x, obj);
-          indexState.setObjId(nu.getProperty("id"));
-          indexState = getIndexStateDAO().put_(x, indexState).fclone();
           String data = data(x, nu, old, dop);
           // data will be empty if only changes are storageTransient.
           if ( ! SafetyUtil.isEmpty(data) ) {
             MedusaEntry entry = (MedusaEntry) submit(x, data, dop);
-            indexState.setIndex(entry.getIndex());
-            getLogger().debug("update", "primary", obj.getProperty("id"), "entry", entry.toSummary());
+            getLogger().debug("update", "primary", dop, obj.getProperty("id"), "entry", entry.toSummary());
             if ( cmd != null ) {
               cmd.setMedusaEntryId((Long) entry.getId());
             }
           }
-          getIndexStateDAO().put_(x, indexState);
-          promoteIndexState(x);
           if ( cmd != null ) {
             cmd.setData(nu);
             return cmd;
           }
           return nu;
         } else if ( DOP.REMOVE == dop ) {
-          indexState.setObjId(obj.getProperty("id"));
-          indexState = getIndexStateDAO().put_(x, indexState).fclone();
           FObject result = getDelegate().remove_(x, obj);
           String data = data(x, obj, null, dop);
           MedusaEntry entry = (MedusaEntry) submit(x, data, dop);
-          indexState.setIndex(entry.getIndex());
-          getIndexStateDAO().put_(x, indexState);
-          promoteIndexState(x);
           if ( cmd != null ) {
             cmd.setMedusaEntryId((Long) entry.getId());
             cmd.setData(result);
             return cmd;
           }
           return result;
+        }
+        } finally {
+          getLogger().debug("update", "writeLock", "complete");
+          writeLock.setComplete(true);
+          notifyWriteLocks(x);
         }
       }
 
@@ -300,20 +273,20 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       // send cmd to Primary
 
       ClusterCommand cmd = new ClusterCommand(x, getNSpec().getName(), dop, obj);
-      getLogger().debug("update", dop.getLabel(), "client", "cmd", obj.getProperty("id"), "send");
+      getLogger().debug("update", "secondary", dop.getLabel(), "client", "cmd", obj.getProperty("id"), "send");
       // PM pm = PM.create(x, this.getClass().getSimpleName(), "cmd");
       PM pm = new PM(this.getClass().getSimpleName(), "cmd");
       cmd = (ClusterCommand) getClientDAO().cmd_(x, cmd);
       pm.log(x);
       cmd.logHops(x);
-      getLogger().debug("update", dop.getLabel(), "client", "cmd", obj.getProperty("id"), "receive", cmd.getMedusaEntryId());
+      getLogger().debug("update", "secondary", dop.getLabel(), "client", "cmd", obj.getProperty("id"), "receive", cmd.getMedusaEntryId());
      if ( cmd.getMedusaEntryId() > 0 ) {
-        getLogger().debug("update", dop.getLabel(), cmd.getMedusaEntryId(), "registry", "wait");
+        getLogger().debug("update", "secondary", dop.getLabel(), cmd.getMedusaEntryId(), "registry", "wait");
         MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
         registry.wait(x, (Long) cmd.getMedusaEntryId());
-        getLogger().debug("update", dop.getLabel(), cmd.getMedusaEntryId(), "registry", "unwait");
+        getLogger().debug("update", "secondary", dop.getLabel(), cmd.getMedusaEntryId(), "registry", "unwait");
       } else {
-        getLogger().debug("update", dop.getLabel(), cmd.getMedusaEntryId(), "promoted");
+        getLogger().debug("update", "secondary", dop.getLabel(), cmd.getMedusaEntryId(), "promoted");
       }
       FObject result = cmd.getData();
       if ( DOP.PUT == dop ) {
@@ -321,16 +294,16 @@ It then marshalls it to the primary mediator, and waits on a response.`,
           FObject nu = getDelegate().find_(x, result.getProperty("id"));
           if ( nu == null ) {
             // TODO/REVIEW - still occuring?
-            getLogger().error("update", dop.getLabel(), cmd.getMedusaEntryId(), "find", result.getProperty("id"), "null");
+            getLogger().error("update", "secondary", dop.getLabel(), cmd.getMedusaEntryId(), "find", result.getProperty("id"), "null");
           }
           // put again to update storageTransient properties
           return getDelegate().put_(x, result);
         }
         // TODO/REVIEW
-        getLogger().error("update", dop.getLabel(), obj.getProperty("id"), "result,null");
+        getLogger().error("update", "secondary", dop.getLabel(), obj.getProperty("id"), "result,null");
       } else { // if ( DOP.REMOVE == dop ) {
         if ( getDelegate().find_(x, obj.getProperty("id")) != null ) {
-          getLogger().error("update", dop.getLabel(), obj.getProperty("id"), "not deleted");
+          getLogger().error("update", "secondary", dop.getLabel(), obj.getProperty("id"), "not deleted");
           return getDelegate().remove_(x, obj);
         }
       }
@@ -475,9 +448,8 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       `
     },
     {
-      documentation: `Set the next available mdao state to be used for find/select calls`,
-      name: 'promoteIndexState',
-      synchronized: true,
+      documentation: 'Notify waiters on completed locks - in order',
+      name: 'notifyWriteLocks',
       args: [
         {
           name: 'x',
@@ -485,31 +457,28 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         }
       ],
       javaCode: `
-      PM pm = PM.create(x, this.getClass().getSimpleName(), "promoteIndexState");
-      try {
-        // IndexStateDAO ordered in original 'put' order.
-        // Any entries with an 'index' value can be removed, and
-        // the first entry without an 'index' is the next, in order,
-        // state which can be used for find/select.
-        // If no unfinished entries found, then the find/select state
-        // can be reset.
-
-        Object state = null;
-        List<IndexState> indexStates = (List) ((ArraySink) getIndexStateDAO().select_(x, new ArraySink(), 0, 0, null, null)).getArray();
-        for ( IndexState indexState : indexStates ) {
-          if ( indexState.getIndex() == 0 ) {
-            state = indexState.getState();
-            getLogger().debug("promoteIndexState", "found", indexState.getId());
-            break;
-          } else {
-            getIndexStateDAO().remove_(x, indexState);
-            getLogger().debug("promoteIndexState", "remove", indexState.getIndex());
+      if ( ! writeLocks_.isEmpty() ) {
+        PM pm = PM.create(x, this.getClass().getSimpleName(), "notifyWriteLocks");
+        try {
+          synchronized ( writeLocks_ ) {
+            while ( ! writeLocks_.isEmpty() ) {
+              WriteLock writeLock = (WriteLock) writeLocks_.peek();
+              if ( writeLock == null ||
+                   ! writeLock.getComplete() ) {
+                break;
+              } else if ( writeLock.getComplete() ) {
+                writeLocks_.poll();
+                getLogger().debug("notifyWriteLocks", "pop", writeLocks_.size());
+                synchronized ( writeLock ) {
+                  getLogger().debug("notifyWriteLocks", "notifyAll");
+                  writeLock.notifyAll();
+                }
+              }
+            }
           }
+        } finally {
+          pm.log(x);
         }
-        getLogger().debug("promoteIndexState", "state", state);
-        setState(state);
-      } finally {
-        pm.log(x);
       }
       `
     }
