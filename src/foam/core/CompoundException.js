@@ -9,12 +9,15 @@
 foam.CLASS({
   name: 'CompoundException',
   package: 'foam.core',
-  implements: [ 'foam.core.ExceptionInterface' ],
   extends: 'foam.core.FOAMException',
+
+  implements: [ 'foam.core.ExceptionInterface' ],
+
   javaImports: [
     'foam.core.ExceptionInterface',
     'java.util.ArrayList'
   ],
+
   javaGenerateConvenienceConstructor: false,
 
   axioms: [
@@ -23,13 +26,13 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(foam.java.Code.create({
           data: `
-  public CompoundException(String message) {
-    super(message);
-  }
+            public CompoundException(String message) {
+              super(message);
+            }
 
-  public CompoundException(String message, java.lang.Exception cause) {
-    super(message, cause);
-  }
+            public CompoundException(String message, java.lang.Exception cause) {
+              super(message, cause);
+            }
             `
         }));
       }
@@ -47,19 +50,20 @@ foam.CLASS({
       class: 'Object',
       name: 'sb',
       javaType: 'ThreadLocal',
-      javaFactory: `return new ThreadLocal<StringBuilder>() {
-                @Override
-                protected StringBuilder initialValue() {
-                    return new StringBuilder();
-                }
-            
-                @Override
-                public StringBuilder get() {
-                    StringBuilder b = super.get();
-                    b.setLength(0);
-                    return b;
-                }
-            };`
+      javaFactory: `
+        return new ThreadLocal<StringBuilder>() {
+          @Override
+          protected StringBuilder initialValue() {
+            return new StringBuilder();
+          }
+
+          @Override
+          public StringBuilder get() {
+            StringBuilder b = super.get();
+            b.setLength(0);
+            return b;
+          }
+      };`
     }
   ],
 
@@ -67,28 +71,29 @@ foam.CLASS({
     {
       // TODO: cloning this property from ExceptionInterface creates a bug.
       name: 'getClientRethrowException',
-      documentation: 
+      documentation:
       `If an exception is intended to go to the client, this
-            returns an exception object; it returns null otherwise.
+      returns an exception object; it returns null otherwise.
 
-            Note that the exception returned by this property is the
-            one that should be re-thrown. This is particularly useful
-            for CompoundException where the CompoundException itself
-            is not intended to be re-thrown but any of its child
-            exceptions might be.`,
+      Note that the exception returned by this property is the
+      one that should be re-thrown. This is particularly useful
+      for CompoundException where the CompoundException itself
+      is not intended to be re-thrown but any of its child
+      exceptions might be.`,
       type: 'RuntimeException',
       visibility: 'public',
-      javaCode: `ArrayList<RuntimeException> exceptions = getExceptions();
-            for ( RuntimeException re : exceptions ) {
-                if ( re instanceof ExceptionInterface ) {
-                    RuntimeException clientE =
-                        ((ExceptionInterface) re).getClientRethrowException();
-                    if ( clientE != null ) {
-                        return clientE;
-                    }
-                }
+      javaCode: `
+        ArrayList<RuntimeException> exceptions = getExceptions();
+        for ( RuntimeException re : exceptions ) {
+          if ( re instanceof ExceptionInterface ) {
+            RuntimeException clientE =
+                ((ExceptionInterface) re).getClientRethrowException();
+            if ( clientE != null ) {
+              return clientE;
             }
-            return null;`
+          }
+        }
+        return null;`
     },
     {
       name: 'add',
@@ -103,32 +108,32 @@ foam.CLASS({
       name: 'getMessage',
       type: 'String',
       javaCode: `
-            StringBuilder str = (StringBuilder) getSb().get();
-            var size = getExceptions().size();
-        
-            for ( int i = 0; i < size; i++ ) {
-              Throwable t = (Throwable) getExceptions().get(i);
-              var counter = i + 1;
-        
-              str.append('[')
-                .append(counter)
-                .append('/')
-                .append(size)
-                .append("] ")
-                .append(t.getClass().getSimpleName())
-                .append(":")
-                .append(t.getMessage());
+        StringBuilder str = (StringBuilder) getSb().get();
+        var size = getExceptions().size();
 
-              while ( t.getCause() != null ) {
-                t = t.getCause();
-                str.append(",\\n  Cause: ")
-                  .append(t.getClass().getSimpleName())
-                  .append(":")
-                  .append(t.getMessage());
-              }
-              if ( counter < size ) str.append(';');
-            }
-            return str.toString();`
+        for ( int i = 0; i < size; i++ ) {
+          Throwable t = (Throwable) getExceptions().get(i);
+          var counter = i + 1;
+
+          str.append('[')
+            .append(counter)
+            .append('/')
+            .append(size)
+            .append("] ")
+            .append(t.getClass().getSimpleName())
+            .append(":")
+            .append(t.getMessage());
+
+          while ( t.getCause() != null ) {
+            t = t.getCause();
+            str.append(",\\n  Cause: ")
+              .append(t.getClass().getSimpleName())
+              .append(":")
+              .append(t.getMessage());
+          }
+          if ( counter < size ) str.append(';');
+        }
+        return str.toString();`
     }
   ]
 });

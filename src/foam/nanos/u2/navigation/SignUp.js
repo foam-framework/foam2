@@ -134,7 +134,7 @@ foam.CLASS({
         passwordIcon: true
       },
       validateObj: function(desiredPassword) {
-        if ( ! desiredPassword || desiredPassword.length < 6 ) return this.PASSWORD_ERR;
+        if ( ! desiredPassword || desiredPassword.length < 10 ) return this.PASSWORD_ERR;
       },
       required: true
     }
