@@ -29,6 +29,7 @@ foam.CLASS({
       white-space: nowrap;
       inset: none;
       cursor: pointer;
+      width: 250px;
     }
 
     ^:hover > ^heading {
@@ -42,6 +43,7 @@ foam.CLASS({
     }
 
     ^label {
+      font-weight: 300;
       min-width: 120px;
       padding: 4px;
       font-weight: normal;
@@ -220,8 +222,7 @@ foam.CLASS({
             addClass(self.myClass('select-level')).
             style({
               'width':         '100%',
-              'padding-right': '20px',
-              'display':       'inline-flex'
+              'padding-right': '20px'
             }).
             addClass(self.myClass('label')).
             call(this.formatter, [self.data]).
@@ -231,6 +232,7 @@ foam.CLASS({
               style({
                 'visibility':    'visible',
                 'font-size':     '16px',
+                'float':         'right',
                 'display':       'inline-block',
                 'margin-top':    'auto',
                 'margin-bottom': 'auto',

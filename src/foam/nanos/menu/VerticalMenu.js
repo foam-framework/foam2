@@ -39,7 +39,6 @@ foam.CLASS({
     display: inline-block;
     position: absolute;
     height: calc(100vh - 80px);
-    width: 250px;
     overflow-x: hidden;
     z-index: 100;
     font-size: 26px;
@@ -53,13 +52,6 @@ foam.CLASS({
     margin: 14px 0 0;
   }
 
-  ^ .foam-u2-view-TreeViewRow-label {
-    font-weight: 300;
-  }
-
-  ^ .foam-u2-view-TreeViewRow {
-    width: 100%;
-  }
   ^ .tree-view-height-manager {
     margin-bottom: 40px;
   }
