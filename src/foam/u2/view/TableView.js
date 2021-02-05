@@ -10,6 +10,10 @@ foam.CLASS({
   extends: 'foam.u2.view.UnstyledTableView',
 
   css: `
+    ^ {
+      overflow-x: scroll;
+    }
+
     ^tbody {
       display: flow-root;
     }
