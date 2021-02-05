@@ -153,7 +153,7 @@ foam.CLASS({
       let p = Promise.resolve();
 
       // Intercept view for regular user capability options
-      console.log('intercept', intercept)
+      console.debug('intercept', intercept)
       if ( intercept.capabilities.length > 1 ) {
         p = p.then(() => {
           return self.maybeLaunchInterceptView(intercept);
