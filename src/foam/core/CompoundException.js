@@ -100,7 +100,14 @@ foam.CLASS({
     },
     {
       name: 'maybeThrow',
-      javaCode: 'if ( getExceptions().size() != 0 ) throw this;'
+      javaCode: `
+        if ( getExceptions().length == 1 ) {
+          throw getExceptions()[0] instanceof RuntimeException
+            ? (RuntimeException) getExceptions()[0] : this;
+        }
+
+        if ( getExceptions().length >= 2 ) throw this;
+      `
     },
     {
       name: 'getMessage',
