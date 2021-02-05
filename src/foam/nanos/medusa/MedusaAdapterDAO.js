@@ -28,9 +28,11 @@ It then marshalls it to the primary mediator, and waits on a response.`,
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
+    'java.util.HashMap',
+    'java.util.Map',
+    'java.util.List',
     'foam.util.SafetyUtil',
     'java.util.concurrent.ConcurrentLinkedDeque',
-    'java.util.List'
   ],
 
   classes: [
@@ -110,7 +112,9 @@ It then marshalls it to the primary mediator, and waits on a response.`,
     }
   };
 
-  protected ConcurrentLinkedDeque writeLocks_ = new ConcurrentLinkedDeque();
+  // TODO: pool of reusable WriteLocks
+  protected Map<Object, WriteLock> findLocks_ = new HashMap();
+  protected ConcurrentLinkedDeque selectLocks_ = new ConcurrentLinkedDeque();
           `
         }));
       }
@@ -119,42 +123,40 @@ It then marshalls it to the primary mediator, and waits on a response.`,
 
   methods: [
     {
-      name: 'waitOnWriteLock',
-      args: [
-        {
-          name: 'x',
-          type: 'X'
-        }
-      ],
+      name: 'find_',
       javaCode: `
-      WriteLock lock = (WriteLock) writeLocks_.peekLast();
-      if ( lock != null &&
-           ! lock.getComplete() ) {
-        synchronized ( lock ) {
-          while ( ! lock.getComplete() ) {
-              try {
-                getLogger().debug("waitOnWriteLock", "wait", writeLocks_.size());
-                lock.wait(1000L);
-                getLogger().debug("waitOnWriteLock", "unwait", writeLocks_.size());
-              } catch (InterruptedException e) {
-                break;
-              }
+      WriteLock findLock = findLocks_.get(id);
+      if ( findLock != null &&
+           ! findLock.getComplete() ) {
+        synchronized ( findLock ) {
+          while ( ! findLock.getComplete() ) {
+            try {
+              findLock.wait(1000L);
+            } catch (InterruptedException e) {
+              break;
+            }
           }
         }
       }
-      `
-    },
-    {
-      name: 'find_',
-      javaCode: `
-      waitOnWriteLock(x);
       return getDelegate().find_(x, id);
       `
     },
     {
       name: 'select_',
       javaCode: `
-      waitOnWriteLock(x);
+      WriteLock lock = (WriteLock) selectLocks_.peekLast();
+      if ( lock != null &&
+           ! lock.getComplete() ) {
+        synchronized ( lock ) {
+          while ( ! lock.getComplete() ) {
+              try {
+                lock.wait(1000L);
+              } catch (InterruptedException e) {
+                break;
+              }
+          }
+        }
+      }
       return getDelegate().select_(x, sink, skip, limit, order, predicate);
       `
     },
@@ -229,12 +231,16 @@ It then marshalls it to the primary mediator, and waits on a response.`,
 
         getLogger().debug("update", "primary", dop, obj.getClass().getSimpleName());
         // TODO: create a pool of WriteLock to reuse
-        WriteLock writeLock = new WriteLock();
-        getLogger().debug("update", "writeLock", "add");
-        writeLocks_.add(writeLock);
+        WriteLock selectLock = new WriteLock();
+        selectLocks_.add(selectLock);
+        WriteLock findLock = null;
         try {
         if ( DOP.PUT == dop ) {
           FObject old = getDelegate().find_(x, obj.getProperty("id"));
+          if ( old != null ) {
+            findLock = new WriteLock();
+            findLocks_.put(obj.getProperty("id"), findLock);
+          }
           FObject nu = getDelegate().put_(x, obj);
           String data = data(x, nu, old, dop);
           // data will be empty if only changes are storageTransient.
@@ -262,9 +268,15 @@ It then marshalls it to the primary mediator, and waits on a response.`,
           return result;
         }
         } finally {
-          getLogger().debug("update", "writeLock", "complete");
-          writeLock.setComplete(true);
-          notifyWriteLocks(x);
+          if ( findLock != null ) {
+            synchronized ( findLock ) {
+              findLock.setComplete(true);
+              findLock.notifyAll();
+            }
+            findLocks_.remove(findLock);
+          }
+          selectLock.setComplete(true);
+          notifySelectors(x);
         }
       }
 
@@ -342,9 +354,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
           if ( id != null &&
                id > 0L ) {
             MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
-            getLogger().debug("cmd", id, "registry", "wait");
             registry.wait(x, id);
-            getLogger().debug("cmd", id, "registry", "unwait");
           } else {
             getLogger().debug("cmd", "ClusterCommand", "medusaEntry", "null");
           }
@@ -427,15 +437,12 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         getLogger().debug("submit", entry.getId());
 
         MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
-        getLogger().debug("submit", entry.getId(), "registry", "register");
         registry.register(x, (Long) entry.getId());
         PM pmPut = new PM(this.getClass().getSimpleName(), "submit", "put");
         entry = (MedusaEntry) getMedusaEntryDAO().put_(x, entry);
         pmPut.log(x);
         PM pmWait = new PM(this.getClass().getSimpleName(), "submit", "wait");
-        getLogger().debug("submit", entry.getId(), "registry", "wait");
         registry.wait(x, (Long) entry.getId());
-        getLogger().debug("submit", entry.getId(), "registry", "unwait");
         pmWait.log(x);
         return entry;
       } catch (Throwable t) {
@@ -448,8 +455,8 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       `
     },
     {
-      documentation: 'Notify waiters on completed locks - in order',
-      name: 'notifyWriteLocks',
+      documentation: 'Notify waiters on select locks - in order',
+      name: 'notifySelectors',
       args: [
         {
           name: 'x',
@@ -457,21 +464,19 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         }
       ],
       javaCode: `
-      if ( ! writeLocks_.isEmpty() ) {
-        PM pm = PM.create(x, this.getClass().getSimpleName(), "notifyWriteLocks");
+      if ( ! selectLocks_.isEmpty() ) {
+        PM pm = PM.create(x, this.getClass().getSimpleName(), "notifySelectors");
         try {
-          synchronized ( writeLocks_ ) {
-            while ( ! writeLocks_.isEmpty() ) {
-              WriteLock writeLock = (WriteLock) writeLocks_.peek();
-              if ( writeLock == null ||
-                   ! writeLock.getComplete() ) {
+          while ( ! selectLocks_.isEmpty() ) {
+            synchronized ( selectLocks_ ) {
+              WriteLock selectLock = (WriteLock) selectLocks_.peek();
+              if ( selectLock == null ||
+                   ! selectLock.getComplete() ) {
                 break;
-              } else if ( writeLock.getComplete() ) {
-                writeLocks_.poll();
-                getLogger().debug("notifyWriteLocks", "pop", writeLocks_.size());
-                synchronized ( writeLock ) {
-                  getLogger().debug("notifyWriteLocks", "notifyAll");
-                  writeLock.notifyAll();
+              } else if ( selectLock.getComplete() ) {
+                selectLocks_.poll();
+                synchronized ( selectLock ) {
+                  selectLock.notifyAll();
                 }
               }
             }
