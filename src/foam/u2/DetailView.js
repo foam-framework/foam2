@@ -137,10 +137,6 @@ foam.CLASS({
       table-layout: fixed;
     }
 
-    ^ table tr td:nth-of-type(1) {
-      width: 30%;
-    }
-
     ^ table tr td:nth-of-type(2) {
       width: 70%;
     }

@@ -31,7 +31,6 @@ foam.CLASS({
       padding: 4px 8px 4px 8px;
       text-align: left;
       vertical-align: top;
-      white-space: nowrap;
     }
     .foam-u2-PropertyView-view {
       padding: 2px 8px 2px 6px;
