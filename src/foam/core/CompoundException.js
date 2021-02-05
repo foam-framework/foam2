@@ -96,7 +96,15 @@ foam.CLASS({
     {
       name: 'add',
       args: [{ name: 't', javaType: 'Throwable' }],
-      javaCode: 'addSuppressed(t);'
+      javaCode: `
+        for ( var e : t.getSuppressed() ) {
+          add(e);
+        }
+
+        if ( t.getSuppressed().length == 0 ) {
+          addSuppressed(t);
+        }
+      `
     },
     {
       name: 'maybeThrow',
