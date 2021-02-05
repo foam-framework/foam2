@@ -211,6 +211,15 @@ foam.CLASS({
                   validationErrors.put(key, ie.getMessage());
                 } catch (ValidationException ve) {
                   validationErrors.put(key, ve.getErrorMessage());
+                } catch (CompoundException ce) {
+                  for ( var t : ce.getExceptions() ) {
+                    if ( t instanceof ValidationException ) {
+                      var ve = (ValidationException) t;
+                      validationErrors.put(
+                        String.format("%s[%s]", key, ve.getPropName()),
+                        ve.getErrorMessage());
+                    }
+                  }
                 } catch (Throwable t) {
                   Logger logger = (Logger) x.get("logger");
                   logger.warning("Unexpected exception validating " + key + ": ", t);
