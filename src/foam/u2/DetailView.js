@@ -122,14 +122,7 @@ foam.CLASS({
     ^toolbar {
       display: flex;
       padding-top: 8px;
-    }
-
-    ^ .foam-u2-stack-StackView {
-      padding-left: 0!important;
-    }
-
-    ^ .foam-u2-CheckBox {
-      margin: 0px;
+      flex-wrap: wrap;
     }
 
     ^ table {
@@ -139,6 +132,18 @@ foam.CLASS({
 
     ^ table tr td:nth-of-type(2) {
       width: 70%;
+    }
+
+    ^ table .foam-u2-stack-StackView {
+      padding-left: 0 !important;
+    }
+
+    ^ table .foam-u2-CheckBox {
+      margin: 0px;
+    }
+
+    ^ table .foam-u2-tag-TextArea {
+      width: 100%;
     }
   `,
 
