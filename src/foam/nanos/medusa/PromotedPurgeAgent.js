@@ -112,9 +112,6 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
 
-      long min = getMinIndex();
-      long max = replaying.getIndex() - getRetain();
-
       try {
         DAO dao = (DAO) x.get("medusaEntryDAO");
         dao = dao.where(
@@ -129,7 +126,6 @@ foam.CLASS({
           getLogger().info("purging", count.getValue());
           dao.select(new PurgeSink(x, new foam.dao.RemoveSink(x, dao)));
         }
-        setMinIndex(Math.max(min, max));
       } catch ( Throwable t ) {
         pm.error(x, t);
         getLogger().error(t);
