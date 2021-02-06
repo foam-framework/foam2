@@ -38,6 +38,7 @@ foam.RELATIONSHIP({
   sourceProperty: {
     hidden: true
   },
+  sourceDAOKey: 'agentJunctionDAO',
   targetDAOKey: 'notificationSettingDAO',
   unauthorizedTargetDAOKey: 'localNotificationSettingDAO'
 });

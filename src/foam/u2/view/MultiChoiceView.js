@@ -170,7 +170,10 @@ foam.CLASS({
     function getSelectedSlot(choice) {
       var slot = foam.core.SimpleSlot.create();
       slot.sub(() => {
-        arr = arr.filter((o) => o != choice)
+        var arr = [
+          ...this.data,
+        ];
+        arr = arr.filter((o) => o != choice);
         if ( slot.get() ) { 
           arr.push(choice); 
         }

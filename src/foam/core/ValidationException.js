@@ -22,7 +22,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'errorMessage'
+      name: 'errorMessage',
+      javaFactory: 'return getMessage();'
     }
   ],
 
