@@ -97,7 +97,8 @@ public class NanoRouter
         System.err.println("Service not found: " + serviceKey);
         resp.sendError(resp.SC_NOT_FOUND, "No service found for: "+serviceKey);
         return;
-      } else if ( ! spec.getEnabled() ) {
+      }
+      if ( ! spec.getEnabled() ) {
         System.err.println("Service disabled: " + serviceKey);
         resp.sendError(resp.SC_NOT_FOUND, "No service found for: "+serviceKey);
         return;
