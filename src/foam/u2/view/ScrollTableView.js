@@ -224,7 +224,7 @@
 
         var id = mementoHead;
         if ( of ) {
-          id = of.ID.fromString(mementoHead);
+          id = of.ID.fromString(decodeURI(mementoHead));
         }
 
         this.stack.push({
