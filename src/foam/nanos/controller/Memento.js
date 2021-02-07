@@ -126,6 +126,9 @@ foam.CLASS({
     function parseValue() {
       if ( this.feedback_ ) return;
       this.feedback_ = true;
+
+      this.value = decodeURI(this.value);
+      
       var i = this.value[0] == this.PARAMS_BEGIN ? -1 : this.value.indexOf(this.SEPARATOR);
 
       var params = '';

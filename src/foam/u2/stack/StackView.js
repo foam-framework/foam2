@@ -89,7 +89,7 @@ foam.CLASS({
           else {
             //X.memento.head is parent view head
             //so the v view mementoHead is X.memento.tail.head
-            if ( ! X.memento.tail || decodeURI(X.memento.tail.head) !== v.mementoHead ) {
+            if ( ! X.memento.tail || X.memento.tail.head !== v.mementoHead ) {
               var m = this.Memento.create();
 
               m.value = v.mementoHead;
