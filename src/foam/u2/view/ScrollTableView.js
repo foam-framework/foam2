@@ -228,10 +228,11 @@
             id = of.ID.fromString(mementoHead);
           } else {
             id = of.ID.of.create();
-            var idJSON = foam.json.parseString(decodeURI(mementoHead));
-            for ( var key in idJSON ) {
+            var idFromJSON = foam.json.parseString(mementoHead);
+            for ( var key in idFromJSON ) {
               var axiom = of.ID.of.getAxiomByName(key);
-              axiom.set(id, idJSON[key]);
+              if ( axiom )
+                axiom.set(id, idFromJSON[key]);
             }
           }
         }
