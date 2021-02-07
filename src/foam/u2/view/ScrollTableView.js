@@ -225,7 +225,7 @@
         var id = mementoHead;
         if ( of ) {
           if ( ! foam.core.MultiPartID.isInstance(of.ID) ) {
-            id = of.ID.fromString(decodeURI(mementoHead));
+            id = of.ID.fromString(mementoHead);
           } else {
             id = of.ID.of.create();
             var idJSON = foam.json.parseString(decodeURI(mementoHead));
