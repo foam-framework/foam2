@@ -228,6 +228,7 @@
             id = of.ID.fromString(mementoHead);
           } else {
             id = of.ID.of.create();
+            mementoHead = '{' + mementoHead.replaceAll('=', ':') + '}';
             var idFromJSON = foam.json.parseString(mementoHead);
             for ( var key in idFromJSON ) {
               var axiom = of.ID.of.getAxiomByName(key);

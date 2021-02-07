@@ -129,7 +129,7 @@ foam.CLASS({
 
       this.value = decodeURI(this.value);
       
-      var i = this.value[0] == this.PARAMS_BEGIN ? -1 : this.value.indexOf(this.SEPARATOR);
+      var i = this.value.indexOf(this.SEPARATOR);
 
       var params = '';
       if ( i === -1 ) {
