@@ -224,8 +224,10 @@ foam.CLASS({
               'width':         '100%',
               'padding-right': '20px'
             }).
-            addClass(self.myClass('label')).
-            call(this.formatter, [self.data]).
+            start()
+              .addClass(self.myClass('label')).
+              call(this.formatter, [self.data]).
+            end().
             start('div').
               addClass('toggle-icon').
               show(this.hasChildren$).
@@ -234,8 +236,8 @@ foam.CLASS({
                 'font-size':     '16px',
                 'float':         'right',
                 'display':       'inline-block',
-                'margin-top':    'auto',
-                'margin-bottom': 'auto',
+                'height':        '6px',
+                'padding':       '3px 0px 3px 3px',
                 'transform':     self.expanded$.map(function(c) { return c ? 'rotate(0deg)' : 'rotate(90deg)'; })
               }).
               on('click', this.toggleExpanded).
