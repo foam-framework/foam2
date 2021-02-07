@@ -42,12 +42,6 @@ foam.CLASS({
   properties:  [
     {
       class: 'Object',
-      name: 'exceptions',
-      javaType: 'ArrayList',
-      javaFactory: 'return new ArrayList<RuntimeException>();'
-    },
-    {
-      class: 'Object',
       name: 'sb',
       javaType: 'ThreadLocal',
       javaFactory: `
@@ -69,6 +63,11 @@ foam.CLASS({
 
   methods:  [
     {
+      name: 'getExceptions',
+      type: 'Throwable[]',
+      javaCode: 'return getSuppressed();'
+    },
+    {
       // TODO: cloning this property from ExceptionInterface creates a bug.
       name: 'getClientRethrowException',
       documentation:
@@ -83,11 +82,10 @@ foam.CLASS({
       type: 'RuntimeException',
       visibility: 'public',
       javaCode: `
-        ArrayList<RuntimeException> exceptions = getExceptions();
-        for ( RuntimeException re : exceptions ) {
-          if ( re instanceof ExceptionInterface ) {
+        for ( var t : getExceptions() ) {
+          if ( t instanceof ExceptionInterface ) {
             RuntimeException clientE =
-                ((ExceptionInterface) re).getClientRethrowException();
+                ((ExceptionInterface) t).getClientRethrowException();
             if ( clientE != null ) {
               return clientE;
             }
@@ -98,21 +96,36 @@ foam.CLASS({
     {
       name: 'add',
       args: [{ name: 't', javaType: 'Throwable' }],
-      javaCode: 'getExceptions().add(t);'
+      javaCode: `
+        if ( t instanceof CompoundException ) {
+          for ( var e : t.getSuppressed() ) {
+            add(e);
+          }
+        } else {
+          addSuppressed(t);
+        }
+      `
     },
     {
       name: 'maybeThrow',
-      javaCode: 'if ( getExceptions().size() != 0 ) throw this;'
+      javaCode: `
+        if ( getExceptions().length == 1 ) {
+          throw getExceptions()[0] instanceof RuntimeException
+            ? (RuntimeException) getExceptions()[0] : this;
+        }
+
+        if ( getExceptions().length >= 2 ) throw this;
+      `
     },
     {
       name: 'getMessage',
       type: 'String',
       javaCode: `
         StringBuilder str = (StringBuilder) getSb().get();
-        var size = getExceptions().size();
+        var size = getExceptions().length;
 
         for ( int i = 0; i < size; i++ ) {
-          Throwable t = (Throwable) getExceptions().get(i);
+          var t = getExceptions()[i];
           var counter = i + 1;
 
           str.append('[')
