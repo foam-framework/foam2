@@ -270,7 +270,18 @@ foam.CLASS({
         nu = old.fclone();
         nu.copyFrom(obj);
       }
-      return dao.put(nu);
+
+      try {
+        return dao.put(nu);
+      } catch ( ValidationException ve ) {
+        throw new DAOPutException(ve.getMessage());
+      } catch ( CompoundException ce ) {
+        var clientEx = ce.getClientRethrowException();
+        if ( clientEx instanceof ValidationException ) {
+          throw new DAOPutException(clientEx.getMessage());
+        }
+        throw ce;
+      }
       `
     }
   ]
