@@ -39,7 +39,6 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'value_',
-      scope: 'protected',
       documentation: 'The next value to be used.',
       swiftExpressionArgs: ['delegate', 'property_', 'startingValue'],
       swiftExpression: `
