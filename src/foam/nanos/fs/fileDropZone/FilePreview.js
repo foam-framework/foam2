@@ -18,10 +18,10 @@ foam.CLASS({
   ],
 
   methods: [
-    function initE() {
+    async function initE() {
       this.SUPER();
 
-      this
+      await this
         .addClass(this.myClass())
         .start('div')
           .addClass('file-image-div' + this.id)
@@ -47,10 +47,11 @@ foam.CLASS({
             'width': '0px'
           })
         .end();
+        this.showData();
       this.data$.sub(() => this.showData());
     },
 
-    function showData() {
+    async function showData() {
       let iFrame = document.getElementsByClassName('file-iframe' + this.id)[0],
           image = document.getElementsByClassName('file-image' + this.id)[0],
           div = document.getElementsByClassName('file-image-div' + this.id)[0],
@@ -70,7 +71,12 @@ foam.CLASS({
       if ( ! this.data[pos] ) {
         return;
       }
-      url = URL.createObjectURL(this.data[pos].data.blob);
+      let d = await this.data[pos].data;
+      if ( ! d ) {
+        url = this.data[pos].address;
+      } else {
+        url = URL.createObjectURL(d.blob);
+      }
 
       if ( this.data[pos].mimeType !== 'application/pdf' ) {
         image.src = url;
@@ -83,6 +89,11 @@ foam.CLASS({
         iFrame.style.height = '100%';
         iFrame.style.width = '100%';
       }
+    }
+  ],
+  listeners: [
+    function onLoad() {
+      this.showData();
     }
   ]
 });
