@@ -80,7 +80,7 @@ foam.CLASS({
     ^feature-column-grid {
       display: inline-flex;
       width: calc(100% - 48px);
-      overflow-x: scroll;
+      overflow-x: auto;
     }
 
     ^featureSection {
