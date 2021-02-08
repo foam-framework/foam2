@@ -155,7 +155,7 @@ foam.CLASS({
       border-radius: 73px;
     }
     ^ .main-container {
-      overflow: scroll;
+      overflow: auto;
       height: 90%;
       margin-top: 15px;
     }

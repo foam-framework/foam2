@@ -11,11 +11,11 @@ foam.CLASS({
 
   css: `
     ^ {
-      overflow: scroll;
+      overflow: auto;
     }
     ^view {
       zoom: 0.7;
-      overflow: scroll;
+      overflow: auto;
     }
   `,
 

@@ -15,7 +15,7 @@ foam.CLASS({
 
   css: `
     ^text {
-        overflow-y: scroll;
+        overflow-y: auto;
         height: 500px;
         width: 100%;
         border: 1px solid #DDD;
