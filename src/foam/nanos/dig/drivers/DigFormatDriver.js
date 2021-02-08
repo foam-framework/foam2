@@ -274,11 +274,11 @@ foam.CLASS({
       try {
         return dao.put(nu);
       } catch ( ValidationException ve ) {
-        throw new DAOPutException(ve.getMessage());
+        throw new DAOPutException(ve.getMessage(), ve);
       } catch ( CompoundException ce ) {
         var clientEx = ce.getClientRethrowException();
         if ( clientEx instanceof ValidationException ) {
-          throw new DAOPutException(clientEx.getMessage());
+          throw new DAOPutException(clientEx.getMessage(), ce);
         }
         throw ce;
       }
