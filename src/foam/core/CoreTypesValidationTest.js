@@ -57,7 +57,7 @@ foam.CLASS({
 
       try {
         v.put(testModelInvalidHigh);
-      } catch (CompoundException e) {
+      } catch (ValidationException e) {
         throwsIllegalState = true;
       }
       test(throwsIllegalState,
@@ -67,7 +67,7 @@ foam.CLASS({
 
       try {
         v.put(testModelInvalidLow);
-      } catch (CompoundException e) {
+      } catch (ValidationException e) {
         throwsIllegalState = true;
       }
       test(throwsIllegalState,
