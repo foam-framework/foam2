@@ -16,6 +16,7 @@
 
   exports: [
     'as summaryView',
+    'dblclick as click',
     'dblclick',
     'memento'
   ],
