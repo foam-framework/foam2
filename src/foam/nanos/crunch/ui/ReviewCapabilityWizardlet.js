@@ -33,7 +33,7 @@ foam.CLASS({
         Override of isValid to omit per-section logic; it is not needed
         for ReviewCapabilityData which contains only the default section.
       `,
-      expression: function (of, data, currentSection, data$errors_) {
+      expression: function (of, data, data$errors_) {
         if ( ! this.of ) return true;
         if ( data$errors_ && data$errors_.length > 0 ) {
           return false;
