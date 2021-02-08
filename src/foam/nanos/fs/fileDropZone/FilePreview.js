@@ -90,10 +90,5 @@ foam.CLASS({
         iFrame.style.width = '100%';
       }
     }
-  ],
-  listeners: [
-    function onLoad() {
-      this.showData();
-    }
   ]
 });
