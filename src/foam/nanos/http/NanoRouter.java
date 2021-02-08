@@ -127,7 +127,7 @@ public class NanoRouter
         agent.execute(requestContext);
       }
     } catch (Throwable t) {
-      System.err.println("Error serving: "+serviceKey+" "+path+" "+t.getMessage());
+      System.err.println("Error serving: " + serviceKey + " " + path + " " + t.getMessage());
       t.printStackTrace();
       throw t;
     } finally {
