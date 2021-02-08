@@ -225,7 +225,18 @@
 
         var id = mementoHead;
         if ( of ) {
-          id = of.ID.fromString(mementoHead);
+          if ( ! foam.core.MultiPartID.isInstance(of.ID) ) {
+            id = of.ID.fromString(mementoHead);
+          } else {
+            id = of.ID.of.create();
+            mementoHead = '{' + mementoHead.replaceAll('=', ':') + '}';
+            var idFromJSON = foam.json.parseString(mementoHead);
+            for ( var key in idFromJSON ) {
+              var axiom = of.ID.of.getAxiomByName(key);
+              if ( axiom )
+                axiom.set(id, idFromJSON[key]);
+            }
+          }
         }
 
         this.stack.push({
