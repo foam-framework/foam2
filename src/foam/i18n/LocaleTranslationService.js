@@ -50,7 +50,7 @@ foam.CLASS({
             AND(
               OR(
                 EQ(Locale.SPID, spid),
-                EQ(Locale.SPID, "*")
+                EQ(Locale.SPID, "")
               ),
               EQ(Locale.SOURCE, source),
               EQ(Locale.LOCALE, locale),
