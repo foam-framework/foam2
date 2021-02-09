@@ -298,7 +298,6 @@ foam.CLASS({
         var self = this;
         var seq = ++this.seq_;
         var dao = this.dao;
-        console.log(this.$UID);
         if ( ! foam.dao.DAO.isInstance(this.dao) ) return;
 
         var of = this.dao.of
