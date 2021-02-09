@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.i18n',
   name: 'Locale',
 
-  ids: ['locale', 'variant', 'source'],
+  ids: ['spid', 'locale', 'variant', 'source'],
 
   implements: [
     'foam.nanos.auth.LastModifiedAware',
@@ -16,6 +16,12 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.ServiceProvider',
+      name: 'spid',
+      // value: *, "", or null  for default?
+    },
     {
       class: 'String',
       name: 'locale',

@@ -46,30 +46,50 @@ foam.CLASS({
           locale = locale.substring(0,2).toLowerCase();
 
           // search for locale and variant
-          localeEntry = (Locale) localeDAO.find(
+          List<Locale> entries = List ((ArraySink) localeDAO.where(
             AND(
-              EQ(Locale.SOURCE, source),        
+              OR(
+                EQ(Locale.SPID, spid),
+                EQ(Locale.SPID, "*")
+              ),
+              EQ(Locale.SOURCE, source),
               EQ(Locale.LOCALE, locale),
               EQ(Locale.VARIANT, variant)
             )
-          );
+          )
+          .orderBy(Locale.SPID)
+          .limit(1)
+          .select(new ArraySink())).getArray();
+          if ( entries.size() > 0 ) {
+            localEntry = list.get(0);
+          }
         } else {
           locale = locale.toLowerCase();
         }
 
         // search for locale with no variant
         if ( localeEntry == null ) {
-          localeEntry = (Locale) localeDAO.find(
+          List<Locale> entries = List ((ArraySink) localeDAO.where(
             AND(
+              OR(
+                EQ(Locale.SPID, spid),
+                EQ(Locale.SPID, "*")
+              ),
               EQ(Locale.SOURCE, source),
               EQ(Locale.LOCALE, locale),
-              EQ(Locale.VARIANT, "")
+              EQ(Locale.VARIANT, variant)
             )
-          );
+          )
+          .orderBy(Locale.SPID)
+          .limit(1)
+          .select(new ArraySink())).getArray();
+          if ( entries.size() > 0 ) {
+            localEntry = list.get(0);
+          }
         }
 
         String translation = localeEntry != null ? localeEntry.getTarget() : defaultText;
-        
+
         return translation;
       `
     }
