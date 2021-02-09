@@ -43,10 +43,7 @@ foam.CLASS({
       name: 'wizardlets',
       documentation: 'wizardlets for capable payloads',
       postSet: function(_, n) {
-        var promises = [];
-        n.forEach(wizard => promises.push(wizard.save()));
-        Promise.all(promises);
-        this.listenOnPayloads();
+        this.listenOnWizardlets();
       }
     },
     {
@@ -85,38 +82,50 @@ foam.CLASS({
       this.wizardlets = this.capableObj ?
         await this.crunchController.getWizardletsFromCapable(this.capableObj) : [];
 
+      console.log('capable and wizardlets', this.capableObj, this.wizardlets);
+
       this.start().addClass(this.myClass())
-        .forEach(this.wizardletSectionsList, function(sections, index) {
-          sections.map(section => (
-            this.tag(self.SectionView, {
-              section,
-              data: self.wizardlets[index].data,
-              showTitle: self.showTitle
-            })
-          ));
-        }).end()
+        .forEach(this.wizardlets, function (w, wi) {
+          this.add(foam.core.ExpressionSlot.create({
+            args: [w.sections$, w.data$],
+            code: (sections, data) => {
+              return sections.map(section => section.createView({
+                showTitle: self.showTitle,
+                wizardlet: w,
+              }));
+            }
+          }));
+        })
       .end();
     },
 
-    // add listeners to payload data
-    function listenOnPayloads() {
-      for ( const payload of this.capableObj.capablePayloads ) {
-        if ( payload.data ) payload.data.sub(this.clonePayloads);
-      }
-    }
-  ],
-
-  listeners: [
-    {
-      name: 'clonePayloads',
-      documentation: `
-        This listener reassgins capablePayloads array each time its elements get updated.
-        The purpose of this is to listen to changes for payloads of a capable object
-        that calls this view. (e.g., for bank accounts which are an capable object, we want to
-        know if acceptance doc payloads are valid or not)
-      `,
-      code: function() {
-        this.capableObj.capablePayloads = [...this.capableObj.capablePayloads];
+    // add listeners to wizardlet data
+    // TODO: after scrolling wizard is merged, remove this method and add
+    //   AutoSaveWizardletsAgent to the sequence.
+    function listenOnWizardlets() {
+      for ( let wizardlet of this.wizardlets ) {
+        let s = foam.core.FObject.create();
+        let saving = false;
+        let bind = () => {
+          if ( ! wizardlet.data || ! wizardlet.data.cls_ ) return;
+          s.detach();
+          if ( ! saving ) {
+            saving = true;
+            wizardlet.save().then(() => { saving = false; console.log('y') });
+          }
+          s = foam.core.FObject.create();
+          var props = wizardlet.data.cls_.getAxiomsByClass(foam.core.Property);
+          for ( let prop of props ) {
+            let prop$ = prop.toSlot(wizardlet.data);
+            s.onDetach(prop$.sub(() => {
+              if ( saving ) return;
+              saving = true;
+              wizardlet.save().then(() => { saving = false; console.log('c'); });
+            }));
+          }
+        };
+        wizardlet.data$.sub(bind);
+        bind();
       }
     }
   ]

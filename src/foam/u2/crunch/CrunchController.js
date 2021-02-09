@@ -50,6 +50,7 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.SkipGrantedAgent',
     'foam.u2.crunch.wizardflow.MaybeDAOPutAgent',
     'foam.u2.crunch.wizardflow.ShowPreexistingAgent',
+    'foam.u2.crunch.wizardflow.SaveAllAgent',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
     'foam.u2.crunch.CapabilityInterceptView',
@@ -140,6 +141,21 @@ foam.CLASS({
           .add(this.MaybeDAOPutAgent)
           ;
       }
+    },
+
+    // This function is only called by CapableView
+    function getWizardletsFromCapable(capable) {
+      return this.createCapableWizardSequence(undefined, capable)
+        .remove('WizardStateAgent')
+        .remove('FilterGrantModeAgent')
+        .remove('SkipGrantedAgent')
+        .remove('RequirementsPreviewAgent')
+        .remove('StepWizardAgent')
+        .remove('MaybeDAOPutAgent')
+        .add(this.SaveAllAgent)
+        .execute().then(x => {
+          return x.wizardlets
+        })
     },
 
     function handleIntercept(intercept) {
@@ -264,22 +280,6 @@ foam.CLASS({
       })
 
       return p;
-    },
-
-    // This function is only called by CapableView
-    function getWizardletsFromCapable(capable) {
-      return this.Sequence.create(null, this.__subContext__.createSubContext({
-        capable: capable,
-        rootCapability: capable.capabilityIds[0]
-      }))
-        .add(this.CapabilityAdaptAgent)
-        .add(this.LoadCapabilitiesAgent, {
-          waoSetting: this.LoadCapabilitiesAgent.WAOSetting.CAPABLE })
-        .add(this.CreateWizardletsAgent)
-        .add(this.LoadWizardletsAgent)
-        .execute().then(x => {
-          return x.wizardlets
-        })
     }
   ]
 });

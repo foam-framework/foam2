@@ -640,6 +640,7 @@ FOAM_FILES([
   { name: "foam/u2/crunch/wizardflow/TestAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/LoadTopConfig", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/ShowPreexistingAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/SaveAllAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/lite/CapableDefaultConfigAgent", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityRequirementView", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityCardView", flags: ['web'] },
