@@ -30,7 +30,8 @@ foam.CLASS({
     'columns',
     'hoverSelection',
     'selection',
-    'subStack as stack'
+    'subStack as stack',
+    'currentMemento as memento'
   ],
 
   imports: [
@@ -40,7 +41,7 @@ foam.CLASS({
     'filteredTableColumns?',
     'memento',
     'selection? as importSelection',
-    'stack?'
+    'stack?',
   ],
 
   constants: [
@@ -108,7 +109,7 @@ foam.CLASS({
     {
       name: 'selectedColumnNames',
       expression: function(columns, of, memento) {
-        var ls =  memento && memento.paramsObj.c ? memento.paramsObj.c.split(',').map(c => this.returnMementoColumnNameDisregardSorting(c)) : JSON.parse(localStorage.getItem(of.id));
+        var ls =  memento && memento.paramsObj && memento.paramsObj.c ? memento.paramsObj.c.split(',').map(c => this.returnMementoColumnNameDisregardSorting(c)) : JSON.parse(localStorage.getItem(of.id));
         return ls || columns;
       }
     },
@@ -266,7 +267,8 @@ foam.CLASS({
       factory: function() {
         return foam.nanos.approval.NoBackStack.create({delegate: this.stack});
       },
-    }
+    },
+    'currentMemento'
   ],
 
   methods: [
@@ -324,8 +326,11 @@ foam.CLASS({
     async function initE() {
       var view = this;
 
+      this.currentMemento = null;
+
+
       //set memento's selected columns
-      if ( this.memento && ! this.memento.paramsObj.c ) {
+      if ( this.memento && this.memento.paramsObj && ! this.memento.paramsObj.c ) {
         this.memento.paramsObj.c = this.columns_.map(c => {
           return this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c);
         }).join(',');
@@ -673,7 +678,7 @@ foam.CLASS({
               return tbodyElement;
             });
 
-            if ( this.memento && this.memento.paramsObj.c ) {
+            if ( this.memento && this.memento.paramsObj && this.memento.paramsObj.c ) {
               var columns = this.memento.paramsObj.c.split(',');
               for ( var c of columns ) {
                 if ( this.shouldColumnBeSorted(c) && ! c.includes('.')) {

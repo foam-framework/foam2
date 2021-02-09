@@ -104,7 +104,15 @@ foam.CLASS({
     {
       class: 'String',
       name: 'mementoHead',
-      value: 'Edit'
+      getter: function() {
+        if ( this.memento.head === 'view' ) {
+          this.memento.head = 'edit';
+          return null;
+        }
+        if ( this.data.id )
+          return 'edit::' + this.data.id;
+        return null;
+      }
     }
   ],
 

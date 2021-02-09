@@ -119,7 +119,7 @@ foam.CLASS({
       class: 'String',
       name: 'mementoHead',
       factory: function() {
-        return this.idOfRecord;
+        return 'view::' + this.idOfRecord;
       }
     },
     'idOfRecord'
@@ -154,6 +154,7 @@ foam.CLASS({
       code: function() {
         if ( ! this.stack ) return;
 
+        this.memento.head = 'edit';
         this.stack.push({
           class:  'foam.comics.v2.DAOUpdateView',
           data:   this.data,

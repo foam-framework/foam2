@@ -135,7 +135,7 @@ foam.CLASS({
       code: function() {
         var value = this.view.data;
 
-        if (  this.memento ) {
+        if ( this.memento && this.memento.paramsObj ) {
           if ( value ) {
             this.memento.paramsObj.s = value;
           } else {

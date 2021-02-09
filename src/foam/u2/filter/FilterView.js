@@ -286,7 +286,7 @@ foam.CLASS({
     function initE() {
       var self = this;
 
-      if ( this.memento && this.memento.paramsObj.f ) {
+      if ( this.memento && this.memento.paramsObj && this.memento.paramsObj.f ) {
         this.memento.paramsObj.f.forEach(f => {
           var parser = foam.parse.QueryParser.create({ of: self.dao.of.id });
           var pred = parser.parseString(f.pred);

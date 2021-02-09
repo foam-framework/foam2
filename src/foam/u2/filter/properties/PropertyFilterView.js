@@ -205,7 +205,7 @@ foam.CLASS({
           var newFilterValue = { criteria: this.criteria, n: this.property.name, pred: pred }
           this.memento.paramsObj.f.push(newFilterValue);
         }
-        if ( this.memento && this.memento.paramsObj.f && this.memento.paramsObj.f.length === 0 ) {
+        if ( this.memento && this.memento.paramsObj && this.memento.paramsObj.f && this.memento.paramsObj && this.memento.paramsObj.f.length === 0 ) {
           delete this.memento.paramsObj.f;
         }
 

@@ -257,8 +257,12 @@ foam.CLASS({
         this.searchPredicate = foam.mlang.predicate.True.create();
       }));
 
-      if ( this.memento )
+      if ( this.memento ) {
+        if ( ! this.memento.tail ) {
+          this.memento.tail = foam.nanos.controller.Memento.create({ head: 'browse' });
+        }
         this.currentMemento$ = this.memento.tail$;
+      }
     },
     function click(obj, id) {
       if ( ! this.stack ) return;
@@ -306,14 +310,14 @@ foam.CLASS({
                         this.tag(self.SimpleSearch, {
                           showCount: false,
                           data$: self.searchPredicate$,
-                          searchValue: self.memento && self.memento.paramsObj.s
+                          searchValue: self.memento && self.memento.paramsObj && self.memento.paramsObj.s
                         });
                       })
                       .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
                         this.tag(self.FilterView, {
                           dao$: self.searchFilterDAO$,
                           data$: self.searchPredicate$,
-                          searchValue: self.memento && self.memento.paramsObj.s
+                          searchValue: self.memento && self.memento.paramsObj && self.memento.paramsObj.s
                         });
                     })
                     .endContext()
