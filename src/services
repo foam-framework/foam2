@@ -703,9 +703,9 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.ruler.RuleHistory.getOwnClassInfo())
       .setSeqNo(true)
-      .setNullify(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("ruleHistory")
       .setRuler(false)
-      .setCluster(false)
       .setPm(true)
       .build();
     """,

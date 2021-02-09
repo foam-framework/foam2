@@ -141,6 +141,9 @@ foam.CLASS({
 
   messages: [
     { name: 'REQUIRED', message: 'required' },
+    { name: 'SHOULD_BE_LEAST', message: 'should be at least' },
+    { name: 'SHOULD_BE_MOST', message: 'should be at most' },
+    { name: 'CHARACTER', message: 'character' },
   ],
 
   properties: [
@@ -160,7 +163,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.GTE(foam.mlang.StringLength.create({ arg1: self }), self.minLength);
             },
-            errorString: `${this.label} should be at least ${this.minLength} character${this.minLength>1?'s':''}`
+            errorString: `${this.label} ${foam.core.String.SHOULD_BE_LEAST} ${this.minLength} ${foam.core.String.CHARACTER}${this.minLength>1?'s':''}`
           });
         }
 
@@ -170,7 +173,7 @@ foam.CLASS({
             predicateFactory: function(e) {
               return e.LTE(foam.mlang.StringLength.create({ arg1: self }), self.maxLength);
             },
-            errorString: `${this.label} should be at most ${this.maxLength} character${this.maxLength>1?'s':''}`
+            errorString: `${this.label} ${foam.core.String.SHOULD_BE_MOST} ${this.maxLength} ${foam.core.String.CHARACTER}${this.maxLength>1?'s':''}`
           });
         }
 

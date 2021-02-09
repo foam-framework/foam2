@@ -62,7 +62,7 @@ foam.CLASS({
       flex: 1;
       padding: 24px;
 
-      overflow-y: scroll;
+      overflow-y: auto;
     }
 
     ^container-handle {

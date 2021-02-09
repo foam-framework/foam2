@@ -79,7 +79,7 @@ foam.CLASS({
         }
 
         var v = foam.u2.ViewSpec.createView(view, null, this, X);
-        if ( v.mementoHead ) {
+        if ( X.memento && v.mementoHead ) {
           var currMemento = this.data.findCurrentMemento();
           //we need to check if memento is already set
           //for example when we copy-paste url
@@ -89,10 +89,14 @@ foam.CLASS({
           else {
             //X.memento.head is parent view head
             //so the v view mementoHead is X.memento.tail.head
-            if ( ! X.memento.tail || X.memento.tail.head !== v.mementoHead ) {
+            if ( this.shouldMementoValueBeChanged(currMemento, v.mementoHead) ) {
               var m = this.Memento.create();
+              if ( v.mementoHead[0] === '{' && v.mementoHead[v.mementoHead.length - 1] == '}' ) {
+                m.value = v.mementoHead.substr(1, v.mementoHead.length - 2).replaceAll(':', '=');
+              } else {
+                m.value = v.mementoHead;
+              }
 
-              m.value = v.mementoHead;
               m.parent = currMemento;
     
               currMemento.tail = m;
@@ -102,6 +106,17 @@ foam.CLASS({
         return v;
 
       }, this.data$.dot('top')));
+    },
+
+    function shouldMementoValueBeChanged(mementoTail, mementoHead) {
+      if ( ! mementoTail )
+        return false;
+
+      var isMementoHeadAnObject = mementoHead[0] === '{' && mementoHead[mementoHead.length - 1] == '}';
+      if ( ! isMementoHeadAnObject && mementoTail.head !== mementoHead )
+        return true;
+
+      return isMementoHeadAnObject && mementoHead.substr(1, mementoHead.length - 2).replaceAll(':', '=') !== mementoTail.head;
     }
   ]
 });

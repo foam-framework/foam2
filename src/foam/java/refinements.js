@@ -163,6 +163,11 @@ foam.CLASS({
       name: 'javaFactory'
     },
     {
+      class: 'Boolean',
+      name: 'synchronized',
+      value: false
+    },
+    {
       class: 'String',
       name: 'javaGetter'
     },

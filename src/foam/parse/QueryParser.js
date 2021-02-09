@@ -403,17 +403,17 @@ foam.CLASS({
                   });
             }
 
-            if ( values.negated ) {
-              return self.Not.create({ arg1: expr });
-            } else if ( values.and ) {
+            if ( values.negated ) return self.Not.create({ arg1: expr });
+
+            if ( values.and ) {
               return self.And.create({
                 args: values.map(function(x) {
                   expr.class_.create({ arg1: expr.arg1, arg2: [ x ] });
                 })
               });
-            } else {
-              return expr;
             }
+
+            return expr;
           },
 
           negateValue: function(v) {
@@ -515,7 +515,8 @@ foam.CLASS({
   methods: [
     function parseString(str, opt_name) {
       var query = this.grammar_.parseString(str, opt_name);
-      return query && query.partialEval ? query.partialEval() : query;
+      query = query && query.partialEval ? query.partialEval() : query;
+      return query;
     }
   ]
 });

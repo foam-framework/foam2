@@ -27,14 +27,7 @@ foam.CLASS({
   properties: [
     {
       name: 'view',
-      value: {
-        class: 'foam.u2.view.ModeAltView',
-        readView: {
-          class: 'foam.u2.view.ScrollTableView',
-          enableDynamicTableHeight: false
-        },
-        writeView: { class: 'foam.comics.InlineBrowserView' }
-      }
+      value: { class: 'foam.comics.InlineBrowserView' }
     },
     {
       name: 'createVisibility',

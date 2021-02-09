@@ -37,7 +37,7 @@ foam.CLASS({
       name: 'objectClass',
       label: '',
       visibility: function(allowCustom, classIsFinal, choices, data, placeholder) {
-        if ( ! allowCustom && choices.length <= 1 && ! placeholder ) return foam.u2.DisplayMode.HIDDEN;
+        if ( ! allowCustom && choices.length <= 1 && ! this.hasOwnProperty('placeholder') ) return foam.u2.DisplayMode.HIDDEN;
         if ( classIsFinal && this.dataWasProvided_ ) return foam.u2.DisplayMode.HIDDEN;
         return foam.u2.DisplayMode.RW;
       },
@@ -117,7 +117,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'placeholder',
-      factory: function() {
+      expression: function() {
         return this.PLACEHOLDER_TEXT;
       },
       documentation: 'If no placeholder, the choiceView will select the first element',
@@ -234,7 +234,7 @@ foam.CLASS({
       );
 
       if ( this.data ) { this.objectClass = dataToClass(this.data); }
-      if ( ! this.data && ! this.objectClass && this.choices.length && !this.placeholder ) this.objectClass = this.choices[0][0];
+      if ( ! this.data && ! this.objectClass && this.choices.length && ! this.hasOwnProperty('placeholder') ) this.objectClass = this.choices[0][0];
 
       this.
         start(this.OBJECT_CLASS).

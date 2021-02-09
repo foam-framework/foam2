@@ -7,7 +7,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'ValidationException',
   extends: 'foam.core.FOAMException',
-  implements: ['foam.core.Exception'],
+  implements: ['foam.core.ExceptionInterface'],
   javaGenerateConvenienceConstructor: false,
 
   properties: [
@@ -22,7 +22,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'errorMessage'
+      name: 'errorMessage',
+      javaFactory: 'return getMessage();'
     }
   ],
 

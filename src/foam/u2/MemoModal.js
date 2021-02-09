@@ -26,7 +26,7 @@ foam.CLASS({
       /* Don't let the modal exceed the screen size, minus some margin. */
       max-width: calc(100vw - 48px);
       max-height: calc(100vh - 116px);
-      overflow-y: scroll;
+      overflow-y: auto;
       /* The line below accounts for the top nav bar. */
     }
     ^title {

@@ -21,6 +21,20 @@ foam.INTERFACE({
 
   documentation: 'DAO Interface',
 
+  constants: [
+    {
+      name: 'RESET_CMD',
+      type: 'String',
+      value: 'RESET_CMD',
+    },
+    {
+      name: 'LAST_CMD',
+      documentation: 'Command to request the last DAO in a DAO delegate chain, such as the MDAO.',
+      type: 'String',
+      value: 'LAST_CMD'
+    }
+  ],
+
   methods: [
     {
       name: 'put',

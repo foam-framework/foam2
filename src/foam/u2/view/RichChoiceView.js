@@ -127,7 +127,7 @@ foam.CLASS({
       background: white;
       border: 1px solid /*%GREY3%*/ #cbcfd4;
       max-height: 378px;
-      overflow-y: scroll;
+      overflow-y: auto;
       box-sizing: border-box;
       width: 100%;
       min-width: fit-content;

@@ -93,9 +93,15 @@ public class NanoRouter
     resp.setHeader("X-Frame-Options", "deny");
 
     try {
+      if ( spec == null ) {
+        System.err.println("Service not found: " + serviceKey);
+        resp.sendError(resp.SC_NOT_FOUND, "No service found for: "+serviceKey);
+        return;
+      }
       if ( ! spec.getEnabled() ) {
         System.err.println("Service disabled: " + serviceKey);
         resp.sendError(resp.SC_NOT_FOUND, "No service found for: "+serviceKey);
+        return;
       }
 
       WebAgent agent     = getWebAgent(spec, service);
@@ -121,7 +127,7 @@ public class NanoRouter
         agent.execute(requestContext);
       }
     } catch (Throwable t) {
-      System.err.println("Error serving " + serviceKey + " " + path);
+      System.err.println("Error serving: " + serviceKey + " " + path + " " + t.getMessage());
       t.printStackTrace();
       throw t;
     } finally {
