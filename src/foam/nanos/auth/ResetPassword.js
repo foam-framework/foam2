@@ -24,14 +24,22 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'SUCCESS_MSG', message: 'Your password was successfully updated' }
+    { name: 'RESET_PASSWORD_TITLE', message: 'Reset your password' },
+    { name: 'RESET_PASSWORD_SUBTITLE', message: 'Create a new password for your account' },
+    { name: 'SUCCESS_MSG', message: 'Your password was successfully updated' },
+    { name: 'PASSWORD_LENGTH_10_ERROR', message: 'Password must be at least 10 characters' },
+    { name: 'PASSWORD_NOT_MATCH', message: 'Passwords do not match' }
   ],
 
   sections: [
     {
       name: 'resetPasswordSection',
-      title: 'Reset your password',
-      subTitle: 'Create a new password for your account',
+      title: function() {
+        return this.RESET_PASSWORD_TITLE
+      },
+      subTitle: function() {
+        return this.RESET_PASSWORD_SUBTITLE
+      }
     }
   ],
 
@@ -44,6 +52,7 @@ foam.CLASS({
         class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
+      minLength: 10,
       validationPredicates: [
         {
           args: ['newPassword'],
@@ -52,7 +61,7 @@ foam.CLASS({
               arg1: foam.nanos.auth.ResetPassword.NEW_PASSWORD
             }), 10);
           },
-          errorString: 'Passwords must be at least 10 characters.'
+          errorMessage: 'PASSWORD_LENGTH_10_ERROR'
         }
       ]
     },
@@ -73,7 +82,7 @@ foam.CLASS({
               foam.nanos.auth.ResetPassword.NEW_PASSWORD,
               foam.nanos.auth.ResetPassword.CONFIRMATION_PASSWORD);
           },
-          errorString: 'Passwords do not match.'
+          errorMessage: 'PASSWORD_NOT_MATCH'
         }
       ]
     },
