@@ -194,7 +194,11 @@ foam.CLASS({
         than this number.`,
       value: Number.MAX_SAFE_INTEGER
     },
-    'prop_'
+    'prop_',
+    {
+      class: 'Int',
+      name: 'seq_'
+    }
   ],
 
   methods: [
@@ -291,11 +295,16 @@ foam.CLASS({
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
+        var self = this;
+        var seq = ++this.seq_;
+        var dao = this.dao;
+        console.log(this.$UID);
         if ( ! foam.dao.DAO.isInstance(this.dao) ) return;
 
         var of = this.dao.of
         if ( of._CHOICE_TEXT_ ) {
-          this.dao.select(this.PROJECTION(of.ID, of._CHOICE_TEXT_)).then((s) => {
+          dao.select(this.PROJECTION(of.ID, of._CHOICE_TEXT_)).then((s) => {
+            if ( seq !== self.seq_ ) return; // stale select
             this.choices = s.projection;
           });
           return;
@@ -312,13 +321,14 @@ foam.CLASS({
           */
         }
         var p = this.mode === foam.u2.DisplayMode.RW ?
-          this.dao.select().then(s => s.array) :
-          this.dao.find(this.data).then(o => o ? [o] : []);
+          dao.select().then(s => s.array) :
+          dao.find(this.data).then(o => o ? [o] : []);
 
         p.then(a => {
           var choices = a.map(this.objToChoice);
           var choiceLabels = a.map(o => { return this.objToChoice(o)[1]});
           Promise.all(choiceLabels).then(resolvedChoiceLabels => {
+            if ( seq !== self.seq_ ) return; // stale select
             for ( let i = 0; i < choices.length; i++ ) {
               choices[i][1] = resolvedChoiceLabels[i];
             }
