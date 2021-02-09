@@ -105,22 +105,18 @@ This is the heart of Medusa.`,
         MedusaEntry existing = (MedusaEntry) getDelegate().find_(x, entry.getId());
         if ( existing != null &&
              existing.getPromoted() ) {
-          // getLogger().debug("put", replaying.getIndex(), entry.toSummary(), "from", entry.getNode(), "discarding");
           return existing;
         }
 
         synchronized ( entry.getId().toString().intern() ) {
           if ( replaying.getIndex() > entry.getIndex() ) {
-            getLogger().debug("put", replaying.getIndex(), entry.toSummary(), "from", entry.getNode(), "discarding", "in-lock");
             return entry;
           }
           existing = (MedusaEntry) getDelegate().find_(x, entry.getId());
           if ( existing != null ) {
             if ( existing.getPromoted() ) {
-              // getLogger().debug("put", replaying.getIndex(), entry.toSummary(), "from", entry.getNode(), "discarding", "in-lock");
               return existing;
             }
-            // getLogger().debug("put", entry.toSummary(), "from", entry.getNode(), "existing");
           } else {
              existing = entry;
           }
@@ -189,7 +185,6 @@ This is the heart of Medusa.`,
       type: 'foam.nanos.medusa.MedusaEntry',
       javaCode: `
       // NOTE: implementation expects caller to lock on entry index
-      // getLogger().debug("promote", entry.getId());
       PM pm = PM.create(x, this.getClass().getSimpleName(), "promote");
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
       DaggerService dagger = (DaggerService) x.get("daggerService");
@@ -262,7 +257,6 @@ This is the heart of Medusa.`,
         }
       ],
       javaCode: `
-      getLogger().debug("promoter", "execute");
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       Long nextIndexSince = System.currentTimeMillis();
       Alarm alarm = new Alarm.Builder(x)
@@ -276,7 +270,9 @@ This is the heart of Medusa.`,
           MedusaEntry entry = null;
           try {
             Long nextIndex = replaying.getIndex() + 1;
-            getLogger().debug("promoter", "next", nextIndex);
+            // This log message is 'info' as it acts like a progress indicator or
+            // heartbeat for anyone monitoring logs.
+            getLogger().info("promoter", "next", nextIndex);
             MedusaEntry next = (MedusaEntry) getDelegate().find_(x, nextIndex);
             if ( next != null ) {
               synchronized ( next.getId().toString().intern() ) {
@@ -380,7 +376,6 @@ This is the heart of Medusa.`,
       type: 'foam.nanos.medusa.MedusaEntry',
       javaCode: `
       PM pm = PM.create(x, this.getClass().getSimpleName(), "mdao");
-      // getLogger().debug("mdao", entry.getIndex());
 
       try {
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
@@ -389,7 +384,6 @@ This is the heart of Medusa.`,
         if ( replaying.getReplaying() ||
              ! config.getIsPrimary() ) {
           String data = entry.getData();
-          // getLogger().debug("mdao", entry.getIndex(), entry.getDop().getLabel()); //, data);
           if ( ! SafetyUtil.isEmpty(data) ) {
             // TODO: cache cls for nspecName
             DAO dao = support.getMdao(x, entry.getNSpecName());
@@ -430,7 +424,6 @@ This is the heart of Medusa.`,
             if ( ! replaying.getReplaying() &&
                  ! config.getIsPrimary() ) {
               MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
-              getLogger().debug("mdao", entry.getDop(), entry.getId(), "registry", "register");
               registry.register(x, (Long) entry.getId());
             }
           }
@@ -529,7 +522,6 @@ This is the heart of Medusa.`,
       try {
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
         ClusterConfig config = support.getConfig(x, support.getConfigId());
-        getLogger().debug("gap", "testing", index);
         MedusaEntry entry = (MedusaEntry) getDelegate().find_(x, index + 1);
         if ( entry == null ) {
           Min min = (Min) getDelegate().where(
@@ -583,7 +575,7 @@ This is the heart of Medusa.`,
 
               // REVIEW: This is quick and dirty.
               // look ahead, keep reducing threshold over time
-              Long lookAheadThreshold = 5L;
+              Long lookAheadThreshold = 10L;
               Long minutes = (long) (System.currentTimeMillis() - since) / (1000 * 60);
               lookAheadThreshold = Math.max(1, lookAheadThreshold - minutes);
 

@@ -66,7 +66,7 @@ foam.CLASS({
       margin-right: -50px; /* Maximum width of scrollbar */
       padding-right: 50px; /* Maximum width of scrollbar */
       height: 100%;
-      overflow-y: scroll;
+      overflow-y: auto;
     }
 
     ^arrow-right {

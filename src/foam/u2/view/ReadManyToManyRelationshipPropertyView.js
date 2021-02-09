@@ -9,6 +9,15 @@ foam.CLASS({
   name: 'ReadManyToManyRelationshipPropertyView',
   extends: 'foam.u2.View',
 
+  exports: [
+    'click',
+    'click as dblclick'
+  ],
+
+  imports: [
+    'stack'
+  ],
+
   documentation: 'A read-only view of a ManyToManyRelationshipProperty.',
 
   requires: [
@@ -16,14 +25,38 @@ foam.CLASS({
     'foam.comics.v2.DAOControllerConfig'
   ],
 
+  property: [
+    'config'
+  ],
+
   methods: [
     function initE() {
       this.SUPER();
-      this.tag(this.ScrollTableView, {
+
+      this.config = this.DAOControllerConfig.create({ dao: this.data.dao.delegate });
+
+
+      var view = foam.u2.ViewSpec.createView(this.ScrollTableView, {
         data: this.data.dao,
         enableDynamicTableHeight: false,
-        config: this.DAOControllerConfig.create({ dao: this.data.dao.delegate })
-      });
+        config: this.config
+      },
+      this,
+      this.__subContext__.createSubContext({ memento: null }));
+      
+
+      this.tag(view);
+    },
+    function click(obj, id) {
+      if ( ! this.stack ) return;
+
+      this.stack.push({
+        class: 'foam.comics.v2.DAOSummaryView',
+        data: obj,
+        config: this.config,
+        idOfRecord: id,
+        backLabel: 'Back'
+      }, this.__subContext__.createSubContext({memento: null}));
     }
   ]
 });

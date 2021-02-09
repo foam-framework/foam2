@@ -18,7 +18,12 @@ foam.CLASS({
           public DigErrorMessage(String message) {
             super(message);
             setMessage(message);
-          } 
+          }
+
+          public DigErrorMessage(String message, Throwable cause) {
+            super(message, cause);
+            setMessage(message);
+          }
         `
         );
       }

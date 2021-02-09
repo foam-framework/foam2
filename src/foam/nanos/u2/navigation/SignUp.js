@@ -39,7 +39,7 @@ foam.CLASS({
     { name: 'USERNAME_EMPTY_ERR', message: 'Username required' },
     { name: 'USERNAME_AVAILABILITY_ERR', message: 'This username is taken. Please try another.' },
     //TODO: Find out better way to deal with PASSWORD_ERR
-    { name: 'PASSWORD_ERR', message: 'Password should be at least 6 characters.' }
+    { name: 'PASSWORD_ERR', message: 'Password should be at least 10 characters.' }
   ],
 
   properties: [
@@ -134,7 +134,7 @@ foam.CLASS({
         passwordIcon: true
       },
       validateObj: function(desiredPassword) {
-        if ( ! desiredPassword || desiredPassword.length < 6 ) return this.PASSWORD_ERR;
+        if ( ! desiredPassword || desiredPassword.length < 10 ) return this.PASSWORD_ERR;
       },
       required: true
     }

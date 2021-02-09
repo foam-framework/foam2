@@ -57,7 +57,8 @@ foam.CLASS({
       this.SUPER(prop);
       this.prop = prop;
       var dao = this.ctrl.__subContext__[prop.targetDAOKey];
-      dao.find(this.data).then((o) => this.obj = o);
+      if ( dao )
+        dao.find(this.data).then((o) => this.obj = o);
     }
   ]
 });

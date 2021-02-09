@@ -44,8 +44,8 @@ foam.CLASS({
       documentation: 'wizardlets for capable payloads',
       postSet: function(_, n) {
         var promises = [];
-        n.forEach(wizard => promises.push(wizard.save()))
-        Promise.all(promises).then(cps => console.log(cps))
+        n.forEach(wizard => promises.push(wizard.save()));
+        Promise.all(promises);
         this.listenOnPayloads();
       }
     },

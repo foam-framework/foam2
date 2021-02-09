@@ -66,9 +66,9 @@ foam.CLASS({
           predicateFactory: function(e) {
             return e.GTE(foam.mlang.StringLength.create({
               arg1: foam.nanos.auth.UpdatePassword.NEW_PASSWORD
-            }), 6);
+            }), 10);
           },
-          errorString: 'Passwords must be at least 6 characters.'
+          errorString: 'Passwords must be at least 10 characters.'
         }
       ]
     },

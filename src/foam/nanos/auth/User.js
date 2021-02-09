@@ -766,7 +766,10 @@ foam.CLASS({
       name: 'doNotify',
       javaCode: `
         // Get the default settings for the user if none are already defined
-        List<NotificationSetting> settingDefaults = ((ArraySink) ((DAO) x.get("notificationSettingDefaultsDAO")).select(new ArraySink())).getArray();
+        List<NotificationSetting> settingDefaults = ((ArraySink) ((DAO) x.get("notificationSettingDefaultsDAO"))
+          .where(EQ(foam.nanos.notification.NotificationSetting.SPID, getSpid()))
+          .select(new ArraySink()))
+          .getArray();
         HashMap<String, NotificationSetting> settingsMap = new HashMap<String, NotificationSetting>();
         for ( NotificationSetting setting : settingDefaults ) {
           settingsMap.put(setting.getClassInfo().getId(), setting);
