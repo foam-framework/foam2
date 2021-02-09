@@ -18,10 +18,18 @@ foam.CLASS({
   ],
 
   imports: [
-    'translationService'
+    'translationService',
+    'capabilityDAO'
   ],
 
   properties: [
+    {
+      name: 'data',
+      flags: ['web'],
+      factory: function(){
+        return foam.nanos.crunch.MinMaxCapabilityData.create();
+      }
+    },
     {
       class: 'FObjectArray',
       of: 'foam.u2.wizard.Wizardlet',
@@ -103,7 +111,10 @@ foam.CLASS({
       }
     },
     {
-      name: 'selectedData'
+      name: 'selectedData',
+      postSet: function(_,n){
+        this.data.selectedData = n.map(capability => capability.id);
+      }
     },
     {
       name: 'sections',
@@ -113,8 +124,29 @@ foam.CLASS({
       of: 'foam.u2.wizard.WizardletSection',
       factory: function() {
         // to account for isFinal: true in choices
-        var selectedData = this.choices.filter(choice => choice[2]).map(selectedChoice => selectedChoice[0]);
+        var finalData = this.choices.filter(choice => choice[2]).map(selectedChoice => selectedChoice[0]);
+        var selectedData = finalData;
 
+        // to account for previously selected data
+        if ( this.data.selectedData.length > 0 ){
+          var savedSelectedDataIds = [
+            ...this.data.selectedData
+          ];
+
+          var savedSelectedData = [];
+
+          // need to grab the selected capability objects
+          for ( let i = 0; i < this.choices.length; i++ ){
+            if ( savedSelectedDataIds.includes(this.choices[i][0].id) ){
+              savedSelectedData.push(this.choices[i][0]);
+            }
+
+            if ( savedSelectedData.length === savedSelectedDataIds.length ) break;
+          }
+
+          selectedData = finalData.concat(savedSelectedData);     
+        }
+        
         this.selectedData = selectedData;
 
         var sections = [
@@ -122,6 +154,7 @@ foam.CLASS({
             isAvailable: true,
             title: this.capability.name,
             choiceWizardlets$: this.choiceWizardlets$,
+            isLoaded: true,
             customView: {
               class: 'foam.u2.view.MultiChoiceView',
               choices$: this.choices$,
@@ -134,7 +167,7 @@ foam.CLASS({
           })
         ];
 
-        if ( this.of ){
+        if ( this.of && this.showDefaultSections ){
           var ofSections = foam.u2.detail.AbstractSectionedDetailView.create({
             of: this.of,
           }, this).sections.map(section => this.WizardletSection.create({
@@ -167,6 +200,10 @@ foam.CLASS({
       documentation: `
         When true, do not display the choice selection section.
       `,
+      class: 'Boolean'
+    },
+    {
+      name: 'showDefaultSections',
       class: 'Boolean'
     }
   ],
