@@ -44,7 +44,17 @@ foam.CLASS({
         class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
-      minLength: 6
+      validationPredicates: [
+        {
+          args: ['newPassword'],
+          predicateFactory: function(e) {
+            return e.GTE(foam.mlang.StringLength.create({
+              arg1: foam.nanos.auth.ResetPassword.NEW_PASSWORD
+            }), 6);
+          },
+          errorString: 'Passwords must be at least 6 characters.'
+        }
+      ]
     },
     {
       class: 'Password',

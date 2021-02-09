@@ -42,6 +42,15 @@ foam.CLASS({
         class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
+      validationPredicates: [
+        {
+          args: ['originalPassword'],
+          predicateFactory: function(e) {
+            return e.NEQ(foam.nanos.auth.UpdatePassword.ORIGINAL_PASSWORD, "");
+          },
+          errorString: 'Please enter the original password.'
+        }
+      ]
     },
     {
       class: 'Password',
@@ -51,7 +60,17 @@ foam.CLASS({
         class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
-      minLength: 6
+      validationPredicates: [
+        {
+          args: ['newPassword'],
+          predicateFactory: function(e) {
+            return e.GTE(foam.mlang.StringLength.create({
+              arg1: foam.nanos.auth.UpdatePassword.NEW_PASSWORD
+            }), 6);
+          },
+          errorString: 'Passwords must be at least 6 characters.'
+        }
+      ]
     },
     {
       class: 'Password',
