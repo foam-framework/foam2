@@ -82,7 +82,6 @@ foam.CLASS({
       this.wizardlets = this.capableObj ?
         await this.crunchController.getWizardletsFromCapable(this.capableObj) : [];
 
-      console.log('capable and wizardlets', this.capableObj, this.wizardlets);
 
       this.start().addClass(this.myClass())
         .forEach(this.wizardlets, function (w, wi) {
