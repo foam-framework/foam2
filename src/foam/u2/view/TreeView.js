@@ -237,7 +237,7 @@ foam.CLASS({
                 'float':         'right',
                 'display':       'inline-block',
                 'height':        '6px',
-                'padding':       '3px 0px 3px 3px',
+                'padding':       '7px 0px 8px 3px',
                 'transform':     self.expanded$.map(function(c) { return c ? 'rotate(0deg)' : 'rotate(90deg)'; })
               }).
               on('click', this.toggleExpanded).
