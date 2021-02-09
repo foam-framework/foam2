@@ -64,7 +64,7 @@ foam.CLASS({
               throw new RuntimeException("You are not authorized to perform this update");
 
             // get the
-            User user = (User) ucj.findSourceId(x);
+            User user = (User) ucj.findSourceId(x).fclone();
             ServiceProvider serviceProvider = (ServiceProvider) target;
 
             // if is create, check if any old user-serviceprovider junctions exist, and remove it and its grant path   

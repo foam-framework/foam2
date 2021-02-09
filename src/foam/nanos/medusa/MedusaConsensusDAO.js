@@ -105,22 +105,18 @@ This is the heart of Medusa.`,
         MedusaEntry existing = (MedusaEntry) getDelegate().find_(x, entry.getId());
         if ( existing != null &&
              existing.getPromoted() ) {
-          // getLogger().debug("put", replaying.getIndex(), entry.toSummary(), "from", entry.getNode(), "discarding");
           return existing;
         }
 
         synchronized ( entry.getId().toString().intern() ) {
           if ( replaying.getIndex() > entry.getIndex() ) {
-            getLogger().debug("put", replaying.getIndex(), entry.toSummary(), "from", entry.getNode(), "discarding", "in-lock");
             return entry;
           }
           existing = (MedusaEntry) getDelegate().find_(x, entry.getId());
           if ( existing != null ) {
             if ( existing.getPromoted() ) {
-              // getLogger().debug("put", replaying.getIndex(), entry.toSummary(), "from", entry.getNode(), "discarding", "in-lock");
               return existing;
             }
-            // getLogger().debug("put", entry.toSummary(), "from", entry.getNode(), "existing");
           } else {
              existing = entry;
           }
@@ -189,7 +185,6 @@ This is the heart of Medusa.`,
       type: 'foam.nanos.medusa.MedusaEntry',
       javaCode: `
       // NOTE: implementation expects caller to lock on entry index
-      // getLogger().debug("promote", entry.getId());
       PM pm = PM.create(x, this.getClass().getSimpleName(), "promote");
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
       DaggerService dagger = (DaggerService) x.get("daggerService");
@@ -213,14 +208,14 @@ This is the heart of Medusa.`,
           dagger.setGlobalIndex(x, entry.getIndex());
         }
 
-        entry.setPromoted(true);
-        entry = (MedusaEntry) getDelegate().put_(x, entry);
-
         try {
           entry = mdao(x, entry);
         } catch( IllegalArgumentException e ) {
           // nop - already reported - occurs when a DAO is removed.
         }
+
+        entry.setPromoted(true);
+        entry = (MedusaEntry) getDelegate().put_(x, entry);
 
         // Notify any blocked Primary puts
         MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
@@ -262,7 +257,6 @@ This is the heart of Medusa.`,
         }
       ],
       javaCode: `
-      getLogger().debug("promoter", "execute");
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       Long nextIndexSince = System.currentTimeMillis();
       Alarm alarm = new Alarm.Builder(x)
@@ -276,7 +270,9 @@ This is the heart of Medusa.`,
           MedusaEntry entry = null;
           try {
             Long nextIndex = replaying.getIndex() + 1;
-            getLogger().debug("promoter", "next", nextIndex);
+            // This log message is 'info' as it acts like a progress indicator or
+            // heartbeat for anyone monitoring logs.
+            getLogger().info("promoter", "next", nextIndex);
             MedusaEntry next = (MedusaEntry) getDelegate().find_(x, nextIndex);
             if ( next != null ) {
               synchronized ( next.getId().toString().intern() ) {
@@ -380,7 +376,6 @@ This is the heart of Medusa.`,
       type: 'foam.nanos.medusa.MedusaEntry',
       javaCode: `
       PM pm = PM.create(x, this.getClass().getSimpleName(), "mdao");
-      // getLogger().debug("mdao", entry.getIndex());
 
       try {
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
@@ -389,8 +384,8 @@ This is the heart of Medusa.`,
         if ( replaying.getReplaying() ||
              ! config.getIsPrimary() ) {
           String data = entry.getData();
-          // getLogger().debug("mdao", entry.getIndex(), entry.getDop().getLabel()); //, data);
           if ( ! SafetyUtil.isEmpty(data) ) {
+            // TODO: cache cls for nspecName
             DAO dao = support.getMdao(x, entry.getNSpecName());
             Class cls = null;
             if ( dao instanceof foam.dao.ProxyDAO ) {
@@ -419,6 +414,17 @@ This is the heart of Medusa.`,
             } else {
               getLogger().warning("Unsupported operation", entry.getDop().getLabel());
               throw new UnsupportedOperationException(entry.getDop().getLabel());
+            }
+
+            // Secondaries will block on registry
+            // NOTE: See PromotedPurgeAgent for Registry cleanup.  These
+            // registry.register requests will remain until a 'waiter', or
+            // until purged, which is the case for idle Secondaries and
+            // non-active Regions.
+            if ( ! replaying.getReplaying() &&
+                 ! config.getIsPrimary() ) {
+              MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
+              registry.register(x, (Long) entry.getId());
             }
           }
         }
@@ -516,7 +522,6 @@ This is the heart of Medusa.`,
       try {
         ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
         ClusterConfig config = support.getConfig(x, support.getConfigId());
-        getLogger().debug("gap", "testing", index);
         MedusaEntry entry = (MedusaEntry) getDelegate().find_(x, index + 1);
         if ( entry == null ) {
           Min min = (Min) getDelegate().where(
@@ -570,7 +575,7 @@ This is the heart of Medusa.`,
 
               // REVIEW: This is quick and dirty.
               // look ahead, keep reducing threshold over time
-              Long lookAheadThreshold = 5L;
+              Long lookAheadThreshold = 10L;
               Long minutes = (long) (System.currentTimeMillis() - since) / (1000 * 60);
               lookAheadThreshold = Math.max(1, lookAheadThreshold - minutes);
 
@@ -588,13 +593,17 @@ This is the heart of Medusa.`,
                 config.setErrorMessage("");
                 ((DAO) x.get("clusterConfigDAO")).put(config);
               } else {
-                getLogger().error("gap", "index", index, "dependencies", dependencies.getValue(), "lookAhead", lookAhead.getValue(), "lookAhead threshold",lookAheadThreshold);
-                alarm.setNote("Index: "+index+"\\n"+"Dependencies: YES");
-                alarm.setSeverity(foam.log.LogLevel.ERROR);
-                ((DAO) x.get("alarmDAO")).put(alarm);
-                config.setErrorMessage("gap with dependencies");
-                ((DAO) x.get("clusterConfigDAO")).put(config);
-                throw new MedusaException("gap with dependencies");
+                if ( ((Long)lookAhead.getValue()).intValue() > lookAheadThreshold ) {
+                  getLogger().error("gap", "index", index, "dependencies", dependencies.getValue(), "lookAhead", lookAhead.getValue(), "lookAhead threshold",lookAheadThreshold);
+                  alarm.setNote("Index: "+index+"\\n"+"Dependencies: YES");
+                  alarm.setSeverity(foam.log.LogLevel.ERROR);
+                  ((DAO) x.get("alarmDAO")).put(alarm);
+                  config.setErrorMessage("gap with dependencies");
+                  ((DAO) x.get("clusterConfigDAO")).put(config);
+                  throw new MedusaException("gap with dependencies");
+                } else {
+                  getLogger().info("gap", "investigating", index, "dependencies", dependencies.getValue(), "lookAhead", lookAhead.getValue(), "lookAhead threshold",lookAheadThreshold);
+                }
               }
             } else {
               getLogger().info("gap", "not-found", index);

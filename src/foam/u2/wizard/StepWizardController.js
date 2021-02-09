@@ -90,9 +90,12 @@ foam.CLASS({
     },
     {
       name: 'currentSection',
-      expression: function(currentWizardlet, wizardPosition$sectionIndex) {
-        return this.currentWizardlet.currentSection = currentWizardlet
-            .sections[wizardPosition$sectionIndex];
+      expression: function(
+        wizardlets,
+        wizardPosition$wizardletIndex, wizardPosition$sectionIndex
+      ) {
+        return wizardlets[wizardPosition$wizardletIndex]
+          .sections[wizardPosition$sectionIndex];
       }
     },
     {
@@ -205,6 +208,7 @@ foam.CLASS({
       });
     },
     function nextAvailable(pos, iter) {
+      if ( ! pos || ! iter ) return null;
       for ( let p = iter(pos) ; p != null ; p = iter(p) ) {
         let wizardlet = this.wizardlets[p.wizardletIndex]
         if ( ! wizardlet.isVisible ) continue;

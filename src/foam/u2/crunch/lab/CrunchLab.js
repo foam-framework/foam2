@@ -30,6 +30,7 @@ foam.CLASS({
   requires: [
     'foam.graph.GraphBuilder',
     'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.u2.crunch.lab.CapabilityGraphNodeView',
     'foam.u2.svg.graph.RelationshipGridPlacementStrategy',
     'foam.u2.svg.graph.IdPropertyPlacementPlanDecorator',
     'foam.u2.svg.TreeGraph',
@@ -143,7 +144,6 @@ foam.CLASS({
                 self.EQ(self.UserCapabilityJunction.SOURCE_ID, crunchUser)
               )).select().then(r => {
                 r.array.forEach(ucj => {
-                  console.log('replacing', ucj.targetId, ucj);
                   let capability = graph.data[ucj.targetId].data;
                   graph.data[ucj.targetId].data = [
                     capability, ucj
@@ -162,11 +162,11 @@ foam.CLASS({
                 nodePlacementPlan: placementPlan,
                 graph: graph,
                 size: 200,
-                nodeView: 'foam.u2.crunch.lab.CapabilityGraphNodeView'
+                nodeView: this.CapabilityGraphNodeView
                 // nodeView: 'foam.u2.svg.graph.ZoomedOutFObjectGraphNodeView'
               })
               ;
-          })
+          });
       });
     }
   ],

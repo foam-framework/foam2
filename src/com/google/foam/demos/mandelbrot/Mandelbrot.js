@@ -18,7 +18,7 @@ foam.CLASS({
   ],
 
   constants: {
-    MEMENTO_PROPERTIES: [ 'x1', 'y1', 'x2', 'y2', 'maxIterations' ]
+    MEMENTO_PROPERTIES: [ 'x1', 'y1', 'x2', 'y2', 'maxIterations', 'width', 'height' ]
   },
 
   properties: [

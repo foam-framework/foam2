@@ -211,7 +211,7 @@ foam.CLASS({
           .start(this.GUnit, { columns: 8 })
             .addClass(this.myClass('rightside'))
             .add(this.slot(function(hideX) {
-              return hideX ? 
+              return hideX ?
                 null :
                 this.E().addClass(this.myClass('top-buttons'))
                 .start(this.CircleIndicator, {
@@ -235,15 +235,6 @@ foam.CLASS({
                   }
 
                   return data$currentSection.createView();
-                  var ctx = this.__subContext__.createSubContext();
-                  ctx.register(
-                    this.VerticalDetailView,
-                    'foam.u2.detail.SectionedDetailView'
-                  );
-                  return self.SectionView.create({
-                    section: data$currentSection,
-                    data$: data$currentWizardlet.data$,
-                  }, ctx)
                 }))
               .end()
             .end()

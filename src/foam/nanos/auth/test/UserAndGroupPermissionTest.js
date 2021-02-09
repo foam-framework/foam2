@@ -43,12 +43,8 @@ foam.CLASS({
         ((DAO) x.get("localGroupDAO")).put(new Group.Builder(x).setId("test2").build());
         ((DAO) x.get("localGroupDAO")).put(new Group.Builder(x).setId("fail").build());
 
-        foam.nanos.app.AppConfig appConfig = (foam.nanos.app.AppConfig) ((FObject) x.get("appConfig")).fclone();
-        appConfig.setDefaultSpid("spid");
-        X y = x.put("appConfig", appConfig);
-
-        testUserPermissions(y);
-        testUserSpidPermissions(y);
+        testUserPermissions(x);
+        testUserSpidPermissions(x);
       `
     },
     {

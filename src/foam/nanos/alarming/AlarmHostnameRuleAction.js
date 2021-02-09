@@ -15,7 +15,8 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.ContextAgent',
-    'foam.core.X'
+    'foam.core.X',
+    'foam.util.SafetyUtil'
   ],
 
   methods: [
@@ -26,7 +27,9 @@ foam.CLASS({
           @Override
           public void execute(X x) {
             Alarm alarm = (Alarm) obj;
-            alarm.setHostname(System.getProperty("hostname", "localhost"));
+            if ( SafetyUtil.isEmpty(alarm.getHostname()) ) {
+              alarm.setHostname(System.getProperty("hostname", "localhost"));
+            }
           }
         }, "Alarm hostname");
       `

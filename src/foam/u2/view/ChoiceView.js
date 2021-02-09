@@ -105,8 +105,6 @@ foam.CLASS({
           }
         }
 
-        if ( nu.length == 1 ) this.data = nu[0][0];
-
         if ( this.dynamicSize ) this.size = Math.min(nu.length, this.maxSize);
         return nu;
       }
@@ -206,6 +204,8 @@ foam.CLASS({
 
     function initE() {
       var self = this;
+
+      if ( ! this.choice && this.choices.length == 1 ) this.data = this.choices[0][0];
 
       // If no item is selected, and data has not been provided, select the 0th
       // entry.
@@ -323,6 +323,7 @@ foam.CLASS({
               choices[i][1] = resolvedChoiceLabels[i];
             }
             this.choices = choices;
+            if ( ! this.choice && this.choices.length == 1 ) this.data = this.choices[0][0];
           });
           if ( this.data == null && this.index === -1 ) this.index = this.placeholder ? -1 : 0;
         });

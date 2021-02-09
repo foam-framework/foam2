@@ -56,7 +56,11 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'showOther_',
-      expression: function(choiceData_, otherKey) {
+      expression: function(choiceData_, otherKey, mode, otherData_) {
+        if ( mode === foam.u2.DisplayMode.RO ) {
+          // Prevent extra information from being displayed in RO
+          return false;
+        }
         return foam.util.equals(choiceData_, otherKey);
       }
     },
@@ -91,9 +95,16 @@ foam.CLASS({
         this.preventFeedback_ = true;
         this.choiceView_.data = this.data;
         if ( this.choiceView_.choice == null ) {
-          if ( ! foam.util.equals(this.data, this.noSelectionValue) ) {
-            this.choiceData_ = this.otherKey;
-            this.otherData_ = this.data;
+          if ( this.mode === foam.u2.DisplayMode.RO ) {
+            if ( foam.util.equals(this.data, this.otherKey) ) {
+              this.choiceData_ = this.otherKey;
+              this.otherData_ = this.data;
+            }
+          } else {
+            if ( ! foam.util.equals(this.data, this.noSelectionValue) ) {
+              this.choiceData_ = this.otherKey;
+              this.otherData_ = this.data;
+            }
           }
         } else {
           this.otherData_ = this.otherDefault;
@@ -106,6 +117,7 @@ foam.CLASS({
     function initE() {
       var self = this;
       self.SUPER();
+
       self.add(self.slot(function(choiceView, otherView) {
         return self.Rows.create()
           .tag(choiceView, { data$: self.choiceData_$ }, self.choiceView_$)

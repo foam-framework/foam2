@@ -63,7 +63,7 @@ foam.CLASS({
         return this.ifFoundElseIfNotFound_(
           obj.capability,
           (payloads, i) => { payloads[i] = obj; return obj; },
-          (payloads) => { payloads.push(obj); }
+          (payloads) => { payloads.push(obj); return obj; }
         );
       }
     },

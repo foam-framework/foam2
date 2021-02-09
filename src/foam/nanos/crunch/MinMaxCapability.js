@@ -57,45 +57,29 @@ foam.CLASS({
       javaCode: `
         // Required services and DAOs
         CrunchService crunchService = (CrunchService) x.get("crunchService");
-        DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
-        DAO userDAO = (DAO) x.get("userDAO");
-        Subject currentSubject = (Subject) x.get("subject");
+        DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+        Subject junctionSubject = (Subject) ucj.getSubject(x);
 
         // Prepare to count statuses
         int numberGranted = 0;
         int numberPending = 0;
 
-        // Create ccJunctions list
-        DAO myPrerequisitesDAO = ((DAO)
-          x.get("prerequisiteCapabilityJunctionDAO"))
-            .where(
-              EQ(CapabilityCapabilityJunction.SOURCE_ID, getId()));
-        List<CapabilityCapabilityJunction> ccJunctions =
-          ((ArraySink) myPrerequisitesDAO.select(new ArraySink()))
-          .getArray();
+        // Get list of prerequisite capability ids
+        List<String> prereqCapabilityIds = crunchService.getPrereqs(getId());
+
+        // this is under the assumption that minmaxCapabilities should always have prerequisites
+        // and that min is never less than 1
+        if ( prereqCapabilityIds == null || prereqCapabilityIds.size() == 0 ) return CapabilityJunctionStatus.ACTION_REQUIRED;
 
         // Count junction statuses
-        for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
-          Capability cap = (Capability) ccJunction.findTargetId(x);
+        for ( String capId : prereqCapabilityIds ) {
+          Capability cap = (Capability) capabilityDAO.find(capId);
           if ( ! cap.getEnabled() ) continue;
 
-          // Use getSubject method of UCJ when NP-2436 (PR 4248) is merged
-          Subject subject = new Subject(x);
-          if ( ucj instanceof AgentCapabilityJunction ) {
-            subject.setUser((User) userDAO.find(ucj.getSourceId()));
-            AgentCapabilityJunction acj = (AgentCapabilityJunction) ucj;
-            subject.setUser((User) userDAO.find(acj.getEffectiveUser())); // "user"
-          } else if ( ucj.getSourceId() == currentSubject.getUser().getId() ) {
-            subject.setUser(currentSubject.getRealUser());
-            subject.setUser(currentSubject.getUser());
-          } else {
-            subject.setUser((User) userDAO.find(ucj.getSourceId()));
-          }
-
-          X subjectContext = x.put("subject", subject);
+          X junctionSubjectContext = x.put("subject", junctionSubject);
 
           UserCapabilityJunction ucJunction =
-            crunchService.getJunction(subjectContext, ccJunction.getTargetId());
+            crunchService.getJunction(junctionSubjectContext, capId);
           if ( ucJunction.getStatus() == AVAILABLE ) continue;
 
           switch ( ucJunction.getStatus() ) {
@@ -130,8 +114,9 @@ foam.CLASS({
         is less than 'min'
       `,
       javaCode: `
-        if ( ! getEnabled() ) return false; 
-        
+        if ( ! getEnabled() ) return false;
+        if ( getGrantMode() == CapabilityGrantMode.MANUAL ) return false;
+
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         CrunchService crunchService = (CrunchService) x.get("crunchService");
 
@@ -144,9 +129,13 @@ foam.CLASS({
         int numberGrantedNotReopenable = 0;
         for ( var capId : prereqs ) {
           Capability cap = (Capability) capabilityDAO.find(capId);
+          if ( cap.getGrantMode() == CapabilityGrantMode.MANUAL ) {
+            numberGrantedNotReopenable++;
+            continue;
+          }
           if ( cap == null ) throw new RuntimeException("Cannot find prerequisite capability");
           UserCapabilityJunction prereq = crunchService.getJunction(x, capId);
-          if ( prereq != null && prereq.getStatus() == CapabilityJunctionStatus.GRANTED && ! cap.maybeReopen(x, prereq) )
+          if ( prereq != null && ! cap.maybeReopen(x, prereq) )
             numberGrantedNotReopenable++;
         }
         // if there are at least min number granted not reopenable, then no need to reopen capability

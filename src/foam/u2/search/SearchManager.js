@@ -136,6 +136,8 @@ foam.CLASS({
         // That will tickle the expression for filteredDAO.
         this.updateViews();
 
+        if ( ! this.memento )
+          return;
         var searches = [];
         var keys = Object.keys(this.views);
         if ( keys.length == 0 ) {
@@ -157,7 +159,6 @@ foam.CLASS({
           
           this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
         }
-        
       }
     },
     {

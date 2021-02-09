@@ -15,14 +15,10 @@ foam.CLASS({
   javaImports: [
     'foam.core.ContextAgent',
     'foam.core.X',
-    'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.nanos.crunch.Capability',
-    'foam.nanos.crunch.CapabilityCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
-    'foam.nanos.crunch.UserCapabilityJunction',
-    'java.util.List',
-    'static foam.mlang.MLang.*'
+    'foam.nanos.crunch.UserCapabilityJunction'
   ],
 
   methods: [
@@ -47,6 +43,9 @@ foam.CLASS({
               return;
 
             CapabilityJunctionStatus chainedStatus = checkPrereqsChainedStatus(x, ucj);
+
+            // if the ucj is already equal to the chainedStatus, it does not need to be updated
+            if ( chainedStatus == ucj.getStatus() ) return;
 
             // the following should be checked if the result of previous rule ( validateUCJDataOnPut ) 
             // is not ACTION_REQUIRED. In the ACTION_REQUIRED case, the ucj should be put into the
@@ -89,39 +88,10 @@ foam.CLASS({
         ACTION_REQUIRED: If not any of the above
       `,
       javaCode: `
-        DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         Capability cap = (Capability) capabilityDAO.find(ucj.getTargetId());
         return cap.getPrereqsChainedStatus(x, ucj);
       `
-    },
-    {
-      name: 'getPrereqs',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-        {
-          name: 'ucj',
-          type: 'foam.nanos.crunch.UserCapabilityJunction'
-        }
-      ],
-      javaType: 'java.util.List<CapabilityCapabilityJunction>',
-      documentation: `
-        Returns the list of prerequisiteCapabilityJunctions for the target capability of the ucj
-      `, 
-      javaCode: `
-        DAO prerequisiteCapabilityJunctionDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
-
-        // get a list of the prerequisite junctions where the current capability is the dependent
-        List<CapabilityCapabilityJunction> ccJunctions = (List<CapabilityCapabilityJunction>) ((ArraySink) prerequisiteCapabilityJunctionDAO
-        .where(EQ(CapabilityCapabilityJunction.SOURCE_ID, ucj.getTargetId()))
-        .select(new ArraySink()))
-        .getArray();
-
-        return ccJunctions;
-      `
-    },
+    }
   ]
 });

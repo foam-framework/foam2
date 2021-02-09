@@ -13,8 +13,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'capabilityDAO',
-    'prerequisiteCapabilityJunctionDAO'
+    'capabilityDAO'
   ],
 
   javaImports: [
@@ -504,7 +503,8 @@ foam.CLASS({
         are granted but not in an reopenable state
       `,
       javaCode: `
-        if ( ! getEnabled() ) return false; 
+        if ( ! getEnabled() ) return false;
+        if ( getGrantMode() == CapabilityGrantMode.MANUAL ) return false;
 
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         CrunchService crunchService = (CrunchService) x.get("crunchService");
@@ -554,6 +554,7 @@ foam.RELATIONSHIP({
   inverseName: 'users',
   sourceProperty: {
     section: 'systemInformation',
+    order: 20,
     updateVisibility: 'RO'
   }
 });

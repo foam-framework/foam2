@@ -122,6 +122,14 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
         // Manually grab the direct  prereqs to the  MinMaxCapability
         for ( int i = prereqs.length - 1 ; i >= 0 ; i-- ) {
           var prereqGrantPath = this.getCapabilityPath(x, prereqs[i], filterGrantedUCJ);
+          
+          // remove prereqs that are already listed
+          prereqGrantPath.removeIf(c -> {
+            if (  c instanceof List ){
+              return false;
+            }       
+            return alreadyListed.contains(((Capability) c).getId());
+          });
 
           // Essentially we reserve arrays to denote  ANDs and ORs, must be at least 2  elements
           if ( prereqGrantPath.size() > 1 ) minMaxArray.add(prereqGrantPath);
@@ -155,7 +163,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return grantPath;
   }
 
-  public String[] getDependantIds(X x, String capabilityId) {
+  public String[] getDependentIds(X x, String capabilityId) {
     return Arrays.stream(((CapabilityCapabilityJunction[]) ((ArraySink) ((DAO) x.get("prerequisiteCapabilityJunctionDAO"))
       .where(EQ(CapabilityCapabilityJunction.TARGET_ID, capabilityId))
       .select(new ArraySink())).getArray()
@@ -184,32 +192,6 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       }
     }
     return prereqsCache_.get(capId);
-  }
-
-  // Return capability path for multiple prerequisites without duplicates.
-  public List getMultipleCapabilityPath(
-    X x, String[] capabilityIds, boolean filterGrantedUCJ
-  ) {
-    Set alreadyListed = new HashSet<String>();
-
-    List multiplePath = new ArrayList();
-
-    for ( String capId : capabilityIds ) {
-      List crunchyPath = getCapabilityPath(x, capId, filterGrantedUCJ);
-      for ( Object obj : crunchyPath ) {
-        Capability cap = null;
-        if ( obj instanceof List ) {
-          List list = (List) obj;
-          cap = (Capability) list.get(list.size() - 1);
-        } else {
-          cap = (Capability) obj;
-        }
-        if ( alreadyListed.contains(cap.getId()) ) continue;
-        multiplePath.add(obj);
-      }
-    }
-
-    return multiplePath;
   }
 
   public UserCapabilityJunction getJunction(X x, String capabilityId) {
@@ -472,22 +454,27 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
   public WizardState getWizardState(X x, String capabilityId) {
     var subject = (Subject) x.get("subject");
 
+    DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+    Capability capability = (Capability) capabilityDAO.find(capabilityId);
+
     if ( ! subject.isAgent() ) {
       return getWizardStateFor_(x, subject, capabilityId);
     }
 
-    { // Save unassociated wizard states if none exist yet
-      var realUser = new Subject();
-      realUser.setUser(subject.getRealUser());
-      realUser.setUser(subject.getRealUser());
-      getWizardStateFor_(x, realUser, capabilityId);
-      var effectiveUser = new Subject();
-      effectiveUser.setUser(subject.getUser());
-      effectiveUser.setUser(subject.getUser());
-      getWizardStateFor_(x, effectiveUser, capabilityId);
-    }
+    var realUser = new Subject();
+    realUser.setUser(subject.getRealUser());
+    realUser.setUser(subject.getRealUser());
+    var realUserWizardState = getWizardStateFor_(x, realUser, capabilityId);
+    var effectiveUser = new Subject();
+    effectiveUser.setUser(subject.getUser());
+    effectiveUser.setUser(subject.getUser());
+    var userWizardState = getWizardStateFor_(x, effectiveUser, capabilityId);
 
-    return getWizardStateFor_(x, subject, capabilityId);
+    var subjectWizardState = getWizardStateFor_(x, subject, capabilityId);
+
+    return capability.getAssociatedEntity() == AssociatedEntity.USER ? userWizardState : 
+      capability.getAssociatedEntity() == AssociatedEntity.REAL_USER ? realUserWizardState :
+      subjectWizardState;
   }
 
   private WizardState getWizardStateFor_(X x, Subject s, String capabilityId) {
@@ -521,7 +508,9 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
     for ( Object obj : capsOrLists ) {
       Capability cap;
+      boolean isPrereqAware = false;
       if ( obj instanceof List ) {
+        isPrereqAware = true;
         var list = (List) obj;
         cap = (Capability) list.get(list.size() - 1);
       } else {
@@ -531,7 +520,14 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       try {
         var ucj = getJunction(x, cap.getId());
         if ( IN(UserCapabilityJunction.STATUS, grantedStatuses).f(ucj) ) {
-          granted.add(cap.getId());
+          // if a minmax capability is in GRANTED status, its prerequisites should also be added
+          // as a part of granted list, so the wizrd will know to ignore the prerequisites
+          if ( isPrereqAware ) {
+            for ( var c : (List) obj ) {
+              granted.add(((Capability) c).getId());
+            }
+          }
+          else granted.add(cap.getId());
         }
       } catch ( RuntimeException e ) {
         // This happens if getJunction was called with an unavailabile

@@ -32,13 +32,27 @@ foam.INTERFACE({
       documentation: 'Full legal name of user. Appends first, middle & last name.',
       transient: true,
       expression: function(firstName, middleName, lastName) {
-        return middleName != '' ? firstName + ' ' + middleName + ' ' + lastName : firstName + ' ' + lastName;
+        return [firstName, middleName, lastName].filter(name => name).join(' ');
       },
       javaGetter: `
-        return ! getMiddleName().equals("")
-          ? getFirstName() + " " + getMiddleName() + " " + getLastName()
-          : getFirstName() + " " + getLastName();
-      `,
+        String firstName = getFirstName();
+        String middleName = getMiddleName();
+        String lastName = getLastName();
+
+        StringBuilder sb = new StringBuilder();
+
+        if ( ! firstName.isEmpty() ) sb.append(firstName);
+        if ( ! middleName.isEmpty() ) {
+          if ( sb.length() > 0 ) sb.append(' ');
+          sb.append(middleName);
+        }
+        if ( ! lastName.isEmpty() ) {
+          if( sb.length() > 0 ) sb.append(' ');
+          sb.append(lastName);
+        }
+
+        return sb.toString();
+      `
     }
   ]
 });

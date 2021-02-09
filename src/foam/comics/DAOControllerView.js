@@ -36,6 +36,7 @@ foam.CLASS({
     'data.data as dao',
     'data.filteredTableColumns as filteredTableColumns',
     'data.searchColumns as searchColumns',
+    'dblclick as click',
     'dblclick'
   ],
 
@@ -190,7 +191,7 @@ foam.CLASS({
                   this
                     .start()
                       .add(self.cls.PREDICATE.clone().copyFrom({
-                        view: { 
+                        view: {
                           class: 'foam.u2.view.SimpleSearch',
                           searchValue: self.memento && self.memento.paramsObj.s
                         }

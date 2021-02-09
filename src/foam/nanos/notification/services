@@ -4,8 +4,15 @@ p({
   "lazy": false,
   "serve": false,
   "serviceScript": """
-    dao = new foam.dao.EasyDAO.Builder(x)
+    mdao = new foam.dao.MDAO(foam.nanos.notification.Notification.getOwnClassInfo());
+    mdao.addIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.GROUP_ID,foam.nanos.notification.Notification.READ });
+    mdao.addIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.BROADCASTED,foam.nanos.notification.Notification.READ });
+    mdao.addIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.USER_ID,foam.nanos.notification.Notification.READ });
+    mdao.addIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.EXPIRY_DATE });
+
+    return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.notification.Notification.getOwnClassInfo())
+      .setMdao(mdao)
       .setAuthorize(false)
       .setPm(true)
       .setSeqNo(true)
@@ -23,11 +30,6 @@ p({
         .setSize(100000)
         .build())
       .build();
-    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.GROUP_ID,foam.nanos.notification.Notification.READ });
-    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.BROADCASTED,foam.nanos.notification.Notification.READ });
-    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.USER_ID,foam.nanos.notification.Notification.READ });
-    dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.notification.Notification.EXPIRY_DATE });
-    return dao;
   """
 })
 
@@ -42,6 +44,7 @@ p({
       .setAuthorize(true)
       .setInnerDAO((foam.dao.DAO) x.get("localNotificationDAO"))
       .setDecorator(new foam.nanos.notification.ToastNotificationDAO.Builder(x).build())
+      .setEnableInterfaceDecorators(false)
       .build();
   """,
   "client": "{\"of\":\"foam.nanos.notification.Notification\"}"
@@ -62,6 +65,7 @@ p({
       .setAuthorize(false)
       .setDecorator( new foam.nanos.notification.MyNotificationDAO.Builder(x).build() )
       .setInnerDAO((foam.dao.DAO) x.get("notificationDAO"))
+      .setEnableInterfaceDecorators(false)
       .build();
   """,
   "client": "{\"of\":\"foam.nanos.notification.Notification\"}"
@@ -86,11 +90,11 @@ p({
 
 p({
   "class": "foam.nanos.boot.NSpec",
-  "name": "notificationSettingDefaultsDAO",
+  "name": "localNotificationSettingDefaultsDAO",
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(false)
-      .setSeqNo(true)
+      .setGuid(true)
       .setPm(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("notificationSettingDefaults")
@@ -99,6 +103,22 @@ p({
   """
 })
 
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "notificationSettingDefaultsDAO",
+  "serve":true,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.notification.NotificationSetting.getOwnClassInfo())
+      .setPm(true)
+      .setAuthorize(true)
+      .setPermissionPrefix("notificationsettingdefaults")
+      .setInnerDAO((foam.dao.DAO) x.get("localNotificationSettingDefaultsDAO"))
+      .setEnableInterfaceDecorators(false)
+      .build();
+  """,
+  "client": "{\"of\":\"foam.nanos.notification.NotificationSetting\"}"
+})
 
 p({
   "class": "foam.nanos.boot.NSpec",
@@ -106,7 +126,7 @@ p({
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(false)
-      .setSeqNo(true)
+      .setGuid(true)
       .setPm(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("notificationSettings")

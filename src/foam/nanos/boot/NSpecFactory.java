@@ -7,6 +7,7 @@
 package foam.nanos.boot;
 
 import foam.core.*;
+import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.nanos.*;
 import foam.nanos.logger.Logger;
@@ -47,7 +48,16 @@ public class NSpecFactory
 
     try {
       logger.info("Creating Service", spec_.getName());
-      ns_ = spec_.createService(x_.getX().put(NSpec.class, spec_), null);
+      var service = spec_.createService(x_.getX().put(NSpec.class, spec_), null);
+      if ( service instanceof DAO ) {
+        if ( ns_ == null ) {
+          ns_ = new ProxyDAO();
+        }
+        ((ProxyDAO) ns_).setDelegate((DAO) service);
+      } else {
+        ns_ = service;
+      }
+
       Object ns = ns_;
       while ( ns != null ) {
         if ( ns instanceof ContextAware ) {
@@ -78,7 +88,10 @@ public class NSpecFactory
   }
 
   public synchronized Object create(X x) {
-    if ( ns_ == null ) buildService(x);
+    if ( ns_ == null ||
+         ns_ instanceof ProxyDAO && ((ProxyDAO) ns_).getDelegate() == null ) {
+      buildService(x);
+    }
 
     if ( ns_ instanceof XFactory ) return ((XFactory) ns_).create(x);
 
@@ -87,11 +100,22 @@ public class NSpecFactory
   }
 
   public synchronized void invalidate(NSpec spec) {
+    Logger logger = (Logger) x_.get("logger");
+    if ( logger == null ) {
+      logger = new StdoutLogger();
+    }
+    logger.info("Invalidating Service", spec_.getName());
     if ( ! SafetyUtil.equals(spec.getService(), spec_.getService())
       || ! SafetyUtil.equals(spec.getServiceClass(), spec_.getServiceClass())
       || ! SafetyUtil.equals(spec.getServiceScript(), spec_.getServiceScript())
     ) {
-      ns_ = null;
+      logger.info("Invalidated Service", spec_.getName());
+      if ( ns_ instanceof DAO ) {
+        logger.warning("Invalidation of DAO Service not supported.", spec_.getName());
+        // ((ProxyDAO) ns_).setDelegate(null);
+      } else {
+        ns_ = null;
+      }
     }
 
     spec_ = spec;

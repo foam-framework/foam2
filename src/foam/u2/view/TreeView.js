@@ -68,7 +68,7 @@ foam.CLASS({
       border-left: 4px solid /*%PRIMARY3%*/ #406dea;
     }
 
-    ^selected > ^heading > ^label{
+    ^selected > ^heading > ^label {
       color: /*%BLACK%*/ #1E1F21 !important;
       font-weight: bold;
     }
@@ -176,7 +176,7 @@ foam.CLASS({
           else {
             isThisItemRelatedToSearch = true;
           }
-          if( ! self.query.get() )
+          if ( ! self.query.get() )
             self.expanded = false;
           else if ( self.query.get() && isThisItemRelatedToSearch )
             self.expanded = true;
@@ -228,9 +228,9 @@ foam.CLASS({
               addClass('toggle-icon').
               show(this.hasChildren$).
               style({
-                'visibility':     'visible',
-                'font-size':      '16px',
-                'transform':      this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)'; })
+                'visibility': 'visible',
+                'font-size':  '16px',
+                'transform':  this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)'; })
               }).
               on('click', this.toggleExpanded).
               add('\u2303').
@@ -316,7 +316,7 @@ foam.CLASS({
     },
 
     function toggleExpanded(e) {
-      this.expanded = ! this.expanded;
+      this.expanded  = ! this.expanded;
       this.selection = this.data;
       e.preventDefault();
       e.stopPropagation();
@@ -348,7 +348,7 @@ foam.CLASS({
   css: `
     ^ {
       padding-top: 10px;
-      overflow-y: scroll;
+      overflow-y: auto;
     }
   `,
 
@@ -397,14 +397,14 @@ foam.CLASS({
             isFirstSet = true;
           }
           return self.TreeViewRow.create({
-            data: obj,
+            data:         obj,
             relationship: self.relationship,
-            expanded: self.startExpanded,
-            formatter: self.formatter,
-            query: self.query,
+            expanded:     self.startExpanded,
+            formatter:    self.formatter,
+            query:        self.query,
             onClickAddOn: self.onClickAddOn,
-            selection$: self.selection$,
-            level: 1
+            selection$:   self.selection$,
+            level:        1
           }, this);
         });
     },

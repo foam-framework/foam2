@@ -263,12 +263,28 @@ foam.CLASS({
       synchronized: true,
       javaCode: `
       FObject nu = obj;
-      FObject old = dao.find(obj);
+      
+      // adding system context in case if user has permission to update but not to read
+      FObject old = dao.inX(getX()).find(obj);
       if ( old != null ) {
         nu = old.fclone();
         nu.copyFrom(obj);
       }
-      return dao.put(nu);
+
+      try {
+        return dao.put(nu);
+      } catch ( ValidationException ve ) {
+        throw new DAOPutException(ve.getMessage(), ve);
+      } catch ( CompoundException ce ) {
+        // FObject.validate(x) can collect all validation exceptions into a
+        // CompoundException but we just need to return the first to preserve
+        // the existing behavior.
+        var clientEx = ce.getClientRethrowException();
+        if ( clientEx instanceof ValidationException ) {
+          throw new DAOPutException(clientEx.getMessage(), ce);
+        }
+        throw ce;
+      }
       `
     }
   ]

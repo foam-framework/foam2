@@ -137,6 +137,7 @@ var classes = [
   'foam.box.socket.SocketClientBox',
   'foam.box.socket.SocketClientReplyBox',
   'foam.box.socket.SocketServer',
+  'foam.box.socket.SslContextFactory',
  // 'foam.box.network.DemoSocketClientReplyBox',
   'foam.box.NullBox',
   'foam.dao.DAO',
@@ -424,6 +425,7 @@ var classes = [
   'foam.nanos.medusa.MedusaUniqueDAO',
   'foam.nanos.medusa.MedusaType',
   'foam.nanos.medusa.PromotedPurgeAgent',
+  'foam.nanos.medusa.PurgeSink',
   'foam.nanos.medusa.RegionStatus',
   'foam.nanos.medusa.ReplayCmd',
   'foam.nanos.medusa.ReplayCompleteCmd',
@@ -471,6 +473,7 @@ var classes = [
   'foam.nanos.notification.email.ChainedPropertyService',
   'foam.nanos.notification.email.EmailTemplateApplyEmailPropertyService',
   'foam.nanos.notification.email.GroupEmailTemplateService',
+  'foam.nanos.notification.email.EmailConfig',
   'foam.nanos.notification.email.EmailConfigEmailPropertyService',
   // EmailMessageDAO(service) decorator
   'foam.nanos.notification.email.EmailServiceDAO',
@@ -724,7 +727,6 @@ var classes = [
   'foam.nanos.dig.exception.EmptyParameterException',
   'foam.nanos.dig.exception.GeneralException',
 
-  'foam.nanos.app.EmailConfig',
   'foam.nanos.app.SupportConfig',
 
   'foam.nanos.test.StockSnapshot',
@@ -891,6 +893,8 @@ var classes = [
   'foam.i18n.ProxyTranslationService',
   'foam.i18n.LocaleTranslationService',
 
+  // Notification
+  'foam.nanos.crunch.TopLevelCapabilityStatusUpdateNotification',
 
   'foam.counter.Counter'
 ];
@@ -948,9 +952,10 @@ var proxies = [
 var blacklist = [
   'foam.core.Property',
   'foam.mlang.predicate.Func',
+  'foam.nanos.controller.Memento',
   'foam.u2.AttrSlot',
   'foam.u2.RenderSink',
-  'foam.u2.ViewSpec',
+  'foam.u2.ViewSpec'
 ];
 
 module.exports = {

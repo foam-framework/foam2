@@ -7,6 +7,7 @@
 foam.INTERFACE({
   package: 'foam.nanos.http',
   name: 'WebAgent',
+
   implements: [
     'foam.core.ContextAgent'
   ],

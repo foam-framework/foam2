@@ -16,5 +16,5 @@ foam.CLASS({
       this.SUPER();
       return this.add(this.data$);
     }
-  ],
+  ]
 });

@@ -77,8 +77,6 @@ foam.CLASS({
 
     ^query-bar {
       padding: 40px 16px;
-      align-items: flex-start;
-      justify-content: flex-end;
     }
 
     ^toolbar {
@@ -109,6 +107,9 @@ foam.CLASS({
 
     ^ .foam-u2-view-SimpleSearch .foam-u2-search-TextSearchView .foam-u2-tag-Input {
       width: 100%;
+      height: 34px;
+      border-radius: 0 5px 5px 0;
+      border: 1px solid;
     }
   `,
 
@@ -123,7 +124,7 @@ foam.CLASS({
   ],
 
   exports: [
-    'dblclick',
+    'click',
     'filteredTableColumns',
     'serviceName',
     'config'
@@ -256,9 +257,10 @@ foam.CLASS({
         this.searchPredicate = foam.mlang.predicate.True.create();
       }));
 
-      this.currentMemento$ = this.memento.tail$;
+      if ( this.memento )
+        this.currentMemento$ = this.memento.tail$;
     },
-    function dblclick(obj, id) {
+    function click(obj, id) {
       if ( ! this.stack ) return;
 
       this.stack.push({
@@ -315,17 +317,19 @@ foam.CLASS({
                         });
                     })
                     .endContext()
-                    .startContext({ data: self })
-                      .start(self.EXPORT, { buttonStyle: 'SECONDARY' })
-                        .addClass(self.myClass('export'))
-                      .end()
-                      .start(self.IMPORT, { buttonStyle: 'SECONDARY', icon: 'images/export-arrow-icon.svg', css: {'transform': 'rotate(180deg)'} })
-                        .addClass(self.myClass('export'))
-                      .end()
-                      .start(self.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })
-                        .addClass(self.myClass('refresh'))
-                      .end()
-                    .endContext()
+                    .start()
+                      .startContext({ data: self })
+                        .start(self.EXPORT, { buttonStyle: 'SECONDARY' })
+                          .addClass(self.myClass('export'))
+                        .end()
+                        .start(self.IMPORT, { buttonStyle: 'SECONDARY', icon: 'images/export-arrow-icon.svg', css: {'transform': 'rotate(180deg)'} })
+                          .addClass(self.myClass('export'))
+                        .end()
+                        .start(self.REFRESH_TABLE, { buttonStyle: 'SECONDARY' })
+                          .addClass(self.myClass('refresh'))
+                        .end()
+                      .endContext()
+                    .end()
                   .end();
               })
               .start(self.summaryView,{

@@ -15,7 +15,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.nanos.crunch.CapabilityJunctionPayload',
-
+    'foam.nanos.crunch.CrunchService',
     'static foam.nanos.crunch.CapabilityJunctionStatus.*'
   ],
 
@@ -41,22 +41,16 @@ foam.CLASS({
         MinMaxCapability.min requirement of 2 even if that 1 CapablePayload is GRANTED.
       `,
       javaCode: `
-        // These two statements duplicate getPrereqsChainedStatus
-        DAO myPrerequisitesDAO = ((DAO)
-          x.get("prerequisiteCapabilityJunctionDAO"))
-            .where(
-              EQ(CapabilityCapabilityJunction.SOURCE_ID, getId()));
-        List<CapabilityCapabilityJunction> ccJunctions =
-          ((ArraySink) myPrerequisitesDAO.select(new ArraySink()))
-          .getArray();
+        CrunchService crunchService = (CrunchService) x.get("crunchService");
+        List<String> prereqCapIds = crunchService.getPrereqs(getId());
 
         int numberGranted = 0;
         int numberPending = 0;
         int numberRejected = 0;
 
-        for ( CapabilityCapabilityJunction ccJunction : ccJunctions ) {
+        for ( String capId : prereqCapIds ) {
           CapabilityJunctionPayload prereqPayload = (CapabilityJunctionPayload)
-            capablePayloadDAO.find(ccJunction.getTargetId());
+            capablePayloadDAO.find(capId);
 
           if ( prereqPayload == null ) {
             continue;

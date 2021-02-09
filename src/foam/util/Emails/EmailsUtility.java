@@ -3,7 +3,7 @@ package foam.util.Emails;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.app.AppConfig;
-import foam.nanos.app.EmailConfig;
+import foam.nanos.notification.email.EmailConfig;
 import foam.nanos.app.SupportConfig;
 import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
@@ -48,18 +48,29 @@ public class EmailsUtility {
       emailMessage = new EmailMessage();
     }
 
-    String group = user != null ? user.getGroup() : "";
+    X userX = x;
+    String group = "";
+    String spid = null;
     AppConfig appConfig = (AppConfig) x.get("appConfig");
     if ( user != null ) {
+      userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
+      group = user.getGroup();
       appConfig = user.findGroup(x).getAppConfig(x);
+      spid = user.getSpid();
     }
+
     Theme theme = (Theme) x.get("theme");
-    X userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
-    if ( theme == null ) {
+    if ( theme == null
+      || ( user != null && ! user.getSpid().equals(x.get("spid")) )
+    ) {
       theme = ((Themes) x.get("themes")).findTheme(userX);
-      if ( theme.getAppConfig() != null ) {
-        appConfig.copyFrom(theme.getAppConfig());
-      }
+    }
+    if ( spid == null ) {
+      spid = theme.getSpid();
+    }
+
+    if ( theme.getAppConfig() != null ) {
+      appConfig.copyFrom(theme.getAppConfig());
     }
     userX = userX.put("appConfig", appConfig);
 
@@ -68,23 +79,25 @@ public class EmailsUtility {
     }
 
     SupportConfig supportConfig = theme.getSupportConfig();
-    EmailConfig supportEmailConfig = supportConfig.getEmailConfig();
-
+    EmailConfig emailConfig = supportConfig.getEmailConfig();
+    if ( emailConfig == null ) {
+      emailConfig = (EmailConfig) ((DAO) userX.get("emailConfigDAO")).find(spid);
+    }
     // Set ReplyTo, From, DisplayName from support email config
-    if ( supportEmailConfig != null ) {
+    if ( emailConfig != null ) {
       // REPLY TO:
-      if ( ! SafetyUtil.isEmpty(supportEmailConfig.getReplyTo()) ) {
-        emailMessage.setReplyTo(supportEmailConfig.getReplyTo());
+      if ( ! SafetyUtil.isEmpty(emailConfig.getReplyTo()) ) {
+        emailMessage.setReplyTo(emailConfig.getReplyTo());
       }
 
       // DISPLAY NAME:
-      if ( ! SafetyUtil.isEmpty(supportEmailConfig.getDisplayName()) ) {
-        emailMessage.setDisplayName(supportEmailConfig.getDisplayName());
+      if ( ! SafetyUtil.isEmpty(emailConfig.getDisplayName()) ) {
+        emailMessage.setDisplayName(emailConfig.getDisplayName());
       }
 
       // FROM:
-      if ( ! SafetyUtil.isEmpty(supportEmailConfig.getFrom()) ) {
-        emailMessage.setFrom(supportEmailConfig.getFrom());
+      if ( ! SafetyUtil.isEmpty(emailConfig.getFrom()) ) {
+        emailMessage.setFrom(emailConfig.getFrom());
       }
     }
 

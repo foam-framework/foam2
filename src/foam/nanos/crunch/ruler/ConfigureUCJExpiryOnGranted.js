@@ -17,15 +17,13 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.X',
     'foam.dao.DAO',
-    'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.RenewableData',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.logger.Logger',
     'java.util.Calendar',
-    'java.util.Date',
-    'static foam.mlang.MLang.*'
+    'java.util.Date'
   ],
 
   methods: [
@@ -38,18 +36,10 @@ foam.CLASS({
             DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
-            Long effectiveUser = ( ucj instanceof AgentCapabilityJunction ) ? ((AgentCapabilityJunction) ucj).getEffectiveUser() : null;
-            UserCapabilityJunction old = (UserCapabilityJunction) userCapabilityJunctionDAO.find(AND(
-              EQ(UserCapabilityJunction.SOURCE_ID, ucj.getSourceId()),
-              EQ(UserCapabilityJunction.TARGET_ID, ucj.getTargetId()),
-              OR(
-                NOT(INSTANCE_OF(foam.nanos.crunch.AgentCapabilityJunction.class)),
-                EQ(AgentCapabilityJunction.EFFECTIVE_USER, effectiveUser)
-              )
-            ));
+            UserCapabilityJunction old = (UserCapabilityJunction) userCapabilityJunctionDAO.find(ucj.getId());
 
             if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED || ucj.getIsRenewable() ) return;
-            if ( old != null && ! old.getIsRenewable() && 
+            if ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && ! old.getIsRenewable() && 
               ( ( old.getData() == null && ucj.getData() == null ) || old.getData().equals(ucj.getData()) ) 
             ) return;
               

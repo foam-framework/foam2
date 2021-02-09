@@ -3,7 +3,7 @@ p({
   "name": "socketConnectionBoxManager",
   "lazy": false,
   "service": {
-    "class": "foam.box.socket.SocketConnectionBoxManager",
+    "class": "foam.box.socket.SocketConnectionBoxManager"
   }
 })
 
@@ -13,5 +13,15 @@ p({
   "lazy": false,
   "service": {
     "class": "foam.box.socket.SocketServer"
+  }
+})
+
+p({
+  "class": "foam.nanos.boot.NSpec",
+  "name": "sslContextFactory",
+  "description": "ssl context factory for creating ssl socket",
+  "lazy":false,
+  "service": {
+    "class": "foam.box.socket.SslContextFactory"
   }
 })

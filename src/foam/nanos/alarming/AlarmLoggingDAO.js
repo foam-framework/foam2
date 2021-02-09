@@ -28,6 +28,10 @@ foam.CLASS({
         return alarm;
       }
 
+      if ( ! alarm.getHostname().equals(System.getProperty("hostname", "localhost")) ) {
+        return alarm;
+      }
+
       Logger logger = (Logger) x.get("logger");
       switch ( alarm.getSeverity() ) {
         case DEBUG:

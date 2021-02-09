@@ -126,9 +126,6 @@ foam.CLASS({
         }
       }
       if ( SafetyUtil.isEmpty(spid) ) {
-        spid = ((AppConfig) x.get("appConfig")).getDefaultSpid();
-      }
-      if ( SafetyUtil.isEmpty(spid) ) {
         throw new AuthorizationException();
       }
       return spid;
@@ -153,8 +150,7 @@ foam.CLASS({
       if ( isCreate ) {
         if ( SafetyUtil.isEmpty(sp.getSpid()) ) {
           sp.setSpid(getSpid(x));
-        } else if ( ! sp.getSpid().equals(getSpid(x)) &&
-                    ! auth.check(x, "serviceprovider.create." + sp.getSpid()) ) {
+        } else if ( ! auth.check(x, "serviceprovider.read." + sp.getSpid()) ) {
           throw new AuthorizationException();
         }
       } else if ( ! sp.getSpid().equals(oldSp.getSpid()) &&

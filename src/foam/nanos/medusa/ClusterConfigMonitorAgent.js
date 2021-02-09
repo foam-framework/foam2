@@ -20,10 +20,19 @@ foam.CLASS({
     'foam.core.ContextAgent',
     'foam.core.FObject',
     'foam.core.X',
+    'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.log.LogLevel',
+    'static foam.mlang.MLang.AND',
+    'static foam.mlang.MLang.COUNT',
+    'static foam.mlang.MLang.EQ',
+    'static foam.mlang.MLang.GTE',
+    'foam.nanos.alarming.Alarm',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
+    'java.util.HashMap',
+    'java.util.List',
     'java.util.Timer'
   ],
 
@@ -71,6 +80,11 @@ foam.CLASS({
     {
       name: 'isRunning',
       class: 'Boolean'
+    },
+    {
+      name: 'lastAlarmsSince',
+      class: 'Date',
+      javaFactory: 'return new java.util.Date(1081157732);'
     },
     {
       name: 'logger',
@@ -160,6 +174,26 @@ foam.CLASS({
             getDao().put_(x, cfg);
           }
         }
+
+        java.util.Date now = new java.util.Date();
+        client = support.getHTTPClientDAO(x, "alarmDAO", myConfig, config);
+        client = client.where(
+          AND(
+            EQ(Alarm.SEVERITY, LogLevel.ERROR),
+            EQ(Alarm.CLUSTERABLE, false),
+            EQ(Alarm.HOSTNAME, config.getName()),
+            GTE(Alarm.LAST_MODIFIED, getLastAlarmsSince())
+          )
+        );
+        List<Alarm> alarms = (List) ((ArraySink) client.select(new ArraySink())).getArray();
+        if ( alarms != null ) {
+          DAO alarmDAO = (DAO) x.get("alarmDAO");
+          for (Alarm alarm : alarms ) {
+            getLogger().debug("alarm", alarm);
+            alarmDAO.put(alarm);
+          }
+        }
+        setLastAlarmsSince(now);
       } catch ( Throwable t ) {
         getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage());
       } finally {

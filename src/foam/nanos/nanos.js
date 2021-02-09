@@ -34,7 +34,6 @@ FOAM_FILES([
   { name: "foam/nanos/app/AppConfig" },
   { name: "foam/nanos/app/ContextLookupAppConfigService"},
   { name: "foam/nanos/app/AppConfigService" },
-  { name: "foam/nanos/app/EmailConfig" },
   { name: 'foam/nanos/app/SupportConfig' },
   { name: "foam/nanos/notification/email/SMTPConfig" },
   { name: "foam/nanos/app/ClientAppConfigService" },
@@ -205,6 +204,7 @@ FOAM_FILES([
   { name: 'foam/nanos/medusa/MedusaType' },
   { name: 'foam/nanos/medusa/NodeCView' },
   { name: 'foam/nanos/medusa/PromotedPurgeAgent' },
+  { name: 'foam/nanos/medusa/PurgeSink' },
   { name: 'foam/nanos/medusa/RegionCView' },
   { name: 'foam/nanos/medusa/RegionStatus' },
   { name: 'foam/nanos/medusa/ReplayCmd' },
@@ -313,6 +313,7 @@ FOAM_FILES([
   { name: "foam/nanos/pool/ThreadPoolAgency" },
   { name: "foam/nanos/jetty/JettyThreadPoolConfig" },
   { name: "foam/nanos/auth/PMAuthService" },
+  { name: 'foam/nanos/notification/email/EmailConfig' },
   { name: 'foam/nanos/notification/email/EmailMessage' },
   { name: 'foam/nanos/notification/email/EmailService' },
   { name: 'foam/nanos/notification/email/EmailTemplate' },
@@ -499,6 +500,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ui/CapableWAO" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
   { name: "foam/nanos/crunch/ui/MinMaxCapabilityWizardlet" },
+  { name: "foam/nanos/crunch/ui/MinMaxCapabilityWizardletSection" },
   { name: "foam/nanos/crunch/ui/ReviewCapabilityWizardlet" },
   { name: "foam/nanos/crunch/ui/ReviewCapabilityView" },
   { name: "foam/nanos/crunch/ui/CapableView" },
@@ -541,4 +543,7 @@ FOAM_FILES([
   { name: "foam/nanos/iban/IBANInfo" },
   { name: "foam/nanos/iban/ValidationIBAN" },
   { name: "foam/nanos/iban/test/ValidationIBANTest" },
+
+  //notification
+  { name: "foam/nanos/crunch/TopLevelCapabilityStatusUpdateNotification" },
 ]);

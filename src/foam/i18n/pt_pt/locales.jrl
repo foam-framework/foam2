@@ -261,7 +261,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.FOOTER_LINK",target:"Iniciar sessão"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.ERROR_MSG",target:"Houve um problema na criação da sua conta"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.EMAIL_ERR",target:"É necessário um email válido"})
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.PASSWORD_ERR",target:"a senha deve ter pelo menos 6 caracteres"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.PASSWORD_ERR",target:"a senha deve ter pelo menos 10 caracteres"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.EMAIL_AVAILABILITY_ERR",target:"Este e-mail foi recebido. Por favor, tente outro."})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.USERNAME_EMPTY_ERR",target:"Nome de usuário"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.USERNAME_AVAILABILITY_ERR",target:"Esse nome de usuário já está em uso. Por favor, tente outro."})
@@ -307,8 +307,8 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.email.EmailVerif
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.email.EmailVerificationWebAgent.TOKEN_NOT_FOUND",target:"Token não encontrado."})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.email.EmailVerificationWebAgent.EMAIL_ALREADY_VERIFIED",target:"Email já verificado."})
 
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate.NOTIFICATION_BODY_P1",target:"Sua capacidade \""})
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate.NOTIFICATION_BODY_P2",target:"\" foi definido para o status "})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.TopLevelCapabilityStatusUpdateNotification.NOTIFICATION_BODY_P1",target:"Sua capacidade \""})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.TopLevelCapabilityStatusUpdateNotification.NOTIFICATION_BODY_P2",target:"\" foi definido para o status "})
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.EMail.EMAIL_REQUIRED",target:"Endereço de email necessário"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.EMail.VALID_EMAIL_REQUIRED",target:"Endereço de email válido necessário"})
@@ -366,3 +366,18 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.Advanced
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.AdvancedFilterView.CLOSE_MODAL.label",target:"Cancelar"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.AdvancedFilterView.CLEAR_ALL.label",target:"Limpar mudanças"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.advanced.AdvancedFilterView.FILTER.label",target:"Aplicar filtros"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.FObjectView.PLACEHOLDER_TEXT",target:"selecionar..."})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UpdatePassword.SUCCESS_MSG",target:"Sua senha foi atualizada com sucesso"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UpdatePassword.SECTION_UPDATE_PASSWORD_SECTION.title",target:"Atualize sua senha"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UpdatePassword.SECTION_UPDATE_PASSWORD_SECTION.subTitle",target:"Crie uma nova senha para sua conta"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.String.SHOULD_BE_LEAST",target:"deve ser pelo menos"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.String.SHOULD_BE_MOST",target:"deve ser no máximo"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.core.String.CHARACTER",target:"caractere"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UpdatePassword.ORIGINAL_PASSWORD.label",target:"Senha original"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UpdatePassword.UPDATE_PASSWORD.label",target:"Atualizar senha"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UpdatePassword.NEW_PASSWORD.label",target:"Nova Senha"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UpdatePassword.CONFIRMATION_PASSWORD.label",target:"Confirme a Senha"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UpdatePassword.CONFIRMATION_PASSWORD.validationPredicates[0].errorString",target:"As senhas não coincidem."})

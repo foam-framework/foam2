@@ -77,11 +77,6 @@ foam.CLASS({
       value: false
     },
     {
-      class: 'Reference',
-      of: 'foam.nanos.auth.ServiceProvider',
-      name: 'defaultSpid'
-    },
-    {
       class: 'String',
       name: 'externalUrl'
     }

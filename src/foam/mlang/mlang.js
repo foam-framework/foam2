@@ -1721,6 +1721,12 @@ return false
         }
         return this;
       `
+    },
+    function toMQL() {
+      var arg2 = this.arg2ToMQL();
+      if ( ! arg2 )
+        return null;
+      return this.arg1.name + ':' + arg2.join(',');
     }
   ]
 });
@@ -1814,6 +1820,9 @@ foam.CLASS({
         var isoDateString = this.value.toISOString();
         return isoDateString.substr(0, isoDateString.indexOf(':', isoDateString.indexOf(':') + 1));
       }
+
+      if ( foam.String.isInstance(this.value) )
+        return '\"' + this.value + '\"';
       return this.value;
     }
   ]
