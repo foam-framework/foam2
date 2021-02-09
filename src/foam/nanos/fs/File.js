@@ -101,8 +101,7 @@ foam.CLASS({
           {
             class: 'foam.u2.tag.TextArea',
             rows: 4, cols: 80
-          },
-          { class: 'foam.u2.view.ImageView' },
+          }
         ]
       },
     },
@@ -124,10 +123,18 @@ foam.CLASS({
       updateVisibility: 'RO',
       readVisibility: 'RO',
       transient: true,
-      expression: function (id) {
-        return window.location.origin + '/service/httpFileService/' + id
+      storageTransient: true,
+      expression: function () {
+        return [this];
       },
-      view: 'foam.u2.view.ImageView'
+      view: function() {
+        let dataSlot = foam.core.SimpleSlot.create({value: [this]});
+        let selectSlot = foam.core.SimpleSlot.create({value: 0});
+        return foam.nanos.fs.fileDropZone.FilePreview.create({
+          data$: dataSlot,
+          selected$: selectSlot
+        });
+      }
     },
     {
       class: 'Blob',
