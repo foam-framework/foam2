@@ -51,7 +51,6 @@ foam.CLASS({
         class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
-      minLength: 10,
       validationPredicates: [
         {
           args: ['originalPassword'],
@@ -70,6 +69,7 @@ foam.CLASS({
         class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
+      minLength: 10,
       validationPredicates: [
         {
           args: ['newPassword'],
