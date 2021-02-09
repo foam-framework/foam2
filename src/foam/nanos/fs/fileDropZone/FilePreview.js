@@ -71,7 +71,9 @@ foam.CLASS({
       if ( ! this.data[pos] ) {
         return;
       }
+      // getData File method is async, so we need to wait for it to return data before we can show it
       let d = await this.data[pos].data;
+      // If file is stored as a dataString, actual file is already on client side. Otherwise, actual file can be retrieved from server from File.address
       if ( ! d ) {
         url = this.data[pos].address;
       } else {
