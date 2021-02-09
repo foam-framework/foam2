@@ -43,7 +43,7 @@ foam.CLASS({
       overflow: hidden;
       position: sticky;
       top: 0;
-      overflow-x: scroll;
+      overflow-x: auto;
     }
 
     ^td,

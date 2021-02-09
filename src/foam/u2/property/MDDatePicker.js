@@ -488,7 +488,7 @@ foam.CLASS({
       display: flex;
       flex-direction: column;
       height: 310px;
-      overflow-y: scroll;
+      overflow-y: auto;
       width: 300px;
     }
     ^years-year {

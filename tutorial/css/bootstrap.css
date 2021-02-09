@@ -731,7 +731,7 @@ pre code {
 }
 .pre-scrollable {
   max-height: 340px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 .container {
   padding-right: 15px;
@@ -1586,7 +1586,7 @@ table th[class*="col-"] {
   .table-responsive {
     width: 100%;
     margin-bottom: 15px;
-    overflow-x: scroll;
+    overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     -ms-overflow-style: -ms-autohiding-scrollbar;
@@ -5094,7 +5094,7 @@ button.close {
   z-index: 1050;
   display: none;
   overflow: auto;
-  overflow-y: scroll;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   outline: 0;
 }

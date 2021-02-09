@@ -56,7 +56,7 @@ foam.CLASS({
   css: `
   ^ {
     height: 100%;
-    overflow: scroll;
+    overflow: auto;
     overflow-x: hidden;
   }
   ^ .md-row {

@@ -82,9 +82,9 @@ foam.CLASS({
               try {
                 s.setStatus(ScriptStatus.RUNNING);
                 s = (Script) getDelegate().put_(x, s).fclone();
-                getLogger().debug("agency", s.getId(), "start");
+                getLogger().info("agency", s.getId(), "start");
                 s.runScript(x);
-                getLogger().debug("agency", s.getId(), "end");
+                getLogger().info("agency", s.getId(), "end");
                 s.setStatus(ScriptStatus.UNSCHEDULED);
                 getDelegate().put_(x, s);
               } catch(Throwable t) {

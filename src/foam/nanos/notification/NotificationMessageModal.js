@@ -16,7 +16,7 @@ foam.CLASS({
         background-color: #fff;
         width: 60vw;
         max-height: 80vh;
-        overflow-y: scroll;
+        overflow-y: auto;
       }
       ^ .main {
         padding: 8px 24px 24px;
