@@ -110,7 +110,6 @@ foam.CLASS({
             obj[self.property_.name] = self.value_;
             self.value_++;
           } else if ( obj[self.property_name] >= self.value ) {
-                      obj[self.property_name] >= self.value ) {
             self.value_ = obj[self.property_name] + 1;
           }
           return self.delegate.put_(x, obj);
