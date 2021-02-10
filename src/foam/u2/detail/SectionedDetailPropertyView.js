@@ -53,7 +53,7 @@ foam.CLASS({
       color: #fff;
       border-radius: 5px;
       direction: ltr;
-      max-height: 100px;
+      max-height: 106px;
       margin-top: -16px;
       overflow: hidden;
     }
