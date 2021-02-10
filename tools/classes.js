@@ -141,6 +141,7 @@ var classes = [
  // 'foam.box.network.DemoSocketClientReplyBox',
   'foam.box.NullBox',
   'foam.dao.DAO',
+  'foam.dao.SlowDAO',
   'foam.dao.DOP',
   'foam.dao.PredicatedDualDelegateDAO',
   'foam.dao.CSVSink',
