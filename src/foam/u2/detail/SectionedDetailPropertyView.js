@@ -59,8 +59,8 @@ foam.CLASS({
     }
 
     ^helper-text p {
-      padding: 16px;
-      margin: 0;
+      padding: 0 16px;
+      margin: 16px 0;
       margin-right: 8px; /* give right padding to scroll bar */
       height: calc(100% - 32px); /* compensate for padding top and bottom */
       overflow-y: auto;
