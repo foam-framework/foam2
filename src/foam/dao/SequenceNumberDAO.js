@@ -109,8 +109,8 @@ foam.CLASS({
           if ( ! obj.hasOwnProperty(self.property_.name) ) {
             obj[self.property_.name] = self.value_;
             self.value_++;
-          } else if ( obj.getProperty(self.property_name) >= self.value ) {
-            self.value_ = obj.getProperty(self.property_name) + 1;
+          } else if ( obj[self.property_name] >= self.value_ ) {
+            self.value_ = obj[self.property_name] + 1;
           }
           return self.delegate.put_(x, obj);
         });
