@@ -38,9 +38,7 @@ foam.CLASS({
     },
     {
       name: 'data',
-      class: 'FObjectProperty',
-      documentation: `data for capability.of`,
-      view: { class: 'foam.u2.detail.VerticalDetailView' }
+      class: 'FObjectProperty'
     },
     {
       name: 'status',
