@@ -153,10 +153,8 @@ foam.CLASS({
       box-sizing: border-box;
       left: 0;
       max-height: 378px;
-      min-width: fit-content;
-      overflow-y: scroll;
-      position: absolute;
-      transform: translateY(100%);
+      overflow-y: auto;
+      box-sizing: border-box;
       width: 100%;
       z-index: 2;
     }

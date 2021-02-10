@@ -27,20 +27,30 @@ foam.CLASS({
       factory: function() {
         return [];
       }
+    },
+    {
+      // TODO: Add for base WizardletSection
+      class: 'Boolean',
+      name: 'isLoaded'
     }
   ],
 
   methods: [
     function createView() {
-      var vs = this.ViewSpec.createView(
-        this.customView, this.customView, this, this.__subContext__
-      );
-
-      this.choiceWizardlets.forEach((choiceWizardlet) => {
-        choiceWizardlet.isAvailable$ = vs.getSelectedSlot(choiceWizardlet.capability);
+      return this.slot(function(isLoaded){
+        if (isLoaded){
+          var vs = this.ViewSpec.createView(
+            this.customView, this.customView, this, this.__subContext__
+          );
+    
+          this.choiceWizardlets.forEach((choiceWizardlet) => {
+            choiceWizardlet.isAvailable$ = vs.getSelectedSlot(choiceWizardlet.capability);
+          })
+    
+          return vs;
+        }
+        return null;
       })
-
-      return vs;
     }
   ],
 });
