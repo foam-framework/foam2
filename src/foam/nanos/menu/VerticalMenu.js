@@ -105,7 +105,7 @@ foam.CLASS({
               startExpanded: true,
               query: self.menuSearch$,
               onClickAddOn: function(data) { self.openMenu(data); },
-              selection$: self.currentMenu$,
+              selection: self.currentMenu,
               formatter: function(data) {
                 this.translate(data.id + '.label', data.label);
               }
