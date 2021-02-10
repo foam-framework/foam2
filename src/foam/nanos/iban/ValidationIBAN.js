@@ -494,7 +494,6 @@ Columns: validation format, parsing format, example`,
               break;
             case 'n': // owner account - Brazil
               ownerAccountNumber.append(next);
-              accountNumber.append(next);
               break;
             case 's': // branch
               branch.append(next);
@@ -502,7 +501,6 @@ Columns: validation format, parsing format, example`,
               break;
             case 't': // account type
               accountType.append(next);
-              accountNumber.append(next);
               break;
             case 'x': // add to previous
               previous.append(next);
