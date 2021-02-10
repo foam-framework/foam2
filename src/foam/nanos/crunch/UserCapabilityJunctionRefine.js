@@ -115,6 +115,7 @@ foam.CLASS({
       name: 'payload',
       class: 'FObjectProperty',
       of: 'foam.nanos.crunch.UserCapabilityJunction',
+      javaCompare: 'return 0;',
       javaGetter: `
         return this;
       `
