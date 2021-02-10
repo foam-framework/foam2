@@ -141,12 +141,10 @@ foam.CLASS({
       storageTransient: true,
       getter: function () { return this.payload.data },
       javaGetter: `
-        if ( ! dataIsSet_ ) return null;
         return getPayload().getData();
       `,
       setter: function (nu) { this.payload.data = nu; },
       javaSetter: `
-        dataIsSet_ = true;
         getPayload().setData(val);
       `
     },
