@@ -139,9 +139,9 @@ It then marshalls it to the primary mediator, and waits on a response.`,
                   writeLocks_.contains( lock ) ) {
             try {
               // getLogger().debug("waitOnWrite_", "wait");
-              lock.wait(1000L);
+              lock.wait(10000L);
               // getLogger().debug("waitOnWrite_", "unwait");
-              // getLogger().debug("waitOnWrite_", "complete", lock.getComplete(), "contains", writeLocks_.contains( lock ), "size", writeLocks_.size());
+              getLogger().debug("waitOnWrite_", "complete", lock.getComplete(), "contains", writeLocks_.contains( lock ), "size", writeLocks_.size());
             } catch (InterruptedException e) {
               break;
             }
@@ -161,7 +161,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
     {
       name: 'select_',
       javaCode: `
-      waitOnWrite(x);
+      // waitOnWrite(x);
       return getDelegate().select_(x, sink, skip, limit, order, predicate);
       `
     },
@@ -322,9 +322,9 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         obj = cmd.getData();
       }
 
-      // TODO: create a pool of WriteLock to reuse
-      WriteLock writeLock = new WriteLock();
-      writeLocks_.add(writeLock);
+      // // TODO: create a pool of WriteLock to reuse
+      // WriteLock writeLock = new WriteLock();
+      // writeLocks_.add(writeLock);
       // getLogger().debug("updatePrimary", "writeLock", "add", writeLocks_.size());
       try {
         if ( DOP.PUT == dop ) {
@@ -356,12 +356,12 @@ It then marshalls it to the primary mediator, and waits on a response.`,
           return cmd;
         }
         return result;
-      } finally {
-        synchronized ( writeLock ) {
-          writeLock.setComplete(true);
-          writeLock.notifyAll();
-          writeLocks_.remove(writeLock);
-          // getLogger().debug("updatePrimary", "writeLock", "complete", writeLocks_.size());
+      // } finally {
+      //   synchronized ( writeLock ) {
+      //     writeLock.setComplete(true);
+      //     writeLock.notifyAll();
+      //     writeLocks_.remove(writeLock);
+      //     getLogger().debug("updatePrimary", "writeLock", "complete", writeLocks_.size());
         }
         pm.log(x);
       }
