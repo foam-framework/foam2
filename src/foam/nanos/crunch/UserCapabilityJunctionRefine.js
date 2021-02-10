@@ -127,8 +127,8 @@ foam.CLASS({
       javaFactory: `
         var payload = new CapabilityJunctionPayload();
         // Temporary so outdated test journals work
-        if ( statusIsSet_ ) payload.setStatus(status_);
-        if ( dataIsSet_ ) payload.setData(data_);
+        if ( statusIsSet_ ) payload.setStatus(getStatus());
+        if ( dataIsSet_ ) payload.setData(getData());
         return payload;
       `
     },
@@ -141,12 +141,10 @@ foam.CLASS({
       storageTransient: true,
       getter: function () { return this.payload.data },
       javaGetter: `
-        if ( ! dataIsSet_ ) return null;
         return getPayload().getData();
       `,
       setter: function (nu) { this.payload.data = nu; },
       javaSetter: `
-        dataIsSet_ = true;
         getPayload().setData(val);
       `
     },
