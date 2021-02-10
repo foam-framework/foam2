@@ -70,7 +70,12 @@ foam.CLASS({
       border-left: 4px solid /*%PRIMARY3%*/ #406dea;
     }
 
-    ^selected > ^heading > ^label {
+    ^selected > ^heading > ^select-level > ^label {
+      color: /*%BLACK%*/ #1E1F21 !important;
+      font-weight: bold;
+    }
+
+    ^selected > ^heading > ^select-level > ^toggle-icon {
       color: /*%BLACK%*/ #1E1F21 !important;
       font-weight: bold;
     }
@@ -231,7 +236,7 @@ foam.CLASS({
               call(this.formatter, [self.data]).
             end().
             start('span').
-              addClass('toggle-icon').
+              addClass(self.myClass('toggle-icon')).
               show(this.hasChildren$).
               style({
                 'visibility':    'visible',
