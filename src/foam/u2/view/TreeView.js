@@ -219,16 +219,15 @@ foam.CLASS({
               .addClass(self.myClass('label')).
               call(this.formatter, [self.data]).
             end().
-            start('div').
+            start('span').
               addClass('toggle-icon').
               show(this.hasChildren$).
               style({
                 'visibility':    'visible',
                 'font-size':     '16px',
                 'float':         'right',
-                'display':       'inline-block',
                 'height':        '6px',
-                'padding':       self.expanded$.map(function(c) { return c ? '6px 0px 8px 3px' : '0px 0px 11px 3px'}),
+                'padding':       self.expanded$.map(function(c) { return c ? '5px 0px 8px 3px' : '0px 0px 11px 4px'}),
                 'transform':     self.expanded$.map(function(c) { return c ? 'rotate(0deg)' : 'rotate(90deg)'; })
               }).
               on('click', this.toggleExpanded).
