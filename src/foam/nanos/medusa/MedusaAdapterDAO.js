@@ -115,8 +115,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
   };
 
   // TODO: pool of reusable WriteLocks
-  protected Map<Object, WriteLock> findLocks_ = new HashMap();
-  protected ConcurrentLinkedDeque selectLocks_ = new ConcurrentLinkedDeque();
+  protected ConcurrentLinkedDeque writeLocks_ = new ConcurrentLinkedDeque();
           `
         }));
       }
@@ -125,44 +124,44 @@ It then marshalls it to the primary mediator, and waits on a response.`,
 
   methods: [
     {
-      name: 'find_',
+      name: 'waitOnWrite',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
       javaCode: `
-      Object lockId = id;
-      if ( id instanceof FObject) {
-        lockId = ((FObject) id).getProperty("id");
-      }
-      WriteLock lock = findLocks_.get(lockId);
-      if ( lock != null &&
-           ! lock.getComplete() ) {
+      WriteLock lock = (WriteLock) writeLocks_.peekLast();
+      if ( lock != null ) {
         synchronized ( lock ) {
-          while ( ! lock.getComplete() ) {
+          while ( ! lock.getComplete() &&
+                  writeLocks_.contains( lock ) ) {
             try {
+              // getLogger().debug("waitOnWrite_", "wait");
               lock.wait(1000L);
+              // getLogger().debug("waitOnWrite_", "unwait");
+              // getLogger().debug("waitOnWrite_", "complete", lock.getComplete(), "contains", writeLocks_.contains( lock ), "size", writeLocks_.size());
             } catch (InterruptedException e) {
               break;
             }
           }
         }
       }
+      `
+    },
+    {
+      name: 'find_',
+      javaCode: `
+      // FIXME: this is causing threadwait on primary - related to registry
+      // waitOnWrite(x);
       return getDelegate().find_(x, id);
       `
     },
     {
       name: 'select_',
       javaCode: `
-      WriteLock lock = (WriteLock) selectLocks_.peekLast();
-      if ( lock != null &&
-           ! lock.getComplete() ) {
-        synchronized ( lock ) {
-          while ( ! lock.getComplete() ) {
-              try {
-                lock.wait(1000L);
-              } catch (InterruptedException e) {
-                break;
-              }
-          }
-        }
-      }
+      waitOnWrite(x);
       return getDelegate().select_(x, sink, skip, limit, order, predicate);
       `
     },
@@ -324,28 +323,19 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       }
 
       // TODO: create a pool of WriteLock to reuse
-      WriteLock selectLock = new WriteLock();
-      selectLocks_.add(selectLock);
-      WriteLock findLock = null;
+      WriteLock writeLock = new WriteLock();
+      writeLocks_.add(writeLock);
+      // getLogger().debug("updatePrimary", "writeLock", "add", writeLocks_.size());
       try {
         if ( DOP.PUT == dop ) {
           Object id = obj.getProperty("id");
           FObject old = getDelegate().find_(x, id);
-          if ( old != null ) {
-            synchronized ( findLocks_ ) {
-              findLock = (WriteLock) findLocks_.get(id);
-              if ( findLock == null ) {
-                findLock = new WriteLock();
-                findLocks_.put(id, findLock);
-              }
-            }
-          }
           FObject nu = getDelegate().put_(x, obj);
           String data = data(x, nu, old, dop);
           // data will be empty if only changes are storageTransient.
           if ( ! SafetyUtil.isEmpty(data) ) {
             MedusaEntry entry = (MedusaEntry) submit(x, data, dop);
-            getLogger().debug("update", "primary", dop, nu.getProperty("id"), "entry", entry.toSummary());
+            getLogger().debug("updatePrimary", "primary", dop, nu.getProperty("id"), "entry", entry.toSummary());
             if ( cmd != null ) {
               cmd.setMedusaEntryId((Long) entry.getId());
             }
@@ -367,18 +357,12 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         }
         return result;
       } finally {
-        if ( findLock != null ) {
-          synchronized ( findLock ) {
-            findLock.setComplete(true);
-            findLock.notifyAll();
-          }
-          findLocks_.remove(findLock);
+        synchronized ( writeLock ) {
+          writeLock.setComplete(true);
+          writeLock.notifyAll();
+          writeLocks_.remove(writeLock);
+          // getLogger().debug("updatePrimary", "writeLock", "complete", writeLocks_.size());
         }
-        synchronized ( selectLock ) {
-          selectLock.setComplete(true);
-          selectLock.notifyAll();
-        }
-        selectLocks_.remove(selectLock);
         pm.log(x);
       }
       `
