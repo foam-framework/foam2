@@ -8,19 +8,13 @@ foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'UserCapabilityJunctionRefine',
   refines: 'foam.nanos.crunch.UserCapabilityJunction',
+  mixins: [ 'foam.nanos.crunch.CapabilityJunctionPayload' ],
+  implements: [ 'foam.nanos.auth.LifecycleAware' ],
 
   documentation: `
     Model for UserCapabilityJunction, contains the data needed to grant the
     capability to user.
   `,
-
-  implements: [
-    'foam.nanos.auth.LifecycleAware'
-  ],
-
-  requires: [
-    'foam.nanos.crunch.CapabilityJunctionPayload'
-  ],
 
   javaImports: [
     'foam.core.FObject',
@@ -120,47 +114,9 @@ foam.CLASS({
     {
       name: 'payload',
       class: 'FObjectProperty',
-      of: 'foam.nanos.crunch.CapabilityJunctionPayload',
-      factory: function () {
-        return this.CapabilityJunctionPayload.create();
-      },
-      javaFactory: `
-        var payload = new CapabilityJunctionPayload();
-        // Temporary so outdated test journals work
-        if ( statusIsSet_ ) payload.setStatus(status_);
-        if ( dataIsSet_ ) payload.setData(data_);
-        return payload;
-      `
-    },
-    {
-      name: 'data',
-      class: 'foam.core.FObjectProperty',
-      of: 'foam.core.FObject',
-      documentation: `data for capability.of`,
-      view: { class: 'foam.u2.detail.VerticalDetailView' },
-      storageTransient: true,
-      getter: function () { return this.payload.data },
+      of: 'foam.nanos.crunch.UserCapabilityJunction',
       javaGetter: `
-        return getPayload().getData();
-      `,
-      setter: function (nu) { this.payload.data = nu; },
-      javaSetter: `
-        getPayload().setData(val);
-      `
-    },
-    {
-      name: 'status',
-      class: 'Enum',
-      of: 'foam.nanos.crunch.CapabilityJunctionStatus',
-      storageTransient: true,
-      getter: function () { return this.payload.status },
-      javaGetter: `
-        return getPayload().getStatus();
-      `,
-      setter: function (nu) { this.payload.status = nu },
-      javaSetter: `
-        getPayload().setStatus(val);
-        if ( val == CapabilityJunctionStatus.EXPIRED && ! getIsExpired() ) setIsExpired(true);
+        return this;
       `
     },
     {
