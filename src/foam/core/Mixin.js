@@ -26,7 +26,7 @@ foam.CLASS({
   methods: [
     function installInClass(cls) {
       var m = this.__context__.lookup(this.path);
-      if ( ! m ) throw 'No such interface or trait: ' + this.path;
+      if ( ! m ) throw 'No such mixin: ' + this.path;
 
       cls.installAxioms(m.getOwnAxioms());
     }
