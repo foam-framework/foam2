@@ -170,6 +170,7 @@ foam.CLASS({
                 }
               }
             }
+            
             isThisItemRelatedToSearch = self.query.get() ? ( self.doesThisIncludeSearch && ( ! hasChildren || self.data.parent !== '' ) ) || ( hasChildren && showThisRootOnSearch ) : true;
             if ( self.showRootOnSearch )
               self.showRootOnSearch.set(self.showRootOnSearch.get() || isThisItemRelatedToSearch);
@@ -203,6 +204,10 @@ foam.CLASS({
           addClass(self.myClass('heading')).
           style({
             'padding-left': ((( self.level - 1) * 16 + 28) + 'px')
+//enableClass(selected, on selected) 
+//border-left: solid 3px #406dea;
+// font-weight: bold;
+// color: #406dea;
           }).
           start().
             addClass(self.myClass('select-level')).
