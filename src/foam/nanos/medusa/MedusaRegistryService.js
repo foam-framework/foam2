@@ -145,9 +145,12 @@ foam.CLASS({
       }
       PM pm = new PM(this.getClass().getSimpleName(), "wait");
       try {
-        // getLogger().debug("wait", id);
-        latch.await();
-        // getLogger().debug("wake", id);
+//        while ( latch.countDown() > 0 ) {
+//          getLogger().debug("wait", id);
+//          latch.await(1000L, java.util.concurrent.TimeUnit.MILLISECONDS);
+          latch.await();
+//          getLogger().debug("wake", id);
+//        }
         return (FObject) getEntries().get(id);
       } catch (InterruptedException e) {
         // nop

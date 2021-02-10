@@ -257,6 +257,8 @@ This is the heart of Medusa.`,
         }
       ],
       javaCode: `
+      String savedThreadName = Thread.currentThread().getName();
+      Thread.currentThread().setName(this.getClass().getSimpleName());
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       Long nextIndexSince = System.currentTimeMillis();
       Alarm alarm = new Alarm.Builder(x)
@@ -357,6 +359,7 @@ This is the heart of Medusa.`,
         ((DAO) x.get("alarmDAO")).put(alarm);
       } finally {
         getLogger().warning("promoter", "exit");
+        Thread.currentThread().setName(savedThreadName);
       }
      `
     },

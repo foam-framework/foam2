@@ -26,10 +26,13 @@ public class ContextAgentRunnable
   public void run() {
     X oldX = ((ProxyX) XLocator.get()).getX();
     XLocator.set(x_);
+    String savedThreadName = Thread.currentThread().getName();
     try {
+      Thread.currentThread().setName(description_);
       agent_.execute(x_);
     } finally {
       XLocator.set(oldX);
+      Thread.currentThread().setName(savedThreadName);
     }
   }
 }

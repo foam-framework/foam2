@@ -241,6 +241,8 @@ foam.CLASS({
       ],
       javaCode: `
       getLogger().debug("execute");
+      String savedThreadName = Thread.currentThread().getName();
+      Thread.currentThread().setName(this.getClass().getSimpleName());
       while( true ) {
         try {
           synchronized ( electionLock_ ) {
@@ -263,6 +265,7 @@ foam.CLASS({
         }
       }
       getLogger().debug("execute", "exit", "state", getState().getLabel(), "election time", getElectionTime());
+      Thread.currentThread().setName(savedThreadName);
       `
     },
     {
