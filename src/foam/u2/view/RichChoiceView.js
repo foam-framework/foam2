@@ -145,18 +145,19 @@ foam.CLASS({
     }
 
     ^container {
-      background: white;
-      border-radius: 3px;
-      border: 1px solid /*%GREY3%*/ #cbcfd4;
+      position: absolute;
       bottom: -4px;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 2px 8px 0 rgba(0, 0, 0, 0.16);
-      box-sizing: border-box;
       left: 0;
+      transform: translateY(100%);
+      background: white;
+      border: 1px solid /*%GREY3%*/ #cbcfd4;
       max-height: 378px;
       overflow-y: auto;
       box-sizing: border-box;
       width: 100%;
-      z-index: 2;
+      min-width: fit-content;
+      border-radius: 3px;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 2px 8px 0 rgba(0, 0, 0, 0.16);
     }
 
     ^heading {

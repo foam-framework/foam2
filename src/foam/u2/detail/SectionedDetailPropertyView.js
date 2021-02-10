@@ -52,21 +52,27 @@ foam.CLASS({
       background-color: rgba(0, 0, 0, 0.8);
       color: #fff;
       border-radius: 5px;
-      border-top-right-radius: 0px;
       direction: ltr;
-      padding: 2px;
-      max-height: 100px;
+      max-height: 106px;
+      margin-top: -16px;
       overflow: hidden;
     }
 
     ^helper-text p {
-      padding: 3px;
-      margin: 0;
-      /* css trick for hiding scroll bar in all browsers */
-      margin-right: -50px; /* Maximum width of scrollbar */
-      padding-right: 50px; /* Maximum width of scrollbar */
-      height: 100%;
+      padding: 0 16px;
+      margin: 16px 0;
+      margin-right: 8px; /* give right padding to scroll bar */
+      height: calc(100% - 32px); /* compensate for padding top and bottom */
       overflow-y: auto;
+    }
+
+    ^helper-text p::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ^helper-text p::-webkit-scrollbar-thumb {
+      background-color: grey;
+      border-radius: 5px;
     }
 
     ^arrow-right {
