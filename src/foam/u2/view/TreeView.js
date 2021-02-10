@@ -204,11 +204,22 @@ foam.CLASS({
           addClass(self.myClass('heading')).
           style({
             'padding-left': ((( self.level - 1) * 16 + 28) + 'px')
-//enableClass(selected, on selected) 
-//border-left: solid 3px #406dea;
-// font-weight: bold;
-// color: #406dea;
           }).
+          add(this.slot( function(level, selected, id) {
+            if ( level === 1 ) {
+              var imgUrl = self.data.icon;
+              if ( selected && foam.util.equals(selected.id, id) ) {
+                imgUrl = self.data.activeIcon;
+              }
+              if ( imgUrl )
+                return this.E().start('img').
+                  addClass(self.myClass('label-icon')).
+                  attrs({ 'src': imgUrl, 'width': '16px', 'height': '16px' }).
+                end();
+              else
+                return;
+            }
+          }, self.level$, this.selection$, this.data$.dot('id'))).
           start().
             addClass(self.myClass('select-level')).
             style({
