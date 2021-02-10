@@ -170,7 +170,6 @@ foam.CLASS({
                 }
               }
             }
-
             isThisItemRelatedToSearch = self.query.get() ? ( self.doesThisIncludeSearch && ( ! hasChildren || self.data.parent !== '' ) ) || ( hasChildren && showThisRootOnSearch ) : true;
             if ( self.showRootOnSearch )
               self.showRootOnSearch.set(self.showRootOnSearch.get() || isThisItemRelatedToSearch);
@@ -205,19 +204,6 @@ foam.CLASS({
           style({
             'padding-left': ((( self.level - 1) * 16 + 28) + 'px')
           }).
-          add(this.slot( function(level, selected, id) {
-            if ( level === 1 ) {
-              var isDefault = ! this.data.icon || ! this.data.activeIcon;
-              var imgUrl = isDefault ? 'images/settings-icon-resting.svg' : self.data.icon;
-              if ( selected && foam.util.equals(selected.id, id) ) {
-                imgUrl = isDefault ? 'images/settings-icon-active.svg' : self.data.activeIcon;
-              }
-              return this.E().start('img').
-                addClass(self.myClass('label-icon')).
-                attrs({ 'src': imgUrl, 'width': '16px', 'height': '16px' }).
-              end();
-            }
-          }, self.level$, this.selection$, this.data$.dot('id'))).
           start().
             addClass(self.myClass('select-level')).
             style({
