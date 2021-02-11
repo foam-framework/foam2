@@ -186,7 +186,8 @@ foam.CLASS({
           .style({
             display:'grid',
             'padding-left': '32px',
-            'padding-top': '8px'
+            'padding-top': '8px',
+            'overflow': 'scroll'
           })
           .start()
             .style({gridColumn: '1/span 1', gridRow: '1/span 1'})
