@@ -183,7 +183,11 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start()
-          .style({display:'grid', justifyContent: 'center'})
+          .style({
+            display:'grid',
+            'padding-left': '32px',
+            'padding-top': '8px'
+          })
           .start()
             .style({gridColumn: '1/span 1', gridRow: '1/span 1'})
             .addClass(this.myClass('header'))
