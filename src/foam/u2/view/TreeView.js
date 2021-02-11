@@ -29,6 +29,7 @@ foam.CLASS({
       white-space: nowrap;
       inset: none;
       cursor: pointer;
+      width: 250px;
     }
 
     ^:hover > ^heading {
@@ -42,6 +43,7 @@ foam.CLASS({
     }
 
     ^label {
+      font-weight: 300;
       min-width: 120px;
       padding: 4px;
       font-weight: normal;
@@ -68,7 +70,12 @@ foam.CLASS({
       border-left: 4px solid /*%PRIMARY3%*/ #406dea;
     }
 
-    ^selected > ^heading > ^label {
+    ^selected > ^heading > ^select-level > ^label {
+      color: /*%BLACK%*/ #1E1F21 !important;
+      font-weight: bold;
+    }
+
+    ^selected > ^heading > ^select-level > ^toggle-icon {
       color: /*%BLACK%*/ #1E1F21 !important;
       font-weight: bold;
     }
@@ -200,37 +207,46 @@ foam.CLASS({
         }).
         start().
           addClass(self.myClass('heading')).
-            style({
-              'padding-left': ((( self.level - 1) * 16 + 28) + 'px')
-            }).
-            add(this.slot( function(level, selected, id) {
-              if ( level === 1 ) {
-                var isDefault = ! this.data.icon || ! this.data.activeIcon;
-                var imgUrl = isDefault ? 'images/settings-icon-resting.svg' : self.data.icon;
-                if ( selected && foam.util.equals(selected.id, id) ) {
-                  imgUrl = isDefault ? 'images/settings-icon-active.svg' : self.data.activeIcon;
-                }
+          style({
+            'padding-left': ((( self.level - 1) * 16 + 28) + 'px')
+          }).
+          add(this.slot( function(level, selected, id) {
+            if ( level === 1 ) {
+              var imgUrl = self.data.icon;
+              if ( selected && foam.util.equals(selected.id, id) ) {
+                imgUrl = self.data.activeIcon;
+              }
+              if ( imgUrl )
                 return this.E().start('img').
                   addClass(self.myClass('label-icon')).
                   attrs({ 'src': imgUrl, 'width': '16px', 'height': '16px' }).
                 end();
-              }
-            }, self.level$, this.selection$, this.data$.dot('id'))).
-            start().
-              addClass(self.myClass('select-level')).
-              style({
-                'width': '100%',
-                'padding-right': '20px'
-              }).
-              addClass(self.myClass('label')).
+              return;
+            }
+          }, self.level$, this.selection$, this.data$.dot('id'))).
+          start().
+            addClass(self.myClass('select-level')).
+            style({
+              'width':         '100%',
+              'padding-right': '20px'
+            }).
+            start()
+              .addClass(self.myClass('label')).
               call(this.formatter, [self.data]).
-              start('span').
-              addClass('toggle-icon').
+            end().
+            start('span').
+              addClass(self.myClass('toggle-icon')).
               show(this.hasChildren$).
               style({
-                'visibility': 'visible',
-                'font-size':  '16px',
-                'transform':  this.expanded$.map(function(c) { return c ? 'rotate(180deg)' : 'rotate(90deg)'; })
+                'visibility':    'visible',
+                'font-size':     '16px',
+                'float':         'right',
+                'height':        '12px',
+                'width':         '12px',
+                'padding-top':   '4px',
+                'padding-left':  self.expanded$.map(function(c) { return c ? '0px' : '4px'; }),
+                'padding-right':  self.expanded$.map(function(c) { return c ? '4px' : '0px'; }),
+                'transform':     self.expanded$.map(function(c) { return c ? 'rotate(0deg)' : 'rotate(90deg)'; })
               }).
               on('click', this.toggleExpanded).
               add('\u2303').
