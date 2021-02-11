@@ -184,12 +184,11 @@ foam.CLASS({
         .addClass(this.myClass())
         .start()
           .style({
-            // display:'grid',
-            'padding-left': '16px',
-            'padding-top': '16px',
+            'padding-left':  '16px',
+            'padding-top':   '16px',
             'padding-right': '16px',
-            'height': 'calc(100% - 32px)',
-            'overflow': 'hidden'
+            'height':        'calc(100% - 32px)',
+            'overflow':      'hidden'
           })
           .start()
             .style({
@@ -209,7 +208,6 @@ foam.CLASS({
             .style({ 'overflow': 'scroll' })
               .start('table')
               .on('wheel', this.onWheel)
-              // .style({gridColumn: '1/span 1', gridRow: '2/span 1'})
               .start('thead')
                 .start('tr')
                   .start('th')
