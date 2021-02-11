@@ -12,7 +12,7 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.auth.Authorizable',
-    'foam.nanos.auth.ServiceProviderAware'
+//    'foam.nanos.auth.ServiceProviderAware'
   ],
 
   requires: [
@@ -29,7 +29,7 @@ foam.CLASS({
     'foam.blob.InputStreamBlob',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.AuthorizationException',
-    'foam.nanos.auth.ServiceProviderAwareSupport',
+//    'foam.nanos.auth.ServiceProviderAwareSupport',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.util.SafetyUtil',
@@ -191,23 +191,23 @@ foam.CLASS({
         return newObj;
       }
     },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.ServiceProvider',
-      name: 'spid',
-      visibility: 'HIDDEN',
-      storageTransient: true,
-      section: 'systemInformation',
-      javaFactory: `
-        var map = new java.util.HashMap();
-        map.put(
-          File.class.getName(),
-          new foam.core.PropertyInfo[] { File.OWNER }
-        );
-        return new ServiceProviderAwareSupport()
-          .findSpid(foam.core.XLocator.get(), map, this);
-      `
-    },
+//    {
+//      class: 'Reference',
+//      of: 'foam.nanos.auth.ServiceProvider',
+//      name: 'spid',
+//      visibility: 'HIDDEN',
+//      storageTransient: true,
+//      section: 'systemInformation',
+//      javaFactory: `
+//        var map = new java.util.HashMap();
+//        map.put(
+//          File.class.getName(),
+//          new foam.core.PropertyInfo[] { File.OWNER }
+//        );
+//        return new ServiceProviderAwareSupport()
+//          .findSpid(foam.core.XLocator.get(), map, this);
+//      `
+//    },
   ],
   methods: [
     {
@@ -247,13 +247,14 @@ foam.CLASS({
         return new Promise((resolve, reject) => {
           let reader = new FileReader();
 
+
           reader.onload = () => {
             resolve(reader.result);
           };
 
           reader.onerror = reject;
 
-          reader.readAsText(this.data.blob);
+          this.data.then((d) => reader.readAsText(d.blob));
         });
       },
       javaCode: `

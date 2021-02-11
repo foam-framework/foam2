@@ -357,9 +357,8 @@ p({
   "name": "httpBlobService",
   "authenticate": false,
   "serviceScript": """
-    return new foam.nanos.blob.HttpBlobService(x, x.get("blobStore"));
-//    httpBlobService = new foam.nanos.blob.HttpBlobService(x, x.get("blobStore"));
-//    return new foam.nanos.http.SessionWebAgent("service.run.httpBlobService", httpBlobService);
+    httpBlobService = new foam.nanos.blob.HttpBlobService(x, x.get("blobStore"));
+    return new foam.nanos.http.SessionWebAgent("service.run.httpBlobService", httpBlobService);
   """
 })
 
@@ -368,9 +367,9 @@ p({
   "name": "httpFileService",
   "authenticate": false,
   "serviceScript": """
-    return new foam.nanos.blob.FileService(x, x.get("blobStore"));
-//    fileService = new foam.nanos.blob.FileService(x, x.get("blobStore"));
-//    return new foam.nanos.http.SessionWebAgent("service.run.httpFileService", fileService);
+    fileService = new foam.nanos.blob.FileService(x, x.get("blobStore"));
+//    return fileService;
+    return new foam.nanos.http.SessionWebAgent("service.run.httpFileService", fileService);
   """
 })
 
