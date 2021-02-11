@@ -67,6 +67,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/Notifiable' },
   { name: "foam/nanos/auth/CreatedAware" },
   { name: "foam/nanos/auth/User" },
+  { name: "foam/nanos/auth/PermissionTableView" },
   { name: "foam/nanos/auth/LastModifiedAware" },
   { name: "foam/nanos/auth/LastModifiedByAware" },
   { name: "foam/nanos/auth/ServiceProviderAware" },
