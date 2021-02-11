@@ -11,7 +11,7 @@ foam.CLASS({
 
   css: `
     ^ {
-      overflow-x: scroll;
+      overflow-x: auto;
     }
 
     ^tbody {

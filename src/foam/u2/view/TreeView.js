@@ -221,8 +221,7 @@ foam.CLASS({
                   addClass(self.myClass('label-icon')).
                   attrs({ 'src': imgUrl, 'width': '16px', 'height': '16px' }).
                 end();
-              else
-                return;
+              return;
             }
           }, self.level$, this.selection$, this.data$.dot('id'))).
           start().
@@ -243,7 +242,8 @@ foam.CLASS({
                 'font-size':     '16px',
                 'float':         'right',
                 'height':        '6px',
-                'padding':       self.expanded$.map(function(c) { return c ? '5px 0px 8px 3px' : '0px 0px 11px 4px'}),
+                'width':         '6px',
+                // 'padding':       self.expanded$.map(function(c) { return c ? '5px 0px 8px 3px' : '0px 0px 11px 4px'}),
                 'transform':     self.expanded$.map(function(c) { return c ? 'rotate(0deg)' : 'rotate(90deg)'; })
               }).
               on('click', this.toggleExpanded).
