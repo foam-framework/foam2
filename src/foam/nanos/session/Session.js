@@ -136,9 +136,12 @@ foam.CLASS({
       tableWidth: 120
     },
     {
-      documentation: 'Intended to be used with long TTL sessions, further restricting to a known set of IPs.',
+      documentation: `Restrict access to long TTL session to particular IP address range.
+
+@see https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing
+List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 172 network.`,
       class: 'StringArray',
-      name: 'remoteHostWhiteList',
+      name: 'cidrWhiteList',
       includeInDigest: true
     },
     {
@@ -185,25 +188,21 @@ foam.CLASS({
       `
     },
     {
-      name: 'validRemoteHost',
-      type: 'Boolean',
+      name: 'validateRemoteHost',
       args: [
         {
-          name: 'remoteHost', type: 'String'
+          name: 'x',
+          type: 'Context'
         }
       ],
+      javaThrows: ['foam.core.ValidationException'],
       javaCode: `
-        if ( SafetyUtil.isEmpty(getRemoteHost()) || SafetyUtil.equals(getRemoteHost(), remoteHost) ) {
-          return true;
-        }
-
-        for ( String host : getRemoteHostWhiteList() ) {
-          if ( SafetyUtil.equals(host, remoteHost) ) {
-            return true;
-          }
-        }
-
-        return false;
+      String remoteIp = foam.net.IPSupport.instance().getRemoteIp(x);
+      if ( ! SafetyUtil.isEmpty(getRemoteHost()) ||
+           SafetyUtil.equals(getRemoteHost(), remoteIp) ) {
+        return;
+      }
+      foam.net.IPSupport.instance().validateIpCidr(x, remoteIp, java.util.Arrays.stream(getCidrWhiteList()).collect(java.util.stream.Collectors.toList()));
       `
     },
     {
