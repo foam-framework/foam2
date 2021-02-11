@@ -207,6 +207,7 @@ foam.CLASS({
           .start()
             .style({ 'overflow': 'scroll' })
               .start('table')
+              .style({ 'width': '100%' })
               .on('wheel', this.onWheel)
               .start('thead')
                 .start('tr')
