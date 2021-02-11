@@ -241,9 +241,11 @@ foam.CLASS({
                 'visibility':    'visible',
                 'font-size':     '16px',
                 'float':         'right',
-                'height':        '6px',
-                'width':         '6px',
-                // 'padding':       self.expanded$.map(function(c) { return c ? '5px 0px 8px 3px' : '0px 0px 11px 4px'}),
+                'height':        '12px',
+                'width':         '12px',
+                'padding-top':   '4px',
+                'padding-left':  self.expanded$.map(function(c) { return c ? '0px' : '4px'; }),
+                'padding-right':  self.expanded$.map(function(c) { return c ? '4px' : '0px'; }),
                 'transform':     self.expanded$.map(function(c) { return c ? 'rotate(0deg)' : 'rotate(90deg)'; })
               }).
               on('click', this.toggleExpanded).
