@@ -59,7 +59,7 @@ foam.CLASS({
       name: 'sendNotification',
       javaCode: `
         // Check if the user has disabled email notifications
-        if ( ! getEnabled() || user == null ) 
+        if ( ! getEnabled() || user == null )
           return;
 
         // Do not send notifications to users that are not yet active
@@ -91,13 +91,12 @@ foam.CLASS({
           if ( config != null ) {
             notification.getEmailArgs().put("link", config.getUrl());
           }
-        }    
+        }
 
         try {
           if ( foam.util.SafetyUtil.isEmpty(notification.getEmailName()) ) {
-            message.setSubject(notification.getTemplate());
             message.setBody(notification.getBody());
-            EmailsUtility.sendEmailFromTemplate(x, null, message, null, null);
+            EmailsUtility.sendEmailFromTemplate(x, null, message, "NOCTemplate", null);
           } else {
             EmailsUtility.sendEmailFromTemplate(x, user, message, notification.getEmailName(), notification.getEmailArgs());
           }

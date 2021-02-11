@@ -46,7 +46,7 @@ foam.CLASS({
   messages: [
     { name: 'TITLE', message: 'Delete ' },
     { name: 'CONFIRM_DELETE_1', message: 'Are you sure you want to delete' },
-    { name: 'SUCCESS_MSG', message: ' deleted.' },
+    { name: 'SUCCESS_MSG', message: ' deleted' },
     { name: 'FAIL_MSG', message: 'Failed to delete' }
   ],
 
@@ -77,10 +77,10 @@ foam.CLASS({
         .start()
           .addClass(this.myClass('main'))
           .start('h2')
-            .add(this.TITLE).add(this.label ? this.label : this.data.model_.label).add('?')
+            .add(this.TITLE).add(this.data.model_.label).add('?')
           .end()
           .start('p')
-            .add(`${this.CONFIRM_DELETE_1} `).add(this.label ? this.label : `${this.data.toSummary()}`).add('?')
+            .add(`${this.CONFIRM_DELETE_1} `).add(this.data.toSummary() ? this.data.toSummary() : this.data.model_.label).add('?')
           .end()
         .end()
         .start()

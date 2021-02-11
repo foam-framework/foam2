@@ -108,6 +108,7 @@ public class EmailsUtility {
       } else {
         templateArgs = new HashMap<>();
         templateArgs.put("template", templateName);
+        templateArgs.put("body", emailMessage.getBody() == null ? "" : emailMessage.getBody());
       }
       templateArgs.put("supportPhone", (supportConfig.getSupportPhone()));
       templateArgs.put("supportEmail", (supportConfig.getSupportEmail()));
