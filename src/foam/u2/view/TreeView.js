@@ -208,7 +208,7 @@ foam.CLASS({
         start().
           addClass(self.myClass('heading')).
           style({
-            'padding-left': ((( self.level - 1) * 16 + 28) + 'px')
+            'padding-left': ((( self.level - 1) * 16 + 8) + 'px')
           }).
           add(this.slot( function(level, selected, id) {
             if ( level === 1 ) {

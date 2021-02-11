@@ -84,7 +84,7 @@ foam.CLASS({
       isFramed: 'true',
       code: function() {
         if ( this.isHidden ) return;
-        this.angle = (this.angle + 6) % 360;
+        this.angle = (this.angle + 3) % 360;
         this.tick();
       }
     }
