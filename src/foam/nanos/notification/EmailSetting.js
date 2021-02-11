@@ -96,7 +96,7 @@ foam.CLASS({
         try {
           if ( foam.util.SafetyUtil.isEmpty(notification.getEmailName()) ) {
             message.setBody(notification.getBody());
-            EmailsUtility.sendEmailFromTemplate(x, null, message, "NOCTemplate", null);
+            EmailsUtility.sendEmailFromTemplate(x, null, message, "NOC", null);
           } else {
             EmailsUtility.sendEmailFromTemplate(x, user, message, notification.getEmailName(), notification.getEmailArgs());
           }
