@@ -184,64 +184,77 @@ foam.CLASS({
         .addClass(this.myClass())
         .start()
           .style({
-            display:'grid',
-            'padding-left': '32px',
-            'padding-top': '8px',
-            'overflow': 'scroll'
+            // display:'grid',
+            'padding-left': '16px',
+            'padding-top': '16px',
+            'padding-right': '16px',
+            'height': 'calc(100% - 32px)',
+            'overflow': 'hidden'
           })
           .start()
-            .style({gridColumn: '1/span 1', gridRow: '1/span 1'})
+            .style({
+              height: '32px'
+            })
             .addClass(this.myClass('header'))
-            .add('Permission Matrix')
+            .start('span')
+              .style({
+                'display': 'inline-block',
+                'padding': '8px'
+              })
+              .add('Permission Matrix')
+            .end()
             .add(this.GROUP_QUERY, ' ', this.QUERY)
           .end()
-          .start('table')
-            .on('wheel', this.onWheel)
-            .style({gridColumn: '1/span 1', gridRow: '2/span 1'})
-            .start('thead')
-              .start('tr')
-                .start('th')
-                  .attrs({colspan:1000})
-                  .style({textAlign: 'left', padding: '8px', fontWeight: 400})
-                  .add(gs.length, ' groups, ', ps.length, ' permissions', self.filteredRows$.map(function(rows) { return rows == ps.length ?  '' : (', ' + rows + ' selected'); }))
-                  .start()
-                    .style({float: 'right'})
-                    .add('⋮')
+          .start()
+            .style({ 'overflow': 'scroll' })
+              .start('table')
+              .on('wheel', this.onWheel)
+              // .style({gridColumn: '1/span 1', gridRow: '2/span 1'})
+              .start('thead')
+                .start('tr')
+                  .start('th')
+                    .attrs({colspan:1000})
+                    .style({textAlign: 'left', padding: '8px', fontWeight: 400})
+                    .add(gs.length, ' groups, ', ps.length, ' permissions', self.filteredRows$.map(function(rows) { return rows == ps.length ?  '' : (', ' + rows + ' selected'); }))
+                    .start()
+                      .style({float: 'right'})
+                      .add('⋮')
+                    .end()
                   .end()
                 .end()
+                .start('tr')
+                  .start('th').style({minWidth: '510px'}).end()
+                  .call(function() { self.initTableColumns.call(this, gs, self); })
+                .end()
               .end()
-              .start('tr')
-                .start('th').style({minWidth: '510px'}).end()
-                .call(function() { self.initTableColumns.call(this, gs, self); })
-              .end()
+              .add(this.slot(function(skip, filteredPs) {
+                var count = 0;
+                return self.E('tbody').forEach(filteredPs, function(p) {
+                  if ( count > self.skip + self.ROWS ) return;
+                  if ( count < self.skip ) { count++; return; }
+                  count++;
+                  this.start('tr')
+                    .start('td')
+                      .addClass('permissionHeader')
+                      .attrs({title: p.description})
+                      .add(p.id)
+                    .end()
+                    .forEach(gs, function(g) {
+                      this.start('td')
+                        .show(self.groupQuery$.map(function(q) {
+                          return q == '' || g.id.indexOf(q) != -1;
+                        }))
+                        .on('mouseover', function() { self.currentGroup = g; })
+                        .on('mouseout', function() { if ( self.currentGroup === g ) self.currentGroup = ''; })
+                        .enableClass(self.myClass('hovered'), self.currentGroup$.map(function(cg) { return cg === g; } ))
+                        .attrs({title: g.id + ' : ' + p.id})
+                        .tag(self.createCheckBox(p, g))
+                      .end();
+                    })
+                  .end();
+                });
+              }))
             .end()
-            .add(this.slot(function(skip, filteredPs) {
-              var count = 0;
-              return self.E('tbody').forEach(filteredPs, function(p) {
-                if ( count > self.skip + self.ROWS ) return;
-                if ( count < self.skip ) { count++; return; }
-                count++;
-                this.start('tr')
-                  .start('td')
-                    .addClass('permissionHeader')
-                    .attrs({title: p.description})
-                    .add(p.id)
-                  .end()
-                  .forEach(gs, function(g) {
-                    this.start('td')
-                      .show(self.groupQuery$.map(function(q) {
-                        return q == '' || g.id.indexOf(q) != -1;
-                      }))
-                      .on('mouseover', function() { self.currentGroup = g; })
-                      .on('mouseout', function() { if ( self.currentGroup === g ) self.currentGroup = ''; })
-                      .enableClass(self.myClass('hovered'), self.currentGroup$.map(function(cg) { return cg === g; } ))
-                      .attrs({title: g.id + ' : ' + p.id})
-                      .tag(self.createCheckBox(p, g))
-                    .end();
-                  })
-                .end();
-              });
-            }))
           .end()
           .start(self.ScrollCView.create({
             value$: self.skip$,
