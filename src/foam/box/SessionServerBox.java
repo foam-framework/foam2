@@ -134,7 +134,7 @@ public class SessionServerBox
       } else if ( req != null ) {
         // if req == null it means that we're being accessed via webSockets
         try {
-          session.validateRemoteHost(getX()); //, getRemoteHost(req)) ) {
+          session.validateRemoteHost(getX());
         } catch (foam.core.ValidationException e) {
           // If an existing session is reused with a different remote host then
           // delete the session and force a re-login.
