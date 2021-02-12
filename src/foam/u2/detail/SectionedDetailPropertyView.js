@@ -205,16 +205,22 @@ foam.CLASS({
       margin-top: 6px;
     }
 
-    ^ .foam-u2-view-RadioView .foam-u2-view-RadioView {
-      margin-bottom:16px;
-      display: flex;
-      align-items: center;
+    ^ .foam-u2-view-RadioView { 
+      padding: 4px 0;
+    }
+
+    ^ .foam-u2-view-RadioView .choice {
+      margin-bottom: 16px;
       font-size: 16px;
-      margin-right: auto;
+    }
+
+    ^ .foam-u2-view-RadioView.foam-u2-view-RadioView-horizontal-radio .choice {
+      flex-basis: calc(100% / 3);
     }
 
     ^ .foam-u2-view-RadioView label {
       margin-left: 12px;
+      color: #444; 
     }
 
     ^ .foam-u2-layout-Cols {

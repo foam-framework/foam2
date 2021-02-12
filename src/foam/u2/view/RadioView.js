@@ -25,9 +25,12 @@ foam.CLASS({
   ],
 
   css: `
-    ^ { padding: 4px 0; }
-    ^ label { position: relative; color: #444; }
-    ^horizontal-radio { display: flex; }
+    ^horizontal-radio { 
+      display: flex;
+      align-items: center;
+      align-content: center;
+      flex-wrap: wrap;
+    }
   `,
 
   properties: [
@@ -76,8 +79,7 @@ foam.CLASS({
 
       this.add(this.choices.map(function(c) {
         return this.E('div').
-          // TODO: why is the radio item getting assigned the same class as the radio whole
-          addClass(this.myClass()).
+          addClass('choice').
           start('input').
             attrs({
               type: 'radio',
