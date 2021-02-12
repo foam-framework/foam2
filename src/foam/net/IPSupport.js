@@ -71,6 +71,7 @@ foam.CLASS({
       javaThrows: ['foam.core.ValidationException'],
       javaCode: `
       String remoteIp = getRemoteIp(x);
+      ((foam.nanos.logger.Logger) x.get("logger")).debug(this.getClass().getSimpleName(), "validateCidr", "remoteIp", remoteIp);
       if ( remoteIp == null ) {
         return;
       }
@@ -91,7 +92,7 @@ foam.CLASS({
           type: 'String'
         },
         {
-          documentation: 'List of CIDR ranges',
+          documentation: 'List of CIDR ranges, in format ###.###.###/##',
           name: 'cidrList',
           type: 'List'
         }
@@ -100,21 +101,26 @@ foam.CLASS({
       javaCode: `
       if ( cidrList == null ||
            cidrList.size() == 0 ) {
+      ((foam.nanos.logger.Logger) x.get("logger")).debug(this.getClass().getSimpleName(), "validateIpCidr", "remoteIp", ip, "list empty");
         return;
       }
       byte[] remote = ip.getBytes();
-      boolean match = false;
+//      boolean match = false;
       for ( String cidr : (java.util.List<String>)cidrList ) {
+        ((foam.nanos.logger.Logger) x.get("logger")).debug(this.getClass().getSimpleName(), "validateIpCidr", "remoteIp", ip, "testing", cidr);
         String[] parts = cidr.split("/");
         String address = parts[0];
         int maskBits = -1;
         if ( parts.length == 1 ) {
           if ( address.equals(ip) ) {
-            match = true;
+//            match = true;
             return;
           }
+          throw new foam.core.ValidationException("Restricted IP");
         }
         maskBits = Integer.parseInt(parts[1]);
+        // alarm on < 0 > 32
+
         byte[] required = address.getBytes();
 
         int maskFullBytes = maskBits / 8;
@@ -132,6 +138,7 @@ foam.CLASS({
           }
         }
       }
+      ((foam.nanos.logger.Logger) x.get("logger")).debug(this.getClass().getSimpleName(), "validateIpCidr", "remoteIp", ip, "fall through");
       `
     }
   ]
