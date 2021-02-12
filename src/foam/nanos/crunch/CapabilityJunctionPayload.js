@@ -38,7 +38,8 @@ foam.CLASS({
     },
     {
       name: 'data',
-      class: 'FObjectProperty'
+      class: 'FObjectProperty',
+      view: 'foam.u2.view.AnyView'
     },
     {
       name: 'status',
