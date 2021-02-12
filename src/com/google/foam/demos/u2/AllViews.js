@@ -304,6 +304,24 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'radioViewHorizontal',
+      view: {
+        class: 'foam.u2.view.RadioView',
+        choices: ['Yes', 'No', 'Maybe'],
+        isHorizontal: true
+      }
+    },
+    {
+      class: 'String',
+      name: 'radioViewHorizontalMoreOptions',
+      view: {
+        class: 'foam.u2.view.RadioView',
+        choices: [1, 2, 3, 4, 5, 6, 7],
+        isHorizontal: true
+      }
+    },
+    {
+      class: 'String',
       name: 'stringWithDisplayWidth',
       displayWidth: 4
     },
