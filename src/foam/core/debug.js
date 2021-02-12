@@ -291,8 +291,10 @@ foam.CLASS({
 
   methods: [
     function unknownArg(key, value) {
+      /*
       if ( key == 'class' ) return;
       this.__context__.warn('Unknown property ' + this.cls_.id + '.' + key + ': ' + value);
+      */
     },
 
     function describe(opt_name) {
