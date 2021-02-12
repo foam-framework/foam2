@@ -258,7 +258,7 @@ foam.CLASS({
           });
         }
 
-        if ( ! ( primitiveType.includes(this.propType) || this.propType  == 'java.util.Date' || this.propType == 'String' || this.propType == 'Object' || this.extends == 'foam.core.AbstractFObjectPropertyInfo') ) {
+        if ( this.compare !== '' ) {
           m.push({
             name: 'compare',
             type: 'int',

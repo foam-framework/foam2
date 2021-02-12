@@ -740,7 +740,7 @@ return sb.toString();`
               +'}'
               +cls.name+' o2 = ('+ cls.name + ') o;\n'
               +'int cmp;\n'].concat(props.map(function(f) {
-                return 'cmp = foam.util.SafetyUtil.compare(get'+foam.String.capitalize(f.name)+'(), o2.get'+foam.String.capitalize(f.name)+'());\n'
+                return 'cmp = ' + foam.String.constantize(f.name) + '.compare(this, o2);\n'
                   +'if ( cmp != 0 ) return cmp;';
               })).join('\n')+'\n'
               +'  return 0;\n'
@@ -1192,7 +1192,8 @@ foam.CLASS({
 
   properties: [
     ['javaType',       'int'],
-    ['javaInfoType',   'foam.core.AbstractIntPropertyInfo']
+    ['javaInfoType',   'foam.core.AbstractIntPropertyInfo'],
+    ['javaCompare',    '']
   ]
 });
 
@@ -1205,7 +1206,8 @@ foam.CLASS({
 
   properties: [
     ['javaType',       'byte'],
-    ['javaInfoType',   'foam.core.AbstractBytePropertyInfo']
+    ['javaInfoType',   'foam.core.AbstractBytePropertyInfo'],
+    ['javaCompare',    '']
   ]
 });
 
@@ -1218,7 +1220,8 @@ foam.CLASS({
 
   properties: [
     ['javaType',       'short'],
-    ['javaInfoType',   'foam.core.AbstractShortPropertyInfo']
+    ['javaInfoType',   'foam.core.AbstractShortPropertyInfo'],
+    ['javaCompare',    '']
   ]
 });
 
@@ -1231,7 +1234,8 @@ foam.CLASS({
 
   properties: [
     ['javaType',                     'long'],
-    ['javaInfoType',                 'foam.core.AbstractLongPropertyInfo']
+    ['javaInfoType',                 'foam.core.AbstractLongPropertyInfo'],
+    ['javaCompare',    '']
   ]
 });
 
@@ -1244,7 +1248,8 @@ foam.CLASS({
 
   properties: [
     ['javaType',       'double'],
-    ['javaInfoType',   'foam.core.AbstractDoublePropertyInfo']
+    ['javaInfoType',   'foam.core.AbstractDoublePropertyInfo'],
+    ['javaCompare',    '']
   ]
 });
 
@@ -1257,7 +1262,8 @@ foam.CLASS({
 
   properties: [
     ['javaType',     'float'],
-    ['javaInfoType', 'foam.core.AbstractFloatPropertyInfo']
+    ['javaInfoType', 'foam.core.AbstractFloatPropertyInfo'],
+    ['javaCompare',    '']
   ]
 });
 
@@ -1450,7 +1456,8 @@ foam.CLASS({
   properties: [
     ['javaInfoType',    'foam.core.AbstractDatePropertyInfo'],
     ['javaJSONParser',  'foam.lib.json.DateParser.instance()'],
-    ['sqlType',         'TIMESTAMP WITHOUT TIME ZONE']
+    ['sqlType',         'TIMESTAMP WITHOUT TIME ZONE'],
+    ['javaCompare',    '']
   ],
 
   methods: [
@@ -1485,7 +1492,8 @@ foam.CLASS({
    properties: [
        ['javaInfoType',    'foam.core.AbstractDatePropertyInfo'],
        ['javaJSONParser',  'foam.lib.json.DateParser.instance()'],
-       ['sqlType',         'DATE']
+       ['sqlType',         'DATE'],
+       ['javaCompare',    '']
    ],
 
    methods: [
@@ -1521,16 +1529,13 @@ foam.CLASS({
     ['javaType',       'java.util.Map'],
     ['javaInfoType',   'foam.core.AbstractMapPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.MapParser.instance()'],
-    ['javaFactory',    'return new java.util.HashMap();']
+    ['javaFactory',    'return new java.util.HashMap();'],
+    ['javaCompare',    '']
   ],
 
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
-
-      // override usage of SafetyUtil.compare with PropertyInfo compare
-      var compare = info.getMethod('compare');
-      compare.body = 'return super.compare(o1, o2);';
 
       var getValueClass = info.getMethod('getValueClass');
       getValueClass.body = 'return java.util.Map.class;';
@@ -1552,15 +1557,12 @@ foam.CLASS({
     ['javaInfoType',   'foam.core.AbstractListPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ListParser.instance()'],
     ['javaFactory',    'return new java.util.ArrayList();'],
+    ['javaCompare',    '']
   ],
 
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
-
-      // override usage of SafetyUtil.compare with PropertyInfo compare
-      var compare = info.getMethod('compare');
-      compare.body = 'return super.compare(o1, o2);';
 
       var getValueClass = info.getMethod('getValueClass');
       getValueClass.body = 'return java.util.List.class;';
@@ -1579,6 +1581,7 @@ foam.CLASS({
 
   properties: [
     ['javaInfoType',    'foam.core.AbstractStringPropertyInfo'],
+    ['javaCompare',    ''],
     {
       name: 'sqlType',
       expression: function(width) {
@@ -1595,6 +1598,7 @@ foam.CLASS({
   flags: ['java'],
   properties: [
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
+    ['javaCompare',    ''],
     {
       name: 'javaJSONParser',
       expression: function(of) {
@@ -1906,7 +1910,8 @@ foam.CLASS({
   flags: ['java'],
   properties: [
     ['javaType',       'boolean'],
-    ['javaInfoType',   'foam.core.AbstractBooleanPropertyInfo']
+    ['javaInfoType',   'foam.core.AbstractBooleanPropertyInfo'],
+    ['javaCompare',    '']
   ]
 });
 
@@ -1917,7 +1922,8 @@ foam.CLASS({
   refines: 'foam.core.Object',
   flags: ['java'],
   properties: [
-    ['javaInfoType',    'foam.core.AbstractObjectPropertyInfo']
+    ['javaInfoType',    'foam.core.AbstractObjectPropertyInfo'],
+    ['javaCompare',    '']
   ]
 });
 
@@ -2315,13 +2321,8 @@ foam.CLASS({
   name: 'DAOPropertyJavaRefinement',
   refines: 'foam.dao.DAOProperty',
   flags: ['java'],
-  methods: [
-    function createJavaPropertyInfo_(cls) {
-      var info = this.SUPER(cls);
-      var compare = info.getMethod('compare');
-      compare.body = 'return 0;';
-      return info;
-    }
+  properties: [
+    ['javaCompare',    '']
   ]
 });
 
