@@ -118,8 +118,7 @@ foam.CLASS({
     },
     {
       class: 'Array',
-      name: 'subMenus',
-      value: []
+      name: 'subMenus'
     },
     'showRootOnSearch',
     {
