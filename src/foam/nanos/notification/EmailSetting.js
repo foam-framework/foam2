@@ -21,6 +21,7 @@ foam.CLASS({
     'java.util.HashSet',
     'java.util.Iterator',
     'java.util.Map',
+    'foam.util.SafetyUtil',
     'static foam.mlang.MLang.EQ'
   ],
 
@@ -74,6 +75,7 @@ foam.CLASS({
           }
         }
 
+        Logger logger = (Logger) x.get("logger");
         EmailMessage message = new EmailMessage();
         message.setSpid(user.getSpid());
         message.setTo(new String[] { user.getEmail() });
@@ -93,15 +95,17 @@ foam.CLASS({
           }
         }
 
+        if ( "NOC".equals(notification.getEmailName()) && ! SafetyUtil.isEmpty(notification.getBody()) ) {
+          notification.getEmailArgs().put("body", notification.getBody());
+        }
+
         try {
-          if ( foam.util.SafetyUtil.isEmpty(notification.getEmailName()) ) {
-            message.setBody(notification.getBody());
-            EmailsUtility.sendEmailFromTemplate(x, null, message, "NOC", null);
-          } else {
+          if ( ! SafetyUtil.isEmpty(notification.getEmailName()) ) {
             EmailsUtility.sendEmailFromTemplate(x, user, message, notification.getEmailName(), notification.getEmailArgs());
+          } else {
+            logger.warning("No email template found");
           }
         } catch(Throwable t) {
-          Logger logger = (Logger) x.get("logger");
           logger.error("Error sending notification email message: " + message + ". Error: " + t);
         }
       `
