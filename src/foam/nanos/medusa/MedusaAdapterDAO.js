@@ -161,7 +161,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
     {
       name: 'select_',
       javaCode: `
-      waitOnWrite(x);
+      // waitOnWrite(x);
       return getDelegate().select_(x, sink, skip, limit, order, predicate);
       `
     },
@@ -321,11 +321,6 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         cmd = (ClusterCommand) obj;
         obj = cmd.getData();
       }
-
-      // TODO: create a pool of WriteLock to reuse
-      WriteLock writeLock = new WriteLock();
-      writeLocks_.add(writeLock);
-      // getLogger().debug("updatePrimary", "writeLock", "add", writeLocks_.size());
       try {
         if ( DOP.PUT == dop ) {
           Object id = obj.getProperty("id");
@@ -357,12 +352,6 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         }
         return result;
       } finally {
-        synchronized ( writeLock ) {
-          writeLock.setComplete(true);
-          writeLock.notifyAll();
-          writeLocks_.remove(writeLock);
-          // getLogger().debug("updatePrimary", "writeLock", "complete", writeLocks_.size());
-        }
         pm.log(x);
       }
       `
