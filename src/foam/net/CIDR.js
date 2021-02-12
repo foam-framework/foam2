@@ -8,7 +8,9 @@ foam.CLASS({
   package: 'foam.net',
   name: 'CIDR',
 
-  documentation: 'Model a Classless Inter-Domain Routing Range. See IPSupport for validating an IP against a list of CIDRs.',
+  documentation: `Model a Classless Inter-Domain Routing Range. See IPSupport for validating an IP against a list of CIDRs.  Used to restrict access to particular IP address range.
+@see https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing
+List entries are of the form: 172.0.0.0/24 - this would restrict logins to 172.xxx.xxx adresses.`,
 
   javaImports: [
     'java.net.InetAddress'
