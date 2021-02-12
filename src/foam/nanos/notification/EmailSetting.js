@@ -95,7 +95,7 @@ foam.CLASS({
           }
         }
 
-        if ( "NOC".equals(notification.getEmailName()) && ! SafetyUtil.isEmpty(notification.getBody()) ) {
+        if ( ! SafetyUtil.isEmpty(notification.getBody()) ) {
           notification.getEmailArgs().put("body", notification.getBody());
         }
 

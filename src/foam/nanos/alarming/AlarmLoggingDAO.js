@@ -48,7 +48,6 @@ foam.CLASS({
           if ( alarm.getIsActive() ) {
             Notification notification = new Notification.Builder(x)
               .setTemplate("NOC")
-              .setEmailName("NOC")
               .setToastMessage(alarm.getName())
               .setBody(alarm.getNote())
               .setClusterable(alarm.getClusterable())
