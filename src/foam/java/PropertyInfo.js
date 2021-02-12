@@ -267,7 +267,7 @@ foam.CLASS({
             body: this.compare,
           });
         }
-        if ( ! ( primitiveType.includes(this.propType) || this.propType  == 'java.util.Date' || this.propType == 'String' || this.propType == 'Object' || this.extends == 'foam.core.AbstractFObjectPropertyInfo' || this.extends == 'foam.core.AbstractFObjectArrayPropertyInfo') ) {
+        if ( this.comparePropertyToObject !== '' ) {
           m.push({
             name: 'comparePropertyToObject',
             type: 'int',
@@ -275,6 +275,8 @@ foam.CLASS({
             args: [{ name: 'key', type: 'Object' }, { name: 'o', type: 'Object' }],
             body: this.comparePropertyToObject,
           });
+        }
+        if ( this.comparePropertyToValue !== '' ) {
           m.push({
             name: 'comparePropertyToValue',
             type: 'int',
@@ -282,6 +284,8 @@ foam.CLASS({
             args: [{ name: 'key', type: 'Object' }, { name: 'value', type: 'Object' }],
             body: this.comparePropertyToValue,
           });
+        }
+        if ( ! ( primitiveType.includes(this.propType) || this.propType  == 'java.util.Date' || this.propType == 'String' || this.propType == 'Object' || this.extends == 'foam.core.AbstractFObjectPropertyInfo' || this.extends == 'foam.core.AbstractFObjectArrayPropertyInfo') ) {
           m.push({
             name: 'isDefaultValue',
             visibility: 'public',

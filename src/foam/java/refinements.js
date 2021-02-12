@@ -1184,16 +1184,30 @@ foam.CLASS({
 });
 
 
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'JavaCompareImplementor',
+  flags: ['java'],
+
+  properties: [
+    ['javaCompare', ''],
+    ['javaComparePropertyToObject', ''],
+    ['javaComparePropertyToValue', '']
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.java',
   name: 'IntJavaRefinement',
   refines: 'foam.core.Int',
   flags: ['java'],
+  mixins: [ 'foam.java.JavaCompareImplementor' ],
 
   properties: [
     ['javaType',       'int'],
     ['javaInfoType',   'foam.core.AbstractIntPropertyInfo'],
-    ['javaCompare',    '']
   ]
 });
 
@@ -1203,11 +1217,11 @@ foam.CLASS({
   name: 'ByteJavaRefinement',
   refines: 'foam.core.Byte',
   flags: ['java'],
+  mixins: [ 'foam.java.JavaCompareImplementor' ],
 
   properties: [
     ['javaType',       'byte'],
     ['javaInfoType',   'foam.core.AbstractBytePropertyInfo'],
-    ['javaCompare',    '']
   ]
 });
 
@@ -1217,11 +1231,11 @@ foam.CLASS({
   name: 'ShortJavaRefinement',
   refines: 'foam.core.Short',
   flags: ['java'],
+  mixins: [ 'foam.java.JavaCompareImplementor' ],
 
   properties: [
     ['javaType',       'short'],
     ['javaInfoType',   'foam.core.AbstractShortPropertyInfo'],
-    ['javaCompare',    '']
   ]
 });
 
@@ -1231,11 +1245,11 @@ foam.CLASS({
   name: 'LongJavaRefinement',
   refines: 'foam.core.Long',
   flags: ['java'],
+  mixins: [ 'foam.java.JavaCompareImplementor' ],
 
   properties: [
     ['javaType',                     'long'],
     ['javaInfoType',                 'foam.core.AbstractLongPropertyInfo'],
-    ['javaCompare',    '']
   ]
 });
 
@@ -1245,11 +1259,11 @@ foam.CLASS({
   name: 'DoubleJavaRefinement',
   refines: 'foam.core.Double',
   flags: ['java'],
+  mixins: [ 'foam.java.JavaCompareImplementor' ],
 
   properties: [
     ['javaType',       'double'],
     ['javaInfoType',   'foam.core.AbstractDoublePropertyInfo'],
-    ['javaCompare',    '']
   ]
 });
 
@@ -1259,11 +1273,11 @@ foam.CLASS({
   name: 'FloatJavaRefinement',
   refines: 'foam.core.Float',
   flags: ['java'],
+  mixins: [ 'foam.java.JavaCompareImplementor' ],
 
   properties: [
     ['javaType',     'float'],
     ['javaInfoType', 'foam.core.AbstractFloatPropertyInfo'],
-    ['javaCompare',    '']
   ]
 });
 
@@ -1452,12 +1466,12 @@ foam.CLASS({
   name: 'DateTimeJavaRefinement',
   refines: 'foam.core.DateTime',
   flags: ['java'],
+  mixins: [ 'foam.java.JavaCompareImplementor' ],
 
   properties: [
     ['javaInfoType',    'foam.core.AbstractDatePropertyInfo'],
     ['javaJSONParser',  'foam.lib.json.DateParser.instance()'],
     ['sqlType',         'TIMESTAMP WITHOUT TIME ZONE'],
-    ['javaCompare',    '']
   ],
 
   methods: [
@@ -1488,6 +1502,7 @@ foam.CLASS({
   name: 'DateJavaRefinement',
   refines: 'foam.core.Date',
   flags: ['java'],
+  mixins: [ 'foam.java.JavaCompareImplementor' ],
 
    properties: [
        ['javaInfoType',    'foam.core.AbstractDatePropertyInfo'],
@@ -1578,10 +1593,10 @@ foam.CLASS({
   name: 'StringJavaRefinement',
   refines: 'foam.core.String',
   flags: ['java'],
+  mixins: [ 'foam.java.JavaCompareImplementor' ],
 
   properties: [
     ['javaInfoType',    'foam.core.AbstractStringPropertyInfo'],
-    ['javaCompare',    ''],
     {
       name: 'sqlType',
       expression: function(width) {
