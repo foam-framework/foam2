@@ -66,13 +66,13 @@ foam.CLASS({
       visibility: 'RO'
     },
     {
-      documentation: 'precalculated and saved to spead inRange tests',
+      documentation: 'precalculated and saved to speed inRange tests',
       name: 'high',
       class: 'Long',
       visibility: 'HIDDEN'
     },
     {
-      documentation: 'precalculated and saved to spead inRange tests',
+      documentation: 'precalculated and saved to speed inRange tests',
       name: 'low',
       class: 'Long',
       visibility: 'HIDDEN'
