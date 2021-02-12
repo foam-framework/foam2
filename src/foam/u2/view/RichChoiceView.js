@@ -208,6 +208,7 @@ foam.CLASS({
 
     ^custom-selection-view {
       flex-grow: 1;
+      overflow: hidden;
     }
 
     ^ .search .property-filter_ {
@@ -706,6 +707,13 @@ foam.CLASS({
 
       methods: [
         function initE() {
+
+          this.style({
+            'overflow': 'hidden',
+            'white-space': 'nowrap',
+            'text-overflow': 'ellipsis'
+          });
+
           var summary = this.fullObject$.map(o => {
             return o ? o.toSummary() : this.defaultSelectionPrompt;
           });
