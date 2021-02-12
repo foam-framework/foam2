@@ -49,9 +49,8 @@ foam.CLASS({
       if ( ! foam.util.SafetyUtil.isEmpty(forwardedForHeader) ) {
         String[] addresses = forwardedForHeader.split(",");
         return addresses[addresses.length -1].trim(); // right most
-      } else {
-        return req.getRemoteHost();
       }
+      return req.getRemoteHost();
       `
     }
   ]
