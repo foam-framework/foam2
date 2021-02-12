@@ -17,7 +17,7 @@ foam.CLASS({
   ],
 
   properties: [
-    [ 'readView', { class: 'foam.u2.view.ReadReferenceView' } ],
+    [ 'readView',  { class: 'foam.u2.view.ReadReferenceView' } ],
     [ 'writeView', { class: 'foam.u2.view.ReferenceView' } ]
   ],
 });
