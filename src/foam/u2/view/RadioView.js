@@ -25,11 +25,29 @@ foam.CLASS({
   ],
 
   css: `
+    ^ { 
+      padding: 4px 0;
+    }
+
     ^horizontal-radio { 
       display: flex;
       align-items: center;
       align-content: center;
       flex-wrap: wrap;
+    }
+
+    ^ .choice {
+      margin-bottom: 16px;
+      font-size: 16px;
+    }
+
+    ^.foam-u2-view-RadioView-horizontal-radio .choice {
+      flex-basis: calc(100% / 3);
+    }
+
+    ^ label {
+      margin-left: 12px;
+      color: #444; 
     }
   `,
 
