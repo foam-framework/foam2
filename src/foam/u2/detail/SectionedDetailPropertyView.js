@@ -205,18 +205,6 @@ foam.CLASS({
       margin-top: 6px;
     }
 
-    ^ .foam-u2-view-RadioView .foam-u2-view-RadioView {
-      margin-bottom:16px;
-      display: flex;
-      align-items: center;
-      font-size: 16px;
-      margin-right: auto;
-    }
-
-    ^ .foam-u2-view-RadioView label {
-      margin-left: 12px;
-    }
-
     ^ .foam-u2-layout-Cols {
       padding-bottom: 4px;
       display: flex;
