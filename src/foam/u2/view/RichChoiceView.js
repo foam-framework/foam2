@@ -6,6 +6,31 @@
 
 foam.CLASS({
   package: 'foam.u2.view',
+  name: 'RichChoiceViewI18NComparator',
+
+  imports: [
+    'translationService?'
+  ],
+
+  methods: [
+    function compare(o1, o2) {
+      var k1 = this.key(o1);
+      var k2 = this.key(o2);
+      return foam.util.compare(k1, k2);
+    },
+    function key(o) {
+      var k = o.toSummary ? o.toSummary() : o.id;
+      if ( this.translationService ) {
+        k = this.translationService.getTranslation(foam.locale, k, k);
+      }
+      return k;
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2.view',
   name: 'RichChoiceViewSection',
 
   documentation: 'Models one section of the dropdown for a RichChoiceView.',
@@ -127,7 +152,7 @@ foam.CLASS({
       background: white;
       border: 1px solid /*%GREY3%*/ #cbcfd4;
       max-height: 378px;
-      overflow-y: scroll;
+      overflow-y: auto;
       box-sizing: border-box;
       width: 100%;
       min-width: fit-content;
@@ -183,6 +208,7 @@ foam.CLASS({
 
     ^custom-selection-view {
       flex-grow: 1;
+      overflow: hidden;
     }
 
     ^ .search .property-filter_ {
@@ -379,6 +405,10 @@ foam.CLASS({
       documentation: `
         Set to true if you want the user to be able to clear their selection.
       `
+    },
+    {
+      name: 'comparator',
+      documentation: 'Optional comparator for ordering choices.'
     }
   ],
 
@@ -526,7 +556,7 @@ foam.CLASS({
                                     });
                                   })
                                 .end();
-                            })
+                            }, false, self.comparator)
                           .end();
                           index++;
                       });
@@ -629,7 +659,7 @@ foam.CLASS({
           return this
             .start()
               .addClass(this.myClass('row'))
-              .translate(summary || ('richChoiceSummary.'+this.data.cls_.id+'.'+this.data.id), summary)
+              .translate(summary || ('richChoiceSummary.' + this.data.cls_.id + '.' + this.data.id), summary)
             .end();
         }
       ]
@@ -677,6 +707,13 @@ foam.CLASS({
 
       methods: [
         function initE() {
+
+          this.style({
+            'overflow': 'hidden',
+            'white-space': 'nowrap',
+            'text-overflow': 'ellipsis'
+          });
+
           var summary = this.fullObject$.map(o => {
             return o ? o.toSummary() : this.defaultSelectionPrompt;
           });
@@ -709,8 +746,8 @@ foam.CLASS({
         }
 
         ^:hover {
-          cursor: pointer;
           color: /*%PRIMARY2%*/ #144794;
+          cursor: pointer;
         }
 
         ^ img + span {

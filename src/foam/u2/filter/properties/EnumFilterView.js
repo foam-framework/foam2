@@ -43,7 +43,7 @@ foam.CLASS({
 
     ^container-filter {
       max-height: 320px;
-      overflow: scroll;
+      overflow: auto;
       padding-bottom: 24px;
     }
 

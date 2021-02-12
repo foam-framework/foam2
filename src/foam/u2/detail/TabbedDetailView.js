@@ -36,7 +36,7 @@ foam.CLASS({
     }
 
     ^ .foam-u2-Tabs-tabRow {
-      overflow-x: scroll;
+      overflow-x: auto;
       white-space: nowrap;
       border-top-left-radius: 6px;
       border-top-right-radius: 6px;

@@ -28,7 +28,7 @@ foam.CLASS({
       margin: 0;
       padding: 0;
       overflow-x: hidden;
-      overflow-y: scroll;
+      overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       width: 100%;
       height: 100%;

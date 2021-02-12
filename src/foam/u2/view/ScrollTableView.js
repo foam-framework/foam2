@@ -31,7 +31,7 @@
 
   css: `
     ^ {
-      overflow: scroll;
+      overflow: auto;
       padding-bottom: 20px;
     }
     ^table {
