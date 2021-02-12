@@ -144,7 +144,8 @@ foam.CLASS({
       documentation: `Restrict members of this group to particular IP address range.
 @see https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing
 List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 172 network.`,
-      class: 'StringArray',
+      class: 'FObjectArray',
+      of: 'foam.net.CIDR',
       name: 'cidrWhiteList',
       includeInDigest: true
     },
@@ -384,7 +385,20 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
       ],
       javaThrows: ['foam.core.ValidationException'],
       javaCode: `
-      foam.net.IPSupport.instance().validateCidr(x, java.util.Arrays.stream(getCidrWhiteList()).collect(java.util.stream.Collectors.toList()));
+      String remoteIp = foam.net.IPSupport.instance().getRemoteIp(x);
+      if ( remoteIp == null ) {
+        return;
+      }
+      for ( foam.net.CIDR cidr : getCidrWhiteList() ) {
+        try {
+          if ( cidr.inRange(x, remoteIp) ) {
+            return;
+          }
+        } catch (java.net.UnknownHostException e) {
+          ((foam.nanos.logger.Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "validateCidrWhiteList", remoteIp, e.getMessage());
+        }
+      }
+      throw new foam.core.ValidationException("Restricted IP");
       `
     }
   ]
