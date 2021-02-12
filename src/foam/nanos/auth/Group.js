@@ -386,10 +386,13 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
       javaThrows: ['foam.core.ValidationException'],
       javaCode: `
       String remoteIp = foam.net.IPSupport.instance().getRemoteIp(x);
-      if ( remoteIp == null ) {
+      foam.net.CIDR[] cidrs = getCidrWhiteList();
+      if ( remoteIp == null ||
+           cidrs == null ||
+           cidrs.length == 0 ) {
         return;
       }
-      for ( foam.net.CIDR cidr : getCidrWhiteList() ) {
+      for ( foam.net.CIDR cidr : cidrs ) {
         try {
           if ( cidr.inRange(x, remoteIp) ) {
             return;
