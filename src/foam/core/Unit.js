@@ -31,6 +31,7 @@
       required: true
     }
   ],
+
   methods: [
     {
       name: 'format',
