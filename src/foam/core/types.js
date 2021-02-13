@@ -774,7 +774,7 @@ foam.CLASS({
     {
       name: 'value',
       expression: function(of) {
-        return of ? of.ID.value : null;
+        return ( of && of.ID.value ) || null;
       }
     }
   ],
