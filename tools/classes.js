@@ -696,6 +696,7 @@ var classes = [
   'foam.nanos.ruler.predicate.PropertyEQProperty',
   'foam.nanos.ruler.predicate.NewEqOld',
   'foam.nanos.ruler.predicate.IsInstancePredicate',
+  'foam.nanos.ruler.predicate.IsClassPredicate',
   'foam.nanos.ruler.predicate.PropertyIsInstance',
   'foam.nanos.ruler.predicate.PropertyIsClass',
   'foam.nanos.ruler.predicate.ContextContainsPredicate',
