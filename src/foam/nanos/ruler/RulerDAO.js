@@ -321,15 +321,15 @@ for ( Object key : groups.getGroupKeys() ) {
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
-  public RulerDAO(foam.core.X x, foam.dao.DAO delegate, String serviceName) {
-    setX(x);
-    setDelegate(delegate);
-    setDaoKey(serviceName);
-    // This doesn't get called when using Builder,
-    //   it must be called manually in this case.
-    updateRules(x);
-  }
-      `
+    public RulerDAO(foam.core.X x, foam.dao.DAO delegate, String serviceName) {
+      setX(x);
+      setDelegate(delegate);
+      setDaoKey(serviceName);
+      // This doesn't get called when using Builder,
+      //   it must be called manually in this case.
+      updateRules(x);
+    }
+        `
          );
       }
     }
