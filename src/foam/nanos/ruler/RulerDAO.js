@@ -23,8 +23,6 @@ foam.CLASS({
     'foam.dao.AbstractSink',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
-    'foam.lib.formatter.FObjectFormatter',
-    'foam.lib.formatter.JSONFObjectFormatter',
     'foam.mlang.order.Desc',
     'foam.mlang.predicate.Predicate',
     'foam.mlang.sink.GroupBy',
@@ -130,9 +128,10 @@ if ( oldObj == null ) {
   applyRules(x, obj, oldObj, (GroupBy) rulesList.get(getUpdateBefore()));
 }
 
-// Clone so Sync 'after' rules can be coded similar to
-// 'before' rules, whereby the rule is not responsible for 'put's and
-// subsequent rules received the updated object.
+// Clone and pass unfrozen object to 'sync' 'after' rules so, similar
+// to 'before' rules, the rule is not responsible for put'ing
+// and the updated object is properly passed on to the next rule.
+// If the object was modified in an 'after' rule, then it is 'put'.
 FObject ret =  getDelegate().put_(x, obj);
 if ( ret != null ) {
   ret = ret.fclone();
@@ -142,10 +141,9 @@ if ( ret != null ) {
   } else {
     applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getUpdateAfter()));
   }
-  // Test for changes during after rule
-  FObjectFormatter formatter = formatter_.get();
-  if ( formatter.maybeOutputDelta(before, ret) ) {
-    ((foam.nanos.logger.Logger) x.get("logger")).debug(this.getClass().getSimpleName(), "put_", "after", "delta", formatter.builder().toString());
+
+  // Test for changes during 'after' rule
+  if ( before.diff(ret).size() > 0 ) {
     ret = getDelegate().put_(x, ret);
   }
 }
@@ -331,27 +329,6 @@ for ( Object key : groups.getGroupKeys() ) {
     //   it must be called manually in this case.
     updateRules(x);
   }
-
-  protected static final ThreadLocal<FObjectFormatter> formatter_ = new ThreadLocal<FObjectFormatter>() {
-    @Override
-    protected JSONFObjectFormatter initialValue() {
-      JSONFObjectFormatter formatter = new JSONFObjectFormatter();
-      formatter.setQuoteKeys(false); // default
-      formatter.setOutputShortNames(true); // default
-      formatter.setOutputDefaultValues(true);
-      formatter.setOutputClassNames(true); // default
-      formatter.setOutputDefaultClassNames(true); // default
-      formatter.setOutputReadableDates(false);
-      return formatter;
-    }
-
-    @Override
-    public FObjectFormatter get() {
-      FObjectFormatter formatter = super.get();
-      formatter.reset();
-      return formatter;
-    }
-  };
       `
          );
       }
