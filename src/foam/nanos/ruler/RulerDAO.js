@@ -23,6 +23,8 @@ foam.CLASS({
     'foam.dao.AbstractSink',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.lib.formatter.FObjectFormatter',
+    'foam.lib.formatter.JSONFObjectFormatter',
     'foam.mlang.order.Desc',
     'foam.mlang.predicate.Predicate',
     'foam.mlang.sink.GroupBy',
@@ -127,11 +129,25 @@ if ( oldObj == null ) {
 } else {
   applyRules(x, obj, oldObj, (GroupBy) rulesList.get(getUpdateBefore()));
 }
+
+// Clone so Sync 'after' rules can be coded similar to
+// 'before' rules, whereby the rule is not responsible for 'put's and
+// subsequent rules received the updated object.
 FObject ret =  getDelegate().put_(x, obj);
-if ( oldObj == null ) {
-  applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getCreateAfter()));
-} else {
-  applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getUpdateAfter()));
+if ( ret != null ) {
+  ret = ret.fclone();
+  FObject before = ret.fclone();
+  if ( oldObj == null ) {
+    applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getCreateAfter()));
+  } else {
+    applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getUpdateAfter()));
+  }
+  // Test for changes during after rule
+  FObjectFormatter formatter = formatter_.get();
+  if ( formatter.maybeOutputDelta(before, ret) ) {
+    ((foam.nanos.logger.Logger) x.get("logger")).debug(this.getClass().getSimpleName(), "put_", "after", "delta", formatter.builder().toString());
+    ret = getDelegate().put_(x, ret);
+  }
 }
 return ret;`
     },
@@ -307,14 +323,35 @@ for ( Object key : groups.getGroupKeys() ) {
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
-    public RulerDAO(foam.core.X x, foam.dao.DAO delegate, String serviceName) {
-      setX(x);
-      setDelegate(delegate);
-      setDaoKey(serviceName);
-      // This doesn't get called when using Builder,
-      //   it must be called manually in this case.
-      updateRules(x);
+  public RulerDAO(foam.core.X x, foam.dao.DAO delegate, String serviceName) {
+    setX(x);
+    setDelegate(delegate);
+    setDaoKey(serviceName);
+    // This doesn't get called when using Builder,
+    //   it must be called manually in this case.
+    updateRules(x);
+  }
+
+  protected static final ThreadLocal<FObjectFormatter> formatter_ = new ThreadLocal<FObjectFormatter>() {
+    @Override
+    protected JSONFObjectFormatter initialValue() {
+      JSONFObjectFormatter formatter = new JSONFObjectFormatter();
+      formatter.setQuoteKeys(false); // default
+      formatter.setOutputShortNames(true); // default
+      formatter.setOutputDefaultValues(true);
+      formatter.setOutputClassNames(true); // default
+      formatter.setOutputDefaultClassNames(true); // default
+      formatter.setOutputReadableDates(false);
+      return formatter;
     }
+
+    @Override
+    public FObjectFormatter get() {
+      FObjectFormatter formatter = super.get();
+      formatter.reset();
+      return formatter;
+    }
+  };
       `
          );
       }
