@@ -28,7 +28,9 @@ public class ContextAgentRunnable
     XLocator.set(x_);
     String savedThreadName = Thread.currentThread().getName();
     try {
-      Thread.currentThread().setName(description_);
+      if ( ! foam.util.SafetyUtil.isEmpty(description_) ) {
+        Thread.currentThread().setName(description_);
+      }
       agent_.execute(x_);
     } finally {
       XLocator.set(oldX);
