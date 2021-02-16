@@ -71,7 +71,7 @@ foam.CLASS({
               self.writeView,
               {
                 ...this.args,
-                focused$: this.focused$,
+                focused$: self.focused$,
                 data$: self.data$,
                 mode: mode
               }).call(callFromProperty);
@@ -80,7 +80,6 @@ foam.CLASS({
               self.readView,
               {
                 ...this.args,
-                focused$: this.focused$,
                 data$: self.data$,
                 mode: mode
               }).call(callFromProperty);

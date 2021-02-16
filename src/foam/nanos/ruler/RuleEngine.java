@@ -63,8 +63,10 @@ public class RuleEngine extends ContextAwareSupport {
     for (Rule rule : rules) {
       try {
         if ( stops_.get() ) break;
+        if ( ! isRuleActive(rule, rule.getAction()) ) continue;
         if ( ! checkPermission(rule, obj) ) continue;
-        if ( ! isRuleApplicable(rule, obj, oldObj)) continue;
+        if ( ! rule.f(userX_, obj, oldObj) ) continue;
+
         PM pm = (PM) x_.get("PM");
         pm.setKey(RulerDAO.getOwnClassInfo().getId());
         pm.setName(rule.getDaoKey() + ": " + rule.getId());
@@ -119,9 +121,10 @@ public class RuleEngine extends ContextAwareSupport {
       pm.setName("Probe:" + obj.getClassInfo());
       pm.init_();
     for (Rule rule : rules) {
-      if ( ! isRuleApplicable(rule, obj, oldObj) ) {
-        continue;
-      }
+      if ( ! isRuleActive(rule, rule.getAction()) ) continue;
+      if ( ! checkPermission(rule, obj) ) continue;
+      if ( ! rule.f(userX_, obj, oldObj) ) continue;
+
       TestedRule agent = new TestedRule();
       agent.setRule(rule.getId());
       if ( stops_.get() ) {
@@ -140,7 +143,10 @@ public class RuleEngine extends ContextAwareSupport {
       rulerProbe.getAppliedRules().add(agent);
     }
     for (Rule rule : rules) {
-      if ( rule.getAsyncAction() != null && rule.f(x_, obj, oldObj) ) {
+      if ( isRuleActive(rule, rule.getAsyncAction())
+        && checkPermission(rule, obj)
+        && rule.f(x_, obj, oldObj)
+      ) {
         TestedRule asyncAgent = new TestedRule();
         asyncAgent.setRule(rule.getId());
         asyncAgent.setMessage("AsyncAction.");
@@ -174,7 +180,7 @@ public class RuleEngine extends ContextAwareSupport {
     rule.apply(readOnlyX, obj, oldObj, this, rule, agency);
   }
 
-  private boolean isRuleApplicable(Rule rule, FObject obj, FObject oldObj) {
+  private boolean isRuleActive(Rule rule, RuleAction action) {
     currentRule_ = rule;
 
     // Check if the rule is in an ACTIVE state
@@ -183,10 +189,7 @@ public class RuleEngine extends ContextAwareSupport {
       isActive = ((LifecycleAware) rule).getLifecycleState() == LifecycleState.ACTIVE;
     }
 
-    return
-         isActive
-      && rule.getAction() != null
-      && rule.f(userX_, obj, oldObj);
+    return isActive && action != null;
   }
 
   private boolean checkPermission(Rule rule, FObject obj) {
@@ -205,9 +208,8 @@ public class RuleEngine extends ContextAwareSupport {
       for (Rule rule : rules) {
         if ( stops_.get() ) return;
 
-        currentRule_ = rule;
-        if ( checkPermission(rule, obj)
-          && rule.getAsyncAction() != null
+        if ( isRuleActive(rule, rule.getAsyncAction())
+          && checkPermission(rule, obj)
           && rule.f(x, obj, oldObj)
         ) {
           // We assume the original object `obj` is stale when running after rules.
