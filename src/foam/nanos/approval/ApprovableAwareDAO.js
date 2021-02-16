@@ -328,6 +328,7 @@ foam.CLASS({
         approvalRequest = new ApprovalRequest.Builder(x)
           .setDaoKey(getServiceName())
           .setServerDaoKey(getDaoKey())
+          .setReferenceSummary(obj.toSummary())
           .setObjId(String.valueOf(obj.getProperty("id")))
           .setClassification(getOf().getObjClass().getSimpleName())
           .setOperation(operation)
@@ -368,6 +369,7 @@ foam.CLASS({
           .setPropertiesToUpdate(propertiesToApprove).build());
 
         approvalRequest = new ApprovalRequest.Builder(x)
+          .setReferenceSummary(obj.toSummary())
           .setDaoKey("approvableDAO")
           .setObjId(approvable.getId())
           .setClassification(getOf().getObjClass().getSimpleName())

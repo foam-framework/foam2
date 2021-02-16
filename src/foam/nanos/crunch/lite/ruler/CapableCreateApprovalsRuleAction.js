@@ -162,6 +162,7 @@ foam.CLASS({
                     " - id:" +
                     String.valueOf(obj.getProperty("id"))
                   )
+                  .setReferenceSummary(obj.toSummary())
                   .setStatus(ApprovalStatus.REQUESTED).build();
 
                 approvalRequest = decorateApprovalRequest(x, approvalRequest, capableObj, capablePayload);
