@@ -297,7 +297,9 @@ public class JSONFObjectFormatter
     if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
 
     Object value = prop.get(fo);
-    if ( value == null || ( isArray(value) && Array.getLength(value) == 0 ) ) {
+    if ( value == null ||
+         ( isArray(value) && Array.getLength(value) == 0 ) ||
+         ( value instanceof FObject && value.equals(fo) ) ) {
       return false;
     }
 
