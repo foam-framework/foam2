@@ -38,7 +38,11 @@ foam.CLASS({
     },
     {
       name: 'data',
-      class: 'FObjectProperty'
+      class: 'FObjectProperty',
+      of: 'foam.core.FObject',
+      autoValidate: true,
+      documentation: `data for capability.of`,
+      view: 'foam.u2.view.AnyView'
     },
     {
       name: 'status',

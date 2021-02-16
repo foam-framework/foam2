@@ -8,6 +8,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'SlowDAO',
   extends: 'foam.dao.ProxyDAO',
+
   properties: [
     {
       class: 'Int',

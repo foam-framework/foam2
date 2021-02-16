@@ -127,11 +127,25 @@ if ( oldObj == null ) {
 } else {
   applyRules(x, obj, oldObj, (GroupBy) rulesList.get(getUpdateBefore()));
 }
+
+// Clone and pass unfrozen object to 'sync' 'after' rules so, similar
+// to 'before' rules, the rule is not responsible for put'ing
+// and the updated object is properly passed on to the next rule.
+// If the object was modified in an 'after' rule, then it is 'put'.
 FObject ret =  getDelegate().put_(x, obj);
-if ( oldObj == null ) {
-  applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getCreateAfter()));
-} else {
-  applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getUpdateAfter()));
+if ( ret != null ) {
+  ret = ret.fclone();
+  FObject before = ret.fclone();
+  if ( oldObj == null ) {
+    applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getCreateAfter()));
+  } else {
+    applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getUpdateAfter()));
+  }
+
+  // Test for changes during 'after' rule
+  if ( before.diff(ret).size() > 0 ) {
+    ret = getDelegate().put_(x, ret);
+  }
 }
 return ret;`
     },

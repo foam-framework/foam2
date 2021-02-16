@@ -740,7 +740,7 @@ return sb.toString();`
               +'}'
               +cls.name+' o2 = ('+ cls.name + ') o;\n'
               +'int cmp;\n'].concat(props.map(function(f) {
-                return 'cmp = foam.util.SafetyUtil.compare(get'+foam.String.capitalize(f.name)+'(), o2.get'+foam.String.capitalize(f.name)+'());\n'
+                return 'cmp = ' + foam.String.constantize(f.name) + '.compare(this, o2);\n'
                   +'if ( cmp != 0 ) return cmp;';
               })).join('\n')+'\n'
               +'  return 0;\n'
@@ -1184,11 +1184,26 @@ foam.CLASS({
 });
 
 
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'JavaCompareImplementor',
+  flags: ['java'],
+
+  properties: [
+    ['javaCompare', ''],
+    ['javaComparePropertyToObject', ''],
+    ['javaComparePropertyToValue', '']
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.java',
   name: 'IntJavaRefinement',
   refines: 'foam.core.Int',
   flags: ['java'],
+  mixins: [ 'foam.java.JavaCompareImplementor' ],
 
   properties: [
     ['javaType',       'int'],
@@ -1202,6 +1217,7 @@ foam.CLASS({
   name: 'ByteJavaRefinement',
   refines: 'foam.core.Byte',
   flags: ['java'],
+  mixins: [ 'foam.java.JavaCompareImplementor' ],
 
   properties: [
     ['javaType',       'byte'],
@@ -1215,6 +1231,7 @@ foam.CLASS({
   name: 'ShortJavaRefinement',
   refines: 'foam.core.Short',
   flags: ['java'],
+  mixins: [ 'foam.java.JavaCompareImplementor' ],
 
   properties: [
     ['javaType',       'short'],
@@ -1228,6 +1245,7 @@ foam.CLASS({
   name: 'LongJavaRefinement',
   refines: 'foam.core.Long',
   flags: ['java'],
+  mixins: [ 'foam.java.JavaCompareImplementor' ],
 
   properties: [
     ['javaType',                     'long'],
@@ -1241,6 +1259,7 @@ foam.CLASS({
   name: 'DoubleJavaRefinement',
   refines: 'foam.core.Double',
   flags: ['java'],
+  mixins: [ 'foam.java.JavaCompareImplementor' ],
 
   properties: [
     ['javaType',       'double'],
@@ -1254,6 +1273,7 @@ foam.CLASS({
   name: 'FloatJavaRefinement',
   refines: 'foam.core.Float',
   flags: ['java'],
+  mixins: [ 'foam.java.JavaCompareImplementor' ],
 
   properties: [
     ['javaType',     'float'],
@@ -1446,6 +1466,7 @@ foam.CLASS({
   name: 'DateTimeJavaRefinement',
   refines: 'foam.core.DateTime',
   flags: ['java'],
+  mixins: [ 'foam.java.JavaCompareImplementor' ],
 
   properties: [
     ['javaInfoType',    'foam.core.AbstractDatePropertyInfo'],
@@ -1481,6 +1502,7 @@ foam.CLASS({
   name: 'DateJavaRefinement',
   refines: 'foam.core.Date',
   flags: ['java'],
+  mixins: [ 'foam.java.JavaCompareImplementor' ],
 
    properties: [
        ['javaInfoType',    'foam.core.AbstractDatePropertyInfo'],
@@ -1521,16 +1543,13 @@ foam.CLASS({
     ['javaType',       'java.util.Map'],
     ['javaInfoType',   'foam.core.AbstractMapPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.MapParser.instance()'],
-    ['javaFactory',    'return new java.util.HashMap();']
+    ['javaFactory',    'return new java.util.HashMap();'],
+    ['javaCompare',    '']
   ],
 
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
-
-      // override usage of SafetyUtil.compare with PropertyInfo compare
-      var compare = info.getMethod('compare');
-      compare.body = 'return super.compare(o1, o2);';
 
       var getValueClass = info.getMethod('getValueClass');
       getValueClass.body = 'return java.util.Map.class;';
@@ -1552,15 +1571,12 @@ foam.CLASS({
     ['javaInfoType',   'foam.core.AbstractListPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ListParser.instance()'],
     ['javaFactory',    'return new java.util.ArrayList();'],
+    ['javaCompare',    '']
   ],
 
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
-
-      // override usage of SafetyUtil.compare with PropertyInfo compare
-      var compare = info.getMethod('compare');
-      compare.body = 'return super.compare(o1, o2);';
 
       var getValueClass = info.getMethod('getValueClass');
       getValueClass.body = 'return java.util.List.class;';
@@ -1576,6 +1592,7 @@ foam.CLASS({
   name: 'StringJavaRefinement',
   refines: 'foam.core.String',
   flags: ['java'],
+  mixins: [ 'foam.java.JavaCompareImplementor' ],
 
   properties: [
     ['javaInfoType',    'foam.core.AbstractStringPropertyInfo'],
@@ -1595,6 +1612,7 @@ foam.CLASS({
   flags: ['java'],
   properties: [
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
+    ['javaCompare',    ''],
     {
       name: 'javaJSONParser',
       expression: function(of) {
@@ -1906,7 +1924,8 @@ foam.CLASS({
   flags: ['java'],
   properties: [
     ['javaType',       'boolean'],
-    ['javaInfoType',   'foam.core.AbstractBooleanPropertyInfo']
+    ['javaInfoType',   'foam.core.AbstractBooleanPropertyInfo'],
+    ['javaCompare',    '']
   ]
 });
 
@@ -1917,7 +1936,8 @@ foam.CLASS({
   refines: 'foam.core.Object',
   flags: ['java'],
   properties: [
-    ['javaInfoType',    'foam.core.AbstractObjectPropertyInfo']
+    ['javaInfoType',    'foam.core.AbstractObjectPropertyInfo'],
+    ['javaCompare',    '']
   ]
 });
 
@@ -2315,13 +2335,8 @@ foam.CLASS({
   name: 'DAOPropertyJavaRefinement',
   refines: 'foam.dao.DAOProperty',
   flags: ['java'],
-  methods: [
-    function createJavaPropertyInfo_(cls) {
-      var info = this.SUPER(cls);
-      var compare = info.getMethod('compare');
-      compare.body = 'return 0;';
-      return info;
-    }
+  properties: [
+    ['javaCompare',    '']
   ]
 });
 

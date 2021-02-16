@@ -56,9 +56,9 @@ foam.CLASS({
 
     function link() {
       this.data$.relateTo(
-          this.attrSlot(null, this.onKey ? 'input' : null),
-          d => this.dataToInput(d),
-          d => this.inputToData(d)
+        this.attrSlot(null, this.onKey ? 'input' : null),
+        d => this.dataToInput(d),
+        d => this.inputToData(d)
       );
     },
 
@@ -74,7 +74,7 @@ foam.CLASS({
       const year = data.getUTCFullYear();
       const month = (data.getUTCMonth() + 1).toString().padStart(2, '0');
       const day = data.getUTCDate().toString().padStart(2, '0');
-      
+
       return `${year}-${month}-${day}`;
     }
   ]
