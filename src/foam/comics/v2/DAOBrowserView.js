@@ -276,8 +276,20 @@ foam.CLASS({
     },
     function initE() {
       var self = this;
+
+      var filterView  = foam.u2.ViewSpec.createView(self.FilterView, {
+        dao$: self.searchFilterDAO$,
+        data$: self.searchPredicate$,
+        searchValue: self.memento && self.memento.paramsObj && self.memento.paramsObj.s
+      },  self, self.__subSubContext__.createSubContext({ memento: this.memento.tail }));
+      var summaryView = foam.u2.ViewSpec.createView(self.summaryView ,{
+        data: self.predicatedDAO$proxy,
+        config: self.config
+      },  filterView, filterView.__subSubContext__);
+
       this.addClass(this.myClass());
       this.SUPER();
+
       this
         .add(this.slot(function(config$cannedQueries, config$hideQueryBar, searchFilterDAO) {
           return self.E()
@@ -314,11 +326,7 @@ foam.CLASS({
                         });
                       })
                       .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
-                        this.tag(self.FilterView, {
-                          dao$: self.searchFilterDAO$,
-                          data$: self.searchPredicate$,
-                          searchValue: self.memento && self.memento.paramsObj && self.memento.paramsObj.s
-                        });
+                        this.tag(filterView);
                     })
                     .endContext()
                     .start()
@@ -336,10 +344,7 @@ foam.CLASS({
                     .end()
                   .end();
               })
-              .start(self.summaryView,{
-                data: self.predicatedDAO$proxy,
-                config: self.config
-              })
+              .start(summaryView)
                 .addClass(self.myClass('browse-view-container'))
               .end()
             .end();
