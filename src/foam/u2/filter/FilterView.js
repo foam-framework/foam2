@@ -33,7 +33,8 @@ foam.CLASS({
 
   exports: [
     'as data',
-    'filterController'
+    'filterController',
+    'currentMemento as memento'
   ],
 
   css: `
@@ -279,12 +280,28 @@ foam.CLASS({
         return filterController$isAdvanced ? this.LINK_SIMPLE : this.LINK_ADVANCED;
       }
     },
-    'searchValue'
+    'searchValue',
+    'currentMemento'
   ],
 
   methods: [
     function initE() {
       var self = this;
+
+      if ( ! this.memento.tail ) {
+        var m;
+        for ( var filter of this.filters ) {
+          if ( ! m ) {
+            m = foam.nanos.controller.Memento.create({ value: '', parent: this.memento });
+            this.memento.tail$.set(m);
+          } else {
+            m.tail = foam.nanos.controller.Memento.create({ value: '', parent: m });
+            m = m.tail;
+          }
+          
+        }
+        this.currentMemento$ = m.tail$;
+      }
 
       if ( this.memento && this.memento.paramsObj && this.memento.paramsObj.f ) {
         this.memento.paramsObj.f.forEach(f => {
