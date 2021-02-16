@@ -106,7 +106,7 @@ foam.CLASS({
       String spid = (String) x.get("spid");
       Subject subject = (Subject) x.get("subject");
       if ( subject != null ) {
-        user = subject.getRealUser();
+        user = subject.getUser();
         if ( user != null ) {
           if ( ! SafetyUtil.isEmpty(user.getSpid()) ) {
              spid = user.getSpid();
