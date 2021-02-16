@@ -145,9 +145,7 @@ foam.CLASS({
       }
       PM pm = new PM(this.getClass().getSimpleName(), "wait");
       try {
-       while ( latch.countDown() > 0 ) {
-         latch.await(1000L, java.util.concurrent.TimeUnit.MILLISECONDS);
-       }
+        latch.await();
         return (FObject) getEntries().get(id);
       } catch (InterruptedException e) {
         // nop
