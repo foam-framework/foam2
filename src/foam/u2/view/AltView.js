@@ -117,10 +117,10 @@ foam.CLASS({
 
   actions: [
     function setMementoWithSelectedView() {
-      if ( ! this.memento )
+      if ( ! this.memento || ! this.memento.paramsObj )
         return;
       var view = this.views.find(v => v[0] == this.selectedView);
-      if ( view )
+      if ( view  )
         this.memento.paramsObj.sV = view[1];
       else
         delete this.memento.paramsObj.sV;
