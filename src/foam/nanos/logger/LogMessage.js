@@ -24,7 +24,7 @@ foam.CLASS({
 
   searchColumns: [
     'hostname',
-    'created',
+    'lastModified',
     'severity',
     'message'
   ],
@@ -125,5 +125,13 @@ foam.CLASS({
     //   view: { class: 'foam.u2.view.PreView' },
     //   updateVisibility: 'RO'
     // }
+    {
+      documentation: 'Support searching by date range.  Created is a human readable date string',
+      name: 'lastModified',
+      label: 'Created',
+      class: 'DateTime',
+      storageTransient: 'true',
+      visibility: 'HIDDEN'
+    }
   ]
 });

@@ -40,6 +40,7 @@ foam.CLASS({
       javaCode: `
       LogMessage lm = (LogMessage) obj;
       lm.setHostname(getHostname());
+      lm.setLastModified(new java.util.Date());
       lm.setCreated(((foam.util.SyncFastTimestamper)getTimestamper()).createTimestamp());
       Subject subject = (Subject) x.get("subject");
       User user = subject.getUser();
