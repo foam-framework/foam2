@@ -38,9 +38,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
     'foam.nanos.pm.PM',
     'foam.util.SafetyUtil',
     'java.util.concurrent.ConcurrentLinkedQueue',
-    'java.util.HashMap',
     'java.util.List',
-    'java.util.Map',
     'java.util.Timer'
   ],
 
