@@ -91,6 +91,8 @@ var classes = [
   'foam.mlang.predicate.isAuthorizedToRead',
   'foam.mlang.predicate.isAuthorizedToDelete',
   'foam.mlang.predicate.ContextUserPredicate',
+  'foam.net.CIDR',
+  'foam.net.IPSupport',
   'foam.net.Host',
   'foam.box.Box',
   'foam.box.Skeleton',
