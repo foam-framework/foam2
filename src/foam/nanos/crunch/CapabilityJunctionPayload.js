@@ -41,7 +41,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.core.FObject',
       autoValidate: true,
-      // TODO: investigate why default view resets data in CapableView
+      documentation: `data for capability.of`,
       view: 'foam.u2.view.AnyView'
     },
     {

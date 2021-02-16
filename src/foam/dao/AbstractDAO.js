@@ -50,10 +50,6 @@ foam.CLASS({
     }
   ],
 
-  constants: {
-    RESET_CMD: 'RESET_CMD'
-  },
-
   properties: [
     {
       /**

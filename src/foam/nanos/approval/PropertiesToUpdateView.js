@@ -51,7 +51,7 @@
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
       margin-left: 1vw;
       z-index: -1;
-      overflow: scroll;
+      overflow: auto;
       max-height: 100%;
     }
 

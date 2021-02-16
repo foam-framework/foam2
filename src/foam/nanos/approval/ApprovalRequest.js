@@ -238,7 +238,13 @@
       section: 'systemInformation',
       documentation: `Used internally in approvalDAO if an approval request concerns both a clientDAO and
       a server side dao. The server dao key is mainly used for backend actions that get executed on
-      the object as a cause of the approval request being approved or rejected.`
+      the object as a cause of the approval request being approved or rejected.`,
+      factory: function(){
+        return this.daoKey;
+      },
+      javaFactory: `
+        return getDaoKey();
+      `
     },
     {
       class: 'String',

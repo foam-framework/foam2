@@ -45,10 +45,10 @@ FOAM_FILES([
   { name: "foam/core/Duration" },
   { name: "foam/core/FObjectArray" },
   { name: "foam/core/Constant" },
-  { name: "foam/core/Validation" },
   { name: "foam/core/Topic" },
   { name: "foam/core/InnerClass" },
   { name: "foam/core/InnerEnum" },
+  { name: "foam/core/Mixin" },
   { name: "foam/core/Implements" },
   { name: "foam/core/ImportsExports" },
   { name: "foam/core/Listener" },
@@ -95,6 +95,7 @@ FOAM_FILES([
   { name: "foam/parsers/FON" },
   { name: "foam/core/templates" },
   { name: "foam/i18n/Messages" },
+  { name: "foam/core/Validation" },
   { name: "foam/core/Action" },
   { name: "foam/core/Static" },
   { name: "foam/core/Reaction" },
@@ -368,9 +369,9 @@ FOAM_FILES([
   { name: "foam/net/node/WebSocketService", flags: ['node'] },
   { name: "lib/firebase" },
   { name: "lib/fcm" },
-  { name: "foam/core/StubMethod" },
-  { name: "foam/core/StubAction" },
-  { name: "foam/core/Stub" },
+  { name: "foam/core/StubMethod", flags: ['java'] },
+  { name: "foam/core/StubAction", flags: ['java'] },
+  { name: "foam/core/Stub", flags: ['java'] },
   { name: "foam/box/Box" },
   { name: "foam/box/AnonymousBox" },
   { name: "foam/box/RemoteException" },
@@ -968,9 +969,6 @@ FOAM_FILES([
   { name: 'foam/i18n/ProxyTranslationService' },
   { name: 'foam/i18n/InlineLocaleEditor' },
 
-  { name: "foam/nanos/pool/AbstractFixedThreadPool" },
-  { name: "foam/nanos/pool/ThreadPoolAgency" },
-
   // md
   { name: "foam/u2/layout/MDDAOUpdateController" },
   { name: "foam/u2/layout/MDStackView" },
@@ -1004,12 +1002,6 @@ FOAM_FILES([
   { name: "foam/u2/layout/MDLoginView", flags: ['web'] },
   { name: "foam/u2/layout/MDNotificationMessage", flags: ['web'] },
   { name: "foam/u2/md/tag/PaperDropdown", flags: ['web'] },
-
-  // fs
-  { name: 'foam/nanos/fs/fileDropZone/FileDropZone', flags: ['web'] },
-  { name: 'foam/nanos/fs/fileDropZone/FileCard', flags: ['web'] },
-  { name: 'foam/nanos/fs/fileDropZone/FilePreview', flags: ['web'] },
-  { name: 'foam/nanos/fs/TextSaveView' },
 
   { name: 'foam/counter/Counter' },
   { name: 'foam/dashboard/view/DashboardCitationView' },
