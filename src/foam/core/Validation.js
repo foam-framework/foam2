@@ -238,7 +238,12 @@ foam.CLASS({
   properties: [
     {
       class: 'Boolean',
-      name: 'autoValidate'
+      name: 'autoValidate',
+      documentation: `
+        Enables default implementation for validateObj on this array property,
+        which will invalidate the property when any FObject array element is
+        invalid.
+      `
     },
     {
       name: 'validateObj',
