@@ -126,8 +126,9 @@ foam.CLASS({
         form of capabilities that are stored object-locally rather than in
         association with a user.
       `,
-      code: function createCapableWizardSequence(intercept, capable) {
-        let x = this.__subContext__.createSubContext({
+      code: function createCapableWizardSequence(intercept, capable, x) {
+        x = x || this.__subContext__;
+        x = x.createSubContext({
           intercept: intercept,
           capable: capable
         });
@@ -143,19 +144,37 @@ foam.CLASS({
       }
     },
 
-    // This function is only called by CapableView
-    function getWizardletsFromCapable(capable) {
-      return this.createCapableWizardSequence(undefined, capable)
+    function wizardSequenceToViewSequence_(sequence) {
+      return sequence
         .remove('WizardStateAgent')
         .remove('FilterGrantModeAgent')
         .remove('SkipGrantedAgent')
         .remove('RequirementsPreviewAgent')
         .remove('StepWizardAgent')
         .remove('MaybeDAOPutAgent')
+        .remove('PutFinalPayloadsAgent')
+        // if input is UCJ sequence, these apply
+        .remove('CheckRootIdAgent')
+        .remove('CheckPendingAgent')
+        .remove('CheckNoDataAgent')
+
+    },
+
+    // This function is only called by CapableView
+    function createCapableViewSequence(capable, x) {
+      return this.wizardSequenceToViewSequence_(
+        this.createCapableWizardSequence(undefined, capable, x)
+      )
         .add(this.SaveAllAgent)
-        .execute().then(x => {
-          return x.wizardlets
-        })
+        ;
+    },
+
+    function createCapabilityViewSequence(capabilityOrId, x) {
+      return this.wizardSequenceToViewSequence_(
+        this.createWizardSequence(capabilityOrId, x)
+      )
+        .add(this.SaveAllAgent)
+        ;
     },
 
     function handleIntercept(intercept) {

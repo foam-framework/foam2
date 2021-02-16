@@ -80,7 +80,9 @@ foam.CLASS({
       // note: payloads data are also set from getWizardletsFromCapable
       //       this is why we add listeners to payloads data after wizardlets are set
       this.wizardlets = this.capableObj ?
-        await this.crunchController.getWizardletsFromCapable(this.capableObj) : [];
+        await this.crunchController.createCapableViewSequence(this.capableObj)
+          .execute().then(x => x.wizardlets)
+        : [];
 
 
       this.start().addClass(this.myClass())
