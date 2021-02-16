@@ -8,12 +8,18 @@ foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'MedusaAdapterDAO',
   extends: 'foam.dao.ProxyDAO',
+  implements: [
+    'foam.core.ContextAgent',
+    'foam.nanos.NanoService'
+  ],
 
   documentation: `Entry point into the Medusa system.
 This DAO intercepts MDAO 'put' operations and creates a medusa entry for argument model.
 It then marshalls it to the primary mediator, and waits on a response.`,
 
   javaImports: [
+    'foam.core.Agency',
+    'foam.core.AgencyTimerTask',
     'foam.core.FObject',
     'foam.core.X',
     'foam.dao.ArraySink',
@@ -30,18 +36,26 @@ It then marshalls it to the primary mediator, and waits on a response.`,
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
-    'java.util.HashMap',
-    'java.util.Map',
-    'java.util.List',
     'foam.util.SafetyUtil',
-    'java.util.concurrent.ConcurrentLinkedDeque',
+    'java.util.concurrent.ConcurrentLinkedQueue',
+    'java.util.HashMap',
+    'java.util.List',
+    'java.util.Map',
+    'java.util.Timer'
   ],
 
   classes: [
     {
-      name: 'WriteLock',
+      documentation: `Helper model to store a particular MDAO state.`,
+      name: 'When',
       properties: [
         {
+          documentation: `WhenCmd containing 'state' of MDAO at time of creation.`,
+          name: 'cmd',
+          class: 'Object'
+        },
+        {
+          documentation: `'true' when the associated 'put' operation has completed.`,
           name: 'complete',
           class: 'Boolean'
         }
@@ -114,8 +128,9 @@ It then marshalls it to the primary mediator, and waits on a response.`,
     }
   };
 
-  // TODO: pool of reusable WriteLocks
-  protected ConcurrentLinkedDeque writeLocks_ = new ConcurrentLinkedDeque();
+  // Each 'put' operations appends a When, which captures the
+  // state of the delegate MDAO immediately preceeding the put.
+  protected ConcurrentLinkedQueue<When> whens_ = new ConcurrentLinkedQueue();
           `
         }));
       }
@@ -124,45 +139,32 @@ It then marshalls it to the primary mediator, and waits on a response.`,
 
   methods: [
     {
-      name: 'waitOnWrite',
+      name: 'getReadDelegate',
       args: [
         {
           name: 'x',
           type: 'Context'
         }
       ],
+      type: 'foam.dao.DAO',
       javaCode: `
-      WriteLock lock = (WriteLock) writeLocks_.peekLast();
-      if ( lock != null ) {
-        synchronized ( lock ) {
-          while ( ! lock.getComplete() &&
-                  writeLocks_.contains( lock ) ) {
-            try {
-              // getLogger().debug("waitOnWrite_", "wait");
-              lock.wait(1000L);
-              // getLogger().debug("waitOnWrite_", "unwait");
-              // getLogger().debug("waitOnWrite_", "complete", lock.getComplete(), "contains", writeLocks_.contains( lock ), "size", writeLocks_.size());
-            } catch (InterruptedException e) {
-              break;
-            }
-          }
-        }
+      When when = (When) whens_.peek();
+      if ( when != null ) {
+       return (DAO) getDelegate().cmd_(x, when.getCmd());
       }
+      return getDelegate();
       `
     },
     {
       name: 'find_',
       javaCode: `
-      // FIXME: this is causing threadwait on primary - related to registry
-      // waitOnWrite(x);
-      return getDelegate().find_(x, id);
+      return getReadDelegate(x).find_(x, id);
       `
     },
     {
       name: 'select_',
       javaCode: `
-      // waitOnWrite(x);
-      return getDelegate().select_(x, sink, skip, limit, order, predicate);
+      return getReadDelegate(x).select_(x, sink, skip, limit, order, predicate);
       `
     },
     {
@@ -321,6 +323,19 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         cmd = (ClusterCommand) obj;
         obj = cmd.getData();
       }
+
+      // On the Primary, 'put' operations occur before the object
+      // is sent to the nodes, and consensus determined.  To avoid
+      // 'find' and 'select' operations from seeing the not yet
+      // persisted create/update, serve the delegate DAO in the
+      // state preceeding the 'put'.
+      // A 'When', which captures the MDAO state, is created
+      // for each 'put'.  The When is marked complete when the
+      // 'put' completes.
+      // 'find' and 'select' operations will use the most recently
+      // added When.
+      When when = new When(x, new MDAO.WhenCmd(getDelegate().cmd_(x, MDAO.NOW_CMD)), false);
+      whens_.add(when);
       try {
         if ( DOP.PUT == dop ) {
           Object id = obj.getProperty("id");
@@ -352,6 +367,10 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         }
         return result;
       } finally {
+        when.setComplete(true);
+        synchronized ( whens_ ) {
+          whens_.notify();
+        }
         pm.log(x);
       }
       `
@@ -477,6 +496,44 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         throw t;
       } finally {
         pm.log(x);
+      }
+      `
+    },
+    {
+      documentation: 'NanoService implementation.',
+      name: 'start',
+      javaCode: `
+      getLogger().info("start");
+      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      Timer timer = new Timer(this.getClass().getSimpleName());
+      timer.schedule(
+        new AgencyTimerTask(getX(), support.getThreadPoolName(), this), 1000L);
+      `
+    },
+    {
+      documentation: `Monitor and clear 'when' queue.  'When's can complete out-of-order but are removed in-order.`,
+      name: 'execute',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+      while ( true ) {
+        When when = whens_.peek();
+        if ( when != null &&
+             when.getComplete() ) {
+          whens_.remove(when);
+        } else {
+          synchronized ( whens_ ) {
+            try {
+              whens_.wait(1000L);
+            } catch ( InterruptedException e ) {
+              break;
+            }
+          }
+        }
       }
       `
     }
