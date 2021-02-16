@@ -604,6 +604,7 @@ FOAM_FILES([
   { name: 'foam/u2/filter/properties/FloatFilterView', flags: ['web'] },
   { name: 'foam/u2/filter/properties/BooleanFilterView', flags: ['web'] },
   { name: 'foam/u2/filter/properties/DateFilterView', flags: ['web'] },
+  { name: 'foam/u2/filter/properties/DateTimeFilterView', flags: ['web'] },
   { name: 'foam/u2/filter/properties/EnumFilterView', flags: ['web'] },
   { name: 'foam/u2/filter/properties/ReferenceFilterView', flags: ['web'] },
   { name: "foam/u2/search/FilterController", flags: ['web'] },
