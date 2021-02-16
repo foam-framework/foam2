@@ -139,6 +139,11 @@
 
   properties: [
     {
+      class: 'String',
+      name: 'referenceSummary',
+      section: 'requestDetails'
+    },
+    {
       class: 'Long',
       name: 'id',
       section: 'requestDetails',
