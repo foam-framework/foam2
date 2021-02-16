@@ -228,6 +228,44 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
+  name: 'FObjectArrayValidationRefinement',
+  refines: 'foam.core.FObjectArray',
+
+  messages: [
+    { name: 'PLEASE_ENTER_VALID', message: 'Please enter valid' },
+  ],
+
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'autoValidate',
+      documentation: `
+        Enables default implementation for validateObj on this array property,
+        which will invalidate the property when any FObject array element is
+        invalid.
+      `
+    },
+    {
+      name: 'validateObj',
+      expression: function(name, label, required, validationPredicates, autoValidate) {
+        if ( autoValidate ) {
+          var self = this;
+          return [
+            [`${name}$errors`],
+            function(errs) {
+              return errs ? `${self.PLEASE_ENTER_VALID} ${(label || name).toLowerCase()}` : null;
+            }
+          ];
+        }
+        return foam.core.Property.VALIDATE_OBJ.expression.apply(this, arguments);
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
   name: 'IntPropertyValidationRefinement',
   refines: 'foam.core.Int',
 
