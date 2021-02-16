@@ -175,9 +175,10 @@ public class AuthWebAgent
             String token = st.nextToken();
             Session tmp = (Session) sessionDAO.find(token);
             if ( tmp != null ) {
-              if ( tmp.validRemoteHost(req.getRemoteHost()) ) {
+              try {
+                tmp.validateRemoteHost(x);
                 session = tmp;
-                session.setRemoteHost(req.getRemoteHost());
+                session.setRemoteHost(foam.net.IPSupport.instance().getRemoteIp(x));
                 X effectiveContext = session.applyTo(x);
                 session.setContext(effectiveContext);
                 User user = ((Subject) effectiveContext.get("subject")).getUser();
@@ -204,7 +205,7 @@ public class AuthWebAgent
                   sendError(x, resp, HttpServletResponse.SC_UNAUTHORIZED, "Invalid authentication token.");
                   return null;
                 }
-              } else {
+              } catch( foam.core.ValidationException e ) {
                 logger.debug("Invalid Source Address.");
                 sendError(x, resp, HttpServletResponse.SC_UNAUTHORIZED, "Invalid Source Address.");
                 return null;
