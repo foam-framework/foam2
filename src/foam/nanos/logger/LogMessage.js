@@ -17,14 +17,14 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'created',
+    'timestamp',
     'severity',
     'message'
   ],
 
   searchColumns: [
     'hostname',
-    'lastModified',
+    'created',
     'severity',
     'message'
   ],
@@ -37,7 +37,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'created',
+      name: 'timestamp',
       visibility: 'RO',
       tableWidth: 180
     },
@@ -126,12 +126,11 @@ foam.CLASS({
     //   updateVisibility: 'RO'
     // }
     {
-      documentation: 'Support searching by date range.  Created is a human readable date string',
-      name: 'lastModified',
-      label: 'Created',
+      documentation: `Support searching by date range.  'timestamp' is a human readable date string, not a 'DateTime' type that can be used for range searching in table view filters.  'timestamp' is optimized to avoid use of java.util.Date and this property is only calculated for table views.`,
+      name: 'created',
       class: 'DateTime',
       storageTransient: 'true',
-      visibility: 'HIDDEN'
+//      visibility: 'HIDDEN'
     }
   ]
 });
