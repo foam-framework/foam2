@@ -288,7 +288,6 @@ foam.CLASS({
     function initE() {
       var self = this;
 
-      this.currentMemento$ = this.memento.tail$;
       if ( ! this.memento.tail ) {
         var m;
         //i + 1 as there is a textSearch that we also need for memento
@@ -300,9 +299,10 @@ foam.CLASS({
             m.tail = foam.nanos.controller.Memento.create({ value: '', parent: m });
             m = m.tail;
           }
-          
         }
       }
+
+      this.currentMemento = this.memento.tail;
 
       if ( this.memento && this.memento.paramsObj && this.memento.paramsObj.f ) {
         this.memento.paramsObj.f.forEach(f => {
@@ -359,7 +359,10 @@ foam.CLASS({
                         property: axiom,
                         dao: self.dao
                       },  self, self.__subSubContext__.createSubContext({ memento: self.currentMemento }));//this.currentMemento
-                      // self.currentMemento = self.currentMemento.tail;
+
+                      if ( self.currentMemento ) {
+                        self.currentMemento = self.currentMemento.tail;
+                      }
 
                       this.start(propView)
                       .hide(self.filterController$.dot('isAdvanced'))
@@ -403,8 +406,6 @@ foam.CLASS({
 
           return e;
         }, this.filters$));
-
-        this.currentMemento$ = this.memento.tail$;
     },
 
     function addFilter(key) {
