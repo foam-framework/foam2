@@ -52,7 +52,10 @@ foam.CLASS({
       postSet: function(o, n) {
         if ( n && ! n.parent )
           n.parent = this;
-          
+        //clean up
+        if ( o )
+          o.parent = null;
+
         if ( this.feedback_ ) return;
         this.feedback_       = true;
         this.changeIndicator = ! this.changeIndicator;
