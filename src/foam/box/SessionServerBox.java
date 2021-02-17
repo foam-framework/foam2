@@ -113,7 +113,7 @@ public class SessionServerBox
         session = new Session((X) getX().get(Boot.ROOT));
         session.setId(sessionID == null ? "anonymous" : sessionID);
         if ( req != null ) {
-          session.setRemoteHost(getRemoteHost(req));
+          session.setRemoteHost(foam.net.IPSupport.instance().getRemoteIp(getX()));
         }
         try {
           // set clusterable false so only saved locally until user known.
@@ -133,7 +133,9 @@ public class SessionServerBox
         }
       } else if ( req != null ) {
         // if req == null it means that we're being accessed via webSockets
-        if ( ! session.validRemoteHost(getRemoteHost(req)) ) {
+        try {
+          session.validateRemoteHost(getX());
+        } catch (foam.core.ValidationException e) {
           // If an existing session is reused with a different remote host then
           // delete the session and force a re-login.
           // This is done as a security measure to reduce the likelihood of
@@ -144,7 +146,7 @@ public class SessionServerBox
           // to sign back in when the remote host changes, we reduce the attack
           // surface for session hijacking. Session hijacking is still possible,
           // but only if the user is on the same remote host.
-          logger.warning("Remote host for session ", sessionID, " changed from ", session.getRemoteHost(), " to ", getRemoteHost(req), ". Deleting session and forcing the user to sign in again.");
+          logger.warning("Remote host for session ", sessionID, " changed from ", session.getRemoteHost(), " to ", foam.net.IPSupport.instance().getRemoteIp(getX()), ". Deleting session and forcing the user to sign in again.");
           sessionDAO.remove(session);
           msg.replyWithException(new AuthenticationException("IP address changed. Your session was deleted to keep your account secure. Please sign in again to verify your identity."));
         }
@@ -191,14 +193,5 @@ public class SessionServerBox
     } finally {
       XLocator.set(null);
     }
-  }
-
-  protected String getRemoteHost(HttpServletRequest req) {
-    String xForwardedFor = req.getHeader("x-forwarded-for");
-    // If server is running in local, then X-Forwarded-For is empty.
-    if ( xForwardedFor == null ) return "";
-
-    String[] ips = xForwardedFor.split(",");
-    return ips[0].trim();
   }
 }
