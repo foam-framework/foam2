@@ -135,13 +135,10 @@ foam.CLASS({
       code: function() {
         var value = this.view.data;
 
-        if ( this.memento && this.memento.paramsObj ) {
-          if ( value ) {
-            this.memento.paramsObj.s = value;
-          } else {
-            delete this.memento.paramsObj.s;
-          }
-          this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
+        if ( value ) {
+          this.memento.head = value;
+        } else {
+          this.memento.head = '';
         }
         
         this.predicate = ! value ?
