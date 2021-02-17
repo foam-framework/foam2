@@ -359,7 +359,6 @@ var classes = [
   'foam.nanos.cron.Cron',
   'foam.nanos.auth.TimeZone',
   'foam.nanos.logger.LogMessage',
-  'foam.nanos.logger.LogMessageCreatedSink',
   'foam.nanos.logger.LogMessageDAO',
   'foam.nanos.logger.LogLevelFilterLogger',
   'foam.nanos.logger.AbstractLogger',

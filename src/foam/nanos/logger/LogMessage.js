@@ -17,7 +17,7 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'timestamp',
+    'created',
     'severity',
     'message'
   ],
@@ -36,10 +36,13 @@ foam.CLASS({
       visibility: 'RO'
     },
     {
-      class: 'String',
-      name: 'timestamp',
+      name: 'created',
+      class: 'DateTime',
       visibility: 'RO',
-      tableWidth: 180
+      toJSON: `
+      java.util.Date date = (java.util.Date) value;
+      outputter.output(new foam.util.FastTimestamper().createTimestamp(date.getTime()));
+      `
     },
     {
       class: 'Reference',
@@ -125,12 +128,5 @@ foam.CLASS({
     //   view: { class: 'foam.u2.view.PreView' },
     //   updateVisibility: 'RO'
     // }
-    {
-      documentation: `Support searching by date range.  'timestamp' is a human readable date string, not a 'DateTime' type that can be used for range searching in table view filters.  'timestamp' is optimized to avoid use of java.util.Date and this property is only calculated for table views.`,
-      name: 'created',
-      class: 'DateTime',
-      storageTransient: 'true',
-//      visibility: 'HIDDEN'
-    }
   ]
 });
