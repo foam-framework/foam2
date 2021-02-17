@@ -59,5 +59,16 @@ foam.ENUM({
       Capable object junctions.`,
       background: '#bfae32'
     },
+  ],
+
+  methods: [
+    function toStyle() {
+      return {
+        'display': 'inline-block',
+        'background': this.background,
+        'border-radius': '50px',
+        'padding': '4px 12px'
+      }
+    }
   ]
 });
