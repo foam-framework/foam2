@@ -34,7 +34,8 @@
           name: 'importConfig',
           type: 'foam.nanos.google.api.sheets.GoogleSheetsImportConfig'
         }
-      ]
+      ],
+      flags: ['java']
     }
   ]
 });

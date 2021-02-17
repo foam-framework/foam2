@@ -86,7 +86,8 @@ foam.INTERFACE({
           name: 'capabilityId',
           type: 'String'
         }
-      ]
+      ],
+      flags: ['java']
     },
     {
       name: 'getJunction',
