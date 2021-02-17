@@ -32,16 +32,24 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to 172.x
       class: 'String',
       placeholder: '10.0.0.0/24',
       required: true,
-      onKey: false,
       validateObj: function(notation) {
         if ( ! notation ||
              notation.length < this.NOTATION_MIN_LENGTH ||
              notation.length > this.NOTATION_MAX_LENGTH ) {
           return 'invalid notation';
         }
-        var m = notation.match(/\d+/g); // [ '198', '162', '1', '1', '24' ]
-        if ( ! m || m.length < 5 ) {
+        var m = notation.match(/\d+/g); // 198.162.1.1/24 -> ['198','162','1','1','24']
+        if ( ! m || m.length != 5 ) {
           return 'invalid notation';
+        }
+      },
+      // NOTE: use postSet rather than expression: function(notation) to
+      // support CIDRs as FObjectArray - which is the most common use case.
+      postSet: function(o, n) {
+        if ( n &&
+                n.length >= this.NOTATION_MIN_LENGTH &&
+                n.length <= this.NOTATION_MAX_LENGTH ) {
+          this.calculateAddresses(n);
         }
       },
       javaSetter: `
@@ -58,20 +66,21 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to 172.x
       notationIsSet_ = true;
       `
     },
-    {
-      flags: ['js'],
-      name: 'calculate_',
-      class: 'String',
-      visibility: 'HIDDEN',
-      expression: function(notation) {
-        if ( notation &&
-                notation.length >= this.NOTATION_MIN_LENGTH &&
-                notation.length <= this.NOTATION_MAX_LENGTH ) {
-          this.calculateAddresses(notation);
-        }
-        return notation;
-      }
-    },
+    // NOTE: see postSet above
+    // {
+    //   flags: ['js'],
+    //   name: 'calculate_',
+    //   class: 'String',
+    //   visibility: 'HIDDEN',
+    //   expression: function(notation) {
+    //     if ( notation &&
+    //             notation.length >= this.NOTATION_MIN_LENGTH &&
+    //             notation.length <= this.NOTATION_MAX_LENGTH ) {
+    //       this.calculateAddresses(notation);
+    //     }
+    //     return notation;
+    //   }
+    // },
     {
       documentation: 'Not used in inRange calculations. Calculated for Human inspection.',
       name: 'startAddress',
@@ -121,14 +130,14 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to 172.x
           ].join('.');
         };
 
-        var m = notation.match(/\d+/g); // [ '198', '162', '1', '1', '24' ]
+        var m = notation.match(/\d+/g); // 198.162.1.1/24 -> ['198','162','1','1','24']
         if ( ! m || m.length < 5 ) {
           console.warn('invalid notation', notation);
           return;
         }
         var addr32 = m.slice(0, 4).reduce(function (a, o) {
-          return u(+a << 8) + +o;
-        });                           // 0xc6a20101
+          return u(+a << 8) + +o;            // 0xc6a20101
+        });
         let mask = u(~0 << (32 - +m[4])); // 0xffffff00
         this.low = u(addr32 & mask);
         this.high = u(addr32 | ~mask);
