@@ -50,6 +50,9 @@ foam.CLASS({
     {
       name: 'tail',
       postSet: function(o, n) {
+        if ( n && ! n.parent )
+          n.parent = this;
+          
         if ( this.feedback_ ) return;
         this.feedback_       = true;
         this.changeIndicator = ! this.changeIndicator;
