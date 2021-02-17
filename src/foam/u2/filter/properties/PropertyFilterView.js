@@ -191,25 +191,15 @@ foam.CLASS({
         if ( ! this.view_ || ! this.memento )
           return;
 
-        if ( ! this.memento.paramsObj.f ) {
-          this.memento.paramsObj.f = [];
-        }
-
-        this.memento.paramsObj.f = this.memento.paramsObj.f.filter(f => f.n !== this.property.name || f.criteria !== this.criteria );
-
         var pred;
         if ( Object.keys(this.view_.predicate).length > 0 && ! foam.mlang.predicate.True.isInstance(this.view_.predicate) )
         pred =  this.view_.predicate.toMQL && this.view_.predicate.toMQL();
 
         if ( pred ) {
-          var newFilterValue = { criteria: this.criteria, n: this.property.name, pred: pred }
-          this.memento.paramsObj.f.push(newFilterValue);
+          this.memento.head = pred;
+        } else {
+          this.memento.head = '';
         }
-        if ( this.memento && this.memento.paramsObj && this.memento.paramsObj.f && this.memento.paramsObj && this.memento.paramsObj.f.length === 0 ) {
-          delete this.memento.paramsObj.f;
-        }
-
-        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
       }
       
       // Since the existing predicates are lazy loaded (on opening the view),

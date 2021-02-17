@@ -326,7 +326,7 @@ foam.CLASS({
                         });
                       })
                       .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
-                        this.tag(filterView);
+                        this.add(filterView);
                     })
                     .endContext()
                     .start()

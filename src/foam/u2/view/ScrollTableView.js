@@ -206,7 +206,7 @@
       this.updateCount();
 
       if ( this.memento )
-        this.currentMemento = this.memento;//temp
+        this.currentMemento = this.memento.tail;//temp
     },
 
     function initE() {

@@ -42,6 +42,7 @@ foam.CLASS({
       postSet: function(o, n) {
         if ( this.feedback_ ) return;
         this.feedback_ = true;
+        this.changeIndicator = ! this.changeIndicator;
         this.value     = this.combine();
         this.feedback_ = false;
       }

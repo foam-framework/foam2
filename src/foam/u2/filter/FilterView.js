@@ -288,9 +288,11 @@ foam.CLASS({
     function initE() {
       var self = this;
 
+      this.currentMemento$ = this.memento.tail$;
       if ( ! this.memento.tail ) {
         var m;
-        for ( var filter of this.filters ) {
+        //i + 1 as there is a textSearch that we also need for memento
+        for ( var i = 0; i < this.filters.length + 1; i++ ) {
           if ( ! m ) {
             m = foam.nanos.controller.Memento.create({ value: '', parent: this.memento });
             this.memento.tail$.set(m);
@@ -300,7 +302,7 @@ foam.CLASS({
           }
           
         }
-        this.currentMemento$ = m.tail$;
+        // this.currentMemento = m;
       }
 
       if ( this.memento && this.memento.paramsObj && this.memento.paramsObj.f ) {
@@ -311,6 +313,20 @@ foam.CLASS({
           self.filterController.setExistingPredicate(f.criteria, f.n, pred);
         });
       }
+
+      this.generalSearchField = foam.u2.ViewSpec.createView(self.TextSearchView, {
+        richSearch: true,
+        of: self.dao.of.id,
+        onKey: true,
+        searchValue: self.searchValue,
+        viewSpec: {
+          class: 'foam.u2.tag.Input',
+          placeholder: this.LABEL_SEARCH
+        }
+      },  self, self.__subSubContext__.createSubContext({ memento: this.currentMemento }));
+      
+      
+      this.currentMemento = this.currentMemento.tail;
 
       this.onDetach(this.filterController$.dot('isAdvanced').sub(this.isAdvancedChanged));
       this.addClass(self.myClass())
@@ -324,16 +340,7 @@ foam.CLASS({
               .on('click', self.toggleDrawer)
               .start('p').addClass(self.myClass('handle-title')).add(self.LABEL_FILTER).end()
             .end()
-            .start(self.TextSearchView, {
-              richSearch: true,
-              of: self.dao.of.id,
-              onKey: true,
-              searchValue: self.searchValue,
-              viewSpec: {
-                class: 'foam.u2.tag.Input',
-                placeholder: this.LABEL_SEARCH
-              }
-            }, self.generalSearchField$)
+            .start(self.generalSearchField)
               .addClass(self.myClass('general-field'))
             .end()
           .end()
@@ -349,13 +356,16 @@ foam.CLASS({
                 .start().addClass(self.myClass('container-filters'))
                   .forEach(filters, function(f) {
                     var axiom = self.dao.of.getAxiomByName(f);
-                    if ( axiom ){
-                      this.start(self.PropertyFilterView, {
+                    if ( axiom ) {
+                      var propView = foam.u2.ViewSpec.createView(self.PropertyFilterView, {
                         criteria: 0,
                         searchView: axiom.searchView,
                         property: axiom,
                         dao: self.dao
-                      })
+                      },  self, self.__subSubContext__.createSubContext({ memento: self.currentMemento }));//this.currentMemento
+                      // self.currentMemento = self.currentMemento.tail;
+
+                      this.start(propView)
                       .hide(self.filterController$.dot('isAdvanced'))
                       .end();
                     }
@@ -397,6 +407,8 @@ foam.CLASS({
 
           return e;
         }, this.filters$));
+
+        this.currentMemento$ = this.memento.tail$;
     },
 
     function addFilter(key) {
