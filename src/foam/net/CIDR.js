@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.net',
   name: 'CIDR',
 
-  documentation: `Model a Classless Inter-Domain Routing Range.  Used to restrict access to particular IP address range.  So, for example, admin group users can only login when on a company VPN. 
+  documentation: `Model a Classless Inter-Domain Routing Range.  Used to restrict access to particular IP address range.  So, for example, admin group users can only login when on a company VPN.
 @see https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing
 List entries are of the form: 172.0.0.0/24 - this would restrict logins to 172.xxx.xxx adresses.`,
 
@@ -21,11 +21,26 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to 172.x
       documentation: 'CIDR Address and Mask.',
       name: 'notation',
       class: 'String',
-      placeholder: '10.0.0.0/24'
+      placeholder: '10.0.0.0/24',
+      required: true,
+      maxLength: 18,
+      onKey: true,
+      validateObj: function(notation) {
+        if ( ! notation || notation.length > 18 ) {
+          return 'invalid notation';
+        }
+        var m = notation && notation.match(/\d+/g); // [ '198', '162', '1', '1', '24' ]
+        if ( ! m || m.length < 5 ) {
+          return 'invalid notation';
+        }
+      }
     },
     {
-      name: 'calculate',
-      visibility: 'HIDDEN',
+      flags: ['js'],
+      name: 'calculateAddresses_',
+      class: 'String',
+      hidden: true,
+//      visibility: 'HIDDEN',
       expression: function(notation) {
         // https://stackoverflow.com/a/33003795
         function u(n) {
