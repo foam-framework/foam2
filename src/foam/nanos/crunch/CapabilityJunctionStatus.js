@@ -25,8 +25,8 @@ foam.ENUM({
       name: 'EXPIRED',
       label: { en: 'expired', pt: 'expirada'},
       documentation: 'The information required has changed, or your inputs are no longer valid',
-      background: '#F79393',
-      color: '#631414'
+      background: '#FBE88F',
+      color: '#816819'
     },
     {
       name: 'ACTION_REQUIRED',
