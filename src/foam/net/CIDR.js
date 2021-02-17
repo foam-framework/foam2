@@ -66,21 +66,6 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to 172.x
       notationIsSet_ = true;
       `
     },
-    // NOTE: see postSet above
-    // {
-    //   flags: ['js'],
-    //   name: 'calculate_',
-    //   class: 'String',
-    //   visibility: 'HIDDEN',
-    //   expression: function(notation) {
-    //     if ( notation &&
-    //             notation.length >= this.NOTATION_MIN_LENGTH &&
-    //             notation.length <= this.NOTATION_MAX_LENGTH ) {
-    //       this.calculateAddresses(notation);
-    //     }
-    //     return notation;
-    //   }
-    // },
     {
       documentation: 'Not used in inRange calculations. Calculated for Human inspection.',
       name: 'startAddress',
