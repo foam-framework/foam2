@@ -295,14 +295,13 @@ foam.CLASS({
         for ( var i = 0; i < this.filters.length + 1; i++ ) {
           if ( ! m ) {
             m = foam.nanos.controller.Memento.create({ value: '', parent: this.memento });
-            this.memento.tail$.set(m);
+            this.memento.tail = m;
           } else {
             m.tail = foam.nanos.controller.Memento.create({ value: '', parent: m });
             m = m.tail;
           }
           
         }
-        // this.currentMemento = m;
       }
 
       if ( this.memento && this.memento.paramsObj && this.memento.paramsObj.f ) {
@@ -325,9 +324,6 @@ foam.CLASS({
         }
       },  self, self.__subSubContext__.createSubContext({ memento: this.currentMemento }));
       
-      
-      this.currentMemento = this.currentMemento.tail;
-
       this.onDetach(this.filterController$.dot('isAdvanced').sub(this.isAdvancedChanged));
       this.addClass(self.myClass())
         .add(this.slot(function(filters) {
