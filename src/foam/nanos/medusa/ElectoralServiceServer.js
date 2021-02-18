@@ -25,6 +25,7 @@ foam.CLASS({
     'foam.net.Host',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
+    'foam.nanos.pm.PM',
     'foam.util.SafetyUtil',
     'java.util.ArrayList',
     'java.util.concurrent.*',
@@ -242,30 +243,36 @@ foam.CLASS({
       javaCode: `
       getLogger().debug("execute");
       String savedThreadName = Thread.currentThread().getName();
-      Thread.currentThread().setName(this.getClass().getSimpleName());
-      while( true ) {
-        try {
-          synchronized ( electionLock_ ) {
-            getLogger().debug("execute", "state", getState().getLabel(), "election time", getElectionTime());
-            if ( getState() != ElectoralServiceState.ELECTION ) {
-              break;
+      try {
+        Thread.currentThread().setName(this.getClass().getSimpleName());
+        while( true ) {
+          try {
+            synchronized ( electionLock_ ) {
+              getLogger().debug("execute", "state", getState().getLabel(), "election time", getElectionTime());
+              if ( getState() != ElectoralServiceState.ELECTION ) {
+                break;
+              }
             }
+            callVote(x);
+          } catch(Throwable t) {
+            getLogger().error(t);
+            break;
           }
-          callVote(x);
-        } catch(Throwable t) {
-          getLogger().error(t);
-          break;
+          PM pm = PM.create(x, this.getClass().getSimpleName(),"execute", "sleep");
+          try {
+            java.util.Random r = ThreadLocalRandom.current();
+            int sleep = r.nextInt(1000) + 1000;
+            Thread.currentThread().sleep(sleep);
+          } catch (InterruptedException e) {
+            break;
+          } finally {
+            pm.log(x);
+          }
         }
-        try {
-          java.util.Random r = ThreadLocalRandom.current();
-          int sleep = r.nextInt(1000) + 1000;
-          Thread.currentThread().sleep(sleep);
-        } catch (InterruptedException e) {
-          break;
-        }
+      } finally {
+        getLogger().debug("execute", "exit", "state", getState().getLabel(), "election time", getElectionTime());
+        Thread.currentThread().setName(savedThreadName);
       }
-      getLogger().debug("execute", "exit", "state", getState().getLabel(), "election time", getElectionTime());
-      Thread.currentThread().setName(savedThreadName);
       `
     },
     {

@@ -252,7 +252,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       cmd.logHops(x);
       getLogger().debug("update", "secondary", dop, obj.getProperty("id"), "receive", cmd.getMedusaEntryId());
       if ( cmd.getMedusaEntryId() > 0 ) {
-        pm = PM.create(x, this.getClass().getSimpleName(), "secondary", "wait");
+        pm = PM.create(x, this.getClass().getSimpleName(), "secondary", "registry", "wait");
         MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
         registry.wait(x, (Long) cmd.getMedusaEntryId());
         pm.log(x);
