@@ -18,7 +18,7 @@
     'as summaryView',
     'dblclick as click',
     'dblclick',
-    'memento'
+    // 'memento'
   ],
 
   requires: [
@@ -184,7 +184,7 @@
             data: obj,
             config: this.config,
             idOfRecord: id
-          }, this.__subContext__.createSubContext({ memento: this.memento.returnTail() }));
+          }, this.__subContext__.createSubContext({ memento: this.table.memento }));
         }
       }
     },
@@ -205,65 +205,89 @@
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.updateCount })));
       this.updateCount();
 
-      if ( this.memento )
-        this.currentMemento = this.memento.tail;//temp
+      // if ( this.memento )
+      //   this.currentMemento = this.memento.tail;//temp
     },
 
     function initE() {
-      if ( this.currentMemento ) {
-        var mementoHead = this.currentMemento.head;
+      // if currentMemento is not null then there is some table 
+      //config's happening
 
-        var of = this.data.of || this.config.of;
-        var createMemento = this.memento.findMementoTail('create');
-        if ( createMemento && of ) {
-          this.stack.push({
-            class: 'foam.comics.v2.DAOCreateView',
-            data: ((this.config.factory && this.config.factory$cls) ||  this.data.of).create({ mode: 'create'}, this),
-            config$: this.config$,
-            of: of
-          }, this.__subContext__.createSubContext({ memento: createMemento }));
-          return;
-        }
-        var viewMemento = this.memento.findMementoTail('view') || this.memento.findMementoTail('edit');
-        if ( viewMemento && viewMemento.tail && of ) {
-          var id = viewMemento.tail.mementoHead;
-          if ( of ) {
-            if ( ! foam.core.MultiPartID.isInstance(of.ID) ) {
-              id = of.ID.fromString(id);
-            } else {
-              id = of.ID.of.create();
-              mementoHead = '{' + mementoHead.replaceAll('=', ':') + '}';
-              var idFromJSON = foam.json.parseString(viewMemento.tail.mementoHead);
-              for ( var key in idFromJSON ) {
-                var axiom = of.ID.of.getAxiomByName(key);
-                if ( axiom )
-                  axiom.set(id, idFromJSON[key]);
-              }
-            }
+      // if ( this.currentMemento ) {
+      //   var mementoHead = this.currentMemento.head;
+
+      //   var of = this.data.of || this.config.of;
+      //   var createMemento = this.memento.findMementoTail('create');
+      //   if ( createMemento && of ) {
+      //     this.stack.push({
+      //       class: 'foam.comics.v2.DAOCreateView',
+      //       data: ((this.config.factory && this.config.factory$cls) ||  this.data.of).create({ mode: 'create'}, this),
+      //       config$: this.config$,
+      //       of: of
+      //     }, this.__subContext__.createSubContext({ memento: createMemento }));
+      //     return;
+      //   }
+      //   var viewMemento = this.memento.findMementoTail('view') || this.memento.findMementoTail('edit');
+      //   if ( viewMemento && viewMemento.tail && of ) {
+      //     var id = viewMemento.tail.mementoHead;
+      //     if ( of ) {
+      //       if ( ! foam.core.MultiPartID.isInstance(of.ID) ) {
+      //         id = of.ID.fromString(id);
+      //       } else {
+      //         id = of.ID.of.create();
+      //         mementoHead = '{' + mementoHead.replaceAll('=', ':') + '}';
+      //         var idFromJSON = foam.json.parseString(viewMemento.tail.mementoHead);
+      //         for ( var key in idFromJSON ) {
+      //           var axiom = of.ID.of.getAxiomByName(key);
+      //           if ( axiom )
+      //             axiom.set(id, idFromJSON[key]);
+      //         }
+      //       }
+      //     }
+      //     this.stack.push({
+      //       class: 'foam.comics.v2.DAOSummaryView',
+      //       data: null,
+      //       config: this.config,
+      //       idOfRecord: id
+      //     }, this.__subContext__.createSubContext({ memento: viewMemento }));
+      //     return;
+      //   }
+      // }
+
+      if ( this.memento ) {
+        //as there two settings to configure for table scroll and columns params
+        //scroll setting which setts the record to which table currently scrolled
+        var m = this.memento;
+        for ( var i = 0; i < 2; i++ ) {
+          if ( ! m ) {
+            m = foam.nanos.controller.Memento.create({ value: '', parent: this.memento });
+            this.memento.tail = m;
+          } else {
+            m.tail = foam.nanos.controller.Memento.create({ value: '', parent: m });
+            m = m.tail;
           }
-          this.stack.push({
-            class: 'foam.comics.v2.DAOSummaryView',
-            data: null,
-            config: this.config,
-            idOfRecord: id
-          }, this.__subContext__.createSubContext({ memento: viewMemento }));
-          return;
         }
       }
+
+      if ( this.memento )
+        this.currentMemento = this.memento.tail;
+
+      //table view
+      this.table = foam.u2.ViewSpec.createView(this.TableView, {
+        data: foam.dao.NullDAO.create({of: this.data.of}),
+        columns: this.columns,
+        contextMenuActions: this.contextMenuActions,
+        selection$: this.selection$,
+        editColumnsEnabled: this.editColumnsEnabled,
+        disableUserSelection: this.disableUserSelection,
+        multiSelectEnabled: this.multiSelectEnabled,
+        selectedObjects$: this.selectedObjects$
+      },  this, this.__subSubContext__.createSubContext({ memento: this.currentMemento.tail }));
 
       this.
         addClass(this.myClass()).
         on('scroll', this.onScroll).
-        start(this.TableView, {
-          data: foam.dao.NullDAO.create({of: this.data.of}),
-          columns: this.columns,
-          contextMenuActions: this.contextMenuActions,
-          selection$: this.selection$,
-          editColumnsEnabled: this.editColumnsEnabled,
-          disableUserSelection: this.disableUserSelection,
-          multiSelectEnabled: this.multiSelectEnabled,
-          selectedObjects$: this.selectedObjects$
-        }, this.table_$).
+        start(this.table).
           addClass(this.myClass('table')).
           style({
             height: this.scrollHeight$.map(h => h + 'px')
@@ -295,8 +319,8 @@
           delete this.renderedPages_[i];
         });
         this.updateRenderedPages_();
-        if ( this.el() && ! this.isInit && this.memento && this.memento.paramsObj && this.memento.paramsObj.r ) {
-          var scroll = this.memento.paramsObj.r * this.rowHeight;
+        if ( this.el() && ! this.isInit && this.currentMemento && this.currentMemento.head.length != 0 ) {
+          var scroll = this.currentMemento.head * this.rowHeight;
           scroll = scroll >= this.rowHeight && scroll < this.scrollHeight ? scroll : 0;
 
           document.getElementById(this.id).scrollTop = scroll;
@@ -350,9 +374,8 @@
       isFramed: true,
       code: function(e) {
         this.scrollPos_ = e.target.scrollTop;
-        if ( this.memento &&  this.memento.paramsObj ) {
-          this.memento.paramsObj.r = this.scrollPos_ >= this.rowHeight && this.scrollPos_ < this.scrollHeight ? Math.floor( this.scrollPos_  / this.rowHeight) : 0;
-          this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
+        if ( this.memento &&  this.currentMemento.head.length != 0 ) {
+          this.currentMemento.head = this.scrollPos_ >= this.rowHeight && this.scrollPos_ < this.scrollHeight ? Math.floor( this.scrollPos_  / this.rowHeight) : 0;
         }
       }
     },

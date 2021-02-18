@@ -31,7 +31,7 @@ foam.CLASS({
     'hoverSelection',
     'selection',
     'subStack as stack',
-    'currentMemento as memento'
+    'memento'//currentMemento as 
   ],
 
   imports: [
@@ -109,7 +109,7 @@ foam.CLASS({
     {
       name: 'selectedColumnNames',
       expression: function(columns, of, memento) {
-        var ls =  memento && memento.paramsObj && memento.paramsObj.c ? memento.paramsObj.c.split(',').map(c => this.returnMementoColumnNameDisregardSorting(c)) : JSON.parse(localStorage.getItem(of.id));
+        var ls =  memento && memento.head.length != 0 ? memento.head.c.split(',').map(c => this.returnMementoColumnNameDisregardSorting(c)) : JSON.parse(localStorage.getItem(of.id));
         return ls || columns;
       }
     },
@@ -278,13 +278,10 @@ foam.CLASS({
         this.DESC(column) :
         column;
 
-      if ( ! this.memento )
+      if ( ! this.memento || this.memento.head.length == 0 )
         return;
 
-      if ( ! this.memento.paramsObj.c ) {
-        this.memento.paramsObj.c = [];
-      }
-      var columns = this.memento.paramsObj.c.split(',');
+      var columns = this.memento.head.split(',');
       var mementoColumn = columns.find(c => this.returnMementoColumnNameDisregardSorting(c) === column.name)
       var orderChar = isNewOrderDesc ? this.DESCENDING_ORDER_CHAR : this.ASCENDING_ORDER_CHAR;
       if ( ! mementoColumn ) {
@@ -293,8 +290,7 @@ foam.CLASS({
         var index = columns.indexOf(mementoColumn);
         columns[index] = column.name + orderChar;
       }
-      this.memento.paramsObj.c = columns.join(',');
-      this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
+      this.memento.head = columns.join(',');
     },
 
     function updateColumns() {
@@ -305,11 +301,10 @@ foam.CLASS({
         return;
 
       var newMementoColumns = [];
-
       for ( var s of this.selectedColumnNames ) {
         var columns = [];
-        if ( this.memento.paramsObj.c )
-          columns = this.memento.paramsObj.c.split(',');
+        if ( this.memento.head.length != 0 )
+          columns = this.memento.head.split(',');
         var col = columns.find(c => this.returnMementoColumnNameDisregardSorting(c) === s);
         if ( ! col ) {
           newMementoColumns.push(s);
@@ -317,8 +312,7 @@ foam.CLASS({
           newMementoColumns.push(col);
         }
       }
-      this.memento.paramsObj.c = newMementoColumns.join(',');
-      this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj)
+      this.memento.head = newMementoColumns.join(',');
 
       this.isColumnChanged = ! this.isColumnChanged;
     },
@@ -330,11 +324,10 @@ foam.CLASS({
 
 
       //set memento's selected columns
-      if ( this.memento && this.memento.paramsObj && ! this.memento.paramsObj.c ) {
-        this.memento.paramsObj.c = this.columns_.map(c => {
+      if ( this.memento ) {
+        this.memento.head = this.columns_.map(c => {
           return this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c);
         }).join(',');
-        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj)
       }
 
       //otherwise on adding new column creating new EditColumnsView, which is closed by default
@@ -678,8 +671,8 @@ foam.CLASS({
               return tbodyElement;
             });
 
-            if ( this.memento && this.memento.paramsObj && this.memento.paramsObj.c ) {
-              var columns = this.memento.paramsObj.c.split(',');
+            if ( this.memento && this.memento.head.length != 0 ) {
+              var columns = this.memento.head.split(',');
               for ( var c of columns ) {
                 if ( this.shouldColumnBeSorted(c) && ! c.includes('.')) {
                   var prop = view.props.find(p => p.fullPropertyName === c.substr(0, c.length - 1) );
