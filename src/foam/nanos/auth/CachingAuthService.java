@@ -64,6 +64,10 @@ public class CachingAuthService
     Subject subject = (Subject) x.get("subject");
     User    user    = subject.getUser();
 
+    if ( user == null ) {
+      return new ConcurrentHashMap<String,Boolean>();
+    }
+
     // If the user in the context does not match the session user, do not use the
     // cache permission map, which belong to session user
     Long contextUserId = user.getId();

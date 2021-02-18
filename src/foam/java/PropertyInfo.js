@@ -134,6 +134,7 @@ foam.CLASS({
     'toCSV',
     'toCSVLabel',
     'fromCSVLabelMapping',
+    'formatJSON',
     {
       class: 'Boolean',
       name: 'sheetsOutput',
@@ -515,6 +516,25 @@ foam.CLASS({
             type: 'boolean',
             visibility: 'public',
             body: 'return ' + this.sheetsOutput + ';'
+          });
+        }
+
+        if ( this.formatJSON != null ) {
+          m.push({
+            name: 'formatJSON',
+            type: 'void',
+            visibility: 'public',
+            args: [
+              {
+                name: 'formatter',
+                type: 'foam.lib.formatter.FObjectFormatter'
+              },
+              {
+                name: 'obj',
+                type: 'foam.core.FObject'
+              }
+            ],
+            body: this.formatJSON + ';'
           });
         }
 

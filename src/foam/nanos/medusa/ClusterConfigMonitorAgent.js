@@ -108,13 +108,6 @@ foam.CLASS({
       javaCode: `
       getLogger().info("start", "interval", getTimerInterval());
       schedule(getX());
-      // ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
-      // Timer timer = new Timer(this.getClass().getSimpleName(), true);
-      // setTimer(timer);
-      // timer.scheduleAtFixedRate(
-      //   new AgencyTimerTask(getX(), support.getThreadPoolName(), this),
-      //   getInitialTimerDelay(),
-      //   getTimerInterval());
       `
     },
     {
@@ -167,11 +160,16 @@ foam.CLASS({
           }
         } catch ( Throwable t ) {
           pm.error(x, t);
-          getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage());
           if ( config.getStatus() != Status.OFFLINE ) {
+            getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage());
             ClusterConfig cfg = (ClusterConfig) config.fclone();
             cfg.setStatus(Status.OFFLINE);
-            getDao().put_(x, cfg);
+            config = (ClusterConfig) getDao().put_(x, cfg);
+          }
+          Throwable cause = t.getCause();
+          if ( cause == null ||
+               ! ( cause instanceof java.io.IOException ) ) {
+            getLogger().warning(config.getId(), t.getClass().getSimpleName(), t.getMessage());
           }
         }
 
@@ -195,7 +193,12 @@ foam.CLASS({
         }
         setLastAlarmsSince(now);
       } catch ( Throwable t ) {
-        getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage());
+        Throwable cause = t.getCause();
+        if ( cause == null ||
+             ! ( cause instanceof java.io.IOException ) &&
+             config.getStatus() != Status.OFFLINE ) {
+          getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage());
+        }
       } finally {
         schedule(x);
       }

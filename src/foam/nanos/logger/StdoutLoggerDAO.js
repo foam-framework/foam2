@@ -31,9 +31,16 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.app.Mode',
       value: 'DEVELOPMENT'
+    },
+    {
+      name: 'timestamper',
+      class: 'Object',
+      of: 'foam.util.SyncFastTimestamper',
+      visibility: 'HIDDEN',
+      javaFactory: `return new foam.util.SyncFastTimestamper();`
     }
   ],
-  
+
   methods: [
     {
       name: 'put_',
@@ -44,13 +51,9 @@ foam.CLASS({
         // Only write INFO, WARN, ERROR to SYSLOG in production to reduce
         // burden on syslogd, journald. With our own journal logs we are
         // effectively writing out logs twice. 
-        if ( lm.getSeverity().getOrdinal() >= LogLevel.INFO.getOrdinal() ||
-            getMode() != Mode.PRODUCTION ) {
-          if ( lm.getSeverity() == LogLevel.ERROR ) {
-            System.err.println(lm.getCreated() + ","+lm.getThread()+","+lm.getSeverity()+","+lm.getMessage());
-          } else {
-            System.out.println(lm.getCreated() + ","+lm.getThread()+","+lm.getSeverity()+","+lm.getMessage());
-          }
+        if ( getMode() != Mode.PRODUCTION ||
+             lm.getSeverity().getOrdinal() >= LogLevel.INFO.getOrdinal() ) {
+          System.err.println(((foam.util.SyncFastTimestamper)getTimestamper()).createTimestamp(lm.getCreated().getTime())+","+lm.getThread()+","+lm.getSeverity()+","+lm.getMessage());
         }
       }
       return lm;

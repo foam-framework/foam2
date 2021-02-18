@@ -257,6 +257,8 @@ This is the heart of Medusa.`,
         }
       ],
       javaCode: `
+      String savedThreadName = Thread.currentThread().getName();
+      Thread.currentThread().setName(this.getClass().getSimpleName());
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       Long nextIndexSince = System.currentTimeMillis();
       Alarm alarm = new Alarm.Builder(x)
@@ -357,6 +359,7 @@ This is the heart of Medusa.`,
         ((DAO) x.get("alarmDAO")).put(alarm);
       } finally {
         getLogger().warning("promoter", "exit");
+        Thread.currentThread().setName(savedThreadName);
       }
      `
     },
@@ -419,7 +422,7 @@ This is the heart of Medusa.`,
             // Secondaries will block on registry
             // NOTE: See PromotedPurgeAgent for Registry cleanup.  These
             // registry.register requests will remain until a 'waiter', or
-            // until purged, which is the case for idle Secondaries and
+            // until purged - which is the case for idle Secondaries and
             // non-active Regions.
             if ( ! replaying.getReplaying() &&
                  ! config.getIsPrimary() ) {

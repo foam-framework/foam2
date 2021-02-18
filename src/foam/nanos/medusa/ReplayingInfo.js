@@ -140,10 +140,13 @@ foam.CLASS({
       name: 'replayTps',
       class: 'String',
       expression: function(index, replayIndex, startTime, endTime) {
-        let end = endTime || new Date();
-        let tm = (end.getTime() - startTime.getTime()) / 1000;
-        let tps = index / tm;
-        return Math.round(tps);
+        if ( startTime ) {
+          let end = endTime || new Date();
+          let tm = (end.getTime() - startTime.getTime()) / 1000;
+          let tps = index / tm;
+          return Math.round(tps);
+        }
+        return 0;
       }
     },
     {

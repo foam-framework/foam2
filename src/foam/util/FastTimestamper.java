@@ -32,8 +32,10 @@ public class FastTimestamper {
   }
 
   public String createTimestamp() {
-    long now = System.currentTimeMillis();
+    return createTimestamp(System.currentTimeMillis());
+  }
 
+  public String createTimestamp(long now) {
     if ( now == lastTime_ ) {
       // reuse, NOP
     } else if ( now / 1000 == lastTime_ / 1000 ) {

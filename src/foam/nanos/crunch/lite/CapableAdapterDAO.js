@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * Copyright 2021 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -62,8 +62,16 @@ foam.CLASS({
       code: async function (x, obj) {
         return this.ifFoundElseIfNotFound_(
           obj.capability,
-          (payloads, i) => { payloads[i] = obj; return obj; },
-          (payloads) => { payloads.push(obj); return obj; }
+          (payloads, i) => {
+            payloads[i] = obj;
+            this.pubPayloadsUpdate_();
+            return obj;
+          },
+          (payloads) => {
+            payloads.push(obj);
+            this.pubPayloadsUpdate_();
+            return obj;
+          }
         );
       }
     },
@@ -95,7 +103,11 @@ foam.CLASS({
       code: async function (x, obj) {
         return this.ifFoundElseIfNotFound_(
           obj.capability,
-          (payloads, i) => { payloads.splice(i, 1); return obj },
+          (payloads, i) => {
+            payloads.splice(i, 1);
+            this.pubPayloadsUpdate_();
+            return obj;
+          },
           (payloads) => obj
         );
       }
@@ -154,8 +166,16 @@ foam.CLASS({
         }
 
         if ( found ) return foundReturn;
-        // payloads.push(obj);
         return ifNotFound(payloads);
+      }
+    },
+    {
+      name: 'pubPayloadsUpdate_',
+      flags: ['web'],
+      code: function () {
+        // A publish on propertyChange isn't enough here; slots won't update if
+        //   the object is identical.
+        this.capable.capablePayloads = [ ...this.capable.capablePayloads ];
       }
     }
   ]

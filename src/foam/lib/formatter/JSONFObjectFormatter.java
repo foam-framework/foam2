@@ -190,7 +190,7 @@ public class JSONFObjectFormatter
   protected void outputProperty(FObject o, PropertyInfo p) {
     outputKey(getPropertyName(p));
     append(':');
-    p.format(this, o);
+    p.formatJSON(this, o);
   }
 /*
   public void outputMap(Object... values) {
@@ -297,7 +297,9 @@ public class JSONFObjectFormatter
     if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
 
     Object value = prop.get(fo);
-    if ( value == null || ( isArray(value) && Array.getLength(value) == 0 ) ) {
+    if ( value == null ||
+         ( isArray(value) && Array.getLength(value) == 0 ) ||
+         ( value instanceof FObject && value.equals(fo) ) ) {
       return false;
     }
 
