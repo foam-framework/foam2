@@ -23,8 +23,7 @@ import java.text.SimpleDateFormat;
 public class FastTimestamper {
 
   protected SimpleDateFormat format_        = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ"); // ISO 8601 format
-
-  protected long             lastTime_       = 0;
+  protected long             lastTime_      = 0;
   protected String           lastTimestamp_ = null;
 
   public FastTimestamper() {
