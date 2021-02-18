@@ -655,52 +655,6 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'DebounceSlot',
-  extends: 'foam.core.SimpleSlot',
-
-  properties: [
-    {
-      name: 'delay',
-      class: 'Int',
-      value: 200
-    },
-    'other',
-    'timeout_',
-    'cleanup_', // detachable to cleanup old subs when obj changes
-  ],
-
-  methods: [
-    function init() {
-      var attach = function(delay, other) {
-        this.cleanup();
-        this.cleanup_ = foam.core.FObject.create();
-        this.cleanup_.onDetach(other.sub(() => {
-          if ( this.timeout_ ) {
-            clearTimeout(this.timeout_);
-          }
-          this.timeout_ = setTimeout(this.update.bind(this, other), delay);
-        }));
-      };
-      foam.core.ExpressionSlot.create({
-        args: [this.delay$, this.other$],
-        code: attach,
-        obj: this
-      });
-      attach.call(this, this.delay, this.other);
-    },
-    function cleanup() { this.cleanup_ && this.cleanup_.detach(); },
-    function update(s) {
-      console.log('update happen', this);
-      this.clearProperty('timeout_');
-      this.value = s.get();
-    }
-  ]
-
-})
-
-
-foam.CLASS({
-  package: 'foam.core',
   name: 'FObjectRecursionSlot',
   extends: 'foam.core.SimpleSlot',
   documentation: `
@@ -719,7 +673,15 @@ foam.CLASS({
     },
     {
       name: 'parentRefs',
+<<<<<<< HEAD
       class: 'Array'
+=======
+      class: 'Array',
+      documentation: `
+        Object references already seen. This is used to prevent infinite
+        recursion.
+      `
+>>>>>>> Add FObjectRecursionSlot
     },
     {
       name: 'testProp',
@@ -740,9 +702,7 @@ foam.CLASS({
       var debug_updateCalls = 0;
       var update = (obj, parentRefs) => {
         debug_updateCalls++;
-        // console.log(debug_updateCalls, parentRefs.length);
         if ( parentRefs.includes(obj) ) {
-          console.log('prevented infinite recursion');
           this.cleanup();
           return;
         }
@@ -765,7 +725,6 @@ foam.CLASS({
       if ( ! (o && o.cls_) ) return;
       var props = o.cls_.getAxiomsByClass(foam.core.Property);
 
-      this.testProp = [];
       for ( let prop of props ) {
         let prop$ = prop.toSlot(o);
         if ( prop.cls_.id != 'foam.core.FObjectProperty' ) {
@@ -781,9 +740,7 @@ foam.CLASS({
           parentRefs: [ ...this.parentRefs, prop$, o ],
         }, this);
 
-        this.testProp.push(propR$);
         cleanup.onDetach(propR$.sub(() => {
-          console.log('test');
           this.value = { obj: o, cause: propR$ };
         }));
       }
