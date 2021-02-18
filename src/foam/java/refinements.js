@@ -338,7 +338,7 @@ foam.CLASS({
         toCSV:                   this.javaToCSV,
         toCSVLabel:              this.javaToCSVLabel,
         fromCSVLabelMapping:     this.javaFromCSVLabelMapping,
-        formatJSON:             this.javaFormatJSON,
+        formatJSON:              this.javaFormatJSON,
         sheetsOutput:            this.sheetsOutput2
       });
     },
