@@ -134,6 +134,7 @@ foam.CLASS({
     'toCSV',
     'toCSVLabel',
     'fromCSVLabelMapping',
+    'formatJSON',
     {
       class: 'Boolean',
       name: 'sheetsOutput',
@@ -258,7 +259,7 @@ foam.CLASS({
           });
         }
 
-        if ( ! ( primitiveType.includes(this.propType) || this.propType  == 'java.util.Date' || this.propType == 'String' || this.propType == 'Object' || this.extends == 'foam.core.AbstractFObjectPropertyInfo') ) {
+        if ( this.compare !== '' ) {
           m.push({
             name: 'compare',
             type: 'int',
@@ -267,7 +268,7 @@ foam.CLASS({
             body: this.compare,
           });
         }
-        if ( ! ( primitiveType.includes(this.propType) || this.propType  == 'java.util.Date' || this.propType == 'String' || this.propType == 'Object' || this.extends == 'foam.core.AbstractFObjectPropertyInfo' || this.extends == 'foam.core.AbstractFObjectArrayPropertyInfo') ) {
+        if ( this.comparePropertyToObject !== '' ) {
           m.push({
             name: 'comparePropertyToObject',
             type: 'int',
@@ -275,6 +276,8 @@ foam.CLASS({
             args: [{ name: 'key', type: 'Object' }, { name: 'o', type: 'Object' }],
             body: this.comparePropertyToObject,
           });
+        }
+        if ( this.comparePropertyToValue !== '' ) {
           m.push({
             name: 'comparePropertyToValue',
             type: 'int',
@@ -282,6 +285,8 @@ foam.CLASS({
             args: [{ name: 'key', type: 'Object' }, { name: 'value', type: 'Object' }],
             body: this.comparePropertyToValue,
           });
+        }
+        if ( ! ( primitiveType.includes(this.propType) || this.propType  == 'java.util.Date' || this.propType == 'String' || this.propType == 'Object' || this.extends == 'foam.core.AbstractFObjectPropertyInfo' || this.extends == 'foam.core.AbstractFObjectArrayPropertyInfo') ) {
           m.push({
             name: 'isDefaultValue',
             visibility: 'public',
@@ -511,6 +516,25 @@ foam.CLASS({
             type: 'boolean',
             visibility: 'public',
             body: 'return ' + this.sheetsOutput + ';'
+          });
+        }
+
+        if ( this.formatJSON != null ) {
+          m.push({
+            name: 'formatJSON',
+            type: 'void',
+            visibility: 'public',
+            args: [
+              {
+                name: 'formatter',
+                type: 'foam.lib.formatter.FObjectFormatter'
+              },
+              {
+                name: 'obj',
+                type: 'foam.core.FObject'
+              }
+            ],
+            body: this.formatJSON + ';'
           });
         }
 
