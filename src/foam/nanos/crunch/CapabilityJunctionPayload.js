@@ -94,7 +94,7 @@ foam.CLASS({
       name: 'toSummary',
       code: function(){
         return this.capability
-          ? this.capabilityDAO.find(this.capability).then(capability => `${capability.name}`)
+          ? this.capabilityDAO.find(this.capability).then(capability => capability.name)
           : '';
       }
     }
