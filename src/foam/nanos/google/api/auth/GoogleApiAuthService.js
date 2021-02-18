@@ -54,7 +54,9 @@ foam.CLASS({
         'java.io.IOException'
       ],
       javaCode: `
-        GoogleApiCredentials credentialsConfig = (GoogleApiCredentials) ((DAO)getX().get("googleApiCredentialsDAO")).find(((AppConfig)x.get("appConfig")).getUrl());
+        javax.servlet.http.HttpServletRequest req = (javax.servlet.http.HttpServletRequest)x.get(javax.servlet.http.HttpServletRequest.class);
+        GoogleApiCredentials credentialsConfig = (GoogleApiCredentials) ((DAO)getX().get("googleApiCredentialsDAO")).find(req.getServerName());
+        
         if ( credentialsConfig == null )
           return null;
         GoogleClientSecrets.Details details = new GoogleClientSecrets.Details()
