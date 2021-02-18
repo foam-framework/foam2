@@ -29,8 +29,8 @@
   flags.web    = ! isServer;
   flags.node   = isServer;
   flags.loader = ! isServer;
-  if ( ! flags.hasOwnProperty('java') ) flags.java   = true;
-  if ( ! flags.hasOwnProperty('swift') ) flags.swift = true;
+  if ( ! flags.hasOwnProperty('java')  ) flags.java  = false;
+  if ( ! flags.hasOwnProperty('swift') ) flags.swift = false;
   if ( ! flags.hasOwnProperty('debug') ) flags.debug = true;
   if ( ! flags.hasOwnProperty('js')    ) flags.js    = true;
 
@@ -53,7 +53,19 @@
     if ( typeof global !== 'undefined' && ! global.FOAM_ROOT ) global.FOAM_ROOT = path;
     if ( typeof window !== 'undefined' && ! window.FOAM_ROOT ) window.FOAM_ROOT = path;
 
+    var loadedMap = {};
+
     return function(filename) {
+      if ( loadedMap[filename] ) {
+        console.log('*********************************** DUPLICATE LOAD: ', filename);
+        return;
+      }
+      loadedMap[filename] = true;
+      /*
+      var script = document.createElement("script");
+      script.src = path + filename + '.js';
+      document.head.appendChild(script);
+      */
       document.writeln(
         '<script type="text/javascript" src="' + path + filename + '.js"></script>\n');
     };

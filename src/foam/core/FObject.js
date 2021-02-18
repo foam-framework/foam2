@@ -775,8 +775,8 @@ foam.CLASS({
         return this[obj + '$'];
       }
 
-      var names = obj.split('$');
-      var axiom = this.cls_.getAxiomByName(names.shift());
+      var split = obj.indexOf('$');
+      var axiom = this.cls_.getAxiomByName(split < 0 ? obj : obj.slice(0, split));
 
       if ( axiom == null ) {
         throw new Error(`slot() called with unknown axiom: '${obj}' on model '${this.cls_.id}'.`);
@@ -785,9 +785,7 @@ foam.CLASS({
       }
 
       var slot = axiom.toSlot(this);
-      names.forEach(function(n) {
-        slot = slot.dot(n);
-      });
+      if ( split >= 0 ) slot = slot.dot(obj.slice(split + 1));
 
       return slot;
     },

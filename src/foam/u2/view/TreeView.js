@@ -118,8 +118,7 @@ foam.CLASS({
     },
     {
       class: 'Array',
-      name: 'subMenus',
-      value: []
+      name: 'subMenus'
     },
     'showRootOnSearch',
     {
@@ -419,7 +418,6 @@ foam.CLASS({
             formatter:    self.formatter,
             query:        self.query,
             onClickAddOn: self.onClickAddOn,
-            selection$:   self.selection$,
             level:        1
           }, this);
         });

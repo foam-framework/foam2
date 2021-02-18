@@ -109,6 +109,21 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2.filter',
+  name: 'DateTimeRefinement',
+  refines: 'foam.core.DateTime',
+
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'searchView',
+      value: { class: 'foam.u2.filter.properties.DateTimeFilterView' }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2.filter',
   name: 'IntRefinement',
   refines: 'foam.core.Int',
 
