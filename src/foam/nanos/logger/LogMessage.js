@@ -39,7 +39,7 @@ foam.CLASS({
       name: 'created',
       class: 'DateTime',
       visibility: 'RO',
-      javaFormatJSON: `formatter.append("\\"").append(new foam.util.FastTimestamper().createTimestamp(get_(obj).getTime())).append("\\"");`,
+      javaFormatJSON: `formatter.outputReadableDate(get_(obj));`
     },
     {
       class: 'Reference',
