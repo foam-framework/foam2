@@ -125,23 +125,20 @@ foam.CLASS({
     },
     {
       name: 'getDataUpdateSub',
-      code: function (o$) {
-        if ( o$ ) return this.SUPER(o$);
-
-        var s = this.SUPER(o$);
-
-        var ss = foam.core.FObject.create();
-
-        s.sub((...args) => { ss.pub(...args); });
-
+      code: function () {
+        // ???: Replace subs with slots to use ArraySlot here
+        var s = foam.core.FObject.create();
+        this.SUPER().sub(() => {
+          console.log('A');
+          s.pub(true);
+        })
         for ( let wizardlet of this.delegates ) {
-          let subSub = wizardlet.getDataUpdateSub();
-          subSub.sub((...args) => {
-            console.log('subSub->sub', args);
-            ss.pub(...args);
+          wizardlet.getDataUpdateSub().sub(() => {
+            console.log('B');
+            s.pub(true);
           });
         }
-        return ss;
+        return s;
       }
     }
   ]

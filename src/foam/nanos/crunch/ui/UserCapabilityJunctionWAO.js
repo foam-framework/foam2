@@ -24,8 +24,8 @@ foam.CLASS({
       return this.crunchService.updateJunction( null,
         wizardlet.capability.id, wizardlet.data, null
       ).then((ucj) => {
-        this.crunchService.pub('grantedJunction');
-        this.load_(wizardlet, ucj);
+        // this.crunchService.pub('grantedJunction');
+        // this.load_(wizardlet, ucj);
         return ucj;
       });
     },
@@ -38,6 +38,7 @@ foam.CLASS({
       });
     },
     function load(wizardlet) {
+      wizardlet.loading = true;
       return this.crunchService.getJunction(
         null, wizardlet.capability.id
       ).then(ucj => {
@@ -59,7 +60,6 @@ foam.CLASS({
         if ( prop ) prop.set(loadedData, wizardlet.capability);
 
       // Finally, apply new data to wizardlet
-      wizardlet.loading = true;
       wizardlet.data = loadedData;
       wizardlet.loading = false;
     }

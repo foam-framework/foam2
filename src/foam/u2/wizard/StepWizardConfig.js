@@ -25,7 +25,8 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'wizardView',
-      value: { class: 'foam.u2.wizard.IncrementalStepWizardView' }
+      // value: { class: 'foam.u2.wizard.IncrementalStepWizardView' }
+      value: { class: 'foam.u2.wizard.ScrollingStepWizardView' }
     }
   ],
 

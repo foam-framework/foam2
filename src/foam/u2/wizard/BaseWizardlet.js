@@ -16,6 +16,7 @@ foam.CLASS({
 
   requires: [
     'foam.u2.detail.AbstractSectionedDetailView',
+    'foam.u2.wizard.WizardletAware',
     'foam.u2.wizard.WizardletIndicator',
     'foam.u2.wizard.WizardletSection',
     'foam.u2.wizard.WAO'
@@ -142,45 +143,28 @@ foam.CLASS({
 
         This is useful for checking if a wizardlet has unsaved changes.
       `,
-      code: function (o$) {
-        if ( ! o$ ) o$ = this.data$;
-
-        var s = foam.core.FObject.create();
-
+      code: function () {
         var self = this;
-
-        var bindProps = (sub1, o) => {
-          if ( ! (o && o.cls_) ) return;
-          var props = o.cls_.getAxiomsByClass(foam.core.Property);
-
-          // Some wizardlet data objects have a "capability" property, and
-          // Capability has a wizardlet property. This causes errors.
-          if ( this.data && o.cls_.id == this.data.cls_.id ) {
-            props = props.filter(p => p.name != 'capability')
-          }
-
-          for ( let prop of props ) {
-            let prop$ = prop.toSlot(o);
-            sub1.onDetach(this.getDataUpdateSub(prop$).sub(() => {
-              if ( ! self.loading ) s.pub(o);
-            }));
-          }
-        };
-
-        var sub1 = foam.core.FObject.create();
-        s.onDetach(o$.sub(o => {
-          sub1.detach();
-          sub1 = foam.core.FObject.create();
-          s.onDetach(sub1);
-
-          bindProps(sub1, o);
-          if ( ! self.loading ) s.pub(o);
-        }));
-
-        s.onDetach(sub1);
-        bindProps(sub1, o$.get());
-
-        return s;
+        if ( this.of && this.WizardletAware.isSubClass(this.of) ) {
+          var s = foam.core.FObject.create();
+          this.data$
+            .filter(v => v && ! self.loading) // ignore data when it's undefined
+            .map(data => {
+              console.log('wuuut', data);
+              return foam.core.DebounceSlot.create({
+                other: data.getUpdateSlot(),
+                delay: 700 // TODO: constant
+              });
+            })
+            .valueSub(() => { if ( ! self.loading ) s.pub(true); });
+          return s;
+        }
+        var sl = foam.core.FObjectRecursionSlot.create({ obj$: this.data$ });
+        console.log('top slot', sl);
+        return foam.core.DebounceSlot.create({
+          other: sl.filter(() => ! self.loading),
+          delay: 700
+        }).filter(() => ! self.loading);
       }
     }
   ]

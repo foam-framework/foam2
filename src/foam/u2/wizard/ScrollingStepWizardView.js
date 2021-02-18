@@ -52,7 +52,7 @@ foam.CLASS({
           }
         }
 
-        console.log(minTopPosition.instance_)
+        // console.log(minTopPosition.instance_)
 
         return minTopPosition;
       }
