@@ -95,6 +95,11 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
+  public void formatJSON(foam.lib.formatter.FObjectFormatter formatter, FObject obj) {
+    format(formatter, obj);
+  }
+
+  @Override
   public void toXML(foam.lib.xml.Outputter outputter, Object value) {
     outputter.output(value);
   }

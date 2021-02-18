@@ -269,7 +269,12 @@ foam.CLASS({
       class: 'String',
       name: 'javaToCSVLabel',
       value: 'outputter.outputValue(getName());'
-    }
+    },
+    {
+      class: 'String',
+      name: 'javaFormatJSON',
+      value: null
+    },
   ],
 
   methods: [
@@ -333,7 +338,8 @@ foam.CLASS({
         toCSV:                   this.javaToCSV,
         toCSVLabel:              this.javaToCSVLabel,
         fromCSVLabelMapping:     this.javaFromCSVLabelMapping,
-        sheetsOutput:            this.sheetsOutput
+        formatJSON:              this.javaFormatJSON,
+        sheetsOutput:            this.sheetsOutput2
       });
     },
 
