@@ -1,7 +1,11 @@
-
+/**
+ * @license
+ * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 
 foam.CLASS({
-  package: 'net.nanopay.crunch.compliance',
+  package: 'foam.nanos.crunch.predicate',
   name: 'CapabilityJunctionTransistionToStatus',
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: ['foam.core.Serializable'],
@@ -40,12 +44,12 @@ foam.CLASS({
       javaCode: `
         X x = (X) obj;
         UserCapabilityJunction old = (UserCapabilityJunction) x.get("OLD");
-        UserCapabilityJunction new = (UserCapabilityJunction) x.get("NEW");
+        UserCapabilityJunction ucj = (UserCapabilityJunction) x.get("NEW");
 
         return old != null &&
-            ! old.getStatus().equals(new.getStatus()) &&
-            new.getStatus().equals(getStatus()) &&
-            new.getTargetId().equals(getCapabilityId());
+            ! old.getStatus().equals(ucj.getStatus()) &&
+            ucj.getStatus().equals(getStatus()) &&
+            ucj.getTargetId().equals(getCapabilityId());
       `
     }
   ]
