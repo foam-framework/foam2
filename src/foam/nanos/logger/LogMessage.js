@@ -33,16 +33,13 @@ foam.CLASS({
     {
       name: 'hostname',
       class: 'String',
-      visibility: 'RO'
+      visibility: 'RO',
     },
     {
       name: 'created',
       class: 'DateTime',
       visibility: 'RO',
-      toJSON: `
-      java.util.Date date = (java.util.Date) value;
-      outputter.output(new foam.util.FastTimestamper().createTimestamp(date.getTime()));
-      `
+      javaFormatJSON: `formatter.append("\\"").append(new foam.util.FastTimestamper().createTimestamp(get_(obj).getTime())).append("\\"");`,
     },
     {
       class: 'Reference',
@@ -92,7 +89,7 @@ foam.CLASS({
       name: 'severity',
       class: 'Enum',
       of: 'foam.log.LogLevel',
-      toJSON: function(value) { return value && value.label; },
+      javaFormatJSON: 'formatter.append(get_(obj).getName());',
       updateVisibility: 'RO',
       tableCellFormatter: function(severity, obj, axiom) {
          this

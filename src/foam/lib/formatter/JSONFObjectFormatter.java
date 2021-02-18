@@ -190,7 +190,7 @@ public class JSONFObjectFormatter
   protected void outputProperty(FObject o, PropertyInfo p) {
     outputKey(getPropertyName(p));
     append(':');
-    p.format(this, o);
+    p.formatJSON(this, o);
   }
 /*
   public void outputMap(Object... values) {
