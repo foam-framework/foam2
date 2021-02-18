@@ -141,7 +141,21 @@
     {
       class: 'String',
       name: 'referenceSummary',
-      section: 'requestDetails'
+      section: 'requestDetails',
+      transient: true,
+      tableWidth: 200,
+      tableCellFormatter: function(_,obj) {
+        let self = this;
+        this.__subSubContext__[obj.daoKey].find(obj.objId).then(requestObj => {
+          let referenceSummaryString = `ID:${obj.objId}`;
+
+          if ( requestObj && requestObj.toSummary() ){
+            referenceSummaryString = requestObj.toSummary()
+          }
+
+          self.add(referenceSummaryString);
+        });
+      }
     },
     {
       class: 'Long',
