@@ -12,7 +12,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      documentation: 'Use app url as an id'
+      documentation: 'Use app domain as an id'
     },
     {
       class: 'String',
