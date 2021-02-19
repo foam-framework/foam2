@@ -18,10 +18,10 @@ foam.CLASS({
   ],
 
   methods: [
-    function initE() {
+    async function initE() {
       this.SUPER();
 
-      this
+      await this
         .addClass(this.myClass())
         .start('div')
           .addClass('file-image-div' + this.id)
@@ -47,10 +47,11 @@ foam.CLASS({
             'width': '0px'
           })
         .end();
+        this.showData();
       this.data$.sub(() => this.showData());
     },
 
-    function showData() {
+    async function showData() {
       let iFrame = document.getElementsByClassName('file-iframe' + this.id)[0],
           image = document.getElementsByClassName('file-image' + this.id)[0],
           div = document.getElementsByClassName('file-image-div' + this.id)[0],
@@ -70,7 +71,14 @@ foam.CLASS({
       if ( ! this.data[pos] ) {
         return;
       }
-      url = URL.createObjectURL(this.data[pos].data.blob);
+      // getData File method is async, so we need to wait for it to return data before we can show it
+      let d = await this.data[pos].data;
+      // If file is stored as a dataString, actual file is already on client side. Otherwise, actual file can be retrieved from server from File.address
+      if ( ! d ) {
+        url = this.data[pos].address;
+      } else {
+        url = URL.createObjectURL(d.blob);
+      }
 
       if ( this.data[pos].mimeType !== 'application/pdf' ) {
         image.src = url;
