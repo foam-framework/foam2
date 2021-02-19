@@ -483,7 +483,7 @@ foam.CLASS({
       var adapt = function(value) {
         if ( foam.String.isInstance(value) ) {
           var cls = this.__context__.lookup(value, true);
-          if ( ! cls ) {
+          if ( ! cls ) { // if the model is not available, it will be set on each get()
             console.error(`Property '${name}' of type '${this.model_.name}' was set to '${value}', which isn't a valid class.`);
             return null;
           }
