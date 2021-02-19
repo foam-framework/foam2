@@ -104,6 +104,10 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      if ( this.memento && this.memento.head.length != 0  ) {
+        this.view.data = this.memento.head;
+      }
+      
       this
         .addClass(this.myClass())
         .tag(this.viewSpec, {

@@ -82,7 +82,7 @@ foam.CLASS({
       var generalQueryView = foam.u2.ViewSpec.createView(
         { 
           class: 'foam.u2.search.TextSearchView',
-          searchValue: this.searchValue
+          searchValue: this.searchValue//use memento head as searchValue in the view
         },
         {
           richSearch: true,

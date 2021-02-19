@@ -178,7 +178,7 @@ foam.CLASS({
                   class: 'foam.u2.tag.Input',
                   focused: true
                 },
-                searchValue: this.searchValue
+                searchValue: this.searchValue//use memento head as searchValue in the view
             }, slot)
             .addClass('general-query')
           .end();

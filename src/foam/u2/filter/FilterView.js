@@ -304,6 +304,7 @@ foam.CLASS({
 
       this.currentMemento = this.memento.tail;
 
+      //fix me
       if ( this.memento && this.memento.paramsObj && this.memento.paramsObj.f ) {
         this.memento.paramsObj.f.forEach(f => {
           var parser = foam.parse.QueryParser.create({ of: self.dao.of.id });
@@ -317,7 +318,7 @@ foam.CLASS({
         richSearch: true,
         of: self.dao.of.id,
         onKey: true,
-        searchValue: self.searchValue,
+        // searchValue: his.currentMemento,
         viewSpec: {
           class: 'foam.u2.tag.Input',
           placeholder: this.LABEL_SEARCH

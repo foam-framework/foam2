@@ -278,8 +278,7 @@ foam.CLASS({
 
       var filterView  = foam.u2.ViewSpec.createView(self.FilterView, {
         dao$: self.searchFilterDAO$,
-        data$: self.searchPredicate$,
-        searchValue: self.memento && self.memento.paramsObj && self.memento.paramsObj.s
+        data$: self.searchPredicate$
       },  self, self.__subSubContext__.createSubContext({ memento: this.memento.tail }));
       var summaryView = foam.u2.ViewSpec.createView(self.summaryView ,{
         data: self.predicatedDAO$proxy,
@@ -321,7 +320,7 @@ foam.CLASS({
                         this.tag(self.SimpleSearch, {
                           showCount: false,
                           data$: self.searchPredicate$,
-                          searchValue: self.memento && self.memento.paramsObj && self.memento.paramsObj.s
+                          searchValue: self.memento && self.memento.paramsObj && self.memento.paramsObj.s//use memento head as searchValue in the view
                         });
                       })
                       .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
