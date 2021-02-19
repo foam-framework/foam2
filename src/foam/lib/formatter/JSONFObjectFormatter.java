@@ -276,7 +276,7 @@ public class JSONFObjectFormatter
   public void outputDateValue(Date date) {
     append("{\"class\":\"__Timestamp__\",\"value\":");
     if ( outputReadableDates_ ) {
-      output(timestamper_.get().createTimestamp(date.getTime()));
+      outputReadableDate(date);
     } else {
       outputNumber(date.getTime());
     }
