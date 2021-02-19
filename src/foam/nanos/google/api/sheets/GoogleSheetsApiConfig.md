@@ -5,11 +5,14 @@ for local Google Sheets Api test:
 4. press "Download JSON" button to download app credentials, which will aprear at the top after navigation bar
 5. go to http://localhost:8080 -> Admin -> Google Api Credentials
 6. create new credential
-7. as an id enter url of an app you'll use to export from: either http://localhost:8080 or http://ablii:8080 ( add two records if you need both )
+7. as an id enter domain of an app you'll use to export from: either localhost or ablii ( add two records if you need both )
 8. copy-paste data from json to corresponding fields
-9. make sure you are using your nanopay email and please follow up with google account authentication process
-10. make sure you are not using VPN
 
-*if you cannot access credentials post request to add you to the Google Sheets project on dev-chanel
 
-**you can skip to step 3 and use the link. step 1-3 is mentioned just in case change of url 
+* if you cannot access credentials post request to add you to the Google Sheets project on dev-chanel
+
+** you can skip to step 3 and use the link. step 1-3 is mentioned just in case change of url 
+
+*** make sure you are not using VPN
+
+**** make sure you are using your nanopay email and please follow up with google account authentication process

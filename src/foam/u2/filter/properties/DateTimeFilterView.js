@@ -58,9 +58,7 @@ foam.CLASS({
       preSet: function(o, n) {
         if ( this.isSetFromPredicate )
           return n;
-        var n1 = new Date(n);
-        n1.setDate(n1.getDate() + 1);
-        return n1;
+        return new Date(n);
       }
     },
   ]
