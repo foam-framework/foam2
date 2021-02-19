@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * Copyright 2021 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -47,9 +47,9 @@ foam.CLASS({
         UserCapabilityJunction ucj = (UserCapabilityJunction) x.get("NEW");
 
         return old != null &&
-            ! old.getStatus().equals(ucj.getStatus()) &&
-            ucj.getStatus().equals(getStatus()) &&
-            ucj.getTargetId().equals(getCapabilityId());
+            ! old.getStatus() == ucj.getStatus() &&
+            ucj.getStatus() == getStatus() &&
+            ucj.getTargetId() == getCapabilityId();
       `
     }
   ]
