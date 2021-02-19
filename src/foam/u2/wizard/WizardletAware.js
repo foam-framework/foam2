@@ -9,8 +9,9 @@ foam.INTERFACE({
   name: 'WizardletAware',
 
   documentation: `
-    Wizardlet data implementing this interface can override the default
-    method of detecting changes.
+    Wizardlet data implementing this interface can override the default method
+    of detecting changes. This can be used to reduce the number of saves when
+    the model's properties update too frequently.
   `,
 
   methods: [
