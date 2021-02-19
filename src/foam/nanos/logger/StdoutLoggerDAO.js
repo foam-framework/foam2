@@ -31,13 +31,25 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.app.Mode',
       value: 'DEVELOPMENT'
-    },
+    }
+  ],
+
+  axioms: [
     {
-      name: 'timestamper',
-      class: 'Object',
-      of: 'foam.util.SyncFastTimestamper',
-      visibility: 'HIDDEN',
-      javaFactory: `return new foam.util.SyncFastTimestamper();`
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data: `
+  protected static ThreadLocal<foam.util.FastTimestamper> timestamper_ = new ThreadLocal<foam.util.FastTimestamper>() {
+    @Override
+    protected foam.util.FastTimestamper initialValue() {
+      foam.util.FastTimestamper ft = new foam.util.FastTimestamper();
+      return ft;
+    }
+  };
+          `
+        }));
+      }
     }
   ],
 
@@ -53,7 +65,7 @@ foam.CLASS({
         // effectively writing out logs twice. 
         if ( getMode() != Mode.PRODUCTION ||
              lm.getSeverity().getOrdinal() >= LogLevel.INFO.getOrdinal() ) {
-          System.err.println(((foam.util.SyncFastTimestamper)getTimestamper()).createTimestamp(lm.getCreated().getTime())+","+lm.getThread()+","+lm.getSeverity()+","+lm.getMessage());
+          System.err.println(timestamper_.get().createTimestamp(lm.getCreated().getTime())+","+lm.getThread()+","+lm.getSeverity()+","+lm.getMessage());
         }
       }
       return lm;
