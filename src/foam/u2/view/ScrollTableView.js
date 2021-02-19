@@ -273,7 +273,7 @@
         this.currentMemento = this.memento.tail;
 
       //table view
-      this.table = foam.u2.ViewSpec.createView(this.TableView, {
+      this.table_ = foam.u2.ViewSpec.createView(this.TableView, {
         data: foam.dao.NullDAO.create({of: this.data.of}),
         columns: this.columns,
         contextMenuActions: this.contextMenuActions,
@@ -287,7 +287,7 @@
       this.
         addClass(this.myClass()).
         on('scroll', this.onScroll).
-        start(this.table).
+        start(this.table_).
           addClass(this.myClass('table')).
           style({
             height: this.scrollHeight$.map(h => h + 'px')
