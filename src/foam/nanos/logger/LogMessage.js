@@ -39,7 +39,7 @@ foam.CLASS({
       name: 'created',
       class: 'DateTime',
       visibility: 'RO',
-      javaFormatJSON: `formatter.append("\\"").append(new foam.util.FastTimestamper().createTimestamp(get_(obj).getTime())).append("\\"");`,
+      javaFormatJSON: `formatter.outputReadableDate(get_(obj));`
     },
     {
       class: 'Reference',
@@ -89,7 +89,7 @@ foam.CLASS({
       name: 'severity',
       class: 'Enum',
       of: 'foam.log.LogLevel',
-      javaFormatJSON: 'formatter.append(get_(obj).getName());',
+      javaFormatJSON: 'formatter.output(get_(obj).getName());',
       updateVisibility: 'RO',
       tableCellFormatter: function(severity, obj, axiom) {
          this
