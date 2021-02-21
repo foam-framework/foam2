@@ -102,6 +102,12 @@ foam.CLASS({
                this.color = '#F5F5F5';
                return 'gray';
             }
+            if ( c.bucket == 1 ) {
+              return 'lightblue';
+            }
+            if ( c.bucket == 3 ) {
+              return 'darkblue';
+            }
             return 'blue';
           }
           return 'green';

@@ -76,6 +76,18 @@ foam.CLASS({
       label.text = this.config.name;
       this.add(label);
 
+      if ( this.config.availabilityId ) {
+        var label = this.makeLabel();
+        label.text = 'AZ: '+this.config.availabilityId;
+        this.add(label);
+      }
+
+      if ( this.config.bucket ) {
+        var label = this.makeLabel();
+        label.text = 'Bucket: '+this.config.bucket;
+        this.add(label);
+      }
+
       label = this.makeLabel();
       label.text$ = this.config$.map(function(c) {
         let delta = new Date().getTime() - c.replayingInfo.startTime.getTime();

@@ -169,7 +169,7 @@ foam.CLASS({
           Throwable cause = t.getCause();
           if ( cause == null ||
                ! ( cause instanceof java.io.IOException ) ) {
-            getLogger().warning(config.getId(), t.getClass().getSimpleName(), t.getMessage());
+            getLogger().warning(config.getId(), t.getClass().getSimpleName(), t.getMessage(), t);
           }
         }
 
@@ -197,7 +197,7 @@ foam.CLASS({
         if ( cause == null ||
              ! ( cause instanceof java.io.IOException ) &&
              config.getStatus() != Status.OFFLINE ) {
-          getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage());
+          getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage(), t);
         }
       } finally {
         schedule(x);

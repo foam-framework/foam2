@@ -131,8 +131,7 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
-      int groups = support.getNodeGroups();
-      List nodes = ((ArraySink)((DAO) x.get("localClusterConfigDAO"))
+      List<ClusterConfig> nodes = ((ArraySink)((DAO) x.get("localClusterConfigDAO"))
         .where(
           AND(
             EQ(ClusterConfig.ENABLED, true),
@@ -144,16 +143,30 @@ foam.CLASS({
             EQ(ClusterConfig.REALM, myConfig.getRealm())
           ))
         .select(new ArraySink())).getArray();
-      Map<Integer, List> buckets = new HashMap();
-      for ( int i = 0; i < nodes.size(); i++ ) {
-        ClusterConfig node = (ClusterConfig) nodes.get(i);
-        int index = i % groups;
-        List bucket = (List) buckets.get(index);
+      ArrayList<List> buckets = new ArrayList();
+      for ( ClusterConfig node : nodes ) {
+        int index = foam.util.SafetyUtil.hashCode(node.getId()) % support.getNodeGroups();
+        if ( node.getBucket() > 0 ) {
+          index = node.getBucket() -1;
+        }
+        List bucket = null;
+        if ( index >= buckets.size() ) {
+          for ( int i = 0; i < index; i++ ) {
+            if ( i < buckets.size() ) {
+              buckets.add(new ArrayList());
+            }
+          }
+          bucket = new ArrayList();
+          buckets.add(index, bucket);
+        } else {
+          bucket = (List) buckets.get(index);
+        }
         if ( bucket == null ) {
-          bucket = new ArrayList<String>();
-          buckets.put(index, bucket);
+          bucket = new ArrayList();
+          buckets.add(index, bucket);
         }
         bucket.add(node.getId());
+        getLogger().debug("bucketNodes", "node", node.getId(), "bucket/index", index, "size", bucket.size());
       }
       support.setNodeBuckets(buckets);
       support.outputBuckets(x);
