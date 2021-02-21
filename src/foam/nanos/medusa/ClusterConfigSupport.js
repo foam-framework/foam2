@@ -49,7 +49,8 @@ configuration for contacting the primary node.`,
     'java.util.ArrayList',
     'java.util.HashMap',
     'java.util.List',
-    'java.util.Map'
+    'java.util.Map',
+    'java.util.Set'
   ],
 
   properties: [
@@ -266,23 +267,24 @@ configuration for contacting the primary node.`,
 
       int minNodesInBucket = (int) Math.max(1, Math.floor(getNodeCount() / getNodeGroups()) - 1);
 
-      List<List> buckets = getNodeBuckets();
+      List<Set<String>> buckets = getNodeBuckets();
       if ( buckets.size() < getNodeQuorum() ) {
         getLogger().warning("hasNodeQuorum", "false", "insufficient buckets", buckets.size(), "threshold", getNodeQuorum());
         outputBuckets(getX());
         return false;
       }
-      for ( List<String> bucket : buckets ) {
+      for ( int i = 0; i < buckets.size(); i++ ) {
+        Set<String> bucket = buckets.get(i);
         // Need at least minNodesInBucket in ONLINE state for Quorum.
         int online = 0;
-        for ( int j = 0; j < bucket.size(); j++ ) {
-          ClusterConfig config = getConfig(getX(), (String) bucket.get(j));
+        for ( String id : bucket ) {
+          ClusterConfig config = getConfig(getX(), id);
           if ( config.getStatus() == Status.ONLINE ) {
             online += 1;
           }
         }
         if ( online < minNodesInBucket ) {
-           getLogger().warning("hasNodeQuorum", "false", "insufficient ONLINE nodes in bucket", "bucket.size", bucket.size(), "online", online, "threshold", minNodesInBucket);
+           getLogger().warning("hasNodeQuorum", "false", "insufficient ONLINE nodes in bucket", i, "size", bucket.size(), "online", online, "threshold", minNodesInBucket);
           outputBuckets(getX());
           return false;
         }
@@ -996,12 +998,16 @@ configuration for contacting the primary node.`,
         },
       ],
       javaCode: `
-      List<List<String>> buckets = getNodeBuckets();
+      List<Set<String>> buckets = getNodeBuckets();
       for ( int i = 0; i < buckets.size(); i++ ) {
-        List<String> bucket = buckets.get(i);
-        for ( String id : bucket ) {
-          ClusterConfig node = getConfig(x, id);
-          getLogger().info("bucket", i, id, node.getStatus());
+        Set<String> bucket = buckets.get(i);
+        if ( bucket.size() == 0 ) {
+          getLogger().info("bucket", i, "empty");
+        } else {
+          for ( String id : bucket ) {
+            ClusterConfig node = getConfig(x, id);
+            getLogger().info("bucket", i, id, node.getStatus());
+          }
         }
       }
       `

@@ -20,7 +20,9 @@ foam.CLASS({
     'java.util.ArrayList',
     'java.util.List',
     'java.util.HashMap',
-    'java.util.Map'
+    'java.util.HashSet',
+    'java.util.Map',
+    'java.util.Set'
   ],
 
   properties: [
@@ -143,30 +145,20 @@ foam.CLASS({
             EQ(ClusterConfig.REALM, myConfig.getRealm())
           ))
         .select(new ArraySink())).getArray();
-      ArrayList<List> buckets = new ArrayList();
+      ArrayList<Set> buckets = new ArrayList();
       for ( ClusterConfig node : nodes ) {
-        int index = foam.util.SafetyUtil.hashCode(node.getId()) % support.getNodeGroups();
+       int index = Math.abs(foam.util.SafetyUtil.hashCode(node.getId())) % support.getNodeGroups();
         if ( node.getBucket() > 0 ) {
           index = node.getBucket() -1;
         }
-        List bucket = null;
         if ( index >= buckets.size() ) {
-          for ( int i = 0; i < index; i++ ) {
-            if ( i < buckets.size() ) {
-              buckets.add(new ArrayList());
-            }
+          // create buckets for known gaps
+          for ( int i = buckets.size(); i <= index; i++ ) {
+            buckets.add(new HashSet());
           }
-          bucket = new ArrayList();
-          buckets.add(index, bucket);
-        } else {
-          bucket = (List) buckets.get(index);
         }
-        if ( bucket == null ) {
-          bucket = new ArrayList();
-          buckets.add(index, bucket);
-        }
+        Set bucket = (Set) buckets.get(index);
         bucket.add(node.getId());
-        getLogger().debug("bucketNodes", "node", node.getId(), "bucket/index", index, "size", bucket.size());
       }
       support.setNodeBuckets(buckets);
       support.outputBuckets(x);
