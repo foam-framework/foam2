@@ -92,49 +92,54 @@ foam.CLASS({
             }
           });
 
-          self.nSpecDAO.where(self.EQ(self.NSpec.SERVE, true)).select({
-            put: function(spec) {
-              if ( spec.client ) {
-                client.exports.push(spec.name);
+          self.nSpecDAO.where(self.EQ(self.NSpec.SERVE, true)).select(
+            foam.mlang.Expressions.create().PROJECTION(foam.nanos.boot.NSpec.NAME, foam.nanos.boot.NSpec.CLIENT))
+            .then(p => {
+              foam.dao.ArrayDAO.create({array: p.array})
+              .select({
+                put: function(spec) {
+                  if ( spec.client ) {
+                    client.exports.push(spec.name);
 
-                var json = JSON.parse(spec.client);
+                    var json = JSON.parse(spec.client);
 
-                references = references.concat(foam.json.references(self.__context__, json));
+                    references = references.concat(foam.json.references(self.__context__, json));
 
-                client.properties.push({
-                  name: spec.name,
-                  factory: function() {
-                    if ( ! json.class ) json.class = 'foam.dao.EasyDAO';
-                    var cls = foam.lookup(json.class);
-                    if ( cls == null ) {
-                      self.error('Uknown Client class:', json.class, 'for service:', spec.name);
-                      return null;
-                    }
-                    var defaults = {
-                      serviceName: 'service/' + spec.name,
-                      retryBoxMaxAttempts: 0
-                    };
-                    if ( cls == foam.dao.EasyDAO ) {
-                      defaults.cache              = true;
-                      defaults.ttlSelectPurgeTime = 15000;    // for select()
-                      defaults.ttlPurgeTime       = 15000;    // for find()
-                      defaults.daoType            = 'CLIENT';
-                    }
-                    for ( var k in defaults ) {
-                      if ( cls.getAxiomByName(k) && json[k] == undefined )
-                        json[k] = defaults[k];
-                    }
-                    return foam.json.parse(json, null, this.__subContext__);
+                    client.properties.push({
+                      name: spec.name,
+                      factory: function() {
+                        if ( ! json.class ) json.class = 'foam.dao.EasyDAO';
+                        var cls = foam.lookup(json.class);
+                        if ( cls == null ) {
+                          self.error('Uknown Client class:', json.class, 'for service:', spec.name);
+                          return null;
+                        }
+                        var defaults = {
+                          serviceName: 'service/' + spec.name,
+                          retryBoxMaxAttempts: 0
+                        };
+                        if ( cls == foam.dao.EasyDAO ) {
+                          defaults.cache              = true;
+                          defaults.ttlSelectPurgeTime = 15000;    // for select()
+                          defaults.ttlPurgeTime       = 15000;    // for find()
+                          defaults.daoType            = 'CLIENT';
+                        }
+                        for ( var k in defaults ) {
+                          if ( cls.getAxiomByName(k) && json[k] == undefined )
+                            json[k] = defaults[k];
+                        }
+                        return foam.json.parse(json, null, this.__subContext__);
+                      }
+                    });
                   }
-                });
-              }
-            },
-            eof: function() {
-              Promise.all(references.concat(appConfigPromise)).then(function() {
-                resolve(foam.core.Model.create(client).buildClass());
+                },
+                eof: function() {
+                  Promise.all(references.concat(appConfigPromise)).then(function() {
+                    resolve(foam.core.Model.create(client).buildClass());
+                  });
+                }
               });
-            }
-          });
+            })
         });
       }
     }
