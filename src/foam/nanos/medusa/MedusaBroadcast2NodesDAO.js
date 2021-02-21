@@ -57,7 +57,7 @@ foam.CLASS({
 
   methods: [
     {
-      documentation: `Distribute entry once to each bucket. Mod of entry.id and bucket.size selects the Node in the bucket to receive the entry.`,
+      documentation: `Distribute entry to each node in one bucket. Mod of entry.id and bucket.size selects the bucket to receive the entry.`,
       name: 'put_',
       javaCode: `
       final MedusaEntry entry = (MedusaEntry) obj;
