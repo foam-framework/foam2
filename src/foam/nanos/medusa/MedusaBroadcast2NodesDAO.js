@@ -24,7 +24,8 @@ foam.CLASS({
     'java.util.ArrayList',
     'java.util.HashMap',
     'java.util.List',
-    'java.util.Map'
+    'java.util.Map',
+    'java.util.Set'
   ],
 
   properties: [
@@ -65,9 +66,9 @@ foam.CLASS({
       final ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
       Agency agency = (Agency) x.get("threadPool");
 
-      List<List> buckets = support.getNodeBuckets();
+      List<Set> buckets = support.getNodeBuckets();
       int index = (int) (entry.getIndex() % buckets.size());
-      List<String> bucket = buckets.get(index);
+      Set<String> bucket = buckets.get(index);
       for ( String id : bucket ) {
         ClusterConfig config = support.getConfig(x, id);
         agency.submit(x, new ContextAgent() {
