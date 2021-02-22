@@ -81,16 +81,10 @@ foam.CLASS({
               } else if ( ! hadQuorum && hasQuorum) {
                 getLogger().warning("mediator quorum acquired");
                 electoralService.dissolve(x);
-              } else {
-                getLogger().info("mediator quorum membership change");
-                if ( nu.getIsPrimary() &&
-                     nu.getStatus() == Status.OFFLINE ) {
-                  getLogger().warning("primary OFFLINE");
-                  electoralService.dissolve(x);
-                } else if ( electoralService.getState() != ElectoralServiceState.IN_SESSION ) {
-                  // When cluster has quorum, the last mediator may not be in-session.
-                  electoralService.register(x, myConfig.getId());
-                }
+              } else if ( hasQuorum &&
+                          electoralService.getState() != ElectoralServiceState.IN_SESSION ) {
+                // When cluster has quorum, the last mediator may not be in-session.
+                electoralService.register(x, myConfig.getId());
               }
             }
           }
