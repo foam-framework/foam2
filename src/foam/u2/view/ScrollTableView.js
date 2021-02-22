@@ -263,7 +263,8 @@
             m = foam.nanos.controller.Memento.create({ value: '', parent: this.memento });
             this.memento.tail = m;
           } else {
-            m.tail = foam.nanos.controller.Memento.create({ value: '', parent: m });
+            if ( ! m.tail )
+              m.tail = foam.nanos.controller.Memento.create({ value: '', parent: m });
             m = m.tail;
           }
         }
@@ -284,7 +285,8 @@
         selectedObjects$: this.selectedObjects$
       },  this, this.__subSubContext__.createSubContext({ memento: this.currentMemento ? this.currentMemento.tail : this.currentMemento }));
 
-      this.
+      if ( ! this.table_.memento || ! this.table_.memento.tail || this.table_.memento.tail.head.length == 0 ) {
+        this.
         addClass(this.myClass()).
         on('scroll', this.onScroll).
         start(this.table_).
@@ -293,6 +295,15 @@
             height: this.scrollHeight$.map(h => h + 'px')
           }).
         end();
+      } else {
+        this.stack.push({
+          class: 'foam.comics.v2.DAOSummaryView',
+          data: null,
+          config: this.config,
+          idOfRecord: this.table_.memento.tail.tail.head
+        }, this.__subContext__.createSubContext({ memento: this.table_.memento }));
+      }
+      
 
       /*
         to be used in cases where we don't want the whole table to

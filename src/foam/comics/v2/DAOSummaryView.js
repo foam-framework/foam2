@@ -236,8 +236,20 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.SUPER();
-      if ( this.memento )
-        this.currentMemento$ = this.memento.tail$;
+      if ( this.memento ) {
+
+        var m = this.memento;
+        var counter = 0;
+
+        // counter < 2 is as at this point we need to skip 2 memento
+        // head of first one will be column selection
+        // and second will be DAOSummaryView mode
+        while( m.tail != null && counter < 2 ) {
+          m = m.tail;
+          counter++;
+        }
+        this.currentMemento = m;
+      }
 
       var promise = this.data ? Promise.resolve(this.data) : this.config.unfilteredDAO.inX(this.__subContext__).find(this.idOfRecord);
 
