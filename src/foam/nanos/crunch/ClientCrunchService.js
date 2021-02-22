@@ -9,22 +9,22 @@ foam.CLASS({
   name: 'ClientCrunchService',
 
   implements: [
-    'foam.nanos.crunch.CrunchService',
-    'foam.mlang.Expressions'
+    'foam.mlang.Expressions',
+    'foam.nanos.crunch.CrunchService'
   ],
 
   requires: [
     'foam.nanos.crunch.AgentCapabilityJunction',
-    'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.crunch.AssociatedEntity',
-    'foam.nanos.crunch.CapabilityJunctionStatus'
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.crunch.UserCapabilityJunction'
   ],
 
   imports: [
     'capabilityDAO',
-    'userCapabilityJunctionDAO',
     'logger',
-    'subject'
+    'subject',
+    'userCapabilityJunctionDAO'
   ],
 
 
