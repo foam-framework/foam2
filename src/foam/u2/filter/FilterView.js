@@ -305,13 +305,22 @@ foam.CLASS({
       this.currentMemento = this.memento.tail;
 
       //fix me
-      if ( this.memento && this.memento.paramsObj && this.memento.paramsObj.f ) {
-        this.memento.paramsObj.f.forEach(f => {
-          var parser = foam.parse.QueryParser.create({ of: self.dao.of.id });
-          var pred = parser.parseString(f.pred);
+      if ( this.currentMemento && this.currentMemento.tail ) {
+        var m = this.memento;
+        var parser = foam.parse.QueryParser.create({ of: self.dao.of.id });
 
-          self.filterController.setExistingPredicate(f.criteria, f.n, pred);
-        });
+        var counter = 0;
+
+        while ( counter < this.filters.length &&  m != null ) {
+          m = m.tail;
+
+          counter++;
+
+          if ( !m || m.head.length == 0 )
+            continue;
+
+          self.filterController.setExistingPredicate(0, m.head.substr(0, m.head.indexOf('=')), parser.parseString(m.head));
+        }
       }
 
       this.generalSearchField = foam.u2.ViewSpec.createView(self.TextSearchView, {
@@ -324,6 +333,8 @@ foam.CLASS({
           placeholder: this.LABEL_SEARCH
         }
       },  self, self.__subSubContext__.createSubContext({ memento: this.currentMemento }));
+
+      self.currentMemento = self.currentMemento.tail;
       
       this.onDetach(this.filterController$.dot('isAdvanced').sub(this.isAdvancedChanged));
       this.addClass(self.myClass())

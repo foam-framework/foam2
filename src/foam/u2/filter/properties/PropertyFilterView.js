@@ -171,7 +171,12 @@ foam.CLASS({
 
       // Restore the search view using an existing predicate for that view
       // This requires that every search view implements restoreFromPredicate
-      var existingPredicate = this.filterController.getExistingPredicate(this.criteria, this.property);
+      var existingPredicate = this.filterController.getExistingPredicate(this.criteria, this.property);//here memento head
+
+      // if ( ! existingPredicate && this.memento && this.memento.length != 0 ) {
+
+      // }
+
       if ( existingPredicate ) {
         this.view_.restoreFromPredicate(existingPredicate);
       }
