@@ -2335,6 +2335,9 @@ foam.CLASS({
         delegate$: controllerMode$.map(controllerMode => {
           var visibility = controllerMode.getVisibilityValue(this);
 
+          if ( foam.String.isInstance(visibility) )
+            visibility = foam.u2.DisplayMode[visibility];
+
           if ( DisplayMode.isInstance(visibility) )
             return foam.core.ConstantSlot.create({value: visibility});
 
@@ -2357,7 +2360,7 @@ foam.CLASS({
 
           if ( foam.core.Slot.isInstance(visibility) ) return visibility;
 
-          throw new Error('Property.visibility must be set to one of the following: (1) a value of DisplayMode, (2) a function that returns a value of DisplayMode, or (3) a slot whose value is a value of DisplayMode. Property ' + this.name + ' was set to ' + value + ' instead.');
+          throw new Error('Property.visibility must be set to one of the following: (1) a value of DisplayMode, (2) a function that returns a value of DisplayMode, or (3) a slot whose value is a value of DisplayMode. Property ' + this.name + ' was set to ' + visibility + ' instead.');
         })
       });
     },
