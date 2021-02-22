@@ -184,7 +184,7 @@
             data: obj,
             config: this.config,
             idOfRecord: id
-          }, this.__subContext__.createSubContext({ memento: this.table.memento }));
+          }, this.__subContext__.createSubContext({ memento: this.table_.memento }));
         }
       }
     },
@@ -282,7 +282,7 @@
         disableUserSelection: this.disableUserSelection,
         multiSelectEnabled: this.multiSelectEnabled,
         selectedObjects$: this.selectedObjects$
-      },  this, this.__subSubContext__.createSubContext({ memento: this.currentMemento.tail }));
+      },  this, this.__subSubContext__.createSubContext({ memento: this.currentMemento ? this.currentMemento.tail : this.currentMemento }));
 
       this.
         addClass(this.myClass()).
