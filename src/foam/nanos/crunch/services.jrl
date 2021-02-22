@@ -85,7 +85,15 @@ p({
         .build())
       .build();
   """,
-  "client":"{\"of\":\"foam.nanos.crunch.UserCapabilityJunction\", \"remoteListenerSupport\": false}"
+  "client":"{
+    \"of\":\"foam.nanos.crunch.UserCapabilityJunction\",
+     \"remoteListenerSupport\": false,
+     \"decorators\": [
+        {
+          \"class\":\"foam.nanos.fs.FileArrayDAODecorator\"
+        }
+      ]
+     }"
 })
 
 p({

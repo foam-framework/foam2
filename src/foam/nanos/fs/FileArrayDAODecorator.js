@@ -25,16 +25,25 @@ foam.CLASS({
       class: 'Long',
       name: 'maxStringDataSize',
       value: 1024 * 3
+    },
+    {
+      class: 'Boolean',
+      name: 'skipToData',
+      value: false
     }
   ],
 
   methods: [
     function write(X, dao, obj, existing) {
       var self  = this;
-      var props = obj.cls_.getAxiomsByClass(foam.nanos.fs.FileArray);
+      var newObj = this.skipToData ? obj.data : obj;
+      if ( ! newObj ) {
+        return Promise.resolve(obj);
+      }
+      var props = newObj.cls_.getAxiomsByClass(foam.nanos.fs.FileArray);
 
       var promises = props.map((prop) => {
-        let files = prop.f(obj);
+        let files = prop.f(newObj);
         return Promise.all(files.map(async f => {
 
           // We do not allow file update, so there is no point to send file again
@@ -57,7 +66,7 @@ foam.CLASS({
           f2.data = undefined;
         }));
         props.forEach((prop, i) => {
-          prop.set(obj, values[i]);
+          prop.set(newObj, values[i]);
         });
         return obj;
       });
