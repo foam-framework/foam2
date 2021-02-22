@@ -90,7 +90,8 @@ p({
      \"remoteListenerSupport\": false,
      \"decorators\": [
         {
-          \"class\":\"foam.nanos.fs.FileArrayDAODecorator\"
+          \"class\":\"foam.nanos.fs.FileArrayDAODecorator\",
+          \"skipToData\": true
         }
       ]
      }"
