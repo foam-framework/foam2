@@ -2335,6 +2335,8 @@ foam.CLASS({
         delegate$: controllerMode$.map(controllerMode => {
           var visibility = controllerMode.getVisibilityValue(this);
 
+          // KGR: I'm not sure how this happens, but it does.
+          // TODO: find out how/where.
           if ( foam.String.isInstance(visibility) )
             visibility = foam.u2.DisplayMode[visibility];
 
