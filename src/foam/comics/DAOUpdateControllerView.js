@@ -55,7 +55,7 @@ foam.CLASS({
       margin-left: 8px;
     }
     ^detail-container {
-      overflow-x: scroll;
+      overflow-x: auto;
     }
   `,
 

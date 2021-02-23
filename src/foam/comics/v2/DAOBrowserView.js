@@ -125,9 +125,9 @@ foam.CLASS({
 
   exports: [
     'click',
+    'config',
     'filteredTableColumns',
-    'serviceName',
-    'config'
+    'serviceName'
   ],
 
   properties: [
@@ -206,7 +206,7 @@ foam.CLASS({
         return {
           class: 'foam.nanos.google.api.sheets.ImportFromGoogleSheetsForm',
           of: this.config.of,
-          dao: this.serviceName
+          dao: this.serviceName || this.data.delegate.serviceName
         };
       }
     },
@@ -262,7 +262,6 @@ foam.CLASS({
     },
     function click(obj, id) {
       if ( ! this.stack ) return;
-
       this.stack.push({
         class: 'foam.comics.v2.DAOSummaryView',
         data: obj,

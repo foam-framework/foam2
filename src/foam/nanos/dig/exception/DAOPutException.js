@@ -16,7 +16,12 @@ foam.CLASS({
           public DAOPutException(String message) {
             super(message);
             setMessage(message);
-          } 
+          }
+
+          public DAOPutException(String message, Throwable cause) {
+            super(message, cause);
+            setMessage(message);
+          }
         `
         );
       }

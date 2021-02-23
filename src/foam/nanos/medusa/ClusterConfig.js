@@ -45,7 +45,7 @@ foam.CLASS({
       class: 'String',
       label: 'Hostname',
       required: true,
-      tableWidth: 150,
+      tableWidth: 250,
     },
     {
       documentation: 'External DNS name, or name instance is known by. Used in log messages.',
@@ -83,6 +83,16 @@ foam.CLASS({
       name: 'zone',
       class: 'Long',
       value: 0
+    },
+    {
+      documentation: 'A server hosting company proprietary name or id which designates an instance to a some availability area. AWS calls them Availability Zones, while Azure Availablitly Sets or Regions',
+      name: 'availabilityId',
+      class: 'String'
+    },
+    {
+      documentation: 'Override random bucket assignment (1-indexed, 0 indicates auto bucket assignment).',
+      name: 'bucket',
+      class: 'Int'
     },
     {
       documentation: 'Type of a Medusa instance.',

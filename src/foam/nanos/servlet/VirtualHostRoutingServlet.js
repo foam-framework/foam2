@@ -37,14 +37,6 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'liveScriptBundlerDisabled',
-      documentation: `If set to true, generate index file with live script bundler disabled.`,
-      javaFactory: `
-        return getX().get("liveScriptBundler") == null;
-      `
-    },
-    {
-      class: 'Boolean',
       name: 'isResourceStorage',
       documentation: `If set to true, generate index file from jar file resources.`,
       value: false
@@ -152,7 +144,7 @@ foam.CLASS({
         }
         // development
         else {
-          if ( this.getLiveScriptBundlerDisabled() ) {
+          if ( x.get("liveScriptBundler") == null ) {
             out.println("<script language=\\"javascript\\" src=\\"../../../../foam2/src/foam.js\\"></script>");
             out.println("<script language=\\"javascript\\" src=\\"../../../../foam2/src/foam/nanos/nanos.js\\"></script>");
             out.println("<script language=\\"javascript\\" src=\\"../../../../foam2/src/foam/support/support.js\\"></script>");

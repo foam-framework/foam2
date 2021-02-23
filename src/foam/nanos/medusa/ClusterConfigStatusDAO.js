@@ -20,7 +20,9 @@ foam.CLASS({
     'java.util.ArrayList',
     'java.util.List',
     'java.util.HashMap',
-    'java.util.Map'
+    'java.util.HashSet',
+    'java.util.Map',
+    'java.util.Set'
   ],
 
   properties: [
@@ -79,15 +81,16 @@ foam.CLASS({
               } else if ( ! hadQuorum && hasQuorum) {
                 getLogger().warning("mediator quorum acquired");
                 electoralService.dissolve(x);
-              } else {
-                getLogger().info("mediator quorum membership change");
-                if ( nu.getIsPrimary() &&
-                     nu.getStatus() == Status.OFFLINE ) {
-                  getLogger().warning("primary OFFLINE");
+              } else if ( hasQuorum ) {
+                try {
+                  support.getPrimary(x);
+                  if ( electoralService.getState() != ElectoralServiceState.IN_SESSION ) {
+                    // When cluster has quorum, the last mediator may not be in-session.
+                    electoralService.register(x, myConfig.getId());
+                  }
+                } catch ( RuntimeException e ) {
+                  // no primary
                   electoralService.dissolve(x);
-                } else if ( electoralService.getState() != ElectoralServiceState.IN_SESSION ) {
-                  // When cluster has quorum, the last mediator may not be in-session.
-                  electoralService.register(x, myConfig.getId());
                 }
               }
             }
@@ -131,8 +134,7 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
 
-      int groups = support.getNodeGroups();
-      List nodes = ((ArraySink)((DAO) x.get("localClusterConfigDAO"))
+      List<ClusterConfig> nodes = ((ArraySink)((DAO) x.get("localClusterConfigDAO"))
         .where(
           AND(
             EQ(ClusterConfig.ENABLED, true),
@@ -144,15 +146,19 @@ foam.CLASS({
             EQ(ClusterConfig.REALM, myConfig.getRealm())
           ))
         .select(new ArraySink())).getArray();
-      Map<Integer, List> buckets = new HashMap();
-      for ( int i = 0; i < nodes.size(); i++ ) {
-        ClusterConfig node = (ClusterConfig) nodes.get(i);
-        int index = i % groups;
-        List bucket = (List) buckets.get(index);
-        if ( bucket == null ) {
-          bucket = new ArrayList<String>();
-          buckets.put(index, bucket);
+      ArrayList<Set> buckets = new ArrayList();
+      for ( ClusterConfig node : nodes ) {
+       int index = Math.abs(foam.util.SafetyUtil.hashCode(node.getId())) % support.getNodeGroups();
+        if ( node.getBucket() > 0 ) {
+          index = node.getBucket() -1;
         }
+        if ( index >= buckets.size() ) {
+          // create buckets for known gaps
+          for ( int i = buckets.size(); i <= index; i++ ) {
+            buckets.add(new HashSet());
+          }
+        }
+        Set bucket = (Set) buckets.get(index);
         bucket.add(node.getId());
       }
       support.setNodeBuckets(buckets);

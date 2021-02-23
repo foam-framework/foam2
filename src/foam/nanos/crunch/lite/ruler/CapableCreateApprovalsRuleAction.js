@@ -9,7 +9,8 @@ foam.CLASS({
   name: 'CapableCreateApprovalsRuleAction',
 
   documentation: `
-    TODO:
+    To create approvals requests specifically for Capable Payloads since theey are nested within an
+    actual Capable object
   `,
 
   javaImports: [
@@ -179,7 +180,7 @@ foam.CLASS({
             }
           }
 
-        }, "Sent out approval requests for needed payloads and granted the others");
+        }, "Sent out approval requests for required capable payloads and granted the others");
       `
     }
   ]

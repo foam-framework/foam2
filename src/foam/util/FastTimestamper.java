@@ -23,8 +23,7 @@ import java.text.SimpleDateFormat;
 public class FastTimestamper {
 
   protected SimpleDateFormat format_        = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ"); // ISO 8601 format
-
-  protected long             lastTime_       = 0;
+  protected long             lastTime_      = 0;
   protected String           lastTimestamp_ = null;
 
   public FastTimestamper() {
@@ -33,8 +32,10 @@ public class FastTimestamper {
   }
 
   public String createTimestamp() {
-    long now = System.currentTimeMillis();
+    return createTimestamp(System.currentTimeMillis());
+  }
 
+  public String createTimestamp(long now) {
     if ( now == lastTime_ ) {
       // reuse, NOP
     } else if ( now / 1000 == lastTime_ / 1000 ) {

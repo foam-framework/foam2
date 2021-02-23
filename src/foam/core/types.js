@@ -80,8 +80,28 @@ foam.CLASS({
        if ( foam.core.I18NString.GETTER__ ) return foam.core.I18NString.GETTER__(proto, prop, obj, key);
        var msg_ = obj.instance_[key];
        if ( ! foam.i18n || ! foam.xmsg ) return msg_;
-       return foam.i18n.Lib.createText(prop.sourceCls_.id + '.' + this.name, msg_, msg_);
+       return foam.i18n.Lib.createText(prop.sourceCls_.id + '.' + this.name, msg_);
       }
+   },
+   {
+     name: 'expression',
+     preSet: function(o, n) {
+       var prop = this;
+       var name = this.name;
+       if ( ! foam.i18n || ! foam.xmsg ) return n;
+       n.apply = function(o, a) {
+         var ret = n.call(o, a[0], a[1], a[2], a[3], a[4], a[5], a[6]);
+         if ( ! foam.i18n || ! foam.xmsg ) return ret;
+         return foam.i18n.Lib.createText(prop.sourceCls_.id + '.' + name, ret, ret);
+       };
+       return n;
+     }
+     /*
+     value: function(o, n, prop) {
+       if ( ! foam.i18n || ! foam.xmsg || ! prop.sourceCls_ ) return n;
+       return foam.i18n.Lib.createText(prop.sourceCls_.id + '.' + prop.name, n);
+     }
+     */
    }
   ]
 });
@@ -463,7 +483,7 @@ foam.CLASS({
       var adapt = function(value) {
         if ( foam.String.isInstance(value) ) {
           var cls = this.__context__.lookup(value, true);
-          if ( ! cls ) {
+          if ( ! cls ) { // if the model is not available, it will be set on each get()
             console.error(`Property '${name}' of type '${this.model_.name}' was set to '${value}', which isn't a valid class.`);
             return null;
           }
@@ -775,6 +795,7 @@ foam.CLASS({
       name: 'value',
       expression: function(of) {
         return of ? of.ID.value : null;
+        // return ( of && of.ID.value ) || null;
       }
     }
   ],
