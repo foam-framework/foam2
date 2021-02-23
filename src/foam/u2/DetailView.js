@@ -20,6 +20,7 @@ foam.CLASS({
 
   exports: [
     'currentData as data',
+    'currentData as objData',
     'controllerMode',
     'currentMemento as memento'
   ],

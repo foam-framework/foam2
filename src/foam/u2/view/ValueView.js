@@ -30,7 +30,8 @@ foam.CLASS({
 
       if ( prop && prop.unitPropValueToString ) {
         this.add(this.data$.map(data => {
-          return prop.unitPropValueToString(self.__subContext__, data, prop.unitPropName);
+          debugger;
+          return prop.unitPropValueToString(self.__subContext__, data, self.__context__.objData[prop.unitPropName]);
         }));
       } else {
         this.add(this.data$);
