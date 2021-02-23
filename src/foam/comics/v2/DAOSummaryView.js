@@ -118,7 +118,13 @@ foam.CLASS({
     {
       class: 'String',
       name: 'mementoHead',
-      factory: function() {
+      getter: function() {
+        if ( ! this.memento || ! this.memento.tail )
+          return 'view::' + this.idOfRecord;
+        if ( this.memento.tail.head == 'edit' ) {
+          this.memento.tail.head = 'view';
+          return null;
+        }
         return 'view::' + this.idOfRecord;
       }
     },
@@ -238,6 +244,16 @@ foam.CLASS({
       var self = this;
       this.SUPER();
       if ( this.memento ) {
+        // if ( this.memento.tail.head == 'edit' ) {
+        //   this.stack.push({
+        //     class:  'foam.comics.v2.DAOUpdateView',
+        //     data:   this.data,
+        //     config: this.config,
+        //     of:     this.config.of,
+        //   }, this.__subContext__);
+        //   return;
+        // }
+        
 
         var m = this.memento;
         var counter = 0;
@@ -258,7 +274,7 @@ foam.CLASS({
       // to this view from the edit view on the stack.
       promise.then(d => {
         if ( d ) self.data = d;
-        if ( self.currentMemento && self.currentMemento.tail && self.currentMemento.tail.head.toLowerCase() === 'edit' ) {
+        if ( self.memento && self.memento.tail && self.memento.tail.head.toLowerCase() === 'edit' ) {
           self.edit();
         } else {
           this
