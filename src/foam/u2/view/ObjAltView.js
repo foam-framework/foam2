@@ -36,7 +36,7 @@ foam.CLASS({
         );
       },
       postSet: function() {
-        if ( ! this.memento )
+        if ( ! this.memento || ! this.memento.paramsObj )
           return;
           
         var view = this.views.find(v => v[0] === this.selectedView);
