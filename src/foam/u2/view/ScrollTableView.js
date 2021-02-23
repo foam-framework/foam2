@@ -296,12 +296,21 @@
           }).
         end();
       } else {
-        this.stack.push({
-          class: 'foam.comics.v2.DAOSummaryView',
-          data: null,
-          config: this.config,
-          idOfRecord: this.table_.memento.tail.tail.head
-        }, this.__subContext__.createSubContext({ memento: this.table_.memento }));
+        if ( this.table_.memento.tail.head == 'create' ) {
+          this.stack.push({
+            class: 'foam.comics.v2.DAOCreateView',
+            data: ((this.config.factory && this.config.factory$cls) ||  this.data.of).create({ mode: 'create'}, this),
+            config$: this.config$,
+            of: of
+          }, this.__subContext__.createSubContext({ memento: this.table_.memento }));
+        } else {
+          this.stack.push({
+            class: 'foam.comics.v2.DAOSummaryView',
+            data: null,
+            config: this.config,
+            idOfRecord: this.table_.memento.tail.tail.head
+          }, this.__subContext__.createSubContext({ memento: this.table_.memento }));
+        }
       }
       
 
