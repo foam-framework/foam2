@@ -244,17 +244,6 @@ foam.CLASS({
       var self = this;
       this.SUPER();
       if ( this.memento ) {
-        // if ( this.memento.tail.head == 'edit' ) {
-        //   this.stack.push({
-        //     class:  'foam.comics.v2.DAOUpdateView',
-        //     data:   this.data,
-        //     config: this.config,
-        //     of:     this.config.of,
-        //   }, this.__subContext__);
-        //   return;
-        // }
-        
-
         var m = this.memento;
         var counter = 0;
 
