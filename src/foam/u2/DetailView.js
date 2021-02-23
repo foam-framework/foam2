@@ -141,7 +141,7 @@ foam.CLASS({
      */
 
     ^ table .foam-u2-stack-StackView {
-      padding-left: 0;
+      padding-left: 0 !important;
     }
 
     ^ table .foam-u2-tag-TextArea {
