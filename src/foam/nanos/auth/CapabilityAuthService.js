@@ -148,7 +148,8 @@ foam.CLASS({
           null :
           user.getId() + ":" + realUser.getId() + permission;
         String userKey = user.getId() + permission;
-        String realUserKey = realUser.getId() == user.getId() ? null : realUser.getId() + permission;
+        String realUserKey = realUser.getId() == user.getId() ? null
+          : (realUser.getSpid().equals(user.getSpid()) ? realUser.getId() + permission : null);
         this.initialize(x);
 
         Boolean result = ( (Map<String, Boolean>) getCache() ).get(userKey);
