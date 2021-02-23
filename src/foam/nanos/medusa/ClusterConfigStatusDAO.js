@@ -81,10 +81,17 @@ foam.CLASS({
               } else if ( ! hadQuorum && hasQuorum) {
                 getLogger().warning("mediator quorum acquired");
                 electoralService.dissolve(x);
-              } else if ( hasQuorum &&
-                          electoralService.getState() != ElectoralServiceState.IN_SESSION ) {
-                // When cluster has quorum, the last mediator may not be in-session.
-                electoralService.register(x, myConfig.getId());
+              } else if ( hasQuorum ) {
+                try {
+                  support.getPrimary(x);
+                  if ( electoralService.getState() != ElectoralServiceState.IN_SESSION ) {
+                    // When cluster has quorum, the last mediator may not be in-session.
+                    electoralService.register(x, myConfig.getId());
+                  }
+                } catch ( RuntimeException e ) {
+                  // no primary
+                  electoralService.dissolve(x);
+                }
               }
             }
           }
