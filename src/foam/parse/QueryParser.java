@@ -6,6 +6,7 @@
 
 package foam.parse;
 
+import foam.core.AbstractDatePropertyInfo;
 import foam.core.ClassInfo;
 import foam.core.PropertyInfo;
 import foam.lib.json.AnyParser;
@@ -13,15 +14,14 @@ import foam.lib.json.IntParser;
 import foam.lib.json.KeyParser;
 import foam.lib.json.Whitespace;
 import foam.lib.parse.*;
+import foam.lib.parse.Not;
 import foam.lib.query.*;
 import foam.mlang.Constant;
 import foam.mlang.Expr;
-import foam.mlang.predicate.And;
-import foam.mlang.predicate.Eq;
-import foam.mlang.predicate.Has;
-import foam.mlang.predicate.Not;
+import foam.mlang.predicate.*;
 import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
+import foam.nanos.logger.Logger;
 import foam.util.SafetyUtil;
 
 import java.util.ArrayList;
@@ -53,17 +53,6 @@ public class QueryParser
         }
       }
     }
-
-//    expressions.add(new MeParser());
-//    expressions.add(new IsInstanceOfParser());
-//
-//    Parser[] parsers = expressions.toArray(new Parser[expressions.size()]);
-//    Parser altParser = new Alt(parsers);
-
-//    setDelegate(new Alt(
-//      new ParenParser(new OrParser(new AndParser(altParser))),
-//      new ParenParser(new OrParser(new ParenParser(new AndParser(altParser)))),
-//      new OrParser(new AndParser(altParser))));
   }
 
   public PStream parse(PStream ps, ParserContext x) {
@@ -81,10 +70,8 @@ public class QueryParser
     grammar.addSymbol("FIELD_NAME", new Alternate(expressions));
 
     grammar.addSymbol("OR", new Repeat(grammar.sym("AND"),
-      new Seq0(foam.lib.json.Whitespace.instance(),
         new Alt(new LiteralIC("OR "),
-          Literal.create("| "))
-      )));
+          Literal.create("| ")), 1));
     grammar.addAction("OR", new Action() {
       @Override
       public Object execute(Object val, ParserContext x) {
@@ -104,7 +91,7 @@ public class QueryParser
     });
 
     grammar.addSymbol("AND", new Repeat(grammar.sym("EXPR"),
-      new LiteralIC("AND ")));
+      new LiteralIC("AND "), 1));
     grammar.addAction("AND", new Action() {
       @Override
       public Object execute(Object val, ParserContext x) {
@@ -139,60 +126,55 @@ public class QueryParser
     grammar.addAction("NEGATE", new Action() {
       @Override
       public Object execute(Object val, ParserContext x) {
-        Not predicate = new Not();
-        predicate.setArg1((foam.mlang.predicate.Binary) val);
+        foam.mlang.predicate.Not predicate = new foam.mlang.predicate.Not();
+        predicate.setArg1((Predicate) val);
         return predicate;
       }
     });
 
-//    grammar.addSymbol("ID", new Seq1(7,
-//      Whitespace.instance(),
-//      Literal.create("{"),
-//      Whitespace.instance(),
-//      new KeyParser("id"),
-//      Whitespace.instance(),
-//      Literal.create(":"),
-//      Whitespace.instance(),
-//      AnyParser.instance(),
-//      Whitespace.instance(),
-//      Literal.create("}")
-//    ));
-    grammar.addSymbol("ID", grammar.sym("NUMBER"));
+    grammar.addSymbol("ID", new Seq1(7,
+      Whitespace.instance(),
+      Literal.create("id"),
+      Whitespace.instance(),
+      new Alt(Literal.create("="), Literal.create(":")),
+      Whitespace.instance(),
+      grammar.sym("NUMBER")
+    ));
     grammar.addAction("ID", new Action() {
       @Override
       public Object execute(Object val, ParserContext x) {
+        Object[] values = (Object[]) val;
+        if ( values.length == 0 ) return val;
         Eq predicate = new Eq();
         predicate.setArg1((PropertyInfo) info_.getAxiomByName("ID"));
-        predicate.setArg2((Expr) val);
+        predicate.setArg2((Expr) values[0]);
         return predicate;
       }
     });
 
-    grammar.addSymbol("HAS", new Seq(Literal.create("has:"),
+    grammar.addSymbol("HAS", new Seq1(1, Literal.create("has:"),
       grammar.sym("FIELD_NAME")));
     grammar.addAction("HAS", new Action() {
       @Override
       public Object execute(Object val, ParserContext x) {
-        Object[] values = (Object[]) val;
         Has predicate = new foam.mlang.predicate.Has();
-        predicate.setArg1((PropertyInfo) values[1]);
+        predicate.setArg1((PropertyInfo) val);
         return predicate;
       }
     });
 
-    grammar.addSymbol("IS", new Seq(Literal.create("is:"), grammar.sym("FIELD_NAME")));
+    grammar.addSymbol("IS", new Seq1(1,Literal.create("is:"), grammar.sym("FIELD_NAME")));
     grammar.addAction("IS", new Action() {
       @Override
       public Object execute(Object val, ParserContext x) {
-        PropertyInfo[] values = (PropertyInfo[]) val;
         foam.mlang.predicate.Binary predicate = new foam.mlang.predicate.Eq ();
-        predicate.setArg1(values[1]);
+        predicate.setArg1((PropertyInfo) val);
         predicate.setArg2(new foam.mlang.Constant(true));
         return predicate;
       }
     });
 
-    grammar.addSymbol("EQUALS", new Seq2(0,2,
+    grammar.addSymbol("EQUALS", new Seq(
       grammar.sym("FIELD_NAME"),
       new Alt(Literal.create(":"), Literal.create("=")),
       grammar.sym("VALUE_LIST")
@@ -203,16 +185,61 @@ public class QueryParser
       public Object execute(Object val, ParserContext x) {
         Object[] values = (Object[]) val;
         Expr prop = ( foam.mlang.Expr ) values[0];
+
+        Object[] value = (Object[]) values[2];
+        if ( value[0] instanceof Date || prop instanceof AbstractDatePropertyInfo) {
+          And and = new And();
+          Gte gte = new Gte();
+          gte.setArg1(prop);
+          gte.setArg2((value[0] instanceof foam.mlang.Expr) ? (foam.mlang.Expr) value[0] :
+            new foam.mlang.Constant(value[0]));
+          Lte lte = new Lte();
+          lte.setArg1(prop);
+          lte.setArg2((value[0] instanceof foam.mlang.Expr) ? (foam.mlang.Expr) value[0] :
+            new foam.mlang.Constant(value[0]));
+
+          foam.mlang.predicate.Binary[] predicates = { gte, lte };
+          and.setArgs(predicates);
+          return and;
+        }
+        if ( value.length > 1 ) {
+
+          foam.mlang.predicate.Or innerPredicate = new foam.mlang.predicate.Or();
+
+          foam.mlang.predicate.Predicate[] args = new foam.mlang.predicate.Predicate[value.length];
+          for ( int i = 0; i < args.length; i++ ) {
+            foam.mlang.predicate.Eq eq = new foam.mlang.predicate.Eq();
+            eq.setArg1(prop);
+            eq.setArg2(( value[i] instanceof foam.mlang.Expr ) ?
+              ( foam.mlang.Expr ) value[i] : new foam.mlang.Constant (value[i]));
+            args[i] = eq;
+          }
+          innerPredicate.setArgs(args);
+
+          return innerPredicate;
+        }
+
+        if ( values[1].equals(":") ) {
+//          foam.mlang.predicate.Or or = new foam.mlang.predicate.Or();
+          Contains contains = new Contains();
+          contains.setArg1(prop);
+          contains.setArg2(( value[0] instanceof foam.mlang.Expr ) ?
+            ( foam.mlang.Expr ) value[0] : new foam.mlang.Constant (value[0]));
+          foam.mlang.predicate.Binary[] predicates = { contains };
+//          or.setArgs(predicates);
+          return contains;
+        }
+
         foam.mlang.predicate.Binary expr = new foam.mlang.predicate.Eq();
         expr.setArg1(prop);
         expr.setArg2(
-          ( val instanceof foam.mlang.Expr ) ? (foam.mlang.Expr) values[1] : new foam.mlang.Constant(values[1]));
+          ( value[0] instanceof foam.mlang.Expr ) ? (foam.mlang.Expr) value[0] : new foam.mlang.Constant(value[0]));
 
         return expr;
       }
     });
 
-    grammar.addSymbol("BEFORE", new Seq2(0, 2,
+    grammar.addSymbol("BEFORE", new Seq(
       grammar.sym("FIELD_NAME"),
       new Alt(Literal.create("<="), Literal.create("<"),
         new LiteralIC("-before:")),
@@ -221,18 +248,19 @@ public class QueryParser
       @Override
       public Object execute(Object val, ParserContext x) {
         Object[] values = (Object[]) val;
-        foam.mlang.predicate.Binary predicate = new foam.mlang.predicate.Lte();
+        foam.mlang.predicate.Binary predicate = values[1].equals("<") ?
+          new foam.mlang.predicate.Lt() : new foam.mlang.predicate.Lte();
         predicate.setArg1((foam.mlang.Expr) values[0]);
 
         predicate
-          .setArg2((values[1] instanceof foam.mlang.Expr) ? (foam.mlang.Expr) values[1] :
-            new foam.mlang.Constant(values[1]));
+          .setArg2((values[2] instanceof foam.mlang.Expr) ? (foam.mlang.Expr) values[2] :
+            new foam.mlang.Constant(values[2]));
 
         return predicate;
       }
     });
 
-    grammar.addSymbol("AFTER", new Seq2(0,2,
+    grammar.addSymbol("AFTER", new Seq(
       grammar.sym("FIELD_NAME"),
       new Alt(Literal.create(">="), Literal.create(">"),
         new LiteralIC("-after:")),
@@ -242,18 +270,19 @@ public class QueryParser
       @Override
       public Object execute(Object val, ParserContext x) {
         Object[] values = (Object[]) val;
-        foam.mlang.predicate.Binary predicate = new foam.mlang.predicate.Gte();
+        foam.mlang.predicate.Binary predicate = values[1].equals(">") ?
+          new foam.mlang.predicate.Gt() : new foam.mlang.predicate.Gte();
         predicate.setArg1(( foam.mlang.Expr ) values[0]);
 
         predicate
-          .setArg2(( values[1] instanceof foam.mlang.Expr ) ? (foam.mlang.Expr) values[1] : new foam.mlang.Constant(values[1]));
+          .setArg2(( values[2] instanceof foam.mlang.Expr ) ? (foam.mlang.Expr) values[2] : new foam.mlang.Constant(values[2]));
 
         return predicate;
       }
     });
 
-    grammar.addSymbol("VALUE", new Alt(grammar.sym("ME"),
-      grammar.sym("DATE"), grammar.sym("STRING"), grammar.sym("NUMBER")));
+    grammar.addSymbol("VALUE", new Alt(grammar.sym("ME"),grammar.sym("NUMBER"),
+      grammar.sym("DATE"), grammar.sym("STRING")));
 
     grammar.addSymbol("COMPOUND_VALUE", new Alt(grammar.sym("NEGATE_VALUE"),
       grammar.sym("OR_VALUE"), grammar.sym("AND_VALUE")));
@@ -269,21 +298,20 @@ public class QueryParser
       }
     });
 
-    grammar.addSymbol("OR_VALUE", new Seq(
+    grammar.addSymbol("OR_VALUE", new Seq1(1,
       Literal.create("("),
       new Repeat(
           grammar.sym("VALUE"),
-          new Alt(Literal.create("|"), new LiteralIC(" or "), Literal.create("|"))
+          new Alt(Literal.create("|"), new LiteralIC(" or "), Literal.create("|")), 1
         ),
       Literal.create(")")
     ));
     grammar.addAction("OR_VALUE", new Action() {
       @Override
       public Object execute(Object val, ParserContext x) {
-        Object[] values = (Object[]) val;
-        Object[] args = new Object[( (Object[]) values[1] ).length];
+        Object[] args = new Object[( (Object[]) val ).length];
         for ( int i = 0; i < args.length; i++ ) {
-          args[i] = ( (Object[]) values[1] )[i];
+          args[i] = ( (Object[]) val )[i];
         }
 
         return args;
@@ -294,7 +322,7 @@ public class QueryParser
       Literal.create("("),
       new Repeat(
         grammar.sym("VALUE"),
-        new Alt(Literal.create("|"), new LiteralIC(" and "), Literal.create("|"))
+        new Alt(Literal.create("|"), new LiteralIC(" and "), Literal.create("|")), 1
       ),
       Literal.create(")")
     ));
@@ -321,7 +349,8 @@ public class QueryParser
         if ( ( (Object[]) val )[0].equals("me") ) {
           User user = ((Subject) x.get("subject")).getUser();
           if ( user == null ) {
-            System.err.println("User is not logged in");
+            foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+            logger.warning("user not logged in ");
             return val;
           }
           return user.getId();
@@ -402,7 +431,10 @@ public class QueryParser
         grammar.sym("NUMBER"),
         Literal.create("/"),
         grammar.sym("NUMBER")
-      )
+      ),
+      //YYYY
+      new Seq(
+        grammar.sym("NUMBER"))
     ));
     grammar.addAction("LITERAL_DATE", new Action() {
       @Override
@@ -502,12 +534,12 @@ public class QueryParser
     });
 
     grammar.addSymbol("WORD", new Repeat(
-      grammar.sym("CHAR")
+      AnyChar.instance()
     ));
     grammar.addAction("WORD", new Action() {
       @Override
       public Object execute(Object val, ParserContext x) {
-        return joinChars(val);
+        return compactToString(val);
       }
     });
 
@@ -529,23 +561,20 @@ public class QueryParser
     grammar.addAction("NUMBER", new Action() {
       @Override
       public Object execute(Object val, ParserContext x) {
-        Object[] values = (Object[]) val;
-        if ( values.length == 0 ) return val;
-        StringBuilder numberStr = new StringBuilder();
-        for ( Object num: values ) {
-          numberStr.append(num);
-        }
-        return Integer.parseInt(numberStr.toString());
+        String num = compactToString(val);
+        if ( num.length() == 0 ) return val;
+        return Integer.parseInt(num);
       }
     });
 
     return grammar;
   }
 
-  protected String joinChars(Object chars) {
+  protected String compactToString(Object val) {
+    Object[] values = (Object[]) val;
     StringBuilder sb = new StringBuilder();
-    for (Object ch: (Object[]) chars) {
-      sb.append(ch);
+    for ( Object num: values ) {
+      sb.append(num);
     }
     return sb.toString();
   }
