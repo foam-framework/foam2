@@ -135,16 +135,21 @@ foam.CLASS({
       width: 70%;
     }
 
+    
+    /* 
+     * Styles for table contents 
+     */
+
     ^ table .foam-u2-stack-StackView {
       padding-left: 0 !important;
     }
 
-    ^ table .foam-u2-CheckBox {
-      margin: 0px;
-    }
-
     ^ table .foam-u2-tag-TextArea {
       max-width: 100%;
+    }
+
+    ^ table .foam-u2-Multiview-container[style*="float"] .foam-u2-tag-TextArea {
+      width: 100%;
     }
   `,
 
