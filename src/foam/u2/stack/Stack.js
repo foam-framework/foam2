@@ -130,7 +130,7 @@ foam.CLASS({
       name: 'back',
       // icon: 'arrow_back',
       isEnabled: function(pos) { return pos > 0; },
-      code: function() {
+      code: function(X) {
         var isMementoSetWithView = false;
 
         //check if the class of the view to which current position points has property MEMENTO_HEAD
@@ -141,7 +141,7 @@ foam.CLASS({
           if ( foam.String.isInstance(classObj) ) {
             classObj = foam.lookup(this.stack_[this.pos][0].class);
           }
-          var obj = classObj.create(this.stack_[this.pos][0]);
+          var obj = classObj.create(this.stack_[this.pos][0], X);
           if ( obj && obj.mementoHead ) {
             isMementoSetWithView = true;
           }
