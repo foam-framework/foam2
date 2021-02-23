@@ -84,7 +84,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'mementoHead',
-      value: 'Create'
+      value: 'create'
     },
     'currentMemento'
   ],
