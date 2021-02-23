@@ -154,12 +154,13 @@ foam.CLASS({
       code: function() {
         if ( ! this.stack ) return;
 
-        this.memento.head = 'edit';
+        if ( this.memento.tail )
+          this.memento.tail.head = 'edit';
         this.stack.push({
           class:  'foam.comics.v2.DAOUpdateView',
           data:   this.data,
           config: this.config,
-          of:     this.config.of
+          of:     this.config.of,
         }, this.__subContext__);
       }
     },

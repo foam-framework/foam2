@@ -373,6 +373,8 @@ foam.CLASS({
                       },  self, self.__subSubContext__.createSubContext({ memento: self.currentMemento }));//this.currentMemento
 
                       if ( self.currentMemento ) {
+                        if ( self.currentMemento.tail == null )
+                          self.currentMemento.tail = foam.nanos.controller.Memento.create();
                         self.currentMemento = self.currentMemento.tail;
                       }
 
