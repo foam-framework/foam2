@@ -48,7 +48,9 @@ foam.CLASS({
                 backLabel: 'Back'
               }, self);
             })
-            .call(this.addCitationView.call(this, self))
+            .call(function() {
+              self.addCitationView.call(this, self);
+            })
           .end();
       }
     },
