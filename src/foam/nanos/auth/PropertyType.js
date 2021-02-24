@@ -4,11 +4,29 @@ foam.ENUM({
   documentation: `Indicates property type of address`,
 
   values: [
-    { name: 'RESIDENTIAL',  label: 'Residential' },
-    { name: 'COMMERCIAL',   label: 'Commercial' },
-    { name: 'INDUSTRIAL',   label: 'Industrial' },
-    { name: 'AGRICULTURAL', label: 'Agricultural' },
-    { name: 'MIXED_USE',    label: 'Mixed Use' },
-    { name: 'SPECIAL_USE',  label: 'Special Use' },
+    {
+      name: 'RESIDENTIAL',
+      label: { en: 'Residential',  pt: 'Residencial'}
+    },
+    {
+      name: 'COMMERCIAL',
+      label: { en: 'Commercial',   pt: 'Comercial'}
+    },
+    {
+      name: 'INDUSTRIAL',
+      label: { en: 'Industrial',   pt: 'Industrial'}
+    },
+    {
+      name: 'AGRICULTURAL',
+      label: { en: 'Agricultural', pt: 'Agrícola'}
+    },
+    {
+      name: 'MIXED_USE',
+      label: { en: 'Mixed Use',    pt: 'Uso Misto'}
+    },
+    {
+      name: 'SPECIAL_USE',
+      label: { en: 'Special Use',  pt: 'Uso Especial'}
+    }
   ]
 });
