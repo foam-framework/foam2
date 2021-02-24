@@ -259,7 +259,7 @@ foam.CLASS({
 
           reader.onerror = reject;
 
-          this.data.then((d) => reader.readAsText(d.blob));
+          reader.readAsText(this.data.blob);
         });
       },
       javaCode: `
