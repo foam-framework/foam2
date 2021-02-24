@@ -55,6 +55,7 @@ public class FileService
 
       File file = (File) fileDAO_.find_(x, id);
 
+      // file service don't check sessionId so only files without owner should be retrived
       if ( name_.equals("file") && file.getOwner() != 0 ) {
         throw new AuthenticationException("Unauthenticated file access");
       }
