@@ -148,7 +148,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       javaCode: `
       When when = (When) whens_.peek();
       if ( when != null ) {
-       return (DAO) getDelegate().cmd_(x, when.getCmd());
+        return (DAO) getDelegate().cmd_(x, when.getCmd());
       }
       return getDelegate();
       `
@@ -330,8 +330,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       // A 'When', which captures the MDAO state, is created
       // for each 'put'.  The When is marked complete when the
       // 'put' completes.
-      // 'find' and 'select' operations will use the most recently
-      // added When.
+      // 'find' and 'select' operations will use the oldest 'when'.
       When when = new When(x, new MDAO.WhenCmd(getDelegate().cmd_(x, MDAO.NOW_CMD)), false);
       whens_.add(when);
       try {
@@ -526,7 +525,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         } else {
           synchronized ( whens_ ) {
             try {
-              whens_.wait(1000L);
+              whens_.wait(10000L);
             } catch ( InterruptedException e ) {
               break;
             }

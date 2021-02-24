@@ -11,10 +11,31 @@ foam.CLASS({
 
   documentation: 'Just shows the value of data as a string.',
 
+  properties: [
+    {
+      name: 'prop'
+    }
+  ],
+
   methods: [
+    function fromProperty(prop) {
+      this.SUPER(prop);
+      this.prop = prop;
+    },
+
     function initE() {
       this.SUPER();
-      return this.add(this.data$);
+      var self = this;
+      var prop = this.prop;
+
+      if ( prop && prop.unitPropValueToString ) {
+        this.add(this.data$.map(data => {
+          debugger;
+          return prop.unitPropValueToString(self.__subContext__, data, self.__context__.objData[prop.unitPropName]);
+        }));
+      } else {
+        this.add(this.data$);
+      }
     }
   ]
 });
