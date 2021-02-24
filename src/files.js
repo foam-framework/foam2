@@ -511,6 +511,7 @@ FOAM_FILES([
   { name: "foam/u2/svg/arrow/ArrowLine", flags: ['web'] },
   { name: "foam/u2/svg/arrow/ArrowHead", flags: ['web'] },
   { name: "foam/u2/svg/graph/ZoomedOutFObjectGraphNodeView", flags: ['web'] },
+  { name: "foam/u2/svg/graph/DAGView", flags: ['web'] },
   { name: "foam/u2/svg/TreeGraph", flags: ['web'] },
   { name: "foam/u2/svg/TestView", flags: ['web'] },
   { name: "foam/u2/view/EnumLegendView", flags: ['web'] },
