@@ -11,6 +11,7 @@ import foam.blob.BlobService;
 import foam.blob.IdentifiedBlob;
 import foam.core.X;
 import foam.dao.DAO;
+import foam.nanos.auth.*;
 import foam.nanos.app.AppConfig;
 import foam.nanos.fs.File;
 import foam.util.SafetyUtil;
@@ -53,6 +54,11 @@ public class FileService
       String id   = path.replaceFirst("/service/" + name_ + "/", "");
 
       File file = (File) fileDAO_.find_(x, id);
+
+      if ( name_.equals("file") && file.getOwner() != 0 ) {
+        throw new AuthenticationException("Unauthenticated file access");
+      }
+
       if ( file == null ) {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         return;
