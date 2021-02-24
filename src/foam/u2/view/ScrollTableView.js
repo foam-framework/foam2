@@ -31,7 +31,7 @@
 
   css: `
     ^ {
-      overflow: auto;
+      overflow: unset;
       padding-bottom: 20px;
     }
     ^table {
@@ -249,22 +249,24 @@
       }
 
       this.
-        addClass(this.myClass()).
-        on('scroll', this.onScroll).
-        start(this.TableView, {
-          data: foam.dao.NullDAO.create({of: this.data.of}),
-          columns: this.columns,
-          contextMenuActions: this.contextMenuActions,
-          selection$: this.selection$,
-          editColumnsEnabled: this.editColumnsEnabled,
-          disableUserSelection: this.disableUserSelection,
-          multiSelectEnabled: this.multiSelectEnabled,
-          selectedObjects$: this.selectedObjects$
-        }, this.table_$).
-          addClass(this.myClass('table')).
-          style({
-            height: this.scrollHeight$.map(h => h + 'px')
-          }).
+        start().
+          addClass(this.myClass()).
+          on('scroll', this.onScroll).
+          start(this.TableView, {
+            data: foam.dao.NullDAO.create({of: this.data.of}),
+            columns: this.columns,
+            contextMenuActions: this.contextMenuActions,
+            selection$: this.selection$,
+            editColumnsEnabled: this.editColumnsEnabled,
+            disableUserSelection: this.disableUserSelection,
+            multiSelectEnabled: this.multiSelectEnabled,
+            selectedObjects$: this.selectedObjects$
+          }, this.table_$).
+            addClass(this.myClass('table')).
+            style({
+              height: this.scrollHeight$.map(h => h + 'px')
+            }).
+          end().
         end();
 
       /*
