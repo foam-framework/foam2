@@ -63,6 +63,17 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return getCapabilityPath(x, rootId, true);
   }
 
+  public List getCapabilityPathFor(X x, String rootId, boolean filterGrantedUCJ, User effectiveUser, User user) {
+    foam.nanos.auth.AuthService auth = (foam.nanos.auth.AuthService) x.get("auth");
+    if ( auth.check(x, "service.crunchService.customSubject") ) {
+      var requestedSubject = new Subject();
+      requestedSubject.setUser(user);
+      requestedSubject.setUser(effectiveUser);
+      x = x.put("subject", requestedSubject);
+    }
+    return this.getCapabilityPath(x, rootId, filterGrantedUCJ);
+  }
+
   public List getCapabilityPath(X x, String rootId, boolean filterGrantedUCJ) {
     Logger logger = (Logger) x.get("logger");
     PM pm = PM.create(x, this.getClass().getSimpleName(), "getCapabilityPath");
@@ -193,6 +204,18 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       }
     }
     return prereqsCache_.get(capId);
+  }
+
+  public UserCapabilityJunction getJunctionFor(X x, String capabilityId, User effectiveUser, User user) {
+    Subject subject = (Subject) x.get("subject");
+    foam.nanos.auth.AuthService auth = (foam.nanos.auth.AuthService) x.get("auth");
+    if ( auth.check(x, "service.crunchService.customSubject") ) {
+      var requestedSubject = new Subject();
+      requestedSubject.setUser(user);
+      requestedSubject.setUser(effectiveUser);
+      return this.getJunctionForSubject(x, capabilityId, requestedSubject);
+    }
+    return this.getJunctionForSubject(x, capabilityId, subject);
   }
 
   public UserCapabilityJunction getJunction(X x, String capabilityId) {
