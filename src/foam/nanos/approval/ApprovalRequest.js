@@ -141,7 +141,26 @@
 
           self.add(referenceSummaryString);
         });
-      }
+      },
+      view: function(_, X) {
+        let slot = foam.core.SimpleSlot.create();
+        let data = X.data;
+
+        X[data.daoKey].find(data.objId).then(requestObj => {
+          let referenceSummaryString = `ID:${obj.objId}`;
+
+          if ( requestObj && requestObj.toSummary() ){
+            referenceSummaryString = requestObj.toSummary()
+          }
+
+          slot.set(referenceSummaryString);
+        })
+
+        return {
+          class: 'foam.u2.view.ValueView',
+          data$: slot
+        };
+      },
     },
     {
       class: 'Long',
