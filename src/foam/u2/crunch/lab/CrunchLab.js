@@ -31,8 +31,8 @@ foam.CLASS({
     'foam.graph.GraphBuilder',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.u2.crunch.lab.CapabilityGraphNodeView',
-    'foam.u2.svg.graph.RelationshipGridPlacementStrategy',
-    'foam.u2.svg.graph.IdPropertyPlacementPlanDecorator',
+    'foam.graph.map2d.RelationshipGridPlacementStrategy',
+    'foam.u2.svg.map2d.IdPropertyPlacementPlanDecorator',
     'foam.u2.svg.TreeGraph',
     'foam.u2.Tab',
     'foam.u2.Tabs'
@@ -157,6 +157,9 @@ foam.CLASS({
               delegate: placementPlan,
               targetProperty: 'id'
             });
+            window._testing = {};
+            window._testing.placementPlan = placementPlan;
+            window._testing.graph = graph;
             return this.E()
               .tag(self.TreeGraph, {
                 nodePlacementPlan: placementPlan,
