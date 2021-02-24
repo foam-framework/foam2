@@ -34,17 +34,7 @@ foam.CLASS({
       name: 'updateSummary',
       isFramed: true,
       code: function() {
-        if ( this.data ) {
-          if ( this.data.toSummaryPromise !== undefined ) {
-            this.data.toSummaryPromise().then(response => {
-              this.summary = response;
-            });
-          } else {
-            this.summary = this.data.toSummary();
-          }
-        } else {
-          this.summary = undefined;
-        }
+        this.summary = this.data ? this.data.toSummary() : undefined;
       }
     }
   ],
