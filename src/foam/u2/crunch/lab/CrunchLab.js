@@ -23,13 +23,15 @@ foam.CLASS({
   `,
 
   imports: [
-//    'memento',
-    'userCapabilityJunctionDAO'
+    'userCapabilityJunctionDAO',
+    'capabilityDAO'
   ],
 
   requires: [
     'foam.graph.GraphBuilder',
+    'foam.dao.PromisedDAO',
     'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.nanos.crunch.Capability',
     'foam.u2.crunch.lab.CapabilityGraphNodeView',
     'foam.u2.svg.graph.RelationshipGridPlacementStrategy',
     'foam.u2.svg.graph.IdPropertyPlacementPlanDecorator',
@@ -44,26 +46,6 @@ foam.CLASS({
   ],
 
   properties: [
-    {
-      name: 'rootCapability',
-      class: 'Reference',
-      of: 'foam.nanos.crunch.Capability',
-      view: function(_, X) {
-        return {
-          class: 'foam.u2.view.RichChoiceView',
-          search: true,
-          sections: [
-            {
-              heading: 'Capabilities',
-              dao: X.capabilityDAO
-            }
-          ]
-        };
-      },
-      // postSet: function(_, n) {
-      //   this.memento = n;
-      // }
-    },
     {
       name: 'crunchUser',
       class: 'Reference',
@@ -80,6 +62,41 @@ foam.CLASS({
           ]
         };
       },
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'filteredCapabilityDAO',
+      expression: function(crunchUser) {
+        if ( crunchUser == 0 ) return this.capabilityDAO;
+        return this.PromisedDAO.create({
+          of: 'foam.nanos.crunch.Capability',
+          promise: this.userCapabilityJunctionDAO.where(this.EQ(this.UserCapabilityJunction.SOURCE_ID, crunchUser))
+            .select(this.MAP(this.UserCapabilityJunction.TARGET_ID))
+            .then((sink) => {
+              let capabilities = sink.delegate.array ? sink.delegate.array : [];
+              return this.capabilityDAO.where(
+                this.IN(this.Capability.ID, capabilities.flat())
+              );
+            })
+        });
+      }
+    },
+    {
+      name: 'rootCapability',
+      class: 'Reference',
+      of: 'foam.nanos.crunch.Capability',
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          search: true,
+          sections: [
+            {
+              heading: 'Capabilities',
+              dao$: X.data.filteredCapabilityDAO$
+            }
+          ]
+        };
+      }
     },
     {
       name: 'relation',
@@ -118,7 +135,6 @@ foam.CLASS({
       return this.slot(function (rootCapability, crunchUser, relation) {
         if ( ! rootCapability ) return this.E();
         var graphBuilder = self.GraphBuilder.create();
-
         // Having these variables here makes promise returns cleaner
         var rootCapabilityObj = null;
         var placementPlan = null;
