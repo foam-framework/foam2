@@ -70,8 +70,8 @@ public class QueryParser
     grammar.addSymbol("FIELD_NAME", new Alternate(expressions));
 
     grammar.addSymbol("OR", new Repeat(grammar.sym("AND"),
-        new Alt(new LiteralIC("OR "),
-          Literal.create("| ")), 1));
+        new Alt(new LiteralIC(" OR "),
+          Literal.create(" | ")), 1));
     grammar.addAction("OR", new Action() {
       @Override
       public Object execute(Object val, ParserContext x) {
@@ -91,7 +91,7 @@ public class QueryParser
     });
 
     grammar.addSymbol("AND", new Repeat(grammar.sym("EXPR"),
-      new LiteralIC("AND "), 1));
+      new Alt(new LiteralIC(" AND "), Literal.create("k")), 1));
     grammar.addAction("AND", new Action() {
       @Override
       public Object execute(Object val, ParserContext x) {
@@ -302,7 +302,7 @@ public class QueryParser
       Literal.create("("),
       new Repeat(
           grammar.sym("VALUE"),
-          new Alt(Literal.create("|"), new LiteralIC(" or "), Literal.create("|")), 1
+          new Alt(Literal.create("|"), new LiteralIC(" or "), Literal.create(" | ")), 1
         ),
       Literal.create(")")
     ));
@@ -322,7 +322,7 @@ public class QueryParser
       Literal.create("("),
       new Repeat(
         grammar.sym("VALUE"),
-        new Alt(Literal.create("|"), new LiteralIC(" and "), Literal.create("|")), 1
+        new Alt(Literal.create("|"), new LiteralIC(" and "), Literal.create(" | ")), 1
       ),
       Literal.create(")")
     ));
@@ -336,7 +336,7 @@ public class QueryParser
 
     grammar.addSymbol("VALUE_LIST", new Alt(
       grammar.sym("COMPOUND_VALUE"),
-      new Repeat(grammar.sym("VALUE"), Literal.create(","))
+      new Repeat(grammar.sym("VALUE"), Literal.create(","), 1)
     ));
 
     grammar.addSymbol("ME", new Seq(
@@ -534,7 +534,7 @@ public class QueryParser
     });
 
     grammar.addSymbol("WORD", new Repeat(
-      AnyChar.instance()
+      grammar.sym("CHAR"), 1
     ));
     grammar.addAction("WORD", new Action() {
       @Override
@@ -556,7 +556,7 @@ public class QueryParser
     ));
 
     grammar.addSymbol("NUMBER", new Repeat(
-      Range.create('0', '9')
+      Range.create('0', '9'), 1
     ));
     grammar.addAction("NUMBER", new Action() {
       @Override

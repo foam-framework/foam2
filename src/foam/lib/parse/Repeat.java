@@ -30,6 +30,9 @@ public class Repeat
   public Repeat(Parser parser) {
     this(parser, null, -1, -1);
   }
+  public Repeat(Parser parser, int minimum) {
+    this(parser, null, minimum, -1);
+  }
 
   public Repeat(Parser parser, String str) {
     this(parser, Literal.create(str));

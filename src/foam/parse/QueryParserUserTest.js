@@ -52,8 +52,8 @@ foam.CLASS({
       test( isValid("-id=6 | firstName=Simon"," ( id <>  ?  )  OR  ( firstname =  ?  ) ") , "The id is not equal to value1 OR the firstName is equal to value2");
       test( isValid("firstName=abc or id=20"," ( firstname =  ?  )  OR  ( id =  ?  ) ") , "The firstName is equal to value1 OR the id is equal to value2");
       test( isValid("firstName=abc and id=20"," ( firstname =  ?  )  AND  ( id =  ?  ) ") , "The firstName is equal to value1 AND the id is equal to value2");
-      test( isValid("id=20 and firstName=adam11 OR id<5 and firstName=john"," ( id =  ?  )  AND  ( firstname =  ?  )  OR  ( id <  ?  )  AND  ( firstname =  ?  ) ") , "(The id is equal to value1 AND the firstName is equal to value2) OR (the id is less than the value3 AND the firstName is equal to value4)");
-      test( isValid("id=20 firstName=adam11 OR id<5 firstName=john"," ( id =  ?  )  AND  ( firstname =  ?  )  OR  ( id <  ?  )  AND  ( firstname =  ?  ) ") , "(The id is equal to value1 AND 'whitespace' the firstName is equal to value2) OR (the id is less than the value3 AND 'whitespace' the firstName is equal to value4)");
+      test( isValid("id=20 and firstName=adam11 OR id<5 and firstName=john"," ( ( id =  ?  )  AND  ( firstname =  ?  ) )  OR  ( ( id <  ?  )  AND  ( firstname =  ?  ) ) ") , "(The id is equal to value1 AND the firstName is equal to value2) OR (the id is less than the value3 AND the firstName is equal to value4)");
+      test( isValid("id=20 firstName=adam11 OR id<5 firstName=john"," ( ( id =  ?  )  AND  ( firstname =  ?  ) )  OR  ( ( id <  ?  )  AND  ( firstname =  ?  ) ) ") , "(The id is equal to value1 AND 'whitespace' the firstName is equal to value2) OR (the id is less than the value3 AND 'whitespace' the firstName is equal to value4)");
 
       // TODO:
       test( isValid("((id<30) or (id>20))"," ( id <  ?  )  OR  ( id >  ?  ) ") , "((The id is less than the value1) OR (the id is greater than the value2))");
@@ -61,9 +61,9 @@ foam.CLASS({
       //          {"(((id<30) or (id>20)) and ((firstName=john) or (id>20)))"," ( ( ( ( ( ( ( ( id <  ?  ) ) ) )  OR  ( ( ( ( id >  ?  ) ) ) ) )  AND  ( ( ( firstname =  ?  ) ) ) ) ) ) "},//Not supported
       test( isValid("(id=20)"," id =  ?  ") , "(The id is equal to the value)");
       test( isValid("(firstName=adam)"," firstname =  ?  ") , "(The firstName is equal to value)");
-      test( isValid("((firstName=abc and id=20) or (firstName=abc and id=20))"," ( firstname =  ?  )  AND  ( id =  ?  )  OR  ( firstname =  ?  )  AND  ( id =  ?  ) ") , "((The firstName is equal to value1 AND the id is equal to value2) OR (the firstName is equal to value3 AND the id is equal to value4))");
+      test( isValid("((firstName=abc and id=20) or (firstName=abc and id=20))"," ( ( firstname =  ?  )  AND  ( id =  ?  ) )  OR  ( ( firstname =  ?  )  AND  ( id =  ?  ) ) ") , "((The firstName is equal to value1 AND the id is equal to value2) OR (the firstName is equal to value3 AND the id is equal to value4))");
       test( isValid("(firstName=adam)"," firstname =  ?  ") , "(The firstName is equal to value)");
-      test( isValid("firstName=adam11 and id=20 or firstName=john id=5"," ( firstname =  ?  )  AND  ( id =  ?  )  OR  ( firstname =  ?  )  AND  ( id =  ?  ) ") , "(the firstName is equal to value1 AND the id is equal to value2) OR (the firstName is equal to value3 AND the id is equal to value4)");
+      test( isValid("firstName=adam11 and id=20 or firstName=john id=5"," ( ( firstname =  ?  )  AND  ( id =  ?  ) )  OR  ( ( firstname =  ?  )  AND  ( id =  ?  ) ) ") , "(the firstName is equal to value1 AND the id is equal to value2) OR (the firstName is equal to value3 AND the id is equal to value4)");
       
       test( isValid("has:businessName"," ( ( (businessname <> '') is not true ) ) ") , "The businessName exist");
       test( isValid("is:emailVerified"," emailverified =  ?  ") , "The emailVerified is equal to true");
