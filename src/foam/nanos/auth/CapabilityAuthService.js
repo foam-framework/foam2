@@ -42,63 +42,7 @@ foam.CLASS({
     'static foam.mlang.MLang.*'
   ],
 
-  properties: [
-    {
-      class: 'Map',
-      name: 'cache',
-      javaFactory: `
-        return new ConcurrentHashMap<String, Boolean>();
-      `
-    },
-    {
-      name: 'initialized',
-      class: 'Boolean',
-      value: false
-    }
-  ],
-
   methods: [
-    {
-      name: 'initialize',
-      synchronized: true,
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        },
-      ],
-      javaCode: `
-        if ( getInitialized() )
-          return;
-
-        DAO userCapabilityJunctionDAO = (DAO) getX().get("userCapabilityJunctionDAO");
-        DAO capabilityDAO = (DAO) getX().get("localCapabilityDAO");
-        if ( capabilityDAO == null || userCapabilityJunctionDAO == null )
-          return;
-
-        Map<String, Boolean> cache = ( Map<String, Boolean> ) getCache();
-        Sink purgeSink = new Sink() {
-          public void put(Object obj, Detachable sub) {
-            cache.clear();
-          }
-          public void remove(Object obj, Detachable sub) {
-            cache.clear();
-          }
-          public void eof() {
-          }
-          public void reset(Detachable sub) {
-            cache.clear();
-          }
-        };
-
-        // Add the purge listener
-        userCapabilityJunctionDAO.listen(purgeSink, TRUE);
-        capabilityDAO.listen(purgeSink, TRUE);
-
-        // Initialization done
-        setInitialized(true);
-      `
-    },
     {
       name: 'check',
       documentation: `
@@ -148,18 +92,8 @@ foam.CLASS({
           null :
           user.getId() + ":" + realUser.getId() + permission;
         String userKey = user.getId() + permission;
-        String realUserKey = realUser.getId() == user.getId() ? null : realUser.getId() + permission;
-        this.initialize(x);
-
-        Boolean result = ( (Map<String, Boolean>) getCache() ).get(userKey);
-        if ( realUserKey != null ) result = result == null || ! result ?  ( (Map<String, Boolean>) getCache() ).get(realUserKey) : result;
-        if ( associationKey != null ) result = result == null || ! result ?  ( (Map<String, Boolean>) getCache() ).get(associationKey) : result;
-        if ( result != null ) {
-          if ( ! result ) maybeIntercept(x, permission);
-          return result;
-        }
-
-        result = false;
+        String realUserKey = realUser.getId() == user.getId() ? null
+          : (realUser.getSpid().equals(user.getSpid()) ? realUser.getId() + permission : null);
 
         try {
           DAO capabilityDAO = ( x.get("localCapabilityDAO") == null ) ? (DAO) x.get("capabilityDAO") : (DAO) x.get("localCapabilityDAO");
@@ -189,11 +123,6 @@ foam.CLASS({
             EQ(UserCapabilityJunction.SOURCE_ID, user.getId())
           );
           if ( userCapabilityJunctionDAO.find(AND(userPredicate, capabilityScope, predicate)) != null ) {
-            result = true;
-          }
-
-          (( Map<String, Boolean> ) getCache()).put(userKey, result);
-          if ( result ) {
             return true;
           }
 
@@ -204,11 +133,6 @@ foam.CLASS({
               EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId())
             );
             if ( userCapabilityJunctionDAO.find(AND(userPredicate, capabilityScope, predicate)) != null ) {
-              result = true;
-            }
-
-            (( Map<String, Boolean> ) getCache()).put(realUserKey, result);
-            if ( result ) {
               return true;
             }
           }
@@ -221,11 +145,6 @@ foam.CLASS({
               EQ(AgentCapabilityJunction.EFFECTIVE_USER, user.getId())
             );
             if ( userCapabilityJunctionDAO.find(AND(userPredicate, capabilityScope, predicate)) != null ) {
-              result = true;
-            }
-
-            (( Map<String, Boolean> ) getCache()).put(associationKey, result);
-            if ( result ) {
               return true;
             }
           }
