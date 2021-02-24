@@ -9,13 +9,12 @@ package foam.nanos.auth;
 import foam.core.ContextAwareSupport;
 import foam.core.X;
 import foam.dao.DAO;
-import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
+import foam.nanos.logger.Logger;
 import foam.nanos.session.Session;
-import foam.nanos.auth.AuthenticationException;
-import foam.nanos.auth.AuthorizationException;
-import static foam.mlang.MLang.EQ;
+
 import static foam.mlang.MLang.AND;
+import static foam.mlang.MLang.EQ;
 
 public class AgentUserAuthService
   extends    ContextAwareSupport
