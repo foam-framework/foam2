@@ -34,6 +34,7 @@ foam.CLASS({
     'foam.graph.map2d.RelationshipGridPlacementStrategy',
     'foam.u2.svg.map2d.IdPropertyPlacementPlanDecorator',
     'foam.u2.svg.TreeGraph',
+    'foam.u2.svg.graph.DAGView',
     'foam.u2.Tab',
     'foam.u2.Tabs'
   ],
@@ -161,12 +162,11 @@ foam.CLASS({
             window._testing.placementPlan = placementPlan;
             window._testing.graph = graph;
             return this.E()
-              .tag(self.TreeGraph, {
-                nodePlacementPlan: placementPlan,
+              .tag(self.DAGView, {
+                gridPlacement: placementPlan,
                 graph: graph,
-                size: 200,
-                nodeView: this.CapabilityGraphNodeView
-                // nodeView: 'foam.u2.svg.graph.ZoomedOutFObjectGraphNodeView'
+                nodeView: this.CapabilityGraphNodeView,
+                cellSize: 200
               })
               ;
           });
