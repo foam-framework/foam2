@@ -124,9 +124,12 @@
     {
       class: 'String',
       name: 'referenceSummary',
-      section: 'requestDetails',
+      section: 'approvalRequestInformation',
+      order: 21,
+      gridColumns: 6,
       transient: true,
       tableWidth: 200,
+      visibility: 'RO',
       tableCellFormatter: function(_,obj) {
         let self = this;
         this.__subSubContext__[obj.daoKey].find(obj.objId).then(requestObj => {
