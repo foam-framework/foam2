@@ -22,6 +22,14 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'of',
+      hidden: true,
+      value: "foam.nanos.crunch.MinMaxCapabilityData",
+      javaFactory:`
+        return foam.nanos.crunch.MinMaxCapabilityData.getOwnClassInfo();
+      `
+    },
+    {
       name: 'min',
       class: 'Int',
       value: 1
@@ -43,6 +51,18 @@ foam.CLASS({
       javaFactory: `
         return new MinMaxCapabilityWizardlet();
       `
+    },
+    {
+      class: 'Object',
+      name: 'wizardlet',
+      documentation: `
+        Defines a wizardlet to display this capability in a wizard. This
+        wizardlet will display after this capability's prerequisites.
+      `,
+      factory: function() {
+        return foam.nanos.crunch.ui.CapabilityWizardlet.create({isVisible: false}, this);
+      },
+      includeInDigest: false,
     },
   ],
 

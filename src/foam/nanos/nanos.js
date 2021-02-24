@@ -67,6 +67,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/Notifiable' },
   { name: "foam/nanos/auth/CreatedAware" },
   { name: "foam/nanos/auth/User" },
+  { name: "foam/nanos/auth/PermissionTableView" },
   { name: "foam/nanos/auth/LastModifiedAware" },
   { name: "foam/nanos/auth/LastModifiedByAware" },
   { name: "foam/nanos/auth/ServiceProviderAware" },
@@ -439,6 +440,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/Renewable" },
   { name: "foam/nanos/crunch/Refinements" },
   { name: "foam/nanos/crunch/MinMaxCapability" },
+  { name: "foam/nanos/crunch/MinMaxCapabilityData" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
   { name: "foam/nanos/crunch/CapabilityIntercept" },
   { name: "foam/nanos/crunch/CapabilityJunctionPayload" },
@@ -484,6 +486,7 @@ FOAM_FILES([
   { name: 'foam/nanos/crunch/predicate/CapabilityPrerequisitesGranted' },
   { name: 'foam/nanos/crunch/predicate/StatusChangedTo' },
   { name: 'foam/nanos/crunch/predicate/IsAgent' },
+  { name: 'foam/nanos/crunch/predicate/CapabilityJunctionTransitionToStatus' },
   //spid
   { name: "foam/nanos/auth/CreateUserCapabilityJunctionOnSpidSet" },
   { name: "foam/nanos/auth/SetUserServiceProviderJunctionRuleAction" },

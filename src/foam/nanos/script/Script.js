@@ -134,7 +134,7 @@ foam.CLASS({
       tableCellFormatter: function(value, obj) {
         this.start()
           .style({ color: value ? /*%APPROVAL3*/ 'green' : /*%GREY2%*/ 'grey' })
-          .add(value ? obj.ENABLED_YES : obj.ENABLED_NO )
+          .add(value ? obj.ENABLED_YES : obj && obj.ENABLED_NO || 'N')
         .end();
       },
       tableWidth: 90,

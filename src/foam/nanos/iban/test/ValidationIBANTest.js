@@ -56,7 +56,7 @@ foam.CLASS({
           test( "BR".equals(info.getCountry()), "Country parsed");
           test( "00360305".equals(info.getBankCode()), "BankCode parsed");
           test( "00001".equals(info.getBranch()), "Branch parsed");
-          test( "0009795493P1".equals(info.getAccountNumber()), "Account parsed");
+          test( "0009795493".equals(info.getAccountNumber()), "Account parsed");
         }
         // same but with spaces in input
         info = vban.parse("BR97 0036 0305 0000 1000 9795 493P 1");
@@ -65,7 +65,7 @@ foam.CLASS({
           test( "BR".equals(info.getCountry()), "Country parsed");
           test( "00360305".equals(info.getBankCode()), "BankCode parsed");
           test( "00001".equals(info.getBranch()), "Branch parsed");
-          test( "0009795493P1".equals(info.getAccountNumber()), "Account parsed");
+          test( "0009795493".equals(info.getAccountNumber()), "Account parsed");
         }
       } catch ( Exception e ) {
         test(false, e.getMessage());

@@ -454,13 +454,17 @@ foam.CLASS({
 
       var map = this.__subContext__.translationService.localeEntries;
       for ( var key in map ) {
-        var node = global;
-        var path = key.split('.');
+        try {
+          var node = global;
+          var path = key.split('.');
 
-        for ( var i = 0 ; node && i < path.length-1 ; i++ ) node = node[path[i]];
-        if ( node ) {
-          this.languageDefaults_.push([node, path[path.length-1], node[path[path.length-1]]]);
-          node[path[path.length-1]] = map[key];
+          for ( var i = 0 ; node && i < path.length-1 ; i++ ) node = node[path[i]];
+          if ( node ) {
+            this.languageDefaults_.push([node, path[path.length-1], node[path[path.length-1]]]);
+            node[path[path.length-1]] = map[key];
+          }
+        } catch (x) {
+          console.error('Error installing locale message.', key, x);
         }
       }
     },

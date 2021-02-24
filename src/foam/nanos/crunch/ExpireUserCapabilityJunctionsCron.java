@@ -55,7 +55,9 @@ public class ExpireUserCapabilityJunctionsCron implements ContextAgent {
       } else {
         activeJunction.setIsInGracePeriod(true);
       }
-      if ( activeJunction.getStatus() == CapabilityJunctionStatus.EXPIRED ) activeJunction.clearData();
+      if ( activeJunction.getStatus() == CapabilityJunctionStatus.EXPIRED ) {
+        activeJunction.getPayload().clearData();
+      }
       
       logger.debug("Moved UserCapabilityJunction : " + activeJunction.getId() + " into status :" + activeJunction.getStatus());
       userCapabilityJunctionDAO.put(activeJunction);

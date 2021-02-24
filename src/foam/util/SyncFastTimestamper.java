@@ -27,4 +27,8 @@ public class SyncFastTimestamper
     return super.createTimestamp();
   }
 
+  public synchronized String createTimestamp(long now) {
+    return super.createTimestamp(now);
+  }
+
 }

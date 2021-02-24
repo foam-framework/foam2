@@ -44,9 +44,9 @@ foam.CLASS({
       name: 'body',
       transient: true,
       javaGetter: `
-        Subject subject = (foam.nanos.auth.Subject) getX().get("subject");
+        Subject subject = (foam.nanos.auth.Subject) foam.core.XLocator.get().get("subject");
         String locale = ((foam.nanos.auth.User) subject.getRealUser()).getLanguage().getCode().toString();
-        TranslationService ts = (TranslationService) getX().get("translationService");
+        TranslationService ts = (TranslationService) foam.core.XLocator.get().get("translationService");
 
         String t1 = ts.getTranslation(locale, getClassInfo().getId()+ ".NOTIFICATION_BODY_P1", this.NOTIFICATION_BODY_P1);
         String capName = ts.getTranslation(locale, getCapabilitySource(), getCapabilityName());

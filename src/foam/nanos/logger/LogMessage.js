@@ -33,13 +33,13 @@ foam.CLASS({
     {
       name: 'hostname',
       class: 'String',
-      visibility: 'RO'
+      visibility: 'RO',
     },
     {
-      class: 'String',
       name: 'created',
+      class: 'DateTime',
       visibility: 'RO',
-      tableWidth: 180
+      javaFormatJSON: `formatter.outputReadableDate(get_(obj));`
     },
     {
       class: 'Reference',
@@ -89,7 +89,7 @@ foam.CLASS({
       name: 'severity',
       class: 'Enum',
       of: 'foam.log.LogLevel',
-      toJSON: function(value) { return value && value.label; },
+      javaFormatJSON: 'formatter.output(get_(obj).getName());',
       updateVisibility: 'RO',
       tableCellFormatter: function(severity, obj, axiom) {
          this

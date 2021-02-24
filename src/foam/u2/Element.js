@@ -25,22 +25,38 @@ foam.ENUM({
     {
       class: 'String',
       name: 'modePropertyName'
+    },
+    {
+      name: 'restrictDisplayMode',
+      value: function(mode) { return mode; }
     }
   ],
 
   methods: [
-    {
-      name: 'getVisibilityValue',
-      code: function(prop) {
-        return prop.visibility || prop[this.modePropertyName];
-      }
+    function getVisibilityValue(prop) {
+      return prop.visibility || prop[this.modePropertyName];
     }
   ],
 
   values: [
-    { name: 'CREATE', label: 'Create', modePropertyName: 'createVisibility' },
-    { name: 'VIEW',   label: 'View',   modePropertyName: 'readVisibility'   },
-    { name: 'EDIT',   label: 'Edit',   modePropertyName: 'updateVisibility' }
+    {
+      name: 'CREATE',
+      label: 'Create',
+      modePropertyName: 'createVisibility'
+    },
+    {
+      name: 'VIEW',
+      label: 'View',
+      modePropertyName: 'readVisibility',
+      restrictDisplayMode: function(mode) {
+        return mode == foam.u2.DisplayMode.RW ? foam.u2.DisplayMode.RO : mode;
+      }
+    },
+    {
+      name: 'EDIT',
+      label: 'Edit',
+      modePropertyName: 'updateVisibility'
+    }
   ]
 });
 
@@ -51,11 +67,18 @@ foam.ENUM({
 
   documentation: 'View display mode; how or if a view is displayed.',
 
+  properties: [
+    {
+      name: 'restrictDisplayMode',
+      value: function(mode) { return mode === foam.u2.DisplayMode.RW ? this : mode; }
+    }
+  ],
+
   values: [
     { name: 'RW',       label: 'Read-Write' },
-    { name: 'DISABLED', label: 'Disabled'   },
-    { name: 'RO',       label: 'Read-Only'  },
-    { name: 'HIDDEN',   label: 'Hidden'     }
+    { name: 'DISABLED', label: 'Disabled' },
+    { name: 'RO',       label: 'Read-Only' },
+    { name: 'HIDDEN',   label: 'Hidden', restrictDisplayMode: function() { return foam.u2.DisplayMode.HIDDEN; } }
   ]
 });
 
@@ -353,7 +376,7 @@ foam.CLASS({
       this.state = this.LOADED;
       if ( this.tabIndex ) this.setAttribute('tabindex', this.tabIndex);
       // Add a delay before setting the focus in case the DOM isn't visible yet.
-      if ( this.focused ) window.setTimeout(() => this.el().focus(), 70);
+      if ( this.focused ) window.setTimeout(() => { try { this.el().focus(); } catch(x) {} }, 70);
       // Allows you to take the DOM element and map it back to a
       // foam.u2.Element object.  This is expensive when building
       // lots of DOM since it adds an extra DOM call per Element.
@@ -2215,63 +2238,6 @@ foam.CLASS({
 });
 
 
-foam.ENUM({
-  package: 'foam.u2',
-  name: 'PermissionedPropertyVisibilityConstraints',
-
-  properties: [
-    {
-      class: 'Array',
-      name: 'allowedValues'
-    },
-    {
-      class: 'Enum',
-      of: 'foam.u2.DisplayMode',
-      name: 'fallbackValue'
-    }
-  ],
-
-  methods: [
-    function applyConstraints(displayMode) {
-      return this.allowedValues.some(x => displayMode === x)
-        ? displayMode
-        : this.fallbackValue;
-    }
-  ],
-
-  values: [
-    {
-      name: 'HIDDEN',
-      documentation: 'The visibility must be HIDDEN because the user lacks the requisite permission.',
-      allowedValues: [
-        foam.u2.DisplayMode.HIDDEN
-      ],
-      fallbackValue: foam.u2.DisplayMode.HIDDEN
-    },
-    {
-      name: 'RO_OR_HIDDEN',
-      documentation: 'The visibility must be read-only or hidden because the user has permission to read but not to write.',
-      allowedValues: [
-        foam.u2.DisplayMode.RO,
-        foam.u2.DisplayMode.HIDDEN
-      ],
-      fallbackValue: foam.u2.DisplayMode.RO
-    },
-    {
-      name: 'ANYTHING',
-      documentation: 'The user has all requisite permissions so the visibility is unconstrained.',
-      allowedValues: [
-        foam.u2.DisplayMode.RO,
-        foam.u2.DisplayMode.RW,
-        foam.u2.DisplayMode.HIDDEN,
-        foam.u2.DisplayMode.DISABLED
-      ],
-      fallbackValue: foam.u2.DisplayMode.RW
-    }
-  ]
-});
-
-
 foam.CLASS({
   package: 'foam.u2',
   name: 'PropertyViewRefinements',
@@ -2305,19 +2271,19 @@ foam.CLASS({
       name: 'createVisibility',
       adapt: function(o, n) { if ( foam.Object.isInstance(n) ) return foam.u2.DisplayMode.create(n); return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'The display mode for this property when the controller mode is CREATE.',
-      value: 'RW'
+      factory: function() { return foam.u2.DisplayMode.RW; }
     },
     {
       name: 'readVisibility',
       adapt: function(o, n) { if ( foam.Object.isInstance(n) ) return foam.u2.DisplayMode.create(n); return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'The display mode for this property when the controller mode is VIEW.',
-      value: 'RO'
+      factory: function() { return foam.u2.DisplayMode.RO; }
     },
     {
       name: 'updateVisibility',
       adapt: function(o, n) { if ( foam.Object.isInstance(n) ) return foam.u2.DisplayMode.create(n); return foam.String.isInstance(n) ? foam.u2.DisplayMode[n] : n; },
       documentation: 'The display mode for this property when the controller mode is EDIT.',
-      value: 'RW'
+      factory: function() { return foam.u2.DisplayMode.RW; }
     },
     {
       class: 'Boolean',
@@ -2357,6 +2323,50 @@ foam.CLASS({
       return e;
     },
 
+    function combineControllerModeAndVisibility_(data$, controllerMode$) {
+      /**
+        Create a VisibilitySlot which combines controllerMode and the mode specific visibility.
+        Is used in createVisibilityFor(), which also combines permissions.
+      **/
+
+      const DisplayMode = foam.u2.DisplayMode;
+
+      return foam.core.ProxySlot.create({
+        delegate$: controllerMode$.map(controllerMode => {
+          var visibility = controllerMode.getVisibilityValue(this);
+
+          // KGR: I'm not sure how this happens, but it does.
+          // TODO: find out how/where.
+          if ( foam.String.isInstance(visibility) )
+            visibility = foam.u2.DisplayMode[visibility];
+
+          if ( DisplayMode.isInstance(visibility) )
+            return foam.core.ConstantSlot.create({value: visibility});
+
+          if ( foam.Function.isInstance(visibility) ) {
+            var slot = foam.core.ExpressionSlot.create({
+              obj$: data$,
+              // Disallow RW DisplayMode when in View Controller Mode
+              code: visibility
+            });
+
+            // Call slot.args so its expression extracts args from visibility function
+            slot.args;
+
+            slot.code = function() {
+              return controllerMode.restrictDisplayMode(visibility.apply(this, arguments));
+            };
+
+            return slot;
+          }
+
+          if ( foam.core.Slot.isInstance(visibility) ) return visibility;
+
+          throw new Error('Property.visibility must be set to one of the following: (1) a value of DisplayMode, (2) a function that returns a value of DisplayMode, or (3) a slot whose value is a value of DisplayMode. Property ' + this.name + ' was set to ' + visibility + ' instead.');
+        })
+      });
+    },
+
     function createVisibilityFor(data$, controllerMode$) {
       /**
        * Return a slot of DisplayMode based on:
@@ -2366,73 +2376,38 @@ foam.CLASS({
        *   * readVisibility
        *   * readPermissionRequired
        *   * writePermissionRequired
+       *
+       * 'this' is a Property
        */
+//      controllerMode$.sub(() => { debugger; /* I don't think this ever happens. KGR */ });
+
+      var vis = this.combineControllerModeAndVisibility_(data$, controllerMode$)
+
+      if ( ! this.readPermissionRequired && ! this.writePermissionRequired ) return vis;
+
       const DisplayMode = foam.u2.DisplayMode;
 
-      var slot = foam.core.ProxySlot.create({
-        delegate$: controllerMode$.map(controllerMode => {
-          var value = controllerMode.getVisibilityValue(this);
+      var perm = data$.map((data) => {
+        if ( ! data || ! data.__subContext__.auth ) return DisplayMode.HIDDEN;
+        var auth     = data.__subContext__.auth;
+        var propName = this.name.toLowerCase();
+        var clsName  = data.cls_.name.toLowerCase();
+        var canRead  = this.readPermissionRequired === false;
 
-          if ( foam.String.isInstance(value) )
-            value = DisplayMode[foam.String.constantize(value)];
-
-          if ( DisplayMode.isInstance(value) ) {
-            return foam.core.ConstantSlot.create({ value: value });
-          }
-
-          if ( foam.Function.isInstance(value) ) {
-            var slot = foam.core.ExpressionSlot.create({
-              obj$: data$,
-              // Disallow RW DisplayMode when in View Controller Mode
-              code: value
-            });
-
-            slot.args;
-
-            slot.code = function() {
-              var ret = value.apply(this, arguments);
-              return controllerMode == foam.u2.ControllerMode.VIEW && ret == DisplayMode.RW ? DisplayMode.RO : ret;
-            };
-
-            return slot;
-          }
-
-          if ( foam.core.Slot.isInstance(value) ) {
-            return value;
-          }
-
-          throw new Error('Property.visibility must be set to one of the following: (1) a value of DisplayMode, (2) a function that returns a value of DisplayMode, or (3) a slot whose value is a value of DisplayMode. Property ' + this.name + ' was set to ' + value + ' instead.');
-        })
+        return auth.check(null, `${clsName}.rw.${propName}`)
+          .then(function(rw) {
+            if ( rw      ) return DisplayMode.RW;
+            if ( canRead ) return DisplayMode.RO;
+            return auth.check(null, `${clsName}.ro.${propName}`)
+              .then((ro) => ro ? DisplayMode.RO : DisplayMode.HIDDEN);
+          });
       });
 
-      if ( this.readPermissionRequired || this.writePermissionRequired ) {
-        const PPVC = foam.u2.PermissionedPropertyVisibilityConstraints;
-        var visSlot  = slot;
-        var permSlot = data$.map((data) => {
-          if ( ! data || ! data.__subContext__.auth ) return PPVC.HIDDEN;
-          var auth     = data.__subContext__.auth;
-          var propName = this.name.toLowerCase();
-          var clsName  = data.cls_.name.toLowerCase();
-          var canRead  = this.readPermissionRequired === false;
-
-          return auth.check(null, `${clsName}.rw.${propName}`)
-            .then(function(rw) {
-              if ( rw ) return PPVC.ANYTHING;
-              if ( canRead ) return PPVC.RO_OR_HIDDEN;
-              return auth.check(null, `${clsName}.ro.${propName}`)
-                .then((ro) => ro ? PPVC.RO_OR_HIDDEN : PPVC.HIDDEN);
-            });
-        });
-
-        slot = foam.core.ArraySlot.create({slots: [visSlot, permSlot] }).map((arr) => {
-          var vis  = arr[0];
-          var perm = arr[1] || PPVC.HIDDEN;
-
-          return perm.applyConstraints(vis);
-        });
-      }
-
-      return slot;
+      return foam.core.ArraySlot.create({slots: [vis, perm]}).map((arr) => {
+        // The || HIDDEN is required because slot.map() above which returns
+        // a promise will generate an intermediate null value.
+        return arr[0].restrictDisplayMode(arr[1] || DisplayMode.HIDDEN)
+      });
     }
   ]
 });

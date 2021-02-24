@@ -64,19 +64,12 @@
 
   sections: [
     {
-      name: 'requestDetails',
-      title: 'Approval Request Information',
-      order: 0
-    },
-    {
-      name: 'complianceInformation',
-      title: 'Compliance',
-      order: 1
+      name: 'approvalRequestInformation',
+      order: 10
     },
     {
       name: 'systemInformation',
-      title: 'System Information',
-      order: 2,
+      order: 30,
       permissionRequired: true
     }
   ],
@@ -114,16 +107,6 @@
     },
     {
       class: 'foam.comics.v2.CannedQuery',
-      label: 'Cancelled',
-      predicateFactory: function(e) {
-        return  e.EQ(
-          foam.nanos.approval.ApprovalRequest.STATUS,
-          foam.nanos.approval.ApprovalStatus.CANCELLED
-        );
-      }
-    },
-    {
-      class: 'foam.comics.v2.CannedQuery',
       label: 'All',
       predicateFactory: function(e) {
         return e.TRUE;
@@ -141,16 +124,74 @@
     {
       class: 'Long',
       name: 'id',
-      section: 'requestDetails',
+      section: 'approvalRequestInformation',
+      order: 10,
+      gridColumns: 6,
       visibility: 'RO',
-      documentation: 'Sequence number.'
+      documentation: 'Approval request primary key.'
+    },
+    {
+      class: 'Object',
+      javaType: 'Object',
+      name: 'objId',
+      includeInDigest: true,
+      section: 'approvalRequestInformation',
+      order: 20,
+      gridColumns: 6,
+      documentation: 'id of the object that needs approval.',
+      tableWidth: 150
+    },
+    {
+      class: 'Enum',
+      of: 'foam.nanos.ruler.Operations',
+      name: 'operation',
+      label: 'Action',
+      includeInDigest: false,
+      section: 'approvalRequestInformation',
+      order: 30,
+      gridColumns: 6
+    },
+    {
+      class: 'String',
+      name: 'description',
+      documentation: `Approval request description.`,
+      includeInDigest: false,
+      tableWidth: 200,
+      section: 'approvalRequestInformation',
+      order: 40,
+      gridColumns: 6
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.Group',
+      name: 'group',
+      documentation: `When set, each user in the group will receive a request for approval.
+      If "approver" property is set, "group" property is ignored.`,
+      includeInDigest: false,
+      section: 'approvalRequestInformation',
+      order: 50,
+      gridColumns: 6
+    },
+    {
+      class: 'Enum',
+      of: 'foam.nanos.approval.ApprovalStatus',
+      name: 'status',
+      value: 'REQUESTED',
+      includeInDigest: true,
+      section: 'approvalRequestInformation',
+      order: 60,
+      gridColumns: 6,
+      javaFactory: 'return foam.nanos.approval.ApprovalStatus.REQUESTED;',
+      visibility: 'RO'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'approver',
       includeInDigest: true,
-      section: 'systemInformation',
+      section: 'approvalRequestInformation',
+      order: 70,
+      gridColumns: 6,
       documentation: `The user that is requested for approval. When set, "group" property is ignored.`,
       view: function(_, X) {
         let slot = foam.core.SimpleSlot.create();
@@ -199,33 +240,92 @@
       visibility: 'RO'
     },
     {
-      class: 'Object',
-      javaType: 'Object',
-      name: 'objId',
+      class: 'String',
+      name: 'classification',
+      label: 'Approval Type',
+      section: 'approvalRequestInformation',
+      order: 80,
+      gridColumns: 6,
+      includeInDigest: false,
+      tableWidth: 450,
+      documentation: `Should be unique to a certain type of requests and created within a single rule.
+      For example "IdentityMind Business approval".
+      When retrieving approval requests from a dao, do not use daoKey, use classification instead:
+      mlang.AND(
+        EQ(ApprovalRequest.OBJ_ID, objectId),
+        EQ(ApprovalRequest.REQUEST_REFERENCE, "reference")
+      )`
+    },
+    {
+      class: 'DateTime',
+      name: 'created',
+      section: 'approvalRequestInformation',
+      order: 100,
+      gridColumns: 6,
       includeInDigest: true,
-      section: 'requestDetails',
-      documentation: 'id of the object that needs approval.',
-      tableWidth: 150,
-      tableCellFormatter: function(objId) {
-        let self = this;
-        var userId = parseInt(objId);
-        if ( !! userId ) {
-          this.__subSubContext__.userDAO.find(userId).then(function(a) {
-          if ( a != undefined ) {
-            self.add(a.toSummary());
-          } else {
-            self.add(objId);
-          }
-          }).catch(function(err) {
-            self.add(objId);
-          });
-        }
+      visibility: function(created) {
+        return created ?
+          foam.u2.DisplayMode.RO :
+          foam.u2.DisplayMode.HIDDEN;
       }
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
+      includeInDigest: true,
+      section: 'approvalRequestInformation',
+      order: 110,
+      gridColumns: 3
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+      includeInDigest: true,
+      section: 'approvalRequestInformation',
+      order: 115,
+      gridColumns: 3,
+      readPermissionRequired: true
+    },
+    {
+      class: 'DateTime',
+      name: 'lastModified',
+      includeInDigest: true,
+      section: 'approvalRequestInformation',
+      order:  120,
+      gridColumns: 6,
+      visibility: function(lastModified) {
+        return lastModified ?
+          foam.u2.DisplayMode.RO :
+          foam.u2.DisplayMode.HIDDEN;
+      }
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedBy',
+      includeInDigest: true,
+      section: 'approvalRequestInformation',
+      order: 130,
+      gridColumns: 6,
+      readPermissionRequired: true
+    },
+    {
+      class: 'String',
+      name: 'memo',
+      view: { class: 'foam.u2.tag.TextArea', rows: 3, cols: 60 },
+      documentation: 'Meant to be used for explanation on why request was approved/rejected',
+      includeInDigest: true,
+      section: 'approvalRequestInformation',
+      order: 135
     },
     {
       class: 'String',
       name: 'daoKey',
       section: 'systemInformation',
+      order: 10,
+      gridColumns: 6,
       documentation: `Used internally in approvalDAO to point where requested object can be found.
       Should not be used to retrieve approval requests for a given objects
       since an object can have multiple requests of different nature. When used in conjunction with serverDaoKey,
@@ -236,30 +336,33 @@
       class: 'String',
       name: 'serverDaoKey',
       section: 'systemInformation',
+      order: 20,
+      gridColumns: 6,
       documentation: `Used internally in approvalDAO if an approval request concerns both a clientDAO and
       a server side dao. The server dao key is mainly used for backend actions that get executed on
-      the object as a cause of the approval request being approved or rejected.`
+      the object as a cause of the approval request being approved or rejected.`,
+      factory: function(){
+        return this.daoKey;
+      },
+      javaFactory: `
+        return getDaoKey();
+      `
     },
     {
-      class: 'String',
-      name: 'classification',
-      label: 'Approval Type',
-      section: 'requestDetails',
+      class: 'Boolean',
+      name: 'isTrackingRequest',
+      includeInDigest: true,
+      section: 'systemInformation',
+      order: 30,
+      gridColumns: 6
+    },
+    {
+      class: 'Boolean',
+      name: 'isFulfilled',
       includeInDigest: false,
-      tableWidth: 450,
-      documentation: `Should be unique to a certain type of requests and created within a single rule.
-      For example "IdentityMind Business approval".
-      When retrieving approval requests from a dao, do not use daoKey, use classification instead:
-      mlang.AND(
-        EQ(ApprovalRequest.OBJ_ID, objectId),
-        EQ(ApprovalRequest.REQUEST_REFERENCE, "reference")
-      )`,
-      gridColumns: 4,
-      visibility: function(classification) {
-        return classification ?
-          'RO' :
-          'HIDDEN';
-      }
+      section: 'systemInformation',
+      order: 40,
+      gridColumns: 6
     },
     {
       class: 'Int',
@@ -269,8 +372,9 @@
       Future: populated in approvalRequestDAO pipeline based on configurations.
       Currentely populated as 1.`,
       includeInDigest: false,
-      gridColumns: 4,
       section: 'systemInformation',
+      order: 50,
+      gridColumns: 6,
       visibility: function(points) {
         return points ?
           foam.u2.DisplayMode.RO :
@@ -282,8 +386,9 @@
       name: 'requiredPoints',
       value: 1,
       includeInDigest: false,
-      gridColumns: 4,
-      section: 'requestDetails',
+      section: 'systemInformation',
+      order: 60,
+      gridColumns: 3,
       documentation: `Defines how many approvers required and approvers' ranks.
       E.g. when set to 10:
       1) 10 approval requests with "points" set to 1.
@@ -301,8 +406,9 @@
       name: 'requiredRejectedPoints',
       value: 1,
       includeInDigest: false,
-      gridColumns: 4,
-      section: 'requestDetails',
+      section: 'systemInformation',
+      order: 70,
+      gridColumns: 3,
       visibility: function(requiredRejectedPoints) {
         return requiredRejectedPoints ?
           foam.u2.DisplayMode.RO :
@@ -310,126 +416,12 @@
       }
     },
     {
-      class: 'Reference',
-      of: 'foam.nanos.auth.Group',
-      name: 'group',
-      documentation: `When set, each user in the group will receive a request for approval.
-      If "approver" property is set, "group" property is ignored.`,
-      includeInDigest: false,
-      section: 'requestDetails',
-      visibility: function(group) {
-        return group ?
-          foam.u2.DisplayMode.RO :
-          foam.u2.DisplayMode.HIDDEN;
-      }
-    },
-    {
-      class: 'Enum',
-      of: 'foam.nanos.approval.ApprovalStatus',
-      name: 'status',
-      value: 'REQUESTED',
-      includeInDigest: true,
-      section: 'requestDetails',
-      javaFactory: 'return foam.nanos.approval.ApprovalStatus.REQUESTED;',
-      visibility: 'RO'
-    },
-    {
-      class: 'String',
-      name: 'memo',
-      view: { class: 'foam.u2.tag.TextArea', rows: 5, cols: 80 },
-      documentation: 'Meant to be used for explanation on why request was approved/rejected',
-      includeInDigest: true,
-      section: 'requestDetails',
-      visibility: function(memo) {
-        if ( memo ) {
-          return foam.u2.DisplayMode.RO;
-        } else {
-          return foam.u2.DisplayMode.HIDDEN;
-        }
-      }
-    },
-    {
-      class: 'String',
-      name: 'description',
-      documentation: `Approval request description.`,
-      includeInDigest: false,
-      tableWidth: 200,
-      section: 'requestDetails',
-      visibility: function(description) {
-        return description ?
-          foam.u2.DisplayMode.RO :
-          foam.u2.DisplayMode.HIDDEN;
-      }
-    },
-    {
-      class: 'String',
-      name: 'token',
-      documentation: 'token in email for ‘click to approve’.',
-      includeInDigest: true,
-      section: 'systemInformation',
-      readPermissionRequired: true,
-      writePermissionRequired: true
-    },
-    {
-      class: 'DateTime',
-      name: 'created',
-      section: 'requestDetails',
-      includeInDigest: true,
-      gridColumns: 6,
-      visibility: function(created) {
-        return created ?
-          foam.u2.DisplayMode.RO :
-          foam.u2.DisplayMode.HIDDEN;
-      }
-    },
-    {
-      class: 'DateTime',
-      name: 'lastModified',
-      gridColumns: 6,
-      includeInDigest: true,
-      section: 'requestDetails',
-      visibility: function(lastModified) {
-        return lastModified ?
-          foam.u2.DisplayMode.RO :
-          foam.u2.DisplayMode.HIDDEN;
-      }
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'createdBy',
-      includeInDigest: true,
-      section: 'requestDetails',
-      tableCellFormatter: function(initiatingUser) {
-        let self = this;
-        this.__subSubContext__.userDAO.find(initiatingUser).then(user => {
-          self.add(user ? user.toSummary() : `User #${initiatingUser}`);
-        });
-      }
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'createdByAgent',
-      includeInDigest: true,
-      section: 'requestDetails',
-      readPermissionRequired: true,
-      writePermissionRequired: true
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'lastModifiedBy',
-      includeInDigest: true,
-      section: 'requestDetails',
-      readPermissionRequired: true,
-      writePermissionRequired: true
-    },
-    {
       class: 'Object',
       name: 'refObjId',
       includeInDigest: true,
-      hidden: true,
+      section: 'systemInformation',
+      order: 80,
+      gridColumns: 6,
       readPermissionRequired: true,
       writePermissionRequired: true,
       documentation: `
@@ -443,7 +435,9 @@
       class: 'String',
       name: 'refDaoKey',
       includeInDigest: true,
-      hidden: true,
+      section: 'systemInformation',
+      order: 90,
+      gridColumns: 6,
       readPermissionRequired: true,
       writePermissionRequired: true,
       documentation: `
@@ -454,29 +448,15 @@
       `
     },
     {
-      class: 'Boolean',
-      name: 'isTrackingRequest',
+      class: 'String',
+      name: 'token',
+      documentation: 'token in email for ‘click to approve’.',
       includeInDigest: true,
-      section: 'systemInformation'
-    },
-    {
-      class: 'Boolean',
-      name: 'isFulfilled',
-      includeInDigest: false,
-      visibility: 'HIDDEN'
-    },
-    {
-      class: 'Enum',
-      of: 'foam.nanos.ruler.Operations',
-      name: 'operation',
-      label: 'Action',
-      includeInDigest: false,
-      section: 'requestDetails',
-      visibility: function(operation) {
-        return operation ?
-          foam.u2.DisplayMode.RO :
-          foam.u2.DisplayMode.HIDDEN;
-      }
+      section: 'systemInformation',
+      order: 100,
+      gridColumns: 6,
+      readPermissionRequired: true,
+      writePermissionRequired: true
     },
     {
       class: 'String',
@@ -550,7 +530,7 @@
   actions: [
     {
       name: 'approve',
-      section: 'requestDetails',
+      section: 'approvalRequestInformation',
       isAvailable: function(isTrackingRequest, status) {
         if ( status !== this.ApprovalStatus.REQUESTED ) return false;
         return ! isTrackingRequest;
@@ -572,7 +552,7 @@
     },
     {
       name: 'approveWithMemo',
-      section: 'requestDetails',
+      section: 'approvalRequestInformation',
       isAvailable: function(isTrackingRequest, status) {
         if ( status !== this.ApprovalStatus.REQUESTED ) return false;
         return ! isTrackingRequest;
@@ -588,7 +568,7 @@
     },
     {
       name: 'reject',
-      section: 'requestDetails',
+      section: 'approvalRequestInformation',
       isAvailable: function(isTrackingRequest, status) {
         if ( status !== this.ApprovalStatus.REQUESTED ) return false;
         return ! isTrackingRequest;
@@ -606,7 +586,7 @@
     },
     {
       name: 'cancel',
-      section: 'requestDetails',
+      section: 'approvalRequestInformation',
       isAvailable: function(isTrackingRequest, status) {
         if ( status !== this.ApprovalStatus.REQUESTED ) return false;
         return isTrackingRequest;
@@ -632,7 +612,7 @@
     },
     {
       name: 'viewReference',
-      section: 'requestDetails',
+      section: 'approvalRequestInformation',
       isDefault: true,
       isAvailable: function() {
         var self = this;
@@ -774,6 +754,7 @@
       tableWidth: 100
     }
   ],
+
   listeners: [
     {
       name: 'approveWithMemoL',

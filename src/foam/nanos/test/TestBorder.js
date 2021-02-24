@@ -21,6 +21,7 @@ foam.CLASS({
 
   properties: [
     'status',
+    { class: 'Int', name: 'total' },
     { class: 'Int', name: 'passed' },
     { class: 'Int', name: 'failed' }
   ],
@@ -35,11 +36,21 @@ foam.CLASS({
             .add(this.RUN_ALL, this.RUN_FAILED_TESTS)
           .endContext()
         .end()
+        .start('span').add('Total: ', this.total$).end()
         .start('span').add('Passed: ', this.passed$).end()
         .start('span').add('Failed: ', this.failed$).end()
         .start('span').add('Status: ', this.status$).end();
 
       this.SUPER();
+
+      var self = this;
+      this.data.select({
+        put: function(t) {
+          if ( t && t.enabled ) {
+            self.total += 1;
+          }
+        }
+      });
     },
 
     function runTests(dao) {
@@ -52,9 +63,14 @@ foam.CLASS({
       dao.select({
         put: function(t) {
           self.status = 'Testing: ' + t.id;
-          t.run();
-          self.passed += t.passed;
-          self.failed += t.failed;
+          try {
+            t.run();
+            self.passed += t.passed;
+            self.failed += t.failed;
+          } catch (e) {
+            console.error('Failed testing', t.id, e);
+            self.failed += 1;
+          }
         },
         eof: function() {
           var duration = (Date.now() - startTime) / 1000;
