@@ -9,13 +9,12 @@ package foam.nanos.auth;
 import foam.core.ContextAwareSupport;
 import foam.core.X;
 import foam.dao.DAO;
-import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
+import foam.nanos.logger.Logger;
 import foam.nanos.session.Session;
-import foam.nanos.auth.AuthenticationException;
-import foam.nanos.auth.AuthorizationException;
-import static foam.mlang.MLang.EQ;
+
 import static foam.mlang.MLang.AND;
+import static foam.mlang.MLang.EQ;
 
 public class AgentUserAuthService
   extends    ContextAwareSupport
@@ -33,7 +32,7 @@ public class AgentUserAuthService
   @Override
   public void start() {
     userDAO_          = (DAO) getX().get("localUserDAO");
-    groupDAO_         = (DAO) getX().get("groupDAO");
+    groupDAO_         = (DAO) getX().get("localGroupDAO");
     sessionDAO_       = (DAO) getX().get("localSessionDAO");
     agentJunctionDAO_ = (DAO) getX().get("agentJunctionDAO");
   }
@@ -44,7 +43,7 @@ public class AgentUserAuthService
     act on behalf of others while retaining information on the user.
   */
   public User actAs(X x, User entity) throws AuthenticationException {
-    User agent = ((Subject) x.get("subject")).getUser();
+    User agent = ((Subject) x.get("subject")).getRealUser();
     User user  = (User) userDAO_.find(entity.getId());
 
     // Check for current context user

@@ -57,6 +57,7 @@ foam.CLASS({
         this.args = {};
       }
     },
+
     function initE() {
       var self = this;
       var callFromProperty = function() {
