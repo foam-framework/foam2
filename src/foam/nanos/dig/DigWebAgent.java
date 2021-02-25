@@ -22,21 +22,17 @@ public class DigWebAgent extends ContextAwareSupport
   public DigWebAgent() {}
 
   public void execute(X x) {
-    Logger              logger  = new PrefixLogger(new Object[] { this.getClass().getSimpleName() }, (Logger) x.get("logger"));
+    Logger              logger = (Logger) x.get("logger");
 
     HttpServletResponse resp    = x.get(HttpServletResponse.class);
     HttpParameters      p       = x.get(HttpParameters.class);
     Command             command = (Command) p.get(Command.class);
     Format              format  = (Format) p.get(Format.class);
-    PM                  pm      = new PM(getClass().getSimpleName(), command.getName() + '/' + format.getName());
+    PM                  pm      = new PM(getClass(), command.getName() + '/' + format.getName());
+
+    logger  = new PrefixLogger(new Object[] { this.getClass().getSimpleName() }, logger);
 
     try {
-      PrintWriter out = (PrintWriter) x.get(PrintWriter.class);
-      if ( out == null ) {
-        out = resp.getWriter();
-        x = x.put(java.io.PrintWriter.class, out);
-      }
-
       // Find the operation
       DigFormatDriver driver = DigFormatDriverFactory.create(getX(), format);
 
