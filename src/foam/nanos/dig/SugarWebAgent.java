@@ -59,6 +59,11 @@ public class SugarWebAgent
     var pm = new PM(SugarWebAgent.class.getSimpleName(), "");
 
     try {
+      if ( out == null ) {
+        out = resp.getWriter();
+        x = x.put(java.io.PrintWriter.class, out);
+      }
+
       if ( SafetyUtil.isEmpty(data) ) {
         DigErrorMessage error = new GeneralException.Builder(x)
           .setMessage("Empty data")

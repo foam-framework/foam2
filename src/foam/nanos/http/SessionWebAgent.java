@@ -98,7 +98,7 @@ public class SessionWebAgent
       }
 
       // execute delegate
-      getDelegate().execute(session.getContext().put(HttpServletResponse.class, resp).put(HttpServletRequest.class, req));
+      getDelegate().execute(session.getContext().put(HttpServletResponse.class, resp).put(HttpServletRequest.class, req).put(HttpParameters.class, x.get(HttpParameters.class)));
 
     } catch ( AuthorizationException e ) {
       // report permission issues
