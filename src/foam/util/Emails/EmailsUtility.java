@@ -109,22 +109,26 @@ public class EmailsUtility {
         templateArgs = new HashMap<>();
         templateArgs.put("template", templateName);
       }
+
+      String url = appConfig.getUrl().replaceAll("/$", "");
+      templateArgs.put("logo", (url + "/" + theme.getLogo()));
+      templateArgs.put("appLink", url);
+      templateArgs.put("appName", (theme.getAppName()));
+
+      templateArgs.put("locale", user.getLanguage().getCode().toString());
+  
+      foam.nanos.auth.Address address = supportConfig.getSupportAddress();
+      templateArgs.put("supportAddress", address == null ? "" : address.toSummary());
       templateArgs.put("supportPhone", (supportConfig.getSupportPhone()));
       templateArgs.put("supportEmail", (supportConfig.getSupportEmail()));
-
+  
       // personal support user
       User psUser = supportConfig.findPersonalSupportUser(x);
       templateArgs.put("personalSupportPhone", psUser == null ? "" : psUser.getPhoneNumber());
       templateArgs.put("personalSupportEmail", psUser == null ? "" : psUser.getEmail());
       templateArgs.put("personalSupportFirstName", psUser == null ? "" : psUser.getFirstName());
       templateArgs.put("personalSupportFullName", psUser == null ? "" : psUser.getLegalName());
-
-      foam.nanos.auth.Address address = supportConfig.getSupportAddress();
-      templateArgs.put("supportAddress", address == null ? "" : address.toSummary());
-      templateArgs.put("appName", (theme.getAppName()));
-      String url = appConfig.getUrl().replaceAll("/$", "");
-      templateArgs.put("logo", (url + "/" + theme.getLogo()));
-      templateArgs.put("appLink", url);
+      
       emailMessage.setTemplateArguments(templateArgs);
     }
 
@@ -142,5 +146,4 @@ public class EmailsUtility {
     emailMessage.setStatus(foam.nanos.notification.email.Status.UNSENT);
     email.put(emailMessage);
   }
-
 }

@@ -5,11 +5,10 @@
  */
 
 foam.INTERFACE({
-  package: 'foam.u2.svg.graph',
+  package: 'foam.u2.svg.map2d',
   name: 'GridPlacementStrategy',
   documentation: `
-    Interface for a strategy for placing objects in a 2D
-    coordinate spave
+    Provides a plan for placing objects in a 2D coordinate space.
   `,
 
   properties: [
@@ -22,7 +21,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'getPlan',
-      type: 'foam.u2.svg.graph.GridPlacementPlan'
+      type: 'foam.u2.svg.map2d.GridPlacementPlan'
     }
   ]
 });
