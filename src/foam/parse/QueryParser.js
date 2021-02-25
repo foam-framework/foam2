@@ -78,7 +78,7 @@ foam.CLASS({
 
           and: repeat(
               sym('expr'),
-              literalIC(' AND '), 1),
+              alt(literalIC(' AND '), literal(' ')), 1),
 
           expr: alt(
               sym('paren'),

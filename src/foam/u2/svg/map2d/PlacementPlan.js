@@ -1,12 +1,15 @@
 /**
  * @license
- * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * Copyright 2021 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.INTERFACE({
-  package: 'foam.u2.svg.graph',
-  name: 'GridPlacementPlan',
+  package: 'foam.u2.svg.map2d',
+  name: 'PlacementPlan',
+  documentation: `
+    Provides a mapping for FObjects to pixel coordinates.
+  `,
 
   properties: [
     {
@@ -26,8 +29,8 @@ foam.INTERFACE({
         { name: 'obj', type: 'FObject' }
       ],
       documentation: `
-        Given an FObject, returns an array of cell coordinates,
-        or null if the object hasn't been planned for.
+        Given an FObject, returns an array of pixel coordinates,
+        or null if the object cannot be mapped.
       `
     }
   ]
