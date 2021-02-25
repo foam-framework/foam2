@@ -23,21 +23,21 @@ foam.CLASS({
   `,
 
   imports: [
-    'capabilityDAO',
-    'userCapabilityJunctionDAO'
+    'userCapabilityJunctionDAO',
+    'capabilityDAO'
   ],
 
   requires: [
-    'foam.dao.PromisedDAO',
     'foam.graph.GraphBuilder',
-    'foam.nanos.crunch.Capability',
+    'foam.dao.PromisedDAO',
     'foam.nanos.crunch.UserCapabilityJunction',
-    'foam.u2.Tab',
-    'foam.u2.Tabs',
+    'foam.nanos.crunch.Capability',
     'foam.u2.crunch.lab.CapabilityGraphNodeView',
-    'foam.u2.svg.TreeGraph',
+    'foam.u2.svg.graph.RelationshipGridPlacementStrategy',
     'foam.u2.svg.graph.IdPropertyPlacementPlanDecorator',
-    'foam.u2.svg.graph.RelationshipGridPlacementStrategy'
+    'foam.u2.svg.TreeGraph',
+    'foam.u2.Tab',
+    'foam.u2.Tabs'
   ],
 
   messages: [
@@ -135,6 +135,7 @@ foam.CLASS({
       return this.slot(function (rootCapability, crunchUser, relation) {
         if ( ! rootCapability ) return this.E();
         var graphBuilder = self.GraphBuilder.create();
+
         // Having these variables here makes promise returns cleaner
         var rootCapabilityObj = null;
         var placementPlan = null;
