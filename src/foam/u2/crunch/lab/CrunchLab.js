@@ -15,7 +15,7 @@ foam.CLASS({
 
   css: `
     ^ svg {
-      height: calc(100% - 40px); /* temp */
+      display: inline-block;
     }
     ^ .foam-u2-view-RichChoiceView-selection-view {
       width: 30vw;
@@ -33,9 +33,10 @@ foam.CLASS({
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.crunch.Capability',
     'foam.u2.crunch.lab.CapabilityGraphNodeView',
-    'foam.u2.svg.graph.RelationshipGridPlacementStrategy',
-    'foam.u2.svg.graph.IdPropertyPlacementPlanDecorator',
+    'foam.graph.map2d.RelationshipGridPlacementStrategy',
+    'foam.u2.svg.map2d.IdPropertyPlacementPlanDecorator',
     'foam.u2.svg.TreeGraph',
+    'foam.u2.svg.graph.DAGView',
     'foam.u2.Tab',
     'foam.u2.Tabs'
   ],
@@ -174,13 +175,16 @@ foam.CLASS({
               delegate: placementPlan,
               targetProperty: 'id'
             });
+            window._testing = {};
+            window._testing.placementPlan = placementPlan;
+            window._testing.graph = graph;
             return this.E()
-              .tag(self.TreeGraph, {
-                nodePlacementPlan: placementPlan,
+              .tag(self.DAGView, {
+                gridPlacement: placementPlan,
                 graph: graph,
-                size: 200,
-                nodeView: this.CapabilityGraphNodeView
-                // nodeView: 'foam.u2.svg.graph.ZoomedOutFObjectGraphNodeView'
+                nodeView: this.CapabilityGraphNodeView,
+                cellSize: 200,
+                zoom: 0.7
               })
               ;
           });

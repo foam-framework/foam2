@@ -39,6 +39,10 @@ public class Repeat
     this(parser, delimiter, -1, -1);
   }
 
+  public Repeat(Parser parser, int minimum) {
+    this(parser, null, minimum, -1);
+  }
+
   public Repeat(Parser parser, Parser delimiter, int minimum) {
     this(parser, delimiter, minimum, -1);
   }
