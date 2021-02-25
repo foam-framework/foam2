@@ -101,6 +101,17 @@ foam.CLASS({
         return lines;
       }
     },
+    { name: 'hoverState', class: 'Boolean' },
+    { name: 'toggleState', class: 'Boolean' },
+    {
+      name: 'stroke',
+      expression: function (hoverState, toggleState) {
+        return ( hoverState && toggleState ) ? 'cyan' :
+          toggleState ? 'blue' :
+          hoverState ? 'green' :
+          'black';
+      }
+    },
     'testing'
   ],
 
@@ -108,6 +119,9 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this
+        .on('mouseover', () => { this.hoverState = true })
+        .on('mouseleave', () => { this.hoverState = false })
+        .on('click', () => { this.toggleState = ! this.toggleState; })
         .forEach(this.lines, function (line) {
           this
             .start('line')
@@ -116,7 +130,8 @@ foam.CLASS({
                 y1: line[1],
                 x2: line[2],
                 y2: line[3],
-                stroke: 'black' // TODO: prop
+                stroke: this.stroke$,
+                'stroke-width': 3,
               })
             .end()
             ;
