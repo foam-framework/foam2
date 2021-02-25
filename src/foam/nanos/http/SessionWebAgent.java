@@ -7,14 +7,11 @@
 package foam.nanos.http;
 
 import foam.core.X;
-import foam.core.XFactory;
 import foam.dao.DAO;
 import foam.nanos.auth.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
-import java.io.IOException;
-import java.io.PrintWriter;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -101,14 +98,7 @@ public class SessionWebAgent
       }
 
       // execute delegate
-      // Update session context with support setup from earlier WebAgents.
-      getDelegate().execute(session.getContext()
-                            .put("auth", auth)
-                            .put(HttpServletResponse.class, resp)
-                            .put(HttpServletRequest.class, req)
-                            .put(HttpParameters.class, x.get(HttpParameters.class))
-                            .putFactory(PrintWriter.class, new XFactory() {
-                              public Object create(X x) { try { return resp.getWriter(); } catch (IOException e) { return null; } } } ));
+      getDelegate().execute(session.getContext().put(HttpServletResponse.class, resp).put(HttpServletRequest.class, req));
 
     } catch ( AuthorizationException e ) {
       // report permission issues
