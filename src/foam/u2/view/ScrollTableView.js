@@ -31,7 +31,7 @@
 
   css: `
     ^ {
-      overflow: scroll;
+      overflow: auto;
       height: 373px;
       padding-bottom: 20px;
     }
