@@ -65,7 +65,7 @@ foam.CLASS({
       test( isValid("(firstName=adam)"," firstname =  ?  ") , "(The firstName is equal to value)");
       test( isValid("firstName=adam11 and id=20 or firstName=john id=5"," ( ( firstname =  ?  )  AND  ( id =  ?  ) )  OR  ( ( firstname =  ?  )  AND  ( id =  ?  ) ) ") , "(the firstName is equal to value1 AND the id is equal to value2) OR (the firstName is equal to value3 AND the id is equal to value4)");
       
-      test( isValid("has:businessName"," ( ( (businessname <> '') is not true ) ) ") , "The businessName exist");
+      test( isValid("has:businessName"," (businessname <> '') is not true ") , "The businessName exist");
       test( isValid("is:emailVerified"," emailverified =  ?  ") , "The emailVerified is equal to true");
       //          {"id=me"," ( ( id =  ?  ) ) "},
       

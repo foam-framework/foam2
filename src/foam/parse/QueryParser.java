@@ -15,6 +15,7 @@ import foam.lib.json.KeyParser;
 import foam.lib.json.Whitespace;
 import foam.lib.parse.*;
 import foam.lib.parse.Not;
+import foam.lib.parse.Optional;
 import foam.lib.query.*;
 import foam.mlang.Constant;
 import foam.mlang.Expr;
@@ -24,21 +25,19 @@ import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.util.SafetyUtil;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class QueryParser
 {
   protected ClassInfo info_;
-  protected List<Parser> expressions;
+  protected List expressions;
 
   public QueryParser(ClassInfo classInfo) {
     info_ = classInfo;
 
     List<PropertyInfo>         properties  = classInfo.getAxiomsByClass(PropertyInfo.class);
     expressions = new ArrayList();
+    Collections.sort(properties, Collections.reverseOrder());
 
     for ( PropertyInfo prop : properties ) {
       expressions.add(new LiteralIC(prop.getName(), prop));
@@ -67,7 +66,7 @@ public class QueryParser
     grammar.addSymbol("START", grammar.sym("OR"));
 
 
-    grammar.addSymbol("FIELD_NAME", new Alternate(expressions));
+    grammar.addSymbol("FIELD_NAME", new Alt(expressions));
 
     grammar.addSymbol("OR", new Repeat(grammar.sym("AND"),
         new Alt(new LiteralIC(" OR "),
