@@ -132,14 +132,7 @@ public class QueryParser
       }
     });
 
-    grammar.addSymbol("ID", new Seq1(7,
-      Whitespace.instance(),
-      Literal.create("id"),
-      Whitespace.instance(),
-      new Alt(Literal.create("="), Literal.create(":")),
-      Whitespace.instance(),
-      grammar.sym("NUMBER")
-    ));
+    grammar.addSymbol("ID", grammar.sym("NUMBER"));
     grammar.addAction("ID", new Action() {
       @Override
       public Object execute(Object val, ParserContext x) {
@@ -322,7 +315,7 @@ public class QueryParser
       Literal.create("("),
       new Repeat(
         grammar.sym("VALUE"),
-        new Alt(Literal.create("|"), new LiteralIC(" and "), Literal.create(" | ")), 1
+        new Alt(new LiteralIC(" and "), Literal.create(" ")), 1
       ),
       Literal.create(")")
     ));
