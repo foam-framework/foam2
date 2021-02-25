@@ -548,10 +548,11 @@ foam.CLASS({
 
         if ( delim && ret.length != 0 ) {
           if ( ! ( res = ps.apply(delim, obj) ) ) break;
-          ps = res;
+        } else {
+          res = ps;
         }
 
-        if ( ! ( res = ps.apply(p, obj) ) ) break;
+        if ( ! ( res = res.apply(p, obj) ) ) break;
         ret.push(res.value);
         ps = res;
       }

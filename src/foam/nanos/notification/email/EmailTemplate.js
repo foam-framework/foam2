@@ -22,7 +22,7 @@ foam.CLASS({
     'java.nio.charset.StandardCharsets'
   ],
 
-  tableColumns: ['id', 'name', 'group'],
+  tableColumns: ['id', 'name', 'group', 'locale'],
 
   properties: [
     {
@@ -41,6 +41,11 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'locale',
+      value: 'en'
+    },
+    {
+      class: 'String',
       name: 'subject',
       documentation: 'Template subject'
     },
@@ -48,7 +53,13 @@ foam.CLASS({
       class: 'String',
       name: 'body',
       documentation: 'Template body',
-      view: { class: 'foam.u2.tag.TextArea', rows: 40, cols: 150 }
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          { class: 'foam.u2.HTMLView' },
+          { class: 'foam.u2.tag.TextArea', rows: 40, cols: 150}
+        ]
+      }
     },
     {
       class: 'String',

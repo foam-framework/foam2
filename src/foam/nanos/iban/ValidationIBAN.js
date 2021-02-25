@@ -451,7 +451,11 @@ Columns: validation format, parsing format, example`,
         Object[] temp = (Object[]) COUNTRIES.get(ibanInfo.getCountry());
 
         if ( temp == null || temp[1] == null || SafetyUtil.isEmpty((String)temp[1]) ) {
-          ((foam.nanos.logger.Logger) getX().get("logger")).warning(this.getClass().getSimpleName(), "parse", "Format not found", ibanInfo.getCountry());
+          foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+          if ( logger == null ) {
+            logger = new foam.nanos.logger.StdoutLogger();
+          }
+          logger.warning(this.getClass().getSimpleName(), "parse", "Format not found", ibanInfo.getCountry());
           return null;
         }
 
@@ -508,11 +512,19 @@ Columns: validation format, parsing format, example`,
             case '0': // Zero
               previous.append('0');
               if ( Character.compare('0', next) != 0 ) {
-                ((foam.nanos.logger.Logger) getX().get("logger")).warning(this.getClass().getSimpleName(), "parse", "symbol mismatch", format, i, format[i], next);
+                foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+                if ( logger == null ) {
+                  logger = new foam.nanos.logger.StdoutLogger();
+                }
+                logger.warning(this.getClass().getSimpleName(), "parse", "symbol mismatch", format, i, format[i], next);
               }
               break;
             default:
-              ((foam.nanos.logger.Logger) getX().get("logger")).warning(this.getClass().getSimpleName(), "parse", "unexpected symbol", format, i, format[i]);
+              foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+              if ( logger == null ) {
+                logger = new foam.nanos.logger.StdoutLogger();
+              }
+              logger.warning(this.getClass().getSimpleName(), "parse", "unexpected symbol", format, i, format[i]);
           }
         }
 

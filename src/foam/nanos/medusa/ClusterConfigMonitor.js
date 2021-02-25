@@ -198,6 +198,7 @@ foam.CLASS({
           if ( getAgents().get(cfg.getId()) == null ) {
             ClusterConfigMonitorAgent agent = new ClusterConfigMonitorAgent(x, cfg.getId(), dao);
             getAgents().put(cfg.getId(), agent);
+            getLogger().debug("starting,ClusterConfigMonitorAgent", cfg.getId());
             agent.start();
           }
           // TODO: deal with instance ENABLED true -> false.

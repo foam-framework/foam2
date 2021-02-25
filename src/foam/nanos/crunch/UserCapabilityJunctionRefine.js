@@ -118,7 +118,8 @@ foam.CLASS({
       javaCompare: 'return 0;',
       javaGetter: `
         return this;
-      `
+      `,
+      hidden: true
     },
     {
       name: 'lifecycleState',

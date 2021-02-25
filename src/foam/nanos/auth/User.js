@@ -852,7 +852,7 @@ foam.RELATIONSHIP({
   },
   targetProperty: {
     hidden: false,
-    section: 'administrative',
+    section: 'systemInformation',
     order: 30,
     gridColumns: 6
   }

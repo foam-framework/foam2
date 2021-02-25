@@ -90,7 +90,7 @@ public class NanoRouter
     // enable xss filtering to allow browser to sanitize page if xss attack is detected
     resp.setHeader("X-XSS-Protection", "1");
     // protect against clickjacking attacks
-    resp.setHeader("X-Frame-Options", "deny");
+    resp.setHeader("X-Frame-Options", "SAMEORIGIN");
 
     try {
       if ( spec == null ) {

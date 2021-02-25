@@ -24,7 +24,8 @@ foam.CLASS({
     'java.util.ArrayList',
     'java.util.HashMap',
     'java.util.List',
-    'java.util.Map'
+    'java.util.Map',
+    'java.util.Set'
   ],
 
   properties: [
@@ -57,10 +58,7 @@ foam.CLASS({
 
   methods: [
     {
-      documentation: `
-  - mod by node groups to get node bucket
-  - create job for each client in bucket
-`,
+      documentation: `Distribute entry to each node in one bucket. Mod of entry.id and bucket.size selects the bucket to receive the entry.`,
       name: 'put_',
       javaCode: `
       final MedusaEntry entry = (MedusaEntry) obj;
@@ -68,15 +66,11 @@ foam.CLASS({
       final ClusterConfig myConfig = support.getConfig(x, support.getConfigId());
       Agency agency = (Agency) x.get("threadPool");
 
-//      int groups = support.getNodeGroups();
-      Map buckets = support.getNodeBuckets();
-//      int index = (int) (entry.getIndex() % groups);
-//      List bucket = (List) buckets.get(index);
-
-      for ( int i = 0; i < buckets.size(); i++ ) {
-        List bucket = (List) buckets.get(i);
-        int index = (int) (entry.getIndex() % bucket.size());
-        ClusterConfig config = support.getConfig(x, (String) bucket.get(index));
+      List<Set> buckets = support.getNodeBuckets();
+      int index = (int) (entry.getIndex() % buckets.size());
+      Set<String> bucket = buckets.get(index);
+      for ( String id : bucket ) {
+        ClusterConfig config = support.getConfig(x, id);
         agency.submit(x, new ContextAgent() {
           public void execute(X x) {
             try {

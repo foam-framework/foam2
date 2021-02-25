@@ -25,42 +25,51 @@ foam.CLASS({
       class: 'Long',
       name: 'maxStringDataSize',
       value: 1024 * 3
+    },
+    {
+      class: 'Boolean',
+      name: 'skipToData',
+      value: false
     }
   ],
 
   methods: [
-    function write(X, dao, obj, existing) {
-      var self  = this;
-      var props = obj.cls_.getAxiomsByClass(foam.nanos.fs.FileArray);
+    async function write(X, dao, obj, existing) {
+      var newObj = this.skipToData ? obj.data : obj;
+      if ( ! newObj ) {
+        return Promise.resolve(obj);
+      }
+      await this.processFiles(newObj);
+      return Promise.resolve(obj);
+    },
 
-      var promises = props.map((prop) => {
-        let files = prop.f(obj);
-        return Promise.all(files.map(async f => {
+    async function processFiles(obj) {
+      var props1 = obj.cls_.getAxiomsByClass(foam.nanos.fs.FileArray);
+      var values = await Promise.all(props1.map(prop => Promise.all(prop.f(obj).map(f => this.processFile(f)))));
+      values.forEach(f => f.forEach(f2 => {
+        f2.dataString = undefined;
+        f2.data = undefined;
+      }));
+      props1.forEach((prop, i) => prop.set(obj, values[i]));
+      var props2 = obj.cls_.getAxiomsByClass(foam.core.FObjectProperty).filter((p) => ! foam.dao.DAOProperty.isInstance(p));
+      for ( let prop of props2 ) {
+        var subFObject = prop.f(obj);
+        if ( ! subFObject ) continue;
+        await this.processFiles(subFObject);
+      }
+    },
 
-          // We do not allow file update, so there is no point to send file again
-          // if it is already stored and has id
-          if ( f.id ) return f;
-
-          if ( f.filesize <= this.maxStringDataSize ) {
-            f.dataString = await this.encode(f.data.blob);
-            f.data = undefined;
-          } else {
-            f.dataString = undefined;
-          }
-          return self.fileDAO.put(f);
-        }));
-      });
-
-      return Promise.all(promises).then((values) => {
-        values.map(f => f.map(f2 => {
-          f2.dataString = undefined;
-          f2.data = undefined;
-        }));
-        props.forEach((prop, i) => {
-          prop.set(obj, values[i]);
-        });
-        return obj;
-      });
+    async function processFile(f) {
+      // We do not allow file update, so there is no point to send file again
+      // if it is already stored and has id
+      if ( f.id ) return f;
+      if ( f.filesize <= this.maxStringDataSize ) {
+        f.dataString = await this.encode(f.data.blob);
+        f.data = undefined;
+      } else {
+        f.dataString = undefined;
+      }
+      return await this.fileDAO.put(f);
     },
 
     async function encode(file) {

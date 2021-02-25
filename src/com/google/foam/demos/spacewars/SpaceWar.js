@@ -4,6 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+// Original: https://www.masswerk.at/spacewar/
 foam.CLASS({
   package: 'com.google.foam.demos.spacewars',
   name: 'Ship',

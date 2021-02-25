@@ -11,6 +11,7 @@ foam.CLASS({
   documentation: 'IP address helper/support methods',
 
   javaImports: [
+    'java.net.InetAddress',
     'javax.servlet.http.HttpServletRequest'
   ],
 
@@ -51,6 +52,49 @@ foam.CLASS({
         return addresses[addresses.length -1].trim(); // right most
       }
       return req.getRemoteHost();
+      `
+    },
+    {
+      name: 'ip2long',
+      args: [
+        {
+          name: 'ip',
+          type: 'String'
+        }
+      ],
+      type: 'Long',
+      javaThrows: ['java.net.UnknownHostException'],
+      javaCode: `
+      InetAddress address = InetAddress.getByName(ip);
+      byte[] octets = address.getAddress();
+      long result = 0;
+      for (byte octet : octets) {
+        result <<= 8;
+        result |= octet & 0xff;
+      }
+      return result;
+      `
+    },
+    {
+      name: 'long2ip',
+      args: [
+        {
+          documentation: 'decimal representation of ip',
+          name: 'ip',
+          type: 'Long'
+        }
+      ],
+      type: 'String',
+      javaCode: `
+      StringBuilder sb = new StringBuilder(15);
+      for (int i = 0; i < 4; i++) {
+        sb.insert(0,Long.toString(ip & 0xff));
+        if (i < 3) {
+          sb.insert(0,'.');
+        }
+        ip = ip >> 8;
+      }
+      return sb.toString();
       `
     }
   ]

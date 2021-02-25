@@ -22,6 +22,7 @@ foam.CLASS({
     'foam.graphics.Point',
     'foam.graphics.ScrollCView',
     'foam.nanos.medusa.ClusterConfig',
+    'foam.nanos.medusa.MedusaType',
     'foam.nanos.medusa.ReplayingInfoDetailCView',
     'foam.u2.DetailView',
     'foam.u2.PopupView'
@@ -46,7 +47,8 @@ foam.CLASS({
           align: 'center',
           y: -25,
           text$: this.config$.map(function(c) {
-            if ( c.replayingInfo &&
+            if ( c.type == this.MedusaType.MEDIATOR &&
+                 c.replayingInfo &&
                  c.replayingInfo.replaying &&
                  c.replayingInfo.replayIndex > 0 ) {
               let complete = c.replayingInfo.percentComplete;
@@ -56,11 +58,12 @@ foam.CLASS({
               }
             }
             return '';
-          })
+          }.bind(this))
         });
       }
     },
     {
+      // only applies to mediators
       name: 'etaLabel',
       class: 'FObjectProperty',
       of: 'foam.graphics.Label',
@@ -69,14 +72,14 @@ foam.CLASS({
           align: 'center',
           y: -15,
           text$: this.config$.map(function(c) {
-            if ( c.replayingInfo &&
+            if ( c.type == this.MedusaType.MEDIATOR &&
+                 c.replayingInfo &&
                  c.replayingInfo.replaying &&
                  c.replayingInfo.replayIndex > 0 ) {
               return c.replayingInfo.timeRemaining;
             }
-            //return c.replayingInfo && c.replayingInfo.tps > 0 && c.replayingInfo.tps;
             return '';
-          })
+          }.bind(this))
         });
       }
     },
@@ -109,13 +112,14 @@ foam.CLASS({
           align: 'center',
           y: +15,
           text$: this.config$.map(function(c) {
-            if ( c.replayingInfo &&
+            if ( c.type == this.MedusaType.MEDIATOR &&
+                 c.replayingInfo &&
                  c.replayingInfo.replaying &&
                  c.replayingInfo.replayIndex > 0 ) {
               return c.replayingInfo.replayIndex;
             }
             return '';
-          })
+          }.bind(this))
        });
       }
     },

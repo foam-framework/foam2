@@ -60,13 +60,11 @@ public class JSONFObjectFormatter
   extends AbstractFObjectFormatter
 {
 
-  // TODO: use fast timestamper?
-  protected static ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
+  protected static ThreadLocal<foam.util.FastTimestamper> timestamper_ = new ThreadLocal<foam.util.FastTimestamper>() {
     @Override
-    protected SimpleDateFormat initialValue() {
-      SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-      df.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
-      return df;
+    protected foam.util.FastTimestamper initialValue() {
+      foam.util.FastTimestamper ft = new foam.util.FastTimestamper();
+      return ft;
     }
   };
 
@@ -190,7 +188,7 @@ public class JSONFObjectFormatter
   protected void outputProperty(FObject o, PropertyInfo p) {
     outputKey(getPropertyName(p));
     append(':');
-    p.format(this, o);
+    p.formatJSON(this, o);
   }
 /*
   public void outputMap(Object... values) {
@@ -278,7 +276,7 @@ public class JSONFObjectFormatter
   public void outputDateValue(Date date) {
     append("{\"class\":\"__Timestamp__\",\"value\":");
     if ( outputReadableDates_ ) {
-      output(sdf.get().format(date));
+      outputReadableDate(date);
     } else {
       outputNumber(date.getTime());
     }
@@ -290,6 +288,14 @@ public class JSONFObjectFormatter
       output(date.getTime());
     } else {
       append("null");
+    }
+  }
+
+  public void outputReadableDate(Date date) {
+    if ( date != null ) {
+      output(timestamper_.get().createTimestamp(date.getTime()));
+    } else {
+      output("null");
     }
   }
 
