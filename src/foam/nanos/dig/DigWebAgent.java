@@ -33,7 +33,7 @@ public class DigWebAgent extends ContextAwareSupport
 
     try {
       // Find the operation
-      DigFormatDriver driver = DigFormatDriverFactory.create(getX(), format);
+      DigFormatDriver driver = DigFormatDriverFactory.create(x, format);
 
       if ( driver == null ) {
         DigUtil.outputException(x, new ParsingErrorException.Builder(x)
