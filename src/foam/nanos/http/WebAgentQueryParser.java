@@ -53,7 +53,6 @@ public class WebAgentQueryParser {
         throw new IllegalArgumentException("failed to parse [" + q + "]: " + message);
       }
 
-//      parser_.setX(EmptyX.instance());
       Predicate pred = (Predicate) ps.value();
       logger.debug(this.getClass().getSimpleName(), "pred", pred.getClass(), pred.toString());
       return pred;
