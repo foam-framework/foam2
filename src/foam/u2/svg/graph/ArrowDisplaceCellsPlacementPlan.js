@@ -27,7 +27,7 @@ foam.CLASS({
     {
       name: 'displacementFactor',
       class: 'Int',
-      value: 6
+      value: 12
     },
     {
       name: 'colDisplacement_',
@@ -45,7 +45,7 @@ foam.CLASS({
     {
       name: 'width',
       getter: function () {
-        let v = this.cellSize * this.gridPlacementPlan.shape[0];
+        let v = (this.cellSize + this.gridGap) * this.gridPlacementPlan.shape[0];
         for ( let k in this.colDisplacement_ ) {
           v += this.colDisplacement_[k] * this.displacementFactor;
         }
@@ -55,7 +55,7 @@ foam.CLASS({
     {
       name: 'height',
       getter: function () {
-        let v = this.cellSize * this.gridPlacementPlan.shape[1];
+        let v = (this.cellSize + this.gridGap) * this.gridPlacementPlan.shape[1];
         for ( let k in this.rowDisplacement_ ) {
           v += this.rowDisplacement_[k] * this.displacementFactor;
         }

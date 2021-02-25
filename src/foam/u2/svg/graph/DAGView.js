@@ -69,6 +69,10 @@ foam.CLASS({
       class: 'foam.u2.ViewSpec'
     },
     {
+      name: 'zoom',
+      class: 'Float'
+    },
+    {
       name: 'rowLanes_',
       factory: () => ({})
     },
@@ -118,7 +122,9 @@ foam.CLASS({
         'xmlns': 'http://www.w3.org/2000/svg',
         'viewBox': '0 0 ' +
           ('' + (this.placement_.width)) + ' ' +
-          ('' + (this.placement_.height))
+          ('' + (this.placement_.height)),
+        width: this.placement_.width * this.zoom,
+        height: this.placement_.height * this.zoom
       });
       this.graph.roots.forEach(node => {
         this.renderBoxes(g, node);
@@ -196,11 +202,13 @@ foam.CLASS({
 
         for ( let arrow of arrows ) {
           let anchors = [];
+          let enterCellLane = this.cellSize * this.cellLaneRatio_(arrow.enterCellLane);
+          let exitCellLane = this.cellSize * this.cellLaneRatio_(arrow.exitCellLane);
 
           // Start first row after exiting the node
           if ( arrow.hasOwnProperty('topRowLane') ) {
             anchors.push([
-              parentPixelCoords[0] + cellLanePixels,
+              parentPixelCoords[0] + exitCellLane,
               this.placement_.getRowLanePosition(exitCell[1], arrow.topRowLane)
             ]);
           }
@@ -223,18 +231,18 @@ foam.CLASS({
           var lane = arrow.hasOwnProperty('bottomRowLane')
             ? arrow.bottomRowLane : arrow.topRowLane ;
           anchors.push([
-            nodePixelCoords[0] + cellLanePixels,
+            nodePixelCoords[0] + enterCellLane,
             this.placement_.getRowLanePosition(enterCell[1], lane)
           ])
 
           // TODO: calculate cell lane factor
           g.tag(this.SegmentedArrowLine, {
             startPos: [
-              parentPixelCoords[0] + cellLanePixels,
+              parentPixelCoords[0] + exitCellLane,
               parentPixelCoords[1] + this.cellSize,
             ],
             endPos: [
-              nodePixelCoords[0] + cellLanePixels,
+              nodePixelCoords[0] + enterCellLane,
               nodePixelCoords[1],
             ],
             anchors: anchors,
@@ -244,6 +252,14 @@ foam.CLASS({
               arrow: arrow
             }
           });
+          g.tag(this.SimpleArrowHead, {
+            originPos: [
+              nodePixelCoords[0] + enterCellLane,
+              nodePixelCoords[1],
+            ],
+            angle: 0,
+            size: 5
+          })
         }
       }
       this.graph.getDirectChildren(node.id).forEach(childNode => {
@@ -267,8 +283,10 @@ foam.CLASS({
         let exitCell = [parentCoords[0], parentCoords[1] + 1];
 
         let arrow = this.ArrowPlan.create({
-          enterCellLane: this.getCellLane(enterCell, parent.id),
-          exitCellLane: this.getCellLane(exitCell, parent.id),
+          // Swap these to disable arrowhead sharing
+          // enterCellLane: this.getCellLane(enterCell, parent.id),
+          enterCellLane: 0,
+          exitCellLane: this.getCellLane(exitCell, parent.id)
         });
 
         if ( hasDX || hasDY ) {
@@ -280,7 +298,9 @@ foam.CLASS({
           let row = enterCell[1];
           arrow.bottomRowLane = this.getLane(this.rowLanes_, row, parent.id);
           let col = enterCell[0];
-          arrow.columnLane = this.getLane(this.colLanes_, col, parent.id);
+          // Swap these to disable column sharing
+          // arrow.columnLane = this.getLane(this.colLanes_, col, parent.id);
+          arrow.columnLane = this.getLane(this.colLanes_, col, node.id);
         }
 
         this.arrows_[parent.id][node.id].push(arrow);
@@ -301,6 +321,17 @@ foam.CLASS({
     },
     function hash_(x, y) {
       return (x + y) * (x + y + 1) / 2 + x;
+    },
+    function cellLaneRatio_(lane) {
+      // f0 produces the series: [1 2 2 4 4 4 4....] as v increases from 0.
+      //  Multiplying the output of f0 by 2 gives the denominator
+      let f0 = v => Math.pow(2, Math.floor(Math.log(v+1) / Math.log(2)));
+
+      // f1 produces the series: [1 1 3 1 3 5 7....] as v increases from 0.
+      // ???: If this has a formal name please let me know
+      let f1 = v => (v - f0(v) + 2) * 2 - 1;
+
+      return f1(lane) / (2*f0(lane));
     }
   ]
 });

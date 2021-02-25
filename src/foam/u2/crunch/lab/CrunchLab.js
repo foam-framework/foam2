@@ -15,7 +15,7 @@ foam.CLASS({
 
   css: `
     ^ svg {
-      height: calc(100% - 40px); /* temp */
+      display: inline-block;
     }
     ^ .foam-u2-view-RichChoiceView-selection-view {
       width: 30vw;
@@ -166,7 +166,8 @@ foam.CLASS({
                 gridPlacement: placementPlan,
                 graph: graph,
                 nodeView: this.CapabilityGraphNodeView,
-                cellSize: 200
+                cellSize: 200,
+                zoom: 0.7
               })
               ;
           });
