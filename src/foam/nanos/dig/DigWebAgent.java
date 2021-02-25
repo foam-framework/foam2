@@ -26,7 +26,7 @@ public class DigWebAgent extends ContextAwareSupport
     HttpParameters      p       = x.get(HttpParameters.class);
     Command             command = (Command) p.get(Command.class);
     Format              format  = (Format) p.get(Format.class);
-    Logger              logger = (Logger) x.get("logger");
+    Logger              logger  = (Logger) x.get("logger");
     PM                  pm      = new PM(getClass(), command.getName() + '/' + format.getName());
 
     logger = new PrefixLogger(new Object[] { this.getClass().getSimpleName() }, logger);
