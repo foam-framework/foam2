@@ -48,9 +48,15 @@ foam.CLASS({
                 backLabel: 'Back'
               }, self);
             })
-            .tag(this.CitationView, { data$: this.obj$ })
+            .call(function() {
+              self.addCitationView.call(this, self);
+            })
           .end();
       }
+    },
+
+    function addCitationView(self) {
+      this.tag(self.CitationView, { data$: self.obj$ });
     },
 
     function fromProperty(prop) {
