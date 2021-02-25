@@ -5,18 +5,13 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2.svg.graph',
+  package: 'foam.u2.svg.map2d',
   name: 'IdPropertyPlacementPlanDecorator',
-  implements: ['foam.u2.svg.graph.GridPlacementPlan'],
+  implements: ['foam.u2.svg.map2d.GridPlacementPlan'],
 
   documentation: `
-    For more flexibility in how object placement is determined,
-    the TreeGraph (SVG) view provides the entire object to the
+    Provides only the value of the specified property to the underlying grid
     placement plan.
-
-    Placement plans that determine placement using only the
-    object's ID can be decorated with this model to be used in
-    a TreeGraph view.
   `,
 
   properties: [
