@@ -192,7 +192,8 @@
     {
       class: 'Boolean',
       name: 'isInit'
-    }
+    },
+    'tableWrapper_'
   ],
 
   reactions: [
@@ -250,7 +251,7 @@
       }
 
       this.
-        start().
+        start('div', {}, this.tableWrapper_$).
           addClass(this.myClass()).
           on('scroll', this.onScroll).
           start(this.TableView, {
@@ -300,7 +301,7 @@
           scroll = scroll >= this.rowHeight && scroll < this.scrollHeight ? scroll : 0;
 
           if ( this.childNodes && this.childNodes.length > 0 )
-            document.getElementById(this.childNodes[0].id).scrollTop = scroll;
+            document.getElementById(this.tableWrapper_.id).scrollTop = scroll;
 
           this.isInit = true;
         } else if ( this.el() ) this.el().scrollTop = 0;
