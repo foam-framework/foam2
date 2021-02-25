@@ -22,15 +22,14 @@ public class DigWebAgent extends ContextAwareSupport
   public DigWebAgent() {}
 
   public void execute(X x) {
-    Logger              logger = (Logger) x.get("logger");
-
     HttpServletResponse resp    = x.get(HttpServletResponse.class);
     HttpParameters      p       = x.get(HttpParameters.class);
     Command             command = (Command) p.get(Command.class);
     Format              format  = (Format) p.get(Format.class);
+    Logger              logger = (Logger) x.get("logger");
     PM                  pm      = new PM(getClass(), command.getName() + '/' + format.getName());
 
-    logger  = new PrefixLogger(new Object[] { this.getClass().getSimpleName() }, logger);
+    logger = new PrefixLogger(new Object[] { this.getClass().getSimpleName() }, logger);
 
     try {
       // Find the operation
