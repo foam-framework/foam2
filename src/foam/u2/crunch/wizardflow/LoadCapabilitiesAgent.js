@@ -41,12 +41,21 @@ foam.CLASS({
       factory: function () {
         return this.WAOSetting.UCJ;
       }
+    },
+    {
+      name: 'subject',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.Subject'
     }
   ],
 
   methods: [
     // If Property expressions ever unwrap promises this method can be blank.
     function execute() {
+      if ( this.subject ) {
+        return this.crunchService.getCapabilityPathFor(null, this.rootCapability.id, false, this.subject.user, this.subject.realUser)
+          .then(capabilities => { this.capabilities = capabilities });
+      }
       return this.crunchService.getCapabilityPath(null, this.rootCapability.id, false)
         .then(capabilities => { this.capabilities = capabilities });
     },
