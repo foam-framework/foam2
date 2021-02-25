@@ -394,7 +394,7 @@
       isFramed: true,
       code: function(e) {
         this.scrollPos_ = e.target.scrollTop;
-        if ( this.memento &&  this.currentMemento.head.length != 0 ) {
+        if ( this.currentMemento ) {
           this.currentMemento.head = this.scrollPos_ >= this.rowHeight && this.scrollPos_ < this.scrollHeight ? Math.floor( this.scrollPos_  / this.rowHeight) : 0;
         }
       }
