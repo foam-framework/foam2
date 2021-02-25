@@ -156,13 +156,15 @@ foam.CLASS({
                       }
                     }
                   }
-                  this.start(self.GUnit, { columns: p.gridColumns })
-                    .show(p.createVisibilityFor(self.data$, self.controllerMode$).map(mode => mode !== self.DisplayMode.HIDDEN))
-                    .tag(self.SectionedDetailPropertyView, {
-                      prop: p,
-                      data$: self.data$
-                    })
-                  .end();
+                  this.startContext({ controllerMode$: self.controllerMode$ })
+                    .start(self.GUnit, { columns: p.gridColumns })
+                      .show(p.createVisibilityFor(self.data$, self.controllerMode$).map(mode => mode !== self.DisplayMode.HIDDEN))
+                      .tag(self.SectionedDetailPropertyView, {
+                        prop: p,
+                        data$: self.data$
+                      })
+                    .end()
+                  .endContext();
                 });
               }
 
