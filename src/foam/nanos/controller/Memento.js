@@ -100,7 +100,7 @@ foam.CLASS({
       } else {
         this.head     = this.value.substring(0, i);
         var tailStr   = this.value.substring(i + 2);
-        this.tail = this.cls_.create({ value: tailStr, parent: this });
+        this.tail$.set(this.cls_.create({ value: tailStr, parent: this }));
       }
       this.feedback_ = false;
       this.params    = params;
