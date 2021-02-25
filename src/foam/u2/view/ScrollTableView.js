@@ -31,7 +31,8 @@
 
   css: `
     ^ {
-      overflow: unset;
+      overflow: scroll;
+      height: 373px;
       padding-bottom: 20px;
     }
     ^table {
