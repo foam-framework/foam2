@@ -91,7 +91,7 @@ public class QueryParser
     });
 
     grammar.addSymbol("AND", new Repeat(grammar.sym("EXPR"),
-      new Alt(new LiteralIC(" AND "), Literal.create("k")), 1));
+      new Alt(new LiteralIC(" AND "), Literal.create(" ")), 1));
     grammar.addAction("AND", new Action() {
       @Override
       public Object execute(Object val, ParserContext x) {
