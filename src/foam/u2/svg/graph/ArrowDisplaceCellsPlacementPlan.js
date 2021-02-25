@@ -103,8 +103,8 @@ foam.CLASS({
     function makeRoomInRow(row, lanes) {
       this.rowDisplacement_[row] = lanes;
     },
-    function makeRoomInCol(row, lanes) {
-      this.rowDisplacement_[row] = lanes;
+    function makeRoomInCol(col, lanes) {
+      this.colDisplacement_[col] = lanes;
     }
   ]
 });
