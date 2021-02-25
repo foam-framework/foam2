@@ -32,6 +32,7 @@
   css: `
     ^ {
       overflow: auto;
+      height: 373px;
       padding-bottom: 20px;
     }
     ^table {
@@ -192,7 +193,8 @@
     {
       class: 'Boolean',
       name: 'isInit'
-    }
+    },
+    'tableWrapper_'
   ],
 
   reactions: [
@@ -268,12 +270,11 @@
             m = m.tail;
           }
         }
+        this.currentMemento = this.memento.tail;
       }
 
-      if ( this.memento )
-        this.currentMemento = this.memento.tail;
 
-      //table view
+
       this.table_ = foam.u2.ViewSpec.createView(this.TableView, {
         data: foam.dao.NullDAO.create({of: this.data.of}),
         columns: this.columns,
@@ -284,17 +285,19 @@
         multiSelectEnabled: this.multiSelectEnabled,
         selectedObjects$: this.selectedObjects$
       },  this, this.__subSubContext__.createSubContext({ memento: this.currentMemento ? this.currentMemento.tail : this.currentMemento }));
-
+      
       if ( ! this.table_.memento || ! this.table_.memento.tail || this.table_.memento.tail.head.length == 0 ) {
         this.
-        addClass(this.myClass()).
-        on('scroll', this.onScroll).
-        start(this.table_).
-          addClass(this.myClass('table')).
-          style({
-            height: this.scrollHeight$.map(h => h + 'px')
-          }).
-        end();
+          start('div', {}, this.tableWrapper_$).
+            addClass(this.myClass()).
+            on('scroll', this.onScroll).
+            start(this.table_).
+              addClass(this.myClass('table')).
+              style({
+                height: this.scrollHeight$.map(h => h + 'px')
+              }).
+            end().
+          end();
       } else {
         if ( this.table_.memento.tail.head == 'create' ) {
           this.stack.push({
@@ -343,7 +346,8 @@
           var scroll = this.currentMemento.head * this.rowHeight;
           scroll = scroll >= this.rowHeight && scroll < this.scrollHeight ? scroll : 0;
 
-          document.getElementById(this.id).scrollTop = scroll;
+          if ( this.childNodes && this.childNodes.length > 0 )
+            document.getElementById(this.tableWrapper_.id).scrollTop = scroll;
 
           this.isInit = true;
         } else if ( this.el() ) this.el().scrollTop = 0;
