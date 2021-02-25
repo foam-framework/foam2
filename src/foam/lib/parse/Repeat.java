@@ -66,9 +66,11 @@ public class Repeat
         result = ps.apply(delim, x);
         if ( result == null ) break;
         ps = result;
+      } else {
+        result = ps;
       }
 
-      result = ps.apply(p, x);
+      result = result.apply(p, x);
       if ( result == null ) break;
 
       values.add(result.value());
