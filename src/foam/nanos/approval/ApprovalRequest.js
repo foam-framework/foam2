@@ -122,6 +122,47 @@
 
   properties: [
     {
+      class: 'String',
+      name: 'referenceSummary',
+      section: 'approvalRequestInformation',
+      order: 21,
+      gridColumns: 6,
+      transient: true,
+      tableWidth: 200,
+      visibility: 'RO',
+      tableCellFormatter: function(_,obj) {
+        let self = this;
+        this.__subSubContext__[obj.daoKey].find(obj.objId).then(requestObj => {
+          let referenceSummaryString = `ID:${obj.objId}`;
+
+          if ( requestObj && requestObj.toSummary() ){
+            referenceSummaryString = requestObj.toSummary()
+          }
+
+          self.add(referenceSummaryString);
+        });
+      },
+      view: function(_, X) {
+        let slot = foam.core.SimpleSlot.create();
+        let data = X.data;
+
+        X[data.daoKey].find(data.objId).then(requestObj => {
+          let referenceSummaryString = `ID:${obj.objId}`;
+
+          if ( requestObj && requestObj.toSummary() ){
+            referenceSummaryString = requestObj.toSummary()
+          }
+
+          slot.set(referenceSummaryString);
+        })
+
+        return {
+          class: 'foam.u2.view.ValueView',
+          data$: slot
+        };
+      },
+    },
+    {
       class: 'Long',
       name: 'id',
       section: 'approvalRequestInformation',
