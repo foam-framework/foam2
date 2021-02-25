@@ -299,7 +299,8 @@
           var scroll = this.memento.paramsObj.r * this.rowHeight;
           scroll = scroll >= this.rowHeight && scroll < this.scrollHeight ? scroll : 0;
 
-          document.getElementById(this.id).scrollTop = scroll;
+          if ( this.childNodes && this.childNodes.length > 0 )
+            document.getElementById(this.childNodes[0].id).scrollTop = scroll;
 
           this.isInit = true;
         } else if ( this.el() ) this.el().scrollTop = 0;
