@@ -65,7 +65,6 @@ public class Repeat
       if ( delim != null && values.size() != 0 ) {
         result = ps.apply(delim, x);
         if ( result == null ) break;
-        ps = result;
       } else {
         result = ps;
       }
