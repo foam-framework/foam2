@@ -80,12 +80,12 @@ foam.CLASS({
         };
       },
       postSet: function(o, n) {
-        if ( ! n ) this.clearProperty('associatedUser');
+        if ( ! n ) this.clearProperty('effectiveUser');
       }
     },
     {
       class: 'Reference',
-      name: 'associatedUser',
+      name: 'effectiveUser',
       of: 'foam.nanos.auth.User',
       help: `User reference used to further filter capabilities listed for rootCapability.
           This user references the effectiveUser of a capabilityJunction.`,
@@ -117,12 +117,12 @@ foam.CLASS({
           sections: [
             {
               heading: 'Capabilities',
-              dao$: X.data.slot(function(showAllCapabilities, associatedUser, crunchUser) {
+              dao$: X.data.slot(function(showAllCapabilities, effectiveUser, crunchUser) {
                 if ( crunchUser == 0 || showAllCapabilities) return this.capabilityDAO;
-                let predicate = associatedUser ?
+                let predicate = effectiveUser ?
                     this.AND(
                       this.EQ(this.AgentCapabilityJunction.SOURCE_ID, crunchUser),
-                      this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, associatedUser)
+                      this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, effectiveUser)
                     ) :
                     this.EQ(this.UserCapabilityJunction.SOURCE_ID, crunchUser);
                 return this.PromisedDAO.create({
@@ -211,7 +211,7 @@ foam.CLASS({
               capabilityIds = Object.keys(graph.data);
               // Replace with ucjDAO call below once getJunctionFor exists in Crunch Service.
               // return Promise.all(capabilityIds.forEach((c) => {
-              //   return this.crunchService.getJunctionFor(null, c, this.associatedUser, this.crunchUser)
+              //   return this.crunchService.getJunctionFor(null, c, this.effectiveUser, this.crunchUser)
               // }))
               return self.userCapabilityJunctionDAO.where(self.AND(
                 self.IN(self.UserCapabilityJunction.TARGET_ID, capabilityIds),
