@@ -174,7 +174,7 @@ foam.CLASS({
           })  
             .tag(this.SectionedDetailPropertyView, { data: this, prop: this.ROOT_CAPABILITY })
             .tag(this.SectionedDetailPropertyView, { data: this, prop: this.CRUNCH_USER })
-            .tag(this.SectionedDetailPropertyView, { data: this, prop: this.ASSOCIATED_USER })
+            .tag(this.SectionedDetailPropertyView, { data: this, prop: this.EFFECTIVE_USER })
             .tag(this.SectionedDetailPropertyView, { data: this, prop: this.SHOW_ALL_CAPABILITIES })
             .start().style({ display: 'block' }).add(this.getGraphSlot(true)).end()
           .end()
@@ -210,7 +210,7 @@ foam.CLASS({
             if ( replaceWithUCJ ) {
               capabilityIds = Object.keys(graph.data);
               // Replace with ucjDAO call below once getJunctionFor exists in Crunch Service.
-              // return Promise.all(capabilityIds.forEach((c) => {
+              // return Promise.all(capabilityIds.map((c) => {
               //   return this.crunchService.getJunctionFor(null, c, this.effectiveUser, this.crunchUser)
               // }))
               return self.userCapabilityJunctionDAO.where(self.AND(
