@@ -121,6 +121,8 @@ foam.CLASS({
       getter: function() {
         if ( ! this.memento || ! this.memento.tail )
           return 'view::' + this.idOfRecord;
+
+        //this creates bug on url being set to edit
         if ( this.memento.tail.head == 'edit' ) {
           this.memento.tail.head = 'view';
           return null;
