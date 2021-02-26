@@ -297,16 +297,16 @@ foam.CLASS({
 
         if ( hasDX || hasDY ) {
           let row = exitCell[1];
-          arrow.topRowLane = this.getLane(this.rowLanes_, row, parent.id);
+          arrow.topRowLane = this.getLane(this.rowLanes_, row, node.id, parent.id);
         }
 
         if ( hasDY ) {
           let row = enterCell[1];
-          arrow.bottomRowLane = this.getLane(this.rowLanes_, row, parent.id);
+          arrow.bottomRowLane = this.getLane(this.rowLanes_, row, node.id, parent.id);
           let col = enterCell[0];
           // Swap these to disable column sharing
           // arrow.columnLane = this.getLane(this.colLanes_, col, parent.id);
-          arrow.columnLane = this.getLane(this.colLanes_, col, node.id);
+          arrow.columnLane = this.getLane(this.colLanes_, col, node.id, parent.id);
         }
 
         this.arrows_[parent.id][node.id].push(arrow);
@@ -318,11 +318,25 @@ foam.CLASS({
     function getCellLane(cell, id) {
       return this.getLane(this.cellLanes_, this.hash_(...cell), id);
     },
-    function getLane(laneMap, index, owner) {
+    function getLane(laneMap, index, toNode, fromNode) {
       var lanes = laneMap[index] || {};
-      for ( let k in lanes ) if ( lanes[k] == owner ) return k;
+      for ( let k in lanes ) {
+        if ( lanes[k] == toNode ) return k;
+        if ( fromNode && lanes[k] == fromNode ) return k;
+        if ( fromNode && lanes[k].includes(':') ) {
+          var parts = lanes[k].split(':');
+          if ( parts[0] == toNode ) {
+            lanes[k] = toNode;
+            return k;
+          }
+          if ( parts[1] == fromNode ) {
+            lanes[k] = fromNode;
+            return k;
+          }
+        }
+      }
       var lane = Object.keys(lanes).length;
-      laneMap[index] = { ...lanes, [lane]: owner };
+      laneMap[index] = { ...lanes, [lane]: fromNode ? `${toNode}:${fromNode}` : owner };
       return lane;
     },
     function hash_(x, y) {
@@ -331,7 +345,7 @@ foam.CLASS({
     function cellLaneRatio_(lane) {
       // f0 produces the series: [1 2 2 4 4 4 4....] as v increases from 0.
       //  Multiplying the output of f0 by 2 gives the denominator
-      let f0 = v => Math.pow(2, Math.floor(Math.log(v+1) / Math.log(2)));
+      let f0 = v => Math.pow(2, Math.floor(Math.log2(v+1)));
 
       // f1 produces the series: [1 1 3 1 3 5 7....] as v increases from 0.
       // ???: If this has a formal name please let me know
