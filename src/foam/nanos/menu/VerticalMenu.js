@@ -76,7 +76,8 @@ foam.CLASS({
       view: {
         class: 'foam.u2.TextField',
         type: 'search',
-        onKey: true
+        onKey: true,
+        ariaLabel: 'Menu Search'
       },
       value: ''
     }

@@ -185,8 +185,8 @@ foam.CLASS({
         .end();
 
         e.start('div')
-            .addClass(this.myClass('filter-body'))
-            .add(args.view)
+          .addClass(this.myClass('filter-body'))
+          .add(args.view)
         .end();
         return e;
       }
@@ -257,32 +257,32 @@ foam.CLASS({
           .addClass(this.myClass('adding'));
       if ( this.allowAddingFilters ) {
         topPanel.start()
-            .addClass(this.myClass('add-filter'))
-            .start(this.ChoiceView, {
-              data$: this.filterChoice$,
-              choices: this.filters
-            }).end()
-            .add(this.NEW_FILTER)
+          .addClass(this.myClass('add-filter'))
+          .start(this.ChoiceView, {
+            data$: this.filterChoice$,
+            choices: this.filters
+          }).end()
+          .add(this.NEW_FILTER)
         .end();
       }
 
       topPanel.start()
           .addClass(this.myClass('count'))
           .start('span')
-              .addClass(this.myClass('count-text'))
-              .add(this.countString$)
+            .addClass(this.myClass('count-text'))
+            .add(this.countString$)
           .end()
           .start(this.CLEAR, { raised: true }).end()
       .end();
       this.filtersE_ = searchPanel.start(this.filterAreaSpec)
-          .addClass(this.myClass('filter-area'));
+        .addClass(this.myClass('filter-area'));
       this.filtersE_.end();
       this.endContext();
       searchPanel.end();
 
       this.start().addClass(this.myClass('results'))
-          .start(this.tableView, { of: this.data.of, data$: this.filteredDAO$ })
-          .end()
+        .start(this.tableView, { of: this.data.of, data$: this.filteredDAO$ })
+        .end()
       .end();
 
       var self = this;
@@ -370,8 +370,8 @@ foam.CLASS({
     function splitName(key) {
       var match = key.match(/^(.*)_(\d+)$/);
       return match ?
-          { name: match[1], count: match[2] } :
-          { name: key, count: 1 };
+        { name: match[1], count: match[2] } :
+        { name: key, count: 1 };
     }
   ],
 
@@ -382,7 +382,7 @@ foam.CLASS({
       mergeDelay: 250,
       code: function() {
         this.filteredDAO.select(this.Count.create())
-            .then(function(c) { this.count = c.value; }.bind(this));
+          .then(function(c) { this.count = c.value; }.bind(this));
       }
     },
     {
