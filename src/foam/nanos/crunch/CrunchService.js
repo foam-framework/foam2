@@ -89,6 +89,34 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'getJunctionFor',
+      documentation: `
+        Returns the junction with the requested subject set in the context.
+        Requires permission to overwrite context's subject, otherwise returns
+        junction with default context.
+      `,
+      async: true,
+      type: 'UserCapabilityJunction',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        },
+        {
+          name: 'effectiveUser',
+          type: 'foam.nanos.auth.User'
+        },
+        {
+          name: 'user',
+          type: 'foam.nanos.auth.User'
+        }
+      ],
+    },
+    {
       name: 'getJunction',
       documentation: `
         getJunction provides the correct UserCapabilityJunction based on the

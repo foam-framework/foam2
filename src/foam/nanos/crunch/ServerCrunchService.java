@@ -193,6 +193,18 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     }
     return prereqsCache_.get(capId);
   }
+  
+  public UserCapabilityJunction getJunctionFor(X x, String capabilityId, User effectiveUser, User user) {
+    Subject subject = (Subject) x.get("subject");
+    foam.nanos.auth.AuthService auth = (foam.nanos.auth.AuthService) x.get("auth");
+    if ( auth.check(x, "service.crunchService.customSubject") ) {
+      var requestedSubject = new Subject();
+      requestedSubject.setUser(user);
+      requestedSubject.setUser(effectiveUser);
+      return this.getJunctionForSubject(x, capabilityId, requestedSubject);
+    }
+    return this.getJunctionForSubject(x, capabilityId, subject);
+  }
 
   public UserCapabilityJunction getJunction(X x, String capabilityId) {
     Subject subject = (Subject) x.get("subject");
