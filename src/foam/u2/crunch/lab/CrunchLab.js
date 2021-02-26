@@ -209,9 +209,20 @@ foam.CLASS({
             placementPlan = placementPlan_;
             if ( replaceWithUCJ ) {
               capabilityIds = Object.keys(graph.data);
+              // Replace with ucjDAO call below once getJunctionFor exists in Crunch Service.
+              // return Promise.all(capabilityIds.forEach((c) => {
+              //   return this.crunchService.getJunctionFor(null, c, this.associatedUser, this.crunchUser)
+              // }))
               return self.userCapabilityJunctionDAO.where(self.AND(
                 self.IN(self.UserCapabilityJunction.TARGET_ID, capabilityIds),
-                self.EQ(self.UserCapabilityJunction.SOURCE_ID, crunchUser)
+                self.OR(
+                  self.EQ(self.UserCapabilityJunction.SOURCE_ID, this.crunchUser),
+                  self.EQ(self.UserCapabilityJunction.SOURCE_ID, this.effectiveUser),
+                  self.AND(
+                    self.EQ(self.AgentCapabilityJunction.SOURCE_ID, this.crunchUser),
+                    self.EQ(self.AgentCapabilityJunction.EFFECTIVE_USER, this.effectiveUser)
+                  )
+                )
               )).select().then(r => {
                 r.array.forEach(ucj => {
                   let capability = graph.data[ucj.targetId].data;
