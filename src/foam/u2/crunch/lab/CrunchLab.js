@@ -32,24 +32,24 @@ foam.CLASS({
   `,
 
   imports: [
-    'userCapabilityJunctionDAO',
-    'capabilityDAO'
+    'capabilityDAO',
+    'userCapabilityJunctionDAO'
   ],
 
   requires: [
-    'foam.graph.GraphBuilder',
     'foam.dao.PromisedDAO',
-    'foam.nanos.crunch.UserCapabilityJunction',
-    'foam.nanos.crunch.AgentCapabilityJunction',
-    'foam.u2.detail.SectionedDetailPropertyView',
-    'foam.nanos.crunch.Capability',
-    'foam.u2.DetailPropertyView',
-    'foam.u2.crunch.lab.CapabilityGraphNodeView',
+    'foam.graph.GraphBuilder',
     'foam.graph.map2d.RelationshipGridPlacementStrategy',
-    'foam.u2.svg.map2d.IdPropertyPlacementPlanDecorator',
+    'foam.nanos.crunch.AgentCapabilityJunction',
+    'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.u2.DetailPropertyView',
+    'foam.u2.Tab',
+    'foam.u2.crunch.lab.CapabilityGraphNodeView',
+    'foam.u2.detail.SectionedDetailPropertyView',
     'foam.u2.svg.TreeGraph',
     'foam.u2.svg.graph.DAGView',
-    'foam.u2.Tab',
+    'foam.u2.svg.map2d.IdPropertyPlacementPlanDecorator',
     'foam.u2.Tabs'
   ],
 
