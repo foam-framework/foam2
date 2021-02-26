@@ -122,6 +122,7 @@
 
   properties: [
     {
+      // TODO: True fix will be with ReferenceView
       class: 'String',
       name: 'referenceSummary',
       section: 'approvalRequestInformation',
