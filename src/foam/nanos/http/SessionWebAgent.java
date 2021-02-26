@@ -15,7 +15,6 @@ import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,18 +44,6 @@ public class SessionWebAgent
 
     try {
       String sessionId = "";
-
-      // check for session id in cookie
-      Cookie[] cookies = req.getCookies();
-
-      if ( cookies != null ) {
-        for ( Cookie c : cookies ) {
-          if ( c.getName().equals("sessionId") ) {
-            sessionId = c.getValue();
-            break;
-          }
-        }
-      }
 
       // fallback: check for session id as request param
       if ( sessionId.equals("") ) {
@@ -103,12 +90,8 @@ public class SessionWebAgent
       // execute delegate
       // Update session context with support setup from earlier WebAgents.
       getDelegate().execute(session.getContext()
-                            .put("auth", auth)
                             .put(HttpServletResponse.class, resp)
-                            .put(HttpServletRequest.class, req)
-                            .put(HttpParameters.class, x.get(HttpParameters.class))
-                            .putFactory(PrintWriter.class, new XFactory() {
-                              public Object create(X x) { try { return resp.getWriter(); } catch (IOException e) { return null; } } } ));
+                            .put(HttpServletRequest.class, req));
 
     } catch ( AuthorizationException e ) {
       // report permission issues
