@@ -209,11 +209,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'currentMemento_',
-      // postSet: function(o, n) {
-      //   if ( this.memento )
-      //     this.memento.tail = n;
-      // }
+      name: 'currentMemento_'
     }
   ],
 
