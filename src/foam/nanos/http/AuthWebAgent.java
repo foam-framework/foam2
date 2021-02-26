@@ -6,6 +6,7 @@
 
 package foam.nanos.http;
 
+import foam.box.HTTPAuthorizationType;
 import foam.core.X;
 import foam.core.XLocator;
 import foam.dao.DAO;
@@ -97,46 +98,59 @@ public class AuthWebAgent
 
     // instance parameters
     Session             session      = null;
-    Cookie              cookie       = getCookie(req);
-    boolean             attemptLogin = ! SafetyUtil.isEmpty(authHeader) || ( ! SafetyUtil.isEmpty(email) && ! SafetyUtil.isEmpty(password) );
-
-    // get session id from either query parameters or cookie
-    String sessionId = ( ! SafetyUtil.isEmpty(req.getParameter("sessionId")) ) ?
-        req.getParameter("sessionId") : ( cookie != null ) ?
-        cookie.getValue() : null;
-
-    if ( ! SafetyUtil.isEmpty(sessionId) ) {
-      session = (Session) sessionDAO.find(sessionId);
-      if ( session == null ) {
-        session = createSession(x);
-        session.setId(sessionId);
-        session = (Session) sessionDAO.put(session);
-      }
-
-      // save cookie
-      createCookie(x, session);
-      User user = ((Subject) session.getContext().get("subject")).getUser();
-      if ( ! attemptLogin && user != null ) {
-        return session;
-      }
-    } else {
-      // create new cookie
-      session = createSession(x);
-      session = (Session) sessionDAO.put(session);
-      createCookie(x, session);
-    }
-
-    // why are we updating here? Joel
-    session.touch();
-
-    if ( ! attemptLogin ) return null;
-
-    try {
+   try {
       if ( ! SafetyUtil.isEmpty(authHeader) ) {
         StringTokenizer st = new StringTokenizer(authHeader);
         if ( st.hasMoreTokens() ) {
           String authType = st.nextToken();
-          if ( authType.equalsIgnoreCase("basic") ) {
+          if ( HTTPAuthorizationType.BEARER.getName().equalsIgnoreCase(authType) ) {
+            //
+            // Support for Bearer token
+            // wget --header="Authorization: Bearer 8b4529d8-636f-a880-d0f2-637650397a71" \
+            //     http://localhost:8080/service/memory
+            //
+            String token = st.nextToken();
+            Session tmp = null;
+
+            // test and use non-clustered sessions
+            DAO internalSessionDAO = (DAO) x.get("localInternalSessionDAO");
+            if ( internalSessionDAO != null ) {
+              tmp = (Session) internalSessionDAO.find(token);
+              if ( tmp != null ) {
+                tmp.setClusterable(false);
+              }
+            }
+            if ( tmp == null ) {
+              tmp = (Session) sessionDAO.find(token);
+            }
+            if ( tmp != null ) {
+              try {
+                tmp.validateRemoteHost(x);
+                session = tmp;
+                String remoteIp = foam.net.IPSupport.instance().getRemoteIp(x);
+                if ( SafetyUtil.isEmpty(session.getRemoteHost()) ||
+                     ! SafetyUtil.equals(session.getRemoteHost(), remoteIp) ) {
+                  session.setRemoteHost(remoteIp);
+                  session = (Session) sessionDAO.put(session);
+                }
+                session.touch();
+
+                X effectiveContext = session.applyTo(x);
+                // Make context available to thread-local XLocator
+                XLocator.set(effectiveContext);
+                session.setContext(effectiveContext);
+                return session;
+              } catch( foam.core.ValidationException e ) {
+                logger.debug(e.getMessage(), foam.net.IPSupport.instance().getRemoteIp(x));
+                sendError(x, resp, HttpServletResponse.SC_UNAUTHORIZED, "Invalid Source Address.");
+                return null;
+              }
+            } else {
+              logger.debug("Invalid authentication token.", token);
+              sendError(x, resp, HttpServletResponse.SC_UNAUTHORIZED, "Invalid authentication token.");
+              return null;
+            }
+          } else if ( HTTPAuthorizationType.BASIC.getName().equalsIgnoreCase(authType) ) {
             //
             // Support for Basic HTTP Authentication
             // Redimentary testing: curl --user username:password http://localhost:8080/service/dig
@@ -166,55 +180,6 @@ public class AuthWebAgent
                 return null;
               }
             }
-          } else if ( authType.equalsIgnoreCase("bearer") ) {
-            //
-            // Support for Bearer token
-            // wget --header="Authorization: Bearer 8b4529d8-636f-a880-d0f2-637650397a71" \
-            //     http://localhost:8080/service/memory
-            //
-            String token = st.nextToken();
-            Session tmp = (Session) sessionDAO.find(token);
-            if ( tmp != null ) {
-              try {
-                tmp.validateRemoteHost(x);
-                session = tmp;
-                session.setRemoteHost(foam.net.IPSupport.instance().getRemoteIp(x));
-                X effectiveContext = session.applyTo(x);
-                session.setContext(effectiveContext);
-                User user = ((Subject) effectiveContext.get("subject")).getUser();
-
-                try {
-                  if ( user == null ) {
-                    throw new AuthenticationException("User not found");
-                  }
-
-                  Group group = (Group) effectiveContext.get("group");
-
-                  if ( group == null ) {
-                    throw new AuthenticationException("Group not found.");
-                  }
-
-                  if ( ! group.getEnabled() ) {
-                    throw new AuthenticationException("Group disabled");
-                  }
-
-                  // Put to sessionDAO because we want to save the change to remoteHost.
-                  return (Session) sessionDAO.put(session);
-                } catch ( AuthenticationException e ) {
-                  logger.debug("Invalid authentication token. User,Group of Session not found.", e.getMessage());
-                  sendError(x, resp, HttpServletResponse.SC_UNAUTHORIZED, "Invalid authentication token.");
-                  return null;
-                }
-              } catch( foam.core.ValidationException e ) {
-                logger.debug("Invalid Source Address.");
-                sendError(x, resp, HttpServletResponse.SC_UNAUTHORIZED, "Invalid Source Address.");
-                return null;
-              }
-            } else {
-              logger.debug("Invalid authentication token.");
-              sendError(x, resp, HttpServletResponse.SC_UNAUTHORIZED, "Invalid authentication token.");
-              return null;
-            }
           } else {
             logger.warning("Unsupported authorization type, expecting Basic or Bearer, received: "+authType);
             if ( ! SafetyUtil.isEmpty(authHeader) ) {
@@ -226,7 +191,46 @@ public class AuthWebAgent
       }
 
       try {
-        User user = auth.login(session.getContext()
+        String sessionId = req.getParameter("sessionId");
+
+        if ( ! SafetyUtil.isEmpty(sessionId) ) {
+          session = (Session) sessionDAO.find(sessionId);
+        }
+        if ( session == null ) {
+          session = createSession(x);
+          if ( ! SafetyUtil.isEmpty(sessionId) ) {
+            session.setId(sessionId);
+          }
+          session = (Session) sessionDAO.put(session);
+        }
+        session.touch();
+
+        try {
+          session.validateRemoteHost(x);
+        } catch (foam.core.ValidationException e) {
+          logger.debug(e.getMessage(), foam.net.IPSupport.instance().getRemoteIp(x));
+          if ( ! SafetyUtil.isEmpty(authHeader) ) {
+            sendError(x, resp, HttpServletResponse.SC_UNAUTHORIZED, "Access denied");
+          } else {
+            PrintWriter out = x.get(PrintWriter.class);
+            out.println("Access denied");
+          }
+          return null;
+        }
+
+        String remoteIp = foam.net.IPSupport.instance().getRemoteIp(x);
+        if ( SafetyUtil.isEmpty(session.getRemoteHost()) ||
+             ! SafetyUtil.equals(session.getRemoteHost(), remoteIp) ) {
+          session.setRemoteHost(remoteIp);
+          session = (Session) sessionDAO.put(session);
+        }
+        User user = ((Subject) session.getContext().get("subject")).getUser();
+        if ( user != null &&
+             SafetyUtil.isEmpty(email) ) {
+          return session;
+        }
+ 
+        user = auth.login(session.getContext()
           .put(HttpServletRequest.class,  req)
           .put(HttpServletResponse.class, resp), email, password);
 
@@ -251,15 +255,23 @@ public class AuthWebAgent
         if ( ! SafetyUtil.isEmpty(authHeader) ) {
           sendError(x, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Authentication failure.");
         } else {
-          PrintWriter out = x.get(PrintWriter.class);
-          out.println("Authentication failure.");
+          if ( sendErrorHandler_ == null || sendErrorHandler_.redirectToLogin(x) ) {
+            templateLogin(x);
+          } else {
+            PrintWriter out = x.get(PrintWriter.class);
+            out.println("Authentication failure.");
+          }
         }
       } catch ( AuthenticationException e ) {
         if ( ! SafetyUtil.isEmpty(authHeader) ) {
           sendError(x, resp, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         } else {
-          PrintWriter out = x.get(PrintWriter.class);
-          out.println("Authentication failure.");
+          if ( sendErrorHandler_ == null || sendErrorHandler_.redirectToLogin(x) ) {
+            templateLogin(x);
+          } else {
+            PrintWriter out = x.get(PrintWriter.class);
+            out.println("Authentication failure.");
+          }
         }
       }
     } catch (java.io.IOException | IllegalStateException e) { // thrown by HttpServletResponse.sendError
@@ -279,43 +291,12 @@ public class AuthWebAgent
     sendErrorHandler_.sendError(x, status, message);
   }
 
-  public Cookie getCookie(HttpServletRequest req) {
-    Cookie[] cookies = req.getCookies();
-    if ( cookies == null ) {
-      return null;
-    }
-
-    for ( Cookie cookie : cookies ) {
-      if ( SESSION_ID.equals(cookie.getName()) ) {
-        return cookie;
-      }
-    }
-
-    return null;
-  }
-
   public Session createSession(X x) {
     HttpServletRequest req     = x.get(HttpServletRequest.class);
     Session            session = new Session((X) x.get(Boot.ROOT));
     session.setRemoteHost(req.getRemoteHost());
     session.setContext(session.applyTo(x));
     return session;
-  }
-
-  public void createCookie(X x, Session session) {
-    HttpServletResponse resp = x.get(HttpServletResponse.class);
-    Cookie sessionCookie = new Cookie(SESSION_ID, session.getId());
-
-    // Specify that the cookie should not be accessible by client-side scripts.
-    sessionCookie.setHttpOnly(true);
-
-    // Specify that the cookie should only be sent over secure connections if
-    // the app is configured that way.
-    AppConfig appConfig = (AppConfig) x.get("appConfig");
-    sessionCookie.setSecure(appConfig.getForceHttps());
-    int ttlInSeconds = (int) Math.ceil(session.getTtl() / 1000.0);
-    sessionCookie.setMaxAge(ttlInSeconds);
-    resp.addCookie(sessionCookie);
   }
 
   public void templateLogin(X x) {
