@@ -191,7 +191,7 @@ foam.CLASS({
       background: none;
       border: 1px solid transparent;
       box-shadow: none;
-      color: #8e9090;
+      color: /*%GREY1%*/ #5E6061;
     }
 
     ^tertiary:hover:not(:disabled) {
@@ -378,7 +378,7 @@ foam.CLASS({
       this.addContent();
 
       if ( this.action ) {
-        this.attrs({ name: this.action.name });
+        this.attrs({name: this.action.name, 'aria-label': this.action.ariaLabel });
 
         this.enableClass(this.myClass('unavailable'), this.action.createIsAvailable$(this.__context__, this.data), true);
         this.attrs({ disabled: this.action.createIsEnabled$(this.__context__, this.data).map((e) => e ? false : 'disabled') });
