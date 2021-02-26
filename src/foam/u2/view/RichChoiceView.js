@@ -45,7 +45,7 @@ foam.CLASS({
       class: 'foam.dao.DAOProperty',
       name: 'filteredDAO',
       documentation: 'A filtered version of the underlying DAO, depending on the search term the user has typed in.',
-      expression: function(dao) { return dao; }
+      factory: function() { return this.dao; }
     },
     {
       class: 'Array',
@@ -292,12 +292,6 @@ foam.CLASS({
       `,
       postSet: function(_, nv) {
         if ( nv && ! this.hasBeenOpenedYet_ ) this.hasBeenOpenedYet_ = true;
-        if ( ! nv ) {
-          this.clearProperty('filter_');
-          this.sections.forEach((section) => {
-            section.clearProperty('filteredDAO');
-          });
-        }
       }
     },
     {
@@ -540,6 +534,7 @@ foam.CLASS({
                     sections.forEach(function(section) {
                       promiseArray.push(section.dao.select(self.COUNT()));
                     });
+
                     return Promise.all(promiseArray).then((resp) => {
                       var index = 0;
                       return this.E().forEach(sections, function(section) {
