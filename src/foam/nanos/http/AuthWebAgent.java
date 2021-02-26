@@ -191,8 +191,13 @@ public class AuthWebAgent
       }
 
       try {
-        String sessionId = req.getParameter("sessionId");
-
+        String sessionId = req.getParameter(SESSION_ID);
+        if ( SafetyUtil.isEmpty(sessionId) ) {
+          Cookie cookie = getCookie(req);
+          if ( cookie != null ) {
+            sessionId = cookie.getValue();
+          }
+        }
         if ( ! SafetyUtil.isEmpty(sessionId) ) {
           session = (Session) sessionDAO.find(sessionId);
         }
@@ -289,6 +294,21 @@ public class AuthWebAgent
     }
 
     sendErrorHandler_.sendError(x, status, message);
+  }
+
+  public Cookie getCookie(HttpServletRequest req) {
+    Cookie[] cookies = req.getCookies();
+    if ( cookies == null ) {
+      return null;
+    }
+
+    for ( Cookie cookie : cookies ) {
+      if ( SESSION_ID.equals(cookie.getName()) ) {
+        return cookie;
+      }
+    }
+
+    return null;
   }
 
   public Session createSession(X x) {
