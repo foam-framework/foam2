@@ -101,6 +101,14 @@ foam.CLASS({
       }
     },
     'currentMemento',
+    {
+      class: 'String',
+      name: 'mementoHead',
+      getter: function() {
+        if ( this.data.id )
+          return 'edit::' + this.data.id;
+      }
+    }
     // {
     //   class: 'String',
     //   name: 'mementoHead',

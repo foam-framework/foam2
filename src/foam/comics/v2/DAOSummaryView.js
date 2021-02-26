@@ -119,15 +119,18 @@ foam.CLASS({
       class: 'String',
       name: 'mementoHead',
       getter: function() {
-        if ( ! this.memento || ! this.memento.tail )
+        if ( ! this.memento || ! this.memento.tail || this.memento.tail.head != 'edit' ) {
           return 'view::' + this.idOfRecord;
-
-        //this creates bug on url being set to edit
-        if ( this.memento.tail.head == 'edit' ) {
-          this.memento.tail.head = 'view';
-          return null;
         }
-        return 'view::' + this.idOfRecord;
+        // if ( ! this.memento || ! this.memento.tail )
+        //   return 'view::' + this.idOfRecord;
+
+        // //this creates bug on url being set to edit
+        // if ( this.memento.tail.head == 'edit' ) {
+        //   this.memento.tail.head = 'view';
+        //   return null;
+        // }
+        // return this.idOfRecord;
       }
     },
     'idOfRecord'
