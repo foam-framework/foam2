@@ -20,6 +20,15 @@ foam.CLASS({
     ^ .foam-u2-view-RichChoiceView-selection-view {
       width: 30vw;
     }
+    ^ .foam-u2-Tabs-tabRow {
+      margin-bottom: 30px;
+    }
+
+    ^ .foam-u2-Tabs-content > div > div {
+      display: inline-flex;
+      vertical-align: text-bottom;
+      margin-right: 20px;
+    }
   `,
 
   imports: [
@@ -31,7 +40,9 @@ foam.CLASS({
     'foam.graph.GraphBuilder',
     'foam.dao.PromisedDAO',
     'foam.nanos.crunch.UserCapabilityJunction',
+    'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.Capability',
+    'foam.u2.DetailPropertyView',
     'foam.u2.crunch.lab.CapabilityGraphNodeView',
     'foam.graph.map2d.RelationshipGridPlacementStrategy',
     'foam.u2.svg.map2d.IdPropertyPlacementPlanDecorator',
@@ -48,13 +59,40 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'crunchUser',
       class: 'Reference',
+      name: 'crunchUser',
+      label: 'User',
       of: 'foam.nanos.auth.User',
+      help: `User reference used to populate UCJ data on capability graph.
+          This user references the sourceId/owner of a user capability junction.`,
       view: function(_, X) {
         return {
           class: 'foam.u2.view.RichChoiceView',
           search: true,
+          allowClearingSelection: true,
+          sections: [
+            {
+              heading: 'Users',
+              dao: X.userDAO
+            }
+          ]
+        };
+      },
+      postSet: function(o, n) {
+        if ( ! n ) this.clearProperty('associatedUser');
+      }
+    },
+    {
+      class: 'Reference',
+      name: 'associatedUser',
+      of: 'foam.nanos.auth.User',
+      help: `User reference used to further filter capabilities listed for rootCapability.
+          This user references the effectiveUser of a capabilityJunction.`,
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.RichChoiceView',
+          search: true,
+          allowClearingSelection: true,
           sections: [
             {
               heading: 'Users',
@@ -65,66 +103,79 @@ foam.CLASS({
       },
     },
     {
-      class: 'foam.dao.DAOProperty',
-      name: 'filteredCapabilityDAO',
-      expression: function(crunchUser) {
-        if ( crunchUser == 0 ) return this.capabilityDAO;
-        return this.PromisedDAO.create({
-          of: 'foam.nanos.crunch.Capability',
-          promise: this.userCapabilityJunctionDAO.where(this.EQ(this.UserCapabilityJunction.SOURCE_ID, crunchUser))
-            .select(this.MAP(this.UserCapabilityJunction.TARGET_ID))
-            .then((sink) => {
-              let capabilities = sink.delegate.array ? sink.delegate.array : [];
-              return this.capabilityDAO.where(
-                this.IN(this.Capability.ID, capabilities.flat())
-              );
-            })
-        });
-      }
-    },
-    {
-      name: 'rootCapability',
       class: 'Reference',
+      name: 'rootCapability',
       of: 'foam.nanos.crunch.Capability',
+      help: `Root capability reference used to populate graph.
+          Graph renders prerequisites downward of the selected capabilty.`,
       view: function(_, X) {
         return {
           class: 'foam.u2.view.RichChoiceView',
           search: true,
+          allowClearingSelection: true,
           sections: [
             {
               heading: 'Capabilities',
-              dao$: X.data.filteredCapabilityDAO$
+              dao$: X.data.slot(function(showAllCapabilities, associatedUser, crunchUser) {
+                if ( crunchUser == 0 || showAllCapabilities) return this.capabilityDAO;
+                let predicate = associatedUser ?
+                    this.AND(
+                      this.EQ(this.AgentCapabilityJunction.SOURCE_ID, crunchUser),
+                      this.EQ(this.AgentCapabilityJunction.EFFECTIVE_USER, associatedUser)
+                    ) :
+                    this.EQ(this.UserCapabilityJunction.SOURCE_ID, crunchUser);
+                return this.PromisedDAO.create({
+                  of: 'foam.nanos.crunch.Capability',
+                  promise: this.userCapabilityJunctionDAO.where(predicate)
+                    .select(this.MAP(this.UserCapabilityJunction.TARGET_ID))
+                    .then((sink) => {
+                      let capabilities = sink.delegate.array ? sink.delegate.array : [];
+                      return this.capabilityDAO.where(
+                        this.IN(this.Capability.ID, capabilities.flat())
+                      );
+                    })
+                });
+              })
             }
           ]
         };
       }
     },
     {
+      class: 'Boolean',
+      name: 'showAllCapabilities',
+      value: true,
+      help: `Toggles dropdown list to contain all capabilities instead 
+          of a filtered list based on user selections`
+    },
+    {
       name: 'relation',
       class: 'String',
       value: 'prerequisites'
-    }
+    },
   ],
 
   methods: [
     function initE() {
-      var self = this;
       this
         .addClass(this.myClass())
+        .start('h2').add(this.cls_.name).end()
         .start(this.Tabs)
           .start(this.Tab, {
             label: this.ALL_TAB,
             selected: true,
           })
-            .add(this.ROOT_CAPABILITY)
-            .add(this.getGraphSlot())
+            .add(this.ROOT_CAPABILITY )
+            .start().style({ display: 'block' }).add(this.getGraphSlot()).end()
           .end()
           .start(this.Tab, {
             label: this.UCJ_TAB,
-          })
+          })  
             .add(this.ROOT_CAPABILITY)
-            .add(this.CRUNCH_USER)
-            .add(this.getGraphSlot(true))
+            .add(this.CRUNCH_USER )
+            .add(this.ASSOCIATED_USER)
+            .add(this.SHOW_ALL_CAPABILITIES)
+            .start().style({ display: 'block' }).add(this.getGraphSlot(true)).end()
           .end()
         .end()
         ;
