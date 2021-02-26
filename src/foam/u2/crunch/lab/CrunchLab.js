@@ -41,6 +41,7 @@ foam.CLASS({
     'foam.dao.PromisedDAO',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.crunch.AgentCapabilityJunction',
+    'foam.u2.detail.SectionedDetailPropertyView',
     'foam.nanos.crunch.Capability',
     'foam.u2.DetailPropertyView',
     'foam.u2.crunch.lab.CapabilityGraphNodeView',
@@ -165,16 +166,16 @@ foam.CLASS({
             label: this.ALL_TAB,
             selected: true,
           })
-            .add(this.ROOT_CAPABILITY )
+            .tag(this.SectionedDetailPropertyView, { data: this, prop: this.ROOT_CAPABILITY })
             .start().style({ display: 'block' }).add(this.getGraphSlot()).end()
           .end()
           .start(this.Tab, {
             label: this.UCJ_TAB,
           })  
-            .add(this.ROOT_CAPABILITY)
-            .add(this.CRUNCH_USER )
-            .add(this.ASSOCIATED_USER)
-            .add(this.SHOW_ALL_CAPABILITIES)
+            .tag(this.SectionedDetailPropertyView, { data: this, prop: this.ROOT_CAPABILITY })
+            .tag(this.SectionedDetailPropertyView, { data: this, prop: this.CRUNCH_USER })
+            .tag(this.SectionedDetailPropertyView, { data: this, prop: this.ASSOCIATED_USER })
+            .tag(this.SectionedDetailPropertyView, { data: this, prop: this.SHOW_ALL_CAPABILITIES })
             .start().style({ display: 'block' }).add(this.getGraphSlot(true)).end()
           .end()
         .end()
