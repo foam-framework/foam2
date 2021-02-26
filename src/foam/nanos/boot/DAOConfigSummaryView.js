@@ -210,10 +210,10 @@ foam.CLASS({
     },
     {
       name: 'currentMemento_',
-      postSet: function(o, n) {
-        if ( this.memento )
-          this.memento.tail = n;
-      }
+      // postSet: function(o, n) {
+      //   if ( this.memento )
+      //     this.memento.tail = n;
+      // }
     }
   ],
 
