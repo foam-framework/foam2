@@ -99,12 +99,9 @@ foam.CLASS({
           DAO capabilityDAO = ( x.get("localCapabilityDAO") == null ) ? (DAO) x.get("capabilityDAO") : (DAO) x.get("localCapabilityDAO");
           DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
-          Predicate capabilityScope = AND(
-            OR(
+          Predicate capabilityScope = OR(
               NOT(HAS(UserCapabilityJunction.EXPIRY)),
               NOT(EQ(UserCapabilityJunction.STATUS, CapabilityJunctionStatus.EXPIRED))
-            ),
-            EQ(UserCapabilityJunction.LIFECYCLE_STATE, LifecycleState.ACTIVE)
           );
           AbstractPredicate predicate = new AbstractPredicate(x) {
             @Override
