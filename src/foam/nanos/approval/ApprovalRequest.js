@@ -122,6 +122,7 @@
 
   properties: [
     {
+      // TODO: True fix will be with ReferenceView
       class: 'String',
       name: 'referenceSummary',
       section: 'approvalRequestInformation',
@@ -135,11 +136,15 @@
         this.__subSubContext__[obj.daoKey].find(obj.objId).then(requestObj => {
           let referenceSummaryString = `ID:${obj.objId}`;
 
-          if ( requestObj && requestObj.toSummary() ){
-            referenceSummaryString = requestObj.toSummary()
-          }
+          if ( requestObj ){
+            Promise.resolve(requestObj.toSummary()).then(function(requestObjSummary) {
+              if ( requestObjSummary ){
+                referenceSummaryString = requestObjSummary;
+              }
 
-          self.add(referenceSummaryString);
+              self.add(referenceSummaryString);
+            })
+          }
         });
       },
       view: function(_, X) {
@@ -147,13 +152,17 @@
         let data = X.data;
 
         X[data.daoKey].find(data.objId).then(requestObj => {
-          let referenceSummaryString = `ID:${obj.objId}`;
+          let referenceSummaryString = `ID:${data.objId}`;
 
-          if ( requestObj && requestObj.toSummary() ){
-            referenceSummaryString = requestObj.toSummary()
+          if ( requestObj ){
+            Promise.resolve(requestObj.toSummary()).then(function(requestObjSummary) {
+              if ( requestObjSummary ){
+                referenceSummaryString = requestObjSummary;
+              }
+
+              slot.set(referenceSummaryString);
+            })
           }
-
-          slot.set(referenceSummaryString);
         })
 
         return {
