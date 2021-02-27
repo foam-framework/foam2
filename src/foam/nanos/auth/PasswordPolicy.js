@@ -16,7 +16,15 @@ foam.CLASS({
 
   javaImports: [
     'foam.util.Password',
-    'foam.util.SafetyUtil'
+    'foam.util.SafetyUtil',
+    'foam.dao.DAO',
+    'java.util.List',
+    'foam.dao.Sink',
+    'foam.dao.ArraySink'
+  ],
+
+  imports: [
+    'commonPasswordDAO'
   ],
 
   constants: [
@@ -55,9 +63,13 @@ foam.CLASS({
         when resetting the users passwords to prevent them from using the same password again.
         `
     },
+    'blackList'
   ],
 
   methods: [
+    async function init() {
+      this.blackList = (await this.commonPasswordDAO.select()).array;
+    },
     {
       name: 'validate',
       args: [
@@ -70,6 +82,9 @@ foam.CLASS({
           javaType: 'String'
         }
       ],
+      code: function(user, potentialPassword) {
+        return this.blackList.find( w => w.toString() === potentialPassword ) === undefined ? true : false;
+      },
       javaCode: `
         // check if this policy is enabled
         if ( ! this.getEnabled() ) {

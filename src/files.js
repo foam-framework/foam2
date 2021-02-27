@@ -313,6 +313,7 @@ FOAM_FILES([
   { name: 'foam/nanos/auth/UserPropertyAvailabilityServiceInterface' },
   { name: 'foam/nanos/auth/ClientUserPropertyAvailabilityService' },
   { name: 'foam/nanos/auth/UserMDCitationView' },
+  { name: 'foam/nanos/auth/CommonPassword' },
   { name: "foam/nanos/logger/Logger" },
   { name: "foam/nanos/logger/DAOLogger" },
   { name: "foam/nanos/logger/LoggingDAO" },

@@ -20,7 +20,8 @@ foam.CLASS({
     'auth',
     'ctrl',
     'stack',
-    'user'
+    'user',
+    'theme'
   ],
 
   requires: [
@@ -39,7 +40,8 @@ foam.CLASS({
     { name: 'USERNAME_EMPTY_ERR', message: 'Username required' },
     { name: 'USERNAME_AVAILABILITY_ERR', message: 'This username is taken. Please try another.' },
     //TODO: Find out better way to deal with PASSWORD_ERR
-    { name: 'PASSWORD_ERR', message: 'Password should be at least 10 characters.' }
+    { name: 'PASSWORD_ERR', message: 'Password should be at least 10 characters.' },
+    { name: 'WEAK_PASSWORD_ERR', message: 'Password is weak.' }
   ],
 
   properties: [
@@ -135,6 +137,7 @@ foam.CLASS({
       },
       validateObj: function(desiredPassword) {
         if ( ! desiredPassword || desiredPassword.length < 10 ) return this.PASSWORD_ERR;
+        if ( ! this.theme.passwordPolicy.validate(this.user, desiredPassword) ) return this.WEAK_PASSWORD_ERR;
       },
       required: true
     }
