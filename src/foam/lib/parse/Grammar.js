@@ -126,8 +126,8 @@ foam.CLASS({
       ],
       javaCode: `
 ps = getParser().parse(ps, x);
-if ( ps != null ) ps.setValue(getAction().execute(ps.value(), x));
-return ps;
+if ( ps == null ) return null;
+return ps.setValue(getAction().execute(ps.value(), x));
       `
     }
   ]
