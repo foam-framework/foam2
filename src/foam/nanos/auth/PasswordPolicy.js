@@ -83,7 +83,7 @@ foam.CLASS({
         }
       ],
       code: function(user, potentialPassword) {
-        return this.blackList.find( w => w.toString() === potentialPassword ) === undefined ? true : false;
+        return this.blackList.find( w => w.toString() === potentialPassword.toLowerCase() ) === undefined ? true : false;
       },
       javaCode: `
         // check if this policy is enabled
@@ -96,6 +96,12 @@ foam.CLASS({
         String minLengthRegex = "^.{" + minLength + ",}$";
         if ( SafetyUtil.isEmpty(potentialPassword) || potentialPassword.length() < minLength ) {
           throw new RuntimeException("Password must be at least " + minLength + " characters long.");
+        }
+
+        // check weak password
+        DAO commonPasswordDAO = (DAO) getX().get("commonPasswordDAO");
+        if ( commonPasswordDAO.find(potentialPassword.toLowerCase()) != null ) {
+          throw new RuntimeException("Password is weak.");
         }
 
         // check password history

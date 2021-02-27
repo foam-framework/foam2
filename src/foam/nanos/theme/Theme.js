@@ -527,7 +527,7 @@ foam.CLASS({
         return this.PasswordPolicy.create();
       },
       javaFactory: `
-        return new foam.nanos.auth.PasswordPolicy();
+        return new foam.nanos.auth.PasswordPolicy(getX());
       `,
       view: {
         class: 'foam.u2.view.FObjectPropertyView',

@@ -95,6 +95,7 @@ foam.CLASS({
           // default password policy
           PasswordPolicy policy = new PasswordPolicy();
           policy.setEnabled(true);
+          policy.setX(x);
           policy.setMinLength(6);
           policy.setPriorPasswordsToCheckCount(0);
 
@@ -125,6 +126,7 @@ foam.CLASS({
           // default password policy
           PasswordPolicy policy = new PasswordPolicy();
           policy.setEnabled(true);
+          policy.setX(x);
           policy.setMinLength(6);
           policy.setPriorPasswordsToCheckCount(historyCount);
 
@@ -161,6 +163,7 @@ foam.CLASS({
           // default password policy
           PasswordPolicy policy = new PasswordPolicy();
           policy.setEnabled(true);
+          policy.setX(x);
           policy.setMinLength(minLength);
           policy.setPriorPasswordsToCheckCount(0);
 
