@@ -87,6 +87,7 @@ foam.CLASS({
       border-bottom: solid 1px #e7eaec;
       box-sizing: border-box;
       padding: 0 16px;
+      overflow: hidden;
     }
 
     ^canned-queries {
