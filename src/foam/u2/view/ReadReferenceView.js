@@ -14,7 +14,7 @@ foam.CLASS({
   requires: [
     'foam.comics.v2.DAOControllerConfig',
     'foam.u2.detail.SectionedDetailView',
-    'foam.u2.CitationView'
+    'foam.u2.view.ReferenceCitationView'
   ],
 
   properties: [
@@ -50,16 +50,10 @@ foam.CLASS({
                 backLabel: 'Back'
               }, self);
             })
-            .call(function() {
-              self.addCitationView.call(this, self);
-            })
+            .tag(self.ReferenceCitationView, {data: self.obj})
           .end();
         }));
       }
-    },
-
-    function addCitationView(self) {
-      this.tag(self.CitationView, { data$: self.obj$ });
     },
 
     function fromProperty(prop) {
