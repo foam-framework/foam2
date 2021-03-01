@@ -712,6 +712,12 @@ foam.CLASS({
             this.__context__.lookup(v.class) :
             type ).create(v, this.__subContext__);
       }
+    },
+    {
+      name: 'cloneProperty',
+      value: function(value, cloneMap, opt_X) {
+        cloneMap[this.name] = value && value.clone(opt_X);
+      }
     }
   ],
   methods: [
