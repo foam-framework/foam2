@@ -83,7 +83,8 @@ foam.CLASS({
         }
       ],
       code: function(user, potentialPassword) {
-        return this.blackList.find( w => w.toString() === potentialPassword.toLowerCase() ) === undefined ? true : false;
+        let password = potentialPassword.toLowerCase();
+        return this.blackList.find( w => w.toString() === password ) === undefined ? true : false;
       },
       javaCode: `
         // check if this policy is enabled
