@@ -275,11 +275,26 @@ foam.CLASS({
     },
     function initE() {
       var self = this;
+      var filterView;
+      var simpleSearch;
 
-      var filterView  = foam.u2.ViewSpec.createView(self.FilterView, {
-        dao$: self.searchFilterDAO$,
-        data$: self.searchPredicate$
-      },  self, self.__subSubContext__.createSubContext({ memento: this.memento.tail }));
+      if ( self.config.searchMode === self.SearchMode.SIMPLE ) {
+        simpleSearch = foam.u2.ViewSpec.createView(self.SimpleSearch, {
+          showCount: false,
+          data$: self.searchPredicate$,
+        },  self, self.__subSubContext__.createSubContext({ memento: this.memento.tail }));
+
+        filterView  = foam.u2.ViewSpec.createView(self.FilterView, {
+          dao$: self.searchFilterDAO$,
+          data$: self.searchPredicate$
+        },  self, simpleSearch.__subSubContext__);
+      } else {
+        filterView  = foam.u2.ViewSpec.createView(self.FilterView, {
+          dao$: self.searchFilterDAO$,
+          data$: self.searchPredicate$
+        },  self, self.__subSubContext__.createSubContext({ memento: this.memento.tail }));
+      }
+
       var summaryView = foam.u2.ViewSpec.createView(self.summaryView ,{
         data: self.predicatedDAO$proxy,
         config: self.config
@@ -317,11 +332,7 @@ foam.CLASS({
                       controllerMode: foam.u2.ControllerMode.EDIT
                     })
                       .callIf(self.config.searchMode === self.SearchMode.SIMPLE, function() {
-                        this.tag(self.SimpleSearch, {
-                          showCount: false,
-                          data$: self.searchPredicate$,
-                          searchValue: self.memento && self.memento.paramsObj && self.memento.paramsObj.s//use memento head as searchValue in the view
-                        });
+                        this.tag(simpleSearch);
                       })
                       .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
                         this.add(filterView);
