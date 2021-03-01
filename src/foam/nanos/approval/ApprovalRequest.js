@@ -122,6 +122,56 @@
 
   properties: [
     {
+      // TODO: True fix will be with ReferenceView
+      class: 'String',
+      name: 'referenceSummary',
+      section: 'approvalRequestInformation',
+      order: 21,
+      gridColumns: 6,
+      transient: true,
+      tableWidth: 200,
+      visibility: 'RO',
+      tableCellFormatter: function(_,obj) {
+        let self = this;
+        this.__subSubContext__[obj.daoKey].find(obj.objId).then(requestObj => {
+          let referenceSummaryString = `ID:${obj.objId}`;
+
+          if ( requestObj ){
+            Promise.resolve(requestObj.toSummary()).then(function(requestObjSummary) {
+              if ( requestObjSummary ){
+                referenceSummaryString = requestObjSummary;
+              }
+
+              self.add(referenceSummaryString);
+            })
+          }
+        });
+      },
+      view: function(_, X) {
+        let slot = foam.core.SimpleSlot.create();
+        let data = X.data;
+
+        X[data.daoKey].find(data.objId).then(requestObj => {
+          let referenceSummaryString = `ID:${data.objId}`;
+
+          if ( requestObj ){
+            Promise.resolve(requestObj.toSummary()).then(function(requestObjSummary) {
+              if ( requestObjSummary ){
+                referenceSummaryString = requestObjSummary;
+              }
+
+              slot.set(referenceSummaryString);
+            })
+          }
+        })
+
+        return {
+          class: 'foam.u2.view.ValueView',
+          data$: slot
+        };
+      },
+    },
+    {
       class: 'Long',
       name: 'id',
       section: 'approvalRequestInformation',

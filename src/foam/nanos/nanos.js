@@ -220,7 +220,6 @@ FOAM_FILES([
   { name: 'foam/nanos/medusa/ReplayingInfoDetailCView' },
   { name: 'foam/nanos/medusa/RetryClientSinkDAO' },
   { name: 'foam/nanos/medusa/Status' },
-  { name: 'foam/nanos/session/Session' },
   { name: 'foam/nanos/medusa/ZoneCView' },
   { name: 'foam/nanos/medusa/benchmark/DaggerLinkBenchmark' },
   { name: 'foam/nanos/medusa/benchmark/DaggerVerifyBenchmark' },
@@ -361,8 +360,6 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/SlackSetting' },
   { name: 'foam/nanos/notification/ToastNotificationDAO' },
   { name: 'foam/nanos/notification/ToastState' },
-  { name: 'foam/nanos/notification/ScriptRunNotification'},
-  { name: 'foam/nanos/notification/ScriptRunNotificationNotificationCitationView'},
   { name: 'foam/nanos/notification/NotificationMessageModal'},
   { name: 'foam/nanos/dashboard/Demo' },
 
@@ -486,6 +483,7 @@ FOAM_FILES([
   { name: 'foam/nanos/crunch/predicate/CapabilityPrerequisitesGranted' },
   { name: 'foam/nanos/crunch/predicate/StatusChangedTo' },
   { name: 'foam/nanos/crunch/predicate/IsAgent' },
+  { name: 'foam/nanos/crunch/predicate/CapabilityJunctionTransitionToStatus' },
   //spid
   { name: "foam/nanos/auth/CreateUserCapabilityJunctionOnSpidSet" },
   { name: "foam/nanos/auth/SetUserServiceProviderJunctionRuleAction" },

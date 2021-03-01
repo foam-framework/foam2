@@ -39,7 +39,8 @@ foam.CLASS({
       name: 'created',
       class: 'DateTime',
       visibility: 'RO',
-      javaFormatJSON: `formatter.outputReadableDate(get_(obj));`
+      javaFormatJSON: `formatter.outputReadableDate(get_(obj));`,
+      tableWidth: 180
     },
     {
       class: 'Reference',

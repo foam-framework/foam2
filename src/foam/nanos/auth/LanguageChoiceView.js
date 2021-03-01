@@ -130,10 +130,10 @@ foam.CLASS({
   methods: [
     async function initE() {
       this.supportedLanguages = (await this.languageDAO
-                        .where(foam.mlang.predicate.Eq.create({
-                          arg1: foam.nanos.auth.Language.ENABLED,
-                          arg2: true
-                        })).select()).array;
+        .where(foam.mlang.predicate.Eq.create({
+          arg1: foam.nanos.auth.Language.ENABLED,
+          arg2: true
+        })).select()).array;
 
       let country = await this.countryDAO.find(this.lastLanguage.variant)
       let label = this.lastLanguage.variant != "" ? `${this.lastLanguage.nativeName}(${this.lastLanguage.variant})` : `${this.lastLanguage.nativeName}`

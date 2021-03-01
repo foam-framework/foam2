@@ -16,11 +16,11 @@ foam.ENUM({
       label: 'None',
       ordinal: 0
     },
-    // {
-    //   name: 'BASIC',
-    //   label: 'Basic',
-    //   ordinal: 1
-    // },
+    {
+      name: 'BASIC',
+      label: 'Basic',
+      ordinal: 1
+    },
     {
       name: 'BEARER',
       label: 'Bearer',
