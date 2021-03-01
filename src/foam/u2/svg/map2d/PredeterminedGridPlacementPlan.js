@@ -5,9 +5,13 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2.svg.graph',
+  package: 'foam.u2.svg.map2d',
   name: 'PredeterminedGridPlacementPlan',
-  implements: ['foam.u2.svg.graph.GridPlacementPlan'],
+  implements: ['foam.u2.svg.map2d.GridPlacementPlan'],
+
+  documentation: `
+    This is a convenient GridPlacementPlan for predetermined cell placements.
+  `,
 
   properties: [
     {

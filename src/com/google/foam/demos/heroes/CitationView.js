@@ -3,7 +3,7 @@
  * Copyright 2016 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
- 
+
 foam.CLASS({
   package: 'com.google.foam.demos.heroes',
   name: 'CitationView',
@@ -71,7 +71,7 @@ foam.CLASS({
     {
       name: 'removeHero',
       label: 'X',
-      speechLabel: 'delete',
+      ariaLabel: 'delete',
       toolTip: 'delete',
       xxxiconFontName: 'delete_forever',
       code: function() { this.dao.remove(this.data); }

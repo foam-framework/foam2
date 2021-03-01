@@ -151,7 +151,7 @@ foam.CLASS({
     {
       name: 'data',
       postSet: function(o, n) {
-        if ( o !== n ) this.choice = this.findChoiceByData(n) || [n, n];
+        if ( o !== n ) this.choice = this.findChoiceByData(n) || [n, n.label || n];
       }
     },
     {
@@ -235,9 +235,9 @@ foam.CLASS({
               .attrs({ name: self.name })
               .enableClass('selection-made', self.index$.map((index) => index !== -1))
             .end();
-        } else {
-          return self.E().add(self.text$);
         }
+
+        return self.E().add(self.text$);
       }));
 
       this.dao$proxy.on.sub(this.onDAOUpdate);

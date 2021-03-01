@@ -34,8 +34,10 @@ foam.CLASS({
         var self = this;
         this.SUPER();
         this
-          .start('a')
-            .attrs({ href: '#' })
+          .add(this.obj$.map((obj) => {
+          if ( ! obj ) return '';
+          return this.E().start('a')
+            .attrs({ href: '#'})
             .on('click', function(evt) {
               evt.preventDefault();
               self.stack.push({
@@ -48,9 +50,16 @@ foam.CLASS({
                 backLabel: 'Back'
               }, self);
             })
-            .tag(this.CitationView, { data$: this.obj$ })
+            .call(function() {
+              self.addCitationView.call(this, self);
+            })
           .end();
+        }));
       }
+    },
+
+    function addCitationView(self) {
+      this.tag(self.CitationView, { data$: self.obj$ });
     },
 
     function fromProperty(prop) {

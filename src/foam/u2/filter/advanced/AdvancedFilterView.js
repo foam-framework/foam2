@@ -43,7 +43,7 @@ foam.CLASS({
     }
 
     ^ .foam-u2-ModalHeader {
-      border-radius: 5px 5px 0 0;
+      color: /*%GREY1%*/ #5E6061;
     }
 
     ^ .foam-u2-ModalHeader-title {
