@@ -41,6 +41,15 @@ public class DAOResourceLoader
                   EQ(EmailTemplate.LOCALE, locale)
                   ));
 
+      if ( emailTemplate == null ) {
+        emailTemplate = (EmailTemplate) emailTemplateDAO
+          .find(
+            AND(
+              EQ(EmailTemplate.NAME, name),
+              EQ(EmailTemplate.GROUP, ! SafetyUtil.isEmpty(groupId) ? groupId : "*")
+            ));
+      }
+
       if ( emailTemplate != null ) {
         return emailTemplate;
       }
@@ -81,7 +90,7 @@ public class DAOResourceLoader
   public boolean exists(String s) {
     return load(s) != null;
   }
-  
+
   @Override
   public Optional<URL> toUrl(String s) {
     return Optional.absent();

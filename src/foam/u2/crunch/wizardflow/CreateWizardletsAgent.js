@@ -89,10 +89,10 @@ foam.CLASS({
     },
     function getWizardlet(capability, isBefore) {
         let wizardlet = capability[isBefore ? 'beforeWizardlet' : 'wizardlet'];
-        return wizardlet && wizardlet.clone().copyFrom({
+        return wizardlet && wizardlet.clone(this.__subContext__).copyFrom({
           capability: capability,
           wao: this.getWAO()
-        }, this.__subContext__);
+        });
     },
     function isPrerequisiteAware(wizardlet) {
       return this.PrerequisiteAwareWizardlet.isInstance(wizardlet);

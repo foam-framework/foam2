@@ -68,6 +68,30 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'implies',
+      type: 'Boolean',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'permission', type: 'String' }
+      ],
+      documentation: `
+        Checks if a permission or capability string is implied by a minmaxcapability
+        by only checking the capability's name, and permissionsGranted.
+      `,
+      javaCode: `
+        if ( ! this.getEnabled() ) return false;
+
+        // check if permission is a capability string implied by this permission
+        if ( this.stringImplies(this.getName(), permission) ) return true;
+
+        String[] permissionsGranted = this.getPermissionsGranted();
+        for ( String permissionName : permissionsGranted ) {
+          if ( this.stringImplies(permissionName, permission) ) return true;
+        }
+        return false;
+      `
+    },
+    {
       name: 'getPrereqsChainedStatus',
       type: 'CapabilityJunctionStatus',
       args: [

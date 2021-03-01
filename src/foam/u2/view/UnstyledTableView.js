@@ -405,7 +405,12 @@ foam.CLASS({
                   addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + prop.name))
                   .style({ flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0', 'word-wrap' : 'break-word', 'white-space' : 'normal'})
-                  .add(view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col))./*
+                  .start()
+                    .style({ 
+                      'display': 'inline-block',
+                    })
+                    .add(view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col)).
+                  end()./*
                   .forEach(
                     view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col),
                     function(c, i) { if ( i ) this.add(' / '); this.add(c); }
@@ -416,15 +421,26 @@ foam.CLASS({
                       view.sortBy(prop);
                       }).
                       callIf(prop.label !== '', function() {
-                        this.start('img').attr('src', this.slot(function(order) {
-                          if ( prop === order ) {
-                            currArrow = view.ascIcon;
-                          } else {
-                            if ( view.Desc.isInstance(order) && order.arg1 === prop )
-                            currArrow = view.descIcon;
-                          }
-                          return currArrow;
-                        }, view.order$)).end();
+                        this.start()
+                          .style({ 
+                            'display': 'inline-block',
+                            'position': 'absolute'
+                          })
+                          .start('img')
+                            .style({ 
+                              'margin-top': '2px'
+                            })
+                            .attr('src', this.slot(function(order) {
+                              if ( prop === order ) {
+                                currArrow = view.ascIcon;
+                              } else {
+                                if ( view.Desc.isInstance(order) && order.arg1 === prop )
+                                currArrow = view.descIcon;
+                              }
+                              return currArrow;
+                            }, view.order$))
+                          .end()
+                        .end();
                     });
                   }).
                 end();

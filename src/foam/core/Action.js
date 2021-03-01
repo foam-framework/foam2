@@ -50,8 +50,8 @@ foam.CLASS({
     {
       class: 'String',
       generateJava: false,
-      name: 'speechLabel',
-      expression: function(label) { return label; }
+      name: 'ariaLabel',
+      expression: function(name) { return this.label || foam.String.labelize(name); }
     },
     {
       documentation: 'displayed on :hover',

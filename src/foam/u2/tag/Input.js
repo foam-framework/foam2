@@ -61,6 +61,7 @@ foam.CLASS({
     },
     'type',
     'placeholder',
+    'ariaLabel',
     {
       name: 'choices',
       documentation: 'Array of [value, text] choices. You can pass in just ' +
@@ -103,6 +104,7 @@ foam.CLASS({
       if ( this.size          ) this.setAttribute('size',        this.size);
       if ( this.type          ) this.setAttribute('type',        this.type);
       if ( this.placeholder   ) this.setAttribute('placeholder', this.placeholder);
+      if ( this.ariaLabel     ) this.setAttribute('aria-label',  this.ariaLabel);
       if ( this.maxLength > 0 ) this.setAttribute('maxlength',   this.maxLength);
       if ( this.choices && this.choices.length ) {
         this.
@@ -137,6 +139,7 @@ foam.CLASS({
       this.SUPER(p);
 
       if ( ! this.hasOwnProperty('onKey') && p.validateObj ) this.onKey = true;
+      this.ariaLabel = p.label || p.name;
     },
 
     function updateMode_(mode) {
