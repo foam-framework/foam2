@@ -336,7 +336,7 @@ foam.CLASS({
         }
       }
       var lane = Object.keys(lanes).length;
-      laneMap[index] = { ...lanes, [lane]: fromNode ? `${toNode}:${fromNode}` : owner };
+      laneMap[index] = { ...lanes, [lane]: fromNode ? `${toNode}:${fromNode}` : toNode };
       return lane;
     },
     function hash_(x, y) {
