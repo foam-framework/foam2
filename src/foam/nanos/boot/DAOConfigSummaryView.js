@@ -86,7 +86,7 @@ foam.CLASS({
       imports: [ 'memento', 'stack' ],
 
       exports: [
-        'currentMemento as memento'
+        'currentMemento_ as memento'
       ],
 
       css: `
@@ -106,7 +106,7 @@ foam.CLASS({
           class: 'foam.u2.ViewSpec',
           name: 'inner'
         },
-        'currentMemento'
+        'currentMemento_'
       ],
 
       methods: [
@@ -114,7 +114,9 @@ foam.CLASS({
           this.SUPER();
 
           if ( this.memento )
-            this.currentMemento$ = this.memento.tail$;
+            this.currentMemento_$ = this.memento.tail$;
+          if ( ! this.currentMemento_ )
+            this.currentMemento_ = foam.nanos.controller.Memento.create();
 
           this.
             start().
@@ -179,7 +181,7 @@ foam.CLASS({
 
 
   exports: [
-    'memento'
+    'currentMemento_ as memento'
   ],
 
   properties: [
@@ -338,13 +340,16 @@ foam.CLASS({
       x.register(this.CustomDAOUpdateView,     'foam.comics.v2.DAOUpdateView');
       x.register(foam.u2.DetailView,           'foam.u2.DetailView');
 
-      this.stack.push({
-        class: this.BackBorder,
-        title: m.tail.head,
-        inner: {
+
+      if ( this.currentMemento_ && ! this.currentMemento_.tail ) {
+        //does it works??
+        this.currentMemento_.tail$.set(foam.nanos.controller.Memento.create());
+      }
+
+      var innerView = foam.u2.ViewSpec.createView({
           class: 'foam.u2.view.AltView',
           data: this.__context__[m.tail.head],
-          views: [
+          views: [//so we need to initialize this views?? 
             [
               {
                 class: this.DAOBrowseControllerView,
@@ -360,7 +365,14 @@ foam.CLASS({
               'Old Controller'
             ]
           ]
-        }
+      }, null,  this, this.__subContext__.createSubContext({memento: this.currentMemento_.tail}));
+
+      this.currentMemento_$ = innerView.memento$;
+
+      this.stack.push({
+        class: this.BackBorder,
+        title: m.tail.head,
+        inner: innerView
       }, x);
     }
   ]

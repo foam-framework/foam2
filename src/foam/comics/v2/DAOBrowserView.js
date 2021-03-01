@@ -282,7 +282,7 @@ foam.CLASS({
         simpleSearch = foam.u2.ViewSpec.createView(self.SimpleSearch, {
           showCount: false,
           data$: self.searchPredicate$,
-        },  self, self.__subSubContext__.createSubContext({ memento: this.memento.tail }));
+        },  self, self.__subSubContext__.createSubContext({ memento: this.memento.tail }));//bug
 
         filterView  = foam.u2.ViewSpec.createView(self.FilterView, {
           dao$: self.searchFilterDAO$,
@@ -292,7 +292,7 @@ foam.CLASS({
         filterView  = foam.u2.ViewSpec.createView(self.FilterView, {
           dao$: self.searchFilterDAO$,
           data$: self.searchPredicate$
-        },  self, self.__subSubContext__.createSubContext({ memento: this.memento.tail }));
+        },  self, self.__subSubContext__.createSubContext({ memento: this.memento.tail }));//bug
       }
 
       var summaryView = foam.u2.ViewSpec.createView(self.summaryView ,{
