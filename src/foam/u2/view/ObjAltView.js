@@ -36,16 +36,15 @@ foam.CLASS({
         );
       },
       postSet: function() {
-        if ( ! this.memento || ! this.memento.paramsObj )
+        if ( ! this.memento )
           return;
           
         var view = this.views.find(v => v[0] === this.selectedView);
         if ( view ) {
-          this.memento.paramsObj.sV = view[1];
+          this.memento.head = view[1];
         } else {
-          delete this.memento.paramsObj.sV;
+          this.memento.head = '';
         }
-        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
       }
     },
     {
@@ -58,8 +57,8 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      if ( this.memento && this.memento.paramsObj && this.memento.paramsObj.sV ) {
-        var view = this.views.find(v => v[1] === this.memento.paramsObj.sV);
+      if ( this.memento && this.memento.head.length != 0 ) {
+        var view = this.views.find(v => v[1] === this.memento.head);
         if ( view ) {
           this.selectedView = view[0];
         } else {

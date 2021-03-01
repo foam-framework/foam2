@@ -17,6 +17,10 @@ foam.CLASS({
     'memento'
   ],
 
+  exports: [
+    'currentMemento_ as memento'
+  ],
+
   css: `
     ^ { margin: auto; }
     ^ select { height: 26px }
@@ -83,7 +87,8 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'data'
-    }
+    },
+    'currentMemento_'
   ],
 
   methods: [
@@ -91,8 +96,10 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      if ( this.memento && this.memento.paramsObj && this.memento.paramsObj.sV )
-        this.selectedView = this.memento.paramsObj.sV;
+      this.currentMemento_$ = this.memento.tail$;
+
+      if ( this.memento && this.memento.head.length != 0 )
+        this.selectedView = this.memento.head;
       else {
         self.setMementoWithSelectedView();
       }
@@ -117,15 +124,13 @@ foam.CLASS({
 
   actions: [
     function setMementoWithSelectedView() {
-      if ( ! this.memento || ! this.memento.paramsObj )
+      if ( ! this.memento )
         return;
       var view = this.views.find(v => v[0] == this.selectedView);
-      if ( view  )
-        this.memento.paramsObj.sV = view[1];
+      if ( view )
+        this.memento.head = view[1];
       else
-        delete this.memento.paramsObj.sV;
-
-      this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
+        this.memento.head = '';
     }
   ]
 });
