@@ -338,7 +338,11 @@ foam.CLASS({
     },
     function toSummary() { return this.label; },
     function toStyle() {
-      var style = {};
+      var style = {
+        'display': 'inline-block',
+        'border-radius': '50px',
+        'padding': '4px 12px'
+      };
 
       if ( this.color      ) style.color          = this.color;
       if ( this.background ) style.background     = this.background;

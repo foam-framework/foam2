@@ -22,6 +22,14 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'of',
+      hidden: true,
+      value: "foam.nanos.crunch.MinMaxCapabilityData",
+      javaFactory:`
+        return foam.nanos.crunch.MinMaxCapabilityData.getOwnClassInfo();
+      `
+    },
+    {
       name: 'min',
       class: 'Int',
       value: 1
@@ -44,9 +52,45 @@ foam.CLASS({
         return new MinMaxCapabilityWizardlet();
       `
     },
+    {
+      class: 'Object',
+      name: 'wizardlet',
+      documentation: `
+        Defines a wizardlet to display this capability in a wizard. This
+        wizardlet will display after this capability's prerequisites.
+      `,
+      factory: function() {
+        return foam.nanos.crunch.ui.CapabilityWizardlet.create({isVisible: false}, this);
+      },
+      includeInDigest: false,
+    },
   ],
 
   methods: [
+    {
+      name: 'implies',
+      type: 'Boolean',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'permission', type: 'String' }
+      ],
+      documentation: `
+        Checks if a permission or capability string is implied by a minmaxcapability
+        by only checking the capability's name, and permissionsGranted.
+      `,
+      javaCode: `
+        if ( ! this.getEnabled() ) return false;
+
+        // check if permission is a capability string implied by this permission
+        if ( this.stringImplies(this.getName(), permission) ) return true;
+
+        String[] permissionsGranted = this.getPermissionsGranted();
+        for ( String permissionName : permissionsGranted ) {
+          if ( this.stringImplies(permissionName, permission) ) return true;
+        }
+        return false;
+      `
+    },
     {
       name: 'getPrereqsChainedStatus',
       type: 'CapabilityJunctionStatus',

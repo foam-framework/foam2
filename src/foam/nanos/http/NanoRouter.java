@@ -90,12 +90,18 @@ public class NanoRouter
     // enable xss filtering to allow browser to sanitize page if xss attack is detected
     resp.setHeader("X-XSS-Protection", "1");
     // protect against clickjacking attacks
-    resp.setHeader("X-Frame-Options", "deny");
+    resp.setHeader("X-Frame-Options", "SAMEORIGIN");
 
     try {
+      if ( spec == null ) {
+        System.err.println("Service not found: " + serviceKey);
+        resp.sendError(resp.SC_NOT_FOUND, "No service found for: "+serviceKey);
+        return;
+      }
       if ( ! spec.getEnabled() ) {
         System.err.println("Service disabled: " + serviceKey);
         resp.sendError(resp.SC_NOT_FOUND, "No service found for: "+serviceKey);
+        return;
       }
 
       WebAgent agent     = getWebAgent(spec, service);
@@ -121,7 +127,7 @@ public class NanoRouter
         agent.execute(requestContext);
       }
     } catch (Throwable t) {
-      System.err.println("Error serving " + serviceKey + " " + path);
+      System.err.println("Error serving: " + serviceKey + " " + path + " " + t.getMessage());
       t.printStackTrace();
       throw t;
     } finally {

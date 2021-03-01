@@ -182,7 +182,7 @@ foam.CLASS({
           end().
         end().
         start(this.CardBorder, {}, this.content$).
-          style({'overflow-y':'scroll'}).
+          style({'overflow-y':'auto'}).
           style({'margin-top': '10px', height: '90%' }).
           add(this.FILTERED_DAO).
         end();

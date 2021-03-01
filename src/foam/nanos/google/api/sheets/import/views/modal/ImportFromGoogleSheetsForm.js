@@ -20,7 +20,7 @@
     ^ {
       width: 500px;
       height: 500px;
-      overflow-x: scroll;
+      overflow-x: auto;
     }
   `,
   properties: [

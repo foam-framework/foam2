@@ -80,7 +80,7 @@ foam.CLASS({
     ^feature-column-grid {
       display: inline-flex;
       width: calc(100% - 48px);
-      overflow-x: scroll;
+      overflow-x: auto;
     }
 
     ^featureSection {
@@ -417,7 +417,6 @@ foam.CLASS({
         this.daoUpdate();
         // Attempting to reset menuDAO incase of menu permission grantings.
         this.menuDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
-        this.menuDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
       }
     }
   ]

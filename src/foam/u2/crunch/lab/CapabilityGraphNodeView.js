@@ -81,7 +81,6 @@ foam.CLASS({
       var capability = this.data;
       var ucj = null;
       if ( Array.isArray(this.data) ) {
-        console.log('YES, ARRY', this.data);
         capability = this.data[0];
         ucj = this.data[1];
       }
@@ -135,7 +134,7 @@ foam.CLASS({
                 .on('click', function() {
                   var menu = 'admin.data';
                   var dao = 'userCapabilityJunctionDAO';
-                  self.memento.value = [menu, dao, capability.id].join(foam.nanos.controller.Memento.SEPARATOR);
+                  self.memento.value = [menu, dao, ucj.id].join(foam.nanos.controller.Memento.SEPARATOR);
                 })
               .end()
               ;

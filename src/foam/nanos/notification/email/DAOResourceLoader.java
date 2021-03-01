@@ -28,7 +28,7 @@ public class DAOResourceLoader
     extends ContextAwareSupport
     implements ResourceLoader
 {
-  public static EmailTemplate findTemplate(X x, String name, String groupId) {
+  public static EmailTemplate findTemplate(X x, String name, String groupId, String locale) {
     DAO groupDAO = (DAO) x.get("groupDAO");
     DAO emailTemplateDAO = (DAO) x.get("localEmailTemplateDAO");
 
@@ -37,8 +37,18 @@ public class DAOResourceLoader
         .find(
               AND(
                   EQ(EmailTemplate.NAME, name),
-                  EQ(EmailTemplate.GROUP, ! SafetyUtil.isEmpty(groupId) ? groupId : "*")
+                  EQ(EmailTemplate.GROUP, ! SafetyUtil.isEmpty(groupId) ? groupId : "*"),
+                  EQ(EmailTemplate.LOCALE, locale)
                   ));
+
+      if ( emailTemplate == null ) {
+        emailTemplate = (EmailTemplate) emailTemplateDAO
+          .find(
+            AND(
+              EQ(EmailTemplate.NAME, name),
+              EQ(EmailTemplate.GROUP, ! SafetyUtil.isEmpty(groupId) ? groupId : "*")
+            ));
+      }
 
       if ( emailTemplate != null ) {
         return emailTemplate;
@@ -57,10 +67,12 @@ public class DAOResourceLoader
   }
 
   protected String groupId_;
+  protected String locale_;
 
-  public DAOResourceLoader(X x, String groupId) {
+  public DAOResourceLoader(X x, String groupId, String locale) {
     setX(x);
     this.groupId_ = groupId;
+    this.locale_ = locale;
   }
 
   @Override
@@ -70,7 +82,7 @@ public class DAOResourceLoader
 
   @Override
   public InputStream load(String s) {
-    EmailTemplate template = DAOResourceLoader.findTemplate(getX(), s, this.groupId_);
+    EmailTemplate template = DAOResourceLoader.findTemplate(getX(), s, this.groupId_, this.locale_);
     return template == null ? null : new ByteArrayInputStream(template.getBodyAsByteArray());
   }
 

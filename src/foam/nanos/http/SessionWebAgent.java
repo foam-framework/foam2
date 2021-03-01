@@ -7,12 +7,14 @@
 package foam.nanos.http;
 
 import foam.core.X;
+import foam.core.XFactory;
 import foam.dao.DAO;
 import foam.nanos.auth.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
-import javax.servlet.http.Cookie;
+import java.io.IOException;
+import java.io.PrintWriter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -42,18 +44,6 @@ public class SessionWebAgent
 
     try {
       String sessionId = "";
-
-      // check for session id in cookie
-      Cookie[] cookies = req.getCookies();
-
-      if ( cookies != null ) {
-        for ( Cookie c : cookies ) {
-          if ( c.getName().equals("sessionId") ) {
-            sessionId = c.getValue();
-            break;
-          }
-        }
-      }
 
       // fallback: check for session id as request param
       if ( sessionId.equals("") ) {
@@ -98,6 +88,7 @@ public class SessionWebAgent
       }
 
       // execute delegate
+      // Update session context with support setup from earlier WebAgents.
       getDelegate().execute(session.getContext().put(HttpServletResponse.class, resp).put(HttpServletRequest.class, req));
 
     } catch ( AuthorizationException e ) {

@@ -19,6 +19,10 @@ foam.CLASS({
     'foam.nanos.script.Language'
   ],
 
+  imports: [
+    'ctrl'
+  ],
+
   javaImports: [
     'java.io.IOException',
     'java.io.PrintStream',
@@ -275,16 +279,7 @@ foam.CLASS({
       code: function() {
         var service = this.__context__[this.name];
         if ( foam.dao.DAO.isInstance(service) ) {
-          this.__context__.stack.push({
-            class: 'foam.comics.v2.DAOBrowseControllerView',
-            data: service,
-            config: {
-              class: 'foam.comics.v2.DAOControllerConfig',
-              dao: service,
-              createPredicate: foam.mlang.predicate.True,
-              editPredicate: foam.mlang.predicate.True
-            }
-          });
+          this.ctrl.memento.value = 'admin.data' + foam.nanos.controller.Memento.SEPARATOR + this.name;
         }
       }
     }

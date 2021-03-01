@@ -36,28 +36,11 @@ foam.CLASS({
       class: 'String'
     },
     {
-      flags: ['web'],
-      name: 'currentSection',
-      transient: true
-    },
-    {
       name: 'isValid',
       class: 'Boolean',
-      expression: function (of, data, currentSection, data$errors_) {
-        let sectionErrors = [];
-        if ( currentSection && currentSection.section && data$errors_ ) {
-          sectionErrors = data$errors_.filter(error =>
-            currentSection.section.properties.includes(error[0])
-          );
-        }
-
+      expression: function (of, data, data$errors_) {
         if ( ! this.of ) return true;
-        if (
-          ( ! data ) ||
-          ( currentSection && currentSection.section )
-            ? sectionErrors.length > 0
-            : data$errors_
-        ) {
+        if ( ! data || data$errors_ ) {
           return false;
         }
         return true;

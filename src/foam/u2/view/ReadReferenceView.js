@@ -14,7 +14,7 @@ foam.CLASS({
   requires: [
     'foam.comics.v2.DAOControllerConfig',
     'foam.u2.detail.SectionedDetailView',
-    'foam.u2.CitationView'
+    'foam.u2.view.ReferenceCitationView'
   ],
 
   properties: [
@@ -34,8 +34,10 @@ foam.CLASS({
         var self = this;
         this.SUPER();
         this
-          .start('a')
-            .attrs({ href: '#' })
+          .add(this.obj$.map((obj) => {
+          if ( ! obj ) return '';
+          return this.E().start('a')
+            .attrs({ href: '#'})
             .on('click', function(evt) {
               evt.preventDefault();
               self.stack.push({
@@ -48,8 +50,9 @@ foam.CLASS({
                 backLabel: 'Back'
               }, self);
             })
-            .tag(this.CitationView, { data$: this.obj$ })
+            .tag(self.ReferenceCitationView, {data: self.obj})
           .end();
+        }));
       }
     },
 
@@ -57,7 +60,8 @@ foam.CLASS({
       this.SUPER(prop);
       this.prop = prop;
       var dao = this.ctrl.__subContext__[prop.targetDAOKey];
-      dao.find(this.data).then((o) => this.obj = o);
+      if ( dao )
+        dao.find(this.data).then((o) => this.obj = o);
     }
   ]
 });

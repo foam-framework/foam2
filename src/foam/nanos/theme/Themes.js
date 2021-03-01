@@ -101,6 +101,7 @@ Later themes:
               if ( !! group.defaultMenu ) {
                 theme.defaultMenu = group.defaultMenu;
               }
+              break;
             }
             group = await group.parent$find;
           }

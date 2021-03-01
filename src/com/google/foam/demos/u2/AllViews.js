@@ -60,6 +60,20 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'com.google.foam.demos.u2',
+  name: 'SampleData3',
+  properties: [
+    {
+      name: 'check',
+      class: 'Boolean',
+      validateObj: function (check) {
+        return check ? '' : 'Please check the box';
+      }
+    }
+  ],
+});
+
+foam.CLASS({
+  package: 'com.google.foam.demos.u2',
   name: 'AllViews',
 
   requires: [
@@ -290,6 +304,24 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'radioViewHorizontal',
+      view: {
+        class: 'foam.u2.view.RadioView',
+        choices: ['Yes', 'No', 'Maybe'],
+        isHorizontal: true
+      }
+    },
+    {
+      class: 'String',
+      name: 'radioViewHorizontalMoreOptions',
+      view: {
+        class: 'foam.u2.view.RadioView',
+        choices: [1, 2, 3, 4, 5, 6, 7],
+        isHorizontal: true
+      }
+    },
+    {
+      class: 'String',
       name: 'stringWithDisplayWidth',
       displayWidth: 4
     },
@@ -412,6 +444,27 @@ foam.CLASS({
       view: { class: 'foam.u2.view.DAOtoFObjectArrayView', xxxdelegate: { class: 'foam.comics.InlineBrowserView' } },
       factory: function() {
         return this.sampleDataDAO.testData;
+      }
+    },
+    {
+      class: 'FObjectArray',
+      name: 'fobjectArray5',
+      of: 'com.google.foam.demos.u2.SampleData3',
+      view: {
+        class: 'foam.u2.view.FObjectArrayView',
+        mode: 'RW',
+        enableAdding: true,
+        enableRemoving: true,
+        defaultNewItem: ''
+      },
+      autoValidate: true,
+      validationTextVisible: true,
+      validateObj: function(fobjectArray5, fobjectArray5$errors) {
+        console.log('called');
+        if ( fobjectArray5.length < 1 )
+          return 'Please enter fobjectArray5 information'
+        console.log('...', fobjectArray5$errors)
+        return fobjectArray5$errors
       }
     },
     {

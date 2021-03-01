@@ -79,7 +79,8 @@ foam.CLASS({
   ],
 
   methods: [
-    function createView() {
+    function createView(opt_spec) {
+      if ( ! opt_spec ) opt_spec = {};
       if ( this.customView ) {
         return this.ViewSpec.createView(
           this.customView, null, this, this.__subContext__);
@@ -92,6 +93,7 @@ foam.CLASS({
       return this.SectionView.create({
         section: this.section,
         data$: this.data$,
+        ...opt_spec
       }, ctx)
     }
   ],

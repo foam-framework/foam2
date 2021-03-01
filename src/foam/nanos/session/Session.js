@@ -136,9 +136,13 @@ foam.CLASS({
       tableWidth: 120
     },
     {
-      documentation: 'Intended to be used with long TTL sessions, further restricting to a known set of IPs.',
-      class: 'StringArray',
-      name: 'remoteHostWhiteList',
+      documentation: `Restrict access to long TTL session to particular IP address range.
+
+@see https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing
+List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 172 network.`,
+      class: 'FObjectArray',
+      of: 'foam.net.CIDR',
+      name: 'cidrWhiteList',
       includeInDigest: true
     },
     {
@@ -185,25 +189,38 @@ foam.CLASS({
       `
     },
     {
-      name: 'validRemoteHost',
-      type: 'Boolean',
+      name: 'validateRemoteHost',
       args: [
         {
-          name: 'remoteHost', type: 'String'
+          name: 'x',
+          type: 'Context'
         }
       ],
+      javaThrows: ['foam.core.ValidationException'],
       javaCode: `
-        if ( SafetyUtil.isEmpty(getRemoteHost()) || SafetyUtil.equals(getRemoteHost(), remoteHost) ) {
-          return true;
-        }
-
-        for ( String host : getRemoteHostWhiteList() ) {
-          if ( SafetyUtil.equals(host, remoteHost) ) {
-            return true;
+      String remoteIp = foam.net.IPSupport.instance().getRemoteIp(x);
+      foam.net.CIDR[] cidrs = getCidrWhiteList();
+      if ( remoteIp == null ||
+           SafetyUtil.isEmpty(getRemoteHost()) ||
+           SafetyUtil.equals(getRemoteHost(), remoteIp) ||
+           cidrs == null ||
+           cidrs.length == 0 ) {
+        return;
+      }
+      if ( ! SafetyUtil.isEmpty(getRemoteHost()) &&
+           ! SafetyUtil.equals(getRemoteHost(), remoteIp) ) {
+        throw new foam.core.ValidationException("IP changed");
+      }
+      for ( foam.net.CIDR cidr : cidrs ) {
+        try {
+          if ( cidr.inRange(x, remoteIp) ) {
+            return;
           }
+        } catch (java.net.UnknownHostException e) {
+          ((foam.nanos.logger.Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "validateRemoteHost", remoteIp, e.getMessage());
         }
-
-        return false;
+      }
+      throw new foam.core.ValidationException("Restricted IP");
       `
     },
     {

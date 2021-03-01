@@ -22,6 +22,7 @@ foam.CLASS({
     'java.io.FileInputStream',
     'java.io.IOException',
     'java.io.InputStreamReader',
+    'javax.servlet.http.HttpServletRequest',
     'java.util.Arrays',
     'java.util.List'
   ],
@@ -54,7 +55,9 @@ foam.CLASS({
         'java.io.IOException'
       ],
       javaCode: `
-        GoogleApiCredentials credentialsConfig = (GoogleApiCredentials) ((DAO)getX().get("googleApiCredentialsDAO")).find(((AppConfig)x.get("appConfig")).getUrl());
+        HttpServletRequest req = (HttpServletRequest)x.get(HttpServletRequest.class);
+        GoogleApiCredentials credentialsConfig = (GoogleApiCredentials) ((DAO)getX().get("googleApiCredentialsDAO")).find(req.getServerName());
+        
         if ( credentialsConfig == null )
           return null;
         GoogleClientSecrets.Details details = new GoogleClientSecrets.Details()

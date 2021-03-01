@@ -8,21 +8,57 @@ foam.CLASS({
   package: 'foam.nanos.medusa',
   name: 'MedusaAdapterDAO',
   extends: 'foam.dao.ProxyDAO',
+  implements: [
+    'foam.core.ContextAgent',
+    'foam.nanos.NanoService'
+  ],
 
   documentation: `Entry point into the Medusa system.
 This DAO intercepts MDAO 'put' operations and creates a medusa entry for argument model.
 It then marshalls it to the primary mediator, and waits on a response.`,
 
   javaImports: [
+    'foam.core.Agency',
+    'foam.core.AgencyTimerTask',
     'foam.core.FObject',
+    'foam.core.X',
+    'foam.dao.ArraySink',
+    'foam.dao.DAO',
     'foam.dao.DOP',
+    'foam.dao.MDAO',
     'foam.dao.RemoveSink',
     'foam.lib.formatter.FObjectFormatter',
     'foam.lib.formatter.JSONFObjectFormatter',
+    'static foam.mlang.MLang.AND',
+    'static foam.mlang.MLang.EQ',
+    'foam.log.LogLevel',
+    'foam.nanos.alarming.Alarm',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
-    'foam.util.SafetyUtil'
+    'foam.util.SafetyUtil',
+    'java.util.concurrent.ConcurrentLinkedQueue',
+    'java.util.List',
+    'java.util.Timer'
+  ],
+
+  classes: [
+    {
+      documentation: `Helper model to store a particular MDAO state.`,
+      name: 'When',
+      properties: [
+        {
+          documentation: `WhenCmd containing 'state' of MDAO at time of creation.`,
+          name: 'cmd',
+          class: 'Object'
+        },
+        {
+          documentation: `'true' when the associated 'put' operation has completed.`,
+          name: 'complete',
+          class: 'Boolean'
+        }
+      ]
+    }
   ],
 
   properties: [
@@ -89,6 +125,10 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       return formatter;
     }
   };
+
+  // Each 'put' operations appends a When, which captures the
+  // state of the delegate MDAO immediately preceeding the put.
+  protected ConcurrentLinkedQueue<When> whens_ = new ConcurrentLinkedQueue();
           `
         }));
       }
@@ -96,6 +136,35 @@ It then marshalls it to the primary mediator, and waits on a response.`,
   ],
 
   methods: [
+    {
+      name: 'getReadDelegate',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      type: 'foam.dao.DAO',
+      javaCode: `
+      When when = (When) whens_.peek();
+      if ( when != null ) {
+        return (DAO) getDelegate().cmd_(x, when.getCmd());
+      }
+      return getDelegate();
+      `
+    },
+    {
+      name: 'find_',
+      javaCode: `
+      return getReadDelegate(x).find_(x, id);
+      `
+    },
+    {
+      name: 'select_',
+      javaCode: `
+      return getReadDelegate(x).select_(x, sink, skip, limit, order, predicate);
+      `
+    },
     {
       name: 'put_',
       javaCode: `
@@ -115,10 +184,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       `
     },
     {
-      documentation: `
-      1. If primary mediator, then delegate to medusaAdapter, accept result.
-      2. If secondary mediator, proxy to next 'server', find result.
-      3. If not mediator, proxy to the next 'server', put result.`,
+      documentation: 'Route DAO operation to primary mediator',
       name: 'update',
       args: [
         {
@@ -136,16 +202,15 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       ],
       javaType: 'foam.core.FObject',
       javaCode: `
-      getLogger().debug("update");
       if ( ! ( DOP.PUT == dop ||
                DOP.REMOVE == dop ) ) {
-        getLogger().warning("Unsupported operation", dop.getLabel());
+        getLogger().warning("update", "Unsupported operation", dop.getLabel());
         throw new UnsupportedOperationException(dop.getLabel());
       }
 
       if ( obj instanceof Clusterable &&
            ! ((Clusterable) obj).getClusterable() ) {
-        getLogger().debug("update", dop.getLabel(), "not clusterable", obj.getClass().getSimpleName(), obj.getProperty("id").toString());
+        getLogger().debug("update", dop.getLabel(), "not clusterable", obj.getClass().getSimpleName(), obj.getProperty("id"));
         if ( DOP.PUT == dop ) return getDelegate().put_(x, obj);
         if ( DOP.REMOVE == dop ) return getDelegate().remove_(x, obj);
       }
@@ -153,78 +218,164 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       ClusterConfig config = support.getConfig(x, support.getConfigId());
 
-
       if ( config.getIsPrimary() ) {
-        // Primary instance - put to MDAO (delegate)
-
-        ClusterCommand cmd = null;
-        if ( obj instanceof ClusterCommand ) {
-          cmd = (ClusterCommand) obj;
-          obj = cmd.getData();
-        }
-
-        getLogger().debug("update", dop.getLabel(), "primary", obj.getClass().getSimpleName());
-        FObject old = getDelegate().find_(x, obj.getProperty("id"));
-        FObject nu = null;
-        String data = null;
-        if ( DOP.PUT == dop ) {
-          nu = getDelegate().put_(x, obj);
-          data = data(x, nu, old, dop);
-        } else if ( DOP.REMOVE == dop ) {
-          getDelegate().remove_(x, obj);
-          data = data(x, obj, null, dop);
-        }
-        if ( SafetyUtil.isEmpty(data) ) {
-          getLogger().debug("update", "primary", obj.getProperty("id"), "data", "no delta");
-        } else {
-          MedusaEntry entry = (MedusaEntry) submit(x, data, dop);
-          if ( cmd != null ) {
-            getLogger().debug("update", "primary", obj.getProperty("id"), "setMedusaEntryId", entry.toSummary());
-            cmd.setMedusaEntryId((Long) entry.getId());
-            if ( DOP.PUT == dop ) {
-              cmd.setData(nu);
-            } else if ( DOP.REMOVE == dop ) {
-              cmd.setData(null);
-            }
-          }
-        }
-        if ( cmd != null ) {
-          return cmd;
-        }
-        return nu;
+        return updatePrimary(x, obj, dop);
       }
-
+      return updateSecondary(x, obj, dop);
+    `
+    },
+    {
+      documentation: `Secondary flow: proxy to next server, wait on own mdao update.`,
+      name: 'updateSecondary',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'foam.core.FObject'
+        },
+        {
+          name: 'dop',
+          type: 'foam.dao.DOP'
+        }
+      ],
+      javaType: 'foam.core.FObject',
+      javaCode: `
       ClusterCommand cmd = new ClusterCommand(x, getNSpec().getName(), dop, obj);
-      getLogger().debug("update", dop.getLabel(), "client", "cmd", obj.getProperty("id"), "send");
-      // PM pm = PM.create(x, this.getClass().getSimpleName(), "cmd");
-      PM pm = new PM(this.getClass().getSimpleName(), "cmd");
+      getLogger().debug("update", "secondary", dop, obj.getProperty("id"), "send");
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "secondary", "cmd");
+      // PM pm = new PM(this.getClass().getSimpleName(), "secondary", "cmd");
       cmd = (ClusterCommand) getClientDAO().cmd_(x, cmd);
       pm.log(x);
       cmd.logHops(x);
-      getLogger().debug("update", dop.getLabel(), "client", "cmd", obj.getProperty("id"), "receive", cmd.getMedusaEntryId());
+      getLogger().debug("update", "secondary", dop, obj.getProperty("id"), "receive", cmd.getMedusaEntryId());
+      if ( cmd.getMedusaEntryId() > 0 ) {
+        pm = PM.create(x, this.getClass().getSimpleName(), "secondary", "registry", "wait");
+        MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
+        registry.wait(x, (Long) cmd.getMedusaEntryId());
+        pm.log(x);
+      }
+      FObject result = cmd.getData();
       if ( DOP.PUT == dop ) {
-        FObject result = cmd.getData();
         if ( result != null ) {
           FObject nu = getDelegate().find_(x, result.getProperty("id"));
           if ( nu == null ) {
-            // Occurs if we've clustered a NullDAO (EasyDAO nullify)
-            getLogger().warning("update", dop.getLabel(), "delegate", "find", result.getProperty("id"), "null");
+            getLogger().error("update", "secondary", dop, obj.getProperty("id"), "delegate", cmd.getMedusaEntryId(), "find", result.getProperty("id"), "null");
+            Alarm alarm = new Alarm();
+            alarm.setClusterable(false);
+            alarm.setSeverity(LogLevel.ERROR);
+            alarm.setName("MedusaAdapter secondary find failed");
+            alarm.setNote(obj.getClass().getName()+" "+obj.getProperty("id"));
+            alarm = (Alarm) ((DAO) x.get("alarmDAO")).put(alarm);
+          }
+          // put again to update storageTransient properties
+          return getDelegate().put_(x, result);
+        }
+        // TODO/REVIEW
+        getLogger().error("update", "secondary", dop, obj.getProperty("id"), "result,null");
+        Alarm alarm = new Alarm();
+        alarm.setClusterable(false);
+        alarm.setSeverity(LogLevel.ERROR);
+        alarm.setName("MedusaAdapter secondary cmd failed");
+        alarm.setNote(obj.getClass().getName()+" "+obj.getProperty("id"));
+        alarm = (Alarm) ((DAO) x.get("alarmDAO")).put(alarm);
+      } else if ( DOP.REMOVE == dop ) {
+        if ( getDelegate().find_(x, obj.getProperty("id")) != null ) {
+          getLogger().error("update", "secondary", dop, obj.getProperty("id"), "delegate", "not deleted");
+          Alarm alarm = new Alarm();
+          alarm.setClusterable(false);
+          alarm.setSeverity(LogLevel.ERROR);
+          alarm.setName("MedusaAdapter secondary remove failed");
+          alarm.setNote(obj.getClass().getName()+" "+obj.getProperty("id"));
+          alarm = (Alarm) ((DAO) x.get("alarmDAO")).put(alarm);
+          return getDelegate().remove_(x, obj);
+        }
+      }
+      return result;
+      `
+    },
+    {
+      documentation: 'Primary flow: put to delegate/MDAO, then submit to nodes, wait on MedusaEntry consensus.',
+      name: 'updatePrimary',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'obj',
+          type: 'foam.core.FObject'
+        },
+        {
+          name: 'dop',
+          type: 'foam.dao.DOP'
+        }
+      ],
+      javaType: 'foam.core.FObject',
+      javaCode: `
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "primary");
+      ClusterCommand cmd = null;
+      if ( obj instanceof ClusterCommand ) {
+        cmd = (ClusterCommand) obj;
+        obj = cmd.getData();
+      }
+
+      // On the Primary, 'put' operations occur before the object
+      // is sent to the nodes, and consensus determined.  To avoid
+      // 'find' and 'select' operations from seeing the not yet
+      // persisted create/update, serve the delegate DAO in the
+      // state preceeding the 'put'.
+      // A 'When', which captures the MDAO state, is created
+      // for each 'put'.  The When is marked complete when the
+      // 'put' completes.
+      // 'find' and 'select' operations will use the oldest 'when'.
+      When when = new When(x, new MDAO.WhenCmd(getDelegate().cmd_(x, MDAO.NOW_CMD)), false);
+      whens_.add(when);
+      try {
+        if ( DOP.PUT == dop ) {
+          Object id = obj.getProperty("id");
+          FObject old = getDelegate().find_(x, id);
+          FObject nu = getDelegate().put_(x, obj);
+          String data = data(x, nu, old, dop);
+          // data will be empty if only changes are storageTransient.
+          if ( ! SafetyUtil.isEmpty(data) ) {
+            MedusaEntry entry = (MedusaEntry) submit(x, data, dop);
+            getLogger().debug("updatePrimary", "primary", dop, nu.getProperty("id"), "entry", entry.toSummary());
+            if ( cmd != null ) {
+              cmd.setMedusaEntryId((Long) entry.getId());
+            }
+          }
+          if ( cmd != null ) {
+            cmd.setData(nu);
+            return cmd;
           }
           return nu;
         }
-        // TODO/REVIEW
-        getLogger().warning("update", dop.getLabel(), obj.getProperty("id"), "result,null");
+        // DOP.REMOVE
+        FObject result = getDelegate().remove_(x, obj);
+        String data = data(x, obj, null, dop);
+        MedusaEntry entry = (MedusaEntry) submit(x, data, dop);
+        if ( cmd != null ) {
+          cmd.setMedusaEntryId((Long) entry.getId());
+          cmd.setData(result);
+          return cmd;
+        }
         return result;
-      } else { // if ( DOP.REMOVE == dop ) {
-        return getDelegate().remove_(x, obj);
+      } finally {
+        when.setComplete(true);
+        synchronized ( whens_ ) {
+          whens_.notify();
+        }
+        pm.log(x);
       }
       `
     },
     {
       name: 'cmd_',
       javaCode: `
-      getLogger().debug("cmd");
-      if ( foam.dao.MDAO.GET_MDAO_CMD.equals(obj) ) {
+      if ( foam.dao.DAO.LAST_CMD.equals(obj) ) {
         return getDelegate();
       }
       if ( obj instanceof ClusterCommand ) {
@@ -233,18 +384,16 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         ClusterCommand cmd = (ClusterCommand) obj;
 
         if ( config.getIsPrimary() ) {
-          getLogger().debug("cmd", "ClusterCommand", "primary");
           if ( DOP.PUT == cmd.getDop() ) {
             return put_(x, cmd);
-          } else if ( DOP.REMOVE == cmd.getDop() ) {
-            return remove_(x, cmd);
-          } else {
-            getLogger().warning("Unsupported operation", cmd.getDop().getLabel());
-            throw new UnsupportedOperationException(cmd.getDop().getLabel());
           }
+          if ( DOP.REMOVE == cmd.getDop() ) {
+            return remove_(x, cmd);
+          }
+          getLogger().warning("Unsupported operation", cmd.getDop().getLabel());
+          throw new UnsupportedOperationException(cmd.getDop().getLabel());
         }
 
-        getLogger().debug("cmd", "ClusterCommand", "non-primary");
         cmd = (ClusterCommand) getClientDAO().cmd_(x, obj);
 
         if ( config.getType() == MedusaType.MEDIATOR ) {
@@ -253,14 +402,10 @@ It then marshalls it to the primary mediator, and waits on a response.`,
                id > 0L ) {
             MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
             registry.wait(x, id);
-          } else {
-            getLogger().debug("cmd", "ClusterCommand", "medusaEntry", "null");
           }
         }
-        getLogger().debug("cmd", "ClusterCommand", "return");
         return cmd;
       }
-      getLogger().debug("cmd", "getClientDAO");
       return getClientDAO().cmd_(x, obj);
       `
     },
@@ -320,8 +465,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       ],
       type: 'FObject',
       javaCode: `
-      // PM pm = PM.create(x, this.getClass().getSimpleName(), "submit");
-      PM pm = new PM(this.getClass().getSimpleName(), "submit");
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "submit");
       MedusaEntry entry = x.create(MedusaEntry.class);
       try {
         PM pmLink = new PM(this.getClass().getSimpleName(), "submit", "link");
@@ -349,6 +493,44 @@ It then marshalls it to the primary mediator, and waits on a response.`,
         throw t;
       } finally {
         pm.log(x);
+      }
+      `
+    },
+    {
+      documentation: 'NanoService implementation.',
+      name: 'start',
+      javaCode: `
+      getLogger().info("start");
+      ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
+      Timer timer = new Timer(this.getClass().getSimpleName());
+      timer.schedule(
+        new AgencyTimerTask(getX(), support.getThreadPoolName(), this), 1000L);
+      `
+    },
+    {
+      documentation: `Monitor and clear 'when' queue.  'When's can complete out-of-order but are removed in-order.`,
+      name: 'execute',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ],
+      javaCode: `
+      while ( true ) {
+        When when = whens_.peek();
+        if ( when != null &&
+             when.getComplete() ) {
+          whens_.remove(when);
+        } else {
+          synchronized ( whens_ ) {
+            try {
+              whens_.wait(10000L);
+            } catch ( InterruptedException e ) {
+              break;
+            }
+          }
+        }
       }
       `
     }

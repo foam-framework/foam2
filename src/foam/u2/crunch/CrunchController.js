@@ -50,6 +50,7 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.SkipGrantedAgent',
     'foam.u2.crunch.wizardflow.MaybeDAOPutAgent',
     'foam.u2.crunch.wizardflow.ShowPreexistingAgent',
+    'foam.u2.crunch.wizardflow.SaveAllAgent',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
     'foam.u2.crunch.CapabilityInterceptView',
@@ -125,8 +126,9 @@ foam.CLASS({
         form of capabilities that are stored object-locally rather than in
         association with a user.
       `,
-      code: function createCapableWizardSequence(intercept, capable) {
-        let x = this.__subContext__.createSubContext({
+      code: function createCapableWizardSequence(intercept, capable, x) {
+        x = x || this.__subContext__;
+        x = x.createSubContext({
           intercept: intercept,
           capable: capable
         });
@@ -142,6 +144,39 @@ foam.CLASS({
       }
     },
 
+    function wizardSequenceToViewSequence_(sequence) {
+      return sequence
+        .remove('WizardStateAgent')
+        .remove('FilterGrantModeAgent')
+        .remove('SkipGrantedAgent')
+        .remove('RequirementsPreviewAgent')
+        .remove('StepWizardAgent')
+        .remove('MaybeDAOPutAgent')
+        .remove('PutFinalPayloadsAgent')
+        // if input is UCJ sequence, these apply
+        .remove('CheckRootIdAgent')
+        .remove('CheckPendingAgent')
+        .remove('CheckNoDataAgent')
+
+    },
+
+    // This function is only called by CapableView
+    function createCapableViewSequence(capable, x) {
+      return this.wizardSequenceToViewSequence_(
+        this.createCapableWizardSequence(undefined, capable, x)
+      )
+        .add(this.SaveAllAgent)
+        ;
+    },
+
+    function createCapabilityViewSequence(capabilityOrId, x) {
+      return this.wizardSequenceToViewSequence_(
+        this.createWizardSequence(capabilityOrId, x)
+      )
+        .add(this.SaveAllAgent)
+        ;
+    },
+
     function handleIntercept(intercept) {
       var self = this;
 
@@ -153,7 +188,6 @@ foam.CLASS({
       let p = Promise.resolve();
 
       // Intercept view for regular user capability options
-      console.log('intercept', intercept)
       if ( intercept.capabilities.length > 1 ) {
         p = p.then(() => {
           return self.maybeLaunchInterceptView(intercept);
@@ -265,22 +299,6 @@ foam.CLASS({
       })
 
       return p;
-    },
-
-    // This function is only called by CapableView
-    function getWizardletsFromCapable(capable) {
-      return this.Sequence.create(null, this.__subContext__.createSubContext({
-        capable: capable,
-        rootCapability: capable.capabilityIds[0]
-      }))
-        .add(this.CapabilityAdaptAgent)
-        .add(this.LoadCapabilitiesAgent, {
-          waoSetting: this.LoadCapabilitiesAgent.WAOSetting.CAPABLE })
-        .add(this.CreateWizardletsAgent)
-        .add(this.LoadWizardletsAgent)
-        .execute().then(x => {
-          return x.wizardlets
-        })
     }
   ]
 });

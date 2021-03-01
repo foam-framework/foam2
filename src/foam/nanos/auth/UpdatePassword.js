@@ -22,14 +22,23 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'SUCCESS_MSG', message: 'Your password was successfully updated' }
+    { name: 'UPDATE_PASSWORD_TITLE', message: 'Update your password' },
+    { name: 'UPDATE_PASSWORD_SUBTITLE', message: 'Create a new password for your account' },
+    { name: 'SUCCESS_MSG', message: 'Your password was successfully updated' },
+    { name: 'ORIGINAL_PASSWORD_MISSING', message: 'Please enter the original password' },
+    { name: 'PASSWORD_LENGTH_10_ERROR', message: 'Password must be at least 10 characters' },
+    { name: 'PASSWORD_NOT_MATCH', message: 'Passwords do not match' }
   ],
 
   sections: [
     {
       name: 'updatePasswordSection',
-      title: 'Update your password',
-      subTitle: 'Create a new password for your account',
+      title: function() {
+        return this.UPDATE_PASSWORD_TITLE
+      },
+      subTitle: function() {
+        return this.UPDATE_PASSWORD_SUBTITLE
+      }
     }
   ],
 
@@ -42,6 +51,15 @@ foam.CLASS({
         class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
+      validationPredicates: [
+        {
+          args: ['originalPassword'],
+          predicateFactory: function(e) {
+            return e.NEQ(foam.nanos.auth.UpdatePassword.ORIGINAL_PASSWORD, "");
+          },
+          errorMessage: 'ORIGINAL_PASSWORD_MISSING'
+        }
+      ]
     },
     {
       class: 'Password',
@@ -51,7 +69,18 @@ foam.CLASS({
         class: 'foam.u2.view.PasswordView',
         passwordIcon: true
       },
-      minLength: 6
+      minLength: 10,
+      validationPredicates: [
+        {
+          args: ['newPassword'],
+          predicateFactory: function(e) {
+            return e.GTE(foam.mlang.StringLength.create({
+              arg1: foam.nanos.auth.UpdatePassword.NEW_PASSWORD
+            }), 10);
+          },
+          errorMessage: 'PASSWORD_LENGTH_10_ERROR'
+        }
+      ]
     },
     {
       class: 'Password',
@@ -70,7 +99,7 @@ foam.CLASS({
               foam.nanos.auth.UpdatePassword.NEW_PASSWORD,
               foam.nanos.auth.UpdatePassword.CONFIRMATION_PASSWORD);
           },
-          errorString: 'Passwords do not match.'
+          errorMessage: 'PASSWORD_NOT_MATCH'
         }
       ]
     },

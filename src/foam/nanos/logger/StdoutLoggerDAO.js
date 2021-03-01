@@ -33,7 +33,26 @@ foam.CLASS({
       value: 'DEVELOPMENT'
     }
   ],
-  
+
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data: `
+  protected static ThreadLocal<foam.util.FastTimestamper> timestamper_ = new ThreadLocal<foam.util.FastTimestamper>() {
+    @Override
+    protected foam.util.FastTimestamper initialValue() {
+      foam.util.FastTimestamper ft = new foam.util.FastTimestamper();
+      return ft;
+    }
+  };
+          `
+        }));
+      }
+    }
+  ],
+
   methods: [
     {
       name: 'put_',
@@ -44,13 +63,9 @@ foam.CLASS({
         // Only write INFO, WARN, ERROR to SYSLOG in production to reduce
         // burden on syslogd, journald. With our own journal logs we are
         // effectively writing out logs twice. 
-        if ( lm.getSeverity().getOrdinal() >= LogLevel.INFO.getOrdinal() ||
-            getMode() != Mode.PRODUCTION ) {
-          if ( lm.getSeverity() == LogLevel.ERROR ) {
-            System.err.println(lm.getCreated() + ","+lm.getThread()+","+lm.getSeverity()+","+lm.getMessage());
-          } else {
-            System.out.println(lm.getCreated() + ","+lm.getThread()+","+lm.getSeverity()+","+lm.getMessage());
-          }
+        if ( getMode() != Mode.PRODUCTION ||
+             lm.getSeverity().getOrdinal() >= LogLevel.INFO.getOrdinal() ) {
+          System.err.println(timestamper_.get().createTimestamp(lm.getCreated().getTime())+","+lm.getThread()+","+lm.getSeverity()+","+lm.getMessage());
         }
       }
       return lm;

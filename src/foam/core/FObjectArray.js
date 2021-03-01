@@ -22,6 +22,52 @@ foam.CLASS({
 
   documentation: "A Property which contains an array of 'of' FObjects.",
 
+  methods: [
+    function installInProto(proto) {
+      this.SUPER(proto);
+      var self = this;
+      Object.defineProperty(proto, self.name + '$' + 'errors$', {
+        get: function getArrayErrorSlot() {
+          // errors_$ will be updated with an array member's error_$ slot
+          var errors_$ = foam.core.SimpleSlot.create({ value: [] });
+          // sub will be replaced when the array changes
+          var sub = foam.core.FObject.create();
+
+          // Safely combine error lists and update error_$
+          var setErrors = errorLists => {
+            let errors = errorLists.flat(1).filter(v => v);
+            errors_$.set(errors.length > 0 ? errors : null);
+          };
+          // Handle an array property update
+          var subToArray = val => {
+            console.log('subbing to', val);
+            var errorSlots = val.map(v => v.errors_$);
+            setErrors(val.map(v => v.errors_));
+
+            // Alternative to ArraySlot.create(...).map(...), which fails here
+            var l = () => {
+              val.forEach(v => { let _ = v.errors_ });
+              setErrors(val.map(v => v.errors_));
+            };
+            var subs = errorSlots.map(s => s.sub(l));
+            sub.onDetach({ detach: () => { subs.forEach(s => s.detach()); } });
+          };
+          // Initialize slot listener
+          var val = this[self.name];
+          if ( Array.isArray(val) ) subToArray(val);
+          self.toSlot(this).sub(() => {
+            sub.detach();
+            sub = foam.core.FObject.create();
+            var val = this[self.name];
+            if ( Array.isArray(val) ) subToArray(val);
+          })
+          return errors_$;
+        },
+        configurable: true
+      })
+    }
+  ],
+
   properties: [
     { name: 'of', required: true },
     {

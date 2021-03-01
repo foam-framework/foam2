@@ -41,7 +41,7 @@ foam.CLASS({
         UserCapabilityJunction oldUCJ = (UserCapabilityJunction) x.get("OLD");
         UserCapabilityJunction newUCJ = (UserCapabilityJunction) x.get("NEW");
 
-        if ( getCheckInequality() ) {
+        if ( getCheckInequality() && oldUCJ != null ) {
           if ( oldUCJ.getStatus() == newUCJ.getStatus() ) return false;
         }
 

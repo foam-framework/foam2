@@ -16,6 +16,7 @@
 
   exports: [
     'as summaryView',
+    'dblclick as click',
     'dblclick',
     'memento'
   ],
@@ -30,7 +31,8 @@
 
   css: `
     ^ {
-      overflow: scroll;
+      overflow: auto;
+      height: calc(100% - 20px);
       padding-bottom: 20px;
     }
     ^table {
@@ -190,7 +192,8 @@
     {
       class: 'Boolean',
       name: 'isInit'
-    }
+    },
+    'tableWrapper_'
   ],
 
   reactions: [
@@ -224,7 +227,18 @@
 
         var id = mementoHead;
         if ( of ) {
-          id = of.ID.fromString(mementoHead);
+          if ( ! foam.core.MultiPartID.isInstance(of.ID) ) {
+            id = of.ID.fromString(mementoHead);
+          } else {
+            id = of.ID.of.create();
+            mementoHead = '{' + mementoHead.replaceAll('=', ':') + '}';
+            var idFromJSON = foam.json.parseString(mementoHead);
+            for ( var key in idFromJSON ) {
+              var axiom = of.ID.of.getAxiomByName(key);
+              if ( axiom )
+                axiom.set(id, idFromJSON[key]);
+            }
+          }
         }
 
         this.stack.push({
@@ -237,22 +251,24 @@
       }
 
       this.
-        addClass(this.myClass()).
-        on('scroll', this.onScroll).
-        start(this.TableView, {
-          data: foam.dao.NullDAO.create({of: this.data.of}),
-          columns: this.columns,
-          contextMenuActions: this.contextMenuActions,
-          selection$: this.selection$,
-          editColumnsEnabled: this.editColumnsEnabled,
-          disableUserSelection: this.disableUserSelection,
-          multiSelectEnabled: this.multiSelectEnabled,
-          selectedObjects$: this.selectedObjects$
-        }, this.table_$).
-          addClass(this.myClass('table')).
-          style({
-            height: this.scrollHeight$.map(h => h + 'px')
-          }).
+        start('div', {}, this.tableWrapper_$).
+          addClass(this.myClass()).
+          on('scroll', this.onScroll).
+          start(this.TableView, {
+            data: foam.dao.NullDAO.create({of: this.data.of}),
+            columns: this.columns,
+            contextMenuActions: this.contextMenuActions,
+            selection$: this.selection$,
+            editColumnsEnabled: this.editColumnsEnabled,
+            disableUserSelection: this.disableUserSelection,
+            multiSelectEnabled: this.multiSelectEnabled,
+            selectedObjects$: this.selectedObjects$
+          }, this.table_$).
+            addClass(this.myClass('table')).
+            style({
+              height: this.scrollHeight$.map(h => h + 'px')
+            }).
+          end().
         end();
 
       /*
@@ -284,7 +300,8 @@
           var scroll = this.memento.paramsObj.r * this.rowHeight;
           scroll = scroll >= this.rowHeight && scroll < this.scrollHeight ? scroll : 0;
 
-          document.getElementById(this.id).scrollTop = scroll;
+          if ( this.childNodes && this.childNodes.length > 0 )
+            document.getElementById(this.tableWrapper_.id).scrollTop = scroll;
 
           this.isInit = true;
         } else if ( this.el() ) this.el().scrollTop = 0;
