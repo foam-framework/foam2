@@ -527,6 +527,7 @@ FOAM_FILES([
   { name: "foam/u2/view/UserPropertyAvailabilityView", flags: ['web'] },
   { name: "foam/u2/view/FObjectView", flags: ['web'] },
   { name: "foam/u2/view/CollapseableDetailView", flags: ['web'] },
+  { name: "foam/u2/view/ReferenceCitationView", flags: ['web'] },
   { name: "foam/u2/view/ReadReferenceView", flags: ['web'] },
   { name: "foam/u2/view/ReadManyToManyRelationshipPropertyView", flags: ['web'] },
   { name: "foam/u2/view/ReferenceArrayView", flags: ['web'] },
