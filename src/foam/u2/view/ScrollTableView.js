@@ -32,7 +32,7 @@
   css: `
     ^ {
       overflow: auto;
-      height: calc(100% - 65px);
+      height: calc(100% - 20px);
       padding-bottom: 20px;
     }
     ^table {
