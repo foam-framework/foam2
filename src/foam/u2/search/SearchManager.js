@@ -60,14 +60,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function init() {
-      if ( this.memento && this.memento.paramsObj && this.memento.paramsObj.f && this.memento.paramsObj && this.memento.paramsObj.f.length > 0 ) {
-        var predicates = this.memento.paramsObj.f.map(f => foam.json.parseString(f.pred, this.__subContext__));
-        this.predicate = this.And.create({
-          args: predicates
-        }).partialEval();
-      }
-    },
 
     function and(views) {
       return this.And.create({
