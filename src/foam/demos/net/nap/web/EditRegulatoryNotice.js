@@ -251,7 +251,7 @@
                                     if ( self.BlobBlob.isInstance(blob) ) {
                                       return URL.createObjectURL(blob.blob);
                                     } else {
-                                      return '/service/httpFileService/' + fileData[i].id;
+                                      return fileData[i].address;
                                     }
                                 }
                              }),
