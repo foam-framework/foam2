@@ -14,6 +14,7 @@ import foam.nanos.logger.Logger;
 import foam.nanos.logger.PrefixLogger;
 import foam.nanos.pm.PM;
 import java.io.PrintWriter;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class DigWebAgent extends ContextAwareSupport
@@ -87,6 +88,11 @@ public class DigWebAgent extends ContextAwareSupport
   }
 
   public boolean redirectToLogin(X x) {
+    HttpServletRequest req = x.get(HttpServletRequest.class);
+    String methodName = req.getMethod();
+    if ( "get".equalsIgnoreCase(methodName) ) {
+      return true;
+    }
     return false;
   }
 }

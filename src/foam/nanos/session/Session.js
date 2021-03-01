@@ -207,6 +207,10 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
            cidrs.length == 0 ) {
         return;
       }
+      if ( ! SafetyUtil.isEmpty(getRemoteHost()) &&
+           ! SafetyUtil.equals(getRemoteHost(), remoteIp) ) {
+        throw new foam.core.ValidationException("IP changed");
+      }
       for ( foam.net.CIDR cidr : cidrs ) {
         try {
           if ( cidr.inRange(x, remoteIp) ) {

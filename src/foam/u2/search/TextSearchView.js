@@ -108,6 +108,7 @@ foam.CLASS({
         .tag(this.viewSpec, {
           alwaysFloatLabel: true,
           label$: this.label$,
+          ariaLabel$: this.label$,
           onKey: this.onKey,
           mode$: this.mode$
         }, this.view$);
@@ -144,7 +145,7 @@ foam.CLASS({
         } else {
           this.memento.head = '';
         }
-        
+
         this.predicate = ! value ?
           this.True.create() :
           this.richSearch ?

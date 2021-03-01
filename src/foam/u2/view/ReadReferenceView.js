@@ -34,8 +34,10 @@ foam.CLASS({
         var self = this;
         this.SUPER();
         this
-          .start('a')
-            .attrs({ href: '#' })
+          .add(this.obj$.map((obj) => {
+          if ( ! obj ) return '';
+          return this.E().start('a')
+            .attrs({ href: '#'})
             .on('click', function(evt) {
               evt.preventDefault();
               self.stack.push({
@@ -52,6 +54,7 @@ foam.CLASS({
               self.addCitationView.call(this, self);
             })
           .end();
+        }));
       }
     },
 
