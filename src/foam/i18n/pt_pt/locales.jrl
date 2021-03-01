@@ -190,7 +190,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.BACK_DISABLED.label",target:"voltar desativado"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.DISCARD.label",target:"Dispensar"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.SAVE_AND_CLOSE.label",target:"Salvar e sair"})
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.GO_PREV.label",target:"Costas"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.GO_PREV.label",target:"Voltar"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.StepWizardletView.GO_NEXT.label",target:"Próximo"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollWizardletView.ACTION_LABEL",target:"Enviar"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollWizardletView.SAVE_IN_PROGRESS",target:"Salvando ..."})
@@ -272,8 +272,12 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignUp.
 p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.REGION.label",target:"Região"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.REGION.error",target:"Região requerido"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.POSTAL_CODE.label",target:"CEP"})
-p({class:"foam.i18n.Locale"locale:"pt",source:"*.foam.nanos.auth.Address.POSTAL_CODE.error",target:"CEP válido necessário"})
-p({class:"foam.i18n.Locale"locale:"pt",source:"*.foam.nanos.auth.Address.POSTAL_CODE_REQUIRE",target:"CEP requerido"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.POSTAL_CODE.error",target:"CEP válido necessário"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.POSTAL_CODE_REQUIRE",target:"CEP requerido"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"*.foam.nanos.auth.Address.SUITE.label",target:"Complemento"})
+
+p({class:"foam.i18n.Locale",locale:"pt",variant:"BR",source:"br.foam.nanos.auth.Address.REGION.label",target:"Estado"})
+p({class:"foam.i18n.Locale",locale:"pt",variant:"BR",source:"br.foam.nanos.auth.Address.REGION.error",target:"Estado requerido"})
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.OPTIONS_MSG",target:"opções"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHOOSE_AT_LEAST_1_OPTION",target:"Escolha pelo menos uma opção"})
