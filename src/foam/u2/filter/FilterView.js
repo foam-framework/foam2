@@ -280,7 +280,6 @@ foam.CLASS({
         return filterController$isAdvanced ? this.LINK_SIMPLE : this.LINK_ADVANCED;
       }
     },
-    'searchValue',
     'currentMemento'
   ],
 
@@ -327,7 +326,6 @@ foam.CLASS({
         richSearch: true,
         of: self.dao.of.id,
         onKey: true,
-        // searchValue: his.currentMemento,
         viewSpec: {
           class: 'foam.u2.tag.Input',
           placeholder: this.LABEL_SEARCH
