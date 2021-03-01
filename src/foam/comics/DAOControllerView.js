@@ -32,6 +32,7 @@ foam.CLASS({
 
   exports: [
     'as controllerView',
+    'currentMemento_ as memento',
     'data.selection as selection',
     'data.data as dao',
     'data.filteredTableColumns as filteredTableColumns',
@@ -132,7 +133,8 @@ foam.CLASS({
           class: 'foam.comics.DAOUpdateControllerView'
         };
       }
-    }
+    },
+    'currentMemento_'
   ],
 
   reactions: [
@@ -145,6 +147,24 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
+
+      if ( this.memento ) {
+        this.currentMemento_ = this.memento.tail;
+      }
+
+      var searchView = foam.u2.ViewSpec.createView({
+        class: 'foam.u2.view.SimpleSearch',
+      },  self, self.__subSubContext__.createSubContext({ memento: this.memento.tail }));
+
+      var summaryView = foam.u2.ViewSpec.createView({
+        class: this.summaryView,
+        data$: this.data.filteredDAO$,
+        multiSelectEnabled: !! this.data.relationship,
+        selectedObjects$: this.data.selectedObjects$
+      }, searchView);
+
+      this.currentMemento_ = summaryView.memento;
+
       this.data.border.add(
         this.E()
           .addClass(this.myClass())
@@ -173,13 +193,13 @@ foam.CLASS({
           .start()
             .addClass(this.myClass('container'))
             .callIf(this.data.searchMode === this.SearchMode.FULL, function() {
-              this.start()
+              this.start()//create view
                 .hide(self.data.searchHidden$)
                 .addClass(self.myClass('full-search-container'))
                 .add(self.cls.PREDICATE.clone().copyFrom({
                   view: {
                     class: 'foam.u2.view.ReciprocalSearch',
-                    searchValue: self.memento && self.memento.paramsObj && self.memento.paramsObj.s//FIX ME
+                    // searchValue: self.memento && self.memento.paramsObj && self.memento.paramsObj.s//FIX ME
                     //use memento head as searchValue in the view
                   }
                 }))
@@ -192,10 +212,7 @@ foam.CLASS({
                   this
                     .start()
                       .add(self.cls.PREDICATE.clone().copyFrom({
-                        view: {
-                          class: 'foam.u2.view.SimpleSearch',
-                          searchValue: self.memento && self.memento.paramsObj && self.memento.paramsObj.s//use memento head as searchValue in the view
-                        }
+                        view: searchView
                       }))
                     .end();
                 })
@@ -208,11 +225,7 @@ foam.CLASS({
                   .add()
                 .end()
               .end()
-              .tag(this.summaryView, {
-                data$: this.data.filteredDAO$,
-                multiSelectEnabled: !! this.data.relationship,
-                selectedObjects$: this.data.selectedObjects$
-              })
+              .tag(summaryView)
             .end()
           .end()
         .end());
