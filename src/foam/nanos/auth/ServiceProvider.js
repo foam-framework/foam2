@@ -18,6 +18,7 @@ foam.CLASS({
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.Subject',
     'foam.nanos.crunch.Capability',
+    'foam.nanos.crunch.CapabilityCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.CrunchService',
     'foam.nanos.crunch.UserCapabilityJunction',
@@ -63,7 +64,7 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'setupSpid', 
+      name: 'setupSpid',
       args: [
         { name: 'x', javaType: 'foam.core.X' },
         { name: 'user', javaType: 'foam.nanos.auth.User' }
@@ -137,6 +138,33 @@ foam.CLASS({
             EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
             IN(UserCapabilityJunction.TARGET_ID, targetIdsToRemove)
           )).removeAll();
+          invalidateDependents(x, user, sp.getTargetId());
+        }
+      `
+    },
+    {
+      name: 'invalidateDependents',
+      args: [
+        { name: 'x', javaType: 'foam.core.X' },
+        { name: 'user', javaType: 'foam.nanos.auth.User' },
+        { name: 'spid', javaType: 'String' }
+      ],
+      documentation: `
+        Reput dependents of serviceprovider to invalidate them since serviceprovider was
+        removed via bareUserCapabilityJunctionDAO
+      `,
+      javaCode: `
+        CrunchService crunchService = (CrunchService) x.get("crunchService");
+        DAO prereqDAO = (DAO) x.get("prerequisiteCapabilityJunctionDAO");
+        Subject subject = new Subject(user);
+
+        List<CapabilityCapabilityJunction> ccjs = ((ArraySink) prereqDAO
+          .where(EQ(CapabilityCapabilityJunction.TARGET_ID, spid))
+          .select(new ArraySink()))
+          .getArray();
+
+        for ( CapabilityCapabilityJunction ccj : ccjs ) {
+          crunchService.updateUserJunction(x, subject, ccj.getSourceId(), null, null);
         }
       `
     }
