@@ -211,7 +211,7 @@ configuration for contacting the primary node.`,
       javaFactory: `
       int c = getNodeCount();
 
-      if ( c < 2 ) {
+      if ( c < 4 ) {
         return 1;
       }
       if ( c < 6 ) {

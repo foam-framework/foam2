@@ -272,9 +272,7 @@ This is the heart of Medusa.`,
           MedusaEntry entry = null;
           try {
             Long nextIndex = replaying.getIndex() + 1;
-            // This log message is 'info' as it acts like a progress indicator or
-            // heartbeat for anyone monitoring logs.
-            getLogger().info("promoter", "next", nextIndex);
+            getLogger().debug("promoter", "next", nextIndex);
             MedusaEntry next = (MedusaEntry) getDelegate().find_(x, nextIndex);
             if ( next != null ) {
               synchronized ( next.getId().toString().intern() ) {
