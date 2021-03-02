@@ -154,7 +154,7 @@ foam.CLASS({
 
       var searchView = foam.u2.ViewSpec.createView({
         class: 'foam.u2.view.SimpleSearch',
-      },  self, self.__subSubContext__.createSubContext({ memento: this.memento.tail }));//bug
+      },  self, self.__subSubContext__.createSubContext({ memento: this.memento ? this.memento.tail : this.memento}));//refactoring candidate
 
       var summaryView = foam.u2.ViewSpec.createView({
         class: this.summaryView,
