@@ -67,9 +67,6 @@ foam.CLASS({
   ],
 
   methods: [
-    async function init() {
-      this.blackList = (await this.commonPasswordDAO.select()).array;
-    },
     {
       name: 'validate',
       args: [
@@ -82,9 +79,8 @@ foam.CLASS({
           javaType: 'String'
         }
       ],
-      code: function(user, potentialPassword) {
-        let password = potentialPassword.toLowerCase();
-        return this.blackList.find( w => w.toString() === password ) === undefined ? true : false;
+      code: function(potentialPassword) {
+        return this.commonPasswordDAO.find(potentialPassword.toLowerCase());
       },
       javaCode: `
         // check if this policy is enabled

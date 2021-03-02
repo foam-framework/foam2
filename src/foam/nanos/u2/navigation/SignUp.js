@@ -128,16 +128,25 @@ foam.CLASS({
       required: true
     },
     {
+      class: 'Boolean',
+      name: 'passwordAvailable',
+      value: true,
+      hidden: true
+    },
+    {
       class: 'Password',
       name: 'desiredPassword',
       label: 'Password',
-      view: {
-        class: 'foam.u2.view.PasswordView',
-        passwordIcon: true
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.PasswordView',
+          isAvailable$: X.data.passwordAvailable$,
+          passwordIcon: true
+        }
       },
-      validateObj: function(desiredPassword) {
+      validateObj: function(desiredPassword, passwordAvailable) {
         if ( ! desiredPassword || desiredPassword.length < 10 ) return this.PASSWORD_ERR;
-        if ( ! this.theme.passwordPolicy.validate(this.user, desiredPassword) ) return this.WEAK_PASSWORD_ERR;
+        if ( ! passwordAvailable ) return this.WEAK_PASSWORD_ERR;
       },
       required: true
     }
