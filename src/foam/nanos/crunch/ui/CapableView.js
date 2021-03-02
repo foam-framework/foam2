@@ -14,7 +14,8 @@ foam.CLASS({
     'crunchController',
     'notify',
     'subject',
-    'userCapabilityJunctionDAO'
+    'userCapabilityJunctionDAO',
+    'userDAO'
   ],
 
   requires: [
@@ -38,12 +39,18 @@ foam.CLASS({
       documentation: 'a capable object'
     },
     {
+      name: 'ucjObj',
+      documentation: 'ucj object'
+    },
+    {
       class: 'FObjectArray',
       of: 'foam.u2.wizard.BaseWizardlet',
       name: 'wizardlets',
       documentation: 'wizardlets for capable payloads',
       postSet: function(_, n) {
-        this.listenOnWizardlets();
+        if (this.capableObj) {
+          this.listenOnWizardlets();
+        }
       }
     },
     {
@@ -73,17 +80,39 @@ foam.CLASS({
       const self = this;
 
       // a flag for checking if the capable object has payloads
-      const hasPayloads = this.capableObj.capablePayloads &&
-        Object.keys(this.capableObj.capablePayloads).length > 0;
+      // const hasPayloads = this.capableObj.capablePayloads &&
+      //   Object.keys(this.capableObj.capablePayloads).length > 0;
 
       // set wizardlets based on the capableObj
       // note: payloads data are also set from getWizardletsFromCapable
       //       this is why we add listeners to payloads data after wizardlets are set
-      this.wizardlets = this.capableObj ?
-        await this.crunchController.createCapableViewSequence(this.capableObj)
-          .execute().then(x => x.wizardlets)
-        : [];
 
+      //this.__subContext__.createSubContext({'controllerMode':foam.u2.ControllerMode.VIEW}
+      //export controllerMode 
+      //ContextAgent
+
+      var x;
+      if (this.ucjObj) {
+        var user = await this.userDAO.find(this.data.effectiveUser);
+        var realUser = await this.userDAO.find(this.data.sourceId);
+        var subject = foam.nanos.auth.Subject.create({user: user, realUser: realUser}, this);
+        var x = this.__subContext__.createSubContext({ subject: subject })
+        this.wizardlets = this.ucjObj ?
+          await this.crunchController.createCapabilityViewSequence(this.data.targetId, x)
+            .reconfigure('LoadCapabilitiesAgent', {
+              subject: subject })
+            .reconfigure('LoadWizardletsAgent', {
+              subject: subject })
+            .remove('UnlockPaymentsWizardConfig')
+            .execute().then(x => x.wizardlets)
+          : [];
+      }
+      if (this.capableObj) {
+        this.wizardlets = this.capableObj ?
+          await this.crunchController.createCapableViewSequence(this.capableObj)
+            .execute().then(x => x.wizardlets)
+          : [];
+      }
 
       this.start().addClass(this.myClass())
         .forEach(this.wizardlets, function (w, wi) {
@@ -92,10 +121,10 @@ foam.CLASS({
             code: (sections, data) => {
               return sections.map(section => section.createView({
                 showTitle: self.showTitle,
-                wizardlet: w,
-              }));
+                wizardlet: w
+              }, x));
             }
-          }));
+          }, x));
         })
       .end();
     },

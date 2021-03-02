@@ -76,6 +76,7 @@ foam.CLASS({
         var update = function() {
           var data = data$.get();
           if ( data && data.__subContext__.auth ) {
+            // data.__subContext__.auth.checkUser(null, data.__subContext__.subject.user,
             data.__subContext__.auth.check(null,
               `${data.cls_.id.toLowerCase()}.section.${self.name}`).then((hasAuth) => {
                 permSlot.set(hasAuth);
