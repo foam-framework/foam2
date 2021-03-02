@@ -124,23 +124,6 @@ foam.CLASS({
       includeInDigest: false
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.PasswordPolicy',
-      name: 'passwordPolicy',
-      documentation: 'Password policy for this group.',
-      factory: function() {
-        return this.PasswordPolicy.create();
-      },
-      javaFactory: `
-        return new foam.nanos.auth.PasswordPolicy();
-      `,
-      view: {
-        class: 'foam.u2.view.FObjectPropertyView',
-        readView: { class: 'foam.u2.detail.VerticalDetailView' }
-      },
-      includeInDigest: true
-    },
-    {
       documentation: `Restrict members of this group to particular IP address range.
 @see https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing
 List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 172 network.`,
