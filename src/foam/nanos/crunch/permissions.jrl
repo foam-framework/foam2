@@ -5,6 +5,6 @@ p({
 })
 p({
   class: "foam.nanos.auth.Permission",
-  id: "service.crunchService.customSubject",
-  description: "Permission to use a custom subject inside crunch service."
+  id: "service.crunchService.getJunctionFor",
+  description: "Permission to use crunch service's getJunctionFor method."
 })
