@@ -19,7 +19,13 @@ foam.CLASS({
 
   properties: [
     'obj',
-    'prop'
+    'prop',
+    {
+      documentation: `Create the reference view as an anchor link to the reference's  DetailView.`,
+      name: 'enableLink',
+      class: 'Boolean',
+      value: true
+    }
   ],
 
   imports: [
@@ -36,24 +42,29 @@ foam.CLASS({
         this
           .add(this.obj$.map(obj => {
             if ( ! obj ) return '';
-            return this.E().start('a')
-              .attrs({ href: '#'})
-              .on('click', function(evt) {
-                evt.preventDefault();
-                self.stack.push({
-                  class: 'foam.comics.v2.DAOSummaryView',
-                  data: self.obj,
-                  of: self.obj.cls_,
-                  config: self.DAOControllerConfig.create({
-                    daoKey: self.prop.targetDAOKey
-                  }),
-                  backLabel: 'Back'
-                }, self);
-              })
+            if ( this.enableLink ) {
+              return this.E().start('a')
+                .attrs({ href: '#'})
+                .on('click', function(evt) {
+                  evt.preventDefault();
+                  self.stack.push({
+                    class: 'foam.comics.v2.DAOSummaryView',
+                    data: self.obj,
+                    of: self.obj.cls_,
+                    config: self.DAOControllerConfig.create({
+                      daoKey: self.prop.targetDAOKey
+                    }),
+                    backLabel: 'Back'
+                  }, self);
+                })
+                .tag(self.ReferenceCitationView, {data: obj})
+              .end();
+            } else {
+              return this.E().start()
               .tag(self.ReferenceCitationView, {data: obj})
-            .end();
-          }
-        ));
+              .end();
+            }
+          }));
       }
     },
 
