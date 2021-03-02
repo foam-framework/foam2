@@ -28,6 +28,12 @@ foam.CLASS({
       documentation: `Used to catch any ucj's with their targetId equaling this value.`
     },
     {
+      name: 'previousStatus',
+      class: 'Enum',
+      of: 'foam.nanos.crunch.CapabilityJunctionStatus',
+      documentation: `Not required. Expected junction status of old junction.`,
+    },
+    {
       name: 'status',
       class: 'Enum',
       of: 'foam.nanos.crunch.CapabilityJunctionStatus',
@@ -46,8 +52,7 @@ foam.CLASS({
         UserCapabilityJunction old = (UserCapabilityJunction) x.get("OLD");
         UserCapabilityJunction ucj = (UserCapabilityJunction) x.get("NEW");
 
-        return old != null &&
-            old.getStatus() != ucj.getStatus() &&
+        return ( old == null || old != null && old.getStatus() != ucj.getStatus() ) &&
             ucj.getStatus() == getStatus() &&
             ucj.getTargetId() == getCapabilityId();
       `
