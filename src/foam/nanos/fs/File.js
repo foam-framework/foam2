@@ -113,13 +113,7 @@ foam.CLASS({
       readVisibility: 'RO',
       transient: true,
       expression: function (id) {
-        var sessionId = localStorage['defaultSession'];
-        var url = window.location.origin + '/service/httpFileService/' + id
-        // attach session id if available
-        if ( sessionId ) {
-          url += '?sessionId=' + sessionId;
-        }
-        return url;
+        return window.location.origin + '/service/httpFileService/' + id
       }
     },
     {
@@ -161,7 +155,7 @@ foam.CLASS({
 
         return null;
       `,
-      getter: function() {
+      getter: async function() {
         if ( this.dataString ) {
           let b64Data = this.dataString.split(',')[1];
           const b64toBlob = (b64Data, contentType = this.mimeType, sliceSize = 512) => {
