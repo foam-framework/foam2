@@ -18,8 +18,8 @@ foam.CLASS({
     {
       name: 'toString',
       code: function() {
-        return this.id
+        return this.id;
       }
-    },
+    }
   ]
 })  
