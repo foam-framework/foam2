@@ -214,6 +214,12 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'hideQueryBar'
+    },
+    {
+      class: 'Boolean',
+      name: 'DAOCreateView',
+      documentation: 'True to use the DAOCreateView else it will use the WizardController.',
+      
     }
   ]
 });

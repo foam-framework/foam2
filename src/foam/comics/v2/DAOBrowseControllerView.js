@@ -120,12 +120,23 @@ foam.CLASS({
       },
       code: function() {
         if ( ! this.stack ) return;
-        this.stack.push({
-          class: 'foam.comics.v2.DAOCreateView',
-          data: ((this.config.factory && this.config.factory$cls) ||  this.data.of).create({ mode: 'create'}, this),
-          config$: this.config$,
-          of: this.data.of
-        }, this.__subContext__);
+
+        if ( this.config.DAOCreateView ){
+          this.stack.push({
+            class: 'foam.comics.v2.DAOCreateView',
+            data: ((this.config.factory && this.config.factory$cls) ||  this.data.of).create({ mode: 'create'}, this),
+            config$: this.config$,
+            of: this.data.of
+          }, this.__subContext__);
+        } else {
+          this.stack.push(
+            net.nanopay.ui.wizard.WizardController.create({
+              model: this.data.of.id || this.config.of.id,
+              //data: this.selection,
+              controllerMode: foam.u2.ControllerMode.CREATE,
+              isEdit: true
+          }, this.__subContext__));
+        }
       }
     }
   ],
