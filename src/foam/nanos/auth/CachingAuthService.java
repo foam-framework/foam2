@@ -131,13 +131,6 @@ public class CachingAuthService
   }
 
   public static void purgeCache(X x) {
-    // TODO: figure out underlying issue
-    // x.get("anything") throws an NPE in tests
-
-    if ( x instanceof ProxyX && ((ProxyX) x).getX() == null ){
-      return;
-    }
-
     Session session = x.get(Session.class);
 
     if ( session != null ){
