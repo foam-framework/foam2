@@ -73,6 +73,7 @@ public class AuthWebAgent
     X requestX = session.getContext()
       .put(HttpServletRequest.class,  x.get(HttpServletRequest.class))
       .put(HttpServletResponse.class, x.get(HttpServletResponse.class))
+      // "lazy" the invoking of getWriter(). It prevents throwing exception from calling getOutputStream() later in the code.
       .putFactory(PrintWriter.class, new XFactory() {
         @Override
         public Object create(X x) {
