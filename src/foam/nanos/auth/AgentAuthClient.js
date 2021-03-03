@@ -27,7 +27,6 @@ foam.CLASS({
         this.menuDAO.cmd_(x, foam.dao.CachingDAO.PURGE);
         this.menuDAO.cmd_(x, foam.dao.AbstractDAO.RESET_CMD);
         this.crunchController.purgeCachedCapabilityDAOs();
-        return;
       }
     },
   ],
