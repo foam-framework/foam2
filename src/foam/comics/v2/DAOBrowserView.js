@@ -112,6 +112,10 @@ foam.CLASS({
       border-radius: 0 5px 5px 0;
       border: 1px solid;
     }
+
+    ^browse-view-container .foam-u2-view-ScrollTableView {
+      height: calc(100% - 20px);
+    }
   `,
 
   messages: [
