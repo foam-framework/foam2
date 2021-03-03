@@ -9,20 +9,26 @@ foam.CLASS({
   name: 'AgentAuthClient',
   extends: 'foam.nanos.auth.ProxyAuthService',
   documentation: `
+    AgentAuthService client side decorator use to assign business to users and 
+    direct them to the default page.
   `,
-
+  imports: [
+    'crunchController',
+    'initLayout',
+    'menuDAO',
+    'subject',
+  ],
   methods: [
     async function actAs(x, business) {
       let result = await this.delegate.actAs(x, business);
       if ( result ) {
         await x.fetchGroup();
-        x.subject.user = business;
-        x.crunchController.purgeCachedCapabilityDAOs();
-        x.client.menuDAO.cmd_(x, foam.dao.CachingDAO.PURGE);
-        x.client.menuDAO.cmd_(x, foam.dao.AbstractDAO.RESET_CMD);
-        x.crunchController.purgeCachedCapabilityDAOs();
-        x.initLayout.resolve();
-        await x.pushDefaultMenu();
+        this.subject.user = business;
+        this.subject.realUser = result;
+        this.menuDAO.cmd_(x, foam.dao.CachingDAO.PURGE);
+        this.menuDAO.cmd_(x, foam.dao.AbstractDAO.RESET_CMD);
+        this.crunchController.purgeCachedCapabilityDAOs();
+        this.initLayout.resolve();
         return;
       }
     },
