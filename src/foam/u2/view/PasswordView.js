@@ -24,6 +24,10 @@ foam.CLASS({
     'foam.u2.TextField'
   ],
 
+  imports: [
+    'theme'
+  ],
+
   css: `
     ^ .input-image {
       --fieldSize: /*%INPUTHEIGHT%*/ 32px;
@@ -76,7 +80,11 @@ foam.CLASS({
       name: 'type',
       value: 'password'
     },
-    'inputElement'
+    'inputElement',
+    {
+      class: 'Boolean',
+      name: 'isAvailable',
+    },
   ],
 
   methods: [
@@ -90,6 +98,7 @@ foam.CLASS({
           onKey: true,
         }, this.inputElement$)
           .addClass('full-width-input-password')
+          .on('blur', this.checkAvailability)
         .end()
 
         .start('img')
@@ -119,6 +128,16 @@ foam.CLASS({
         // Make password invisible
         this.visibleIcon(this.VISIBILITY_OFF, 'password');
       }
+    },
+    function checkAvailability() {
+      this.theme.passwordPolicy.validate(this.data)
+        .then((pw) => {
+          if ( pw === undefined ) {
+            this.isAvailable = true;
+          } else {
+            this.isAvailable = false;
+          }
+        });
     }
   ]
 });

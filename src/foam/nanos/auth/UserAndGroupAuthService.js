@@ -40,6 +40,8 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'foam.nanos.notification.Notification',
     'foam.nanos.session.Session',
+    'foam.nanos.theme.Theme',
+    'foam.nanos.theme.Themes',
     'foam.util.Email',
     'foam.util.Password',
     'foam.util.SafetyUtil',
@@ -266,24 +268,16 @@ foam.CLASS({
         // Retrieve the logger
         Logger logger = (Logger) x.get("logger");
 
-        // Retrieve the password policy from the user and group when available
-        if ( user != null ) {
-          Group ancestor = (Group) x.get("group");
-          if ( ancestor != null ) {
-            // Check password policy
-            passwordPolicy = ancestor.getPasswordPolicy();
-            while ( passwordPolicy == null || ! passwordPolicy.getEnabled() ) {
-              ancestor = ancestor.getAncestor(x, ancestor);
-              if ( ancestor == null ) break;
-              passwordPolicy = ancestor.getPasswordPolicy();
-            }
-          }
-        }
+        // Retrieve the password policy from theme.
+        Theme theme = ((Themes) x.get("themes")).findTheme(x);
+        passwordPolicy = theme.getPasswordPolicy();
+        passwordPolicy.setX(x);
 
         // Use the default password policy if nothing is found
         if ( passwordPolicy == null || ! passwordPolicy.getEnabled() ) {
           passwordPolicy = new PasswordPolicy();
           passwordPolicy.setEnabled(true);
+          passwordPolicy.setX(x);
         }
 
         // Validate the password against the password policy
