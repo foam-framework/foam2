@@ -21,6 +21,7 @@ foam.CLASS({
     'foam.core.ContextAgent',
     'foam.core.X',
     'foam.core.XLocator',
+    'foam.core.ProxyX',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
     'java.util.concurrent.LinkedBlockingQueue',
@@ -64,13 +65,15 @@ foam.CLASS({
       Logger logger = (Logger) x_.get("logger");
       PM     pm     = new PM(this.getClass(), agent_.getClass().getSimpleName()+":"+description_);
 
+      X oldX = ((ProxyX) XLocator.get()).getX();
+
       try {
         XLocator.set(x_);
         agent_.execute(x_);
       } catch (Throwable t) {
         logger.error(this.getClass(), agent_.getClass().getSimpleName(), description_, t.getMessage(), t);
       } finally {
-        XLocator.set(null);
+        XLocator.set(oldX);
         incrExecuting(-1);
         incrExecuted();
         pm.log(x_);
