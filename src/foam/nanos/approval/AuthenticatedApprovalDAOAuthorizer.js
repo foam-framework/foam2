@@ -23,7 +23,7 @@ foam.CLASS({
       name: 'authorizeOnCreate',
       javaCode: `
         AuthService authService = (AuthService) x.get("auth");
-        if ( ! authService.check(x, "approval.create") ) {
+        if ( ! authService.check(x, "approvalrequest.create") ) {
           throw new AuthorizationException();
         }
       `
@@ -61,15 +61,15 @@ foam.CLASS({
       name: 'checkGlobalRead',
       javaCode: `
         AuthService authService = (AuthService) x.get("auth");
-        return authService.check(x, "approval.read.*");
+        return authService.check(x, "approvalrequest.read.*");
       `
     },
     {
       name: 'checkGlobalRemove',
       javaCode: `
         AuthService authService = (AuthService) x.get("auth");
-        return authService.check(x, "approval.remove.*");
+        return authService.check(x, "approvalrequest.remove.*");
       `
     }
   ]
-})
+});
