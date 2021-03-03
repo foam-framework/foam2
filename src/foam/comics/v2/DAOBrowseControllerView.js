@@ -137,7 +137,7 @@ foam.CLASS({
     var self = this;
 
       this.addClass(this.myClass())
-      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction) {
+      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction, config$createTitle) {
         return self.E()
           .start(self.Rows)
             .addClass(self.myClass('container'))
@@ -148,7 +148,9 @@ foam.CLASS({
                     .addClass(self.myClass('browse-title'))
                     .translate(config$browseTitle, config$browseTitle)
                   .end()
-                  .startContext({ data: self }).tag(self.CREATE).endContext()
+                  .startContext({ data: self })
+                    .tag(self.CREATE, { label: config$createTitle })
+                  .endContext()
                   .callIf(config$primaryAction, function() {
                     this.startContext({ data: self }).tag(config$primaryAction, { size: 'LARGE' }).endContext();
                   })
