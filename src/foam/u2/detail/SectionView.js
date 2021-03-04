@@ -95,7 +95,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'selected',
       postSet: function() {
-        if ( this.selected )
+        if ( this.selected ) 
           this.loadLatch = this.selected;
       },
       value: true
@@ -143,28 +143,26 @@ foam.CLASS({
             })
             .add(this.slot(function(loadLatch) {
               var view = this.E().start(self.Grid);
-
+              
               if ( loadLatch ) {
                 view.forEach(section.properties, function(p, index) {
                   var config = self.config && self.config[p.name];
 
-                  if ( p.visibility != "HIDDEN" && p.createVisibility.name != "HIDDEN" ) {
-                    if ( config ) {
-                      p = p.clone();
-                      for ( var key in config ) {
-                        if ( config.hasOwnProperty(key) ) {
-                          p[key] = config[key];
-                        }
+                  if ( config ) {
+                    p = p.clone();
+                    for ( var key in config ) {
+                      if ( config.hasOwnProperty(key) ) {
+                        p[key] = config[key];
                       }
                     }
-                    this.start(self.GUnit, { columns: p.gridColumns })
-                      .show(p.createVisibilityFor(self.data$, self.controllerMode$).map(mode => mode !== self.DisplayMode.HIDDEN))
-                      .tag(self.SectionedDetailPropertyView, {
-                        prop: p,
-                        data$: self.data$
-                      })
-                    .end();
                   }
+                  this.start(self.GUnit, { columns: p.gridColumns })
+                    .show(p.createVisibilityFor(self.data$, self.controllerMode$).map(mode => mode !== self.DisplayMode.HIDDEN))
+                    .tag(self.SectionedDetailPropertyView, {
+                      prop: p,
+                      data$: self.data$
+                    })
+                  .end();
                 });
               }
 
