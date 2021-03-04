@@ -344,6 +344,15 @@
       readPermissionRequired: true
     },
     {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdFor',
+      includeInDigest: true,
+      section: 'approvalRequestInformation',
+      order: 116,
+      gridColumns: 3
+    },
+    {
       class: 'DateTime',
       name: 'lastModified',
       includeInDigest: true,
