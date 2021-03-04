@@ -293,8 +293,9 @@ foam.CLASS({
               .attrs({title: spec.description})
               .on('click', function() {
                 if ( self.memento ) {
-                  self.memento.tail = self.Memento.create({ head: spec.id });
-                  self.memento.tail.parent = self.memento;
+                  var tail = self.Memento.create({ head: spec.id, tail: self.Memento.create() });
+                  this.currentMemento_ = self.memento.tail;
+                  self.memento.tail$.set(tail);
                 }
               });
 
@@ -319,8 +320,12 @@ foam.CLASS({
         });
       });
 
-      if ( this.memento )
+      if ( this.memento ) {
+        if ( ! this.memento.tail ) {
+          this.memento.tail = self.Memento.create();
+        }
         this.onDetach(this.memento.tail$.sub(this.mementoChange));
+      }
       this.mementoChange();
     }
   ],
@@ -329,7 +334,7 @@ foam.CLASS({
     function mementoChange() {
       var m = this.memento;
 
-      if ( ! m || ! m.tail ) {
+      if ( ! m || ! m.tail || ! m.tail.tail ) {
         if ( this.currentMemento_ ) this.stack.back();
         return;
       }
@@ -339,12 +344,6 @@ foam.CLASS({
       x.register(this.CustomDAOSummaryView,    'foam.comics.v2.DAOSummaryView');
       x.register(this.CustomDAOUpdateView,     'foam.comics.v2.DAOUpdateView');
       x.register(foam.u2.DetailView,           'foam.u2.DetailView');
-
-
-      if ( this.currentMemento_ && ! this.currentMemento_.tail ) {
-        //does it works??
-        this.currentMemento_.tail$.set(foam.nanos.controller.Memento.create());
-      }
 
       var innerView = foam.u2.ViewSpec.createView({
           class: 'foam.u2.view.AltView',
@@ -365,9 +364,7 @@ foam.CLASS({
               'Old Controller'
             ]
           ]
-      }, null,  this, this.__subContext__.createSubContext({memento: this.currentMemento_.tail}));
-
-      this.currentMemento_$ = innerView.memento$;
+      }, null,  this, this.__subContext__.createSubContext({memento: this.memento.tail}));
 
       this.stack.push({
         class: this.BackBorder,

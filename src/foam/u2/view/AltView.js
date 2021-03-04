@@ -96,11 +96,19 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      this.currentMemento_$ = this.memento.tail$;
+      if ( this.memento ) {
+        this.currentMemento_$ = this.memento.tail$;
+      }
 
-      if ( this.memento && this.memento.head.length != 0 )
-        this.selectedView = this.memento.head;
-      else {
+      if ( this.currentMemento_ ) {
+        if ( ! this.currentMemento_.tail ) {
+          this.currentMemento_.tail = foam.nanos.controller.Memento.create();
+        }
+      }
+
+      if ( this.memento && this.memento.tail && this.memento.tail.head.length != 0 ) {
+        this.selectedView = this.memento.tail.head;
+      } else {
         self.setMementoWithSelectedView();
       }
 
@@ -124,13 +132,13 @@ foam.CLASS({
 
   actions: [
     function setMementoWithSelectedView() {
-      if ( ! this.memento )
+      if ( ! this.memento || ! this.memento.tail )
         return;
       var view = this.views.find(v => v[0] == this.selectedView);
       if ( view )
-        this.memento.head = view[1];
+        this.memento.tail.head = view[1];
       else
-        this.memento.head = '';
+        this.memento.tail.head = '';
     }
   ]
 });
