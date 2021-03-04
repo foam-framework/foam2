@@ -626,6 +626,7 @@ FOAM_FILES([
   { name: 'foam/u2/search/Toolbar' },
   { name: "foam/u2/stack/Stack", flags: ['web'] },
   { name: "foam/u2/stack/StackView", flags: ['web'] },
+  { name: "foam/u2/stack/DesktopStackView", flags: ['web'] },
   { name: "foam/u2/crunch/Style", flags: ['web'] },
   { name: "foam/u2/crunch/CrunchController", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/ConfigureFlowAgent", flags: ['web'] },
