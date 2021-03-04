@@ -345,8 +345,7 @@
       includeInDigest: true,
       section: 'approvalRequestInformation',
       order: 116,
-      gridColumns: 3,
-      readPermissionRequired: true
+      gridColumns: 3
     },
     {
       class: 'DateTime',
