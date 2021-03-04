@@ -132,7 +132,7 @@ foam.CLASS({
     function checkAvailability() {
       this.theme.passwordPolicy.validate(this.data)
         .then((pw) => {
-          this.isAvailable = !pw
+          this.isAvailable = !pw;
         });
     }
   ]
