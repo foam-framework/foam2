@@ -97,7 +97,8 @@ foam.CLASS({
       expression: function(defaultColumns) {
         return {
           class: 'foam.u2.view.ScrollTableView',
-          enableDynamicTableHeight: true,
+          enableDynamicTableHeight: true,//false
+          editColumnsEnabled: false,
           columns: defaultColumns,
           css: {
             width: '100%',
