@@ -29,20 +29,27 @@ public class QueryParser
 
     List<PropertyInfo>         properties  = classInfo.getAxiomsByClass(PropertyInfo.class);
     expressions = new ArrayList();
-    Collections.sort(properties, Collections.reverseOrder());
+    Map props = new HashMap<String, PropertyInfo>();
 
     for ( PropertyInfo prop : properties ) {
-      expressions.add(new LiteralIC(prop.getName(), prop));
+      props.put(prop.getName(), prop);
 
       if ( ! SafetyUtil.isEmpty(prop.getShortName()) ) {
-        expressions.add(new LiteralIC(prop.getShortName(), prop));
+        props.put(prop.getShortName(), prop);
       }
 
       if ( prop.getAliases().length != 0 ) {
         for ( int i = 0; i < prop.getAliases().length; i++) {
-          expressions.add(new LiteralIC(prop.getAliases()[0], prop));
+          props.put(prop.getAliases()[i], prop);
         }
       }
+    }
+    ArrayList<String> sortedKeys =
+      new ArrayList<String>(props.keySet());
+
+    Collections.sort(sortedKeys, Collections.reverseOrder());
+    for (String propName : sortedKeys) {
+      expressions.add(new LiteralIC(propName, props.get(propName)));
     }
   }
 
