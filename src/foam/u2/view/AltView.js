@@ -36,12 +36,7 @@ foam.CLASS({
     {
       name: 'selectedView',
       view: function(_, X) {
-        debugger;
         return X.data.RadioView.create({choices: X.data.views, isHorizontal: true}, X);
-      //  return { class: X.data.ChoiceView, choices: X.data.views };
-      },
-      xxxview: function(_, X) {
-        return foam.u2.view.ChoiceView.create({choices: X.data.views}, X);
       },
       documentation: `Set one of the views as the selectedView.
 
