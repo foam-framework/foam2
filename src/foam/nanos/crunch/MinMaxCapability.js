@@ -17,6 +17,8 @@ foam.CLASS({
     'static foam.mlang.MLang.*',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
+    'foam.nanos.crunch.CrunchService',
+    'foam.nanos.crunch.MinMaxCapabilityData',
     'foam.nanos.crunch.ui.MinMaxCapabilityWizardlet'
   ],
 
@@ -199,6 +201,43 @@ foam.CLASS({
                   ucj.getStatus() != CapabilityJunctionStatus.PENDING &&
                   ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return true;
         return false;
+      `
+    },
+    {
+      name: 'getImpliedData',
+      documentation: `
+        If this UCJ is stored for a MinMax without a list of choices, and enough
+        UCJs are present to describe a choice selection, then the
+        data of the UCJ will be set to the first LIMIT(max) choices.
+      `,
+      args: [
+        { name: 'x', javaType: 'foam.core.X' },
+        { name: 'ucj', javaType: 'foam.nanos.crunch.UserCapabilityJunction' }
+      ],
+      type: 'FObject',
+      javaCode: `
+        var crunchService = (CrunchService) x.get("crunchService");
+        List<String> ids = crunchService.getPrereqs(getId());
+        var ucjDAO = (DAO) x.get("userCapabilityJunctionDAO");
+
+        List<UserCapabilityJunction> ucjs = ((ArraySink) ucjDAO
+          .where(IN(UserCapabilityJunction.TARGET_ID, ids))
+          .select(new ArraySink())).getArray();
+
+        if ( ucjs.size() < getMin() ) return null;
+
+        var data = new MinMaxCapabilityData();
+
+        var count = Math.min(ucjs.size(), getMax());
+        String[] foundIds = new String[count];
+
+        for ( var i = 0 ; i < count ; i++ ) {
+          foundIds[i] = ucjs.get(i).getTargetId();
+        }
+
+        data.setSelectedData(foundIds);
+
+        return data;
       `
     }
   ]
