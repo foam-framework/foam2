@@ -330,7 +330,7 @@
       tableCellFormatter: function(value, obj, axiom) {
         this.__subSubContext__.userDAO
           .find(value)
-          .then(user => this.add(user.toSummary()));
+          .then(user => this.add(user ? user.toSummary() : `ID: ${value}`));
       }
     },
     {
