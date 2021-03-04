@@ -538,6 +538,21 @@ foam.CLASS({
                   ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return true;
         return false;
       `
+    },
+    {
+      name: 'getImpliedData',
+      documentation: `
+        A subclass of Capability can override this to define what gets stored
+        when a UCJ is saved with null data.
+      `,
+      args: [
+        { name: 'x', javaType: 'foam.core.X' },
+        { name: 'ucj', javaType: 'foam.nanos.crunch.UserCapabilityJunction' }
+      ],
+      type: 'FObject',
+      javaCode: `
+        return null;
+      `
     }
   ]
 });
