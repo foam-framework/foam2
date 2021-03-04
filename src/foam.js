@@ -57,7 +57,7 @@
 
     return function(filename) {
       if ( loadedMap[filename] ) {
-        console.error(`Duplicated load of '${filename}'`);
+        console.warn(`Duplicated load of '${filename}'`);
         return;
       }
       loadedMap[filename] = true;
