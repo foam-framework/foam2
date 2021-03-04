@@ -415,6 +415,7 @@ FOAM_FILES([
   { name: "foam/nanos/ruler/predicate/PropertyHasValue" },
   { name: "foam/nanos/ruler/predicate/PropertyEQValue" },
   { name: "foam/nanos/ruler/predicate/PropertyNEQValue" },
+  { name: "foam/nanos/ruler/predicate/PropertyCompare" },
   { name: "foam/nanos/ruler/predicate/NewEqOld" },
   { name: "foam/nanos/ruler/predicate/IsInstancePredicate" },
   { name: "foam/nanos/ruler/predicate/PropertyIsInstance" },
