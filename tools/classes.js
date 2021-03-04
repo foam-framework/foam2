@@ -296,6 +296,7 @@ var classes = [
   'foam.nanos.auth.ClientAuthService',
   'foam.nanos.auth.ClientLoginAuthService',
   'foam.nanos.auth.AgentAuthService',
+  'foam.nanos.auth.AgentAuthClient',
   'foam.nanos.auth.ClientAgentAuthService',
   'foam.nanos.auth.HtmlDoc',
   'foam.nanos.auth.PasswordExpiryAuthService',
