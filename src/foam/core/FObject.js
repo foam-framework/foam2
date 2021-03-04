@@ -920,6 +920,18 @@ foam.CLASS({
       return this.cls_.create(m, opt_X || this.__context__);
     },
 
+    function shallowClone(opt_X) {
+      /** Create a shallow copy of this object. **/
+      var m = {};
+      for ( var key in this.instance_ ) {
+        if ( this.instance_[key] === undefined ) continue; // Skip previously cleared keys.
+
+        var value = this[key];
+        m[key] = value;
+      }
+      return this.cls_.create(m, opt_X || this.__context__);
+    },
+
     /**
       Copy property values from the supplied object or map.
 
