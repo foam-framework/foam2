@@ -703,6 +703,10 @@ foam.CLASS({
       }
 
       return slot;
+    },
+
+    function clone(opt_X) {
+      return this.shallowClone(opt_X);
     }
   ]
 });
