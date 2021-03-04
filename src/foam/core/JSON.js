@@ -626,6 +626,9 @@ foam.CLASS({
             creationContext: opt_ctx || this.creationContext
           }).parseClassFromString(str, opt_cls) :
           this.fonParser_.parseClassFromString(str, opt_cls);
+    },
+    function clone() {
+      return this;
     }
   ]
 });
