@@ -212,6 +212,10 @@ foam.SCRIPT({
       foam.Object.freeze(sub);
 
       return sub;
+    },
+
+    clone: function() {
+      return this;
     }
   };
 
