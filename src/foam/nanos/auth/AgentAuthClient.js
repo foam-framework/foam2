@@ -9,8 +9,8 @@ foam.CLASS({
   name: 'AgentAuthClient',
   extends: 'foam.nanos.auth.ProxyAuthService',
   documentation: `
-    AgentAuthService client side decorator use to assign business to users and 
-    direct them to the default page.
+    AgentAuthService client side decorator. When user call agentAuth.actAs(), it assign 
+    the business to users, and then purge caches.
   `,
   imports: [
     'crunchController',
