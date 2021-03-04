@@ -181,7 +181,7 @@ foam.CLASS({
 
 
   exports: [
-    'currentMemento_ as memento'
+    // 'currentMemento_ as memento'
   ],
 
   properties: [
@@ -335,7 +335,7 @@ foam.CLASS({
       var m = this.memento;
 
       if ( ! m || ! m.tail || ! m.tail.tail ) {
-        if ( this.currentMemento_ ) this.stack.back();
+        if ( this.currentMemento_.head.length != 0 ) this.stack.back();
         return;
       }
 
