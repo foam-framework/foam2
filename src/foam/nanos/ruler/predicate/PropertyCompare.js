@@ -11,12 +11,12 @@ foam.CLASS({
   documentation: `Returns true if the provided comparator evaluates to true for the value of the specified property and the provided value.
   Exactly like "Operation(DOT(Object,propName), value)" however much neater to write.
   Possible operations include:
-  'gt' - Greater Than
-  'gte' - Greater Than or Equal
-  'lt' - Less Than
-  'lte' - Less Than or Equal
-  'eq' - Equal
-  'neq' - Not Equal
+  'Gt' - Greater Than
+  'Gte' - Greater Than or Equal
+  'Lt' - Less Than
+  'Lte' - Less Than or Equal
+  'Eq' - Equal
+  'Neq' - Not Equal
   TODO: Can probably delete PropertyEQValue and PropertyNEQValue as this renders them obsolete.
   `,
 
@@ -71,22 +71,22 @@ foam.CLASS({
       ],
       type: 'Boolean',
       javaCode: `
-      if ( SafetyUtil.equals(getOperation(), "gt" ) ) {
+      if ( SafetyUtil.equals(getOperation().toLowerCase(), "gt" ) ) {
         return GT(obj.getClassInfo().getAxiomByName(getPropName()), getValue()).f(obj);
       }
-      if ( SafetyUtil.equals(getOperation(), "gte" ) ) {
+      if ( SafetyUtil.equals(getOperation().toLowerCase(), "gte" ) ) {
         return GTE(obj.getClassInfo().getAxiomByName(getPropName()), getValue()).f(obj);
       }
-      if ( SafetyUtil.equals(getOperation(), "lt" ) ) {
+      if ( SafetyUtil.equals(getOperation().toLowerCase(), "lt" ) ) {
         return LT(obj.getClassInfo().getAxiomByName(getPropName()), getValue()).f(obj);
       }
-      if ( SafetyUtil.equals(getOperation(), "lte" ) ) {
+      if ( SafetyUtil.equals(getOperation().toLowerCase(), "lte" ) ) {
         return LTE(obj.getClassInfo().getAxiomByName(getPropName()), getValue()).f(obj);
       }
-      if ( SafetyUtil.equals(getOperation(), "eq" ) ) {
+      if ( SafetyUtil.equals(getOperation().toLowerCase(), "eq" ) ) {
         return EQ(obj.getClassInfo().getAxiomByName(getPropName()), getValue()).f(obj);
       }
-      if ( SafetyUtil.equals(getOperation(), "neq" ) ) {
+      if ( SafetyUtil.equals(getOperation().toLowerCase(), "neq" ) ) {
         return NEQ(obj.getClassInfo().getAxiomByName(getPropName()), getValue()).f(obj);
       }
       return false;
