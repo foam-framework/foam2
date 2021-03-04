@@ -921,7 +921,7 @@ foam.CLASS({
     },
 
     function shallowClone(opt_X) {
-      /** Create a shalow copy of this object. **/
+      /** Create a shallow copy of this object. **/
       var m = {};
       for ( var key in this.instance_ ) {
         if ( this.instance_[key] === undefined ) continue; // Skip previously cleared keys.
