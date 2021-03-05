@@ -8,16 +8,19 @@ foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'AgentAuthClient',
   extends: 'foam.nanos.auth.ProxyAuthService',
+
   documentation: `
     AgentAuthService client side decorator. When user call agentAuth.actAs(), it assign 
     the business to users, and then purge caches.
   `,
+
   imports: [
     'crunchController',
     'ctrl',
     'menuDAO',
     'subject',
   ],
+
   methods: [
     async function actAs(x, user) {
       let result = await this.delegate.actAs(x, user);
