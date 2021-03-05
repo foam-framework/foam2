@@ -95,7 +95,10 @@ public abstract class AbstractStringPropertyInfo
     formatter.output(get_(obj));
   }
 
-//  public Object castObject(Object value) {
-//    return value.toString();
-//  }
+  public Object castObject(Object value) {
+    if ( value instanceof Number ) {
+      return value.toString();
+    }
+    return value;
+  }
 }
