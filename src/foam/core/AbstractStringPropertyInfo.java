@@ -94,4 +94,11 @@ public abstract class AbstractStringPropertyInfo
   public void format(foam.lib.formatter.FObjectFormatter formatter, foam.core.FObject obj) {
     formatter.output(get_(obj));
   }
+
+  public Object castObject(Object value) {
+    if ( value != null ) {
+      return value.toString();
+    }
+    return null;
+  }
 }
