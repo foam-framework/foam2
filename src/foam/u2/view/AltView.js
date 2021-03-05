@@ -13,17 +13,16 @@ foam.CLASS({
   "Takes a views property which should be the value of an array containing arrays that contain desired views, and label." +
   "Ex. views: [[ { class: 'foam.u2.view.TableView' }, 'Table' ]]",
 
-  imports: [
-    'memento'
-  ],
+  imports: [ 'memento' ],
+
+  requires: [ 'foam.u2.view.RadioView' ],
 
   exports: [
     'currentMemento_ as memento'
   ],
 
   css: `
-    ^ { margin: auto; }
-    ^ select { height: 26px }
+    ^ { margin: auto; width: 100%; }
   `,
 
   properties: [
@@ -38,7 +37,7 @@ foam.CLASS({
     {
       name: 'selectedView',
       view: function(_, X) {
-        return foam.u2.view.ChoiceView.create({choices: X.data.views}, X);
+        return X.data.RadioView.create({choices: X.data.views, isHorizontal: true, columns: 8}, X);
       },
       documentation: `Set one of the views as the selectedView.
 

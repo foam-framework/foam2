@@ -98,6 +98,9 @@ foam.CLASS({
 
         DAO userDAO = (DAO) x.get("localUserDAO");
         User initiatingUser = (User) userDAO.find(((ApprovalRequest) request).getCreatedBy());
+        if ( ((ApprovalRequest) request).getCreatedFor() != 0 ) {
+          initiatingUser = (User) userDAO.find(((ApprovalRequest) request).getCreatedFor());
+        }
         Subject subject = new Subject.Builder(x).setUser(initiatingUser).build();
         X initiatingUserX = x.put("subject", subject);
 

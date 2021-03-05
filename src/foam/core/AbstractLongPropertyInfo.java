@@ -107,4 +107,14 @@ public abstract class AbstractLongPropertyInfo
   public void format(foam.lib.formatter.FObjectFormatter formatter, foam.core.FObject obj) {
     formatter.output(get_(obj));
   }
+  @Override
+  public Object castObject(Object value) {
+    if ( value instanceof String ) {
+      return Long.valueOf((String) value);
+    }
+    if ( value instanceof Number ) {
+      return ((Number) value).longValue();
+    }
+    return value;
+  }
 }

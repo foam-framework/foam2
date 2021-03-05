@@ -23,6 +23,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.bouncycastle.util.encoders.Base64;
+import foam.core.XFactory;
+import java.io.IOException;
 import static foam.mlang.MLang.AND;
 import static foam.mlang.MLang.EQ;
 
@@ -67,10 +69,18 @@ public class AuthWebAgent
 
     // Create a per-request sub-context of the session context which
     // contains necessary Servlet request/response objects.
+    X x_ = x;
     X requestX = session.getContext()
       .put(HttpServletRequest.class,  x.get(HttpServletRequest.class))
       .put(HttpServletResponse.class, x.get(HttpServletResponse.class))
-      .put(PrintWriter.class,         x.get(PrintWriter.class));
+      // "lazy" the invoking of getWriter(). It prevents throwing exception from calling getOutputStream() later in the code.
+      // The calling context provided a PrintWriter, but it needs to be explicitly passed on the requestX context, similar to HttpServletRequest/Response.
+      .putFactory(PrintWriter.class, new XFactory() {
+        @Override
+        public Object create(X x) {
+          return x_.get(PrintWriter.class);
+        }
+      });
     
     try {
       XLocator.set(requestX);

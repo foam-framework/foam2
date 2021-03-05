@@ -20,16 +20,14 @@ foam.CLASS({
   name: 'RadioView',
   extends: 'foam.u2.view.ChoiceView',
 
-  requires: [
-    'foam.u2.DisplayMode'
-  ],
+  requires: [ 'foam.u2.DisplayMode' ],
 
   css: `
-    ^ { 
+    ^ {
       padding: 4px 0;
     }
 
-    ^horizontal-radio { 
+    ^horizontal-radio {
       display: flex;
       align-items: center;
       align-content: center;
@@ -41,25 +39,25 @@ foam.CLASS({
       font-size: 16px;
     }
 
-    ^.foam-u2-view-RadioView-horizontal-radio .choice {
-      flex-basis: calc(100% / 3);
-    }
-
     ^ label {
       margin-left: 12px;
-      color: #444; 
+      color: #444;
     }
   `,
 
   properties: [
     {
       class: 'Boolean',
-      name: 'isHorizontal',
-      value: false
+      name: 'isHorizontal'
     },
     {
       class: 'Boolean',
       name: 'isDisabled'
+    },
+    {
+      class: 'Int',
+      name: 'columns',
+      value: 3
     }
   ],
 
@@ -82,8 +80,8 @@ foam.CLASS({
     },
 
     function updateMode_(mode) {
-      this.isDisabled = mode === this.DisplayMode.RO ||
-                        mode === this.DisplayMode.DISABLED;
+      this.isDisabled =
+        mode === this.DisplayMode.RO || mode === this.DisplayMode.DISABLED;
     }
   ],
 
@@ -95,9 +93,10 @@ foam.CLASS({
 
       this.removeAllChildren();
 
-      this.add(this.choices.map(function(c) {
+      this.add(this.choices.map(c => {
         return this.E('div').
           addClass('choice').
+            callIf(this.columns != -1, function() { this.style({'flex-basis': (100 / self.columns) + '%'}) }).
           start('input').
             attrs({
               type: 'radio',
@@ -107,9 +106,7 @@ foam.CLASS({
               disabled: self.isDisabled$
             }).
             setID(id = self.NEXT_ID()).
-            on('change', function(evt) {
-              self.data = c[0];
-            }).
+            on('change', function(evt) { self.data = c[0]; }).
           end().
           start('label').
             attrs({for: id}).
@@ -117,7 +114,7 @@ foam.CLASS({
               add(c[1]).
             end().
           end();
-      }.bind(this)));
+      }));
     }
   ]
 });

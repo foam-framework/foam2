@@ -326,7 +326,12 @@
       includeInDigest: true,
       section: 'approvalRequestInformation',
       order: 110,
-      gridColumns: 3
+      gridColumns: 3,
+      tableCellFormatter: function(value, obj, axiom) {
+        this.__subSubContext__.userDAO
+          .find(value)
+          .then(user => this.add(user ? user.toSummary() : `ID: ${value}`));
+      }
     },
     {
       class: 'Reference',
@@ -337,6 +342,15 @@
       order: 115,
       gridColumns: 3,
       readPermissionRequired: true
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdFor',
+      includeInDigest: true,
+      section: 'approvalRequestInformation',
+      order: 116,
+      gridColumns: 3
     },
     {
       class: 'DateTime',

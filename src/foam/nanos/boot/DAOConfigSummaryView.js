@@ -351,17 +351,17 @@ foam.CLASS({
           views: [//so we need to initialize this views?? 
             [
               {
-                class: this.DAOBrowseControllerView,
-                stack: this.stack
-              },
-              'New Controller'
-            ],
-            [
-              {
                 class: this.BrowserView,
                 stack: this.stack
               },
-              'Old Controller'
+              'Controller 1'
+            ],
+            [
+              {
+                class: this.DAOBrowseControllerView,
+                stack: this.stack
+              },
+              'Controller 2'
             ]
           ]
       }, null,  this, this.__subContext__.createSubContext({memento: this.memento.tail}));
