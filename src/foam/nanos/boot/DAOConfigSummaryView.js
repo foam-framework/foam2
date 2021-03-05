@@ -294,7 +294,7 @@ foam.CLASS({
               .on('click', function() {
                 if ( self.memento ) {
                   var tail = self.Memento.create({ head: spec.id, tail: self.Memento.create() });
-                  this.currentMemento_ = self.memento.tail;
+                  // self.currentMemento_ = self.memento.tail;
                   self.memento.tail$.set(tail);
                 }
               });
@@ -334,8 +334,8 @@ foam.CLASS({
     function mementoChange() {
       var m = this.memento;
 
-      if ( ! m || ! m.tail || ! m.tail.tail ) {
-        if ( this.currentMemento_.head.length != 0 ) this.stack.back();
+      if ( ! m || ! m.tail || m.tail.head.length == 0 ) {
+        if ( ! m.tail ) this.stack.back();
         return;
       }
 
