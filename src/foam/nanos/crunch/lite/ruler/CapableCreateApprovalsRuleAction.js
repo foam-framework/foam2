@@ -153,7 +153,7 @@ foam.CLASS({
                   .setDaoKey("approvableDAO")
                   .setObjId(approvable.getId())
                   .setOperation(operation)
-                  .setCreatedBy(user.getId())
+                  .setCreatedFor(user.getId())
                   .setGroup(getGroupToNotify())
                   .setClassification(
                     capability.getName() +
