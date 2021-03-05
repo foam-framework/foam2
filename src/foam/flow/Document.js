@@ -128,7 +128,9 @@ foam.CLASS({
             seq1(1, '<foam', sym('attributes'), '>'),
             join(until('</foam>'))),
 
-          'attributes': repeat(sym('attrib-key-value'), ' '),
+          'attributes': seq(
+            repeat(sym('attrib-key-value'), ' '),
+            optional(sym('ws'))),
 
           'attrib-key-value': seq(sym('attrib-key'),
                                   '="',
