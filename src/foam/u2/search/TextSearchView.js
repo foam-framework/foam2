@@ -121,7 +121,7 @@ foam.CLASS({
 
       this.updateValue();
 
-      if ( this.memento.head ) {
+      if ( this.memento && this.memento.head ) {
         this.view.data = this.memento.head;
       }
     },

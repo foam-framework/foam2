@@ -287,21 +287,22 @@ foam.CLASS({
     function initE() {
       var self = this;
 
-      if ( ! this.memento.tail ) {
-        var m;
-        //i + 1 as there is a textSearch that we also need for memento
-        for ( var i = 0; i < this.filters.length + 1; i++ ) {
-          if ( ! m ) {
-            m = foam.nanos.controller.Memento.create({ value: '', parent: this.memento });
-            this.memento.tail = m;
-          } else {
-            m.tail = foam.nanos.controller.Memento.create({ value: '', parent: m });
-            m = m.tail;
+      if ( this.memento ) {
+        if ( ! this.memento.tail ) {
+          var m;
+          //i + 1 as there is a textSearch that we also need for memento
+          for ( var i = 0; i < this.filters.length + 1; i++ ) {
+            if ( ! m ) {
+              m = foam.nanos.controller.Memento.create({ value: '', parent: this.memento });
+              this.memento.tail = m;
+            } else {
+              m.tail = foam.nanos.controller.Memento.create({ value: '', parent: m });
+              m = m.tail;
+            }
           }
         }
+        this.currentMemento = this.memento.tail;
       }
-
-      this.currentMemento = this.memento.tail;
 
       //fix me
       if ( this.currentMemento && this.currentMemento.tail ) {
@@ -332,7 +333,7 @@ foam.CLASS({
         }
       },  self, self.__subSubContext__.createSubContext({ memento: this.currentMemento }));
 
-      self.currentMemento = self.currentMemento.tail;
+      if ( self.currentMemento ) self.currentMemento = self.currentMemento.tail;
       
       this.onDetach(this.filterController$.dot('isAdvanced').sub(this.isAdvancedChanged));
       this.addClass(self.myClass())
