@@ -1507,7 +1507,16 @@ foam.CLASS({
         }
 
         return value;
-      }
+      },
+      javaPreSet: `
+        if ( val instanceof Constant && getArg1() instanceof PropertyInfo ) {
+          Object[] valArr = (Object[]) ((Constant) val).getValue();
+          for ( int i = 0; i < valArr.length; i++ ) {
+            PropertyInfo prop = (PropertyInfo) getArg1();
+            valArr[i] = prop.castObject(valArr[i]);
+          }
+        }
+      `
     },
     {
       // TODO: simpler to make an expression
