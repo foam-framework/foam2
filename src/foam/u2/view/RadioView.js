@@ -101,7 +101,7 @@ foam.CLASS({
             attrs({
               type: 'radio',
               name: self.getAttribute('name') + 'Choice' + String.fromCharCode("A".charCodeAt(0) + (index++)),
-              value: c[0],
+              value: c[1],
               checked: self.slot(function (data) { return data === c[0]; }),
               disabled: self.isDisabled$
             }).
