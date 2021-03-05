@@ -152,15 +152,21 @@ foam.CLASS({
         this.currentMemento_ = this.memento.tail;
       }
 
+      var reciprocalSearch =  foam.u2.ViewSpec.createView({
+        class: 'foam.u2.view.ReciprocalSearch',
+      },  {}, self, self.__subSubContext__.createSubContext({ memento: this.memento ? this.memento.tail : this.memento}));
+
       var searchView = foam.u2.ViewSpec.createView({
         class: 'foam.u2.view.SimpleSearch',
-      },  {}, self, self.__subSubContext__.createSubContext({ memento: this.memento ? this.memento.tail : this.memento}));//refactoring candidate
+      },  {}, self, reciprocalSearch.__subSubContext__.createSubContext({ memento: this.memento ? this.memento.tail : this.memento}));//refactoring candidate
 
       var summaryView = foam.u2.ViewSpec.createView(this.summaryView, {
         data$: this.data.filteredDAO$,
         multiSelectEnabled: !! this.data.relationship,
         selectedObjects$: this.data.selectedObjects$
       }, {}, searchView, searchView.__subContext__);
+
+      
 
       this.currentMemento_ = summaryView.memento;
 
@@ -196,11 +202,7 @@ foam.CLASS({
                 .hide(self.data.searchHidden$)
                 .addClass(self.myClass('full-search-container'))
                 .add(self.cls.PREDICATE.clone().copyFrom({
-                  view: {
-                    class: 'foam.u2.view.ReciprocalSearch',
-                    // searchValue: self.memento && self.memento.paramsObj && self.memento.paramsObj.s//FIX ME
-                    //use memento head as searchValue in the view
-                  }
+                  view: reciprocalSearch
                 }))
               .end();
             })
