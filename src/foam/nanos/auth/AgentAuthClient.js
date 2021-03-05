@@ -14,19 +14,20 @@ foam.CLASS({
   `,
   imports: [
     'crunchController',
+    'ctrl',
     'menuDAO',
     'subject',
   ],
   methods: [
-    async function actAs(x, business) {
-      let result = await this.delegate.actAs(x, business);
+    async function actAs(x, user) {
+      let result = await this.delegate.actAs(x, user);
       if ( result ) {
-        await x.fetchGroup();
-        this.subject.user = business;
-        this.subject.realUser = result;
+        await this.ctrl.fetchSubject();
+        await this.ctrl.fetchGroup();
         this.menuDAO.cmd_(x, foam.dao.CachingDAO.PURGE);
         this.menuDAO.cmd_(x, foam.dao.AbstractDAO.RESET_CMD);
         this.crunchController.purgeCachedCapabilityDAOs();
+        return result;
       }
     },
   ],
