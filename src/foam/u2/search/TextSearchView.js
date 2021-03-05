@@ -140,10 +140,12 @@ foam.CLASS({
       code: function() {
         var value = this.view.data;
 
-        if ( value ) {
-          this.memento.head = value;
-        } else {
-          this.memento.head = '';
+        if ( this.memento ) {
+          if ( value ) {
+            this.memento.head = value;
+          } else {
+            this.memento.head = '';
+          }
         }
 
         this.predicate = ! value ?
