@@ -96,9 +96,9 @@ public abstract class AbstractStringPropertyInfo
   }
 
   public Object castObject(Object value) {
-    if ( value instanceof Number ) {
+    if ( value != null ) {
       return value.toString();
     }
-    return value;
+    return null;
   }
 }

@@ -111,7 +111,8 @@ public abstract class AbstractLongPropertyInfo
   public Object castObject(Object value) {
     if ( value instanceof String ) {
       return Long.valueOf((String) value);
-    } else if ( value instanceof Number ) {
+    }
+    if ( value instanceof Number ) {
       return ((Number) value).longValue();
     }
     return value;
