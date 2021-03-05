@@ -96,7 +96,7 @@ foam.CLASS({
       this.add(this.choices.map(c => {
         return this.E('div').
           addClass('choice').
-            callIf(this.columns != -1, function() { this.style({'flex-basis': 100 / this.columns + '%'} })
+            callIf(this.columns != -1, function() { this.style({'flex-basis': 100 / this.columns + '%'}) }).
           start('input').
             attrs({
               type: 'radio',
