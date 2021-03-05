@@ -39,7 +39,7 @@ foam.CLASS({
       if ( ! newObj ) {
         return Promise.resolve(obj);
       }
-      await this.processFiles(newObj);
+      await this.arrayRecursion(newObj, this);
       return Promise.resolve(obj);
     },
 
@@ -80,6 +80,14 @@ foam.CLASS({
         reader.onerror = error => reject(error);
       });
       return await toBase64(file);
+    },
+
+    // Some models can include other models with file
+    // Do recursive look up for fileArrays on inside models
+    async function arrayRecursion(obj, self) {
+      await self.processFiles(obj);
+      let arr = obj.cls_.getAxiomsByClass(foam.core.Array);
+      await Promise.all(arr.map(async a => await Promise.all(await a.f(obj).map(async f => await this.arrayRecursion(f, self)))));
     }
   ]
 });
