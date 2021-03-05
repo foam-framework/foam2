@@ -19,7 +19,6 @@ foam.CLASS({
     ^ { margin: auto; }
     ^ select { height: 26px }
     ^ .foam-u2-view-RadioView.foam-u2-view-RadioView-horizontal-radio .choice {
-      flex-basis: calc(100% / 10);
     }
   `,
 
@@ -36,7 +35,7 @@ foam.CLASS({
       name: 'selectedView',
       view: function(_, X) {
         return X.data.RadioView.create(
-          {choices: X.data.views, isHorizontal: true},
+          {choices: X.data.views, isHorizontal: true, columns: 10},
           X.createSubContext({controllerMode: foam.u2.ControllerMode.EDIT})
         );
       },
