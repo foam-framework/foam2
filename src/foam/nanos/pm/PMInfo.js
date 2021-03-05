@@ -41,12 +41,14 @@ foam.CLASS({
     {
       class: 'Duration',
       name: 'minTime',
+      aliases: ['min'],
       label: 'Min'
     },
     {
       class: 'Duration',
       name: 'average',
       label: 'Avg',
+      aliases: ['avg'],
       getter: function() { return (this.totalTime / this.count).toFixed(2); },
       javaGetter: `return (long) (Math.round( ( (float)getTotalTime() / (float)getCount() ) * 100.0 ) / 100.0);`,
       storageTransient: true
@@ -54,12 +56,14 @@ foam.CLASS({
     {
       class: 'Duration',
       name: 'maxTime',
+      aliases: ['max'],
       label: 'Max'
     },
     {
       class: 'Long',
       name: 'totalTime',
       label: 'Total',
+      aliases: ['total'],
       tableCellFormatter: { class: 'foam.nanos.pm.PMTemperatureCellFormatter' }
     },
     {
