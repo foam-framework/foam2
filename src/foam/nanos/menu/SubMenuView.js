@@ -52,7 +52,7 @@ foam.CLASS({
       var self = this;
       var menu = this.menu;
       var X    = this.__subContext__;
-      menu.children.select({
+      menu.children.orderBy(foam.nanos.menu.Menu.ORDER).select({
         put: function(menu) {
           if ( ! menu.handler ) return;
           self.start('div').call(function() {
