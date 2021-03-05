@@ -181,7 +181,7 @@ foam.CLASS({
 
 
   exports: [
-    // 'currentMemento_ as memento'
+    'memento'
   ],
 
   properties: [
