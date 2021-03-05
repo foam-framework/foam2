@@ -438,7 +438,6 @@ foam.CLASS({
         },
 
         'attributes': function(v) {
-          console.log('v', v);
           return v[0].reduce(function(a, kv) {
             a[kv[0]] = kv[1];
             return a;
