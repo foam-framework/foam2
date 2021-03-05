@@ -720,7 +720,7 @@ foam.CLASS({
         return value;
       },
       javaPreSet: `
-        if ( val instanceof Constant && getArg2() instanceof PropertyInfo ) {
+        if ( val instanceof Constant && getArg1() instanceof PropertyInfo ) {
           Constant c = (Constant) val;
           Object value = c.getValue();
           PropertyInfo prop = (PropertyInfo) getArg1();
