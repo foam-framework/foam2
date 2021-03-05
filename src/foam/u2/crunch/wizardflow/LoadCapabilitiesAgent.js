@@ -62,7 +62,7 @@ foam.CLASS({
     function getWAO() {
       switch ( this.waoSetting ) {
         case this.WAOSetting.UCJ:
-          return this.UserCapabilityJunctionWAO.create({}, this.__context__);
+          return  this.UserCapabilityJunctionWAO.create({ subject: this.subject ? this.subject : null }, this.__context__);
         case this.WAOSetting.CAPABLE:
           return this.CapableWAO.create({}, this.__context__);
         default:
