@@ -694,6 +694,11 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.AbstractPredicate',
   abstract: true,
 
+  javaImports:[
+    'foam.core.PropertyInfo',
+    'foam.mlang.Constant'
+  ],
+
   documentation: 'Abstract Binary (two-argument) Predicate base-class.',
 
   properties: [
@@ -715,21 +720,11 @@ foam.CLASS({
         return value;
       },
       javaPreSet: `
-        // Temporary Fix
-        if ( val instanceof foam.mlang.Constant ) {
-
-          foam.mlang.Constant c = (foam.mlang.Constant) val;
+        if ( val instanceof Constant && getArg1() instanceof PropertyInfo ) {
+          Constant c = (Constant) val;
           Object value = c.getValue();
-
-          // TODO: add castObject() method to PropertyInfo and use instead
-          if ( getArg1() instanceof foam.core.AbstractLongPropertyInfo ) {
-            foam.core.PropertyInfo prop1 = (foam.core.PropertyInfo) getArg1();
-            if ( value instanceof String ) {
-              c.setValue(Long.valueOf((String) value));
-            } else if ( value instanceof Number ) {
-              c.setValue(((Number) value).longValue());
-            }
-          }
+          PropertyInfo prop = (PropertyInfo) getArg1();
+          c.setValue(prop.castObject(value));
         }
       `
     }
@@ -997,7 +992,7 @@ return this;`
           throw new Error( 'Predicate\'s argument does not support toMQL' );
         var mql = this.args[a].toMQL();
         if ( mql )
-          mqlStringsArr.push(mql); 
+          mqlStringsArr.push(mql);
       }
       return mqlStringsArr.join(' OR ');
     }
@@ -1258,7 +1253,7 @@ return this;`
           throw new Error( 'Predicate\'s argument does not support toMQL' );
         var mql = this.args[a].toMQL();
         if ( mql )
-          mqlStringsArr.push(mql); 
+          mqlStringsArr.push(mql);
       }
       return mqlStringsArr.join(' AND ');
     }
@@ -1483,6 +1478,7 @@ foam.CLASS({
   documentation: 'Binary predicate that accepts an array in "arg2".',
 
   javaImports: [
+    'foam.core.PropertyInfo',
     'foam.mlang.ArrayConstant',
     'foam.mlang.Constant',
     'java.util.List'
@@ -2029,7 +2025,7 @@ return FOAM_utils.equals(v1, v2)
     function toMQL() {
       var arg2 = this.arg2ToMQL();
       if ( ! arg2 )
-        return null; 
+        return null;
       return this.arg1.name + '=' + arg2;
     }
   ]
@@ -2094,7 +2090,7 @@ foam.CLASS({
     function toMQL() {
       var arg2 = this.arg2ToMQL();
       if ( ! arg2 )
-        return null; 
+        return null;
       return this.arg1.name + '<' + arg2;
     }
   ]
@@ -2125,7 +2121,7 @@ foam.CLASS({
     function toMQL() {
       var arg2 = this.arg2ToMQL();
       if ( ! arg2 )
-        return null; 
+        return null;
       return this.arg1.name + '<=' + arg2;
     }
   ]
@@ -2156,7 +2152,7 @@ foam.CLASS({
     function toMQL() {
       var arg2 = this.arg2ToMQL();
       if ( ! arg2 )
-        return null; 
+        return null;
       return this.arg1.name + '>' + arg2;
     }
   ]
@@ -2187,7 +2183,7 @@ foam.CLASS({
     function toMQL() {
       var arg2 = this.arg2ToMQL();
       if ( ! arg2 )
-        return null; 
+        return null;
       return this.arg1.name + '>=' + arg2;
     }
   ]
@@ -2905,7 +2901,7 @@ foam.CLASS({
               Object[]  arr = (Object[]) p.get(i);
               ClassInfo ci  = (ClassInfo) arr[CLS_OR_OBJ_INDEX];
               Object    o   = ci.newInstance();
-  
+
               for ( int j = 0 ; j < es.length ; j++ ) {
                 if ( es[j] instanceof PropertyInfo ) {
                   PropertyInfo e = (PropertyInfo) es[j];
@@ -2915,7 +2911,7 @@ foam.CLASS({
                   e.set(o, arr[i]);
                 }
               }
-  
+
               a.set(i, o);
             } catch (Throwable t) {}
           } else {
