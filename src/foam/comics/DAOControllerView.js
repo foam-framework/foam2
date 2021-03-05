@@ -154,14 +154,13 @@ foam.CLASS({
 
       var searchView = foam.u2.ViewSpec.createView({
         class: 'foam.u2.view.SimpleSearch',
-      },  self, self.__subSubContext__.createSubContext({ memento: this.memento ? this.memento.tail : this.memento}));//refactoring candidate
+      },  {}, self, self.__subSubContext__.createSubContext({ memento: this.memento ? this.memento.tail : this.memento}));//refactoring candidate
 
-      var summaryView = foam.u2.ViewSpec.createView({
-        class: this.summaryView,
+      var summaryView = foam.u2.ViewSpec.createView(this.summaryView, {
         data$: this.data.filteredDAO$,
         multiSelectEnabled: !! this.data.relationship,
         selectedObjects$: this.data.selectedObjects$
-      }, searchView);
+      }, {}, searchView, searchView.__subContext__);
 
       this.currentMemento_ = summaryView.memento;
 
