@@ -220,6 +220,11 @@ foam.CLASS({
       class: 'Boolean',
       name: 'DAOCreateView',
       documentation: 'True to use the DAOCreateView else it will use the WizardController.'
+    },
+    {
+      class: 'Class',
+      name: 'wizardDetailView',
+      documentation: 'class of WizardDetailView.'
     }
   ]
 });
