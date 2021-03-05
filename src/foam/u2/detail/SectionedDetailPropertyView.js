@@ -251,7 +251,6 @@ foam.CLASS({
               })
               .start()
                 .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
-                .startContext({ controllerMode$: self.controllerMode$ })
                   .start()
                     .style({ 'flex-grow': 1, 'max-width': '100%' })
                     .tag(prop, { mode$: self.mode$ })
@@ -259,7 +258,6 @@ foam.CLASS({
                       this.enableClass(self.myClass('error'), errorSlot);
                     })
                   .end()
-                .endContext()
                 .callIf(prop.help, function() {
                   this.start()
                     .addClass(self.myClass('tooltip'))

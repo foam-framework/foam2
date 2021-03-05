@@ -14,9 +14,14 @@ foam.CLASS({
   ],
 
   exports: [
-    'customAuth as auth',
-    'controllerMode'
+    'customAuth as auth'
   ],
+
+  // css: `
+  //   .foam-nanos-crunch-AgentCapabilityJunctionDAOSummaryView-actions-header .foam-u2-ActionView-tertiary:focus:not(:hover) {
+  //     border-color: transparent;
+  //   }
+  // `,
 
   classes: [
     {
@@ -51,10 +56,22 @@ foam.CLASS({
       }
     },
     {
+      name: 'primary',
+      factory: function() {
+        return this.SUBMIT;
+      }
+    },
+    {
+      name: 'onBack',
+      factory: function() {
+        return this.controllerMode == foam.u2.ControllerMode.EDIT ? () => this.controllerMode == foam.u2.ControllerMode.VIEW : () => this.stack.back();
+      }
+    },
+    {
       class: 'foam.u2.ViewSpecWithJava',
       name: 'viewView',
       factory: function() {
-        return foam.nanos.crunch.ui.CapableView.create({ ucjObj: this.data, showTitle: true }, this);
+        return foam.nanos.crunch.ui.CapableView.create({ ucjObj: this.data, showTitle: true, controllerMode$: this.controllerMode$ }, this);
       }
     }
   ],
@@ -64,8 +81,15 @@ foam.CLASS({
       isEnabled: () => true,
       isAvailable: () => true,
       code: function() {
-        debugger;
         this.controllerMode = foam.u2.ControllerMode.EDIT;
+      }
+    },
+    {
+      name: 'submit',
+      isEnabled: () => false,
+      isAvailable: () => true,
+      code: function(x) {
+        this.controllerMode = foam.u2.ControllerMode.VIEW;
       }
     }
   ]

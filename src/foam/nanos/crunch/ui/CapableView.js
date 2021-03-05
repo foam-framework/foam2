@@ -43,6 +43,9 @@ foam.CLASS({
       documentation: 'ucj object'
     },
     {
+      name: 'controllerMode'
+    },
+    {
       class: 'FObjectArray',
       of: 'foam.u2.wizard.BaseWizardlet',
       name: 'wizardlets',
@@ -117,7 +120,7 @@ foam.CLASS({
       this.start().addClass(this.myClass())
         .forEach(this.wizardlets, function (w, wi) {
           this.add(foam.core.ExpressionSlot.create({
-            args: [w.sections$, w.data$],
+            args: [w.sections$, w.data$, self.controllerMode$],
             code: (sections, data) => {
               return sections.map(section => section.createView({
                 showTitle: self.showTitle,
