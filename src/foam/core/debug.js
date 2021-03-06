@@ -26,7 +26,7 @@
  * it should not be included in production.
  */
 
-// Set a global flag so that code we are not able to patch can still do some debugging thigns.
+// Set a global flag so that code we are not able to patch can still do some debugging things.
 foam._IS_DEBUG_ = true;
 
 /* Validating a Model should also validate all of its Axioms. */
