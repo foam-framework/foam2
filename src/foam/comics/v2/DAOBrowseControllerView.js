@@ -130,7 +130,7 @@ foam.CLASS({
           }, this.__subContext__);
         } else {
           this.stack.push(
-            net.nanopay.ui.wizard.ContactWizardDetailView.create({
+            this.config.wizardDetailView.create({
               model: this.data.of.id || this.config.of.id,
               //data: this.selection,
               controllerMode: foam.u2.ControllerMode.CREATE,
