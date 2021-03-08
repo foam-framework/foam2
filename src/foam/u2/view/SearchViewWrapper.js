@@ -22,10 +22,6 @@ foam.CLASS({
     'memento'
   ],
 
-  exports: [
-    'memento'
-  ],
-
   css: `
     ^ {
       background-color: white;

@@ -161,7 +161,7 @@ foam.CLASS({
 
       var m;
       if ( this.memento ) {
-        m = this.memento;
+        m = this.memento.tail || this.memento;
         if ( ! m ) {
           m.tail$.set(foam.nanos.controller.Memento.create());
         }
@@ -209,11 +209,13 @@ foam.CLASS({
           e.forEach(filters, function(f) {
             var axiom = self.dao.of.getAxiomByName(f);
 
+            var localM = m;
+
             var propView = foam.u2.ViewSpec.createView(self.SearchViewWrapper, {
               searchView: axiom.searchView,
               property: axiom,
               dao: self.dao
-            }, {}, self, self.__subSubContext__.createSubContext({ memento: m}));
+            }, self, self.__subSubContext__.createSubContext({ memento: localM }));
 
             this
             .start(propView)
