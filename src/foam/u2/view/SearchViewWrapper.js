@@ -160,6 +160,7 @@ foam.CLASS({
   listeners: [
     function checkboxChanged() {
       this.active = ! this.active;
+      var self = this;
 
       if ( this.active ) {
         if ( this.firstTime_ ) {
@@ -175,6 +176,21 @@ foam.CLASS({
 
           this.searchManager.add(this.view_$.get());
           this.firstTime_ = false;
+        }
+
+        if ( this.view_ ) {
+          this.view_.onDetach(self.view_.predicate$.sub(function() {
+
+            var pred;
+            if ( Object.keys(self.view_.predicate).length > 0 && ! foam.mlang.predicate.True.isInstance(self.view_.predicate) )
+              pred =  self.view_.predicate.toMQL && self.view_.predicate.toMQL();
+    
+            if ( pred ) {
+              self.memento.head = pred;
+            } else {
+              self.memento.head = '';
+            }
+          }));
         }
       } else {
         if ( this.view_ ) this.view_.clear();
