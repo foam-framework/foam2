@@ -1509,7 +1509,8 @@ foam.CLASS({
         return value;
       },
       javaPreSet: `
-        if ( val instanceof Constant && getArg1() instanceof PropertyInfo ) {
+        if ( val instanceof Constant && getArg1() instanceof PropertyInfo &&
+                      ((Constant) val).getValue() instanceof  Object[]) {
           Object[] valArr = (Object[]) ((Constant) val).getValue();
           for ( int i = 0; i < valArr.length; i++ ) {
             PropertyInfo prop = (PropertyInfo) getArg1();
