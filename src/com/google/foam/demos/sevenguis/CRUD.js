@@ -68,7 +68,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'prefix',
-      label: 'Filter prefix'
+      label: 'Filter prefix',
+      view: { class: 'foam.u2.TextField', onKey: true, type: 'search' }
     },
     {
       name: 'dao',
