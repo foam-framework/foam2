@@ -25,7 +25,8 @@ foam.CLASS({
   exports: [
     'as filterController',
     'as data',
-    'searchManager'
+    'searchManager',
+    'currentMemento_ as memento'
   ],
 
   css: `
@@ -144,7 +145,7 @@ foam.CLASS({
         return `${selectedCount.toLocaleString(foam.locale)} of ${totalCount.toLocaleString(foam.locale)} selected`;
       }
     },
-    'searchValue'
+    'currentMemento_'
   ],
 
   methods: [
@@ -158,6 +159,16 @@ foam.CLASS({
 
       this.updateTotalCount();
 
+      var m;
+      if ( this.memento ) {
+        m = this.memento;
+        if ( ! m ) {
+          m.tail$.set(foam.nanos.controller.Memento.create());
+        }
+
+        this.currentMemento_$ = this.memento.tail$;
+      }
+
       this.
         addClass(self.myClass()).
         add(this.slot(function(filters) {
@@ -168,18 +179,28 @@ foam.CLASS({
 
           e.onDetach(this.searchManager);
 
-          var slot = self.SimpleSlot.create();
+          // var searchView = foam.u2.ViewSpec.createView(self.TextSearchView, {
+          //   richSearch: true,
+          //   of: self.dao.of.id,
+          //   onKey: true,
+          //   viewSpec: {
+          //     class: 'foam.u2.tag.Input',
+          //     focused: true
+          //   }
+          // });
+          var slot = self.SimpleSlot.create();//{ value: searchView }
 
           e.start(self.TextSearchView, {
-                richSearch: true,
-                of: self.dao.of.id,
-                onKey: true,
-                viewSpec: {
-                  class: 'foam.u2.tag.Input',
-                  focused: true
-                },
-                searchValue: this.searchValue//use memento head as searchValue in the view
-            }, slot)
+            richSearch: true,
+            of: self.dao.of.id,
+            onKey: true,
+            viewSpec: {
+              class: 'foam.u2.tag.Input',
+              focused: true
+            },
+            searchValue: this.searchValue//use memento head as searchValue in the view
+        }, slot)
+            // .tag(slot)
             .addClass('general-query')
           .end();
 
@@ -188,14 +209,23 @@ foam.CLASS({
           e.forEach(filters, function(f) {
             var axiom = self.dao.of.getAxiomByName(f);
 
+            var propView = foam.u2.ViewSpec.createView(self.SearchViewWrapper, {
+              searchView: axiom.searchView,
+              property: axiom,
+              dao: self.dao
+            }, {}, self, self.__subSubContext__.createSubContext({ memento: m}));
+
             this
-              .start(self.SearchViewWrapper, {
-                searchView: axiom.searchView,
-                property: axiom,
-                dao: self.dao
-              })
+            .start(propView)
                 .addClass(self.myClass('filter'))
               .end();
+
+            if ( self.memento && m ) {
+              m = m.tail;
+              if ( ! m ) {
+                m = foam.nanos.controller.Memento.create();
+              }
+            }
           });
 
           return e;

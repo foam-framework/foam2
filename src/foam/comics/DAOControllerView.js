@@ -149,16 +149,16 @@ foam.CLASS({
       var self = this;
 
       if ( this.memento ) {
-        this.currentMemento_ = this.memento.tail;
+        // this.currentMemento_$ = this.memento.tail$;
       }
 
       var reciprocalSearch =  foam.u2.ViewSpec.createView({
         class: 'foam.u2.view.ReciprocalSearch',
-      },  {}, self, self.__subSubContext__.createSubContext({ memento: this.memento ? this.memento.tail : this.memento}));
+      },  {}, self, self.__subContext__.createSubContext({ memento: this.memento && this.memento.tail ? this.memento.tail : this.memento }));
 
       var searchView = foam.u2.ViewSpec.createView({
         class: 'foam.u2.view.SimpleSearch',
-      },  {}, self, reciprocalSearch.__subSubContext__.createSubContext({ memento: this.memento ? this.memento.tail : this.memento}));//refactoring candidate
+      },  {}, self, reciprocalSearch.__subContext__);//refactoring candidate
 
       var summaryView = foam.u2.ViewSpec.createView(this.summaryView, {
         data$: this.data.filteredDAO$,

@@ -1,4 +1,4 @@
-/**
+ /**
  * @license
  * Copyright 2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -13,11 +13,16 @@ foam.CLASS({
     predicate.`,
 
   requires: [
-    'foam.mlang.predicate.True'
+    'foam.mlang.predicate.True',
+    'foam.parse.QueryParser'
   ],
 
   imports: [
     'searchManager',
+    'memento'
+  ],
+
+  exports: [
     'memento'
   ],
 
@@ -105,7 +110,13 @@ foam.CLASS({
       name: 'firstTime_',
       value: true
     },
-    'view_'
+    'view_',
+    {
+      name: 'queryParser',
+      factory: function() {
+        return this.QueryParser.create({ of: this.dao.of || this.__subContext__.lookup(this.property.forClass_) });
+      }
+    }
   ],
 
   methods: [
@@ -135,10 +146,10 @@ foam.CLASS({
         this.checkbox.data = true;
     },
     function getPredicateFromMemento() {
-      if ( this.memento && this.memento.paramsObj && this.memento.paramsObj.f && this.memento.paramsObj && this.memento.paramsObj.f.length > 0 ) {
-        var f = this.memento.paramsObj.f.find(f => f.n === this.property.name && f.criteria === 0);
-        if ( f ) {
-          var predicate = foam.json.parseString(f.pred, this.__context__);
+      //fix me
+      if ( this.memento && this.memento.head.length > 0 ) { //&& f.criteria == 0
+        var predicate = this.queryParser.parseString(this.memento.head);
+        if ( predicate ) {
           return predicate;
         }
       }
