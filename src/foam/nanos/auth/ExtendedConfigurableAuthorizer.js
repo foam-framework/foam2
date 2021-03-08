@@ -48,9 +48,8 @@ foam.CLASS({
       class: 'Boolean',
       name: 'enableStandardAuthorizer',
       value: true,
-      documentation: `Defines default operation permissions similar to the standard authorizer.
+      documentation: `Enables default operation permissions identical to the StandardAuthorizer.
           ex: model.read.id || model.read etc..
-          Warning: If this is set to false and no template references are associated to DAOKey, all records in DAO will be authorized.
       `
     }
   ],
@@ -132,6 +131,23 @@ foam.CLASS({
       `
     },
     {
+      name: 'createStandardAuthorizationTemplate',
+      type: 'PermissionTemplateReference',
+      args: [
+        { type: 'Operations', name: 'op' }
+      ],
+      javaCode: `
+        PermissionTemplateReference template = new PermissionTemplateReference();
+        template.setOperation(op);
+        if ( op != Operations.CREATE ) {
+          PermissionTemplateProperty templateProperties = new PermissionTemplateProperty();
+          templateProperties.setPropertyReference("id");
+          template.setProperties(new PermissionTemplateProperty[] { templateProperties } );
+        }
+        return template;
+      `
+    },
+    {
       name: 'checkPermissionTemplates',
       type: 'Void',
       args: [
@@ -144,7 +160,13 @@ foam.CLASS({
         AuthService authService = (AuthService) x.get("auth");
         Map<String,List> cache = (Map<String,List>) getTemplateCache(x);
         List<PermissionTemplateReference> templates = (List<PermissionTemplateReference>) cache.get(getDAOKey());
-        if ( templates != null && ! templates.stream().filter(t -> t.operation().equals(op)).anyMatch(t -> authService.check(x, createPermission((PermissionTemplateReference) t, obj))) ) {
+        if ( getEnableStandardAuthorizer() ) {
+          if ( templates == null ) {
+            templates = new ArrayList<PermissionTemplateReference>();
+          }
+          templates.add(createStandardAuthorizationTemplate(op));
+        }
+        if ( templates != null && ! templates.stream().filter(t -> t.getOperation().equals(op)).anyMatch(t -> authService.check(x, createPermission((PermissionTemplateReference) t, obj))) ) {
           ((foam.nanos.logger.Logger) x.get("logger")).debug("ExtendedConfigurableAuthorizer", "Permission denied");
           throw new AuthorizationException();
         }
