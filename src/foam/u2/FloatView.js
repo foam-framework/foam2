@@ -95,9 +95,9 @@ foam.CLASS({
     function fromProperty(p) {
       this.SUPER(p);
 
-      this.precision = p.precision;
-      this.min = p.min;
-      this.max = p.max;
+      if ( ! foam.Undefined.isInstance(p.precision) ) this.precision = p.precision;
+      if ( ! foam.Undefined.isInstance(p.min)       ) this.min       = p.min;
+      if ( ! foam.Undefined.isInstance(p.max)       ) this.max       = p.max;
     },
 
     function formatNumber(val) {
