@@ -19,9 +19,6 @@ foam.CLASS({
 
   css: `
     ^ { margin: auto; width: 100%; }
-    ^ .foam-u2-view-RadioView.foam-u2-view-RadioView-horizontal-radio .choice {
-      flex-basis: calc(100% / 8);
-    }
   `,
 
   properties: [
@@ -36,12 +33,7 @@ foam.CLASS({
     {
       name: 'selectedView',
       view: function(_, X) {
-        debugger;
-        return X.data.RadioView.create({choices: X.data.views, isHorizontal: true}, X);
-      //  return { class: X.data.ChoiceView, choices: X.data.views };
-      },
-      xxxview: function(_, X) {
-        return foam.u2.view.ChoiceView.create({choices: X.data.views}, X);
+        return X.data.RadioView.create({choices: X.data.views, isHorizontal: true, columns: 8}, X);
       },
       documentation: `Set one of the views as the selectedView.
 

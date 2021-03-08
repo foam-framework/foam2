@@ -32,6 +32,7 @@ foam.CLASS({
   properties: [
     ['type', 'number'],
     { class: 'Float', name: 'data' },
+    { class: 'Boolean', name: 'trimZeros', value: true },
     'precision',
     'min',
     'max',
@@ -48,9 +49,9 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.addClass(this.myClass());
-      if ( this.min != undefined ) this.setAttribute('min', this.min);
-      if ( this.max != undefined ) this.setAttribute('max', this.max);
-      if ( this.step != undefined ) this.setAttribute('step', this.step);
+      if ( ! foam.Undefined.isInstance(this.min)  ) this.setAttribute('min',  this.min);
+      if ( ! foam.Undefined.isInstance(this.max)  ) this.setAttribute('max',  this.max);
+      if ( ! foam.Undefined.isInstance(this.step) ) this.setAttribute('step', this.step);
     },
 
     function link() {
@@ -94,21 +95,20 @@ foam.CLASS({
     function fromProperty(p) {
       this.SUPER(p);
 
-      this.precision = p.precision;
-      this.min = p.min;
-      this.max = p.max;
+      if ( ! foam.Undefined.isInstance(p.precision) ) this.precision = p.precision;
+      if ( ! foam.Undefined.isInstance(p.min)       ) this.min       = p.min;
+      if ( ! foam.Undefined.isInstance(p.max)       ) this.max       = p.max;
     },
 
     function formatNumber(val) {
-      if ( ! val ) val = 0;
-      val = val.toFixed(this.precision);
-      return val;
+      val = (val || 0).toFixed(this.precision);
+      return this.trimZeros ? Number(val).toString() : val;
     },
 
     function dataToText(val) {
-      return this.precision !== undefined ?
-          this.formatNumber(val) :
-          '' + val;
+      return foam.Undefined.isInstance(this.precision) ?
+      '' + val :
+      this.formatNumber(val) ;
     },
 
     function textToData(text) {

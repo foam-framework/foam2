@@ -59,7 +59,9 @@ foam.CLASS({
         RPCErrorMessage reply = new RPCErrorMessage();
         reply.setData(wrapper);
 
-        Message replyMessage = new Message();
+        // Ensure replyMessage has a valid context, as ReplyBox acquires
+        // it's context from the message.
+        Message replyMessage = getX().create(foam.box.Message.class);
         replyMessage.setObject(reply);
 
         replyBox.send(replyMessage);
