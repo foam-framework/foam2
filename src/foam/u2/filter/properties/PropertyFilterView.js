@@ -198,7 +198,7 @@ foam.CLASS({
 
         var pred;
         if ( Object.keys(this.view_.predicate).length > 0 && ! foam.mlang.predicate.True.isInstance(this.view_.predicate) )
-        pred =  this.view_.predicate.toMQL && this.view_.predicate.toMQL();
+          pred =  this.view_.predicate.toMQL && this.view_.predicate.toMQL();
 
         if ( pred ) {
           this.memento.head = pred;
