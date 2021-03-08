@@ -596,3 +596,49 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'ProxyExpressionSlot',
+  extends: 'foam.core.ProxySlot',
+
+  requires: [
+    'foam.core.ExpressionSlot'
+  ],
+
+  documentation: "An expression slot which supports 'obj' changing.",
+
+  properties: [
+    {
+      name: 'obj',
+      postSet: function () {
+        this.update();
+      }
+    },
+    {
+      name: 'code',
+      postSet: function () {
+        this.update();
+      }
+    },
+    {
+      name: 'args',
+      postSet: function () {
+        this.update();
+      }
+    }
+  ],
+
+  methods: [
+    function update() {
+      if ( ! this.code || ! this.obj ) return;
+
+      this.delegate = this.ExpressionSlot.create({
+        args: this.args,
+        code: this.code,
+        obj:  this.obj
+      })
+    }
+  ]
+});

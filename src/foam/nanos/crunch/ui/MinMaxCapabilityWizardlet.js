@@ -13,14 +13,23 @@ foam.CLASS({
   requires: [
     'foam.u2.view.MultiChoiceView',
     'foam.u2.view.CardSelectView',
-    'foam.nanos.crunch.CapabilityJunctionStatus'
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.nanos.crunch.ui.MinMaxCapabilityWizardletSection'
   ],
 
   imports: [
-    'translationService'
+    'translationService',
+    'capabilityDAO'
   ],
 
   properties: [
+    {
+      name: 'data',
+      flags: ['web'],
+      factory: function(){
+        return foam.nanos.crunch.MinMaxCapabilityData.create();
+      }
+    },
     {
       class: 'FObjectArray',
       of: 'foam.u2.wizard.Wizardlet',
@@ -57,7 +66,7 @@ foam.CLASS({
             wizardlet.status === this.CapabilityJunctionStatus.GRANTED ||
             wizardlet.status === this.CapabilityJunctionStatus.PENDING;
 
-          return [wizardlet.title, self.translationService.getTranslation(foam.locale, `${wizardlet.capability.id}.name`,wizardlet.title), isFinal ? true : wizardlet.isAvailable$, isFinal ?  foam.u2.DisplayMode.DISABLED : foam.u2.DisplayMode.RW, isFinal]
+          return [wizardlet.capability, self.translationService.getTranslation(foam.locale, `${wizardlet.capability.id}.name`,wizardlet.title), isFinal]
         })
       }
     },
@@ -79,11 +88,16 @@ foam.CLASS({
       value: true,
       documentation: `
         Specify the availability of this wizardlet. If true, wizardlet is
-        available iff at least one section is available. If false, wizardlet
+        available if at least one section is available. If false, wizardlet
         does not display even if some sections are available.
       `,
       postSet: function(_,n){
         if ( !n ){
+          this.selectedData = [];
+
+          // to cascade hiding all descendent wizardlets
+          // TODO: investigate why this is still needed, 
+          // setting data to empty array should have made isAvailable automatically evaluate to false
           this.choiceWizardlets.forEach(cw => {
             cw.isAvailable = false
           });
@@ -97,27 +111,79 @@ foam.CLASS({
       }
     },
     {
+      name: 'selectedData',
+      postSet: function(_,n){
+        this.data.selectedData = n.map(capability => capability.id);
+      }
+    },
+    {
       name: 'sections',
       flags: ['web'],
       transient: true,
       class: 'FObjectArray',
       of: 'foam.u2.wizard.WizardletSection',
       factory: function() {
-        // TODO: If 'of' is set for a MinMax it should be added as a section
-        return this.hideChoiceView ? [] : [
-          this.WizardletSection.create({
+        // to account for isFinal: true in choices
+        var finalData = this.choices.filter(choice => choice[2]).map(selectedChoice => selectedChoice[0]);
+        var selectedData = finalData;
+
+        // to account for previously selected data
+        if ( this.data.selectedData.length > 0 ){
+          var savedSelectedDataIds = [
+            ...this.data.selectedData
+          ];
+
+          var savedSelectedData = [];
+
+          // need to grab the selected capability objects
+          for ( let i = 0; i < this.choices.length; i++ ){
+            if ( savedSelectedDataIds.includes(this.choices[i][0].id) ){
+              savedSelectedData.push(this.choices[i][0]);
+            }
+
+            if ( savedSelectedData.length === savedSelectedDataIds.length ) break;
+          }
+
+          selectedData = finalData.concat(savedSelectedData);     
+        }
+        
+        this.selectedData = selectedData;
+
+        var sections = [
+          this.MinMaxCapabilityWizardletSection.create({
             isAvailable: true,
             title: this.capability.name,
+            choiceWizardlets$: this.choiceWizardlets$,
+            isLoaded: true,
             customView: {
               class: 'foam.u2.view.MultiChoiceView',
               choices$: this.choices$,
               isValidNumberOfChoices$: this.isValid$,
               showValidNumberOfChoicesHelper: false,
+              data$: this.selectedData$,
               minSelected$: this.min$,
               maxSelected$: this.max$
             }
           })
         ];
+
+        if ( this.of && this.showDefaultSections ){
+          var ofSections = foam.u2.detail.AbstractSectionedDetailView.create({
+            of: this.of,
+          }, this).sections.map(section => this.WizardletSection.create({
+            section: section,
+            data$: this.data$,
+            isAvailable$: section.createIsAvailableFor(
+              this.data$,
+            )
+          }));
+
+          sections = [
+            ...ofSections,
+            ...sections
+          ]
+        }
+        return this.hideChoiceView ? [] : sections;
       }
     },
     {
@@ -134,6 +200,10 @@ foam.CLASS({
       documentation: `
         When true, do not display the choice selection section.
       `,
+      class: 'Boolean'
+    },
+    {
+      name: 'showDefaultSections',
       class: 'Boolean'
     }
   ],

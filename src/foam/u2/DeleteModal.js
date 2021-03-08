@@ -26,7 +26,7 @@ foam.CLASS({
       /* Don't let the modal exceed the screen size, minus some margin. */
       max-width: calc(100vw - 48px);
       max-height: calc(100vh - 116px);
-      overflow-y: scroll;
+      overflow-y: auto;
       /* The line below accounts for the top nav bar. */
     }
     ^main {
@@ -46,7 +46,7 @@ foam.CLASS({
   messages: [
     { name: 'TITLE', message: 'Delete ' },
     { name: 'CONFIRM_DELETE_1', message: 'Are you sure you want to delete' },
-    { name: 'SUCCESS_MSG', message: ' deleted.' },
+    { name: 'SUCCESS_MSG', message: ' deleted' },
     { name: 'FAIL_MSG', message: 'Failed to delete' }
   ],
 

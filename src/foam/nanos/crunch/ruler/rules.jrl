@@ -168,12 +168,12 @@ p({
 
 p({
   "class":"foam.nanos.ruler.Rule",
-  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-3-c",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-3",
   "name":"Configure UCJ Expiry On Granted - Create",
   "priority":700,
   "ruleGroup":"ucjDAO",
   "daoKey":"userCapabilityJunctionDAO",
-  "operation":0,
+  "operation":3,
   "after":false,
   "enabled":true,
   "action":{"class":"foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted"},
@@ -181,27 +181,6 @@ p({
   "documentation":"""
     On put of a new UCJ that has been GRANTED, configure the expiry info of the
     ucj based on the duration and expiry properties of the target capability
-  """
-})
-
-p({
-  "class":"foam.nanos.ruler.Rule",
-  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-3-u",
-  "name":"Configure UCJ Expiry On Granted - Update",
-  "priority":700,
-  "ruleGroup":"ucjDAO",
-  "daoKey":"userCapabilityJunctionDAO",
-  "operation":1,
-  "after":false,
-  "enabled":true,
-  "action":{"class":"foam.nanos.crunch.ruler.ConfigureUCJExpiryOnGranted"},
-  "predicate":{
-    "class":"foam.nanos.ruler.predicate.PropertyEQValue",
-    "propName":"status",
-    "propValue":{ "class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1 }
-  },
-  "lifecycleState":1,
-  "documentation":"""
     On update of a UCJ, if the ucj data has been updated or if the ucj underwent a status change to GRANTED
     configure the expiry info based on the duration and expiry properties of the target capability
     this check is implemented in the ruleaction due to updating of the renewal status no occuring
@@ -210,12 +189,12 @@ p({
 })
 p({
   "class":"foam.nanos.ruler.Rule",
-  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-4-c",
+  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-4",
   "name":"Save UCJ Data On Granted - Create",
   "priority":600,
   "ruleGroup":"ucjDAO",
   "daoKey":"userCapabilityJunctionDAO",
-  "operation":0,
+  "operation":3,
   "after":false,
   "enabled":true,
   "action":{"class":"foam.nanos.crunch.ruler.SaveUCJDataOnGranted"},
@@ -223,27 +202,6 @@ p({
   "documentation":"""
     On put of a new UCJ that has been GRANTED, save the data of the ucj to a DAO based on whether the 
     target capability specifies a daoKey or contextDAOFindKey
-  """
-})
-
-p({
-  "class":"foam.nanos.ruler.Rule",
-  "id":"68afcf0c-c718-98f8-0841-75e9-ucjdao-4-u",
-  "name":"Save UCJ Data On Granted - Update",
-  "priority":600,
-  "ruleGroup":"ucjDAO",
-  "daoKey":"userCapabilityJunctionDAO",
-  "operation":1,
-  "after":false,
-  "enabled":true,
-  "action":{"class":"foam.nanos.crunch.ruler.SaveUCJDataOnGranted"},
-  "predicate":{
-    "class":"foam.nanos.ruler.predicate.PropertyEQValue",
-    "propName":"status",
-    "propValue":{ "class":"foam.nanos.crunch.CapabilityJunctionStatus","ordinal":1 }
-  },
-  "lifecycleState":1,
-  "documentation":"""
     On update of a UCJ, if the ucj data has been updated or if the ucj underwent a status change to GRANTED,
     save the data of the ucj to a DAO based on wether target capability specifies a daoKey or contextDAOFindKey
     this check is implemented in the ruleaction due to updating of the renewal status no occuring

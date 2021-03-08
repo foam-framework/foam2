@@ -89,7 +89,7 @@ foam.CLASS({
       position: relative;
       margin-bottom: 10px;
       margin-left: 5px;
-      overflow: scroll;
+      overflow: auto;
     }
     ^ .attachment-footer {
       float: right;

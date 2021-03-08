@@ -31,7 +31,6 @@ configuration for contacting the primary node.`,
     'foam.dao.ClientDAO',
     'foam.dao.DAO',
     'foam.dao.EasyDAO',
-    'foam.dao.MDAO',
     'foam.dao.NotificationClientDAO',
     'foam.dao.ProxyDAO',
     'static foam.mlang.MLang.*',
@@ -50,7 +49,8 @@ configuration for contacting the primary node.`,
     'java.util.ArrayList',
     'java.util.HashMap',
     'java.util.List',
-    'java.util.Map'
+    'java.util.Map',
+    'java.util.Set'
   ],
 
   properties: [
@@ -211,7 +211,7 @@ configuration for contacting the primary node.`,
       javaFactory: `
       int c = getNodeCount();
 
-      if ( c < 2 ) {
+      if ( c < 4 ) {
         return 1;
       }
       if ( c < 6 ) {
@@ -248,10 +248,10 @@ configuration for contacting the primary node.`,
     },
     {
       name: 'nodeBuckets',
-      class: 'Map',
+      class: 'List',
       javaFactory: `
-      return new HashMap();
-     `,
+      return new ArrayList();
+      `,
       visibility: 'RO'
     },
     {
@@ -260,27 +260,31 @@ configuration for contacting the primary node.`,
       class: 'Boolean',
       visibility: 'RO',
       javaFactory: `
+      ClusterConfig myConfig = getConfig(getX(), getConfigId());
+      if ( myConfig.getType() == MedusaType.NODE ) {
+        return true;
+      }
+
       int minNodesInBucket = (int) Math.max(1, Math.floor(getNodeCount() / getNodeGroups()) - 1);
 
-      Map buckets = getNodeBuckets();
+      List<Set<String>> buckets = getNodeBuckets();
       if ( buckets.size() < getNodeQuorum() ) {
         getLogger().warning("hasNodeQuorum", "false", "insufficient buckets", buckets.size(), "threshold", getNodeQuorum());
         outputBuckets(getX());
         return false;
       }
       for ( int i = 0; i < buckets.size(); i++ ) {
-        List bucket = (List) buckets.get(i);
-
+        Set<String> bucket = buckets.get(i);
         // Need at least minNodesInBucket in ONLINE state for Quorum.
         int online = 0;
-        for ( int j = 0; j < bucket.size(); j++ ) {
-          ClusterConfig config = getConfig(getX(), (String) bucket.get(j));
+        for ( String id : bucket ) {
+          ClusterConfig config = getConfig(getX(), id);
           if ( config.getStatus() == Status.ONLINE ) {
             online += 1;
           }
         }
         if ( online < minNodesInBucket ) {
-           getLogger().warning("hasNodeQuorum", "false", "insufficient ONLINE nodes in bucket", "bucket", i, "online", online, "threshold", minNodesInBucket);
+           getLogger().warning("hasNodeQuorum", "false", "insufficient ONLINE nodes in bucket", i, "size", bucket.size(), "online", online, "threshold", minNodesInBucket);
           outputBuckets(getX());
           return false;
         }
@@ -483,9 +487,14 @@ configuration for contacting the primary node.`,
       javaCode: `
       ReplayingInfo replaying = (ReplayingInfo) getX().get("replayingInfo");
       DAO dao = (DAO) getX().get("localClusterConfigDAO");
-      ClusterConfig myConfig = (ClusterConfig) dao.find(getConfigId()).fclone();
-      myConfig.setReplayingInfo(replaying);
-      dao.put(myConfig);
+      ClusterConfig myConfig = (ClusterConfig) dao.find(getConfigId());
+      if ( myConfig != null ) {
+        myConfig = (ClusterConfig) myConfig.fclone();
+        myConfig.setReplayingInfo(replaying);
+        dao.put(myConfig);
+      } else {
+        throw new foam.core.FOAMException("ClusterConfig not found: "+getConfigId());
+      }
       `
     },
     {
@@ -947,8 +956,14 @@ configuration for contacting the primary node.`,
           getLogger().error("getMdao" ,serviceName, "not instance of dao", obj.getClass().getSimpleName());
         }
         dao = (DAO) x.get(serviceName);
-        // look for 'local' version
-        if ( ! key.startsWith("local") ) {
+        // look for 'bare' and 'local' versions first
+        if ( ! key.startsWith("bare") ) {
+          key = "bare" + serviceName.substring(0,1).toUpperCase()+serviceName.substring(1);
+          if ( x.get(key) != null ) {
+            dao = (DAO) x.get(key);
+            getLogger().debug("mdao", "bare", serviceName, key);
+          }
+        } else if ( ! key.startsWith("local") ) {
           key = "local" + serviceName.substring(0,1).toUpperCase()+serviceName.substring(1);
           if ( x.get(key) != null ) {
             dao = (DAO) x.get(key);
@@ -956,31 +971,10 @@ configuration for contacting the primary node.`,
           }
         }
         if ( dao != null ) {
-          Object result = dao.cmd(MDAO.GET_MDAO_CMD);
+          Object result = dao.cmd(DAO.LAST_CMD);
           if ( result != null &&
                result instanceof DAO ) {
-            getLogger().debug("mdao", "cmd", serviceName, dao.getClass().getSimpleName(), dao.getOf().getId());
             dao = (DAO) result;
-          } else {
-            while ( dao != null ) {
-              getLogger().debug("mdao", "while", serviceName, dao.getClass().getSimpleName(), dao.getOf().getId());
-              if ( dao instanceof MDAO ) {
-                break;
-              }
-              if ( dao instanceof EasyDAO ) {
-                dao = ((EasyDAO) dao).getMdao();
-                if ( dao != null ) {
-                  break;
-                }
-              }
-              if ( dao instanceof ProxyDAO ) {
-                dao = ((ProxyDAO) dao).getDelegate();
-              } else {
-                dao = null;
-              }
-            }
-          }
-          if ( dao != null ) {
             getMdaos().put(serviceName, dao);
             getLogger().debug("mdao", "found", serviceName, dao.getClass().getSimpleName(), dao.getOf().getId());
             return dao;
@@ -1004,13 +998,16 @@ configuration for contacting the primary node.`,
         },
       ],
       javaCode: `
-      Map<Integer, List> buckets = getNodeBuckets();
+      List<Set<String>> buckets = getNodeBuckets();
       for ( int i = 0; i < buckets.size(); i++ ) {
-        List bucket = (List) buckets.get(i);
-        for ( int j = 0; j < bucket.size(); j++ ) {
-          String id = (String) bucket.get(j);
-          ClusterConfig node = getConfig(x, id);
-          getLogger().info("buckets", buckets.size(), "bucket", i, id, node.getStatus());
+        Set<String> bucket = buckets.get(i);
+        if ( bucket.size() == 0 ) {
+          getLogger().info("bucket", i, "empty");
+        } else {
+          for ( String id : bucket ) {
+            ClusterConfig node = getConfig(x, id);
+            getLogger().info("bucket", i, id, node.getStatus());
+          }
         }
       }
       `

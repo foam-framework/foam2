@@ -26,7 +26,7 @@ foam.CLASS({
       background-color: #fff;
       max-width: calc(100vw - 48px);
       max-height: calc(100vh - 116px);
-      overflow-y: scroll;
+      overflow-y: auto;
 
       /* TODO: Left the below height as temp fix, need to figure out better way to handle properties rendering in the modal visibly */
       height: 80vh;

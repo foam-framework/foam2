@@ -8,19 +8,13 @@ foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'UserCapabilityJunctionRefine',
   refines: 'foam.nanos.crunch.UserCapabilityJunction',
+  mixins: [ 'foam.nanos.crunch.CapabilityJunctionPayload' ],
+  implements: [ 'foam.nanos.auth.LifecycleAware' ],
 
   documentation: `
     Model for UserCapabilityJunction, contains the data needed to grant the
     capability to user.
   `,
-
-  implements: [
-    'foam.nanos.auth.LifecycleAware'
-  ],
-
-  requires: [
-    'foam.nanos.crunch.CapabilityJunctionPayload'
-  ],
 
   javaImports: [
     'foam.core.FObject',
@@ -35,10 +29,14 @@ foam.CLASS({
     'sourceId',
     'targetId',
     'status',
-    // 'created', todo, use createaware instead
     'expiry',
     'gracePeriod',
     'data'
+  ],
+
+  messages: [
+    { name: 'VIEW_TITLE_USER', message: 'Users' },
+    { name: 'VIEW_TITLE_CAP', message: 'Capabilities' }
   ],
 
   sections: [
@@ -59,16 +57,23 @@ foam.CLASS({
       name: 'sourceId',
       label: 'User',
       includeInDigest: true,
-      view: function(_, X) {
+      view: function(_, x) {
         return {
-          class: 'foam.u2.view.RichChoiceView',
-          search: true,
-          sections: [
-            {
-              heading: 'Users',
-              dao: X.userDAO
-            }
-          ]
+          class: 'foam.u2.view.ModeAltView',
+          readView: {
+            class: 'foam.u2.view.ReadReferenceView',
+            of: 'foam.nanos.auth.User'
+          },
+          writeView: {
+            class: 'foam.u2.view.RichChoiceView',
+            search: true,
+            sections: [
+              {
+                heading: x.data.VIEW_TITLE_USER,
+                dao: x.userDAO
+              }
+            ]
+          }
         };
       }
     },
@@ -80,14 +85,21 @@ foam.CLASS({
       includeInDigest: true,
       view: function(_, X) {
         return {
-          class: 'foam.u2.view.RichChoiceView',
-          search: true,
-          sections: [
-            {
-              heading: 'Capabilities',
-              dao: X.capabilityDAO
-            }
-          ]
+          class: 'foam.u2.view.ModeAltView',
+          readView: {
+            class: 'foam.u2.view.ReadReferenceView',
+            of: 'foam.nanos.crunch.Capability'
+          },
+          writeView: {
+            class: 'foam.u2.view.RichChoiceView',
+            search: true,
+            sections: [
+              {
+                heading: X.data.VIEW_TITLE_CAP,
+                dao: X.capabilityDAO
+              }
+            ]
+          }
         };
       },
       tableCellFormatter: function(value, obj, axiom) {
@@ -102,48 +114,12 @@ foam.CLASS({
     {
       name: 'payload',
       class: 'FObjectProperty',
-      of: 'foam.nanos.crunch.CapabilityJunctionPayload',
-      factory: function () {
-        return this.CapabilityJunctionPayload.create();
-      },
-      javaFactory: `
-        var payload = new CapabilityJunctionPayload();
-        // Temporary so outdated test journals work
-        if ( statusIsSet_ ) payload.setStatus(getStatus());
-        if ( dataIsSet_ ) payload.setData(getData());
-        return payload;
-      `
-    },
-    {
-      name: 'data',
-      class: 'foam.core.FObjectProperty',
-      of: 'foam.core.FObject',
-      documentation: `data for capability.of`,
-      view: { class: 'foam.u2.detail.VerticalDetailView' },
-      storageTransient: true,
-      getter: function () { return this.payload.data },
+      of: 'foam.nanos.crunch.UserCapabilityJunction',
+      javaCompare: 'return 0;',
       javaGetter: `
-        return getPayload().getData();
+        return this;
       `,
-      setter: function (nu) { this.payload.data = nu; },
-      javaSetter: `
-        getPayload().setData(val);
-      `
-    },
-    {
-      name: 'status',
-      class: 'Enum',
-      of: 'foam.nanos.crunch.CapabilityJunctionStatus',
-      storageTransient: true,
-      getter: function () { return this.payload.status },
-      javaGetter: `
-        return getPayload().getStatus();
-      `,
-      setter: function (nu) { this.payload.status = nu },
-      javaSetter: `
-        getPayload().setStatus(val);
-        if ( val == CapabilityJunctionStatus.EXPIRED && ! getIsExpired() ) setIsExpired(true);
-      `
+      hidden: true
     },
     {
       name: 'lifecycleState',
@@ -172,7 +148,7 @@ foam.CLASS({
         isExpired_ = val;
         isExpiredIsSet_ = true;
         if ( isExpired_ ) {
-          if ( getStatus() != CapabilityJunctionStatus.EXPIRED ) setStatus(CapabilityJunctionStatus.EXPIRED); 
+          if ( getStatus() != CapabilityJunctionStatus.EXPIRED ) setStatus(CapabilityJunctionStatus.EXPIRED);
           isInGracePeriod_ = false;
         }
       `

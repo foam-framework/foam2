@@ -55,7 +55,7 @@ foam.CLASS({
       margin-left: 8px;
     }
     ^detail-container {
-      overflow-x: scroll;
+      overflow-x: auto;
     }
   `,
 
@@ -128,7 +128,8 @@ foam.CLASS({
   methods: [
     function initE() {
 
-      this.currentMemento$ = this.memento.tail$;
+      if ( this.memento )
+        this.currentMemento$ = this.memento.tail$;
 
       /* Doesn't work because obj isn't known yet.
       this.startContext({data: this.data.obj})

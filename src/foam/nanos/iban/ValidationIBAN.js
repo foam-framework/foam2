@@ -311,7 +311,6 @@ Columns: validation format, parsing format, example`,
         int checksum = mod(num, 97);
 
         if ( checksum != 1 ) throw new ValidationException(INVALID_CHECKSUM + checksum);
-
       `
     },
     {
@@ -325,8 +324,8 @@ Columns: validation format, parsing format, example`,
       ],
       code: function(iban) {
         iban = iban.substring(0,2) + '00' + iban.substring(4, 200);
-        let num = this.toNumber(iban);
-        let checksum = this.mod(num, 97);
+        let num             = this.toNumber(iban);
+        let checksum        = this.mod(num, 97);
         let desiredChecksum = 98 - checksum;
         iban = iban.substring(0,2) + ('' + desiredChecksum).padStart(2, '0') + iban.substring(4);
         return iban;
@@ -443,8 +442,7 @@ Columns: validation format, parsing format, example`,
         }
       ],
       javaCode: `
-        if ( foam.util.SafetyUtil.isEmpty(iban) ||
-             iban.length() < 20 ) {
+        if ( foam.util.SafetyUtil.isEmpty(iban) || iban.length() < 20 ) {
           return null;
         }
         iban = iban.replaceAll(" ", "").trim();
@@ -452,29 +450,28 @@ Columns: validation format, parsing format, example`,
         ibanInfo.setCountry(iban.substring(0,2));
         Object[] temp = (Object[]) COUNTRIES.get(ibanInfo.getCountry());
 
-        if ( temp == null ||
-             temp[1] == null ||
-             SafetyUtil.isEmpty((String)temp[1]) ) {
-          ((foam.nanos.logger.Logger) getX().get("logger")).warning(this.getClass().getSimpleName(), "parse", "Format not found", ibanInfo.getCountry());
+        if ( temp == null || temp[1] == null || SafetyUtil.isEmpty((String)temp[1]) ) {
+          foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+          if ( logger == null ) {
+            logger = new foam.nanos.logger.StdoutLogger();
+          }
+          logger.warning(this.getClass().getSimpleName(), "parse", "Format not found", ibanInfo.getCountry());
           return null;
         }
 
-        char[] format = ((String) temp[1]).replaceAll(" ","").trim().toCharArray();
-
-        StringBuilder previous = null;
-        StringBuilder bankCode = new StringBuilder();
-        StringBuilder branch = new StringBuilder();
-        StringBuilder accountNumber  = new StringBuilder();
-        StringBuilder ibanChecksum = new StringBuilder();
-        StringBuilder accountType = new StringBuilder();
+        char[]        format             = ((String) temp[1]).replaceAll(" ","").trim().toCharArray();
+        StringBuilder previous           = null;
+        StringBuilder bankCode           = new StringBuilder();
+        StringBuilder branch             = new StringBuilder();
+        StringBuilder accountNumber      = new StringBuilder();
+        StringBuilder ibanChecksum       = new StringBuilder();
+        StringBuilder accountType        = new StringBuilder();
         StringBuilder ownerAccountNumber = new StringBuilder();
 
         // TODO: flag mismatch of character type in parse format.
 
-        for ( int i = 2; i < format.length; i ++ ) {
-          if ( i >= iban.length() ) {
-            break;
-          }
+        for ( int i = 2 ; i < format.length ; i ++ ) {
+          if ( i >= iban.length() ) break;
           char next = iban.charAt(i);
 
           switch ( format[i] ) {
@@ -501,7 +498,6 @@ Columns: validation format, parsing format, example`,
               break;
             case 'n': // owner account - Brazil
               ownerAccountNumber.append(next);
-              accountNumber.append(next);
               break;
             case 's': // branch
               branch.append(next);
@@ -509,7 +505,6 @@ Columns: validation format, parsing format, example`,
               break;
             case 't': // account type
               accountType.append(next);
-              accountNumber.append(next);
               break;
             case 'x': // add to previous
               previous.append(next);
@@ -517,11 +512,19 @@ Columns: validation format, parsing format, example`,
             case '0': // Zero
               previous.append('0');
               if ( Character.compare('0', next) != 0 ) {
-                ((foam.nanos.logger.Logger) getX().get("logger")).warning(this.getClass().getSimpleName(), "parse", "symbol mismatch", format, i, format[i], next);
+                foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+                if ( logger == null ) {
+                  logger = new foam.nanos.logger.StdoutLogger();
+                }
+                logger.warning(this.getClass().getSimpleName(), "parse", "symbol mismatch", format, i, format[i], next);
               }
               break;
             default:
-              ((foam.nanos.logger.Logger) getX().get("logger")).warning(this.getClass().getSimpleName(), "parse", "unexpected symbol", format, i, format[i]);
+              foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) getX().get("logger");
+              if ( logger == null ) {
+                logger = new foam.nanos.logger.StdoutLogger();
+              }
+              logger.warning(this.getClass().getSimpleName(), "parse", "unexpected symbol", format, i, format[i]);
           }
         }
 
@@ -531,7 +534,7 @@ Columns: validation format, parsing format, example`,
         ibanInfo.setAccountNumber(accountNumber.toString());
         ibanInfo.setAccountType(accountType.toString());
         ibanInfo.setOwnerAccountNumber(ownerAccountNumber.toString());
-        return  ibanInfo;
+        return ibanInfo;
       `
     }
   ]

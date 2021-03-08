@@ -64,14 +64,16 @@ foam.CLASS({
 
         var id = ( pkg ? pkg + '.' : '' ) + name + this.name;
 
-        return X.lookup(id, true) || this;
+        // The of[this.name] checks for an inner-class facet
+        return X.lookup(id, true) || of[this.name] || this;
       };
 
       // ignoreFacets is set to true when called to prevent a second-level
       // of facet checking
       cls.create = function(args, X, ignoreFacets) {
         if ( ! ignoreFacets ) {
-          var of = args && ( args.of || ( args.data && args.data.of ) );
+          // If class does not have an 'of', then check for 'data.of' instead.
+          var of       = args && ( args.of || ( args.data && ( args.data.of || args.data.cls_ ) ) );
           var facetCls = this.getFacetOf(of, X);
 
           if ( facetCls !== this ) return facetCls.create(args, X, true);

@@ -27,7 +27,9 @@ foam.CLASS({
                 [ {class: 'foam.u2.DetailView'},                 'Detail' ],
                 [ {class: 'foam.u2.detail.TabbedDetailView'},    'Tabbed' ],
                 [ {class: 'foam.u2.detail.SectionedDetailView'}, 'Sectioned' ],
-                [ {class: 'foam.u2.md.DetailView'},              'Material' ]
+                [ {class: 'foam.u2.detail.MDDetailView'},        'Material' ],
+                [ {class: 'foam.u2.detail.WizardSectionsView'},  'Wizard' ],
+                [ {class: 'foam.u2.detail.VerticalDetailView'},  'Vertical' ]
               ]
             };
           }
@@ -50,7 +52,10 @@ foam.CLASS({
               views: [
                 [ {class: 'foam.u2.DetailView'},                 'Detail' ],
                 [ {class: 'foam.u2.detail.TabbedDetailView'},    'Tabbed' ],
-                [ {class: 'foam.u2.detail.SectionedDetailView'}, 'Sectioned' ]
+                [ {class: 'foam.u2.detail.SectionedDetailView'}, 'Sectioned' ],
+                [ {class: 'foam.u2.detail.MDDetailView'},        'Material' ],
+                [ {class: 'foam.u2.detail.WizardSectionsView'},  'Wizard' ],
+                [ {class: 'foam.u2.detail.VerticalDetailView'},  'Vertical' ]
               ]
             };
           }
@@ -108,13 +113,14 @@ foam.CLASS({
         function initE() {
           this.SUPER();
 
-          this.currentMemento$ = this.memento.tail$;
+          if ( this.memento )
+            this.currentMemento$ = this.memento.tail$;
 
           this.
             start().
               addClass(this.myClass('title')).
               start('a').
-                add('Data Management').on('click', () => { 
+                add('Data Management').on('click', () => {
                   this.memento.tail$.set(null);
                   this.stack.back();
                 }).
@@ -202,7 +208,13 @@ foam.CLASS({
        onKey: true
       }
     },
-    'currentMemento_'
+    {
+      name: 'currentMemento_',
+      postSet: function(o, n) {
+        if ( this.memento )
+          this.memento.tail = n;
+      }
+    }
   ],
 
   methods: [
@@ -213,7 +225,8 @@ foam.CLASS({
       var currentLetter = '';
       var section;
 
-      this.currentMemento_$ = self.memento.tail$;
+      if ( self.memento )
+        this.currentMemento_$ = self.memento.tail$;
 
       this.addClass(this.myClass()).
       start().
@@ -281,8 +294,10 @@ foam.CLASS({
               .add(label)
               .attrs({title: spec.description})
               .on('click', function() {
-                self.memento.tail = self.Memento.create({ head: spec.id });
-                self.memento.tail.parent = self.memento;
+                if ( self.memento ) {
+                  self.memento.tail = self.Memento.create({ head: spec.id });
+                  self.memento.tail.parent = self.memento;
+                }
               });
 
               self.search$.sub(function() {
@@ -306,7 +321,8 @@ foam.CLASS({
         });
       });
 
-      this.onDetach(this.memento.tail$.sub(this.mementoChange)); 
+      if ( this.memento )
+        this.onDetach(this.memento.tail$.sub(this.mementoChange));
       this.mementoChange();
     }
   ],
@@ -335,17 +351,17 @@ foam.CLASS({
           views: [
             [
               {
-                class: this.DAOBrowseControllerView,
-                stack: this.stack
-              },
-              'New Controller'
-            ],
-            [
-              {
                 class: this.BrowserView,
                 stack: this.stack
               },
-              'Old Controller'
+              'Controller 1'
+            ],
+            [
+              {
+                class: this.DAOBrowseControllerView,
+                stack: this.stack
+              },
+              'Controller 2'
             ]
           ]
         }

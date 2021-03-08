@@ -17,10 +17,20 @@ foam.CLASS({
     'static foam.mlang.MLang.*',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
+    'foam.nanos.crunch.CrunchService',
+    'foam.nanos.crunch.MinMaxCapabilityData',
     'foam.nanos.crunch.ui.MinMaxCapabilityWizardlet'
   ],
 
   properties: [
+    {
+      name: 'of',
+      hidden: true,
+      value: "foam.nanos.crunch.MinMaxCapabilityData",
+      javaFactory:`
+        return foam.nanos.crunch.MinMaxCapabilityData.getOwnClassInfo();
+      `
+    },
     {
       name: 'min',
       class: 'Int',
@@ -44,9 +54,45 @@ foam.CLASS({
         return new MinMaxCapabilityWizardlet();
       `
     },
+    {
+      class: 'Object',
+      name: 'wizardlet',
+      documentation: `
+        Defines a wizardlet to display this capability in a wizard. This
+        wizardlet will display after this capability's prerequisites.
+      `,
+      factory: function() {
+        return foam.nanos.crunch.ui.CapabilityWizardlet.create({isVisible: false}, this);
+      },
+      includeInDigest: false,
+    },
   ],
 
   methods: [
+    {
+      name: 'implies',
+      type: 'Boolean',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'permission', type: 'String' }
+      ],
+      documentation: `
+        Checks if a permission or capability string is implied by a minmaxcapability
+        by only checking the capability's name, and permissionsGranted.
+      `,
+      javaCode: `
+        if ( ! this.getEnabled() ) return false;
+
+        // check if permission is a capability string implied by this permission
+        if ( this.stringImplies(this.getName(), permission) ) return true;
+
+        String[] permissionsGranted = this.getPermissionsGranted();
+        for ( String permissionName : permissionsGranted ) {
+          if ( this.stringImplies(permissionName, permission) ) return true;
+        }
+        return false;
+      `
+    },
     {
       name: 'getPrereqsChainedStatus',
       type: 'CapabilityJunctionStatus',
@@ -114,8 +160,9 @@ foam.CLASS({
         is less than 'min'
       `,
       javaCode: `
-        if ( ! getEnabled() ) return false; 
-        
+        if ( ! getEnabled() ) return false;
+        if ( getGrantMode() == CapabilityGrantMode.MANUAL ) return false;
+
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         CrunchService crunchService = (CrunchService) x.get("crunchService");
 
@@ -128,9 +175,13 @@ foam.CLASS({
         int numberGrantedNotReopenable = 0;
         for ( var capId : prereqs ) {
           Capability cap = (Capability) capabilityDAO.find(capId);
+          if ( cap.getGrantMode() == CapabilityGrantMode.MANUAL ) {
+            numberGrantedNotReopenable++;
+            continue;
+          }
           if ( cap == null ) throw new RuntimeException("Cannot find prerequisite capability");
           UserCapabilityJunction prereq = crunchService.getJunction(x, capId);
-          if ( prereq != null && prereq.getStatus() == CapabilityJunctionStatus.GRANTED && ! cap.maybeReopen(x, prereq) )
+          if ( prereq != null && ! cap.maybeReopen(x, prereq) )
             numberGrantedNotReopenable++;
         }
         // if there are at least min number granted not reopenable, then no need to reopen capability
@@ -150,6 +201,43 @@ foam.CLASS({
                   ucj.getStatus() != CapabilityJunctionStatus.PENDING &&
                   ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return true;
         return false;
+      `
+    },
+    {
+      name: 'getImpliedData',
+      documentation: `
+        If this UCJ is stored for a MinMax without a list of choices, and enough
+        UCJs are present to describe a choice selection, then the
+        data of the UCJ will be set to the first LIMIT(max) choices.
+      `,
+      args: [
+        { name: 'x', javaType: 'foam.core.X' },
+        { name: 'ucj', javaType: 'foam.nanos.crunch.UserCapabilityJunction' }
+      ],
+      type: 'FObject',
+      javaCode: `
+        var crunchService = (CrunchService) x.get("crunchService");
+        List<String> ids = crunchService.getPrereqs(getId());
+        var ucjDAO = (DAO) x.get("userCapabilityJunctionDAO");
+
+        List<UserCapabilityJunction> ucjs = ((ArraySink) ucjDAO
+          .where(IN(UserCapabilityJunction.TARGET_ID, ids))
+          .select(new ArraySink())).getArray();
+
+        if ( ucjs.size() < getMin() ) return null;
+
+        var data = new MinMaxCapabilityData();
+
+        var count = Math.min(ucjs.size(), getMax());
+        String[] foundIds = new String[count];
+
+        for ( var i = 0 ; i < count ; i++ ) {
+          foundIds[i] = ucjs.get(i).getTargetId();
+        }
+
+        data.setSelectedData(foundIds);
+
+        return data;
       `
     }
   ]

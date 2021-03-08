@@ -77,9 +77,7 @@ foam.CLASS({
             Subject junctionSubject = ucj.getSubject(x);
             effectiveX = x.put("subject", junctionSubject);
 
-            Capability dependent = null;
             for ( UserCapabilityJunction ucjToReput : ucjsToReput ) {
-              dependent = (Capability) ucjToReput.findTargetId(x);
               if ( ucjToReput.getStatus() == CapabilityJunctionStatus.GRANTED ) {
                 if ( ucj.getIsInGracePeriod() ) ucjToReput.setIsInGracePeriod(true);
                 if ( ucj.getIsRenewable() ) ucjToReput.setIsRenewable(true);

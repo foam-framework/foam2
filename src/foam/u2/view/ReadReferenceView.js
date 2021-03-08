@@ -14,12 +14,18 @@ foam.CLASS({
   requires: [
     'foam.comics.v2.DAOControllerConfig',
     'foam.u2.detail.SectionedDetailView',
-    'foam.u2.CitationView'
+    'foam.u2.view.ReferenceCitationView'
   ],
 
   properties: [
     'obj',
-    'prop'
+    'prop',
+    {
+      documentation: `Create the reference view as an anchor link to the reference's  DetailView.`,
+      name: 'enableLink',
+      class: 'Boolean',
+      value: true
+    }
   ],
 
   imports: [
@@ -34,22 +40,31 @@ foam.CLASS({
         var self = this;
         this.SUPER();
         this
-          .start('a')
-            .attrs({ href: '#' })
-            .on('click', function(evt) {
-              evt.preventDefault();
-              self.stack.push({
-                class: 'foam.comics.v2.DAOSummaryView',
-                data: self.obj,
-                of: self.obj.cls_,
-                config: self.DAOControllerConfig.create({
-                  daoKey: self.prop.targetDAOKey
-                }),
-                backLabel: 'Back'
-              }, self);
-            })
-            .tag(this.CitationView, { data$: this.obj$ })
-          .end();
+          .add(this.obj$.map(obj => {
+            if ( ! obj ) return '';
+            if ( this.enableLink ) {
+              return this.E().start('a')
+                .attrs({ href: '#'})
+                .on('click', function(evt) {
+                  evt.preventDefault();
+                  self.stack.push({
+                    class: 'foam.comics.v2.DAOSummaryView',
+                    data: self.obj,
+                    of: self.obj.cls_,
+                    config: self.DAOControllerConfig.create({
+                      daoKey: self.prop.targetDAOKey
+                    }),
+                    backLabel: 'Back'
+                  }, self);
+                })
+                .tag(self.ReferenceCitationView, {data: obj})
+              .end();
+            } else {
+              return this.E().start()
+              .tag(self.ReferenceCitationView, {data: obj})
+              .end();
+            }
+          }));
       }
     },
 
@@ -57,7 +72,8 @@ foam.CLASS({
       this.SUPER(prop);
       this.prop = prop;
       var dao = this.ctrl.__subContext__[prop.targetDAOKey];
-      dao.find(this.data).then((o) => this.obj = o);
+      if ( dao )
+        dao.find(this.data).then((o) => this.obj = o);
     }
   ]
 });

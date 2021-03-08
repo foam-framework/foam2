@@ -105,8 +105,6 @@ foam.CLASS({
           }
         }
 
-        if ( nu.length == 1 ) this.data = nu[0][0];
-
         if ( this.dynamicSize ) this.size = Math.min(nu.length, this.maxSize);
         return nu;
       }
@@ -153,7 +151,7 @@ foam.CLASS({
     {
       name: 'data',
       postSet: function(o, n) {
-        if ( o !== n ) this.choice = this.findChoiceByData(n) || [n, n];
+        if ( o !== n ) this.choice = this.findChoiceByData(n) || [n, n.label || n];
       }
     },
     {
@@ -196,7 +194,11 @@ foam.CLASS({
         than this number.`,
       value: Number.MAX_SAFE_INTEGER
     },
-    'prop_'
+    'prop_',
+    {
+      class: 'Int',
+      name: 'seq_'
+    }
   ],
 
   methods: [
@@ -206,6 +208,8 @@ foam.CLASS({
 
     function initE() {
       var self = this;
+
+      if ( ! this.choice && this.choices.length == 1 ) this.data = this.choices[0][0];
 
       // If no item is selected, and data has not been provided, select the 0th
       // entry.
@@ -231,9 +235,9 @@ foam.CLASS({
               .attrs({ name: self.name })
               .enableClass('selection-made', self.index$.map((index) => index !== -1))
             .end();
-        } else {
-          return self.E().add(self.text$);
         }
+
+        return self.E().add(self.text$);
       }));
 
       this.dao$proxy.on.sub(this.onDAOUpdate);
@@ -291,11 +295,15 @@ foam.CLASS({
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
+        var self = this;
+        var seq = ++this.seq_;
+        var dao = this.dao;
         if ( ! foam.dao.DAO.isInstance(this.dao) ) return;
 
         var of = this.dao.of
         if ( of._CHOICE_TEXT_ ) {
-          this.dao.select(this.PROJECTION(of.ID, of._CHOICE_TEXT_)).then((s) => {
+          dao.select(this.PROJECTION(of.ID, of._CHOICE_TEXT_)).then((s) => {
+            if ( seq !== self.seq_ ) return; // stale select
             this.choices = s.projection;
           });
           return;
@@ -312,17 +320,19 @@ foam.CLASS({
           */
         }
         var p = this.mode === foam.u2.DisplayMode.RW ?
-          this.dao.select().then(s => s.array) :
-          this.dao.find(this.data).then(o => o ? [o] : []);
+          dao.select().then(s => s.array) :
+          dao.find(this.data).then(o => o ? [o] : []);
 
         p.then(a => {
           var choices = a.map(this.objToChoice);
           var choiceLabels = a.map(o => { return this.objToChoice(o)[1]});
           Promise.all(choiceLabels).then(resolvedChoiceLabels => {
+            if ( seq !== self.seq_ ) return; // stale select
             for ( let i = 0; i < choices.length; i++ ) {
               choices[i][1] = resolvedChoiceLabels[i];
             }
             this.choices = choices;
+            if ( ! this.choice && this.choices.length == 1 ) this.data = this.choices[0][0];
           });
           if ( this.data == null && this.index === -1 ) this.index = this.placeholder ? -1 : 0;
         });

@@ -42,6 +42,10 @@ foam.CLASS({
         return alarm;
       }
 
+      if ( ! alarm.getHostname().equals(System.getProperty("hostname", "localhost")) ) {
+        return alarm;
+      }
+
       // create body for non-email notifications
       StringBuilder body = new StringBuilder();
       body.append("name: ");

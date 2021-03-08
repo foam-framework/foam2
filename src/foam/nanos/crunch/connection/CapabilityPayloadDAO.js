@@ -11,9 +11,7 @@ foam.CLASS({
   flags: ['java'],
 
   javaImports: [
-    'foam.core.FObject',
-    'foam.core.X',
-    'foam.core.Validatable',
+    'foam.core.*',
     'foam.dao.*',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
@@ -28,6 +26,7 @@ foam.CLASS({
     'foam.nanos.crunch.CrunchService',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.nanos.logger.Logger',
+    'foam.nanos.pm.PM',
     'foam.util.SafetyUtil',
     'java.util.ArrayList',
     'java.util.HashMap',
@@ -100,7 +99,7 @@ foam.CLASS({
                     data = ( ucj != null ) ? ucj.getData() : null;
                     if ( data == null )
                       data = (FObject) capability.getOf().newInstance();
-                  } catch (Exception e){
+                  } catch (java.lang.Exception e){
                     throw new RuntimeException(e);
                   }
                 }
@@ -210,6 +209,17 @@ foam.CLASS({
                 }
                 catch (IllegalStateException | IllegalArgumentException ie) {
                   validationErrors.put(key, ie.getMessage());
+                } catch (ValidationException ve) {
+                  validationErrors.put(key, ve.getErrorMessage());
+                } catch (CompoundException ce) {
+                  for ( var t : ce.getExceptions() ) {
+                    if ( t instanceof ValidationException ) {
+                      var ve = (ValidationException) t;
+                      validationErrors.put(
+                        String.format("%s[%s]", key, ve.getPropName()),
+                        ve.getErrorMessage());
+                    }
+                  }
                 } catch (Throwable t) {
                   Logger logger = (Logger) x.get("logger");
                   logger.warning("Unexpected exception validating " + key + ": ", t);
@@ -228,6 +238,9 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
+      var pm = new PM(CapabilityPayloadDAO.getOwnClassInfo().getId(), "put");
+
+      try {
         CapabilityPayload receivingCapPayload = (CapabilityPayload) obj;
         Map<String,FObject> capabilityDataObjects = (Map<String,FObject>) receivingCapPayload.getCapabilityDataObjects();
 
@@ -238,7 +251,14 @@ foam.CLASS({
         List grantPath = ((CrunchService) x.get("crunchService")).getGrantPath(x, receivingCapPayload.getId());
         processCapabilityList(x, grantPath, capabilityDataObjects, currentCapabilityDataObjects);
 
-        return find_(x, receivingCapPayload.getId());
+        var ret =  find_(x, receivingCapPayload.getId());
+        return ret;
+      } catch(Throwable t) {
+        pm.error(x, t.getMessage());
+        throw t;
+      } finally {
+        pm.log(x);
+      }
       `
     },
     {

@@ -48,6 +48,7 @@ foam.CLASS({
     'foam.dao.ContextualizingDAO',
     'foam.dao.DeDupDAO',
     'foam.dao.InterceptedDAO',
+    'foam.dao.DAO',
     'foam.dao.GUIDDAO',
     'foam.dao.IDBDAO',
     {
@@ -123,36 +124,9 @@ foam.CLASS({
       type: 'foam.nanos.boot.NSpec'
     },
     {
-      /**
-       * TODO: More investigation needed at https://github.com/foam-framework/foam2/pull/4085
-       * Even though this property doesn't get called
-       * If you uncomment the javaFactory it will break debuggers
-       * To reproduce:
-       * 1. Uncomment the javaFactory below
-       * 2. Using intellij, set a breakpoint in a try block within an agency.submit
-       * 3. Trigger the breakpoint
-       * 4. Step over the line
-       * 5. Server should be hanging no threads available to stop the server using Ctrl+C
-       * 6. Intellij should be stuck on "Waiting until last debugger command completes"
-       * 7. Java core dumps should appear as well
-       * 8. Need to resort to using kill -9 on both the server & debugger
-       */
-      name: 'logger',
-      class: 'FObjectProperty',
-      of: 'foam.nanos.logger.Logger',
-      visibility: 'HIDDEN',
-      /*
-      javaFactory: `
-        Logger logger = (Logger) getX().get("logger");
-        if ( logger == null ) {
-          logger = new foam.nanos.logger.StdoutLogger();
-        }
-
-        return new PrefixLogger(new Object[] {
-          this.getClass().getSimpleName()
-        }, logger);
-      `
-      */
+      documentation: 'Hold Last usuable dao in decorator chain. For example, an MDAO wrapped in FixedSizeDAO should always go through the FixedSizeDAO and not update the MDAO directly.',
+      name: 'lastDao',
+      class: 'foam.dao.DAOProperty'
     },
     {
       /** This is set automatically when you create an EasyDAO.
@@ -179,18 +153,23 @@ foam.CLASS({
             }
             delegate = getMdao();
             if ( getIndex() != null && getIndex().length > 0 ) {
-              ((foam.dao.MDAO) getMdao()).addIndex(getIndex());
+              if ( delegate instanceof foam.dao.MDAO ) {
+                ((foam.dao.MDAO) delegate).addIndex(getIndex());
+              } else {
+                logger.warning(getName(), "Index not added, no access to MDAO");
+              }
             }
             if ( getFixedSize() != null ) {
               foam.dao.ProxyDAO fixedSizeDAO = (foam.dao.ProxyDAO) getFixedSize();
               fixedSizeDAO.setDelegate(getMdao());
-              setMdao(fixedSizeDAO);
+              delegate = fixedSizeDAO;
+              //setMdao(fixedSizeDAO);
             }
             if ( getJournalType().equals(JournalType.SINGLE_JOURNAL) ) {
               if ( getWriteOnly() ) {
-                delegate = new foam.dao.WriteOnlyJDAO(getX(), getMdao(), getOf(), getJournalName());
+                delegate = new foam.dao.WriteOnlyJDAO(getX(), delegate, getOf(), getJournalName());
               } else {
-                delegate = new foam.dao.java.JDAO(getX(), getMdao(), getJournalName(), getCluster());
+                delegate = new foam.dao.java.JDAO(getX(), delegate, getJournalName(), getCluster());
               }
             }
           }
@@ -210,20 +189,38 @@ foam.CLASS({
         if ( getGuid() )
           delegate = new foam.dao.GUIDDAO.Builder(getX()).setDelegate(delegate).build();
 
-        if ( getCluster() ) {
-          if ( getMdao() != null ) {
-            logger.debug(getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
-            delegate = new foam.nanos.medusa.MedusaAdapterDAO.Builder(getX())
-              .setNSpec(getNSpec())
-              .setDelegate(delegate)
-              .build();
-          }
+        if ( getMdao() != null &&
+             getLastDao() == null ) {
+          setLastDao(delegate);
+        }
+
+        if ( getCluster() &&
+             getMdao() != null ) {
+          logger.debug(getName(), "cluster", "delegate", delegate.getClass().getSimpleName());
+          delegate = new foam.nanos.medusa.MedusaAdapterDAO.Builder(getX())
+            .setNSpec(getNSpec())
+            .setDelegate(delegate)
+            .build();
         }
 
         if ( getServiceProviderAware() ) {
           delegate = new foam.nanos.auth.ServiceProviderAwareDAO.Builder(getX())
             .setDelegate(delegate)
             .build();
+
+          // auto add index on spid
+          DAO dao = (DAO) getMdao();
+          if ( dao != null &&
+               dao instanceof foam.dao.MDAO ) {
+            PropertyInfo pInfo = (PropertyInfo) this.getOf().getAxiomByName("spid");
+            if ( pInfo != null ) {
+              ((foam.dao.MDAO)dao).addIndex(pInfo);
+            } else {
+              logger.warning(getName(), "Index not added. Property not found. spid");
+            }
+          } else {
+            logger.warning(getName(), "Index not added on spid, no access to MDAO");
+          }
         }
 
         delegate = getOuterDAO(delegate);
@@ -342,9 +339,6 @@ foam.CLASS({
           */
         if ( getPm() )
           delegate = new foam.dao.PMDAO.Builder(getX()).setNSpec(getNSpec()).setDelegate(delegate).build();
-
-        // reset logger
-        EasyDAO.LOGGER.clear(this);
 
         // see comments above regarding DAOs with init_
         ((ProxyDAO)delegate_).setDelegate(delegate);
@@ -776,6 +770,12 @@ model from which to test ServiceProvider ID (spid)`,
          }
          System.exit(1);
        }
+
+       if ( getInnerDAO() == null &&
+            getMdao() == null &&
+            ! getNullify() ) {
+         setMdao(new foam.dao.MDAO(of_));
+       }
      `
     },
     {
@@ -1022,8 +1022,12 @@ model from which to test ServiceProvider ID (spid)`,
         return this;
       },
       javaCode: `
-        if ( getMdao() != null ) {
-          ((foam.dao.MDAO) getMdao()).addIndex(props);
+        DAO dao = (DAO) getMdao();
+        if ( dao != null &&
+             dao instanceof foam.dao.MDAO ) {
+          ((foam.dao.MDAO)dao).addIndex(props);
+        } else {
+          ((Logger) getX().get("logger")).warning(getName(), "Index not added, no access to MDAO");
         }
         return this;
       `
@@ -1045,8 +1049,13 @@ model from which to test ServiceProvider ID (spid)`,
         return this;
       },
       javaCode: `
-        if ( getMdao() != null )
-          ((foam.dao.MDAO) getMdao()).addIndex(index);
+        DAO dao = (DAO) getMdao();
+        if ( dao != null &&
+             dao instanceof foam.dao.MDAO ) {
+          ((foam.dao.MDAO)dao).addIndex(index);
+        } else {
+          ((Logger) getX().get("logger")).warning(getName(), "Index not added, no access to MDAO");
+        }
         return this;
       `
     },
@@ -1138,13 +1147,26 @@ model from which to test ServiceProvider ID (spid)`,
       },
       javaCode: `
       // Used by Medusa to get the real MDAO to update
-      if ( foam.dao.MDAO.GET_MDAO_CMD.equals(obj) ) {
-        DAO dao = getMdao();
+      if ( foam.dao.DAO.LAST_CMD.equals(obj) ) {
+        DAO dao = getLastDao();
         if ( dao != null ) {
           return dao;
         }
       }
       return getDelegate().cmd_(x, obj);
+      `
+    },
+    {
+      name: 'toString',
+      javaCode: `
+        var sb = new StringBuilder();
+        sb.append("EasyDAO");
+        if ( of_ != null ) {
+          sb.append("(of: ")
+            .append(of_.getId())
+            .append(")");
+        }
+        return sb.toString();
       `
     }
   ]

@@ -34,13 +34,13 @@ foam.CLASS({
       name: 'updateSummary',
       isFramed: true,
       code: function() {
-        this.summary = this.data ? this.data.toSummary() : undefined;
+        this.summary = this.data && this.data.toSummary ? this.data.toSummary() : undefined;
       }
     }
   ],
 
   methods: [
-   function initE() {
+    function initE() {
       this.SUPER();
       this.updateSummary();
       this.add(this.summary$);

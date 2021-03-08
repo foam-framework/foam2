@@ -16,14 +16,22 @@ foam.CLASS({
 
   javaImports: [
     'foam.util.Password',
-    'foam.util.SafetyUtil'
+    'foam.util.SafetyUtil',
+    'foam.dao.DAO',
+    'java.util.List',
+    'foam.dao.Sink',
+    'foam.dao.ArraySink'
+  ],
+
+  imports: [
+    'commonPasswordDAO'
   ],
 
   constants: [
     {
       name: 'MIN_PASSWORD_LENGTH',
       type: 'Long',
-      value: 6
+      value: 10
     }
   ],
 
@@ -36,7 +44,7 @@ foam.CLASS({
       class: 'Long',
       name: 'minLength',
       documentation: 'Minimum length of the password.',
-      min: 6,
+      min: this.MIN_PASSWORD_LENGTH,
       factory: function() {
         return this.MIN_PASSWORD_LENGTH;
       },
@@ -55,6 +63,7 @@ foam.CLASS({
         when resetting the users passwords to prevent them from using the same password again.
         `
     },
+    'blackList'
   ],
 
   methods: [
@@ -70,6 +79,9 @@ foam.CLASS({
           javaType: 'String'
         }
       ],
+      code: function(potentialPassword) {
+        return this.commonPasswordDAO.find(potentialPassword.toLowerCase());
+      },
       javaCode: `
         // check if this policy is enabled
         if ( ! this.getEnabled() ) {
@@ -81,6 +93,12 @@ foam.CLASS({
         String minLengthRegex = "^.{" + minLength + ",}$";
         if ( SafetyUtil.isEmpty(potentialPassword) || potentialPassword.length() < minLength ) {
           throw new RuntimeException("Password must be at least " + minLength + " characters long.");
+        }
+
+        // check weak password
+        DAO commonPasswordDAO = (DAO) getX().get("commonPasswordDAO");
+        if ( commonPasswordDAO.find(potentialPassword.toLowerCase()) != null ) {
+          throw new RuntimeException("Password is weak.");
         }
 
         // check password history

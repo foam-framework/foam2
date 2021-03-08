@@ -9,7 +9,8 @@ foam.CLASS({
   name: 'CapablePayloadApprovableRuleAction',
 
   documentation: `
-    TODO:
+    Handles fulfilment of an approved approvable for a capable payload. Where the capable payload gets copied from the related approvable and
+    saves onto the Capable.CapablePayloads object itself.
   `,
 
   javaImports: [
@@ -78,7 +79,7 @@ foam.CLASS({
               throw new RuntimeException("Unsupported approvable operation.");
             }
           }
-        }, "Updated the payload based on a approved approvable");
+        }, "Updated the payload based on an approved approvable");
       `
     }
   ]

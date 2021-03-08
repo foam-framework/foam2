@@ -127,13 +127,21 @@ foam.CLASS({
       this.copyFrom({
         createIsAvailableFor: a.createIsAvailableFor.bind(a),
         fromClass: a.sourceCls_.name,
-        properties: cls.getAxiomsByClass(this.Property)
-          .filter(p => p.section == a.name)
-          .filter(p => ! p.hidden)
-          .sort((p1, p2) => p1.order - p2.order),
         actions: cls.getAxiomsByClass(this.Action)
           .filter(action => action.section == a.name)
       });
+
+      if ( a.hasOwnProperty('properties') ) {
+        this.properties = a.properties.map(p => {
+          if ( foam.String.isInstance(p) ) return cls.getAxiomByName(p);
+          if ( p.name ) return cls.getAxiomByName(p.name).clone().copyFrom(p);
+        });
+      } else {
+        this.properties = cls.getAxiomsByClass(foam.core.Property)
+          .filter(p => p.section == a.name)
+          .filter(p => ! p.hidden)
+          .sort((p1, p2) => p1.order - p2.order);
+      }
 
       return this;
     }

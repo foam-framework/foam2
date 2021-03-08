@@ -20,21 +20,39 @@ foam.CLASS({
   name: 'RadioView',
   extends: 'foam.u2.view.ChoiceView',
 
-  requires: [
-    'foam.u2.DisplayMode'
-  ],
+  requires: [ 'foam.u2.DisplayMode' ],
 
   css: `
-    ^ { padding: 4px 0; }
-    ^ label { position: relative; color: #444; }
-    ^horizontal-radio { display: flex; }
+    ^ {
+      padding: 4px 0;
+    }
+
+    ^horizontal-radio {
+      display: flex;
+      align-items: center;
+      align-content: center;
+      flex-wrap: wrap;
+    }
+
+    ^ .choice {
+      margin-bottom: 16px;
+      font-size: 16px;
+    }
+
+    ^.foam-u2-view-RadioView-horizontal-radio .choice {
+      flex-basis: calc(100% / 3);
+    }
+
+    ^ label {
+      margin-left: 12px;
+      color: #444;
+    }
   `,
 
   properties: [
     {
       class: 'Boolean',
-      name: 'isHorizontal',
-      value: false
+      name: 'isHorizontal'
     },
     {
       class: 'Boolean',
@@ -61,8 +79,8 @@ foam.CLASS({
     },
 
     function updateMode_(mode) {
-      this.isDisabled = mode === this.DisplayMode.RO ||
-                        mode === this.DisplayMode.DISABLED;
+      this.isDisabled =
+        mode === this.DisplayMode.RO || mode === this.DisplayMode.DISABLED;
     }
   ],
 
@@ -74,10 +92,9 @@ foam.CLASS({
 
       this.removeAllChildren();
 
-      this.add(this.choices.map(function(c) {
+      this.add(this.choices.map(c => {
         return this.E('div').
-          // TODO: why is the radio item getting assigned the same class as the radio whole
-          addClass(this.myClass()).
+          addClass('choice').
           start('input').
             attrs({
               type: 'radio',
@@ -87,9 +104,7 @@ foam.CLASS({
               disabled: self.isDisabled$
             }).
             setID(id = self.NEXT_ID()).
-            on('change', function(evt) {
-              self.data = c[0];
-            }).
+            on('change', function(evt) { self.data = c[0]; }).
           end().
           start('label').
             attrs({for: id}).
@@ -97,7 +112,7 @@ foam.CLASS({
               add(c[1]).
             end().
           end();
-      }.bind(this)));
+      }));
     }
   ]
 });

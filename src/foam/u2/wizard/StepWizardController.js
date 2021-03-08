@@ -90,9 +90,12 @@ foam.CLASS({
     },
     {
       name: 'currentSection',
-      expression: function(currentWizardlet, wizardPosition$sectionIndex) {
-        return this.currentWizardlet.currentSection = currentWizardlet
-            .sections[wizardPosition$sectionIndex];
+      expression: function(
+        wizardlets,
+        wizardPosition$wizardletIndex, wizardPosition$sectionIndex
+      ) {
+        return wizardlets[wizardPosition$wizardletIndex]
+          .sections[wizardPosition$sectionIndex];
       }
     },
     {
@@ -146,7 +149,6 @@ foam.CLASS({
 
         // Bind availability listener for wizardlet availability
         var isAvailable$ = w.isAvailable$;
-        console.log(wizardletIndex, w, w.isAvailable$, isAvailable$);
         this.wsub.onDetach(isAvailable$.sub(() => {
           this.onWizardletAvailability(wizardletIndex, isAvailable$.get());
         }));
@@ -205,6 +207,7 @@ foam.CLASS({
       });
     },
     function nextAvailable(pos, iter) {
+      if ( ! pos || ! iter ) return null;
       for ( let p = iter(pos) ; p != null ; p = iter(p) ) {
         let wizardlet = this.wizardlets[p.wizardletIndex]
         if ( ! wizardlet.isVisible ) continue;
@@ -225,6 +228,8 @@ foam.CLASS({
     function next() {
       // Save current wizardlet, and any save-able (isAvailable) but invisible
       // wizardlets that may exist in between this one and the next.
+      // If it exists, load the next wizardlet
+      // TODO: Just load next wizardlet instead of loading all in the beginning
       var start = this.wizardPosition.wizardletIndex;
       var end = this.nextScreen ?
         this.nextScreen.wizardletIndex : this.wizardlets.length;
@@ -232,6 +237,7 @@ foam.CLASS({
       for ( let i = start ; i < end ; i++ ) {
         if ( ! this.wizardlets[i].isAvailable ) continue;
         p = p.then(() => this.wizardlets[i].save());
+        if ( (i + 1) < end && this.wizardlets[i + 1] ) p = p.then(() => this.wizardlets[i + 1].load());
       }
       return p.then(() => {
         if ( this.nextScreen == null ) {

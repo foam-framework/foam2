@@ -94,6 +94,8 @@ foam.CLASS({
     function setToNullCurrentMemento() {
       /** setting the last not null memento in memento chain to null to update application controller memento value on stack.back **/
       var m = this.memento;
+      if ( ! m )
+        return;
       var tail = this.memento.tail;
       
       if ( tail == null ) {
@@ -112,6 +114,8 @@ foam.CLASS({
     },
     function findCurrentMemento() {
       var tail = this.memento;
+      if ( ! tail )
+        return tail;
       while ( true ) {
         if ( tail.tail == null ) {
           return tail;

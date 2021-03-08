@@ -71,76 +71,26 @@ foam.CLASS({
     {
       name: 'choices',
       documentation: `
-        An array of choices which are single choice is denoted as [value, label, isSelected, choiceMode, isFinal], however the user can
-        just pass in [value, label] and the adapt function will turn it into the [value, label, isSelected, choiceMode, isFinal] format
-        for processing purposes
+        An array of choices which are single choice is denoted as [value, label, isFinal]
+
       `,
       factory: function() {
         return [];
-      },
-      adapt: function(_, n) {
-        if ( ! Array.isArray(n) ) throw new Error('Please submit an array to choices in the MultiChoiceView');
-
-        if ( n.length > 0 ) {
-          n = n.sort();
-          var valueLabelChoices = n.filter(choice => choice.length === 2);
-          var fullChoices = n.filter(choice => choice.length === 5);
-
-          if ( valueLabelChoices.length === n.length ) return n.map(choice => [choice[0], choice[1], false, this.mode, false]);
-          if ( fullChoices.length === n.length ) return n;
-
-          throw new Error('Items in choices array do not have consistent lengths');
-        }
-
-        return n;
-      },
+      }
     },
     {
       class: 'foam.dao.DAOProperty',
       name: 'dao',
       documentation: `
-        If the user just wants to pass in a dao, it will be processed to populate the
+        If the user wants to be able to export data as a dao, then this needs to be filled out.
+
+        If the user just wants to pass in a dao and no choices array, useDao should be true as well and it will be processed to populate the
         choices array instead of manually inputing the choices
       `
     },
     {
-      name: 'selectedChoices',
-      value: [],
-      postSet: function(o, n) {
-        if ( this.onSelect ) this.onSelect(o, n);
-
-        if ( this.selectedChoices.length < this.maxSelected ) {
-          this.choices.forEach(choice => {
-            var isSelected = foam.core.Slot.isInstance(choice[2])
-              ? choice[2].get()
-              : choice[2];
-
-            var isFinal = foam.core.Slot.isInstance(choice[4])
-              ? choice[4].get()
-              : choice[4];
-
-            if ( ! isSelected && ! isFinal ) {
-              choice[3] = this.mustSlot(choice[3]);
-              choice[3].set(foam.u2.DisplayMode.RW);
-            }
-          });
-        } else {
-          this.choices.forEach(choice => {
-            var isSelected = foam.core.Slot.isInstance(choice[2])
-              ? choice[2].get()
-              : choice[2];
-
-            var isFinal = foam.core.Slot.isInstance(choice[4])
-              ? choice[4].get()
-              : choice[4];
-
-            if ( ! isSelected && ! isFinal ) {
-              choice[3] = this.mustSlot(choice[3]);
-              choice[3].set(foam.u2.DisplayMode.DISABLED);
-            }
-          });
-        }
-      }
+      class: 'Boolean',
+      name: 'useDao'
     },
     {
       class: 'Boolean',
@@ -150,8 +100,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isValidNumberOfChoices',
-      expression: function(minSelected, maxSelected, selectedChoices){
-        return selectedChoices.length >= minSelected && selectedChoices.length <= maxSelected;
+      expression: function(minSelected, maxSelected, data){
+        return data.length >= minSelected && data.length <= maxSelected;
       }
     },
     {
@@ -198,10 +148,42 @@ foam.CLASS({
             : `${this.CHOOSE_AT_LEAST} ${minSelected} ${this.OPTIONS_MSG}`
           ;
       }
+    },
+    {
+      name: 'data',
+      value: []
     }
   ],
 
   methods: [
+    function outputSelectedChoicesInDAO() {
+      if ( ! this.isValidNumberOfChoices || ! this.dao ) {
+        console.warn("Please select a valid number of choices");
+        return foam.dao.NullDAO;
+      }
+
+      var of = this.dao.of
+
+      return this.dao.where(this.IN(of.ID, this.data));
+    },
+
+    function getSelectedSlot(choice) {
+      var slot = foam.core.SimpleSlot.create();
+      slot.sub(() => {
+        var arr = [
+          ...this.data,
+        ];
+        arr = arr.filter((o) => o != choice);
+        if ( slot.get() ) { 
+          arr.push(choice); 
+        }
+        this.data = arr;
+      });
+      this.data$.sub(()=> slot.set(this.data.includes(choice)));
+      slot.set(this.data.includes(choice));
+      return slot;
+    },
+
     function initE() {
       var self = this;
 
@@ -209,7 +191,7 @@ foam.CLASS({
 
       this
         .start()
-          .add(self.slot(function(showMinMaxHelper, helpText_) {
+          .add(this.slot(function(showMinMaxHelper, helpText_) {
             return self.E().callIf(showMinMaxHelper, function() {
               this
               .start(foam.u2.layout.Rows)
@@ -221,54 +203,86 @@ foam.CLASS({
             });
           }))
         .end()
-        .start(self.isVertical ? foam.u2.layout.Rows : foam.u2.layout.Cols)
-          .addClass(self.myClass('flexer'))
+        .start(this.isVertical ? foam.u2.layout.Rows : foam.u2.layout.Cols)
+          .addClass(this.myClass('flexer'))
           .add( // TODO isDoaFetched and simpSlot0 aren't used should be clean up
-            self.isDaoFetched$.map(isDaoFetched => {
-              var newChoices = [];
+            this.isDaoFetched$.map(isDaoFetched => {
+              var toRender = this.choices.map((choice, index) => {
+                var valueSimpSlot = this.mustSlot(choice[0]);
+                var labelSimpSlot = this.mustSlot(choice[1]);
 
-              var toRender = self.choices.map(function(choice) {
-                var simpSlot0 = self.mustSlot(choice[0]);
-                var simpSlot1 = self.mustSlot(choice[1]);
-                var simpSlot2 = self.mustSlot(choice[2]);
-                var simpSlot3 = self.mustSlot(choice[3]);
-                var simpSlot4 = self.mustSlot(choice[4]);
+                var isFinal = choice[2];
+                
+                var isSelectedSlot = self.slot(function(choices, data) {
+                  try {
+                    var isSelected = data.includes(choices[index][0]);
+                    return !! isSelected;
+                  } catch(err) {
+                    console.error('isSelectedSlot', err)
+                    return false;
+                  }
+      
+                });
 
-                newChoices = [
-                  ...newChoices,
-                  [choice[0], simpSlot1, simpSlot2, simpSlot3, simpSlot4]
-                ];
-                var cap = choice[2] && choice[2].obj && choice[2].obj.capability;
-                var cls =  cap && cap.cls_.id;
-                return self.E()
+                var isDisabledSlot = self.slot(function(choices, data, maxSelected) {
+                  try {
+                      if ( isFinal ) {
+                        return true;
+                      }
+  
+                      var isSelected = data.includes(choices[index][0]);
+  
+                      return !! (! isSelected && data.length >= maxSelected);
+                  } catch(err) {
+                    console.error('isDisabledSlot', err);
+                    return false;
+                  }
+                });
+                
+                var cls =  choice[0] && choice[0].cls_.id;
+
+                var selfE = self.E();
+
+                return selfE
                   .addClass(self.myClass('innerFlexer'))
                   // NOTE: This should not be the way we implement columns.
                   .style({
                     'width': `${100 / self.NUM_COLUMNS}%`
                   })
-                  .tag(self.CardSelectView, {
-                      data$: simpSlot2,
-                      label$: simpSlot1,
-                      mode$: simpSlot3,
-                      of: cls,
-                      obj: cap
-                    });
-              });
+                  .start(self.CardSelectView, {
+                    data$: valueSimpSlot,
+                    label$: labelSimpSlot,
+                    isSelected$: isSelectedSlot,
+                    isDisabled$: isDisabledSlot, 
+                    of: cls
+                  })
+                    .call(function () {
+                      selfE.onDetach(
+                        this.clicked.sub(() => {
+                          var array;
+                          var indexDataToAdd = self.data.indexOf(valueSimpSlot.get())
+                          if ( indexDataToAdd === -1 ){
+                            if ( self.data.length >= self.maxSelected ){
+                              return;
+                            }
 
-              this.choices = newChoices;
+                            array = [
+                              ...self.data,
+                              valueSimpSlot.get()
+                            ];
+                          } else {
+                            array = [
+                              ...self.data
+                            ]
 
-              self.selectedChoices$ = foam.core.ArraySlot.create({
-                slots: newChoices.map(choice => {
-                  return this.mustSlot(choice[2]);
-                })
-              }).map(v => {
-                var selectedChoices = [];
-                v.forEach((w, i) => {
-                  if ( w ) {
-                    selectedChoices.push(this.choices[i]);
-                  }
-                });
-                return selectedChoices;
+                            array.splice(indexDataToAdd, 1);
+                          }
+                          self.data = array;
+                        })
+                      )
+                    })
+                  .end()
+
               });
               return toRender;
             })
@@ -288,7 +302,7 @@ foam.CLASS({
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
-        if ( ! this.dao || ! foam.dao.DAO.isInstance(this.dao) ) return;
+        if ( ! this.useDao && ! this.dao || ! foam.dao.DAO.isInstance(this.dao) ) return;
 
         var of = this.dao.of;
         if ( of._CHOICE_TEXT_ ) {

@@ -5,19 +5,15 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2.svg.graph',
+  package: 'foam.graph.map2d',
   name: 'RelationshipGridPlacementStrategy',
   documentation: `
-    A GridPlacementStrategy that positions FObjects by a
-    predetermined plan based on a specified relationship.
-
-    This plan requires a relationship property name and a
-    root node. The plan fails if there is no path via this
-    key to the 
+    A GridPlacementStrategy that positions FObjects based on their relationship
+    in a provided Graph.
   `,
 
   requires: [
-    'foam.u2.svg.graph.PredeterminedGridPlacementPlan'
+    'foam.u2.svg.map2d.PredeterminedGridPlacementPlan'
   ],
 
   properties: [

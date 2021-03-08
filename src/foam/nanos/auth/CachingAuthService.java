@@ -7,6 +7,7 @@ package foam.nanos.auth;
 
 import foam.core.Detachable;
 import foam.core.X;
+import foam.core.ProxyX;
 import foam.core.XFactory;
 import foam.dao.DAO;
 import foam.dao.Sink;
@@ -63,6 +64,10 @@ public class CachingAuthService
     Session session = x.get(Session.class);
     Subject subject = (Subject) x.get("subject");
     User    user    = subject.getUser();
+
+    if ( user == null ) {
+      return new ConcurrentHashMap<String,Boolean>();
+    }
 
     // If the user in the context does not match the session user, do not use the
     // cache permission map, which belong to session user
@@ -127,7 +132,10 @@ public class CachingAuthService
 
   public static void purgeCache(X x) {
     Session session = x.get(Session.class);
-    session.setContext(session.getContext().put(CACHE_KEY, null));
+
+    if ( session != null ){
+      session.setContext(session.getContext().put(CACHE_KEY, null));
+    }
   }
 
   public CachingAuthService(AuthService delegate) {

@@ -91,6 +91,8 @@ var classes = [
   'foam.mlang.predicate.isAuthorizedToRead',
   'foam.mlang.predicate.isAuthorizedToDelete',
   'foam.mlang.predicate.ContextUserPredicate',
+  'foam.net.CIDR',
+  'foam.net.IPSupport',
   'foam.net.Host',
   'foam.box.Box',
   'foam.box.Skeleton',
@@ -137,9 +139,11 @@ var classes = [
   'foam.box.socket.SocketClientBox',
   'foam.box.socket.SocketClientReplyBox',
   'foam.box.socket.SocketServer',
+  'foam.box.socket.SslContextFactory',
  // 'foam.box.network.DemoSocketClientReplyBox',
   'foam.box.NullBox',
   'foam.dao.DAO',
+  'foam.dao.SlowDAO',
   'foam.dao.DOP',
   'foam.dao.PredicatedDualDelegateDAO',
   'foam.dao.CSVSink',
@@ -294,6 +298,7 @@ var classes = [
   'foam.nanos.auth.ClientAuthService',
   'foam.nanos.auth.ClientLoginAuthService',
   'foam.nanos.auth.AgentAuthService',
+  'foam.nanos.auth.AgentAuthClient',
   'foam.nanos.auth.ClientAgentAuthService',
   'foam.nanos.auth.HtmlDoc',
   'foam.nanos.auth.PasswordExpiryAuthService',
@@ -335,6 +340,7 @@ var classes = [
   'foam.nanos.auth.DeletedAwareDAOTest',
   'foam.nanos.auth.UserAndGroupAuthService',
   'foam.nanos.auth.EnabledCheckAuthService',
+  'foam.nanos.auth.CommonPassword',
   'foam.nanos.http.HttpParameters',
   'foam.nanos.http.DefaultHttpParameters',
   'foam.nanos.http.SendErrorHandler',
@@ -426,6 +432,7 @@ var classes = [
   'foam.nanos.medusa.MedusaUniqueDAO',
   'foam.nanos.medusa.MedusaType',
   'foam.nanos.medusa.PromotedPurgeAgent',
+  'foam.nanos.medusa.PurgeSink',
   'foam.nanos.medusa.RegionStatus',
   'foam.nanos.medusa.ReplayCmd',
   'foam.nanos.medusa.ReplayCompleteCmd',
@@ -695,6 +702,7 @@ var classes = [
   'foam.nanos.ruler.predicate.PropertyEQProperty',
   'foam.nanos.ruler.predicate.NewEqOld',
   'foam.nanos.ruler.predicate.IsInstancePredicate',
+  'foam.nanos.ruler.predicate.IsClassPredicate',
   'foam.nanos.ruler.predicate.PropertyIsInstance',
   'foam.nanos.ruler.predicate.PropertyIsClass',
   'foam.nanos.ruler.predicate.ContextContainsPredicate',
@@ -776,6 +784,7 @@ var classes = [
   'foam.nanos.crunch.Capability',
   'foam.nanos.crunch.CapabilityIntercept',
   'foam.nanos.crunch.MinMaxCapability',
+  'foam.nanos.crunch.MinMaxCapabilityData',
   'foam.nanos.crunch.CapabilityJunctionPayload',
   'foam.nanos.crunch.lite.Capable',
   'foam.nanos.crunch.lite.CapableDAO',
@@ -845,6 +854,7 @@ var classes = [
   'foam.nanos.crunch.predicate.CapabilityPrerequisitesGranted',
   'foam.nanos.crunch.predicate.StatusChangedTo',
   'foam.nanos.crunch.predicate.IsAgent',
+  'foam.nanos.crunch.predicate.CapabilityJunctionTransitionToStatus',
 
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
@@ -893,6 +903,8 @@ var classes = [
   'foam.i18n.ProxyTranslationService',
   'foam.i18n.LocaleTranslationService',
 
+  // Notification
+  'foam.nanos.crunch.TopLevelCapabilityStatusUpdateNotification',
 
   'foam.counter.Counter'
 ];
@@ -950,9 +962,10 @@ var proxies = [
 var blacklist = [
   'foam.core.Property',
   'foam.mlang.predicate.Func',
+  'foam.nanos.controller.Memento',
   'foam.u2.AttrSlot',
   'foam.u2.RenderSink',
-  'foam.u2.ViewSpec',
+  'foam.u2.ViewSpec'
 ];
 
 module.exports = {

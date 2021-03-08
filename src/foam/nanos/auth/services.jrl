@@ -1,0 +1,17 @@
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"commonPasswordDAO",
+  "lazy":false,
+  "serve":true,
+  "authenticate":false,
+  "serviceScript":`
+    return new foam.dao.EasyDAO.Builder(x)
+      .setPm(true)
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("commonPasswordDAO"))
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("commonPasswords")
+      .setOf(foam.nanos.auth.CommonPassword.getOwnClassInfo())
+      .build();
+    `,
+  "client":"{\"of\":\"foam.nanos.auth.CommonPassword\"}"
+})

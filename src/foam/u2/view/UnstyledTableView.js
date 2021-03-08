@@ -34,6 +34,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'click?',
     'dblclick?',
     'editRecord?',
     'filteredTableColumns?',
@@ -97,7 +98,7 @@ foam.CLASS({
       expression: function(of) {
         return ! of ? [] : [].concat(
           of.getAxiomsByClass(foam.core.Property)
-            .filter(p => ! p.hidden && ! p.networkTransient )
+            .filter(p => ! p.hidden )
             .map(a => a.name),
           of.getAxiomsByClass(foam.core.Action)
             .map(a => a.name)
@@ -107,7 +108,7 @@ foam.CLASS({
     {
       name: 'selectedColumnNames',
       expression: function(columns, of, memento) {
-        var ls =  memento && memento.paramsObj.c ? memento.paramsObj.c.map(c => this.returnMementoColumnNameDisregardSorting(c)) : JSON.parse(localStorage.getItem(of.id));
+        var ls =  memento && memento.paramsObj.c ? memento.paramsObj.c.split(',').map(c => this.returnMementoColumnNameDisregardSorting(c)) : JSON.parse(localStorage.getItem(of.id));
         return ls || columns;
       }
     },
@@ -275,39 +276,46 @@ foam.CLASS({
         this.DESC(column) :
         column;
 
-      if ( this.memento ) {
-        if ( ! this.memento.paramsObj.c ) {
-          this.memento.paramsObj.c = [];
-        }
-        var mementoColumn = this.memento.paramsObj.c.find(c => this.returnMementoColumnNameDisregardSorting(c) === column.name)
-        var orderChar = isNewOrderDesc ? this.DESCENDING_ORDER_CHAR : this.ASCENDING_ORDER_CHAR;
-        if ( ! mementoColumn ) {
-          this.memento.paramsObj.c.push(column.name + orderChar);
-        } else {
-          var index = this.memento.paramsObj.c.indexOf(mementoColumn);
-          this.memento.paramsObj.c[index] = column.name + orderChar;
-        }
-        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
+      if ( ! this.memento )
+        return;
+
+      if ( ! this.memento.paramsObj.c ) {
+        this.memento.paramsObj.c = [];
       }
+      var columns = this.memento.paramsObj.c.split(',');
+      var mementoColumn = columns.find(c => this.returnMementoColumnNameDisregardSorting(c) === column.name)
+      var orderChar = isNewOrderDesc ? this.DESCENDING_ORDER_CHAR : this.ASCENDING_ORDER_CHAR;
+      if ( ! mementoColumn ) {
+        columns.push(column.name + orderChar);
+      } else {
+        var index = columns.indexOf(mementoColumn);
+        columns[index] = column.name + orderChar;
+      }
+      this.memento.paramsObj.c = columns.join(',');
+      this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
     },
 
     function updateColumns() {
       localStorage.removeItem(this.of.id);
       localStorage.setItem(this.of.id, JSON.stringify(this.selectedColumnNames.map(c => foam.String.isInstance(c) ? c : c.name )));
 
+      if ( ! this.memento )
+        return;
+
       var newMementoColumns = [];
 
       for ( var s of this.selectedColumnNames ) {
-        if ( ! this.memento.paramsObj.c )
-          this.memento.paramsObj.c = [];
-        var col = this.memento.paramsObj.c.find(c => this.returnMementoColumnNameDisregardSorting(c) === s);
+        var columns = [];
+        if ( this.memento.paramsObj.c )
+          columns = this.memento.paramsObj.c.split(',');
+        var col = columns.find(c => this.returnMementoColumnNameDisregardSorting(c) === s);
         if ( ! col ) {
           newMementoColumns.push(s);
         } else {
           newMementoColumns.push(col);
         }
       }
-      this.memento.paramsObj.c = newMementoColumns;
+      this.memento.paramsObj.c = newMementoColumns.join(',');
       this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj)
 
       this.isColumnChanged = ! this.isColumnChanged;
@@ -317,10 +325,10 @@ foam.CLASS({
       var view = this;
 
       //set memento's selected columns
-      if ( ! this.memento.paramsObj.c ) {
+      if ( this.memento && ! this.memento.paramsObj.c ) {
         this.memento.paramsObj.c = this.columns_.map(c => {
           return this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c);
-        });
+        }).join(',');
         this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj)
       }
 
@@ -397,21 +405,42 @@ foam.CLASS({
                   addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + prop.name))
                   .style({ flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0', 'word-wrap' : 'break-word', 'white-space' : 'normal'})
-                  .add(view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col))./*
+                  .start()
+                    .style({ 
+                      'display': 'inline-block',
+                    })
+                    .add(view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col)).
+                  end()./*
                   .forEach(
                     view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col),
                     function(c, i) { if ( i ) this.add(' / '); this.add(c); }
                   ).*/
                   callIf(isFirstLevelProperty && prop.sortable, function() {
+                    var currArrow = view.restingIcon;
                     this.on('click', function(e) {
                       view.sortBy(prop);
                       }).
                       callIf(prop.label !== '', function() {
-                        this.start('img').attr('src', this.slot(function(order) {
-                          return prop === order ? view.ascIcon :
-                              ( view.Desc.isInstance(order) && order.arg1 === prop )
-                              ? view.descIcon : view.restingIcon;
-                        }, view.order$)).end();
+                        this.start()
+                          .style({ 
+                            'display': 'inline-block',
+                            'position': 'absolute'
+                          })
+                          .start('img')
+                            .style({ 
+                              'margin-top': '2px'
+                            })
+                            .attr('src', this.slot(function(order) {
+                              if ( prop === order ) {
+                                currArrow = view.ascIcon;
+                              } else {
+                                if ( view.Desc.isInstance(order) && order.arg1 === prop )
+                                currArrow = view.descIcon;
+                              }
+                              return currArrow;
+                            }, view.order$))
+                          .end()
+                        .end();
                     });
                   }).
                 end();
@@ -423,7 +452,7 @@ foam.CLASS({
               call(function() {
                 this.start().
                   addClass(view.myClass('th')).
-                  style({ flex: `0 0 ${view.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
+                  style({ flex: `0 0 ${view.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px`, 'text-align': 'unset!important;' }).
                   callIf(view.editColumnsEnabled, function() {
                     this.addClass(view.myClass('th-editColumns'))
                     .on('click', function(e) {
@@ -461,20 +490,6 @@ foam.CLASS({
           var view = this;
           view.props = this.returnPropertiesForColumns(view, view.columns_);
 
-          if ( this.memento && this.memento.paramsObj.c ) {
-            for ( var c of this.memento.paramsObj.c ) {
-              if ( this.shouldColumnBeSorted(c) && ! c.includes('.')) {
-                var prop = view.props.find(p => p.fullPropertyName === c.substr(0, c.length - 1) );
-                if ( prop ) {
-                  if ( c[c.length - 1] === this.DESCENDING_ORDER_CHAR )
-                    dao = dao.orderBy(this.DESC(prop.property));
-                  else
-                    dao = dao.orderBy(prop.property);
-                }
-              }
-            }
-          }
-
           var actions = {};
           var actionsMerger = action => { actions[action.name] = action; };
 
@@ -483,9 +498,9 @@ foam.CLASS({
           // Context menu actions
           view.contextMenuActions.forEach(actionsMerger);
 
-          //with this code error created  slot.get cause promise return
-          //FIX ME
-          return this.slot(function(data, data$delegate, order, updateValues) {
+          // with this code error created slot.get cause promise return
+          // FIX ME
+          var slot = this.slot(function(data, data$delegate, order, updateValues) {
             // Make sure the DAO set here responds to ordering when a user clicks
             // on a table column header to sort by that column.
             if ( this.order ) dao = dao.orderBy(this.order);
@@ -508,9 +523,8 @@ foam.CLASS({
             var valPromises = view.returnRecords(view.of, proxy, propertyNamesToQuery, canObjBeBuildFromProjection);
             var nastedPropertyNamesAndItsIndexes = view.columnHandler.buildArrayOfNestedPropertyNamesAndCorrespondingIndexesInArray(propertyNamesToQuery);
 
-            var tbodyElement = this.
-              E();
-              tbodyElement.
+            var tbodyElement = this.E();
+            tbodyElement.
               addClass(view.myClass('tbody'));
               valPromises.then(function(values) {
 
@@ -525,9 +539,14 @@ foam.CLASS({
                   on('mouseover', function() {
                     view.hoverSelection = obj;
                   }).
+                  callIf(view.click && ! view.disableUserSelection, function() {
+                    tableRowElement.on('click', function() {
+                      view.click(null, obj.id);
+                    });
+                  }).
                   callIf(view.dblclick && ! view.disableUserSelection, function() {
                     tableRowElement.on('dblclick', function() {
-                      view.dblclick && view.dblclick(null, obj.id);
+                      view.dblclick(null, obj.id);
                     });
                   }).
                   callIf( ! view.disableUserSelection, function() {
@@ -555,7 +574,7 @@ foam.CLASS({
                   }).
                   addClass(view.slot(function(selection) {
                     return selection && foam.util.equals(obj.id, selection.id) ?
-                        view.myClass('selected') : '';
+                      view.myClass('selected') : '';
                   })).
                   addClass(view.myClass('row')).
                   style({ 'min-width': view.tableWidth_$ }).
@@ -630,7 +649,7 @@ foam.CLASS({
                     });
                   });
 
-                  for ( var  j = 0 ; j < view.columns_.length ; j++  ) {
+                  for ( var j = 0 ; j < view.columns_.length ; j++  ) {
                     var objForCurrentProperty = obj;
                     var propName = view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view.columns_[j]);
                     var prop = view.props.find(p => p.fullPropertyName === propName);
@@ -669,6 +688,23 @@ foam.CLASS({
 
               return tbodyElement;
             });
+
+            if ( this.memento && this.memento.paramsObj.c ) {
+              var columns = this.memento.paramsObj.c.split(',');
+              for ( var c of columns ) {
+                if ( this.shouldColumnBeSorted(c) && ! c.includes('.')) {
+                  var prop = view.props.find(p => p.fullPropertyName === c.substr(0, c.length - 1) );
+                  if ( prop ) {
+                    if ( c[c.length - 1] === this.DESCENDING_ORDER_CHAR )
+                      this.order = this.DESC(prop.property);
+                    else
+                      this.order = prop.property;
+                    dao = dao.orderBy(this.order);
+                  }
+                }
+              }
+            }
+          return slot;
         }
       },
       function returnRecords(of, dao, propertyNamesToQuery, useProjection) {
@@ -706,7 +742,7 @@ foam.CLASS({
     {
       name: 'property',
       class: 'FObjectProperty',
-      of: 'Property',
+      of: 'Property'
     }
   ]
 });

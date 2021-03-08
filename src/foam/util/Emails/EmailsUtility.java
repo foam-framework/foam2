@@ -50,11 +50,13 @@ public class EmailsUtility {
 
     X userX = x;
     String group = "";
+    String spid = null;
     AppConfig appConfig = (AppConfig) x.get("appConfig");
     if ( user != null ) {
       userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
       group = user.getGroup();
       appConfig = user.findGroup(x).getAppConfig(x);
+      spid = user.getSpid();
     }
 
     Theme theme = (Theme) x.get("theme");
@@ -62,6 +64,9 @@ public class EmailsUtility {
       || ( user != null && ! user.getSpid().equals(x.get("spid")) )
     ) {
       theme = ((Themes) x.get("themes")).findTheme(userX);
+    }
+    if ( spid == null ) {
+      spid = theme.getSpid();
     }
 
     if ( theme.getAppConfig() != null ) {
@@ -74,23 +79,25 @@ public class EmailsUtility {
     }
 
     SupportConfig supportConfig = theme.getSupportConfig();
-    EmailConfig supportEmailConfig = supportConfig.getEmailConfig();
-
+    EmailConfig emailConfig = supportConfig.getEmailConfig();
+    if ( emailConfig == null ) {
+      emailConfig = (EmailConfig) ((DAO) userX.get("emailConfigDAO")).find(spid);
+    }
     // Set ReplyTo, From, DisplayName from support email config
-    if ( supportEmailConfig != null ) {
+    if ( emailConfig != null ) {
       // REPLY TO:
-      if ( ! SafetyUtil.isEmpty(supportEmailConfig.getReplyTo()) ) {
-        emailMessage.setReplyTo(supportEmailConfig.getReplyTo());
+      if ( ! SafetyUtil.isEmpty(emailConfig.getReplyTo()) ) {
+        emailMessage.setReplyTo(emailConfig.getReplyTo());
       }
 
       // DISPLAY NAME:
-      if ( ! SafetyUtil.isEmpty(supportEmailConfig.getDisplayName()) ) {
-        emailMessage.setDisplayName(supportEmailConfig.getDisplayName());
+      if ( ! SafetyUtil.isEmpty(emailConfig.getDisplayName()) ) {
+        emailMessage.setDisplayName(emailConfig.getDisplayName());
       }
 
       // FROM:
-      if ( ! SafetyUtil.isEmpty(supportEmailConfig.getFrom()) ) {
-        emailMessage.setFrom(supportEmailConfig.getFrom());
+      if ( ! SafetyUtil.isEmpty(emailConfig.getFrom()) ) {
+        emailMessage.setFrom(emailConfig.getFrom());
       }
     }
 
@@ -102,22 +109,26 @@ public class EmailsUtility {
         templateArgs = new HashMap<>();
         templateArgs.put("template", templateName);
       }
+
+      String url = appConfig.getUrl().replaceAll("/$", "");
+      templateArgs.put("logo", (url + "/" + theme.getLogo()));
+      templateArgs.put("appLink", url);
+      templateArgs.put("appName", (theme.getAppName()));
+
+      templateArgs.put("locale", user.getLanguage().getCode().toString());
+  
+      foam.nanos.auth.Address address = supportConfig.getSupportAddress();
+      templateArgs.put("supportAddress", address == null ? "" : address.toSummary());
       templateArgs.put("supportPhone", (supportConfig.getSupportPhone()));
       templateArgs.put("supportEmail", (supportConfig.getSupportEmail()));
-
+  
       // personal support user
       User psUser = supportConfig.findPersonalSupportUser(x);
       templateArgs.put("personalSupportPhone", psUser == null ? "" : psUser.getPhoneNumber());
       templateArgs.put("personalSupportEmail", psUser == null ? "" : psUser.getEmail());
       templateArgs.put("personalSupportFirstName", psUser == null ? "" : psUser.getFirstName());
       templateArgs.put("personalSupportFullName", psUser == null ? "" : psUser.getLegalName());
-
-      foam.nanos.auth.Address address = supportConfig.getSupportAddress();
-      templateArgs.put("supportAddress", address == null ? "" : address.toSummary());
-      templateArgs.put("appName", (theme.getAppName()));
-      String url = appConfig.getUrl().replaceAll("/$", "");
-      templateArgs.put("logo", (url + "/" + theme.getLogo()));
-      templateArgs.put("appLink", url);
+      
       emailMessage.setTemplateArguments(templateArgs);
     }
 
@@ -135,5 +146,4 @@ public class EmailsUtility {
     emailMessage.setStatus(foam.nanos.notification.email.Status.UNSENT);
     email.put(emailMessage);
   }
-
 }

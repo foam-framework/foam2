@@ -80,7 +80,7 @@ foam.CLASS({
     ^feature-column-grid {
       display: inline-flex;
       width: calc(100% - 48px);
-      overflow-x: scroll;
+      overflow-x: auto;
     }
 
     ^featureSection {
@@ -245,7 +245,7 @@ foam.CLASS({
                 .addClass(self.myClass('featureSection'))
               .end()
               .on('click', () => {
-                self.openWizard(arr[i].id);
+                self.openWizard(arr[i].id, true);
               })
             .end());
         }
@@ -317,7 +317,7 @@ foam.CLASS({
                   .start(self.GUnit, { columns: 4 })
                     .tag(self.CapabilityCardView, { data: cap })
                     .on('click', () => {
-                      self.openWizard(cap);
+                      self.openWizard(cap, true);
                     })
                   .end();
               }
@@ -350,7 +350,7 @@ foam.CLASS({
               .start(self.GUnit, { columns: 4 })
                 .tag(self.CapabilityCardView, { data: cap })
                 .on('click', () => {
-                  self.openWizard(cap);
+                  self.openWizard(cap, false);
                 })
               .end();
           }
@@ -388,17 +388,18 @@ foam.CLASS({
           )).select())
         .then(sink => {
           if ( sink.array.length == 1 ) {
-            this.openWizard(sink.array[0]);
+            this.openWizard(sink.array[0], false);
           }
         })
     },
-    function openWizard(cap) {
+    function openWizard(cap, showToast) {
       if ( this.wizardOpened ) return;
       this.wizardOpened = true;
-      this.crunchController
-        .createWizardSequence(cap).execute().then(() => {
-          this.wizardOpened = false;
-        });
+      this.crunchController.createWizardSequence(cap)
+        .reconfigure('CheckPendingAgent', { showToast: showToast })
+          .execute().then(() => {
+            this.wizardOpened = false
+          });
     }
   ],
 
@@ -416,7 +417,6 @@ foam.CLASS({
         this.daoUpdate();
         // Attempting to reset menuDAO incase of menu permission grantings.
         this.menuDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
-        this.menuDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
       }
     }
   ]

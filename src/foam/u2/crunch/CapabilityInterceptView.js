@@ -71,7 +71,7 @@ foam.CLASS({
       margin-top: 16px;
     }
     ^detail-container {
-      overflow-y: scroll;
+      overflow-y: auto;
       width: 100%;
     }
     ^main-section {
@@ -82,7 +82,7 @@ foam.CLASS({
       padding: 80px;
 
       max-height: 60%;
-      overflow-y: scroll;
+      overflow-y: auto;
     }
     ^label-title {
       margin: 0;

@@ -131,20 +131,32 @@ p({
 
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"internalSessionDAO",
+  "name":"localInternalSessionDAO",
   "serviceScript":"""
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.session.Session.getOwnClassInfo())
       .setGuid(true)
-      .setCreatedAware(true)
-      .setCreatedByAware(true)
       .setJournalName("sessionsinternal")
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setAuthorize(false)
       .setCluster(false)
-      .setDecorator(new foam.dao.ValidatingDAO(x, new foam.dao.NullDAO.Builder(x).setOf(foam.nanos.session.Session.getOwnClassInfo()).build()))
+      .setDecorator(new foam.dao.ValidatingDAO(x, new foam.dao.NullDAO(x, foam.nanos.session.Session.getOwnClassInfo())))
       .build();
   """
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"internalSessionDAO",
+  "serve":true,
+  "serviceScript":"""
+    return new foam.dao.EasyDAO.Builder(x)
+      .setOf(foam.nanos.session.Session.getOwnClassInfo())
+      .setInnerDAO(x.get("localInternalSessionDAO"))
+      .setEnableInterfaceDecorators(false)
+      .build();
+  """,
+  "client": "{\"of\":\"foam.nanos.session.Session\"}"
 })
 
 p({

@@ -60,6 +60,20 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'com.google.foam.demos.u2',
+  name: 'SampleData3',
+  properties: [
+    {
+      name: 'check',
+      class: 'Boolean',
+      validateObj: function (check) {
+        return check ? '' : 'Please check the box';
+      }
+    }
+  ],
+});
+
+foam.CLASS({
+  package: 'com.google.foam.demos.u2',
   name: 'AllViews',
 
   requires: [
@@ -264,6 +278,16 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'choiceViewWithPlaceholder',
+      value: 'Yes',
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+        placeholder: 'placeholder',
+        choices: ['Yes', 'No', 'Maybe']
+      }
+    },
+    {
+      class: 'String',
       name: 'choiceViewWithValues',
       view: {
         class: 'foam.u2.view.ChoiceView',
@@ -276,6 +300,24 @@ foam.CLASS({
       view: {
         class: 'foam.u2.view.RadioView',
         choices: ['Yes', 'No', 'Maybe']
+      }
+    },
+    {
+      class: 'String',
+      name: 'radioViewHorizontal',
+      view: {
+        class: 'foam.u2.view.RadioView',
+        choices: ['Yes', 'No', 'Maybe'],
+        isHorizontal: true
+      }
+    },
+    {
+      class: 'String',
+      name: 'radioViewHorizontalMoreOptions',
+      view: {
+        class: 'foam.u2.view.RadioView',
+        choices: [1, 2, 3, 4, 5, 6, 7],
+        isHorizontal: true
       }
     },
     {
@@ -405,6 +447,27 @@ foam.CLASS({
       }
     },
     {
+      class: 'FObjectArray',
+      name: 'fobjectArray5',
+      of: 'com.google.foam.demos.u2.SampleData3',
+      view: {
+        class: 'foam.u2.view.FObjectArrayView',
+        mode: 'RW',
+        enableAdding: true,
+        enableRemoving: true,
+        defaultNewItem: ''
+      },
+      autoValidate: true,
+      validationTextVisible: true,
+      validateObj: function(fobjectArray5, fobjectArray5$errors) {
+        console.log('called');
+        if ( fobjectArray5.length < 1 )
+          return 'Please enter fobjectArray5 information'
+        console.log('...', fobjectArray5$errors)
+        return fobjectArray5$errors
+      }
+    },
+    {
       class: 'EMail',
       name: 'defaultEMail',
       value: 'someone@somewhere.com'
@@ -505,11 +568,9 @@ foam.CLASS({
       view: {
         class: 'foam.u2.view.FObjectView',
         choices: [
-          [ 'foam.util.Timer', 'Timer' ],
-          [ 'foam.core.Property', 'Property' ],
-          [ 'foam.nanos.menu.DAOMenu',  'DAO'     ],
-          [ 'foam.nanos.menu.SubMenu',  'SubMenu' ],
-          [ 'foam.nanos.menu.TabsMenu', 'Tabs'    ]
+          [ 'foam.util.Timer',         'Timer' ],
+          [ 'foam.core.Property',      'Property' ],
+          [ 'foam.nanos.menu.DAOMenu', 'DAO' ]
         ]
       }
     },

@@ -1,10 +1,17 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.fs;
 
 import foam.util.SafetyUtil;
-
 import java.nio.file.*;
 
-public class FileSystemStorage extends AbstractStorage {
+public class FileSystemStorage
+  extends AbstractStorage
+{
 
   public FileSystemStorage() {
     super();
@@ -16,7 +23,7 @@ public class FileSystemStorage extends AbstractStorage {
 
   @Override
   protected FileSystem getFS() {
-      return FileSystems.getDefault();
+    return FileSystems.getDefault();
   }
 
   @Override

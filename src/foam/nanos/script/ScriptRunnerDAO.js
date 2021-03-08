@@ -81,10 +81,10 @@ foam.CLASS({
               Script s = (Script) script.fclone();
               try {
                 s.setStatus(ScriptStatus.RUNNING);
-                s = (Script) getDelegate().put_(x, s);
-                getLogger().debug("agency", s.getId(), "start");
+                s = (Script) getDelegate().put_(x, s).fclone();
+                getLogger().info("agency", s.getId(), "start");
                 s.runScript(x);
-                getLogger().debug("agency", s.getId(), "end");
+                getLogger().info("agency", s.getId(), "end");
                 s.setStatus(ScriptStatus.UNSCHEDULED);
                 getDelegate().put_(x, s);
               } catch(Throwable t) {
@@ -92,7 +92,7 @@ foam.CLASS({
                 s.setStatus(ScriptStatus.ERROR);
                 getDelegate().put_(x, s);
                 getLogger().error("agency", s.getId(), t);
-             }
+              }
             }
           }, "Run script: " + script.getId());
         return script;

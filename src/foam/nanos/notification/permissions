@@ -3,3 +3,8 @@ p({"class":"foam.nanos.auth.Permission","id":"notificationsetting.create","descr
 p({"class":"foam.nanos.auth.Permission","id":"notificationsetting.remove.*","description":"Permission to delete any notificationsetting."})
 p({"class":"foam.nanos.auth.Permission","id":"notificationsetting.read.*","description":"Permission to read any notificationsetting."})
 p({"class":"foam.nanos.auth.Permission","id":"notificationsetting.update.*","description":"Permission to update any notificationsettings."})
+p({"class":"foam.nanos.auth.Permission","id":"service.notificationSettingDefaultsDAO","description":"Permission to access notificationSettingDefaultsDAO"})
+p({"class":"foam.nanos.auth.Permission","id":"notificationsettingdefaults.create","description":"Permission to create default notificationsetting."})
+p({"class":"foam.nanos.auth.Permission","id":"notificationsettingdefaults.remove.*","description":"Permission to delete any default notificationsetting."})
+p({"class":"foam.nanos.auth.Permission","id":"notificationsettingdefaults.read.*","description":"Permission to read any default notificationsetting."})
+p({"class":"foam.nanos.auth.Permission","id":"notificationsettingdefaults.update.*","description":"Permission to update any default notificationsetting."})

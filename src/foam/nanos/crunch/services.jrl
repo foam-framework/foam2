@@ -85,7 +85,16 @@ p({
         .build())
       .build();
   """,
-  "client":"{\"of\":\"foam.nanos.crunch.UserCapabilityJunction\", \"remoteListenerSupport\": false}"
+  "client":"{
+    \"of\":\"foam.nanos.crunch.UserCapabilityJunction\",
+     \"remoteListenerSupport\": false,
+     \"decorators\": [
+        {
+          \"class\":\"foam.nanos.fs.FileArrayDAODecorator\",
+          \"skipToData\": true
+        }
+      ]
+     }"
 })
 
 p({
@@ -99,6 +108,7 @@ p({
       .setGuid(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("userCapabilityJunctions")
+      .setEnableInterfaceDecorators(false)
       .setOf(foam.nanos.crunch.UserCapabilityJunction.getOwnClassInfo())
       // .setDecorator(decorator)
       .build();

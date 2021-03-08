@@ -67,6 +67,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/Notifiable' },
   { name: "foam/nanos/auth/CreatedAware" },
   { name: "foam/nanos/auth/User" },
+  { name: "foam/nanos/auth/PermissionTableView" },
   { name: "foam/nanos/auth/LastModifiedAware" },
   { name: "foam/nanos/auth/LastModifiedByAware" },
   { name: "foam/nanos/auth/ServiceProviderAware" },
@@ -205,6 +206,7 @@ FOAM_FILES([
   { name: 'foam/nanos/medusa/MedusaType' },
   { name: 'foam/nanos/medusa/NodeCView' },
   { name: 'foam/nanos/medusa/PromotedPurgeAgent' },
+  { name: 'foam/nanos/medusa/PurgeSink' },
   { name: 'foam/nanos/medusa/RegionCView' },
   { name: 'foam/nanos/medusa/RegionStatus' },
   { name: 'foam/nanos/medusa/ReplayCmd' },
@@ -219,7 +221,6 @@ FOAM_FILES([
   { name: 'foam/nanos/medusa/ReplayingInfoDetailCView' },
   { name: 'foam/nanos/medusa/RetryClientSinkDAO' },
   { name: 'foam/nanos/medusa/Status' },
-  { name: 'foam/nanos/session/Session' },
   { name: 'foam/nanos/medusa/ZoneCView' },
   { name: 'foam/nanos/medusa/benchmark/DaggerLinkBenchmark' },
   { name: 'foam/nanos/medusa/benchmark/DaggerVerifyBenchmark' },
@@ -300,6 +301,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/ClientAuthService" },
   { name: "foam/nanos/auth/ClientLoginAuthService" },
   { name: "foam/nanos/auth/AgentAuthService" },
+  { name: "foam/nanos/auth/AgentAuthClient" },
   { name: "foam/nanos/auth/ClientAgentAuthService" },
   { name: "foam/nanos/pm/PMTemperatureCellFormatter" },
   { name: "foam/nanos/pm/NullPM" },
@@ -360,8 +362,6 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/SlackSetting' },
   { name: 'foam/nanos/notification/ToastNotificationDAO' },
   { name: 'foam/nanos/notification/ToastState' },
-  { name: 'foam/nanos/notification/ScriptRunNotification'},
-  { name: 'foam/nanos/notification/ScriptRunNotificationNotificationCitationView'},
   { name: 'foam/nanos/notification/NotificationMessageModal'},
   { name: 'foam/nanos/dashboard/Demo' },
 
@@ -439,6 +439,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/Renewable" },
   { name: "foam/nanos/crunch/Refinements" },
   { name: "foam/nanos/crunch/MinMaxCapability" },
+  { name: "foam/nanos/crunch/MinMaxCapabilityData" },
   { name: "foam/nanos/crunch/CapabilityJunctionStatus" },
   { name: "foam/nanos/crunch/CapabilityIntercept" },
   { name: "foam/nanos/crunch/CapabilityJunctionPayload" },
@@ -484,6 +485,7 @@ FOAM_FILES([
   { name: 'foam/nanos/crunch/predicate/CapabilityPrerequisitesGranted' },
   { name: 'foam/nanos/crunch/predicate/StatusChangedTo' },
   { name: 'foam/nanos/crunch/predicate/IsAgent' },
+  { name: 'foam/nanos/crunch/predicate/CapabilityJunctionTransitionToStatus' },
   //spid
   { name: "foam/nanos/auth/CreateUserCapabilityJunctionOnSpidSet" },
   { name: "foam/nanos/auth/SetUserServiceProviderJunctionRuleAction" },
@@ -500,6 +502,7 @@ FOAM_FILES([
   { name: "foam/nanos/crunch/ui/CapableWAO" },
   { name: "foam/nanos/crunch/ui/CapabilityWizardlet" },
   { name: "foam/nanos/crunch/ui/MinMaxCapabilityWizardlet" },
+  { name: "foam/nanos/crunch/ui/MinMaxCapabilityWizardletSection" },
   { name: "foam/nanos/crunch/ui/ReviewCapabilityWizardlet" },
   { name: "foam/nanos/crunch/ui/ReviewCapabilityView" },
   { name: "foam/nanos/crunch/ui/CapableView" },
@@ -542,4 +545,7 @@ FOAM_FILES([
   { name: "foam/nanos/iban/IBANInfo" },
   { name: "foam/nanos/iban/ValidationIBAN" },
   { name: "foam/nanos/iban/test/ValidationIBANTest" },
+
+  //notification
+  { name: "foam/nanos/crunch/TopLevelCapabilityStatusUpdateNotification" },
 ]);

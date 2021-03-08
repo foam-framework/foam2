@@ -36,10 +36,8 @@ foam.CLASS({
   ^ .side-nav-view {
     font-size: medium!important;
     font-weight: normal;
-    display: inline-block;
     position: absolute;
     height: calc(100vh - 80px);
-    width: 250px;
     overflow-x: hidden;
     z-index: 100;
     font-size: 26px;
@@ -53,13 +51,6 @@ foam.CLASS({
     margin: 14px 0 0;
   }
 
-  ^ .foam-u2-view-TreeViewRow-label {
-    font-weight: 300;
-  }
-
-  ^ .foam-u2-view-TreeViewRow {
-    width: 100%;
-  }
   ^ .tree-view-height-manager {
     margin-bottom: 40px;
   }
@@ -76,7 +67,7 @@ foam.CLASS({
       class: 'foam.dao.DAOProperty',
       name: 'dao_',
       expression: function(menuDAO) {
-        return menuDAO.orderBy(this.Menu.ORDER);
+        return menuDAO;
       }
     },
     {
@@ -85,7 +76,8 @@ foam.CLASS({
       view: {
         class: 'foam.u2.TextField',
         type: 'search',
-        onKey: true
+        onKey: true,
+        ariaLabel: 'Menu Search'
       },
       value: ''
     }
@@ -114,7 +106,7 @@ foam.CLASS({
               startExpanded: true,
               query: self.menuSearch$,
               onClickAddOn: function(data) { self.openMenu(data); },
-              selection$: self.currentMenu$,
+              selection: self.currentMenu,
               formatter: function(data) {
                 this.translate(data.id + '.label', data.label);
               }

@@ -20,10 +20,19 @@ foam.CLASS({
     'foam.core.ContextAgent',
     'foam.core.FObject',
     'foam.core.X',
+    'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.log.LogLevel',
+    'static foam.mlang.MLang.AND',
+    'static foam.mlang.MLang.COUNT',
+    'static foam.mlang.MLang.EQ',
+    'static foam.mlang.MLang.GTE',
+    'foam.nanos.alarming.Alarm',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
+    'java.util.HashMap',
+    'java.util.List',
     'java.util.Timer'
   ],
 
@@ -73,6 +82,11 @@ foam.CLASS({
       class: 'Boolean'
     },
     {
+      name: 'lastAlarmsSince',
+      class: 'Date',
+      javaFactory: 'return new java.util.Date(1081157732);'
+    },
+    {
       name: 'logger',
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
@@ -94,13 +108,6 @@ foam.CLASS({
       javaCode: `
       getLogger().info("start", "interval", getTimerInterval());
       schedule(getX());
-      // ClusterConfigSupport support = (ClusterConfigSupport) getX().get("clusterConfigSupport");
-      // Timer timer = new Timer(this.getClass().getSimpleName(), true);
-      // setTimer(timer);
-      // timer.scheduleAtFixedRate(
-      //   new AgencyTimerTask(getX(), support.getThreadPoolName(), this),
-      //   getInitialTimerDelay(),
-      //   getTimerInterval());
       `
     },
     {
@@ -153,15 +160,45 @@ foam.CLASS({
           }
         } catch ( Throwable t ) {
           pm.error(x, t);
-          getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage());
           if ( config.getStatus() != Status.OFFLINE ) {
+            getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage());
             ClusterConfig cfg = (ClusterConfig) config.fclone();
             cfg.setStatus(Status.OFFLINE);
-            getDao().put_(x, cfg);
+            config = (ClusterConfig) getDao().put_(x, cfg);
+          }
+          Throwable cause = t.getCause();
+          if ( cause == null ||
+               ! ( cause instanceof java.io.IOException ) ) {
+            getLogger().warning(config.getId(), t.getClass().getSimpleName(), t.getMessage(), t);
           }
         }
+
+        java.util.Date now = new java.util.Date();
+        client = support.getHTTPClientDAO(x, "alarmDAO", myConfig, config);
+        client = client.where(
+          AND(
+            EQ(Alarm.SEVERITY, LogLevel.ERROR),
+            EQ(Alarm.CLUSTERABLE, false),
+            EQ(Alarm.HOSTNAME, config.getName()),
+            GTE(Alarm.LAST_MODIFIED, getLastAlarmsSince())
+          )
+        );
+        List<Alarm> alarms = (List) ((ArraySink) client.select(new ArraySink())).getArray();
+        if ( alarms != null ) {
+          DAO alarmDAO = (DAO) x.get("alarmDAO");
+          for (Alarm alarm : alarms ) {
+            getLogger().debug("alarm", alarm);
+            alarmDAO.put(alarm);
+          }
+        }
+        setLastAlarmsSince(now);
       } catch ( Throwable t ) {
-        getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage());
+        Throwable cause = t.getCause();
+        if ( cause == null ||
+             ! ( cause instanceof java.io.IOException ) &&
+             config.getStatus() != Status.OFFLINE ) {
+          getLogger().debug(config.getId(), t.getClass().getSimpleName(), t.getMessage(), t);
+        }
       } finally {
         schedule(x);
       }

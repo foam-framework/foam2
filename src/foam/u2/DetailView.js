@@ -20,7 +20,13 @@ foam.CLASS({
 
   exports: [
     'currentData as data',
-    'controllerMode'
+    'currentData as objData',
+    'controllerMode',
+    'currentMemento as memento'
+  ],
+
+  imports: [
+    'memento'
   ],
 
   axioms: [
@@ -102,7 +108,8 @@ foam.CLASS({
         return this.of ? this.of.model_.label : '';
       },
     },
-    ['nodeName', 'DIV']
+    ['nodeName', 'DIV'],
+    'currentMemento'
   ],
 
   css: `
@@ -116,6 +123,33 @@ foam.CLASS({
     ^toolbar {
       display: flex;
       padding-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    ^ table {
+      width: 100%;
+      table-layout: fixed;
+    }
+
+    ^ table tr td:nth-of-type(2) {
+      width: 70%;
+    }
+
+    
+    /* 
+     * Styles for table contents 
+     */
+
+    ^ table .foam-u2-stack-StackView {
+      padding-left: 0 !important;
+    }
+
+    ^ table .foam-u2-tag-TextArea {
+      max-width: 100%;
+    }
+
+    ^ table .foam-u2-Multiview-container[style*="float"] .foam-u2-tag-TextArea {
+      width: 100%;
     }
   `,
 
@@ -169,6 +203,10 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
+
+      if ( this.memento )
+        this.currentMemento$ = this.memento.tail$;
+
       var hasTabs = false;
       this.add(this.slot(function(of, properties, actions) {
         if ( ! of ) return '';
@@ -180,18 +218,14 @@ foam.CLASS({
         // bound to data of a new class, which causes problems.
         self.currentData = self.data;
 
-        var title = self.title && this.E('tr').
-          start('td').addClass(this.myClass('title')).attrs({ colspan: 2 }).
-            add(self.title$).
-          end();
+        self.start().addClass(self.myClass('title')).add(self.title$).end();
 
         var tabs = foam.u2.Tabs.create({}, self);
 
         return self.actionBorder(
           this.
-            E('table').
             addClass(this.myClass()).
-            add(title).
+            E('table').
             forEach(properties, function(p) {
               var config = self.config && self.config[p.name];
               var expr = foam.mlang.Expressions.create();

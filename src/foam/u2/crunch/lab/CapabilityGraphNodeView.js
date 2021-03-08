@@ -13,6 +13,10 @@ foam.CLASS({
     'foam.u2.crunch.CapabilityFeatureView'
   ],
 
+  imports: [
+    'memento'
+  ],
+
   css: `
     ^div {
       position: relative;
@@ -44,6 +48,7 @@ foam.CLASS({
     }
     ^segment.tiny {
       font-size: 9px;
+      width: inherit;
     }
   `,
 
@@ -76,7 +81,6 @@ foam.CLASS({
       var capability = this.data;
       var ucj = null;
       if ( Array.isArray(this.data) ) {
-        console.log('YES, ARRY', this.data);
         capability = this.data[0];
         ucj = this.data[1];
       }
@@ -102,17 +106,23 @@ foam.CLASS({
             .addClass(this.myClass('segment')).addClass('title')
             .add(foam.String.labelize(capability.name))
           .end()
-          .start()
+          .start('button')
             .addClass(this.myClass('segment')).addClass('tiny')
             .add(capability.id)
+            .on('click', function() {
+              var menu = 'admin.data';
+              var dao = 'capabilityDAO';
+              self.memento.value = [menu, dao, capability.id].join(foam.nanos.controller.Memento.SEPARATOR);
+            })
           .end()
           .callIf(ucj !== null, function () {
             this
-              .start()
+              .start('button')
                 .addClass(self.myClass('segment'))
                 .callIf(ucj.status.background, function () {
                   this.style({
                     'background-color': ucj.status.background,
+                    'width': 'inherit'
                   })
                 })
                 .callIf(ucj.status.color, function () {
@@ -121,6 +131,11 @@ foam.CLASS({
                   })
                 })
                 .add(ucj.status.label)
+                .on('click', function() {
+                  var menu = 'admin.data';
+                  var dao = 'userCapabilityJunctionDAO';
+                  self.memento.value = [menu, dao, ucj.id].join(foam.nanos.controller.Memento.SEPARATOR);
+                })
               .end()
               ;
           })

@@ -43,6 +43,12 @@ foam.CLASS({
       name: 'DAOKey',
       documentation: `Defines the daokey segment of the permission pertaining to your service.
           Checked in permission templates and applied in authorizer.`
+    },
+    {
+      class: 'Boolean',
+      name: 'enableDefaultPermission',
+      documentation: `Defines default operation permissions similar to the standard authorizer.
+          ex: model.read.id || model.read etc..`
     }
   ],
 

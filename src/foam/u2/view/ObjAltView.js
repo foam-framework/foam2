@@ -11,11 +11,16 @@ foam.CLASS({
 
   imports: [ 'memento' ],
 
+  requires: [ 'foam.u2.view.RadioView' ],
+
   documentation: "Like AltView, but for Objects instead of DAO's.",
 
   css: `
     ^ { margin: auto; }
     ^ select { height: 26px }
+    ^ .foam-u2-view-RadioView.foam-u2-view-RadioView-horizontal-radio .choice {
+      flex-basis: calc(100% / 10);
+    }
   `,
 
   properties: [
@@ -30,12 +35,15 @@ foam.CLASS({
     {
       name: 'selectedView',
       view: function(_, X) {
-        return foam.u2.view.ChoiceView.create(
-          {choices: X.data.views},
+        return X.data.RadioView.create(
+          {choices: X.data.views, isHorizontal: true},
           X.createSubContext({controllerMode: foam.u2.ControllerMode.EDIT})
         );
       },
       postSet: function() {
+        if ( ! this.memento )
+          return;
+
         var view = this.views.find(v => v[0] === this.selectedView);
         if ( view ) {
           this.memento.paramsObj.sV = view[1];

@@ -21,16 +21,11 @@ foam.CLASS({
     'foam.i18n.TranslationService',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Subject',
-    'foam.nanos.notification.Notification',
+    'foam.nanos.crunch.TopLevelCapabilityStatusUpdateNotification',
     'foam.nanos.theme.Theme',
     'foam.nanos.theme.Themes',
     'java.util.Date',
     'java.util.HashMap'
-  ],
-
-  messages: [
-    { name: 'NOTIFICATION_BODY_P1', message: 'Your capability \"'},
-    { name: 'NOTIFICATION_BODY_P2', message: '\" has been set to the status '}
   ],
 
   methods: [
@@ -57,22 +52,17 @@ foam.CLASS({
           String capabilityName = ts.getTranslation(locale, cap.getId() + ".name", cap.getName());
           String junctionStatus = ts.getTranslation(locale, "foam.nanos.crunch.CapabilityJunctionStatus." + junction.getStatus().getName() + ".label", junction.getStatus().getLabel());
 
-          String notificationP1 = ts.getTranslation(locale, getClassInfo().getId()+ ".NOTIFICATION_BODY_P1", NOTIFICATION_BODY_P1);
-          String notificationP2 = ts.getTranslation(locale, getClassInfo().getId()+ ".NOTIFICATION_BODY_P2", NOTIFICATION_BODY_P2);
-
-          StringBuilder sb = new StringBuilder(notificationP1)
-          .append(capabilityName)
-          .append(notificationP2)
-          .append(junctionStatus)
-          .append(".");
-
           HashMap<String, Object> args = new HashMap<>();
-            args.put("capNameEn", cap.getName());
-            args.put("capName", capabilityName);
-            args.put("junctionStatusEn", junction.getStatus().getName());
-            args.put("junctionStatus", junctionStatus);
+          args.put("capNameEn", cap.getName());
+          args.put("capName", capabilityName);
+          args.put("junctionStatusEn", junction.getStatus().getName());
+          args.put("junctionStatus", junctionStatus);
 
-          Notification notification = new Notification();
+          TopLevelCapabilityStatusUpdateNotification notification = new TopLevelCapabilityStatusUpdateNotification();
+          notification.setCapabilityName(cap.getName());
+          notification.setCapabilitySource(cap.getId() + ".name");
+          notification.setJunctionStatus(junction.getStatus().getLabel());
+          notification.setJunctionSource("foam.nanos.crunch.CapabilityJunctionStatus." + junction.getStatus().getName() + ".label");
 
           // if the UserCapabilityJunction belongs to an actual user, send the notification to the user.
           // otherwise, send the notification to the group the user is under
@@ -81,7 +71,6 @@ foam.CLASS({
 
           notification.setNotificationType("Capability Status Update");
           notification.setCreated(new Date());
-          notification.setBody(sb.toString());
           notification.setEmailName("top-level-capability-status-update");
           notification.setEmailArgs(args);
           user.doNotify(x, notification);

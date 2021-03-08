@@ -57,7 +57,7 @@ foam.CLASS({
               if ( ! axiom )
                 axiom = data.of.getAxiomByName(data.selectedColumnNames[i]);
             }
-            if ( ! axiom || axiom.networkTransient ) {
+            if ( ! axiom ) {
               continue;
             }
             rootProperty = [ axiom.name, this.columnHandler.returnAxiomHeader(axiom) ];
@@ -101,8 +101,6 @@ foam.CLASS({
           else {
             var axiom =  tableColumns.find(c => c.name === notSelectedColumns[i]);
             axiom = axiom || data.of.getAxiomByName(notSelectedColumns[i]);
-            if ( axiom.networkTransient )
-              continue;
             rootProperty = [ axiom.name, this.columnHandler.returnAxiomHeader(axiom) ];
           }
 
@@ -186,7 +184,7 @@ foam.CLASS({
           .add(this.slot(function(views) {
             var i = 0;
             return this.E()
-              .style({'overflow': 'scroll', 'padding-bottom': '20px', 'max-height': window.innerHeight - 300 > 0 ? window.innerHeight - 300 : window.innerHeight + 'px'})
+              .style({'overflow': 'auto', 'padding-bottom': '20px', 'max-height': window.innerHeight - 300 > 0 ? window.innerHeight - 300 : window.innerHeight + 'px'})
               .forEach(views, function(view) {
                 view.prop.index = i;
                 this

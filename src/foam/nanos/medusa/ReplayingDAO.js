@@ -14,6 +14,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
+    'foam.nanos.pm.PM',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
   ],
@@ -129,12 +130,15 @@ foam.CLASS({
 
       synchronized ( replayingLock_ ) {
         if ( replaying.getReplaying() ) {
+          PM pm = PM.create(x, this.getClass().getSimpleName(), "blockOnReplay", "wait");
           try {
             getLogger().debug("wait");
             replayingLock_.wait();
             getLogger().debug("wake");
           } catch (InterruptedException e) {
             throw new RuntimeException(e);
+          } finally {
+            pm.log(x);
           }
         }
       }

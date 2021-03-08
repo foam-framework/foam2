@@ -95,12 +95,11 @@ public class SessionServerBox
         return;
       }
 
-      // test and use non-clustered medusa sessions
-      DAO internalSessionDAO = (DAO) getX().get("internalSessionDAO");
+      // test and use non-clustered sessions
+      DAO internalSessionDAO = (DAO) getX().get("localInternalSessionDAO");
       if ( internalSessionDAO != null ) {
         session = (Session) internalSessionDAO.find(sessionID);
         if ( session != null ) {
-          session = (Session) session.fclone();
           session.setClusterable(false);
         }
       }
@@ -112,41 +111,40 @@ public class SessionServerBox
       if ( session == null ) {
         session = new Session((X) getX().get(Boot.ROOT));
         session.setId(sessionID == null ? "anonymous" : sessionID);
-        if ( req != null ) {
-          session.setRemoteHost(req.getRemoteHost());
-        }
-        try {
-          // set clusterable false so only saved locally until user known.
-          boolean savedClusterable = session.getClusterable();
-          session.setClusterable(false);
-          session = (Session) sessionDAO.put(session).fclone();
-          session.setClusterable(savedClusterable);
-        } catch ( RuntimeException e ) {
-          // Allow admin to login in locally during startup
-          if ( session.getUserId() > 0 ) {
-            User user = (User) ((DAO) getX().get("localUserDAO")).find_(getX(), session.getUserId());
-            if ( user.isAdmin() ) {
-              session.setClusterable(false);
-              session = (Session) sessionDAO.put(session);
-            }
-          }
-        }
-      } else if ( req != null ) {
+        session = (Session) sessionDAO.put(session);
+      }
+      if ( req != null ) {
         // if req == null it means that we're being accessed via webSockets
-        if ( ! session.validRemoteHost(req.getRemoteHost()) ) {
-          // If an existing session is reused with a different remote host then
-          // delete the session and force a re-login.
-          // This is done as a security measure to reduce the likelihood of
-          // session hijacking. If an attacker were to get ahold of another
-          // user's session id, they could start using that session id in the
-          // requests they send to the server and gain access to the real user's
-          // session and therefore their privileges and data. By forcing users
-          // to sign back in when the remote host changes, we reduce the attack
-          // surface for session hijacking. Session hijacking is still possible,
-          // but only if the user is on the same remote host.
-          logger.warning("Remote host for session ", sessionID, " changed from ", session.getRemoteHost(), " to ", req.getRemoteHost(), ". Deleting session and forcing the user to sign in again.");
+        try {
+          session.validateRemoteHost(getX());
+          String remoteIp = foam.net.IPSupport.instance().getRemoteIp(getX());
+          if ( SafetyUtil.isEmpty(session.getRemoteHost()) ||
+               ! SafetyUtil.equals(session.getRemoteHost(), remoteIp) ) {
+            session.setRemoteHost(remoteIp);
+            session = (Session) sessionDAO.put(session);
+          }
+        } catch (foam.core.ValidationException e) {
           sessionDAO.remove(session);
-          msg.replyWithException(new AuthenticationException("IP address changed. Your session was deleted to keep your account secure. Please sign in again to verify your identity."));
+          // Session.validateRemoteHost tests for both a change in IP and
+          // restricted IPs.
+          if ( e.getMessage().equals("Restricted IP") ) {
+            logger.warning(e.getMessage(), foam.net.IPSupport.instance().getRemoteIp(getX()));
+            msg.replyWithException(new AuthenticationException("Access denied"));
+          } else {
+            // If an existing session is reused with a different remote host then
+            // delete the session and force a re-login.
+            // This is done as a security measure to reduce the likelihood of
+            // session hijacking. If an attacker were to get ahold of another
+            // user's session id, they could start using that session id in the
+            // requests they send to the server and gain access to the real user's
+            // session and therefore their privileges and data. By forcing users
+            // to sign back in when the remote host changes, we reduce the attack
+            // surface for session hijacking. Session hijacking is still possible,
+            // but only if the user is on the same remote host.
+            logger.warning("Remote host for session ", sessionID, " changed from ", session.getRemoteHost(), " to ", foam.net.IPSupport.instance().getRemoteIp(getX()), ". Deleting session and forcing the user to sign in again.");
+            msg.replyWithException(new AuthenticationException("IP address changed. Your session was deleted to keep your account secure. Please sign in again to verify your identity."));
+          }
+          return;
         }
       }
 

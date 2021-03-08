@@ -52,21 +52,27 @@ foam.CLASS({
       background-color: rgba(0, 0, 0, 0.8);
       color: #fff;
       border-radius: 5px;
-      border-top-right-radius: 0px;
       direction: ltr;
-      padding: 2px;
-      max-height: 100px;
+      max-height: 106px;
+      margin-top: -16px;
       overflow: hidden;
     }
 
     ^helper-text p {
-      padding: 3px;
-      margin: 0;
-      /* css trick for hiding scroll bar in all browsers */
-      margin-right: -50px; /* Maximum width of scrollbar */
-      padding-right: 50px; /* Maximum width of scrollbar */
-      height: 100%;
-      overflow-y: scroll;
+      padding: 0 16px;
+      margin: 16px 0;
+      margin-right: 8px; /* give right padding to scroll bar */
+      height: calc(100% - 32px); /* compensate for padding top and bottom */
+      overflow-y: auto;
+    }
+
+    ^helper-text p::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ^helper-text p::-webkit-scrollbar-thumb {
+      background-color: grey;
+      border-radius: 5px;
     }
 
     ^arrow-right {
@@ -199,18 +205,6 @@ foam.CLASS({
       margin-top: 6px;
     }
 
-    ^ .foam-u2-view-RadioView .foam-u2-view-RadioView {
-      margin-bottom:16px;
-      display: flex;
-      align-items: center;
-      font-size: 16px;
-      margin-right: auto;
-    }
-
-    ^ .foam-u2-view-RadioView label {
-      margin-left: 12px;
-    }
-
     ^ .foam-u2-layout-Cols {
       padding-bottom: 4px;
       display: flex;
@@ -259,6 +253,9 @@ foam.CLASS({
                 .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                 .start()
                   .style({ 'flex-grow': 1, 'max-width': '100%' })
+                  .callIf( prop.view.class == 'foam.u2.CheckBox', function() {
+                    this.style({ 'margin': '20px' });
+                  })
                   .tag(prop, { mode$: self.mode$ })
                   .callIf(prop.validationStyleEnabled, function() {
                     this.enableClass(self.myClass('error'), errorSlot);

@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.u2.filter',
   name: 'FilterController',
+
   documentation: `
     This file will be deprecating the SearchManager.
     The FilterController controls the final predicate the DAO will use. This
@@ -324,6 +325,8 @@ foam.CLASS({
         this.dao.select(this.COUNT()).then((count) => {
           // This will need scalability testing (eg: 1mil items)
           this.totalCount = count.value;
+          //to init resultsCount
+          this.resultsCount = count.value;
         });
       }
     },

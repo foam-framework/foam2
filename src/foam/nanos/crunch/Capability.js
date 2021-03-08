@@ -503,7 +503,8 @@ foam.CLASS({
         are granted but not in an reopenable state
       `,
       javaCode: `
-        if ( ! getEnabled() ) return false; 
+        if ( ! getEnabled() ) return false;
+        if ( getGrantMode() == CapabilityGrantMode.MANUAL ) return false;
 
         DAO capabilityDAO = (DAO) x.get("capabilityDAO");
         CrunchService crunchService = (CrunchService) x.get("crunchService");
@@ -537,6 +538,21 @@ foam.CLASS({
                   ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return true;
         return false;
       `
+    },
+    {
+      name: 'getImpliedData',
+      documentation: `
+        A subclass of Capability can override this to define what gets stored
+        when a UCJ is saved with null data.
+      `,
+      args: [
+        { name: 'x', javaType: 'foam.core.X' },
+        { name: 'ucj', javaType: 'foam.nanos.crunch.UserCapabilityJunction' }
+      ],
+      type: 'FObject',
+      javaCode: `
+        return null;
+      `
     }
   ]
 });
@@ -553,6 +569,7 @@ foam.RELATIONSHIP({
   inverseName: 'users',
   sourceProperty: {
     section: 'systemInformation',
+    order: 20,
     updateVisibility: 'RO'
   }
 });

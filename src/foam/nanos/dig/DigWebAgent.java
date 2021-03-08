@@ -14,6 +14,7 @@ import foam.nanos.logger.Logger;
 import foam.nanos.logger.PrefixLogger;
 import foam.nanos.pm.PM;
 import java.io.PrintWriter;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class DigWebAgent extends ContextAwareSupport
@@ -57,33 +58,41 @@ public class DigWebAgent extends ContextAwareSupport
     } catch (DigErrorMessage dem) {
       logger.error(dem);
       DigUtil.outputException(x, dem, format);
+      pm.error(x, dem.getMessage());
     } catch (FOAMException fe) {
       logger.error(fe);
       DigUtil.outputFOAMException(x, fe, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, format);
+      pm.error(x, fe.getMessage());
     } catch (Throwable t) {
       logger.error(t);
-      DigUtil.outputException(x, 
+      DigUtil.outputException(x,
           new GeneralException.Builder(x)
             .setStatus(String.valueOf(HttpServletResponse.SC_INTERNAL_SERVER_ERROR))
             .setMessage(t.getMessage())
             .setMoreInfo(t.getClass().getName())
-            .build(), 
+            .build(),
           format);
+      pm.error(x, t.getMessage());
     } finally {
       pm.log(x);
     }
   }
 
   public void sendError(X x, int status, String message) {
-    DigUtil.outputException(x, 
+    DigUtil.outputException(x,
       new GeneralException.Builder(x)
         .setStatus(String.valueOf(status))
         .setMessage(message)
-        .build(), 
+        .build(),
       Format.JSON);
   }
 
   public boolean redirectToLogin(X x) {
+    HttpServletRequest req = x.get(HttpServletRequest.class);
+    String methodName = req.getMethod();
+    if ( "get".equalsIgnoreCase(methodName) ) {
+      return true;
+    }
     return false;
   }
 }
