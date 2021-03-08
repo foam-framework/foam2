@@ -11,6 +11,8 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.MDAO;
 import foam.dao.ProxyDAO;
+import foam.mlang.order.Comparator;
+import foam.mlang.predicate.Predicate;
 import foam.util.concurrent.FoldReducer;
 import java.util.HashMap;
 import java.util.Map;
@@ -111,6 +113,9 @@ public class FoldReducePMLogger
 
           return dao;
         }
+      }
+      public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
+        resetState();
       }
     };
   }

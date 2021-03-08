@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'com.google.foam.demos.sevenguis',
   name: 'FlightBooker',
-//  extends: 'foam.u2.Controller',
+  extends: 'foam.u2.Controller', // can be commented out and remove initE
 
   requires: [
     'foam.u2.DateView',
@@ -64,7 +64,6 @@ foam.CLASS({
       name: 'returnDate',
       factory: function() { return new Date(Date.now()+2*3600000*24); },
       visibility: function(isReturn) {
-        debugger;
         return isReturn ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       },
       validateObj: function(isReturn, returnDate, departDate) {

@@ -39,10 +39,6 @@ foam.CLASS({
       font-size: 16px;
     }
 
-    ^.foam-u2-view-RadioView-horizontal-radio .choice {
-      flex-basis: calc(100% / 3);
-    }
-
     ^ label {
       margin-left: 12px;
       color: #444;
@@ -57,6 +53,11 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isDisabled'
+    },
+    {
+      class: 'Int',
+      name: 'columns',
+      value: 3
     }
   ],
 
@@ -95,11 +96,12 @@ foam.CLASS({
       this.add(this.choices.map(c => {
         return this.E('div').
           addClass('choice').
+            callIf(this.columns != -1, function() { this.style({'flex-basis': (100 / self.columns) + '%'}) }).
           start('input').
             attrs({
               type: 'radio',
               name: self.getAttribute('name') + 'Choice' + String.fromCharCode("A".charCodeAt(0) + (index++)),
-              value: c[0],
+              value: c[1],
               checked: self.slot(function (data) { return data === c[0]; }),
               disabled: self.isDisabled$
             }).

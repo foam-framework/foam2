@@ -178,6 +178,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'EOF',
@@ -194,6 +195,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
@@ -340,6 +342,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'Sequence1',
@@ -381,6 +384,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
@@ -572,6 +576,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'Until',
@@ -603,6 +608,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'Join',
@@ -621,6 +627,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
@@ -1112,6 +1119,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'GrammarAxiom',
@@ -1214,6 +1222,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',

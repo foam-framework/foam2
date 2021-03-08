@@ -125,7 +125,6 @@ public class TestUser {
       foam.mlang.predicate.Nary result = (foam.mlang.predicate.Nary) ps.value();
       System.out.println("Result: " + result.createStatement());
 
-      parser.setX(EmptyX.instance());
       ArraySink listDao = (ArraySink) dao.where(result).select(new ArraySink());
 
       // show data
