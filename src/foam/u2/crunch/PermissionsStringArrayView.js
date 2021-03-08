@@ -4,32 +4,32 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-foam.CLASS(
- {
-   package: 'foam.u2.crunch',
-   name: 'PermissionRow',
-   extends: 'foam.nanos.auth.Permission',
+foam.CLASS({
+  package: 'foam.u2.crunch',
+  name: 'PermissionRow',
+  extends: 'foam.nanos.auth.Permission',
 
-   properties: [
-     {
-       class: 'Boolean',
-       name: 'granted',
-       tableWidth: 70,
-       tableCellFormatter: function(value, _, projection) {
-         var id = projection[0];
-         var slot = foam.core.SimpleSlot.create({value: value});
-         slot.sub(() => {
-           if ( slot.get() ) {
-             this.__context__.addPermission(id);
-           } else {
-             this.__context__.removePermission(id);
-           }
-         });
-         this.add(foam.u2.CheckBox.create({data$: slot}));
-       }
+  properties: [
+   {
+     class: 'Boolean',
+     name: 'granted',
+     tableWidth: 70,
+     tableCellFormatter: function(value, _, projection) {
+       var id = projection[0];
+       var slot = foam.core.SimpleSlot.create({value: value});
+       slot.sub(() => {
+         if ( slot.get() ) {
+           this.__context__.addPermission(id);
+         } else {
+           this.__context__.removePermission(id);
+         }
+       });
+       this.add(foam.u2.CheckBox.create({data$: slot}));
      }
-   ]
- });
+   }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.u2.crunch',
@@ -149,18 +149,23 @@ foam.CLASS({
 
       this.permissionDAO.select(p => {
         this.permissions.put(this.PermissionRow.create(p).copyFrom({granted: this.pMap[p]}));
+      }).then(() => {
+        debugger;
+        if ( this.mode != foam.u2.DisplayMode.RW ) {
+          this.permissions.where(foam.mlang.Expressions.create().EQ(this.PermissionRow.GRANTED, false)).removeAll();
+        }
+        this.start()
+          .startContext({ data: this })
+            .start()
+              .add(this.SEARCH, ' ', this.CUSTOM_PERMISSION, ' ', this.ADD_CUSTOM)
+            .end()
+            .start()
+              .add(this.FILTERED_PERMISSIONS)
+            .end()
+          .endContext()
+        .end();
       });
 
-      this.start()
-        .startContext({ data: this })
-          .start()
-            .add(this.SEARCH, ' ', this.CUSTOM_PERMISSION, ' ', this.ADD_CUSTOM)
-          .end()
-          .start()
-            .add(this.FILTERED_PERMISSIONS)
-          .end()
-        .endContext()
-      .end();
     },
 
     function onSelectFunction(permission, isSelected) {
