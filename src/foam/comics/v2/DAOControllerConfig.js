@@ -224,7 +224,7 @@ foam.CLASS({
     {
       class: 'Class',
       //of: 'foam.u2.View',
-      of: 'FObject',
+      //of: 'FObject',
       name: 'wizardDetailView',
       documentation: 'class of WizardDetailView.'
     }
