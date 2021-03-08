@@ -46,9 +46,12 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'enableDefaultPermission',
+      name: 'enableStandardAuthorizer',
+      value: true,
       documentation: `Defines default operation permissions similar to the standard authorizer.
-          ex: model.read.id || model.read etc..`
+          ex: model.read.id || model.read etc..
+          Warning: If this is set to false and no template references are associated to DAOKey, all records in DAO will be authorized.
+      `
     }
   ],
 
@@ -63,8 +66,11 @@ foam.CLASS({
       documentation: `Construct permission from permission template reference.`,
       javaCode: `
         String permission = getDAOKey() + "." + ((Operations) permissionTemplate.getOperation()).getLabel();
-        for (String prop : permissionTemplate.getProperties()) {
-          permission += "." + obj.getProperty(prop);
+        for (PermissionTemplateProperty templateProperty : permissionTemplate.getProperties()) {
+          String propertyName = templateProperty.getPropertyReference();
+            permission += templateProperty.getImpliesValue() ?
+                "." + propertyName + "[" + obj.getProperty(propertyName) + "]" :
+                "." + obj.getProperty(propertyName);
         }
         return permission.toLowerCase();
       `
@@ -114,7 +120,7 @@ foam.CLASS({
             String[] daoKeys = template.getDaoKeys();
             for ( var daoKey : daoKeys ) {
               List<PermissionTemplateReference> references = cache.containsKey(daoKey) ?
-              cache.get(daoKey) : new ArrayList<PermissionTemplateReference>();
+                  cache.get(daoKey) : new ArrayList<PermissionTemplateReference>();
               references.add(template);
               cache.put(daoKey, references);
             }
@@ -138,7 +144,7 @@ foam.CLASS({
         AuthService authService = (AuthService) x.get("auth");
         Map<String,List> cache = (Map<String,List>) getTemplateCache(x);
         List<PermissionTemplateReference> templates = (List<PermissionTemplateReference>) cache.get(getDAOKey());
-        if ( templates != null && ! templates.stream().anyMatch(t -> authService.check(x, createPermission((PermissionTemplateReference) t, obj))) ) {
+        if ( templates != null && ! templates.stream().filter(t -> t.operation().equals(op)).anyMatch(t -> authService.check(x, createPermission((PermissionTemplateReference) t, obj))) ) {
           ((foam.nanos.logger.Logger) x.get("logger")).debug("ExtendedConfigurableAuthorizer", "Permission denied");
           throw new AuthorizationException();
         }

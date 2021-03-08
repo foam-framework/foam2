@@ -302,6 +302,7 @@ FOAM_FILES([
   { name: "foam/nanos/boot/NSpecAware" },
   { name: "foam/nanos/auth/Authorizer" },
   { name: "foam/nanos/auth/PermissionTemplateReference" },
+  { name: "foam/nanos/auth/PermissionTemplateProperty" },
   { name: "foam/nanos/auth/AccessDeniedException" },
   { name: "foam/nanos/auth/AuthenticationException" },
   { name: "foam/nanos/auth/EnabledAware" },

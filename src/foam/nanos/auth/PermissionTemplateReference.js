@@ -43,7 +43,8 @@ foam.CLASS({
       documentation: `Reference operation type of permission. Includes read, update and remove.`
     },
     {
-      class: 'StringArray',
+      class: 'FObjectArray',
+      of: 'foam.nanos.auth.PermissionTemplateProperty',
       name: 'properties',
       documentation: `Furthur defines object properties to construct authorization permissions.
           If an object satisfies all property conditions it is authorized for the corresponding operation.
@@ -58,7 +59,13 @@ foam.CLASS({
       code: `
         ArrayList<String> arr = new ArrayList();
         for ( String daoKey : getDaoKeys() ) {
-          arr.add(daoKey, ".",getOperation(), String.join(".", getProperties()));
+          for (PermissionTemplateProperty templateProperty : getProperties()) {
+            String propertyName = templateProperty.getPropertyReference();
+              permission += templateProperty.getImpliesValue() ?
+                  "." + propertyName + "[propertyValue]" :
+                  ".propertyValueOf" + propertName;
+          }
+          arr.add(permission);
         }
         return arr;
       `
