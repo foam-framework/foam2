@@ -760,6 +760,8 @@ FOAM_FILES([
   { name: "foam/core/ContextAware", flags: ['java'] },
   { name: "foam/dao/history/PropertyUpdate" },
   { name: "foam/dao/history/HistoryRecord" },
+  { name: "foam/dao/history/HistoryDAO" },
+  { name: "foam/dao/debug/putpath" },
   { name: "foam/mop/MOP" },
   { name: "foam/dao/jdbc/ConnectionPool" },
   { name: "foam/lib/Outputter" },
