@@ -189,6 +189,10 @@ public class RuleEngine extends ContextAwareSupport {
       isActive = ((LifecycleAware) rule).getLifecycleState() == LifecycleState.ACTIVE;
     }
 
+    if ( action == null ) {
+      Logger logger = (Logger) getX().get("logger");
+      logger.log("rule ID "+rule.getId()+" has a action set to null ");
+    }
     return isActive && action != null;
   }
 
