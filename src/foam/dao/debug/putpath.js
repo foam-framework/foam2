@@ -1,6 +1,7 @@
 foam.CLASS({
   package: 'foam.dao.debug',
   name: 'PutPathElement',
+  extends: 'foam.dao.history.HistoryRecord',
   documentation: `
     Interface for objects that can store a path of operations they
     encountered during a put operation.
@@ -14,15 +15,6 @@ foam.CLASS({
     {
       name: 'description',
       class: 'String'
-    },
-    {
-      name: 'historyRecord',
-      class: 'FObjectProperty',
-      of: 'foam.dao.history.HistoryRecord',
-    },
-    {
-      name: 'snapshot',
-      class: 'FObjectProperty'
     }
   ]
 });
@@ -60,12 +52,14 @@ foam.CLASS({
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.X',
-    'foam.lib.PropertyPredicate',
-    'foam.lib.StorageOptionalPropertyPredicate',
-    'foam.lib.StoragePropertyPredicate',
     'foam.dao.history.HistoryRecord',
     'foam.dao.history.PropertyUpdate',
     'foam.dao.debug.PutPathElement',
+    'foam.lib.PropertyPredicate',
+    'foam.lib.StorageOptionalPropertyPredicate',
+    'foam.lib.StoragePropertyPredicate',
+    'foam.nanos.app.AppConfig',
+    'foam.nanos.app.Mode',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'java.util.ArrayList',
@@ -98,6 +92,7 @@ foam.CLASS({
     {
       name: 'lastUpdateSnapshot',
       class: 'FObjectProperty',
+      hidden: true
     },
   ],
 
@@ -162,7 +157,7 @@ foam.CLASS({
         { name: 'description', type: 'String' }
       ],
       javaCode: `
-        var arry = new PutPathElement[getUpdateHistory().length + 1];
+        if ( ! checkDebugInfoEnabled(x) ) return;
 
         Subject subject = (Subject) x.get("subject");
         User user = subject.getUser();
@@ -170,26 +165,46 @@ foam.CLASS({
 
         var last = getLastUpdateSnapshot();
 
-        var historyRecord = new HistoryRecord();
+        var el = new PutPathElement.Builder(x)
+          .setOrigin(origin)
+          .setDescription(description)
+          .setObjectId(getProperty("id"))
+          .setUser(formatUserName(user))
+          .setAgent(formatUserName(agent))
+          .setTimestamp(new Date())
+          .build();
 
-        historyRecord.setObjectId(getProperty("id"));
-        historyRecord.setUser(formatUserName(user));
-        historyRecord.setAgent(formatUserName(agent));
-        historyRecord.setTimestamp(new Date());
         if ( last != null )
-          historyRecord.setUpdates(getUpdatedProperties(x, last, this));
+          el.setUpdates(getUpdatedProperties(x, last, this));
 
         setLastUpdateSnapshot(((FObject) this).fclone());
 
+        addPutPathElement(el);
+      `
+    },
+    {
+      name: 'addPutPathElement',
+      args: [
+        { type: 'PutPathElement', name: 'el' },
+      ],
+      javaCode: `
+        var arry = new PutPathElement[getUpdateHistory().length + 1];
         for ( var i = 0 ; i < getUpdateHistory().length; i++ ) {
           arry[i] = getUpdateHistory()[i];
         }
-        arry[getUpdateHistory().length] = new PutPathElement.Builder(x)
-          .setOrigin(origin)
-          .setDescription(description)
-          .setHistoryRecord(historyRecord)
-          .build();
+        arry[getUpdateHistory().length] = el;
         setUpdateHistory(arry);
+      `
+    },
+    {
+      name: 'checkDebugInfoEnabled',
+      args: [
+        { type: 'Context', name: 'x' },
+      ],
+      type: 'Boolean',
+      javaCode: `
+        AppConfig app = (AppConfig) x.get("appConfig");
+        return app.getMode() != Mode.PRODUCTION;
       `
     }
   ]

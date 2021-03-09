@@ -182,7 +182,7 @@ public class RuleEngine extends ContextAwareSupport {
     if ( obj instanceof PutPathAware ) {
       ((PutPathAware) obj).describePut(
         readOnlyX,
-        String.format("APPLY %s", rule.getId()),
+        String.format("APPLY %s/%s", rule.getName(), rule.getId()),
         rule.getDocumentation()
       );
     }
@@ -231,7 +231,7 @@ public class RuleEngine extends ContextAwareSupport {
             if ( obj instanceof PutPathAware ) {
               ((PutPathAware) obj).describePut(
                 x,
-                String.format("ASYNC APPLY %s", rule.getId()),
+                String.format("ASYNC APPLY %s/%s", rule.getName(), rule.getId()),
                 rule.getDocumentation()
               );
             }
