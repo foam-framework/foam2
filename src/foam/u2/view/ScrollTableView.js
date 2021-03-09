@@ -297,7 +297,7 @@
               }).
             end().
           end();
-      } else {
+      } else if ( this.table_.memento.tail.head.length != 0 ) {
         if ( this.table_.memento.tail.head == 'create' ) {
           this.stack.push({
             class: 'foam.comics.v2.DAOCreateView',
