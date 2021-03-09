@@ -34,15 +34,15 @@ foam.CLASS({
         a property name and value.
 
         (E.g.
-          crayon.read.color[blue] when true,
-          crayon.read.blue when false)
+          crayondao.read.color[blue] when true,
+          crayondao.read.blue when false)
 
         Setting this to false may create conflicts and undesired authorization when building templates
         that reference similar property values.
 
-        (e.g house.read.interiorColor[green], house.read.exteriorColor[blue] )
+        (e.g housedao.read.interiorColor[green], housedao.read.exteriorColor[blue] )
         This would work fine with impliesValue set to true, however if false these values would conflict
-        (e.g house.read.green, house.read.blue)
+        (e.g housedao.read.green, housedao.read.blue)
         The Authorizer and users permission list would not know how to distinguish which property to compare to
         and would permit the user to view all houses that are both green and blue exteriors and interiors.
       `

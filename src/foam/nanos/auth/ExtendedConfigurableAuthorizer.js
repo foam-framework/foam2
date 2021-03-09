@@ -17,6 +17,8 @@ foam.CLASS({
     The authorizer requires the use of configurable permission templates defined in permissionTemplateReferenceDAO.
     Template reference DAOKeys detail when to apply to an authorizer. An authorizer must define its own daoKey.
 
+    * Permissions created from templates are lowercase.
+
     Please see PermissionTemplateReference.js for further documentation.
   `,
 

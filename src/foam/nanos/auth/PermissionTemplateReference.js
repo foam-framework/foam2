@@ -19,7 +19,7 @@ foam.CLASS({
       against an object attempting to be authorized.
 
       In this case the userDAO would permit the user access to all users that match its property values to the permissions available to the requestor.
-      The requestor may have the following permission 'userDAO.read.en' granting access to all users with the values of language 'en'.
+      The requestor may have the following permission 'userdao.read.en' granting access to all users with the values of language 'en'.
 
       In the case where conflicts may arise from properties holding similar values, a common one for example may be color
       You can set impliesValue on the PermissionTemplateProperty referenced in the list of your PermissionTemplateReference.
