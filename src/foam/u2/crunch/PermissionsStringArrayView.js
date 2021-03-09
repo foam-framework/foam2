@@ -93,8 +93,8 @@ foam.CLASS({
     .foam-u2-crunch-PermissionsStringArrayView-padding {
       padding-top: 8px;
     }
-    .property-permissionGranted > .foam-u2-view-ScrollTableView {
-      height: 400px;
+    ^ .property-filteredPermissions .foam-u2-view-ScrollTableView {
+      height: 374px;
     }
   `,
 
@@ -113,7 +113,7 @@ foam.CLASS({
         if ( mode == foam.u2.DisplayMode.RO ) dao = dao.where(this.EQ(this.PermissionRow.GRANTED, true));
         return dao;
       },
-      view: { class: 'foam.u2.view.ScrollTableView', editColumnsEnabled: false, pageSize: 10, dblClickListenerAction: function(){} }
+      view: { class: 'foam.u2.view.ScrollTableView', enableDynamicTableHeight: false, editColumnsEnabled: false, pageSize: 10, dblClickListenerAction: function(){} }
     },
     {
       class: 'String',
@@ -158,6 +158,7 @@ foam.CLASS({
       });
 
       this.start()
+        .addClass(this.myClass())
         .startContext({ data: this })
           .start()
             .add(this.SEARCH, ' ', this.CUSTOM_PERMISSION)
