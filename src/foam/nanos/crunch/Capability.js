@@ -127,6 +127,7 @@ foam.CLASS({
       name: 'enabled',
       class: 'Boolean',
       value: true,
+      view: { class: 'foam.u2.CheckBox', showLabel: false },
       includeInDigest: true,
       documentation: `Capability is ignored by system when enabled is false.
       user will lose permissions implied by this capability and upper level capabilities will ignore this prerequisite`
@@ -230,7 +231,8 @@ foam.CLASS({
       name: 'reviewRequired',
       class: 'Boolean',
       includeInDigest: true,
-      permissionRequired: true
+      permissionRequired: true,
+      view: { class: 'foam.u2.CheckBox', showLabel: false }
     },
     {
       name: 'associatedEntity',
