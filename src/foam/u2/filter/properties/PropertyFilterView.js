@@ -24,6 +24,10 @@ foam.CLASS({
     'memento'
   ],
 
+  requires: [
+    'foam.parse.QueryParser'
+  ],
+
   css: `
     ^ {
       margin: 16px;
@@ -122,13 +126,20 @@ foam.CLASS({
     {
       name: 'criteria'
     },
-    'isInit'
+    'isInit',
+    {
+      name: 'queryParser',
+      factory: function() {
+        return this.QueryParser.create({ of: this.dao.of || this.__subContext__.lookup(this.property.forClass_) });
+      }
+    }
   ],
 
   methods: [
     function initE() {
       this.SUPER();
       var self = this;
+
       this.addClass(this.myClass())
         .start().addClass(this.myClass('container-property'))
           .enableClass(this.myClass('container-property-active'), this.active$)
@@ -151,6 +162,22 @@ foam.CLASS({
       this.isInit = true;
       this.isFiltering();
       this.isInit = false;
+
+      if ( this.memento && this.memento.head.length != 0 ) {
+        var predicate = this.getPredicateFromMemento();
+        if ( predicate ) {
+          this.filterController.setExistingPredicate(0, this.property.name, predicate);
+        }
+      }
+    },
+    function getPredicateFromMemento() {
+      if ( this.memento && this.memento.head.length > 0 ) { //&& f.criteria == 0
+        var predicate = this.queryParser.parseString(this.property.name + '=' + this.memento.head);
+        if ( predicate ) {
+          return predicate;
+        }
+      }
+      return null;
     }
   ],
 
@@ -201,7 +228,8 @@ foam.CLASS({
           pred =  this.view_.predicate.toMQL && this.view_.predicate.toMQL();
 
         if ( pred ) {
-          this.memento.head = pred;
+          var split = pred.split('=');
+          this.memento.head = split.length == 2 ? split[1] : '';
         } else {
           this.memento.head = '';
         }

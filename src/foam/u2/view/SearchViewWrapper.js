@@ -179,10 +179,11 @@ foam.CLASS({
 
             var pred;
             if ( Object.keys(self.view_.predicate).length > 0 && ! foam.mlang.predicate.True.isInstance(self.view_.predicate) )
-              pred =  self.view_.predicate.toMQL && self.view_.predicate.toMQL();
+              pred = self.view_.predicate.toMQL && self.view_.predicate.toMQL();
     
             if ( pred ) {
-              self.memento.head = pred;
+              var split = pred.split('=');
+              self.memento.head = split.length == 2 ? split[1] : '';
             } else {
               self.memento.head = '';
             }

@@ -301,14 +301,12 @@ foam.CLASS({
             }
           }
         }
-        this.currentMemento = this.memento.tail;
+        this.currentMemento = this.memento;
       }
 
       //fix me
       if ( this.currentMemento && this.currentMemento.tail ) {
         var m = this.memento;
-        var parser = foam.parse.QueryParser.create({ of: self.dao.of.id });
-
         var counter = 0;
 
         while ( counter < this.filters.length &&  m != null ) {
@@ -318,8 +316,6 @@ foam.CLASS({
 
           if ( !m || m.head.length == 0 )
             continue;
-
-          self.filterController.setExistingPredicate(0, m.head.substr(0, m.head.indexOf('=')), parser.parseString(m.head));
         }
       }
 
@@ -334,6 +330,8 @@ foam.CLASS({
       },  self, self.__subSubContext__.createSubContext({ memento: this.currentMemento }));
 
       if ( self.currentMemento ) self.currentMemento = self.currentMemento.tail;
+
+      // var m = self.currentMemento
       
       this.onDetach(this.filterController$.dot('isAdvanced').sub(this.isAdvancedChanged));
       this.addClass(self.myClass())
