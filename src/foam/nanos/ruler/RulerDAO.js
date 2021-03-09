@@ -142,10 +142,10 @@ if ( ret != null ) {
     applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getUpdateAfter()));
   }
 
-  // Test for changes during 'after' rule
-  if ( before.diff(ret).size() > 0 ) {
-    ret = getDelegate().put_(x, ret);
-  }
+  // // Test for changes during 'after' rule
+  // if ( before.diff(ret).size() > 0 ) {
+  //   ret = getDelegate().put_(x, ret);
+  // }
 }
 return ret;`
     },

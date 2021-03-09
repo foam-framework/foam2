@@ -62,7 +62,7 @@ public class RuleEngine extends ContextAwareSupport {
     Logger logger = (Logger) getX().get("logger");
     for (Rule rule : rules) {
       try {
-        if ( stops_.get() ) break;
+         if ( stops_.get() ) break;
         if ( ! isRuleActive(rule, rule.getAction()) ) continue;
         if ( ! checkPermission(rule, obj) ) continue;
         if ( ! rule.f(userX_, obj, oldObj) ) continue;
