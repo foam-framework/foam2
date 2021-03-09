@@ -26,7 +26,7 @@ foam.CLASS({
             this.__context__.removePermission(id);
           }
         });
-        this.add(foam.u2.CheckBox.create({data$: slot}));
+        this.add(foam.u2.CheckBox.create({data$: slot}, this));
       }
     }
   ]
@@ -160,7 +160,8 @@ foam.CLASS({
       this.start()
         .startContext({ data: this })
           .start()
-            .add(this.SEARCH, ' ', this.CUSTOM_PERMISSION, ' ', this.ADD_CUSTOM)
+            .add(this.SEARCH, ' ', this.CUSTOM_PERMISSION)
+            .callIf(this.mode == foam.u2.DisplayMode.RW, function() {this.add(' ', self.ADD_CUSTOM); })
           .end()
           .start()
             .add(this.FILTERED_PERMISSIONS)
