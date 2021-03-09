@@ -9,24 +9,26 @@ foam.CLASS({
   name: 'PermissionRow',
   extends: 'foam.nanos.auth.Permission',
 
+  tableColumns: [ 'granted', 'id', 'description' ],
+
   properties: [
-   {
-     class: 'Boolean',
-     name: 'granted',
-     tableWidth: 70,
-     tableCellFormatter: function(value, _, projection) {
-       var id = projection[0];
-       var slot = foam.core.SimpleSlot.create({value: value});
-       slot.sub(() => {
-         if ( slot.get() ) {
-           this.__context__.addPermission(id);
-         } else {
-           this.__context__.removePermission(id);
-         }
-       });
-       this.add(foam.u2.CheckBox.create({data$: slot}));
-     }
-   }
+    {
+      class: 'Boolean',
+      name: 'granted',
+      tableWidth: 70,
+      tableCellFormatter: function(value, obj) {
+        var id   = obj.id;
+        var slot = foam.core.SimpleSlot.create({value: value});
+        slot.sub(() => {
+          if ( slot.get() ) {
+            this.__context__.addPermission(id);
+          } else {
+            this.__context__.removePermission(id);
+          }
+        });
+        this.add(foam.u2.CheckBox.create({data$: slot}));
+      }
+    }
   ]
 });
 
@@ -101,15 +103,17 @@ foam.CLASS({
       class: 'foam.dao.DAOProperty',
       name: 'permissions',
       factory: function() { return this.MDAO.create({of: this.PermissionRow}); },
-      view: { class: 'foam.u2.view.ScrollTableView', editColumnsEnabled: false, pageSize: 10 }
+     // view: { class: 'foam.u2.view.ScrollTableView', editColumnsEnabled: false, pageSize: 10 }
     },
     {
       class: 'foam.dao.DAOProperty',
       name: 'filteredPermissions',
-      expression: function(search, permissions) {
-        return permissions.where(this.CONTAINS(this.Permission.ID, search));
+      expression: function(search, permissions, mode) {
+        var dao = permissions.where(this.CONTAINS(this.Permission.ID, search));
+        if ( mode == foam.u2.DisplayMode.RO ) dao = dao.where(this.EQ(this.PermissionRow.GRANTED, true));
+        return dao;
       },
-      view: { class: 'foam.u2.view.ScrollTableView', editColumnsEnabled: false, pageSize: 10 }
+      view: { class: 'foam.u2.view.ScrollTableView', editColumnsEnabled: false, pageSize: 10, dblClickListenerAction: function(){} }
     },
     {
       class: 'String',
@@ -143,29 +147,26 @@ foam.CLASS({
       var self = this;
 
       this.data.forEach(p => {
+        if ( p == 'undefined' ) return;
         this.pMap[p] = true;
         this.permissions.put(this.PermissionRow.create({id: p, description: 'custom permission', granted: true}));
       });
 
       this.permissionDAO.select(p => {
-        this.permissions.put(this.PermissionRow.create(p).copyFrom({granted: this.pMap[p]}));
-      }).then(() => {
-        debugger;
-        if ( this.mode != foam.u2.DisplayMode.RW ) {
-          this.permissions.where(foam.mlang.Expressions.create().EQ(this.PermissionRow.GRANTED, false)).removeAll();
-        }
-        this.start()
-          .startContext({ data: this })
-            .start()
-              .add(this.SEARCH, ' ', this.CUSTOM_PERMISSION, ' ', this.ADD_CUSTOM)
-            .end()
-            .start()
-              .add(this.FILTERED_PERMISSIONS)
-            .end()
-          .endContext()
-        .end();
+        if ( p.id == 'undefined' ) return;
+        this.permissions.put(this.PermissionRow.create({id: p.id, description: p.description, granted: this.pMap[p.id]}));
       });
 
+      this.start()
+        .startContext({ data: this })
+          .start()
+            .add(this.SEARCH, ' ', this.CUSTOM_PERMISSION, ' ', this.ADD_CUSTOM)
+          .end()
+          .start()
+            .add(this.FILTERED_PERMISSIONS)
+          .end()
+        .endContext()
+      .end();
     },
 
     function onSelectFunction(permission, isSelected) {
@@ -186,6 +187,8 @@ foam.CLASS({
         data.sort();
         this.data = data;
       }
+      this.permissions.put(this.PermissionRow.create({id: id, description: 'custom permission', granted: true}));
+      // ???: What is this next block for?
       this.permissions.find(id).then(row => {
         if ( row ) {
           row.granted = true;
