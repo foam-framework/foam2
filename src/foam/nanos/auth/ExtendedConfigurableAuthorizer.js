@@ -10,10 +10,15 @@ foam.CLASS({
   implements: ['foam.nanos.auth.Authorizer'],
 
   documentation: `
-    Configurable authorizer allowing the use of configurable permissions templates defined in permissionTemplateReferenceDAO. 
-    Templates reference DAOKeys detailing when to apply to an authorizer. An authorizer must define its own daoKey.
-    Allows for grouped object access based on object values and template configuration.
-    Please see PermissionTemplateReference.js for additional documentation`,
+    Configurable authorizer provides a service DAO access control using permissions and permission templates.
+    The authorizer is capable of providing StandardAuthorizer behaviour along with it's configurated authorization
+    using enableStandardAuthorizer which is applied by default.
+
+    The authorizer requires the use of configurable permission templates defined in permissionTemplateReferenceDAO.
+    Template reference DAOKeys detail when to apply to an authorizer. An authorizer must define its own daoKey.
+
+    Please see PermissionTemplateReference.js for further documentation.
+  `,
 
   javaImports: [
   'foam.core.Detachable',
@@ -49,7 +54,7 @@ foam.CLASS({
       name: 'enableStandardAuthorizer',
       value: true,
       documentation: `Enables default operation permissions identical to the StandardAuthorizer.
-          ex: model.read.id || model.read etc..
+          ex: model.read.id || model.read.* etc..
       `
     }
   ],

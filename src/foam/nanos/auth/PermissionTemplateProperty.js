@@ -9,8 +9,10 @@ foam.CLASS({
   name: 'PermissionTemplateProperty',
 
   documentation: `
-    Referenced in permission template references. Describes property permission segments
-    in generated permission strings within configurable authorizer.
+    Can be applied in PermissionTemplateReference. Describes property permission segments
+    in generated permission strings when applied within a configurable authorizer.
+
+    Please read documentation on impliesValue property for important configuration information.
   `,
 
   properties: [
@@ -18,17 +20,31 @@ foam.CLASS({
       class: 'String',
       name: 'propertyReference',
       documentation: `
-        References property to get value from object attempting to be
-        accessed by configurable authorizer.
+        References property to get a value from object attempting to be
+        accessed by a configurable authorizer.
       `
     },
     {
       class: 'Boolean',
       name: 'impliesValue',
+      value: true,
       documentation: `
         Implies value on permission generated in configurable authorizer.
         When true, permission string segment generated will hold reference to
-        the property name and value.
+        a property name and value.
+
+        (E.g.
+          crayon.read.color[blue] when true,
+          crayon.read.blue when false)
+
+        Setting this to false may create conflicts and undesired authorization when building templates
+        that reference similar property values.
+
+        (e.g house.read.interiorColor[green], house.read.exteriorColor[blue] )
+        This would work fine with impliesValue set to true, however if false these values would conflict
+        (e.g house.read.green, house.read.blue)
+        The Authorizer and users permission list would not know how to distinguish which property to compare to
+        and would permit the user to view all houses that are both green and blue exteriors and interiors.
       `
     },
     {
