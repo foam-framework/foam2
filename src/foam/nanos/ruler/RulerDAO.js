@@ -27,6 +27,7 @@ foam.CLASS({
     'foam.mlang.predicate.Predicate',
     'foam.mlang.sink.GroupBy',
     'foam.nanos.auth.ServiceProviderAwareSupport',
+    'foam.nanos.pool.AgentAgency',
     'foam.util.SafetyUtil',
     'java.util.stream.Collectors',
     'java.util.List',
@@ -136,11 +137,17 @@ FObject ret =  getDelegate().put_(x, obj);
 if ( ret != null ) {
   ret = ret.fclone();
   FObject before = ret.fclone();
+
+  // Serialize applying async after rules across all rule groups
+  AgentAgency agency = new AgentAgency();
+  x = x.put("threadPool", agency);
+
   if ( oldObj == null ) {
     applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getCreateAfter()));
   } else {
     applyRules(x, ret, oldObj, (GroupBy) rulesList.get(getUpdateAfter()));
   }
+  agency.execute();
 
   // Test for changes during 'after' rule
   if ( before.diff(ret).size() > 0 ) {

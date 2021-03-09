@@ -203,7 +203,7 @@ public class RuleEngine extends ContextAwareSupport {
 
   private void asyncApplyRules(List<Rule> rules, FObject obj, FObject oldObj) {
     if (rules.isEmpty()) return;
-    ((Agency) getX().get("threadPool")).submit(userX_, x -> {
+    ((Agency) userX_.get("threadPool")).submit(userX_, x -> {
       Logger logger = (Logger) x.get("logger");
       for (Rule rule : rules) {
         if ( stops_.get() ) return;
