@@ -73,6 +73,14 @@ foam.CLASS({
             }
           }),
           foam.u2.view.AnyView.Choice.create({
+            label: 'Enum',
+            type: foam.core.AbstractEnum,
+            view: foam.u2.view.EnumView,
+            toType: function(o) {
+              return foam.core.AbstractEnum.isInstance(o) ? o : foam.core.AbstractEnum.create();
+            }
+          }),
+          foam.u2.view.AnyView.Choice.create({
             label: 'Array',
             type: foam.Array,
             view: foam.u2.view.ArrayView,
@@ -133,6 +141,12 @@ foam.CLASS({
       name: 'selected',
       expression: function(data, types) {
         var type = foam.typeOf(data);
+        // Hack for Enum values.
+        if ( type == foam.core.FObject ) {
+          if ( foam.core.AbstractEnum.isInstance(data) ) {
+            type = foam.core.AbstractEnum;
+          }
+        }
         var choice = types.find(t => type == t.type);
         if ( ! choice ) {
           console.warn("Unable to find view for type!");
