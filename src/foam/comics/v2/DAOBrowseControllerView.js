@@ -130,7 +130,7 @@ foam.CLASS({
           }, this.__subContext__);
         } else {
           this.stack.push(
-            this.config.wizardDetailView.create({
+            eval(this.config.wizardDetailView.class).create({
               model: this.data.of.id || this.config.of.id,
               //data: this.selection,
               controllerMode: foam.u2.ControllerMode.CREATE,
