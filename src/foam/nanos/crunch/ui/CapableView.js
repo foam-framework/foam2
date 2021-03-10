@@ -212,9 +212,8 @@ foam.CLASS({
       name: 'submit',
       // isEnabled: () => true,
       // isAvailable: () => true,
-      code: function() {
-
-        // for each wizardlet call wao.save() (needs subject support)
+      code: async function() {
+        await Promise.all(this.wizardlets.map(w => w.save()));
         this.controllerMode = foam.u2.ControllerMode.VIEW;
       }
     }

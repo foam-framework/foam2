@@ -255,6 +255,37 @@ foam.INTERFACE({
       ],
     },
     {
+      name: 'updateJunctionFor',
+      async: true,
+      type: 'UserCapabilityJunction',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        },
+        {
+          name: 'data',
+          type: 'foam.core.FObject'
+        },
+        {
+          name: 'status',
+          type: 'foam.nanos.crunch.CapabilityJunctionStatus'
+        },
+        {
+          name: 'effectiveUser',
+          type: 'foam.nanos.auth.User'
+        },
+        {
+          name: 'user',
+          type: 'foam.nanos.auth.User'
+        }
+      ],
+    },
+    {
       name: 'maybeIntercept',
       documentation: `
         Invoke a capability intercept if no capabilities from the list of

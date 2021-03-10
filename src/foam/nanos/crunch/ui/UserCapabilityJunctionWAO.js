@@ -29,16 +29,26 @@ foam.CLASS({
   methods: [
     function save(wizardlet) {
       if ( ! wizardlet.isAvailable ) return Promise.resolve();
+      var wData = wizardlet.data ? wizardlet.data.clone() : null;
       wizardlet.loading = true;
-      return this.crunchService.updateJunction( null,
-        wizardlet.capability.id,
-        wizardlet.data ? wizardlet.data.clone() : null,
-        null
-      ).then((ucj) => {
+      let p = this.subject ? this.crunchService.updateJunctionFor(
+        null, wizardlet.capability.id, wData, null,
+        this.subject.user, this.subject.realUser
+      ) : this.crunchService.updateJunction(null,
+        wizardlet.capability.id, wData, null
+      );
+      return p.then((ucj) => {
         this.crunchService.pub('grantedJunction');
         this.load_(wizardlet, ucj);
         return ucj;
       });
+      // return this.crunchService.updateJunction( null,
+      //   wizardlet.capability.id, wizardlet.data, null
+      // ).then((ucj) => {
+      //   this.crunchService.pub('grantedJunction');
+      //   this.load_(wizardlet, ucj);
+      //   return ucj;
+      // });
     },
     function cancel(wizardlet) {
       return this.crunchService.updateJunction( null,

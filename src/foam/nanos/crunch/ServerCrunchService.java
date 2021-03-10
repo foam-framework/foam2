@@ -364,6 +364,21 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return (UserCapabilityJunction) userCapabilityJunctionDAO.inX(x).put(ucj);
   }
 
+  public UserCapabilityJunction updateJunctionFor(
+    X x, String capabilityId, FObject data,
+    CapabilityJunctionStatus status, User effectiveUser, User user
+  ) {
+    Subject subject = (Subject) x.get("subject");
+    foam.nanos.auth.AuthService auth = (foam.nanos.auth.AuthService) x.get("auth");
+    if ( auth.check(x, "service.crunchService.updateJunctionFor") ) {
+      var requestedSubject = new Subject();
+      requestedSubject.setUser(user);
+      requestedSubject.setUser(effectiveUser);
+      return this.updateUserJunction(x, requestedSubject, capabilityId, data, status);
+    }
+    return this.updateUserJunction(x, subject, capabilityId, data, status);
+  }
+
   public UserCapabilityJunction updateUserJunction(
     X x, Subject subject, String capabilityId, FObject data,
     CapabilityJunctionStatus status
