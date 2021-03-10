@@ -49,48 +49,49 @@ foam.CLASS({
         return this.CustomAuth.create({ delegate: this.auth, ucj: this.data });
       }
     },
-    {
-      name: 'controllerMode',
-      factory: function() {
-        return foam.u2.ControllerMode.VIEW;
-      }
-    },
-    {
-      name: 'primary',
-      factory: function() {
-        return this.SUBMIT;
-      }
-    },
-    {
-      name: 'onBack',
-      factory: function() {
-        return this.controllerMode == foam.u2.ControllerMode.EDIT ? () => this.controllerMode == foam.u2.ControllerMode.VIEW : () => this.stack.back();
-      }
-    },
+    // {
+    //   name: 'primary',
+    //   factory: function() {
+    //     return this.SUBMIT;
+    //   }
+    // },
     {
       class: 'foam.u2.ViewSpecWithJava',
       name: 'viewView',
       factory: function() {
-        return foam.nanos.crunch.ui.CapableView.create({ ucjObj: this.data, showTitle: true, controllerMode$: this.controllerMode$ }, this);
-      }
-    }
-  ],
-  actions: [
-    {
-      name: 'edit',
-      isEnabled: () => true,
-      isAvailable: () => true,
-      code: function() {
-        this.controllerMode = foam.u2.ControllerMode.EDIT;
+        return foam.nanos.crunch.ui.CapableView.create({ ucjObj: this.data, showTitle: true }, this);
       }
     },
     {
-      name: 'submit',
-      isEnabled: () => false,
-      isAvailable: () => true,
-      code: function(x) {
-        this.controllerMode = foam.u2.ControllerMode.VIEW;
-      }
+      class: 'Boolean',
+      name: 'hideTop',
+      value: true
     }
-  ]
+  ],
+  // actions: [
+  //   {
+  //     name: 'back',
+  //     code: (data) => {
+  //       let self = data.data;
+  //       self.controllerMode == foam.u2.ControllerMode.EDIT ? self.controllerMode = foam.u2.ControllerMode.VIEW : self.stack.back();
+  //     }
+  //   },
+  //   {
+  //     name: 'edit',
+  //     isEnabled: () => true,
+  //     isAvailable: () => true,
+  //     code: function() {
+  //       this.controllerMode = foam.u2.ControllerMode.EDIT;
+  //     }
+  //   },
+  //   {
+  //     name: 'submit',
+  //     isEnabled: () => true,
+  //     isAvailable: () => true,
+  //     code: function(x) {
+  //       let self = x.c;
+  //       self.controllerMode = foam.u2.ControllerMode.VIEW;
+  //     }
+  //   }
+  // ]
 });

@@ -75,7 +75,6 @@ foam.CLASS({
       }
 
       if ( this.dao ) this.onDAOUpdate();
-      this.updateMode_(this.mode);
       this.choices$.sub(this.onChoicesUpdate);
       this.onChoicesUpdate();
     },

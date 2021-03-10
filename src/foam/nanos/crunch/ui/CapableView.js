@@ -13,9 +13,14 @@ foam.CLASS({
   imports: [
     'crunchController',
     'notify',
+    'stack',
     'subject',
     'userCapabilityJunctionDAO',
     'userDAO'
+  ],
+
+  exports:[
+    'controllerMode'
   ],
 
   requires: [
@@ -31,6 +36,9 @@ foam.CLASS({
       top: 0px;
       position: relative;
     }
+    ^button-container {
+      display: flex;
+    }
   `,
 
   properties: [
@@ -43,7 +51,10 @@ foam.CLASS({
       documentation: 'ucj object'
     },
     {
-      name: 'controllerMode'
+      name: 'controllerMode',
+      factory: function() {
+        return foam.u2.ControllerMode.VIEW;
+      }
     },
     {
       class: 'FObjectArray',
@@ -73,6 +84,10 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'showTitle'
+    },
+    {
+      class: 'List',
+      name: 'fallBackWizardlets'
     }
   ],
 
@@ -116,8 +131,17 @@ foam.CLASS({
             .execute().then(x => x.wizardlets)
           : [];
       }
+      // this.fallBackWizardlets = [...this.wizardlets];
 
       this.start().addClass(this.myClass())
+        .start().addClass(this.myClass('button-container'))
+          .startContext({ data: self })
+          .tag(this.BACK)
+          .tag(this.CANCEL, { isDestructive: true })
+          .tag(this.EDIT)
+          .tag(this.SUBMIT)
+          .endContext()
+        .end()
         .forEach(this.wizardlets, function (w, wi) {
           this.add(foam.core.ExpressionSlot.create({
             args: [w.sections$, w.data$, self.controllerMode$],
@@ -159,6 +183,39 @@ foam.CLASS({
         };
         wizardlet.data$.sub(bind);
         bind();
+      }
+    }
+  ],
+  actions: [
+    {
+      name: 'cancel',
+      code: async function() {
+        await Promise.all(this.wizardlets.map(w => w.load()));
+        this.controllerMode = foam.u2.ControllerMode.VIEW;
+      }
+    },
+    {
+      name: 'back',
+      code: function() {
+        this.controllerMode == foam.u2.ControllerMode.EDIT ? this.controllerMode = foam.u2.ControllerMode.VIEW : this.stack.back();
+      }
+    },
+    {
+      name: 'edit',
+      // isEnabled: () => true,
+      // isAvailable: () => true,
+      code: function() {
+        this.controllerMode = foam.u2.ControllerMode.EDIT;
+      }
+    },
+    {
+      name: 'submit',
+      // isEnabled: () => true,
+      // isAvailable: () => true,
+      code: function() {
+
+        // for each wizardlet call wao.save() (needs subject support)
+        this.controllerMode = foam.u2.ControllerMode.VIEW;
       }
     }
   ]
