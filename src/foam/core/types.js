@@ -153,7 +153,11 @@ foam.CLASS({
             console.warn("Invalid date: " + d + "; assuming " + ret.toISOString() + ".");
           }
 
-          return ret;
+          d = ret;
+        }
+        if ( foam.Date.isInstance(d) ) {
+          // Convert the Date to Noon time in its timezone.
+          d = new Date(d.getTime() - (d.getTime() % (1000*60*60*24)) + (12*60 + d.getTimezoneOffset()) * 60000)
         }
         return d;
       }
