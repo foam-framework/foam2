@@ -10,7 +10,8 @@ foam.CLASS({
   extends: 'foam.core.Property',
 
   documentation: `
-    Add properties to an object allowing the server to handle it.
+    A Property which is only meaningful in JS.
+    Is stored in Java as unresolved JSON.
     Avoid parse data in the server`
   ,
 
