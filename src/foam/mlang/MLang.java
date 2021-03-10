@@ -249,6 +249,11 @@ public class MLang
     return dotF;
   }
 
+  public static Predicate MQL(String query) {
+    MQLExpr mql = new MQLExpr(query);
+    return mql;
+  }
+
   public static Expr[] toExprArray(Object... args) {
     return Arrays.stream(args).map(MLang::prepare).toArray(Expr[]::new);
   }
