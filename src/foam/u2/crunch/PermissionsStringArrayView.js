@@ -17,16 +17,17 @@ foam.CLASS({
       name: 'granted',
       tableWidth: 70,
       tableCellFormatter: function(value, obj) {
-        var id   = obj.id;
-        var slot = foam.core.SimpleSlot.create({value: value});
-        slot.sub(() => {
-          if ( slot.get() ) {
-            this.__context__.addPermission(id);
+        var cb = foam.u2.CheckBox.create({data: value}, this);
+        this.onDetach(cb.data$.sub (()=> {
+          if ( cb.data == value ) return;
+          obj.granted = cb.data;
+          if ( cb.data ) {
+            this.__context__.addPermission(obj.id);
           } else {
-            this.__context__.removePermission(id);
+            this.__context__.removePermission(obj.id);
           }
-        });
-        this.add(foam.u2.CheckBox.create({data$: slot}, this));
+        }));
+        this.add(cb);
       }
     }
   ]
@@ -102,8 +103,7 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'permissions',
-      factory: function() { return this.MDAO.create({of: this.PermissionRow}); },
-     // view: { class: 'foam.u2.view.ScrollTableView', editColumnsEnabled: false, pageSize: 10 }
+      factory: function() { return this.MDAO.create({of: this.PermissionRow}); }
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -111,7 +111,7 @@ foam.CLASS({
       expression: function(search, permissions, mode) {
         var dao = permissions.where(this.CONTAINS(this.Permission.ID, search));
         if ( mode == foam.u2.DisplayMode.RO ) dao = dao.where(this.EQ(this.PermissionRow.GRANTED, true));
-        return dao;
+        return dao.orderBy(this.PermissionRow.ID);
       },
       view: { class: 'foam.u2.view.ScrollTableView', enableDynamicTableHeight: false, editColumnsEnabled: false, pageSize: 10, dblClickListenerAction: function(){} }
     },
@@ -188,14 +188,13 @@ foam.CLASS({
         data.push(id);
         data.sort();
         this.data = data;
+        this.permissions.put(this.PermissionRow.create({id: id, description: 'custom permission', granted: true}));
       }
-      this.permissions.put(this.PermissionRow.create({id: id, description: 'custom permission', granted: true}));
       // ???: What is this next block for?
       this.permissions.find(id).then(row => {
         if ( row ) {
           row.granted = true;
           this.permissions.put(row);
-          this.permissions.on.put.pub();
         } else {
           this.permissions.put(this.PermissionRow.create({id: id, description: 'custom permission', granted: true}));
         }
@@ -208,7 +207,6 @@ foam.CLASS({
         if ( row ) {
           row.granted = false;
           this.permissions.put(row);
-          this.permissions.on.put.pub();
         }
       });
     },
