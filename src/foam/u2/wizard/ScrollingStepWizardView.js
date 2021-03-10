@@ -107,7 +107,7 @@ foam.CLASS({
     function renderWizardlets(e, wizardlets) {
       var self = this;
       return e.forEach(wizardlets, function (wizardlet, wi) {
-        this.add(wizardlet.slot(function (isAvailable, isVisible, indicator) {
+        this.add(wizardlet.slot(function (isAvailable, isVisible) {
           if ( ! isVisible ) return self.E();
           return self.renderWizardletSections(self.E(), wizardlet, wi);
         }));
