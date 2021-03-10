@@ -81,6 +81,7 @@ FOAM_FILES([
   { name: "foam/core/templates" },
   { name: "foam/i18n/Messages" },
   { name: "foam/core/Action" },
+  { name: "foam/core/JSFObject" },
   { name: "foam/core/Static" },
   { name: "foam/core/Reaction" },
   { name: "foam/core/Serializable" },
@@ -585,7 +586,7 @@ FOAM_FILES([
 
   { name: "foam/core/CoreTypesValidationTest" },
   { name: "foam/core/CoreTypesValidationTestModel" },
-  
+
   // Translation Support
   { name: "foam/i18n/XLIFFTranslationValue" },
   { name: "foam/i18n/Locale" },
