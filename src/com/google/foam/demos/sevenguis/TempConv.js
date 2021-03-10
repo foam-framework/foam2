@@ -24,8 +24,8 @@ foam.CLASS({
 
   properties: [
     [ 'nodeName', 'span' ],
-    { class: 'Float', name: 'c', view: { class: 'foam.u2.FloatView', onKey: true, precision: 4 } },
-    { class: 'Float', name: 'f', view: { class: 'foam.u2.FloatView', onKey: true, precision: 4 } }
+    { class: 'Float', name: 'c', precision: 4, view: { class: 'foam.u2.FloatView', onKey: true, trimZeros: true } },
+    { class: 'Float', name: 'f', precision: 4, view: { class: 'foam.u2.FloatView', onKey: true, trimZeros: true } }
   ],
 
   methods: [

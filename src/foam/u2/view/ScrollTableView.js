@@ -122,7 +122,7 @@
     {
       type: 'Boolean',
       name: 'enableDynamicTableHeight',
-      value: true,
+      value: true
     },
     {
       class: 'Boolean',

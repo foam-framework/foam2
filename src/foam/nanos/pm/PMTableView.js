@@ -65,8 +65,8 @@ foam.CLASS({
     },
     {
       name: 'clearAll',
-      code: function() {
-        this.data.removeAll();
+      code: function(X) {
+        X.pmInfoDAO.removeAll();
       }
     }
   ],

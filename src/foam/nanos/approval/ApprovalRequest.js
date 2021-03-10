@@ -350,7 +350,13 @@
       includeInDigest: true,
       section: 'approvalRequestInformation',
       order: 116,
-      gridColumns: 3
+      gridColumns: 3,
+      tableCellFormatter: function(value, obj, axiom) {
+        var defaultOutput = value ? `ID: ${value}`: "N/A";
+        this.__subSubContext__.userDAO
+          .find(value)
+          .then(user => this.add(user ? user.toSummary() : defaultOutput));
+      }
     },
     {
       class: 'DateTime',
