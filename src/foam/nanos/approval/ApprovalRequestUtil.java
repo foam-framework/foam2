@@ -20,7 +20,11 @@ import static foam.mlang.MLang.*;
 public class ApprovalRequestUtil {
 
   public static DAO getAllRequests(X x, Object objId, String classification) {
-    return ((DAO) x.get("approvalRequestDAO")).where(AND(
+    return getAllRequests(x, (DAO) x.get("approvalRequestDAO"), objId, classification);
+  }
+
+  public static DAO getAllRequests(X x, DAO dao, Object objId, String classification) {
+    return dao.where(AND(
       EQ(ApprovalRequest.OBJ_ID, objId),
       EQ(ApprovalRequest.CLASSIFICATION, classification)
     ));
