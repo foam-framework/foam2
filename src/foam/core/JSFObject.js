@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2',
+  package: 'foam.core',
   name: 'JSFObject',
   extends: 'foam.core.Property',
 

@@ -97,7 +97,7 @@ FOAM_FILES([
   { name: "foam/i18n/Messages" },
   { name: "foam/core/Validation" },
   { name: "foam/core/Action" },
-  { name: "foam/u2/JSFObject" },
+  { name: "foam/core/JSFObject" },
   { name: "foam/core/Static" },
   { name: "foam/core/Reaction" },
   { name: "foam/core/Serializable" },
