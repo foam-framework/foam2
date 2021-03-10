@@ -69,6 +69,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'ClientDAO',
   extends: 'foam.dao.BaseClientDAO',
+  mixins: ['foam.dao.TerminalDAO'],
 
   requires: [
     'foam.box.SkeletonBox',
@@ -179,6 +180,6 @@ return sink
       },
       javaCode: `super.listen_(null, sink, predicate);`,
       swiftCode: `return try super.listen_(nil, sink, predicate)`
-    },
+    }
   ]
 });

@@ -20,6 +20,7 @@ foam.CLASS({
   name: 'MDAO',
   label: 'Indexed DAO',
   extends: 'foam.dao.AbstractDAO',
+  mixins: ['foam.dao.TerminalDAO'],
 
   documentation: 'Indexed in-Memory DAO.',
 

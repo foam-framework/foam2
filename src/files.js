@@ -256,6 +256,7 @@ FOAM_FILES([
   { name: "foam/dao/index/TreeIndex" },
   { name: "foam/dao/index/AutoIndex" },
   { name: "foam/dao/index/PersistedIndexTest" },
+  { name: "foam/dao/TerminalDAO" },
   { name: "foam/dao/MDAO" },
   { name: "foam/dao/ArrayDAO" },
   { name: "foam/dao/TimestampDAO" },
