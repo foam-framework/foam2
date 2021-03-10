@@ -162,11 +162,11 @@ foam.CLASS({
       var m;
       if ( this.memento ) {
         m = this.memento.tail || this.memento;
-        if ( ! m ) {
-          m.tail$.set(foam.nanos.controller.Memento.create());
+        if ( m ) {
+          m.tail = foam.nanos.controller.Memento.create();
         }
 
-        this.currentMemento_$ = this.memento.tail$;
+        this.currentMemento_ = this.memento.tail;
       }
 
       this.

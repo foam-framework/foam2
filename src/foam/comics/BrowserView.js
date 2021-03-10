@@ -25,12 +25,17 @@ foam.CLASS({
     'foam.comics.DAOControllerView'
   ],
 
+  imports: [
+    'memento'
+  ],
+
   exports: [
     'controller as data',
     'summaryView',
     'createControllerView',
     'updateView',
-    'serviceName'
+    'serviceName',
+    'memento'
   ],
 
   properties: [

@@ -152,6 +152,8 @@ foam.CLASS({
         // this.currentMemento_$ = this.memento.tail$;
       }
 
+      var summaryViewParent;
+
       var reciprocalSearch =  foam.u2.ViewSpec.createView({
         class: 'foam.u2.view.ReciprocalSearch',
       },  {}, self, self.__subContext__.createSubContext({ memento: this.memento && this.memento.tail ? this.memento.tail : this.memento }));
@@ -160,11 +162,18 @@ foam.CLASS({
         class: 'foam.u2.view.SimpleSearch',
       },  {}, self, reciprocalSearch.__subContext__);//refactoring candidate
 
+      if (this.data.searchMode === this.SearchMode.FULL) {
+        summaryViewParent = reciprocalSearch;
+      }
+      if ( this.data.searchMode === this.SearchMode.SIMPLE ) {
+        summaryViewParent = searchView;
+      }
+
       var summaryView = foam.u2.ViewSpec.createView(this.summaryView, {
         data$: this.data.filteredDAO$,
         multiSelectEnabled: !! this.data.relationship,
         selectedObjects$: this.data.selectedObjects$
-      }, {}, searchView, searchView.__subContext__);
+      }, {}, summaryViewParent);
 
       
 
