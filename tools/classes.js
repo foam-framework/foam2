@@ -725,6 +725,7 @@ var classes = [
   'foam.dao.ValidatingDAO',
 
   // DAO Debugging
+  'foam.dao.debug.PutPathDAO',
   'foam.dao.debug.PutPathElement',
   'foam.dao.debug.PutPathAware',
   'foam.dao.debug.PutPathTracking',

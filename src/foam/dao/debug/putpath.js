@@ -1,5 +1,56 @@
 foam.CLASS({
   package: 'foam.dao.debug',
+  name: 'PutPathDAO',
+  extends: 'foam.dao.ProxyDAO',
+
+  javaImports: [
+    'foam.core.FObject',
+    'foam.dao.debug.PutPathAware',
+    'java.util.Arrays'
+  ],
+
+  methods: [
+    {
+      name: 'put_',
+      javaCode: `
+        var obj_ = (PutPathAware) obj;
+        var oldObj = (PutPathAware) this.find_(x, obj);
+        if ( oldObj == null ) {
+          obj_.describePut(x, "NEW", obj.toSummary());
+          return super.put_(x, obj);
+        }
+
+        var oldHistory = oldObj.getUpdateHistory();
+        var newHistory = obj_.getUpdateHistory();
+        var i = oldHistory.length;
+        var compatibleHistories =
+          newHistory.length >= oldHistory.length &&
+          oldHistory[i-1].getObjHash() == newHistory[i-1].getObjHash();
+
+        if ( ! compatibleHistories ) {
+          var newNewHistory = Arrays.copyOf(oldHistory,
+            oldHistory.length + newHistory.length);
+          System.arraycopy(
+            newHistory, 0,
+            newNewHistory, oldHistory.length,
+            newHistory.length
+          );
+          newHistory = newNewHistory;
+        }
+
+        obj_.describePut(x, "PutPathDAO",
+          compatibleHistories
+            ? "Histories were compatible"
+            : "Histories were merged");
+
+        return super.put_(x, obj);
+      `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao.debug',
   name: 'PutPathElement',
   extends: 'foam.dao.history.HistoryRecord',
   documentation: `
@@ -15,6 +66,10 @@ foam.CLASS({
     {
       name: 'description',
       class: 'String'
+    },
+    {
+      name: 'objHash',
+      class: 'Int'
     }
   ]
 });
@@ -35,6 +90,19 @@ foam.INTERFACE({
         { name: 'origin', type: 'String' },
         { name: 'description', type: 'String' }
       ],
+    },
+    {
+      name: 'getUpdateHistory',
+      type: 'foam.dao.debug.PutPathElement[]'
+    },
+    {
+      name: 'setUpdateHistory',
+      args: [
+        {
+          name: 'v',
+          type: 'foam.dao.debug.PutPathElement[]'
+        }
+      ]
     }
   ]
 });
@@ -172,6 +240,7 @@ foam.CLASS({
           .setUser(formatUserName(user))
           .setAgent(formatUserName(agent))
           .setTimestamp(new Date())
+          .setObjHash(hashCode())
           .build();
 
         if ( last != null )
