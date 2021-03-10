@@ -222,9 +222,16 @@ foam.CLASS({
       documentation: 'True to use the DAOCreateView else it will use the WizardController.'
     },
     {
-      class: 'Class',
-      //of: 'foam.u2.View',
-      //of: 'FObject',
+      class: 'foam.u2.ViewSpec',
+      // type: 'foam.lib.json.UnknownFObject',
+      // javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
+      // javaJSONParser: 'new foam.lib.json.UnknownFObjectParser()',
+      // fromJSON: function fromJSON(value, ctx, prop, json) {
+      //   return value;
+      // },
+      //class: 'Class',
+      ////of: 'foam.u2.View',
+      ////of: 'FObject',
       name: 'wizardDetailView',
       documentation: 'class of WizardDetailView.'
     }
