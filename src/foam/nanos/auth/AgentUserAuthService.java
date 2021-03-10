@@ -105,6 +105,10 @@ public class AgentUserAuthService
         throw new AuthorizationException("You don't have access to act as the requested entity.");
       }
 
+      if ( permissionJunction.getStatus() != AgentJunctionStatus.ACTIVE ) {
+        throw new AuthorizationException("Junction currently disabled, unable to act as user.");
+      }
+
       // Junction object contains a group which has a unique set of permissions specific to the relationship.
       Group actingWithinGroup = (Group) groupDAO_.find(permissionJunction.getGroup());
 

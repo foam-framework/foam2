@@ -251,6 +251,7 @@ var classes = [
   'foam.nanos.app.Mode',
   'foam.nanos.bench.Benchmark',
   'foam.nanos.auth.AccessDeniedException',
+  'foam.nanos.auth.AgentJunctionStatus',
   'foam.nanos.auth.Authorizer',
   'foam.nanos.auth.AuthorizationDAO',
   'foam.nanos.auth.AuthenticationException',
