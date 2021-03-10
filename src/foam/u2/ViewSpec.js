@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.u2',
   name: 'ViewSpec',
-  extends: 'foam.core.Property',
+  extends: 'foam.core.JSFObject',
 
   documentation: `
     Set a ViewFactory to be a string containing a class name,
