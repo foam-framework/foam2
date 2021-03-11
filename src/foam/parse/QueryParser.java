@@ -187,12 +187,19 @@ public class QueryParser
 
       if ( prop instanceof AbstractEnumPropertyInfo ) {
         List newValues = new ArrayList();
-        Object[] enumVals = ((AbstractEnumPropertyInfo) prop).getValueClass().getEnumConstants();
+        Class enumClass = ((AbstractEnumPropertyInfo) prop).getValueClass();
+        Object[] enumVals = enumClass.getEnumConstants();
         for ( int j = 0; j < value.length; j++ ) {
-          Object enumVal = value[j];
+          String enumVal = (String) value[j];
           for ( int i = 0; i < enumVals.length; i++ ) {
-            Enum enumObj = (Enum) enumVals[i];
-            if ( enumObj.name().toUpperCase().equals(enumVal.toString().toUpperCase()) ) newValues.add(enumObj);
+            try {
+              String enumLabel = (String) enumClass.getMethod("getLabel").invoke(enumVals[i]);
+              String enumName = (String) enumClass.getMethod("getName").invoke(enumVals[i]);
+              if ( enumLabel.equalsIgnoreCase(enumVal) || enumName.equalsIgnoreCase(enumVal)) newValues.add(enumVals[i]);
+            } catch (Exception e) {
+              foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+              logger.error(e.getMessage());
+            }
           }
         }
         In in = new In();
