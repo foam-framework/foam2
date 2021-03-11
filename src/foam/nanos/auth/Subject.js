@@ -89,6 +89,18 @@ foam.CLASS({
       javaCode: `
         return getUser().getId() != getRealUser().getId();
       `
+    },
+    {
+      name: 'toSummary',
+      type: 'String',
+      javaCode: `
+        User user = (User) getUser();
+        User realUser = (User) getRealUser();
+
+        return realUser.getId() != user.getId() ?
+            realUser.toSummary() + "(" + user.toSummary() + ")" :
+            user.toSummary();
+      `
     }
   ]
 })

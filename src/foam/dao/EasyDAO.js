@@ -317,6 +317,10 @@ foam.CLASS({
             .build();
         }
 
+        if ( getHistory() ) {
+          delegate = new foam.dao.history.HistoryDAO(getX(), getHistoryDAOKey(), delegate);
+        }
+
         if ( getNSpec() != null &&
              getNSpec().getServe() &&
              ! getAuthorize() &&
@@ -510,6 +514,17 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'pm'
+    },
+    {
+      class: 'Boolean',
+      name: 'history',
+      documentation: `Enables storing history of object property changes.`
+    },
+    {
+      class: 'String',
+      name: 'historyDAOKey',
+      documentation: `HistoryDAO key referencing where history objects will be stored, useful when seperating history journals from each other.`,
+      javaValue: `"historyDAO";`
     },
     {
       documentation: 'Contextualize objects on .find, re-creating them with this EasyDAO\'s exports, as if they were children of this EasyDAO.',
