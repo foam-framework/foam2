@@ -250,7 +250,8 @@ public class MLang
   }
 
   public static Predicate MQL(String query) {
-    MQLExpr mql = new MQLExpr(query);
+    MQLExpr mql = new MQLExpr();
+    mql.setQuery(query);
     return mql;
   }
 

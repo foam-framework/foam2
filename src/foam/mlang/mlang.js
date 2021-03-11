@@ -3884,7 +3884,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'MQLExpr',
-  extends: 'foam.mlang.predicate.Unary',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: [ 'foam.core.Serializable' ],
 
   javaImports: [
@@ -3905,6 +3905,10 @@ foam.CLASS({
       name: 'specializations_',
       factory: function() { return {}; },
       javaFactory: 'return new java.util.HashMap<ClassInfo, foam.mlang.predicate.Predicate>();'
+    },
+    {
+      class: 'String',
+      name: 'query'
     }
   ],
   methods: [
@@ -3939,13 +3943,13 @@ foam.CLASS({
       type: 'Predicate',
       code: function(model) {
         var qp = foam.parse.QueryParser.create({of: model.id});
-        return qp.parseString(this.arg1.f()) || foam.mlang.predicate.False.create();
+        return qp.parseString(query) || foam.mlang.predicate.False.create();
       },
       javaCode: `
         QueryParser parser = new QueryParser(model);
 
         StringPStream sps = new StringPStream();
-        sps.setString(getArg1().f(null).toString());
+        sps.setString(getQuery());
         PStream ps = sps;
         ParserContext x = new ParserContextImpl();
         ps = parser.parse(ps, x);
@@ -3956,24 +3960,7 @@ foam.CLASS({
         return (foam.mlang.predicate.Nary) ps.value();
       `
     }
-  ],
-
-  axioms: [
-    {
-      name: 'javaExtras',
-      buildJavaClass: function(cls) {
-        cls.extras.push(
-          `
-            public MQLExpr(String mql) {
-              setArg1(new Constant.Builder(getX())
-                .setValue(mql)
-                .build());
-            }
-          `
-        );
-      }
-    }
-  ],
+  ]
 });
 
 
