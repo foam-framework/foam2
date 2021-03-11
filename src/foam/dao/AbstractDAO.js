@@ -546,6 +546,10 @@ return this.cmd_(this.getX(), obj);
 this.select_(x, new RemoveSink(x, this), skip, limit, order, predicate);
       `,
     },
+
+    function clone() {
+      return this;
+    }
   ],
   static: [
     {

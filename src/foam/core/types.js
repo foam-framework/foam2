@@ -144,6 +144,7 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function (_, d) {
+        var od = d;
         if ( typeof d === 'number' ) return new Date(d);
         if ( typeof d === 'string' ) {
           var ret = new Date(d);
@@ -154,6 +155,11 @@ foam.CLASS({
           }
 
           return ret;
+        }
+        if ( foam.Date.isInstance(d) ) {
+          // Convert the Date to Noon time in its timezone.
+          // d = new Date(d.getTime() - (d.getTime() % (1000*60*60*24)) + (12*60 + d.getTimezoneOffset()) * 60000);
+          //console.log('*****************************************************', od, d);
         }
         return d;
       }
