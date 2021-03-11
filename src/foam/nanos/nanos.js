@@ -57,6 +57,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/DayOfWeek" },
   { name: "foam/nanos/auth/Hours" },
   { name: "foam/nanos/auth/Address" },
+  { name: "foam/nanos/auth/AgentJunctionStatus" },
   { name: "foam/nanos/auth/DeletedAware" },
   { name: "foam/nanos/auth/DeletedAwareDAOTest" },
   { name: "foam/nanos/auth/PasswordPolicy" },
