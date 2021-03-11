@@ -74,13 +74,13 @@ foam.CLASS({
       javaCode: `
       String ret = "user path";
       for ( User user : getUserPath() ) {
-        ret += " >> " + user.getFirstName() + " " + user.getLastName();
+        ret += " >> " + user.toSummary();
       }
       return ret;
       `,
       code: function() {
         // Question: should we use u.toSummary() instead?
-        return ['user path', ...this.userPath.map(u => u.firstName + ' ' + u.lastName)].join(' >> ');
+        return ['user path', ...this.userPath.map(u => u.toSummary())].join(' >> ');
       }
     },
     {
@@ -94,12 +94,9 @@ foam.CLASS({
       name: 'toSummary',
       type: 'String',
       javaCode: `
-        User user = (User) getUser();
-        User realUser = (User) getRealUser();
-
-        return realUser.getId() != user.getId() ?
-            user.toSummary() + "(" + realUser.toSummary() + ")" :
-            user.toSummary();
+        return isAgent() ?
+            getUser().toSummary() + "(" + getRealUser().toSummary() + ")" :
+            getUser().toSummary();
       `
     }
   ]

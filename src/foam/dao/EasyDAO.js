@@ -524,7 +524,7 @@ foam.CLASS({
       class: 'String',
       name: 'historyDAOKey',
       documentation: `HistoryDAO key referencing where history objects will be stored, useful when seperating history journals from each other.`,
-      javaValue: `"historyDAO";`
+      javaValue: `"historyDAO"`
     },
     {
       documentation: 'Contextualize objects on .find, re-creating them with this EasyDAO\'s exports, as if they were children of this EasyDAO.',
