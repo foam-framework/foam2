@@ -3898,7 +3898,9 @@ foam.CLASS({
     'foam.lib.parse.ParserContextImpl',
     'foam.lib.parse.StringPStream',
     'foam.mlang.Constant',
-    'foam.parse.QueryParser'
+    'foam.parse.QueryParser',
+    'java.util.Map',
+    'java.util.concurrent.ConcurrentHashMap'
   ],
 
   properties: [
@@ -3906,7 +3908,7 @@ foam.CLASS({
       class: 'Map',
       name: 'specializations_',
       factory: function() { return {}; },
-      javaFactory: 'return new java.util.HashMap<ClassInfo, foam.mlang.predicate.Predicate>();'
+      javaFactory: 'return new java.util.concurrent.ConcurrentHashMap<ClassInfo, foam.mlang.predicate.Predicate>();'
     },
     {
       class: 'String',
@@ -3959,6 +3961,29 @@ foam.CLASS({
 
         return (foam.mlang.predicate.Nary) ps.value();
       `
+    }
+  ],
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(
+          `
+  protected final static Map map__ = new ConcurrentHashMap();
+  public static MQLExpr create(String query) {
+    MQLExpr p = (MQLExpr) map__.get(query);
+
+    if ( p == null ) {
+      p = new MQLExpr();
+      p.setQuery(query);
+      map__.put(query, p);
+    }
+
+    return p;
+  }
+ `
+        );
+      }
     }
   ]
 });
