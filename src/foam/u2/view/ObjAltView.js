@@ -35,7 +35,7 @@ foam.CLASS({
       name: 'selectedView',
       view: function(_, X) {
         return X.data.RadioView.create(
-          {choices: X.data.views, isHorizontal: true, columns: 10},
+          {choices: X.data.views, isHorizontal: true, columns: 8},
           X.createSubContext({controllerMode: foam.u2.ControllerMode.EDIT})
         );
       },

@@ -122,6 +122,7 @@ foam.CLASS({
       `
     }
   ],
+
   methods: [
     {
       name: 'start',
@@ -339,7 +340,7 @@ foam.CLASS({
             InputStream is = resourceStorageX.get(foam.nanos.fs.Storage.class).getInputStream(getKeystoreFileName());
             if ( is != null ) {
               baos = new ByteArrayOutputStream();
- 
+
               byte[] buffer = new byte[8192];
               int len;
               while ((len = is.read(buffer)) != -1) {
@@ -388,7 +389,7 @@ foam.CLASS({
           server.addConnector(sslConnector);
 
         } catch ( java.io.FileNotFoundException e ) {
-          logger.error(e.getMessage(), 
+          logger.error(e.getMessage(),
                        "Please see: https://docs.google.com/document/d/1hXVdHjL8eASG2AG2F7lPwpO1VmcW2PHnAW7LuDC5xgA/edit?usp=sharing", e);
         } catch ( java.io.IOException e ) {
           logger.error("Invalid KeyStore file password, please make sure you have set the correct password.",

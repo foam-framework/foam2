@@ -308,7 +308,7 @@ p({
             {
               "class":"foam.mlang.expr.DateGrouping",
               "name":"Older",
-              "low":2,
+              "low":2
             }
           ]
         }
