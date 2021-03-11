@@ -3831,7 +3831,7 @@ foam.CLASS({
 
     function INSTANCE_OF(cls) { return this.IsInstanceOf.create({ targetClass: cls }); },
     function CLASS_OF(cls) { return this.IsClassOf.create({ targetClass: cls }); },
-    function MQL(mql) { return this.MQLExpr.create({arg1: mql}); }
+    function MQL(mql) { return this.MQLExpr.create({query: mql}); }
   ]
 });
 
@@ -3887,16 +3887,18 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: [ 'foam.core.Serializable' ],
 
+  documentation: `Stores mql query as a property and converts it into predicate when f() is called.`,
+
   javaImports: [
-    'foam.parse.QueryParser',
     'foam.core.ClassInfo',
     'foam.core.FObject',
-    'foam.lib.parse.ParserContext',
-    'foam.lib.parse.StringPStream',
-    'foam.lib.parse.ParserContextImpl',
-    'foam.lib.parse.ParserContext',
     'foam.lib.parse.PStream',
-    'foam.mlang.Constant'
+    'foam.lib.parse.ParserContext',
+    'foam.lib.parse.ParserContext',
+    'foam.lib.parse.ParserContextImpl',
+    'foam.lib.parse.StringPStream',
+    'foam.mlang.Constant',
+    'foam.parse.QueryParser'
   ],
 
   properties: [
@@ -3947,7 +3949,6 @@ foam.CLASS({
       },
       javaCode: `
         QueryParser parser = new QueryParser(model);
-
         StringPStream sps = new StringPStream();
         sps.setString(getQuery());
         PStream ps = sps;
@@ -3955,7 +3956,6 @@ foam.CLASS({
         ps = parser.parse(ps, x);
         if (ps == null)
           return new False();
-
 
         return (foam.mlang.predicate.Nary) ps.value();
       `

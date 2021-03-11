@@ -1,27 +1,22 @@
 /**
  * @license
- * Copyright 2019 The FOAM Authors. All Rights Reserved.
+ * Copyright 2021 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
   package: 'foam.nanos.ruler.predicate',
   name: 'MQL',
-
-  documentation: ``,
-
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: ['foam.core.Serializable'],
+
+  documentation: `A predicate that converts mql query to predicate and evaluates object`,
 
   javaImports: [
     'foam.core.FObject',
     'static foam.mlang.MLang.*'
   ],
   properties: [
-    {
-      class: 'Object',
-      name: 'propValue'
-    },
     {
       class: 'Boolean',
       name: 'isNew',
