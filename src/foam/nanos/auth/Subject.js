@@ -98,7 +98,7 @@ foam.CLASS({
         User realUser = (User) getRealUser();
 
         return realUser.getId() != user.getId() ?
-            realUser.toSummary() + "(" + user.toSummary() + ")" :
+            user.toSummary() + "(" + realUser.toSummary() + ")" :
             user.toSummary();
       `
     }
