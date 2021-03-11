@@ -12,7 +12,6 @@ import foam.core.ClassInfo;
 import foam.core.PropertyInfo;
 import foam.lib.parse.*;
 import foam.lib.parse.Optional;
-import foam.mlang.Constant;
 import foam.mlang.Expr;
 import foam.mlang.MLang;
 import foam.mlang.predicate.*;
