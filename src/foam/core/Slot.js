@@ -673,15 +673,11 @@ foam.CLASS({
     },
     {
       name: 'parentRefs',
-<<<<<<< HEAD
-      class: 'Array'
-=======
       class: 'Array',
       documentation: `
         Object references already seen. This is used to prevent infinite
         recursion.
       `
->>>>>>> Add FObjectRecursionSlot
     },
     {
       name: 'testProp',
