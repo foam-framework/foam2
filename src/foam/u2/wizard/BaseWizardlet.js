@@ -19,7 +19,8 @@ foam.CLASS({
     'foam.u2.wizard.WizardletAware',
     'foam.u2.wizard.WizardletIndicator',
     'foam.u2.wizard.WizardletSection',
-    'foam.u2.wizard.WAO'
+    'foam.u2.wizard.WAO',
+    'foam.u2.wizard.internal.WizardletAutoSaveSlot'
   ],
 
   properties: [
@@ -151,7 +152,7 @@ foam.CLASS({
             .filter(v => v && ! self.loading) // ignore data when it's undefined
             .map(data => {
               console.log('wuuut', data);
-              return foam.core.DebounceSlot.create({
+              return this.WizardletAutoSaveSlot.create({
                 other: data.getUpdateSlot(),
                 delay: 700 // TODO: constant
               });
@@ -161,7 +162,7 @@ foam.CLASS({
         }
         var sl = foam.core.FObjectRecursionSlot.create({ obj$: this.data$ });
         console.log('top slot', sl);
-        return foam.core.DebounceSlot.create({
+        return this.WizardletAutoSaveSlot.create({
           other: sl.filter(() => ! self.loading),
           delay: 700
         }).filter(() => ! self.loading);

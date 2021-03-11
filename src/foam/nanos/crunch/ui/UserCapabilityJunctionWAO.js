@@ -21,11 +21,12 @@ foam.CLASS({
   methods: [
     function save(wizardlet) {
       if ( ! wizardlet.isAvailable ) return Promise.resolve();
+      wizardlet.loading = true;
       return this.crunchService.updateJunction( null,
-        wizardlet.capability.id, wizardlet.data, null
+        wizardlet.capability.id, wizardlet.data.clone(), null
       ).then((ucj) => {
-        // this.crunchService.pub('grantedJunction');
-        // this.load_(wizardlet, ucj);
+        this.crunchService.pub('grantedJunction');
+        this.load_(wizardlet, ucj);
         return ucj;
       });
     },

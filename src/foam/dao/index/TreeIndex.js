@@ -321,6 +321,9 @@ foam.CLASS({
 
   methods: [
     function init() {
+      if ( ! this.root && ! this.index ) {
+        debugger;
+      }
       this.root = this.root || this.index.nullNode;
       this.selectCount = this.selectCount || 0;
     },

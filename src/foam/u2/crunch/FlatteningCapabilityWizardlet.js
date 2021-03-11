@@ -72,7 +72,7 @@ foam.CLASS({
         }));
         for ( let delegate of n ) {
           this.delegatesSub_.onDetach(delegate.saveEvent.sub(() => {
-            this.save();
+            this.wao.save(this);
           }));
         }
       }

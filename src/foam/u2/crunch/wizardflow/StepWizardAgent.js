@@ -43,6 +43,7 @@ foam.CLASS({
     // 'wizardConfig',
     'pushView',
     'popView',
+    'ctrl',
     'initialPosition?'
   ],
 
@@ -96,7 +97,7 @@ foam.CLASS({
             resolve();
           }).catch(e => {
             console.error(e);
-            x.ctrl.notify(this.ERROR_MSG_DRAFT, '', this.LogLevel.ERROR, true);
+            this.ctrl.notify(this.ERROR_MSG_DRAFT, '', this.LogLevel.ERROR, true);
           });
         });
       });
