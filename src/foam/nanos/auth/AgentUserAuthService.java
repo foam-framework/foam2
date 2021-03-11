@@ -70,6 +70,7 @@ public class AgentUserAuthService
     Session session = x.get(Session.class);
     session.setUserId(user.getId());
     session.setAgentId(agent.getId());
+    foam.nanos.crunch.ServerCrunchService.purgeCache(x);
     session = (Session) sessionDAO_.put(session);
     session.setContext(session.applyTo(session.getContext()));
     return user;

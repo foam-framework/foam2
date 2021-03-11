@@ -28,6 +28,7 @@ foam.INTERFACE({
       name: 'getPrereqs',
       type: 'java.util.List<String>',
       args: [
+        { name: 'x', type: 'Context' },
         { name: 'capId', type: 'String' }
       ],
       flags: ['java']
@@ -86,7 +87,8 @@ foam.INTERFACE({
           name: 'capabilityId',
           type: 'String'
         }
-      ]
+      ],
+      flags: ['java']
     },
     {
       name: 'getJunction',
