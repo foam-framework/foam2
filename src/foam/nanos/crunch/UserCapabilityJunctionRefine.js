@@ -205,6 +205,14 @@ foam.CLASS({
         If the data on an UserCapabilityJunction should be stored in some DAO, the daoKey should be provided on its corresponding Capability object.
       `,
       javaCode: `
+        Logger logger = (Logger) x.get("logger");
+        if ( capability.getId().equals("777af38a-8225-87c8-dfdf-eeb15f71215f-123") ) {
+          logger.error(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - subject", x.get("subject"));
+          logger.error(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - user", ((foam.nanos.auth.Subject) x.get("subject")).getUser());
+          logger.error(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - realuser", ((foam.nanos.auth.Subject) x.get("subject")).getRealUser());
+          logger.error(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - data", getData());
+          logger.error(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - daoKey", capability.getDaoKey());
+        }
         if ( getData() == null )
           throw new RuntimeException("UserCapabilityJunction data not submitted for capability: " + getTargetId());
 
@@ -212,31 +220,53 @@ foam.CLASS({
         if ( daoKey == null ) return null;
 
         DAO dao = (DAO) x.get(daoKey);
+        if ( capability.getId().equals("777af38a-8225-87c8-dfdf-eeb15f71215f-123") ) {
+          logger.error(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - is dao null", dao == null);
+        }
         if ( dao == null ) return null;
 
         FObject objectToSave;                                                  // Identify or create data to go into dao.
         String contextDAOFindKey = (String) capability.getContextDAOFindKey();
+        if ( capability.getId().equals("777af38a-8225-87c8-dfdf-eeb15f71215f-123") ) {
+          logger.error(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - contextdaofindkey", contextDAOFindKey);
+        }
 
         if ( contextDAOFindKey != null && ! contextDAOFindKey.isEmpty() ) {
           if ( contextDAOFindKey.toLowerCase().contains("subject") ) {         // 1- Case if subject lookup
             String[] words = foam.util.StringUtil.split(contextDAOFindKey, '.');
             objectToSave = getSubject(x);
+            if ( capability.getId().equals("777af38a-8225-87c8-dfdf-eeb15f71215f-123") ) {
+              logger.error(this.getClass().getSimpleName(), "getSubject(x). - objectToSave", objectToSave);
+            }
 
             if ( objectToSave == null || words.length < 2 )
               throw new RuntimeException("@UserCapabilityJunction capability.contextDAOFindKey not found in context. Please check capability: " + getTargetId() + " and its contextDAOFindKey: " + contextDAOFindKey);
 
             if ( words[1].toLowerCase().equals("user") ) {
               objectToSave = ((Subject) objectToSave).getUser();
+              if ( capability.getId().equals("777af38a-8225-87c8-dfdf-eeb15f71215f-123") ) {
+                logger.error(this.getClass().getSimpleName(), "contextdaofindkey == subject.user - objectToSave", objectToSave);
+              }
             } else if ( words[1].toLowerCase().equals("realuser") ) {
+
+              if ( capability.getId().equals("777af38a-8225-87c8-dfdf-eeb15f71215f-123") ) {
+                logger.error(this.getClass().getSimpleName(), "contextdaofindkey == subject.realUser - objectToSave", objectToSave);
+              }
               objectToSave = ((Subject) objectToSave).getRealUser();
             }
             try {
               objectToSave = dao.find(((User)objectToSave).getId());
+              if ( capability.getId().equals("777af38a-8225-87c8-dfdf-eeb15f71215f-123") ) {
+                logger.error(this.getClass().getSimpleName(), "dao.find(objectToSave) - objectToSave", objectToSave);
+              }
             } catch(Exception e) {
               throw e;
             }
           } else {                                                              // 2- Case if anything other then subject specified
             objectToSave = (FObject) x.get(contextDAOFindKey);
+            if ( capability.getId().equals("777af38a-8225-87c8-dfdf-eeb15f71215f-123") ) {
+              logger.error(this.getClass().getSimpleName(), "this is just wrong", objectToSave);
+            }
 
             if ( objectToSave == null )
               throw new RuntimeException("@UserCapabilityJunction capability.contextDAOFindKey not found in context. Please check capability: " + getTargetId() + " and its contextDAOFindKey: " + contextDAOFindKey);
@@ -255,14 +285,20 @@ foam.CLASS({
           objectToSave = (FObject) getData();
         }
         else {
-          objectToSave = objectToSave.fclone().copyFrom(getData());           // finally copy user inputed data into objectToSave <- typed to the safest possibility from above cases
+          try {
+            objectToSave = objectToSave.fclone().copyFrom(getData());           // finally copy user inputed data into objectToSave <- typed to the safest possibility from above cases
+          } catch (RuntimeException e) {
+            logger.error(this.getClass().getSimpleName(), "exception copying data to objectToSave - objectToSave ", objectToSave);
+            logger.error(this.getClass().getSimpleName(), "exception copying data to objectToSave - data ", getData());
+            logger.error(this.getClass().getSimpleName(), "exception copying data to objectToSave - exception ", e);
+          }
         }
 
         try {                                                                   // save data to dao
           if ( putObject ) dao.inX(x).put(objectToSave);
         } catch (Exception e) {
-          Logger logger = (Logger) x.get("logger");
-          logger.warning("Data cannot be added to " + capability.getDaoKey() + " for UserCapabilityJunction object : " + getId() );
+          logger.error("Data cannot be added to " + capability.getDaoKey() + " for UserCapabilityJunction object : " + getId() );
+          logger.error(this.getClass().getSimpleName(), "dao.inx.put exception - ", e);
         }
 
         return objectToSave;
