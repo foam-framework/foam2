@@ -207,10 +207,8 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
            cidrs.length == 0 ) {
         return;
       }
-      if ( ! SafetyUtil.isEmpty(getRemoteHost()) &&
-           ! SafetyUtil.equals(getRemoteHost(), remoteIp) ) {
-        throw new foam.core.ValidationException("IP changed");
-      }
+
+      // Check whitelisted IP addresses
       for ( foam.net.CIDR cidr : cidrs ) {
         try {
           if ( cidr.inRange(x, remoteIp) ) {
@@ -220,6 +218,15 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
           ((foam.nanos.logger.Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "validateRemoteHost", remoteIp, e.getMessage());
         }
       }
+      
+      if ( cidrs.length > 0 ) return;
+
+      // Do not allow IP to change if not in whitelist
+      if ( ! SafetyUtil.isEmpty(getRemoteHost()) &&
+           ! SafetyUtil.equals(getRemoteHost(), remoteIp) ) {
+        throw new foam.core.ValidationException("IP changed");
+      }
+
       throw new foam.core.ValidationException("Restricted IP");
       `
     },
