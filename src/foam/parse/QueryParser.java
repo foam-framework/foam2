@@ -12,6 +12,7 @@ import foam.core.ClassInfo;
 import foam.core.PropertyInfo;
 import foam.lib.parse.*;
 import foam.lib.parse.Optional;
+import foam.mlang.Constant;
 import foam.mlang.Expr;
 import foam.mlang.MLang;
 import foam.mlang.predicate.*;
@@ -192,7 +193,7 @@ public class QueryParser
           Object enumVal = value[j];
           for ( int i = 0; i < enumVals.length; i++ ) {
             Enum enumObj = (Enum) enumVals[i];
-            if ( enumObj.name().toUpperCase().startsWith(enumVal.toString().toUpperCase()) ) newValues.add(enumObj);
+            if ( enumObj.name().toUpperCase().equals(enumVal.toString().toUpperCase()) ) newValues.add(enumObj);
           }
         }
         In in = new In();
@@ -200,37 +201,18 @@ public class QueryParser
         in.setArg2(MLang.prepare(newValues));
         return in;
       }
-      if ( value.length > 1 ) {
 
-        Or innerPredicate = new Or();
-
-        Predicate[] args = new Predicate[value.length];
-        for ( int i = 0; i < args.length; i++ ) {
-          Eq eq = new Eq();
-          eq.setArg1(prop);
-          eq.setArg2(( value[i] instanceof Expr ) ?
-            ( Expr ) value[i] : new foam.mlang.Constant (value[i]));
-          args[i] = eq;
-        }
-        innerPredicate.setArgs(args);
-
-        return innerPredicate;
+      Or or = new Or();
+      Predicate[] vals = new Predicate[value.length];
+      for ( int i = 0; i < value.length; i++ ) {
+        Binary binary = values[1].equals("=") ? new Eq() : new Contains();
+        binary.setArg1(prop);
+        binary.setArg2(( value[i] instanceof Expr ) ?
+          ( Expr ) value[i] : new foam.mlang.Constant (value[i]));
+        vals[i] = binary;
       }
-
-      if ( values[1].equals(":") ) {
-        Contains contains = new Contains();
-        contains.setArg1(prop);
-        contains.setArg2(( value[0] instanceof Expr ) ?
-          ( Expr ) value[0] : new foam.mlang.Constant (value[0]));
-        return contains;
-      }
-
-      Binary expr = new Eq();
-      expr.setArg1(prop);
-      expr.setArg2(
-        ( value[0] instanceof Expr ) ? (Expr) value[0] : new foam.mlang.Constant(value[0]));
-
-      return expr;
+      or.setArgs(vals);
+      return or;
     });
 
     grammar.addSymbol("BEFORE", new Seq(
