@@ -86,8 +86,8 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
         continue;
       }
       alreadyListed.add(sourceCapabilityId);
-      var prereqs = getPrereqs(sourceCapabilityId) == null ? new String[0] :
-        getPrereqs(sourceCapabilityId).stream()
+      var prereqsList = getPrereqs(x, sourceCapabilityId);
+      var prereqs = prereqsList == null ? new String[0] : prereqsList.stream()
           .filter(c -> ! alreadyListed.contains(c))
           .toArray(String[]::new);
 
@@ -499,7 +499,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     UserCapabilityJunction ucj = crunchService.getJunction(x, capabilityId);
       if ( ! capability.getEnabled() ) return false;
 
-    var prereqs = getPrereqs(capabilityId);
+    var prereqs = getPrereqs(x.put("subject", ucj.getSubject(x)), capabilityId);
     boolean topLevelRenewable = ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ucj.getIsRenewable();
 
     if ( prereqs == null || prereqs.size() == 0 || topLevelRenewable ) return topLevelRenewable;

@@ -331,7 +331,7 @@ foam.CLASS({
         }
 
         CrunchService crunchService = (CrunchService) x.get("crunchService");
-        var prereqs = crunchService.getPrereqs(getId());
+        var prereqs = crunchService.getPrereqs(x, getId());
 
         if ( prereqs != null && prereqs.size() > 0 ) {
           DAO capabilityDAO = (DAO) x.get("capabilityDAO");
@@ -424,7 +424,7 @@ foam.CLASS({
           subject.setUser((User) userDAO.find(ucj.getSourceId()));
         }
 
-        var prereqs = crunchService.getPrereqs(getId());
+        var prereqs = crunchService.getPrereqs(x.put("subject", ucj.getSubject(x)), getId());
         CapabilityJunctionStatus prereqChainedStatus = null;
         if ( prereqs != null ) {
           for ( var capId : prereqs ) {
@@ -514,7 +514,7 @@ foam.CLASS({
         boolean shouldReopenTopLevel = shouldReopenUserCapabilityJunction(ucj);
         if ( shouldReopenTopLevel ) return true;
 
-        var prereqs = crunchService.getPrereqs(getId());
+        var prereqs = crunchService.getPrereqs(x.put("subject", ucj.getSubject(x)), getId());
         if ( prereqs == null || prereqs.size() == 0 ) return false;
 
         for ( var capId : prereqs ) {

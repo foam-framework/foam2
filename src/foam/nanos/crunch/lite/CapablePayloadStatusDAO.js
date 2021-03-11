@@ -66,7 +66,7 @@ foam.CLASS({
           if ( newStatus == PENDING ){
             var crunchService = (CrunchService) x.get("crunchService");
             payload.setStatus(REJECTED);
-            List<String> prereqIdsList = crunchService.getPrereqs(payload.getCapability());
+            List<String> prereqIdsList = crunchService.getPrereqs(x, payload.getCapability());
 
             if ( prereqIdsList != null && prereqIdsList.size() > 0 ){
               String[] prereqIds = prereqIdsList.toArray(new String[prereqIdsList.size()]);
@@ -98,7 +98,7 @@ foam.CLASS({
           payload.setStatus(newStatus);
           // TODO Maybe use projection MLang
           var crunchService = (CrunchService) x.get("crunchService");
-          var depIds = crunchService.getDependentIds(x, payload.getCapability());
+          var depIds = crunchService.getDependentIds(x, payload.getCapability()); // todo ruby look into seems fine
 
           ((ArraySink) payloadDAO.select(new ArraySink())).getArray().stream()
           .filter(cp -> Arrays.stream(depIds).anyMatch(((CapabilityJunctionPayload) cp).getCapability()::equals))
