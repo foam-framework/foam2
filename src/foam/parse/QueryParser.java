@@ -7,11 +7,13 @@
 package foam.parse;
 
 import foam.core.AbstractDatePropertyInfo;
+import foam.core.AbstractEnumPropertyInfo;
 import foam.core.ClassInfo;
 import foam.core.PropertyInfo;
 import foam.lib.parse.*;
 import foam.lib.parse.Optional;
 import foam.mlang.Expr;
+import foam.mlang.MLang;
 import foam.mlang.predicate.*;
 import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
@@ -167,6 +169,7 @@ public class QueryParser
 
       Object[] value = (Object[]) values[2];
       if ( value[0] instanceof Date || prop instanceof AbstractDatePropertyInfo) {
+
         And and = new And();
         Gte gte = new Gte();
         gte.setArg1(prop);
@@ -180,6 +183,22 @@ public class QueryParser
         Binary[] predicates = { gte, lte };
         and.setArgs(predicates);
         return and;
+      }
+
+      if ( prop instanceof AbstractEnumPropertyInfo ) {
+        List newValues = new ArrayList();
+        Object[] enumVals = ((AbstractEnumPropertyInfo) prop).getValueClass().getEnumConstants();
+        for ( int j = 0; j < value.length; j++ ) {
+          Object enumVal = value[j];
+          for ( int i = 0; i < enumVals.length; i++ ) {
+            Enum enumObj = (Enum) enumVals[i];
+            if ( enumObj.name().toUpperCase().startsWith(enumVal.toString().toUpperCase()) ) newValues.add(enumObj);
+          }
+        }
+        In in = new In();
+        in.setArg1(prop);
+        in.setArg2(MLang.prepare(newValues));
+        return in;
       }
       if ( value.length > 1 ) {
 
@@ -453,10 +472,11 @@ public class QueryParser
     grammar.addSymbol("QUOTED_STRING", new Seq1(1,
       Literal.create("\""),
       new Repeat(new Alt(
-        Literal.create("\\\""),
-        Literal.create("\"")
-      ), new NotChars("\""))
+        new Literal("\\\"", "\""),
+        new NotChars("\"")
+      ))
     ));
+    grammar.addAction("QUOTED_STRING", (val, x) -> compactToString(val));
 
     grammar.addSymbol("WORD", new Repeat(
       grammar.sym("CHAR"), 1

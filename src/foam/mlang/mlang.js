@@ -3725,6 +3725,7 @@ foam.CLASS({
     'foam.mlang.predicate.StartsWithIC',
     'foam.mlang.predicate.EndsWith',
     'foam.mlang.predicate.True',
+    'foam.mlang.predicate.MQLExpr',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Explain',
     'foam.mlang.sink.GroupBy',
@@ -3829,7 +3830,8 @@ foam.CLASS({
     function THEN_BY(a, b) { return this.ThenBy.create({head: a, tail: b}); },
 
     function INSTANCE_OF(cls) { return this.IsInstanceOf.create({ targetClass: cls }); },
-    function CLASS_OF(cls) { return this.IsClassOf.create({ targetClass: cls }); }
+    function CLASS_OF(cls) { return this.IsClassOf.create({ targetClass: cls }); },
+    function MQL(mql) { return this.MQLExpr.create({arg1: mql}); }
   ]
 });
 
@@ -3877,6 +3879,101 @@ foam.CLASS({
       `
     }
   ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'MQLExpr',
+  extends: 'foam.mlang.predicate.Unary',
+  implements: [ 'foam.core.Serializable' ],
+
+  javaImports: [
+    'foam.parse.QueryParser',
+    'foam.core.ClassInfo',
+    'foam.core.FObject',
+    'foam.lib.parse.ParserContext',
+    'foam.lib.parse.StringPStream',
+    'foam.lib.parse.ParserContextImpl',
+    'foam.lib.parse.ParserContext',
+    'foam.lib.parse.PStream',
+    'foam.mlang.Constant'
+  ],
+
+  properties: [
+    {
+      class: 'Map',
+      name: 'specializations_',
+      factory: function() { return {}; },
+      javaFactory: 'return new java.util.HashMap<ClassInfo, foam.mlang.predicate.Predicate>();'
+    }
+  ],
+  methods: [
+    {
+      name: 'f',
+      code: function(o) {
+        return this.specialization(o.model_).f(o);
+      },
+      javaCode: `
+        if ( ! ( obj instanceof FObject ) )
+          return false;
+
+        return specialization(((FObject)obj).getClassInfo()).f(obj);
+      `
+    },
+    {
+      name: 'specialization',
+      args: [ { name: 'model', type: 'ClassInfo' } ],
+      type: 'Predicate',
+      code: function(model) {
+        return this.specializations_[model.name] ||
+          ( this.specializations_[model.name] = this.specialize(model) );
+      },
+      javaCode: `
+        if ( getSpecializations_().get(model) == null ) getSpecializations_().put(model, specialize(model));
+        return (Predicate) getSpecializations_().get(model);
+      `
+    },
+    {
+      name: 'specialize',
+      args: [ { name: 'model', type: 'ClassInfo' } ],
+      type: 'Predicate',
+      code: function(model) {
+        var qp = foam.parse.QueryParser.create({of: model.id});
+        return qp.parseString(this.arg1.f()) || foam.mlang.predicate.False.create();
+      },
+      javaCode: `
+        QueryParser parser = new QueryParser(model);
+
+        StringPStream sps = new StringPStream();
+        sps.setString(getArg1().f(null).toString());
+        PStream ps = sps;
+        ParserContext x = new ParserContextImpl();
+        ps = parser.parse(ps, x);
+        if (ps == null)
+          return new False();
+
+
+        return (foam.mlang.predicate.Nary) ps.value();
+      `
+    }
+  ],
+
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(
+          `
+            public MQLExpr(String mql) {
+              setArg1(new Constant.Builder(getX())
+                .setValue(mql)
+                .build());
+            }
+          `
+        );
+      }
+    }
+  ],
 });
 
 
