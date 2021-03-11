@@ -32,7 +32,8 @@ foam.CLASS({
     { name: 'FOOTER_LINK', message: 'Create an account' },
     { name: 'SUB_FOOTER_LINK', message: 'Forgot password?' },
     { name: 'ERROR_MSG', message: 'There was an issue logging in' },
-    { name: 'ERROR_MSG2', message: 'Please enter email or username' }
+    { name: 'ERROR_MSG2', message: 'Please enter email or username' },
+    { name: 'BROWSER_SUPPORT', message: 'This application is optimized for Google Chrome'}
   ],
 
   properties: [
