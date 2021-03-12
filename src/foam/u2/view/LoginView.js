@@ -304,9 +304,10 @@ foam.CLASS({
                 .addClass('image-one')
                 .attr('src', this.imgPath)
               .end()
-      // add a disclaimer under
+      // add a disclaimer under img
               .start('p')
                 .addClass('disclaimer-login').addClass('disclaimer-login-img')
+                .add(this.model.DISCLAIMER)
               .end()
             .end();
         }, function() {
