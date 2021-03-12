@@ -35,7 +35,9 @@ foam.CLASS({
       test( isValid("id-before:20"," id <=  ?  ") , "The id is less than value 'before'");
       test( isValid("firstName=Simon"," firstname =  ?  ") , "The firstname is equal to value");
       test( isValid("firstName:Sim"," 'firstname' like '% ? %' ") , "The firstname that contains the value");
-      
+      test( isValid("firstName:Sim,Kol"," ( 'firstname' like '% ? %' )  OR  ( 'firstname' like '% ? %' ) ") , "The firstname that contains the value or the value");
+      test( isValid("firstName:(Sim|Kol)"," ( 'firstname' like '% ? %' )  OR  ( 'firstname' like '% ? %' ) ") , "The firstname that contains the value or the value");
+
       test( isValid("birthday=2020/09/10"," ( birthday >=  ?  )  AND  ( birthday <=  ?  ) ") , "The birthday equal to value yyyy/mm/dd");
       test( isValid("birthday=2020-09-10"," ( birthday >=  ?  )  AND  ( birthday <=  ?  ) ") , "The birthday equal to value yyyy-mm-dd");
       test( isValid("birthday<2020-09-10"," birthday <  ?  ") , "The birthday less than the value");

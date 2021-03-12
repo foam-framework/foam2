@@ -43,6 +43,7 @@ public class WebAgentQueryParser {
       StringPStream sps    = new StringPStream();
       PStream       ps = sps;
       ParserContext px = new ParserContextImpl();
+      px.set("logger", logger);
 
       sps.setString(q);
       ps = parser_.parse(ps, px);
