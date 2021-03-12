@@ -19,6 +19,7 @@ import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.util.SafetyUtil;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class QueryParser
@@ -190,29 +191,26 @@ public class QueryParser
         Class enumClass = ((AbstractEnumPropertyInfo) prop).getValueClass();
         Object[] enumVals = enumClass.getEnumConstants();
         for ( int j = 0; j < value.length; j++ ) {
-          if ( value[j] instanceof String ) {
-            String enumVal = (String) value[j];
-            for ( int i = 0; i < enumVals.length; i++ ) {
-              try {
-                String enumLabel = (String) enumClass.getMethod("getLabel").invoke(enumVals[i]);
-                String enumName = (String) enumClass.getMethod("getName").invoke(enumVals[i]);
+          try {
+            if ( value[j] instanceof String ) {
+              String enumVal = (String) value[j];
+              Method labelMet = enumClass.getMethod("getLabel");
+                Method nameMet = enumClass.getMethod("getName");
+              for ( int i = 0; i < enumVals.length; i++ ) {
+                String enumLabel = (String) labelMet.invoke(enumVals[i]);
+                String enumName = (String) nameMet.invoke(enumVals[i]);
                 if ( enumLabel.equalsIgnoreCase(enumVal) || enumName.equalsIgnoreCase(enumVal)) newValues.add(enumVals[i]);
-              } catch (Exception e) {
-                foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
-                logger.error(e.getMessage());
               }
-            }
-          } else if ( value[j] instanceof Integer ) {
-            Integer enumVal = (Integer) value[j];
-            for ( int i = 0; i < enumVals.length; i++ ) {
-              try {
-                Integer enumOrdinal = (Integer) enumClass.getMethod("getOrdinal").invoke(enumVals[i]);
+            } else if ( value[j] instanceof Integer ) {
+              Integer enumVal = (Integer) value[j];
+              Method ordinalMet = enumClass.getMethod("getOrdinal");
+              for ( int i = 0; i < enumVals.length; i++ ) {
+                Integer enumOrdinal = (Integer) ordinalMet.invoke(enumVals[i]);
                 if (enumOrdinal.intValue() == enumVal.intValue() ) newValues.add(enumVals[i]);
-              } catch (Exception e) {
-                foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
-                logger.error(e.getMessage());
               }
             }
+          } catch (Exception e) {
+            throw new RuntimeException(e);
           }
         }
         In in = new In();
