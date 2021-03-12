@@ -297,7 +297,7 @@ foam.CLASS({
         try {                                                                   // save data to dao
           if ( putObject ) dao.inX(x).put(objectToSave);
         } catch (Exception e) {
-          logger.error("Data cannot be added to " + capability.getDaoKey() + " for UserCapabilityJunction object : " + getId() );
+          logger.warning("Data cannot be added to " + capability.getDaoKey() + " for UserCapabilityJunction object : " + getId() );
           logger.debug(this.getClass().getSimpleName(), "dao.inx.put exception - ", e);
         }
 
