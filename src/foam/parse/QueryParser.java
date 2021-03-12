@@ -269,7 +269,7 @@ public class QueryParser
       return predicate;
     });
 
-    grammar.addSymbol("VALUE", new Alt(grammar.sym("ME"),grammar.sym("NUMBER"),
+    grammar.addSymbol("VALUE", new GreedyAlt(grammar.sym("ME"),grammar.sym("NUMBER"),
       grammar.sym("DATE"), grammar.sym("STRING")));
 
     grammar.addSymbol("COMPOUND_VALUE", new Alt(grammar.sym("NEGATE_VALUE"),
