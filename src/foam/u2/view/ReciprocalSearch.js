@@ -163,9 +163,9 @@ foam.CLASS({
       if ( this.memento ) {
         m = this.memento.tail || this.memento;
         if ( m ) {
-          m.tail = foam.nanos.controller.Memento.create();
+          m.tail$.set(foam.nanos.controller.Memento.create());
         }
-
+        m = this.memento.tail || this.memento;
         this.currentMemento_ = this.memento.tail;
       }
 
@@ -223,10 +223,8 @@ foam.CLASS({
               .end();
 
             if ( self.memento && m ) {
+                m.tail$.set(foam.nanos.controller.Memento.create());
               m = m.tail;
-              if ( ! m ) {
-                m = foam.nanos.controller.Memento.create();
-              }
             }
           });
 
@@ -237,6 +235,8 @@ foam.CLASS({
           .add(self.countText$)
         .end()
         .tag(this.CLEAR, { buttonStyle: 'SECONDARY' });
+
+        this.currentMemento_ = m;
     },
 
     function addFilter(key) {
