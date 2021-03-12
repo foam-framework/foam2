@@ -5,6 +5,16 @@ p({
 })
 p({
   class: "foam.nanos.auth.Permission",
-  id: "service.crunchService.customSubject",
-  description: "Permission to use a custom subject inside crunch service."
+  id: "service.crunchService.getCapabilityPathFor",
+  description: "Permission to use crunch service's getCapabilityPathFor method."
+})
+p({
+  class: "foam.nanos.auth.Permission",
+  id: "service.crunchService.getJunctionFor",
+  description: "Permission to use crunch service's getJunctionFor method."
+})
+p({
+  class: "foam.nanos.auth.Permission",
+  id: "service.crunchService.updateJunctionFor",
+  description: "Permission to use crunch service's updateJunctionFor method."
 })

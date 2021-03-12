@@ -65,7 +65,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
   public List getCapabilityPathFor(X x, String rootId, boolean filterGrantedUCJ, User effectiveUser, User user) {
     foam.nanos.auth.AuthService auth = (foam.nanos.auth.AuthService) x.get("auth");
-    if ( auth.check(x, "service.crunchService.customSubject") ) {
+    if ( auth.check(x, "service.crunchService.getCapabilityPathFor") ) {
       var requestedSubject = new Subject();
       requestedSubject.setUser(user);
       requestedSubject.setUser(effectiveUser);
@@ -209,7 +209,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
   public UserCapabilityJunction getJunctionFor(X x, String capabilityId, User effectiveUser, User user) {
     Subject subject = (Subject) x.get("subject");
     foam.nanos.auth.AuthService auth = (foam.nanos.auth.AuthService) x.get("auth");
-    if ( auth.check(x, "service.crunchService.customSubject") ) {
+    if ( auth.check(x, "service.crunchService.getJunctionFor") ) {
       var requestedSubject = new Subject();
       requestedSubject.setUser(user);
       requestedSubject.setUser(effectiveUser);

@@ -122,12 +122,7 @@ foam.CLASS({
         return this.idOfRecord;
       }
     },
-    'idOfRecord',
-    {
-      class: 'Boolean',
-      name: 'hideTop',
-      value: false
-    }
+    'idOfRecord'
   ],
 
   actions: [
@@ -254,10 +249,10 @@ foam.CLASS({
         } else {
           this
           .addClass(this.myClass())
-          .add(self.slot(function(data, config$viewBorder, viewView, hideTop) {
+          .add(self.slot(function(data, config$viewBorder, viewView) {
             return self.E()
               .start(self.Rows)
-                .start(self.Rows).show(!hideTop)
+                .start(self.Rows)
                   // we will handle this in the StackView instead
                   .startContext({ onBack: self.onBack })
                     .tag(self.BACK, {
@@ -276,7 +271,7 @@ foam.CLASS({
                   .end()
                 .end()
 
-                .start(self.Cols).show(!hideTop)
+                .start(self.Cols)
                   .start(self.Cols).addClass(self.myClass('actions-header'))
                     .startContext({ data: self })
                       .tag(self.EDIT, {

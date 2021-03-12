@@ -20,14 +20,6 @@ foam.CLASS({
     'foam.core.ContextAgent'
   ],
 
-  properties: [
-    {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Subject',
-      name: 'subject'
-    }
-  ],
-
   methods: [
     async function execute() {
       await Promise.all(this.wizardlets.map(w => w.load()));

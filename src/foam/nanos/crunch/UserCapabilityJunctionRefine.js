@@ -363,16 +363,6 @@ foam.CLASS({
       javaCode: `
       return "UCJ id: "+getId()+", source: "+getSourceId()+", target: "+getTargetId()+", status: "+getStatus().getName()+", data: "+(getData() != null ? getData().getClass().getName() : "null");
       `
-    },
-    {
-      name: 'toSummary',
-      type: 'String',
-      code: function() {
-        return 'UCJ id: '+this.id;
-      },
-      javaCode: `
-      return "UCJ id: "+getId();
-      `
     }
   ]
 });

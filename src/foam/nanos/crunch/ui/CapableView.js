@@ -84,10 +84,6 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'showTitle'
-    },
-    {
-      class: 'List',
-      name: 'fallBackWizardlets'
     }
   ],
 
@@ -105,9 +101,6 @@ foam.CLASS({
       // note: payloads data are also set from getWizardletsFromCapable
       //       this is why we add listeners to payloads data after wizardlets are set
 
-      //this.__subContext__.createSubContext({'controllerMode':foam.u2.ControllerMode.VIEW}
-      //export controllerMode 
-      //ContextAgent
 
       var x;
       if (this.ucjObj) {
@@ -131,7 +124,6 @@ foam.CLASS({
             .execute().then(x => x.wizardlets)
           : [];
       }
-      // this.fallBackWizardlets = [...this.wizardlets];
 
       this.start().addClass(this.myClass())
         .start().addClass(this.myClass('button-container'))
@@ -202,16 +194,12 @@ foam.CLASS({
     },
     {
       name: 'edit',
-      // isEnabled: () => true,
-      // isAvailable: () => true,
       code: function() {
         this.controllerMode = foam.u2.ControllerMode.EDIT;
       }
     },
     {
       name: 'submit',
-      // isEnabled: () => true,
-      // isAvailable: () => true,
       code: async function() {
         await Promise.all(this.wizardlets.map(w => w.save()));
         this.controllerMode = foam.u2.ControllerMode.VIEW;
