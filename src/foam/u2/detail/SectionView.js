@@ -162,7 +162,7 @@ foam.CLASS({
                       prop: p,
                       data$: self.data$
                     })
-                  .end()
+                  .end();
                 });
               }
 
