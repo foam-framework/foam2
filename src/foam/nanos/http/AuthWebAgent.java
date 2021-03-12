@@ -270,9 +270,7 @@ public class AuthWebAgent
         if ( ! SafetyUtil.isEmpty(authHeader) ) {
           sendError(x, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Authentication failure.");
         } else {
-          if ( sendErrorHandler_ == null || sendErrorHandler_.redirectToLogin(x) ) {
-            templateLogin(x);
-          } else {
+          if ( sendErrorHandler_ != null && ! sendErrorHandler_.redirectToLogin(x) ) {
             PrintWriter out = x.get(PrintWriter.class);
             out.println("Authentication failure.");
           }
@@ -281,9 +279,7 @@ public class AuthWebAgent
         if ( ! SafetyUtil.isEmpty(authHeader) ) {
           sendError(x, resp, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         } else {
-          if ( sendErrorHandler_ == null || sendErrorHandler_.redirectToLogin(x) ) {
-            templateLogin(x);
-          } else {
+          if ( sendErrorHandler_ != null && ! sendErrorHandler_.redirectToLogin(x) ) {
             PrintWriter out = x.get(PrintWriter.class);
             out.println("Authentication failure.");
           }
