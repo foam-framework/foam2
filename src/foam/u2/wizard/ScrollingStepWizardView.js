@@ -21,6 +21,39 @@ foam.CLASS({
     ^mainView > * > *:not(:last-child) {
       margin-bottom: 64px;
     }
+
+    ^rightside {
+      --actionBarTbPadding: 32px;
+      --buttonHeight: 38px;
+      --actionBarHeight: calc(
+        2*var(--actionBarTbPadding) + var(--buttonHeight));
+      --lrPadding: 48px;
+      position: relative;
+    }
+
+    ^rightside ^entry {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: var(--lrPadding);
+      padding-bottom: calc(var(--lrPadding) + var(--actionBarHeight))
+    }
+
+    ^rightside ^actions {
+      position: absolute;
+      bottom: 0;
+      padding: 0 var(--lrPadding);
+      padding-top: var(--actionBarTbPadding);
+      text-align: right;
+      width: calc(100% - 2*var(--lrPadding));
+      flex-grow: 0;
+      min-height: calc(
+        var(--actionBarHeight) - var(--actionBarTbPadding));
+      background-color: rgba(255,255,255,0.7);
+      backdrop-filter: blur(5px);
+
+      /* TODO: Themes don't support this, so color is static */
+      border-top: 2px solid hsla(240,100%,80%,0.8);
+    }
   `,
 
   properties: [
@@ -112,6 +145,10 @@ foam.CLASS({
                 return self.renderWizardlets(this.E(), data$wizardlets);
               }))
             .end()
+            .start()
+              .addClass(this.myClass('actions'))
+              .tag(this.SUBMIT)
+            .end()
           .end()
         .end()
         ;
@@ -169,6 +206,14 @@ foam.CLASS({
           }));
         }));
       });
+    }
+  ],
+
+  actions: [
+    {
+      name: 'submit',
+      label: 'Done',
+      code: function () {}
     }
   ]
 });
