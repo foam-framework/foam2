@@ -207,11 +207,11 @@ foam.CLASS({
       javaCode: `
         Logger logger = (Logger) x.get("logger");
         if ( capability.getId().equals("777af38a-8225-87c8-dfdf-eeb15f71215f-123") ) {
-          logger.error(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - subject", x.get("subject"));
-          logger.error(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - user", ((foam.nanos.auth.Subject) x.get("subject")).getUser());
-          logger.error(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - realuser", ((foam.nanos.auth.Subject) x.get("subject")).getRealUser());
-          logger.error(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - data", getData());
-          logger.error(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - daoKey", capability.getDaoKey());
+          logger.debug(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - subject", x.get("subject"));
+          logger.debug(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - user", ((foam.nanos.auth.Subject) x.get("subject")).getUser());
+          logger.debug(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - realuser", ((foam.nanos.auth.Subject) x.get("subject")).getRealUser());
+          logger.debug(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - data", getData());
+          logger.debug(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - daoKey", capability.getDaoKey());
         }
         if ( getData() == null )
           throw new RuntimeException("UserCapabilityJunction data not submitted for capability: " + getTargetId());
