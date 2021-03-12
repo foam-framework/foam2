@@ -179,30 +179,23 @@ foam.CLASS({
 
           e.onDetach(this.searchManager);
 
-          // var searchView = foam.u2.ViewSpec.createView(self.TextSearchView, {
-          //   richSearch: true,
-          //   of: self.dao.of.id,
-          //   onKey: true,
-          //   viewSpec: {
-          //     class: 'foam.u2.tag.Input',
-          //     focused: true
-          //   }
-          // });
-          var slot = self.SimpleSlot.create();//{ value: searchView }
-
-          e.start(self.TextSearchView, {
+          var searchView = foam.u2.ViewSpec.createView(self.TextSearchView, {
             richSearch: true,
             of: self.dao.of.id,
             onKey: true,
             viewSpec: {
               class: 'foam.u2.tag.Input',
               focused: true
-            },
-            searchValue: this.searchValue//use memento head as searchValue in the view
-        }, slot)
-            // .tag(slot)
+            }
+          }, this, this.__subContext__.createSubContext({ memento: this.memento.tail }));
+          var slot = self.SimpleSlot.create({ value: searchView });//
+
+          e.start()
+            .tag(slot)
             .addClass('general-query')
           .end();
+
+          m = searchView.__subContext__.memento;
 
           this.searchManager.add(slot.value);
 

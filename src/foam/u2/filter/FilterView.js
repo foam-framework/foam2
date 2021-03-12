@@ -329,9 +329,7 @@ foam.CLASS({
         }
       },  self, self.__subSubContext__.createSubContext({ memento: this.currentMemento }));
 
-      if ( self.currentMemento ) self.currentMemento = self.currentMemento.tail;
-
-      // var m = self.currentMemento
+      // if ( self.currentMemento ) self.currentMemento = self.currentMemento.tail;
       
       this.onDetach(this.filterController$.dot('isAdvanced').sub(this.isAdvancedChanged));
       this.addClass(self.myClass())
@@ -370,9 +368,9 @@ foam.CLASS({
                       },  self, self.__subSubContext__.createSubContext({ memento: self.currentMemento }));//this.currentMemento
 
                       if ( self.currentMemento ) {
+                        self.currentMemento = self.currentMemento.tail;
                         if ( self.currentMemento.tail == null )
                           self.currentMemento.tail = foam.nanos.controller.Memento.create();
-                        self.currentMemento = self.currentMemento.tail;
                       }
 
                       this.start(propView)

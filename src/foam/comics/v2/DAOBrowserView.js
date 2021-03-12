@@ -292,18 +292,18 @@ foam.CLASS({
         filterView  = foam.u2.ViewSpec.createView(self.FilterView, {
           dao$: self.searchFilterDAO$,
           data$: self.searchPredicate$
-        },  self, simpleSearch.__subSubContext__);
+        },  self, simpleSearch.__subContext__);
       } else {
         filterView  = foam.u2.ViewSpec.createView(self.FilterView, {
           dao$: self.searchFilterDAO$,
           data$: self.searchPredicate$
-        },  self, self.__subSubContext__.createSubContext({ memento: this.memento ? this.memento.tail : this.memento }));//refactoring candidate
+        },  self, self.__subContext__.createSubContext({ memento: this.memento ? this.memento.tail : this.memento }));//refactoring candidate
       }
 
       var summaryView = foam.u2.ViewSpec.createView(self.summaryView ,{
         data: self.predicatedDAO$proxy,
         config: self.config
-      },  filterView, filterView.__subSubContext__);
+      },  filterView, filterView.__subContext__);
 
       this.addClass(this.myClass());
       this.SUPER();
