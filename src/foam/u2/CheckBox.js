@@ -33,6 +33,7 @@ foam.CLASS({
       border: none;
       box-shadow: none;
       outline: none;
+      padding-left: 0;
     }
     input[type='checkbox']^:checked:disabled:after {
       background: none;
