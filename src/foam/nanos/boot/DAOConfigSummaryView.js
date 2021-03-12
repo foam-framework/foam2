@@ -85,9 +85,9 @@ foam.CLASS({
 
       imports: [ 'memento', 'stack' ],
 
-      exports: [
-        'currentMemento_ as memento'
-      ],
+      // exports: [
+      //   'currentMemento_ as memento'
+      // ],
 
       css: `
         ^title {
@@ -105,18 +105,12 @@ foam.CLASS({
         {
           class: 'foam.u2.ViewSpec',
           name: 'inner'
-        },
-        'currentMemento_'
+        }
       ],
 
       methods: [
         function initE() {
           this.SUPER();
-
-          if ( this.memento )
-            this.currentMemento_$ = this.memento.tail$;
-          if ( ! this.currentMemento_ )
-            this.currentMemento_ = foam.nanos.controller.Memento.create();
 
           this.
             start().
@@ -321,9 +315,9 @@ foam.CLASS({
       });
 
       if ( this.memento ) {
-        if ( ! this.memento.tail ) {
-          this.memento.tail = self.Memento.create();
-        }
+        // if ( ! this.memento.tail ) {
+        //   this.memento.tail = self.Memento.create();
+        // }
         this.onDetach(this.memento.tail$.sub(this.mementoChange));
       }
       this.mementoChange();
