@@ -476,7 +476,8 @@ public class QueryParser
       new Repeat(new Alt(
         new Literal("\\\"", "\""),
         new NotChars("\"")
-      ))
+      )),
+      Literal.create("\"")
     ));
     grammar.addAction("QUOTED_STRING", (val, x) -> compactToString(val));
 
