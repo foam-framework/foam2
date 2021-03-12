@@ -29,7 +29,7 @@ public class GreedyAlt
 
   public PStream parse(PStream ps, ParserContext x) {
     int retPos = 0;
-    PStream finalRet =null;
+    PStream finalRet = null;
     for ( int i = 0 ; i < parsers_.length ; i++ ) {
       PStream ret = ps.apply(parsers_[i], x);
       if ( ret != null && ret.pos() > retPos ) {

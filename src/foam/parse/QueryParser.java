@@ -10,6 +10,7 @@ import foam.core.AbstractDatePropertyInfo;
 import foam.core.AbstractEnumPropertyInfo;
 import foam.core.ClassInfo;
 import foam.core.PropertyInfo;
+import foam.lib.json.Whitespace;
 import foam.lib.parse.*;
 import foam.lib.parse.Optional;
 import foam.mlang.Expr;
@@ -64,7 +65,7 @@ public class QueryParser
 
   private Grammar getGrammar() {
     Grammar grammar = new Grammar();
-    grammar.addSymbol("START", grammar.sym("OR"));
+    grammar.addSymbol("START", new Seq1(0, grammar.sym("OR"), new Repeat0(Literal.create(" ")), Eof.instance()));
 
 
     grammar.addSymbol("FIELD_NAME", new Alt(expressions));
