@@ -166,11 +166,8 @@ foam.CLASS({
       javaCode:  `
         AuthService authService = (AuthService) x.get("auth");
         Map<String,List> cache = (Map<String,List>) getTemplateCache(x);
-        List<PermissionTemplateReference> templates = (List<PermissionTemplateReference>) cache.get(getDAOKey());
+        List<PermissionTemplateReference> templates = new ArrayList<PermissionTemplateReference>(cache.get(getDAOKey()));
         if ( getEnableStandardAuthorizer() ) {
-          if ( templates == null ) {
-            templates = new ArrayList<PermissionTemplateReference>();
-          }
           templates.add(createStandardAuthorizationTemplate(op));
         }
         if ( templates != null && ! templates.stream().filter(t -> t.getOperation().equals(op)).anyMatch(t -> authService.check(x, createPermission((PermissionTemplateReference) t, obj))) ) {
@@ -209,7 +206,7 @@ foam.CLASS({
         String permission = getDAOKey() + ".read.*";
         AuthService authService = (AuthService) x.get("auth");
         try {
-          return authService.check(x, permission);
+          return authService.check(x, permission.toLowerCase());
         } catch ( AuthorizationException e ) {
           return false;
         }
@@ -221,7 +218,7 @@ foam.CLASS({
         String permission = getDAOKey() + ".remove.*";
         AuthService authService = (AuthService) x.get("auth");
         try {
-          return authService.check(x, permission);
+          return authService.check(x, permission.toLowerCase());
         } catch ( AuthorizationException e ) {
           return false;
         }

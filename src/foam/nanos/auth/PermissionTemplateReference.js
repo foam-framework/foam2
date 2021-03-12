@@ -39,7 +39,7 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'daoKeys',
-      documentation: `References dao keys used by services using the ConfigurableAuthorizer as their authorizer.`
+      documentation: `References dao keys used by services using the ConfigurableAuthorizer as their authorizer.`,
     },
     {
       class: 'Enum',

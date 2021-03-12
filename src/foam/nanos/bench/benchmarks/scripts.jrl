@@ -7,7 +7,17 @@ p({
 		import foam.nanos.bench.benchmarks.*;
 
 		x = x.put("pmLogger", null);
-		b = new ConfigurableAuthorizerBenchmark();
+		b = new ConfigurableAuthorizerBenchmark(false, false);
+		builder = new BenchmarkRunner.Builder(x).setInvocationCount(1).setBenchmark(b);
+		runner = builder.build();
+		runner.execute(x);
+
+		b = new ConfigurableAuthorizerBenchmark(true, true);
+		builder = new BenchmarkRunner.Builder(x).setInvocationCount(1).setBenchmark(b);
+		runner = builder.build();
+		runner.execute(x);
+
+		b = new ConfigurableAuthorizerBenchmark(true, false);
 		builder = new BenchmarkRunner.Builder(x).setInvocationCount(1).setBenchmark(b);
 		runner = builder.build();
 		runner.execute(x);
