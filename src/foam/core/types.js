@@ -150,16 +150,17 @@ foam.CLASS({
           var ret = new Date(d);
 
           if ( isNaN(ret.getTime()) ) {
-            ret = new Date((Number.MAX_SAFE_INTEGER || Number.MAX_VALUE) * 0.9);
+            ret = foam.Date.MAX_DATE;
             console.warn("Invalid date: " + d + "; assuming " + ret.toISOString() + ".");
+            return ret;
           }
 
-          return ret;
+          d = ret;
         }
+        if ( d == foam.Date.MAX_DATE || d == foam.Date.MIN_DATE ) return d;
         if ( foam.Date.isInstance(d) ) {
-          // Convert the Date to Noon time in its timezone.
-          // d = new Date(d.getTime() - (d.getTime() % (1000*60*60*24)) + (12*60 + d.getTimezoneOffset()) * 60000);
-          //console.log('*****************************************************', od, d);
+          // Convert the Date to Noon time in GMT /*its timezone*/.
+          d = new Date(d.getTime() - (d.getTime() % (1000*60*60*24)) + (12*60 /*+ d.getTimezoneOffset()*/) * 60000);
         }
         return d;
       }
