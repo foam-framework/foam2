@@ -17,9 +17,20 @@
 
 package foam.lib.parse;
 
+import foam.lib.json.Whitespace;
+
 public class Eof
   implements Parser
 {
+  protected static final Parser instance__ = new Eof();
+
+  public static Parser instance() {
+    return instance__;
+  }
+
+  private Eof() {
+  }
+
   public PStream parse(PStream ps, ParserContext x) {
     return ps.valid() ? null : ps;
   }
