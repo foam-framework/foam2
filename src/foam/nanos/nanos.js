@@ -17,6 +17,7 @@ FOAM_FILES([
   { name: "foam/nanos/logger/RepeatLogMessageDAO" },
   { name: "foam/nanos/logger/StdoutLoggerDAO" },
   { name: 'foam/nanos/fs/File' },
+  { name: 'foam/nanos/fs/FileDataClearSink' },
   { name: 'foam/nanos/fs/FileType' },
   { name: 'foam/nanos/fs/FileProperty' },
   { name: 'foam/nanos/fs/FileDAODecorator' },

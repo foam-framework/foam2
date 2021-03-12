@@ -11,9 +11,8 @@ import foam.blob.BlobService;
 import foam.blob.IdentifiedBlob;
 import foam.core.X;
 import foam.dao.DAO;
+import foam.nanos.auth.*;
 import foam.nanos.app.AppConfig;
-import foam.nanos.auth.AuthService;
-import foam.nanos.auth.User;
 import foam.nanos.fs.File;
 import foam.util.SafetyUtil;
 import java.io.OutputStream;
@@ -42,7 +41,6 @@ public class FileService
     OutputStream        os        = null;
     HttpServletRequest  req       = x.get(HttpServletRequest.class);
     HttpServletResponse resp      = x.get(HttpServletResponse.class);
-    AuthService         auth      = (AuthService) x.get("auth");
     AppConfig           appConfig = (AppConfig) x.get("appConfig");
 
     // TODO: Add better ACL support for files.  In the meantime,
@@ -56,6 +54,12 @@ public class FileService
       String id   = path.replaceFirst("/service/" + name_ + "/", "");
 
       File file = (File) fileDAO_.find_(x, id);
+
+      // file service don't check sessionId so only files without owner should be retrived
+      if ( name_.equals("file") && file.getOwner() != 0 ) {
+        throw new AuthenticationException("Unauthenticated file access");
+      }
+
       if ( file == null ) {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         return;

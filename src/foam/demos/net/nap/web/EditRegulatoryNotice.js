@@ -248,11 +248,10 @@
                               href: this.data_$.map(function (fileData) {
                                 if ( fileData[i] ) {
                                     var blob = fileData[i].data;
-
                                     if ( self.BlobBlob.isInstance(blob) ) {
                                       return URL.createObjectURL(blob.blob);
                                     } else {
-                                      return '/service/httpFileService/' + fileData[i].id;
+                                      return fileData[i].address;
                                     }
                                 }
                              }),
