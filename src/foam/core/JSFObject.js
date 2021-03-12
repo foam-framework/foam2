@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'JSFObject',
-  extends: 'foam.core.Property',
+  extends: 'foam.core.FObjectProperty',
 
   documentation: `
     A Property which is only meaningful in JS.
