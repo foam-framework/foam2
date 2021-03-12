@@ -8,11 +8,20 @@ foam.CLASS({
   package: 'foam.u2.wizard',
   name: 'ScrollingStepWizardView',
   extends: 'foam.u2.wizard.IncrementalStepWizardView',
+  mixins: ['foam.u2.wizard.WizardletRenderUtils'],
   documentation: `Displays all wizardlets in a scrolling page.`,
 
   requires: [
-    'foam.u2.wizard.WizardPosition'
+    'foam.u2.tag.CircleIndicator',
+    'foam.u2.wizard.WizardPosition',
+    'foam.u2.wizard.WizardletIndicator'
   ],
+
+  css: `
+    ^mainView > * > *:not(:last-child) {
+      margin-bottom: 64px;
+    }
+  `,
 
   properties: [
     {
@@ -71,6 +80,7 @@ foam.CLASS({
         .start(this.Grid)
           .addClass(this.myClass('fix-grid'))
           .start(this.GUnit, { columns: 4 })
+            // TODO: deprecate this hide-X-status class
             .addClass(this.hideX ? this.myClass('hide-X-status') : this.myClass('status'))
             .add(
               this.slot(function (data, data$currentWizardlet) {
@@ -95,6 +105,8 @@ foam.CLASS({
               .on('scroll', function (e) {
                 self.scrollPosition = e.srcElement.scrollTop;
               })
+              .addClass(this.myClass('mainView'))
+              // TODO: deprecate this hide-X-entry class
               .addClass(this.hideX ? this.myClass('hide-X-entry') : this.myClass('entry'))
               .add(this.slot(function (data$wizardlets) {
                 return self.renderWizardlets(this.E(), data$wizardlets);
@@ -109,9 +121,35 @@ foam.CLASS({
       return e.forEach(wizardlets, function (wizardlet, wi) {
         this.add(wizardlet.slot(function (isAvailable, isVisible) {
           if ( ! isVisible ) return self.E();
-          return self.renderWizardletSections(self.E(), wizardlet, wi);
+          var e2 = self.renderWizardletHeading(self.E(), wizardlet);
+          return self.renderWizardletSections(e2, wizardlet, wi);
         }));
       });
+    },
+    function renderWizardletHeading(e, wizardlet) {
+      // ???: should properties of 'this.data' be read here? Does it matter?
+      var isCurrent = wizardlet == this.data.currentWizardlet;
+      var self = this;
+      return e
+        .start()
+          .add(wizardlet.slot(function (indicator) {
+            return self.E()
+              .style({
+                // TODO: move to CSS axiom
+                display: 'inline-block',
+                float: 'left',
+                'margin-right': '15px'
+              })
+              .start(self.CircleIndicator, self.configureIndicator(
+                wizardlet, isCurrent, self.calculateWizardletDisplayNumber(
+                  wizardlet, self.data.wizardlets)
+              ))
+              .end()
+          }))
+          .start('h2') // ???: Should this really be h2?
+            .add(wizardlet.title)
+          .end()
+        .end()
     },
     function renderWizardletSections(e, wizardlet, wi) {
       var self = this;

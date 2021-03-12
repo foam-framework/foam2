@@ -6,8 +6,69 @@
 
 foam.CLASS({
   package: 'foam.u2.wizard',
+  name: 'WizardletRenderUtils',
+
+  methods: [
+    function calculateWizardletDisplayNumber(w, list) {
+      // Since wizardlet visibility is dynamic it is not possible to
+      // get the correct number without first checking how many invisible
+      // wizardlets exist along the waay.
+      var wSkipped = 0;
+      var i;
+      for ( i = 0; i < list.length && list[i] != w; i++ ) {
+        if ( ! list[i].isAvailable || ! list[i].isVisible ) {
+          wSkipped++;
+        }
+      }
+      return i + 1 - wSkipped;
+    },
+    function configureIndicator(wizardlet, isCurrent, number) {
+      var args = {
+        size: 24, borderThickness: 2,
+      };
+      if ( wizardlet.indicator == this.WizardletIndicator.COMPLETED ) {
+        args = {
+          ...args,
+          borderColor: this.theme.approval3,
+          backgroundColor: this.theme.approval3,
+          borderColorHover: this.theme.approval3,
+          icon: this.theme.glyphs.checkmark.getDataUrl({
+            fill: this.theme.white
+          }),
+        };
+      } else if ( wizardlet.indicator == this.WizardletIndicator.SAVING ) {
+        args = {
+          ...args,
+          indicateProcessing: true,
+          borderColor: this.theme.grey2,
+          borderColorHover: this.theme.grey2,
+          label: '' + number
+        };
+      } else {
+        args = {
+          ...args,
+          borderColor: this.theme.grey2,
+          borderColorHover: this.theme.grey2,
+          label: '' + number
+        };
+      }
+      if ( isCurrent ) {
+        args = {
+          ...args,
+          borderColor: this.theme.black,
+          borderColorHover: this.theme.black
+        };
+      }
+      return args;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2.wizard',
   name: 'StepWizardletStepsView',
   extends: 'foam.u2.View',
+  mixins: ['foam.u2.wizard.WizardletRenderUtils'],
 
   css: `
     ^item {

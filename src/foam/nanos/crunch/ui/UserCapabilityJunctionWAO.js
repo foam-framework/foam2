@@ -23,7 +23,9 @@ foam.CLASS({
       if ( ! wizardlet.isAvailable ) return Promise.resolve();
       wizardlet.loading = true;
       return this.crunchService.updateJunction( null,
-        wizardlet.capability.id, wizardlet.data.clone(), null
+        wizardlet.capability.id,
+        wizardlet.data ? wizardlet.data.clone() : null,
+        null
       ).then((ucj) => {
         this.crunchService.pub('grantedJunction');
         this.load_(wizardlet, ucj);
