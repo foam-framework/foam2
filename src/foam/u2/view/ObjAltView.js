@@ -40,14 +40,14 @@ foam.CLASS({
         );
       },
       postSet: function() {
-        if ( ! this.memento )
+        if ( ! this.memento || ! this.memento.tail )
           return;
 
         var view = this.views.find(v => v[0] === this.selectedView);
         if ( view ) {
-          this.memento.head = view[1];
+          this.memento.tail.head = view[1];
         } else {
-          this.memento.head = '';
+          this.memento.tail.head = '';
         }
       }
     },
@@ -61,8 +61,12 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      if ( this.memento && this.memento.head.length != 0 ) {
-        var view = this.views.find(v => v[1] === this.memento.head);
+      if ( this.memento && ! this.memento.tail) {
+        this.memento.tail$.set(foam.nanos.controller.Memento.create());
+      }
+
+      if ( this.memento && this.memento.tail && this.memento.tail.head.length != 0 ) {
+        var view = this.views.find(v => v[1] === this.memento.tail.head);
         if ( view ) {
           this.selectedView = view[0];
         } else {
