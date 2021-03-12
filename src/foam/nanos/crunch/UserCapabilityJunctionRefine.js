@@ -221,14 +221,14 @@ foam.CLASS({
 
         DAO dao = (DAO) x.get(daoKey);
         if ( capability.getId().equals("777af38a-8225-87c8-dfdf-eeb15f71215f-123") ) {
-          logger.error(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - is dao null", dao == null);
+          logger.debug(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - is dao null", dao == null);
         }
         if ( dao == null ) return null;
 
         FObject objectToSave;                                                  // Identify or create data to go into dao.
         String contextDAOFindKey = (String) capability.getContextDAOFindKey();
         if ( capability.getId().equals("777af38a-8225-87c8-dfdf-eeb15f71215f-123") ) {
-          logger.error(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - contextdaofindkey", contextDAOFindKey);
+          logger.debug(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-123, " + putObject + "). - contextdaofindkey", contextDAOFindKey);
         }
 
         if ( contextDAOFindKey != null && ! contextDAOFindKey.isEmpty() ) {
@@ -236,7 +236,7 @@ foam.CLASS({
             String[] words = foam.util.StringUtil.split(contextDAOFindKey, '.');
             objectToSave = getSubject(x);
             if ( capability.getId().equals("777af38a-8225-87c8-dfdf-eeb15f71215f-123") ) {
-              logger.error(this.getClass().getSimpleName(), "getSubject(x). - objectToSave", objectToSave);
+              logger.debug(this.getClass().getSimpleName(), "getSubject(x). - objectToSave", objectToSave);
             }
 
             if ( objectToSave == null || words.length < 2 )
@@ -245,19 +245,19 @@ foam.CLASS({
             if ( words[1].toLowerCase().equals("user") ) {
               objectToSave = ((Subject) objectToSave).getUser();
               if ( capability.getId().equals("777af38a-8225-87c8-dfdf-eeb15f71215f-123") ) {
-                logger.error(this.getClass().getSimpleName(), "contextdaofindkey == subject.user - objectToSave", objectToSave);
+                logger.debug(this.getClass().getSimpleName(), "contextdaofindkey == subject.user - objectToSave", objectToSave);
               }
             } else if ( words[1].toLowerCase().equals("realuser") ) {
 
               if ( capability.getId().equals("777af38a-8225-87c8-dfdf-eeb15f71215f-123") ) {
-                logger.error(this.getClass().getSimpleName(), "contextdaofindkey == subject.realUser - objectToSave", objectToSave);
+                logger.debug(this.getClass().getSimpleName(), "contextdaofindkey == subject.realUser - objectToSave", objectToSave);
               }
               objectToSave = ((Subject) objectToSave).getRealUser();
             }
             try {
               objectToSave = dao.find(((User)objectToSave).getId());
               if ( capability.getId().equals("777af38a-8225-87c8-dfdf-eeb15f71215f-123") ) {
-                logger.error(this.getClass().getSimpleName(), "dao.find(objectToSave) - objectToSave", objectToSave);
+                logger.debug(this.getClass().getSimpleName(), "dao.find(objectToSave) - objectToSave", objectToSave);
               }
             } catch(Exception e) {
               throw e;
@@ -265,7 +265,7 @@ foam.CLASS({
           } else {                                                              // 2- Case if anything other then subject specified
             objectToSave = (FObject) x.get(contextDAOFindKey);
             if ( capability.getId().equals("777af38a-8225-87c8-dfdf-eeb15f71215f-123") ) {
-              logger.error(this.getClass().getSimpleName(), "this is just wrong", objectToSave);
+              logger.debug(this.getClass().getSimpleName(), "this is just wrong", objectToSave);
             }
 
             if ( objectToSave == null )
@@ -288,9 +288,9 @@ foam.CLASS({
           try {
             objectToSave = objectToSave.fclone().copyFrom(getData());           // finally copy user inputed data into objectToSave <- typed to the safest possibility from above cases
           } catch (RuntimeException e) {
-            logger.error(this.getClass().getSimpleName(), "exception copying data to objectToSave - objectToSave ", objectToSave);
-            logger.error(this.getClass().getSimpleName(), "exception copying data to objectToSave - data ", getData());
-            logger.error(this.getClass().getSimpleName(), "exception copying data to objectToSave - exception ", e);
+            logger.debug(this.getClass().getSimpleName(), "exception copying data to objectToSave - objectToSave ", objectToSave);
+            logger.debug(this.getClass().getSimpleName(), "exception copying data to objectToSave - data ", getData());
+            logger.debug(this.getClass().getSimpleName(), "exception copying data to objectToSave - exception ", e);
           }
         }
 
@@ -298,7 +298,7 @@ foam.CLASS({
           if ( putObject ) dao.inX(x).put(objectToSave);
         } catch (Exception e) {
           logger.error("Data cannot be added to " + capability.getDaoKey() + " for UserCapabilityJunction object : " + getId() );
-          logger.error(this.getClass().getSimpleName(), "dao.inx.put exception - ", e);
+          logger.debug(this.getClass().getSimpleName(), "dao.inx.put exception - ", e);
         }
 
         return objectToSave;

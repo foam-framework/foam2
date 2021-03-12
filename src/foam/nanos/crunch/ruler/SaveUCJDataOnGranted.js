@@ -34,8 +34,8 @@ foam.CLASS({
 
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
             UserCapabilityJunction old = (UserCapabilityJunction) userCapabilityJunctionDAO.find(ucj.getId());
-            logger.error(this.getClass().getSimpleName(), "ucj ", ucj);
-            logger.error(this.getClass().getSimpleName(), "old ", old);
+            logger.debug(this.getClass().getSimpleName(), "ucj ", ucj);
+            logger.debug(this.getClass().getSimpleName(), "old ", old);
 
             if ( ucj.getStatus() != CapabilityJunctionStatus.GRANTED || ucj.getIsRenewable() ) return;
             if ( old != null && old.getStatus() == CapabilityJunctionStatus.GRANTED && ! old.getIsRenewable() && 
@@ -43,19 +43,19 @@ foam.CLASS({
             ) return;
 
             Capability capability = (Capability) ucj.findTargetId(x);
-            logger.error(this.getClass().getSimpleName(), "ucj.findTargetId(x) - capability ", capability);
+            logger.debug(this.getClass().getSimpleName(), "ucj.findTargetId(x) - capability ", capability);
             if ( capability == null ) throw new RuntimeException("Data not saved to target object: Capability not found.");
 
             foam.core.FObject obj = null;
             if ( capability.getOf() != null && capability.getDaoKey() != null ) obj = (foam.core.FObject) ucj.saveDataToDAO(x, capability, true);
             if ( obj instanceof foam.nanos.auth.User ) {
-              logger.error(this.getClass().getSimpleName(), "ucj.saveDataToDAO(x, "+capability.getId()+", true). - subject", x.get("subject"));
-              logger.error(this.getClass().getSimpleName(), "ucj.saveDataToDAO(x, "+capability.getId()+", true). - user", ((foam.nanos.auth.Subject) x.get("subject")).getUser());
-              logger.error(this.getClass().getSimpleName(), "ucj.saveDataToDAO(x, "+capability.getId()+", true). - realuser", ((foam.nanos.auth.Subject) x.get("subject")).getRealUser());
-              logger.error(this.getClass().getSimpleName(), "ucj.saveDataToDAO(x, "+capability.getId()+", true). - capability", capability);
-              logger.error(this.getClass().getSimpleName(), "ucj.saveDataToDAO(x, "+capability.getId()+", true). - ucj", ucj);
-              logger.error(this.getClass().getSimpleName(), "ucj.saveDataToDAO(x, "+capability.getId()+", true). - data", ucj.getData());
-              logger.error(this.getClass().getSimpleName(), "ucj.saveDataToDAO(x, "+capability.getId()+", true). - savedObj", obj);
+              logger.debug(this.getClass().getSimpleName(), "ucj.saveDataToDAO(x, "+capability.getId()+", true). - subject", x.get("subject"));
+              logger.debug(this.getClass().getSimpleName(), "ucj.saveDataToDAO(x, "+capability.getId()+", true). - user", ((foam.nanos.auth.Subject) x.get("subject")).getUser());
+              logger.debug(this.getClass().getSimpleName(), "ucj.saveDataToDAO(x, "+capability.getId()+", true). - realuser", ((foam.nanos.auth.Subject) x.get("subject")).getRealUser());
+              logger.debug(this.getClass().getSimpleName(), "ucj.saveDataToDAO(x, "+capability.getId()+", true). - capability", capability);
+              logger.debug(this.getClass().getSimpleName(), "ucj.saveDataToDAO(x, "+capability.getId()+", true). - ucj", ucj);
+              logger.debug(this.getClass().getSimpleName(), "ucj.saveDataToDAO(x, "+capability.getId()+", true). - data", ucj.getData());
+              logger.debug(this.getClass().getSimpleName(), "ucj.saveDataToDAO(x, "+capability.getId()+", true). - savedObj", obj);
             }
           }
         }, "");
