@@ -7,16 +7,19 @@
 package foam.parse;
 
 import foam.core.AbstractDatePropertyInfo;
+import foam.core.AbstractEnumPropertyInfo;
 import foam.core.ClassInfo;
 import foam.core.PropertyInfo;
 import foam.lib.parse.*;
 import foam.lib.parse.Optional;
 import foam.mlang.Expr;
+import foam.mlang.MLang;
 import foam.mlang.predicate.*;
 import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.util.SafetyUtil;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class QueryParser
@@ -62,7 +65,7 @@ public class QueryParser
 
   private Grammar getGrammar() {
     Grammar grammar = new Grammar();
-    grammar.addSymbol("START", grammar.sym("OR"));
+    grammar.addSymbol("START", new Seq1(0, grammar.sym("OR"), new Repeat0(Literal.create(" ")), EOF.instance()));
 
 
     grammar.addSymbol("FIELD_NAME", new Alt(expressions));
@@ -167,6 +170,7 @@ public class QueryParser
 
       Object[] value = (Object[]) values[2];
       if ( value[0] instanceof Date || prop instanceof AbstractDatePropertyInfo) {
+
         And and = new And();
         Gte gte = new Gte();
         gte.setArg1(prop);
@@ -181,37 +185,51 @@ public class QueryParser
         and.setArgs(predicates);
         return and;
       }
-      if ( value.length > 1 ) {
 
-        Or innerPredicate = new Or();
-
-        Predicate[] args = new Predicate[value.length];
-        for ( int i = 0; i < args.length; i++ ) {
-          Eq eq = new Eq();
-          eq.setArg1(prop);
-          eq.setArg2(( value[i] instanceof Expr ) ?
-            ( Expr ) value[i] : new foam.mlang.Constant (value[i]));
-          args[i] = eq;
+      if ( prop instanceof AbstractEnumPropertyInfo ) {
+        List newValues = new ArrayList();
+        Class enumClass = ((AbstractEnumPropertyInfo) prop).getValueClass();
+        Object[] enumVals = enumClass.getEnumConstants();
+        try {
+          Method labelMet = enumClass.getMethod("getLabel");
+          Method nameMet = enumClass.getMethod("getName");
+          Method ordinalMet = enumClass.getMethod("getOrdinal");
+          for ( int j = 0; j < value.length; j++ ) {
+              if ( value[j] instanceof String ) {
+                String enumVal = (String) value[j];
+                for ( int i = 0; i < enumVals.length; i++ ) {
+                  String enumLabel = (String) labelMet.invoke(enumVals[i]);
+                  String enumName = (String) nameMet.invoke(enumVals[i]);
+                  if ( enumLabel.equalsIgnoreCase(enumVal) || enumName.equalsIgnoreCase(enumVal)) newValues.add(enumVals[i]);
+                }
+              } else if ( value[j] instanceof Integer ) {
+                Integer enumVal = (Integer) value[j];
+                for ( int i = 0; i < enumVals.length; i++ ) {
+                  Integer enumOrdinal = (Integer) ordinalMet.invoke(enumVals[i]);
+                  if (enumOrdinal.intValue() == enumVal.intValue() ) newValues.add(enumVals[i]);
+                }
+              }
+          }
+        } catch (Exception e) {
+          throw new RuntimeException(e);
         }
-        innerPredicate.setArgs(args);
-
-        return innerPredicate;
+        In in = new In();
+        in.setArg1(prop);
+        in.setArg2(MLang.prepare(newValues));
+        return in;
       }
 
-      if ( values[1].equals(":") ) {
-        Contains contains = new Contains();
-        contains.setArg1(prop);
-        contains.setArg2(( value[0] instanceof Expr ) ?
-          ( Expr ) value[0] : new foam.mlang.Constant (value[0]));
-        return contains;
+      Or or = new Or();
+      Predicate[] vals = new Predicate[value.length];
+      for ( int i = 0; i < value.length; i++ ) {
+        Binary binary = values[1].equals("=") ? new Eq() : new Contains();
+        binary.setArg1(prop);
+        binary.setArg2(( value[i] instanceof Expr ) ?
+          ( Expr ) value[i] : new foam.mlang.Constant (value[i]));
+        vals[i] = binary;
       }
-
-      Binary expr = new Eq();
-      expr.setArg1(prop);
-      expr.setArg2(
-        ( value[0] instanceof Expr ) ? (Expr) value[0] : new foam.mlang.Constant(value[0]));
-
-      return expr;
+      or.setArgs(vals);
+      return or;
     });
 
     grammar.addSymbol("BEFORE", new Seq(
@@ -249,7 +267,7 @@ public class QueryParser
       return predicate;
     });
 
-    grammar.addSymbol("VALUE", new Alt(grammar.sym("ME"),grammar.sym("NUMBER"),
+    grammar.addSymbol("VALUE", new GreedyAlt(grammar.sym("ME"),grammar.sym("NUMBER"),
       grammar.sym("DATE"), grammar.sym("STRING")));
 
     grammar.addSymbol("COMPOUND_VALUE", new Alt(grammar.sym("NEGATE_VALUE"),
@@ -453,10 +471,12 @@ public class QueryParser
     grammar.addSymbol("QUOTED_STRING", new Seq1(1,
       Literal.create("\""),
       new Repeat(new Alt(
-        Literal.create("\\\""),
-        Literal.create("\"")
-      ), new NotChars("\""))
+        new Literal("\\\"", "\""),
+        new NotChars("\"")
+      )),
+      Literal.create("\"")
     ));
+    grammar.addAction("QUOTED_STRING", (val, x) -> compactToString(val));
 
     grammar.addSymbol("WORD", new Repeat(
       grammar.sym("CHAR"), 1
