@@ -7,20 +7,41 @@ p({
 		import foam.nanos.bench.benchmarks.*;
 
 		x = x.put("pmLogger", null);
-		b = new ConfigurableAuthorizerBenchmark(false, false);
-		builder = new BenchmarkRunner.Builder(x).setInvocationCount(1).setBenchmark(b);
-		runner = builder.build();
-		runner.execute(x);
+		b = new ConfigurableAuthorizerBenchmark(false, false, 0);
+		builder = new BenchmarkRunner.Builder(x)
+			.setInvocationCount(1)
+      .setThreadCount(3)
+			.setReverseThreads(true)
+			.setBenchmark(b)
+			.build();
+		builder.execute(x);
 
-		b = new ConfigurableAuthorizerBenchmark(true, true);
-		builder = new BenchmarkRunner.Builder(x).setInvocationCount(1).setBenchmark(b);
-		runner = builder.build();
-		runner.execute(x);
+		b = new ConfigurableAuthorizerBenchmark(true, true, 0);
+		builder = new BenchmarkRunner.Builder(x)
+			.setInvocationCount(1)
+      .setThreadCount(3)
+			.setReverseThreads(true)
+			.setBenchmark(b)
+			.build();
+		builder.execute(x);
 
-		b = new ConfigurableAuthorizerBenchmark(true, false);
-		builder = new BenchmarkRunner.Builder(x).setInvocationCount(1).setBenchmark(b);
-		runner = builder.build();
-		runner.execute(x);
+		b = new ConfigurableAuthorizerBenchmark(true, false, 5);
+	  builder = new BenchmarkRunner.Builder(x)
+			.setInvocationCount(1)
+			.setBenchmark(b)
+      .setThreadCount(3)
+			.setReverseThreads(true)
+			.build();
+		builder.execute(x);
+
+		b = new ConfigurableAuthorizerBenchmark(true, false, 100);
+		builder = new BenchmarkRunner.Builder(x)
+			.setInvocationCount(1)
+			.setBenchmark(b)
+      .setThreadCount(3)
+			.setReverseThreads(true)
+			.build();
+		builder.execute(x);
 	`
 })
 

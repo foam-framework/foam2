@@ -27,6 +27,9 @@ import static foam.mlang.MLang.*;
 
 /**
   Benchmark comparisons between unauthenticated, StandardAuthorized, and ConfigurableAuthorized ServiceDAOs
+  {@authenticate runs benchmark with authorizer}
+  {@standardAuth runs benchmark with StandardAuthorizer, when false applied ConfigurableAuthorizer}
+  {@templateAmount defines how many templates used in the configurable authorizer}
  */
 
 public class ConfigurableAuthorizerBenchmark
@@ -38,11 +41,13 @@ public class ConfigurableAuthorizerBenchmark
   protected Group group;
   protected boolean authenticate_;
   protected boolean standardAuth_;
+  protected int templateAmount_;
   protected X authX;
 
-  public ConfigurableAuthorizerBenchmark(boolean authenticate, boolean standardAuth) {
+  public ConfigurableAuthorizerBenchmark(boolean authenticate, boolean standardAuth, int templateAmount) {
     authenticate_ = authenticate;
     standardAuth_ = standardAuth;
+    templateAmount_ = templateAmount;
   }
 
   @Override
@@ -62,14 +67,19 @@ public class ConfigurableAuthorizerBenchmark
 
     DAO userDAO = (DAO) x.get("bareUserDAO");
     templateDAO = (DAO) x.get("permissionTemplateReferenceDAO");
-    PermissionTemplateReference template = new PermissionTemplateReference();
-    template.setOperation(foam.nanos.ruler.Operations.READ);
-    template.setDaoKeys(new String[]{ "authorizedUserDAO" });
-    PermissionTemplateProperty[] properties = new PermissionTemplateProperty[]{
-      new PermissionTemplateProperty.Builder(x).setPropertyReference("jobTitle").build()
-    };
-    template.setProperties(properties);
-    templateDAO.put(template);
+
+    if ( ! standardAuth_ ) {
+      for ( int i = 0; i < templateAmount_; i++) {
+        PermissionTemplateReference template = new PermissionTemplateReference();
+        template.setOperation(foam.nanos.ruler.Operations.READ);
+        template.setDaoKeys(new String[]{ "authorizedUserDAO" });
+        PermissionTemplateProperty[] properties = new PermissionTemplateProperty[]{
+          new PermissionTemplateProperty.Builder(x).setPropertyReference("jobTitle").build()
+        };
+        template.setProperties(properties);
+        templateDAO.put(template);
+      }
+    }
 
     group = new Group.Builder(x)
       .setId("test")
@@ -81,11 +91,11 @@ public class ConfigurableAuthorizerBenchmark
     groupPermissionJunctionDAO.put(new GroupPermissionJunction.Builder(x).setSourceId("test").setTargetId("permissiontemplatereference.read.*").build());
 
     User authUser = null;
-    for (int i = 1; i < 11; i++) {
+    for (int i = 1; i < 100000; i++) {
       User user = (User) new User();
       user.setId(i);
       user.setUserName("Dr.Disrespect" + i);
-      user.setJobTitle(i > 5 ? "thetwotime" : "blockbusterchampion");
+      user.setJobTitle(i > 5000 ? "thetwotime" : "blockbusterchampion");
       user.setGroup("test");
       user.setSpid("foam");
       user.setLifecycleState(foam.nanos.auth.LifecycleState.ACTIVE);
@@ -123,15 +133,24 @@ public class ConfigurableAuthorizerBenchmark
 /**
     Initial Results:
 
-    Unauthenticated User MDAO select operation on 10 entries of users:
+    Unauthenticated User MDAO select operation on 100000 entries of users:
     Threads,  Memory GB,  Operations/s/t,  Pass,  Operations/s,  Total,  Run,  Fail
-          1,       0.14,           14.71,     1,         14.71,      1,    1,     0
+          1,       0.13,           62.50,     1,         62.50,      1,    1,     0
+          3,       0.36,           71.43,     3,        214.29,      3,    1,     0
 
-    Authenticated using StandardAuthorizer User MDAO select operation on 10 entries of users:
+    Authenticated using StandardAuthorizer User MDAO select operation on 100000 entries of users:
     Threads,  Memory GB,  Operations/s/t,  Pass,  Operations/s,  Total,  Run,  Fail
-          1,       0.14,           37.04,     1,         37.04,      1,    1,     0
+          1,       0.25,            0.05,     1,          0.05,      1,    1,     0
+          3,       0.18,            0.03,     3,          0.10,      3,    1,     0
 
-    Authenticated using ExtendedConfigurableAuthorizer User MDAO select operation on 10 entries of users:
+    Authenticated using ExtendedConfigurableAuthorizer User MDAO select operation on 100000 entries of users and 5 permission templates(likely):
     Threads,  Memory GB,  Operations/s/t,  Pass,  Operations/s,  Total,  Run,  Fail
-          1,       0.14,           50.00,     1,         50.50,      1,    1,     0
+          1,       0.27,            0.06,     1,          0.06,      1,    1,     0
+          3,       0.48,            0.04,     3,          0.13,      3,    1,     0
+
+    Authenticated using ExtendedConfigurableAuthorizer User MDAO select operation on 100000 entries of users and 100 permission templates(unlikely):
+    Threads,  Memory GB,  Operations/s/t,  Pass,  Operations/s,  Total,  Run,  Fail
+          1,       0.23,            0.03,     1,          0.03,      1,    1,     0
+          3,       0.66,            0.02,     3,          0.07,      3,    1,     0
+
  */
