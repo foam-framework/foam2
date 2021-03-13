@@ -11,10 +11,9 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.MDAO;
 import foam.nanos.auth.Group;
-import foam.nanos.session.Session;
 import foam.nanos.auth.User;
 import foam.nanos.fs.File;
-
+import foam.nanos.session.Session;
 /**
  * Helper methods to make writing tests easier.
  */
