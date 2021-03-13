@@ -7,7 +7,6 @@
 package foam.nanos.bench.benchmarks;
 
 import foam.core.X;
-import foam.test.*;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.dao.MDAO;
@@ -15,13 +14,11 @@ import foam.nanos.auth.AuthorizationDAO;
 import foam.nanos.auth.Authorizer;
 import foam.nanos.auth.User;
 import foam.nanos.bench.Benchmark;
-import java.util.List;
-
-import static foam.mlang.MLang.*;
+import foam.test.TestUtils;
 
 /**
   Generic benchmark authorizer.
-  {@authenticate runs benchmark with authorizer}
+  {@authorizer wraps target DAO using authorizer provided}
  */
 
 public class GenericAuthorizerBenchmark
