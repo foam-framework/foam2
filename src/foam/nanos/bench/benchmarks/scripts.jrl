@@ -8,7 +8,7 @@ p({
 
 		x = x.put("pmLogger", null);
 		authorizer = new foam.nanos.auth.StandardAuthorizer("user");
-		b = new GenericAuthorizerBenchmark(authorizer);
+		b = new GenericAuthorizerBenchmark(authorizer, 100);
 		builder = new BenchmarkRunner.Builder(x)
 			.setInvocationCount(1)
 			.setBenchmark(b)

@@ -32,7 +32,7 @@ public class GenericAuthorizerBenchmark
   protected Authorizer authorizer;
   protected int recordAmount;
 
-  public ConfigurableAuthorizerBenchmark(Authorizer authorizer_, int recordAmount_) {
+  public GenericAuthorizerBenchmark(Authorizer authorizer_, int recordAmount_) {
     authorizer = authorizer_;
     recordAmount = recordAmount_;
   }
@@ -40,17 +40,19 @@ public class GenericAuthorizerBenchmark
   @Override
   public void setup(X x) {
     userAuthorizedContext = TestUtils.createTestContext(x, "foam");
+
+    for (int i = 1; i < recordAmount + 1; i++) {
+      User user = TestUtils.createTestUser();
+      user.setId(i);
+      user.setEmail(i + user.getEmail());
+      dao.put(user);
+    }
+
     if ( authorizer != null ) {
       dao = new AuthorizationDAO.Builder(userAuthorizedContext)
               .setDelegate(dao)
               .setAuthorizer(authorizer)
               .build();
-    }
-
-    for (int i = 0; i < recordAmount; i++) {
-      User user = TestUtils.createTestUser();
-      user.setEmail(i + user.getEmail());
-      dao.put(user);
     }
   }
 

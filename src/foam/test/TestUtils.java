@@ -21,18 +21,18 @@ import foam.nanos.fs.File;
 public class TestUtils {
 
   /**
-    Create a simple session context with a test user, group.
+    Create a simple session context with a test user, group and auth related DAOs.
     Includes self contained bareUserDAO and groupDAO so no user or group journals
     are updated related to the authorization of the current user.
     @param spid create test context acting within specified spid
   */
 
   public static X createTestContext(X x, String spid) {
-    x = mockDAO(x, "bareUserDAO");
+    x = mockDAO(x, "localUserDAO");
     x = mockDAO(x, "groupPermissionJunctionDAO");
     x = mockDAO(x, "groupDAO");
 
-    DAO userDAO = (DAO) x.get("bareUserDAO");
+    DAO userDAO = (DAO) x.get("localUserDAO");
     DAO groupDAO = (DAO) x.get("localGroupDAO");
 
     Group group = new Group.Builder(x)
@@ -43,6 +43,7 @@ public class TestUtils {
     User user = createTestUser();
     user.setGroup("test");
     user.setSpid(spid);
+    user.setId(900);
     user = (User) userDAO.put(user);
 
     Session testUserSession = new Session.Builder(x).setUserId(user.getId()).build();
