@@ -390,8 +390,8 @@ foam.CLASS({
       this.data$proxy.sub('on', this.onDAOUpdate);
 
       return this.
-          addClass(this.myClass()).
-          add(this.header$, this.body$);
+        addClass(this.myClass()).
+        add(this.header$, this.body$);
     },
 
     function sortBy(prop) {
@@ -421,9 +421,9 @@ foam.CLASS({
         if ( this.sortOrder ) dao = dao.orderBy(this.sortOrder);
         dao.select(this.TableBodySink.create({
           columns_: this.columns_
-        })).then(function(a) {
+        })).then(a => {
           this.body = a.body;
-        }.bind(this));
+        });
       }
     }
   ]
