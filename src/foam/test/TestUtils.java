@@ -10,6 +10,8 @@ import foam.core.ClassInfo;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.MDAO;
+import foam.nanos.auth.Group;
+import foam.nanos.session.Session;
 import foam.nanos.auth.User;
 import foam.nanos.fs.File;
 
@@ -17,6 +19,40 @@ import foam.nanos.fs.File;
  * Helper methods to make writing tests easier.
  */
 public class TestUtils {
+
+  /**
+    Create a simple session context with a test user, group.
+    Includes self contained bareUserDAO and groupDAO so no user or group journals
+    are updated related to the authorization of the current user.
+    @param spid create test context acting within specified spid
+  */
+
+  public static X createTestContext(X x, String spid) {
+    x = mockDAO(x, "bareUserDAO");
+    x = mockDAO(x, "groupPermissionJunctionDAO");
+    x = mockDAO(x, "groupDAO");
+
+    DAO userDAO = (DAO) x.get("bareUserDAO");
+    DAO groupDAO = (DAO) x.get("localGroupDAO");
+
+    group = new Group.Builder(x)
+      .setId("test")
+      .build();
+    group = (Group) groupDAO.put(group);
+
+    User user = createTestUser();
+    user.setGroup("test");
+    user.setSpid(spid)
+    user = (User) userDAO.put(user);
+
+    Session testUserSession = new Session.Builder(x).setUserId(userId).build();
+    testX = testUserSession.applyTo(x);
+    testX = testX.put(Session.class, testUserSession);
+    testX.put("group", group);
+    testUserSession.setContext(testX);
+
+    return testX;
+  }
 
   /**
    * Mock out a DAO in the given context by replacing it with an undecorated, empty MDAO.
@@ -44,6 +80,7 @@ public class TestUtils {
     File profilePicFile = new File();
     profilePicFile.setFilename("Profile picture");
     user.setProfilePicture(profilePicFile);
+    user.setLifecycleState(foam.nanos.auth.LifecycleState.ACTIVE);
     user.setEnabled(true);
     return user;
   }

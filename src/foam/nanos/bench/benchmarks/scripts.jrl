@@ -1,5 +1,24 @@
 p({
 	"class": "foam.nanos.script.Script",
+	"id": "genericBenchmarkAuthorizer",
+	"description": "Benchmark Authorizer",
+	"code": `
+		import foam.nanos.bench.*;
+		import foam.nanos.bench.benchmarks.*;
+
+		x = x.put("pmLogger", null);
+		authorizer = new foam.nanos.auth.StandardAuthorizer("user");
+		b = new GenericAuthorizerBenchmark(authorizer);
+		builder = new BenchmarkRunner.Builder(x)
+			.setInvocationCount(1)
+			.setBenchmark(b)
+			.build();
+		builder.execute(x);
+	`
+})
+
+p({
+	"class": "foam.nanos.script.Script",
 	"id": "benchmarkDateFormat",
 	"description": "Benchmark Date Formatting",
 	"code": `import foam.nanos.bench.*;
