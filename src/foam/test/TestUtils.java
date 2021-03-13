@@ -35,18 +35,18 @@ public class TestUtils {
     DAO userDAO = (DAO) x.get("bareUserDAO");
     DAO groupDAO = (DAO) x.get("localGroupDAO");
 
-    group = new Group.Builder(x)
+    Group group = new Group.Builder(x)
       .setId("test")
       .build();
     group = (Group) groupDAO.put(group);
 
     User user = createTestUser();
     user.setGroup("test");
-    user.setSpid(spid)
+    user.setSpid(spid);
     user = (User) userDAO.put(user);
 
-    Session testUserSession = new Session.Builder(x).setUserId(userId).build();
-    testX = testUserSession.applyTo(x);
+    Session testUserSession = new Session.Builder(x).setUserId(user.getId()).build();
+    X testX = testUserSession.applyTo(x);
     testX = testX.put(Session.class, testUserSession);
     testX.put("group", group);
     testUserSession.setContext(testX);

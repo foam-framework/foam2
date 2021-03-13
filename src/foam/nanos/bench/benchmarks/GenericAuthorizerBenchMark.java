@@ -24,7 +24,7 @@ import static foam.mlang.MLang.*;
   {@authenticate runs benchmark with authorizer}
  */
 
-public class ConfigurableAuthorizerBenchmark
+public class GenericAuthorizerBenchmark
   implements Benchmark
 {
   protected X userAuthorizedContext;
