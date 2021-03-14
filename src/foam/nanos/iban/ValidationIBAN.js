@@ -510,8 +510,8 @@ Columns: validation format, parsing format, example`,
             case 't': // account type
               accountType.append(next);
               break;
-            case 'x': // add to previous
-              previous.append(next);
+            case 'x': // national check digits
+              // previous.append(next);
               break;
             case '0': // Zero
               previous.append('0');
