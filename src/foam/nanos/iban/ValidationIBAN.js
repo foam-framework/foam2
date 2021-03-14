@@ -459,7 +459,11 @@ Columns: validation format, parsing format, example`,
           return null;
         }
 
-        char[]        format             = ((String) temp[1]).replaceAll(" ","").trim().toCharArray();
+        char[] format = ((String) temp[1]).replaceAll(" ","").trim().toCharArray();
+        if ( iban.length() != format.length + 2 ) {
+          return null;
+        }
+
         StringBuilder previous           = null;
         StringBuilder bankCode           = new StringBuilder();
         StringBuilder branch             = new StringBuilder();
