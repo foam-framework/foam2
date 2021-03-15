@@ -151,7 +151,6 @@ foam.CLASS({
           var s = foam.core.FObject.create();
           this.data$
             .map(data => {
-              console.log('wuuut', data);
               var updateSlot = data.getUpdateSlot();
               return this.WizardletAutoSaveSlot.create({
                 other: updateSlot.filter(v => v && ! self.loading),
@@ -162,7 +161,6 @@ foam.CLASS({
           return s;
         }
         var sl = this.FObjectRecursionSlot.create({ obj$: this.data$ });
-        console.log('top slot', sl);
         return this.WizardletAutoSaveSlot.create({
           other: sl.filter(() => ! self.loading),
           delay: 700

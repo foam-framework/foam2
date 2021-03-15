@@ -98,7 +98,6 @@ foam.CLASS({
           }
         }
 
-        // console.log(minTopPosition.instance_)
 
         return minTopPosition;
       }
@@ -142,7 +141,6 @@ foam.CLASS({
             .start()
               .call(function () {
                 self.onDetach(this.state$.sub(() => {
-                  console.log('state', this.state)
                   if ( this.state.cls_ == foam.u2.LoadedElementState ) {
                     self.mainScrollElement = this.el();
                     self.scrollWizardPosition$.get();

@@ -41,7 +41,6 @@ foam.CLASS({
     },
     function cleanup() { this.cleanup_ && this.cleanup_.detach(); },
     function update(s) {
-      console.log('update happen', this);
       this.clearProperty('timeout_');
       this.value = s.get();
     }
