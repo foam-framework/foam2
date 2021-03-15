@@ -118,7 +118,7 @@ public class RulerDAOTest extends Test {
     CompositeRuleAction compositeAction = new CompositeRuleAction();
     Predicate pred10 = EQ(DOT(NEW_OBJ, foam.nanos.auth.User.EMAIL), "nanos@nanos.net");
     rule10.setPredicate(pred10);
-    rule10.setOperation(Operations.CREATE_OR_UPDATE);
+    rule10.setOperation(Operation.CREATE_OR_UPDATE);
     rule10.setLifecycleState(LifecycleState.ACTIVE);
 
     // test array of 1 action
@@ -158,7 +158,7 @@ public class RulerDAOTest extends Test {
     rule7.setName("rule7. userDAO email filter");
     rule7.setRuleGroup("users:email filter");
     rule7.setDaoKey("localUserDAO");
-    rule7.setOperation(Operations.CREATE);
+    rule7.setOperation(Operation.CREATE);
     rule7.setAfter(false);
     rule7.setPriority(100);
     rule7.setLifecycleState(LifecycleState.ACTIVE);
@@ -191,7 +191,7 @@ public class RulerDAOTest extends Test {
     rule1.setName("rule1. userDAO email filter");
     rule1.setRuleGroup("users:email filter");
     rule1.setDaoKey("localUserDAO");
-    rule1.setOperation(Operations.CREATE);
+    rule1.setOperation(Operation.CREATE);
     rule1.setAfter(false);
     rule1.setPriority(60);
     RuleAction action1 = (x1, obj, oldObj, ruler, rule1, agent) -> ruler.stop();
@@ -205,7 +205,7 @@ public class RulerDAOTest extends Test {
     rule2.setName("rule2. userDAO email filter");
     rule2.setRuleGroup("users:email filter");
     rule2.setDaoKey("localUserDAO");
-    rule2.setOperation(Operations.CREATE);
+    rule2.setOperation(Operation.CREATE);
     rule2.setLifecycleState(LifecycleState.ACTIVE);
     rule2.setAfter(false);
     rule2.setPriority(80);
@@ -231,7 +231,7 @@ public class RulerDAOTest extends Test {
     rule3.setName("rule3. userDAO email filter");
     rule3.setRuleGroup("users:email filter");
     rule3.setDaoKey("localUserDAO");
-    rule3.setOperation(Operations.CREATE);
+    rule3.setOperation(Operation.CREATE);
     rule3.setLifecycleState(LifecycleState.ACTIVE);
     rule3.setAfter(false);
     rule3.setPriority(20);
@@ -247,7 +247,7 @@ public class RulerDAOTest extends Test {
     rule4.setName("rule4. userDAO lastName filter");
     rule4.setRuleGroup("users:change lastName");
     rule4.setDaoKey("localUserDAO");
-    rule4.setOperation(Operations.CREATE);
+    rule4.setOperation(Operation.CREATE);
     rule4.setAfter(false);
     rule4.setPriority(10);
     rule4.setLifecycleState(LifecycleState.ACTIVE);
@@ -268,7 +268,7 @@ public class RulerDAOTest extends Test {
     rule5.setName("rule5. userDAO lastName filter");
     rule5.setRuleGroup("users:change lastName");
     rule5.setDaoKey("localUserDAO");
-    rule5.setOperation(Operations.UPDATE);
+    rule5.setOperation(Operation.UPDATE);
     rule5.setAfter(false);
     rule5.setLifecycleState(LifecycleState.ACTIVE);
     Predicate predicate5 = EQ(DOT(NEW_OBJ, INSTANCE_OF(foam.nanos.auth.User.class)), true);
@@ -314,7 +314,7 @@ public class RulerDAOTest extends Test {
     rule6.setName("rule6. user2 update");
     rule6.setRuleGroup("user2 update");
     rule6.setDaoKey("localUserDAO");
-    rule6.setOperation(Operations.UPDATE);
+    rule6.setOperation(Operation.UPDATE);
     rule6.setSaveHistory(true);
     rule6.setLifecycleState(LifecycleState.ACTIVE);
     rule6.setPredicate(EQ(DOT(NEW_OBJ, foam.nanos.auth.User.EMAIL), "user2@nanos.net"));
@@ -340,7 +340,7 @@ public class RulerDAOTest extends Test {
     rgDAO.put(rg2);
     rule8.setRuleGroup("user created");
     rule8.setDaoKey("localUserDAO");
-    rule8.setOperation(Operations.CREATE);
+    rule8.setOperation(Operation.CREATE);
     rule8.setAfter(false);
     rule8.setLifecycleState(LifecycleState.ACTIVE);
     rule8.setPredicate(new DummyErroneousPredicate());
@@ -357,7 +357,7 @@ public class RulerDAOTest extends Test {
     rgDAO.put(rg3);
     rule9.setRuleGroup("user updated");
     rule9.setDaoKey("localUserDAO");
-    rule9.setOperation(Operations.UPDATE);
+    rule9.setOperation(Operation.UPDATE);
     rule9.setAfter(false);
     rule9.setPredicate(EQ(foam.nanos.auth.User.EMAIL, "nanos@nanos.net"));
     rule9.setLifecycleState(LifecycleState.ACTIVE);

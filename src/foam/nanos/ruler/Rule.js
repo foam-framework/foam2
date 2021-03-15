@@ -120,7 +120,7 @@
     },
     {
       class: 'Enum',
-      of: 'foam.nanos.ruler.Operations',
+      of: 'foam.nanos.dao.Operation',
       name: 'operation',
       readPermissionRequired: true,
       writePermissionRequired: true,
@@ -191,9 +191,9 @@
       transient: true,
       hidden: true,
       javaFactory: `
-        if ( Operations.CREATE == getOperation()
-          || Operations.UPDATE == getOperation()
-          || Operations.CREATE_OR_UPDATE == getOperation()
+        if ( Operation.CREATE == getOperation()
+          || Operation.UPDATE == getOperation()
+          || Operation.CREATE_OR_UPDATE == getOperation()
         ) {
           return RulerDAO.PUT_CMD;
         }
