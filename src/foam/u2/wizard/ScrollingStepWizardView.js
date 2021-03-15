@@ -147,7 +147,9 @@ foam.CLASS({
             .end()
             .start()
               .addClass(this.myClass('actions'))
-              .tag(this.SUBMIT)
+              .startContext({ data: self })
+                .tag(this.SUBMIT)
+              .endContext()
             .end()
           .end()
         .end()
@@ -213,7 +215,12 @@ foam.CLASS({
     {
       name: 'submit',
       label: 'Done',
-      code: function () {}
+      code: function () {
+        for ( let w of this.data.wizardlets ) {
+          if ( w.submit ) w.submit();
+        }
+        this.onClose(x, true);
+      }
     }
   ]
 });
