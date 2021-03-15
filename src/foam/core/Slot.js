@@ -172,15 +172,6 @@ foam.CLASS({
       return foam.core.ExpressionSlot.create({code: f, args: [this]});
     },
 
-    function filter(f) {
-      var s = foam.core.SimpleSlot.create({ value: this.get() });
-      this.sub(() => {
-        var v = this.get();
-        if ( f(v) ) s.set(v);
-      });
-      return s;
-    },
-
     /**
      * Relate to another Slot.
      * @param f maps from this to other

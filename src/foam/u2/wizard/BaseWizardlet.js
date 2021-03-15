@@ -147,13 +147,14 @@ foam.CLASS({
       `,
       code: function () {
         var self = this;
+        var filter = foam.u2.wizard.Slot.filter;
         if ( this.of && this.WizardletAware.isSubClass(this.of) ) {
           var s = foam.core.FObject.create();
           this.data$
             .map(data => {
               var updateSlot = data.getUpdateSlot();
               return this.WizardletAutoSaveSlot.create({
-                other: updateSlot.filter(v => v && ! self.loading),
+                other: filter(updateSlot, v => v && ! self.loading),
                 delay: 700 // TODO: constant
               });
             })
@@ -161,10 +162,10 @@ foam.CLASS({
           return s;
         }
         var sl = this.FObjectRecursionSlot.create({ obj$: this.data$ });
-        return this.WizardletAutoSaveSlot.create({
-          other: sl.filter(() => ! self.loading),
+        return filter(this.WizardletAutoSaveSlot.create({
+          other: filter(sl, () => ! self.loading),
           delay: 700
-        }).filter(() => ! self.loading);
+        }), () => ! self.loading);
       }
     }
   ]
