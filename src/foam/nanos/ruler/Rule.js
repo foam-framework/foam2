@@ -18,7 +18,8 @@
     'foam.nanos.auth.LastModifiedAware',
     'foam.nanos.auth.LastModifiedByAware',
     'foam.nanos.approval.ApprovableAware',
-    'foam.nanos.auth.ServiceProviderAware'
+    'foam.nanos.auth.ServiceProviderAware',
+    'foam.nanos.dao.Operation'
   ],
 
   imports: [

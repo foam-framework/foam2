@@ -27,10 +27,11 @@ foam.CLASS({
     'foam.mlang.predicate.Predicate',
     'foam.mlang.sink.GroupBy',
     'foam.nanos.auth.ServiceProviderAwareSupport',
+    'foam.nanos.dao.Operation',
     'foam.util.SafetyUtil',
-    'java.util.stream.Collectors',
     'java.util.List',
     'java.util.Map',
+    'java.util.stream.Collectors',
     'static foam.mlang.MLang.*'
   ],
 

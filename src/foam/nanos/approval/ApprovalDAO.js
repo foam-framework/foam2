@@ -16,7 +16,7 @@ foam.CLASS({
     'foam.mlang.sink.Sum',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
-    'foam.nanos.ruler.Operation',
+    'foam.nanos.dao.Operation',
     'foam.util.SafetyUtil',
 
     'static foam.mlang.MLang.*'

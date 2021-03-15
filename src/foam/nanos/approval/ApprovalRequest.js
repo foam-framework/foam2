@@ -24,7 +24,7 @@
     'foam.dao.DAO',
     'foam.nanos.auth.*',
     'foam.nanos.logger.Logger',
-    'foam.nanos.ruler.Operation',
+    'foam.nanos.dao.Operation',
     'java.util.ArrayList',
     'java.util.List',
     'static foam.mlang.MLang.*'

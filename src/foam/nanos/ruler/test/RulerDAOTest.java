@@ -6,11 +6,12 @@ import foam.core.X;
 import foam.dao.ArraySink;
 import foam.dao.DAO;
 import foam.mlang.predicate.Predicate;
+import foam.nanos.auth.LifecycleState;
 import foam.nanos.auth.User;
+import foam.nanos.dao.Operation;
 import foam.nanos.ruler.*;
 import foam.nanos.test.Test;
 import foam.test.TestUtils;
-import foam.nanos.auth.LifecycleState;
 
 import java.util.List;
 
