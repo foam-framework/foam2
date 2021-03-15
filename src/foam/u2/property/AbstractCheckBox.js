@@ -63,8 +63,7 @@ foam.CLASS({
 
   methods: [
     function updateMode_(mode) {
-      var disabled = mode === foam.u2.DisplayMode.RO ||
-                     mode === foam.u2.DisplayMode.DISABLED;
+      var disabled = mode === foam.u2.DisplayMode.RO || mode === foam.u2.DisplayMode.DISABLED;
       this.setAttribute('disabled', disabled);
     },
 

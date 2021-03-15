@@ -276,6 +276,7 @@ foam.CLASS({
         this.DESC(column) :
         column;
 
+return;
       if ( ! this.memento )
         return;
 
@@ -406,7 +407,7 @@ foam.CLASS({
                   addClass(view.myClass('th-' + prop.name))
                   .style({ flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0', 'word-wrap' : 'break-word', 'white-space' : 'normal'})
                   .start()
-                    .style({ 
+                    .style({
                       'display': 'inline-block',
                     })
                     .add(view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col)).
@@ -422,12 +423,12 @@ foam.CLASS({
                       }).
                       callIf(prop.label !== '', function() {
                         this.start()
-                          .style({ 
+                          .style({
                             'display': 'inline-block',
                             'position': 'absolute'
                           })
                           .start('img')
-                            .style({ 
+                            .style({
                               'margin-top': '2px'
                             })
                             .attr('src', this.slot(function(order) {

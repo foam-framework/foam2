@@ -774,6 +774,8 @@ FOAM_FILES([
   { name: "foam/lib/json/OutputterMode" },
   { name: "foam/lib/json/ClassReferenceParserTest" },
   { name: "foam/lib/json/PropertyReferenceParserTest" },
+  { name: "foam/lib/json/UnknownFObject" },
+  { name: "foam/lib/json/OutputJSON" },
   { name: "foam/lib/parse/Parser" },
   { name: "foam/lib/parse/PStream" },
   { name: "foam/lib/parse/BlobPStream" },
