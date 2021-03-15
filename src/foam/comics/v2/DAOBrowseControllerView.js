@@ -132,7 +132,9 @@ foam.CLASS({
           this.stack.push(
             eval(this.config.wizardDetailView.class).create({
               model: this.data.of.id || this.config.of.id,
-              //data: this.selection,
+              data: this.selection,
+              detailView: this.config.detailView.class,
+              menu: this.config.menu,
               controllerMode: foam.u2.ControllerMode.CREATE,
               isEdit: true
           }, this.__subContext__));
