@@ -10,16 +10,17 @@ foam.CLASS({
   extends: 'foam.nanos.crunch.ui.CapabilityWizardlet',
 
   properties: [
+    ['isVisible', false],
     {
       name: 'of',
       value: 'foam.u2.wizard.data.BooleanHolder'
     },
-    // {
-    //   name: 'sections',
-    //   factory: function () {
-    //     return [];
-    //   }
-    // },
+    {
+      name: 'sections',
+      factory: function () {
+        return [];
+      }
+    },
     {
       name: 'isValid',
       expression: function (data) {

@@ -11,6 +11,10 @@ foam.CLASS({
   mixins: ['foam.u2.wizard.WizardletRenderUtils'],
   documentation: `Displays all wizardlets in a scrolling page.`,
 
+  messages: [
+    { name: 'NO_ACTION_LABEL', message: 'Done' },
+  ],
+
   requires: [
     'foam.u2.tag.CircleIndicator',
     'foam.u2.wizard.WizardPosition',
@@ -99,7 +103,17 @@ foam.CLASS({
         return minTopPosition;
       }
     },
-    'mainScrollElement'
+    'mainScrollElement',
+    {
+      name: 'hasAction',
+      documentation: `
+        Used to change submit button text between 'Done' and 'Submit' depending
+        on if any wizardlets have an action for submit.
+      `,
+      expression: function (data$wizardlets) {
+        return data$wizardlets.filter(w => w.submit).length > 0;
+      }
+    }
   ],
 
   methods: [
@@ -148,7 +162,11 @@ foam.CLASS({
             .start()
               .addClass(this.myClass('actions'))
               .startContext({ data: self })
-                .tag(this.SUBMIT)
+                .tag(this.SUBMIT, {
+                  label: this.hasAction
+                    ? this.ACTION_LABEL
+                    : this.NO_ACTION_LABEL
+                })
               .endContext()
             .end()
           .end()
