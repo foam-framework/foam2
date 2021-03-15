@@ -215,7 +215,7 @@ foam.CLASS({
     {
       name: 'submit',
       label: 'Done',
-      code: function () {
+      code: function (x) {
         for ( let w of this.data.wizardlets ) {
           if ( w.submit ) w.submit();
         }
