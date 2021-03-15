@@ -18,10 +18,12 @@ import foam.nanos.ruler.Operations;
 import foam.test.TestUtils;
 
 /**
-  General benchmark authorizer, capable of extending and replaced for complex 
+  General benchmark authorizer
   {@authorizer} wraps target DAO using authorizer provided
   {@recordAmount} defines amount of records to be created for benchmark (creates users in new MDAO)
-  {@op} a (CRUD) operation to run benchmark on. 
+  {@op} a (CRUD) operation to run benchmark on.
+  Each CRUD operation has its own method specified for benchmarking, meaning each benchmark will relate to a single operation.
+  If further setup or additional logic on each CRUD operation is required, extending this class and referencing the setup and CRUD method should suffice.
  */
 
 public class AuthorizerBenchmark
