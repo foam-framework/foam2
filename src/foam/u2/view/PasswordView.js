@@ -84,12 +84,15 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isAvailable',
+      value: true
     },
   ],
 
   methods: [
     function initE() {
       this.SUPER();
+      var typingTimer;
+      var doneTypingInterval = 400; 
 
       this.addClass(this.myClass()).start()
         .start(this.TextField, {
@@ -98,7 +101,14 @@ foam.CLASS({
           onKey: true,
         }, this.inputElement$)
           .addClass('full-width-input-password')
-          .on('blur', this.checkAvailability)
+          .on('keyup', () => {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(this.checkAvailability, doneTypingInterval);
+          })
+          .on('keydown', () => {
+            clearTimeout(typingTimer);
+            this.isAvailable = true;
+          })
         .end()
 
         .start('img')
