@@ -156,10 +156,12 @@ foam.CLASS({
 
       var reciprocalSearch =  foam.u2.ViewSpec.createView({
         class: 'foam.u2.view.ReciprocalSearch',
+        data$: this.data.predicate$
       },  {}, self, self.__subContext__.createSubContext({ memento: this.memento }));
 
       var searchView = foam.u2.ViewSpec.createView({
         class: 'foam.u2.view.SimpleSearch',
+        data$: this.data.predicate$
       },  {}, self, reciprocalSearch.__subContext__);//refactoring candidate
 
       if (this.data.searchMode === this.SearchMode.FULL) {
@@ -210,9 +212,7 @@ foam.CLASS({
               this.start()//create view
                 .hide(self.data.searchHidden$)
                 .addClass(self.myClass('full-search-container'))
-                .add(self.cls.PREDICATE.clone().copyFrom({
-                  view: reciprocalSearch
-                }))
+                .add(reciprocalSearch)
               .end();
             })
             .start().addClass(this.myClass('manual-width-adjust'))
@@ -221,9 +221,7 @@ foam.CLASS({
                 .callIf(this.data.searchMode === this.SearchMode.SIMPLE, function() {
                   this
                     .start()
-                      .add(self.cls.PREDICATE.clone().copyFrom({
-                        view: searchView
-                      }))
+                      .add(searchView)
                     .end();
                 })
                 .start().show(self.mode$.map(m => m === foam.u2.DisplayMode.RW))
