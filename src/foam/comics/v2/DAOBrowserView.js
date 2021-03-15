@@ -358,7 +358,8 @@ foam.CLASS({
                     .end()
                   .end();
               })
-              .start(summaryView)
+              .start()
+                .add(summaryView)
                 .addClass(self.myClass('browse-view-container'))
               .end()
             .end();

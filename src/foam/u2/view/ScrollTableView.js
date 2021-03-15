@@ -290,7 +290,8 @@
           start('div', {}, this.tableWrapper_$).
             addClass(this.myClass()).
             on('scroll', this.onScroll).
-            start(this.table_).
+            start().
+              add(this.table_).
               addClass(this.myClass('table')).
               style({
                 height: this.scrollHeight$.map(h => h + 'px')

@@ -316,6 +316,7 @@ foam.CLASS({
 
   methods: [
     function output(out) {
+      // debugger;
       this.__context__.warn('Outputting unloaded element can cause event/binding bugs.', this.cls_.id);
       this.state = this.OUTPUT;
       this.output_(out);

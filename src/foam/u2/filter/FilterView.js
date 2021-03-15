@@ -343,7 +343,8 @@ foam.CLASS({
               .on('click', self.toggleDrawer)
               .start('p').addClass(self.myClass('handle-title')).add(self.LABEL_FILTER).end()
             .end()
-            .start(self.generalSearchField)
+            .start()
+              .add(self.generalSearchField)
               .addClass(self.myClass('general-field'))
             .end()
           .end()
@@ -373,7 +374,8 @@ foam.CLASS({
                           self.currentMemento.tail = foam.nanos.controller.Memento.create();
                       }
 
-                      this.start(propView)
+                      this.start()
+                      .add(propView)
                       .hide(self.filterController$.dot('isAdvanced'))
                       .end();
                     }

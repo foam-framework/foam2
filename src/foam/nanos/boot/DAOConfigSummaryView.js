@@ -123,7 +123,8 @@ foam.CLASS({
               end().
               add(' / ', this.title).
             end().
-            tag(this.inner);
+            start().
+            add(this.inner).end();
         }
       ]
     }
