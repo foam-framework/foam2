@@ -211,7 +211,8 @@ foam.CLASS({
             }, self, self.__subSubContext__.createSubContext({ memento: localM }));
 
             this
-            .start(propView)
+            .start()
+                .add(propView)
                 .addClass(self.myClass('filter'))
               .end();
 
