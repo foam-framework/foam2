@@ -91,7 +91,6 @@ foam.CLASS({
   methods: [
     function initE() {
       this.SUPER();
-      var self = this;
       var typingTimer;
       var doneTypingInterval = 400; 
 
@@ -108,7 +107,7 @@ foam.CLASS({
           })
           .on('keydown', () => {
             clearTimeout(typingTimer);
-            self.isAvailable = true;
+            this.isAvailable = true;
           })
         .end()
 
