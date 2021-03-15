@@ -86,7 +86,7 @@ foam.CLASS({
       imports: [ 'memento', 'stack' ],
 
       // exports: [
-      //   'currentMemento_ as memento'
+        // 'currentMemento_ as memento'
       // ],
 
       css: `
@@ -112,6 +112,9 @@ foam.CLASS({
         function initE() {
           this.SUPER();
 
+          if ( this.memento )
+            this.currentMemento$ = this.memento.tail$;
+
           this.
             start().
               addClass(this.myClass('title')).
@@ -123,9 +126,8 @@ foam.CLASS({
               end().
               add(' / ', this.title).
             end().
-            start().
-            add(this.inner).end();
-        }
+            tag(this.inner);
+          }
       ]
     }
   ],
@@ -321,20 +323,20 @@ foam.CLASS({
         // }
         this.onDetach(this.memento.tail$.sub(this.mementoChange));
       }
-      this.mementoChange();
+      this.mementoChange(true);
     }
   ],
 
   listeners: [
-    function mementoChange() {
+    function mementoChange(isInitializing) {
       var m = this.memento;
 
       if ( ! m || ! m.tail || m.tail.head.length == 0 ) {
-        if ( ! m.tail ) this.stack.back();
+        if ( ! isInitializing && ! m.tail ) this.stack.back();
         return;
       }
 
-      var x = this.__subContext__.createSubContext();
+      var x = this.__subContext__.createSubContext({memento: this.memento.tail});
       x.register(this.DAOUpdateControllerView, 'foam.comics.DAOUpdateControllerView');
       x.register(this.CustomDAOSummaryView,    'foam.comics.v2.DAOSummaryView');
       x.register(this.CustomDAOUpdateView,     'foam.comics.v2.DAOUpdateView');
@@ -359,12 +361,31 @@ foam.CLASS({
               'Controller 2'
             ]
           ]
-      }, null,  this, this.__subContext__.createSubContext({memento: this.memento.tail}));
+      }, {}, this, this.__subContext__.createSubContext({memento: this.memento.tail}));
 
       this.stack.push({
         class: this.BackBorder,
         title: m.tail.head,
-        inner: innerView
+        inner: {
+          class: 'foam.u2.view.AltView',
+          data: this.__context__[m.tail.head],
+          views: [
+            [
+              {
+                class: this.BrowserView,
+                stack: this.stack
+              },
+              'Controller 1'
+            ],
+            [
+              {
+                class: this.DAOBrowseControllerView,
+                stack: this.stack
+              },
+              'Controller 2'
+            ]
+          ]
+        }
       }, x);
     }
   ]

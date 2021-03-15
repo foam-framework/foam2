@@ -235,7 +235,7 @@ foam.CLASS({
                   .add()
                 .end()
               .end()
-              .tag(summaryView)
+              .add(summaryView)
             .end()
           .end()
         .end());
