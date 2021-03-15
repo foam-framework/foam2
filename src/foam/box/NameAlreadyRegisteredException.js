@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'NameAlreadyRegisteredException',
+  extends: 'foam.core.FOAMException',
 
   properties: [
     {

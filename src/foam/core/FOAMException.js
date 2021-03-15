@@ -10,6 +10,10 @@ foam.CLASS({
   implements: [ 'foam.core.Exception' ],
   javaExtends: 'RuntimeException',
   javaGenerateConvenienceConstructor: false,
+
+  javaImports: [
+    'foam.i18n.TranslationService'
+  ],
   
   axioms: [
     {
@@ -31,6 +35,14 @@ foam.CLASS({
   public FOAMException(String message, Throwable cause) {
     super(message, cause);
     setMessage_(message);
+    getHostname();
+  }
+
+  public FOAMException(String message, String id, String locale) {
+    super(message);
+    TranslationService ts = (TranslationService) foam.core.XLocator.get().get("translationService");
+    String translation_message = ts.getTranslation(locale, id, message);
+    setMessage_(translation_message);
     getHostname();
   }
         `);

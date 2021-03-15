@@ -32,7 +32,8 @@ foam.CLASS({
     { name: 'FOOTER_LINK', message: 'Create an account' },
     { name: 'SUB_FOOTER_LINK', message: 'Forgot password?' },
     { name: 'ERROR_MSG', message: 'There was an issue logging in' },
-    { name: 'ERROR_MSG2', message: 'Please enter email or username' }
+    { name: 'ERROR_MSG2', message: 'Please enter email or username' },
+    { name: 'ERROR_MSG3', message: 'User not found' }
   ],
 
   properties: [
@@ -144,10 +145,17 @@ foam.CLASS({
             }
           ).catch(
             err => {
-              this.ctrl.add(this.NotificationMessage.create({
-                message: err.message || this.ERROR_MSG,
-                type: this.LogLevel.ERROR
-              }));
+              if (err.message == "User not found") {
+                this.ctrl.add(this.NotificationMessage.create({
+                  message: this.ERROR_MSG3,
+                  type: this.LogLevel.ERROR
+                }));
+              } else {
+                this.ctrl.add(this.NotificationMessage.create({
+                  message: err.message || this.ERROR_MSG,
+                  type: this.LogLevel.ERROR
+                }));
+              }
           });
         } else {
           this.ctrl.add(this.NotificationMessage.create({

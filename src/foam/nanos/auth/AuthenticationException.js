@@ -31,6 +31,10 @@ foam.CLASS({
   public AuthenticationException(String message, Throwable cause) {
     super(message, cause);
   }
+
+  public AuthenticationException(String message, String id, String locale) {
+    super(message, id, locale);
+  }
         `);
       }
     }
