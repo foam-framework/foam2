@@ -59,7 +59,6 @@ foam.CLASS({
           slots: n.map(delegate => delegate.indicator$)
         }).map(function (indicators) {
           indicators.push(this.realIndicator);
-          console.log('indicators', indicators)
           var checkStates = ['PLEASE_FILL', 'SAVING', 'COMPLETED']
             .map(v => this.WizardletIndicator[v]);
           for ( let stateToCheck of checkStates ) {
@@ -125,12 +124,10 @@ foam.CLASS({
         // ???: Replace subs with slots to use ArraySlot here
         var s = foam.core.FObject.create();
         this.SUPER().sub(() => {
-          console.log('A');
           s.pub(true);
         })
         for ( let wizardlet of this.delegates ) {
           wizardlet.getDataUpdateSub().sub(() => {
-            console.log('B');
             s.pub(true);
           });
         }
