@@ -70,11 +70,6 @@ foam.CLASS({
           }
           this.clearProperty('indicator');
         }));
-        for ( let delegate of n ) {
-          this.delegatesSub_.onDetach(delegate.saveEvent.sub(() => {
-            this.wao.save(this);
-          }));
-        }
       }
     },
     {
@@ -106,7 +101,8 @@ foam.CLASS({
   methods: [
     function addPrerequisite(wizardlet) {
       // Add prerequisite to delegate wizardlets
-      this.delegates.push(wizardlet);
+      // TODO: investigate why this.delegates$push doesn't work here
+      this.delegates = [ ...this.delegates, wizardlet ];
 
       // Return true to prevent wizardlet from being pushed normally
       return true;

@@ -149,11 +149,11 @@ foam.CLASS({
         if ( this.of && this.WizardletAware.isSubClass(this.of) ) {
           var s = foam.core.FObject.create();
           this.data$
-            .filter(v => v && ! self.loading) // ignore data when it's undefined
             .map(data => {
               console.log('wuuut', data);
+              var updateSlot = data.getUpdateSlot();
               return this.WizardletAutoSaveSlot.create({
-                other: data.getUpdateSlot(),
+                other: updateSlot.filter(v => v && ! self.loading),
                 delay: 700 // TODO: constant
               });
             })
