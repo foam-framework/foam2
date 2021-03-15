@@ -28,6 +28,10 @@ foam.CLASS({
   public ClientRuntimeException(String message, Throwable cause) {
     super(message, cause);
   }
+
+  public ClientRuntimeException(String message, String id, String locale) {
+    super(message, id, locale);
+  }
           `
         );
       }
