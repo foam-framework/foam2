@@ -48,7 +48,7 @@
       tableWidth: 80
     },
     {
-      class: 'FObjectProperty',
+      class: 'JSFObject',
       name: 'handler',
       documentation: 'View initialized when menu is launched.',
       view: {

@@ -23,7 +23,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'actAs',
-      type: 'foam.nanos.auth.User',
+      type: 'foam.nanos.auth.Subject',
       async: true,
       javaThrows: [
         'foam.nanos.auth.AuthorizationException',

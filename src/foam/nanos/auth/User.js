@@ -894,7 +894,7 @@ foam.RELATIONSHIP({
 
 foam.CLASS({
   package: 'foam.nanos.auth',
-  name: 'UserUserJunctionGroupRefinement',
+  name: 'UserUserJunctionGroupAndStatusRefinement',
   refines: 'foam.nanos.auth.UserUserJunction',
 
   properties: [
@@ -902,6 +902,15 @@ foam.CLASS({
       class: 'Reference',
       of: 'foam.nanos.auth.Group',
       name: 'group'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.nanos.auth.AgentJunctionStatus',
+      name: 'status',
+      documentation: 'Describes the active state between agent and entity.',
+      readPermissionRequired: false,
+      writePermissionRequired: true,
+      value: 'ACTIVE'
     }
   ]
 });
