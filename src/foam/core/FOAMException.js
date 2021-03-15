@@ -45,6 +45,14 @@ foam.CLASS({
     setMessage_(translation_message);
     getHostname();
   }
+
+  public FOAMException(String message, String id, String locale, Throwable cause) {
+    super(message, cause);
+    TranslationService ts = (TranslationService) foam.core.XLocator.get().get("translationService");
+    String translation_message = ts.getTranslation(locale, id, message);
+    setMessage_(translation_message);
+    getHostname();
+  }
         `);
       }
     }

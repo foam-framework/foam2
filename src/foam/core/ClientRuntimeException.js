@@ -31,8 +31,12 @@ foam.CLASS({
 
   public ClientRuntimeException(String message, String id, String locale) {
     super(message, id, locale);
+  }   
+
+  public ClientRuntimeException(String message, String id, String locale, Throwable cause) {
+    super(message, id, locale, cause);
   }
-          `
+  `
         );
       }
     }
