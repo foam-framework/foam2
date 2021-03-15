@@ -18,8 +18,7 @@
     'foam.nanos.auth.LastModifiedAware',
     'foam.nanos.auth.LastModifiedByAware',
     'foam.nanos.approval.ApprovableAware',
-    'foam.nanos.auth.ServiceProviderAware',
-    'foam.nanos.dao.Operation'
+    'foam.nanos.auth.ServiceProviderAware'
   ],
 
   imports: [
@@ -30,6 +29,7 @@
     'foam.core.DirectAgency',
     'foam.nanos.auth.AuthorizationException',
     'foam.nanos.auth.AuthService',
+    'foam.nanos.dao.Operation',
     'foam.nanos.logger.Logger',
     'java.util.Collection'
   ],
