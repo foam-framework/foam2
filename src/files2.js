@@ -81,6 +81,7 @@ FOAM_FILES([
   { name: "foam/core/templates" },
   { name: "foam/i18n/Messages" },
   { name: "foam/core/Action" },
+  { name: "foam/core/JSFObject" },
   { name: "foam/core/Static" },
   { name: "foam/core/Reaction" },
   { name: "foam/core/Serializable" },
@@ -546,6 +547,8 @@ FOAM_FILES([
   { name: "foam/lib/json/ClassReferenceParserTest" },
   { name: "foam/lib/parse/Parser" },
   { name: "foam/lib/parse/PStream" },
+  { name: "foam/lib/json/UnknownFObject" },
+  { name: "foam/lib/json/OutputJSON" },
   { name: "foam/crypto/hash/Hasher" },
   { name: "foam/crypto/hash/Hashable" },
   { name: "foam/crypto/hash/HashableTest" },
@@ -585,7 +588,7 @@ FOAM_FILES([
 
   { name: "foam/core/CoreTypesValidationTest" },
   { name: "foam/core/CoreTypesValidationTestModel" },
-  
+
   // Translation Support
   { name: "foam/i18n/XLIFFTranslationValue" },
   { name: "foam/i18n/Locale" },

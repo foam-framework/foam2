@@ -28,6 +28,12 @@ foam.CLASS({
     { class: 'foam.u2.TextInputCSS' }
   ],
 
+  css: `
+    ^ {
+      width: 234px;
+    }
+  `,
+
   methods: [
     function initE() {
       this.SUPER();

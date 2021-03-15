@@ -46,7 +46,11 @@ foam.CLASS({
                  ((AgentCapabilityJunction) ucj).getEffectiveUser() == user.getId() ) {
               return;
             }
-
+            foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+            logger.error(this.getClass().getSimpleName(), "Cannot add UserCapabilityJunction. Not an admin or owner. - subject", subject);
+            logger.error(this.getClass().getSimpleName(), "Cannot add UserCapabilityJunction. Not an admin or owner. - user", user);
+            logger.error(this.getClass().getSimpleName(), "Cannot add UserCapabilityJunction. Not an admin or owner. - realUser", realUser);
+            logger.error(this.getClass().getSimpleName(), "Cannot add UserCapabilityJunction. Not an admin or owner. - ucj", ucj);
             throw new AuthorizationException("Cannot add UserCapabilityJunction. Not an admin or owner.");
           }
         }, "");

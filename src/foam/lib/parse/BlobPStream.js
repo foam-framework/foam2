@@ -84,6 +84,10 @@ foam.CLASS({
     {
       name: 'apply',
       javaCode: `return ps.parse(this, x);`
+    },
+    {
+      name: 'pos',
+      javaCode: `return pos__;`
     }
   ]
 });
