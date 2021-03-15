@@ -1,14 +1,36 @@
 p({
 	"class": "foam.nanos.script.Script",
-	"id": "genericBenchmarkAuthorizer",
-	"description": "Benchmark Authorizer",
+	"id": "BenchmarkStandardAuthorizer",
+	"description": "Benchmark Standard Authorizer can be used as a reference when benchmarking authorizers.",
 	"code": `
 		import foam.nanos.bench.*;
 		import foam.nanos.bench.benchmarks.*;
+    import foam.nanos.ruler.Operations;
 
 		x = x.put("pmLogger", null);
 		authorizer = new foam.nanos.auth.StandardAuthorizer("user");
-		b = new GenericAuthorizerBenchmark(authorizer, 100);
+		b = new AuthorizerBenchmark(authorizer, 100, Operations.READ);
+		builder = new BenchmarkRunner.Builder(x)
+			.setInvocationCount(1)
+			.setBenchmark(b)
+			.build();
+		builder.execute(x);
+
+		b = new AuthorizerBenchmark(authorizer, 100, Operations.UPDATE);
+		builder = new BenchmarkRunner.Builder(x)
+			.setInvocationCount(1)
+			.setBenchmark(b)
+			.build();
+		builder.execute(x);
+
+		b = new AuthorizerBenchmark(authorizer, 100, Operations.CREATE);
+		builder = new BenchmarkRunner.Builder(x)
+			.setInvocationCount(1)
+			.setBenchmark(b)
+			.build();
+		builder.execute(x);
+
+		b = new AuthorizerBenchmark(authorizer, 100, Operations.REMOVE);
 		builder = new BenchmarkRunner.Builder(x)
 			.setInvocationCount(1)
 			.setBenchmark(b)
