@@ -893,6 +893,7 @@ FOAM_FILES([
   // Step Wizard
   { name: "foam/u2/dialog/SimpleActionDialog" },
   { name: "foam/u2/tag/CircleIndicator" },
+  { name: "foam/u2/wizard/internal/FObjectRecursionSlot" },
   { name: "foam/u2/wizard/internal/WizardletAutoSaveSlot" },
   { name: "foam/u2/wizard/axiom/WizardAction" },
   { name: "foam/u2/wizard/data/holders" },

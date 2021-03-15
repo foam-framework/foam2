@@ -20,6 +20,7 @@ foam.CLASS({
     'foam.u2.wizard.WizardletIndicator',
     'foam.u2.wizard.WizardletSection',
     'foam.u2.wizard.WAO',
+    'foam.u2.wizard.internal.FObjectRecursionSlot',
     'foam.u2.wizard.internal.WizardletAutoSaveSlot'
   ],
 
@@ -160,7 +161,7 @@ foam.CLASS({
             .valueSub(() => { if ( ! self.loading ) s.pub(true); });
           return s;
         }
-        var sl = foam.core.FObjectRecursionSlot.create({ obj$: this.data$ });
+        var sl = this.FObjectRecursionSlot.create({ obj$: this.data$ });
         console.log('top slot', sl);
         return this.WizardletAutoSaveSlot.create({
           other: sl.filter(() => ! self.loading),
