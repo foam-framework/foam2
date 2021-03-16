@@ -339,6 +339,7 @@ FOAM_FILES([
   { name: "foam/nanos/http/HttpParameters" },
   { name: 'foam/nanos/http/SendErrorHandler' },
   { name: "foam/nanos/http/DefaultHttpParameters" },
+  { name: "foam/nanos/dao/Operation" },
   { name: "foam/nanos/doc/DocumentationView" },
   { name: 'foam/nanos/demo/relationship/CourseType' },
   { name: 'foam/nanos/demo/relationship/Course' },
@@ -395,7 +396,6 @@ FOAM_FILES([
 
   // foam/nanos/ruler
   { name: "foam/nanos/ruler/RuleGroup" },
-  { name: "foam/nanos/ruler/Operations" },
   { name: "foam/nanos/ruler/FindRuledCommand" },
   { name: "foam/nanos/ruler/Ruled" },
   { name: "foam/nanos/ruler/Rule" },

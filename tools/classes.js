@@ -664,6 +664,9 @@ var classes = [
   'foam.nanos.dig.exception.UnknownIdException',
   'foam.nanos.dig.exception.DigSuccessMessage',
   'foam.nanos.dig.exception.AuthorizationException',
+
+  'foam.nanos.dao.Operation',
+
   'foam.flow.Document',
   'foam.flow.DocumentationFolderDAO',
   'foam.flow.DocumentMenu',
@@ -676,7 +679,6 @@ var classes = [
   'foam.nanos.ruler.test.RuledDAOTest',
   'foam.nanos.ruler.test.RuledDummy',
   'foam.nanos.ruler.RulerDAO',
-  'foam.nanos.ruler.Operations',
   'foam.nanos.ruler.RulerProbe',
   'foam.nanos.ruler.TestedRule',
   'foam.nanos.ruler.RuleAction',
