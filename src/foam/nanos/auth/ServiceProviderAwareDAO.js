@@ -15,6 +15,7 @@ foam.CLASS({
 `,
 
   javaImports: [
+    'foam.nanos.auth.AuthService',
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.X',
@@ -60,7 +61,7 @@ foam.CLASS({
       ArrayList<ServiceProvider> serviceProviders = (ArrayList) ((ArraySink) ((DAO) getX().get("localServiceProviderDAO")).select(new ArraySink())).getArray();
       List<String> ids = serviceProviders.stream()
                             .map(ServiceProvider::getId)
-                            .filter(id -> auth.check(x, "serviceprovider.read."+id))
+                            .filter(id -> auth.check(x, "serviceprovider.read." + id))
                             .collect(Collectors.toList());
       if ( ids.size() == 1 ) {
         return MLang.EQ(getPropertyInfo(), ids.get(0));
@@ -68,27 +69,6 @@ foam.CLASS({
         return MLang.IN(getPropertyInfo(), ids.toArray(new String[0]));
       }
       throw new AuthorizationException();
-      `
-    },
-    {
-      description: `Return true if system/admin context`,
-      name: 'isAdmin',
-      args: [
-        {
-          name: 'x',
-          type: 'Context'
-        }
-      ],
-      type: 'Boolean',
-      javaCode: `
-      Subject subject = (Subject) x.get("subject");
-      if ( subject != null ) {
-        User user = subject.getRealUser();
-        if ( user != null ) {
-          return user.isAdmin();
-        }
-      }
-      return false;
       `
     },
     {
@@ -105,6 +85,8 @@ foam.CLASS({
       User user = null;
       String spid = (String) x.get("spid");
       Subject subject = (Subject) x.get("subject");
+      AuthService auth = (AuthService) x.get("auth");
+
       if ( subject != null ) {
         user = subject.getUser();
         if ( user != null ) {
@@ -115,7 +97,7 @@ foam.CLASS({
       }
       if ( SafetyUtil.isEmpty(spid) ||
            user != null &&
-           user.isAdmin() &&
+           auth.check(x, "default.to.theme.spid") &&
            SafetyUtil.isEmpty(user.getSpid()) ) {
         Theme theme = ((Themes) x.get("themes")).findTheme(x);
         if ( theme != null &&
@@ -168,17 +150,16 @@ foam.CLASS({
     {
       name: 'find_',
       javaCode: `
-      if ( isAdmin(x) ) {
+      if ( ((AuthService) x.get("auth")).check(x, "spid.obj.find.*") ) {
         return getDelegate().find_(x, id);
       }
-
       return getDelegate().where(getPredicate(x)).find_(x, id);
       `
     },
     {
       name: 'remove_',
       javaCode: `
-      if ( isAdmin(x) ||
+      if ( ((AuthService) x.get("auth")).check(x, "spid.obj.remove.*") ||
            getPredicate(x).f(obj) ) {
         return getDelegate().remove_(x, obj);
       }
@@ -190,7 +171,7 @@ foam.CLASS({
       name: 'select_',
       javaCode: `
       Predicate spidPredicate = predicate;
-      if ( ! isAdmin(x) ) {
+      if ( ! ((AuthService) x.get("auth")).check(x, "spid.obj.find.*") ) {
         try {
           spidPredicate = getPredicate(x);
         } catch ( AuthorizationException e ) {

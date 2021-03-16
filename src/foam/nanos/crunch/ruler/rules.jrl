@@ -11,7 +11,7 @@ p({
   "action":{"class":"foam.nanos.crunch.ruler.CheckUCJOwnershipOnPut"},
   "lifecycleState":1,
   "documentation":"""
-    On every ucjDAO put, check that the context user is either an admin user,
+    On every ucjDAO put, check that the context user is either an permissioned,
     or is the source user of the ucj
   """
 })

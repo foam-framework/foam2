@@ -64,9 +64,6 @@ p({
     auth = new foam.nanos.auth.twofactor.TwoFactorAuthService.Builder(x)
       .setDelegate(auth)
       .build();
-    auth = new foam.nanos.auth.SystemAuthService.Builder(x)
-      .setDelegate(auth)
-      .build();
     return auth;
   """,
   "client": "{\"class\":\"foam.nanos.auth.CachedAuthServiceProxy\",\"delegate\":{\"class\":\"foam.nanos.auth.ClientLoginAuthService\"}}"
