@@ -89,14 +89,14 @@ foam.CLASS({
           else {
             //X.memento.head is parent view head
             //so the v view mementoHead is X.memento.tail.head
+
+            //get rid of this logic
             if ( this.shouldMementoValueBeChanged(X.ctrl.memento.value, v.mementoHead) ) {//X.memento.combine()contains(v.mementoHead)
               var m = this.Memento.create();
-              if ( v.mementoHead[0] === '{' && v.mementoHead[v.mementoHead.length - 1] == '}' ) {
-                m.value = v.mementoHead.substr(1, v.mementoHead.length - 2).replaceAll(':', '=');
-              } else {
-                m.value = v.mementoHead;
-              }
 
+              m.value = v.mementoHead;
+
+              //should be already taken care of
               m.parent = currMemento;
     
               currMemento.tail = m;

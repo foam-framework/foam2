@@ -304,14 +304,27 @@
             class: 'foam.comics.v2.DAOCreateView',
             data: ((this.config.factory && this.config.factory$cls) ||  this.data.of).create({ mode: 'create'}, this),
             config$: this.config$,
-            of: of
+            of: this.data.of
           }, this.__subContext__.createSubContext({ memento: this.table_.memento }));
         } else {
+          var id = this.table_.memento.tail.tail.head;
+          if ( ! foam.core.MultiPartID.isInstance(this.data.of.ID) ) {
+            id = this.data.of.ID.fromString(id);
+          } else {
+            id = this.data.of.ID.of.create();
+            mementoHead = '{' + this.table_.memento.tail.tail.head.replaceAll('=', ':') + '}';
+            var idFromJSON = foam.json.parseString(mementoHead);
+            for ( var key in idFromJSON ) {
+              var axiom = this.data.of.getAxiomByName(key);//of.ID.of.getAxiomByName(key);
+              if ( axiom )
+                axiom.set(id, idFromJSON[key]);
+            }
+          }
           this.stack.push({
             class: 'foam.comics.v2.DAOSummaryView',
             data: null,
             config: this.config,
-            idOfRecord: this.table_.memento.tail.tail.head
+            idOfRecord: id
           }, this.__subContext__.createSubContext({ memento: this.table_.memento }));
         }
       }
