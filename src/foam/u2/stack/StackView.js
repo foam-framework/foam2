@@ -95,10 +95,6 @@ foam.CLASS({
               var m = this.Memento.create();
 
               m.value = v.mementoHead;
-
-              //should be already taken care of
-              m.parent = currMemento;
-    
               currMemento.tail = m;
             }
           }
