@@ -6,12 +6,10 @@
 
 package foam.parse;
 
-import foam.core.AbstractDatePropertyInfo;
-import foam.core.AbstractEnumPropertyInfo;
-import foam.core.ClassInfo;
-import foam.core.PropertyInfo;
+import foam.core.*;
 import foam.lib.json.Whitespace;
 import foam.lib.parse.*;
+import foam.lib.parse.Action;
 import foam.lib.parse.Optional;
 import foam.mlang.Expr;
 import foam.mlang.MLang;
@@ -20,6 +18,7 @@ import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.util.SafetyUtil;
 
+import java.lang.Exception;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -116,8 +115,8 @@ public class QueryParser
     });
 
     grammar.addSymbol("EXPR", new Alt(grammar.sym("PAREN"),
-      grammar.sym("NEGATE"), grammar.sym("HAS"), grammar.sym("IS"), grammar.sym("EQUALS"),
-      grammar.sym("BEFORE"), grammar.sym("AFTER"), grammar.sym("ID")));
+      grammar.sym("NEGATE"), grammar.sym("HAS"), grammar.sym("IS"),grammar.sym("INSTANCE_OF"),
+      grammar.sym("EQUALS"), grammar.sym("BEFORE"), grammar.sym("AFTER"), grammar.sym("ID")));
 
     grammar.addSymbol("PAREN", new Seq1(1,
       Literal.create("("),
@@ -158,6 +157,25 @@ public class QueryParser
       predicate.setArg1((PropertyInfo) val);
       predicate.setArg2(new foam.mlang.Constant(true));
       return predicate;
+    });
+
+    grammar.addSymbol("INSTANCE_OF", new Seq1(2,
+      new Alt(Literal.create("instanceof")),
+      Whitespace.instance(),
+      grammar.sym("STRING")
+    ));
+    grammar.addAction("INSTANCE_OF", (val, x) -> {
+      try {
+        Class cls = Class.forName((String) val);
+        FObject clsInstance = (FObject) cls.newInstance();
+        IsInstanceOf instanceOf = new IsInstanceOf();
+        instanceOf.setTargetClass(clsInstance.getClassInfo());
+        return instanceOf;
+      } catch (Exception e) {
+        foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+        logger.warning("failed to parse instanceof query");
+        return null;
+      }
     });
 
     grammar.addSymbol("EQUALS", new Seq(
