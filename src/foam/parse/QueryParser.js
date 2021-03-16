@@ -30,8 +30,10 @@ foam.CLASS({
   // TODO(braden): Support KEYWORD predicates and queries on them.
 
   requires: [
+    'foam.mlang.Constant',
     'foam.mlang.predicate.And',
     'foam.mlang.predicate.ContainsIC',
+    'foam.mlang.predicate.DotF',
     'foam.mlang.predicate.Eq',
     'foam.mlang.predicate.Gt',
     'foam.mlang.predicate.Gte',
@@ -40,6 +42,7 @@ foam.CLASS({
     'foam.mlang.predicate.InIC',
     'foam.mlang.predicate.Lt',
     'foam.mlang.predicate.Lte',
+    'foam.mlang.predicate.MQLExpr',
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
     'foam.mlang.predicate.True',
@@ -68,8 +71,8 @@ foam.CLASS({
       // The core query parser. Needs a fieldname symbol added to function
       // properly.
       name: 'baseGrammar_',
-      value: function(alt, literal, literalIC, not, notChars, optional, range,
-        repeat, repeat0, seq, seq1, str, sym, eof) {
+      value: function(alt, eof, literal, literalIC, not, notChars, optional, range,
+        repeat, repeat0, seq, seq1, str, sym, until) {
         return {
           START: seq1(0, sym('query'), repeat0(' '), eof()),
 
@@ -86,6 +89,7 @@ foam.CLASS({
             sym('negate'),
             sym('has'),
             sym('is'),
+            sym('dot'),
             sym('equals'),
             sym('before'),
             sym('after'),
@@ -104,6 +108,19 @@ foam.CLASS({
           has: seq(literalIC('has:'), sym('fieldname')),
 
           is: seq(literalIC('is:'), sym('fieldname')),
+
+          dot: seq(sym('fieldname'), sym('subQuery')),
+
+          subQuery: alt(sym('compoundSubQuery'), sym('simpleSubQuery')),
+
+          compoundSubQuery: seq1(1, '(', sym('compoundSubQueryBody'), ')'),
+
+          compoundSubQueryBody: repeat(alt(
+            seq('(', sym('compoundSubQueryBody'), ')'),
+            notChars(')')
+          )),
+
+          simpleSubQuery: seq1(1, '.', until(alt(' ', eof()))),
 
           equals: seq(sym('fieldname'), alt(':', '='), sym('valueList')),
 
@@ -295,6 +312,25 @@ foam.CLASS({
               arg1: v[1],
               arg2: true
             });
+          },
+
+          dot: function(v) {
+            return self.DotF.create({
+              arg1: self.Constant.create({value: v[1]}),
+              arg2: v[0]
+            });
+          },
+
+          simpleSubQuery: function(v) {
+            return self.MQLExpr.create({query: v.join('')});
+          },
+
+          compoundSubQuery: function(v) {
+            return self.MQLExpr.create({query: v});
+          },
+
+          compoundSubQueryBody: function(v) {
+            return v.map(s => foam.String.isInstance(s) ? s : s.join('')).join('');
           },
 
           before: function(v) {
