@@ -86,7 +86,6 @@ foam.CLASS({
       String spid = (String) x.get("spid");
       Subject subject = (Subject) x.get("subject");
       AuthService auth = (AuthService) x.get("auth");
-
       if ( subject != null ) {
         user = subject.getUser();
         if ( user != null ) {
@@ -120,15 +119,12 @@ foam.CLASS({
       if ( ! ( obj instanceof ServiceProviderAware ) ) {
         return super.put_(x, obj);
       }
-
       Object id = obj.getProperty("id");
       FObject oldObj = getDelegate().inX(x).find(id);
       boolean isCreate = id == null || oldObj == null;
-
       ServiceProviderAware sp = (ServiceProviderAware) obj;
       ServiceProviderAware oldSp = (ServiceProviderAware) oldObj;
       AuthService auth = (AuthService) x.get("auth");
-
       if ( isCreate ) {
         if ( SafetyUtil.isEmpty(sp.getSpid()) ) {
           sp.setSpid(getSpid(x));
@@ -143,7 +139,6 @@ foam.CLASS({
                   ! auth.check(x, "serviceprovider.read." + sp.getSpid()) ) {
         throw new AuthorizationException();
       }
-
       return super.put_(x, obj);
       `
     },
@@ -163,7 +158,6 @@ foam.CLASS({
            getPredicate(x).f(obj) ) {
         return getDelegate().remove_(x, obj);
       }
-
       throw new AuthorizationException();
       `
     },
