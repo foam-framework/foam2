@@ -301,7 +301,7 @@ foam.CLASS({
             }
           }
         }
-        this.currentMemento = this.memento;
+        this.currentMemento = this.memento.tail;
       }
 
       //fix me
