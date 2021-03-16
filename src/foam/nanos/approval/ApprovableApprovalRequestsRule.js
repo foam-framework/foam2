@@ -21,7 +21,7 @@
     'foam.nanos.approval.Approvable',
     'foam.nanos.approval.ApprovalRequest',
     'foam.nanos.approval.ApprovalStatus',
-    'foam.nanos.ruler.Operations',
+    'foam.nanos.dao.Operation',
   ],
 
   implements: ['foam.nanos.ruler.RuleAction'],
