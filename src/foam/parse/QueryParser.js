@@ -113,7 +113,12 @@ foam.CLASS({
 
           subQuery: alt(sym('compoundSubQuery'), sym('simpleSubQuery')),
 
-          compoundSubQuery: seq1(1, '(', until(')')),
+          compoundSubQuery: seq1(1, '(', sym('compoundSubQueryBody'), ')'),
+
+          compoundSubQueryBody: repeat(alt(
+            seq('(', sym('compoundSubQueryBody'), ')'),
+            notChars(')')
+          )),
 
           simpleSubQuery: seq1(1, '.', until(alt(' ', eof()))),
 
@@ -321,7 +326,11 @@ foam.CLASS({
           },
 
           compoundSubQuery: function(v) {
-            return self.MQLExpr.create({query: v.join('')});
+            return self.MQLExpr.create({query: v});
+          },
+
+          compoundSubQueryBody: function(v) {
+            return v.map(s => foam.String.isInstance(s) ? s : s.join('')).join('');
           },
 
           before: function(v) {
