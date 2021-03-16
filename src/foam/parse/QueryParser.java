@@ -10,6 +10,7 @@ import foam.core.AbstractDatePropertyInfo;
 import foam.core.AbstractEnumPropertyInfo;
 import foam.core.ClassInfo;
 import foam.core.PropertyInfo;
+import foam.lib.json.Whitespace;
 import foam.lib.parse.*;
 import foam.lib.parse.Optional;
 import foam.mlang.Expr;
@@ -161,14 +162,16 @@ public class QueryParser
 
     grammar.addSymbol("EQUALS", new Seq(
       grammar.sym("FIELD_NAME"),
+      Whitespace.instance(),
       new Alt(Literal.create(":"), Literal.create("=")),
+      Whitespace.instance(),
       grammar.sym("VALUE_LIST")
     ));
     grammar.addAction("EQUALS", (val, x) -> {
       Object[] values = (Object[]) val;
       Expr prop = ( Expr ) values[0];
 
-      Object[] value = (Object[]) values[2];
+      Object[] value = (Object[]) values[4];
       if ( value[0] instanceof Date || prop instanceof AbstractDatePropertyInfo) {
 
         And and = new And();
@@ -222,7 +225,7 @@ public class QueryParser
       Or or = new Or();
       Predicate[] vals = new Predicate[value.length];
       for ( int i = 0; i < value.length; i++ ) {
-        Binary binary = values[1].equals("=") ? new Eq() : new Contains();
+        Binary binary = values[2].equals("=") ? new Eq() : new Contains();
         binary.setArg1(prop);
         binary.setArg2(( value[i] instanceof Expr ) ?
           ( Expr ) value[i] : new foam.mlang.Constant (value[i]));
