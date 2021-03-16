@@ -85,9 +85,9 @@ foam.CLASS({
 
       imports: [ 'memento', 'stack' ],
 
-      // exports: [
-        // 'currentMemento_ as memento'
-      // ],
+      exports: [
+        'currentMemento as memento'
+      ],
 
       css: `
         ^title {
@@ -105,7 +105,8 @@ foam.CLASS({
         {
           class: 'foam.u2.ViewSpec',
           name: 'inner'
-        }
+        },
+        'currentMemento'
       ],
 
       methods: [
@@ -336,32 +337,32 @@ foam.CLASS({
         return;
       }
 
-      var x = this.__subContext__.createSubContext({memento: this.memento.tail});
+      var x = this.__subContext__.createSubContext({memento: this.memento});
       x.register(this.DAOUpdateControllerView, 'foam.comics.DAOUpdateControllerView');
       x.register(this.CustomDAOSummaryView,    'foam.comics.v2.DAOSummaryView');
       x.register(this.CustomDAOUpdateView,     'foam.comics.v2.DAOUpdateView');
       x.register(foam.u2.DetailView,           'foam.u2.DetailView');
 
-      var innerView = foam.u2.ViewSpec.createView({
-          class: 'foam.u2.view.AltView',
-          data: this.__context__[m.tail.head],
-          views: [//so we need to initialize this views?? 
-            [
-              {
-                class: this.BrowserView,
-                stack: this.stack
-              },
-              'Controller 1'
-            ],
-            [
-              {
-                class: this.DAOBrowseControllerView,
-                stack: this.stack
-              },
-              'Controller 2'
-            ]
-          ]
-      }, {}, this, this.__subContext__.createSubContext({memento: this.memento.tail}));
+      // var innerView = foam.u2.ViewSpec.createView({
+      //     class: 'foam.u2.view.AltView',
+      //     data: this.__context__[m.tail.head],
+      //     views: [//so we need to initialize this views?? 
+      //       [
+      //         {
+      //           class: this.BrowserView,
+      //           stack: this.stack
+      //         },
+      //         'Controller 1'
+      //       ],
+      //       [
+      //         {
+      //           class: this.DAOBrowseControllerView,
+      //           stack: this.stack
+      //         },
+      //         'Controller 2'
+      //       ]
+      //     ]
+      // }, {}, this, this.__subContext__.createSubContext({memento: this.memento}));
 
       this.stack.push({
         class: this.BackBorder,
