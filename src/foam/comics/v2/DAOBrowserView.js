@@ -261,13 +261,6 @@ foam.CLASS({
       this.onDetach(this.cannedPredicate$.sub(() => {
         this.searchPredicate = foam.mlang.predicate.True.create();
       }));
-
-      if ( this.memento ) {
-        if ( ! this.memento.tail ) {
-          // this.memento.tail = foam.nanos.controller.Memento.create({ head: 'browse' });
-        }
-        this.currentMemento$ = this.memento.tail$;
-      }
     },
     function click(obj, id) {
       if ( ! this.stack ) return;
@@ -282,6 +275,14 @@ foam.CLASS({
       var self = this;
       var filterView;
       var simpleSearch;
+
+      if ( this.memento ) {
+        if ( ! this.memento.tail ) {
+          debugger;
+          this.memento.tail = foam.nanos.controller.Memento.create({ head: 'browse' });
+        }
+        this.currentMemento$ = this.memento.tail$;
+      }
 
       if ( self.config.searchMode === self.SearchMode.SIMPLE ) {
         simpleSearch = foam.u2.ViewSpec.createView(self.SimpleSearch, {
