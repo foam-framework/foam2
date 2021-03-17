@@ -329,7 +329,7 @@ foam.CLASS({
         }
       },  self, self.__subSubContext__.createSubContext({ memento: this.currentMemento }));
 
-      // if ( self.currentMemento ) self.currentMemento = self.currentMemento.tail;
+      if ( self.currentMemento ) self.currentMemento = self.currentMemento.tail;
       
       this.onDetach(this.filterController$.dot('isAdvanced').sub(this.isAdvancedChanged));
       this.addClass(self.myClass())
