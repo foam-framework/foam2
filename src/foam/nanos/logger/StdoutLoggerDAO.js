@@ -27,29 +27,9 @@ foam.CLASS({
       value: true
     },
     {
-      name: 'mode',
-      class: 'Enum',
-      of: 'foam.nanos.app.Mode',
-      value: 'DEVELOPMENT'
-    }
-  ],
-
-  axioms: [
-    {
-      name: 'javaExtras',
-      buildJavaClass: function(cls) {
-        cls.extras.push(foam.java.Code.create({
-          data: `
-  protected static ThreadLocal<foam.util.FastTimestamper> timestamper_ = new ThreadLocal<foam.util.FastTimestamper>() {
-    @Override
-    protected foam.util.FastTimestamper initialValue() {
-      foam.util.FastTimestamper ft = new foam.util.FastTimestamper();
-      return ft;
-    }
-  };
-          `
-        }));
-      }
+      name: 'appConfig',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.app.AppConfig'
     }
   ],
 
@@ -57,18 +37,23 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      LogMessage lm = (LogMessage) getDelegate().put_(x, obj);
+      LogMessage lm = (LogMessage) obj;
       if ( getEnabled() &&
            lm != null ) {
-        // Only write INFO, WARN, ERROR to SYSLOG in production to reduce
-        // burden on syslogd, journald. With our own journal logs we are
-        // effectively writing out logs twice. 
-        if ( getMode() != Mode.PRODUCTION ||
-             lm.getSeverity().getOrdinal() >= LogLevel.INFO.getOrdinal() ) {
-          System.err.println(timestamper_.get().createTimestamp(lm.getCreated().getTime())+","+lm.getThread()+","+lm.getSeverity()+","+lm.getMessage());
+        if ( ( getAppConfig().getMode() != Mode.PRODUCTION &&
+               lm.getSeverity().getOrdinal() == LogLevel.DEBUG.getOrdinal() ) ||
+             lm.getSeverity().getOrdinal() == LogLevel.INFO.getOrdinal() ) {
+          System.out.println(lm.toString());
+        } else if ( lm.getSeverity().getOrdinal() > LogLevel.INFO.getOrdinal() ) {
+          System.err.println(lm.toString());
         }
+        // In PRODUCTION only write to syslogd for performance, no filesystem log
+        if ( getAppConfig().getMode() != Mode.PRODUCTION ) {
+          return getDelegate().put_(x, lm);
+        }
+        return lm;
       }
-      return lm;
+      return getDelegate().put_(x, obj);
       `
     }
   ]

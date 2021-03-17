@@ -62,6 +62,12 @@ foam.CLASS({
       name: 'mode'
     },
     {
+      class: 'Enum',
+      of: 'foam.log.LogLevel',
+      name: 'logLevel',
+      value: 'DEBUG'
+    },
+    {
       class: 'String',
       name: 'appLink',
       value: 'https://www.apple.com/lae/ios/app-store/'
