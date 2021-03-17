@@ -379,9 +379,9 @@ foam.CLASS({
     {
       name: 'runScript',
       code: function() {
-        var log = function() {
+        var log = () => {
           this.output += Array.from(arguments).join('') + '\n';
-        }.bind(this);
+        };
         try {
           with ({ log: log, print: log, x: this.__context__ })
           return Promise.resolve(eval(this.code));
@@ -555,7 +555,7 @@ foam.CLASS({
               this.status = this.ScriptStatus.UNSCHEDULED;
               this.__context__[this.daoKey].put(this);
             },
-            (err) => {
+            (e) => {
               var notification = this.Notification.create();
               notification.userId = this.subject && this.subject.realUser ?
                 this.subject.realUser.id : this.user.id;
@@ -566,8 +566,8 @@ foam.CLASS({
               notification.transient = true;
               this.__subContext__.notificationDAO.put(notification);
 
-              this.output += '\n' + err.stack;
-              console.log(err);
+              this.output += '\n' + e.stack;
+              console.log(e);
               this.status = this.ScriptStatus.ERROR;
               this.__context__[this.daoKey].put(this);
             }

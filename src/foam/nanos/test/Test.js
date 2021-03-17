@@ -50,6 +50,17 @@ foam.CLASS({
   `,
 
   properties: [
+    'id',
+    'enabled',
+    {
+      class: 'String',
+      name: 'testSuite'
+    },
+    {
+      class: 'String',
+      name: 'daoKey',
+      value: 'testDAO'
+    },
     {
       class: 'Long',
       name: 'passed',
@@ -67,15 +78,6 @@ foam.CLASS({
         if ( value ) this.start().style({ color: '#f00' }).add(value).end();
       },
       tableWidth: 85
-    },
-    {
-      class: 'String',
-      name: 'testSuite'
-    },
-    {
-      class: 'String',
-      name: 'daoKey',
-      value: 'testDAO'
     },
     {
       class: 'String',

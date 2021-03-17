@@ -723,7 +723,7 @@ foam.CLASS({
     {
       name: 'cloneProperty',
       value: function(value, cloneMap, opt_X) {
-        cloneMap[this.name] = value && value.clone(opt_X);
+        cloneMap[this.name] = value && value.clone ? value.clone(opt_X) : value;
       }
     }
   ],

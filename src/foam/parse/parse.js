@@ -592,7 +592,7 @@ foam.CLASS({
       var ret = [];
       var p = this.p;
 
-      while ( ps.valid ) {
+      while ( true ) {
         var res;
 
         if ( res = ps.apply(p, obj) ) {

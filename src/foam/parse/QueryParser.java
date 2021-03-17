@@ -6,11 +6,10 @@
 
 package foam.parse;
 
-import foam.core.AbstractDatePropertyInfo;
-import foam.core.AbstractEnumPropertyInfo;
-import foam.core.ClassInfo;
-import foam.core.PropertyInfo;
+import foam.core.*;
+import foam.lib.json.Whitespace;
 import foam.lib.parse.*;
+import foam.lib.parse.Action;
 import foam.lib.parse.Optional;
 import foam.mlang.Expr;
 import foam.mlang.MLang;
@@ -19,6 +18,7 @@ import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
 import foam.util.SafetyUtil;
 
+import java.lang.Exception;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -115,8 +115,8 @@ public class QueryParser
     });
 
     grammar.addSymbol("EXPR", new Alt(grammar.sym("PAREN"),
-      grammar.sym("NEGATE"), grammar.sym("HAS"), grammar.sym("IS"), grammar.sym("EQUALS"),
-      grammar.sym("BEFORE"), grammar.sym("AFTER"), grammar.sym("ID")));
+      grammar.sym("NEGATE"), grammar.sym("HAS"), grammar.sym("IS"),grammar.sym("INSTANCE_OF"),
+      grammar.sym("EQUALS"), grammar.sym("BEFORE"), grammar.sym("AFTER"), grammar.sym("ID")));
 
     grammar.addSymbol("PAREN", new Seq1(1,
       Literal.create("("),
@@ -159,16 +159,37 @@ public class QueryParser
       return predicate;
     });
 
+    grammar.addSymbol("INSTANCE_OF", new Seq1(2,
+      new Alt(Literal.create("instanceof")),
+      Whitespace.instance(),
+      grammar.sym("STRING")
+    ));
+    grammar.addAction("INSTANCE_OF", (val, x) -> {
+      try {
+        Class cls = Class.forName((String) val);
+        FObject clsInstance = (FObject) cls.newInstance();
+        IsInstanceOf instanceOf = new IsInstanceOf();
+        instanceOf.setTargetClass(clsInstance.getClassInfo());
+        return instanceOf;
+      } catch (Exception e) {
+        foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+        logger.warning("failed to parse instanceof query");
+        return null;
+      }
+    });
+
     grammar.addSymbol("EQUALS", new Seq(
       grammar.sym("FIELD_NAME"),
+      Whitespace.instance(),
       new Alt(Literal.create(":"), Literal.create("=")),
+      Whitespace.instance(),
       grammar.sym("VALUE_LIST")
     ));
     grammar.addAction("EQUALS", (val, x) -> {
       Object[] values = (Object[]) val;
       Expr prop = ( Expr ) values[0];
 
-      Object[] value = (Object[]) values[2];
+      Object[] value = (Object[]) values[4];
       if ( value[0] instanceof Date || prop instanceof AbstractDatePropertyInfo) {
 
         And and = new And();
@@ -222,7 +243,7 @@ public class QueryParser
       Or or = new Or();
       Predicate[] vals = new Predicate[value.length];
       for ( int i = 0; i < value.length; i++ ) {
-        Binary binary = values[1].equals("=") ? new Eq() : new Contains();
+        Binary binary = values[2].equals("=") ? new Eq() : new Contains();
         binary.setArg1(prop);
         binary.setArg2(( value[i] instanceof Expr ) ?
           ( Expr ) value[i] : new foam.mlang.Constant (value[i]));
