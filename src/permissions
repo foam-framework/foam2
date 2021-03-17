@@ -42,4 +42,4 @@ p({"class":"foam.nanos.auth.Permission","id":"default.to.theme.spid","descriptio
 p({"class":"foam.nanos.auth.Permission","id":"spid.object.find.*","description":"Permits finding all objects in DAO regardless of their spid"})
 p({"class":"foam.nanos.auth.Permission","id":"spid.object.remove.*","description":"Permits removing objects in a spid aware DAO regardless of their spid"})
 p({"class":"foam.nanos.auth.Permission","id":"spid.object.find.*","description":"Permits finding objects in spid aware DAO regardless of their spid"})
-p({"class":"foam.nanos.auth.Permission","id":"warn.ucj.update","description":"Log when a user with this permission updates a user capability junction."})
+p({"class":"foam.nanos.auth.Permission","id":"usercapabilityjunction.warn.update","description":"Log when a user with this permission updates a user capability junction."})
