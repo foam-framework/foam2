@@ -3903,6 +3903,31 @@ foam.CLASS({
     'java.util.concurrent.ConcurrentHashMap'
   ],
 
+  axioms: [
+    foam.pattern.Multiton.create({property: 'query'}),
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(
+          `
+  protected final static Map map__ = new ConcurrentHashMap();
+  public static MQLExpr create(String query) {
+    MQLExpr p = (MQLExpr) map__.get(query);
+
+    if ( p == null ) {
+      p = new MQLExpr();
+      p.setQuery(query);
+      map__.put(query, p);
+    }
+
+    return p;
+  }
+ `
+        );
+      }
+    }
+  ],
+
   properties: [
     {
       class: 'Map',
@@ -3915,6 +3940,7 @@ foam.CLASS({
       name: 'query'
     }
   ],
+
   methods: [
     {
       name: 'f',
@@ -3961,30 +3987,9 @@ foam.CLASS({
 
         return (foam.mlang.predicate.Nary) ps.value();
       `
-    }
-  ],
-  axioms: [
-    foam.pattern.Multiton.create({property: 'query'}),
-    {
-      name: 'javaExtras',
-      buildJavaClass: function(cls) {
-        cls.extras.push(
-          `
-  protected final static Map map__ = new ConcurrentHashMap();
-  public static MQLExpr create(String query) {
-    MQLExpr p = (MQLExpr) map__.get(query);
-
-    if ( p == null ) {
-      p = new MQLExpr();
-      p.setQuery(query);
-      map__.put(query, p);
-    }
-
-    return p;
-  }
- `
-        );
-      }
+    },
+    function toString() {
+      return '(' + this.query + ')';
     }
   ]
 });

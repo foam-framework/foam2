@@ -16,7 +16,7 @@ foam.CLASS({
     'foam.mlang.sink.Sum',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
-    'foam.nanos.ruler.Operations',
+    'foam.nanos.dao.Operation',
     'foam.util.SafetyUtil',
 
     'static foam.mlang.MLang.*'
@@ -64,7 +64,7 @@ foam.CLASS({
             if (
               request.getStatus() == ApprovalStatus.APPROVED ||
               (
-                request.getStatus() == ApprovalStatus.REJECTED && ((ApprovalRequest) request).getOperation() == Operations.CREATE
+                request.getStatus() == ApprovalStatus.REJECTED && ((ApprovalRequest) request).getOperation() == Operation.CREATE
               )
             ){
               //puts object to its original dao
@@ -106,7 +106,7 @@ foam.CLASS({
         Subject subject = new Subject.Builder(x).setUser(initiatingUser).build();
         X initiatingUserX = x.put("subject", subject);
 
-        if ( ((ApprovalRequest) request).getOperation() == Operations.REMOVE ) {
+        if ( ((ApprovalRequest) request).getOperation() == Operation.REMOVE ) {
           dao.inX(initiatingUserX).remove(found);
         } else {
           dao.inX(initiatingUserX).put(found);

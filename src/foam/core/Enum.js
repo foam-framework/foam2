@@ -339,9 +339,7 @@ foam.CLASS({
     function toSummary() { return this.label; },
     function toStyle() {
       var style = {
-        'display': 'inline-block',
-        'border-radius': '50px',
-        'padding': '4px 12px'
+        'display': 'inline-block'
       };
 
       if ( this.color      ) style.color          = this.color;

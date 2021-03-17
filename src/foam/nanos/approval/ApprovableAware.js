@@ -19,7 +19,7 @@
     'foam.core.PropertyInfo',
     'foam.nanos.logger.Logger',
     'foam.nanos.approval.ApprovableAware',
-    'foam.nanos.ruler.Operations',
+    'foam.nanos.dao.Operation',
     'java.util.Iterator',
     'java.util.ArrayList',
     'java.util.Arrays',
@@ -56,7 +56,7 @@
             args: [
               { name: 'x', type: 'X' },
               { name: 'obj', type: 'FObject' },
-              { name: 'operation', type: 'Operations' }
+              { name: 'operation', type: 'Operation' }
             ],
             body: `
               FObject oldObj = null;
@@ -77,12 +77,12 @@
               }
               
               StringBuilder hash_sb = new StringBuilder(obj.getClass().getSimpleName());
-              if ( operation == Operations.UPDATE && obj instanceof ApprovableAware ) 
+              if ( operation == Operation.UPDATE && obj instanceof ApprovableAware )
                 hash_sb.append(String.valueOf(obj.getProperty("id")));
 
               if ( diff != null ) {
                 // remove ids, timestamps, networkTransient and storageTransient properties for generating the lookup hash
-                if ( operation == Operations.CREATE ) diff.remove("id");
+                if ( operation == Operation.CREATE ) diff.remove("id");
                 diff.remove("created");
                 diff.remove("lastModified");
 
