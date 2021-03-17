@@ -69,7 +69,6 @@ foam.CLASS({
       this.SUPER(tab);
     },
     function setMementoWithSelectedTab() {
-      //fix me
       if ( ! this.updateMemento )
         return;
       if ( this.memento ) {

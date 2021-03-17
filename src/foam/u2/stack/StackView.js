@@ -80,7 +80,7 @@ foam.CLASS({
 
         var v = foam.u2.ViewSpec.createView(view, null, this, X);
         if ( X.memento && v.mementoHead ) {
-          var currMemento = this.data.findCurrentMemento();//X.memento.combine()
+          var currMemento = this.data.findCurrentMemento();
           //we need to check if memento is already set
           //for example when we copy-paste url
 
@@ -91,7 +91,7 @@ foam.CLASS({
             //so the v view mementoHead is X.memento.tail.head
 
             //get rid of this logic
-            if ( this.shouldMementoValueBeChanged(X.ctrl.memento.value, v.mementoHead) ) {//X.memento.combine()contains(v.mementoHead)
+            if ( this.shouldMementoValueBeChanged(X.ctrl.memento.value, v.mementoHead) ) {
               var m = this.Memento.create();
 
               m.value = v.mementoHead;

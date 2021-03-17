@@ -202,7 +202,7 @@ foam.CLASS({
           .start()
             .addClass(this.myClass('container'))
             .callIf(this.data.searchMode === this.SearchMode.FULL, function() {
-              this.start()//create view
+              this.start()
                 .hide(self.data.searchHidden$)
                 .addClass(self.myClass('full-search-container'))
                 .add(reciprocalSearch)

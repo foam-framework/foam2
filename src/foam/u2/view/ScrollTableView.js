@@ -17,7 +17,7 @@
   exports: [
     'as summaryView',
     'dblclick as click',
-    'dblclick',
+    'dblclick'
   ],
 
   requires: [
@@ -268,6 +268,7 @@
             var idFromJSON = foam.json.parseString(mementoHead);
             for ( var key in idFromJSON ) {
               var axiom = this.data.of.getAxiomByName(key);
+
               if ( axiom )
                 axiom.set(id, idFromJSON[key]);
             }

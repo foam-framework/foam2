@@ -304,7 +304,6 @@ foam.CLASS({
         this.currentMemento = this.memento.tail;
       }
 
-      //fix me
       if ( this.currentMemento && this.currentMemento.tail ) {
         var m = this.memento;
         var counter = 0;
@@ -314,7 +313,7 @@ foam.CLASS({
 
           counter++;
 
-          if ( !m || m.head.length == 0 )
+          if ( ! m || m.head.length == 0 )
             continue;
         }
       }
@@ -366,7 +365,7 @@ foam.CLASS({
                         searchView: axiom.searchView,
                         property: axiom,
                         dao: self.dao
-                      },  self, self.__subSubContext__.createSubContext({ memento: self.currentMemento }));//this.currentMemento
+                      },  self, self.__subSubContext__.createSubContext({ memento: self.currentMemento }));
 
                       if ( self.currentMemento ) {
                         self.currentMemento = self.currentMemento.tail;
@@ -375,8 +374,8 @@ foam.CLASS({
                       }
 
                       this.start()
-                      .add(propView)
-                      .hide(self.filterController$.dot('isAdvanced'))
+                        .add(propView)
+                        .hide(self.filterController$.dot('isAdvanced'))
                       .end();
                     }
                   })

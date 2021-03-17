@@ -143,14 +143,12 @@ foam.CLASS({
     },
     
     function getPredicateFromMemento() {
-      //fix me
-      if ( this.memento && this.memento.head.length > 0 ) { //&& f.criteria == 0
+      if ( this.memento && this.memento.head.length > 0 ) {
         var predicate = this.queryParser.parseString(this.memento.head);
         if ( predicate ) {
           return predicate;
         }
       }
-      return null;
     }
   ],
 
