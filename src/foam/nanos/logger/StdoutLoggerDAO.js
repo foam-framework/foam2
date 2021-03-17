@@ -27,9 +27,10 @@ foam.CLASS({
       value: true
     },
     {
-      name: 'appConfig',
-      class: 'FObjectProperty',
-      of: 'foam.nanos.app.AppConfig'
+      name: 'mode',
+      class: 'Enum',
+      of: 'foam.nanos.app.Mode',
+      value: 'DEVELOPMENT'
     }
   ],
 
@@ -40,7 +41,7 @@ foam.CLASS({
       LogMessage lm = (LogMessage) obj;
       if ( getEnabled() &&
            lm != null ) {
-        if ( ( getAppConfig().getMode() != Mode.PRODUCTION &&
+        if ( ( getMode() != Mode.PRODUCTION &&
                lm.getSeverity().getOrdinal() == LogLevel.DEBUG.getOrdinal() ) ||
              lm.getSeverity().getOrdinal() == LogLevel.INFO.getOrdinal() ) {
           System.out.println(lm.toString());
@@ -48,7 +49,7 @@ foam.CLASS({
           System.err.println(lm.toString());
         }
         // In PRODUCTION only write to syslogd for performance, no filesystem log
-        if ( getAppConfig().getMode() != Mode.PRODUCTION ) {
+        if ( getMode() != Mode.PRODUCTION ) {
           return getDelegate().put_(x, lm);
         }
         return lm;

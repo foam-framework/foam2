@@ -1,4 +1,15 @@
 p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"stdoutLoggerDAO",
+  "lazy":false,
+  "serviceScript":"""
+    return new foam.nanos.logger.StdoutLoggerDAO.Builder(x)
+      .setMode(((foam.nanos.app.AppConfig) x.get("appConfig")).getMode())
+      .build();
+  """
+})
+
+p({
   "class":
   "foam.nanos.boot.NSpec",
   "name":"localLogMessageDAO",
@@ -20,9 +31,7 @@ p({
       .setIndex(new foam.core.PropertyInfo[] {foam.nanos.logger.LogMessage.CREATED})
       .setDecorator(new foam.nanos.logger.LogMessageDAO.Builder(x)
           .setDelegate(new foam.nanos.logger.RepeatLogMessageDAO.Builder(x)
-          .setDelegate(new foam.nanos.logger.StdoutLoggerDAO.Builder(x)
-            .setAppConfig((foam.nanos.app.AppConfig) x.get("appConfig"))
-            .build())
+          .setDelegate((foam.dao.DAO) x.get("stdoutLoggerDAO"))
           .build())
         .build())
       .build();
