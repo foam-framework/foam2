@@ -14,7 +14,7 @@ import foam.nanos.auth.AuthorizationDAO;
 import foam.nanos.auth.Authorizer;
 import foam.nanos.auth.User;
 import foam.nanos.bench.Benchmark;
-import foam.nanos.ruler.Operations;
+import foam.nanos.dao.Operation;
 import foam.test.TestUtils;
 
 /**
@@ -33,9 +33,9 @@ public class AuthorizerBenchmark
   protected DAO dao = new MDAO(User.getOwnClassInfo());
   protected Authorizer authorizer;
   protected int recordAmount;
-  protected Operations operation;
+  protected Operation operation;
 
-  public AuthorizerBenchmark(Authorizer authorizer_, int recordAmount_, Operations operation_) {
+  public AuthorizerBenchmark(Authorizer authorizer_, int recordAmount_, Operation operation_) {
     authorizer = authorizer_;
     recordAmount = recordAmount_;
     operation = operation_;
@@ -45,7 +45,7 @@ public class AuthorizerBenchmark
   public void setup(X x) {
     userAuthorizedContext = TestUtils.createTestContext(x, "foam");
 
-    if ( operation != Operations.CREATE ) {
+    if ( operation != Operation.CREATE ) {
       for (int i = 1; i < recordAmount + 1; i++) {
         User user = TestUtils.createTestUser();
         user.setId(i);
@@ -101,10 +101,10 @@ public class AuthorizerBenchmark
 
   @Override
   public void execute(X x) {
-    if ( operation == Operations.READ ) benchmarkOnRead();
-    if ( operation == Operations.CREATE ) benchmarkOnCreate();
-    if ( operation == Operations.UPDATE ) benchmarkOnUpdate();
-    if ( operation == Operations.REMOVE ) benchmarkOnRemove();
+    if ( operation == Operation.READ ) benchmarkOnRead();
+    if ( operation == Operation.CREATE ) benchmarkOnCreate();
+    if ( operation == Operation.UPDATE ) benchmarkOnUpdate();
+    if ( operation == Operation.REMOVE ) benchmarkOnRemove();
   }
 
   @Override
