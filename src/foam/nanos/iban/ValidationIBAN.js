@@ -460,7 +460,7 @@ Columns: validation format, parsing format, example`,
         }
 
         char[] format = ((String) temp[1]).replaceAll(" ","").trim().toCharArray();
-        if ( iban.length() != format.length + 2 ) {
+        if ( iban.length() != format.length ) {
           return null;
         }
 
