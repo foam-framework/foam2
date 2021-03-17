@@ -23,7 +23,7 @@ foam.CLASS({
     async function execute() {
       for ( let wizardlet of this.wizardlets ) {
         wizardlet.getDataUpdateSub().sub(() => {
-          if ( wizardlet.isValid ) wizardlet.save();
+          wizardlet.save();
         })
       }
     }

@@ -642,6 +642,7 @@ FOAM_FILES([
   { name: "foam/u2/crunch/wizardflow/WizardStateAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/SkipGrantedAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/RequirementsPreviewAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/AutoSaveWizardletsAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/StepWizardAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/lite/MaybeDAOPutAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/PutFinalJunctionsAgent", flags: ['web'] },

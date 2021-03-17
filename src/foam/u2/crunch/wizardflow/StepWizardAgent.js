@@ -6,31 +6,6 @@
 
 foam.CLASS({
   package: 'foam.u2.crunch.wizardflow',
-  name: 'AutoSaveWizardletsAgent',
-  documentation: `
-  `,
-
-  imports: [
-    'wizardlets'
-  ],
-
-  implements: [
-    'foam.core.ContextAgent'
-  ],
-
-  methods: [
-    async function execute() {
-      for ( let wizardlet of this.wizardlets ) {
-        wizardlet.getDataUpdateSub().sub(() => {
-          if ( wizardlet.isValid ) wizardlet.save();
-        })
-      }
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.u2.crunch.wizardflow',
   name: 'StepWizardAgent',
 
   implements: [
