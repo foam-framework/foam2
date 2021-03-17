@@ -187,7 +187,7 @@
         }
       }
     },
-    'currentMemento',
+    'currentMemento_',
     {
       class: 'Boolean',
       name: 'isInit'
@@ -221,7 +221,7 @@
             m = m.tail;
           }
         }
-        this.currentMemento = this.memento.tail;
+        this.currentMemento_ = this.memento.tail;
       }
 
 
@@ -235,7 +235,7 @@
         disableUserSelection: this.disableUserSelection,
         multiSelectEnabled: this.multiSelectEnabled,
         selectedObjects$: this.selectedObjects$
-      },  this, this.__subSubContext__.createSubContext({ memento: this.currentMemento ? this.currentMemento.tail : this.currentMemento }));
+      },  this, this.__subSubContext__.createSubContext({ memento: this.currentMemento_ ? this.currentMemento_.tail : this.currentMemento_ }));
       
       if ( ! this.table_.memento || ! this.table_.memento.tail || this.table_.memento.tail.head.length == 0 ) {
         this.
@@ -308,8 +308,8 @@
           delete this.renderedPages_[i];
         });
         this.updateRenderedPages_();
-        if ( this.el() && ! this.isInit && this.currentMemento && this.currentMemento.head.length != 0 ) {
-          var scroll = this.currentMemento.head * this.rowHeight;
+        if ( this.el() && ! this.isInit && this.currentMemento_ && this.currentMemento_.head.length != 0 ) {
+          var scroll = this.currentMemento_.head * this.rowHeight;
           scroll = scroll >= this.rowHeight && scroll < this.scrollHeight ? scroll : 0;
 
           if ( this.childNodes && this.childNodes.length > 0 )
@@ -364,8 +364,8 @@
       isFramed: true,
       code: function(e) {
         this.scrollPos_ = e.target.scrollTop;
-        if ( this.currentMemento ) {
-          this.currentMemento.head = this.scrollPos_ >= this.rowHeight && this.scrollPos_ < this.scrollHeight ? Math.floor( this.scrollPos_  / this.rowHeight) : 0;
+        if ( this.currentMemento_ ) {
+          this.currentMemento_.head = this.scrollPos_ >= this.rowHeight && this.scrollPos_ < this.scrollHeight ? Math.floor( this.scrollPos_  / this.rowHeight) : 0;
         }
       }
     },

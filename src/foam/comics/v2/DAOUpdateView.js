@@ -63,7 +63,7 @@ foam.CLASS({
 
   exports: [
     'controllerMode',
-    'currentMemento as memento'
+    'currentMemento_ as memento'
   ],
 
   messages: [
@@ -100,7 +100,7 @@ foam.CLASS({
         return foam.u2.detail.SectionedDetailView;
       }
     },
-    'currentMemento',
+    'currentMemento_',
     {
       class: 'String',
       name: 'mementoHead',
@@ -157,7 +157,7 @@ foam.CLASS({
       this.SUPER();
 
       if ( this.memento )
-        this.currentMemento$ = this.memento.tail$;
+        this.currentMemento_$ = this.memento.tail$;
 
       this
         .addClass(this.myClass())

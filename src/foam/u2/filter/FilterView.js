@@ -34,7 +34,7 @@ foam.CLASS({
   exports: [
     'as data',
     'filterController',
-    'currentMemento as memento'
+    'currentMemento_ as memento'
   ],
 
   css: `
@@ -280,7 +280,7 @@ foam.CLASS({
         return filterController$isAdvanced ? this.LINK_SIMPLE : this.LINK_ADVANCED;
       }
     },
-    'currentMemento'
+    'currentMemento_'
   ],
 
   methods: [
@@ -301,10 +301,10 @@ foam.CLASS({
             }
           }
         }
-        this.currentMemento = this.memento.tail;
+        this.currentMemento_ = this.memento.tail;
       }
 
-      if ( this.currentMemento && this.currentMemento.tail ) {
+      if ( this.currentMemento_ && this.currentMemento_.tail ) {
         var m = this.memento;
         var counter = 0;
 
@@ -326,9 +326,9 @@ foam.CLASS({
           class: 'foam.u2.tag.Input',
           placeholder: this.LABEL_SEARCH
         }
-      },  self, self.__subSubContext__.createSubContext({ memento: this.currentMemento }));
+      },  self, self.__subSubContext__.createSubContext({ memento: this.currentMemento_ }));
 
-      if ( self.currentMemento ) self.currentMemento = self.currentMemento.tail;
+      if ( self.currentMemento_ ) self.currentMemento_ = self.currentMemento_.tail;
       
       this.onDetach(this.filterController$.dot('isAdvanced').sub(this.isAdvancedChanged));
       this.addClass(self.myClass())
@@ -365,12 +365,12 @@ foam.CLASS({
                         searchView: axiom.searchView,
                         property: axiom,
                         dao: self.dao
-                      },  self, self.__subSubContext__.createSubContext({ memento: self.currentMemento }));
+                      },  self, self.__subSubContext__.createSubContext({ memento: self.currentMemento_ }));
 
-                      if ( self.currentMemento ) {
-                        self.currentMemento = self.currentMemento.tail;
-                        if ( self.currentMemento.tail == null )
-                          self.currentMemento.tail = foam.nanos.controller.Memento.create();
+                      if ( self.currentMemento_ ) {
+                        self.currentMemento_ = self.currentMemento_.tail;
+                        if ( self.currentMemento_.tail == null )
+                          self.currentMemento_.tail = foam.nanos.controller.Memento.create();
                       }
 
                       this.start()

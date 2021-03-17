@@ -268,7 +268,7 @@ foam.CLASS({
         return foam.nanos.approval.NoBackStack.create({delegate: this.stack});
       },
     },
-    'currentMemento'
+    'currentMemento_'
   ],
 
   methods: [
@@ -320,7 +320,7 @@ foam.CLASS({
     async function initE() {
       var view = this;
 
-      this.currentMemento = null;
+      this.currentMemento_ = null;
 
 
       //set memento's selected columns

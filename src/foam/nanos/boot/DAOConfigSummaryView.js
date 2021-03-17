@@ -86,7 +86,7 @@ foam.CLASS({
       imports: [ 'memento', 'stack' ],
 
       exports: [
-        'currentMemento as memento'
+        'currentMemento_ as memento'
       ],
 
       css: `
@@ -106,7 +106,7 @@ foam.CLASS({
           class: 'foam.u2.ViewSpec',
           name: 'inner'
         },
-        'currentMemento'
+        'currentMemento_'
       ],
 
       methods: [
@@ -114,7 +114,7 @@ foam.CLASS({
           this.SUPER();
 
           if ( this.memento )
-            this.currentMemento$ = this.memento.tail$;
+            this.currentMemento_$ = this.memento.tail$;
 
           this.
             start().

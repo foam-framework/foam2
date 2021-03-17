@@ -215,7 +215,7 @@ foam.CLASS({
         };
       }
     },
-    'currentMemento'
+    'currentMemento_'
   ],
 
   actions: [
@@ -280,7 +280,7 @@ foam.CLASS({
         if ( ! this.memento.tail ) {
           this.memento.tail = foam.nanos.controller.Memento.create({ head: 'browse' });
         }
-        this.currentMemento$ = this.memento.tail$;
+        this.currentMemento_$ = this.memento.tail$;
       }
 
       if ( self.config.searchMode === self.SearchMode.SIMPLE ) {

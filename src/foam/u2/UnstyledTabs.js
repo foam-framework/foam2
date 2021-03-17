@@ -30,14 +30,14 @@ foam.CLASS({
       name: 'updateMemento',
       class: 'Boolean'
     },
-    'currentMemento'
+    'currentMemento_'
   ],
 
   methods: [
     function init() {
 
       if ( this.memento )
-        this.currentMemento$ = this.memento.tail$;
+        this.currentMemento_$ = this.memento.tail$;
       this.
         addClass(this.myClass()).
         start('div', null, this.tabRow$).
@@ -72,9 +72,9 @@ foam.CLASS({
       if ( ! this.updateMemento )
         return;
       if ( this.memento ) {
-        if ( ! this.currentMemento )
-          this.currentMemento = foam.nanos.controller.Memento.create();
-        this.currentMemento.head = this.selected.label;
+        if ( ! this.currentMemento_ )
+          this.currentMemento_ = foam.nanos.controller.Memento.create();
+        this.currentMemento_.head = this.selected.label;
       }
     }
   ]

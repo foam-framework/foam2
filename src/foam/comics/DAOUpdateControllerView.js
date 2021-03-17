@@ -112,7 +112,7 @@ foam.CLASS({
       of: 'foam.u2.Element',
       name: 'detailViewElement_'
     },
-    'currentMemento',
+    'currentMemento_',
     {
       class: 'String',
       name: 'mementoHead',
@@ -129,7 +129,7 @@ foam.CLASS({
     function initE() {
 
       if ( this.memento )
-        this.currentMemento$ = this.memento.tail$;
+        this.currentMemento_$ = this.memento.tail$;
 
       /* Doesn't work because obj isn't known yet.
       this.startContext({data: this.data.obj})
