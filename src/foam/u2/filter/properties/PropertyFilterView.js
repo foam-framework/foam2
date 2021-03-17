@@ -170,6 +170,7 @@ foam.CLASS({
         }
       }
     },
+    
     function getPredicateFromMemento() {
       if ( this.memento && this.memento.head.length > 0 ) { //&& f.criteria == 0
         var predicate = this.queryParser.parseString(this.property.name + '=' + this.memento.head);
@@ -198,11 +199,7 @@ foam.CLASS({
 
       // Restore the search view using an existing predicate for that view
       // This requires that every search view implements restoreFromPredicate
-      var existingPredicate = this.filterController.getExistingPredicate(this.criteria, this.property);//here memento head
-
-      // if ( ! existingPredicate && this.memento && this.memento.length != 0 ) {
-
-      // }
+      var existingPredicate = this.filterController.getExistingPredicate(this.criteria, this.property);
 
       if ( existingPredicate ) {
         this.view_.restoreFromPredicate(existingPredicate);

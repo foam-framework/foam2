@@ -1,4 +1,4 @@
- /**
+/**
  * @license
  * Copyright 2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -141,6 +141,7 @@ foam.CLASS({
       if ( predicate )
         this.checkbox.data = true;
     },
+    
     function getPredicateFromMemento() {
       //fix me
       if ( this.memento && this.memento.head.length > 0 ) { //&& f.criteria == 0

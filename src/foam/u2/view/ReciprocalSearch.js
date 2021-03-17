@@ -188,7 +188,7 @@ foam.CLASS({
               focused: true
             }
           }, this, this.__subContext__.createSubContext({ memento: this.memento.tail }));
-          var slot = self.SimpleSlot.create({ value: searchView });//
+          var slot = self.SimpleSlot.create({ value: searchView });
 
           e.start()
             .tag(slot)

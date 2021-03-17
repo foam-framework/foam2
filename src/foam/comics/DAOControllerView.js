@@ -147,11 +147,6 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-
-      if ( this.memento ) {
-        // this.currentMemento_$ = this.memento.tail$;
-      }
-
       var summaryViewParent;
 
       var reciprocalSearch =  foam.u2.ViewSpec.createView({
@@ -162,7 +157,7 @@ foam.CLASS({
       var searchView = foam.u2.ViewSpec.createView({
         class: 'foam.u2.view.SimpleSearch',
         data$: this.data.predicate$
-      },  {}, self, reciprocalSearch.__subContext__);//refactoring candidate
+      },  {}, self, reciprocalSearch.__subContext__);
 
       if (this.data.searchMode === this.SearchMode.FULL) {
         summaryViewParent = reciprocalSearch;
@@ -176,8 +171,6 @@ foam.CLASS({
         multiSelectEnabled: !! this.data.relationship,
         selectedObjects$: this.data.selectedObjects$
       }, {}, summaryViewParent);
-
-      
 
       this.currentMemento_ = summaryView.memento;
 

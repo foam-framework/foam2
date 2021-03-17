@@ -109,7 +109,6 @@ foam.CLASS({
 
       if ( m && m.tail ) {
         m.tail$.set(null);
-        return;
       }
     },
     function findCurrentMemento() {

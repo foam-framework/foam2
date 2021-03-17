@@ -127,15 +127,6 @@ foam.CLASS({
           }
           return 'view::' + id;
         }
-        // if ( ! this.memento || ! this.memento.tail )
-        //   return 'view::' + this.idOfRecord;
-
-        // //this creates bug on url being set to edit
-        // if ( this.memento.tail.head == 'edit' ) {
-        //   this.memento.tail.head = 'view';
-        //   return null;
-        // }
-        // return this.idOfRecord;
       }
     },
     'idOfRecord'
@@ -176,7 +167,7 @@ foam.CLASS({
           class:  'foam.comics.v2.DAOUpdateView',
           data:   this.data,
           config: this.config,
-          of:     this.config.of,
+          of:     this.config.of
         }, this.__subContext__);
       }
     },
@@ -260,7 +251,7 @@ foam.CLASS({
         // counter < 2 is as at this point we need to skip 2 memento
         // head of first one will be column selection
         // and second will be DAOSummaryView mode
-        while( m.tail != null && counter < 2 ) {
+        while ( m.tail != null && counter < 2 ) {
           m = m.tail;
           counter++;
         }

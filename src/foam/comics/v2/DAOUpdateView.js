@@ -109,25 +109,6 @@ foam.CLASS({
           return 'edit::' + this.data.id;
       }
     }
-    // {
-    //   class: 'String',
-    //   name: 'mementoHead',
-    //   getter: function() {
-    //     if ( ! this.memento )//fix me
-    //       return null;
-    //     if ( this.memento.head === 'view' ) {
-    //       this.memento.head = 'edit';
-    //       return null;
-    //     }
-    //     if ( this.memento.head === 'edit' ) {
-    //       this.memento.head = 'edit';
-    //       return null;
-    //     }
-    //     if ( this.data.id )
-    //       return 'edit::' + this.data.id;
-    //     return null;
-    //   }
-    // }
   ],
 
   actions: [

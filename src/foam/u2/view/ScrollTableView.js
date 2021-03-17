@@ -18,7 +18,6 @@
     'as summaryView',
     'dblclick as click',
     'dblclick',
-    // 'memento'
   ],
 
   requires: [
@@ -205,56 +204,9 @@
     function init() {
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.updateCount })));
       this.updateCount();
-
-      // if ( this.memento )
-      //   this.currentMemento = this.memento.tail;//temp
     },
 
     function initE() {
-      // if currentMemento is not null then there is some table 
-      //config's happening
-
-      // if ( this.currentMemento ) {
-      //   var mementoHead = this.currentMemento.head;
-
-      //   var of = this.data.of || this.config.of;
-      //   var createMemento = this.memento.findMementoTail('create');
-      //   if ( createMemento && of ) {
-      //     this.stack.push({
-      //       class: 'foam.comics.v2.DAOCreateView',
-      //       data: ((this.config.factory && this.config.factory$cls) ||  this.data.of).create({ mode: 'create'}, this),
-      //       config$: this.config$,
-      //       of: of
-      //     }, this.__subContext__.createSubContext({ memento: createMemento }));
-      //     return;
-      //   }
-      //   var viewMemento = this.memento.findMementoTail('view') || this.memento.findMementoTail('edit');
-      //   if ( viewMemento && viewMemento.tail && of ) {
-      //     var id = viewMemento.tail.mementoHead;
-      //     if ( of ) {
-      //       if ( ! foam.core.MultiPartID.isInstance(of.ID) ) {
-      //         id = of.ID.fromString(id);
-      //       } else {
-      //         id = of.ID.of.create();
-      //         mementoHead = '{' + mementoHead.replaceAll('=', ':') + '}';
-      //         var idFromJSON = foam.json.parseString(viewMemento.tail.mementoHead);
-      //         for ( var key in idFromJSON ) {
-      //           var axiom = of.ID.of.getAxiomByName(key);
-      //           if ( axiom )
-      //             axiom.set(id, idFromJSON[key]);
-      //         }
-      //       }
-      //     }
-      //     this.stack.push({
-      //       class: 'foam.comics.v2.DAOSummaryView',
-      //       data: null,
-      //       config: this.config,
-      //       idOfRecord: id
-      //     }, this.__subContext__.createSubContext({ memento: viewMemento }));
-      //     return;
-      //   }
-      // }
-
       if ( this.memento ) {
         //as there two settings to configure for table scroll and columns params
         //scroll setting which setts the record to which table currently scrolled
@@ -315,7 +267,7 @@
             mementoHead = '{' + this.table_.memento.tail.tail.head.replaceAll('=', ':') + '}';
             var idFromJSON = foam.json.parseString(mementoHead);
             for ( var key in idFromJSON ) {
-              var axiom = this.data.of.getAxiomByName(key);//of.ID.of.getAxiomByName(key);
+              var axiom = this.data.of.getAxiomByName(key);
               if ( axiom )
                 axiom.set(id, idFromJSON[key]);
             }

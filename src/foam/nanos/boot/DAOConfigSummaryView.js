@@ -128,7 +128,7 @@ foam.CLASS({
               add(' / ', this.title).
             end().
             tag(this.inner);
-          }
+        }
       ]
     }
   ],
@@ -292,7 +292,6 @@ foam.CLASS({
               .on('click', function() {
                 if ( self.memento ) {
                   var tail = self.Memento.create({ head: spec.id, tail: self.Memento.create() });
-                  // self.currentMemento_ = self.memento.tail;
                   self.memento.tail$.set(tail);
                 }
               });
@@ -319,9 +318,6 @@ foam.CLASS({
       });
 
       if ( this.memento ) {
-        // if ( ! this.memento.tail ) {
-        //   this.memento.tail = self.Memento.create();
-        // }
         this.onDetach(this.memento.tail$.sub(this.mementoChange));
       }
       this.mementoChange(true);
@@ -342,27 +338,6 @@ foam.CLASS({
       x.register(this.CustomDAOSummaryView,    'foam.comics.v2.DAOSummaryView');
       x.register(this.CustomDAOUpdateView,     'foam.comics.v2.DAOUpdateView');
       x.register(foam.u2.DetailView,           'foam.u2.DetailView');
-
-      // var innerView = foam.u2.ViewSpec.createView({
-      //     class: 'foam.u2.view.AltView',
-      //     data: this.__context__[m.tail.head],
-      //     views: [//so we need to initialize this views?? 
-      //       [
-      //         {
-      //           class: this.BrowserView,
-      //           stack: this.stack
-      //         },
-      //         'Controller 1'
-      //       ],
-      //       [
-      //         {
-      //           class: this.DAOBrowseControllerView,
-      //           stack: this.stack
-      //         },
-      //         'Controller 2'
-      //       ]
-      //     ]
-      // }, {}, this, this.__subContext__.createSubContext({memento: this.memento}));
 
       this.stack.push({
         class: this.BackBorder,

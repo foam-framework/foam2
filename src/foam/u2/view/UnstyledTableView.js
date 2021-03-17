@@ -31,7 +31,7 @@ foam.CLASS({
     'hoverSelection',
     'selection',
     'subStack as stack',
-    'memento'//currentMemento as 
+    'memento'
   ],
 
   imports: [
@@ -41,7 +41,7 @@ foam.CLASS({
     'filteredTableColumns?',
     'memento',
     'selection? as importSelection',
-    'stack?',
+    'stack?'
   ],
 
   constants: [
