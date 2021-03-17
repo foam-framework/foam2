@@ -90,11 +90,11 @@ foam.CLASS({
         this.VerticalDetailView,
         'foam.u2.detail.SectionedDetailView'
       );
-      return this.SectionView.create({
+      return  this.SectionView.create({
         section: this.section,
-        data$: this.data$,
+        data$: this.wizardlet.data$,
         ...opt_spec
-      }, ctx)
+      }, ctx);
     }
   ],
 });

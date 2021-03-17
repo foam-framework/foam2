@@ -27,7 +27,7 @@ foam.CLASS({
     }
 
     ^rightside {
-      --actionBarTbPadding: 32px;
+      --actionBarTbPadding: 13px;
       --buttonHeight: 38px;
       --actionBarHeight: calc(
         2*var(--actionBarTbPadding) + var(--buttonHeight));
@@ -43,8 +43,6 @@ foam.CLASS({
     }
 
     ^rightside ^actions {
-      position: absolute;
-      bottom: 0;
       padding: 0 var(--lrPadding);
       padding-top: var(--actionBarTbPadding);
       text-align: right;

@@ -20,7 +20,9 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'obj'
+      name: 'obj',
+      class: 'FObjectProperty',
+      of: 'foam.core.FObject'
     },
     {
       name: 'parentRefs',
@@ -47,7 +49,8 @@ foam.CLASS({
     function init() {
       this.onDetach(this.cleanup);
       var debug_updateCalls = 0;
-      var update = (obj, parentRefs) => {
+      var update = function (obj, parentRefs) {
+        console.log('one of these called');
         debug_updateCalls++;
         if ( parentRefs.includes(obj) ) {
           this.cleanup();
@@ -56,12 +59,10 @@ foam.CLASS({
         this.value = { obj: obj, cause: this.obj$ };
         this.subToProps_(obj);
       };
-      this.delegate = this.ExpressionSlot.create({
-        args: [ this.obj$, this.parentRefs$ ],
-        code: update,
-        obj:  this
-      });
-      update(this.obj, this.parentRefs);
+      // this.slot(update);
+      this.obj$.sub(() => { update.call(this, this.obj, this.parentRefs); });
+      this.parentRefs$.sub(() => { update.call(this, this.obj, this.parentRefs); });
+      update.call(this, this.obj, this.parentRefs);
     },
     function set() { /* nop */ },
     function subToProps_(o) {
