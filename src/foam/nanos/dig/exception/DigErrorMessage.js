@@ -23,6 +23,9 @@ foam.CLASS({
           public DigErrorMessage(String message, Throwable cause) {
             super(message, cause);
             setMessage(message);
+            if ( cause instanceof foam.core.Exception ) {
+              setInner((foam.core.Exception) cause);
+            }
           }
         `
         );
@@ -54,6 +57,11 @@ foam.CLASS({
     {
       class: 'String',
       name: 'moreInfo'
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'inner',
+      of: 'foam.core.Exception'
     }
   ],
 
