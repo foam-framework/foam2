@@ -90,7 +90,6 @@ foam.CLASS({
             //X.memento.head is parent view head
             //so the v view mementoHead is X.memento.tail.head
 
-            //get rid of this logic
             if ( this.shouldMementoValueBeChanged(X.ctrl.memento.value, v.mementoHead) ) {
               var m = this.Memento.create();
 
@@ -108,7 +107,7 @@ foam.CLASS({
       if ( ! mementoValue )
         return false;
 
-      return ! mementoValue.includes(mementoHead);
+      return ! decodeURI(mementoValue).includes(mementoHead);
     }
   ]
 });

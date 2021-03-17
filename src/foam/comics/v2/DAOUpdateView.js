@@ -105,8 +105,13 @@ foam.CLASS({
       class: 'String',
       name: 'mementoHead',
       getter: function() {
-        if ( this.data.id )
-          return 'edit::' + this.data.id;
+        if ( this.data.id ) {
+          var id = '' + this.data.id;
+          if ( id && foam.core.MultiPartID.isInstance(this.data.cls_.ID) ) {
+            id = id.substr(1, id.length - 2).replaceAll(':', '=');
+          }
+          return 'edit::' + id;
+        }
       }
     }
   ],
