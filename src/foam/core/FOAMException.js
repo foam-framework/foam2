@@ -12,8 +12,8 @@ foam.CLASS({
   javaGenerateConvenienceConstructor: false,
 
   javaImports: [
-    'foam.i18n.TranslationService',
     'foam.core.X',
+    'foam.i18n.TranslationService',
     'foam.nanos.auth.Subject'
   ],
   

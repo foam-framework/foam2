@@ -29,6 +29,11 @@ foam.ENUM({
       name: 'CREATE_OR_UPDATE',
       label: 'Create/Update',
       documentation: 'Operation applied on dao.put'
+    },
+    {
+      name: 'READ',
+      label: 'read',
+      documentation: 'Operation applied on dao.read'
     }
   ]
 });
