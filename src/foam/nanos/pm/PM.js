@@ -100,9 +100,7 @@ foam.CLASS({
       name: 'getTime',
       type: 'Long',
       javaCode: `
-    long t = getEndTime() - getStartTime();
-    if ( t < 0 ) return 0L; // occurs when timing between physical instances.
-    return t;
+    return Math.max(0, getEndTime() - getStartTime());
       `
     },
     {
