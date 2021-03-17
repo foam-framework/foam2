@@ -328,7 +328,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
     AuthService auth = (AuthService) x.get("auth");
     if (
-      auth.check(x, "warn.ucj.update")
+      auth.check(x, "usercapabilityjunction.warn.update")
       && subject.getRealUser() != subject.getUser()
     ) {
       var logger = (Logger) x.get("logger");
