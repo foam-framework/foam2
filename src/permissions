@@ -34,7 +34,7 @@ p({"class":"foam.nanos.auth.Permission","id":"user.rw.onboarded","description":"
 p({"class":"foam.nanos.auth.Permission","id":"service.userCapabilityJunctionDAO","description":""})
 p({"class":"foam.nanos.auth.Permission","id":"ucj.addPermission","description":"Permission to add a UCJ, if not UCJ owner."})
 p({"class":"foam.nanos.auth.Permission","id":"usercapabilityjunction.read.*","description":"Permission to read usercapabilityjunction"})
-p({"class":"foam.nanos.auth.Permission","id":"usercapabilityjunction.create.*","description":"Permission to create usercapabilityjunction"})
+p({"class":"foam.nanos.auth.Permission","id":"usercapabilityjunction.create","description":"Permission to create usercapabilityjunction"})
 p({"class":"foam.nanos.auth.Permission","id":"usercapabilityjunction.update.*","description":"Permission to update usercapabilityjunction"})
 p({"class":"foam.nanos.auth.Permission","id":"menu.read.admin.googleApiCredentials","description":""})
 p({"class":"foam.nanos.auth.Permission","id":"data.import.googleSheets","description":""})
