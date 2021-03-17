@@ -96,7 +96,7 @@ foam.CLASS({
       }
       if ( SafetyUtil.isEmpty(spid) ||
            user != null &&
-           auth.check(x, "default.to.theme.spid") &&
+           auth.check(x, "spid.default.theme") &&
            SafetyUtil.isEmpty(user.getSpid()) ) {
         Theme theme = ((Themes) x.get("themes")).findTheme(x);
         if ( theme != null &&
@@ -145,7 +145,7 @@ foam.CLASS({
     {
       name: 'find_',
       javaCode: `
-      if ( ((AuthService) x.get("auth")).check(x, "spid.obj.find.*") ) {
+      if ( ((AuthService) x.get("auth")).check(x, "serviceprovider.read.*") ) {
         return getDelegate().find_(x, id);
       }
       return getDelegate().where(getPredicate(x)).find_(x, id);
@@ -154,7 +154,7 @@ foam.CLASS({
     {
       name: 'remove_',
       javaCode: `
-      if ( ((AuthService) x.get("auth")).check(x, "spid.obj.remove.*") ||
+      if ( ((AuthService) x.get("auth")).check(x, "serviceprovider.remove.*") ||
            getPredicate(x).f(obj) ) {
         return getDelegate().remove_(x, obj);
       }
@@ -165,7 +165,7 @@ foam.CLASS({
       name: 'select_',
       javaCode: `
       Predicate spidPredicate = predicate;
-      if ( ! ((AuthService) x.get("auth")).check(x, "spid.obj.find.*") ) {
+      if ( ! ((AuthService) x.get("auth")).check(x, "serviceprovider.read.*") ) {
         try {
           spidPredicate = getPredicate(x);
         } catch ( AuthorizationException e ) {
