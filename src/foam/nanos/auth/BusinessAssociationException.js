@@ -15,17 +15,21 @@ foam.CLASS({
     'foam.core.X'
   ],
 
+  messages: [
+    { name: 'BUSINESS_ASSOCIATION_EXCEPTION', message: 'There was an issue associating the business to the user' },
+  ],
+
   axioms: [
     {
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
   public BusinessAssociationException() {
-    super("There was an issue associating the business to the user");
+    super(BUSINESS_ASSOCIATION_EXCEPTION);
   }
 
   public BusinessAssociationException(X x) {
-    super(x, "There was an issue associating the business to the user");
+    super(x, BUSINESS_ASSOCIATION_EXCEPTION);
   }
 
         `);

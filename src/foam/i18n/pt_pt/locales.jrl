@@ -398,7 +398,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.ResetPassword.PA
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.ResetPassword.PASSWORD_NOT_MATCH",target:"As senhas não coincidem"})
 
 //Exceptions
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.LoginException",target:"Conta bloqueada. Entre em contato com o atendimento ao cliente."})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.AccountLockedException",target:"Conta bloqueada. Entre em contato com o atendimento ao cliente."})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UnknowUserException",target:"usuário não encontrado"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.BusinessAssociationException",target:"Houve um problema ao associar a empresa ao usuário"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.BusinessSignInException",target:"Ocorreu um problema ao iniciar sessão na empresa recém-criada. Vá para o menu de mudança de empresa nos seus menus pessoais para entrar na sua empresa."})

@@ -307,7 +307,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/BusinessAssociationException" },
   { name: "foam/nanos/auth/BusinessSignInException" },
   { name: "foam/nanos/auth/BusinessValidationException" },
-  { name: "foam/nanos/auth/LoginException" },
+  { name: "foam/nanos/auth/AccountLockedException" },
   { name: "foam/nanos/auth/UnknowUserException" },
   { name: "foam/nanos/auth/EnabledAware" },
   { name: "foam/nanos/auth/ServiceProviderAware" },

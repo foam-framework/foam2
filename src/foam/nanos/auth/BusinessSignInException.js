@@ -15,17 +15,22 @@ foam.CLASS({
     'foam.core.X'
   ],
 
+  messages: [
+    { name: 'BUSINESS_SIGN_EXCEPTION', message: 'There was an issue signing in to the newly created business, Please go to the switch business menu in your personal menus to sign in to your business.' },
+  ],
+
+
   axioms: [
     {
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
   public BusinessSignInException() {
-    super("There was an issue signing in to the newly created business, Please go to the switch business menu in your personal menus to sign in to your business.");
+    super(BUSINESS_SIGN_EXCEPTION);
   }
 
   public BusinessSignInException(X x) {
-    super(x, "There was an issue signing in to the newly created business, Please go to the switch business menu in your personal menus to sign in to your business.");
+    super(x, BUSINESS_SIGN_EXCEPTION);
   }
 
         `);

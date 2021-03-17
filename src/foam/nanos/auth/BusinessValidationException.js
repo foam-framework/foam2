@@ -15,17 +15,21 @@ foam.CLASS({
     'foam.core.X'
   ],
 
+  messages: [
+    { name: 'BUSINESS_VALIDATION_EXCEPTION', message: 'There was an issue creating the business' },
+  ],
+
   axioms: [
     {
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
   public BusinessValidationException() {
-    super("There was an issue creating the business");
+    super(BUSINESS_VALIDATION_EXCEPTION);
   }
 
   public BusinessValidationException(X x) {
-    super(x, "There was an issue creating the business");
+    super(x, BUSINESS_VALIDATION_EXCEPTION);
   }
 
         `);

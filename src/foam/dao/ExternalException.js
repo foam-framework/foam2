@@ -18,6 +18,5 @@
 foam.CLASS({
   package: 'foam.dao',
   name: 'ExternalException',
-  implements: ['foam.core.Exception'],
   extends: 'foam.core.FOAMException'
 });

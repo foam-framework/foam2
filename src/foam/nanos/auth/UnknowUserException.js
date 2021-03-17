@@ -15,13 +15,17 @@ foam.CLASS({
     'foam.core.X'
   ],
 
+  messages: [
+    { name: 'USER_MISSING', message: 'User not found' },
+  ],
+
   axioms: [
     {
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
   public UnknowUserException() {
-    super("User not found");
+    super(USER_MISSING);
   }
 
         `);
