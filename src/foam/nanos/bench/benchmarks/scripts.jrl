@@ -1,47 +1,64 @@
 p({
 	"class": "foam.nanos.script.Script",
-	"id": "benchmarkConfigurableAuthorizer",
-	"description": "Benchmark Configurable Authorizer",
+	"id": "BenchmarkStandardAuthorizer",
+	"description": "Benchmark Standard Authorizer can be used as a reference when benchmarking authorizers.",
 	"code": `
 		import foam.nanos.bench.*;
 		import foam.nanos.bench.benchmarks.*;
+    import foam.nanos.dao.Operation;
 
 		x = x.put("pmLogger", null);
-		b = new ConfigurableAuthorizerBenchmark(false, false, 0);
+		authorizer = new foam.nanos.auth.StandardAuthorizer("user");
+		b = new AuthorizerBenchmark(x, authorizer, 100, Operation.READ);
 		builder = new BenchmarkRunner.Builder(x)
 			.setInvocationCount(1)
-      .setThreadCount(3)
-			.setReverseThreads(true)
 			.setBenchmark(b)
 			.build();
 		builder.execute(x);
 
-		b = new ConfigurableAuthorizerBenchmark(true, true, 0);
+		b = new AuthorizerBenchmark(x, authorizer, 100, Operation.UPDATE);
 		builder = new BenchmarkRunner.Builder(x)
 			.setInvocationCount(1)
-      .setThreadCount(3)
-			.setReverseThreads(true)
 			.setBenchmark(b)
 			.build();
 		builder.execute(x);
 
-		b = new ConfigurableAuthorizerBenchmark(true, false, 5);
-	  builder = new BenchmarkRunner.Builder(x)
-			.setInvocationCount(1)
-			.setBenchmark(b)
-      .setThreadCount(3)
-			.setReverseThreads(true)
-			.build();
-		builder.execute(x);
-
-		b = new ConfigurableAuthorizerBenchmark(true, false, 100);
+		b = new AuthorizerBenchmark(x, authorizer, 100, Operation.CREATE);
 		builder = new BenchmarkRunner.Builder(x)
 			.setInvocationCount(1)
 			.setBenchmark(b)
-      .setThreadCount(3)
-			.setReverseThreads(true)
 			.build();
 		builder.execute(x);
+
+		b = new AuthorizerBenchmark(x, authorizer, 100, Operation.REMOVE);
+		builder = new BenchmarkRunner.Builder(x)
+			.setInvocationCount(1)
+			.setBenchmark(b)
+			.build();
+		builder.execute(x);
+	`
+})
+
+p({
+	"class": "foam.nanos.script.Script",
+	"id": "BenchmarkConfigurableAuthorizer",
+	"description": "Benchmark Configurable Authorizer.",
+	"code": `
+import foam.nanos.bench.*;
+import foam.nanos.bench.benchmarks.*;
+import foam.nanos.dao.Operation;
+import foam.nanos.bench.*;
+import foam.nanos.bench.benchmarks.*;
+import foam.nanos.dao.Operation;
+
+x = x.put("pmLogger", null);
+b = new ConfigurableAuthorizerBenchmark(x, null, 10, Operation.READ);
+builder = new BenchmarkRunner.Builder(x)
+  .setInvocationCount(1000)
+  .setBenchmark(b)
+  .build();
+
+builder.execute(x);
 	`
 })
 

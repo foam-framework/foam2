@@ -60,6 +60,10 @@ foam.INTERFACE({
           javaType: 'foam.lib.parse.ParserContext'
         }
       ]
+    },
+    {
+      name: 'pos',
+      type: 'int'
     }
   ]
 });

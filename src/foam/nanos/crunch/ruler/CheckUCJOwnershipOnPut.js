@@ -19,6 +19,7 @@ foam.CLASS({
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
+    'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.UserCapabilityJunction'
   ],
 
@@ -35,12 +36,21 @@ foam.CLASS({
             User user = subject.getUser();
             User realUser = subject.getRealUser();
 
-            boolean isOwner = ucj.getSourceId() == user.getId() || ucj.getSourceId() == realUser.getId();
-            if ( isOwner ) return;
-
             // TODO: check permission for global UCJ updates instead?
             if ( user.isAdmin() ) return;
 
+            boolean isOwner = ucj.getSourceId() == user.getId() || ucj.getSourceId() == realUser.getId();
+            if ( isOwner ) return;
+
+            if ( ucj instanceof AgentCapabilityJunction &&
+                 ((AgentCapabilityJunction) ucj).getEffectiveUser() == user.getId() ) {
+              return;
+            }
+            foam.nanos.logger.Logger logger = (foam.nanos.logger.Logger) x.get("logger");
+            logger.error(this.getClass().getSimpleName(), "Cannot add UserCapabilityJunction. Not an admin or owner. - subject", subject);
+            logger.error(this.getClass().getSimpleName(), "Cannot add UserCapabilityJunction. Not an admin or owner. - user", user);
+            logger.error(this.getClass().getSimpleName(), "Cannot add UserCapabilityJunction. Not an admin or owner. - realUser", realUser);
+            logger.error(this.getClass().getSimpleName(), "Cannot add UserCapabilityJunction. Not an admin or owner. - ucj", ucj);
             throw new AuthorizationException("Cannot add UserCapabilityJunction. Not an admin or owner.");
           }
         }, "");

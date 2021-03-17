@@ -98,7 +98,7 @@ foam.CLASS({
     ^ .foam-u2-tag-Select {
       width: 100%;
       box-shadow: none;
-      background: #ffffff url('images/dropdown-icon.svg') no-repeat 99% 50%;
+      background: #ffffff url('/images/dropdown-icon.svg') no-repeat 99% 50%;
       -webkit-appearance: none;
       cursor: pointer;
     }
@@ -264,7 +264,7 @@ foam.CLASS({
                 .callIf(prop.help, function() {
                   this.start()
                     .addClass(self.myClass('tooltip'))
-                    .start({class: 'foam.u2.tag.Image', data: 'images/question-icon.svg'})
+                    .start({class: 'foam.u2.tag.Image', data: '/images/question-icon.svg'})
                       .addClass(self.myClass('helper-icon'))
                     .end()
 
@@ -292,7 +292,7 @@ foam.CLASS({
                       .show(errorSlot)
                       .start({
                         class: 'foam.u2.tag.Image',
-                        data: 'images/inline-error-icon.svg',
+                        data: '/images/inline-error-icon.svg',
                         displayHeight: '16px',
                         displayWidth: '16px'
                       })

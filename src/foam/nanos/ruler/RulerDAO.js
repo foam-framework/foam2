@@ -27,10 +27,11 @@ foam.CLASS({
     'foam.mlang.predicate.Predicate',
     'foam.mlang.sink.GroupBy',
     'foam.nanos.auth.ServiceProviderAwareSupport',
+    'foam.nanos.dao.Operation',
     'foam.util.SafetyUtil',
-    'java.util.stream.Collectors',
     'java.util.List',
     'java.util.Map',
+    'java.util.stream.Collectors',
     'static foam.mlang.MLang.*'
   ],
 
@@ -50,8 +51,8 @@ foam.CLASS({
       name: 'createBefore',
       javaFactory: `return AND(
   OR(
-    EQ(Rule.OPERATION, Operations.CREATE),
-    EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+    EQ(Rule.OPERATION, Operation.CREATE),
+    EQ(Rule.OPERATION, Operation.CREATE_OR_UPDATE)
   ),
   EQ(Rule.AFTER, false)
 );`
@@ -62,8 +63,8 @@ foam.CLASS({
       name: 'createAfter',
       javaFactory: `return AND(
   OR(
-    EQ(Rule.OPERATION, Operations.CREATE),
-    EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+    EQ(Rule.OPERATION, Operation.CREATE),
+    EQ(Rule.OPERATION, Operation.CREATE_OR_UPDATE)
   ),
   EQ(Rule.AFTER, true)
 );`
@@ -74,8 +75,8 @@ foam.CLASS({
       name: 'updateBefore',
       javaFactory: `return AND(
   OR(
-    EQ(Rule.OPERATION, Operations.UPDATE),
-    EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+    EQ(Rule.OPERATION, Operation.UPDATE),
+    EQ(Rule.OPERATION, Operation.CREATE_OR_UPDATE)
   ),
   EQ(Rule.AFTER, false)
 );`
@@ -86,8 +87,8 @@ foam.CLASS({
       name: 'updateAfter',
       javaFactory: `return AND(
   OR(
-    EQ(Rule.OPERATION, Operations.UPDATE),
-    EQ(Rule.OPERATION, Operations.CREATE_OR_UPDATE)
+    EQ(Rule.OPERATION, Operation.UPDATE),
+    EQ(Rule.OPERATION, Operation.CREATE_OR_UPDATE)
   ),
   EQ(Rule.AFTER, true)
 );`
@@ -97,7 +98,7 @@ foam.CLASS({
       of: 'foam.mlang.predicate.Predicate',
       name: 'removeBefore',
       javaFactory: `return AND(
-  EQ(Rule.OPERATION, Operations.REMOVE),
+  EQ(Rule.OPERATION, Operation.REMOVE),
   EQ(Rule.AFTER, false)
 );`
     },
@@ -106,7 +107,7 @@ foam.CLASS({
       of: 'foam.mlang.predicate.Predicate',
       name: 'removeAfter',
       javaFactory: `return AND(
-  EQ(Rule.OPERATION, Operations.REMOVE),
+  EQ(Rule.OPERATION, Operation.REMOVE),
   EQ(Rule.AFTER, true)
 );`
     },

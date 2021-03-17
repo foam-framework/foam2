@@ -185,6 +185,9 @@ foam.CLASS({
 
   documentation: 'Matches the literal EOF of the input stream, useful if you want to force your grammar to only succeed if it consumes the entire input.',
 
+  axioms: [ foam.pattern.Singleton.create() ],
+
+
   methods: [
     function parse(ps) {
       return ps.valid ? undefined : ps;
@@ -589,7 +592,7 @@ foam.CLASS({
       var ret = [];
       var p = this.p;
 
-      while ( ps.valid ) {
+      while ( true ) {
         var res;
 
         if ( res = ps.apply(p, obj) ) {

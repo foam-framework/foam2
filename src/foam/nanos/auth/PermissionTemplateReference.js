@@ -44,7 +44,7 @@ foam.CLASS({
     {
       class: 'Enum',
       name: 'operation',
-      of: 'foam.nanos.ruler.Operations',
+      of: 'foam.nanos.dao.Operation',
       documentation: `Reference operation type of permission. Includes read, update and remove.`
     },
     {

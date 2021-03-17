@@ -30,7 +30,7 @@ foam.CLASS({
   'foam.dao.DAO',
   'foam.dao.Sink',
   'foam.mlang.predicate.Predicate',
-  'foam.nanos.ruler.Operations',
+  'foam.nanos.dao.Operation',
   'foam.nanos.session.Session',
   'java.util.ArrayList',
   'java.util.List',
@@ -71,7 +71,7 @@ foam.CLASS({
       ],
       documentation: `Construct permission from permission template reference.`,
       javaCode: `
-        String permission = getDAOKey() + "." + ((Operations) permissionTemplate.getOperation()).getLabel();
+        String permission = getDAOKey() + "." + ((Operation) permissionTemplate.getOperation()).getLabel();
         for (PermissionTemplateProperty templateProperty : permissionTemplate.getProperties()) {
           String propertyName = templateProperty.getPropertyReference();
             permission += templateProperty.getImpliesValue() ?
@@ -141,12 +141,12 @@ foam.CLASS({
       name: 'createStandardAuthorizationTemplate',
       type: 'PermissionTemplateReference',
       args: [
-        { type: 'Operations', name: 'op' }
+        { type: 'Operation', name: 'op' }
       ],
       javaCode: `
         PermissionTemplateReference template = new PermissionTemplateReference();
         template.setOperation(op);
-        if ( op != Operations.CREATE ) {
+        if ( op != Operation.CREATE ) {
           PermissionTemplateProperty templateProperties = new PermissionTemplateProperty();
           templateProperties.setPropertyReference("id");
           template.setProperties(new PermissionTemplateProperty[] { templateProperties } );
@@ -159,14 +159,17 @@ foam.CLASS({
       type: 'Void',
       args: [
         { type: 'X', name: 'x' },
-        { type: 'Operations', name: 'op' },
+        { type: 'Operation', name: 'op' },
         { type: 'FObject', name: 'obj' }
       ],
       documentation: `Check if user permissions match any of the template and object constructed permissions`,
       javaCode:  `
         AuthService authService = (AuthService) x.get("auth");
         Map<String,List> cache = (Map<String,List>) getTemplateCache(x);
-        List<PermissionTemplateReference> templates = new ArrayList<PermissionTemplateReference>(cache.get(getDAOKey()));
+        List<PermissionTemplateReference> templates = new ArrayList<PermissionTemplateReference>();
+        if ( cache.get(getDAOKey()) != null ) {
+          templates.addAll(cache.get(getDAOKey()));
+        }
         if ( getEnableStandardAuthorizer() ) {
           templates.add(createStandardAuthorizationTemplate(op));
         }
@@ -179,25 +182,25 @@ foam.CLASS({
     {
       name: 'authorizeOnCreate',
       javaCode: `
-        checkPermissionTemplates(x, Operations.CREATE, obj);
+        checkPermissionTemplates(x, Operation.CREATE, obj);
       `
     },
     {
       name: 'authorizeOnRead',
       javaCode: `
-        checkPermissionTemplates(x, Operations.READ, obj);
+        checkPermissionTemplates(x, Operation.READ, obj);
       `
     },
     {
       name: 'authorizeOnUpdate',
       javaCode: `
-        checkPermissionTemplates(x, Operations.UPDATE, oldObj);
+        checkPermissionTemplates(x, Operation.UPDATE, oldObj);
       `
     },
     {
       name: 'authorizeOnDelete',
       javaCode:`
-        checkPermissionTemplates(x, Operations.REMOVE, obj);
+        checkPermissionTemplates(x, Operation.REMOVE, obj);
       `
     },
     {

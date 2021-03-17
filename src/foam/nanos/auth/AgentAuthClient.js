@@ -10,8 +10,8 @@ foam.CLASS({
   extends: 'foam.nanos.auth.ProxyAuthService',
 
   documentation: `
-    AgentAuthService client side decorator. When user call agentAuth.actAs(), it assign 
-    the business to users, and then purge caches.
+    AgentAuthService client side decorator. When user call agentAuth.actAs(),
+    it assigns new subject (user and agent) on success, and then purges caches.
   `,
 
   imports: [
@@ -25,7 +25,7 @@ foam.CLASS({
     async function actAs(x, user) {
       let result = await this.delegate.actAs(x, user);
       if ( result ) {
-        await this.ctrl.fetchSubject();
+        this.subject = result;
         await this.ctrl.fetchGroup();
         this.menuDAO.cmd_(x, foam.dao.CachingDAO.PURGE);
         this.menuDAO.cmd_(x, foam.dao.AbstractDAO.RESET_CMD);

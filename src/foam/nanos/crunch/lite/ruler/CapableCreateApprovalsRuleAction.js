@@ -26,7 +26,7 @@ foam.CLASS({
     'foam.comics.v2.userfeedback.UserFeedback',
     'foam.comics.v2.userfeedback.UserFeedbackException',
     'foam.comics.v2.userfeedback.UserFeedbackStatus',
-    'foam.nanos.ruler.Operations',
+    'foam.nanos.dao.Operation',
     'foam.nanos.auth.Subject',
     'java.util.Map',
     'java.util.ArrayList',
@@ -110,7 +110,7 @@ foam.CLASS({
               DAO approvalRequestDAO = (DAO) getX().get("approvalRequestDAO");
               DAO approvableDAO = (DAO) getX().get("approvableDAO");
 
-              Operations operation = Operations.CREATE;
+              Operation operation = Operation.CREATE;
 
               String hashedId = new StringBuilder("d")
                 .append(capableObj.getDAOKey())

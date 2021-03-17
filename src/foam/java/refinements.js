@@ -1520,15 +1520,16 @@ foam.CLASS({
      function createJavaPropertyInfo_(cls) {
        var info = this.SUPER(cls);
        var m = info.getMethod('cast');
-      m.body = `
+       m.body = `
         try {
           if ( o instanceof Number ) {
             return new java.util.Date(((Number) o).longValue());
-          } else if ( o instanceof String ) {
-            return (java.util.Date) fromString((String) o);
-          } else {
-            return (java.util.Date) o;
           }
+          if ( o instanceof String ) {
+            o = (java.util.Date) fromString((String) o);
+          }
+          // TODO(Minsun): convert the Date to be Noon time in its timezone
+          return (java.util.Date) o;
         } catch ( Throwable t ) {
           throw new RuntimeException(t);
         }`;

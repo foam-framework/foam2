@@ -368,7 +368,7 @@ foam.CLASS({
 
         await self.fetchSubject();
 
-        await self.maybeReinstallLanguage(client)
+        await self.maybeReinstallLanguage(client);
         self.languageInstalled.resolve();
 
         // add user and agent for backward compatibility

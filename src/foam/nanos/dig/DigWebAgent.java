@@ -90,7 +90,8 @@ public class DigWebAgent extends ContextAwareSupport
   public boolean redirectToLogin(X x) {
     HttpServletRequest req = x.get(HttpServletRequest.class);
     String methodName = req.getMethod();
-    if ( "get".equalsIgnoreCase(methodName) ) {
+    if ( "get".equalsIgnoreCase(methodName)
+      && req.getHeader("Authorization") == null ) {
       return true;
     }
     return false;

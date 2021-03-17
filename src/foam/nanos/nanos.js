@@ -57,6 +57,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/DayOfWeek" },
   { name: "foam/nanos/auth/Hours" },
   { name: "foam/nanos/auth/Address" },
+  { name: "foam/nanos/auth/AgentJunctionStatus" },
   { name: "foam/nanos/auth/DeletedAware" },
   { name: "foam/nanos/auth/DeletedAwareDAOTest" },
   { name: "foam/nanos/auth/PasswordPolicy" },
@@ -255,6 +256,7 @@ FOAM_FILES([
   { name: "foam/nanos/test/TestBorder" },
   { name: "foam/nanos/cron/Cron" },
   { name: "foam/nanos/cron/CronSchedule" },
+  { name: "foam/nanos/cron/CronScheduler" },
   { name: "foam/nanos/cron/CronScheduleDAO" },
   { name: "foam/nanos/cron/IntervalSchedule" },
   { name: "foam/nanos/cron/NeverSchedule" },
@@ -338,6 +340,7 @@ FOAM_FILES([
   { name: "foam/nanos/http/HttpParameters" },
   { name: 'foam/nanos/http/SendErrorHandler' },
   { name: "foam/nanos/http/DefaultHttpParameters" },
+  { name: "foam/nanos/dao/Operation" },
   { name: "foam/nanos/doc/DocumentationView" },
   { name: 'foam/nanos/demo/relationship/CourseType' },
   { name: 'foam/nanos/demo/relationship/Course' },
@@ -394,7 +397,6 @@ FOAM_FILES([
 
   // foam/nanos/ruler
   { name: "foam/nanos/ruler/RuleGroup" },
-  { name: "foam/nanos/ruler/Operations" },
   { name: "foam/nanos/ruler/FindRuledCommand" },
   { name: "foam/nanos/ruler/Ruled" },
   { name: "foam/nanos/ruler/Rule" },
