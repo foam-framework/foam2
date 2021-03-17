@@ -18,7 +18,8 @@ foam.CLASS({
     'stack',
     'user',
     'menuDAO',
-    'memento'
+    'memento',
+    'translationService'
   ],
 
   requires: [
@@ -32,8 +33,7 @@ foam.CLASS({
     { name: 'FOOTER_LINK', message: 'Create an account' },
     { name: 'SUB_FOOTER_LINK', message: 'Forgot password?' },
     { name: 'ERROR_MSG', message: 'There was an issue logging in' },
-    { name: 'ERROR_MSG2', message: 'Please enter email or username' },
-    { name: 'ERROR_MSG3', message: 'User not found' }
+    { name: 'ERROR_MSG2', message: 'Please enter email or username' }
   ],
 
   properties: [
@@ -145,17 +145,11 @@ foam.CLASS({
             }
           ).catch(
             err => {
-              if (err.message == "User not found") {
-                this.ctrl.add(this.NotificationMessage.create({
-                  message: this.ERROR_MSG3,
-                  type: this.LogLevel.ERROR
-                }));
-              } else {
-                this.ctrl.add(this.NotificationMessage.create({
-                  message: err.message || this.ERROR_MSG,
-                  type: this.LogLevel.ERROR
-                }));
-              }
+              let message = err.message ? this.translationService.getTranslation(foam.locale, `${err.data.id}`, err.message) : this.ERROR_MSG
+              this.ctrl.add(this.NotificationMessage.create({
+                message: message,
+                type: this.LogLevel.ERROR
+              }));
           });
         } else {
           this.ctrl.add(this.NotificationMessage.create({

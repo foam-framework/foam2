@@ -12,7 +12,9 @@ foam.CLASS({
   javaGenerateConvenienceConstructor: false,
 
   javaImports: [
-    'foam.i18n.TranslationService'
+    'foam.i18n.TranslationService',
+    'foam.core.X',
+    'foam.nanos.auth.Subject'
   ],
   
   axioms: [
@@ -38,18 +40,16 @@ foam.CLASS({
     getHostname();
   }
 
-  public FOAMException(String message, String id, String locale) {
+  public FOAMException(X x, String message) {
     super(message);
-    TranslationService ts = (TranslationService) foam.core.XLocator.get().get("translationService");
-    String translation_message = ts.getTranslation(locale, id, message);
+    String translation_message = getTranslation(x, message);
     setMessage_(translation_message);
     getHostname();
   }
 
-  public FOAMException(String message, String id, String locale, Throwable cause) {
+  public FOAMException(X x, String message, Throwable cause ) {
     super(message, cause);
-    TranslationService ts = (TranslationService) foam.core.XLocator.get().get("translationService");
-    String translation_message = ts.getTranslation(locale, id, message);
+    String translation_message = getTranslation(x, message);
     setMessage_(translation_message);
     getHostname();
   }
@@ -88,6 +88,24 @@ foam.CLASS({
         return super.getMessage();
       }
       return msg;
+      `
+    },
+    {
+      name: 'getTranslation',
+      type: 'String',
+      args: [
+        { name: 'x',      type: 'Context' },
+        { name: 'message', type: 'String' },
+      ],
+      javaCode: `
+      TranslationService ts = (TranslationService) foam.core.XLocator.get().get("translationService");
+      Subject subject = (foam.nanos.auth.Subject) foam.core.XLocator.get().get("subject");
+      if (subject.getRealUser() == null) {
+        return message;
+      }
+      String locale = ((foam.nanos.auth.User) subject.getRealUser()).getLanguage().getCode().toString();
+      String t_msg = ts.getTranslation(locale, getClassInfo().getId(), message);
+      return t_msg;
       `
     },
     {
