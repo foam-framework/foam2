@@ -1,4 +1,15 @@
 p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"stdoutLoggerDAO",
+  "lazy":false,
+  "serviceScript":"""
+    return new foam.nanos.logger.StdoutLoggerDAO.Builder(x)
+      .setMode(((foam.nanos.app.AppConfig) x.get("appConfig")).getMode())
+      .build();
+  """
+})
+
+p({
   "class":
   "foam.nanos.boot.NSpec",
   "name":"localLogMessageDAO",
@@ -18,11 +29,9 @@ p({
         .setSize(100000)
         .build())
       .setIndex(new foam.core.PropertyInfo[] {foam.nanos.logger.LogMessage.CREATED})
-      .setDecorator(new foam.nanos.logger.StdoutLoggerDAO.Builder(x)
-        .setMode(((foam.nanos.app.AppConfig) x.get("appConfig")).getMode())
-        .setDelegate(new foam.nanos.logger.LogMessageDAO.Builder(x)
+      .setDecorator(new foam.nanos.logger.LogMessageDAO.Builder(x)
           .setDelegate(new foam.nanos.logger.RepeatLogMessageDAO.Builder(x)
-            .build())
+          .setDelegate((foam.dao.DAO) x.get("stdoutLoggerDAO"))
           .build())
         .build())
       .build();
@@ -51,7 +60,27 @@ p({
   "class":"foam.nanos.boot.NSpec",
   "name":"logLevelFilterLogger",
   "lazy":false,
-  "service":{"class":"foam.nanos.logger.LogLevelFilterLogger"}
+  "serviceScript":"""
+    import foam.log.LogLevel;
+    import foam.nanos.app.AppConfig;
+    import foam.nanos.app.Mode;
+    import foam.nanos.logger.ProxyLogger;
+    import foam.nanos.logger.LogLevelFilterLogger;
+    ProxyLogger logLevelFilterLogger = new LogLevelFilterLogger();
+    logLevelFilterLogger.setX(x);
+    AppConfig app = (AppConfig) x.get("appConfig");
+    if ( app.getLogLevel() == LogLevel.INFO ) {
+      logLevelFilterLogger.setLogDebug(false);
+    } else if ( app.getLogLevel() == LogLevel.WARN ) {
+      logLevelFilterLogger.setLogDebug(false);
+      logLevelFilterLogger.setLogInfo(false);
+    } else if ( app.getLogLevel() == LogLevel.ERROR ) {
+      logLevelFilterLogger.setLogDebug(false);
+      logLevelFilterLogger.setLogInfo(false);
+      logLevelFilterLogger.setLogWarn(false);
+    }
+    return logLevelFilterLogger;
+  """
 })
 
 p({
@@ -59,23 +88,12 @@ p({
   "name":"logger",
   "lazy":false,
   "serviceScript":"""
-    import foam.nanos.app.AppConfig;
-    import foam.nanos.app.Mode;
     import foam.nanos.logger.ProxyLogger;
     import foam.nanos.logger.LogLevelFilterLogger;
     import foam.nanos.logger.DAOLogger;
-    ProxyLogger logLevelFilterLogger = (ProxyLogger) x.get("logLevelFilterLogger");
-    logLevelFilterLogger.setX(x);
-    AppConfig app = (AppConfig) x.get("appConfig");
-    if ( app.getMode() == Mode.TEST ) {
-      logLevelFilterLogger.setLogDebug(false);
-    }
-    if ( app.getMode() == Mode.PRODUCTION ) {
-      logLevelFilterLogger.setLogDebug(false);
-      logLevelFilterLogger.setLogInfo(false);
-    }
     DAOLogger daoLogger = new DAOLogger(x);
     daoLogger.setDelegate((foam.dao.DAO) x.get("localLogMessageDAO"));
+    ProxyLogger logLevelFilterLogger = (ProxyLogger) x.get("logLevelFilterLogger");
     logLevelFilterLogger.setDelegate(daoLogger);
     return logLevelFilterLogger;
   """
