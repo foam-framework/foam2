@@ -15,7 +15,6 @@ foam.CLASS({
     { name: 'ACCOUNT_LOCK', message: 'Account locked. Please contact customer service.' },
   ],
 
-
   axioms: [
     {
       name: 'javaExtras',
