@@ -29,6 +29,25 @@ foam.CLASS({
     'message'
   ],
 
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data: `
+  protected static ThreadLocal<foam.util.FastTimestamper> timestamper_ = new ThreadLocal<foam.util.FastTimestamper>() {
+    @Override
+    protected foam.util.FastTimestamper initialValue() {
+      foam.util.FastTimestamper ft = new foam.util.FastTimestamper();
+      return ft;
+    }
+  };
+          `
+        }));
+      }
+    }
+  ],
+
   properties: [
     {
       name: 'hostname',
@@ -126,5 +145,14 @@ foam.CLASS({
     //   view: { class: 'foam.u2.view.PreView' },
     //   updateVisibility: 'RO'
     // }
+  ],
+
+  methods: [
+    {
+      name: 'toString',
+      javaCode: `
+      return timestamper_.get().createTimestamp(getCreated().getTime())+","+getThread()+","+getSeverity()+","+getMessage();
+      `
+    }
   ]
 });
