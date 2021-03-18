@@ -13,13 +13,12 @@ foam.CLASS({
   "Takes a views property which should be the value of an array containing arrays that contain desired views, and label." +
   "Ex. views: [[ { class: 'foam.u2.view.TableView' }, 'Table' ]]",
 
-  imports: [
-    'memento'
-  ],
+  imports: [ 'memento' ],
+
+  requires: [ 'foam.u2.view.RadioView' ],
 
   css: `
-    ^ { margin: auto; }
-    ^ select { height: 26px }
+    ^ { margin: auto; width: 100%; }
   `,
 
   properties: [
@@ -34,7 +33,7 @@ foam.CLASS({
     {
       name: 'selectedView',
       view: function(_, X) {
-        return foam.u2.view.ChoiceView.create({choices: X.data.views}, X);
+        return X.data.RadioView.create({choices: X.data.views, isHorizontal: true, columns: 8}, X);
       },
       documentation: `Set one of the views as the selectedView.
 
@@ -91,9 +90,9 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      if ( this.memento && this.memento.paramsObj.sV )
+      if ( this.memento && this.memento.paramsObj.sV ) {
         this.selectedView = this.memento.paramsObj.sV;
-      else {
+      } else {
         self.setMementoWithSelectedView();
       }
 
@@ -117,13 +116,13 @@ foam.CLASS({
 
   actions: [
     function setMementoWithSelectedView() {
-      if ( ! this.memento )
-        return;
+      if ( ! this.memento ) return;
       var view = this.views.find(v => v[0] == this.selectedView);
-      if ( view )
+      if ( view ) {
         this.memento.paramsObj.sV = view[1];
-      else
+      } else {
         delete this.memento.paramsObj.sV;
+      }
 
       this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
     }

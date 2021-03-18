@@ -11,7 +11,7 @@ foam.CLASS({
 
   requires: [
     'foam.core.FObjectProperty',
-    'foam.u2.view.FnFormatter',
+    'foam.u2.view.FnFormatter'
   ],
 
   properties: [
@@ -119,9 +119,7 @@ foam.CLASS({
       tags: ['web'],
       generateJava: false,
       name: 'tableHeaderFormatter',
-      value: function(axiom) {
-        this.add(axiom.label);
-      }
+      value: function(axiom) { this.add(axiom.label); }
     }
   ]
 });
@@ -211,6 +209,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'StringArrayTableCellFormatterRefinement',
@@ -225,6 +224,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2.view',
@@ -242,6 +242,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2.view',

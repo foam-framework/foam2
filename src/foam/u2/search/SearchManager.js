@@ -151,11 +151,6 @@ foam.CLASS({
               searches.push({ name: key, criteria: 0, pred: outputter.stringify(this.views[key].predicate) });
             }
           }
-          if ( searches.length > 0 ) {
-            this.memento.paramsObj.f = searches;
-          } else {
-            delete this.memento.paramsObj.f;
-          }
           
           this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
         }

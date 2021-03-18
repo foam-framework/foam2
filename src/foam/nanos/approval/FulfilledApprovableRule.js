@@ -25,7 +25,7 @@
     'foam.nanos.approval.ApprovalStatus',
     'foam.nanos.auth.LifecycleState',
     'foam.nanos.auth.LifecycleAware',
-    'foam.nanos.ruler.Operations',
+    'foam.nanos.dao.Operation',
     'foam.nanos.auth.Subject',
     'java.util.Map'
   ],
@@ -45,7 +45,7 @@
 
             FObject objectToPut;
 
-            if ( approvable.getOperation() == Operations.CREATE ){
+            if ( approvable.getOperation() == Operation.CREATE ){
               try {
                 objectToPut =  (FObject) approvable.getOf().newInstance();
               } catch ( Exception e ){
@@ -53,7 +53,7 @@
               }
               LifecycleAware lifecycleAwareObject = (LifecycleAware) objectToPut;
               lifecycleAwareObject.setLifecycleState(LifecycleState.ACTIVE);
-            } else if ( approvable.getOperation() == Operations.UPDATE ){
+            } else if ( approvable.getOperation() == Operation.UPDATE ){
               FObject currentObjInDao = dao.find(approvable.getObjId());
               objectToPut = currentObjInDao.fclone();
             } else {

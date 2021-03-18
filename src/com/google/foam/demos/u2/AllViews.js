@@ -273,6 +273,16 @@ foam.CLASS({
       name: 'choiceView',
       view: {
         class: 'foam.u2.view.ChoiceView',
+        size: 10,
+        choices: ['Yes', 'No', 'Maybe']
+      }
+    },
+    {
+      class: 'String',
+      name: 'choiceViewWithSize',
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+        size: 3,
         choices: ['Yes', 'No', 'Maybe']
       }
     },
@@ -345,6 +355,15 @@ foam.CLASS({
     {
       class: 'Date',
       name: 'defaultDate'
+    },
+    {
+      class: 'Date',
+      name: 'dateRWAndRO',
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: 'foam.u2.DateView',
+        viewb: {class: 'foam.u2.DateView', mode: foam.u2.DisplayMode.RO}
+      }
     },
     {
       class: 'DateTime',

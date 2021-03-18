@@ -694,6 +694,11 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.AbstractPredicate',
   abstract: true,
 
+  javaImports:[
+    'foam.core.PropertyInfo',
+    'foam.mlang.Constant'
+  ],
+
   documentation: 'Abstract Binary (two-argument) Predicate base-class.',
 
   properties: [
@@ -715,21 +720,11 @@ foam.CLASS({
         return value;
       },
       javaPreSet: `
-        // Temporary Fix
-        if ( val instanceof foam.mlang.Constant ) {
-
-          foam.mlang.Constant c = (foam.mlang.Constant) val;
+        if ( val instanceof Constant && getArg1() instanceof PropertyInfo ) {
+          Constant c = (Constant) val;
           Object value = c.getValue();
-
-          // TODO: add castObject() method to PropertyInfo and use instead
-          if ( getArg1() instanceof foam.core.AbstractLongPropertyInfo ) {
-            foam.core.PropertyInfo prop1 = (foam.core.PropertyInfo) getArg1();
-            if ( value instanceof String ) {
-              c.setValue(Long.valueOf((String) value));
-            } else if ( value instanceof Number ) {
-              c.setValue(((Number) value).longValue());
-            }
-          }
+          PropertyInfo prop = (PropertyInfo) getArg1();
+          c.setValue(prop.castObject(value));
         }
       `
     }
@@ -997,7 +992,7 @@ return this;`
           throw new Error( 'Predicate\'s argument does not support toMQL' );
         var mql = this.args[a].toMQL();
         if ( mql )
-          mqlStringsArr.push(mql); 
+          mqlStringsArr.push(mql);
       }
       return mqlStringsArr.join(' OR ');
     }
@@ -1258,7 +1253,7 @@ return this;`
           throw new Error( 'Predicate\'s argument does not support toMQL' );
         var mql = this.args[a].toMQL();
         if ( mql )
-          mqlStringsArr.push(mql); 
+          mqlStringsArr.push(mql);
       }
       return mqlStringsArr.join(' AND ');
     }
@@ -1483,6 +1478,7 @@ foam.CLASS({
   documentation: 'Binary predicate that accepts an array in "arg2".',
 
   javaImports: [
+    'foam.core.PropertyInfo',
     'foam.mlang.ArrayConstant',
     'foam.mlang.Constant',
     'java.util.List'
@@ -1511,7 +1507,21 @@ foam.CLASS({
         }
 
         return value;
-      }
+      },
+      javaPreSet: `
+        if ( val instanceof Constant && getArg1() instanceof PropertyInfo ) {
+          Object[] valArr;
+          if ( ((Constant) val).getValue() instanceof List ) {
+            valArr = ((List)((Constant) val).getValue()).toArray();
+          } else {
+            valArr = (Object[]) ((Constant) val).getValue();
+          }
+          for ( int i = 0; i < valArr.length; i++ ) {
+            PropertyInfo prop = (PropertyInfo) getArg1();
+            valArr[i] = prop.castObject(valArr[i]);
+          }
+        }
+      `
     },
     {
       // TODO: simpler to make an expression
@@ -2029,7 +2039,7 @@ return FOAM_utils.equals(v1, v2)
     function toMQL() {
       var arg2 = this.arg2ToMQL();
       if ( ! arg2 )
-        return null; 
+        return null;
       return this.arg1.name + '=' + arg2;
     }
   ]
@@ -2094,7 +2104,7 @@ foam.CLASS({
     function toMQL() {
       var arg2 = this.arg2ToMQL();
       if ( ! arg2 )
-        return null; 
+        return null;
       return this.arg1.name + '<' + arg2;
     }
   ]
@@ -2125,7 +2135,7 @@ foam.CLASS({
     function toMQL() {
       var arg2 = this.arg2ToMQL();
       if ( ! arg2 )
-        return null; 
+        return null;
       return this.arg1.name + '<=' + arg2;
     }
   ]
@@ -2156,7 +2166,7 @@ foam.CLASS({
     function toMQL() {
       var arg2 = this.arg2ToMQL();
       if ( ! arg2 )
-        return null; 
+        return null;
       return this.arg1.name + '>' + arg2;
     }
   ]
@@ -2187,7 +2197,7 @@ foam.CLASS({
     function toMQL() {
       var arg2 = this.arg2ToMQL();
       if ( ! arg2 )
-        return null; 
+        return null;
       return this.arg1.name + '>=' + arg2;
     }
   ]
@@ -2905,7 +2915,7 @@ foam.CLASS({
               Object[]  arr = (Object[]) p.get(i);
               ClassInfo ci  = (ClassInfo) arr[CLS_OR_OBJ_INDEX];
               Object    o   = ci.newInstance();
-  
+
               for ( int j = 0 ; j < es.length ; j++ ) {
                 if ( es[j] instanceof PropertyInfo ) {
                   PropertyInfo e = (PropertyInfo) es[j];
@@ -2915,7 +2925,7 @@ foam.CLASS({
                   e.set(o, arr[i]);
                 }
               }
-  
+
               a.set(i, o);
             } catch (Throwable t) {}
           } else {
@@ -3715,6 +3725,7 @@ foam.CLASS({
     'foam.mlang.predicate.StartsWithIC',
     'foam.mlang.predicate.EndsWith',
     'foam.mlang.predicate.True',
+    'foam.mlang.predicate.MQLExpr',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Explain',
     'foam.mlang.sink.GroupBy',
@@ -3819,7 +3830,8 @@ foam.CLASS({
     function THEN_BY(a, b) { return this.ThenBy.create({head: a, tail: b}); },
 
     function INSTANCE_OF(cls) { return this.IsInstanceOf.create({ targetClass: cls }); },
-    function CLASS_OF(cls) { return this.IsClassOf.create({ targetClass: cls }); }
+    function CLASS_OF(cls) { return this.IsClassOf.create({ targetClass: cls }); },
+    function MQL(mql) { return this.MQLExpr.create({query: mql}); }
   ]
 });
 
@@ -3865,6 +3877,119 @@ foam.CLASS({
       javaCode: `
         return getRegExp().matcher(getArg1().f(obj).toString()).matches();
       `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'MQLExpr',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: `Stores mql query as a property and converts it into predicate when f() is called.`,
+
+  javaImports: [
+    'foam.core.ClassInfo',
+    'foam.core.FObject',
+    'foam.lib.parse.PStream',
+    'foam.lib.parse.ParserContext',
+    'foam.lib.parse.ParserContext',
+    'foam.lib.parse.ParserContextImpl',
+    'foam.lib.parse.StringPStream',
+    'foam.mlang.Constant',
+    'foam.parse.QueryParser',
+    'java.util.Map',
+    'java.util.concurrent.ConcurrentHashMap'
+  ],
+
+  axioms: [
+    foam.pattern.Multiton.create({property: 'query'}),
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(
+          `
+  protected final static Map map__ = new ConcurrentHashMap();
+  public static MQLExpr create(String query) {
+    MQLExpr p = (MQLExpr) map__.get(query);
+
+    if ( p == null ) {
+      p = new MQLExpr();
+      p.setQuery(query);
+      map__.put(query, p);
+    }
+
+    return p;
+  }
+ `
+        );
+      }
+    }
+  ],
+
+  properties: [
+    {
+      class: 'Map',
+      name: 'specializations_',
+      factory: function() { return {}; },
+      javaFactory: 'return new java.util.concurrent.ConcurrentHashMap<ClassInfo, foam.mlang.predicate.Predicate>();'
+    },
+    {
+      class: 'String',
+      name: 'query'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      code: function(o) {
+        return this.specialization(o.model_).f(o);
+      },
+      javaCode: `
+        if ( ! ( obj instanceof FObject ) )
+          return false;
+
+        return specialization(((FObject)obj).getClassInfo()).f(obj);
+      `
+    },
+    {
+      name: 'specialization',
+      args: [ { name: 'model', type: 'ClassInfo' } ],
+      type: 'Predicate',
+      code: function(model) {
+        return this.specializations_[model.name] ||
+          ( this.specializations_[model.name] = this.specialize(model) );
+      },
+      javaCode: `
+        if ( getSpecializations_().get(model) == null ) getSpecializations_().put(model, specialize(model));
+        return (Predicate) getSpecializations_().get(model);
+      `
+    },
+    {
+      name: 'specialize',
+      args: [ { name: 'model', type: 'ClassInfo' } ],
+      type: 'Predicate',
+      code: function(model) {
+        var qp = foam.parse.QueryParser.create({of: model.id});
+        return qp.parseString(this.query) || foam.mlang.predicate.False.create();
+      },
+      javaCode: `
+        QueryParser parser = new QueryParser(model);
+        StringPStream sps = new StringPStream();
+        sps.setString(getQuery());
+        PStream ps = sps;
+        ParserContext x = new ParserContextImpl();
+        ps = parser.parse(ps, x);
+        if (ps == null)
+          return new False();
+
+        return (foam.mlang.predicate.Nary) ps.value();
+      `
+    },
+    function toString() {
+      return '(' + this.query + ')';
     }
   ]
 });

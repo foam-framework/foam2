@@ -144,7 +144,7 @@ public abstract class FoldReducer {
    * @return the state just prior to being reset
    **/
   public synchronized Object resetState() {
-    Object ret = getState();
+    Object ret = getState(); // invoke reduce to clear local states
 
     setState(initialState());
 

@@ -16,7 +16,7 @@ foam.CLASS({
     'foam.mlang.sink.Sum',
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
-    'foam.nanos.ruler.Operations',
+    'foam.nanos.dao.Operation',
     'foam.util.SafetyUtil',
 
     'static foam.mlang.MLang.*'
@@ -42,27 +42,29 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-        DAO requestDAO = ((DAO)x.get("approvalRequestDAO"));
-        ApprovalRequest old = (ApprovalRequest) requestDAO.find(obj);
-        ApprovalRequest request = (ApprovalRequest) getDelegate().put(obj);
-    
+        ApprovalRequest nu = (ApprovalRequest) obj;
+        ApprovalRequest old = (ApprovalRequest) getDelegate().inX(x).find(nu.getId());
+        ApprovalRequest request = (ApprovalRequest) getDelegate().inX(x).put(obj);
+
         if ( old != null && old.getStatus() != request.getStatus()
           || old == null && request.getStatus() != ApprovalStatus.REQUESTED
         ) {
-          DAO requests = ApprovalRequestUtil.getAllRequests(x, request.getObjId(), request.getClassification());
+          DAO requests = ApprovalRequestUtil.getAllRequests(x, getDelegate().inX(x), request.getObjId(), request.getClassification());
           // if not a cancellation request and points are sufficient to consider object approved
+          var currentPoints = getCurrentPoints(requests);
+          var currentRejectedPoints = getCurrentRejectedPoints(requests);
           if (
             request.getStatus() == ApprovalStatus.CANCELLED ||
-            getCurrentPoints(requests) >= request.getRequiredPoints() ||
-            getCurrentRejectedPoints(requests) >= request.getRequiredRejectedPoints()
+            currentPoints >= request.getRequiredPoints() ||
+            currentRejectedPoints >= request.getRequiredRejectedPoints()
           ) {
-    
+
             //removes all the requests that were not approved to clean up approvalRequestDAO
             removeUnusedRequests(requests);
             if (
               request.getStatus() == ApprovalStatus.APPROVED ||
               (
-                request.getStatus() == ApprovalStatus.REJECTED && ((ApprovalRequest) request).getOperation() == Operations.CREATE
+                request.getStatus() == ApprovalStatus.REJECTED && ((ApprovalRequest) request).getOperation() == Operation.CREATE
               )
             ){
               //puts object to its original dao
@@ -98,10 +100,13 @@ foam.CLASS({
 
         DAO userDAO = (DAO) x.get("localUserDAO");
         User initiatingUser = (User) userDAO.find(((ApprovalRequest) request).getCreatedBy());
+        if ( ((ApprovalRequest) request).getCreatedFor() != 0 ) {
+          initiatingUser = (User) userDAO.find(((ApprovalRequest) request).getCreatedFor());
+        }
         Subject subject = new Subject.Builder(x).setUser(initiatingUser).build();
         X initiatingUserX = x.put("subject", subject);
 
-        if ( ((ApprovalRequest) request).getOperation() == Operations.REMOVE ) {
+        if ( ((ApprovalRequest) request).getOperation() == Operation.REMOVE ) {
           dao.inX(initiatingUserX).remove(found);
         } else {
           dao.inX(initiatingUserX).put(found);

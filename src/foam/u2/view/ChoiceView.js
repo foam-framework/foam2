@@ -39,6 +39,12 @@ foam.CLASS({
     foam.u2.tag.Select.
   `,
 
+  css: `
+    ^ .foam-u2-tag-Select {
+      height: 32px;
+    }
+  `,
+
   properties: [
     {
       class: 'String',
@@ -232,7 +238,7 @@ foam.CLASS({
               size$:            self.size$,
               header$:          self.header$
             })
-              .attrs({ name: self.name })
+              .attrs({name: self.name})
               .enableClass('selection-made', self.index$.map((index) => index !== -1))
             .end();
         }

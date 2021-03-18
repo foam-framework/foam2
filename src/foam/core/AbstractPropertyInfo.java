@@ -293,4 +293,8 @@ public abstract class AbstractPropertyInfo
     });
 
   }
+
+  public Object castObject(Object value) {
+    return value;
+  }
 }

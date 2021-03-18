@@ -24,7 +24,7 @@
     'foam.dao.DAO',
     'foam.nanos.auth.*',
     'foam.nanos.logger.Logger',
-    'foam.nanos.ruler.Operations',
+    'foam.nanos.dao.Operation',
     'java.util.ArrayList',
     'java.util.List',
     'static foam.mlang.MLang.*'
@@ -193,7 +193,7 @@
     },
     {
       class: 'Enum',
-      of: 'foam.nanos.ruler.Operations',
+      of: 'foam.nanos.dao.Operation',
       name: 'operation',
       label: 'Action',
       includeInDigest: false,
@@ -326,7 +326,12 @@
       includeInDigest: true,
       section: 'approvalRequestInformation',
       order: 110,
-      gridColumns: 3
+      gridColumns: 3,
+      tableCellFormatter: function(value, obj, axiom) {
+        this.__subSubContext__.userDAO
+          .find(value)
+          .then(user => this.add(user ? user.toSummary() : `ID: ${value}`));
+      }
     },
     {
       class: 'Reference',
@@ -337,6 +342,21 @@
       order: 115,
       gridColumns: 3,
       readPermissionRequired: true
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdFor',
+      includeInDigest: true,
+      section: 'approvalRequestInformation',
+      order: 116,
+      gridColumns: 3,
+      tableCellFormatter: function(value, obj, axiom) {
+        var defaultOutput = value ? `ID: ${value}`: "N/A";
+        this.__subSubContext__.userDAO
+          .find(value)
+          .then(user => this.add(user ? user.toSummary() : defaultOutput));
+      }
     },
     {
       class: 'DateTime',
@@ -556,7 +576,7 @@
         throw new RuntimeException("Invalid dao key for the approval request object.");
       }
 
-      if ( getOperation() != Operations.CREATE ){
+      if ( getOperation() != Operation.CREATE ){
         FObject obj = dao.inX(x).find(getObjId());
         if ( obj == null ) {
           logger.error(this.getClass().getSimpleName(), "ObjId not found", getObjId());
@@ -672,7 +692,7 @@
         // Do not show the action if the request was reject or approved and removed
         if ( self.status == foam.nanos.approval.ApprovalStatus.REJECTED ||
             ( self.status == foam.nanos.approval.ApprovalStatus.APPROVED &&
-              self.operation == foam.nanos.ruler.Operations.REMOVE) ) {
+              self.operation == foam.nanos.dao.Operation.REMOVE) ) {
              return false;
         }
 
@@ -705,7 +725,7 @@
 
         // This should already be filtered out by the isAvailable, but adding here as duplicate protection
         if ( self.status == foam.nanos.approval.ApprovalStatus.REJECTED ||
-           (self.status == foam.nanos.approval.ApprovalStatus.APPROVED && self.operation == foam.nanos.ruler.Operations.REMOVE) ) {
+           (self.status == foam.nanos.approval.ApprovalStatus.APPROVED && self.operation == foam.nanos.dao.Operation.REMOVE) ) {
              console.warn('Object is inaccessible')
              return;
         }
@@ -729,7 +749,7 @@
             // If the dif of objects is calculated and stored in Map(obj.propertiesToUpdate),
             // this is for updating object approvals
             if ( obj.propertiesToUpdate ) {
-              if ( obj.operation === foam.nanos.ruler.Operations.CREATE ) {
+              if ( obj.operation === foam.nanos.dao.Operation.CREATE ) {
                 var temporaryNewObject = obj.of.create({}, X);
 
                 var propsToUpdate = obj.propertiesToUpdate;

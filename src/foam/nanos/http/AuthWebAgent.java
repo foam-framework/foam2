@@ -270,9 +270,7 @@ public class AuthWebAgent
         if ( ! SafetyUtil.isEmpty(authHeader) ) {
           sendError(x, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Authentication failure.");
         } else {
-          if ( sendErrorHandler_ == null || sendErrorHandler_.redirectToLogin(x) ) {
-            templateLogin(x);
-          } else {
+          if ( ! getRedirectToLogin(x) ) {
             PrintWriter out = x.get(PrintWriter.class);
             out.println("Authentication failure.");
           }
@@ -281,9 +279,7 @@ public class AuthWebAgent
         if ( ! SafetyUtil.isEmpty(authHeader) ) {
           sendError(x, resp, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         } else {
-          if ( sendErrorHandler_ == null || sendErrorHandler_.redirectToLogin(x) ) {
-            templateLogin(x);
-          } else {
+          if ( ! getRedirectToLogin(x) ) {
             PrintWriter out = x.get(PrintWriter.class);
             out.println("Authentication failure.");
           }
@@ -331,7 +327,7 @@ public class AuthWebAgent
 
   public void templateLogin(X x) {
     // Skip the redirect to login if it is not necessary
-    if ( sendErrorHandler_ != null && !sendErrorHandler_.redirectToLogin(x) ) return;
+    if ( ! getRedirectToLogin(x) ) return;
 
     PrintWriter out = x.get(PrintWriter.class);
 
@@ -347,5 +343,9 @@ public class AuthWebAgent
     out.println("<button id=\"login\" type=submit style=\"display:inline-block;margin-top:10px;\";>Log In</button>");
     out.println("</form>");
     out.println("<script>document.getElementById('login').addEventListener('click', checkEmpty); function checkEmpty() { if ( document.getElementById('user').value == '') { alert('Email Required'); } else if ( document.getElementById('password').value == '') { alert('Password Required'); } }</script>");
+  }
+
+  private boolean getRedirectToLogin(X x) {
+    return sendErrorHandler_ == null || sendErrorHandler_.redirectToLogin(x);
   }
 }

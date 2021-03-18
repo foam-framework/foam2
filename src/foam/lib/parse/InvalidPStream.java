@@ -53,4 +53,7 @@ public class InvalidPStream
   public PStream apply(Parser ps, ParserContext x) {
     return null;
   }
+
+  @Override
+  public int pos() { return 0; }
 }
