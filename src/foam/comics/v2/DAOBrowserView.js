@@ -277,7 +277,7 @@ foam.CLASS({
 
       if ( this.memento ) {
         if ( ! this.memento.tail ) {
-          this.memento.tail = foam.nanos.controller.Memento.create({ head: 'browse' });
+          this.memento.tail = foam.nanos.controller.Memento.create({});
         }
       }
 

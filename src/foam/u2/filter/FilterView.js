@@ -288,18 +288,16 @@ foam.CLASS({
       var self = this;
 
       if ( this.memento ) {
-        if ( ! this.memento.tail ) {
-          var m;
-          //i + 1 as there is a textSearch that we also need for memento
-          for ( var i = 0; i < this.filters.length + 1; i++ ) {
-            if ( ! m ) {
-              m = foam.nanos.controller.Memento.create({ value: '', parent: this.memento });
-              this.memento.tail = m;
-            } else {
-              if ( ! m.tail )
-                m.tail = foam.nanos.controller.Memento.create({ value: '', parent: m });
-              m = m.tail;
-            }
+        var m = this.memento;
+        //i + 1 as there is a textSearch that we also need for memento
+        for ( var i = 0; i < this.filters.length + 1; i++ ) {
+          if ( ! m ) {
+            m = foam.nanos.controller.Memento.create({ value: '', parent: this.memento });
+            this.memento.tail = m;
+          } else {
+            if ( ! m.tail )
+              m.tail = foam.nanos.controller.Memento.create({ value: '', parent: m });
+            m = m.tail;
           }
         }
         this.currentMemento_ = this.memento.tail;
