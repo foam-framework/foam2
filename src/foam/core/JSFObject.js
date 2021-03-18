@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'JSFObject',
-  extends: 'foam.core.Property',
+  extends: 'foam.core.FObjectProperty',
 
   documentation: `
     A Property which is only meaningful in JS.
@@ -16,11 +16,11 @@ foam.CLASS({
   ,
 
   properties: [
-    ['type', 'foam.lib.json.UnknownFObject'],
+   // ['type', 'foam.lib.json.UnknownFObject'], // breaks ViewSpecs
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.UnknownFObjectParser()'],
     ['fromJSON', function fromJSON(value, ctx, prop, json) {
       return value;
-    }],
+    }]
   ]
 });

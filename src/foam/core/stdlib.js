@@ -14,17 +14,17 @@ foam.LIB({
     {
       name: 'getName',
       code: (function named() {}).name === 'named' ?
-          function(method) { return method.name; } :
-          function(method) {
-            if (typeof method !== 'function') return method.name;
+        function(method) { return method.name; } :
+        function(method) {
+          if (typeof method !== 'function') return method.name;
 
-            // IE11 does not support named functions. Extract name with
-            // f.toString().
-            var match = method.toString().
-                match(/^function\s+([A-Za-z_$][0-9A-Za-z_$]*)\s*\(/);
-            foam.assert(match, 'Unable to deduce method name from function');
-            return match[1];
-          }
+          // IE11 does not support named functions. Extract name with
+          // f.toString().
+          var match = method.toString().
+              match(/^function\s+([A-Za-z_$][0-9A-Za-z_$]*)\s*\(/);
+          foam.assert(match, 'Unable to deduce method name from function');
+          return match[1];
+        }
     }
   ]
 });
@@ -817,66 +817,6 @@ foam.LIB({
 });
 
 
-foam.LIB({
-  name: 'foam.Date',
-  methods: [
-    function isInstance(o) { return o instanceof Date; },
-    function is(a, b) { return a === b; },
-    function clone(o) { return new Date(o); },
-    function getTime(d) {
-      // if d is null we should return null instead of 0
-      // since 0 is also the value returned when d == 1970/01/01
-      return d && d.getTime ? d.getTime() : d;
-    },
-    function equals(a, b) { return this.getTime(a) === this.getTime(b); },
-    function compare(a, b) {
-      if ( ! foam.Date.isInstance(b) ) return 1;
-      return foam.Number.compare(this.getTime(a), this.getTime(b));
-    },
-    // Hash n & n: Truncate to 32 bits.
-    function hashCode(d) { var n = d.getTime(); return n & n; },
-    function relativeDateString(date) {
-      // FUTURE: make this translatable for i18n, including plurals
-      //   "hours" vs. "hour"
-      var seconds = Math.trunc( ( Date.now() - date.getTime() ) / 1000 );
-
-      if ( seconds >= 0 && seconds < 60 ) return 'moments ago';
-      if ( seconds < 0  && seconds > -60 ) return 'in moments';
-
-      var minutes = Math.trunc((seconds) / 60);
-
-      if ( minutes === 1 ) return '1 minute ago';
-      if ( minutes === -1 ) return 'in 1 minute';
-
-      if ( minutes >= 0 && minutes < 60 ) return minutes + ' minutes ago';
-      if ( minutes < 0  && minutes > -60 ) return 'in ' + -minutes + ' minutes';
-
-      var hours = Math.trunc(minutes / 60);
-      if ( hours === 1 ) return '1 hour ago';
-      if ( hours === -1 ) return 'in 1 hour';
-
-      if ( hours >= 0 && hours < 24 ) return hours + ' hours ago';
-      if ( hours <  0 && hours > -24 ) return 'in ' + -hours + ' hours';
-
-      var days = Math.trunc(hours / 24);
-      if ( days === 1 ) return '1 day ago';
-      if ( days === -1 ) return 'in 1 day';
-
-      if ( days >= 0 && days < 7 ) return days + ' days ago';
-      if ( days <  0 && days > -7 ) return 'in ' + -days + ' days';
-
-      if ( days >= 0 && days < 365 || days < 0 && days > -365 ) {
-        var year = 1900 + date.getYear();
-        var noyear = date.toDateString().replace(' ' + year, '');
-        return noyear.substring(4);
-      }
-
-      return date.toDateString().substring(4);
-    }
-  ]
-});
-
-
 // An FObject is a FOAM-Object, the root class for all modeled classes.
 foam.LIB({
   name: 'foam.core.FObject',
@@ -967,6 +907,72 @@ foam.LIB({
       // be added to the object after it's frozen.
       o.$UID__ = foam.next$UID();
       Object.freeze(o);
+    }
+  ]
+});
+
+
+foam.LIB({
+  name: 'foam.Date',
+
+  constants: {
+    MIN_DATE: new Date(-8640000000000000),
+    MAX_DATE: new Date(8640000000000000)
+  },
+
+  methods: [
+    function isInstance(o) { return o instanceof Date; },
+    function is(a, b) { return a === b; },
+    function clone(o) { return new Date(o); },
+    function getTime(d) {
+      // if d is null we should return null instead of 0
+      // since 0 is also the value returned when d == 1970/01/01
+      return d && d.getTime ? d.getTime() : d;
+    },
+    function equals(a, b) { return this.getTime(a) === this.getTime(b); },
+    function compare(a, b) {
+      if ( ! foam.Date.isInstance(b) ) return 1;
+      return foam.Number.compare(this.getTime(a), this.getTime(b));
+    },
+    // Hash n & n: Truncate to 32 bits.
+    function hashCode(d) { var n = d.getTime(); return n & n; },
+    function relativeDateString(date) {
+      // FUTURE: make this translatable for i18n, including plurals
+      //   "hours" vs. "hour"
+      var seconds = Math.trunc( ( Date.now() - date.getTime() ) / 1000 );
+
+      if ( seconds >= 0 && seconds < 60 ) return 'moments ago';
+      if ( seconds < 0  && seconds > -60 ) return 'in moments';
+
+      var minutes = Math.trunc((seconds) / 60);
+
+      if ( minutes === 1 ) return '1 minute ago';
+      if ( minutes === -1 ) return 'in 1 minute';
+
+      if ( minutes >= 0 && minutes < 60 ) return minutes + ' minutes ago';
+      if ( minutes < 0  && minutes > -60 ) return 'in ' + -minutes + ' minutes';
+
+      var hours = Math.trunc(minutes / 60);
+      if ( hours === 1 ) return '1 hour ago';
+      if ( hours === -1 ) return 'in 1 hour';
+
+      if ( hours >= 0 && hours < 24 ) return hours + ' hours ago';
+      if ( hours <  0 && hours > -24 ) return 'in ' + -hours + ' hours';
+
+      var days = Math.trunc(hours / 24);
+      if ( days === 1 ) return '1 day ago';
+      if ( days === -1 ) return 'in 1 day';
+
+      if ( days >= 0 && days < 7 ) return days + ' days ago';
+      if ( days <  0 && days > -7 ) return 'in ' + -days + ' days';
+
+      if ( days >= 0 && days < 365 || days < 0 && days > -365 ) {
+        var year = 1900 + date.getYear();
+        var noyear = date.toDateString().replace(' ' + year, '');
+        return noyear.substring(4);
+      }
+
+      return date.toDateString().substring(4);
     }
   ]
 });

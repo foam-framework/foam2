@@ -236,9 +236,8 @@ foam.CLASS({
 
   messages: [
     { name: 'SEND_SUCCESS', message: 'Notification successfully resent' },
-    { name: 'SEND_FAILED', message: 'Notification could not be resent' }
+    { name: 'SEND_FAILED',  message: 'Notification could not be resent' }
   ],
-
 
   methods: [
     {
@@ -291,6 +290,7 @@ foam.CLASS({
       `
     }
   ],
+
   actions: [
     {
       name: 'resendNotification',

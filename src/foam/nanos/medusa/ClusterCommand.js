@@ -108,6 +108,9 @@ foam.CLASS({
       type: 'foam.nanos.medusa.ClusterCommand',
       javaCode: `
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
+      if ( ! support.getTrace() ) {
+        return this;
+      }
       ClusterCommandHop[] existing = getHops();
       if ( existing == null ||
            existing.length == 0 ) {

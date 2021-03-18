@@ -29,7 +29,7 @@ foam.CLASS({
     'foam.nanos.crunch.CapabilityJunctionPayload',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.approval.ApprovalStatus',
-    'foam.nanos.ruler.Operations',
+    'foam.nanos.dao.Operation',
     'foam.nanos.auth.Subject',
     'java.util.ArrayList',
     'java.util.Arrays',

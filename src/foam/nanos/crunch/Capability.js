@@ -104,7 +104,7 @@ foam.CLASS({
       view: {
         class: 'foam.u2.tag.TextArea',
         rows: 12,
-        cols: 120
+        cols: 100
       },
       includeInDigest: false
     },
@@ -258,6 +258,7 @@ foam.CLASS({
         Defines a wizardlet to display this capability in a wizard. This
         wizardlet will display after this capability's prerequisites.
       `,
+      hidden: true,
       factory: function() {
         return foam.nanos.crunch.ui.CapabilityWizardlet.create({}, this);
       },
@@ -266,6 +267,7 @@ foam.CLASS({
     {
       class: 'Object',
       name: 'beforeWizardlet',
+      hidden: true,
       documentation: `
         A wizardlet to display before this capability's prerequisites, and only
         if this capability is at the end of a prerequisite group returned by
@@ -293,7 +295,6 @@ foam.CLASS({
       includeInDigest: false,
     }
   ],
-
 
   methods: [
     {
