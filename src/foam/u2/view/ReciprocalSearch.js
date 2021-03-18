@@ -222,6 +222,7 @@ foam.CLASS({
               .end();
 
             if ( self.memento && m ) {
+              if ( ! m.tail )
                 m.tail$.set(foam.nanos.controller.Memento.create());
               counter--;
               if ( counter != 0 )
