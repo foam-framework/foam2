@@ -8,17 +8,12 @@ foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'SystemAuthService',
   extends: 'foam.nanos.auth.ProxyAuthService',
-
-  javaImports: [
-    'javax.security.auth.AuthPermission'
-  ],
-
   methods: [
     {
       name: 'check',
       javaCode: `
-        User user = ((Subject) x.get("subject")).getUser();
-        return user != null && ((Group) x.get("group")).implies(x, new AuthPermission("*")) || getDelegate().check(x, permission);
+        foam.nanos.auth.User user = ((foam.nanos.auth.Subject) x.get("subject")).getUser();
+        return user != null && user.isAdmin() || getDelegate().check(x, permission);
       `
     }
   ]
