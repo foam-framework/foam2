@@ -238,7 +238,6 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignIn.
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignIn.SUB_FOOTER_LINK",target:"Esqueceu a senha?"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignIn.ERROR_MSG",target:"Ocorreu um problema com o login."})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignIn.ERROR_MSG2",target:"Por favor, insira o e-mail ou nome de usuário"})
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignIn.BROWSER_SUPPORT",target:"Este aplicativo é otimizado para Google Chrome"})
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignIn.IDENTIFIER.label",target:"Email ou nome de usuário"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.u2.navigation.SignIn.PASSWORD.label",target:"Senha"})
