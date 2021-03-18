@@ -157,7 +157,7 @@ foam.CLASS({
 
           d = ret;
         }
-        if ( d == foam.Date.MAX_DATE || d == foam.Date.MIN_DATE ) return d;
+        if ( d <= foam.Date.MAX_DATE && d >= foam.Date.MIN_DATE ) return d;
         if ( foam.Date.isInstance(d) ) {
           // Convert the Date to Noon time in GMT /*its timezone*/.
           d = new Date(d.getTime() - (d.getTime() % (1000*60*60*24)) + (12*60 /*+ d.getTimezoneOffset()*/) * 60000);
