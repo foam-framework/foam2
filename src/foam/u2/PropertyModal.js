@@ -59,7 +59,7 @@ foam.CLASS({
       class: 'String',
       name: 'title',
       expression: function(isModalRequired) {
-        if ( isModalRequired ) return 'Please provide fill out the following (required)';
+        if ( isModalRequired ) return 'Please fill out the following (required)';
         return 'Please fill out the following (optional)';
       }
     },
