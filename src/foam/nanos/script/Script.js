@@ -55,8 +55,8 @@ foam.CLASS({
     'foam.dao.*',
     'static foam.mlang.MLang.*',
     'foam.nanos.auth.*',
+    'foam.nanos.cron.CronScheduler',
     'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.auth.*',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
     'java.io.ByteArrayOutputStream',
@@ -366,9 +366,8 @@ foam.CLASS({
              getStatus() == ScriptStatus.SCHEDULED &&
              ! getId().equals(startScript) &&
              getClusterable() ) {
-          foam.nanos.medusa.ClusterConfigSupport support = (foam.nanos.medusa.ClusterConfigSupport) x.get("clusterConfigSupport");
-          if ( support != null &&
-               ! support.cronEnabled(x) ) {
+          CronScheduler scheduler = (CronScheduler) x.get("cronScheduler");
+          if ( ! scheduler.getEnabled() ) {
             ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "execution disabled.", getId(), getDescription());
             throw new ClientRuntimeException(this.getClass().getSimpleName() + " " + EXECUTION_DISABLED);
           }

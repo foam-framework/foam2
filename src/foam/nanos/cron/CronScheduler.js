@@ -118,10 +118,7 @@ foam.CLASS({
 
     try {
       while ( true ) {
-        foam.nanos.medusa.ClusterConfigSupport support = (foam.nanos.medusa.ClusterConfigSupport) x.get("clusterConfigSupport");
-        if ( getEnabled() &&
-             ( support == null ||
-               support.cronEnabled(x) ) ) {
+        if ( getEnabled() ) {
           Date now = new Date();
 
           getCronDAO().where(
