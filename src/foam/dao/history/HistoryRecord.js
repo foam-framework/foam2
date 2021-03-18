@@ -32,6 +32,36 @@ foam.CLASS({
       tableWidth: 150
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.Subject',
+      name: 'subject',
+      documentation: `References subject that made update. TODO: remove references when subject becomes serializable`,
+      postSet: function(o, n) {
+        this.userId = n.user.id;
+        this.agentId = n.realUser.id;
+        this.user = n.user.toSummary();
+        this.agent= n.realUser.toSummary();
+      },
+      javaSetter: `
+        foam.nanos.auth.User user = (foam.nanos.auth.User) val.getUser();
+        foam.nanos.auth.User agent = (foam.nanos.auth.User) val.getRealUser();
+        setUserId(user.getId());
+        setUser(user.toSummary());
+        setAgentId(agent.getId());
+        setAgent(agent.toSummary());
+      `
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'userId'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'agentId',
+    },
+    {
       class: 'String',
       name: 'user',
       label: 'Updated By',
