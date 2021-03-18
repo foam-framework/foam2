@@ -95,7 +95,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'selected',
       postSet: function() {
-        if ( this.selected ) 
+        if ( this.selected )
           this.loadLatch = this.selected;
       },
       value: true
@@ -143,7 +143,7 @@ foam.CLASS({
             })
             .add(this.slot(function(loadLatch) {
               var view = this.E().start(self.Grid);
-              
+
               if ( loadLatch ) {
                 view.forEach(section.properties, function(p, index) {
                   var config = self.config && self.config[p.name];

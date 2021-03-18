@@ -131,6 +131,7 @@ foam.CLASS({
     },
     {
       name: 'onFilesChanged',
+      class: 'Function',
       documentation: 'When a file has been selected/changed/removed, this function will be called. (OPTIONAL)'
     },
     {
