@@ -12,22 +12,23 @@ foam.ENUM({
   values: [
     {
       name: 'CREATE',
-      label: 'Create',
+      label: { en: 'Create', pt: 'Crio'},
       documentation: 'Operation applied on dao.put when the object is new.'
     },
     {
       name: 'UPDATE',
-      label: 'Update',
+      label: { en: 'Update', pt: 'Atualizar'},
       documentation: 'Operation applied on dao.put when the object is not new.'
     },
     {
       name: 'REMOVE',
-      label: 'Remove',
+      label: { en: 'Remove', pt: 'Retirar'},
       documentation: 'Operation applied on dao.remove.'
     },
     {
       name: 'CREATE_OR_UPDATE',
       label: 'Create/Update',
+      label: { en: 'Create/Update', pt: 'Crio/Atualizar'},
       documentation: 'Operation applied on dao.put'
     }
   ]

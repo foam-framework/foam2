@@ -12,10 +12,18 @@ foam.CLASS({
     A customizable model to configure any DAOController
   `,
 
+  imports: [
+    'translationService'
+  ],
+
   requires: [
     'foam.comics.SearchMode',
     'foam.comics.v2.CannedQuery',
     'foam.comics.v2.namedViews.NamedViewCollection'
+  ],
+
+  messages: [
+    { name: 'VIEW_ALL', message: 'View all ' }
   ],
 
   properties: [
@@ -79,7 +87,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'browseSubtitle',
-      factory: function() { return 'View all ' + this.browseTitle.toLowerCase() + '.' }
+      factory: function() {
+        var viewAll = ctrl.__subContext__.translationService.getTranslation(foam.locale, 'foam.comics.v2.DAOControllerConfig.VIEW_ALL', this.VIEW_ALL);
+        return viewAll + this.browseTitle.toLowerCase();
+      }
     },
     {
       class: 'FObjectProperty',
