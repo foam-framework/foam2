@@ -273,6 +273,16 @@ foam.CLASS({
       name: 'choiceView',
       view: {
         class: 'foam.u2.view.ChoiceView',
+        size: 10,
+        choices: ['Yes', 'No', 'Maybe']
+      }
+    },
+    {
+      class: 'String',
+      name: 'choiceViewWithSize',
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+        size: 3,
         choices: ['Yes', 'No', 'Maybe']
       }
     },
