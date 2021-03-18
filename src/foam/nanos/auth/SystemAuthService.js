@@ -10,6 +10,7 @@ foam.CLASS({
   extends: 'foam.nanos.auth.ProxyAuthService',
 
   javaImports: [
+    'foam.nanos.auth.Group',
     'javax.security.auth.AuthPermission'
   ],
 
@@ -18,7 +19,8 @@ foam.CLASS({
       name: 'check',
       javaCode: `
         User user = ((Subject) x.get("subject")).getUser();
-        return user != null && ((Group) x.get("group")).implies(x, new AuthPermission("*")) || getDelegate().check(x, permission);
+        Group group = (Group) x.get("group");
+        return user != null && group != null && group.implies(x, new AuthPermission("*")) || getDelegate().check(x, permission);
       `
     }
   ]
