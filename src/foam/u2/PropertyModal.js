@@ -29,6 +29,7 @@ foam.CLASS({
       overflow-y: auto;
     }
     ^title {
+      max-width: fit-content;
       padding: 32px 0px;
       font-size: 1.5em;
       font-weight: bold;
@@ -86,7 +87,7 @@ foam.CLASS({
           .addClass(this.myClass('main'))
           .start()
             .addClass(this.myClass('title'))
-            .add(this.title)
+            .add(this.title$)
           .end()
           .startContext({ data: this, controllerMode: this.ControllerMode.EDIT })
           .tag(this.SectionedDetailPropertyView, {
