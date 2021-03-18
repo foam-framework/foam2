@@ -160,8 +160,6 @@ foam.CLASS({
         .end();
 
       this.isInit = true;
-      this.isFiltering();
-      this.isInit = false;
 
       if ( this.memento && this.memento.head.length != 0 ) {
         var predicate = this.getPredicateFromMemento();
@@ -169,6 +167,9 @@ foam.CLASS({
           this.filterController.setExistingPredicate(0, this.property.name, predicate);
         }
       }
+
+      this.isFiltering();
+      this.isInit = false;
     },
     
     function getPredicateFromMemento() {
