@@ -14,12 +14,11 @@ foam.CLASS({
   ],
 
   imports: [
-    'wizardlets',
-    // 'wizardConfig',
-    'pushView',
-    'popView',
     'ctrl',
-    'initialPosition?'
+    'initialPosition?',
+    'popView',
+    'pushView',
+    'wizardlets'
   ],
 
   exports: [

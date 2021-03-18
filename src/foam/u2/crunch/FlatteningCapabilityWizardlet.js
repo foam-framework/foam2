@@ -14,7 +14,7 @@ foam.CLASS({
   `,
 
   requires: [
-    'foam.core.ArraySlot',
+    'foam.core.ArraySlot'
   ],
 
   properties: [
@@ -123,13 +123,13 @@ foam.CLASS({
       code: function () {
         // ???: Replace subs with slots to use ArraySlot here
         var s = foam.core.FObject.create();
-        this.SUPER().sub(() => {
+        s.onDetach(this.SUPER().sub(() => {
           s.pub(true);
-        })
+        }));
         for ( let wizardlet of this.delegates ) {
-          wizardlet.getDataUpdateSub().sub(() => {
+          s.onDetach(wizardlet.getDataUpdateSub().sub(() => {
             s.pub(true);
-          });
+          }));
         }
         return s;
       }

@@ -60,8 +60,10 @@ foam.CLASS({
         this.subToProps_(obj);
       };
       // this.slot(update);
-      this.obj$.sub(() => { update.call(this, this.obj, this.parentRefs); });
-      this.parentRefs$.sub(() => { update.call(this, this.obj, this.parentRefs); });
+      this.onDetach(this.obj$.sub(() => {
+        update.call(this, this.obj, this.parentRefs); }));
+      this.onDetach(this.parentRefs$.sub(() => {
+        update.call(this, this.obj, this.parentRefs); }));
       update.call(this, this.obj, this.parentRefs);
     },
     function set() { /* nop */ },

@@ -6,10 +6,10 @@ foam.LIB({
       name: 'filter',
       code: function (from, f) {
         var s = foam.core.SimpleSlot.create({ value: from.get() });
-        from.sub(() => {
+        s.onDetach(from.sub(() => {
           var v = from.get();
           if ( f(v) ) s.set(v);
-        });
+        }));
         return s;
       }
     }

@@ -21,6 +21,7 @@ foam.CLASS({
 
   methods: [
     async function execute() {
+      // TODO: investigate adding onDetach here
       for ( let wizardlet of this.wizardlets ) {
         wizardlet.getDataUpdateSub().sub(() => {
           wizardlet.save();

@@ -12,7 +12,7 @@ foam.CLASS({
   documentation: `Displays all wizardlets in a scrolling page.`,
 
   messages: [
-    { name: 'NO_ACTION_LABEL', message: 'Done' },
+    { name: 'NO_ACTION_LABEL', message: 'Done' }
   ],
 
   requires: [
@@ -96,7 +96,6 @@ foam.CLASS({
           }
         }
 
-
         return minTopPosition;
       }
     },
@@ -117,9 +116,9 @@ foam.CLASS({
     function initE() {
       var self = this;
       window.testing_ = self;
-      this.scrollWizardPosition$.sub(() => {
+      this.onDetach(this.scrollWizardPosition$.sub(() => {
         this.data.wizardPosition = this.scrollWizardPosition;
-      });
+      }));
       this
         .start(this.Grid)
           .addClass(this.myClass('fix-grid'))
