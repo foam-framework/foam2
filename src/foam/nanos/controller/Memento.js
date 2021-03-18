@@ -43,7 +43,6 @@ foam.CLASS({
         if ( this.feedback_ ) return;
         this.feedback_ = true;
         this.changeIndicator = ! this.changeIndicator;
-        this.value     = this.combine();
         this.feedback_ = false;
       }
     },
@@ -59,7 +58,6 @@ foam.CLASS({
         if ( this.feedback_ ) return;
         this.feedback_       = true;
         this.changeIndicator = ! this.changeIndicator;
-        this.value           = this.combine();
         this.feedback_       = false;
       },
       value: null
@@ -70,6 +68,7 @@ foam.CLASS({
     {
       name: 'changeIndicator',
       postSet: function() {
+        this.value                    = this.combine();
         if ( this.parent ) {
           this.parent.feedback_       = true;
           this.parent.changeIndicator = ! this.parent.changeIndicator;

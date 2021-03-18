@@ -162,12 +162,14 @@ foam.CLASS({
       var m;
       if ( this.memento ) {
         m = this.memento.tail || this.memento;
-        if ( m ) {
-          m.tail$.set(foam.nanos.controller.Memento.create());
+        if ( ! m.tail ) {
+          m.tail = foam.nanos.controller.Memento.create();
         }
         m = this.memento.tail || this.memento;
         this.currentMemento_ = this.memento.tail;
       }
+
+      var counter = this.filters.length;
 
       this.
         addClass(self.myClass()).
@@ -195,7 +197,10 @@ foam.CLASS({
             .addClass('general-query')
           .end();
 
-          m = searchView.__subContext__.memento;
+          if (this.memento && this.memento.tail )
+            m = this.memento.tail.tail;
+          else
+            m = null;
 
           this.searchManager.add(slot.value);
 
@@ -218,7 +223,9 @@ foam.CLASS({
 
             if ( self.memento && m ) {
                 m.tail$.set(foam.nanos.controller.Memento.create());
-              m = m.tail;
+              counter--;
+              if ( counter != 0 )
+                m = m.tail;
             }
           });
 

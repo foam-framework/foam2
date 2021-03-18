@@ -24,6 +24,10 @@ foam.CLASS({
     'memento'
   ],
 
+  exports: [
+    'currentMemento_'
+  ],
+
   requires: [
     'foam.parse.QueryParser',
     'foam.u2.tag.Input'
@@ -98,11 +102,14 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'onKey'
-    }
+    },
+    'currentMemento_'
   ],
 
   methods: [
     function initE() {
+      if ( this.memento )
+        this.currentMemento_$ = this.memento.tail$;
       this
         .addClass(this.myClass())
         .tag(this.viewSpec, {

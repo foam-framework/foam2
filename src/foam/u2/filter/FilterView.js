@@ -296,7 +296,8 @@ foam.CLASS({
               m = foam.nanos.controller.Memento.create({ value: '', parent: this.memento });
               this.memento.tail = m;
             } else {
-              m.tail = foam.nanos.controller.Memento.create({ value: '', parent: m });
+              if ( ! m.tail )
+                m.tail = foam.nanos.controller.Memento.create({ value: '', parent: m });
               m = m.tail;
             }
           }
@@ -367,10 +368,13 @@ foam.CLASS({
                         dao: self.dao
                       },  self, self.__subSubContext__.createSubContext({ memento: self.currentMemento_ }));
 
+                      counter--;
                       if ( self.currentMemento_ ) {
-                        self.currentMemento_ = self.currentMemento_.tail;
-                        if ( self.currentMemento_.tail == null )
-                          self.currentMemento_.tail = foam.nanos.controller.Memento.create();
+                        if ( counter != 0 ) {
+                          self.currentMemento_ = self.currentMemento_.tail;
+                          if ( self.currentMemento_.tail == null )
+                            self.currentMemento_.tail = foam.nanos.controller.Memento.create();
+                        }
                       }
 
                       this.start()
