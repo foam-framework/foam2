@@ -55,7 +55,7 @@ foam.CLASS({
 
   /* ON RIGHT SIDE ALL **** */
   ^ .centerVertical {
-    padding-top: 3vh; 
+    padding-top: 3vh;
     max-width: 30vw;
     margin: 0 auto;
   }
@@ -259,6 +259,13 @@ foam.CLASS({
               this.model.subfooterLink();
             })
           .end()
+          .callIf(this.isChrome(), function() {
+            this
+              .br().br()
+              .start('span')
+                .add(this.model.BROWSER_SUPPORT)
+              .end()
+          })
         .end();
 
       // CREATE SPLIT VIEW
@@ -306,6 +313,10 @@ foam.CLASS({
         }, function() {
           this.add(right);
         });
+    },
+
+    function isChrome() {
+      return !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
     }
   ],
 
