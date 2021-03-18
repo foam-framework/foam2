@@ -27,6 +27,7 @@ foam.CLASS({
       max-width: calc(100vw - 48px);
       max-height: calc(100vh - 116px);
       overflow-y: auto;
+      min-width: 20vw;
     }
     ^title {
       max-width: fit-content;
