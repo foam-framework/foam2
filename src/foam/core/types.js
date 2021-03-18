@@ -144,7 +144,6 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function (_, d) {
-        var od = d;
         if ( typeof d === 'number' ) return new Date(d);
         if ( typeof d === 'string' ) {
           var ret = new Date(d);
@@ -188,7 +187,24 @@ foam.CLASS({
   label: 'Date and time',
 
   properties: [
-    [ 'type', 'DateTime' ]
+    [ 'type', 'DateTime' ],
+    {
+      name: 'adapt',
+      value: function (_, d) {
+        if ( typeof d === 'number' ) return new Date(d);
+        if ( typeof d === 'string' ) {
+          d = new Date(d);
+
+          if ( isNaN(ret.getTime()) ) {
+            d = foam.Date.MAX_DATE;
+            console.warn("Invalid date: " + d + "; assuming " + ret.toISOString() + ".");
+          }
+
+          return d;
+        }
+        return d;
+      }
+    }
   ]
 });
 
