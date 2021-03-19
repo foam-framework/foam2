@@ -39,7 +39,6 @@ p({
       "class":"foam.comics.v2.DAOControllerConfig",
       "daoKey":"medusaEntryDAO",
       "browseViews":[{
-        "class":"foam.comics.v2.DAOBrowserView",
         "name":"Table",
         "view":{
           "class":"foam.u2.view.ScrollTableView"
@@ -60,7 +59,6 @@ p({
       "class":"foam.comics.v2.DAOControllerConfig",
       "daoKey":"hostsDAO",
       "browseViews":[{
-        "class":"foam.comics.v2.DAOBrowserView",
         "name":"Table",
         "view":{
           "class":"foam.u2.view.ScrollTableView"
@@ -93,7 +91,6 @@ p({
       "class":"foam.comics.v2.DAOControllerConfig",
       "daoKey":"clusterTopologyDAO",
       "browseViews":[{
-        "class":"foam.comics.v2.DAOBrowserView",
         "name":"Table",
         "view":{
           "class":"foam.u2.view.ScrollTableView"
