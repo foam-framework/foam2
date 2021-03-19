@@ -159,7 +159,7 @@ Columns: validation format, parsing format, example`,
     { name: 'LENGTH_MISMATCHED_1',  message: 'IBAN length mismatch for country code. Was expecting' },
     { name: 'LENGTH_MISMATCHED_2',  message: 'characters but found' },
     { name: 'INVALID_CHARACTER',    message: 'Invalid character at position' },
-    { name: 'INVALID_CHECKSUM',     message: 'IBAN country code mismatched' }
+    { name: 'INVALID_CHECKSUM',     message: 'Invalid IBAN checksum' }
   ],
 
   methods: [
@@ -284,7 +284,7 @@ Columns: validation format, parsing format, example`,
         let num = this.toNumber(iban);
         let checksum = this.mod(num, 97);
 
-        if ( checksum != 1 ) return `${this.INVALID_CHECKSUM} ${checksum}`;
+        if ( checksum != 1 ) return this.INVALID_CHECKSUM;
 
         return 'passed';
       },
@@ -301,7 +301,9 @@ Columns: validation format, parsing format, example`,
         if ( format == null ) throw new ValidationException(UNKNOWN_COUNTRY_CODE + cc);
 
         if ( iban.length() != format.length() + 2 )
-          throw new ValidationException(LENGTH_MISMATCHED_1 + (format.length() + 2) + LENGTH_MISMATCHED_2 + iban.length());
+          throw new ValidationException(
+            String.format("%s %d %s %d",
+              LENGTH_MISMATCHED_1, format.length() + 2, LENGTH_MISMATCHED_2, iban.length()));
 
         for ( int i = 0 ; i < format.length() ; i++ ) {
           if ( ! validateChar(format.charAt(i), iban.charAt(i+2) )) throw new ValidationException(INVALID_CHARACTER + (i+2));
@@ -310,7 +312,7 @@ Columns: validation format, parsing format, example`,
         String num = toNumber(iban);
         int checksum = mod(num, 97);
 
-        if ( checksum != 1 ) throw new ValidationException(INVALID_CHECKSUM + checksum);
+        if ( checksum != 1 ) throw new ValidationException(INVALID_CHECKSUM);
       `
     },
     {
