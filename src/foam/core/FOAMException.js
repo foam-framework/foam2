@@ -94,10 +94,13 @@ foam.CLASS({
       },
       javaCode: `
       String msg = getTranslation();
+System.out.println("FOAMException,msg,translation,"+msg);
       if ( ! SafetyUtil.isEmpty(msg) ) {
         // REVIEW: temporary - default/simple java template support not yet split out from EmailTemplateEngine.
         foam.nanos.notification.email.EmailTemplateEngine template = new foam.nanos.notification.email.EmailTemplateEngine();
-        return template.renderTemplate(XLocator.get(), msg, getTemplateValues()).toString().trim();
+        msg = template.renderTemplate(XLocator.get(), msg, getTemplateValues()).toString().trim();
+System.out.println("FOAMException,msg,templated,"+msg);
+        return msg;
       }
       return EXCEPTION_MESSAGE;
       `
@@ -118,6 +121,7 @@ foam.CLASS({
       TranslationService ts = (TranslationService) XLocator.get().get("translationService");
       return ts.getTranslation(locale, getClassInfo().getId(), EXCEPTION_MESSAGE);
     } catch (NullPointerException e) {
+System.err.println("FOAMException,XLocator.get,null");
       // REVIEW: XLocator.get().get(...) NPE in test mode.
     }
     return null;

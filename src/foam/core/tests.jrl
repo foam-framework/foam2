@@ -1,3 +1,4 @@
 p({"class":"foam.core.FObjectTest","id":"FObjectTest","description":"Test FObject features"})
 p({"class":"foam.core.CoreTypesValidationTest","id":"CoreTypesValidationTest"})
 p({"class":"foam.java.ParseTemplateTest","id":"Test_java_template_output"})
+p({"class":"foam.core.FOAMExceptionTest","id":"FOAMExceptionTest"})
