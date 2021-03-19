@@ -34,14 +34,14 @@ public class PreventDuplicateEmailDAOTest
   private void PreventsDuplicateEmail(X x) {
     User userWithDuplicateEmail = TestUtils.createTestUser();
     userWithDuplicateEmail.setId(2); // Make sure the id is different.
-    DAO dao = new PreventDuplicateEmailDAO.Builder(x).setDelegate(userDAO_).build();
+    DAO dao = userDAO_;
     test(
       TestUtils.testThrows(
         () -> dao.put_(x, userWithDuplicateEmail),
         "User with same email address already exists: " + userWithDuplicateEmail.getEmail(),
         RuntimeException.class
       ),
-      "PreventDuplicateEmailDAO throws a RuntimeException with an appropriate message when a User is put with the same email as an existing user and a different id."
+      "Rule throws a RuntimeException with an appropriate message when a User is put with the same email as an existing user and a different id."
     );
   }
 }

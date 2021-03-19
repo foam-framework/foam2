@@ -310,7 +310,6 @@ var classes = [
   'foam.nanos.auth.email.EmailDocInterface',
   'foam.nanos.auth.email.ClientEmailDocService',
   'foam.nanos.auth.resetPassword.ResetPasswordTokenService',
-  'foam.nanos.auth.PreventDuplicateEmailDAO',
   'foam.nanos.auth.PermissionedPropertyDAO',
   'foam.nanos.auth.SystemAuthService',
   'foam.nanos.auth.HidePropertiesSink',
