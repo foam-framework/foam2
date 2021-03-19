@@ -37,7 +37,7 @@ foam.CLASS({
 
   methods: [
     function createView() {
-      return this.slot(function(isLoaded){
+      return foam.u2.Element.create(null, this).add(this.slot(function(isLoaded){
         if (isLoaded){
           var vs = this.ViewSpec.createView(
             this.customView, this.customView, this, this.__subContext__
@@ -50,7 +50,7 @@ foam.CLASS({
           return vs;
         }
         return null;
-      })
+      }))
     }
   ],
 });
