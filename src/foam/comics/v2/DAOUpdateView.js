@@ -191,9 +191,11 @@ foam.CLASS({
               .start(config$viewBorder)
                 .start().addClass(this.myClass('view-container'))
                   .add(self.slot(function(viewView) {
-                    return self.E().tag(viewView, {
+                    var view = foam.u2.ViewSpec.createView(viewView, {
                       data$: self.workingData$
-                    });
+                    }, self, self.__subContext__.createSubContext({ memento: self.memento }));
+
+                    return self.E().add(view);
                   }))
                 .end()
               .end()
