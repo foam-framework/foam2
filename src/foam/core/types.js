@@ -741,6 +741,15 @@ foam.CLASS({
       value: function(value, cloneMap, opt_X) {
         cloneMap[this.name] = value && value.clone ? value.clone(opt_X) : value;
       }
+    },
+    {
+      name: 'copyTransient',
+      class: 'Boolean',
+      value: false,
+      documentation: `
+        Set this to true to prevent copyFrom recursing into this FObject, and
+        instead copy an FObject from another value by reference.
+      `
     }
   ],
   methods: [
@@ -779,6 +788,16 @@ foam.CLASS({
 
       // TODO: Only hook up the subscription when somebody listens to us.
       if ( obj[name] ) attach(obj[name]);
+    },
+    // Override copyFrom behaviour
+    function copyValueFrom(targetObj, sourceObj) {
+      if ( this.copyTransient ) return false;
+      var name = this.name;
+      if ( targetObj[name] && sourceObj[name] ) {
+        targetObj[name].copyFrom(sourceObj[name])
+        return true;
+      }
+      return false;
     }
   ]
 });
