@@ -61,6 +61,8 @@ foam.CLASS({
     function initE() {
       var self = this;
 
+      this.currentMemento_$ = this.memento$;
+
       this.SUPER();
       this
         .addClass(this.myClass())
@@ -88,12 +90,13 @@ foam.CLASS({
                     this
                       .start(self.Tab, { label$: title$ || self.defaultSectionLabel, selected: self.memento && self.memento.tail && self.memento.tail.head === s.title }, tab)
                         .call(function() {
-                          this.tag(self.SectionView, {
+                          var sectionView = foam.u2.ViewSpec.createView(self.SectionView, {
                             data$: self.data$,
                             section: s,
                             showTitle: false,
                             selected$: tab.value.selected$
-                          })
+                          }, self, self.__subContext__.createSubContext({ memento: null }));
+                          this.add(sectionView)
                         })
                       .end();
                   })
