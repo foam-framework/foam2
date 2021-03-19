@@ -26,6 +26,10 @@ foam.CLASS({
   public BusinessValidationException() {
     super();
   }
+
+  public BusinessValidationException(Exception cause) {
+    super(cause);
+  }
         `);
       }
     }
