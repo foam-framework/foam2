@@ -10,6 +10,7 @@ foam.CLASS({
   implements: [ 'foam.core.ExceptionInterface' ],
   extends: 'foam.core.FOAMException',
   javaGenerateConvenienceConstructor: false,
+  javaGenerateDefaultConstructor: false,
 
   axioms: [
     {
@@ -17,6 +18,10 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(
           `
+  public ClientRuntimeException() {
+    super();
+  }
+
   public ClientRuntimeException(String message) {
     super(message);
   }

@@ -70,7 +70,7 @@ foam.CLASS({
       ],
       javaCode:
         `if ( user == null ) {
-          throw new AuthenticationException("User not found");
+          throw new UserNotFoundException();
         }
         // if we are after the expiry date then prevent login
         return user.getPasswordExpiry() != null && user.getPasswordExpiry().getTime() < System.currentTimeMillis();`

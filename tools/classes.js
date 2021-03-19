@@ -340,6 +340,7 @@ var classes = [
   'foam.nanos.auth.UserAndGroupAuthService',
   'foam.nanos.auth.EnabledCheckAuthService',
   'foam.nanos.auth.CommonPassword',
+  'foam.nanos.auth.UserNotFoundException',
   'foam.nanos.http.HttpParameters',
   'foam.nanos.http.DefaultHttpParameters',
   'foam.nanos.http.SendErrorHandler',

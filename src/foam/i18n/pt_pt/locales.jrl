@@ -395,3 +395,5 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.ResetPassword.RE
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.ResetPassword.RESET_PASSWORD_SUBTITLE",target:"Crie uma nova senha para sua conta"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.ResetPassword.PASSWORD_LENGTH_10_ERROR",target:"A senha deve ter pelo menos 10 caracteres"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.ResetPassword.PASSWORD_NOT_MATCH",target:"As senhas não coincidem"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UserNotFoundException.EXCEPTION_MESSAGE",target:"Usuário não encontrado"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.AuthenticationException.EXCEPTION_MESSAGE",target:"Não logado"})

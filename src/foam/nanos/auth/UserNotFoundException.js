@@ -1,20 +1,20 @@
 /**
  * @license
- * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * Copyright 2021 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
-  name: 'AuthenticationException',
+  name: 'UserNotFoundException',
   package: 'foam.nanos.auth',
-  extends: 'foam.core.ClientRuntimeException',
+  extends: 'foam.nanos.auth.AuthenticationException',
   javaGenerateDefaultConstructor: false,
   javaGenerateConvenienceConstructor: false,
 
   messages: [
     {
       name: 'EXCEPTION_MESSAGE',
-      message: 'Not logged in {{message_}}'
+      message: 'User not found {{message_}}'
     }
   ],
 
@@ -23,19 +23,19 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
-  public AuthenticationException() {
+  public UserNotFoundException() {
     super();
   }
 
-  public AuthenticationException(String message) {
+  public UserNotFoundException(String message) {
     super(message);
   }
 
-  public AuthenticationException(Throwable cause) {
-    super("Not logged in", cause);
+  public UserNotFoundException(Throwable cause) {
+    super(cause);
   }
 
-  public AuthenticationException(String message, Throwable cause) {
+  public UserNotFoundException(String message, Throwable cause) {
     super(message, cause);
   }
         `);

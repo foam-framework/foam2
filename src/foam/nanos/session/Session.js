@@ -369,11 +369,11 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
          || (user instanceof LifecycleAware && ((LifecycleAware)user).getLifecycleState() != LifecycleState.ACTIVE)
        ) {
           ((Logger) x.get("logger")).warning("Session", "User not found.", userId);
-          throw new RuntimeException(String.format("User with id '%d' not found.", userId));
+          throw new foam.nanos.auth.UserNotFoundException(String.valueOf(userId));
         }
 
         if ( ! user.getEnabled() ) {
-          throw new RuntimeException(String.format("The user with id '%d' has been disabled.", userId));
+          throw new foam.nanos.auth.AuthenticationException(String.format("The user with id '%d' has been disabled.", userId));
         }
       `
     }
