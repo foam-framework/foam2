@@ -14,11 +14,11 @@ foam.CLASS({
   ],
 
   imports: [
-    'wizardlets',
-    // 'wizardConfig',
-    'pushView',
+    'ctrl',
+    'initialPosition?',
     'popView',
-    'initialPosition?'
+    'pushView',
+    'wizardlets'
   ],
 
   exports: [
@@ -41,12 +41,6 @@ foam.CLASS({
       }
     },
     {
-      name: 'view',
-      value: {
-        class: 'foam.u2.wizard.StepWizardletView',
-      }
-    },
-    {
       name: 'submitted',
       class: 'Boolean'
     }
@@ -65,7 +59,7 @@ foam.CLASS({
         })
 
         this.pushView({
-          ...this.view,
+          ...this.config.wizardView,
           data: data,
           closeable: true,
           onClose: (x) => {
@@ -77,7 +71,7 @@ foam.CLASS({
             resolve();
           }).catch(e => {
             console.error(e);
-            x.ctrl.notify(this.ERROR_MSG_DRAFT, '', this.LogLevel.ERROR, true);
+            this.ctrl.notify(this.ERROR_MSG_DRAFT, '', this.LogLevel.ERROR, true);
           });
         });
       });

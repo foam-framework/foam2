@@ -15,7 +15,8 @@ foam.CLASS({
   flags: ['web'],
 
   requires: [
-    'foam.core.ExpressionSlot'
+    'foam.core.ExpressionSlot',
+    'foam.u2.LoadingSpinner'
   ],
 
   css: `
@@ -85,8 +86,11 @@ foam.CLASS({
     },
     {
       name: 'clickable',
-      class: 'Boolean',
-      value: false
+      class: 'Boolean'
+    },
+    {
+      name: 'indicateProcessing',
+      class: 'Boolean'
     }
   ],
 
@@ -97,18 +101,18 @@ foam.CLASS({
         .style({
           'background-color': this.backgroundColor,
           'border-color': this.stateBorderColor_$,
-          'width': '' + this.size + 'px',
-          'height': '' + this.size + 'px',
-          'line-height': '' + this.size + 'px',
+          'width': this.size + 'px',
+          'height': this.size + 'px',
+          'line-height': this.size + 'px',
           'font-size': this.size * 0.65,
           'color': this.textColor$,
-          'border': '' + this.borderThickness + 'px solid',
+          'border': this.borderThickness + 'px solid',
           'cursor': this.ExpressionSlot.create({
             obj: this,
             code: function (clickable) {
               return clickable ? 'pointer' : 'default';
             }
-          }),
+          })
         })
         .on('mouseover', () => {
           this.hasMouseOver = true;
@@ -123,14 +127,23 @@ foam.CLASS({
         this.start('img')
           .attr('src', this.icon$)
           .style({
-            'width': '' + this.size + 'px',
-            'height': '' + this.size + 'px',
+            'width': this.size + 'px',
+            'height': this.size + 'px'
+          })
+        .end();
+      }
+
+      if ( this.indicateProcessing ) {
+        this.start(this.LoadingSpinner)
+          .style({
+            'width': this.size + 'px',
+            'height': this.size + 'px'
           })
         .end();
       }
 
       if ( this.label ) {
-        this.add(this.label)
+        this.add(this.label);
       }
     }
   ]
