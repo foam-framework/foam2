@@ -13,6 +13,10 @@ foam.CLASS({
     'memento'
   ],
 
+  exports: [
+    'currentMemento_ as memento'
+  ],
+
   requires: [
     'foam.core.ArraySlot',
     'foam.u2.borders.CardBorder',
@@ -49,7 +53,8 @@ foam.CLASS({
       name: 'defaultSectionLabel',
       value: 'Uncategorized'
     },
-    'tabs'
+    'tabs',
+    'currentMemento_'
   ],
 
   methods: [
