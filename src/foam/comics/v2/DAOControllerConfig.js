@@ -97,7 +97,7 @@ foam.CLASS({
       expression: function(defaultColumns) {
         return {
           class: 'foam.u2.view.ScrollTableView',
-          enableDynamicTableHeight: true,//false
+          enableDynamicTableHeight: true,
           editColumnsEnabled: false,
           columns: defaultColumns,
           css: {
@@ -222,22 +222,12 @@ foam.CLASS({
       documentation: 'True to use the DAOCreateView else it will use the WizardController.'
     },
     {
-      // type: 'foam.lib.json.UnknownFObject',
-      // javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
-      // javaJSONParser: 'new foam.lib.json.UnknownFObjectParser()',
-      // fromJSON: function fromJSON(value, ctx, prop, json) {
-      //   return value;
-      // },
-      //class: 'Class',
-      ////of: 'foam.u2.View',
-      ////of: 'FObject',
       class: 'foam.u2.ViewSpec',
       name: 'wizardDetailView',
       documentation: 'class of WizardDetailView.'
     },
     {
-      //class: 'foam.u2.ViewSpecWithJava',
-      class: 'foam.u2.ViewSpec',//class: 'foam.core.JSFObject',
+      class: 'foam.u2.ViewSpec',
       name: 'detailView',
       documentation: 'class of detailView.'
     },
