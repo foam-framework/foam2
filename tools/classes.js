@@ -298,7 +298,6 @@ var classes = [
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.PMAuthService',
   'foam.nanos.auth.UserUserJunction',
-  'foam.nanos.auth.UnknowUserException',
   'foam.nanos.auth.ClientAuthService',
   'foam.nanos.auth.ClientLoginAuthService',
   'foam.nanos.auth.AgentAuthService',

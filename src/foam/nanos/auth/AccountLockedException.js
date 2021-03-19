@@ -7,12 +7,15 @@
 foam.CLASS({
   name: 'AccountLockedException',
   package: 'foam.nanos.auth',
-  extends: 'foam.core.FOAMException',
+  extends: 'foam.nanos.auth.AuthenticationException',
   javaGenerateDefaultConstructor: false,
   javaGenerateConvenienceConstructor: false,
 
   messages: [
-    { name: 'ACCOUNT_LOCK', message: 'Account locked. Please contact customer service.' },
+    {
+      name: 'EXCEPTION_MESSAGE',
+      message: 'Account locked. Please contact customer service'
+    },
   ],
 
   axioms: [
@@ -21,15 +24,11 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(`
   public AccountLockedException() {
-    super(ACCOUNT_LOCK);
+    super();
   }
 
-  public AccountLockedException(String message) {
-    super(message);
-  }
-
-  public AccountLockedException(String message, Exception cause) {
-    super(message);
+  public AccountLockedException(Exception cause) {
+    super(cause);
   }
 
         `);

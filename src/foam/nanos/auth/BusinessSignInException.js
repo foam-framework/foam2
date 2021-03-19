@@ -11,12 +11,11 @@ foam.CLASS({
   javaGenerateDefaultConstructor: false,
   javaGenerateConvenienceConstructor: false,
 
-  javaImports: [
-    'foam.core.X'
-  ],
-
   messages: [
-    { name: 'BUSINESS_SIGN_EXCEPTION', message: 'There was an issue signing in to the newly created business, Please go to the switch business menu in your personal menus to sign in to your business.' },
+    {
+      name: 'EXCEPTION_MESSAGE',
+      message: 'There was an issue signing in to the newly created business, Please go to the switch business menu in your personal menus to sign in to your business.'
+    },
   ],
 
 
@@ -26,11 +25,11 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(`
   public BusinessSignInException() {
-    super(BUSINESS_SIGN_EXCEPTION);
+    super();
   }
 
-  public BusinessSignInException(X x) {
-    super(x, BUSINESS_SIGN_EXCEPTION);
+  public BusinessSignInException(Exception cause) {
+    super(cause);
   }
 
         `);

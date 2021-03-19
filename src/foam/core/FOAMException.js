@@ -10,7 +10,6 @@ foam.CLASS({
   implements: [ 'foam.core.Exception' ],
   javaExtends: 'RuntimeException',
   javaGenerateConvenienceConstructor: false,
-<<<<<<< HEAD
   javaGenerateDefaultConstructor: false,
 
   imports: [
@@ -25,13 +24,6 @@ foam.CLASS({
     'foam.util.SafetyUtil',
     'java.util.HashMap',
     'java.util.Map',
-=======
-
-  javaImports: [
-    'foam.core.X',
-    'foam.i18n.TranslationService',
-    'foam.nanos.auth.Subject'
->>>>>>> f69bb512705663936da271fcb4841d47a8e24499
   ],
   
   messages: [
@@ -65,20 +57,6 @@ foam.CLASS({
   public FOAMException(String message, Throwable cause) {
     super(message, cause);
     setMessage_(message);
-    getHostname();
-  }
-
-  public FOAMException(X x, String message) {
-    super(message);
-    String translation_message = getTranslation(x, message);
-    setMessage_(translation_message);
-    getHostname();
-  }
-
-  public FOAMException(X x, String message, Throwable cause ) {
-    super(message, cause);
-    String translation_message = getTranslation(x, message);
-    setMessage_(translation_message);
     getHostname();
   }
         `);
@@ -139,7 +117,7 @@ foam.CLASS({
       name: 'getTranslation',
       type: 'String',
       code: function() {
-        return this.translationService.getTranslation(foam.locale, getOwnClassInfo().getId()+'.EXCEPTION_MESSAGE', EXCEPTION_MESSAGE);
+        return this.translationService.getTranslation(foam.locale, getOwnClassInfo().getId(), EXCEPTION_MESSAGE);
       },
       javaCode: `
       String locale = "pt";
@@ -151,25 +129,7 @@ foam.CLASS({
         }
       }
       TranslationService ts = (TranslationService) foam.core.XLocator.get().get("translationService");
-      return ts.getTranslation(locale, getClassInfo().getId()+ ".EXCEPTION_MESSAGE", EXCEPTION_MESSAGE);
-      `
-    },
-    {
-      name: 'getTranslation',
-      type: 'String',
-      args: [
-        { name: 'x',      type: 'Context' },
-        { name: 'message', type: 'String' },
-      ],
-      javaCode: `
-      TranslationService ts = (TranslationService) foam.core.XLocator.get().get("translationService");
-      Subject subject = (foam.nanos.auth.Subject) foam.core.XLocator.get().get("subject");
-      if (subject.getRealUser() == null) {
-        return message;
-      }
-      String locale = ((foam.nanos.auth.User) subject.getRealUser()).getLanguage().getCode().toString();
-      String t_msg = ts.getTranslation(locale, getClassInfo().getId(), message);
-      return t_msg;
+      return ts.getTranslation(locale, getClassInfo().getId(), EXCEPTION_MESSAGE);
       `
     },
     {

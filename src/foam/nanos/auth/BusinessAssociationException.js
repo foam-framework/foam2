@@ -11,12 +11,11 @@ foam.CLASS({
   javaGenerateDefaultConstructor: false,
   javaGenerateConvenienceConstructor: false,
 
-  javaImports: [
-    'foam.core.X'
-  ],
-
   messages: [
-    { name: 'BUSINESS_ASSOCIATION_EXCEPTION', message: 'There was an issue associating the business to the user' },
+    {
+      name: 'EXCEPTION_MESSAGE',
+      message: 'There was an issue associating the business to the user'
+    },
   ],
 
   axioms: [
@@ -25,11 +24,11 @@ foam.CLASS({
       buildJavaClass: function(cls) {
         cls.extras.push(`
   public BusinessAssociationException() {
-    super(BUSINESS_ASSOCIATION_EXCEPTION);
+    super();
   }
 
-  public BusinessAssociationException(X x) {
-    super(x, BUSINESS_ASSOCIATION_EXCEPTION);
+  public BusinessAssociationException(Exception cause) {
+    super(cause);
   }
 
         `);
