@@ -87,7 +87,7 @@ foam.CLASS({
 
   methods: [
     {
-      documentation: 'Override in sub-classes',
+      documentation: 'Override in sub-classes for Java template parameter replacements.',
       name: 'getTemplateValues',
       type: 'Map',
       javaCode: `
@@ -107,12 +107,13 @@ foam.CLASS({
       if ( ! SafetyUtil.isEmpty(msg) ) {
         // REVIEW: temporary - default/simple java template support not yet split out from EmailTemplateEngine.
         foam.nanos.notification.email.EmailTemplateEngine template = new foam.nanos.notification.email.EmailTemplateEngine();
-        return template.renderTemplate(foam.core.XLocator.get(), msg, getTemplateValues()).toString();
+        return template.renderTemplate(XLocator.get(), msg, getTemplateValues()).toString();
       }
-      return toString();
+      return EXCEPTION_MESSAGE;
       `
     },
     {
+      documentation: 'Translate the exception message before template parameter replacement.',
       name: 'getTranslation',
       type: 'String',
       code: function() {
