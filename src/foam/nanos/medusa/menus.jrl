@@ -18,7 +18,6 @@ p({
       "class":"foam.comics.v2.DAOControllerConfig",
       "daoKey":"clusterConfigDAO",
       "browseViews":[{
-        "class":"foam.comics.v2.DAOBrowserView",
         "name":"Table",
         "view":{
           "class":"foam.u2.view.ScrollTableView"
