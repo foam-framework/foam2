@@ -673,6 +673,7 @@ foam.CLASS({
     ['javaCloneProperty', '//noop'],
     ['javaDiffProperty', '//noop'],
     ['generateJava', false],
+    ['toJSON', function() {}], // prevents infinite recursions
     {
       class: 'String',
       name: 'targetPropertyName',
