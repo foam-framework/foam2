@@ -86,20 +86,20 @@ foam.CLASS({
   ],
 
   properties: [
-    /* TODO: uncomment this to fix ViewSpecs converting into Views when loading.
     [
       'fromJSON',
       function fromJSON(value, ctx, prop, json) {
+        /** Prevents viewspecs from converting to views when loaded from JSON. **/
         return value;
       }
     ],
-    */
     ['view', { class: 'foam.u2.view.MapView' }],
     [ 'adapt', function(_, spec, prop) {
       return foam.String.isInstance(spec) ? { class: spec } : spec ;
     } ],
     [ 'displayWidth', 80 ]
     /*
+    TODO: do on the Java side also.
     [ 'toJSON', function(value) {
       Output as string if 'class' is only defined value.
     } ]
