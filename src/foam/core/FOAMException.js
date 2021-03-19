@@ -110,26 +110,17 @@ foam.CLASS({
         return this.translationService.getTranslation(foam.locale, getOwnClassInfo().getId(), EXCEPTION_MESSAGE);
       },
       javaCode: `
-      String locale = "en";
-      try {
-      // Java (server side) translation will most likely be for API calls, so the caller
-      // can specify prefered language via HTTP header parameters.
-      // Otherwise we must cross the foam core/nanos barrier to locate a User.
-      javax.servlet.http.HttpServletRequest req = XLocator.get().get(javax.servlet.http.HttpServletRequest.class);
-      if ( req != null ) {
-        String acceptLanguage = req.getHeader("Accept-Language");
-        if ( ! SafetyUtil.isEmpty(acceptLanguage) ) {
-          String[] languages = acceptLanguage.split(",");
-          locale = languages[0];
-        }
+    try {
+      String locale = (String) XLocator.get().get("locale.language");
+      if ( SafetyUtil.isEmpty(locale) ) {
+        locale = "en";
       }
-
       TranslationService ts = (TranslationService) XLocator.get().get("translationService");
       return ts.getTranslation(locale, getClassInfo().getId(), EXCEPTION_MESSAGE);
-      } catch (NullPointerException e) {
-        // REVIEW: XLocator.get().get(...) NPE in test mode.
-      }
-      return null;
+    } catch (NullPointerException e) {
+      // REVIEW: XLocator.get().get(...) NPE in test mode.
+    }
+    return null;
       `
     },
     {

@@ -274,6 +274,7 @@ var classes = [
   'foam.nanos.auth.LifecycleState',
   'foam.nanos.auth.LifecycleAware',
   'foam.nanos.auth.LifecycleAwareDAO',
+  'foam.nanos.auth.LocaleSupport',
   'foam.nanos.auth.AccountLockedException',
   'foam.nanos.auth.DeletedAwareDAO',
   'foam.nanos.auth.DeletedAwareDAOTest',
