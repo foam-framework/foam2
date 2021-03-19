@@ -111,7 +111,7 @@ foam.CLASS({
       javaCode: `
       try {
         if ( user == null ) {
-          throw new AuthenticationException("User not found");
+          throw new UserNotFoundException();
         }
 
         // check that the user is active

@@ -25,6 +25,6 @@ public class ResendNotificationService extends ContextAwareSupport implements Re
       }
     }
     ((foam.nanos.logger.Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "User not found", userId);
-    throw new foam.core.ClientRuntimeException("User not found");
+    throw new foam.nanos.auth.UserNotFoundException();
   }
 }

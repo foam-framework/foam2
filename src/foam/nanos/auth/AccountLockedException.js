@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * Copyright 2021 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
-  name: 'AccessDeniedException',
+  name: 'AccountLockedException',
   package: 'foam.nanos.auth',
   extends: 'foam.nanos.auth.AuthenticationException',
   javaGenerateDefaultConstructor: false,
@@ -14,8 +14,8 @@ foam.CLASS({
   messages: [
     {
       name: 'EXCEPTION_MESSAGE',
-      value: 'Access denied'
-    }
+      message: 'Account locked. Please contact customer service'
+    },
   ],
 
   axioms: [
@@ -23,13 +23,14 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
-  public AccessDeniedException() {
+  public AccountLockedException() {
     super();
   }
 
-  public AccessDeniedException(Throwable cause) {
+  public AccountLockedException(Exception cause) {
     super(cause);
   }
+
         `);
       }
     }

@@ -22,7 +22,8 @@ foam.CLASS({
     'ctrl',
     'stack',
     'subject',
-    'userCapabilityJunctionDAO'
+    'userCapabilityJunctionDAO',
+    'translationService'
   ],
 
   requires: [
@@ -233,6 +234,9 @@ foam.CLASS({
 
       p.catch(err => {
         console.error(err); // do not remove
+        if (err.data.id == "foam.core.ClientRuntimeException" && err.data.exception.cause_) {
+          err.data.message = this.translationService.getTranslation(foam.locale, `${err.data.exception.cause_}`, err.data.message) 
+        }
         intercept.reject(err.data);
       })
 
