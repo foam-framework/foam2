@@ -17,13 +17,11 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.XLocator',
     'foam.i18n.TranslationService',
-    'foam.nanos.auth.Subject',
-    'foam.nanos.auth.User',
-    'foam.nanos.notification.email.EmailTemplateEngine',
     'foam.util.SafetyUtil',
     'java.util.HashMap',
-    'java.util.Map',
+    'java.util.Map'
   ],
   
   messages: [
@@ -107,7 +105,8 @@ foam.CLASS({
       javaCode: `
       String msg = getTranslation();
       if ( ! SafetyUtil.isEmpty(msg) ) {
-        EmailTemplateEngine template = new EmailTemplateEngine();
+        // REVIEW: temporary - default/simple java template support not yet split out from EmailTemplateEngine.
+        foam.nanos.notification.email.EmailTemplateEngine template = new foam.nanos.notification.email.EmailTemplateEngine();
         return template.renderTemplate(foam.core.XLocator.get(), msg, getTemplateValues()).toString();
       }
       return toString();
@@ -120,15 +119,21 @@ foam.CLASS({
         return this.translationService.getTranslation(foam.locale, getOwnClassInfo().getId(), EXCEPTION_MESSAGE);
       },
       javaCode: `
-      String locale = "pt";
-      Subject subject = (foam.nanos.auth.Subject) foam.core.XLocator.get().get("subject");
-      if ( subject != null ) {
-        User realUser = (User) subject.getRealUser();
-        if ( realUser != null ) {
-          locale = realUser.getLanguage().getCode().toString();
+      String locale = "en";
+
+      // Java (server side) translation will most likely be for API calls, so the caller
+      // can specify prefered language via HTTP header parameters.
+      // Otherwise we must cross the foam core/nanos barrier to locate a User.
+      javax.servlet.http.HttpServletRequest req = XLocator.get().get(javax.servlet.http.HttpServletRequest.class);
+      if ( req != null ) {
+        String acceptLanguage = req.getHeader("Accept-Language");
+        if ( ! SafetyUtil.isEmpty(acceptLanguage) ) {
+          String[] languages = acceptLanguage.split(",");
+          locale = languages[0];
         }
       }
-      TranslationService ts = (TranslationService) foam.core.XLocator.get().get("translationService");
+
+      TranslationService ts = (TranslationService) XLocator.get().get("translationService");
       return ts.getTranslation(locale, getClassInfo().getId(), EXCEPTION_MESSAGE);
       `
     },

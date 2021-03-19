@@ -23,7 +23,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.NanoService',
     'foam.nanos.auth.User',
-    'foam.nanos.auth.UnknowUserException',
+    'foam.nanos.auth.UserNotFoundException',
 
     'static foam.mlang.MLang.AND',
     'static foam.mlang.MLang.OR',
