@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'User',
+  plural: 'Users',
 
   implements: [
     'foam.nanos.auth.Authorizable',
@@ -202,7 +203,7 @@ foam.CLASS({
       class: 'String',
       name: 'firstName',
       shortName: 'fn',
-      documentation: 'The first name of the User.',      
+      documentation: 'The first name of the User.',
       section: 'userInformation',
       order: 70,
       gridColumns: 6,
