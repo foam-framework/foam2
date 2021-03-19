@@ -395,5 +395,14 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.ResetPassword.RE
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.ResetPassword.RESET_PASSWORD_SUBTITLE",target:"Crie uma nova senha para sua conta"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.ResetPassword.PASSWORD_LENGTH_10_ERROR",target:"A senha deve ter pelo menos 10 caracteres"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.ResetPassword.PASSWORD_NOT_MATCH",target:"As senhas não coincidem"})
+
+//Exceptions
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UserNotFoundException.EXCEPTION_MESSAGE",target:"Usuário não encontrado"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.AuthenticationException.EXCEPTION_MESSAGE",target:"Não logado"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.AccountLockedException",target:"Conta bloqueada. Entre em contato com o atendimento ao cliente."})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UnknowUserException",target:"usuário não encontrado"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.BusinessAssociationException",target:"Houve um problema ao associar a empresa ao usuário"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.BusinessSignInException",target:"Ocorreu um problema ao iniciar sessão na empresa recém-criada. Vá para o menu de mudança de empresa nos seus menus pessoais para entrar na sua empresa."})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.BusinessValidationException",target:"Ocorreu um problema ao criar o negócio"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"net.nanopay.tx.planner.UnableToPlanException",target:"incapaz de planejar"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"net.nanopay.tx.planner.InvalidPlanException",target:"Plano inválido"})

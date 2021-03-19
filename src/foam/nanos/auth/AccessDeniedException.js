@@ -31,6 +31,10 @@ foam.CLASS({
   public AccessDeniedException(String message, Throwable cause) {
     super(message, cause);
   }
+
+  public AccessDeniedException(String message, String id, String locale) {
+    super(message, id, locale);
+  }
         `);
       }
     }
