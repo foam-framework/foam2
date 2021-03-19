@@ -285,12 +285,12 @@ foam.CLASS({
           data$: self.searchPredicate$,
         }, self, self.__subSubContext__.createSubContext({ memento: this.memento }));
 
-        filterView  = foam.u2.ViewSpec.createView(self.FilterView, {
+        filterView = foam.u2.ViewSpec.createView(self.FilterView, {
           dao$: self.searchFilterDAO$,
           data$: self.searchPredicate$
         }, self, simpleSearch.__subContext__.createSubContext());
       } else {
-        filterView  = foam.u2.ViewSpec.createView(self.FilterView, {
+        filterView = foam.u2.ViewSpec.createView(self.FilterView, {
           dao$: self.searchFilterDAO$,
           data$: self.searchPredicate$
         }, self, self.__subContext__.createSubContext({ memento: this.memento }));
