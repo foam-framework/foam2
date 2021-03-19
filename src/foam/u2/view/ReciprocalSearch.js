@@ -223,7 +223,7 @@ foam.CLASS({
 
             if ( self.memento && m ) {
               if ( ! m.tail )
-                m.tail$.set(foam.nanos.controller.Memento.create());
+                m.tail = foam.nanos.controller.Memento.create();
               counter--;
               if ( counter != 0 )
                 m = m.tail;

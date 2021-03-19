@@ -333,7 +333,7 @@ foam.CLASS({
         return;
       }
 
-      var x = this.__subContext__.createSubContext({memento: this.memento});
+      var x = this.__subContext__.createSubContext({ memento: this.memento });
       x.register(this.DAOUpdateControllerView, 'foam.comics.DAOUpdateControllerView');
       x.register(this.CustomDAOSummaryView,    'foam.comics.v2.DAOSummaryView');
       x.register(this.CustomDAOUpdateView,     'foam.comics.v2.DAOUpdateView');
