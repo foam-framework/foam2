@@ -50,7 +50,7 @@ foam.CLASS({
           return vs;
         }
         return null;
-      }))
+      }));
     }
   ],
 });
