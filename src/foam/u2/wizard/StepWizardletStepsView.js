@@ -117,7 +117,6 @@ foam.CLASS({
 
   requires: [
     'foam.core.ExpressionSlot',
-    'foam.u2.detail.AbstractSectionedDetailView',
     'foam.u2.tag.CircleIndicator',
     'foam.u2.wizard.WizardPosition',
     'foam.u2.wizard.WizardletIndicator'

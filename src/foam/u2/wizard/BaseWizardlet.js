@@ -79,15 +79,13 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.u2.wizard.WizardletSection',
       factory: function () {
-        return foam.u2.detail.AbstractSectionedDetailView.create({
-          of: this.of,
-        }, this).sections.map(section => this.WizardletSection.create({
-          section: section,
-          wizardlet: this,
-          isAvailable$: section.createIsAvailableFor(
-            this.data$,
-          )
-        }));
+        return this.of.getAxiomsByClass(foam.layout.SectionAxiom).map(ax => {
+          return this.WizardletSection.create({
+            wizardlet: this,
+            sectionAxiom: ax,
+            isAvailable$: ax.createIsAvailableFor(this.data$)
+          });
+        });
       }
     },
     {
