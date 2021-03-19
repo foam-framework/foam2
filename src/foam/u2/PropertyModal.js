@@ -27,8 +27,10 @@ foam.CLASS({
       max-width: calc(100vw - 48px);
       max-height: calc(100vh - 116px);
       overflow-y: auto;
+      min-width: 20vw;
     }
     ^title {
+      max-width: fit-content;
       padding: 32px 0px;
       font-size: 1.5em;
       font-weight: bold;
@@ -86,7 +88,7 @@ foam.CLASS({
           .addClass(this.myClass('main'))
           .start()
             .addClass(this.myClass('title'))
-            .add(this.title)
+            .add(this.title$)
           .end()
           .startContext({ data: this, controllerMode: this.ControllerMode.EDIT })
           .tag(this.SectionedDetailPropertyView, {
