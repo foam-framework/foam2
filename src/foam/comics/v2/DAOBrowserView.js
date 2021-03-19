@@ -275,27 +275,25 @@ foam.CLASS({
       var filterView;
       var simpleSearch;
 
-      if ( this.memento ) {
-        if ( ! this.memento.tail ) {
-          this.memento.tail = foam.nanos.controller.Memento.create({});
-        }
+      if ( this.memento && ! this.memento.tail ) {
+        this.memento.tail = foam.nanos.controller.Memento.create({});
       }
 
       if ( self.config.searchMode === self.SearchMode.SIMPLE ) {
         simpleSearch = foam.u2.ViewSpec.createView(self.SimpleSearch, {
           showCount: false,
           data$: self.searchPredicate$,
-        },  self, self.__subSubContext__.createSubContext({ memento: this.memento }));
+        }, self, self.__subSubContext__.createSubContext({ memento: this.memento }));
 
         filterView  = foam.u2.ViewSpec.createView(self.FilterView, {
           dao$: self.searchFilterDAO$,
           data$: self.searchPredicate$
-        },  self, simpleSearch.__subContext__.createSubContext());
+        }, self, simpleSearch.__subContext__.createSubContext());
       } else {
         filterView  = foam.u2.ViewSpec.createView(self.FilterView, {
           dao$: self.searchFilterDAO$,
           data$: self.searchPredicate$
-        },  self, self.__subContext__.createSubContext({ memento: this.memento }));
+        }, self, self.__subContext__.createSubContext({ memento: this.memento }));
       }
 
       var summaryView = foam.u2.ViewSpec.createView(self.summaryView ,{

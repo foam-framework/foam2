@@ -25,8 +25,8 @@ foam.CLASS({
   exports: [
     'as filterController',
     'as data',
-    'searchManager',
-    'currentMemento_ as memento'
+    'currentMemento_ as memento',
+    'searchManager'
   ],
 
   css: `

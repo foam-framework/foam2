@@ -30,12 +30,12 @@ foam.CLASS({
   ],
 
   exports: [
-    'controller as data',
-    'summaryView',
     'createControllerView',
-    'updateView',
+    'controller as data',
+    'memento',
     'serviceName',
-    'memento'
+    'summaryView',
+    'updateView'
   ],
 
   properties: [

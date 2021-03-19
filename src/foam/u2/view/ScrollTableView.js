@@ -210,7 +210,7 @@
         //as there two settings to configure for table scroll and columns params
         //scroll setting which setts the record to which table currently scrolled
         var m = this.memento;
-        for ( var i = 0; i < 2; i++ ) {
+        for ( var i = 0 ; i < 2 ; i++ ) {
           if ( ! m ) {
             m = foam.nanos.controller.Memento.create({ value: '', parent: this.memento });
             this.memento.tail = m;

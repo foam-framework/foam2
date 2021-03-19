@@ -149,17 +149,17 @@ foam.CLASS({
       var self = this;
       var summaryViewParent;
 
-      var reciprocalSearch =  foam.u2.ViewSpec.createView({
+      var reciprocalSearch = foam.u2.ViewSpec.createView({
         class: 'foam.u2.view.ReciprocalSearch',
         data$: this.data.predicate$
-      },  {}, self, self.__subContext__.createSubContext({ memento: this.memento }));
+      }, {}, self, self.__subContext__.createSubContext({ memento: this.memento }));
 
       var searchView = foam.u2.ViewSpec.createView({
         class: 'foam.u2.view.SimpleSearch',
         data$: this.data.predicate$
-      },  {}, self, reciprocalSearch.__subContext__);
+      }, {}, self, reciprocalSearch.__subContext__.createSubContext());
 
-      if (this.data.searchMode === this.SearchMode.FULL) {
+      if ( this.data.searchMode === this.SearchMode.FULL ) {
         summaryViewParent = reciprocalSearch;
       }
       if ( this.data.searchMode === this.SearchMode.SIMPLE ) {

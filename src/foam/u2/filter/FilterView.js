@@ -290,7 +290,7 @@ foam.CLASS({
       if ( this.memento ) {
         var m = this.memento;
         //i + 1 as there is a textSearch that we also need for memento
-        for ( var i = 0; i < this.filters.length + 1; i++ ) {
+        for ( var i = 0 ; i < this.filters.length + 1 ; i++ ) {
           if ( ! m ) {
             m = foam.nanos.controller.Memento.create({ value: '', parent: this.memento });
             this.memento.tail = m;

@@ -123,7 +123,6 @@ foam.CLASS({
           var id = '' + this.idOfRecord;
           if ( id && foam.core.MultiPartID.isInstance(this.config.of.ID) ) {
             id = id.substr(1, id.length - 2).replaceAll(':', '=');
-
           }
           return 'view::' + id;
         }
