@@ -21,8 +21,11 @@ foam.CLASS({
   methods: [
     function save(wizardlet) {
       if ( ! wizardlet.isAvailable ) return Promise.resolve();
+      wizardlet.loading = true;
       return this.crunchService.updateJunction( null,
-        wizardlet.capability.id, wizardlet.data, null
+        wizardlet.capability.id,
+        wizardlet.data ? wizardlet.data.clone() : null,
+        null
       ).then((ucj) => {
         this.crunchService.pub('grantedJunction');
         this.load_(wizardlet, ucj);
@@ -38,6 +41,7 @@ foam.CLASS({
       });
     },
     function load(wizardlet) {
+      wizardlet.loading = true;
       return this.crunchService.getJunction(
         null, wizardlet.capability.id
       ).then(ucj => {
@@ -54,12 +58,18 @@ foam.CLASS({
       var loadedData = wizardlet.of.create({}, wizardlet);
       if ( ucj.data ) loadedData.copyFrom(ucj.data);
 
-        // Set transient 'capability' property if it exists
-        var prop = wizardlet.of.getAxiomByName('capability');
-        if ( prop ) prop.set(loadedData, wizardlet.capability);
+      // Set transient 'capability' property if it exists
+      // TODO: Get rid of support for this as soon as possible
+      var prop = wizardlet.of.getAxiomByName('capability');
+      if ( prop ) prop.set(loadedData, wizardlet.capability);
 
       // Finally, apply new data to wizardlet
-      wizardlet.data = loadedData;
+      if ( wizardlet.data ) {
+        wizardlet.data.copyFrom(loadedData);
+      } else {
+        wizardlet.data = loadedData;
+      }
+      wizardlet.loading = false;
     }
   ]
 });

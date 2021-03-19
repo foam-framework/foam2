@@ -998,7 +998,11 @@ foam.CLASS({
           var name = props[i].name;
           var otherProp = o.cls_.getAxiomByName(name);
           if ( otherProp && foam.core.Property.isInstance(otherProp) ) {
-            this[name] = o[name];
+            if ( this[name] && this[name].copyFrom ) {
+              this[name].copyFrom(o[name])
+            } else {
+              this[name] = o[name];
+            }
           }
         }
         return this;

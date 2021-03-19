@@ -122,4 +122,26 @@ public class AgentUserAuthService
       return false;
     }
   }
+
+  public void logout(X x) {
+    User agent = ((Subject) x.get("subject")).getRealUser();
+
+    // Check for current context user
+    if ( agent == null || agent.getLifecycleState() != LifecycleState.ACTIVE ) {
+      return;
+    }
+
+    agent = (User) agent.fclone();
+    agent.freeze();
+
+    // Purge auth cache
+    CachingAuthService.purgeCache(x);
+
+    // Update the session and context
+    Session session = x.get(Session.class);
+    session.setUserId(agent.getId());
+    session.setAgentId(0);
+    session = (Session) sessionDAO_.put(session);
+    session.setContext(session.applyTo(session.getContext()));
+  }
 }

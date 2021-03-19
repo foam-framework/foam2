@@ -100,7 +100,7 @@ foam.CLASS({
       name: 'getTime',
       type: 'Long',
       javaCode: `
-    return getEndTime() - getStartTime();
+    return Math.max(0, getEndTime() - getStartTime());
       `
     },
     {
