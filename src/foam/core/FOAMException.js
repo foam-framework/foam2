@@ -87,16 +87,6 @@ foam.CLASS({
 
   methods: [
     {
-      documentation: 'Override in sub-classes for Java template parameter replacements.',
-      name: 'getTemplateValues',
-      type: 'Map',
-      javaCode: `
-      Map map = new HashMap();
-      map.put("message_", getMessage_());
-      return map;
-      `
-    },
-    {
       name: 'getMessage',
       type: 'String',
       code: function() {
@@ -139,13 +129,31 @@ foam.CLASS({
       `
     },
     {
+      documentation: 'Build map of template parameter replacements',
+      name: 'getTemplateValues',
+      type: 'Map',
+      javaCode: `
+      Map map = new HashMap();
+      var props = getClassInfo().getAxiomsByClass(foam.core.PropertyInfo.class);
+      var i     = props.iterator();
+      while ( i.hasNext() ) {
+        foam.core.PropertyInfo prop = i.next();
+        Object value = prop.get(this);
+        if ( value != null ) {
+          map.put(prop.getName(), String.valueOf(value));
+        }
+      }
+      return map;
+      `
+    },
+    {
       name: 'toString',
       type: 'String',
       code: function() {
-        return '['+this.hostname+'],'+this.getOwnClassInfo().getId()+','+EXCEPTION_MESSAGE+','+this.message_;
+        return '['+this.hostname+'],'+this.getOwnClassInfo().getId()+','+getMessage();
       },
       javaCode: `
-      return "["+getHostname()+"],"+this.getClass().getName()+","+EXCEPTION_MESSAGE+","+getMessage_();
+      return "["+getHostname()+"],"+this.getClass().getName()+","+getMessage();
       `
     }
   ]
