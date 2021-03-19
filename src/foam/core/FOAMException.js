@@ -97,7 +97,7 @@ foam.CLASS({
       if ( ! SafetyUtil.isEmpty(msg) ) {
         // REVIEW: temporary - default/simple java template support not yet split out from EmailTemplateEngine.
         foam.nanos.notification.email.EmailTemplateEngine template = new foam.nanos.notification.email.EmailTemplateEngine();
-        return template.renderTemplate(XLocator.get(), msg, getTemplateValues()).toString();
+        return template.renderTemplate(XLocator.get(), msg, getTemplateValues()).toString().trim();
       }
       return EXCEPTION_MESSAGE;
       `
@@ -111,7 +111,7 @@ foam.CLASS({
       },
       javaCode: `
       String locale = "en";
-
+      try {
       // Java (server side) translation will most likely be for API calls, so the caller
       // can specify prefered language via HTTP header parameters.
       // Otherwise we must cross the foam core/nanos barrier to locate a User.
@@ -126,6 +126,10 @@ foam.CLASS({
 
       TranslationService ts = (TranslationService) XLocator.get().get("translationService");
       return ts.getTranslation(locale, getClassInfo().getId(), EXCEPTION_MESSAGE);
+      } catch (NullPointerException e) {
+        // REVIEW: XLocator.get().get(...) NPE in test mode.
+      }
+      return null;
       `
     },
     {
