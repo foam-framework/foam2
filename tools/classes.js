@@ -797,6 +797,7 @@ var classes = [
   'foam.nanos.crunch.CapabilityCategoryCapabilityJunction',
   'foam.nanos.crunch.CapabilityJunctionStatus',
   'foam.nanos.crunch.UserCapabilityJunction',
+  'foam.u2.wizard.data.BooleanHolder',
   'foam.nanos.crunch.ui.WizardState',
   // 'foam.nanos.crunch.ui.UserCapabilityWizardState',
   'foam.nanos.crunch.ui.CapabilityWizardlet',
