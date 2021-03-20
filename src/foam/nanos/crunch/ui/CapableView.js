@@ -13,14 +13,8 @@ foam.CLASS({
   imports: [
     'crunchController',
     'notify',
-    'stack',
     'subject',
-    'userCapabilityJunctionDAO',
-    'userDAO'
-  ],
-
-  exports:[
-    'controllerMode'
+    'userCapabilityJunctionDAO'
   ],
 
   requires: [
@@ -36,9 +30,6 @@ foam.CLASS({
       top: 0px;
       position: relative;
     }
-    ^button-container {
-      display: flex;
-    }
   `,
 
   properties: [
@@ -47,24 +38,12 @@ foam.CLASS({
       documentation: 'a capable object'
     },
     {
-      name: 'ucjObj',
-      documentation: 'ucj object'
-    },
-    {
-      name: 'controllerMode',
-      factory: function() {
-        return foam.u2.ControllerMode.VIEW;
-      }
-    },
-    {
       class: 'FObjectArray',
       of: 'foam.u2.wizard.BaseWizardlet',
       name: 'wizardlets',
       documentation: 'wizardlets for capable payloads',
       postSet: function(_, n) {
-        if (this.capableObj) {
-          this.listenOnWizardlets();
-        }
+        this.listenOnWizardlets();
       }
     },
     {
@@ -94,56 +73,29 @@ foam.CLASS({
       const self = this;
 
       // a flag for checking if the capable object has payloads
-      // const hasPayloads = this.capableObj.capablePayloads &&
-      //   Object.keys(this.capableObj.capablePayloads).length > 0;
+      const hasPayloads = this.capableObj.capablePayloads &&
+        Object.keys(this.capableObj.capablePayloads).length > 0;
 
       // set wizardlets based on the capableObj
       // note: payloads data are also set from getWizardletsFromCapable
       //       this is why we add listeners to payloads data after wizardlets are set
+      this.wizardlets = this.capableObj ?
+        await this.crunchController.createCapableViewSequence(this.capableObj)
+          .execute().then(x => x.wizardlets)
+        : [];
 
-
-      var x;
-      if (this.ucjObj) {
-        var user = await this.userDAO.find(this.data.effectiveUser);
-        var realUser = await this.userDAO.find(this.data.sourceId);
-        var subject = foam.nanos.auth.Subject.create({user: user, realUser: realUser}, this);
-        var x = this.__subContext__.createSubContext({ subject: subject })
-        this.wizardlets = this.ucjObj ?
-          await this.crunchController.createCapabilityViewSequence(this.data.targetId, x)
-            .reconfigure('LoadCapabilitiesAgent', {
-              subject: subject })
-            .reconfigure('LoadWizardletsAgent', {
-              subject: subject })
-            .remove('UnlockPaymentsWizardConfig')
-            .execute().then(x => x.wizardlets)
-          : [];
-      }
-      if (this.capableObj) {
-        this.wizardlets = this.capableObj ?
-          await this.crunchController.createCapableViewSequence(this.capableObj)
-            .execute().then(x => x.wizardlets)
-          : [];
-      }
 
       this.start().addClass(this.myClass())
-        .start().addClass(this.myClass('button-container'))
-          .startContext({ data: self })
-          .tag(this.BACK)
-          .tag(this.CANCEL, { isDestructive: true })
-          .tag(this.EDIT)
-          .tag(this.SUBMIT)
-          .endContext()
-        .end()
         .forEach(this.wizardlets, function (w, wi) {
           this.add(foam.core.ExpressionSlot.create({
-            args: [w.sections$, w.data$, self.controllerMode$],
+            args: [w.sections$, w.data$],
             code: (sections, data) => {
               return sections.map(section => section.createView({
                 showTitle: self.showTitle,
-                wizardlet: w
-              }, x));
+                wizardlet: w,
+              }));
             }
-          }, x));
+          }));
         })
       .end();
     },
@@ -175,34 +127,6 @@ foam.CLASS({
         };
         wizardlet.data$.sub(bind);
         bind();
-      }
-    }
-  ],
-  actions: [
-    {
-      name: 'cancel',
-      code: async function() {
-        await Promise.all(this.wizardlets.map(w => w.load()));
-        this.controllerMode = foam.u2.ControllerMode.VIEW;
-      }
-    },
-    {
-      name: 'back',
-      code: function() {
-        this.controllerMode == foam.u2.ControllerMode.EDIT ? this.controllerMode = foam.u2.ControllerMode.VIEW : this.stack.back();
-      }
-    },
-    {
-      name: 'edit',
-      code: function() {
-        this.controllerMode = foam.u2.ControllerMode.EDIT;
-      }
-    },
-    {
-      name: 'submit',
-      code: async function() {
-        await Promise.all(this.wizardlets.map(w => w.save()));
-        this.controllerMode = foam.u2.ControllerMode.VIEW;
       }
     }
   ]

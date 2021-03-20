@@ -251,13 +251,16 @@ foam.CLASS({
               })
               .start()
                 .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
-                  .start()
-                    .style({ 'flex-grow': 1, 'max-width': '100%' })
-                    .tag(prop, { mode$: self.mode$ })
-                    .callIf(prop.validationStyleEnabled, function() {
-                      this.enableClass(self.myClass('error'), errorSlot);
-                    })
-                  .end()
+                .start()
+                  .style({ 'flex-grow': 1, 'max-width': '100%' })
+                  .callIf( prop.view.class == 'foam.u2.CheckBox', function() {
+                    this.style({ 'margin': '20px' });
+                  })
+                  .tag(prop, { mode$: self.mode$ })
+                  .callIf(prop.validationStyleEnabled, function() {
+                    this.enableClass(self.myClass('error'), errorSlot);
+                  })
+                .end()
                 .callIf(prop.help, function() {
                   this.start()
                     .addClass(self.myClass('tooltip'))
