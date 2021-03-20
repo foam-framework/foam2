@@ -13,6 +13,7 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.layout.Section',
     'foam.u2.detail.SectionView',
     'foam.u2.detail.VerticalDetailView',
     'foam.u2.ViewSpec',
@@ -20,15 +21,15 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'section',
+      name: 'sectionAxiom',
       class: 'FObjectProperty',
-      of: 'foam.layout.Section',
+      of: 'foam.layout.SectionAxiom'
     },
     {
       name: 'title',
       class: 'String',
-      expression: function(section) {
-        return section && section.title;
+      expression: function(sectionAxiom) {
+        return sectionAxiom && sectionAxiom.title;
       }
     },
     {
@@ -56,10 +57,17 @@ foam.CLASS({
         if ( ! wizardlet$of ) return true;
         if ( ! data ) return false;
 
+        var properties = [];
+        (() => {
+          var section = this.Section.create().fromSectionAxiom(
+            this.sectionAxiom, wizardlet$of);
+          properties = section.properties;
+        })();
+
         let sectionErrors = [];
         if ( data$errors_ ) {
           sectionErrors = data$errors_.filter(error =>
-            this.section.properties.includes(error[0])
+            properties.includes(error[0])
           );
         }
         return ! sectionErrors.length > 0;
@@ -72,8 +80,8 @@ foam.CLASS({
     {
       name: 'navTitle',
       class: 'String',
-      expression: function(section) {
-        return section && section.navTitle;
+      expression: function(sectionAxiom) {
+        return sectionAxiom && sectionAxiom.navTitle;
       }
     }
   ],
@@ -91,7 +99,7 @@ foam.CLASS({
         'foam.u2.detail.SectionedDetailView'
       );
       return this.SectionView.create({
-        section: this.section,
+        sectionName: this.sectionAxiom.name,
         data$: this.wizardlet.data$,
         ...opt_spec
       }, ctx);

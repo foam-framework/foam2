@@ -168,15 +168,14 @@ foam.CLASS({
         ];
 
         if ( this.of && this.showDefaultSections ){
-          var ofSections = foam.u2.detail.AbstractSectionedDetailView.create({
-            of: this.of,
-          }, this).sections.map(section => this.WizardletSection.create({
-            section: section,
-            data$: this.data$,
-            isAvailable$: section.createIsAvailableFor(
-              this.data$,
-            )
-          }));
+          var ofSections = this.of.getAxiomsByClass(foam.layout.SectionAxiom).map(ax => {
+            return this.WizardletSection.create({
+              // TODO: Should this get passed 'wizardlet' instead of 'data$'?
+              data$: this.data$,
+              sectionAxiom: ax,
+              isAvailable$: ax.createIsAvailableFor(this.data$)
+            });
+          });
 
           sections = [
             ...ofSections,
