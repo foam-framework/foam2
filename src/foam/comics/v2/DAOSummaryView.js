@@ -57,13 +57,24 @@ foam.CLASS({
   imports: [
     'auth',
     'memento',
-    'stack'
+    'stack',
+    'translationService'
   ],
 
   exports: [
     'controllerMode',
     'as objectSummaryView',
     'currentMemento as memento'
+  ],
+
+  messages: [
+    { name: 'DETAIL', message: 'Detail' },
+    { name: 'TABBED', message: 'Tabbed' },
+    { name: 'SECTIONED', message: 'Sectioned' },
+    { name: 'MATERIAL', message: 'Material' },
+    { name: 'WIZARD', message: 'Wizard' },
+    { name: 'VERTICAL', message: 'Vertical' },
+    { name: 'ALL', message: 'All ' }
   ],
 
   properties: [
@@ -105,7 +116,8 @@ foam.CLASS({
       class: 'String',
       name: 'backLabel',
       expression: function(config$browseTitle) {
-        return 'All ' + config$browseTitle;
+        var allMsg = ctrl.__subContext__.translationService.getTranslation(foam.locale, 'foam.comics.v2.DAOSummaryView.ALL', this.ALL);
+        return allMsg + config$browseTitle;
       }
     },
     {
