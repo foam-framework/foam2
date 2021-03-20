@@ -24,13 +24,6 @@ foam.CLASS({
     'java.util.Map'
   ],
   
-  messages: [
-    {
-      name: 'EXCEPTION_MESSAGE',
-      message: '{{message_}}'
-    }
-  ],
-
   axioms: [
     {
       name: 'javaExtras',
@@ -62,11 +55,25 @@ foam.CLASS({
     }
   ],
 
+  messages: [
+    {
+      name: 'EXCEPTION_MESSAGE',
+      message: '{{message_}}'
+    },
+  ],
+
   properties: [
     {
       name: 'message_',
       class: 'String',
       visibility: 'RO'
+    },
+    {
+      documentation: 'java message template',
+      name: 'javaExceptionMessage',
+      class: 'String',
+      value: '{{message_}}',
+      transient: true
     },
     {
       name: 'hostname',
@@ -93,16 +100,22 @@ foam.CLASS({
         return this.toMessage();
       },
       javaCode: `
+    try {
+System.out.println("FOAMException,translation-before,"+getJavaExceptionMessage());
       String msg = getTranslation();
-System.out.println("FOAMException,msg,translation,"+msg);
+System.out.println("FOAMException,translation-after,"+msg);
       if ( ! SafetyUtil.isEmpty(msg) ) {
         // REVIEW: temporary - default/simple java template support not yet split out from EmailTemplateEngine.
         foam.nanos.notification.email.EmailTemplateEngine template = new foam.nanos.notification.email.EmailTemplateEngine();
         msg = template.renderTemplate(XLocator.get(), msg, getTemplateValues()).toString().trim();
-System.out.println("FOAMException,msg,templated,"+msg);
+System.out.println("FOAMException,templated,"+msg);
         return msg;
       }
-      return EXCEPTION_MESSAGE;
+    } catch (NullPointerException e) {
+      // REVIEW: XLocator.get().get(...) NPE in test mode.
+      System.out.println("FOAMException,XLocator,null");
+    }
+    return getJavaExceptionMessage();
       `
     },
     {
@@ -113,18 +126,12 @@ System.out.println("FOAMException,msg,templated,"+msg);
         return this.translationService.getTranslation(foam.locale, getOwnClassInfo().getId(), EXCEPTION_MESSAGE);
       },
       javaCode: `
-    try {
       String locale = (String) XLocator.get().get("locale.language");
       if ( SafetyUtil.isEmpty(locale) ) {
         locale = "en";
       }
       TranslationService ts = (TranslationService) XLocator.get().get("translationService");
-      return ts.getTranslation(locale, getClassInfo().getId(), EXCEPTION_MESSAGE);
-    } catch (NullPointerException e) {
-System.err.println("FOAMException,XLocator.get,null");
-      // REVIEW: XLocator.get().get(...) NPE in test mode.
-    }
-    return null;
+      return ts.getTranslation(locale, getClassInfo().getId(), getJavaExceptionMessage());
       `
     },
     {
@@ -137,9 +144,11 @@ System.err.println("FOAMException,XLocator.get,null");
       var i     = props.iterator();
       while ( i.hasNext() ) {
         foam.core.PropertyInfo prop = i.next();
-        Object value = prop.get(this);
-        if ( value != null ) {
-          map.put(prop.getName(), String.valueOf(value));
+        if ( ! prop.getNetworkTransient() ) {
+          Object value = prop.get(this);
+          if ( value != null ) {
+            map.put(prop.getName(), String.valueOf(value));
+          }
         }
       }
       return map;

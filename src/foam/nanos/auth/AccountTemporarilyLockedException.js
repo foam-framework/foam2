@@ -1,21 +1,21 @@
 /**
  * @license
- * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * Copyright 2021 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
-  name: 'AuthenticationException',
+  name: 'AccountTemporarilyLockedException',
   package: 'foam.nanos.auth',
-  extends: 'foam.core.ClientRuntimeException',
+  extends: 'foam.nanos.auth.AuthenticationException',
   javaGenerateDefaultConstructor: false,
   javaGenerateConvenienceConstructor: false,
 
   messages: [
     {
       name: 'EXCEPTION_MESSAGE',
-      message: 'Not logged in {{message_}}'
-    }
+      message: 'Account temporarily locked. You can attempt to login after {{message_}}'
+    },
   ],
 
   properties: [
@@ -23,7 +23,7 @@ foam.CLASS({
       documentation: 'java message template',
       name: 'javaExceptionMessage',
       class: 'String',
-      value: 'Not logged in {{message_}}',
+      value: 'Account temporarily locked. You can attempt to login after {{message_}}',
       transient: true
     }
   ],
@@ -33,19 +33,15 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function(cls) {
         cls.extras.push(`
-  public AuthenticationException() {
+  public AccountTemporarilyLockedException() {
     super();
   }
 
-  public AuthenticationException(String message) {
+  public AccountTemporarilyLockedException(String message) {
     super(message);
   }
 
-  public AuthenticationException(Throwable cause) {
-    super("Not logged in", cause);
-  }
-
-  public AuthenticationException(String message, Throwable cause) {
+  public AccountTemporarilyLockedException(String message, Exception cause) {
     super(message, cause);
   }
         `);

@@ -18,6 +18,16 @@ foam.CLASS({
     }
   ],
 
+  properties: [
+    {
+      documentation: 'java message template',
+      name: 'javaExceptionMessage',
+      class: 'String',
+      value: 'Access denied',
+      transient: true
+    }
+  ],
+
   axioms: [
     {
       name: 'javaExtras',
