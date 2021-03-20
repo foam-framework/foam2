@@ -19,10 +19,26 @@ foam.CLASS({
   implements: [
     'foam.core.ContextAgent'
   ],
+  
+  properties: [
+    {
+      class: 'Function',
+      name: 'onSave'
+    }
+  ],
 
   methods: [
     async function execute() {
-      await foam.Promise.inOrder(this.wizardlets, w => w.save());
+      let allValid = true;
+      await foam.Promise.inOrder(this.wizardlets, w => {
+        if ( allValid ) {
+          allValid = w.isValid;
+        }
+        w.save();
+      });
+      if ( this.onSave ) {
+        this.onSave(allValid);
+      }
     }
   ]
 });

@@ -10,27 +10,82 @@ foam.CLASS({
   extends: 'foam.comics.v2.DAOSummaryView',
 
   imports: [
-    'auth'
+    'auth',
+    'crunchController',
+    'userDAO',
+    'stack',
+    'notify'
   ],
 
-  exports: [
-    'customAuth as auth'
+  messages: [
+    { name: 'SUCCESS_UPDATED', message: 'Successfuly updated onboarding information.'},
+    { name: 'SUCCESS_REMOVED', message: 'Successfuly removed onboarding information. Please wait for resubmission.'},
   ],
+
+  css: `
+    ^ {
+      padding-bottom: 0px !important;
+    }
+    ^view-container .foam-u2-stack-StackView {
+      padding-left: 0px !important;
+    }
+    ^ .foam-u2-wizard-ScrollingStepWizardView-hide-X-status {
+      padding-top: 0px !important;
+    }
+    ^ .foam-u2-wizard-ScrollingStepWizardView-hide-X-entry {
+      padding-top: 0px !important;
+    }
+    ^ .foam-u2-wizard-ScrollingStepWizardView-fix-grid {
+      height: calc(100vh - 221px) !important;
+    }
+    ^ .foam-u2-detail-SectionView-backOfficeSuggestedUserTransactionInfo {
+      display: none;
+    }
+  `,
 
   classes: [
     {
-      name: 'CustomAuth',
-      extends: 'foam.nanos.auth.ProxyAuthService',
-      imports: ['auth', 'userDAO'],
+      name: 'ScrollingWizardStackView',
+      extends: 'foam.u2.View',
+      imports: [
+        'crunchController',
+        'userDAO'
+      ],
+      requires: [
+        'foam.u2.crunch.wizardflow.SaveAllAgent'
+      ],
+
       properties: [
+        'ucj',
         {
-          name: 'ucj'
+          class: 'Function',
+          name: 'onSave'
         }
       ],
       methods: [
-        async function check(X, permission) {
+        async function initE() {          
           var user = await this.userDAO.find(this.ucj.effectiveUser);
-          return this.auth.checkUser(null, user, permission);
+          var realUser = await this.userDAO.find(this.ucj.sourceId);
+          var subject = foam.nanos.auth.Subject.create({ user: user, realUser: realUser });
+          var stack = foam.u2.stack.Stack.create();
+          var x = this.__subContext__.createSubContext({ stack: stack, subject: subject, controllerMode: foam.u2.ControllerMode.EDIT });
+          
+          this.crunchController.createWizardSequence(this.ucj.targetId, x)
+            .reconfigure('LoadCapabilitiesAgent', {
+              subject: subject })
+            .reconfigure('LoadWizardletsAgent', {
+              subject: subject })
+            .reconfigure('ConfigureFlowAgent', {
+              popupMode: false
+            })
+            .remove('RequirementsPreviewAgent')
+            .remove('SkipGrantedAgent')
+            .remove('AutoSaveWizardletsAgent')
+            .remove('PutFinalJunctionsAgent')
+            .add(this.SaveAllAgent, { onSave: this.onSave })
+            .execute();
+
+          this.tag(foam.u2.stack.StackView.create({ data: stack, showActions: false }, x));
         }
       ]
     }
@@ -38,16 +93,14 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'customAuth',
-      factory: function() {
-        return this.CustomAuth.create({ delegate: this.auth, ucj: this.data });
-      }
-    },
-    {
       class: 'foam.u2.ViewSpecWithJava',
       name: 'viewView',
       factory: function() {
-        return foam.nanos.crunch.ui.CapableView.create({ ucjObj: this.data, showTitle: true }, this);
+        let onSave = (isValid) => {
+          this.stack.back();
+          this.notify(isValid ? this.SUCCESS_UPDATED : this.SUCCESS_REMOVED, '', foam.log.LogLevel.INFO, true);
+        }
+        return this.ScrollingWizardStackView.create({ ucj: this.data, onSave: onSave });
       }
     }
   ]
