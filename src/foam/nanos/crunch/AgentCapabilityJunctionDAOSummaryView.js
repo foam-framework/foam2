@@ -14,7 +14,9 @@ foam.CLASS({
     'crunchController',
     'userDAO',
     'stack',
-    'notify'
+    'notify',
+    'pushMenu',
+    'approvalRequestDAO'
   ],
 
   messages: [
@@ -28,12 +30,6 @@ foam.CLASS({
     }
     ^view-container .foam-u2-stack-StackView {
       padding-left: 0px !important;
-    }
-    ^ .foam-u2-wizard-ScrollingStepWizardView-hide-X-status {
-      padding-top: 0px !important;
-    }
-    ^ .foam-u2-wizard-ScrollingStepWizardView-hide-X-entry {
-      padding-top: 0px !important;
     }
     ^ .foam-u2-wizard-ScrollingStepWizardView-fix-grid {
       height: calc(100vh - 221px) !important;
@@ -97,8 +93,16 @@ foam.CLASS({
       name: 'viewView',
       factory: function() {
         let onSave = (isValid) => {
-          this.stack.back();
-          this.notify(isValid ? this.SUCCESS_UPDATED : this.SUCCESS_REMOVED, '', foam.log.LogLevel.INFO, true);
+          if ( isValid ) {
+            this.notify(this.SUCCESS_UPDATED, '', foam.log.LogLevel.INFO, true);
+            this.stack.back()
+          }
+          else {
+            this.notify(this.SUCCESS_REMOVED, '', foam.log.LogLevel.INFO, true);
+            this.approvalRequestDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
+            this.approvalRequestDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
+            this.pushMenu('approvals', true);
+          }
         }
         return this.ScrollingWizardStackView.create({ ucj: this.data, onSave: onSave });
       }
