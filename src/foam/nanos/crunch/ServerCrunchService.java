@@ -63,6 +63,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return getCapabilityPath(x, rootId, true);
   }
 
+  //TODO: Needs to be refactored once Subject is serializable
   public List getCapabilityPathFor(X x, String rootId, boolean filterGrantedUCJ, User effectiveUser, User user) {
     foam.nanos.auth.AuthService auth = (foam.nanos.auth.AuthService) x.get("auth");
     if ( auth.check(x, "service.crunchService.getCapabilityPathFor") ) {
@@ -206,6 +207,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return prereqsCache_.get(capId);
   }
 
+  //TODO: Needs to be refactored once Subject is serializable
   public UserCapabilityJunction getJunctionFor(X x, String capabilityId, User effectiveUser, User user) {
     Subject subject = (Subject) x.get("subject");
     foam.nanos.auth.AuthService auth = (foam.nanos.auth.AuthService) x.get("auth");
@@ -364,6 +366,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return (UserCapabilityJunction) userCapabilityJunctionDAO.inX(x).put(ucj);
   }
 
+  //TODO: Needs to be refactored once Subject is serializable
   public UserCapabilityJunction updateJunctionFor(
     X x, String capabilityId, FObject data,
     CapabilityJunctionStatus status, User effectiveUser, User user

@@ -10,13 +10,13 @@ foam.CLASS({
   extends: 'foam.comics.v2.DAOSummaryView',
 
   imports: [
+    'approvalRequestDAO',
     'auth',
     'crunchController',
-    'userDAO',
-    'stack',
     'notify',
     'pushMenu',
-    'approvalRequestDAO'
+    'stack',
+    'userDAO'
   ],
 
   messages: [

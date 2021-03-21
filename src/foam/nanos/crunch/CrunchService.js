@@ -54,7 +54,9 @@ foam.INTERFACE({
     {
       name: 'getCapabilityPathFor',
       documentation: `
-        
+        Returns the capability path with the requested subject set in the context.
+        Requires permission to overwrite context's subject, otherwise returns
+        capability path with default context.
       `,
       async: true,
       type: 'List',
@@ -121,7 +123,9 @@ foam.INTERFACE({
     {
       name: 'getJunctionFor',
       documentation: `
-        
+        Returns the junction with the requested subject set in the context.
+        Requires permission to overwrite context's subject, otherwise returns
+        junction with default context.
       `,
       async: true,
       type: 'UserCapabilityJunction',
@@ -256,6 +260,11 @@ foam.INTERFACE({
     },
     {
       name: 'updateJunctionFor',
+      documentation: `
+        Updates junction with the requested subject set in the context.
+        Requires permission to overwrite context's subject, otherwise updates
+        junction with default context.
+      `,
       async: true,
       type: 'UserCapabilityJunction',
       args: [

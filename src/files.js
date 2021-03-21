@@ -629,7 +629,6 @@ FOAM_FILES([
   { name: "foam/u2/stack/StackView", flags: ['web'] },
   { name: "foam/u2/crunch/Style", flags: ['web'] },
   { name: "foam/u2/crunch/CrunchController", flags: ['web'] },
-  { name: "foam/nanos/crunch/AgentCapabilityJunctionDAOSummaryView", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/ConfigureFlowAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/CapabilityAdaptAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/CheckRootIdAgent", flags: ['web'] },
