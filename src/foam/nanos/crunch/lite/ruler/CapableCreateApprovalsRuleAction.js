@@ -19,23 +19,25 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.dao.ArraySink',
-    'foam.nanos.auth.User',
-    'foam.nanos.approval.Approvable',
-    'foam.nanos.approval.ApprovalRequest',
-    'foam.nanos.approval.ApprovalStatus',
     'foam.comics.v2.userfeedback.UserFeedback',
     'foam.comics.v2.userfeedback.UserFeedbackException',
     'foam.comics.v2.userfeedback.UserFeedbackStatus',
+    'foam.i18n.TranslationService',
+    'foam.nanos.approval.Approvable',
+    'foam.nanos.approval.ApprovalRequest',
+    'foam.nanos.approval.ApprovalStatus',
     'foam.nanos.dao.Operation',
     'foam.nanos.auth.Subject',
-    'java.util.Map',
-    'java.util.ArrayList',
-    'java.util.List',
-    'foam.util.SafetyUtil',
+    'foam.nanos.auth.User',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.lite.Capable',
     'foam.nanos.crunch.CapabilityJunctionPayload',
-    'foam.nanos.logger.Logger'
+    'foam.nanos.logger.Logger',
+    'foam.util.SafetyUtil',
+
+    'java.util.ArrayList',
+    'java.util.List',
+    'java.util.Map'
   ],
 
   implements: ['foam.nanos.ruler.RuleAction'],
@@ -53,8 +55,9 @@ foam.CLASS({
     }
   ],
 
-    messages: [
-    { name: 'REQUEST_SEND_MSG', message: 'An approval request has been sent out' }
+  messages: [
+    { name: 'REQUEST_SEND_MSG', message: 'An approval request has been sent out' },
+    { name: 'FOR', message: ' for ' }
   ],
 
   methods: [
@@ -149,19 +152,19 @@ foam.CLASS({
                   .setIsUsingNestedJournal(true)
                   .setPropertiesToUpdate(propertiesToApprove).build());
 
+                TranslationService ts = (TranslationService) x.get("translationService");
+                Subject subject = (Subject) x.get("subject");
+                String locale = ((User) subject.getRealUser()).getLanguage().getCode().toString();
+                String capName = ts.getTranslation(locale, capability.getId() + ".name", capability.getName());
+                String objName = ts.getTranslation(locale, obj.getClass().getName() + ".name", obj.getClassInfo().getObjClass().getSimpleName());
+
                 ApprovalRequest  approvalRequest = new ApprovalRequest.Builder(getX())
                   .setDaoKey("approvableDAO")
                   .setObjId(approvable.getId())
                   .setOperation(operation)
                   .setCreatedFor(user.getId())
                   .setGroup(getGroupToNotify())
-                  .setClassification(
-                    capability.getName() +
-                    " for " +
-                    obj.getClassInfo().getObjClass().getSimpleName() +
-                    " - id:" +
-                    String.valueOf(obj.getProperty("id"))
-                  )
+                  .setClassification(capName + FOR + objName + " - id:" + String.valueOf(obj.getProperty("id")))
                   .setStatus(ApprovalStatus.REQUESTED).build();
 
                 approvalRequest = decorateApprovalRequest(x, approvalRequest, capableObj, capablePayload);

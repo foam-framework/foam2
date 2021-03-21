@@ -67,7 +67,13 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'BACK', message: 'Back' }
+    { name: 'BACK', message: 'Back' },
+    { name: 'DETAIL', message: 'Detail' },
+    { name: 'TABBED', message: 'Tabbed' },
+    { name: 'SECTIONED', message: 'Sectioned' },
+    { name: 'MATERIAL', message: 'Material' },
+    { name: 'WIZARD', message: 'Wizard' },
+    { name: 'VERTICAL', message: 'Vertical' }
   ],
 
   properties: [
