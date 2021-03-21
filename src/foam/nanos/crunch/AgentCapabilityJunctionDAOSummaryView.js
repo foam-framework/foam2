@@ -14,9 +14,9 @@ foam.CLASS({
     'auth',
     'crunchController',
     'notify',
-    'pushMenu',
     'stack',
-    'userDAO'
+    'userDAO',
+    'window'
   ],
 
   messages: [
@@ -95,13 +95,14 @@ foam.CLASS({
         let onSave = (isValid) => {
           if ( isValid ) {
             this.notify(this.SUCCESS_UPDATED, '', foam.log.LogLevel.INFO, true);
-            this.stack.back()
+            this.stack.back();
           }
           else {
             this.notify(this.SUCCESS_REMOVED, '', foam.log.LogLevel.INFO, true);
-            this.approvalRequestDAO.cmd_(this, foam.dao.CachingDAO.PURGE);
-            this.approvalRequestDAO.cmd_(this, foam.dao.AbstractDAO.RESET_CMD);
-            this.pushMenu('approvals', true);
+            this.approvalRequestDAO.cmd_(this.__subContext__, foam.dao.CachingDAO.PURGE);
+            this.approvalRequestDAO.cmd_(this.__subContext__, foam.dao.AbstractDAO.RESET_CMD);
+            window.location.hash = 'approvals'
+            this.window.location.reload();
           }
         }
         return this.ScrollingWizardStackView.create({ ucj: this.data, onSave: onSave });
