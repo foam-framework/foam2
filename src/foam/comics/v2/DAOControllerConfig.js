@@ -18,6 +18,17 @@ foam.CLASS({
     'foam.comics.v2.namedViews.NamedViewCollection'
   ],
 
+  messages: [
+    {
+      name: 'VIEW_ALL',
+      message: 'View all '
+    },
+    {
+      name: 'CREATE_NEW',
+      message: 'Create a New '
+    }
+  ],
+
   properties: [
     {
       class: 'String',
@@ -79,7 +90,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'browseSubtitle',
-      factory: function() { return 'View all ' + this.browseTitle.toLowerCase() + '.' }
+      factory: function() { return this.VIEW_ALL + this.browseTitle.toLowerCase() + '.' }
     },
     {
       class: 'FObjectProperty',
@@ -109,7 +120,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'createTitle',
-      expression: function(of) { return 'Create a New ' + of.model_.label; }
+      expression: function(of) { return this.CREATE_NEW + of.model_.label; }
     },
     {
       class: 'Array',
