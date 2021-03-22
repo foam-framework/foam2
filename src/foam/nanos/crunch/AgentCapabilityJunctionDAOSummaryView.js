@@ -14,9 +14,20 @@ foam.CLASS({
     'auth',
     'crunchController',
     'notify',
+    'pushMenu',
     'stack',
-    'userDAO',
-    'window'
+    'userDAO'
+  ],
+
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
+  requires: [
+    'foam.dao.AbstractDAO',
+    'foam.log.LogLevel',
+    'foam.nanos.approval.ApprovalRequest',
+    'foam.nanos.approval.ApprovalStatus'
   ],
 
   messages: [
@@ -48,7 +59,11 @@ foam.CLASS({
         'userDAO'
       ],
       requires: [
-        'foam.u2.crunch.wizardflow.SaveAllAgent'
+        'foam.nanos.auth.Subject',
+        'foam.u2.ControllerMode',
+        'foam.u2.crunch.wizardflow.SaveAllAgent',
+        'foam.u2.stack.Stack',
+        'foam.u2.stack.StackView'
       ],
 
       properties: [
@@ -62,9 +77,9 @@ foam.CLASS({
         async function initE() {          
           var user = await this.userDAO.find(this.ucj.effectiveUser);
           var realUser = await this.userDAO.find(this.ucj.sourceId);
-          var subject = foam.nanos.auth.Subject.create({ user: user, realUser: realUser });
-          var stack = foam.u2.stack.Stack.create();
-          var x = this.__subContext__.createSubContext({ stack: stack, subject: subject, controllerMode: foam.u2.ControllerMode.EDIT });
+          var subject = this.Subject.create({ user: user, realUser: realUser });
+          var stack = this.Stack.create();
+          var x = this.__subContext__.createSubContext({ stack: stack, subject: subject, controllerMode: this.ControllerMode.EDIT });
           
           this.crunchController.createWizardSequence(this.ucj.targetId, x)
             .reconfigure('LoadCapabilitiesAgent', {
@@ -81,7 +96,7 @@ foam.CLASS({
             .add(this.SaveAllAgent, { onSave: this.onSave })
             .execute();
 
-          this.tag(foam.u2.stack.StackView.create({ data: stack, showActions: false }, x));
+          this.tag(this.StackView.create({ data: stack, showActions: false }, x));
         }
       ]
     }
@@ -92,17 +107,31 @@ foam.CLASS({
       class: 'foam.u2.ViewSpecWithJava',
       name: 'viewView',
       factory: function() {
-        let onSave = (isValid) => {
+        let onSave = async (isValid, ucj) => {
           if ( isValid ) {
-            this.notify(this.SUCCESS_UPDATED, '', foam.log.LogLevel.INFO, true);
+            this.notify(this.SUCCESS_UPDATED, '', this.LogLevel.INFO, true);
             this.stack.back();
           }
           else {
-            this.notify(this.SUCCESS_REMOVED, '', foam.log.LogLevel.INFO, true);
-            this.approvalRequestDAO.cmd_(this.__subContext__, foam.dao.CachingDAO.PURGE);
-            this.approvalRequestDAO.cmd_(this.__subContext__, foam.dao.AbstractDAO.RESET_CMD);
-            window.location.hash = 'approvals'
-            this.window.location.reload();
+            let approvals = await this.approvalRequestDAO.where(this.AND(
+                this.EQ(this.ApprovalRequest.OBJ_ID, ucj.id),
+                this.EQ(this.ApprovalRequest.DAO_KEY, "userCapabilityJunctionDAO"),
+                this.EQ(this.ApprovalRequest.CLASSIFICATION, "Generic Business Validator"),
+                this.EQ(this.ApprovalRequest.STATUS, this.ApprovalStatus.REQUESTED)
+              )).limit(1).select();
+            let approval = approvals.array[0];
+            if ( approval ) {
+              let rejectedApproval = approval.clone();
+              rejectedApproval.status = this.ApprovalStatus.REJECTED;
+              rejectedApproval.memo = 'reject';
+              this.approvalRequestDAO.put(rejectedApproval).then(o => {
+                this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+                this.notify(this.SUCCESS_REMOVED, '', this.LogLevel.INFO, true);
+                this.pushMenu('approvals', true);
+              }, e => {
+                this.notify(e.message, '', this.LogLevel.ERROR, true);
+              });
+            }
           }
         }
         return this.ScrollingWizardStackView.create({ ucj: this.data, onSave: onSave });
