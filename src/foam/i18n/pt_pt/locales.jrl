@@ -398,6 +398,13 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.ResetPassword.PA
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.notification.Notification.model_.plural",target:"notificações"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"notifications.label",target:"notificações"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"Read",target:"Leitura"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"Unread",target:"Não lida"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"View all notifications",target:"Ver todas as notificações"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"Notifications",target:"Notificações"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"Today",target:"hoje"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"Yesterday",target:"Ontem"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"Older",target:"Mais velho"})
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.RetrievePassword.INSTRUC_ONE",target:"As instruções de redefinição de senha foram enviadas para"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.RetrievePassword.INSTRUC_TWO",target:"Verifique sua caixa de entrada para continuar"})
