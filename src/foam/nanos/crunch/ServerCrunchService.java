@@ -431,7 +431,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
     Capability capability = (Capability) capabilityDAO.find(capabilityId);
     UserCapabilityJunction ucj = crunchService.getJunction(x, capabilityId);
-      if ( ! capability.getEnabled() ) return false;
+    if ( ! capability.getEnabled() ) return false;
 
     var prereqs = getPrereqs(capabilityId);
     boolean topLevelRenewable = ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ucj.getIsRenewable();

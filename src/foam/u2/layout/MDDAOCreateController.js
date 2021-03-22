@@ -47,7 +47,7 @@ foam.CLASS({
       }
     },
     {
-      class: 'foam.u2.ViewSpecWithJava',
+      class: 'foam.u2.ViewSpec',
       name: 'detailView',
       expression: function() {
         return foam.u2.detail.MDDetailView;
