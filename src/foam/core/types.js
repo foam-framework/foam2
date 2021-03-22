@@ -779,6 +779,15 @@ foam.CLASS({
 
       // TODO: Only hook up the subscription when somebody listens to us.
       if ( obj[name] ) attach(obj[name]);
+    },
+    // Override copyFrom behaviour
+    function copyValueFrom(targetObj, sourceObj) {
+      var name = this.name;
+      if ( targetObj[name] && sourceObj[name] ) {
+        targetObj[name].copyFrom(sourceObj[name])
+        return true;
+      }
+      return false;
     }
   ]
 });
