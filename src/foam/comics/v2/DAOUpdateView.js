@@ -111,9 +111,6 @@ foam.CLASS({
   actions: [
     {
       name: 'save',
-      isEnabled: function(workingData$errors_) {
-        return ! workingData$errors_;
-      },
       code: function() {
         this.config.dao.put(this.workingData).then((o) => {
           if ( ! this.data.equals(o) ) {
