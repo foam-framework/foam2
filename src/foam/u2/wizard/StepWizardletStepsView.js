@@ -167,7 +167,9 @@ foam.CLASS({
 
                       // Render circle indicator
                       .start(this.CircleIndicator, this.configureIndicator(
-                        wizardlet, isCurrent, (1 + w - wSkipped)
+                        wizardlet, isCurrent,
+                        this.calculateWizardletDisplayNumber(
+                          wizardlet, data$wizardlets)
                       ))
                         .addClass('circle')
                       .end()
