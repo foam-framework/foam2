@@ -19,8 +19,6 @@ foam.CLASS({
     'foam.mlang.sink.Count',
     'foam.nanos.auth.User',
     'foam.util.SafetyUtil',
-    'net.nanopay.contacts.Contact',
-    'net.nanopay.model.Business',
     'static foam.mlang.MLang.*'
   ],
 
@@ -35,12 +33,8 @@ foam.CLASS({
       javaCode: `
         DAO userDAO = (DAO) x.get("localUserDAO");
 
-        if ( obj instanceof Business || obj instanceof Contact ) {
-          return;
-        }
-
         User user = (User) obj;
-        if ( oldObj == null && SafetyUtil.isEmpty(user.getUserName()) ) {
+        if ( SafetyUtil.isEmpty(user.getUserName()) ) {
           return;
           // TODO: REMOVE COMMENT ONCE READY TO MAKE USERNAME A REQUIREMENT
           // throw new RuntimeException(EMPTY_ERROR);
