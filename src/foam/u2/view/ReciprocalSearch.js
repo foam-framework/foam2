@@ -19,7 +19,8 @@ foam.CLASS({
   imports: [
     'dao',
     'memento',
-    'searchColumns'
+    'searchColumns',
+    'translationService'
   ],
 
   exports: [
@@ -63,6 +64,11 @@ foam.CLASS({
       margin: 20px;
     }
   `,
+
+  messages: [
+    { name: 'SELECTED_TEXT', message: 'selected' },
+    { name: 'OF_TEXT', message: 'of' }
+  ],
 
   properties: [
     {
@@ -138,10 +144,13 @@ foam.CLASS({
         "0 of 0 selected" being shown while loading.
       `,
       expression: function(selectedCount, totalCount, loadingRequests) {
+        var selected_ = ctrl.__subContext__.translationService.getTranslation(foam.locale, 'foam.u2.view.ReciprocalSearch.SELECTED', this.SELECTED_TEXT);
+        var of_ = ctrl.__subContext__.translationService.getTranslation(foam.locale, 'foam.u2.view.ReciprocalSearch.OF', this.OF_TEXT);
+
         if ( loadingRequests > 0 ) {
           return 'Loading...';
         }
-        return `${selectedCount.toLocaleString(foam.locale)} of ${totalCount.toLocaleString(foam.locale)} selected`;
+        return `${selectedCount.toLocaleString(foam.locale)} ` +  of_ + ` ${totalCount.toLocaleString(foam.locale)} ` + selected_;
       }
     },
     'searchValue'

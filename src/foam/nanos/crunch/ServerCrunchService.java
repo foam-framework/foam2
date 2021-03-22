@@ -17,6 +17,7 @@ import foam.mlang.sink.GroupBy;
 import foam.nanos.NanoService;
 import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
+import foam.nanos.auth.AuthService;
 import foam.nanos.crunch.lite.Capable;
 import foam.nanos.crunch.CapabilityJunctionPayload;
 import foam.nanos.crunch.ui.PrerequisiteAwareWizardlet;
@@ -325,14 +326,15 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       ucj.setStatus(status);
     }
 
+    AuthService auth = (AuthService) x.get("auth");
     if (
-      subject.getRealUser().isAdmin()
+      auth.check(x, "usercapabilityjunction.warn.update")
       && subject.getRealUser() != subject.getUser()
     ) {
       var logger = (Logger) x.get("logger");
       // This may be correct when testing features as an admin user
       logger.warning(
-        "admin user is lastUpdatedRealUser on an agent-associated UCJ");
+        subject.getUser().toSummary() + " user is lastUpdatedRealUser on an agent-associated UCJ");
     }
     ucj.setLastUpdatedRealUser(subject.getRealUser().getId());
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
