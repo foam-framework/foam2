@@ -13,7 +13,8 @@ foam.CLASS({
   `,
 
   imports: [
-    'wizardlets'
+    'wizardlets',
+    'rootCapability'
   ],
 
   implements: [
@@ -30,14 +31,16 @@ foam.CLASS({
   methods: [
     async function execute() {
       let allValid = true;
-      await foam.Promise.inOrder(this.wizardlets, w => {
+      let topLevelUCJ;
+      await foam.Promise.inOrder(this.wizardlets, async w => {
         if ( allValid ) {
           allValid = w.isValid;
         }
-        w.save();
+        var ucj = await w.save();
+        if ( ucj.targetId == this.rootCapability.id ) topLevelUCJ = ucj;
       });
       if ( this.onSave ) {
-        this.onSave(allValid);
+        await this.onSave(allValid, topLevelUCJ);
       }
     }
   ]
