@@ -8,6 +8,7 @@ package foam.nanos.auth;
 
 import foam.core.X;
 import foam.dao.DAO;
+import foam.nanos.auth.ruler.PreventDuplicateEmailAction;
 import foam.test.TestUtils;
 
 public class PreventDuplicateEmailTest
@@ -25,7 +26,6 @@ public class PreventDuplicateEmailTest
     // Mock the userDAO and put a test user in it.
     x = TestUtils.mockDAO(x, "localUserDAO");
 
-    // TODO: will need to wrap this in a ruler ...
     userDAO_ = (DAO) x.get("localUserDAO");
     
     User testUser_ = TestUtils.createTestUser();
@@ -38,10 +38,15 @@ public class PreventDuplicateEmailTest
     User userWithDuplicateEmail = TestUtils.createTestUser();
     userWithDuplicateEmail.setId(2); // Make sure the id is different.
     DAO dao = userDAO_;
+
+    PreventDuplicateEmailAction action = new PreventDuplicateEmailAction.Builder(x).build();
+    
+    //super.applyAction(x, obj, oldObj, ruler, rule, agency);
+    
     test(
       TestUtils.testThrows(
-        () -> dao.put_(x, userWithDuplicateEmail),
-        "User with same email address already exists: " + userWithDuplicateEmail.getEmail(),
+        () -> action.applyAction(x, userWithDuplicateEmail, null, null, null, null),
+        "User with same email already exists: " + userWithDuplicateEmail.getEmail(),
         RuntimeException.class
       ),
       "Rule throws a RuntimeException with an appropriate message when a User is put with the same email as an existing user and a different id."
