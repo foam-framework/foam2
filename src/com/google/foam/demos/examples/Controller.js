@@ -5,6 +5,44 @@
  */
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ViewReloader',
+  extends: 'foam.u2.Controller',
+
+  imports: [ 'classloader' ],
+
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'view'
+    },
+    'viewArea'
+  ],
+
+  methods: [
+    function initE() {
+      this.add(this.RELOAD).br().start('span',{}, this.viewArea$).tag(this.view).end();
+    }
+  ],
+
+  actions: [
+    function reload() {
+      debugger;
+      this.viewArea.removeAllChildren();
+
+      delete foam.__context__.__cache__[this.view.class];
+      // foam.register(null, this.view.class);
+      this.viewArea.add(new Date()).br();
+
+      this.classloader.load(this.view.class).then(()=>{
+        this.viewArea.tag(this.view);
+      });
+    }
+  ]
+});
+
+
+foam.CLASS({
   package: 'com.google.foam.demos.examples',
   name: 'Example',
 
@@ -21,7 +59,7 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          this.SUPER();
+          //this.SUPER();
 
           this.
             style({
@@ -50,7 +88,6 @@ foam.CLASS({
             }
           };
           with ( scope ) {
-            debugger;
             eval(self.data.script);
           }
         }
@@ -67,7 +104,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'title',
-      displayWidth: 60,
+      displayWidth: 120,
     },
     {
       class: 'String',
