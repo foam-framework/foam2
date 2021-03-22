@@ -77,7 +77,7 @@ describe('StoreAndForwardDAO', function() {
     InternalException = foam.lookup('foam.dao.InternalException');
   });
 
-  // From node_modules/foam2/test/helpers/generic_dao.js.
+  // From node_modules/foam3/test/helpers/generic_dao.js.
   global.genericDAOTestBattery(function(of) {
     return Promise.resolve(StoreAndForwardDAO.create({
       of: of,

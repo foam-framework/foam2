@@ -16,7 +16,7 @@
  */
 
 /*
-  Accessible through browser at location path static/foam2/src/foam/nanos/controller/index.html
+  Accessible through browser at location path static/foam3/src/foam/nanos/controller/index.html
   Available on browser console as ctrl. (exports axiom)
 */
 foam.CLASS({
