@@ -42,9 +42,11 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityRequire
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityCardView.ASSOCIATED_ENTITY.label",target:"Entidade associada"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityCardView.CJ_STATUS.label",target:"cjStatus"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityCardView.CJ_STATUS.documentation",target:"\n        Armazena o status do recurso de capacidade e é atualizado quando o usuário \n tenta preencher ou preencher os formulários CRUNCH. \n      "})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityCardView.RENEW_DATA_LABEL",target:"Por favor reveja e atualize seus dados"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityFeatureView.ASSOCIATED_ENTITY.label",target:"Entidade associada"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityFeatureView.CJ_STATUS.label",target:"cjStatus"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityFeatureView.CJ_STATUS.documentation",target:"\nArmazena o status do recurso de capacidade e é atualizado quando o usuário \n tenta preencher ou preencher os formulários CRUNCH. \n"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityFeatureView.RENEW_DATA_LABEL",target:"Por favor reveja e atualize seus dados"})
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.CRUNCHThemeRefinement.ADMISSION_CAPABILITY.label",target:"admissionCapability pt"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.CRUNCHThemeRefinement.ADMISSION_CAPABILITY.documentation",target:"Especifica a capacidade de nível superior que deve ser concedida antes de admitirmos um usuário no sistema."})
