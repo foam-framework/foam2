@@ -23,14 +23,8 @@ foam.CLASS({
   ],
 
   messages: [
-    {
-      name: 'VIEW_ALL',
-      message: 'View all '
-    },
-    {
-      name: 'CREATE_NEW',
-      message: 'Create a New '
-    }
+    { name: 'VIEW_ALL', message: 'View all ' },
+    { name: 'CREATE_NEW', message: 'Create a New ' }
   ],
 
   properties: [
