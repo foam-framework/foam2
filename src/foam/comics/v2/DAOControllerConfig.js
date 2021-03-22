@@ -91,8 +91,7 @@ foam.CLASS({
       value: null
     },
     {
-      // TODO: Make ViewSpecWithJava a refinement to ViewSpec and change below to a ViewSpec
-      class: 'foam.u2.ViewSpecWithJava',
+      class: 'foam.u2.ViewSpec',
       name: 'summaryView',
       expression: function(defaultColumns) {
         return {
@@ -133,7 +132,7 @@ foam.CLASS({
       value: 'FULL'
     },
     {
-      class: 'foam.u2.ViewSpecWithJava',
+      class: 'foam.u2.ViewSpec',
       name: 'browseBorder',
       expression: function() {
         // Can't use a value here because java tries to generate a HasMap
@@ -160,7 +159,7 @@ foam.CLASS({
       }
     },
     {
-      class: 'foam.u2.ViewSpecWithJava',
+      class: 'foam.u2.ViewSpec',
       name: 'viewBorder',
       factory: function() {
         // Can't use a value here because java tries to generate a HasMap

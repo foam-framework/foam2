@@ -18,7 +18,7 @@ foam.CLASS({
 
       properties: [
         {
-          class: 'foam.u2.ViewSpecWithJava',
+          class: 'foam.u2.ViewSpec',
           name: 'viewView',
           factory: function() {
             return {
@@ -44,7 +44,7 @@ foam.CLASS({
 
       properties: [
         {
-          class: 'foam.u2.ViewSpecWithJava',
+          class: 'foam.u2.ViewSpec',
           name: 'viewView',
           factory: function() {
             return {

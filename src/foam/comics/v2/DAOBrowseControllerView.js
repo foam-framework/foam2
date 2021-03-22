@@ -85,7 +85,7 @@ foam.CLASS({
       }
     },
     {
-      class: 'foam.u2.ViewSpecWithJava',
+      class: 'foam.u2.ViewSpec',
       name: 'browseView',
       expression: function(config$browseViews) {
         return config$browseViews && config$browseViews.length
