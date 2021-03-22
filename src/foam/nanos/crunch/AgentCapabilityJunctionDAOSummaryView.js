@@ -113,17 +113,18 @@ foam.CLASS({
             this.stack.back();
           }
           else {
+            //TODO: need a better way to specify desired classification
             let approvals = await this.approvalRequestDAO.where(this.AND(
                 this.EQ(this.ApprovalRequest.OBJ_ID, ucj.id),
                 this.EQ(this.ApprovalRequest.DAO_KEY, "userCapabilityJunctionDAO"),
-                this.EQ(this.ApprovalRequest.CLASSIFICATION, "Generic Business Validator"),
+                this.EQ(this.ApprovalRequest.CLASSIFICATION, "Generic Business Validator"), 
                 this.EQ(this.ApprovalRequest.STATUS, this.ApprovalStatus.REQUESTED)
               )).limit(1).select();
             let approval = approvals.array[0];
             if ( approval ) {
               let rejectedApproval = approval.clone();
               rejectedApproval.status = this.ApprovalStatus.REJECTED;
-              rejectedApproval.memo = 'reject';
+              rejectedApproval.memo = 'Outdated Approval.';
               this.approvalRequestDAO.put(rejectedApproval).then(o => {
                 this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
                 this.notify(this.SUCCESS_REMOVED, '', this.LogLevel.INFO, true);
