@@ -82,7 +82,7 @@ foam.CLASS({
           start('label').
             attrs({for: id}).
             start('span').
-              add(ctrl.__subContext__.translationService.getTranslation(foam.locale, c[1], c[1])).
+              translate(c[1]).
             end().
           end();
       }.bind(this)));
