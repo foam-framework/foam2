@@ -10,7 +10,7 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.test.TestUtils;
 
-public class PreventDuplicateEmailDAOTest
+public class PreventDuplicateEmailTest
   extends foam.nanos.test.Test
 {
   private DAO userDAO_;
@@ -24,7 +24,10 @@ public class PreventDuplicateEmailDAOTest
   private X getTestingSubcontext(X x) {
     // Mock the userDAO and put a test user in it.
     x = TestUtils.mockDAO(x, "localUserDAO");
+
+    // TODO: will need to wrap this in a ruler ...
     userDAO_ = (DAO) x.get("localUserDAO");
+    
     User testUser_ = TestUtils.createTestUser();
     userDAO_.put(testUser_);
 

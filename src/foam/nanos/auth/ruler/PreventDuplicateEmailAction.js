@@ -24,7 +24,7 @@ foam.CLASS({
 
   messages: [
     { name: 'DUPLICATE_ERROR', message: 'User with same email already exists: ' },
-    { name: 'EMPTY_ERROR', message: 'Email required' }
+    { name: 'EMPTY_ERROR', message: 'Email required' },
     { name: 'INVALID_ERROR', message: 'Invalid email' }
   ],
 
