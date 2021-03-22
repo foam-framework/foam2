@@ -40,7 +40,7 @@ foam.CLASS({
         }
 
         User user = (User) obj;
-        if ( SafetyUtil.isEmpty(user.getUserName()) ) {
+        if ( oldObj == null && SafetyUtil.isEmpty(user.getUserName()) ) {
           return;
           // TODO: REMOVE COMMENT ONCE READY TO MAKE USERNAME A REQUIREMENT
           // throw new RuntimeException(EMPTY_ERROR);
@@ -50,6 +50,7 @@ foam.CLASS({
         count = (Count) userDAO
             .where(AND(
               EQ(User.USER_NAME, user.getUserName()),
+              EQ(User.SPID, user.getSpid()),
               NEQ(User.ID,  user.getId())
             )).limit(1).select(count);
 

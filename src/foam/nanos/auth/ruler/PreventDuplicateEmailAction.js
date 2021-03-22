@@ -48,6 +48,7 @@ foam.CLASS({
         count = (Count) userDAO
             .where(AND(
               EQ(User.EMAIL, user.getEmail()),
+              EQ(User.SPID, user.getSpid()),
               NEQ(User.ID,  user.getId())
             )).limit(1).select(count);
 
