@@ -872,7 +872,6 @@ FOAM_FILES([
   { name: "foam/comics/v2/DAOSummaryView" },
   { name: "foam/comics/v2/DAOUpdateView" },
   { name: "foam/comics/v2/NamedViews" },
-  { name: "foam/comics/v2/ViewSpecWithJava" },
   { name: "foam/comics/v2/userfeedback/UserFeedbackAware" },
   { name: "foam/comics/v2/userfeedback/UserFeedbackStatus" },
   { name: "foam/comics/v2/userfeedback/UserFeedback" },

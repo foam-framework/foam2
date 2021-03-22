@@ -75,7 +75,7 @@ foam.CLASS({
       }
     },
     {
-      class: 'foam.u2.ViewSpecWithJava',
+      class: 'foam.u2.ViewSpec',
       name: 'viewView',
       expression: function() {
         return foam.u2.detail.SectionedDetailView;
@@ -96,7 +96,7 @@ foam.CLASS({
       },
       code: function() {
         var cData = this.data;
-        
+
         this.config.dao.put(cData).then((o) => {
           this.data = o;
           this.finished.pub();
@@ -114,7 +114,7 @@ foam.CLASS({
           this.stack.back();
         }, (e) => {
           this.throwError.pub(e);
-          
+
           if ( e.exception && e.exception.userFeedback  ) {
             var currentFeedback = e.exception.userFeedback;
             while ( currentFeedback ) {
