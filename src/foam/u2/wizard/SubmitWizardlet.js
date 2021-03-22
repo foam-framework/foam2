@@ -13,7 +13,7 @@ foam.CLASS({
     ['isVisible', false],
     {
       name: 'of',
-      value: 'foam.u2.wizard.data.BooleanHolder'
+      value: 'foam.core.BooleanHolder'
     },
     {
       name: 'sections',
