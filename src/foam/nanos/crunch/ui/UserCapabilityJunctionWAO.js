@@ -22,7 +22,11 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Subject',
-      name: 'subject'
+      name: 'subject',
+      documentation: `
+        The requested subject associated to the ucj. Should only be set
+        when used by a permissioned back-office user.
+      `
     }
   ],
 

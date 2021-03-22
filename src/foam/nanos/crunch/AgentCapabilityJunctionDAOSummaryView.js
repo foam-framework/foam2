@@ -84,8 +84,6 @@ foam.CLASS({
           this.crunchController.createWizardSequence(this.ucj.targetId, x)
             .reconfigure('LoadCapabilitiesAgent', {
               subject: subject })
-            .reconfigure('LoadWizardletsAgent', {
-              subject: subject })
             .reconfigure('ConfigureFlowAgent', {
               popupMode: false
             })
