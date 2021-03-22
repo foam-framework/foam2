@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2.wizard.data',
+  package: 'foam.core',
   name: 'IntHolder',
 
   properties: [
@@ -17,7 +17,7 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  package: 'foam.u2.wizard.data',
+  package: 'foam.core',
   name: 'StringHolder',
 
   properties: [
@@ -29,7 +29,7 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  package: 'foam.u2.wizard.data',
+  package: 'foam.core',
   name: 'BooleanHolder',
 
   properties: [
