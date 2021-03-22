@@ -284,7 +284,7 @@ foam.CLASS({
       name: 'email',
       label: {
         'en' :'Email Address',
-        'fr' :'Adresse e-mail'
+        'fr' :'Adresse Email'
       },
       includeInDigest: true,
       containsPII: true,
