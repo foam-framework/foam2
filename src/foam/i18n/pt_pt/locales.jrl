@@ -396,8 +396,6 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.ResetPassword.RE
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.ResetPassword.PASSWORD_LENGTH_10_ERROR",target:"A senha deve ter pelo menos 10 caracteres"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.ResetPassword.PASSWORD_NOT_MATCH",target:"As senhas não coincidem"})
 
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.comics.v2.DAOControllerConfig.VIEW_ALL",target:"ver tudo "})
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.comics.v2.DAOControllerConfig.CREATE_NEW",target:"crie um novo "})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.notification.Notification.model_.plural",target:"notificações"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"notifications.label",target:"notificações"})
 
@@ -407,6 +405,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.RetrievePassword
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.RetrievePassword.SECTION_EMAIL_PASSWORD_SECTION.title",target:"Esqueceu sua Senha?"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.RetrievePassword.SECTION_EMAIL_PASSWORD_SECTION.subTitle",target:"Forneça o email com o quals e cadastrou e enviaremos um link para que cadastre uma nova senha"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.RetrievePassword.SEND_EMAIL.label",target:"Enviar"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.comics.v2.DAOControllerConfig.CREATE_NEW",target:"crie um novo "})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.comics.v2.DAOControllerConfig.VIEW_ALL",target:"Ver tudo "})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.FilterView.SELECTED",target:" selecionado"})
 
