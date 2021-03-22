@@ -141,9 +141,6 @@ foam.CLASS({
 
           let afterCurrent = false;
 
-          // Fixes the sidebar number if a wizardlet is skipped
-          let wSkipped = 0;
-
           for ( let w = 0 ; w < data$wizardlets.length ; w++ ) {
             let wizardlet = this.data.wizardlets[w];
             let isCurrent = wizardlet === this.data.currentWizardlet;
@@ -153,7 +150,6 @@ foam.CLASS({
               || ! wizardlet.isAvailable
               || ! wizardlet.isVisible
             ) {
-              wSkipped++;
               continue;
             }
 
@@ -167,7 +163,9 @@ foam.CLASS({
 
                       // Render circle indicator
                       .start(this.CircleIndicator, this.configureIndicator(
-                        wizardlet, isCurrent, (1 + w - wSkipped)
+                        wizardlet, isCurrent,
+                        this.calculateWizardletDisplayNumber(
+                          wizardlet, data$wizardlets)
                       ))
                         .addClass('circle')
                       .end()

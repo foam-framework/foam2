@@ -22,6 +22,10 @@ foam.CLASS({
   ],
 
   css: `
+    ^ {
+      --foamMargin: 20px;
+    }
+
     ^mainView > * > *:not(:last-child) {
       margin-bottom: 64px;
     }
@@ -32,14 +36,16 @@ foam.CLASS({
       --actionBarHeight: calc(
         2*var(--actionBarTbPadding) + var(--buttonHeight));
       --lrPadding: 48px;
+      --tbPadding: var(--lrPadding);
       position: relative;
     }
 
-    ^rightside ^entry {
+    ^ ^rightside ^entry, ^ ^rightside ^hide-X-entry {
       flex-grow: 1;
       overflow-y: auto;
-      padding: var(--lrPadding);
-      padding-bottom: calc(var(--lrPadding) + var(--actionBarHeight))
+      padding: var(--tbPadding) var(--lrPadding);
+      padding-bottom: calc(var(--tbPadding) - var(--foamMargin));
+      /* padding-bottom: calc(var(--lrPadding) + var(--actionBarHeight)) */
     }
 
     ^rightside ^actions {
@@ -120,6 +126,7 @@ foam.CLASS({
         this.data.wizardPosition = this.scrollWizardPosition;
       }));
       this
+        .addClass(this.myClass()) // Used to fix CSS precedence with parent
         .start(this.Grid)
           .addClass(this.myClass('fix-grid'))
           .start(this.GUnit, { columns: 4 })
