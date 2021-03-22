@@ -18,6 +18,7 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.mlang.sink.Count',
     'foam.nanos.auth.User',
+    'foam.util.Email',
     'foam.util.SafetyUtil',
     'static foam.mlang.MLang.*'
   ],
