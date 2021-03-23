@@ -18,3 +18,16 @@ p({class:"foam.i18n.Locale",locale:"en",source:"*.foam.nanos.auth.Address.POSTAL
 
 p({class:"foam.i18n.Locale",locale:"en",variant:"BR",source:"br.foam.nanos.auth.Address.REGION.label", target:"State"})
 p({class:"foam.i18n.Locale",locale:"en",variant:"BR",source:"br.foam.nanos.auth.Address.REGION.error",target:"State required"})
+
+p({class:"foam.i18n.Locale",locale:"en",source:"Read",target:"Read"})
+p({class:"foam.i18n.Locale",locale:"en",source:"Unread",target:"Unread"})
+p({class:"foam.i18n.Locale",locale:"en",source:"Today",target:"Today"})
+p({class:"foam.i18n.Locale",locale:"en",source:"Yesterday",target:"Yesterday"})
+p({class:"foam.i18n.Locale",locale:"en",source:"Older",target:"Older"})
+
+p({class:"foam.i18n.Locale",locale:"en",source:"Requested",target:"Requested"})
+p({class:"foam.i18n.Locale",locale:"en",source:"Approved",target:"Approved"})
+p({class:"foam.i18n.Locale",locale:"en",source:"Pending",target:"Pending"})
+p({class:"foam.i18n.Locale",locale:"en",source:"All",target:"All"})
+p({class:"foam.i18n.Locale",locale:"en",source:"Rejected",target:"Rejected"})
+p({class:"foam.i18n.Locale",locale:"en",source:"Completed",target:"Completed"})

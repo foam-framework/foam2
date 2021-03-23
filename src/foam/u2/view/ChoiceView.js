@@ -213,6 +213,7 @@ foam.CLASS({
     },
 
     function initE() {
+      this.SUPER();
       var self = this;
 
       if ( ! this.choice && this.choices.length == 1 ) this.data = this.choices[0][0];

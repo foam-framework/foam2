@@ -76,6 +76,14 @@ foam.CLASS({
       }
       return this;
     },
+    function contains(name) {
+      for ( let ca of this.contextAgentSpecs ) {
+        if ( name == ca.name ) {
+          return true;
+        }
+      }
+      return false;
+    },
     function remove(name) {
       this.contextAgentSpecs$remove(this.EQ(
         this.Step.NAME, name));

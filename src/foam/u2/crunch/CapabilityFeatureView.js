@@ -47,8 +47,7 @@ foam.CLASS({
 
     ^ .foam-u2-crunch-Style-renewable-description {
       position: absolute;
-      bottom: 32px;
-      right: 8px;
+      top: 0px;
     }
   `,
 
@@ -81,6 +80,10 @@ foam.CLASS({
     }
   ],
 
+  messages: [
+    { name: 'RENEW_DATA_LABEL', message: 'Please review and update your data' }
+  ],
+
   methods: [
     function init() {
        this.SUPER();
@@ -106,7 +109,7 @@ foam.CLASS({
           .style({
             'background-image': "url('" + self.data.icon + "')"
           })
-          .add(this.slot(function(cjStatus, isRenewable) {
+          .add(this.slot(function(cjStatus) {
             return this.E().addClass(style.myClass('tooltip'))
               .start('span')
                 .addClass(style.myClass('tooltiptext'))
@@ -114,15 +117,18 @@ foam.CLASS({
                 .enableClass(style.myClass('tooltipDisabled'), self.tooltipEnabled, true)
                 .add(cjStatus.documentation)
               .end()
-              .start()
-                .addClass(style.myClass('renewable-description'))
-                .add(isRenewable ? "Capability is renewable" : "")
-              .end()
               .add(cjStatus.label).addClass(style.myClass('badge'))
               .style({
                 'background-color': cjStatus.background,
                 'color': cjStatus.color
               });
+          }))
+          .add(this.slot(function(isRenewable) {
+            return isRenewable ? this.E()
+              .start()
+                .addClass(style.myClass('renewable-description'))
+                .add(self.RENEW_DATA_LABEL)
+              .end() : null;
           }))
         .end()
         .start()
