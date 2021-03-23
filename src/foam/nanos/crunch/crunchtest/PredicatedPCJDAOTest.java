@@ -111,33 +111,47 @@ public class PredicatedPCJDAOTest extends foam.nanos.test.Test {
   }
 
   public void testUserUCJGranting(X x) {
+    // part 1 - test non-admin user - "cap" should become granted for user as long as the user has been granted all the prerequisites 
+    // they can see, i.e., nanoPrereq
     UserCapabilityJunction n_ucjP = new UserCapabilityJunction.Builder(x).setSourceId(nanoUser.getId()).setTargetId(prereq.getId()).build();
     UserCapabilityJunction n_ucjTP = new UserCapabilityJunction.Builder(x).setSourceId(nanoUser.getId()).setTargetId(testPrereq.getId()).build();
     UserCapabilityJunction n_ucjNP = new UserCapabilityJunction.Builder(x).setSourceId(nanoUser.getId()).setTargetId(nanoPrereq.getId()).build();
     UserCapabilityJunction n_ucjC = new UserCapabilityJunction.Builder(x).setSourceId(nanoUser.getId()).setTargetId(cap.getId()).build();
     n_ucjP = (UserCapabilityJunction) userCapabilityJunctionDAO.inX(nanoX).put(n_ucjP);
     n_ucjTP = (UserCapabilityJunction) userCapabilityJunctionDAO.inX(nanoX).put(n_ucjTP);
-    n_ucjC = (UserCapabilityJunction) userCapabilityJunctionDAO.inX(nanoX).put(n_ucjC);
+    n_ucjC = (UserCapabilityJunction) userCapabilityJunctionDAO.inX(nanoX).put(n_ucjC); 
+    // Testing when all prerequisites of "cap" are granted except for the capability satisfied by 
+    // the capabilityCapabilityPredicate (user.isSpid=nanopay) between capability "cap" and capability "nanoPrereq".
+    // Results in "cap" not being GRANTED.
     test(n_ucjP.getStatus() == GRANTED, "prereq is granted for testUser: " + n_ucjP.getStatus());
     test(n_ucjTP.getStatus() == GRANTED, "testPrereq is granted for testUser: " + n_ucjTP.getStatus());
     test(n_ucjC.getStatus() != GRANTED, "cap is not granted for testUser: " + n_ucjC.getStatus());
 
+    // After adding the missing prerequisite, test if "cap" becomes granted
     n_ucjNP = (UserCapabilityJunction) userCapabilityJunctionDAO.inX(nanoX).put(n_ucjNP);
     test(n_ucjNP.getStatus() == GRANTED, "nanoPrereq is granted for testUser: " + n_ucjNP.getStatus());
     n_ucjC = (UserCapabilityJunction) userCapabilityJunctionDAO.inX(nanoX).find(AND(EQ(UserCapabilityJunction.SOURCE_ID, nanoUser.getId()), EQ(UserCapabilityJunction.TARGET_ID, "cap")));
     test(n_ucjC.getStatus() == GRANTED, "cap is granted for testUser: " + n_ucjC.getStatus());
 
+    // part 2 - test admin user. Since admin users have permission to view all prerequisites, the top-level ucj "cap" will not become GRANTED until all prerequisites are GRANTED
     UserCapabilityJunction a_ucjP = new UserCapabilityJunction.Builder(x).setSourceId(nanoAdmin.getId()).setTargetId(prereq.getId()).build();
     UserCapabilityJunction a_ucjTP = new UserCapabilityJunction.Builder(x).setSourceId(nanoAdmin.getId()).setTargetId(testPrereq.getId()).build();
     UserCapabilityJunction a_ucjNP = new UserCapabilityJunction.Builder(x).setSourceId(nanoAdmin.getId()).setTargetId(nanoPrereq.getId()).build();
     UserCapabilityJunction a_ucjC = new UserCapabilityJunction.Builder(x).setSourceId(nanoAdmin.getId()).setTargetId(cap.getId()).build();
+    // Testing when all prerequisites of "cap" are granted except for prerequisite where the predicate returns true for users in 'test' spid
+    // if the ucj owner did not have permission "predicatedprerequisite.read.*",
+    // this should satisfy the prerequiste requirement for "cap", but since admin users have the permission
+    // the prerequisitejunction between cap and testPrereq is also available. 
+    // Results in "cap" not being GRANTED until the testPrereq is GRANTED
+    a_ucjNP = (UserCapabilityJunction) userCapabilityJunctionDAO.inX(adminX).put(a_ucjNP);
     a_ucjP = (UserCapabilityJunction) userCapabilityJunctionDAO.inX(adminX).put(a_ucjP);
     a_ucjC = (UserCapabilityJunction) userCapabilityJunctionDAO.inX(adminX).put(a_ucjC);
     test(a_ucjP.getStatus() == GRANTED, "prereq is granted for nanoAdmin: " + a_ucjP.getStatus());
+    test(a_ucjNP.getStatus() == GRANTED, "nanoPrereq is granted for nanoAdmin: " + a_ucjNP.getStatus());
+    a_ucjC = (UserCapabilityJunction) userCapabilityJunctionDAO.inX(adminX).find(AND(EQ(UserCapabilityJunction.SOURCE_ID, nanoAdmin.getId()), EQ(UserCapabilityJunction.TARGET_ID, "cap")));
     test(a_ucjC.getStatus() != GRANTED, "cap is not granted for nanoAdmin: " + a_ucjC.getStatus());
 
-    a_ucjNP = (UserCapabilityJunction) userCapabilityJunctionDAO.inX(adminX).put(a_ucjNP);
-    test(a_ucjNP.getStatus() == GRANTED, "nanoPrereq is granted for nanoAdmin: " + a_ucjNP.getStatus());
+    // after granting "testPrereq" for admin user, "cap" becomes granted
     a_ucjTP = (UserCapabilityJunction) userCapabilityJunctionDAO.inX(adminX).put(a_ucjTP);
     test(a_ucjTP.getStatus() == GRANTED, "testPrereq is granted for nanoAdmin: " + a_ucjTP.getStatus());
     a_ucjC = (UserCapabilityJunction) userCapabilityJunctionDAO.inX(adminX).find(AND(EQ(UserCapabilityJunction.SOURCE_ID, nanoAdmin.getId()), EQ(UserCapabilityJunction.TARGET_ID, "cap")));
