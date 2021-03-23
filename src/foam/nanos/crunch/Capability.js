@@ -330,6 +330,10 @@ foam.CLASS({
           if ( this.stringImplies(permissionName, permission) ) return true;
         }
 
+        // temporary prevent infinite loop when checking the permission "predicatedprerequisite.read.*"
+        // TODO : prerequisite checking below may be/probably is unnecessary
+        if ( PredicatedPrerequisiteCapabilityJunctionDAO.PERMISSION.equals(permission) ) return false;
+
         CrunchService crunchService = (CrunchService) x.get("crunchService");
         var prereqs = crunchService.getPrereqs(x, getId());
 
