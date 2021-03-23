@@ -42,9 +42,14 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityRequire
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityCardView.ASSOCIATED_ENTITY.label",target:"Entidade associada"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityCardView.CJ_STATUS.label",target:"cjStatus"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityCardView.CJ_STATUS.documentation",target:"\n        Armazena o status do recurso de capacidade e é atualizado quando o usuário \n tenta preencher ou preencher os formulários CRUNCH. \n      "})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityCardView.RENEW_DATA_LABEL",target:"Por favor reveja e atualize seus dados"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityFeatureView.ASSOCIATED_ENTITY.label",target:"Entidade associada"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityFeatureView.CJ_STATUS.label",target:"cjStatus"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityFeatureView.CJ_STATUS.documentation",target:"\nArmazena o status do recurso de capacidade e é atualizado quando o usuário \n tenta preencher ou preencher os formulários CRUNCH. \n"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityFeatureView.RENEW_DATA_LABEL",target:"Por favor reveja e atualize seus dados"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.AgentCapabilityJunctionDAOSummaryView.SUCCESS_UPDATED",target:"Informações de integração atualizadas com êxito."})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.AgentCapabilityJunctionDAOSummaryView.SUCCESS_REMOVED",target:"Informações de integração removidas com sucesso."})
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.CRUNCHThemeRefinement.ADMISSION_CAPABILITY.label",target:"admissionCapability pt"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.CRUNCHThemeRefinement.ADMISSION_CAPABILITY.documentation",target:"Especifica a capacidade de nível superior que deve ser concedida antes de admitirmos um usuário no sistema."})
@@ -202,6 +207,8 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollWizardletVi
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollWizardletView.IS_ERROR_FREE.label",target:"está livre de erros"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollWizardletView.EXIT.label",target:"Saída"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollWizardletView.SAVE.label",target:"Salve"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollingStepWizardView.SAVE_LABEL",target:"Salve"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollingStepWizardView.NO_ACTION_LABEL",target:"Feito"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.DAOWizardlet.OF.label",target:"do"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.DAOWizardlet.DATA.label",target:"dados"})
 

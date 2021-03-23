@@ -50,7 +50,7 @@ foam.CLASS({
 
       cls.getFacetOf = function(of, X) {
         if ( ! of ) return this;
-        X = foam.core.FObject.isInstance(X) ? X.__context__ : foam.__context__;
+        X = foam.core.FObject.isInstance(X) ? X.__context__ : X || foam.__context__;
 
         var name;
         var pkg;
