@@ -2361,7 +2361,7 @@ return this;`
 
 
     /*
-      TODO: this isn't ported to FOAM2 yet.
+      TODO: this isn't ported to FOAM2/FOAM3 yet.
     function partialEval() {
       return this;
       var newArg = this.arg1.partialEval();
