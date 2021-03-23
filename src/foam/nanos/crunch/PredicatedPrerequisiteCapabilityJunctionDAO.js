@@ -15,43 +15,49 @@ foam.CLASS({
   `,
 
   javaImports: [
-    'foam.core.X',
     'foam.mlang.predicate.AbstractPredicate',
-    'foam.mlang.predicate.Predicate',
-    'foam.nanos.auth.Subject',
-    'foam.nanos.auth.User',
-    'static foam.mlang.MLang.*'
+    'foam.nanos.auth.AuthService',
+    'static foam.mlang.MLang.AND'
+  ],
+  
+  constants: [
+    {
+      type: 'String',
+      name: 'PERMISSION',
+      value: 'predicatedprequisite.read.*'
+    }
   ],
 
   methods: [
     {
-      name: 'isAdmin',
+      name: 'hasPermission',
       args: [
         { name: 'x', javaType: 'foam.core.X' }
       ],
       type: 'Boolean',
       javaCode: `
-        Subject subject = (Subject) x.get("subject");
-        if ( subject != null ) {
-          User user = subject.getUser();
-          if ( user != null ) {
-            return user.isAdmin();
-          }
+        AuthService auth = (AuthService) x.get("auth");
+
+        // use a context with group set to null so that grouppermission
+        // part of auth check will find the group from the context subject
+        try {
+          return auth.check(x.put("group", null), PERMISSION);
+        } catch ( Exception e ) {
+          return false;
         }
-        return false;
       `
     },
     {
       name: 'find_',
       javaCode: `
         CapabilityCapabilityJunction ccj = (CapabilityCapabilityJunction) getDelegate().find_(x, id);
-        return ccj == null || isAdmin(x) || ccj.getPredicate().f(x) ? ccj : null;
+        return ccj == null || hasPermission(x) || ccj.getPredicate().f(x) ? ccj : null;
       `
     },
     {
       name: 'select_',
       javaCode: `
-        if ( isAdmin(x) ) return getDelegate().select_(x, sink, skip, limit, order, predicate);
+        if ( hasPermission(x) ) return getDelegate().select_(x, sink, skip, limit, order, predicate);
         AbstractPredicate prereqPredicate = new AbstractPredicate(x) {
           @Override
           public boolean f(Object obj) {
