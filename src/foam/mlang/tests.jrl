@@ -1,4 +1,5 @@
 p({"class":"foam.mlang.MLangTest","id":"mlang","description":"testing java mlangs","server":true})
+p({"class":"foam.mlang.DOTMQLTest","id":"mqltest","description":"test mqlExpr","server":true})
 p({
   class: "foam.nanos.test.Test",
   id: "mlangFormulas",

@@ -156,6 +156,11 @@ public class QueryParser
 
     grammar.addSymbol("COMPOUND_SUB_QUERY_BODY", new Repeat(new Alt(
       new Seq(Literal.create("("), grammar.sym("COMPOUND_SUB_QUERY_BODY"), Literal.create(")")),
+      new Join(new Seq(
+        Literal.create("\""),
+        new Join(new Repeat(new Alt(new Literal("\\\"", "\""), new NotChars("\"")))),
+        Literal.create("\"")
+      )),
       new NotChars(")")
     )));
     grammar.addAction("COMPOUND_SUB_QUERY_BODY", (val, x) -> compactToString(Arrays.stream((Object[]) val).map(s -> s instanceof String || s instanceof Character ? s : compactToString(s)).toArray()));
