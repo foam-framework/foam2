@@ -141,6 +141,7 @@ foam.CLASS({
       }));
       this
         .addClass(this.myClass()) // Used to fix CSS precedence with parent
+        .enableClass(this.myClass('fullscreen'), this.fullScreen$)
         .start(this.Grid)
           .addClass(this.myClass('fix-grid'))
           .start(this.GUnit, { columns: 4 })
