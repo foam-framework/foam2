@@ -232,9 +232,7 @@ foam.CLASS({
       documentation: 'class of detailView.'
     },
     {
-      class: 'String',//
-      // class: 'foam.u2.ViewSpec',//
-      //class: 'foam.core.JSFObject',
+      class: 'foam.u2.ViewSpec',
       name: 'menu',
       documentation: 'class of detailView.'
     }
