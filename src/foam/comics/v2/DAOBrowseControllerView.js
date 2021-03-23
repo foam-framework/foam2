@@ -71,6 +71,10 @@ foam.CLASS({
     }
   `,
 
+  messages: [
+    { name: 'VIEW_ALL', message: 'View all ' }
+  ],
+
   properties: [
     {
       class: 'foam.dao.DAOProperty',
@@ -137,7 +141,7 @@ foam.CLASS({
     var self = this;
 
       this.addClass(this.myClass())
-      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction) {
+      .add(this.slot(function(data, config, config$of, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction) {
         return self.E()
           .start(self.Rows)
             .addClass(self.myClass('container'))
@@ -146,7 +150,7 @@ foam.CLASS({
                 .start(self.Cols)
                   .start()
                     .addClass(self.myClass('browse-title'))
-                    .translate(config$browseTitle, config$browseTitle)
+                    .translate(config$of.id + ".model_.plural", config$of.name)
                   .end()
                   .startContext({ data: self }).tag(self.CREATE).endContext()
                   .callIf(config$primaryAction, function() {
@@ -157,7 +161,8 @@ foam.CLASS({
                   this
                     .start()
                       .addClass(self.myClass('browse-subtitle'))
-                      .translate(config$browseSubtitle, config$browseSubtitle)
+                      .translate(self.cls_.id + '.VIEW_ALL', self.VIEW_ALL)
+                      .translate(config$of.id + ".model_.plural", config$of.name.toLowerCase())
                     .end();
                 })
               .end()

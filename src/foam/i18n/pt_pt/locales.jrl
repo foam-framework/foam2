@@ -500,6 +500,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.PropertyModal.SUCCESS_MS
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.PropertyModal.FAIL_MSG",target:"Falha ao excluir"})
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.comics.v2.DAOBrowseControllerView.CREATE.label",target:"Crio"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.comics.v2.DAOBrowseControllerView.VIEW_ALL",target:"Ver tudo "})
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.User.SECTION_USER_INFORMATION.title",target:"Usuário Informação"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.User.SECTION_BUSINESS_INFORMATION.title",target:"Negócios Informação"})
