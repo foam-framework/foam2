@@ -12,10 +12,19 @@ foam.CLASS({
     A customizable model to configure any DAOController
   `,
 
+  imports: [
+    'translationService'
+  ],
+
   requires: [
     'foam.comics.SearchMode',
     'foam.comics.v2.CannedQuery',
     'foam.comics.v2.namedViews.NamedViewCollection'
+  ],
+
+  messages: [
+    { name: 'VIEW_ALL', message: 'View all ' },
+    { name: 'CREATE_NEW', message: 'Create a New ' }
   ],
 
   properties: [
@@ -79,7 +88,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'browseSubtitle',
-      factory: function() { return 'View all ' + this.browseTitle.toLowerCase() + '.' }
+      factory: function() { return this.VIEW_ALL + this.browseTitle.toLowerCase() + '.' }
     },
     {
       class: 'FObjectProperty',
@@ -91,8 +100,7 @@ foam.CLASS({
       value: null
     },
     {
-      // TODO: Make ViewSpecWithJava a refinement to ViewSpec and change below to a ViewSpec
-      class: 'foam.u2.ViewSpecWithJava',
+      class: 'foam.u2.ViewSpec',
       name: 'summaryView',
       expression: function(defaultColumns) {
         return {
@@ -109,7 +117,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'createTitle',
-      expression: function(of) { return 'Create a New ' + of.model_.label; }
+      expression: function(of) { return this.CREATE_NEW + of.model_.label; }
     },
     {
       class: 'Array',
@@ -133,7 +141,7 @@ foam.CLASS({
       value: 'FULL'
     },
     {
-      class: 'foam.u2.ViewSpecWithJava',
+      class: 'foam.u2.ViewSpec',
       name: 'browseBorder',
       expression: function() {
         // Can't use a value here because java tries to generate a HasMap
@@ -160,7 +168,7 @@ foam.CLASS({
       }
     },
     {
-      class: 'foam.u2.ViewSpecWithJava',
+      class: 'foam.u2.ViewSpec',
       name: 'viewBorder',
       factory: function() {
         // Can't use a value here because java tries to generate a HasMap

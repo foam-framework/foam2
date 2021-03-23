@@ -188,6 +188,7 @@ foam.CLASS({
     { name: 'MESSAGE_ADVANCEDMODE', message: 'Advanced filters are currently being used.'},
     { name: 'MESSAGE_VIEWADVANCED', message: 'View filters'},
     { name: 'LABEL_SEARCH', message: 'Search'},
+    { name: 'SELECTED', message: 'selected'},
   ],
 
   properties: [
@@ -296,6 +297,7 @@ foam.CLASS({
       }
 
       this.onDetach(this.filterController$.dot('isAdvanced').sub(this.isAdvancedChanged));
+      var selectedLabel = ctrl.__subContext__.translationService.getTranslation(foam.locale, 'foam.u2.filter.FilterView.SELECTED', this.SELECTED);
       this.addClass(self.myClass())
         .add(this.slot(function(filters) {
           self.show(filters.length);
@@ -323,7 +325,7 @@ foam.CLASS({
           .start()
             .style({overflow: 'hidden'})
             .add(this.filterController.slot(function (totalCount, resultsCount) {
-              return self.E().addClass(self.myClass('float-result-count')).add(`${resultsCount.toLocaleString(foam.locale)} of ${totalCount.toLocaleString(foam.locale)} selected`);
+              return self.E().addClass(self.myClass('float-result-count')).add(`${resultsCount.toLocaleString(foam.locale)} of ${totalCount.toLocaleString(foam.locale)}` + selectedLabel);
             }))
           .end()
           .add(this.filterController.slot(function (criterias) {

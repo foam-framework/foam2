@@ -253,6 +253,20 @@ foam.CLASS({
       section: 'metaSection',
     },
     {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedByAgent',
+      visibility: 'RO',
+      tableCellFormatter: function(value, obj) {
+        obj.userDAO.find(value).then(function(user) {
+          if ( user ) {
+            this.add(user.legalName);
+          }
+        }.bind(this));
+      },
+      section: 'metaSection',
+    },
+    {
       name: 'summary',
       class: 'String',
       transient: true,

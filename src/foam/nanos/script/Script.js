@@ -275,6 +275,13 @@ foam.CLASS({
       documentation: 'User who last modified script'
     },
     {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedByAgent',
+      includeInDigest: true,
+      documentation: 'Agent acting user who last modified script'
+    },
+    {
       class: 'DateTime',
       name: 'lastModified',
       includeInDigest: false,

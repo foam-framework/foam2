@@ -203,5 +203,14 @@ foam.CLASS({
       documentation: 'Added to suppress journal comments regarding "modified by". Also, a non-null value is required.',
       javaFactory: 'return 1L;'
     },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedByAgent',
+      value: '1',
+      transient: true,
+      hidden: true,
+      javaFactory: 'return 1L;'
+    }
   ]
 });

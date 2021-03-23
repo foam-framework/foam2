@@ -79,7 +79,6 @@ foam.CLASS({
             logger.debug(this.getClass().getSimpleName(), "ucj.setExpiry()", ucj);
             if ( junctionExpiry != null && ( data instanceof RenewableData ) ) {
               ((RenewableData) data).setRenewable(false);
-              ((RenewableData) data).setReviewed(false);
               ucj.setData(data);
             } 
     
