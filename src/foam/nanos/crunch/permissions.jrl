@@ -3,3 +3,9 @@ p({
   id: "service.crunchService.unsafeSetStatus",
   description: "Permission to set UCJ status above ACTION_REQUIRED explicitly"
 })
+
+p({
+  class:"foam.nanos.auth.Permission",
+  id:"predicatedprequisite.read.*",
+  description:"Permission to view all prerequisites of a capability regardless of whether the predicate holds."
+})
