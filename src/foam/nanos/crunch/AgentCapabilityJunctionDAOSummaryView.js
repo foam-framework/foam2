@@ -10,17 +10,8 @@ foam.CLASS({
   extends: 'foam.comics.v2.DAOSummaryView',
 
   imports: [
-    'approvalRequestDAO',
-    'auth',
-    'crunchController',
     'notify',
-    'pushMenu',
-    'stack',
-    'userDAO'
-  ],
-
-  implements: [
-    'foam.mlang.Expressions'
+    'stack'
   ],
 
   requires: [
@@ -32,7 +23,7 @@ foam.CLASS({
 
   messages: [
     { name: 'SUCCESS_UPDATED', message: 'Successfuly updated onboarding information.'},
-    { name: 'SUCCESS_REMOVED', message: 'Successfuly removed onboarding information. Please wait for resubmission.'},
+    { name: 'SUCCESS_REMOVED', message: 'Successfuly removed onboarding information.'}
   ],
 
   css: `
@@ -44,9 +35,6 @@ foam.CLASS({
     }
     ^ .foam-u2-wizard-ScrollingStepWizardView-fix-grid {
       height: calc(100vh - 221px) !important;
-    }
-    ^ .foam-u2-detail-SectionView-backOfficeSuggestedUserTransactionInfo {
-      display: none;
     }
   `,
 
@@ -102,36 +90,12 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'foam.u2.ViewSpecWithJava',
+      class: 'foam.u2.ViewSpec',
       name: 'viewView',
       factory: function() {
         let onSave = async (isValid, ucj) => {
-          if ( isValid ) {
-            this.notify(this.SUCCESS_UPDATED, '', this.LogLevel.INFO, true);
-            this.stack.back();
-          }
-          else {
-            //TODO: need a better way to specify desired classification
-            let approvals = await this.approvalRequestDAO.where(this.AND(
-                this.EQ(this.ApprovalRequest.OBJ_ID, ucj.id),
-                this.EQ(this.ApprovalRequest.DAO_KEY, "userCapabilityJunctionDAO"),
-                this.EQ(this.ApprovalRequest.CLASSIFICATION, "Generic Business Validator"), 
-                this.EQ(this.ApprovalRequest.STATUS, this.ApprovalStatus.REQUESTED)
-              )).limit(1).select();
-            let approval = approvals.array[0];
-            if ( approval ) {
-              let rejectedApproval = approval.clone();
-              rejectedApproval.status = this.ApprovalStatus.REJECTED;
-              rejectedApproval.memo = 'Outdated Approval.';
-              this.approvalRequestDAO.put(rejectedApproval).then(o => {
-                this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
-                this.notify(this.SUCCESS_REMOVED, '', this.LogLevel.INFO, true);
-                this.pushMenu('approvals', true);
-              }, e => {
-                this.notify(e.message, '', this.LogLevel.ERROR, true);
-              });
-            }
-          }
+          this.notify(isValid ? this.SUCCESS_UPDATED : this.SUCCESS_REMOVED, '', this.LogLevel.INFO, true);
+          this.stack.back();
         }
         return this.ScrollingWizardStackView.create({ ucj: this.data, onSave: onSave });
       }
