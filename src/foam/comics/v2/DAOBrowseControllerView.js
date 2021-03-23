@@ -162,7 +162,7 @@ foam.CLASS({
                     .start()
                       .addClass(self.myClass('browse-subtitle'))
                       .translate(self.cls_.id + '.VIEW_ALL', self.VIEW_ALL)
-                      .translate(config$of.id + ".model_.plural", config$of.name.toLowerCase())
+                      .translate(config$of.id + ".model_.plural", config$of.name)
                     .end();
                 })
               .end()
