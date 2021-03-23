@@ -30,7 +30,7 @@ foam.CLASS({
       --foamMargin: 20px;
     }
 
-    ^mainView > * > *:not(:last-child) {
+    ^mainView > * > *:not(:last-child):not(^heading) {
       margin-bottom: 64px;
     }
 
@@ -66,6 +66,11 @@ foam.CLASS({
       /* TODO: Themes don't support this, so color is static */
       border-top: 2px solid hsla(240,100%,80%,0.8);
     }
+
+    ^heading h2 {
+      margin: 0px;
+    }
+
   `,
 
   properties: [
@@ -208,6 +213,7 @@ foam.CLASS({
       var self = this;
       return e
         .start()
+          .addClass(self.myClass('heading'))
           .add(wizardlet.slot(function (indicator) {
             return self.E()
               .style({
