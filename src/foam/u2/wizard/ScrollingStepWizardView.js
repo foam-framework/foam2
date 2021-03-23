@@ -11,17 +11,25 @@ foam.CLASS({
   mixins: ['foam.u2.wizard.WizardletRenderUtils'],
   documentation: `Displays all wizardlets in a scrolling page.`,
 
+  imports: [ 'sequence?' ],
+
   messages: [
-    { name: 'NO_ACTION_LABEL', message: 'Done' }
+    { name: 'NO_ACTION_LABEL', message: 'Done' },
+    { name: 'SAVE_LABEL', message: 'Save' },
   ],
 
   requires: [
     'foam.u2.tag.CircleIndicator',
+    'foam.u2.crunch.wizardflow.SaveAllAgent',
     'foam.u2.wizard.WizardPosition',
     'foam.u2.wizard.WizardletIndicator'
   ],
 
   css: `
+    ^ {
+      --foamMargin: 20px;
+    }
+
     ^mainView > * > *:not(:last-child) {
       margin-bottom: 64px;
     }
@@ -32,14 +40,16 @@ foam.CLASS({
       --actionBarHeight: calc(
         2*var(--actionBarTbPadding) + var(--buttonHeight));
       --lrPadding: 48px;
+      --tbPadding: var(--lrPadding);
       position: relative;
     }
 
-    ^rightside ^entry {
+    ^ ^rightside ^entry, ^ ^rightside ^hide-X-entry {
       flex-grow: 1;
       overflow-y: auto;
-      padding: var(--lrPadding);
-      padding-bottom: calc(var(--lrPadding) + var(--actionBarHeight))
+      padding: var(--tbPadding) var(--lrPadding);
+      padding-bottom: calc(var(--tbPadding) - var(--foamMargin));
+      /* padding-bottom: calc(var(--lrPadding) + var(--actionBarHeight)) */
     }
 
     ^rightside ^actions {
@@ -109,6 +119,16 @@ foam.CLASS({
       expression: function (data$wizardlets) {
         return data$wizardlets.filter(w => w.submit).length > 0;
       }
+    },
+    {
+      name: 'willSave',
+      documentation: `
+        Used to change submit button text between 'Done' and 'Save' depending
+        on if auto-save is on.
+      `,
+      factory: function () {
+        return this.sequence && this.sequence.contains('SaveAllAgent');
+      }
     }
   ],
 
@@ -120,6 +140,7 @@ foam.CLASS({
         this.data.wizardPosition = this.scrollWizardPosition;
       }));
       this
+        .addClass(this.myClass()) // Used to fix CSS precedence with parent
         .start(this.Grid)
           .addClass(this.myClass('fix-grid'))
           .start(this.GUnit, { columns: 4 })
@@ -160,7 +181,9 @@ foam.CLASS({
                 .tag(this.SUBMIT, {
                   label: this.hasAction
                     ? this.ACTION_LABEL
-                    : this.NO_ACTION_LABEL
+                    : this.willSave
+                      ? this.SAVE_LABEL
+                      : this.NO_ACTION_LABEL
                 })
               .endContext()
             .end()
@@ -199,7 +222,7 @@ foam.CLASS({
               .end()
           }))
           .start('h2') // ???: Should this really be h2?
-            .add(wizardlet.title)
+            .translate(wizardlet.capability.id+'.name', wizardlet.capability.name)
           .end()
         .end()
     },

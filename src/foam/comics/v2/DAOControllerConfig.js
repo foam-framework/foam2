@@ -23,7 +23,8 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'VIEW_ALL', message: 'View all ' }
+    { name: 'VIEW_ALL', message: 'View all ' },
+    { name: 'CREATE_NEW', message: 'Create a New ' }
   ],
 
   properties: [
@@ -87,10 +88,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'browseSubtitle',
-      factory: function() {
-        var viewAll = ctrl.__subContext__.translationService.getTranslation(foam.locale, 'foam.comics.v2.DAOControllerConfig.VIEW_ALL', this.VIEW_ALL);
-        return viewAll + this.browseTitle.toLowerCase();
-      }
+      factory: function() { return this.VIEW_ALL + this.browseTitle.toLowerCase() + '.' }
     },
     {
       class: 'FObjectProperty',
@@ -119,7 +117,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'createTitle',
-      expression: function(of) { return 'Create a New ' + of.model_.label; }
+      expression: function(of) { return this.CREATE_NEW + of.model_.label; }
     },
     {
       class: 'Array',

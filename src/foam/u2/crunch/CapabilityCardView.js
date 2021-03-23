@@ -77,6 +77,10 @@ foam.CLASS({
     }
   ],
 
+  messages: [
+    { name: 'RENEW_DATA_LABEL', message: 'Please review and update your data' }
+  ],
+
   methods: [
     function init() {
        this.SUPER();
@@ -113,7 +117,7 @@ foam.CLASS({
           .end()
         .end()
         .start()
-          .add(this.slot(function(cjStatus, isRenewable) {
+          .add(this.slot(function(cjStatus) {
             return this.E().addClass(style.myClass('tooltip'))
               .add(cjStatus.label).addClass(style.myClass('badge'))
               .style({ 'background-color': cjStatus.background })
@@ -122,10 +126,13 @@ foam.CLASS({
                 .enableClass(style.myClass('tooltipDisabled'), self.tooltipEnabled, true)
                 .add(cjStatus.documentation)
               .end()
+          }))
+          .add(this.slot(function(isRenewable) {
+            return isRenewable ? this.E()
               .start()
                 .addClass(style.myClass('renewable-description'))
-                .add(isRenewable ? "Capability is renewable" : "")
-              .end();
+                .add(self.RENEW_DATA_LABEL)
+              .end() : null;
           }))
         .end()
 

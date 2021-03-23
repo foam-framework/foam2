@@ -42,9 +42,14 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityRequire
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityCardView.ASSOCIATED_ENTITY.label",target:"Entidade associada"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityCardView.CJ_STATUS.label",target:"cjStatus"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityCardView.CJ_STATUS.documentation",target:"\n        Armazena o status do recurso de capacidade e é atualizado quando o usuário \n tenta preencher ou preencher os formulários CRUNCH. \n      "})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityCardView.RENEW_DATA_LABEL",target:"Por favor reveja e atualize seus dados"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityFeatureView.ASSOCIATED_ENTITY.label",target:"Entidade associada"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityFeatureView.CJ_STATUS.label",target:"cjStatus"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityFeatureView.CJ_STATUS.documentation",target:"\nArmazena o status do recurso de capacidade e é atualizado quando o usuário \n tenta preencher ou preencher os formulários CRUNCH. \n"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityFeatureView.RENEW_DATA_LABEL",target:"Por favor reveja e atualize seus dados"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.AgentCapabilityJunctionDAOSummaryView.SUCCESS_UPDATED",target:"Informações de integração atualizadas com êxito."})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.AgentCapabilityJunctionDAOSummaryView.SUCCESS_REMOVED",target:"Informações de integração removidas com sucesso."})
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.CRUNCHThemeRefinement.ADMISSION_CAPABILITY.label",target:"admissionCapability pt"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.CRUNCHThemeRefinement.ADMISSION_CAPABILITY.documentation",target:"Especifica a capacidade de nível superior que deve ser concedida antes de admitirmos um usuário no sistema."})
@@ -202,6 +207,8 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollWizardletVi
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollWizardletView.IS_ERROR_FREE.label",target:"está livre de erros"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollWizardletView.EXIT.label",target:"Saída"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollWizardletView.SAVE.label",target:"Salve"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollingStepWizardView.SAVE_LABEL",target:"Salve"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollingStepWizardView.NO_ACTION_LABEL",target:"Feito"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.DAOWizardlet.OF.label",target:"do"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.DAOWizardlet.DATA.label",target:"dados"})
 
@@ -396,12 +403,23 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.ResetPassword.RE
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.ResetPassword.PASSWORD_LENGTH_10_ERROR",target:"A senha deve ter pelo menos 10 caracteres"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.ResetPassword.PASSWORD_NOT_MATCH",target:"As senhas não coincidem"})
 
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.notification.Notification.model_.plural",target:"notificações"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"notifications.label",target:"notificações"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"Read",target:"Leitura"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"Unread",target:"Não lida"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"View all notifications",target:"Ver todas as notificações"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"Notifications",target:"Notificações"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"Today",target:"hoje"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"Yesterday",target:"Ontem"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"Older",target:"Mais velho"})
+
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.RetrievePassword.INSTRUC_ONE",target:"As instruções de redefinição de senha foram enviadas para"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.RetrievePassword.INSTRUC_TWO",target:"Verifique sua caixa de entrada para continuar"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.RetrievePassword.REDIRECTION_TO",target:"Retornar à tela de login"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.RetrievePassword.SECTION_EMAIL_PASSWORD_SECTION.title",target:"Esqueceu sua Senha?"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.RetrievePassword.SECTION_EMAIL_PASSWORD_SECTION.subTitle",target:"Forneça o email com o quals e cadastrou e enviaremos um link para que cadastre uma nova senha"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.RetrievePassword.SEND_EMAIL.label",target:"Enviar"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.comics.v2.DAOControllerConfig.CREATE_NEW",target:"crie um novo "})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.comics.v2.DAOControllerConfig.VIEW_ALL",target:"Ver tudo "})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.filter.FilterView.SELECTED",target:" selecionado"})
 
