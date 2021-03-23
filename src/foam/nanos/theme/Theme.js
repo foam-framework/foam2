@@ -490,6 +490,26 @@ foam.CLASS({
       section: 'administration'
     },
     {
+      class: 'Long',
+      name: 'lastModifiedByAgent',
+      includeInDigest: true,
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      tableCellFormatter: function(value, obj, axiom) {
+        this.__subSubContext__.userDAO
+          .find(value)
+          .then((user) => {
+            if ( user ) {
+              this.add(user.legalName);
+            }
+          })
+          .catch((error) => {
+            this.add(value);
+          });
+      },
+      section: 'administration'
+    },
+    {
       class: 'DateTime',
       name: 'lastModified',
       includeInDigest: true,
