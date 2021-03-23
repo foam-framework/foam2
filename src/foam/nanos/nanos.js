@@ -26,6 +26,7 @@ FOAM_FILES([
   { name: 'foam/nanos/fs/fileDropZone/FileDropZone', flags: ['web'] },
   { name: 'foam/nanos/fs/fileDropZone/FilePreview', flags: ['web'] },
   { name: 'foam/nanos/fs/fileDropZone/FileCard', flags: ['web'] },
+  { name: "foam/nanos/crunch/AgentCapabilityJunctionDAOSummaryView", flags: ['web'] },
   { name: "foam/nanos/crunch/AssociatedEntity" },
   { name: "foam/nanos/crunch/CapabilityGrantMode" },
   { name: "foam/nanos/crunch/Capability" },
