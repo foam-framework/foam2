@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.notification',
   name: 'Notification',
+  plural: 'notifications',
 
   implements: [
     'foam.nanos.auth.Authorizable',

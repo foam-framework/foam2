@@ -8,9 +8,10 @@ package foam.nanos.auth;
 
 import foam.core.X;
 import foam.dao.DAO;
+import foam.nanos.auth.ruler.PreventDuplicateEmailAction;
 import foam.test.TestUtils;
 
-public class PreventDuplicateEmailDAOTest
+public class PreventDuplicateEmailTest
   extends foam.nanos.test.Test
 {
   private DAO userDAO_;
@@ -24,7 +25,9 @@ public class PreventDuplicateEmailDAOTest
   private X getTestingSubcontext(X x) {
     // Mock the userDAO and put a test user in it.
     x = TestUtils.mockDAO(x, "localUserDAO");
+
     userDAO_ = (DAO) x.get("localUserDAO");
+    
     User testUser_ = TestUtils.createTestUser();
     userDAO_.put(testUser_);
 
@@ -34,14 +37,16 @@ public class PreventDuplicateEmailDAOTest
   private void PreventsDuplicateEmail(X x) {
     User userWithDuplicateEmail = TestUtils.createTestUser();
     userWithDuplicateEmail.setId(2); // Make sure the id is different.
-    DAO dao = new PreventDuplicateEmailDAO.Builder(x).setDelegate(userDAO_).build();
+    DAO dao = userDAO_;
+    PreventDuplicateEmailAction action = new PreventDuplicateEmailAction.Builder(x).build();
+    
     test(
       TestUtils.testThrows(
-        () -> dao.put_(x, userWithDuplicateEmail),
-        "User with same email address already exists: " + userWithDuplicateEmail.getEmail(),
+        () -> action.applyAction(x, userWithDuplicateEmail, null, null, null, null),
+        "User with same email already exists: " + userWithDuplicateEmail.getEmail(),
         RuntimeException.class
       ),
-      "PreventDuplicateEmailDAO throws a RuntimeException with an appropriate message when a User is put with the same email as an existing user and a different id."
+      "Rule throws a RuntimeException with an appropriate message when a User is put with the same email as an existing user and a different id."
     );
   }
 }
