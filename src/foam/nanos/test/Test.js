@@ -229,7 +229,7 @@ foam.CLASS({
           pm.log(x);
         }
 
-      setLastRun(new Date());
+        setLastRun(new Date());
       setLastDuration(pm.getTime());
       ps.flush();
       setOutput(baos.toString() + getOutput());
