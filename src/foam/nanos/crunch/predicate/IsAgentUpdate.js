@@ -21,7 +21,10 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: ['foam.core.Serializable'],
 
-  documentation: 'Returns true if session user(s) match the user(s) of the usercapabilityjunction',
+  documentation: `
+    Returns true if session user(s) is not the same as the user(s) of the usercapabilityjunction,
+    excludes system updates
+  `,
 
   javaImports: [
     'foam.core.X',
