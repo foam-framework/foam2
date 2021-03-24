@@ -245,13 +245,13 @@ foam.CLASS({
 
     function createTestData() {
       var s = `
-## Example 1
-  First U2 Example
+## Welcome
+First U2 Example
 --
 add('testing');
 
-## Example 1
-  First U2 Example
+## Background
+First U2 Example
 --
 add('testing');
       `;
