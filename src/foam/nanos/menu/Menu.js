@@ -93,6 +93,11 @@
       displayWidth: 80
     },
     {
+      class: 'foam.u2.ViewSpec',
+      name: 'border',
+      factory: function() { return { class: 'foam.u2.borders.NullBorder' }; }
+    },
+    {
       class: 'FObjectArray',
       of: 'foam.nanos.menu.XRegistration',
       name: 'registrations'

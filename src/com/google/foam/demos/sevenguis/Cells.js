@@ -233,8 +233,8 @@ foam.CLASS({
         // function listenForLoad() { this.value$.sub(this.onDataLoad); },
         function toReadE() {
           return this.HTMLElement.create(
-              {nodeName: 'span'},
-              this).add(this.data$);
+            {nodeName: 'span'},
+            this).add(this.data$);
         },
 
         function toWriteE() {

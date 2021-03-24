@@ -88,7 +88,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'browseSubtitle',
-      factory: function() { return this.VIEW_ALL + this.browseTitle.toLowerCase() + '.' }
+      factory: function() { return this.VIEW_ALL + this.browseTitle.toLowerCase()}
     },
     {
       class: 'FObjectProperty',
@@ -143,7 +143,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'browseBorder',
-      expression: function() {
+      factory: function() {
         // Can't use a value here because java tries to generate a HasMap
         // for it which doesn't jive with the AbstractFObjectPropertyInfo.
         return { class: 'foam.u2.borders.NullBorder' };
