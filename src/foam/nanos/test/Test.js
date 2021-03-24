@@ -16,13 +16,15 @@ foam.CLASS({
 
   javaImports: [
     'bsh.Interpreter',
-    'foam.nanos.logger.Logger',
     'foam.nanos.app.AppConfig',
     'foam.nanos.app.Mode',
+    'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM',
+    'foam.nanos.script.*',
     'java.io.ByteArrayOutputStream',
     'java.io.PrintStream',
-    'java.util.Date'
+    'java.util.Date',
+    'jdk.jshell.JShell'
   ],
 
   tableColumns: [
@@ -138,7 +140,6 @@ foam.CLASS({
     {
       name: 'runScript',
       code: function() {
-        var ret;
         var startTime = Date.now();
 
         return new Promise((resolve, reject) => {
@@ -196,34 +197,42 @@ foam.CLASS({
 
         ByteArrayOutputStream baos  = new ByteArrayOutputStream();
         PrintStream           ps    = new PrintStream(baos);
-        Interpreter           shell = (Interpreter) createInterpreter(x, null);
         PM                    pm    = new PM(this.getClass(), getId());
+        Language              l     = getLanguage();
 
+        setPassed(0);
+        setFailed(0);
         try {
-          setPassed(0);
-          setFailed(0);
-          setOutput("");
-          shell.setOut(ps);
-
-          // creates the testing method
-          shell.eval("test(boolean exp, String message) { if ( exp ) { currentScript.setPassed(currentScript.getPassed()+1); } else { currentScript.setFailed(currentScript.getFailed()+1); } print((exp ? \\"SUCCESS: \\" : \\"FAILURE: \\")+message);}");
-          shell.eval(getCode());
-          // if the test is a java class (not a script), it will just update the lastRun and lastDuration
+          if ( l == foam.nanos.script.Language.BEANSHELL ) {
+            Interpreter shell = (Interpreter) createInterpreter(x, null);
+            setOutput("");
+            shell.setOut(ps);
+            shell.eval("test(boolean exp, String message) { if ( exp ) { currentScript.setPassed(currentScript.getPassed()+1); } else { currentScript.setFailed(currentScript.getFailed()+1); } print((exp ? \\"SUCCESS: \\" : \\"FAILURE: \\")+message);}");
+            shell.eval(getCode());
+          } else if ( l == foam.nanos.script.Language.JSHELL ) {
+            String print = null;
+            JShell jShell = (JShell) createInterpreter(x, ps);
+            print = new JShellExecutor().execute(x, jShell, getCode());
+            ps.print(print);
+          } else {
+            throw new RuntimeException("Script language not supported");
+          }
           runTest(x);
-        } catch (Throwable e) {
-          setFailed(getFailed()+1);
-          ps.println("FAILURE: "+e.getMessage());
-          e.printStackTrace(ps);
+        } catch (Throwable t) {
+          setFailed(getFailed() + 1);
+          ps.println("FAILURE: " + t.getMessage());
+          t.printStackTrace(ps);
           Logger logger = (Logger) x.get("logger");
-          logger.error(e);
+          logger.error(this.getClass().getSimpleName(), "runTest", getId(), t);
+          pm.error(x, t);
         } finally {
           pm.log(x);
         }
 
         setLastRun(new Date());
-        setLastDuration(pm.getTime());
-        ps.flush();
-        setOutput(baos.toString() + getOutput());
+      setLastDuration(pm.getTime());
+      ps.flush();
+      setOutput(baos.toString() + getOutput());
     `
     }
   ]
