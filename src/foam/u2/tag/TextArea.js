@@ -20,7 +20,6 @@ foam.CLASS({
   name: 'TextArea',
   extends: 'foam.u2.View',
 
-
   axioms: [
     {
       class: 'foam.u2.CSS',

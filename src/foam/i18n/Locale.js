@@ -75,6 +75,20 @@ foam.CLASS({
           }
         }.bind(this));
       }
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedByAgent',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      tableCellFormatter: function(value, obj) {
+        this.__subSubContext__.userDAO.find(value).then(function(user) {
+          if ( user ) {
+            this.add(user.legalName);
+          }
+        }.bind(this));
+      }
     }
   ]
 });

@@ -433,7 +433,9 @@ foam.CLASS({
           this.addContent();
           this.action && this.action.maybeCall(this.__subContext__, this.data);
         }
-      } catch (x) {}
+      } catch (x) {
+        console.warn('Unexpected Exception in Action: ', x);
+      }
 
       e.preventDefault();
       e.stopPropagation();
