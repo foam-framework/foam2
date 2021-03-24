@@ -168,28 +168,17 @@ foam.CLASS({
     },
 
     function isChoiceSelected(data, choice){
-      var isSelected = false
-
       for ( var i = 0 ; i < data.length ; i++ ) {
-        isSelected = foam.util.equals(data[i], choice);
-
-        if ( isSelected ) break;
+        if ( foam.util.equals(data[i], choice) ) return true;
       }
-      
-      return isSelected;
+      return false;
     },
 
-    function getIndexOfChoice(data, choice){
-      var indexDataToAdd = -1;
-                          
+    function getIndexOfChoice(data, choice){                          
       for ( var i = 0 ; i < data.length ; i++ ) {
-        if ( foam.util.equals(data[i], choice) ){
-          indexDataToAdd  = i;
-          break;
-        }
+        if ( foam.util.equals(data[i], choice) ) return i;
       }
-
-      return indexDataToAdd
+      return -1;
     },
 
     function getSelectedSlot(choice) {
