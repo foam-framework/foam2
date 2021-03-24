@@ -30,7 +30,7 @@ foam.CLASS({
 
   css: `
   ^ input[type="search"] {
-    width: 210px;
+    width: 240px;
   }
 
   ^ .side-nav-view {
@@ -67,7 +67,8 @@ foam.CLASS({
       class: 'foam.dao.DAOProperty',
       name: 'dao_',
       expression: function(menuDAO) {
-        return menuDAO;
+        // Stop removing the orderBy!
+        return menuDAO.orderBy(this.Menu.ORDER);
       }
     },
     {
