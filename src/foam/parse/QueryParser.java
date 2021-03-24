@@ -23,6 +23,8 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static foam.mlang.MLang.DOT_F;
+
 public class QueryParser
 {
   protected ClassInfo info_;
@@ -137,11 +139,7 @@ public class QueryParser
     grammar.addSymbol("DOT", new Seq(grammar.sym("FIELD_NAME"), grammar.sym("SUB_QUERY")));
     grammar.addAction("DOT", (val, x) -> {
       Object[] values = (Object[]) val;
-      DotF dot = new DotF();
-      dot.setArg1(( values[1] instanceof Expr ) ?
-        ( Expr ) values[1] : new foam.mlang.Constant (values[1]));
-      dot.setArg2((Expr) values[0]);
-      return dot;
+      return DOT_F(values[1], values[0]);
     });
 
     grammar.addSymbol("SUB_QUERY", new Alt(grammar.sym("COMPOUND_SUB_QUERY"), grammar.sym("SIMPLE_SUB_QUERY")));
