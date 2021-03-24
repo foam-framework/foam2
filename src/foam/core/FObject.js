@@ -985,7 +985,8 @@ foam.CLASS({
           // for each object since they are of the exact same
           // type.
           if ( o.hasOwnProperty(name) || props[i].factory ) {
-            this[name] = o[name];
+            if ( ! props[i].copyValueFrom || ! props[i].copyValueFrom(this, o) )
+              this[name] = o[name];
           }
         }
         return this;
@@ -998,7 +999,8 @@ foam.CLASS({
           var name = props[i].name;
           var otherProp = o.cls_.getAxiomByName(name);
           if ( otherProp && foam.core.Property.isInstance(otherProp) ) {
-            this[name] = o[name];
+            if ( ! props[i].copyValueFrom || ! props[i].copyValueFrom(this, o) )
+              this[name] = o[name];
           }
         }
         return this;

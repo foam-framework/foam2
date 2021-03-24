@@ -7,6 +7,7 @@
  foam.CLASS({
   package: 'foam.nanos.approval',
   name: 'ApprovalRequest',
+  plural: 'ApprovalRequests',
   documentation: 'Approval requests are stored in approvalRequestDAO and' +
   'represent a single approval request for a single user.',
 
@@ -382,6 +383,16 @@
       readPermissionRequired: true
     },
     {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedByAgent',
+      includeInDigest: true,
+      section: 'approvalRequestInformation',
+      order: 130,
+      gridColumns: 6,
+      readPermissionRequired: true
+    },
+    {
       class: 'String',
       name: 'memo',
       view: { class: 'foam.u2.tag.TextArea', rows: 3, cols: 60 },
@@ -497,7 +508,7 @@
       documentation: `
         ID of obj displayed in view reference
         To be used in view reference action when the approvalrequest
-        needs to specify its own reference, for example in the case of 
+        needs to specify its own reference, for example in the case of
         UserCapabilityJunctions where data is null.
       `
     },
@@ -513,7 +524,7 @@
       documentation: `
         Daokey of obj displayed in view reference.
         To be used in view reference action when the approvalrequest
-        needs to specify its own reference, for example in the case of 
+        needs to specify its own reference, for example in the case of
         UserCapabilityJunctions where data is null.
       `
     },
@@ -740,7 +751,7 @@
           property = X[daoKey].of.ID;
           objId = property.adapt.call(property, self.objId, self.objId, property);
         }
-        
+
         return X[daoKey]
           .find(objId)
           .then(obj => {
@@ -815,7 +826,7 @@
               }),
               mementoHead: null,
               backLabel: 'Back'
-            });
+            }, X);
           })
           .catch(err => {
             console.warn(err.message || err);

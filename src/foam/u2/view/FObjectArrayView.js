@@ -19,7 +19,7 @@ foam.CLASS({
       expression: function(of) {
         return foam.core.InterfaceModel.isInstance(of.model_)
           ? null
-          : of.create();
+          : of.create(null, this.__subContext__);
       }
     },
     {

@@ -30,15 +30,23 @@ foam.CLASS({
       factory: function () {
         return this.SkipMode.SKIP;
       }
+    },
+    {
+      name: 'incrementalWizard',
+      class: 'Boolean'
     }
   ],
 
   methods: [
     function applyTo(sequence) {
-      sequence.reconfigure('StepWizardAgent', this.StepWizardConfig.create({
+      var config = this.StepWizardConfig.create({
         allowSkipping: this.allowSkipping,
         allowBacktracking: this.allowBacktracking,
-      }));
+        ...(this.incrementalWizard ? {
+          wizardView: { class: 'foam.u2.wizard.IncrementalStepWizardView' }
+        } : {})
+      });
+      sequence.reconfigure('StepWizardAgent', { config: config });
       if ( this.skipMode )
         sequence.reconfigure('SkipGrantedAgent', {
           mode: this.skipMode });

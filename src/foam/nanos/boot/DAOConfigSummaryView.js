@@ -18,18 +18,18 @@ foam.CLASS({
 
       properties: [
         {
-          class: 'foam.u2.ViewSpecWithJava',
+          class: 'foam.u2.ViewSpec',
           name: 'viewView',
           factory: function() {
             return {
               class: 'foam.u2.view.ObjAltView',
               views: [
-                [ {class: 'foam.u2.DetailView'},                 'Detail' ],
-                [ {class: 'foam.u2.detail.TabbedDetailView'},    'Tabbed' ],
-                [ {class: 'foam.u2.detail.SectionedDetailView'}, 'Sectioned' ],
-                [ {class: 'foam.u2.detail.MDDetailView'},        'Material' ],
-                [ {class: 'foam.u2.detail.WizardSectionsView'},  'Wizard' ],
-                [ {class: 'foam.u2.detail.VerticalDetailView'},  'Vertical' ]
+                [ {class: 'foam.u2.DetailView'},                 this.DETAIL ],
+                [ {class: 'foam.u2.detail.TabbedDetailView'},    this.TABBED ],
+                [ {class: 'foam.u2.detail.SectionedDetailView'}, this.SECTIONED ],
+                [ {class: 'foam.u2.detail.MDDetailView'},        this.MATERIAL ],
+                [ {class: 'foam.u2.detail.WizardSectionsView'},  this.WIZARD ],
+                [ {class: 'foam.u2.detail.VerticalDetailView'},  this.VERTICAL ]
               ]
             };
           }
@@ -44,18 +44,18 @@ foam.CLASS({
 
       properties: [
         {
-          class: 'foam.u2.ViewSpecWithJava',
+          class: 'foam.u2.ViewSpec',
           name: 'viewView',
           factory: function() {
             return {
               class: 'foam.u2.view.ObjAltView',
               views: [
-                [ {class: 'foam.u2.DetailView'},                 'Detail' ],
-                [ {class: 'foam.u2.detail.TabbedDetailView'},    'Tabbed' ],
-                [ {class: 'foam.u2.detail.SectionedDetailView'}, 'Sectioned' ],
-                [ {class: 'foam.u2.detail.MDDetailView'},        'Material' ],
-                [ {class: 'foam.u2.detail.WizardSectionsView'},  'Wizard' ],
-                [ {class: 'foam.u2.detail.VerticalDetailView'},  'Vertical' ]
+                [ {class: 'foam.u2.DetailView'},                 this.DETAIL ],
+                [ {class: 'foam.u2.detail.TabbedDetailView'},    this.TABBED ],
+                [ {class: 'foam.u2.detail.SectionedDetailView'}, this.SECTIONED ],
+                [ {class: 'foam.u2.detail.MDDetailView'},        this.MATERIAL ],
+                [ {class: 'foam.u2.detail.WizardSectionsView'},  this.WIZARD ],
+                [ {class: 'foam.u2.detail.VerticalDetailView'},  this.VERTICAL ]
               ]
             };
           }
@@ -180,6 +180,11 @@ foam.CLASS({
 
   exports: [
     'memento'
+  ],
+
+  messages: [
+    { name: 'CONTROLLER1', message: 'Controller 1' },
+    { name: 'CONTROLLER2', message: 'Controller 2' }
   ],
 
   properties: [
@@ -354,14 +359,14 @@ foam.CLASS({
                 class: this.BrowserView,
                 stack: this.stack
               },
-              'Controller 1'
+              this.CONTROLLER1
             ],
             [
               {
                 class: this.DAOBrowseControllerView,
                 stack: this.stack
               },
-              'Controller 2'
+              this.CONTROLLER2
             ]
           ]
         }

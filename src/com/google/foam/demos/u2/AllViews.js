@@ -400,6 +400,21 @@ foam.CLASS({
       name: 'defaultDouble'
     },
     {
+      class: 'Float',
+      name: 'multiViewFloat',
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          { class: 'foam.u2.TextField', placeholder: 'textfield', onKey: true },
+          { class: 'foam.u2.FloatView', placeholder: 'floatview', onKey: true },
+          { class: 'foam.u2.TextField', onKey: false },
+          { class: 'foam.u2.FloatView', onKey: false },
+          { class: 'foam.u2.FloatView', onKey: false, precision: 2 },
+          { class: 'foam.u2.FloatView', onKey: false, precision: 2, trimZeros: false }
+        ]
+      }
+    },
+    {
       class: 'StringArray',
       name: 'defaultStringArray'
     },

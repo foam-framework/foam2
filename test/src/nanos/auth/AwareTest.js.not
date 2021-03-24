@@ -54,6 +54,11 @@ describe('Created/LastModified Aware tests', function() {
           class: 'Reference',
           of: 'foam.nanos.auth.User',
           name: 'lastModifiedBy'
+        },
+        {
+          class: 'Reference',
+          of: 'foam.nanos.auth.User',
+          name: 'lastModifiedByAgent'
         }
       ]
     });

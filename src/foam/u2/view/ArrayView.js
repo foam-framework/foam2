@@ -91,6 +91,7 @@ foam.CLASS({
           name: 'value',
           postSet: function(_, n) {
             this.data[this.index] = n;
+            this.updateData();
           }
         }
       ],

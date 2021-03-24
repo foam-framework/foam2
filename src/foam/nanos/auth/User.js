@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'User',
+  plural: 'Users',
 
   implements: [
     'foam.nanos.auth.Authorizable',
@@ -202,7 +203,7 @@ foam.CLASS({
       class: 'String',
       name: 'firstName',
       shortName: 'fn',
-      documentation: 'The first name of the User.',      
+      documentation: 'The first name of the User.',
       section: 'userInformation',
       order: 70,
       gridColumns: 6,
@@ -284,7 +285,7 @@ foam.CLASS({
       name: 'email',
       label: {
         'en' :'Email Address',
-        'fr' :'Adresse e-mail'
+        'fr' :'Adresse Email'
       },
       includeInDigest: true,
       containsPII: true,
@@ -817,24 +818,6 @@ foam.CLASS({
         if ( this instanceof LifecycleAware && ((LifecycleAware) this).getLifecycleState() != LifecycleState.ACTIVE ) {
           throw new AuthenticationException("User is not active");
         }
-      `
-    },
-    {
-      name: 'isAdmin',
-      type: 'Boolean',
-      documentation: `
-        Returns true if the user has the system user id, or is in either the
-        admin or system group.
-
-        **IMPORTANT**: It is possible to misuse the value from this method.
-        A check on this method should never be used to override behaviour of
-        authorization; in this case it is preferred to create a permission that
-        no other user will have.
-      `,
-      javaCode: `
-        return getId() == foam.nanos.auth.User.SYSTEM_USER_ID
-          || getGroup().equals("admin")
-          || getGroup().equals("system");
       `
     }
   ]

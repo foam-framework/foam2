@@ -181,12 +181,22 @@ foam.CLASS({
     }
 
     ^renewable-description {
+      height: 24px;
+      padding: 2px 8px;
+      background-color: /*%WHITE%*/ #ffffff;
+      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 10px;
       font-weight: 500;
       font-style: normal;
       font-stretch: normal;
+      color: /*%BLACK%*/ #1e1f21;
       line-height: 24px;
-      color: #DC143C;
+      letter-spacing: normal;
+      text-align: center;
+      opacity: 80%;
+      width: -moz-available;
+      width: -webkit-fill-available;
+      width: fill-available;
     }
 
     ^category {
