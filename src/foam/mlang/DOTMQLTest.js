@@ -22,22 +22,20 @@ foam.CLASS({
       User user = new User();
       UserFeedback feedback1 = new UserFeedback();
       feedback1.setMessage("1(abc))");
-//      feedback1.setMessage("(Msg 1");
 
       UserFeedback feedback2 = new UserFeedback();
-//      feedback2.setMessage("Msg (2))");
       feedback2.setMessage("def2");
 
       feedback1.setNext(feedback2);
       user.setUserFeedback(feedback1);
 
-      test(MQL("userFeedback.message=\\\"1(abc))\\\"").f(user), "userFeedback.message = (Msq1");
-      test(! MQL("userFeedback.message=\\\"1(abc)))\\\"").f(user), "userFeedback.message != (Msq");
-      test(MQL("userFeedback.next.message=def2").f(user), "userFeedback.next.message = Msg (2))");
-      test(! MQL("userFeedback.next.message=def").f(user), "userFeedback.next.message != Msg (2)");
-      test(MQL("userFeedback.next(message=def2)").f(user), "userFeedback.next(message = Msg (2)))");
-      test(MQL("userFeedback(message=\\\"1(abc))\\\" and next.message=\\\"def2\\\")").f(user), "userFeedback(message = (Msg 1 and next.message=Msg (2)))");
-      test(MQL("userFeedback(message=\\\"1(abc))\\\" and next(message=\\\"def2\\\"))").f(user), "userFeedback(message = (Msg 1 and next(message=Msg (2))))");
+      test(MQL("userFeedback.message=\\\"1(abc))\\\"").f(user), "userFeedback.message = 1(abc))");
+      test(! MQL("userFeedback.message=\\\"1(abc)))\\\"").f(user), "userFeedback.message != 1(abc)))");
+      test(MQL("userFeedback.next.message=def2").f(user), "userFeedback.next.message = def2");
+      test(! MQL("userFeedback.next.message=def").f(user), "userFeedback.next.message != def");
+      test(MQL("userFeedback.next(message=def2)").f(user), "userFeedback.next(message = def2");
+      test(MQL("userFeedback(message=\\\"1(abc))\\\" and next.message=\\\"def2\\\")").f(user), "userFeedback(message = 1(abc)) and next.message=def2)");
+      test(MQL("userFeedback(message=\\\"1(abc))\\\" and next(message=\\\"def2\\\"))").f(user), "userFeedback(message = 1(abc)) and next(message=def2))");
       `
     },
     {

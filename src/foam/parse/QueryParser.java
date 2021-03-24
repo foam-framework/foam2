@@ -168,7 +168,7 @@ public class QueryParser
     grammar.addSymbol("SIMPLE_SUB_QUERY", new Seq1(1, Literal.create("."), new Until(new Alt(Literal.create(" "), EOF.instance()))));
     grammar.addAction("SIMPLE_SUB_QUERY", (val, x) -> {
       MQLExpr mql = new MQLExpr();
-      mql.setQuery(compactToString(((Object[])val)[0]));
+      mql.setQuery(compactToString(val));
       return mql;
     });
 
