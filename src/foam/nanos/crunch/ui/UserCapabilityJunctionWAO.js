@@ -18,15 +18,30 @@ foam.CLASS({
     'crunchService'
   ],
 
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.Subject',
+      name: 'subject',
+      documentation: `
+        The requested subject associated to the ucj. Should only be set
+        when used by a permissioned back-office user.
+      `
+    }
+  ],
+
   methods: [
     function save(wizardlet) {
       if ( ! wizardlet.isAvailable ) return Promise.resolve();
+      var wData = wizardlet.data ? wizardlet.data.clone() : null;
       wizardlet.loading = true;
-      return this.crunchService.updateJunction( null,
-        wizardlet.capability.id,
-        wizardlet.data ? wizardlet.data.clone() : null,
-        null
-      ).then((ucj) => {
+      let p = this.subject ? this.crunchService.updateJunctionFor(
+        null, wizardlet.capability.id, wData, null,
+        this.subject.user, this.subject.realUser
+      ) : this.crunchService.updateJunction(null,
+        wizardlet.capability.id, wData, null
+      );
+      return p.then((ucj) => {
         this.crunchService.pub('grantedJunction');
         this.load_(wizardlet, ucj);
         return ucj;
@@ -42,9 +57,12 @@ foam.CLASS({
     },
     function load(wizardlet) {
       wizardlet.loading = true;
-      return this.crunchService.getJunction(
+      let p = this.subject ? this.crunchService.getJunctionFor(
+        null, wizardlet.capability.id, this.subject.user, this.subject.realUser
+      ) : this.crunchService.getJunction(
         null, wizardlet.capability.id
-      ).then(ucj => {
+      );
+      return p.then(ucj => {
         this.load_(wizardlet, ucj);
       });
     },
@@ -67,7 +85,7 @@ foam.CLASS({
       if ( wizardlet.data ) {
         wizardlet.data.copyFrom(loadedData);
       } else {
-        wizardlet.data = loadedData;
+        wizardlet.data = loadedData.clone(this.__subContext__);
       }
       wizardlet.loading = false;
     }

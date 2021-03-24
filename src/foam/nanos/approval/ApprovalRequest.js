@@ -383,6 +383,16 @@
       readPermissionRequired: true
     },
     {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedByAgent',
+      includeInDigest: true,
+      section: 'approvalRequestInformation',
+      order: 130,
+      gridColumns: 6,
+      readPermissionRequired: true
+    },
+    {
       class: 'String',
       name: 'memo',
       view: { class: 'foam.u2.tag.TextArea', rows: 3, cols: 60 },
@@ -816,7 +826,7 @@
               }),
               mementoHead: null,
               backLabel: 'Back'
-            });
+            }, X);
           })
           .catch(err => {
             console.warn(err.message || err);

@@ -16,27 +16,46 @@ foam.CLASS({
       class: 'foam.u2.ViewSpec',
       name: 'view'
     },
-    'viewArea'
+    'viewArea',
+    'lastModel'
   ],
 
   methods: [
     function initE() {
-      this.add(this.RELOAD).br().start('span',{}, this.viewArea$).tag(this.view).end();
+      this.add(this.RELOAD).br().br().start('span',{}, this.viewArea$).tag(this.view).end();
+      this.delayedReload();
     }
   ],
 
   actions: [
     function reload() {
-      debugger;
-      this.viewArea.removeAllChildren();
-
       delete foam.__context__.__cache__[this.view.class];
-      // foam.register(null, this.view.class);
-      this.viewArea.add(new Date()).br();
+      delete this.classloader.latched[this.view.class];
+      delete this.classloader.pending[this.view.class];
 
-      this.classloader.load(this.view.class).then(()=>{
-        this.viewArea.tag(this.view);
+      this.classloader.load(this.view.class).then((cls)=>{
+
+        foam.__context__.__cache__[this.view.class] = cls;
+        if ( true || foam.json.Compact.stringify(cls.model_.instance_) != foam.json.Compact.stringify(this.lastModel && this.lastModel.instance_) ) {
+          console.log('reload');
+          this.lastModel = cls.model_;
+          this.viewArea.removeAllChildren();
+          this.viewArea.tag(this.view);
+        } else {
+//          console.log('no reload');
+        }
       });
+
+      //this.delayedReload();
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'delayedReload',
+      isMerged: true,
+      mergeDelay: 250,
+      code: function() { this.reload(); /*this.delayedReload();*/ }
     }
   ]
 });
@@ -49,46 +68,74 @@ foam.CLASS({
   classes: [
     {
       name: 'CitationView',
-      extends: 'foam.u2.CitationView',
+      extends: 'foam.u2.View',
 
-      requires: [ 'com.google.foam.demos.examples.Example' ],
+      requires: [
+        'com.google.foam.demos.examples.Example',
+        'foam.u2.Element'
+      ],
 
       properties: [
         'dom'
       ],
 
+      css: `
+        ^ { margin-bottom: 36px; }
+        ^ .property-text { border: none; padding: 10 0; }
+        ^ .property-code { margin-bottom: 12px; }
+        ^ .property-title { float: left; }
+        ^ .property-id { float: left; margin-right: 12px; }
+      `,
+
       methods: [
         function initE() {
-          //this.SUPER();
+          this.SUPER();
 
           this.
+            addClass(this.myClass()).
             style({
               width: '100%',
-              border: '2px solid black',
-              'border-radius': '3px'
+              xxxborder: '2px solid black',
+              'border-radius': '3px',
+              'padding-bottom': '24px'
             }).
-            add(this.Example.ID, ' ', this.Example.TITLE).
+            tag('hr').
+            start('h3').
+              add(this.Example.ID, ' ', this.Example.TITLE).
+            end().
             br().
-            add(this.Example.DESCRIPTION).
+            add(this.Example.TEXT).
             br().
-            add(this.Example.SCRIPT).
+            add(this.Example.CODE).
             br().
+            start('b').add('Output:').end().
+            br().br().
             tag('div', {}, this.dom$);
 
             this.onload.sub(this.run.bind(this));
+            this.onDetach(this.data.code$.sub(this.run.bind(this)));
         }
       ],
 
       actions: [
         function run() {
           var self = this;
+          this.dom.removeAllChildren();
           var scope = {
-            print: function(arg) {
-              self.dom.add(arg);
+            E: function(opt_nodeName) {
+              return self.Element.create({nodeName: opt_nodeName});
+            },
+            print: function() {
+              self.dom.add.apply(self.dom, arguments);
+              self.dom.br();
+//              self.dom.add(arg);
+            },
+            add: function() {
+              self.dom.add.apply(self.dom, arguments);
             }
           };
           with ( scope ) {
-            eval(self.data.script);
+            eval(self.data.code);
           }
         }
       ]
@@ -99,22 +146,36 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      displayWidth: 8,
+      displayWidth: 10,
+      view: {
+        class: 'foam.u2.ReadWriteView', nodeName: 'span'
+      }
     },
     {
       class: 'String',
       name: 'title',
-      displayWidth: 120,
+      displayWidth: 123,
+      view: {
+        class: 'foam.u2.ReadWriteView', nodeName: 'span'
+      }
     },
     {
       class: 'String',
-      name: 'description',
+      name: 'text',
+      adapt: function(_, text) { return text.trim(); },
       documentation: 'Description of the script.',
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 120 }
     },
     {
       class: 'Code',
-      name: 'script',
+      name: 'code',
+      adapt: function(_, s) {
+        if ( foam.String.isInstance(s) ) return s.trim();
+        s         = s.toString();
+        var start = s.indexOf('{');
+        var end   = s.lastIndexOf('}');
+        return ( start >= 0 && end >= 0 ) ? s.substring(start + 2, end) : '';
+      },
       view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 120 }
     }
   ],
@@ -128,7 +189,7 @@ foam.CLASS({
         };
         try {
           with ({ log: log, print: log, x: this.__context__ })
-          return Promise.resolve(eval(this.script));
+          return Promise.resolve(eval(this.code));
         } catch (err) {
           this.output += err;
           return Promise.reject(err);
@@ -150,6 +211,8 @@ foam.CLASS({
     'foam.u2.DAOList'
   ],
 
+  css: '^ { background: white}',
+
   properties: [
     {
       name: 'data',
@@ -158,11 +221,7 @@ foam.CLASS({
           of: com.google.foam.demos.examples.Example,
           daoType: 'MDAO',
           cache: true,
-          testData: [
-            { id: '1', name: 'Example',  script: 'console.log("foo");print("example1");' },
-            { id: '2', name: 'Example2', script: 'print("example2");'  },
-            { id: '3', name: 'Example3', script: 'print("example3");'  },
-          ]
+          testData: this.createTestData()
         });
       },
       view: {
@@ -177,8 +236,45 @@ foam.CLASS({
       this.SUPER();
 
       this.
-        add('Examples').
+        addClass(this.myClass()).
+        start('h1').
+          add('U2 by Example').
+        end().
         add(this.DATA);
+    },
+
+    function createTestData() {
+      var s = `
+## Welcome
+First U2 Example
+--
+add('testing');
+
+## Background
+First U2 Example
+--
+add('testing');
+      `;
+      var a = [];
+      var e;
+      var i = 1;
+      var mode = 'text';
+      s = s.substring(1).split('\n').forEach(l => {
+        if ( l.startsWith('##') ) {
+//          e = this.Example.create({id: i++, title: l.substring(3)});
+          e = {id: i++, title: l.substring(3), code: '', text: ''};
+          a.push(e);
+          mode = 'text';
+        } else if ( l.startsWith('--') ) {
+          mode = 'code';
+        } else if ( ! e ) {
+        } else if ( mode == 'text' ) {
+          e.text += l + '\n';
+        } else {
+          e.code += l + '\n';
+        }
+      });
+      return a;
     }
   ]
 });
