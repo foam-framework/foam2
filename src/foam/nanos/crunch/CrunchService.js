@@ -52,6 +52,38 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'getCapabilityPathFor',
+      documentation: `
+        Returns the capability path with the requested subject set in the context.
+        Requires permission to overwrite context's subject, otherwise returns
+        capability path with default context.
+      `,
+      async: true,
+      type: 'List',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'sourceId',
+          type: 'String'
+        },
+        {
+          name: 'filterGrantedUCJ',
+          type: 'boolean'
+        },
+        {
+          name: 'effectiveUser',
+          type: 'foam.nanos.auth.User'
+        },
+        {
+          name: 'user',
+          type: 'foam.nanos.auth.User'
+        }
+      ]
+    },
+    {
       name: 'getCapabilityPath',
       documentation: `
         getGrantPath provides an array of capability objects representing
@@ -87,6 +119,34 @@ foam.INTERFACE({
           type: 'String'
         }
       ]
+    },
+    {
+      name: 'getJunctionFor',
+      documentation: `
+        Returns the junction with the requested subject set in the context.
+        Requires permission to overwrite context's subject, otherwise returns
+        junction with default context.
+      `,
+      async: true,
+      type: 'UserCapabilityJunction',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        },
+        {
+          name: 'effectiveUser',
+          type: 'foam.nanos.auth.User'
+        },
+        {
+          name: 'user',
+          type: 'foam.nanos.auth.User'
+        }
+      ],
     },
     {
       name: 'getJunction',
@@ -195,6 +255,42 @@ foam.INTERFACE({
         {
           name: 'status',
           type: 'foam.nanos.crunch.CapabilityJunctionStatus'
+        }
+      ],
+    },
+    {
+      name: 'updateJunctionFor',
+      documentation: `
+        Updates junction with the requested subject set in the context.
+        Requires permission to overwrite context's subject, otherwise updates
+        junction with default context.
+      `,
+      async: true,
+      type: 'UserCapabilityJunction',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        },
+        {
+          name: 'capabilityId',
+          type: 'String'
+        },
+        {
+          name: 'data',
+          type: 'foam.core.FObject'
+        },
+        {
+          name: 'status',
+          type: 'foam.nanos.crunch.CapabilityJunctionStatus'
+        },
+        {
+          name: 'effectiveUser',
+          type: 'foam.nanos.auth.User'
+        },
+        {
+          name: 'user',
+          type: 'foam.nanos.auth.User'
         }
       ],
     },

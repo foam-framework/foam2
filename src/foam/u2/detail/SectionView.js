@@ -109,6 +109,9 @@ foam.CLASS({
 
       self
         .addClass(self.myClass())
+        .callIf(self.section, function() {
+          self.addClass(self.myClass(self.section.name))
+        })
         .add(self.slot(function(section, showTitle, section$title, section$subTitle) {
           if ( ! section ) return;
           return self.Rows.create()

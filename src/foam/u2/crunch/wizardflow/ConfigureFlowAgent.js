@@ -51,7 +51,7 @@ foam.CLASS({
             )
           }
           : function (viewSpec) {
-            self.stack.push(viewSpec);
+            self.stack.push(viewSpec, self);
             if ( self.ensureHash ) {
               location.hash = self.ensureHash;
             }
