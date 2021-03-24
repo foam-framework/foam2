@@ -95,7 +95,7 @@
     {
       class: 'foam.u2.ViewSpec',
       name: 'border',
-      value: { class: 'foam.u2.borders.NullBorder' }
+      factory: function() { return { class: 'foam.u2.borders.NullBorder' }; }
     },
     {
       class: 'FObjectArray',
