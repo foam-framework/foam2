@@ -31,3 +31,8 @@ p({class:"foam.i18n.Locale",locale:"en",source:"Pending",target:"Pending"})
 p({class:"foam.i18n.Locale",locale:"en",source:"All",target:"All"})
 p({class:"foam.i18n.Locale",locale:"en",source:"Rejected",target:"Rejected"})
 p({class:"foam.i18n.Locale",locale:"en",source:"Completed",target:"Completed"})
+
+p({class:"foam.i18n.Locale",locale:"en",source:"net.nanopay.tx.model.Transaction.model_.plural",target:"Transactions"})
+p({class:"foam.i18n.Locale",locale:"en",source:"net.nanopay.model.Business.model_.plural",target:"Businesses"})
+p({class:"foam.i18n.Locale",locale:"en",source:"foam.nanos.auth.User.model_.plural",target:"Users"})
+p({class:"foam.i18n.Locale",locale:"en",source:"foam.nanos.approval.ApprovalRequest.model_.plural",target:"ApprovalRequests"})
