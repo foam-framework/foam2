@@ -46,8 +46,9 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'onKey',
+      documentation: 'When true, $$DOC{ref:".data"} is updated on every keystroke, rather than on blur.',
       attribute: true,
-      // documentation: 'When true, $$DOC{ref:".data"} is updated on every keystroke, rather than on blur.'
+      value: true
     },
     {
       class: 'Int',
@@ -137,8 +138,6 @@ foam.CLASS({
 
     function fromProperty(p) {
       this.SUPER(p);
-
-      if ( ! this.hasOwnProperty('onKey') && p.validateObj ) this.onKey = true;
       this.ariaLabel = p.label || p.name;
     },
 

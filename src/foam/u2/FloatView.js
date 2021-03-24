@@ -42,7 +42,8 @@ foam.CLASS({
       documentation: `The amount that the value should increment or decrement by
           when the arrow buttons in the input are clicked.`,
       value: 0.01
-    }
+    },
+    ['onKey', false]
   ],
 
   methods: [
@@ -73,7 +74,9 @@ foam.CLASS({
       // When focus is lost on the view, force the view's value to equal the data
       // to ensure it's formatted properly.
       this.on('blur', function () {
-        view.set(self.dataToText(data.get()));
+        var value = self.dataToText(data.get());
+        view.set('0');
+        view.set(value);
       });
 
       var preventFeedback = false;
