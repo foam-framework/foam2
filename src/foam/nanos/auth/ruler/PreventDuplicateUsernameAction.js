@@ -43,6 +43,7 @@ foam.CLASS({
         Count count = new Count();
         count = (Count) userDAO
             .where(AND(
+              EQ(User.TYPE, user.getType()),
               EQ(User.USER_NAME, user.getUserName()),
               EQ(User.SPID, user.getSpid()),
               NEQ(User.ID,  user.getId())
