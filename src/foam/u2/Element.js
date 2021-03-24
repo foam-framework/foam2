@@ -2525,7 +2525,7 @@ foam.CLASS({
   requires: [ 'foam.u2.view.CurrencyView' ],
   properties: [
     [ 'displayWidth', 15 ],
-    [ 'view', { class: 'foam.u2.view.CurrencyView' } ]
+    [ 'view', { class: 'foam.u2.view.CurrencyView', onKey: false } ]
   ]
 });
 
