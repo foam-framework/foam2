@@ -48,7 +48,7 @@ foam.CLASS({
 
   methods: [
     function parse(ps, obj) {
-      var delim = ps.head;
+      var delim  = ps.head;
       var escape = this.escape;
 
       if ( delim !== '"' && delim !== "'" ) return undefined;

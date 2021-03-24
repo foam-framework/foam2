@@ -28,7 +28,7 @@ foam.CLASS({
     function loadTag(el) {
       var clsName = el.getAttribute('class');
 
-      this.classloader.load(clsName).then(function(cls) {
+      this.classloader.load(clsName).then(cls => {
         var obj = cls.create(null, foam.__context__);
 
         this.setAttributes(el, obj);
@@ -40,7 +40,7 @@ foam.CLASS({
         } else if ( ! foam.u2.Element.isInstance(view) )  {
           installView(el, foam.u2.DetailView.create({data: view, showActions: true}));
         }
-      }.bind(this), function(e) {
+      }, function(e) {
         console.error(e);
         console.error('Failed to load class: ', clsName);
       });

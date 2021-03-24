@@ -77,6 +77,7 @@ foam.CLASS({
             })
             .remove('RequirementsPreviewAgent')
             .remove('SkipGrantedAgent')
+            .remove('WizardStateAgent')
             .remove('AutoSaveWizardletsAgent')
             .remove('PutFinalJunctionsAgent')
             .add(this.SaveAllAgent, { onSave: this.onSave })
