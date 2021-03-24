@@ -230,10 +230,10 @@ foam.CLASS({
         }
 
         setLastRun(new Date());
-      setLastDuration(pm.getTime());
-      ps.flush();
-      setOutput(baos.toString() + getOutput());
-    `
+        setLastDuration(pm.getTime());
+        ps.flush();
+        setOutput(baos.toString() + getOutput());
+      `
     }
   ]
 });
