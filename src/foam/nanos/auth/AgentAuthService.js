@@ -61,6 +61,18 @@ foam.INTERFACE({
           type: 'foam.nanos.auth.User'
         }
       ]
+    },
+    {
+      name: 'logout',
+      documentation: 'Agent logs out of the junction.',
+      async: true,
+      type: 'Void',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
+        }
+      ]
     }
   ]
 });

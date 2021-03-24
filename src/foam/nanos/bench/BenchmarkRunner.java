@@ -169,7 +169,9 @@ public class BenchmarkRunner
     int availableThreads = Math.min(Runtime.getRuntime().availableProcessors(), getThreadCount());
     int run = 1;
     int threads = 1;
-    if ( reverseThreads_ ) {
+
+    if ( ! getRunPerThread() ||
+         reverseThreads_ ) {
       threads = availableThreads;
     }
 
@@ -196,7 +198,7 @@ public class BenchmarkRunner
           Thread thread = new Thread(group, new Runnable() {
               @Override
               public void run() {
-                for ( int j = 0 ; j < invocationCount_ ; j++ ) {
+                for ( int j = 0 ; j < getInvocationCount() ; j++ ) {
                   try {
                     test_.execute(x);
                     pass.incrementAndGet();
@@ -230,7 +232,7 @@ public class BenchmarkRunner
         // get number of threads completed and duration
         // print out transactions per second
         long  endTime  = System.currentTimeMillis();
-        float complete = (float) (threads * invocationCount_);
+        float complete = (float) (threads * getInvocationCount());
         float duration = ((float) (endTime - startTime) / 1000.0f);
         stats.put(PASS, pass.get());
         stats.put(FAIL, fail.get());

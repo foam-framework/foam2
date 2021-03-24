@@ -17,6 +17,15 @@ foam.INTERFACE({
       updateVisibility: 'RO',
       documentation: 'User who last modified entry',
       storageOptional: true
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedByAgent',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      documentation: 'Agent acting as User who last modified entry',
+      storageOptional: true
     }
   ]
 });
@@ -41,6 +50,16 @@ foam.CLASS({
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
       documentation: 'User who last modified entry',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      section: 'userInformation',
+      gridColumns: 6
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedByAgent',
+      documentation: 'Agent acting as user who last modified entry',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       section: 'userInformation',

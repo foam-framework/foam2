@@ -23,11 +23,11 @@ foam.CLASS({
   requires: [
     'foam.apploader.ModelFileDAO',
     'foam.apploader.WebModelFileFetcher',
-    'foam.net.HTTPRequest',
+    'foam.net.HTTPRequest'
   ],
 
   imports: [
-    'window',
+    'window'
   ],
 
   properties: [

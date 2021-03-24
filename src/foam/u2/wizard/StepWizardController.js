@@ -42,6 +42,7 @@ foam.CLASS({
       of: 'foam.u2.wizard.Wizardlet',
       postSet: function (_, n) {
         this.setupWizardletListeners(n);
+        this.determineWizardActions(n);
       }
     },
     {
@@ -168,6 +169,12 @@ foam.CLASS({
 
       });
 
+    },
+    function determineWizardActions(wizardlets) {
+      // TODO: If we ever need wizardlets to add new actions to the wizard,
+      //       rather than just overriding existing ones, we can create a list
+      //       of pseudo-actions here by iterating over all the wizardlets and
+      //       finding axioms of type foam.u2.wizard.axiom.WizardAction.
     },
     function detach() {
       this.wsub.detach();
