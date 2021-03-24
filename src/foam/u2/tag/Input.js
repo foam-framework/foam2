@@ -47,8 +47,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'onKey',
       documentation: 'When true, $$DOC{ref:".data"} is updated on every keystroke, rather than on blur.',
-      attribute: true,
-      value: true
+      attribute: true
     },
     {
       class: 'Int',
