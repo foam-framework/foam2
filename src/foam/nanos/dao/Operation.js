@@ -21,28 +21,28 @@ foam.ENUM({
   values: [
     {
       name: 'CREATE',
-      label: 'Create',
+      label: { en: 'Create', pt: 'Crio'},
       documentation: `
         Operation applied when creating a new object in a DAO. (dao.put when the object is new)
       `
     },
     {
       name: 'UPDATE',
-      label: 'Update',
+      label: { en: 'Update', pt: 'Atualizar'},
       documentation: `
         Operation applied when updating an object in a DAO. (dao.put when the object is not new)
       `
     },
     {
       name: 'REMOVE',
-      label: 'Remove',
+      label: { en: 'Remove', pt: 'Retirar'},
       documentation:  `
         Operation applied when removing an object in a DAO. (dao.remove or removeAll)
       `
     },
     {
       name: 'CREATE_OR_UPDATE',
-      label: 'Create/Update',
+      label: { en: 'Create/Update', pt: 'Crio/Atualizar'},
       documentation: `
         Operation applied when creating or updating an object in a DAO. (dao.put)
       `

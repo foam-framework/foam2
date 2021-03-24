@@ -330,17 +330,7 @@ foam.CLASS({
         for ( String permissionName : permissionsGranted ) {
           if ( this.stringImplies(permissionName, permission) ) return true;
         }
-
-        CrunchService crunchService = (CrunchService) x.get("crunchService");
-        var prereqs = crunchService.getPrereqs(getId());
-
-        if ( prereqs != null && prereqs.size() > 0 ) {
-          DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-          for ( var capId : prereqs ) {
-            Capability capability = (Capability) capabilityDAO.find(capId);
-            if ( capability != null && capability.implies(x, permission) ) return true;
-          }
-        }
+        
         return false;
       `
     },
