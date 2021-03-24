@@ -67,8 +67,7 @@ foam.CLASS({
       class: 'foam.dao.DAOProperty',
       name: 'dao_',
       expression: function(menuDAO) {
-        // Stop removing the orderBy!
-        return menuDAO.orderBy(this.Menu.ORDER);
+        return menuDAO;
       }
     },
     {
