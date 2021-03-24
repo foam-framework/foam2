@@ -10,6 +10,7 @@ import java.util.List;
 import foam.core.X;
 import jdk.jshell.JShell;
 import jdk.jshell.SnippetEvent;
+
 /**
  * Evaluate each instruction and return the result 
  *
@@ -65,9 +66,7 @@ public class EvalInstruction {
       }
       Exception exc = event.exception();
       if ( exc != null ) {
-        String out = exc.getMessage();
-        output += "Error is " + out;
-        System.out.println("Error is " + out);
+        exc.printStackTrace();
       }
     }
     return output;
