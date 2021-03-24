@@ -167,20 +167,45 @@ foam.CLASS({
       return this.dao.where(this.IN(of.ID, this.data));
     },
 
+    function isChoiceSelected(data, choice){
+      var isSelected = false
+
+      for ( var i = 0 ; i < data.length ; i++ ) {
+        isSelected = foam.util.equals(data[i], choice);
+
+        if ( isSelected ) break;
+      }
+      
+      return isSelected;
+    },
+
+    function getIndexOfChoice(data, choice){
+      var indexDataToAdd = -1;
+                          
+      for ( var i = 0 ; i < data.length ; i++ ) {
+        if ( foam.util.equals(data[i], choice) ){
+          indexDataToAdd  = i;
+          break;
+        }
+      }
+
+      return indexDataToAdd
+    },
+
     function getSelectedSlot(choice) {
       var slot = foam.core.SimpleSlot.create();
       slot.sub(() => {
         var arr = [
           ...this.data,
         ];
-        arr = arr.filter((o) => o != choice);
+        arr = arr.filter(o => ! foam.util.equals(o, choice));
         if ( slot.get() ) { 
           arr.push(choice); 
         }
         this.data = arr;
       });
-      this.data$.sub(()=> slot.set(this.data.includes(choice)));
-      slot.set(this.data.includes(choice));
+      this.data$.sub(()=> slot.set(this.isChoiceSelected(this.data, choice)));
+      slot.set(this.isChoiceSelected(this.data, choice));
       return slot;
     },
 
@@ -215,7 +240,7 @@ foam.CLASS({
                 
                 var isSelectedSlot = self.slot(function(choices, data) {
                   try {
-                    var isSelected = data.includes(choices[index][0]);
+                    var isSelected = self.isChoiceSelected(data, choices[index][0]);
                     return !! isSelected;
                   } catch(err) {
                     console.error('isSelectedSlot', err)
@@ -230,7 +255,7 @@ foam.CLASS({
                         return true;
                       }
   
-                      var isSelected = data.includes(choices[index][0]);
+                      var isSelected = self.isChoiceSelected(data, choices[index][0]);
   
                       return !! (! isSelected && data.length >= maxSelected);
                   } catch(err) {
@@ -260,7 +285,7 @@ foam.CLASS({
                       selfE.onDetach(
                         this.clicked.sub(() => {
                           var array;
-                          var indexDataToAdd = self.data.indexOf(valueSimpSlot.get())
+                          var indexDataToAdd = self.getIndexOfChoice(self.data, valueSimpSlot.get());
                           if ( indexDataToAdd === -1 ){
                             if ( self.data.length >= self.maxSelected ){
                               return;
