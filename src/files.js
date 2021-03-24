@@ -237,6 +237,7 @@ FOAM_FILES([
   { name: "foam/mlang/order/Comparator" },
 //  { name: "foam/mlang/order/ComparatorJava", flags: ['java'] },
   { name: "foam/mlang/mlang" },
+  { name: "foam/mlang/DOTMQLTest" },
   { name: "foam/mlang/expr/PropertyExpr" },
   { name: "foam/mlang/expr/DateTypes" },
   { name: "foam/mlang/expr/DateGrouping" },

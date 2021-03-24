@@ -59,8 +59,7 @@ foam.CLASS({
         Action simpleValAction = new Action() {
           @Override
           public Object execute(Object val, ParserContext x) {
-            Object[] valArr  = (Object[]) val;
-            Object[] val0    = (Object[]) valArr[0];
+            Object[] val0    = (Object[]) val;
             StringBuilder v = new StringBuilder();
             for ( int i = 0 ; i < val0.length ; i++ ) {
               if ( ! Character.isWhitespace((char) val0[i]) ) v.append(val0[i]);
@@ -107,8 +106,7 @@ foam.CLASS({
           @Override
           public Object execute(Object val, foam.lib.parse.ParserContext x) {
             Object[] valArr  = (Object[]) val;
-            Object[] tempVal = (Object[]) valArr[0];
-            Object[] val0    = (Object[]) tempVal[0];
+            Object[] val0    = (Object[]) valArr[0];
             StringBuilder ifCond = new StringBuilder();
             for ( int i = 0 ; i < val0.length ; i++ ) {
               if ( ! Character.isWhitespace((char)val0[i]) ) ifCond.append(val0[i]);
@@ -116,14 +114,12 @@ foam.CLASS({
 
             StringBuilder finalVal = new StringBuilder();
             if ( ((Map) x.get("values")).get(ifCond.toString() ) != null ) {
-              tempVal = (Object[]) valArr[1];
-              Object[] val1 = (Object[]) tempVal[0];
+              Object[] val1 = (Object[]) valArr[1];
               for ( int i = 0 ; i < val1.length ; i++ ) {
                 finalVal.append(val1[i]);
               }
             } else {
-              tempVal = (Object[]) valArr[2];
-              Object[] val2 = (Object[]) tempVal[0];
+              Object[] val2 = (Object[]) valArr[2];
               for ( int i = 0 ; i < val2.length ; i++ ) {
                 finalVal.append(val2[i]);
               }
@@ -157,8 +153,8 @@ foam.CLASS({
           @Override
           public Object execute(Object val, foam.lib.parse.ParserContext x) {
             Object[] valArr  = (Object[]) val;
-            Object[] tempVal = (Object[]) valArr[0];
-            Object[] val0    = (Object[]) tempVal[0];
+//            Object[] tempVal = (Object[]) valArr[0];
+            Object[] val0    = (Object[]) valArr[0];
             StringBuilder ifCond = new StringBuilder();
             for ( int i = 0 ; i < val0.length ; i++ ) {
               if ( ! Character.isWhitespace((char) val0[i]) ) ifCond.append(val0[i]);
@@ -166,8 +162,7 @@ foam.CLASS({
 
             StringBuilder finalVal = new StringBuilder();
             if ( ((Map) x.get("values")).get(ifCond.toString() ) != null ) {
-              tempVal = (Object[]) valArr[1];
-              Object[] val1 = (Object[]) tempVal[0];
+              Object[] val1 = (Object[]) valArr[1];
               for ( int i = 0 ; i < val1.length ; i++ ) {
                 finalVal.append(val1[i]);
               }
@@ -272,8 +267,7 @@ foam.CLASS({
           @Override
           public Object execute(Object val, foam.lib.parse.ParserContext x) {
             Object[] valArr  = (Object[]) val;
-            Object[] tempVal = (Object[]) valArr[0];
-            Object[] val0    = (Object[]) tempVal[0];
+            Object[] val0    = (Object[]) valArr[0];
             StringBuilder templateName = new StringBuilder();
             for ( int i = 0 ; i < val0.length ; i++ ) {
               templateName.append(val0[i]);
@@ -290,8 +284,7 @@ foam.CLASS({
               return val;
             }
             StringBuilder content = new StringBuilder();
-            tempVal = (Object[]) valArr[1];
-            Object[] val1 = (Object[]) tempVal[0];
+            Object[] val1 = (Object[]) valArr[1];
             for ( int i = 0 ; i < val1.length ; i++ ) {
               content.append(val1[i]);
             }
