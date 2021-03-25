@@ -42,11 +42,15 @@ foam.CLASS({
       documentation: `The amount that the value should increment or decrement by
           when the arrow buttons in the input are clicked.`,
       value: 0.01
-    },
-    ['onKey', false]
+    }
   ],
 
   methods: [
+    function init() {
+      // onKey can't be just a property override
+      // Input.js checks ( ! this.hasOwnProperty('onKey') && p.validateObj )
+      this.onKey = false;
+    },
     function initE() {
       this.SUPER();
       this.addClass(this.myClass());
