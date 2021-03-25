@@ -32,11 +32,12 @@ foam.CLASS({
       delete foam.__context__.__cache__[this.view.class];
       delete this.classloader.latched[this.view.class];
       delete this.classloader.pending[this.view.class];
+      // TODO: remove old stylesheet
 
       this.classloader.load(this.view.class).then((cls)=>{
 
         foam.__context__.__cache__[this.view.class] = cls;
-        if ( true || foam.json.Compact.stringify(cls.model_.instance_) != foam.json.Compact.stringify(this.lastModel && this.lastModel.instance_) ) {
+        if ( foam.json.Compact.stringify(cls.model_.instance_) != foam.json.Compact.stringify(this.lastModel && this.lastModel.instance_) ) {
           console.log('reload');
           this.lastModel = cls.model_;
           this.viewArea.removeAllChildren();
@@ -54,7 +55,7 @@ foam.CLASS({
     {
       name: 'delayedReload',
       isMerged: true,
-      mergeDelay: 250,
+      mergeDelay: 2500,
       code: function() { this.reload(); /*this.delayedReload();*/ }
     }
   ]
@@ -147,6 +148,14 @@ foam.CLASS({
       class: 'String',
       name: 'id',
       displayWidth: 10,
+      comparePropertyValues: function(id1, id2) {
+        var a1 = id1.split('.'), a2 = id2.split('.');
+        for ( var i = 0 ; i < Math.min(a1.length, a2.length)-1 ; i++ ) {
+          var c = foam.util.compare(parseInt(a1[i]), parseInt(a2[i]));
+          if ( c ) return c;
+        }
+        return foam.util.compare(a1.length, a2.length);
+      },
       view: {
         class: 'foam.u2.ReadWriteView', nodeName: 'span'
       }
@@ -211,7 +220,7 @@ foam.CLASS({
     'foam.u2.DAOList'
   ],
 
-  css: '^ { background: white}',
+  css: '^ { background: white; }',
 
   properties: [
     {
@@ -222,7 +231,7 @@ foam.CLASS({
           daoType: 'MDAO',
           cache: true,
           testData: this.createTestData()
-        });
+        }).orderBy(com.google.foam.demos.examples.Example.ID);
       },
       view: {
         class: 'foam.u2.DAOList',
@@ -245,6 +254,10 @@ foam.CLASS({
 
     function createTestData() {
       var s = `
+## A
+##  B
+##   C1
+##   C2
 ## Welcome
 First U2 Example
 --
@@ -254,15 +267,100 @@ add('testing');
 First U2 Example
 --
 add('testing');
+
+## DSL
+## Intro1
+## Intro2
+##  SubIntro
+## Fluent Interface
+## nodeName
+## v2
+## ControllerMode
+## DisplayMode
+## Borders
+##  content
+## CSS
+## CSS Variables
+## inheritCSS
+## ViewSpec
+## Entities / entity() / nbsp()
+## onKey
+## Element States
+##  state
+##  onload
+##  onunload
+## Tooltips
+## shown / show() / hide()
+## focused / focus() / blur()
+## Creating a Component
+##  initE
+## Keyboard Shortcuts
+## el() and id
+## E()
+## addClass() / cssClass() / addClasses()
+## enableCls() / enableClass()
+## myClass()
+## removeClass()
+## setAttribute()
+## removeAttribute()
+## appendChild()
+## removeChild()
+## replaceChild()
+## insertBefore()
+## insertAfter()
+## remove()
+## addEventListener()
+## removeEventListener()
+## on()
+## attr()
+## attrs()
+## style()
+## tag()
+## br()
+## startContext() / endContext()
+## start() / end()
+## i18n
+##  Messages
+##  translate()
+## add()
+##  adding properties
+##  toE()
+##  view:
+## addBefore()
+## removeAllChildren()
+## setChildren()
+## repeat()
+## daoSlot()
+## select()
+## call()
+## callOn
+## callIf
+## callIfElse
+## forEach()
+## write()
+## Tags
+##  attributes
+##  registerElement
+##  elementForName
+## View
+##  fromProperty()
+## Controller
+## Views
+##  ActionView
+## StackView
+## More
       `;
       var a = [];
+      var id = [];
       var e;
-      var i = 1;
       var mode = 'text';
       s = s.substring(1).split('\n').forEach(l => {
         if ( l.startsWith('##') ) {
 //          e = this.Example.create({id: i++, title: l.substring(3)});
-          e = {id: i++, title: l.substring(3), code: '', text: ''};
+          var depth = l.substring(2).match(/^ */)[0].length;
+          id.length = depth;
+          id[depth-1] = (id[depth-1] || 0)+1;
+          e = {id: id.join('.') + '.', title: l.substring(3), code: '', text: ''};
           a.push(e);
           mode = 'text';
         } else if ( l.startsWith('--') ) {

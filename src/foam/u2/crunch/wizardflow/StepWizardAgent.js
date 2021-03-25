@@ -67,12 +67,7 @@ foam.CLASS({
             resolve();
           }
         }, (x) => {
-          data.saveProgress().then(() => {
-            resolve();
-          }).catch(e => {
-            console.error(e);
-            this.ctrl.notify(this.ERROR_MSG_DRAFT, '', this.LogLevel.ERROR, true);
-          });
+          resolve();
         });
       });
     }

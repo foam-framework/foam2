@@ -13,7 +13,8 @@ foam.CLASS({
     predicate.`,
 
   requires: [
-    'foam.mlang.predicate.True'
+    'foam.mlang.predicate.True',
+    'foam.parse.QueryParser'
   ],
 
   imports: [
@@ -105,7 +106,13 @@ foam.CLASS({
       name: 'firstTime_',
       value: true
     },
-    'view_'
+    'view_',
+    {
+      name: 'queryParser',
+      factory: function() {
+        return this.QueryParser.create({ of: this.dao.of || this.__subContext__.lookup(this.property.forClass_) });
+      }
+    }
   ],
 
   methods: [
@@ -134,21 +141,21 @@ foam.CLASS({
       if ( predicate )
         this.checkbox.data = true;
     },
+    
     function getPredicateFromMemento() {
-      if ( this.memento && this.memento.paramsObj.f && this.memento.paramsObj.f.length > 0 ) {
-        var f = this.memento.paramsObj.f.find(f => f.n === this.property.name && f.criteria === 0);
-        if ( f ) {
-          var predicate = foam.json.parseString(f.pred, this.__context__);
+      if ( this.memento && this.memento.head.length > 0 ) {
+        var predicate = this.queryParser.parseString(this.property.name + '=' + this.memento.head);
+        if ( predicate ) {
           return predicate;
         }
       }
-      return null;
     }
   ],
 
   listeners: [
     function checkboxChanged() {
       this.active = ! this.active;
+      var self = this;
 
       if ( this.active ) {
         if ( this.firstTime_ ) {
@@ -164,6 +171,21 @@ foam.CLASS({
 
           this.searchManager.add(this.view_$.get());
           this.firstTime_ = false;
+        }
+
+        if ( this.view_ ) {
+          this.view_.onDetach(self.view_.predicate$.sub(function() {
+            var pred;
+            if ( Object.keys(self.view_.predicate).length > 0 && ! foam.mlang.predicate.True.isInstance(self.view_.predicate) )
+              pred = self.view_.predicate.toMQL && self.view_.predicate.toMQL();
+    
+            if ( pred ) {
+              var split = pred.split('=');
+              self.memento.head = split.length == 2 ? split[1] : '';
+            } else {
+              self.memento.head = '';
+            }
+          }));
         }
       } else {
         if ( this.view_ ) this.view_.clear();

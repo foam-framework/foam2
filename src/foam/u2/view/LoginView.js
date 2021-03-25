@@ -55,7 +55,7 @@ foam.CLASS({
 
   /* ON RIGHT SIDE ALL **** */
   ^ .centerVertical {
-    padding-top: 3vh; 
+    padding-top: 3vh;
     max-width: 30vw;
     margin: 0 auto;
   }
@@ -204,7 +204,8 @@ foam.CLASS({
 
   messages: [
     { name: 'GO_BACK', message: 'Go to ' },
-    { name: 'MODE1', message: 'SignUp' }
+    { name: 'MODE1', message: 'SignUp' },
+    { name: 'BROWSER_SUPPORT', message: 'This application is optimized for Google Chrome'}
   ],
 
   methods: [
@@ -221,6 +222,7 @@ foam.CLASS({
 
     function initE() {
       this.SUPER();
+      var self = this;
       this.document.addEventListener('keyup', this.onKeyPressed);
       this.onDetach(() => {
         this.document.removeEventListener('keyup', this.onKeyPressed);
@@ -259,6 +261,13 @@ foam.CLASS({
               this.model.subfooterLink();
             })
           .end()
+          .callIf(!self.isChrome(), function() {
+            this
+              .br().br()
+              .start('span')
+                .add(self.BROWSER_SUPPORT)
+              .end()
+          })
         .end();
 
       // CREATE SPLIT VIEW
@@ -306,6 +315,10 @@ foam.CLASS({
         }, function() {
           this.add(right);
         });
+    },
+
+    function isChrome() {
+      return navigator.userAgent.includes("Chrome") && navigator.vendor.includes("Google Inc");
     }
   ],
 
