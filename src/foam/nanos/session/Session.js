@@ -160,8 +160,7 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
       name: 'twoFactorSuccess',
       visibility: 'HIDDEN',
       value: false,
-      networkTransient: true,
-      storageTransient: true
+      networkTransient: true
     },
     {
       class: 'Boolean',
