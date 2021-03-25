@@ -350,7 +350,7 @@ foam.CLASS({
           DAO capabilityDAO = (DAO) x.get("capabilityDAO");
           for ( var capId : prereqs ) {
             Capability capability = (Capability) capabilityDAO.find(capId);
-            if ( capability != null && capability.grantsPermission(x, permission) ) return true;
+            if ( capability != null && capability.grantsPermission(permission) ) return true;
           }
         }
         return false;
