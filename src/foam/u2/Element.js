@@ -886,7 +886,7 @@ foam.CLASS({
       transient: true,
       topics: [],
       delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
-          map(function(m) { return m.name; }),
+        map(function(m) { return m.name; }),
       factory: function() {
         return this.INITIAL;
       },
@@ -1020,7 +1020,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'scrollHeight',
+      name: 'scrollHeight'
     },
     {
       class: 'Int',
@@ -1210,6 +1210,7 @@ foam.CLASS({
       return f(opt_extra);
     },
 
+    // TODO: what is this for?
     function instanceClass(opt_extra) {
       return this.myClass(this.id + '-' + opt_extra);
     },
@@ -1501,6 +1502,7 @@ foam.CLASS({
       return this;
     },
 
+    // TODO: remove
     function enableCls(cls, enabled, opt_negate) {
       console.warn('Deprecated use of Element.enableCls(). Use enableClass() instead.');
       return this.enableClass(cls, enabled, opt_negate);
@@ -1528,6 +1530,7 @@ foam.CLASS({
       return this;
     },
 
+    // TODO: remove
     function removeCls(cls) {
       console.warn('Deprecated use of Element.removeCls(). Use removeClass() instead.');
       return this.removeClass(cls);
@@ -2801,7 +2804,6 @@ foam.CLASS({
       documentation: 'The actual error message. Null or the empty string ' +
           'when there is no error.',
     }
-
   `,
 
   exports: [ 'data' ],
