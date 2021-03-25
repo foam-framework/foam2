@@ -120,13 +120,14 @@ foam.CLASS({
                 .enableClass(style.myClass('tooltipDisabled'), self.tooltipEnabled, true)
                 .add(cjStatus.documentation)
               .end()
-              .start(foam.u2.view.BadgeView, {label: cjStatus.label, color: cjStatus.color, backgroundColor: cjStatus.background, isAttachedToCard: true}).addClass(self.myClass('badge')).end()
-              // .add(cjStatus.label).addClass(style.myClass('badge'))
-              // .style({
-              //   'background-color': cjStatus.background,
-              //   'color': cjStatus.color
-              // });
-              
+              .start(foam.u2.view.BadgeView, {
+                label: cjStatus.label,
+                color: cjStatus.color,
+                backgroundColor: cjStatus.background,
+                isAttachedToCard: true
+              })
+                .addClass(self.myClass('badge'))
+              .end()
           }))
           .add(this.slot(function(isRenewable) {
             return isRenewable ? this.E()
