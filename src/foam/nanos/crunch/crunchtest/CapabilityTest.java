@@ -204,10 +204,10 @@ public class CapabilityTest extends Test {
     grantCrunch.setData(data);
     grantCrunch = (UserCapabilityJunction) userCapabilityJunctionDAO.put_(x, grantCrunch);
 
-    test(crunch.implies("crunch.read"), "crunch.* implies crunch.read");
-    test(!readCrunch.implies("crunch.write"), "crunch.read does not imply crunch.write");
-    test(readOther.implies("other.read.all"), "other.read.* implies other.read.all");
-    test(!readCrunch.implies("crunch.*"), "crunch.read does not imply crunch.*");
+    test(crunch.implies(x, "crunch.read"), "crunch.* implies crunch.read");
+    test(!readCrunch.implies(x, "crunch.write"), "crunch.read does not imply crunch.write");
+    test(readOther.implies(x, "other.read.all"), "other.read.* implies other.read.all");
+    test(!readCrunch.implies(x, "crunch.*"), "crunch.read does not imply crunch.*");
     test(auth.checkUser(x, u1, "crunch.*"), "user has capability crunch.*");
     test(auth.checkUser(x, u1, "crunch.read"), "user has capability crunch.read");
     test(!auth.checkUser(x, u1, "other.*"), "user does not have capability other.*");
@@ -215,11 +215,11 @@ public class CapabilityTest extends Test {
     test(auth.checkUser(x, u1, "other.read.all"), "user does have capability other.read.all");
     test(!auth.checkUser(x, u1, "other.write"), "user does not have capability other.write");
     test(!auth.checkUser(x, u1, "cruch"), "user does not have permission or capability named cruch");
-    test(crunch.implies("permission.crunch.*"), "capability crunch.* implies permission permission.crunch.*");
-    test(crunch.implies("permission.crunch.read"), "capability crunch.* implies permission.crunch.read");
-    test(!readCrunch.implies("permission.crunch.write"), "capability crunch.read does not imply permission.crunch.write");
-    test(readOther.implies("permission.other.read.all"), "permission.other.read.* implies permissionother.read.all");
-    test(!readCrunch.implies("permission.crunch.*"), "permission.crunch.read does not imply permission.crunch.*");
+    test(crunch.implies(x, "permission.crunch.*"), "capability crunch.* implies permission permission.crunch.*");
+    test(crunch.implies(x, "permission.crunch.read"), "capability crunch.* implies permission.crunch.read");
+    test(!readCrunch.implies(x, "permission.crunch.write"), "capability crunch.read does not imply permission.crunch.write");
+    test(readOther.implies(x, "permission.other.read.all"), "permission.other.read.* implies permissionother.read.all");
+    test(!readCrunch.implies(x, "permission.crunch.*"), "permission.crunch.read does not imply permission.crunch.*");
     test(auth.checkUser(x, u1, "permission.crunch.*"), "user has permission permission.crunch.*");
     test(auth.checkUser(x, u1, "permission.crunch.read"), "user has permission permission.crunch.read");
     test(!auth.checkUser(x, u1, "permission.other.*"), "user does not have permission permission.other.*");
@@ -413,24 +413,24 @@ public class CapabilityTest extends Test {
     prereqJunction = (CapabilityCapabilityJunction) prerequisiteCapabilityJunctionDAO.put(prereqJunction);
 
     c2 = (Capability) capabilityDAO.put(c2);
-    test(c1.implies(p2), "c1 implies p2");
+    test(c1.implies(x, p2), "c1 implies p2");
 
     
 
     // test the capability.implies method where implies should return false;
-    test(!c2.implies(p1), "c2 does not imply p1");
+    test(!c2.implies(x, p1), "c2 does not imply p1");
 
     // test disabled capability does not imply their permissions granted
     c1 = ((Capability) c1.fclone());
     c1.setEnabled(false);
     c1 = (Capability) capabilityDAO.put(c1);
-    test((!c1.implies(p1)) && (!c1.implies(p2)), "c2 disabled and does not imply p1 and p2");
+    test((!c1.implies(x, p1)) && (!c1.implies(x, p2)), "c2 disabled and does not imply p1 and p2");
 
     // test re-enabled capability imply their permissions granted
     c1 = ((Capability) c1.fclone());
     c1.setEnabled(true);
     c1 = (Capability) capabilityDAO.put(c1);
-    test(c1.implies(p1) && c1.implies(p2), "c2 re-enabled implies p1 and p2");
+    test(c1.implies(x, p1) && c1.implies(x, p2), "c2 re-enabled implies p1 and p2");
   }
  
 }
