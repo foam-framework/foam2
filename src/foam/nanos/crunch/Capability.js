@@ -27,7 +27,6 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'java.util.Date',
     'java.util.List',
-    'foam.util.Arrays',
     'javax.security.auth.AuthPermission',
     'static foam.mlang.MLang.*'
   ],
@@ -319,9 +318,13 @@ foam.CLASS({
       documentation: `Checks if a permission or capability string is implied by the current capability`,
       javaCode: `
         if ( ! this.getEnabled() ) return false;
-        String[] availablePermissions = Arrays.append(this.getInherentPermissions(), this.getPermissionsGranted());
-        List<String> permissionList = java.util.Arrays.asList(availablePermissions);
-        return permissionList.stream().anyMatch(p -> new AuthPermission(p).implies(new AuthPermission(permission)) );
+        for ( String grantedPermission : this.getPermissionsGranted() ) {
+          if ( new AuthPermission(grantedPermission).implies(new AuthPermission(permission)) ) return true;
+        }
+        for ( String inherentPermission : this.getInherentPermissions() ) {
+          if ( new AuthPermission(inherentPermission).implies(new AuthPermission(permission)) ) return true;
+        }
+        return false;
       `
     },
     {
