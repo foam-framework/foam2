@@ -118,27 +118,25 @@ public class Boot {
     });
 
     // Load hierarchically nspecs eg. "foo.bar.serviceName":
-    // 1. Create "foo" proxy sub context from the root context
-    // 2. Create "foo.bar" proxy sub context from "foo" sub context
-    // 3. Create "serviceName" object in "foo.bar" sub context
+    // 1. Create "foo" proxy sub context in the root context
+    // 2. Create "bar" proxy sub context in "foo" sub context
+    // 3. Create "serviceName" object in "bar" sub context
     for ( var sp : hnSpecs ) {
       var x = root_;
-      var pos = sp.getName().indexOf(".");
-      while ( pos > 0 ) {
-        var contextName = sp.getName().substring(0, pos);
+      var path = sp.getName().split("\\.");
+
+      // Add path as sub context
+      for ( var i = 0; i < path.length - 1; i++ ) {
+        var contextName = path[i];
         if ( x.get(contextName) == null ) {
           var subX = new ProxyX( ((ProxyX) x).getX() );
           x.put(contextName, subX);
           x = subX;
         }
-
-        var next = sp.getName().indexOf(".", pos + 1);
-        if ( next < pos ) {
-          break;
-        }
-        pos = next;
       }
-      var serviceName = sp.getName().substring(pos + 1);
+
+      // Add service to the sub context
+      var serviceName = path[path.length - 1];
       NSpecFactory factory = new NSpecFactory((ProxyX) x, sp);
       factories_.put(sp.getName(), factory);
       logger.info("Registering", sp.getName());
