@@ -32,11 +32,12 @@ foam.CLASS({
       delete foam.__context__.__cache__[this.view.class];
       delete this.classloader.latched[this.view.class];
       delete this.classloader.pending[this.view.class];
+      // TODO: remove old stylesheet
 
       this.classloader.load(this.view.class).then((cls)=>{
 
         foam.__context__.__cache__[this.view.class] = cls;
-        if ( true || foam.json.Compact.stringify(cls.model_.instance_) != foam.json.Compact.stringify(this.lastModel && this.lastModel.instance_) ) {
+        if ( foam.json.Compact.stringify(cls.model_.instance_) != foam.json.Compact.stringify(this.lastModel && this.lastModel.instance_) ) {
           console.log('reload');
           this.lastModel = cls.model_;
           this.viewArea.removeAllChildren();
@@ -54,7 +55,7 @@ foam.CLASS({
     {
       name: 'delayedReload',
       isMerged: true,
-      mergeDelay: 250,
+      mergeDelay: 2500,
       code: function() { this.reload(); /*this.delayedReload();*/ }
     }
   ]
@@ -147,6 +148,16 @@ foam.CLASS({
       class: 'String',
       name: 'id',
       displayWidth: 10,
+      comparePropertyValues: function(id1, id2) {
+        var a1 = id1.split('.'), a2 = id2.split('.');
+        for ( var i = 0 ; i < Math.min(a1.length, a2.length) ; i++ ) {
+          var c = foam.util.compare(parseInt(a1[i]), parseInt(a2[i]));
+          if ( c ) return c;
+        }
+        if ( a1.length > a2.length ) return  1;
+        if ( a1.length < a2.length ) return -1;
+        return 0;
+      },
       view: {
         class: 'foam.u2.ReadWriteView', nodeName: 'span'
       }
@@ -211,7 +222,7 @@ foam.CLASS({
     'foam.u2.DAOList'
   ],
 
-  css: '^ { background: white}',
+  css: '^ { background: white; }',
 
   properties: [
     {
@@ -222,7 +233,7 @@ foam.CLASS({
           daoType: 'MDAO',
           cache: true,
           testData: this.createTestData()
-        });
+        }).orderBy(com.google.foam.demos.examples.Example.ID);
       },
       view: {
         class: 'foam.u2.DAOList',
@@ -254,6 +265,85 @@ add('testing');
 First U2 Example
 --
 add('testing');
+
+## DSL
+## Fluent Interface
+## nodeName
+## v2
+## ControllerMode
+## DisplayMode
+## Borders
+##   content
+## CSS
+## CSS Variables
+## inheritCSS
+## ViewSpec
+## Entities / entity() / nbsp()
+## onKey
+## Element States
+##   state
+##   onload
+##   onunload
+## Tooltips
+## shown / show() / hide()
+## focused / focus() / blur()
+## Creating a Component
+##   initE
+## Keyboard Shortcuts
+## el() and id
+## E()
+## addClass() / cssClass() / addClasses()
+## enableCls() / enableClass()
+## myClass()
+## removeClass()
+## setAttribute()
+## removeAttribute()
+## appendChild()
+## removeChild()
+## replaceChild()
+## insertBefore()
+## insertAfter()
+## remove()
+## addEventListener()
+## removeEventListener()
+## on()
+## attr()
+## attrs()
+## style()
+## tag()
+## br()
+## startContext() / endContext()
+## start() / end()
+## i18n
+##   Messages
+##   translate()
+## add()
+##   adding properties
+##   toE()
+##   view:
+## addBefore()
+## removeAllChildren()
+## setChildren()
+## repeat()
+## daoSlot()
+## select()
+## call()
+## callOn
+## callIf
+## callIfElse
+## forEach()
+## write()
+## Tags
+##   attributes
+##   registerElement
+##   elementForName
+## View
+##   fromProperty()
+## Controller
+## Views
+##   ActionView
+## StackView
+##
       `;
       var a = [];
       var e;

@@ -88,7 +88,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'browseSubtitle',
-      factory: function() { return this.VIEW_ALL + this.browseTitle.toLowerCase() + '.' }
+      factory: function() { return this.VIEW_ALL + this.browseTitle.toLowerCase()}
     },
     {
       class: 'FObjectProperty',

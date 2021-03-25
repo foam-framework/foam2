@@ -28,20 +28,21 @@ foam.CLASS({
     }
 
     ^horizontal-radio {
-      display: flex;
-      align-items: center;
       align-content: center;
+      align-items: center;
+      display: flex;
       flex-wrap: wrap;
     }
 
     ^ .choice {
-      margin-bottom: 16px;
       font-size: 16px;
+      margin-bottom: 16px;
+      white-space: nowrap;
     }
 
     ^ label {
-      margin-left: 12px;
       color: #444;
+      margin-left: 12px;
     }
   `,
 

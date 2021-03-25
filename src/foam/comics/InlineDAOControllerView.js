@@ -51,7 +51,7 @@ foam.CLASS({
       this.__subContext__.createSubContext({ memento: null }));
 
       this.
-        tag(view).
+        add(view).
         start('span').
           show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
           add(this.cls.getAxiomsByClass(foam.core.Action)).

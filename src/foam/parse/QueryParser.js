@@ -71,7 +71,7 @@ foam.CLASS({
       // The core query parser. Needs a fieldname symbol added to function
       // properly.
       name: 'baseGrammar_',
-      value: function(alt, eof, join, literal, literalIC, not, notChars, optional, range,
+      value: function(alt, anyChar, eof, join, literal, literalIC, not, notChars, optional, range,
         repeat, repeat0, seq, seq1, str, sym, until) {
         return {
           START: seq1(0, sym('query'), repeat0(' '), eof()),
@@ -124,7 +124,7 @@ foam.CLASS({
             notChars(')')
           )),
 
-          simpleSubQuery: seq1(1, '.', until(alt(' ', eof()))),
+          simpleSubQuery: seq1(1, '.', repeat(not(alt(' ', eof()), anyChar()))),
 
           equals: seq(sym('fieldname'), alt(':', '='), sym('valueList')),
 

@@ -30,7 +30,7 @@ foam.CLASS({
 
   css: `
   ^ input[type="search"] {
-    width: 210px;
+    width: 240px;
   }
 
   ^ .side-nav-view {
