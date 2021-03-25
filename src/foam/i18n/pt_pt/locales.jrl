@@ -296,6 +296,8 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.CHO
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.MultiChoiceView.DAO.documentation",target:"Se o usuário quiser apenas passar um dao, ele será processado para preencher a matriz de opções em vez de inserir manualmente as opções"})
 
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.LoginView.BROWSER_SUPPORT",target:"Este aplicativo é otimizado para Google Chrome"})
+
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.ExportModal.EXPORT_ALL_COLUMNS.view.label",target:"Exportar todas as colunas"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.ExportModal.EXPORT",target:"Exportar"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.ExportModal.DATA_TYPE_MSG",target:"Tipo de dados"})
