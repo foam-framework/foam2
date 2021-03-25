@@ -8,7 +8,7 @@
   package: 'foam.nanos.ruler',
   name: 'RulerData',
 
-  documentation: `An helper model to allow RulerEngine execute predicate on a single object
+  documentation: `A helper model to allow RulerEngine execute predicate on a single object
     that stores all needed information such as oldObj, newObj, user, realUser etc. Add more as needed`,
 
   properties: [
