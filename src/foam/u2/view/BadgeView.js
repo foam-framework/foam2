@@ -67,8 +67,8 @@ foam.CLASS({
         this  
           .addClass(this.myClass('Wrapper'))
           .callIfElse(this.isAttachedToCard,
-            function(){this.style({'border-radius': '0px 12px 12px 0px'})},
-            function(){this.style({'border-radius': '12px'})}
+            function(){this.style({'border-radius': '0px 11.2px 11.2px 0px'})},
+            function(){this.style({'border-radius': '11.2px'})}
           )
           .style({
             'background-color': this.backgroundColor,

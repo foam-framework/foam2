@@ -43,7 +43,7 @@ foam.CLASS({
 
     ^ .foam-u2-crunch-Style-badge {
       position: absolute;
-      bottom: 8px;
+      bottom: 12px;
       right: 8px;
     }
 
