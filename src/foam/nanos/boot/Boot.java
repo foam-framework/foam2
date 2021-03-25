@@ -70,10 +70,29 @@ public class Boot {
         logger.info("Disabled", sp.getName());
         continue;
       }
-      NSpecFactory factory = new NSpecFactory((ProxyX) root_, sp);
+
+      var x = root_;
+      var pos = sp.getName().indexOf(".");
+      while ( pos > 0 ) {
+        var contextName = sp.getName().substring(0, pos);
+        if ( x.get(contextName) == null ) {
+          var subX = new ProxyX(((ProxyX) x).getX());
+          x.put(contextName, subX);
+          x = subX;
+        }
+
+        var next = sp.getName().indexOf(".", pos + 1);
+        if ( next < pos ) {
+          break;
+        }
+        pos = next;
+      }
+      var serviceName = sp.getName().substring(pos + 1);
+
+      NSpecFactory factory = new NSpecFactory((ProxyX) x, sp);
       factories_.put(sp.getName(), factory);
       logger.info("Registering", sp.getName());
-      root_.putFactory(sp.getName(), factory);
+      x.putFactory(serviceName, factory);
     }
 
     serviceDAO_.listen(new AbstractSink() {
