@@ -5,11 +5,15 @@
  */
 package foam.nanos.script.jShell;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 
 import foam.core.X;
 import jdk.jshell.JShell;
 import jdk.jshell.SnippetEvent;
+import jdk.jshell.EvalException;
+
 /**
  * Evaluate each instruction and return the result 
  *
@@ -65,9 +69,11 @@ public class EvalInstruction {
       }
       Exception exc = event.exception();
       if ( exc != null ) {
-        String out = exc.getMessage();
-        output += "Error is " + out;
-        System.out.println("Error is " + out);
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        exc.printStackTrace(pw);
+        output = ((EvalException) exc).getExceptionClassName() + "\n" + sw.toString();
+        System.out.println("JShell Error: " + output);
       }
     }
     return output;

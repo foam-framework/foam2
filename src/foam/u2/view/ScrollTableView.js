@@ -17,8 +17,7 @@
   exports: [
     'as summaryView',
     'dblclick as click',
-    'dblclick',
-    'memento'
+    'dblclick'
   ],
 
   requires: [
@@ -183,11 +182,11 @@
             data: obj,
             config: this.config,
             idOfRecord: id
-          }, this);
+          }, this.__subContext__.createSubContext({ memento: this.table_.memento }));
         }
       }
     },
-    'currentMemento',
+    'currentMemento_',
     {
       class: 'Boolean',
       name: 'isInit'
@@ -204,71 +203,84 @@
     function init() {
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.updateCount })));
       this.updateCount();
-
-      if ( this.memento )
-        this.currentMemento$ = this.memento.tail$;
     },
 
     function initE() {
-      if ( this.currentMemento ) {
-        var mementoHead = this.currentMemento.head;
+      if ( this.memento ) {
+        //as there two settings to configure for table scroll and columns params
+        //scroll setting which setts the record to which table currently scrolled
+        var m = this.memento;
+        for ( var i = 0 ; i < 2 ; i++ ) {
+          if ( ! m ) {
+            m = foam.nanos.controller.Memento.create({ value: '', parent: this.memento });
+            this.memento.tail = m;
+          } else {
+            if ( ! m.tail )
+              m.tail = foam.nanos.controller.Memento.create({ value: '', parent: m });
+            m = m.tail;
+          }
+        }
+        this.currentMemento_ = this.memento.tail;
+      }
 
-        var of = this.data.of || this.config.of;
-        if ( mementoHead === 'Create' && of ) {
+
+
+      this.table_ = foam.u2.ViewSpec.createView(this.TableView, {
+        data: foam.dao.NullDAO.create({of: this.data.of}),
+        columns: this.columns,
+        contextMenuActions: this.contextMenuActions,
+        selection$: this.selection$,
+        editColumnsEnabled: this.editColumnsEnabled,
+        disableUserSelection: this.disableUserSelection,
+        multiSelectEnabled: this.multiSelectEnabled,
+        selectedObjects$: this.selectedObjects$
+      },  this, this.__subSubContext__.createSubContext({ memento: this.currentMemento_ ? this.currentMemento_.tail : this.currentMemento_ }));
+      
+      if ( ! this.table_.memento || ! this.table_.memento.tail || this.table_.memento.tail.head.length == 0 ) {
+        this.
+          start('div', {}, this.tableWrapper_$).
+            addClass(this.myClass()).
+            on('scroll', this.onScroll).
+            start().
+              add(this.table_).
+              addClass(this.myClass('table')).
+              style({
+                height: this.scrollHeight$.map(h => h + 'px')
+              }).
+            end().
+          end();
+      } else if ( this.table_.memento.tail.head.length != 0 ) {
+        if ( this.table_.memento.tail.head == 'create' ) {
           this.stack.push({
             class: 'foam.comics.v2.DAOCreateView',
             data: ((this.config.factory && this.config.factory$cls) ||  this.data.of).create({ mode: 'create'}, this),
             config$: this.config$,
-            of: of
-          }, this.__subContext__);
-          return;
-        }
-
-        var id = mementoHead;
-        if ( of ) {
-          if ( ! foam.core.MultiPartID.isInstance(of.ID) ) {
-            id = of.ID.fromString(mementoHead);
+            of: this.data.of
+          }, this.__subContext__.createSubContext({ memento: this.table_.memento }));
+        } else {
+          var id = this.table_.memento.tail.tail.head;
+          if ( ! foam.core.MultiPartID.isInstance(this.data.of.ID) ) {
+            id = this.data.of.ID.fromString(id);
           } else {
-            id = of.ID.of.create();
-            mementoHead = '{' + mementoHead.replaceAll('=', ':') + '}';
+            id = this.data.of.ID.of.create();
+            mementoHead = '{' + this.table_.memento.tail.tail.head.replaceAll('=', ':') + '}';
             var idFromJSON = foam.json.parseString(mementoHead);
             for ( var key in idFromJSON ) {
-              var axiom = of.ID.of.getAxiomByName(key);
+              var axiom = this.data.of.getAxiomByName(key);
+
               if ( axiom )
                 axiom.set(id, idFromJSON[key]);
             }
           }
+          this.stack.push({
+            class: 'foam.comics.v2.DAOSummaryView',
+            data: null,
+            config: this.config,
+            idOfRecord: id
+          }, this.__subContext__.createSubContext({ memento: this.table_.memento }));
         }
-
-        this.stack.push({
-          class: 'foam.comics.v2.DAOSummaryView',
-          data: null,
-          config: this.config,
-          idOfRecord: id
-        }, this);
-        return;
       }
-
-      this.
-        start('div', {}, this.tableWrapper_$).
-          addClass(this.myClass()).
-          on('scroll', this.onScroll).
-          start(this.TableView, {
-            data: foam.dao.NullDAO.create({of: this.data.of}),
-            columns: this.columns,
-            contextMenuActions: this.contextMenuActions,
-            selection$: this.selection$,
-            editColumnsEnabled: this.editColumnsEnabled,
-            disableUserSelection: this.disableUserSelection,
-            multiSelectEnabled: this.multiSelectEnabled,
-            selectedObjects$: this.selectedObjects$
-          }, this.table_$).
-            addClass(this.myClass('table')).
-            style({
-              height: this.scrollHeight$.map(h => h + 'px')
-            }).
-          end().
-        end();
+      
 
       /*
         to be used in cases where we don't want the whole table to
@@ -295,8 +307,8 @@
           delete this.renderedPages_[i];
         });
         this.updateRenderedPages_();
-        if ( this.el() && ! this.isInit && this.memento && this.memento.paramsObj.r ) {
-          var scroll = this.memento.paramsObj.r * this.rowHeight;
+        if ( this.el() && ! this.isInit && this.currentMemento_ && this.currentMemento_.head.length != 0 ) {
+          var scroll = this.currentMemento_.head * this.rowHeight;
           scroll = scroll >= this.rowHeight && scroll < this.scrollHeight ? scroll : 0;
 
           if ( this.childNodes && this.childNodes.length > 0 )
@@ -351,9 +363,8 @@
       isFramed: true,
       code: function(e) {
         this.scrollPos_ = e.target.scrollTop;
-        if ( this.memento ) {
-          this.memento.paramsObj.r = this.scrollPos_ >= this.rowHeight && this.scrollPos_ < this.scrollHeight ? Math.floor( this.scrollPos_  / this.rowHeight) : 0;
-          this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
+        if ( this.currentMemento_ ) {
+          this.currentMemento_.head = this.scrollPos_ >= this.rowHeight && this.scrollPos_ < this.scrollHeight ? Math.floor( this.scrollPos_  / this.rowHeight) : 0;
         }
       }
     },

@@ -214,6 +214,8 @@ foam.CLASS({
       if ( criteria ) {
         criteria.predicates[propertyName] = predicate;
       }
+
+      this.updateFilterPredicate();
     },
 
     function applyPreview() {

@@ -50,7 +50,6 @@ foam.CLASS({
       this.onDetach(this.cleanup);
       var debug_updateCalls = 0;
       var update = function (obj, parentRefs) {
-        console.log('one of these called');
         debug_updateCalls++;
         if ( parentRefs.includes(obj) ) {
           this.cleanup();
