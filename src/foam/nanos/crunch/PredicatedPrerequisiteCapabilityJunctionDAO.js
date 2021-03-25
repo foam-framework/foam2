@@ -24,7 +24,7 @@ foam.CLASS({
     {
       type: 'String',
       name: 'PERMISSION',
-      value: 'predicatedprequisite.read.*'
+      value: 'predicatedprerequisite.read.*'
     }
   ],
 
