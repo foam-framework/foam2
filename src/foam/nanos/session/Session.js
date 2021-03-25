@@ -312,6 +312,11 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
         Subject subject = new Subject();
         subject.setUser(agent);
         subject.setUser(user);
+
+        var subX = (X) rtn.get(user.getSpid());
+        if ( subX != null ) {
+          rtn = subX;
+        }
         rtn = rtn
           .put("subject", subject)
           .put("spid", user.getSpid())
