@@ -308,10 +308,9 @@ foam.CLASS({
       `
     },
     {
-      name: 'implies',
+      name: 'grantsPermission',
       type: 'Boolean',
       args: [
-        { name: 'x', type: 'Context' },
         { name: 'permission', type: 'String' }
       ],
       documentation: `Checks if a permission or capability string is implied by the current capability`,
@@ -331,6 +330,29 @@ foam.CLASS({
           if ( this.stringImplies(permissionName, permission) ) return true;
         }
         
+        return false;
+      `
+    },
+    {
+      name: 'implies',
+      type: 'Boolean',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'permission', type: 'String' }
+      ],
+      documentation: `Checks if a permission or capability string is implied by the current capability`,
+      javaCode: `
+        if ( this.grantsPermission(permission) ) return true;
+
+        CrunchService crunchService = (CrunchService) x.get("crunchService");
+        var prereqs = crunchService.getPrereqs(getId());
+        if ( prereqs != null && prereqs.size() > 0 ) {
+          DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+          for ( var capId : prereqs ) {
+            Capability capability = (Capability) capabilityDAO.find(capId);
+            if ( capability != null && capability.grantsPermission(x, permission) ) return true;
+          }
+        }
         return false;
       `
     },
