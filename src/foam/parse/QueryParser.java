@@ -10,6 +10,7 @@ import foam.core.*;
 import foam.lib.json.Whitespace;
 import foam.lib.parse.*;
 import foam.lib.parse.Action;
+import foam.lib.parse.Not;
 import foam.lib.parse.Optional;
 import foam.mlang.Expr;
 import foam.mlang.MLang;
@@ -21,6 +22,9 @@ import foam.util.SafetyUtil;
 import java.lang.Exception;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static foam.mlang.MLang.DOT_F;
 
 public class QueryParser
 {
@@ -115,7 +119,7 @@ public class QueryParser
     });
 
     grammar.addSymbol("EXPR", new Alt(grammar.sym("PAREN"),
-      grammar.sym("NEGATE"), grammar.sym("HAS"), grammar.sym("IS"),grammar.sym("INSTANCE_OF"),
+      grammar.sym("NEGATE"), grammar.sym("HAS"), grammar.sym("IS"), grammar.sym("DOT"), grammar.sym("INSTANCE_OF"),
       grammar.sym("EQUALS"), grammar.sym("BEFORE"), grammar.sym("AFTER"), grammar.sym("ID")));
 
     grammar.addSymbol("PAREN", new Seq1(1,
@@ -132,6 +136,41 @@ public class QueryParser
       predicate.setArg1((Predicate) val);
       return predicate;
     });
+
+    grammar.addSymbol("DOT", new Seq(grammar.sym("FIELD_NAME"), grammar.sym("SUB_QUERY")));
+    grammar.addAction("DOT", (val, x) -> {
+      Object[] values = (Object[]) val;
+      return DOT_F(values[1], values[0]);
+    });
+
+    grammar.addSymbol("SUB_QUERY", new Alt(grammar.sym("COMPOUND_SUB_QUERY"), grammar.sym("SIMPLE_SUB_QUERY")));
+
+
+    grammar.addSymbol("COMPOUND_SUB_QUERY", new Seq1(1, Literal.create("("), grammar.sym("COMPOUND_SUB_QUERY_BODY"), Literal.create(")")));
+    grammar.addAction("COMPOUND_SUB_QUERY", (val, x) -> {
+      MQLExpr mql = new MQLExpr();
+      mql.setQuery((String) val);
+      return mql;
+    });
+
+    grammar.addSymbol("COMPOUND_SUB_QUERY_BODY", new Repeat(new Alt(
+      new Seq(Literal.create("("), grammar.sym("COMPOUND_SUB_QUERY_BODY"), Literal.create(")")),
+      new Join(new Seq(
+        Literal.create("\""),
+        new Join(new Repeat(new Alt(new Literal("\\\"", "\""), new NotChars("\"")))),
+        Literal.create("\"")
+      )),
+      new NotChars(")")
+    )));
+    grammar.addAction("COMPOUND_SUB_QUERY_BODY", (val, x) -> compactToString(Arrays.stream((Object[]) val).map(s -> s instanceof String || s instanceof Character ? s : compactToString(s)).toArray()));
+
+    grammar.addSymbol("SIMPLE_SUB_QUERY", new Seq1(1, Literal.create("."), new Repeat(new Not(new Alt(Literal.create(" "), EOF.instance()), AnyChar.instance()))));
+    grammar.addAction("SIMPLE_SUB_QUERY", (val, x) -> {
+      MQLExpr mql = new MQLExpr();
+      mql.setQuery(compactToString(val));
+      return mql;
+    });
+
 
     grammar.addSymbol("ID", grammar.sym("NUMBER"));
     grammar.addAction("ID", (val, x) -> {
@@ -246,7 +285,7 @@ public class QueryParser
         Binary binary = values[2].equals("=") ? new Eq() : new Contains();
         binary.setArg1(prop);
         binary.setArg2(( value[i] instanceof Expr ) ?
-          ( Expr ) value[i] : new foam.mlang.Constant (value[i]));
+          ( Expr ) value[i] : new foam.mlang.Constant (value[i].equals("null") ? null : value[i]));
         vals[i] = binary;
       }
       or.setArgs(vals);

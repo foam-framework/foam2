@@ -73,7 +73,9 @@ foam.CLASS({
       // When focus is lost on the view, force the view's value to equal the data
       // to ensure it's formatted properly.
       this.on('blur', function () {
-        view.set(self.dataToText(data.get()));
+        var value = self.dataToText(data.get());
+        view.set('0');
+        view.set(value);
       });
 
       var preventFeedback = false;
