@@ -64,6 +64,8 @@ public class Boot {
     ArraySink arr = (ArraySink) serviceDAO_.select(new ArraySink());
     List      l   = perfectList(arr.getArray());
 
+    // Hierarchically nspecs
+    var hnSpecs   = new ArrayList<NSpec>();
     for ( int i = 0 ; i < l.size() ; i++ ) {
       NSpec sp = (NSpec) l.get(i);
       if ( ! sp.getEnabled() ) {
@@ -71,28 +73,17 @@ public class Boot {
         continue;
       }
 
-      var x = root_;
-      var pos = sp.getName().indexOf(".");
-      while ( pos > 0 ) {
-        var contextName = sp.getName().substring(0, pos);
-        if ( x.get(contextName) == null ) {
-          var subX = new ProxyX(((ProxyX) x).getX());
-          x.put(contextName, subX);
-          x = subX;
-        }
-
-        var next = sp.getName().indexOf(".", pos + 1);
-        if ( next < pos ) {
-          break;
-        }
-        pos = next;
+      // Skip hierarchically nspecs to be loaded later since the service would
+      // need to be created in the proxy/firewall sub context for the spid.
+      if ( sp.getName().indexOf(".") > -1 ) {
+        hnSpecs.add(sp);
+        continue;
       }
-      var serviceName = sp.getName().substring(pos + 1);
 
-      NSpecFactory factory = new NSpecFactory((ProxyX) x, sp);
+      NSpecFactory factory = new NSpecFactory((ProxyX) root_, sp);
       factories_.put(sp.getName(), factory);
       logger.info("Registering", sp.getName());
-      x.putFactory(serviceName, factory);
+      root_.putFactory(sp.getName(), factory);
     }
 
     serviceDAO_.listen(new AbstractSink() {
@@ -125,6 +116,34 @@ public class Boot {
         return ((Subject) x.get("subject")).getRealUser();
       }
     });
+
+    // Load hierarchically nspecs eg. "foo.bar.serviceName":
+    // 1. Create "foo" proxy sub context from the root context
+    // 2. Create "foo.bar" proxy sub context from "foo" sub context
+    // 3. Create "serviceName" object in "foo.bar" sub context
+    for ( var sp : hnSpecs ) {
+      var x = root_;
+      var pos = sp.getName().indexOf(".");
+      while ( pos > 0 ) {
+        var contextName = sp.getName().substring(0, pos);
+        if ( x.get(contextName) == null ) {
+          var subX = new ProxyX( ((ProxyX) x).getX() );
+          x.put(contextName, subX);
+          x = subX;
+        }
+
+        var next = sp.getName().indexOf(".", pos + 1);
+        if ( next < pos ) {
+          break;
+        }
+        pos = next;
+      }
+      var serviceName = sp.getName().substring(pos + 1);
+      NSpecFactory factory = new NSpecFactory((ProxyX) x, sp);
+      factories_.put(sp.getName(), factory);
+      logger.info("Registering", sp.getName());
+      x.putFactory(serviceName, factory);
+    }
 
     // Revert root_ to non ProxyX to avoid letting children add new bindings.
     root_ = ((ProxyX) root_).getX();
