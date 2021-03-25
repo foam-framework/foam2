@@ -88,12 +88,6 @@ foam.CLASS({
         if ( x.get(Session.class) == null ) return false;
         if ( user == null || ! user.getEnabled() ) return false;
         User realUser = ((Subject) x.get("subject")).getRealUser();
-        String associationKey = realUser.getId() == user.getId() ?
-          null :
-          user.getId() + ":" + realUser.getId() + permission;
-        String userKey = user.getId() + permission;
-        String realUserKey = realUser.getId() == user.getId() ? null
-          : (realUser.getSpid().equals(user.getSpid()) ? realUser.getId() + permission : null);
 
         try {
           DAO capabilityDAO = ( x.get("localCapabilityDAO") == null ) ? (DAO) x.get("capabilityDAO") : (DAO) x.get("localCapabilityDAO");
@@ -127,7 +121,7 @@ foam.CLASS({
           }
 
           // Check if a ucj implies the subject.realUser has this permission
-          if ( realUser != null && realUserKey != null ) {
+          if ( realUser != null && realUser.getId() != user.getId() && realUser.getSpid().equals(user.getSpid()) ) {
             userPredicate = AND(
               NOT(INSTANCE_OF(AgentCapabilityJunction.class)),
               EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId())
@@ -138,7 +132,7 @@ foam.CLASS({
           }
 
           // Check if a ucj implies the subject.realUser has this permission in relation to the user
-          if ( realUser != null && associationKey != null ) {
+          if ( realUser != null && realUser.getId() != user.getId() ) {
             userPredicate = AND(
               INSTANCE_OF(AgentCapabilityJunction.class),
               EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId()),
