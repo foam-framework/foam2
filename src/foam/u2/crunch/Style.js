@@ -208,7 +208,8 @@ foam.CLASS({
     }
 
     ^tooltip {
-      position: relative;
+      position: absolute;
+      bottom: 14px; 
     }
     ^tooltip ^tooltiptext {
       visibility: hidden;

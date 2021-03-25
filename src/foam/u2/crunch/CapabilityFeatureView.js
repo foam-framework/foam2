@@ -27,7 +27,9 @@ foam.CLASS({
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.u2.view.ReadOnlyEnumView',
-    'foam.u2.crunch.Style'
+    'foam.u2.crunch.Style',
+    'foam.u2.Tooltip',
+    'foam.u2.view.BadgeView'
   ],
 
   documentation: `
@@ -110,18 +112,21 @@ foam.CLASS({
             'background-image': "url('" + self.data.icon + "')"
           })
           .add(this.slot(function(cjStatus) {
-            return this.E().addClass(style.myClass('tooltip'))
+            return this.E()
+            .addClass(style.myClass('tooltip'))
               .start('span')
                 .addClass(style.myClass('tooltiptext'))
                 .addClass(style.myClass('tooltip-bottom'))
                 .enableClass(style.myClass('tooltipDisabled'), self.tooltipEnabled, true)
                 .add(cjStatus.documentation)
               .end()
-              .add(cjStatus.label).addClass(style.myClass('badge'))
-              .style({
-                'background-color': cjStatus.background,
-                'color': cjStatus.color
-              });
+              .start(foam.u2.view.BadgeView, {label: cjStatus.label, color: cjStatus.color, backgroundColor: cjStatus.background, isAttachedToCard: true}).addClass(self.myClass('badge')).end()
+              // .add(cjStatus.label).addClass(style.myClass('badge'))
+              // .style({
+              //   'background-color': cjStatus.background,
+              //   'color': cjStatus.color
+              // });
+              
           }))
           .add(this.slot(function(isRenewable) {
             return isRenewable ? this.E()
