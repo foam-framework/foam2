@@ -12,6 +12,18 @@ foam.LIB({
         }));
         return s;
       }
+    },
+    {
+      name: 'blockFramed',
+      code: function () {
+        return new Promise((resolve) => {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              resolve();
+            });
+          });
+        });
+      }
     }
   ]
 });
