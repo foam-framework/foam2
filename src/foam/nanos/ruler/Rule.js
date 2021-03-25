@@ -329,6 +329,7 @@
             data.setO(oldObj);
             data.setUser((User)x.get("user"));
             data.setRealUser((User)x.get("realUser"));
+            data.setSpid((String)x.get("spid"));
             return getPredicate().f(data);
           } else {
             return getPredicate().f(x.put("NEW", obj).put("OLD", oldObj));
