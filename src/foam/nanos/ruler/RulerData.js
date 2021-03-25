@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * Copyright 2021 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -8,28 +8,29 @@
   package: 'foam.nanos.ruler',
   name: 'RulerData',
 
-  documentation: 'TODO',
+  documentation: `An helper model to allow RulerEngine execute predicate on a single object
+    that stores all needed information such as oldObj, newObj, user, realUser etc. Add more as needed`,
 
   properties: [
     {
       class: 'FObjectProperty',
       name: 'o',
-      documentation: 'todo'
+      documentation: 'old object'
     },
     {
       class: 'FObjectProperty',
       name: 'n',
-      documentation: 'todo'
+      documentation: 'new object'
     },
     {
       class: 'FObjectProperty',
       name: 'user',
-      documentation: 'todo'
+      documentation: 'user in the current context'
     },
     {
       class: 'FObjectProperty',
       name: 'realUser',
-      documentation: 'todo'
+      documentation: 'realUser in the current context'
     }
   ]
 });
