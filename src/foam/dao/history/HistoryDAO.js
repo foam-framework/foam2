@@ -22,6 +22,7 @@ foam.CLASS({
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
+    'foam.nanos.session.Session',
     'java.util.ArrayList',
     'java.util.Date',
     'static foam.mlang.MLang.EQ',
@@ -114,9 +115,8 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      Subject subject = (Subject) x.get("subject");
-      User user = subject.getUser();
-      User agent = subject.getRealUser();
+      Subject subject = (Subject) ((Session) x.get(Session.class)).getContext().get("subject");
+
       FObject current = this.find_(x, obj);
       Object objectId = obj.getProperty("id");
 
