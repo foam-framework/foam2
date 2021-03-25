@@ -224,6 +224,7 @@ foam.CLASS({
       label: '',
       toolTip: 'Export Table Data',
       icon: 'images/export-arrow-icon.svg',
+      availablePermissions: [ "data.export" ],
       code: function() {
         this.add(this.Popup.create().tag({
           class: 'foam.u2.ExportModal',
