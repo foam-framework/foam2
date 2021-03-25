@@ -14,7 +14,6 @@ foam.CLASS({
       documentation: 'When true, 2FA will be enforced if AppConfig.MODE == PRODUCTION, otherwise it will generate a warning banner',
       name: 'twoFactorEnabled',
       class: 'Boolean',
-      value: false,
       section: 'administration'
     }
   ]
