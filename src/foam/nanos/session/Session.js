@@ -157,6 +157,14 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
     },
     {
       class: 'Boolean',
+      name: 'twoFactorSuccess',
+      visibility: 'HIDDEN',
+      value: false,
+      networkTransient: true,
+      storageTransient: true
+    },
+    {
+      class: 'Boolean',
       name: 'clusterable',
       value: true,
       visibility: 'HIDDEN',
