@@ -33,8 +33,8 @@ foam.CLASS({
 
   imports: [
     'capabilityDAO',
-    'userCapabilityJunctionDAO',
-    'memento'
+    'memento',
+    'userCapabilityJunctionDAO'
   ],
 
   requires: [
@@ -165,7 +165,6 @@ foam.CLASS({
 
   methods: [
     function initE() {
-
       if ( this.memento) {
         this.currentMemento_$ = this.memento.tail$;
       }
@@ -266,7 +265,7 @@ foam.CLASS({
   listeners: [
     function mementoChange() {
       var m = this.currentMemento_;
-      if ( m && this.rootCapability != m ) this.rootCapability = m.head;
+      if ( m && this.rootCapability != m.head ) this.rootCapability = m.head;
     }
   ]
 });
