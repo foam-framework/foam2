@@ -7,9 +7,6 @@
 foam.CLASS({
   package: 'foam.nanos.export',
   name: 'ExportDriverRegistry',
-  implements: [
-    'foam.nanos.auth.EnabledAware'
-  ],
 
   documentation: 'Export driver registry model',
 
@@ -48,9 +45,24 @@ foam.CLASS({
       documentation: 'exportAllColumns should be set to true for export drivers, which handle both selected column export and export of all available columns'
     },
     {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'enabledPredicate',
+      factory: function () { return foam.mlang.predicate.True; },
+      javaFactory: 'return foam.mlang.MLang.FALSE;'
+    },
+    {
       class: 'Boolean',
-      name: 'enabled',
-      value: true
+      name: 'isEnabled',
+      factory: function() {
+        if ( ! this.enabledPredicate )
+          return false;
+        return this.enabledPredicate.f();
+      },
+      javaFactory: `
+        if ( getEnabledPredicate() == null )
+          return false;
+        return getEnabledPredicate().f(this);
+      `
     }
   ]
 });

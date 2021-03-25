@@ -33,8 +33,9 @@ foam.CLASS({
       class: 'String',
       name: 'dataType',
       view: function(_, X) {
+        var predicates = foam.mlang.Expressions.create();
         return foam.u2.view.ChoiceView.create({
-          dao: X.exportDriverRegistryDAO.where(X.data.predicate),
+          dao: X.exportDriverRegistryDAO.where(predicates.EQ(foam.nanos.export.ExportDriverRegistry.IS_ENABLED, true)),
           objToChoice: function(a) {
             return [a.id, a.id];
           }
@@ -140,7 +141,7 @@ foam.CLASS({
       });
 
       this
-      .tag(this.ModalHeader.create({
+      .add(this.ModalHeader.create({
         title: this.EXPORT
       }))
       .addClass(this.myClass())
