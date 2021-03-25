@@ -144,11 +144,7 @@ foam.CLASS({
       },
       postSet: function(_, n) {
         if ( this.memento ) {
-          if ( ! this.currentMemento_ ) {
-            this.currentMemento_ = foam.nanos.controller.Memento.create({value: n});
-          } else {
-            this.currentMemento_.value = n;
-          }
+          this.currentMemento_ = foam.nanos.controller.Memento.create({value: n});
         }
       }
     },
