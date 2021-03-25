@@ -70,9 +70,11 @@ foam.CLASS({
     function initE() {
       var self = this;
 
-      this.currentMemento_$ = this.memento.tail$;
-      if ( this.memento && ! this.memento.tail ) {
-        this.memento.tail = foam.nanos.controller.Memento.create();
+      if ( this.memento ) {
+        if ( ! this.memento.tail ) {
+          this.memento.tail = foam.nanos.controller.Memento.create();
+        }
+        this.currentMemento_$ = this.memento.tail$;
       }
 
       this.dao.on.sub(this.updateTotalCount);
