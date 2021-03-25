@@ -150,13 +150,11 @@ foam.CLASS({
       displayWidth: 10,
       comparePropertyValues: function(id1, id2) {
         var a1 = id1.split('.'), a2 = id2.split('.');
-        for ( var i = 0 ; i < Math.min(a1.length, a2.length) ; i++ ) {
+        for ( var i = 0 ; i < Math.min(a1.length, a2.length)-1 ; i++ ) {
           var c = foam.util.compare(parseInt(a1[i]), parseInt(a2[i]));
           if ( c ) return c;
         }
-        if ( a1.length > a2.length ) return  1;
-        if ( a1.length < a2.length ) return -1;
-        return 0;
+        return foam.util.compare(a1.length, a2.length);
       },
       view: {
         class: 'foam.u2.ReadWriteView', nodeName: 'span'
@@ -256,6 +254,10 @@ foam.CLASS({
 
     function createTestData() {
       var s = `
+## A
+##  B
+##   C1
+##   C2
 ## Welcome
 First U2 Example
 --
@@ -267,13 +269,16 @@ First U2 Example
 add('testing');
 
 ## DSL
+## Intro1
+## Intro2
+##  SubIntro
 ## Fluent Interface
 ## nodeName
 ## v2
 ## ControllerMode
 ## DisplayMode
 ## Borders
-##   content
+##  content
 ## CSS
 ## CSS Variables
 ## inheritCSS
@@ -281,14 +286,14 @@ add('testing');
 ## Entities / entity() / nbsp()
 ## onKey
 ## Element States
-##   state
-##   onload
-##   onunload
+##  state
+##  onload
+##  onunload
 ## Tooltips
 ## shown / show() / hide()
 ## focused / focus() / blur()
 ## Creating a Component
-##   initE
+##  initE
 ## Keyboard Shortcuts
 ## el() and id
 ## E()
@@ -315,12 +320,12 @@ add('testing');
 ## startContext() / endContext()
 ## start() / end()
 ## i18n
-##   Messages
-##   translate()
+##  Messages
+##  translate()
 ## add()
-##   adding properties
-##   toE()
-##   view:
+##  adding properties
+##  toE()
+##  view:
 ## addBefore()
 ## removeAllChildren()
 ## setChildren()
@@ -334,25 +339,28 @@ add('testing');
 ## forEach()
 ## write()
 ## Tags
-##   attributes
-##   registerElement
-##   elementForName
+##  attributes
+##  registerElement
+##  elementForName
 ## View
-##   fromProperty()
+##  fromProperty()
 ## Controller
 ## Views
-##   ActionView
+##  ActionView
 ## StackView
-##
+## More
       `;
       var a = [];
+      var id = [];
       var e;
-      var i = 1;
       var mode = 'text';
       s = s.substring(1).split('\n').forEach(l => {
         if ( l.startsWith('##') ) {
 //          e = this.Example.create({id: i++, title: l.substring(3)});
-          e = {id: i++, title: l.substring(3), code: '', text: ''};
+          var depth = l.substring(2).match(/^ */)[0].length;
+          id.length = depth;
+          id[depth-1] = (id[depth-1] || 0)+1;
+          e = {id: id.join('.') + '.', title: l.substring(3), code: '', text: ''};
           a.push(e);
           mode = 'text';
         } else if ( l.startsWith('--') ) {
