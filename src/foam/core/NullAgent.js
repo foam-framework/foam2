@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'NullAgent',
   documentation: `
-    Empty agent used to replace existing agents when removing from the sequence.
+    An Agent that has an empty execution.
   `,
 
   implements: [
