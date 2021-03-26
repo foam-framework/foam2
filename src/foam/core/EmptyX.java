@@ -60,15 +60,7 @@ abstract class AbstractX
   }
 
   public X cd(String path) {
-    X subX = this;
-    for ( var c : path.split("\\.") ) {
-      var obj = subX.get(c);
-      if ( ! ( obj instanceof X ) ) {
-        return null;
-      }
-      subX = (X) obj;
-    }
-    return subX;
+    return cd(this, path);
   }
 
   public void append(StringBuilder sb) {

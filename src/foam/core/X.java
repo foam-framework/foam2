@@ -43,10 +43,24 @@ public interface X
   public <T> T create(Class<T> type);
   public <T> T create(Class<T> type, Map<String, Object> args);
 
+  // cd methods
+  X cd(String path);
+
   /**
    * Changes/switches into its sub context.
+   * @param x starting context node
    * @param path Dot-separated path to a sub context eg, "foo.bar".
    * @return A sub context if exists, otherwise returns null.
    */
-  X cd(String path);
+  default X cd(X x, String path) {
+    X subX = x;
+    for ( var c : path.split("\\.") ) {
+      var obj = subX.get(c);
+      if ( ! ( obj instanceof X ) ) {
+        return null;
+      }
+      subX = (X) obj;
+    }
+    return subX;
+  }
 }
