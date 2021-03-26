@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'ExportDriverRegistry',
   implements: [
     'foam.nanos.auth.EnabledAware'
+  ],
+  
   imports:[
     'auth'
   ],
