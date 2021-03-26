@@ -10,7 +10,8 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   css: `
-    ^Wrapper{
+    ^{
+      border-radius: 11.2px
       font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 10px;
       font-style: normal;
@@ -26,13 +27,9 @@ foam.CLASS({
    
   `,
 
-  documentation:`Creates badges with rounded/squared sides based on display context`,
+  documentation: `Creates badges with rounded/squared sides based on display context`,
 
   properties: [
-    {
-        class: 'Boolean',
-        name: 'isAttachedToCard'
-    },
     {
         class: 'String',
         name: 'label'
@@ -50,15 +47,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this
-        .addClass(this.myClass('Wrapper'))
-        .callIfElse(this.isAttachedToCard,
-          function() {
-            this.style({ 'border-radius': '0px 11.2px 11.2px 0px' });
-          },
-          function() {
-            this.style({ 'border-radius': '11.2px' });
-          }
-        )
+        .addClass(this.myClass())
         .style({
           'background-color': this.backgroundColor,
           'color': this.color

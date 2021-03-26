@@ -41,10 +41,8 @@ foam.CLASS({
       position: relative;
     }
 
-    ^ .foam-u2-crunch-Style-badge {
-      position: absolute;
-      bottom: 12px;
-      right: 8px;
+    ^badge > * {
+      border-radius: 0px 11.2px 11.2px 0px
     }
 
     ^ .foam-u2-crunch-Style-renewable-description {
@@ -120,14 +118,14 @@ foam.CLASS({
                 .enableClass(style.myClass('tooltipDisabled'), self.tooltipEnabled, true)
                 .add(cjStatus.documentation)
               .end()
-              .start(foam.u2.view.BadgeView, {
-                label: cjStatus.label,
-                color: cjStatus.color,
-                backgroundColor: cjStatus.background,
-                isAttachedToCard: true
-              })
-                .addClass(self.myClass('badge'))
-              .end()
+              .start()
+                .addClass(this.myClass('badge'))
+                .add(foam.u2.view.BadgeView.create({
+                  label: cjStatus.label,
+                  color: cjStatus.color,
+                  backgroundColor: cjStatus.background
+                }))
+              .end();
           }))
           .add(this.slot(function(isRenewable) {
             return isRenewable ? this.E()
