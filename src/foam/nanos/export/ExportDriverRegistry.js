@@ -16,7 +16,7 @@ foam.CLASS({
   tableColumns: [ 'id', 'driverName', 'targetModel', 'extension' ],
 
   properties: [
-    { class: 'String', name: 'id', tableWidth: 80 },
+    { class: 'String', name: 'id', tableWidth: 220 },
     { class: 'String', name: 'driverName', tableWidth: 300 },
     { class: 'String', name: 'targetModel' },
     {
