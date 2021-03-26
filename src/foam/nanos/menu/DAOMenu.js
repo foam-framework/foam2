@@ -10,6 +10,7 @@ foam.CLASS({
   extends: 'foam.nanos.menu.AbstractMenu',
 
   documentation: 'Menu for displaying standard DAO controller.',
+
   properties: [
     {
       class: 'String',

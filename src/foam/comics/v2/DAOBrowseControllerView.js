@@ -139,6 +139,7 @@ foam.CLASS({
     this.SUPER();
 
     var self = this;
+
       this.addClass(this.myClass())
       .add(this.slot(function(data, config, config$of, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction) {
         return self.E()
