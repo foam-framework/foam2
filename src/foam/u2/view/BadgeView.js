@@ -30,10 +30,6 @@ foam.CLASS({
 
   properties: [
     {
-        class: 'String',
-        name: 'label'
-    },
-    {
         class: 'Color',
         name: 'backgroundColor'
     },
@@ -53,7 +49,7 @@ foam.CLASS({
         })
         .start()
           .addClass(this.myClass('label'))
-          .add(this.label)
+          .add(this.data)
         .end();
     }
   ]

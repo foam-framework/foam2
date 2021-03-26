@@ -121,7 +121,7 @@ foam.CLASS({
               .start()
                 .addClass(this.myClass('badge'))
                 .add(foam.u2.view.BadgeView.create({
-                  label: cjStatus.label,
+                  data: cjStatus.label,
                   color: cjStatus.color,
                   backgroundColor: cjStatus.background
                 }))
