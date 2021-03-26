@@ -79,7 +79,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'isVisible',
       expression: function (isAvailable, choices, hideChoiceView) {
-        return isAvailable && choices.length > 0 && ( ! hideChoiceView )
+        return isAvailable && choices.length > 0 && ! hideChoiceView;
       }
     },
     {
