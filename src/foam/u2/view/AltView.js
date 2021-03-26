@@ -110,7 +110,12 @@ foam.CLASS({
       }
 
       if ( this.memento && this.memento.tail && this.memento.tail.head.length != 0 ) {
-        this.selectedView = this.memento.tail.head;
+        var viewSelectedWithMemento = this.views.find(v => foam.Array.isInstance(v) && v[1] == this.memento.tail.head)
+        if ( viewSelectedWithMemento ) {
+          this.selectedView = viewSelectedWithMemento[1];
+        } else {
+          this.memento.tail.head = '';
+        }
       } else {
         self.setMementoWithSelectedView();
       }
