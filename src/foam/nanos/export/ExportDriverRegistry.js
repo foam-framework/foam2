@@ -16,8 +16,8 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.nanos.auth.AuthService',
-    'foam.core.X'
+    'foam.core.X',
+    'foam.nanos.auth.AuthService'
   ],
 
   documentation: 'Export driver registry model',
