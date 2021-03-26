@@ -389,6 +389,22 @@ foam.CLASS({
         },
         configurable: true
       });
+      Object.defineProperty(proto, self.name + '$replace', {
+        get: function classGetter() {
+          return function (predicate, value) {
+            // Faster than splice or filter as of the time this was added
+            let arry = this[self.name];
+            for ( let i=0 ; i < arry.length ; i++ ) {
+              if ( predicate.f(arry[i]) ) {
+                arry[i] = value;
+              }
+            }
+            // Force property update
+            this.propertyChange.pub(self.name, this.slot(self.name));
+          }
+        },
+        configurable: true
+      });
       // Does not modify the original array; returns an array containing all
       //   elements that satisfy the provided predicate.
       Object.defineProperty(proto, self.name + '$filter', {
