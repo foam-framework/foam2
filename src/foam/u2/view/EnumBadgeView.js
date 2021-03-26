@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.u2.view',
-  name: 'BadgeView',
+  name: 'EnumBadgeView',
   extends: 'foam.u2.View',
 
   css: `
@@ -28,28 +28,17 @@ foam.CLASS({
 
   documentation: 'Creates badges with rounded/squared sides based on display context',
 
-  properties: [
-    {
-        class: 'Color',
-        name: 'backgroundColor'
-    },
-    {
-        class: 'Color',
-        name: 'color'
-    }
-  ],
-
   methods: [
-    function initE() {
+    function initE(data) {
       this
         .addClass(this.myClass())
         .style({
-          'background-color': this.backgroundColor,
-          'color': this.color
+          'background-color': this.data.background,
+          'color': this.data.color
         })
         .start()
           .addClass(this.myClass('label'))
-          .add(this.data)
+          .add(this.data.label)
         .end();
     }
   ]
