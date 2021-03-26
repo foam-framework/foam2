@@ -14,7 +14,7 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.u2.crunch.wizardflow.NullAgent'
+    'foam.core.NullAgent'
   ],
 
   exports: [

@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2.crunch.wizardflow',
+  package: 'foam.core',
   name: 'NullAgent',
   documentation: `
     Empty agent used to replace existing agents when removing from the sequence.
