@@ -697,3 +697,52 @@ var cols = E().
     start(Tab, {label: 'Tab 3'}).add('Even more contents in tab 3').end().
   end();
 cols.write();
+
+
+foam.CLASS({
+//  package: 'foam.u2.borders',
+  name: 'BrowserSupportBorder',
+  extends: 'foam.u2.Element',
+
+  css: `
+  ^ .browser-message {
+    margin-right: 20%;
+    float: right;
+  }
+  `,
+
+  documentation: 'Border to show browser support message',
+
+  messages: [
+    { name: 'BROWSER_SUPPORT', message: 'This application is optimized for Google Chrome'}
+  ],
+
+  methods: [
+    function init() {
+      if ( this.isChrome() ) {
+        this
+          .start()
+            .addClass(this.myClass())
+            .start('div', null, this.content$).addClass(this.myClass('content')).end()
+          .end();
+      } else {
+        this
+          .start()
+            .addClass(this.myClass())
+            .start('div', null, this.content$).addClass(this.myClass('content')).end()
+              .start('div')
+                .addClass(this.myClass("browser-message"))
+                .add(this.BROWSER_SUPPORT)
+              .end()
+          .end();
+      }
+    },
+
+    function isChrome() {
+      return navigator.userAgent.includes("Chrome") && navigator.vendor.includes("Google Inc");
+    }
+  ]
+})
+var bs = BrowserSupportBorder.create();
+bs.add("hello world");
+bs.write();
