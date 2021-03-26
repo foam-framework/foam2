@@ -14,20 +14,19 @@ foam.CLASS({
       border-radius: 11.2px
       font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 10px;
-      font-style: normal;
       font-stretch: normal;
+      font-style: normal;
       font-weight: 500;
       height: 24px;
-      line-height: 24px;
       letter-spacing: normal;
+      line-height: 24px;
       padding: 0 8px;
       text-align: center;
       width: 79px;
     }
-   
   `,
 
-  documentation: `Creates badges with rounded/squared sides based on display context`,
+  documentation: 'Creates badges with rounded/squared sides based on display context',
 
   properties: [
     {
@@ -35,11 +34,11 @@ foam.CLASS({
         name: 'label'
     },
     {
-        class: 'String',
+        class: 'Color',
         name: 'backgroundColor'
     },
     {
-        class: 'String',
+        class: 'Color',
         name: 'color'
     }
   ],

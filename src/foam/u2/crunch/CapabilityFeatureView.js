@@ -26,10 +26,10 @@ foam.CLASS({
     'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
-    'foam.u2.view.ReadOnlyEnumView',
     'foam.u2.crunch.Style',
     'foam.u2.Tooltip',
-    'foam.u2.view.BadgeView'
+    'foam.u2.view.BadgeView',
+    'foam.u2.view.ReadOnlyEnumView'
   ],
 
   documentation: `
@@ -111,7 +111,7 @@ foam.CLASS({
           })
           .add(this.slot(function(cjStatus) {
             return this.E()
-            .addClass(style.myClass('tooltip'))
+              .addClass(style.myClass('tooltip'))
               .start('span')
                 .addClass(style.myClass('tooltiptext'))
                 .addClass(style.myClass('tooltip-bottom'))
