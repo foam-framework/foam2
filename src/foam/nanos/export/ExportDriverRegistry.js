@@ -10,7 +10,7 @@ foam.CLASS({
   implements: [
     'foam.nanos.auth.EnabledAware'
   ],
-  
+
   imports:[
     'auth'
   ],
@@ -59,7 +59,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'enabled',
-      factory: function() {
+      getter: function() {
         if ( ! this.availablePermissions || this.availablePermissions.length == 0 ) {
           return true;
         }
@@ -71,7 +71,7 @@ foam.CLASS({
           return false;
         });
       },
-      javaFactory: `
+      javaGetter: `
         if ( getAvailablePermissions() == null || getAvailablePermissions().length == 0 )
           return true;
         X x = foam.core.XLocator.get();
