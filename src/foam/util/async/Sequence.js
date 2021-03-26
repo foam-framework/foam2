@@ -103,7 +103,7 @@ foam.CLASS({
     function execute() {
       let i = 0;
       let nextStep = x => {
-        if ( i >= this.contextAgentSpecs.length ) return Promise.resolve();
+        if ( i >= this.contextAgentSpecs.length ) return Promise.resolve(x);
         if ( this.halted_ ) return Promise.resolve(x);
         let seqspec = this.contextAgentSpecs[i++];
         var spec = seqspec.spec;
