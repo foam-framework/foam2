@@ -101,6 +101,13 @@ foam.CLASS({
     },
     {
       class: 'foam.u2.ViewSpec',
+      name: 'createView',
+      factory: function() {
+        return { class: 'foam.u2.detail.SectionedDetailView' };
+      }
+    },
+    {
+      class: 'foam.u2.ViewSpec',
       name: 'summaryView',
       expression: function(defaultColumns) {
         return {
