@@ -22,7 +22,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.add(this.RELOAD).br().br().start('span',{}, this.viewArea$).tag(this.view).end();
+      this./*add(this.RELOAD).br().br().*/start('span',{}, this.viewArea$).tag(this.view).end();
       this.delayedReload();
     }
   ],
@@ -47,7 +47,7 @@ foam.CLASS({
         }
       });
 
-      //this.delayedReload();
+      this.delayedReload();
     }
   ],
 
@@ -55,7 +55,7 @@ foam.CLASS({
     {
       name: 'delayedReload',
       isMerged: true,
-      mergeDelay: 2500,
+      mergeDelay: 200,
       code: function() { this.reload(); /*this.delayedReload();*/ }
     }
   ]

@@ -128,7 +128,7 @@ foam.CLASS({
     },
     {
       name: 'name',
-      factory: function() { return 'CSS-' + this.$UID; }
+      factory: function() { return 'CSS-' + Math.abs(foam.util.hashCode(this.code)); }
     },
     {
       name: 'installedDocuments_',
