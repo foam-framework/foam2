@@ -59,6 +59,18 @@ abstract class AbstractX
     return ((FacetManager)get("facetManager")).create(type, args, this);
   }
 
+  public X cd(String path) {
+    X subX = this;
+    for ( var c : path.split("\\.") ) {
+      var obj = subX.get(c);
+      if ( ! ( obj instanceof X ) ) {
+        return null;
+      }
+      subX = (X) obj;
+    }
+    return subX;
+  }
+
   public void append(StringBuilder sb) {
     sb.append("[context]");
   }

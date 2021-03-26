@@ -42,4 +42,11 @@ public interface X
   public Object getInstanceOf(Object value, Class type);
   public <T> T create(Class<T> type);
   public <T> T create(Class<T> type, Map<String, Object> args);
+
+  /**
+   * Changes/switches into its sub context.
+   * @param path Dot-separated path to a sub context eg, "foo.bar".
+   * @return A sub context if exists, otherwise returns null.
+   */
+  X cd(String path);
 }
