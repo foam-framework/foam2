@@ -76,4 +76,10 @@ public class SubX extends ProxyX {
   public X cd(String path) {
     return cd(getX(), path);
   }
+
+  public void freeze() {
+    if ( getX() instanceof ProxyX ) {
+      setX(((ProxyX) getX()).getX());
+    }
+  }
 }

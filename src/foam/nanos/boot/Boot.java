@@ -64,6 +64,8 @@ public class Boot {
     ArraySink arr = (ArraySink) serviceDAO_.select(new ArraySink());
     List      l   = perfectList(arr.getArray());
 
+    // Record all sub contexts to be frozen along with the root context
+    var subContexts = new HashSet<String>();
     for ( int i = 0 ; i < l.size() ; i++ ) {
       NSpec sp = (NSpec) l.get(i);
       if ( ! sp.getEnabled() ) {
@@ -86,6 +88,7 @@ public class Boot {
 
         if ( parent.length() > 0 ) parent.append(".");
         parent.append(contextName);
+        subContexts.add(parent.toString());
       }
 
       // Register service
@@ -126,6 +129,11 @@ public class Boot {
         return ((Subject) x.get("subject")).getRealUser();
       }
     });
+
+    // Freeze sub contexts
+    for ( var path : subContexts ) {
+      ((SubX) root_.cd(path)).freeze();
+    }
 
     // Revert root_ to non ProxyX to avoid letting children add new bindings.
     root_ = ((ProxyX) root_).getX();
