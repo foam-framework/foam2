@@ -27,8 +27,10 @@
 
   javaImports: [
     'foam.core.DirectAgency',
+    'foam.mlang.predicate.MQLExpr',
     'foam.nanos.auth.AuthorizationException',
     'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.User',
     'foam.nanos.dao.Operation',
     'foam.nanos.logger.Logger',
     'java.util.Collection'
@@ -321,7 +323,16 @@
         if ( ! getEnabled() ) return false;
 
         try {
-          return getPredicate().f(x.put("NEW", obj).put("OLD", oldObj));
+          if ( getPredicate() instanceof MQLExpr ) {
+            RulerData data = new RulerData();
+            data.setN(obj);
+            data.setO(oldObj);
+            data.setUser((User)x.get("user"));
+            data.setRealUser((User)x.get("realUser"));
+            return getPredicate().f(data);
+          } else {
+            return getPredicate().f(x.put("NEW", obj).put("OLD", oldObj));
+          }
         } catch ( Throwable t ) {
           try {
             return getPredicate().f(obj);

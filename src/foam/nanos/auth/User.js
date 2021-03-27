@@ -811,7 +811,7 @@ foam.CLASS({
         }
 
         // check for two-factor authentication
-        if ( this.getTwoFactorEnabled() && ! session.getContext().getBoolean("twoFactorSuccess") ) {
+        if ( this.getTwoFactorEnabled() && ! session.getTwoFactorSuccess() ) {
           throw new AuthenticationException("User requires two-factor authentication");
         }
 

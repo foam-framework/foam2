@@ -57,8 +57,17 @@ foam.CLASS({
               ret = spec.create(args, ctx);
             } else {
               var cls = foam.core.FObject.isSubClass(spec.class) ? spec.class : ctx.lookup(spec.class);
-              if ( ! cls ) foam.assert(false, 'ViewSpec specifies unknown class: ', spec.class);
+              if ( ! cls ) {
+                foam.assert(false, 'ViewSpec specifies unknown class: ', spec.class);
+                debugger;
+              }
               ret = cls.create(spec, ctx).copyFrom(args || {});
+            }
+
+            if ( spec.children ) {
+              for ( var i = 0 ; i < spec.children.length ; i++ ) {
+                ret.tag(spec.children[0]);
+              }
             }
 
             foam.assert(

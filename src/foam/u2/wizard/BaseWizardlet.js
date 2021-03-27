@@ -64,10 +64,11 @@ foam.CLASS({
     {
       name: 'isVisible',
       class: 'Boolean',
-      expression: function (of, isAvailable) {
-        return isAvailable && of;
+      expression: function (of, isAvailable, atLeastOneSectionVisible_) {
+        return isAvailable && of && atLeastOneSectionVisible_;
       }
     },
+    { name: 'atLeastOneSectionVisible_', class: 'Boolean', value: true },
     {
       name: 'loading',
       class: 'Boolean'
@@ -79,7 +80,7 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.u2.wizard.WizardletSection',
       factory: function () {
-        return foam.u2.detail.AbstractSectionedDetailView.create({
+        var sections = foam.u2.detail.AbstractSectionedDetailView.create({
           of: this.of,
         }, this).sections.map(section => this.WizardletSection.create({
           section: section,
@@ -88,6 +89,12 @@ foam.CLASS({
             this.data$,
           )
         }));
+        for ( let section of sections ) {
+          this.onDetach(section.isAvailable$.sub(
+            this.updateVisibilityFromSectionCount));
+        }
+        this.updateVisibilityFromSectionCount();
+        return sections;
       }
     },
     {
@@ -167,6 +174,14 @@ foam.CLASS({
           delay: 700
         }), () => ! self.loading);
       }
+    }
+  ],
+
+  listeners: [
+    function updateVisibilityFromSectionCount() {
+      if ( ! this.sections ) return;
+      this.atLeastOneSectionVisible_ = this.sections.filter(
+        v => v.isAvailable).length > 0;
     }
   ]
 });

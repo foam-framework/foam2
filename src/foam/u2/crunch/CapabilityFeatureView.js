@@ -26,8 +26,10 @@ foam.CLASS({
     'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
-    'foam.u2.view.ReadOnlyEnumView',
-    'foam.u2.crunch.Style'
+    'foam.u2.crunch.Style',
+    'foam.u2.Tooltip',
+    'foam.u2.view.EnumBadgeView',
+    'foam.u2.view.ReadOnlyEnumView'
   ],
 
   documentation: `
@@ -39,10 +41,8 @@ foam.CLASS({
       position: relative;
     }
 
-    ^ .foam-u2-crunch-Style-badge {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
+    ^badge > * {
+      border-radius: 0px 11.2px 11.2px 0px
     }
 
     ^ .foam-u2-crunch-Style-renewable-description {
@@ -110,18 +110,18 @@ foam.CLASS({
             'background-image': "url('" + self.data.icon + "')"
           })
           .add(this.slot(function(cjStatus) {
-            return this.E().addClass(style.myClass('tooltip'))
+            return this.E()
+              .addClass(style.myClass('tooltip'))
               .start('span')
                 .addClass(style.myClass('tooltiptext'))
                 .addClass(style.myClass('tooltip-bottom'))
                 .enableClass(style.myClass('tooltipDisabled'), self.tooltipEnabled, true)
                 .add(cjStatus.documentation)
               .end()
-              .add(cjStatus.label).addClass(style.myClass('badge'))
-              .style({
-                'background-color': cjStatus.background,
-                'color': cjStatus.color
-              });
+              .start()
+                .addClass(this.myClass('badge'))
+                .add(foam.u2.view.EnumBadgeView.create({ data: cjStatus }))
+              .end();
           }))
           .add(this.slot(function(isRenewable) {
             return isRenewable ? this.E()

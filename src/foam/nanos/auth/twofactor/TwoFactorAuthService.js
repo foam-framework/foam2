@@ -37,7 +37,7 @@ foam.CLASS({
 
         return user != null &&
           user.getTwoFactorEnabled() &&
-          ! session.getContext().getBoolean("twoFactorSuccess") ? false :
+          ! session.getTwoFactorSuccess() ? false :
             getDelegate().check(x , permission);
       `
     }
