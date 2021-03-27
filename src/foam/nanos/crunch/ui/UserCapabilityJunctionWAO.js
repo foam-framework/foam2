@@ -56,6 +56,7 @@ foam.CLASS({
       });
     },
     function load(wizardlet) {
+      if ( wizardlet.loading ) return;
       wizardlet.loading = true;
       let p = this.subject ? this.crunchService.getJunctionFor(
         null, wizardlet.capability.id, this.subject.user, this.subject.realUser
@@ -87,7 +88,9 @@ foam.CLASS({
       } else {
         wizardlet.data = loadedData.clone(this.__subContext__);
       }
-      wizardlet.loading = false;
+      foam.u2.wizard.Slot.blockFramed().then(() => {
+        wizardlet.loading = false;
+      });
     }
   ]
 });
