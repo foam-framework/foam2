@@ -237,7 +237,10 @@ foam.CLASS({
       background: #f6f6f6;
       margin-right: 20px;
       min-width: 400px;
-      padding: 10px;
+      padding: 6px 0;
+    }
+    ^ .selected {
+      background: #ddf;
     }
   `,
 
@@ -280,7 +283,9 @@ foam.CLASS({
             addClass(this.myClass('index')).
             select(this.data, function(e) {
               return this.E()
+                .style({padding: '4px'})
                 .add(e.id, ' ', e.title)
+                .enableClass('selected', self.selected$.map(s => s == e.id))
                 .on('mouseenter', () => { self.selected = e.id; })
                 .on('mouseleave', () => { if ( self.selected == e.id ) self.selected = null; })
                 ;
