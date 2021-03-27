@@ -313,6 +313,7 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
         subject.setUser(agent);
         subject.setUser(user);
 
+        // Support hierarchical SPID context
         var subX = rtn.cd(user.getSpid());
         if ( subX != null ) {
           rtn = subX;
