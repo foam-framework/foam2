@@ -47,8 +47,8 @@ public interface X
   X cd(String path);
 
   /**
-   * Changes/switches into its sub context.
-   * @param x starting context node
+   * Cd into a sub context.
+   * @param x Starting context
    * @param path Dot-separated path to a sub context eg, "foo.bar".
    * @return A sub context if exists, otherwise returns null.
    */
