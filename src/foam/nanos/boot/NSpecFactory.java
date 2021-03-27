@@ -58,27 +58,24 @@ public class NSpecFactory
         ns_ = service;
       }
 
-      // Check service is not a symbolic link
-      if ( ! ( ns_ instanceof X ) ) {
-        Object ns = ns_;
-        while ( ns != null ) {
-          if ( ns instanceof ContextAware ) {
-            ((ContextAware) ns).setX(x_.getX());
+      Object ns = ns_;
+      while ( ns != null ) {
+        if ( ns instanceof ContextAware && ! ( ns instanceof ProxyX ) ) {
+          ((ContextAware) ns).setX(x_.getX());
+        }
+        if ( ns instanceof NSpecAware ) {
+          if ( ((NSpecAware) ns).getNSpec() == null ) {
+            ((NSpecAware) ns).setNSpec(spec_);
           }
-          if ( ns instanceof NSpecAware ) {
-            if ( ((NSpecAware) ns).getNSpec() == null ) {
-              ((NSpecAware) ns).setNSpec(spec_);
-            }
-          }
-          if ( ns instanceof NanoService )  {
-            logger.info("Starting Service", spec_.getName());
-            ((NanoService) ns).start();
-          }
-          if ( ns instanceof ProxyDAO ) {
-            ns = ((ProxyDAO) ns).getDelegate();
-          } else {
-            ns = null;
-          }
+        }
+        if ( ns instanceof NanoService )  {
+          logger.info("Starting Service", spec_.getName());
+          ((NanoService) ns).start();
+        }
+        if ( ns instanceof ProxyDAO ) {
+          ns = ((ProxyDAO) ns).getDelegate();
+        } else {
+          ns = null;
         }
       }
       logger.info("Created Service", spec_.getName(), ns_ != null ? ns_.getClass().getSimpleName() : "null");
