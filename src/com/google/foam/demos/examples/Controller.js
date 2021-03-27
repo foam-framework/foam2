@@ -76,6 +76,10 @@ foam.CLASS({
         'foam.u2.Element'
       ],
 
+      imports: [
+        'selected'
+      ],
+
       properties: [
         'dom'
       ],
@@ -92,8 +96,11 @@ foam.CLASS({
         function initE() {
           this.SUPER();
 
+          var self = this;
+
           this.
             addClass(this.myClass()).
+            show(this.selected$.map(s => ! s || s == self.data.id)).
             style({
               width: '100%',
               xxxborder: '2px solid black',
@@ -226,10 +233,20 @@ foam.CLASS({
 
   css: `
     ^ { background: white; }
-    ^index { min-width: 400px; }
+    ^index {
+      background: #f6f6f6;
+      margin-right: 20px;
+      min-width: 400px;
+      padding: 10px;
+    }
   `,
 
+  exports: [
+    'selected'
+  ],
+
   properties: [
+    'selected',
     {
       name: 'data',
       factory: function() {
@@ -251,6 +268,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
 
+      var self = this;
       this.
         addClass(this.myClass()).
         start('h1').
@@ -261,7 +279,11 @@ foam.CLASS({
           start().
             addClass(this.myClass('index')).
             select(this.data, function(e) {
-              return this.E().add(e.id, ' ', e.title);
+              return this.E()
+                .add(e.id, ' ', e.title)
+                .on('mouseenter', () => { self.selected = e.id; })
+                .on('mouseleave', () => { if ( self.selected == e.id ) self.selected = null; })
+                ;
             }).
           end().
           start().
