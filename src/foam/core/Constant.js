@@ -57,11 +57,12 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) {
+      var value = this.value;
       Object.defineProperty(
         cls,
         foam.String.constantize(this.name),
         {
-          get: function() { return this.value }.bind(this),
+          value: value,
           configurable: false
         });
     },
