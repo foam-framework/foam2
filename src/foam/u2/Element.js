@@ -1639,6 +1639,13 @@ foam.CLASS({
     function toE() { return this; },
 
     function add_(cs, parentNode) {
+      // Common case is one String, so optimize that case.
+      if ( cs.length == 1 && typeof cs[0] === 'string' ) {
+        this.childNodes.push(this.sanitizeText(cs[0]));
+        this.onAddChildren(cs[0]);
+        return this;
+      }
+
       /* Add Children to this Element. */
       var es = [];
       var Y = this.__subSubContext__;
