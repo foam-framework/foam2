@@ -152,9 +152,9 @@ foam.CLASS({
 
     function installInClass(cls) {
       // Install myself in this Window, if not already there.
-      var oldCreate    = cls.create;
-      var axiom        = this;
-      var isFirstCSS   = ! cls.private_.hasCSS;
+      var oldCreate   = cls.create;
+      var axiom       = this;
+      var isFirstCSS  = ! cls.private_.hasCSS;
 
       if ( isFirstCSS ) cls.private_.hasCSS = true;
 
@@ -847,17 +847,6 @@ foam.CLASS({
       }
     }
   ],
-
-  css: `
-    /*
-     We hide Elements by adding this style rather than setting
-     'display: none' directly because then when we re-show the
-     Element we don't need to remember it's desired 'display' value.
-    */
-    .foam-u2-Element-hidden {
-      display: none !important;
-    }
-  `,
 
   messages: [
     {
