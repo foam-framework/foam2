@@ -254,7 +254,8 @@ foam.CLASS({
     function sanitizeText(text) {
       if ( ! text ) return text;
       text = text.toString();
-      return text.replace(/[&<"']/g, function(m) {
+      if ( text.search(/[&<"']/) == -1 ) return text;
+      return text.replace(/[&<"']/g, (m) => {
         switch ( m ) {
           case '&': return '&amp;';
           case '<': return '&lt;';
