@@ -828,7 +828,7 @@ foam.CLASS({
       name: 'NEXT_ID',
       flags: ['js'],
       value: function() {
-        return 'v' + this.__ID__[ 0 ]++;
+        return this.__ID__[ 0 ]++;
       }
     },
 
@@ -859,7 +859,6 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'String',
       name: 'id',
       transient: true,
       factory: function() { return this.NEXT_ID(); }
