@@ -340,6 +340,8 @@ foam.CLASS({
 
   documentation: 'Initial state of a newly created Element.',
 
+  axioms: [ foam.pattern.Singleton.create() ],
+
   methods: [
     function output(out) {
       this.initE();
@@ -877,9 +879,7 @@ foam.CLASS({
       topics: [],
       delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
         map(function(m) { return m.name; }),
-      factory: function() {
-        return this.INITIAL;
-      },
+      value: foam.u2.InitialElementState.create(),
       postSet: function(oldState, state) {
         if ( state === this.LOADED ) {
           this.pub('onload');
