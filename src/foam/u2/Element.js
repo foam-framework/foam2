@@ -1873,31 +1873,26 @@ foam.CLASS({
         serializing an Element hierarchy.
         Call toString() on the OutputStream to get output.
       */
-      var self = this;
-      var buf = [];
+      var buf = '';
       var Element = foam.u2.Element;
-      var Entity  = self.Entity;
+      var Entity  = this.Entity;
       var f = function templateOut(/* arguments */) {
         for ( var i = 0 ; i < arguments.length ; i++ ) {
           var o = arguments[i];
           if ( o === null || o === undefined ) {
             // NOP
           } else if ( typeof o === 'string' ) {
-            buf.push(o);
+            buf += o;
           } else if ( typeof o === 'number' ) {
-            buf.push(o);
+            buf += o;
           } else if ( Element.isInstance(o) || Entity.isInstance(o) ) {
             o.output(f);
-          } else if ( o === null || o === undefined ) {
-            buf.push(o);
           }
         }
       };
 
       f.toString = function() {
-        if ( buf.length === 0 ) return '';
-        if ( buf.length > 1 ) return buf.join('');
-        return buf[0];
+        return buf;
       };
 
       return f;
