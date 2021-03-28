@@ -1656,38 +1656,32 @@ foam.CLASS({
         // Remove null values
         if ( c === undefined || c === null ) {
           // nop
+        } else if ( c.toE ) {
+          var e = c.toE(null, Y);
+          if ( foam.core.Slot.isInstance(e) ) {
+            var v = this.slotE_(c);
+            if ( Array.isArray(v) ) {
+              for ( var j = 0 ; j < v.length ; j++ ) {
+                var u = v[j];
+                es.push(u.toE ? u.toE(null, Y) : u);
+              }
+            } else {
+              es.push(v.toE ? v.toE(null, Y) : v);
+            }
+          } else {
+            es.push(e);
+          }
         } else if ( Array.isArray(c) ) {
           for ( var j = 0 ; j < c.length ; j++ ) {
             var v = c[j];
             es.push(v.toE ? v.toE(null, Y) : v);
           }
-        } else if ( foam.core.Slot.isInstance(c) ) {
-          var v = this.slotE_(c);
-          if ( Array.isArray(v) ) {
-            for ( var j = 0 ; j < v.length ; j++ ) {
-              var u = v[j];
-              es.push(u.toE ? u.toE(null, Y) : u);
-            }
-          } else {
-            es.push(v.toE ? v.toE(null, Y) : v);
-          }
-        } else if ( c.toE ) {
-          var e = c.toE(null, Y);
-          if ( foam.core.Slot.isInstance(e) ) {
-            e = this.slotE_(e);
-          }
-          es.push(e);
         } else if ( c.then ) {
           this.add(this.PromiseSlot.create({ promise: c }));
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
-        } else if ( this.translationService && c && c.data && c.data.id ) {
-          // TODO: remove
-          var key = c.data.id + '.' + c.clsInfo;
-          console.log('DEPRECATED, use translate() instead ******************* add translate ', key, c.default);
-          var translation = this.translationService.getTranslation(foam.locale, key, c.default);
-          return this.add(translation);
         } else {
+          // String or Number
           es.push(c);
         }
       }

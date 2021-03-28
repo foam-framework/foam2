@@ -204,6 +204,10 @@ foam.CLASS({
 
     function relateFrom(other, f, fPrime) {
       return other.relateTo(this, fPrime, f);
+    },
+
+    function toE() {
+      return this;
     }
   ]
 });
