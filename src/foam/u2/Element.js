@@ -1085,35 +1085,50 @@ foam.CLASS({
     },
 
     function initKeyMap_(keyMap, cls) {
-      var count = 0;
+      var keyMap;
 
-      var as = cls.getAxiomsByClass(foam.core.Action);
+      if ( ! cls.hasOwnProperty('keyMap__') ) {
+        var count = 0;
+        keyMap = {};
 
-      for ( var i = 0 ; i < as.length ; i++ ) {
-        var a = as[i];
+        var as = cls.getAxiomsByClass(foam.core.Action);
 
-        for ( var j = 0 ; a.keyboardShortcuts && j < a.keyboardShortcuts.length ; j++, count++ ) {
-          var key = a.keyboardShortcuts[j];
+        for ( var i = 0 ; i < as.length ; i++ ) {
+          var a = as[i];
 
-          // First, lookup named codes, then convert numbers to char codes,
-          // otherwise, assume we have a single character string treated as
-          // a character to be recognized.
-          if ( this.NAMED_CODES[key] ) {
-            key = this.NAMED_CODES[key];
-          } else if ( typeof key === 'number' ) {
-            key = String.fromCharCode(key);
+          for ( var j = 0 ; a.keyboardShortcuts && j < a.keyboardShortcuts.length ; j++, count++ ) {
+            var key = a.keyboardShortcuts[j];
+
+            // First, lookup named codes, then convert numbers to char codes,
+            // otherwise, assume we have a single character string treated as
+            // a character to be recognized.
+            if ( this.NAMED_CODES[key] ) {
+              key = this.NAMED_CODES[key];
+            } else if ( typeof key === 'number' ) {
+              key = String.fromCharCode(key);
+            }
+
+            keyMap[key] = a;// .maybeCall.bind(a, this.__subContext__, this);
+            /*
+            keyMap[key] = opt_value ?
+              function() { a.maybeCall(this.__subContext__, opt_value.get()); } :
+              a.maybeCall.bind(action, self.X, self) ;
+            */
           }
-
-          keyMap[key] = a.maybeCall.bind(a, this.__subContext__, this);
-          /*
-          keyMap[key] = opt_value ?
-            function() { a.maybeCall(this.__subContext__, opt_value.get()); } :
-            a.maybeCall.bind(action, self.X, self) ;
-          */
         }
+
+        if ( count == 0 ) keyMap = null;
+
+        cls.keyMap__ = keyMap;
       }
 
-      return count;
+      if ( ! keyMap ) return null;
+
+      var map = {};
+
+      for ( var key in keyMap ) map[key] = keyMap[key].maybeCall.bind(keyMap[key], this.__subContext__, this);
+
+      return map;
     },
 
     function initTooltip() {
@@ -1126,12 +1141,10 @@ foam.CLASS({
 
     function initKeyboardShortcuts() {
       /* Initializes keyboard shortcuts. */
-      var keyMap = {}
-      var count = this.initKeyMap_(keyMap, this.cls_);
+      var keyMap = this.initKeyMap_(keyMap, this.cls_);
 
       //      if ( this.of ) count += this.initKeyMap_(keyMap, this.of);
-
-      if ( count ) {
+      if ( keyMap ) {
         this.keyMap_ = keyMap;
         var target = this.parentNode || this;
 
@@ -1609,8 +1622,8 @@ foam.CLASS({
     function start(spec, args, slot) {
       /* Create a new Element and add it as a child. Return the child. */
       var c = this.createChild_(spec, args);
-      this.add(c);
-      /*
+//      this.add(c);
+
       if ( this.content ) {
         this.content.add_(arguments, this);
       } else {
@@ -1618,7 +1631,6 @@ foam.CLASS({
         this.childNodes.push(c);
         this.onAddChildren(c);
       }
-      */
       if ( slot ) slot.set(c);
       return c;
     },
