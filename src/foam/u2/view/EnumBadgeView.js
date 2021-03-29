@@ -11,7 +11,7 @@ foam.CLASS({
 
   css: `
     ^{
-      border-radius: 11.2px
+      border-radius: 11.2px;
       font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 10px;
       font-stretch: normal;
@@ -20,7 +20,6 @@ foam.CLASS({
       height: 24px;
       letter-spacing: normal;
       line-height: 24px;
-      padding: 0 8px;
       text-align: center;
       width: 79px;
     }

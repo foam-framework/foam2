@@ -130,19 +130,18 @@ foam.CLASS({
   name: 'EnumTableCellFormatterRefinement',
   refines: 'foam.core.Enum',
 
+  requires: ['foam.u2.view.ReadOnlyEnumView'],
+
   properties: [
     {
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(value) {
         if ( value ) {
-          this.start().
-            addClasses(value.classes()).
-            style(value.toStyle()).
-            add(value.label).
-          end();
-        }
-        else {
+          this
+            .start(foam.u2.view.ReadOnlyEnumView, { data: value })
+            .end();
+        } else {
           this.start().
             add('-').
           end();

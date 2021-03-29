@@ -9,15 +9,17 @@ foam.CLASS({
   name: 'ReadOnlyEnumView',
   extends: 'foam.u2.View',
 
+  requires: ['foam.u2.view.EnumBadgeView'],
+
   documentation: 'A read-only view for foam.core.Enum properties.',
 
   methods: [
     function initE() {
       this.SUPER();
 
-      this.add(this.slot((data) => {
+      this.add(this.slot(data => {
         if ( ! data ) return '';
-        return this.E().addClasses(data.classes()).style(data.toStyle()).add(data.label);
+        return this.E().add(foam.u2.view.EnumBadgeView.create({ data: data }));
       }));
     }
   ]
