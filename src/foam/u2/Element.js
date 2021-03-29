@@ -375,7 +375,7 @@ foam.CLASS({
     function load() {
       if ( this.hasOwnProperty('elListeners') ) {
         var ls = this.elListeners;
-        for ( var i = 0 ; i < ls.length ; i+=2 ) {
+        for ( var i = 0 ; i < ls.length ; i += 2 ) {
           this.addEventListener_(ls[i], ls[i+1]);
         }
       }
