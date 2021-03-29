@@ -223,6 +223,10 @@ foam.CLASS({
       label: '',
       toolTip: 'Export Table Data',
       icon: 'images/export-arrow-icon.svg',
+      isAvailable: async function() {
+        var records = await this.__subContext__.exportDriverRegistryDAO.select();
+        return records && records.array && records.array.length != 0;
+      },
       code: function() {
         this.add(this.Popup.create().tag({
           class: 'foam.u2.ExportModal',
