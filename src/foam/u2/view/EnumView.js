@@ -19,7 +19,7 @@ foam.CLASS({
   properties: [
     {
       name: 'readView',
-      value: { class: 'foam.u2.view.ReadOnlyEnumView' }
+      value: { class: 'foam.u2.view.EnumBadgeView' }
     },
     {
       name: 'writeView',

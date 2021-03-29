@@ -29,7 +29,7 @@ foam.CLASS({
     'foam.u2.crunch.Style',
     'foam.u2.Tooltip',
     'foam.u2.view.EnumBadgeView',
-    'foam.u2.view.ReadOnlyEnumView'
+    'foam.u2.view.EnumBadgeView'
   ],
 
   documentation: `

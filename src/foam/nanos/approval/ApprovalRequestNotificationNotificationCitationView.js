@@ -38,7 +38,7 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.approval.ApprovalStatus',
       view: {
-        class: 'foam.u2.view.ReadOnlyEnumView'
+        class: 'foam.u2.view.EnumBadgeView'
       }
     },
     {
@@ -89,7 +89,7 @@ foam.CLASS({
           .start().addClass('status')
             .hide(this.hideStatus$)
             .start({
-              class: 'foam.u2.view.ReadOnlyEnumView',
+              class: 'foam.u2.view.EnumBadgeView',
               data$: this.status$
             })
             .end()

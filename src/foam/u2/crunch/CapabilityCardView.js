@@ -18,7 +18,7 @@ foam.CLASS({
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.u2.crunch.Style',
     'foam.u2.Element',
-    'foam.u2.view.ReadOnlyEnumView'
+    'foam.u2.view.EnumBadgeView'
   ],
 
   css: `
