@@ -391,6 +391,11 @@ foam.CLASS({
     {
       class: 'Function',
       name: 'onClickAddOn'
+    },
+    {
+      class: 'String',
+      name: 'rowView',
+      factory: () => { return 'foam.u2.view.TreeViewRow'; }
     }
   ],
 
@@ -404,6 +409,7 @@ foam.CLASS({
         M.EQ(of.getAxiomByName(this.relationship.inverseName), this.theme.navigationRootMenu));
       var self = this;
       var isFirstSet = false;
+      var rowCls = foam.lookup(this.rowView);
 
       this.addClass(this.myClass()).
         select(dao, function(obj) {
@@ -411,7 +417,8 @@ foam.CLASS({
             self.selection = obj;
             isFirstSet = true;
           }
-          return self.TreeViewRow.create({
+
+          return rowCls.create({
             data:         obj,
             relationship: self.relationship,
             expanded:     self.startExpanded,
