@@ -1622,8 +1622,9 @@ foam.CLASS({
     function start(spec, args, slot) {
       /* Create a new Element and add it as a child. Return the child. */
       var c = this.createChild_(spec, args);
-      //this.add(c);
+      this.add(c);
 
+/*
       if ( this.content ) {
         this.add(c);
       } else {
@@ -1631,6 +1632,7 @@ foam.CLASS({
         this.childNodes.push(c);
         this.onAddChildren(c);
       }
+      */
 
       if ( slot ) slot.set(c);
       return c;

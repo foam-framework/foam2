@@ -124,6 +124,7 @@ foam.CLASS({
 
   imports: [
     'ctrl',
+    'exportDriverRegistryDAO',
     'memento',
     'stack?'
   ],
@@ -223,6 +224,10 @@ foam.CLASS({
       label: '',
       toolTip: 'Export Table Data',
       icon: 'images/export-arrow-icon.svg',
+      isAvailable: async function() {
+        var records = await this.exportDriverRegistryDAO.select();
+        return records && records.array && records.array.length != 0;
+      },
       code: function() {
         this.add(this.Popup.create().tag({
           class: 'foam.u2.ExportModal',
@@ -279,33 +284,33 @@ foam.CLASS({
         this.memento.tail = foam.nanos.controller.Memento.create({});
       }
 
-      if ( self.config.searchMode === self.SearchMode.SIMPLE ) {
-        simpleSearch = foam.u2.ViewSpec.createView(self.SimpleSearch, {
-          showCount: false,
-          data$: self.searchPredicate$,
-        }, self, self.__subSubContext__.createSubContext({ memento: this.memento }));
-
-        filterView = foam.u2.ViewSpec.createView(self.FilterView, {
-          dao$: self.searchFilterDAO$,
-          data$: self.searchPredicate$
-        }, self, simpleSearch.__subContext__.createSubContext());
-      } else {
-        filterView = foam.u2.ViewSpec.createView(self.FilterView, {
-          dao$: self.searchFilterDAO$,
-          data$: self.searchPredicate$
-        }, self, self.__subContext__.createSubContext({ memento: this.memento }));
-      }
-
-      var summaryView = foam.u2.ViewSpec.createView(self.summaryView ,{
-        data: self.predicatedDAO$proxy,
-        config: self.config
-      },  filterView, filterView.__subContext__);
-
       this.addClass(this.myClass());
       this.SUPER();
 
       this
         .add(this.slot(function(config$cannedQueries, config$hideQueryBar, searchFilterDAO) {
+          if ( self.config.searchMode === self.SearchMode.SIMPLE ) {
+            var simpleSearch = foam.u2.ViewSpec.createView(self.SimpleSearch, {
+              showCount: false,
+              data$: self.searchPredicate$,
+            }, this, self.__subSubContext__.createSubContext({ memento: self.memento }));
+    
+            var filterView = foam.u2.ViewSpec.createView(self.FilterView, {
+              dao$: self.searchFilterDAO$,
+              data$: self.searchPredicate$
+            }, this, simpleSearch.__subContext__.createSubContext());
+          } else {
+            var filterView = foam.u2.ViewSpec.createView(self.FilterView, {
+              dao$: self.searchFilterDAO$,
+              data$: self.searchPredicate$
+            }, this, self.__subContext__.createSubContext({ memento: self.memento }));
+          }
+
+          summaryView = foam.u2.ViewSpec.createView(self.summaryView ,{
+            data: self.predicatedDAO$proxy,
+            config: self.config
+          },  this, filterView.__subContext__.createSubContext());
+          
           return self.E()
             .start(self.Rows)
               .callIf(config$cannedQueries.length >= 1, function() {
@@ -333,7 +338,7 @@ foam.CLASS({
                       controllerMode: foam.u2.ControllerMode.EDIT
                     })
                       .callIf(self.config.searchMode === self.SearchMode.SIMPLE, function() {
-                        this.tag(simpleSearch);
+                        this.add(simpleSearch);
                       })
                       .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
                         this.add(filterView);
