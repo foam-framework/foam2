@@ -821,7 +821,7 @@ foam.CLASS({
 
     {
       name: '__ID__',
-      value: [ 0 ]
+      value: [ 1 ]
     },
 
     {
@@ -859,6 +859,8 @@ foam.CLASS({
 
   properties: [
     {
+      // TODO: class is needed to fix the Java build, but this shouldn't be building for Java anyway.
+      class: 'Object',
       name: 'id',
       transient: true,
       factory: function() { return this.NEXT_ID(); }
