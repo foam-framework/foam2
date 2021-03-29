@@ -31,6 +31,15 @@
       class: 'FObjectProperty',
       name: 'realUser',
       documentation: 'realUser in the current context'
+    },
+    {
+      class: 'String',
+      name: 'spid',
+      documentation: 'spid in the current context'
+    },
+    {
+      class: 'DateTime',
+      name: 'dateTime'
     }
   ]
 });

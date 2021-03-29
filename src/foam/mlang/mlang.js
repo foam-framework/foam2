@@ -3981,7 +3981,8 @@ foam.CLASS({
       type: 'Predicate',
       code: function(model) {
         var qp = foam.parse.QueryParser.create({of: model.id});
-        return qp.parseString(this.query) || foam.mlang.predicate.False.create();
+        var pred = qp.parseString(this.query);
+        return pred ? pred.partialEval() : foam.mlang.predicate.False.create();
       },
       javaCode: `
         QueryParser parser = new QueryParser(model);
@@ -3993,7 +3994,7 @@ foam.CLASS({
         if (ps == null)
           return new False();
 
-        return (foam.mlang.predicate.Nary) ps.value();
+        return ((foam.mlang.predicate.Nary) ps.value()).partialEval();
       `
     },
     function toString() {
