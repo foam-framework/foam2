@@ -1704,7 +1704,7 @@ return false
         var value = this.arg2;
         if ( this.Constant.isInstance(this.arg2) ) value = this.arg2.value;
 
-        if ( ! value || value === 0 )
+        if ( ! value )
           return this.FALSE;
 
         if ( foam.Array.isInstance(value) && value.length == 1 ) return this.Eq.create({
