@@ -326,6 +326,28 @@ foam.CLASS({
                   .end();
               })
               .callIf( ! config$hideQueryBar, function() {
+                if ( self.config.searchMode === self.SearchMode.SIMPLE ) {
+                  simpleSearch = foam.u2.ViewSpec.createView(self.SimpleSearch, {
+                    showCount: false,
+                    data$: self.searchPredicate$,
+                  }, this, self.__subSubContext__.createSubContext({ memento: self.memento }));
+          
+                  filterView = foam.u2.ViewSpec.createView(self.FilterView, {
+                    dao$: self.searchFilterDAO$,
+                    data$: self.searchPredicate$
+                  }, this, simpleSearch.__subContext__.createSubContext());
+                } else {
+                  filterView = foam.u2.ViewSpec.createView(self.FilterView, {
+                    dao$: self.searchFilterDAO$,
+                    data$: self.searchPredicate$
+                  }, this, self.__subContext__.createSubContext({ memento: self.memento }));
+                }
+
+                summaryView = foam.u2.ViewSpec.createView(self.summaryView ,{
+                  data: self.predicatedDAO$proxy,
+                  config: self.config
+                },  this, filterView.__subContext__.createSubContext());
+
                 this
                   .start(self.Cols).addClass(self.myClass('query-bar'))
                     .startContext({
@@ -333,7 +355,7 @@ foam.CLASS({
                       controllerMode: foam.u2.ControllerMode.EDIT
                     })
                       .callIf(self.config.searchMode === self.SearchMode.SIMPLE, function() {
-                        this.tag(simpleSearch);
+                        this.add(simpleSearch);
                       })
                       .callIf(self.config.searchMode === self.SearchMode.FULL, function() {
                         this.add(filterView);
