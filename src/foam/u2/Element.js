@@ -1610,6 +1610,15 @@ foam.CLASS({
       /* Create a new Element and add it as a child. Return the child. */
       var c = this.createChild_(spec, args);
       this.add(c);
+      /*
+      if ( this.content ) {
+        this.content.add_(arguments, this);
+      } else {
+        c.parentNode = this;
+        this.childNodes.push(c);
+        this.onAddChildren(c);
+      }
+      */
       if ( slot ) slot.set(c);
       return c;
     },
