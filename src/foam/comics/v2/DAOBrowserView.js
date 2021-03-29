@@ -289,6 +289,28 @@ foam.CLASS({
 
       this
         .add(this.slot(function(config$cannedQueries, config$hideQueryBar, searchFilterDAO) {
+          if ( self.config.searchMode === self.SearchMode.SIMPLE ) {
+            var simpleSearch = foam.u2.ViewSpec.createView(self.SimpleSearch, {
+              showCount: false,
+              data$: self.searchPredicate$,
+            }, this, self.__subSubContext__.createSubContext({ memento: self.memento }));
+    
+            var filterView = foam.u2.ViewSpec.createView(self.FilterView, {
+              dao$: self.searchFilterDAO$,
+              data$: self.searchPredicate$
+            }, this, simpleSearch.__subContext__.createSubContext());
+          } else {
+            var filterView = foam.u2.ViewSpec.createView(self.FilterView, {
+              dao$: self.searchFilterDAO$,
+              data$: self.searchPredicate$
+            }, this, self.__subContext__.createSubContext({ memento: self.memento }));
+          }
+
+          summaryView = foam.u2.ViewSpec.createView(self.summaryView ,{
+            data: self.predicatedDAO$proxy,
+            config: self.config
+          },  this, filterView.__subContext__.createSubContext());
+          
           return self.E()
             .start(self.Rows)
               .callIf(config$cannedQueries.length >= 1, function() {
@@ -309,28 +331,6 @@ foam.CLASS({
                   .end();
               })
               .callIf( ! config$hideQueryBar, function() {
-                if ( self.config.searchMode === self.SearchMode.SIMPLE ) {
-                  var simpleSearch = foam.u2.ViewSpec.createView(self.SimpleSearch, {
-                    showCount: false,
-                    data$: self.searchPredicate$,
-                  }, this, self.__subSubContext__.createSubContext({ memento: self.memento }));
-          
-                  var filterView = foam.u2.ViewSpec.createView(self.FilterView, {
-                    dao$: self.searchFilterDAO$,
-                    data$: self.searchPredicate$
-                  }, this, simpleSearch.__subContext__.createSubContext());
-                } else {
-                  var filterView = foam.u2.ViewSpec.createView(self.FilterView, {
-                    dao$: self.searchFilterDAO$,
-                    data$: self.searchPredicate$
-                  }, this, self.__subContext__.createSubContext({ memento: self.memento }));
-                }
-
-                summaryView = foam.u2.ViewSpec.createView(self.summaryView ,{
-                  data: self.predicatedDAO$proxy,
-                  config: self.config
-                },  this, filterView.__subContext__.createSubContext());
-
                 this
                   .start(self.Cols).addClass(self.myClass('query-bar'))
                     .startContext({
