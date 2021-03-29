@@ -1701,10 +1701,18 @@ return false
     {
       name: 'partialEval',
       code: function partialEval() {
-        if ( ! this.Constant.isInstance(this.arg2) ) return this;
+        var value = this.arg2;
+        if ( this.Constant.isInstance(this.arg2) ) value = this.arg2.value;
 
-        return ( ! this.arg2.value ) || this.arg2.value.length === 0 ?
-            this.FALSE : this;
+        if ( ! value )
+          return this.FALSE;
+
+        if ( foam.Array.isInstance(value) && value.length == 1 ) return this.Eq.create({
+          arg1: this.arg1,
+          arg2: value[0]
+        });
+
+        return this;
       },
       javaCode: `
         if ( getArg2() instanceof ArrayBinary || getArg2() instanceof Constant ) {

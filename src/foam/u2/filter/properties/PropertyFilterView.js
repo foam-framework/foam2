@@ -174,9 +174,9 @@ foam.CLASS({
     
     function getPredicateFromMemento() {
       if ( this.memento && this.memento.head.length > 0 ) {
-        var predicate = this.queryParser.parseString(this.property.name + '=' + this.memento.head);
+        var predicate = this.queryParser.parseString(this.memento.head);
         if ( predicate ) {
-          return predicate;
+          return predicate.partialEval();
         }
       }
     }
@@ -225,8 +225,7 @@ foam.CLASS({
           pred =  this.view_.predicate.toMQL && this.view_.predicate.toMQL();
 
         if ( pred ) {
-          var split = pred.split('=');
-          this.memento.head = split.length == 2 ? split[1] : '';
+          this.memento.head = pred ? pred : '';
         } else {
           this.memento.head = '';
         }
