@@ -885,7 +885,7 @@ foam.CLASS({
       topics: [],
       delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
         map(function(m) { return m.name; }),
-      value: foam.u2.InitialElementState.create(),
+      factory: function() { return this.INITIAL; },
       postSet: function(oldState, state) {
         if ( state === this.LOADED ) {
           this.pub('onload');
@@ -1623,7 +1623,6 @@ foam.CLASS({
       /* Create a new Element and add it as a child. Return the child. */
       var c = this.createChild_(spec, args);
 //      this.add(c);
-
       if ( this.content ) {
         this.content.add_(arguments, this);
       } else {
@@ -1631,6 +1630,7 @@ foam.CLASS({
         this.childNodes.push(c);
         this.onAddChildren(c);
       }
+
       if ( slot ) slot.set(c);
       return c;
     },
