@@ -131,11 +131,6 @@ foam.CLASS({
       factory: function() { return 'CSS-' + Math.abs(foam.util.hashCode(this.code)); }
     },
     {
-      name: 'installedDocuments_',
-      factory: function() { return {}; },
-      transient: true
-    },
-    {
       class: 'Boolean',
       name: 'expands_',
       documentation: 'True iff the CSS contains a ^ which needs to be expanded.',
@@ -146,8 +141,22 @@ foam.CLASS({
   ],
 
   methods: [
-    function asKey(document, cls) {
-      return this.expands_ ? document.$UID + '.' + cls.id : document.$UID;
+    function maybeInstallInDocument(X, cls) {
+      var document = X.document;
+      if ( ! document ) return;
+      var installedStyles = document.installedStyles || ( document.installedStyles = {} );
+      if ( this.expands_ ) {
+        var map = installedStyles[this.$UID] || (installedStyles[this.$UID] = {});
+        if ( ! map[cls.id] ) {
+          map[cls.id] = true;
+          X.installCSS(this.expandCSS(cls, this.code), cls.id);
+        }
+      } else {
+        if ( ! installedStyles[this.$UID] ) {
+          installedStyles[this.$UID] = true;
+          X.installCSS(this.expandCSS(cls, this.code), cls.id);
+        }
+      }
     },
 
     function installInClass(cls) {
@@ -173,11 +182,7 @@ foam.CLASS({
 
         if ( ! lastClassToInstallCSSFor || lastClassToInstallCSSFor == cls ) {
           // Install CSS if not already installed in this document for this cls
-          var key = axiom.asKey(X.document, this);
-          if ( X.document && ! axiom.installedDocuments_[key] ) {
-            X.installCSS(axiom.expandCSS(this, axiom.code), this.id);
-            axiom.installedDocuments_[key] = true;
-          }
+          axiom.maybeInstallInDocument(X, this);
         }
 
         if ( ! lastClassToInstallCSSFor && ! this.model_.inheritCSS ) {
@@ -1141,6 +1146,7 @@ foam.CLASS({
 
     function el() {
       /* Return this Element's real DOM element, if loaded. */
+      // Caching this call doesn't appear to help performance.
       return this.getElementById(this.id);
     },
 
