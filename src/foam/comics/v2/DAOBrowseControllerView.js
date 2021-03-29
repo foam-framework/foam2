@@ -150,7 +150,7 @@ foam.CLASS({
                 .start(self.Cols)
                   .start()
                     .addClass(self.myClass('browse-title'))
-                    .translate(config$of.id + ".model_.plural", config$of.name)
+                    .translate(config$of.id + ".model_.plural", config$browseTitle)
                   .end()
                   .startContext({ data: self }).tag(self.CREATE).endContext()
                   .callIf(config$primaryAction, function() {
@@ -162,7 +162,7 @@ foam.CLASS({
                     .start()
                       .addClass(self.myClass('browse-subtitle'))
                       .translate(self.cls_.id + '.VIEW_ALL', self.VIEW_ALL)
-                      .translate(config$of.id + ".model_.plural", config$of.name)
+                      .translate(config$of.id + ".model_.plural", config$browseSubtitle)
                     .end();
                 })
               .end()
