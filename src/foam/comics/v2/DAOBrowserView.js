@@ -124,6 +124,7 @@ foam.CLASS({
 
   imports: [
     'ctrl',
+    'exportDriverRegistryDAO',
     'memento',
     'stack?'
   ],
@@ -224,7 +225,7 @@ foam.CLASS({
       toolTip: 'Export Table Data',
       icon: 'images/export-arrow-icon.svg',
       isAvailable: async function() {
-        var records = await this.__subContext__.exportDriverRegistryDAO.select();
+        var records = await this.exportDriverRegistryDAO.select();
         return records && records.array && records.array.length != 0;
       },
       code: function() {
