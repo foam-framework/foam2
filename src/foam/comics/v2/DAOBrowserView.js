@@ -279,28 +279,6 @@ foam.CLASS({
         this.memento.tail = foam.nanos.controller.Memento.create({});
       }
 
-      if ( self.config.searchMode === self.SearchMode.SIMPLE ) {
-        simpleSearch = foam.u2.ViewSpec.createView(self.SimpleSearch, {
-          showCount: false,
-          data$: self.searchPredicate$,
-        }, self, self.__subSubContext__.createSubContext({ memento: this.memento }));
-
-        filterView = foam.u2.ViewSpec.createView(self.FilterView, {
-          dao$: self.searchFilterDAO$,
-          data$: self.searchPredicate$
-        }, self, simpleSearch.__subContext__.createSubContext());
-      } else {
-        filterView = foam.u2.ViewSpec.createView(self.FilterView, {
-          dao$: self.searchFilterDAO$,
-          data$: self.searchPredicate$
-        }, self, self.__subContext__.createSubContext({ memento: this.memento }));
-      }
-
-      var summaryView = foam.u2.ViewSpec.createView(self.summaryView ,{
-        data: self.predicatedDAO$proxy,
-        config: self.config
-      },  filterView, filterView.__subContext__);
-
       this.addClass(this.myClass());
       this.SUPER();
 
@@ -327,17 +305,17 @@ foam.CLASS({
               })
               .callIf( ! config$hideQueryBar, function() {
                 if ( self.config.searchMode === self.SearchMode.SIMPLE ) {
-                  simpleSearch = foam.u2.ViewSpec.createView(self.SimpleSearch, {
+                  var simpleSearch = foam.u2.ViewSpec.createView(self.SimpleSearch, {
                     showCount: false,
                     data$: self.searchPredicate$,
                   }, this, self.__subSubContext__.createSubContext({ memento: self.memento }));
           
-                  filterView = foam.u2.ViewSpec.createView(self.FilterView, {
+                  var filterView = foam.u2.ViewSpec.createView(self.FilterView, {
                     dao$: self.searchFilterDAO$,
                     data$: self.searchPredicate$
                   }, this, simpleSearch.__subContext__.createSubContext());
                 } else {
-                  filterView = foam.u2.ViewSpec.createView(self.FilterView, {
+                  var filterView = foam.u2.ViewSpec.createView(self.FilterView, {
                     dao$: self.searchFilterDAO$,
                     data$: self.searchPredicate$
                   }, this, self.__subContext__.createSubContext({ memento: self.memento }));
