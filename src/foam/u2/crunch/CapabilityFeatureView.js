@@ -133,7 +133,7 @@ foam.CLASS({
         .end()
         .start()
           .addClass(style.myClass('card-title'))
-          .add(( self.data.name != '') ?  { data : self.data, clsInfo : self.data.cls_.NAME.name, default : self.data.name }  : self.data.id)
+          .translate(self.data.id + '.' + self.data.cls_.NAME.name, self.data.name)
         .end();
     }
   ],
