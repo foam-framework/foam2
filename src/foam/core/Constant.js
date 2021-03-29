@@ -49,7 +49,7 @@ foam.CLASS({
       name: 'value',
       expression: function(factory) {
         return factory ? factory() : null;
-      },
+      }
     },
     'factory',
     'documentation'
@@ -57,14 +57,23 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) {
-      var value = this.value;
-      Object.defineProperty(
-        cls,
-        foam.String.constantize(this.name),
-        {
-          value: value,
-          configurable: false
-        });
+      if ( this.hasOwnProperty('factory') ) {
+        Object.defineProperty(
+          cls,
+          foam.String.constantize(this.name),
+          {
+            value: this.value,
+            configurable: false
+          });
+      } else {
+        Object.defineProperty(
+          cls,
+          foam.String.constantize(this.name),
+          {
+            get: () => this.value,
+            configurable: false
+          });
+      }
     },
     function installInProto(proto) {
       this.installInClass(proto);
