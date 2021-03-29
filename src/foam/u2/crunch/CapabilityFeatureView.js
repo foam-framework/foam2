@@ -140,8 +140,6 @@ foam.CLASS({
   listeners: [
     {
       name: 'daoUpdate',
-      isMerged: true,
-      mergeDelay: 2000,
       code: function() {
         // This code looks hardcorded - why aren't the statuses being set and shown using ucj data status?
         this.crunchService.getJunction(null, this.data.id).then(ucj => {
