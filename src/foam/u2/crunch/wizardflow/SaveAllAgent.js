@@ -17,10 +17,6 @@ foam.CLASS({
     'wizardlets',
     'rootCapability'
   ],
-
-  implements: [
-    'foam.core.ContextAgent'
-  ],
   
   properties: [
     {
