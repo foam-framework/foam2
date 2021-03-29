@@ -65,9 +65,7 @@ foam.CLASS({
         Stores the status of the capability feature and is updated when the user
         attempts to fill out or complete the CRUNCH forms.
       `,
-      factory: function() {
-        return foam.nanos.crunch.CapabilityJunctionStatus.AVAILABLE;
-      }
+      value: null
     },
     {
       class: 'Boolean',
@@ -110,6 +108,7 @@ foam.CLASS({
             'background-image': "url('" + self.data.icon + "')"
           })
           .add(this.slot(function(cjStatus) {
+            if ( ! cjStatus ) return;
             return this.E()
               .addClass(style.myClass('tooltip'))
               .start('span')
@@ -141,8 +140,6 @@ foam.CLASS({
   listeners: [
     {
       name: 'daoUpdate',
-      isMerged: true,
-      mergeDelay: 2000,
       code: function() {
         // This code looks hardcorded - why aren't the statuses being set and shown using ucj data status?
         this.crunchService.getJunction(null, this.data.id).then(ucj => {
@@ -186,7 +183,7 @@ foam.CLASS({
     {
       name: 'statusUpdate',
       isMerged: true,
-      mergeDelay: 2000,
+      mergeDelay: 100,
       code: function() {
         if ( this.cjStatus != this.CapabilityJunctionStatus.PENDING &&
               this.cjStatus != this.CapabilityJunctionStatus.PENDING_REVIEW ) {
