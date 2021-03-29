@@ -36,10 +36,7 @@ foam.CLASS({
     {
       name: 'status',
       class: 'Enum',
-      of: 'foam.nanos.approval.ApprovalStatus',
-      view: {
-        class: 'foam.u2.view.EnumBadgeView'
-      }
+      of: 'foam.nanos.approval.ApprovalStatus'
     },
     {
       name: 'hideStatus',
@@ -60,14 +57,14 @@ foam.CLASS({
   methods: [
     function initE() {
       //this.SUPER();
-
       this.description = this.data.body;
       if ( this.description !== '' && this.description.length > 70 ) {
         this.description = this.description.substr(0, 70-1) + '...';
       }
-
+      console.log(this.controllerMode);
       this
         .addClass(this.myClass())
+        .startContext({ mode: foam.u2.DisplayMode.RO, controllerMode: foam.u2.ControllerMode.VIEW })
         .start()
           // .start().addClass('monogram')
           //   .add(this.monogram)
@@ -88,17 +85,14 @@ foam.CLASS({
           .end()
           .start().addClass('status')
             .hide(this.hideStatus$)
-            .start({
-              class: 'foam.u2.view.EnumBadgeView',
-              data$: this.status$
-            })
-            .end()
+            .add(this.STATUS)
           .end()
           // TODO: Enable when memento support and ability to jump to detail view
           // .start().addClass('viewMore')
           //   .add(this.VIEW_MORE)
           // .end()
-        .end();
+        .end()
+        .endContext();
 
       var self = this;
       this.approvalRequestDAO.find(this.data.approvalRequest).then(function(approval) {
