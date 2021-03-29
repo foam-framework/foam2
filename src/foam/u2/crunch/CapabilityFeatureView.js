@@ -41,7 +41,9 @@ foam.CLASS({
     }
 
     ^badge > * {
-      border-radius: 0px 11.2px 11.2px 0px !important
+      border-radius: 0px 11.2px 11.2px 0px !important;
+      height: 24px;
+      width: 79px;
     }
 
     ^ .foam-u2-crunch-Style-renewable-description {
