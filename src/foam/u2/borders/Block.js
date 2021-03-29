@@ -9,6 +9,11 @@ foam.CLASS({
   name: 'Block',
   extends: 'foam.u2.Element',
 
+  documentation: `
+    A vertical line and padding to the left of its contents.
+    This looks similar to a block quote, but can also group data within cards.
+  `,
+
   css: `
     ^ {
       border-left: 4px solid /*%GREY4%*/ #e7eaec;
