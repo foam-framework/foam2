@@ -288,42 +288,17 @@ foam.CLASS({
     function initE() {
       var self = this;
 
-      if ( this.memento ) {
-        var m = this.memento;
-        //i + 1 as there is a textSearch that we also need for memento
-        for ( var i = 0 ; i < this.filters.length + 1 ; i++ ) {
-          if ( ! m ) {
-            m = foam.nanos.controller.Memento.create({ value: '', parent: this.memento });
-            this.memento.tail = m;
-          } else {
-            if ( ! m.tail )
-              m.tail = foam.nanos.controller.Memento.create({ value: '', parent: m });
-            m = m.tail;
-          }
-        }
-        this.currentMemento_ = this.memento.tail;
-      }
-
-      if ( this.currentMemento_ && this.currentMemento_.tail ) {
-        var m = this.memento;
-        var counter = 0;
-
-        while ( counter < this.filters.length &&  m != null ) {
-          m = m.tail;
-
-          counter++;
-
-          if ( ! m || m.head.length == 0 )
-            continue;
-        }
-      }
-
+      var counter = 0;
+      this.updateCurrentMemento(counter);
+      //memento which will be exported to table view
       if ( self.currentMemento_ ) self.currentMemento_ = self.currentMemento_.tail;
       
       this.onDetach(this.filterController$.dot('isAdvanced').sub(this.isAdvancedChanged));
       var selectedLabel = ctrl.__subContext__.translationService.getTranslation(foam.locale, 'foam.u2.filter.FilterView.SELECTED', this.SELECTED);
       this.addClass(self.myClass())
         .add(this.slot(function(filters) {
+
+          self.updateCurrentMemento.bind(self)(counter);
 
           self.generalSearchField = foam.u2.ViewSpec.createView(self.TextSearchView, {
             richSearch: true,
@@ -334,6 +309,8 @@ foam.CLASS({
               placeholder: this.LABEL_SEARCH
             }
           },  this, self.__subSubContext__.createSubContext({ memento: self.currentMemento_ }));
+
+          if ( self.currentMemento_ ) self.currentMemento_ = self.currentMemento_.tail;
 
           self.show(filters.length);
 
@@ -496,6 +473,38 @@ foam.CLASS({
         } else {
           this.generalSearchField.data = '';
           this.generalSearchField.mode = foam.u2.DisplayMode.DISABLED;
+        }
+      }
+    },
+
+    function updateCurrentMemento(counter) {
+      if ( this.memento ) {
+        var m = this.memento;
+        //i + 1 as there is a textSearch that we also need for memento
+        for ( var i = 0 ; i < this.filters.length + 1 ; i++ ) {
+          if ( ! m ) {
+            m = foam.nanos.controller.Memento.create({ value: '', parent: this.memento });
+            this.memento.tail = m;
+          } else {
+            if ( ! m.tail )
+              m.tail = foam.nanos.controller.Memento.create({ value: '', parent: m });
+            m = m.tail;
+          }
+        }
+        this.currentMemento_ = this.memento.tail;
+      }
+
+      if ( this.currentMemento_ && this.currentMemento_.tail ) {
+        var m = this.memento;
+        counter = 0;
+
+        while ( counter < this.filters.length &&  m != null ) {
+          m = m.tail;
+
+          counter++;
+
+          if ( ! m || m.head.length == 0 )
+            continue;
         }
       }
     }
