@@ -211,7 +211,7 @@ foam.CLASS({
     },
     function installCSS(text, id, opt_eid) {
       /* Create a new <style> tag containing the given CSS code. */
-      this.document && this.document.head.insertAdjacentHTML(
+      this.document && this.document.head && this.document.head.insertAdjacentHTML(
         'beforeend',
         '<style id="' + opt_eid + '" owner="' + id + '">' + text + '</style>');
     }
