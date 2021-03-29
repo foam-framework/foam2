@@ -263,7 +263,6 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
       .setAuthorize(true)
-      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("exportDriverRegistry"))
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("exportDriverRegistrys")
       .setDecorator(new foam.dao.EnabledAwareDAO.Builder(x).setOf(foam.nanos.export.ExportDriverRegistry.getOwnClassInfo()).build())

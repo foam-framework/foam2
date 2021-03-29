@@ -524,6 +524,18 @@ foam.CLASS({
       value: 'Dragon.png'
     },
     {
+      class: 'Image',
+      name: 'dualImageView',
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          'foam.u2.TextField',
+          'foam.u2.view.ImageView'
+        ]
+      },
+      value: 'Dragon.png'
+    },
+    {
       class: 'URL',
       name: 'defaultURL'
     },

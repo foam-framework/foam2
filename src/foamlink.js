@@ -11,6 +11,7 @@ IGNORE('lib/dao_test.js');
 IGNORE('com/google/net/proto_gen.js');
 IGNORE('com/google/foam/demos/tabata/main.js');
 IGNORE('com/google/foam/experimental/Promise_test.js');
+IGNORE('com/google/foam/demos/examples/bench.js');
 
 // these files depend on global objects and should not be loaded by foamlink
 IGNORE('com/google/foam/demos/u2');
