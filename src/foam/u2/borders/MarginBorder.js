@@ -9,25 +9,19 @@ foam.CLASS({
   name: 'MarginBorder',
   extends: 'foam.u2.Element',
 
-  documentation: `
-    A border which adds equal margin to all sides
-  `,
+  documentation: 'A border which adds equal margin to all sides.',
 
   properties: [
     {
       name: 'margin',
       class: 'String',
       value: '24px'
-    },
+    }
   ],
 
   methods: [
     function initE() {
-      this
-        .style({
-          'margin': this.margin$
-        })
-        ;
+      this.style({'margin': this.margin$});
     }
   ]
 });

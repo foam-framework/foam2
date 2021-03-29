@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.u2.crunch.wizardflow',
   name: 'SaveAllAgent',
+  flags: ['web'],
   documentation: `
     Currently used by CapableView to pre-save junctions for immediate
     invalidation of the model. This agent saves wizardlets in order.
@@ -15,10 +16,6 @@ foam.CLASS({
   imports: [
     'wizardlets',
     'rootCapability'
-  ],
-
-  implements: [
-    'foam.core.ContextAgent'
   ],
   
   properties: [

@@ -14,7 +14,8 @@ foam.CLASS({
   css: '^:read-only { border: none; background: rgba(0,0,0,0); }',
 
   properties: [
-    ['precision', 2]
+    ['precision', 2],
+    ['trimZeros', false]
   ],
 
   methods: [
