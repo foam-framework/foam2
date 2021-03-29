@@ -58,8 +58,8 @@ foam.CLASS({
   exports: [ 'maxLvl' ],
 
   properties: [
-    [ 'width', 1600 ],
-    [ 'height' ,1600 ],
+    [ 'width',  1600 ],
+    [ 'height', 800 ],
     'heightFactor',
     'lean', 'myCss',
     { name: 'maxLvl', value: 11 },
