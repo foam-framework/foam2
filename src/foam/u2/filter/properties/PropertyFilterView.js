@@ -176,7 +176,7 @@ foam.CLASS({
       if ( this.memento && this.memento.head.length > 0 ) {
         var predicate = this.queryParser.parseString(this.memento.head);
         if ( predicate ) {
-          return predicate;
+          return predicate.partialEval();
         }
       }
     }
