@@ -318,22 +318,23 @@ foam.CLASS({
         }
       }
 
-      this.generalSearchField = foam.u2.ViewSpec.createView(self.TextSearchView, {
-        richSearch: true,
-        of: self.dao.of.id,
-        onKey: true,
-        viewSpec: {
-          class: 'foam.u2.tag.Input',
-          placeholder: this.LABEL_SEARCH
-        }
-      },  self, self.__subSubContext__.createSubContext({ memento: this.currentMemento_ }));
-
       if ( self.currentMemento_ ) self.currentMemento_ = self.currentMemento_.tail;
       
       this.onDetach(this.filterController$.dot('isAdvanced').sub(this.isAdvancedChanged));
       var selectedLabel = ctrl.__subContext__.translationService.getTranslation(foam.locale, 'foam.u2.filter.FilterView.SELECTED', this.SELECTED);
       this.addClass(self.myClass())
         .add(this.slot(function(filters) {
+
+          self.generalSearchField = foam.u2.ViewSpec.createView(self.TextSearchView, {
+            richSearch: true,
+            of: self.dao.of.id,
+            onKey: true,
+            viewSpec: {
+              class: 'foam.u2.tag.Input',
+              placeholder: this.LABEL_SEARCH
+            }
+          },  this, self.__subSubContext__.createSubContext({ memento: self.currentMemento_ }));
+
           self.show(filters.length);
 
           var e = this.E();
