@@ -61,37 +61,37 @@ foam.CLASS({
       if ( this.description !== '' && this.description.length > 70 ) {
         this.description = this.description.substr(0, 70-1) + '...';
       }
-      console.log(this.controllerMode);
+
       this
         .addClass(this.myClass())
         .startContext({ mode: foam.u2.DisplayMode.RO, controllerMode: foam.u2.ControllerMode.VIEW })
-        .start()
-          // .start().addClass('monogram')
-          //   .add(this.monogram)
-          // .end()
-          .start().addClass('userSummaryDiv')
-            .start().addClass('userSummary')
-              .add(this.userSummary$)
+          .start()
+            // .start().addClass('monogram')
+            //   .add(this.monogram)
+            // .end()
+            .start().addClass('userSummaryDiv')
+              .start().addClass('userSummary')
+                .add(this.userSummary$)
+              .end()
+              .start().addClass('created')
+                .add(this.created$)
+              .end()
             .end()
-            .start().addClass('created')
-              .add(this.created$)
+            .start().addClass('classification')
+              .show(this.showClassification$).add(this.classification$)
             .end()
+            .start().addClass('description')
+              .add(this.description$)
+            .end()
+            .start().addClass('status')
+              .hide(this.hideStatus$)
+              .add(this.STATUS)
+            .end()
+            // TODO: Enable when memento support and ability to jump to detail view
+            // .start().addClass('viewMore')
+            //   .add(this.VIEW_MORE)
+            // .end()
           .end()
-          .start().addClass('classification')
-            .show(this.showClassification$).add(this.classification$)
-          .end()
-          .start().addClass('description')
-            .add(this.description$)
-          .end()
-          .start().addClass('status')
-            .hide(this.hideStatus$)
-            .add(this.STATUS)
-          .end()
-          // TODO: Enable when memento support and ability to jump to detail view
-          // .start().addClass('viewMore')
-          //   .add(this.VIEW_MORE)
-          // .end()
-        .end()
         .endContext();
 
       var self = this;
