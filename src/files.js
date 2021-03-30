@@ -212,6 +212,7 @@ FOAM_FILES([
   { name: 'foam/u2/borders/CardBorder', flags: ['web'] },
   { name: 'foam/u2/borders/MarginBorder', flags: ['web'] },
   { name: 'foam/u2/borders/SplitScreenBorder', flags: ['web'] },
+  { name: 'foam/u2/borders/Block', flags: ['web'] },
   { name: 'foam/nanos/u2/navigation/IFrameTopNavigation', flags: ['web']},
   { name: "foam/version/VersionTrait" },
   { name: "foam/version/VersionedClass" },
