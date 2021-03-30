@@ -43,7 +43,7 @@ foam.CLASS({
       font-size: 11px;
     }
     ^ .name-container {
-      max-width: 75px;
+      max-width: 90px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;

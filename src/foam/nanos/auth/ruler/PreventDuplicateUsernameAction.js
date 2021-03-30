@@ -19,8 +19,6 @@ foam.CLASS({
     'foam.mlang.sink.Count',
     'foam.nanos.auth.User',
     'foam.util.SafetyUtil',
-    'net.nanopay.contacts.Contact',
-    'net.nanopay.model.Business',
     'static foam.mlang.MLang.*'
   ],
 
@@ -35,10 +33,6 @@ foam.CLASS({
       javaCode: `
         DAO userDAO = (DAO) x.get("localUserDAO");
 
-        if ( obj instanceof Business || obj instanceof Contact ) {
-          return;
-        }
-
         User user = (User) obj;
         if ( SafetyUtil.isEmpty(user.getUserName()) ) {
           return;
@@ -49,7 +43,9 @@ foam.CLASS({
         Count count = new Count();
         count = (Count) userDAO
             .where(AND(
+              EQ(User.TYPE, user.getType()),
               EQ(User.USER_NAME, user.getUserName()),
+              EQ(User.SPID, user.getSpid()),
               NEQ(User.ID,  user.getId())
             )).limit(1).select(count);
 

@@ -50,6 +50,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: '__Property__',
@@ -102,6 +103,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: '__Timestamp__',
@@ -116,6 +118,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
@@ -292,15 +295,15 @@ foam.CLASS({
         .replace(/"/g, '\\"')
         .replace(/[\x00-\x1f]/g, function(c) {
           return "\\u00" + ((c.charCodeAt(0) < 0x10) ?
-              '0' + c.charCodeAt(0).toString(16) :
-              c.charCodeAt(0).toString(16));
+            '0' + c.charCodeAt(0).toString(16) :
+            c.charCodeAt(0).toString(16));
         });
     },
 
     function maybeEscapeKey(str) {
       return this.alwaysQuoteKeys || ! /^[a-zA-Z\$_][0-9a-zA-Z$_]*$/.test(str) ?
-          '"' + str + '"' :
-          str ;
+        '"' + str + '"' :
+        str ;
     },
 
     function out() {
@@ -326,17 +329,13 @@ foam.CLASS({
       be '}' for objects or ']' for arrays.
     */
     function end(c) {
-      if ( this.indent ) {
-        this.indentLevel_--;
-      }
+      if ( this.indent ) this.indentLevel_--;
       if ( c ) this.nl().indent().out(c);
       return this;
     },
 
     function nl() {
-      if ( this.nlStr && this.nlStr.length ) {
-        this.out(this.nlStr);
-      }
+      if ( this.nlStr && this.nlStr.length ) this.out(this.nlStr);
       return this;
     },
 
@@ -626,6 +625,9 @@ foam.CLASS({
             creationContext: opt_ctx || this.creationContext
           }).parseClassFromString(str, opt_cls) :
           this.fonParser_.parseClassFromString(str, opt_cls);
+    },
+    function clone() {
+      return this;
     }
   ]
 });
@@ -732,7 +734,7 @@ foam.LIB({
       //      useShortNames: true,
       useShortNames: false,
       propertyPredicate: function(o, p) { return ! p.clusterTransient; }
-    }),
+    })
   },
 
   methods: [
@@ -741,10 +743,12 @@ foam.LIB({
       args: [
         { type: 'Any',     name: 'o' },
         { type: 'Class',   name: 'opt_class' },
-        { type: 'Context', name: 'opt_ctx' },
+        { type: 'Context', name: 'opt_ctx' }
       ],
       code: foam.mmethod({
         Array: function(o, opt_class, opt_ctx) {
+          if ( foam.String.isInstance(opt_class) ) opt_class = ( opt_ctx || foam ).lookup(opt_class);
+
           var a = new Array(o.length);
           for ( var i = 0 ; i < o.length ; i++ ) {
             a[i] = this.parse(o[i], opt_class, opt_ctx);
@@ -754,19 +758,22 @@ foam.LIB({
         },
         FObject: function(o) { return o; },
         Object: function(json, opt_class, opt_ctx) {
-          var cls = json.class || opt_class;
+          if ( foam.String.isInstance(opt_class) ) opt_class = ( opt_ctx || foam ).lookup(opt_class);
+          var c = json.class || opt_class;
+          if ( foam.String.isInstance(c) ) c = ( opt_ctx || foam ).lookup(c);
 
-          if ( cls ) {
-            var c = typeof cls === 'string' ? ( opt_ctx || foam ).lookup(cls) : cls;
-            if ( c === undefined ) {
-              console.warn(
-                "In foam.core.JSON.parse(Object): JSON parser tried to deserialize class '"
-                  + cls + "' and failed. Is this class available to the client?"
-              );
-              return null;
+          if ( c ) {
+            if ( json.class && json.class != c.id ) {
+              if ( foam.Undefined.isInstance(c) ) {
+                console.warn(
+                  "In foam.core.JSON.parse(Object): JSON parser tried to deserialize class '"
+                    + json.class + "' and failed. Is this class available to the client?"
+                );
+                return null;
+              }
             }
 
-            // TODO(markdittmer): Turn into static method: "parseJSON" once
+            // TODO(markdittmer): Turn into static method: "parseJSON__" once
             // https://github.com/foam-framework/foam2/issues/613 is fixed.
             if ( c.PARSE_JSON ) return c.PARSE_JSON(json, opt_class, opt_ctx);
 
@@ -792,7 +799,17 @@ foam.LIB({
               }
             }
 
-            return c.create(json, opt_ctx);
+            var o = c.create(json, opt_ctx);
+
+            /* For debugging:
+            if ( opt_class && ! opt_class.isInstance(o) ) {
+              console.error(
+                '********************************************** JSON: Incompatible specified class. ',
+                o.cls_.id, 'is not a sub-class of', opt_class.id, json);
+            }
+            */
+
+            return o;
           }
 
           for ( var key in json ) {

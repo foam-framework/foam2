@@ -6,8 +6,69 @@
 
 foam.CLASS({
   package: 'foam.u2.wizard',
+  name: 'WizardletRenderUtils',
+
+  methods: [
+    function calculateWizardletDisplayNumber(w, list) {
+      // Since wizardlet visibility is dynamic it is not possible to
+      // get the correct number without first checking how many invisible
+      // wizardlets exist along the waay.
+      var wSkipped = 0;
+      var i;
+      for ( i = 0; i < list.length && list[i] != w; i++ ) {
+        if ( ! list[i].isAvailable || ! list[i].isVisible ) {
+          wSkipped++;
+        }
+      }
+      return i + 1 - wSkipped;
+    },
+    function configureIndicator(wizardlet, isCurrent, number) {
+      var args = {
+        size: 24, borderThickness: 2,
+      };
+      if ( wizardlet.indicator == this.WizardletIndicator.COMPLETED ) {
+        args = {
+          ...args,
+          borderColor: this.theme.approval3,
+          backgroundColor: this.theme.approval3,
+          borderColorHover: this.theme.approval3,
+          icon: this.theme.glyphs.checkmark.getDataUrl({
+            fill: this.theme.white
+          }),
+        };
+      } else if ( wizardlet.indicator == this.WizardletIndicator.SAVING ) {
+        args = {
+          ...args,
+          indicateProcessing: true,
+          borderColor: this.theme.grey2,
+          borderColorHover: this.theme.grey2,
+          label: '' + number
+        };
+      } else {
+        args = {
+          ...args,
+          borderColor: this.theme.grey2,
+          borderColorHover: this.theme.grey2,
+          label: '' + number
+        };
+      }
+      if ( isCurrent ) {
+        args = {
+          ...args,
+          borderColor: this.theme.black,
+          borderColorHover: this.theme.black
+        };
+      }
+      return args;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2.wizard',
   name: 'StepWizardletStepsView',
   extends: 'foam.u2.View',
+  mixins: ['foam.u2.wizard.WizardletRenderUtils'],
 
   css: `
     ^item {
@@ -43,6 +104,11 @@ foam.CLASS({
       vertical-align: middle;
       text-transform: uppercase;
     }
+
+    ^ .foam-u2-LoadingSpinner img {
+      width: 24px;
+      height: 24px;
+    }
   `,
 
   imports: [
@@ -50,6 +116,7 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.core.ExpressionSlot',
     'foam.u2.detail.AbstractSectionedDetailView',
     'foam.u2.tag.CircleIndicator',
     'foam.u2.wizard.WizardPosition',
@@ -64,6 +131,7 @@ foam.CLASS({
     function initE() {
       var self = this;
       this
+        .addClass(this.myClass())
         .add(this.slot(function (
           data$wizardlets,
           data$wizardPosition,
@@ -72,9 +140,6 @@ foam.CLASS({
           let elem = this.E();
 
           let afterCurrent = false;
-
-          // Fixes the sidebar number if a wizardlet is skipped
-          let wSkipped = 0;
 
           for ( let w = 0 ; w < data$wizardlets.length ; w++ ) {
             let wizardlet = this.data.wizardlets[w];
@@ -85,29 +150,37 @@ foam.CLASS({
               || ! wizardlet.isAvailable
               || ! wizardlet.isVisible
             ) {
-              wSkipped++;
               continue;
             }
 
             elem = elem
               .start()
                 .addClass(self.myClass('item'))
-                .start().addClass(self.myClass('step-number-and-title'))
+                .add(this.ExpressionSlot.create({
+                  args: [wizardlet.indicator$],
+                  code: () => {
+                    return self.E().addClass(self.myClass('step-number-and-title'))
 
-                  // Render circle indicator
-                  .start(this.CircleIndicator, this.configureIndicator(
-                    wizardlet, isCurrent, (1 + w - wSkipped)
-                  ))
-                    .addClass('circle')
-                  .end()
+                      // Render circle indicator
+                      .start(this.CircleIndicator, this.configureIndicator(
+                        wizardlet, isCurrent,
+                        this.calculateWizardletDisplayNumber(
+                          wizardlet, data$wizardlets)
+                      ))
+                        .addClass('circle')
+                      .end()
 
-                  // Render title
-                  .start('p').addClass(self.myClass('title'))
-                    .translate(wizardlet.capability.id+'.name', wizardlet.capability.name)
-                    .style({
-                      'color': isCurrent ? this.theme.black : this.theme.grey2
-                    })
-                  .end()
+                      // Render title
+                      .start('p').addClass(self.myClass('title'))
+                        .translate(wizardlet.capability.id+'.name', wizardlet.capability.name)
+                        .style({
+                          'color': isCurrent ? this.theme.black : this.theme.grey2
+                        })
+                      .end()
+                      ;
+                  }
+                }))
+                .start()
                 .end();
 
             // Get section index to highlight current section
@@ -184,6 +257,14 @@ foam.CLASS({
           icon: this.theme.glyphs.checkmark.getDataUrl({
             fill: this.theme.white
           }),
+        };
+      } else if ( wizardlet.indicator == this.WizardletIndicator.SAVING ) {
+        args = {
+          ...args,
+          indicateProcessing: true,
+          borderColor: this.theme.grey2,
+          borderColorHover: this.theme.grey2,
+          label: '' + number
         };
       } else {
         args = {

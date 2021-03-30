@@ -490,6 +490,26 @@ foam.CLASS({
       section: 'administration'
     },
     {
+      class: 'Long',
+      name: 'lastModifiedByAgent',
+      includeInDigest: true,
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      tableCellFormatter: function(value, obj, axiom) {
+        this.__subSubContext__.userDAO
+          .find(value)
+          .then((user) => {
+            if ( user ) {
+              this.add(user.legalName);
+            }
+          })
+          .catch((error) => {
+            this.add(value);
+          });
+      },
+      section: 'administration'
+    },
+    {
       class: 'DateTime',
       name: 'lastModified',
       includeInDigest: true,
@@ -517,7 +537,24 @@ foam.CLASS({
       class: 'String',
       name: 'customRefinement',
       displayWidth: 80
-    }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.PasswordPolicy',
+      name: 'passwordPolicy',
+      documentation: 'Password policy for this group.',
+      factory: function() {
+        return this.PasswordPolicy.create();
+      },
+      javaFactory: `
+        return new foam.nanos.auth.PasswordPolicy(getX());
+      `,
+      view: {
+        class: 'foam.u2.view.FObjectPropertyView',
+        readView: { class: 'foam.u2.detail.VerticalDetailView' }
+      },
+      includeInDigest: true
+    },
   ],
 
   actions: [

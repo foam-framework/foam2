@@ -103,9 +103,7 @@ p({
     return
       new foam.dao.PMDAO(x,
       new foam.dao.SequenceNumberDAO(1000,
-      new foam.nanos.auth.PreventDuplicateEmailDAO.Builder(x).setDelegate(
-        new foam.dao.java.JDAO(x, foam.nanos.auth.User.getOwnClassInfo(), "users")
-      ).build()));
+      new foam.dao.java.JDAO(x, foam.nanos.auth.User.getOwnClassInfo(), "users")));
   """
 })
 
@@ -265,7 +263,6 @@ p({
     return new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
       .setAuthorize(true)
-      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("exportDriverRegistry"))
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("exportDriverRegistrys")
       .setDecorator(new foam.dao.EnabledAwareDAO.Builder(x).setOf(foam.nanos.export.ExportDriverRegistry.getOwnClassInfo()).build())
@@ -521,7 +518,7 @@ p({
 })
 
 p({"class":"foam.nanos.boot.NSpec","name":"appConfigService",                   "serve":true, "authenticate": false, "boxClass":"foam.nanos.app.AppConfigServiceSkeleton", "service":{"class":"foam.nanos.app.ContextLookupAppConfigService"}, "client":"{\"class\":\"foam.nanos.app.ClientAppConfigService\",\"delegate\":{\"class\":\"foam.box.HTTPBox\",\"url\":\"service/appConfigService\"}}"})
-p({"class":"foam.nanos.boot.NSpec", "name":"agentAuth",                        "lazy":false, "serve":true, "authenticate": false, "description":"Permits users to act as others if permitted. Places user as an agent of the system.", "boxClass":"foam.nanos.auth.AgentAuthServiceSkeleton", "serviceScript":"return new foam.nanos.auth.AgentUserAuthService(x);","client":"{\"class\":\"foam.nanos.auth.ClientAgentAuthService\"}"})
+p({"class":"foam.nanos.boot.NSpec", "name":"agentAuth",                        "lazy":false, "serve":true, "authenticate": false, "description":"Permits users to act as others if permitted. Places user as an agent of the system.", "boxClass":"foam.nanos.auth.AgentAuthServiceSkeleton", "serviceScript":"return new foam.nanos.auth.AgentUserAuthService(x);", "client": "{\"class\":\"foam.nanos.auth.AgentAuthClient\",\"delegate\":{\"class\":\"foam.nanos.auth.ClientAgentAuthService\"}}"})
 
 p({
   "class": "foam.nanos.boot.NSpec",

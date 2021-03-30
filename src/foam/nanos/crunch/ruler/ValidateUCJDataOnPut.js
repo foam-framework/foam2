@@ -54,6 +54,9 @@ foam.CLASS({
             }
 
             FObject data = ucj.getData();
+
+            if ( data == null ) data = capability.getImpliedData(x, ucj);
+
             if ( data != null ) {
               try {
                 Subject subject = ucj.getSubject(x);

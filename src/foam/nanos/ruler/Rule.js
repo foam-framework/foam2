@@ -27,10 +27,15 @@
 
   javaImports: [
     'foam.core.DirectAgency',
+    'foam.mlang.predicate.MQLExpr',
     'foam.nanos.auth.AuthorizationException',
     'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.User',
+    'foam.nanos.auth.Subject',
+    'foam.nanos.dao.Operation',
     'foam.nanos.logger.Logger',
-    'java.util.Collection'
+    'java.util.Collection',
+    'java.util.Date'
   ],
 
   tableColumns: [
@@ -120,7 +125,7 @@
     },
     {
       class: 'Enum',
-      of: 'foam.nanos.ruler.Operations',
+      of: 'foam.nanos.dao.Operation',
       name: 'operation',
       readPermissionRequired: true,
       writePermissionRequired: true,
@@ -191,9 +196,9 @@
       transient: true,
       hidden: true,
       javaFactory: `
-        if ( Operations.CREATE == getOperation()
-          || Operations.UPDATE == getOperation()
-          || Operations.CREATE_OR_UPDATE == getOperation()
+        if ( Operation.CREATE == getOperation()
+          || Operation.UPDATE == getOperation()
+          || Operation.CREATE_OR_UPDATE == getOperation()
         ) {
           return RulerDAO.PUT_CMD;
         }
@@ -244,6 +249,20 @@
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      tableCellFormatter: function(value, obj) {
+        obj.userDAO.find(value).then(function(user) {
+          if ( user ) {
+            this.add(user.legalName);
+          }
+        }.bind(this));
+      }
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedByAgent',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       tableCellFormatter: function(value, obj) {
@@ -306,7 +325,19 @@
         if ( ! getEnabled() ) return false;
 
         try {
-          return getPredicate().f(x.put("NEW", obj).put("OLD", oldObj));
+          if ( getPredicate() instanceof MQLExpr ) {
+            RulerData data = new RulerData();
+            Subject subject = (Subject) x.get("subject");
+            data.setN(obj);
+            data.setO(oldObj);
+            data.setUser(subject.getUser());
+            data.setRealUser(subject.getRealUser());
+            data.setSpid(subject.getUser().getSpid());
+            data.setDateTime(new Date());
+            return getPredicate().f(data);
+          } else {
+            return getPredicate().f(x.put("NEW", obj).put("OLD", oldObj));
+          }
         } catch ( Throwable t ) {
           try {
             return getPredicate().f(obj);

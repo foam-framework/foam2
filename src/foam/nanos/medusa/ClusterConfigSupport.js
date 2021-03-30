@@ -211,7 +211,7 @@ configuration for contacting the primary node.`,
       javaFactory: `
       int c = getNodeCount();
 
-      if ( c < 2 ) {
+      if ( c < 4 ) {
         return 1;
       }
       if ( c < 6 ) {
@@ -457,6 +457,12 @@ configuration for contacting the primary node.`,
         throw new RuntimeException("Active Region not found.");
       }
       `
+    },
+    {
+      documentation: 'Debugging tool to build the list of instances an command passes through.',
+      name: 'trace',
+      class: 'Boolean',
+      value: false
     },
     {
       documentation: 'A single instance is using the medusa journal. No other clustering features are used.',

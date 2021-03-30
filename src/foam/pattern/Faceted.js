@@ -50,7 +50,7 @@ foam.CLASS({
 
       cls.getFacetOf = function(of, X) {
         if ( ! of ) return this;
-        X = foam.core.FObject.isInstance(X) ? X.__context__ : foam.__context__;
+        X = foam.core.FObject.isInstance(X) ? X.__context__ : X || foam.__context__;
 
         var name;
         var pkg;
@@ -73,7 +73,7 @@ foam.CLASS({
       cls.create = function(args, X, ignoreFacets) {
         if ( ! ignoreFacets ) {
           // If class does not have an 'of', then check for 'data.of' instead.
-          var of       = args && ( args.of || ( args.data && args.data.of ) );
+          var of       = args && ( args.of || ( args.data && ( args.data.of || args.data.cls_ ) ) );
           var facetCls = this.getFacetOf(of, X);
 
           if ( facetCls !== this ) return facetCls.create(args, X, true);

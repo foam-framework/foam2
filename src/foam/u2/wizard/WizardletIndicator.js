@@ -13,6 +13,9 @@ foam.ENUM({
     },
     {
       name: 'COMPLETED'
+    },
+    {
+      name: 'SAVING'
     }
   ]
 });

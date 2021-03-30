@@ -19,12 +19,14 @@ foam.CLASS({
   imports: [
     'dao',
     'memento',
-    'searchColumns'
+    'searchColumns',
+    'translationService'
   ],
 
   exports: [
     'as filterController',
     'as data',
+    'currentMemento_ as memento',
     'searchManager'
   ],
 
@@ -63,6 +65,11 @@ foam.CLASS({
       margin: 20px;
     }
   `,
+
+  messages: [
+    { name: 'SELECTED_TEXT', message: 'selected' },
+    { name: 'OF_TEXT', message: 'of' }
+  ],
 
   properties: [
     {
@@ -138,13 +145,16 @@ foam.CLASS({
         "0 of 0 selected" being shown while loading.
       `,
       expression: function(selectedCount, totalCount, loadingRequests) {
+        var selected_ = ctrl.__subContext__.translationService.getTranslation(foam.locale, 'foam.u2.view.ReciprocalSearch.SELECTED', this.SELECTED_TEXT);
+        var of_ = ctrl.__subContext__.translationService.getTranslation(foam.locale, 'foam.u2.view.ReciprocalSearch.OF', this.OF_TEXT);
+
         if ( loadingRequests > 0 ) {
           return 'Loading...';
         }
-        return `${selectedCount.toLocaleString(foam.locale)} of ${totalCount.toLocaleString(foam.locale)} selected`;
+        return `${selectedCount.toLocaleString(foam.locale)} ` +  of_ + ` ${totalCount.toLocaleString(foam.locale)} ` + selected_;
       }
     },
-    'searchValue'
+    'currentMemento_'
   ],
 
   methods: [
@@ -158,6 +168,18 @@ foam.CLASS({
 
       this.updateTotalCount();
 
+      var m;
+      if ( this.memento ) {
+        m = this.memento.tail || this.memento;
+        if ( ! m.tail ) {
+          m.tail = foam.nanos.controller.Memento.create();
+        }
+        m = this.memento.tail || this.memento;
+        this.currentMemento_ = this.memento.tail;
+      }
+
+      var counter = this.filters.length;
+
       this.
         addClass(self.myClass()).
         add(this.slot(function(filters) {
@@ -168,34 +190,53 @@ foam.CLASS({
 
           e.onDetach(this.searchManager);
 
-          var slot = self.SimpleSlot.create();
+          var searchView = foam.u2.ViewSpec.createView(self.TextSearchView, {
+            richSearch: true,
+            of: self.dao.of.id,
+            onKey: true,
+            viewSpec: {
+              class: 'foam.u2.tag.Input',
+              focused: true
+            }
+          }, this, this.__subContext__.createSubContext({ memento: this.memento.tail }));
+          var slot = self.SimpleSlot.create({ value: searchView });
 
-          e.start(self.TextSearchView, {
-                richSearch: true,
-                of: self.dao.of.id,
-                onKey: true,
-                viewSpec: {
-                  class: 'foam.u2.tag.Input',
-                  focused: true
-                },
-                searchValue: this.searchValue
-            }, slot)
+          e.start()
+            .tag(slot)
             .addClass('general-query')
           .end();
+
+          if (this.memento && this.memento.tail )
+            m = this.memento.tail.tail;
+          else
+            m = null;
 
           this.searchManager.add(slot.value);
 
           e.forEach(filters, function(f) {
             var axiom = self.dao.of.getAxiomByName(f);
 
+            var localM = m;
+
+            var propView = foam.u2.ViewSpec.createView(self.SearchViewWrapper, {
+              searchView: axiom.searchView,
+              property: axiom,
+              dao: self.dao
+            }, self, self.__subSubContext__.createSubContext({ memento: localM }));
+
             this
-              .start(self.SearchViewWrapper, {
-                searchView: axiom.searchView,
-                property: axiom,
-                dao: self.dao
-              })
+            .start()
+                .add(propView)
                 .addClass(self.myClass('filter'))
               .end();
+
+            if ( self.memento && m ) {
+              if ( ! m.tail )
+                m.tail = foam.nanos.controller.Memento.create();
+              counter--;
+              if ( counter != 0 )
+                m = m.tail;
+            }
           });
 
           return e;
@@ -205,6 +246,8 @@ foam.CLASS({
           .add(self.countText$)
         .end()
         .tag(this.CLEAR, { buttonStyle: 'SECONDARY' });
+
+        this.currentMemento_ = m;
     },
 
     function addFilter(key) {

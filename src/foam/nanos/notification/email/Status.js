@@ -23,38 +23,38 @@ foam.ENUM({
     {
       name: 'UNKNOWN',
       label: 'Unknown',
-      color: '/*%GREY1%*/ #5e6061',
-      background: '/*%GREY4%*/ #e7eaec',
+      color: '/*%GREY1%*/ #5A5A5A',
+      background: '/*%GREY5%*/ #EF0F2',
     },
     {
       name: 'UNSENT',
       label: 'Unsent',
-      color: '/*%DESTRUCTIVE2%*/ #a61414',
-      background: '/*%DESTRUCTIVE5%*/ #fbedec',
+      color: '/*%GREY1%*/ #5A5A5A',
+      background: '/*%GREY5%*/ #EF0F2',
     },
     {
       name: 'SENT',
       label: 'Sent',
-      color: '/*%APPROVAL2%*/ #117a41',
-      background: '/*%APPROVAL5%*/ #e2f2dd',
+      color: '/*%APPROVAL1%*/ #04612E',
+      background: '/*%APPROVAL5%*/ #EEF7ED',
     },
     {
       name: 'FAILED',
       label: 'Failed',
-      color: '/*%WARNING1%*/ #816819',
-      background: '/*%WARNING4%*/ #fbe88f',
+      color: '/*%DESTRUCTIVE2%*/ #A61414',
+      background: '/*%DESTRUCTIVE5%*/ #FFE9E7',
     },
     {
       name: 'BOUNCED',
       label: 'Bounced',
-      color: '/*%WARNING1%*/ #816819',
-      background: '/*%WARNING4%*/ #fbe88f',
+      color: '/*%WARNING2%*/ #D57D11',
+      background: '/*%WARNING5%*/ #FFF4DE',
     },
     {
       name: 'RECEIVED',
       label: 'Received',
-      color: '/*%APPROVAL2%*/ #117a41',
-      background: '/*%APPROVAL5%*/ #e2f2dd',
+      color: '/*%APPROVAL1%*/ #04612E',
+      background: '/*%APPROVAL5%*/ #EEF7ED',
     }
   ]
 });

@@ -149,11 +149,17 @@ foam.CLASS({
           var ret = new Date(d);
 
           if ( isNaN(ret.getTime()) ) {
-            ret = new Date((Number.MAX_SAFE_INTEGER || Number.MAX_VALUE) * 0.9);
+            ret = foam.Date.MAX_DATE;
             console.warn("Invalid date: " + d + "; assuming " + ret.toISOString() + ".");
+            return ret;
           }
 
-          return ret;
+          d = ret;
+        }
+        if ( d == foam.Date.MAX_DATE || d == foam.Date.MIN_DATE ) return d;
+        if ( foam.Date.isInstance(d) ) {
+          // Convert the Date to Noon time in GMT /*its timezone*/.
+          d = new Date(d.getTime() - (d.getTime() % (1000*60*60*24)) + (12*60 /*+ d.getTimezoneOffset()*/) * 60000);
         }
         return d;
       }
@@ -181,7 +187,24 @@ foam.CLASS({
   label: 'Date and time',
 
   properties: [
-    [ 'type', 'DateTime' ]
+    [ 'type', 'DateTime' ],
+    {
+      name: 'adapt',
+      value: function (_, d) {
+        if ( typeof d === 'number' ) return new Date(d);
+        if ( typeof d === 'string' ) {
+          var ret = new Date(d);
+
+          if ( isNaN(ret.getTime()) ) {
+            ret = foam.Date.MAX_DATE;
+            console.warn("Invalid date: " + d + "; assuming " + ret.toISOString() + ".");
+          }
+
+          return ret;
+        }
+        return d;
+      }
+    }
   ]
 });
 
@@ -362,6 +385,22 @@ foam.CLASS({
               }
             }
             this[self.name] = newArry;
+          }
+        },
+        configurable: true
+      });
+      Object.defineProperty(proto, self.name + '$replace', {
+        get: function classGetter() {
+          return function (predicate, value) {
+            // Faster than splice or filter as of the time this was added
+            let arry = this[self.name];
+            for ( let i=0 ; i < arry.length ; i++ ) {
+              if ( predicate.f(arry[i]) ) {
+                arry[i] = value;
+              }
+            }
+            // Force property update
+            this.propertyChange.pub(self.name, this.slot(self.name));
           }
         },
         configurable: true
@@ -712,6 +751,12 @@ foam.CLASS({
             this.__context__.lookup(v.class) :
             type ).create(v, this.__subContext__);
       }
+    },
+    {
+      name: 'cloneProperty',
+      value: function(value, cloneMap, opt_X) {
+        cloneMap[this.name] = value && value.clone ? value.clone(opt_X) : value;
+      }
     }
   ],
   methods: [
@@ -750,6 +795,15 @@ foam.CLASS({
 
       // TODO: Only hook up the subscription when somebody listens to us.
       if ( obj[name] ) attach(obj[name]);
+    },
+    // Override copyFrom behaviour
+    function copyValueFrom(targetObj, sourceObj) {
+      var name = this.name;
+      if ( targetObj[name] && sourceObj[name] ) {
+        targetObj[name].copyFrom(sourceObj[name])
+        return true;
+      }
+      return false;
     }
   ]
 });

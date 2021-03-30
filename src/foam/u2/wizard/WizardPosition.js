@@ -34,6 +34,17 @@ foam.CLASS({
     },
     function apply(list) {
       return list[this.wizardletIndex][this.sectionIndex];
+    },
+    {
+      name: 'hash',
+      documentation: `
+        Turns this wizard position into a unique id that can be used in a map.
+      `,
+      code: function hash() {
+        var a = this.wizardletIndex;
+        var b = this.sectionIndex;
+        return (a + b) * (a + b + 1) / 2 + a;
+      }
     }
   ]
 });

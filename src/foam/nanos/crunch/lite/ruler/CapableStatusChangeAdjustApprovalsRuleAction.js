@@ -29,7 +29,7 @@ foam.CLASS({
     'foam.nanos.crunch.CapabilityJunctionPayload',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.approval.ApprovalStatus',
-    'foam.nanos.ruler.Operations',
+    'foam.nanos.dao.Operation',
     'foam.nanos.auth.Subject',
     'java.util.ArrayList',
     'java.util.Arrays',
@@ -142,7 +142,7 @@ foam.CLASS({
                   foam.mlang.MLang.AND(
                     foam.mlang.MLang.EQ(ApprovalRequest.OBJ_ID, approvable.getId()),
                     foam.mlang.MLang.EQ(ApprovalRequest.DAO_KEY, "approvableDAO"),
-                    foam.mlang.MLang.EQ(Approvable.STATUS, ApprovalStatus.REQUESTED)
+                    foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.REQUESTED)
                   )
                 ).removeAll();
               }

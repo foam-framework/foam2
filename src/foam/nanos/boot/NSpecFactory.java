@@ -48,7 +48,7 @@ public class NSpecFactory
 
     try {
       logger.info("Creating Service", spec_.getName());
-      var service = spec_.createService(x_.getX().put(NSpec.class, spec_), null);
+      var service = spec_.createService(x_.getX().put(NSpec.class, spec_).put("logger", logger), null);
       if ( service instanceof DAO ) {
         if ( ns_ == null ) {
           ns_ = new ProxyDAO();

@@ -18,12 +18,30 @@ foam.CLASS({
     'crunchService'
   ],
 
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.Subject',
+      name: 'subject',
+      documentation: `
+        The requested subject associated to the ucj. Should only be set
+        when used by a permissioned back-office user.
+      `
+    }
+  ],
+
   methods: [
     function save(wizardlet) {
       if ( ! wizardlet.isAvailable ) return Promise.resolve();
-      return this.crunchService.updateJunction( null,
-        wizardlet.capability.id, wizardlet.data, null
-      ).then((ucj) => {
+      var wData = wizardlet.data ? wizardlet.data.clone() : null;
+      wizardlet.loading = true;
+      let p = this.subject ? this.crunchService.updateJunctionFor(
+        null, wizardlet.capability.id, wData, null,
+        this.subject.user, this.subject.realUser
+      ) : this.crunchService.updateJunction(null,
+        wizardlet.capability.id, wData, null
+      );
+      return p.then((ucj) => {
         this.crunchService.pub('grantedJunction');
         this.load_(wizardlet, ucj);
         return ucj;
@@ -38,9 +56,14 @@ foam.CLASS({
       });
     },
     function load(wizardlet) {
-      return this.crunchService.getJunction(
+      if ( wizardlet.loading ) return;
+      wizardlet.loading = true;
+      let p = this.subject ? this.crunchService.getJunctionFor(
+        null, wizardlet.capability.id, this.subject.user, this.subject.realUser
+      ) : this.crunchService.getJunction(
         null, wizardlet.capability.id
-      ).then(ucj => {
+      );
+      return p.then(ucj => {
         this.load_(wizardlet, ucj);
       });
     },
@@ -54,12 +77,20 @@ foam.CLASS({
       var loadedData = wizardlet.of.create({}, wizardlet);
       if ( ucj.data ) loadedData.copyFrom(ucj.data);
 
-        // Set transient 'capability' property if it exists
-        var prop = wizardlet.of.getAxiomByName('capability');
-        if ( prop ) prop.set(loadedData, wizardlet.capability);
+      // Set transient 'capability' property if it exists
+      // TODO: Get rid of support for this as soon as possible
+      var prop = wizardlet.of.getAxiomByName('capability');
+      if ( prop ) prop.set(loadedData, wizardlet.capability);
 
       // Finally, apply new data to wizardlet
-      wizardlet.data = loadedData;
+      if ( wizardlet.data ) {
+        wizardlet.data.copyFrom(loadedData);
+      } else {
+        wizardlet.data = loadedData.clone(this.__subContext__);
+      }
+      foam.u2.wizard.Slot.blockFramed().then(() => {
+        wizardlet.loading = false;
+      });
     }
   ]
 });

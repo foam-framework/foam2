@@ -131,6 +131,7 @@ foam.CLASS({
     },
     {
       name: 'onFilesChanged',
+      class: 'Function',
       documentation: 'When a file has been selected/changed/removed, this function will be called. (OPTIONAL)'
     },
     {
@@ -349,6 +350,7 @@ foam.CLASS({
       this.addFiles(files);
       // Remove all temporary files in the element.target.files
       this.document.querySelector('.' + this.instanceClass(`input`)).value = null;
+      this.onFilesChanged();
     }
   ]
 });

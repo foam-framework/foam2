@@ -273,6 +273,7 @@ p({
       "class": "foam.comics.v2.DAOControllerConfig",
       "daoKey": "myNotificationDAO",
       "browseTitle": "Notifications",
+      "browseSubtitle": "View all notifications",
       "createPredicate":{"class":"foam.mlang.predicate.False"},
       "editPredicate":{"class":"foam.mlang.predicate.False"},
       "deletePredicate":{"class":"foam.mlang.predicate.False"},
@@ -308,7 +309,7 @@ p({
             {
               "class":"foam.mlang.expr.DateGrouping",
               "name":"Older",
-              "low":2,
+              "low":2
             }
           ]
         }

@@ -13,13 +13,16 @@ foam.CLASS({
   "Takes a views property which should be the value of an array containing arrays that contain desired views, and label." +
   "Ex. views: [[ { class: 'foam.u2.view.TableView' }, 'Table' ]]",
 
-  imports: [
-    'memento'
+  imports: [ 'memento' ],
+
+  requires: [ 'foam.u2.view.RadioView' ],
+
+  exports: [
+    'currentMemento_ as memento'
   ],
 
   css: `
-    ^ { margin: auto; }
-    ^ select { height: 26px }
+    ^ { margin: auto; width: 100%; }
   `,
 
   properties: [
@@ -34,7 +37,7 @@ foam.CLASS({
     {
       name: 'selectedView',
       view: function(_, X) {
-        return foam.u2.view.ChoiceView.create({choices: X.data.views}, X);
+        return X.data.RadioView.create({choices: X.data.views, isHorizontal: true, columns: 8}, X);
       },
       documentation: `Set one of the views as the selectedView.
 
@@ -83,7 +86,8 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'data'
-    }
+    },
+    'currentMemento_'
   ],
 
   methods: [
@@ -91,9 +95,28 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      if ( this.memento && this.memento.paramsObj.sV )
-        this.selectedView = this.memento.paramsObj.sV;
-      else {
+      if ( this.memento ) {
+        this.currentMemento_$ = this.memento.tail$;
+
+        if ( ! this.memento.tail ) {
+          this.memento.tail = foam.nanos.controller.Memento.create();
+        }
+      }
+
+      if ( this.currentMemento_ ) {
+        if ( ! this.currentMemento_.tail ) {
+          this.currentMemento_.tail = foam.nanos.controller.Memento.create();
+        }
+      }
+
+      if ( this.memento && this.memento.tail && this.memento.tail.head.length != 0 ) {
+        var viewSelectedWithMemento = this.views.find(v => foam.Array.isInstance(v) && v[1] == this.memento.tail.head);
+        if ( viewSelectedWithMemento ) {
+          this.selectedView = viewSelectedWithMemento[1];
+        } else {
+          this.memento.tail.head = '';
+        }
+      } else {
         self.setMementoWithSelectedView();
       }
 
@@ -117,15 +140,13 @@ foam.CLASS({
 
   actions: [
     function setMementoWithSelectedView() {
-      if ( ! this.memento )
+      if ( ! this.memento || ! this.memento.tail )
         return;
       var view = this.views.find(v => v[0] == this.selectedView);
       if ( view )
-        this.memento.paramsObj.sV = view[1];
+        this.memento.tail.head = view[1];
       else
-        delete this.memento.paramsObj.sV;
-
-      this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
+        this.memento.tail.head = '';
     }
   ]
 });
