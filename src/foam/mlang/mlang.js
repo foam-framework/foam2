@@ -3725,6 +3725,7 @@ foam.CLASS({
     'foam.mlang.predicate.StartsWithIC',
     'foam.mlang.predicate.EndsWith',
     'foam.mlang.predicate.True',
+    'foam.mlang.predicate.MQLExpr',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Explain',
     'foam.mlang.sink.GroupBy',
@@ -3829,7 +3830,8 @@ foam.CLASS({
     function THEN_BY(a, b) { return this.ThenBy.create({head: a, tail: b}); },
 
     function INSTANCE_OF(cls) { return this.IsInstanceOf.create({ targetClass: cls }); },
-    function CLASS_OF(cls) { return this.IsClassOf.create({ targetClass: cls }); }
+    function CLASS_OF(cls) { return this.IsClassOf.create({ targetClass: cls }); },
+    function MQL(mql) { return this.MQLExpr.create({query: mql}); }
   ]
 });
 
@@ -3875,6 +3877,119 @@ foam.CLASS({
       javaCode: `
         return getRegExp().matcher(getArg1().f(obj).toString()).matches();
       `
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'MQLExpr',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: `Stores mql query as a property and converts it into predicate when f() is called.`,
+
+  javaImports: [
+    'foam.core.ClassInfo',
+    'foam.core.FObject',
+    'foam.lib.parse.PStream',
+    'foam.lib.parse.ParserContext',
+    'foam.lib.parse.ParserContext',
+    'foam.lib.parse.ParserContextImpl',
+    'foam.lib.parse.StringPStream',
+    'foam.mlang.Constant',
+    'foam.parse.QueryParser',
+    'java.util.Map',
+    'java.util.concurrent.ConcurrentHashMap'
+  ],
+
+  axioms: [
+    foam.pattern.Multiton.create({property: 'query'}),
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(
+          `
+  protected final static Map map__ = new ConcurrentHashMap();
+  public static MQLExpr create(String query) {
+    MQLExpr p = (MQLExpr) map__.get(query);
+
+    if ( p == null ) {
+      p = new MQLExpr();
+      p.setQuery(query);
+      map__.put(query, p);
+    }
+
+    return p;
+  }
+ `
+        );
+      }
+    }
+  ],
+
+  properties: [
+    {
+      class: 'Map',
+      name: 'specializations_',
+      factory: function() { return {}; },
+      javaFactory: 'return new java.util.concurrent.ConcurrentHashMap<ClassInfo, foam.mlang.predicate.Predicate>();'
+    },
+    {
+      class: 'String',
+      name: 'query'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      code: function(o) {
+        return this.specialization(o.model_).f(o);
+      },
+      javaCode: `
+        if ( ! ( obj instanceof FObject ) )
+          return false;
+
+        return specialization(((FObject)obj).getClassInfo()).f(obj);
+      `
+    },
+    {
+      name: 'specialization',
+      args: [ { name: 'model', type: 'ClassInfo' } ],
+      type: 'Predicate',
+      code: function(model) {
+        return this.specializations_[model.name] ||
+          ( this.specializations_[model.name] = this.specialize(model) );
+      },
+      javaCode: `
+        if ( getSpecializations_().get(model) == null ) getSpecializations_().put(model, specialize(model));
+        return (Predicate) getSpecializations_().get(model);
+      `
+    },
+    {
+      name: 'specialize',
+      args: [ { name: 'model', type: 'ClassInfo' } ],
+      type: 'Predicate',
+      code: function(model) {
+        var qp = foam.parse.QueryParser.create({of: model.id});
+        return qp.parseString(this.query) || foam.mlang.predicate.False.create();
+      },
+      javaCode: `
+        QueryParser parser = new QueryParser(model);
+        StringPStream sps = new StringPStream();
+        sps.setString(getQuery());
+        PStream ps = sps;
+        ParserContext x = new ParserContextImpl();
+        ps = parser.parse(ps, x);
+        if (ps == null)
+          return new False();
+
+        return (foam.mlang.predicate.Nary) ps.value();
+      `
+    },
+    function toString() {
+      return '(' + this.query + ')';
     }
   ]
 });

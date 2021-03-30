@@ -91,6 +91,7 @@ foam.CLASS({
           name: 'value',
           postSet: function(_, n) {
             this.data[this.index] = n;
+            this.updateData();
           }
         }
       ],
@@ -117,9 +118,7 @@ foam.CLASS({
 
     ^ .foam-u2-ActionView-remove {
       align-self: flex-start;
-    }
-
-    ^ .foam-u2-ActionView-remove {
+      background: transparent;
       margin-left: 4px;
       padding: 0;
     }

@@ -273,6 +273,16 @@ foam.CLASS({
       name: 'choiceView',
       view: {
         class: 'foam.u2.view.ChoiceView',
+        size: 10,
+        choices: ['Yes', 'No', 'Maybe']
+      }
+    },
+    {
+      class: 'String',
+      name: 'choiceViewWithSize',
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+        size: 3,
         choices: ['Yes', 'No', 'Maybe']
       }
     },
@@ -388,6 +398,21 @@ foam.CLASS({
     {
       class: 'Double',
       name: 'defaultDouble'
+    },
+    {
+      class: 'Float',
+      name: 'multiViewFloat',
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          { class: 'foam.u2.TextField', placeholder: 'textfield', onKey: true },
+          { class: 'foam.u2.FloatView', placeholder: 'floatview', onKey: true },
+          { class: 'foam.u2.TextField', onKey: false },
+          { class: 'foam.u2.FloatView', onKey: false },
+          { class: 'foam.u2.FloatView', onKey: false, precision: 2 },
+          { class: 'foam.u2.FloatView', onKey: false, precision: 2, trimZeros: false }
+        ]
+      }
     },
     {
       class: 'StringArray',

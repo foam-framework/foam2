@@ -90,13 +90,13 @@ foam.CLASS({
     ],
     [ 'assertValue', function(v, prop) {
         foam.assert(Array.isArray(v),
-            prop.name, 'Attempt to set array property to non-array value', v);
+          prop.name, 'Attempt to set array property to non-array value', v);
       }
     ],
     [ 'adaptArrayElement', function(o, obj) {
       // FUTURE: replace 'foam.' with '(this.__subContext__ || foam).' ?
       var ctx = obj.__subContext__ || foam;
-      var of = o.class || this.of;
+      var of  = o.class || this.of;
       var cls = ctx.lookup(of);
       if ( cls == null ) cls = obj[of];
       return cls.isInstance(o) ? o : cls.create(o, obj);

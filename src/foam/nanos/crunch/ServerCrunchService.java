@@ -17,6 +17,7 @@ import foam.mlang.sink.GroupBy;
 import foam.nanos.NanoService;
 import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
+import foam.nanos.auth.AuthService;
 import foam.nanos.crunch.lite.Capable;
 import foam.nanos.crunch.CapabilityJunctionPayload;
 import foam.nanos.crunch.ui.PrerequisiteAwareWizardlet;
@@ -39,6 +40,18 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
   public List getGrantPath(X x, String rootId) {
     return getCapabilityPath(x, rootId, true);
+  }
+
+  //TODO: Needs to be refactored once Subject is serializable
+  public List getCapabilityPathFor(X x, String rootId, boolean filterGrantedUCJ, User effectiveUser, User user) {
+    foam.nanos.auth.AuthService auth = (foam.nanos.auth.AuthService) x.get("auth");
+    if ( auth.check(x, "service.crunchService.getCapabilityPathFor") ) {
+      var requestedSubject = new Subject();
+      requestedSubject.setUser(user);
+      requestedSubject.setUser(effectiveUser);
+      x = x.put("subject", requestedSubject);
+    }
+    return this.getCapabilityPath(x, rootId, filterGrantedUCJ);
   }
 
   public List getCapabilityPath(X x, String rootId, boolean filterGrantedUCJ) {
@@ -261,6 +274,19 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     return map == null ? initCache(x) : map;
   }
 
+  //TODO: Needs to be refactored once Subject is serializable
+  public UserCapabilityJunction getJunctionFor(X x, String capabilityId, User effectiveUser, User user) {
+    Subject subject = (Subject) x.get("subject");
+    foam.nanos.auth.AuthService auth = (foam.nanos.auth.AuthService) x.get("auth");
+    if ( auth.check(x, "service.crunchService.getJunctionFor") ) {
+      var requestedSubject = new Subject();
+      requestedSubject.setUser(user);
+      requestedSubject.setUser(effectiveUser);
+      return this.getJunctionForSubject(x, capabilityId, requestedSubject);
+    }
+    return this.getJunctionForSubject(x, capabilityId, subject);
+  }
+
   public UserCapabilityJunction getJunction(X x, String capabilityId) {
     Subject subject = (Subject) x.get("subject");
     return this.getJunctionForSubject(x, capabilityId, subject);
@@ -393,18 +419,35 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
       ucj.setStatus(status);
     }
 
+    AuthService auth = (AuthService) x.get("auth");
     if (
-      subject.getRealUser().isAdmin()
+      auth.check(x, "usercapabilityjunction.warn.update")
       && subject.getRealUser() != subject.getUser()
     ) {
       var logger = (Logger) x.get("logger");
       // This may be correct when testing features as an admin user
       logger.warning(
-        "admin user is lastUpdatedRealUser on an agent-associated UCJ");
+        subject.getUser().toSummary() + " user is lastUpdatedRealUser on an agent-associated UCJ");
     }
     ucj.setLastUpdatedRealUser(subject.getRealUser().getId());
     DAO userCapabilityJunctionDAO = (DAO) x.get("userCapabilityJunctionDAO");
     return (UserCapabilityJunction) userCapabilityJunctionDAO.inX(x).put(ucj);
+  }
+
+  //TODO: Needs to be refactored once Subject is serializable
+  public UserCapabilityJunction updateJunctionFor(
+    X x, String capabilityId, FObject data,
+    CapabilityJunctionStatus status, User effectiveUser, User user
+  ) {
+    Subject subject = (Subject) x.get("subject");
+    foam.nanos.auth.AuthService auth = (foam.nanos.auth.AuthService) x.get("auth");
+    if ( auth.check(x, "service.crunchService.updateJunctionFor") ) {
+      var requestedSubject = new Subject();
+      requestedSubject.setUser(user);
+      requestedSubject.setUser(effectiveUser);
+      return this.updateUserJunction(x, requestedSubject, capabilityId, data, status);
+    }
+    return this.updateUserJunction(x, subject, capabilityId, data, status);
   }
 
   public UserCapabilityJunction updateUserJunction(
@@ -497,7 +540,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
     Capability capability = (Capability) capabilityDAO.find(capabilityId);
     UserCapabilityJunction ucj = crunchService.getJunction(x, capabilityId);
-      if ( ! capability.getEnabled() ) return false;
+    if ( ! capability.getEnabled() ) return false;
 
     var prereqs = getPrereqs(x.put("subject", ucj.getSubject(x)), capabilityId);
     boolean topLevelRenewable = ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ucj.getIsRenewable();

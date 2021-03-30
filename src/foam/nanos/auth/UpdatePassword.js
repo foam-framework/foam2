@@ -27,7 +27,8 @@ foam.CLASS({
     { name: 'SUCCESS_MSG', message: 'Your password was successfully updated' },
     { name: 'ORIGINAL_PASSWORD_MISSING', message: 'Please enter the original password' },
     { name: 'PASSWORD_LENGTH_10_ERROR', message: 'Password must be at least 10 characters' },
-    { name: 'PASSWORD_NOT_MATCH', message: 'Passwords do not match' }
+    { name: 'PASSWORD_NOT_MATCH', message: 'Passwords do not match' },
+    { name: 'WEAK_PASSWORD_ERR', message: 'Password is weak.' }
   ],
 
   sections: [
@@ -62,12 +63,21 @@ foam.CLASS({
       ]
     },
     {
+      class: 'Boolean',
+      name: 'passwordAvailable',
+      value: true,
+      hidden: true
+    },
+    {
       class: 'Password',
       name: 'newPassword',
       section: 'updatePasswordSection',
-      view: {
-        class: 'foam.u2.view.PasswordView',
-        passwordIcon: true
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.PasswordView',
+          isAvailable$: X.data.passwordAvailable$,
+          passwordIcon: true
+        }
       },
       minLength: 10,
       validationPredicates: [
@@ -79,6 +89,13 @@ foam.CLASS({
             }), 10);
           },
           errorMessage: 'PASSWORD_LENGTH_10_ERROR'
+        },
+        {
+          args: ['passwordAvailable'],
+          predicateFactory: function(e) {
+            return e.EQ(foam.nanos.auth.UpdatePassword.PASSWORD_AVAILABLE, true);
+          },
+          errorMessage: 'WEAK_PASSWORD_ERR'
         }
       ]
     },

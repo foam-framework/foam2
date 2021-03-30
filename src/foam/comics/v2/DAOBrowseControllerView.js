@@ -71,6 +71,10 @@ foam.CLASS({
     }
   `,
 
+  messages: [
+    { name: 'VIEW_ALL', message: 'View all ' }
+  ],
+
   properties: [
     {
       class: 'foam.dao.DAOProperty',
@@ -85,7 +89,7 @@ foam.CLASS({
       }
     },
     {
-      class: 'foam.u2.ViewSpecWithJava',
+      class: 'foam.u2.ViewSpec',
       name: 'browseView',
       expression: function(config$browseViews) {
         return config$browseViews && config$browseViews.length
@@ -102,7 +106,7 @@ foam.CLASS({
       isEnabled: function(config, data) {
         if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
           try {
-            let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.CREATE, data);
+            let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.dao.Operation.CREATE, data);
 
             return this.auth.check(null, permissionString);
           } catch(e) {
@@ -137,7 +141,7 @@ foam.CLASS({
     var self = this;
 
       this.addClass(this.myClass())
-      .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction) {
+      .add(this.slot(function(data, config, config$of, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction) {
         return self.E()
           .start(self.Rows)
             .addClass(self.myClass('container'))
@@ -146,7 +150,7 @@ foam.CLASS({
                 .start(self.Cols)
                   .start()
                     .addClass(self.myClass('browse-title'))
-                    .translate(config$browseTitle, config$browseTitle)
+                    .translate(config$of.id + ".model_.plural", config$of.name)
                   .end()
                   .startContext({ data: self }).tag(self.CREATE).endContext()
                   .callIf(config$primaryAction, function() {
@@ -157,7 +161,8 @@ foam.CLASS({
                   this
                     .start()
                       .addClass(self.myClass('browse-subtitle'))
-                      .translate(config$browseSubtitle, config$browseSubtitle)
+                      .translate(self.cls_.id + '.VIEW_ALL', self.VIEW_ALL)
+                      .translate(config$of.id + ".model_.plural", config$of.name)
                     .end();
                 })
               .end()

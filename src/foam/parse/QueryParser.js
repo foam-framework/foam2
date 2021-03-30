@@ -30,8 +30,10 @@ foam.CLASS({
   // TODO(braden): Support KEYWORD predicates and queries on them.
 
   requires: [
+    'foam.mlang.Constant',
     'foam.mlang.predicate.And',
     'foam.mlang.predicate.ContainsIC',
+    'foam.mlang.predicate.DotF',
     'foam.mlang.predicate.Eq',
     'foam.mlang.predicate.Gt',
     'foam.mlang.predicate.Gte',
@@ -40,6 +42,7 @@ foam.CLASS({
     'foam.mlang.predicate.InIC',
     'foam.mlang.predicate.Lt',
     'foam.mlang.predicate.Lte',
+    'foam.mlang.predicate.MQLExpr',
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
     'foam.mlang.predicate.True',
@@ -68,34 +71,36 @@ foam.CLASS({
       // The core query parser. Needs a fieldname symbol added to function
       // properly.
       name: 'baseGrammar_',
-      value: function(alt, literal, literalIC, not, notChars, optional, range,
-          repeat, seq, seq1, str, sym) {
+      value: function(alt, anyChar, eof, join, literal, literalIC, not, notChars, optional, range,
+        repeat, repeat0, seq, seq1, str, sym, until) {
         return {
-          START: sym('query'),
+          START: seq1(0, sym('query'), repeat0(' '), eof()),
+
           query: sym('or'),
 
           or: repeat(sym('and'), alt(literalIC(' OR '), literal(' | ')), 1),
 
           and: repeat(
-              sym('expr'),
-              alt(literalIC(' AND '), literal(' ')), 1),
+            sym('expr'),
+            alt(literalIC(' AND '), literal(' ')), 1),
 
           expr: alt(
-              sym('paren'),
-              sym('negate'),
-              sym('has'),
-              sym('is'),
-              sym('equals'),
-              sym('before'),
-              sym('after'),
-              sym('id')
+            sym('paren'),
+            sym('negate'),
+            sym('has'),
+            sym('is'),
+            sym('dot'),
+            sym('equals'),
+            sym('before'),
+            sym('after'),
+            sym('id')
           ),
 
           paren: seq1(1, '(', sym('query'), ')'),
 
           negate: alt(
-              seq(literal('-'), sym('expr')),
-              seq(literalIC('NOT '), sym('expr'))
+            seq(literal('-'), sym('expr')),
+            seq(literalIC('NOT '), sym('expr'))
           ),
 
           id: sym('number'),
@@ -104,44 +109,61 @@ foam.CLASS({
 
           is: seq(literalIC('is:'), sym('fieldname')),
 
+          dot: seq(sym('fieldname'), sym('subQuery')),
+
+          subQuery: alt(sym('compoundSubQuery'), sym('simpleSubQuery')),
+
+          compoundSubQuery: seq1(1, '(', sym('compoundSubQueryBody'), ')'),
+
+          compoundSubQueryBody: repeat(alt(
+            seq('(', sym('compoundSubQueryBody'), ')'),
+            // like 'quoted string', except retains the quotes
+            join(seq('"',
+              join(repeat(alt(literal('\\"', '"'), notChars('"')))),
+              '"')),
+            notChars(')')
+          )),
+
+          simpleSubQuery: seq1(1, '.', repeat(not(alt(' ', eof()), anyChar()))),
+
           equals: seq(sym('fieldname'), alt(':', '='), sym('valueList')),
 
           // TODO(kgr): Merge with 'equals'.
           before: seq(sym('fieldname'), alt('<=', '<', literalIC('-before:')),
-              sym('value')),
+            sym('value')),
           after: seq(sym('fieldname'), alt('>=', '>', literalIC('-after:')),
-              sym('value')),
+            sym('value')),
 
           value: alt(
-              sym('me'),
-              sym('date'),
-              sym('string'),
-              sym('number')
+            sym('me'),
+            sym('date'),
+            sym('string'),
+            sym('number')
           ),
 
           compoundValue: alt(
-              sym('negateValue'),
-              sym('orValue'),
-              sym('andValue')
+            sym('negateValue'),
+            sym('orValue'),
+            sym('andValue')
           ),
 
           negateValue: seq(
-              '(',
-              alt('-', literalIC('not ')),
-              sym('value'),
-              ')'
+            '(',
+            alt('-', literalIC('not ')),
+            sym('value'),
+            ')'
           ),
 
           orValue: seq(
-              '(',
-              repeat(sym('value'), alt('|', literalIC(' or '), ' | '), 1),
-              ')'
+            '(',
+            repeat(sym('value'), alt('|', literalIC(' or '), ' | '), 1),
+            ')'
           ),
 
           andValue: seq(
-              '(',
-              repeat(sym('value'), alt(literalIC(' and '), ' '), 1),
-              ')'
+            '(',
+            repeat(sym('value'), alt(literalIC(' and '), ' '), 1),
+            ')'
           ),
 
           valueList: alt(sym('compoundValue'), repeat(sym('value'), ',', 1)),
@@ -149,44 +171,43 @@ foam.CLASS({
           me: seq(literalIC('me'), not(sym('char'))),
 
           date: alt(
-              sym('range date'),
-              sym('literal date'),
-              sym('relative date')
+            sym('range date'),
+            sym('literal date'),
+            sym('relative date')
           ),
 
           'range date': seq(
-              alt(sym('literal date'), sym('number')),
-              '..',
-              alt(sym('literal date'), sym('number'))),
+            alt(sym('literal date'), sym('number')),
+            '..',
+            alt(sym('literal date'), sym('number'))),
 
           'literal date': alt(
-              // YYYY-MM-DDTHH:MM
-              seq(sym('number'), '-', sym('number'), '-', sym('number'), 'T',
-                  sym('number'), ':', sym('number')),
-              // YYYY-MM-DDTHH
-              seq(sym('number'), '-', sym('number'), '-', sym('number'), 'T',
-                  sym('number')),
-              // YYYY-MM-DD
-              seq(sym('number'), '-', sym('number'), '-', sym('number')),
-              // YYYY-MM
-              seq(sym('number'), '-', sym('number')),
-              // YY/MM/DD
-              seq(sym('number'), '/', sym('number'), '/', sym('number'))
+            // YYYY-MM-DDTHH:MM
+            seq(sym('number'), '-', sym('number'), '-', sym('number'), 'T',
+                sym('number'), ':', sym('number')),
+            // YYYY-MM-DDTHH
+            seq(sym('number'), '-', sym('number'), '-', sym('number'), 'T',
+                sym('number')),
+            // YYYY-MM-DD
+            seq(sym('number'), '-', sym('number'), '-', sym('number')),
+            // YYYY-MM
+            seq(sym('number'), '-', sym('number')),
+            // YY/MM/DD
+            seq(sym('number'), '/', sym('number'), '/', sym('number'))
           ),
 
-          'relative date': seq(literalIC('today'),
-                optional(seq('-', sym('number')))),
+          'relative date': seq(literalIC('today'), optional(seq('-', sym('number')))),
 
           string: alt(sym('word'), sym('quoted string')),
 
           'quoted string': seq1(1, '"',
-                repeat(alt(literal('\\"', '"'), notChars('"'))),
-                '"'),
+            repeat(alt(literal('\\"', '"'), notChars('"'))),
+            '"'),
 
           word: repeat(sym('char'), null, 1),
 
           char: alt(range('a', 'z'), range('A', 'Z'), range('0', '9'), '-', '^',
-              '_', '@', '%', '.'),
+            '_', '@', '%', '.'),
           number: repeat(range('0', '9'), null, 1)
         };
       }
@@ -197,7 +218,7 @@ foam.CLASS({
         var cls = this.of;
         var fields = [];
         var properties = cls.getAxiomsByClass(foam.core.Property);
-        for ( var i = 0; i < properties.length; i++ ) {
+        for ( var i = 0 ; i < properties.length ; i++ ) {
           var prop = properties[i];
           fields.push(this.LiteralIC.create({
             s: prop.name,
@@ -210,7 +231,7 @@ foam.CLASS({
             }));
           }
           if ( prop.aliases ) {
-            for ( var j = 0; j < prop.aliases.length; j++ ) {
+            for ( var j = 0 ; j < prop.aliases.length ; j++ ) {
               fields.push(this.LiteralIC.create({
                 s: prop.aliases[j],
                 value: prop
@@ -297,6 +318,25 @@ foam.CLASS({
             });
           },
 
+          dot: function(v) {
+            return self.DotF.create({
+              arg1: self.Constant.create({value: v[1]}),
+              arg2: v[0]
+            });
+          },
+
+          simpleSubQuery: function(v) {
+            return self.MQLExpr.create({query: v.join('')});
+          },
+
+          compoundSubQuery: function(v) {
+            return self.MQLExpr.create({query: v});
+          },
+
+          compoundSubQueryBody: function(v) {
+            return v.map(s => foam.String.isInstance(s) ? s : s.join('')).join('');
+          },
+
           before: function(v) {
             // If the property (v[0]) is a Date(Time)Property, and the value
             // (v[2]) is a single number, expand it into a Date range for that
@@ -373,7 +413,7 @@ foam.CLASS({
             var expr;
 
             if ( isNum ) {
-              for ( var i = 0; i < values.length; i++ ) {
+              for ( var i = 0 ; i < values.length ; i++ ) {
                 values[i] = isFloat ? parseFloat(values[i]) :
                     parseInt(values[i]);
               }
@@ -453,10 +493,9 @@ foam.CLASS({
             // adjusted like that.
             start = new Date(2000, 0, 1);
             end   = new Date(2000, 0, 1);
-            var ops = [ 'FullYear', 'Month', 'Date', 'Hours', 'Minutes',
-                'Seconds' ];
+            var ops = [ 'FullYear', 'Month', 'Date', 'Hours', 'Minutes', 'Seconds' ];
             var defaults = [ 0, 1, 1, 0, 0, 0 ];
-            for ( var i = 0; i < ops.length; i++ ) {
+            for ( var i = 0 ; i < ops.length ; i++ ) {
               var x = i * 2 > v.length ? defaults[i] : v[i * 2];
               // Adjust for months being 0-based.
               var val = x - (i === 1 ? 1 : 0);

@@ -23,7 +23,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'actAs',
-      type: 'foam.nanos.auth.User',
+      type: 'foam.nanos.auth.Subject',
       async: true,
       javaThrows: [
         'foam.nanos.auth.AuthorizationException',
@@ -59,6 +59,18 @@ foam.INTERFACE({
         {
           name: 'entity',
           type: 'foam.nanos.auth.User'
+        }
+      ]
+    },
+    {
+      name: 'logout',
+      documentation: 'Agent logs out of the junction.',
+      async: true,
+      type: 'Void',
+      args: [
+        {
+          name: 'x',
+          type: 'Context'
         }
       ]
     }

@@ -11,7 +11,7 @@
   values: [
     {
       name: 'REQUESTED',
-      label: 'Requested',
+      label: { en: 'Requested', pt: 'Requeridos'},
       ordinal: 0,
       documentation: 'Request pending.',
       color: '/*%DESTRUCTIVE2%*/ #a61414',
@@ -19,7 +19,7 @@
     },
     {
       name: 'APPROVED',
-      label: 'Approved',
+      label: { en: 'Approved', pt: 'Aprovado'},
       ordinal: 1,
       documentation: 'Request was approved.',
       color: '/*%APPROVAL2%*/ #117a41',
@@ -27,7 +27,7 @@
     },
     {
       name: 'REJECTED',
-      label: 'Rejected',
+      label: { en: 'Rejected', pt: 'Rejeitado'},
       ordinal: 2,
       documentation: 'Request was rejected.',
       color: '/*%WARNING1%*/ #816819',
@@ -35,7 +35,7 @@
     },
     {
       name: 'CANCELLED',
-      label: 'Cancelled',
+      label: { en: 'Cancelled', pt: 'Cancelado'},
       ordinal: 3,
       documentation: 'Request was cancelled.',
       color: '/*%GREY1%*/ #5e6061',

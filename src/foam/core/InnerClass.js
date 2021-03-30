@@ -63,14 +63,18 @@ foam.CLASS({
   methods: [
     function modelAdapt_(m) {
       return foam.core.Model.isInstance(m) ? m :
-          foam.core.EnumModel.isInstance(m) ? m :
-          foam.core.InnerClass.isInstance(m) ? this.modelAdapt_(m.model) :
-          m.class ? foam.lookup(m.class).create(m) :
-          foam.core.Model.create(m);
+        foam.core.EnumModel.isInstance(m)  ? m :
+        foam.core.InnerClass.isInstance(m) ? this.modelAdapt_(m.model) :
+        m.class                            ? foam.lookup(m.class).create(m) :
+        foam.core.Model.create(m);
     },
 
     function installInClass(cls) {
       cls[this.model.name] = this.model.buildClass();
+      // TODO: the inner-class name doesn't include the outer class name,
+      // which is why we need to add it. But this also breaks CSS, so that
+      // should be fixed and then remove the second parameter. KGR
+      foam.register(cls[this.model.name], cls.id + '.' + this.model.name);
     },
 
     function installInProto(proto) {

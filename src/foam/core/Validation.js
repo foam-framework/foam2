@@ -500,7 +500,6 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.core',
   name: 'DatePropertyValidationRefinement',
@@ -524,13 +523,13 @@ foam.CLASS({
                     self,
                     // Maximum date supported by FOAM
                     // (bounded by JavaScript's limit)
-                    new Date(8640000000000000)
+                    foam.Date.MAX_DATE
                   ),
                   e.GTE(
                     self,
                     // Minimum date supported by FOAM
                     // (bounded by JavaScript's limit)
-                    new Date(-8640000000000000)
+                    foam.Date.MIN_DATE
                   )
                 )
               );

@@ -27,11 +27,26 @@ foam.CLASS({
       margin: 8px 0;
       padding: 8px;
     }
-  `,
+    ^:disabled {
+      appearance: none;
+      background: rgba(0,0,0,0);
+      border: none;
+      box-shadow: none;
+      outline: none;
+      padding-left: 0;
+    }
+    input[type='checkbox']^:checked:disabled:after {
+      background: none;
+      box-shadow: none;
+      color: gray;
+    }
+    `,
 
   methods: [
     function initE() {
       this.SUPER();
+
+      this.addClass(this.myClass());
       this.setAttribute('type', 'checkbox');
 
       var self = this;

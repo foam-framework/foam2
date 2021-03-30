@@ -7,6 +7,7 @@
  foam.CLASS({
   package: 'foam.nanos.approval',
   name: 'ApprovalRequest',
+  plural: 'ApprovalRequests',
   documentation: 'Approval requests are stored in approvalRequestDAO and' +
   'represent a single approval request for a single user.',
 
@@ -24,7 +25,7 @@
     'foam.dao.DAO',
     'foam.nanos.auth.*',
     'foam.nanos.logger.Logger',
-    'foam.nanos.ruler.Operations',
+    'foam.nanos.dao.Operation',
     'java.util.ArrayList',
     'java.util.List',
     'static foam.mlang.MLang.*'
@@ -193,7 +194,7 @@
     },
     {
       class: 'Enum',
-      of: 'foam.nanos.ruler.Operations',
+      of: 'foam.nanos.dao.Operation',
       name: 'operation',
       label: 'Action',
       includeInDigest: false,
@@ -382,6 +383,16 @@
       readPermissionRequired: true
     },
     {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedByAgent',
+      includeInDigest: true,
+      section: 'approvalRequestInformation',
+      order: 130,
+      gridColumns: 6,
+      readPermissionRequired: true
+    },
+    {
       class: 'String',
       name: 'memo',
       view: { class: 'foam.u2.tag.TextArea', rows: 3, cols: 60 },
@@ -497,7 +508,7 @@
       documentation: `
         ID of obj displayed in view reference
         To be used in view reference action when the approvalrequest
-        needs to specify its own reference, for example in the case of 
+        needs to specify its own reference, for example in the case of
         UserCapabilityJunctions where data is null.
       `
     },
@@ -513,7 +524,7 @@
       documentation: `
         Daokey of obj displayed in view reference.
         To be used in view reference action when the approvalrequest
-        needs to specify its own reference, for example in the case of 
+        needs to specify its own reference, for example in the case of
         UserCapabilityJunctions where data is null.
       `
     },
@@ -576,7 +587,7 @@
         throw new RuntimeException("Invalid dao key for the approval request object.");
       }
 
-      if ( getOperation() != Operations.CREATE ){
+      if ( getOperation() != Operation.CREATE ){
         FObject obj = dao.inX(x).find(getObjId());
         if ( obj == null ) {
           logger.error(this.getClass().getSimpleName(), "ObjId not found", getObjId());
@@ -692,7 +703,7 @@
         // Do not show the action if the request was reject or approved and removed
         if ( self.status == foam.nanos.approval.ApprovalStatus.REJECTED ||
             ( self.status == foam.nanos.approval.ApprovalStatus.APPROVED &&
-              self.operation == foam.nanos.ruler.Operations.REMOVE) ) {
+              self.operation == foam.nanos.dao.Operation.REMOVE) ) {
              return false;
         }
 
@@ -725,7 +736,7 @@
 
         // This should already be filtered out by the isAvailable, but adding here as duplicate protection
         if ( self.status == foam.nanos.approval.ApprovalStatus.REJECTED ||
-           (self.status == foam.nanos.approval.ApprovalStatus.APPROVED && self.operation == foam.nanos.ruler.Operations.REMOVE) ) {
+           (self.status == foam.nanos.approval.ApprovalStatus.APPROVED && self.operation == foam.nanos.dao.Operation.REMOVE) ) {
              console.warn('Object is inaccessible')
              return;
         }
@@ -740,7 +751,7 @@
           property = X[daoKey].of.ID;
           objId = property.adapt.call(property, self.objId, self.objId, property);
         }
-        
+
         return X[daoKey]
           .find(objId)
           .then(obj => {
@@ -749,7 +760,7 @@
             // If the dif of objects is calculated and stored in Map(obj.propertiesToUpdate),
             // this is for updating object approvals
             if ( obj.propertiesToUpdate ) {
-              if ( obj.operation === foam.nanos.ruler.Operations.CREATE ) {
+              if ( obj.operation === foam.nanos.dao.Operation.CREATE ) {
                 var temporaryNewObject = obj.of.create({}, X);
 
                 var propsToUpdate = obj.propertiesToUpdate;
@@ -815,7 +826,7 @@
               }),
               mementoHead: null,
               backLabel: 'Back'
-            });
+            }, X);
           })
           .catch(err => {
             console.warn(err.message || err);

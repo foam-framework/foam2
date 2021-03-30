@@ -317,6 +317,10 @@ foam.CLASS({
             .build();
         }
 
+        if ( getHistory() ) {
+          delegate = new foam.dao.history.HistoryDAO(getX(), getHistoryDAOKey(), delegate);
+        }
+
         if ( getNSpec() != null &&
              getNSpec().getServe() &&
              ! getAuthorize() &&
@@ -510,6 +514,17 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'pm'
+    },
+    {
+      class: 'Boolean',
+      name: 'history',
+      documentation: `Enables storing history of object property changes.`
+    },
+    {
+      class: 'String',
+      name: 'historyDAOKey',
+      documentation: `HistoryDAO key referencing where history objects will be stored, useful when seperating history journals from each other.`,
+      javaValue: `"historyDAO"`
     },
     {
       documentation: 'Contextualize objects on .find, re-creating them with this EasyDAO\'s exports, as if they were children of this EasyDAO.',
@@ -758,7 +773,7 @@ model from which to test ServiceProvider ID (spid)`,
         if ( logger == null ) {
           logger = new foam.nanos.logger.StdoutLogger();
         }
-        
+
         logger = new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
         }, logger);
@@ -961,9 +976,7 @@ model from which to test ServiceProvider ID (spid)`,
       }
 
       if ( this.order ) {
-        for ( var i = 0; i <  this.order.length; i++ ) {
-          dao = dao.orderBy(this.order[i]);
-        }
+        dao = dao.orderBy(this.order);
       }
 
       if ( this.timing ) {

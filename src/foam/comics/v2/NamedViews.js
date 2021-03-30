@@ -17,7 +17,7 @@ foam.CLASS({
       name: 'name'
     },
     {
-      class: 'foam.u2.ViewSpecWithJava',
+      class: 'foam.u2.ViewSpec',
       name: 'view'
     },
     {
@@ -40,7 +40,7 @@ foam.CLASS({
       name: 'name'
     },
     {
-      class: 'foam.u2.ViewSpecWithJava',
+      class: 'foam.u2.ViewSpec',
       name: 'view'
     },
     {
@@ -48,4 +48,4 @@ foam.CLASS({
       name: 'icon'
     }
   ]
-}); 
+});

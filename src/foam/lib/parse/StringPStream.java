@@ -81,4 +81,8 @@ public class StringPStream
   public PStream apply(Parser ps, ParserContext x) {
     return ps.parse(this, x);
   }
+
+  public int pos() {
+    return pos;
+  }
 }
