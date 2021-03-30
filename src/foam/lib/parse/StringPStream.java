@@ -73,9 +73,7 @@ public class StringPStream
   }
 
   public String substring(PStream end) {
-    StringPStream endps = (StringPStream) end;
-
-    return str.get().subSequence(pos, endps.pos).toString();
+    return str.get().subSequence(pos, end.pos()).toString();
   }
 
   public PStream apply(Parser ps, ParserContext x) {
