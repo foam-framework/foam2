@@ -103,6 +103,6 @@ foam.CLASS({
       }
 
       this.target.on('mouseover', this.onMouseOver);
-    },
-  ],
+    }
+  ]
 });
