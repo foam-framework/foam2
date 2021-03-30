@@ -13,7 +13,7 @@ public class AddressUtil {
   protected static final Pattern SUITE_PATTERN = Pattern.compile("/\\d+/g");
   protected static final Pattern REPLACE_PATTERN = Pattern.compile("/[#\"]/g");
 
-  public static String[] parseAddress(String address1, String address2) {
+  public static String[] parseAddress(String address1, String address2) throws IllegalArgumentException {
     if ( address1.indexOf("Unit") > 0) {
       var parts = address1.split("Unit");
       address1 = parts[0].trim();
@@ -42,7 +42,14 @@ public class AddressUtil {
 
     var newString = REPLACE_PATTERN.matcher(street).replaceAll("");
     var n = newString.indexOf(' ');
-    return new String[] { newString.substring(0,n), newString.substring(n+1) };
+
+    var streetNumber = newString.substring(0, n);
+    var streetName = newString.substring(n+1);
+
+    if ( streetNumber.isEmpty() || ! streetNumber.chars().allMatch(Character::isDigit) || streetName.isEmpty() )
+      throw new IllegalArgumentException("Couldn't parse " + address1 + (address2.isEmpty() ? "" : "," + address2));
+
+    return new String[] { streetNumber, streetName };
   }
 
 }
