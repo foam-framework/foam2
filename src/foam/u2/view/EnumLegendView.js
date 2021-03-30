@@ -50,7 +50,7 @@ foam.CLASS({
           statusEnum => {
             return this.E().start().addClass(this.myClass('eachValue'))
               .start().add(
-                foam.u2.view.EnumBadgeView.create({
+                foam.u2.view.ReadOnlyEnumView.create({
                   data: statusEnum
                 })
               ).end()

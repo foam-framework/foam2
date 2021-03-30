@@ -592,7 +592,7 @@ FOAM_FILES([
   { name: "foam/u2/view/MultiChoiceView", flags: ['web'] },
   { name: "foam/u2/view/CardSelectView", flags: ['web'] },
   { name: "foam/u2/view/NoBackStack", flags: ['web'] },
-  { name: "foam/u2/view/EnumBadgeView", flags: ['web'] },
+  { name: "foam/u2/view/ReadOnlyEnumView", flags: ['web'] },
   { name: "foam/u2/EnumView", flags: ['web'] },
   { name: "foam/u2/ClassView", flags: ['web'] },
   { name: "foam/u2/view/ReferenceView", flags: ['web'] },

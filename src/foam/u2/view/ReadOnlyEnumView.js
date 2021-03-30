@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.u2.view',
-  name: 'EnumBadgeView',
+  name: 'ReadOnlyEnumView',
   extends: 'foam.u2.View',
 
   css: `

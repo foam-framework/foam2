@@ -78,7 +78,7 @@ foam.CLASS({
         .br()
         .add(this.enumValue$.dot('name'))
         .br()
-        .tag({class: 'foam.u2.view.EnumBadgeView'}, { data$: this.enumValue$})
+        .tag({class: 'foam.u2.view.ReadOnlyEnumView'}, { data$: this.enumValue$})
         .br()
         .add(this.slot(function (enumValue) {
           return self.E().addClasses(enumValue.classes()).style(enumValue.toStyle()).add(enumValue.name);

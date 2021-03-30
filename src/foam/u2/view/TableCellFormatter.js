@@ -130,7 +130,7 @@ foam.CLASS({
   name: 'EnumTableCellFormatterRefinement',
   refines: 'foam.core.Enum',
 
-  requires: ['foam.u2.view.EnumBadgeView'],
+  requires: ['foam.u2.view.ReadOnlyEnumView'],
 
   properties: [
     {
@@ -139,7 +139,7 @@ foam.CLASS({
       value: function(value) {
         if ( value ) {
           this
-            .tag(foam.u2.view.EnumBadgeView, { data: value });
+            .tag(foam.u2.view.ReadOnlyEnumView, { data: value });
         } else {
           this.start().
             add('-').

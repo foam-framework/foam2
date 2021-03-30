@@ -28,7 +28,7 @@ foam.CLASS({
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.u2.crunch.Style',
     'foam.u2.Tooltip',
-    'foam.u2.view.EnumBadgeView'
+    'foam.u2.view.ReadOnlyEnumView'
   ],
 
   documentation: `
@@ -121,7 +121,7 @@ foam.CLASS({
               .end()
               .start()
                 .addClass(this.myClass('badge'))
-                .add(foam.u2.view.EnumBadgeView.create({ data: cjStatus }))
+                .add(foam.u2.view.ReadOnlyEnumView.create({ data: cjStatus }))
               .end();
           }))
           .add(this.slot(function(isRenewable) {
