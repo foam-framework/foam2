@@ -11,8 +11,11 @@ import java.util.regex.Pattern;
 
 public class AddressUtil {
 
+  protected static final Pattern suitePattern = Pattern.compile("/\\d+/g");
+  protected static final Pattern replacePattern = Pattern.compile("/[#\"]/g");
+
   public static String[] parseAddress(String address1, String address2) {
-    var suitePattern = Pattern.compile("/\\d+/g");
+
     if ( address1.indexOf("Unit") > 0) {
       var parts = address1.split("Unit");
       address1 = parts[0].trim();
@@ -39,7 +42,6 @@ public class AddressUtil {
       street = parts[1].trim();
     }
 
-    var replacePattern = Pattern.compile("/[#\"]/g");
     var newString = replacePattern.matcher(street).replaceAll("");
     var n = newString.indexOf(' ');
     return new String[] { newString.substring(0,n), newString.substring(n+1) };
