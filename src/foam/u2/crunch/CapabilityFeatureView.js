@@ -28,7 +28,6 @@ foam.CLASS({
     'foam.nanos.crunch.UserCapabilityJunction',
     'foam.u2.crunch.Style',
     'foam.u2.Tooltip',
-    'foam.u2.view.EnumBadgeView',
     'foam.u2.view.ReadOnlyEnumView'
   ],
 
@@ -42,7 +41,9 @@ foam.CLASS({
     }
 
     ^badge > * {
-      border-radius: 0px 11.2px 11.2px 0px
+      border-radius: 0px 11.2px 11.2px 0px !important;
+      height: 24px;
+      width: 79px;
     }
 
     ^ .foam-u2-crunch-Style-renewable-description {
@@ -119,7 +120,7 @@ foam.CLASS({
               .end()
               .start()
                 .addClass(this.myClass('badge'))
-                .add(foam.u2.view.EnumBadgeView.create({ data: cjStatus }))
+                .add(foam.u2.view.ReadOnlyEnumView.create({ data: cjStatus }))
               .end();
           }))
           .add(this.slot(function(isRenewable) {
