@@ -26,8 +26,9 @@ foam.CLASS({
     'foam.nanos.crunch.AgentCapabilityJunction',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.crunch.UserCapabilityJunction',
-    'foam.u2.view.ReadOnlyEnumView',
-    'foam.u2.crunch.Style'
+    'foam.u2.crunch.Style',
+    'foam.u2.Tooltip',
+    'foam.u2.view.ReadOnlyEnumView'
   ],
 
   documentation: `
@@ -39,10 +40,10 @@ foam.CLASS({
       position: relative;
     }
 
-    ^ .foam-u2-crunch-Style-badge {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
+    ^badge > * {
+      border-radius: 0px 11.2px 11.2px 0px !important;
+      height: 24px;
+      width: 79px;
     }
 
     ^ .foam-u2-crunch-Style-renewable-description {
@@ -65,9 +66,7 @@ foam.CLASS({
         Stores the status of the capability feature and is updated when the user
         attempts to fill out or complete the CRUNCH forms.
       `,
-      factory: function() {
-        return foam.nanos.crunch.CapabilityJunctionStatus.AVAILABLE;
-      }
+      value: null
     },
     {
       class: 'Boolean',
@@ -110,18 +109,19 @@ foam.CLASS({
             'background-image': "url('" + self.data.icon + "')"
           })
           .add(this.slot(function(cjStatus) {
-            return this.E().addClass(style.myClass('tooltip'))
+            if ( ! cjStatus ) return;
+            return this.E()
+              .addClass(style.myClass('tooltip'))
               .start('span')
                 .addClass(style.myClass('tooltiptext'))
                 .addClass(style.myClass('tooltip-bottom'))
                 .enableClass(style.myClass('tooltipDisabled'), self.tooltipEnabled, true)
                 .add(cjStatus.documentation)
               .end()
-              .add(cjStatus.label).addClass(style.myClass('badge'))
-              .style({
-                'background-color': cjStatus.background,
-                'color': cjStatus.color
-              });
+              .start()
+                .addClass(this.myClass('badge'))
+                .add(foam.u2.view.ReadOnlyEnumView.create({ data: cjStatus }))
+              .end();
           }))
           .add(this.slot(function(isRenewable) {
             return isRenewable ? this.E()
@@ -133,7 +133,7 @@ foam.CLASS({
         .end()
         .start()
           .addClass(style.myClass('card-title'))
-          .add(( self.data.name != '') ?  { data : self.data, clsInfo : self.data.cls_.NAME.name, default : self.data.name }  : self.data.id)
+          .translate(self.data.id + '.' + self.data.cls_.NAME.name, self.data.name)
         .end();
     }
   ],
@@ -183,6 +183,8 @@ foam.CLASS({
     },
     {
       name: 'statusUpdate',
+      isMerged: true,
+      mergeDelay: 100,
       code: function() {
         if ( this.cjStatus != this.CapabilityJunctionStatus.PENDING &&
               this.cjStatus != this.CapabilityJunctionStatus.PENDING_REVIEW ) {
@@ -194,7 +196,7 @@ foam.CLASS({
             this.crunchService.pub('grantedJunction');
             this.cjStatus = this.CapabilityJunctionStatus.GRANTED;
           } else {
-            this.window.setTimeout(this.statusUpdate, 2000);
+            this.statusUpdate();
           }
         })
       }
