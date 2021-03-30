@@ -13,35 +13,35 @@
       args: [
         {
           name: 'address1',
-          type: 'String',
+          type: 'String'
         },
         {
           name: 'address2',
-          type: 'String',
+          type: 'String'
         }
       ],
       type: 'StringArray',
       code: function(address1, address2) {
         var suitePattern = /\d+/g;
         if ( address1.indexOf('Unit') > 0) {
-            var parts = address1.split('Unit');
-            address1 = parts[0].trim();
-            address2 = parts[1].trim();
+          var parts = address1.split('Unit');
+          address1 = parts[0].trim();
+          address2 = parts[1].trim();
         }
         if ( address1.endsWith(',') ) {
-            address1.split(',')[0];
+          address1.split(',')[0];
         }
         if ( address1.indexOf(',') > 0) {
-            var parts = address1.split(',');
-            address1 = parts[0];
-            address2 = parts[1];
+          var parts = address1.split(',');
+          address1 = parts[0];
+          address2 = parts[1];
         }
         var street = address1;
         var suite = address2.match(suitePattern);
         if ( address1.indexOf('-') > 0) {
-            var parts = address1.split('-');
-            suite = parts[0].match(suitePattern);
-            street = parts[1].trim();
+          var parts = address1.split('-');
+          suite = parts[0].match(suitePattern);
+          street = parts[1].trim();
         }
         street = street.replace(/[\#"]/g, "");
         var n = street.indexOf(' ');
