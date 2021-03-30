@@ -2301,6 +2301,9 @@ foam.CLASS({
     {
       name: 'partialEval',
       code: function() {
+        if ( this.arg1 && this.arg1.partialEval ) {
+          this.arg1 = this.arg1.partialEval();
+        }
         if ( this.Not.isInstance(this.arg1) ) {
           this.arg1 = this.arg1.partialEval();
           if ( ! this.arg2 ) {
