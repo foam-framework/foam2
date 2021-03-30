@@ -81,3 +81,5 @@ p({
   """,
   "output":""
 })
+
+p({"class":"foam.test.AddressUtilTests","id":"AddressUtilAddressParsingTest"})

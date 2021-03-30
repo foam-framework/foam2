@@ -4,7 +4,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-
 package foam.util;
 
 import java.util.regex.Pattern;
@@ -15,7 +14,6 @@ public class AddressUtil {
   protected static final Pattern replacePattern = Pattern.compile("/[#\"]/g");
 
   public static String[] parseAddress(String address1, String address2) {
-
     if ( address1.indexOf("Unit") > 0) {
       var parts = address1.split("Unit");
       address1 = parts[0].trim();
