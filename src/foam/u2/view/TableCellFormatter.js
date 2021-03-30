@@ -177,9 +177,9 @@ foam.CLASS({
               .addClass('foam-u2-view-ImageTableCellFormatter')
             .end();
         } else {
-          this.start().
-            add('-').
-          end();
+          this.start()
+            .add('-')
+          .end();
         }
       }
     }
