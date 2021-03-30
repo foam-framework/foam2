@@ -150,6 +150,41 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'ImageTableCellFormatterRefinement',
+  refines: 'foam.core.Image',
+
+  requires: [
+    'foam.u2.view.ImageView',
+    'foam.u2.crunch.Style'
+  ],
+  css: `
+    .foam-u2-view-ImageTableCellFormatter {
+      height: -webkit-fill-available;
+      height: -moz-available;
+      padding: 2px;
+    }
+  `,
+  properties: [
+    {
+      class: 'foam.u2.view.TableCellFormatter',
+      name: 'tableCellFormatter',
+      value: function(value) {
+        if ( value ) {
+          this
+            .start({ class: 'foam.u2.view.ImageView', data: value })
+              .addClass('foam-u2-view-ImageTableCellFormatter')
+            .end();
+        } else {
+          this.start().
+            add('-').
+          end();
+        }
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.u2.view',
