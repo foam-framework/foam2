@@ -24,6 +24,13 @@ foam.CLASS({
     'foam.u2.wizard.internal.WizardletAutoSaveSlot'
   ],
 
+  constants: [
+    {
+      name: 'SAVE_DELAY',
+      value: 1200
+    }
+  ],
+
   properties: [
     {
       name: 'id',
@@ -162,7 +169,7 @@ foam.CLASS({
               var updateSlot = data.getUpdateSlot();
               return this.WizardletAutoSaveSlot.create({
                 other: filter(updateSlot, v => v && ! self.loading),
-                delay: 700 // TODO: constant
+                delay: self.SAVE_DELAY
               });
             })
             .valueSub(() => { if ( ! self.loading ) s.pub(true); });
@@ -171,7 +178,7 @@ foam.CLASS({
         var sl = this.FObjectRecursionSlot.create({ obj$: this.data$ });
         return filter(this.WizardletAutoSaveSlot.create({
           other: filter(sl, () => ! self.loading),
-          delay: 700
+          delay: self.SAVE_DELAY
         }), () => ! self.loading);
       }
     }
