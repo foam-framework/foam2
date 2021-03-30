@@ -260,6 +260,9 @@ foam.CLASS({
     {
       name: 'submit',
       label: 'Done',
+      isEnabled: function (data$config, data$allValid) {
+        return ! data$config.requireAll || data$allValid;
+      },
       code: function (x) {
         for ( let w of this.data.wizardlets ) {
           if ( w.submit ) w.submit();
