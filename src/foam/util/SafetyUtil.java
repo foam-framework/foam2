@@ -86,6 +86,14 @@ public class SafetyUtil {
     return o1.compareTo(o2);
   }
 
+  public static int compare(Enum o1, Enum o2) {
+    if ( o1 == o2   ) return  0;
+    if ( o2 == null ) return  1;
+    if ( o1 == null ) return -1;
+
+    return o1.compareTo(o2);
+  }
+
   public static int compare(boolean o1, boolean o2) {
     return o1 == o2 ? 0 : o1 ? 1 : -1;
   }
