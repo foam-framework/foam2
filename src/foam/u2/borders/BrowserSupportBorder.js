@@ -24,30 +24,26 @@ foam.CLASS({
 
   methods: [
     function init() {
-      if ( this.isChrome() ) {
+      this
+        .start()
+          .addClass(this.myClass())
+          .start('div', null, this.content$)
+            .addClass(this.myClass('content'))
+          .end()
+        .end();
+      if ( ! this.isChrome() ) {
+        var tmp = this.content;
+        this.content = undefined;
         this
-          .start()
-            .addClass(this.myClass())
-            .start('div', null, this.content$)
-              .addClass(this.myClass('content'))
+          .start('div')
+            .addClass(this.myClass("browser-message"))
+            .add(this.BROWSER_SUPPORT)
+            .start('a')
+              .attrs({href: 'https://www.google.com/chrome/'})
+              .add("Google Chrome")
             .end()
           .end();
-      } else {
-        this
-          .start()
-            .addClass(this.myClass())
-            .start('div', null, this.content$)
-              .addClass(this.myClass('content'))
-            .end()
-            .start('div')
-              .addClass(this.myClass("browser-message"))
-              .add(this.BROWSER_SUPPORT)
-              .start('a')
-                .attrs({href: 'https://www.google.com/chrome/'})
-                .add("Google Chrome")
-              .end()
-            .end()
-          .end();
+        this.content = tmp;
       }
     },
 
