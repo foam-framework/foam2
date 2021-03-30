@@ -247,6 +247,11 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'defaultLanguageLocale',
+      value: 'en'
+    },
+    {
+      class: 'String',
       name: 'font1',
       section: 'sectionCss'
     },
