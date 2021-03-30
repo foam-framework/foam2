@@ -224,7 +224,7 @@ foam.LIB({
           configurable: false
         }
       );
-      foam.locale = l || 'en';
+      foam.locale = l || 'pt';
       foam.xmsg = global.window && ( global.window.location.href.indexOf('XMSG') != -1 );
     },
 
