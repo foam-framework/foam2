@@ -680,6 +680,7 @@ var classes = [
   'foam.nanos.ruler.Ruled',
   'foam.nanos.ruler.Rule',
   'foam.nanos.ruler.RuledDAO',
+  'foam.nanos.ruler.RulerData',
   'foam.nanos.ruler.test.RuledDAOTest',
   'foam.nanos.ruler.test.RuledDummy',
   'foam.nanos.ruler.RulerDAO',
@@ -852,6 +853,7 @@ var classes = [
   'foam.nanos.crunch.predicate.StatusChangedTo',
   'foam.nanos.crunch.predicate.IsAgent',
   'foam.nanos.crunch.predicate.CapabilityJunctionTransitionToStatus',
+  'foam.nanos.crunch.predicate.IsAgentUpdate',
 
   //authservice
   'foam.nanos.auth.CapabilityAuthService',

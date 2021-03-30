@@ -23,7 +23,7 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'VIEW_ALL', message: 'View all ' },
+    { name: 'VIEW_ALL',   message: 'View all ' },
     { name: 'CREATE_NEW', message: 'Create a New ' }
   ],
 
@@ -88,7 +88,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'browseSubtitle',
-      factory: function() { return this.VIEW_ALL + this.browseTitle.toLowerCase()}
+      value: ''
     },
     {
       class: 'FObjectProperty',
@@ -98,6 +98,13 @@ foam.CLASS({
         choose to display this action prominently.
       `,
       value: null
+    },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'createView',
+      factory: function() {
+        return { class: 'foam.u2.view.FObjectView' };
+      }
     },
     {
       class: 'foam.u2.ViewSpec',

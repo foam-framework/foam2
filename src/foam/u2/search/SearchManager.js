@@ -60,14 +60,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function init() {
-      if ( this.memento && this.memento.paramsObj.f && this.memento.paramsObj.f.length > 0 ) {
-        var predicates = this.memento.paramsObj.f.map(f => foam.json.parseString(f.pred, this.__subContext__));
-        this.predicate = this.And.create({
-          args: predicates
-        }).partialEval();
-      }
-    },
 
     function and(views) {
       return this.And.create({
@@ -135,25 +127,6 @@ foam.CLASS({
         this.predicate = this.and(this.views);
         // That will tickle the expression for filteredDAO.
         this.updateViews();
-
-        if ( ! this.memento )
-          return;
-        var searches = [];
-        var keys = Object.keys(this.views);
-        if ( keys.length == 0 ) {
-          delete this.memento.paramsObj.f;
-        } else {
-          var outputter = foam.json.Outputter.create({
-            strict: true
-          });
-          for ( var key of keys ) {
-            if ( ! foam.mlang.predicate.True.isInstance(this.views[key].predicate ) ) {
-              searches.push({ name: key, criteria: 0, pred: outputter.stringify(this.views[key].predicate) });
-            }
-          }
-          
-          this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
-        }
       }
     },
     {

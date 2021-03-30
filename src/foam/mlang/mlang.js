@@ -1701,10 +1701,18 @@ return false
     {
       name: 'partialEval',
       code: function partialEval() {
-        if ( ! this.Constant.isInstance(this.arg2) ) return this;
+        var value = this.arg2;
+        if ( this.Constant.isInstance(this.arg2) ) value = this.arg2.value;
 
-        return ( ! this.arg2.value ) || this.arg2.value.length === 0 ?
-            this.FALSE : this;
+        if ( ! value )
+          return this.FALSE;
+
+        if ( foam.Array.isInstance(value) && value.length == 1 ) return this.Eq.create({
+          arg1: this.arg1,
+          arg2: value[0]
+        });
+
+        return this;
       },
       javaCode: `
         if ( getArg2() instanceof ArrayBinary || getArg2() instanceof Constant ) {
@@ -3973,7 +3981,8 @@ foam.CLASS({
       type: 'Predicate',
       code: function(model) {
         var qp = foam.parse.QueryParser.create({of: model.id});
-        return qp.parseString(this.query) || foam.mlang.predicate.False.create();
+        var pred = qp.parseString(this.query);
+        return pred ? pred.partialEval() : foam.mlang.predicate.False.create();
       },
       javaCode: `
         QueryParser parser = new QueryParser(model);
@@ -3985,7 +3994,7 @@ foam.CLASS({
         if (ps == null)
           return new False();
 
-        return (foam.mlang.predicate.Nary) ps.value();
+        return ((foam.mlang.predicate.Nary) ps.value()).partialEval();
       `
     },
     function toString() {

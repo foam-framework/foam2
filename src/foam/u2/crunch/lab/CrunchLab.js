@@ -33,6 +33,7 @@ foam.CLASS({
 
   imports: [
     'capabilityDAO',
+    'memento',
     'userCapabilityJunctionDAO'
   ],
 
@@ -140,6 +141,14 @@ foam.CLASS({
             }
           ]
         };
+      },
+      postSet: function(_, n) {
+        if ( this.memento ) {
+          if ( n )
+            this.currentMemento_ = foam.nanos.controller.Memento.create({value: n});
+          else
+            this.currentMemento_ = null;
+        }
       }
     },
     {
@@ -154,10 +163,15 @@ foam.CLASS({
       class: 'String',
       value: 'prerequisites'
     },
+    'currentMemento_'
   ],
 
   methods: [
     function initE() {
+      if ( this.memento) {
+        this.currentMemento_$ = this.memento.tail$;
+      }
+
       this
         .addClass(this.myClass())
         .start('h2').add(this.cls_.name).end()
@@ -180,8 +194,8 @@ foam.CLASS({
           .end()
         .end()
         ;
-      // this.memento$.sub(this.mementoChange);
-      // this.mementoChange();
+
+      this.mementoChange();
     },
     function getGraphSlot(replaceWithUCJ) {
       var self = this;
@@ -251,10 +265,10 @@ foam.CLASS({
     }
   ],
 
-  // listeners: [
-  //   function mementoChange() {
-  //     var m = this.memento;
-  //     if ( m && this.rootCapability != m ) this.rootCapability = m;
-  //   }
-  // ]
+  listeners: [
+    function mementoChange() {
+      var m = this.currentMemento_;
+      if ( m && this.rootCapability != m.head ) this.rootCapability = m.head;
+    }
+  ]
 });

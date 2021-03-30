@@ -49,26 +49,26 @@ foam.CLASS({
         var B         = Math.atan(trigH / ((.5+lean) * w));
 
         this.add(
-            nextLeft > 1 && this.cls_.create({
-              x: 0,
-              y: -nextLeft,
-              w: nextLeft,
-              rotate: 'rotate(' + this.radToDeg(-A) + ' 0 ' + nextLeft + ')',
-              lvl: this.lvl+1,
-              maxlvl: this.maxlvl,
-              heightFactor: this.heightFactor,
-              lean: this.lean
-            }),
-            nextRight > 1 && this.cls_.create({
-              x: Math.cos(A)*nextLeft,
-              y: -nextRight - Math.sin(A)*nextLeft,
-              w: nextRight,
-              rotate: 'rotate(' + this.radToDeg(B) + ' 0 ' + nextRight + ')',
-              lvl: this.lvl+1,
-              maxlvl: this.maxlvl,
-              heightFactor: this.heightFactor,
-              lean: this.lean
-            }));
+          nextLeft > 1 && this.cls_.create({
+            x: 0,
+            y: -nextLeft,
+            w: nextLeft,
+            rotate: 'rotate(' + this.radToDeg(-A) + ' 0 ' + nextLeft + ')',
+            lvl: this.lvl+1,
+            maxlvl: this.maxlvl,
+            heightFactor: this.heightFactor,
+            lean: this.lean
+          }),
+          nextRight > 1 && this.cls_.create({
+            x: Math.cos(A)*nextLeft,
+            y: -nextRight - Math.sin(A)*nextLeft,
+            w: nextRight,
+            rotate: 'rotate(' + this.radToDeg(B) + ' 0 ' + nextRight + ')',
+            lvl: this.lvl+1,
+            maxlvl: this.maxlvl,
+            heightFactor: this.heightFactor,
+            lean: this.lean
+          }));
       }
     },
 
@@ -85,7 +85,7 @@ foam.CLASS({
 
   properties: [
     { name: 'heightFactor', value: 0.55 },
-    { name: 'lean', value: 0 }
+    { name: 'lean',         value: 0 }
   ],
 
   methods: [

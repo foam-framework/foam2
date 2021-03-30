@@ -109,6 +109,7 @@ foam.INTERFACE({
     },
     {
       name: 'getDependentIds',
+      async: true,
       type: 'String[]',
       args: [
         {

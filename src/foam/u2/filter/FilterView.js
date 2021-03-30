@@ -33,7 +33,8 @@ foam.CLASS({
 
   exports: [
     'as data',
-    'filterController'
+    'filterController',
+    'currentMemento_ as memento'
   ],
 
   css: `
@@ -280,26 +281,37 @@ foam.CLASS({
         return filterController$isAdvanced ? this.LINK_SIMPLE : this.LINK_ADVANCED;
       }
     },
-    'searchValue'
+    'currentMemento_'
   ],
 
   methods: [
     function initE() {
       var self = this;
 
-      if ( this.memento && this.memento.paramsObj.f ) {
-        this.memento.paramsObj.f.forEach(f => {
-          var parser = foam.parse.QueryParser.create({ of: self.dao.of.id });
-          var pred = parser.parseString(f.pred);
-
-          self.filterController.setExistingPredicate(f.criteria, f.n, pred);
-        });
-      }
-
+      var counter = 0;
+      this.updateCurrentMemento(counter);
+      //memento which will be exported to table view
+      if ( self.currentMemento_ ) self.currentMemento_ = self.currentMemento_.tail;
+      
       this.onDetach(this.filterController$.dot('isAdvanced').sub(this.isAdvancedChanged));
       var selectedLabel = ctrl.__subContext__.translationService.getTranslation(foam.locale, 'foam.u2.filter.FilterView.SELECTED', this.SELECTED);
       this.addClass(self.myClass())
         .add(this.slot(function(filters) {
+
+          self.updateCurrentMemento.bind(self)(counter);
+
+          self.generalSearchField = foam.u2.ViewSpec.createView(self.TextSearchView, {
+            richSearch: true,
+            of: self.dao.of.id,
+            onKey: true,
+            viewSpec: {
+              class: 'foam.u2.tag.Input',
+              placeholder: this.LABEL_SEARCH
+            }
+          },  this, self.__subSubContext__.createSubContext({ memento: self.currentMemento_ }));
+
+          if ( self.currentMemento_ ) self.currentMemento_ = self.currentMemento_.tail;
+
           self.show(filters.length);
 
           var e = this.E();
@@ -309,16 +321,8 @@ foam.CLASS({
               .on('click', self.toggleDrawer)
               .start('p').addClass(self.myClass('handle-title')).add(self.LABEL_FILTER).end()
             .end()
-            .start(self.TextSearchView, {
-              richSearch: true,
-              of: self.dao.of.id,
-              onKey: true,
-              searchValue: self.searchValue,
-              viewSpec: {
-                class: 'foam.u2.tag.Input',
-                placeholder: this.LABEL_SEARCH
-              }
-            }, self.generalSearchField$)
+            .start()
+              .add(self.generalSearchField)
               .addClass(self.myClass('general-field'))
             .end()
           .end()
@@ -334,14 +338,26 @@ foam.CLASS({
                 .start().addClass(self.myClass('container-filters'))
                   .forEach(filters, function(f) {
                     var axiom = self.dao.of.getAxiomByName(f);
-                    if ( axiom ){
-                      this.start(self.PropertyFilterView, {
+                    if ( axiom ) {
+                      var propView = foam.u2.ViewSpec.createView(self.PropertyFilterView, {
                         criteria: 0,
                         searchView: axiom.searchView,
                         property: axiom,
                         dao: self.dao
-                      })
-                      .hide(self.filterController$.dot('isAdvanced'))
+                      },  self, self.__subSubContext__.createSubContext({ memento: self.currentMemento_ }));
+
+                      counter--;
+                      if ( self.currentMemento_ ) {
+                        if ( counter != 0 ) {
+                          self.currentMemento_ = self.currentMemento_.tail;
+                          if ( self.currentMemento_.tail == null )
+                            self.currentMemento_.tail = foam.nanos.controller.Memento.create();
+                        }
+                      }
+
+                      this.start()
+                        .add(propView)
+                        .hide(self.filterController$.dot('isAdvanced'))
                       .end();
                     }
                   })
@@ -457,6 +473,38 @@ foam.CLASS({
         } else {
           this.generalSearchField.data = '';
           this.generalSearchField.mode = foam.u2.DisplayMode.DISABLED;
+        }
+      }
+    },
+
+    function updateCurrentMemento(counter) {
+      if ( this.memento ) {
+        var m = this.memento;
+        //i + 1 as there is a textSearch that we also need for memento
+        for ( var i = 0 ; i < this.filters.length + 1 ; i++ ) {
+          if ( ! m ) {
+            m = foam.nanos.controller.Memento.create({ value: '', parent: this.memento });
+            this.memento.tail = m;
+          } else {
+            if ( ! m.tail )
+              m.tail = foam.nanos.controller.Memento.create({ value: '', parent: m });
+            m = m.tail;
+          }
+        }
+        this.currentMemento_ = this.memento.tail;
+      }
+
+      if ( this.currentMemento_ && this.currentMemento_.tail ) {
+        var m = this.memento;
+        counter = 0;
+
+        while ( counter < this.filters.length &&  m != null ) {
+          m = m.tail;
+
+          counter++;
+
+          if ( ! m || m.head.length == 0 )
+            continue;
         }
       }
     }

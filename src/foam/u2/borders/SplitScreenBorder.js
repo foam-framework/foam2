@@ -39,17 +39,17 @@ foam.CLASS({
       overflow: auto;
       height: 100%;
     }
-`,
+  `,
 
-properties: [
-  'leftPanel',
-  'rightPanel'
-],
+  properties: [
+    'leftPanel',
+    'rightPanel'
+  ],
 
-methods: [
-  function init() {
-    this.addClass(this.myClass())
-    .start().addClass('wrapper-outer')
+  methods: [
+    function init() {
+      this.addClass(this.myClass())
+      .start().addClass('wrapper-outer')
         .start().addClass('left-block')
           .start('div', null, this.leftPanel$)
               .addClass(this.myClass('content'))
@@ -60,7 +60,7 @@ methods: [
             .addClass(this.myClass('content'))
           .end()
         .end()
-    .end();
-  }
-]
+      .end();
+    }
+  ]
 });

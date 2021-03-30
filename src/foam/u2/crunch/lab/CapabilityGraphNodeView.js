@@ -111,7 +111,7 @@ foam.CLASS({
             .add(capability.id)
             .on('click', function() {
               var menu = 'admin.data';
-              var dao = 'capabilityDAO';
+              var dao = 'capabilityDAO::::::::::::::::::::::::view';
               self.memento.value = [menu, dao, capability.id].join(foam.nanos.controller.Memento.SEPARATOR);
             })
           .end()
@@ -133,7 +133,7 @@ foam.CLASS({
                 .add(ucj.status.label)
                 .on('click', function() {
                   var menu = 'admin.data';
-                  var dao = 'userCapabilityJunctionDAO';
+                  var dao = 'userCapabilityJunctionDAO::::::::::::::::::::::::view';
                   self.memento.value = [menu, dao, ucj.id].join(foam.nanos.controller.Memento.SEPARATOR);
                 })
               .end()

@@ -78,8 +78,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isVisible',
-      expression: function (isAvailable) {
-        return isAvailable;
+      expression: function (isAvailable, choices, hideChoiceView) {
+        return isAvailable && choices.length > 0 && ! hideChoiceView;
       }
     },
     {
@@ -96,7 +96,7 @@ foam.CLASS({
           this.selectedData = [];
 
           // to cascade hiding all descendent wizardlets
-          // TODO: investigate why this is still needed, 
+          // TODO: investigate why this is still needed,
           // setting data to empty array should have made isAvailable automatically evaluate to false
           this.choiceWizardlets.forEach(cw => {
             cw.isAvailable = false
@@ -144,9 +144,9 @@ foam.CLASS({
             if ( savedSelectedData.length === savedSelectedDataIds.length ) break;
           }
 
-          selectedData = finalData.concat(savedSelectedData);     
+          selectedData = finalData.concat(savedSelectedData);
         }
-        
+
         this.selectedData = selectedData;
 
         var sections = [
