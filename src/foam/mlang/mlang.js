@@ -2083,6 +2083,12 @@ return !FOAM_utils.equals(v1, v2)
     {
       name: 'createStatement',
       javaCode: 'return " " + getArg1().createStatement() + " <> " + getArg2().createStatement() + " ";'
+    },
+    function toMQL() {
+      var arg2 = this.arg2ToMQL();
+      if ( ! arg2 )
+        return null;
+      return '-' + this.arg1.name + '=' + arg2;
     }
   ]
 });
@@ -2267,7 +2273,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Not',
   extends: 'foam.mlang.predicate.AbstractPredicate',
-  implements: [ 'foam.core.Serializable' ],
+  implements: [ 'foam.core.Serializable', { path: 'foam.mlang.Expressions', flags: ['js'], java: false } ],
 
   documentation: 'Unary Predicate which negates the value of its argument.',
 
@@ -2294,7 +2300,40 @@ foam.CLASS({
     },
     {
       name: 'partialEval',
-      code: function() { return this; },
+      code: function() {
+        if ( this.arg1 && this.arg1.partialEval ) {
+          this.arg1 = this.arg1.partialEval();
+        }
+        if ( this.Not.isInstance(this.arg1) ) {
+          this.arg1 = this.arg1.partialEval();
+          if ( ! this.arg2 ) {
+            return this.arg1;
+          }
+        } else if ( this.Eq.isInstance(this.arg1) ) {
+          return this.Neq.create({arg1: this.arg1.arg1, arg2: this.arg1.arg2});
+        } else if (this.Neq.isInstance(this.arg1)) {
+          return this.Eq.create({arg1: this.arg1.arg1, arg2: this.arg1.arg2});
+        } else if (this.Lt.isInstance(this.arg1)) {
+          return this.Gte.create({arg1: this.arg1.arg1, arg2: this.arg1.arg2});
+        } else if (this.Gte.isInstance(this.arg1)) {
+          return this.Lt.create({arg1: this.arg1.arg1, arg2: this.arg1.arg2});
+        } else if (this.Gt.isInstance(this.arg1)) {
+          return this.Lte.create({arg1: this.arg1.arg1, arg2: this.arg1.arg22});
+        } else if (this.Lte.isInstance(this.arg1)) {
+          return this.Gt.create({arg1: this.arg1.arg1, arg2: this.arg1.arg2});
+        } else if (this.And.isInstance(this.arg1)) {
+          for ( var i = 0; i < this.arg1.args.length; i++ ) {
+            this.arg1.args[i] = this.Not.create(this.arg1.args[i]);
+          }
+          return this.Or.create({args: this.arg1.args[i]});
+        } else if (this.Or.isInstance(this.arg1)) {
+          for ( var i = 0; i < this.arg1.args.length; i++ ) {
+            this.arg1.args[i] = this.Not.create(this.arg1.args[i]);
+          }
+          return this.And.create({args: this.arg1.args[i]});
+        }
+        return this;
+      },
       javaCode:
       `Not predicate = (Not) this.fclone();
     if ( this.arg1_ instanceof Not )

@@ -204,8 +204,7 @@ foam.CLASS({
 
   messages: [
     { name: 'GO_BACK', message: 'Go to ' },
-    { name: 'MODE1', message: 'SignUp' },
-    { name: 'BROWSER_SUPPORT', message: 'This application is optimized for Google Chrome'}
+    { name: 'MODE1', message: 'SignUp' }
   ],
 
   methods: [
@@ -261,13 +260,6 @@ foam.CLASS({
               this.model.subfooterLink();
             })
           .end()
-          .callIf(!self.isChrome(), function() {
-            this
-              .br().br()
-              .start('span')
-                .add(self.BROWSER_SUPPORT)
-              .end()
-          })
         .end();
 
       // CREATE SPLIT VIEW
@@ -315,10 +307,6 @@ foam.CLASS({
         }, function() {
           this.add(right);
         });
-    },
-
-    function isChrome() {
-      return navigator.userAgent.includes("Chrome") && navigator.vendor.includes("Google Inc");
     }
   ],
 

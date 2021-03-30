@@ -76,22 +76,45 @@ foam.CLASS({
 
       for ( let prop of props ) {
         let prop$ = prop.toSlot(o);
-        if ( prop.cls_.id != 'foam.core.FObjectProperty' ) {
-          prop$.sub(() => {
-            this.value = { obj: o, cause: prop$ };
-          });
+        if ( foam.core.FObjectProperty.isInstance(prop) ) {
+          if ( this.parentRefs.includes(prop$) ) continue;
+
+          let propR$ = this.cls_.create({
+            obj$: prop$,
+            parentRefs: [ ...this.parentRefs, prop$, o ],
+          }, this);
+
+          cleanup.onDetach(propR$.sub(() => {
+            this.value = { obj: o, cause: propR$ };
+          }));
+
           continue;
         }
-        if ( this.parentRefs.includes(prop$) ) continue;
-
-        let propR$ = this.cls_.create({
-          obj$: prop$,
-          parentRefs: [ ...this.parentRefs, prop$, o ],
-        }, this);
-
-        cleanup.onDetach(propR$.sub(() => {
-          this.value = { obj: o, cause: propR$ };
-        }));
+        if ( foam.core.FObjectArray.isInstance(prop) ) {
+          let innerCleanup = foam.core.FObject.create();
+          let updateArray = arry => {
+            innerCleanup.detach();
+            innerCleanup = foam.core.FObject.create();
+            for ( let elem of arry ) {
+              let elemR$ = this.cls_.create({
+                obj: elem,
+                parentRefs: [ ...this.parentRefs, prop$, o ]
+              }, this);
+              innerCleanup.onDetach(elemR$.sub(() => {
+                this.value = { obj: elem, cause: elemR$ };
+              }));
+            }
+          };
+          cleanup.onDetach(prop$.sub(() => {
+            updateArray(prop$.get());
+            this.value = { obj: o, cause: prop$ };
+          }));
+          updateArray(prop$.get());
+          continue;
+        }
+        prop$.sub(() => {
+          this.value = { obj: o, cause: prop$ };
+        });
       }
     }
   ],
