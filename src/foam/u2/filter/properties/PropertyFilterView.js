@@ -164,7 +164,7 @@ foam.CLASS({
       if ( this.memento && this.memento.head.length != 0 ) {
         var predicate = this.getPredicateFromMemento();
         if ( predicate ) {
-          this.filterController.setExistingPredicate(0, this.property.name, predicate);
+          this.filterController.setExistingPredicate(0, this.property.name, predicate.partialEval());
         }
       }
 
