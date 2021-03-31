@@ -98,12 +98,6 @@ foam.CLASS({
         return url;
       },
       view: 'foam.nanos.dig.LinkView'
-//      view: function(_, X) {
-//      debugger;
-//        return foam.nanos.dig.LinkView.create({
-//          data: "ad"
-//        }, X)
-//      }
     },
     {
       class: 'Blob',
