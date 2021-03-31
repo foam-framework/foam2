@@ -35,7 +35,12 @@ foam.CLASS({
   ],
 
   properties: [
-    { name: 'customUpdateSlot', class: 'Boolean' }
+    {
+      name: 'customUpdateSlot',
+      class: 'Boolean',
+      hidden: true,
+      transient: true
+    }
   ],
 
   methods: [
