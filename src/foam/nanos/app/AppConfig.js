@@ -21,8 +21,11 @@ foam.CLASS({
       name: 'name'
     },
     {
+      documentation: 'Set at startup in bootscript.',
       class: 'String',
-      name: 'version'
+      name: 'version',
+      visibility: 'RO',
+      storageTransient: true
     },
     {
       class: 'String',
@@ -38,6 +41,7 @@ foam.CLASS({
       name: 'copyright'
     },
     {
+      documentation: 'Set by Theme',
       class: 'String',
       name: 'url',
       value: 'http://localhost:8080/'
