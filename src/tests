@@ -81,3 +81,22 @@ p({
   """,
   "output":""
 })
+p({"class":"net.nanopay.tx.billing.ChargeDateServiceTest","id":"ChargeDateServiceTest"})
+p({"class":"foam.test.AddressUtilTests","id":"AddressUtilAddressParsingTest"})
+p({
+  "class":"foam.nanos.test.Test",
+  "id":"ClientAddressUtilAddressParsingTest",
+  "server":false,
+  "code":"""
+  function testAddressParse(address1, address2, number, street) {
+    var addrs1 = foam.util.AddressUtil.parseAddress(address1, address2);
+    test(addrs1[0] === number && addrs1[1] === street, "[" + address1 + (address2 ? "," + address2 : "") + "] parsed to [" + number + ", " + street + "]");
+  }
+
+  testAddressParse("14 Cheltenham Mews", "", "14", "Cheltenham Mews");
+  testAddressParse("25 St. Dennis Drive", "Suite # 1019", "25", "St. Dennis Drive");
+  testAddressParse("1505 - 25 The Esplanade", "", "25", "The Esplanade");
+  testAddressParse("1505-19 Western Battery Rd", "", "19", "Western Battery Rd");
+  """
+})
+
