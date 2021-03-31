@@ -227,11 +227,11 @@ foam.CLASS({
         await this.choicesLoaded;
       }
 
-      this.data$.relateTo(
+      this.onDetach(this.data$.relateTo(
         this.objectClass$,
         dataToClass,
         classToData
-      );
+      ));
 
       if ( this.data ) { this.objectClass = dataToClass(this.data); }
       if ( ! this.data && ! this.objectClass && this.choices.length && ! this.hasOwnProperty('placeholder') ) this.objectClass = this.choices[0][0];
