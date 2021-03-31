@@ -176,6 +176,7 @@ FOAM_FILES([
   { name: "foam/java/Util", flags:['java'] },
 
   { name: "foam/util/Timer" },
+  { name: "foam/util/AddressUtil" },
   { name: "foam/util/EmailTest" },
   { name: "foam/util/PasswordTest" },
   { name: "foam/util/SecurityUtilTest" },
