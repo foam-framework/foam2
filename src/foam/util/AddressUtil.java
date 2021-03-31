@@ -36,7 +36,9 @@ public class AddressUtil {
 
     if ( address1.indexOf('-') > 0) {
       var parts = address1.split("-");
-      suite = SUITE_PATTERN.matcher(parts[0]).group(0);
+      try {
+        suite = SUITE_PATTERN.matcher(parts[0]).group(0);
+      } catch(IllegalStateException ignored) {}
       street = parts[1].trim();
     }
 
