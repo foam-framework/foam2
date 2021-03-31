@@ -13,6 +13,9 @@ public class AddressUtil {
   protected static final Pattern SUITE_PATTERN = Pattern.compile("/\\d+/g");
   protected static final Pattern REPLACE_PATTERN = Pattern.compile("/[#\"]/g");
 
+  /*
+   * Splits an address into the number and name, in that order, into an array
+   */
   public static String[] parseAddress(String address1, String address2) throws IllegalArgumentException {
     if ( address1.indexOf("Unit") > 0) {
       var parts = address1.split("Unit");

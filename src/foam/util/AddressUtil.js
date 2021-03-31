@@ -10,6 +10,7 @@
   methods: [
     {
       name: 'parseAddress',
+      documentation: 'Splits an address into the number and name, in that order, into an array',
       args: [
         {
           name: 'address1',
