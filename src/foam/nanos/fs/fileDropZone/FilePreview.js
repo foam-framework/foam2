@@ -46,6 +46,15 @@ foam.CLASS({
             'height': '0px',
             'width': '0px'
           })
+        .end()
+        .start('div')
+          .addClass('file-text' + this.id)
+          .style({
+            'visibility': 'hidden',
+            'height': '0px',
+            'width': '0px'
+          })
+          .end()
         .end();
         this.showData();
       this.data$.sub(() => this.showData());
@@ -55,12 +64,14 @@ foam.CLASS({
       let iFrame = document.getElementsByClassName('file-iframe' + this.id)[0],
           image = document.getElementsByClassName('file-image' + this.id)[0],
           div = document.getElementsByClassName('file-image-div' + this.id)[0],
+          p = document.getElementsByClassName('file-text' + this.id)[0],
           url = '',
           pos;
 
       iFrame.style.visibility = 'hidden';
       div.style.visibility = 'hidden';
       div.style.display = 'none';
+      p.style.visibility = 'hidden';
 
       if ( this.selected == undefined || this.selected == this.data.length ) {
         pos = this.data.length - 1;
@@ -71,8 +82,8 @@ foam.CLASS({
       if ( ! this.data[pos] ) {
         return;
       }
-      // getData File method is async, so we need to wait for it to return data before we can show it
-      let d = await this.data[pos].data;
+
+      let d = this.data[pos].data;
       // If file is stored as a dataString, actual file is already on client side. Otherwise, actual file can be retrieved from server from File.address
       if ( ! d ) {
         url = this.data[pos].address;
@@ -80,16 +91,24 @@ foam.CLASS({
         url = URL.createObjectURL(d.blob);
       }
 
-      if ( this.data[pos].mimeType !== 'application/pdf' ) {
-        image.src = url;
-        div.style.visibility = 'visible';
-        div.style.display = 'block';
-      } else {
+      if ( this.data[pos].mimeType === 'application/pdf' ) {
         iFrame.src = url;
         iFrame.style.visibility = 'visible';
         iFrame.style.display = 'block';
         iFrame.style.height = '100%';
         iFrame.style.width = '100%';
+      } else if ( this.data[pos].mimeType === 'plain/text' ) {
+        let t = await this.data[pos].getText();
+        let text = document.createTextNode(t);
+        p.appendChild(text);
+        p.style.visibility = 'visible';
+        p.style.display = 'block';
+        p.style.height = '100%';
+        p.style.width = '100%';
+      } else {
+        image.src = url;
+        div.style.visibility = 'visible';
+        div.style.display = 'block';
       }
     }
   ]
