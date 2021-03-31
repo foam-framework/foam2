@@ -90,6 +90,18 @@ foam.CLASS({
       class: 'Image',
       documentation: `Path to capability icon`,
       section: 'uiSettings',
+      view: {
+        class: 'foam.u2.MultiView',
+        horizontal: false,
+        views: [
+          {
+            class: 'foam.u2.view.StringView'
+          },
+          {
+            class: 'foam.u2.view.ImageView'
+          }
+        ]
+      },
       includeInDigest: false
     },
     {
