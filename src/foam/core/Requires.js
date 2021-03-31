@@ -51,8 +51,11 @@ foam.CLASS({
         return this.path.split('.').pop();
       },
     },
-    'path',
-    'flags',
+    // Lower priority so it is set after Properties, so that it can override
+    // Property constants if there is a conflict.
+    [ 'priority', 90 ],
+     'path',
+    'flags'
   ],
 
   methods: [
