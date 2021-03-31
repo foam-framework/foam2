@@ -52,8 +52,7 @@ foam.CLASS({
               .start().add(
                 foam.u2.view.ReadOnlyEnumView.create({
                   data: statusEnum
-                }).addClass(style.myClass('badge'))
-                .style({ 'background-color': statusEnum.background })
+                })
               ).end()
               .start().add(statusEnum.documentation).end()
             .end();

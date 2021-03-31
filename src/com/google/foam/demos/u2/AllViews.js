@@ -166,6 +166,11 @@ foam.CLASS({
     },
     {
       class: 'Int',
+      name: 'tooltip',
+      view: { class: 'foam.u2.view.IntView', tooltip: 'Please enter a number.' }
+    },
+    {
+      class: 'Int',
       name: 'intWithIntView',
       view: {
         class: 'foam.u2.view.IntView',
@@ -521,6 +526,18 @@ foam.CLASS({
       class: 'Image',
       name: 'imageView',
       view: 'foam.u2.view.ImageView',
+      value: 'Dragon.png'
+    },
+    {
+      class: 'Image',
+      name: 'dualImageView',
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          'foam.u2.TextField',
+          'foam.u2.view.ImageView'
+        ]
+      },
       value: 'Dragon.png'
     },
     {

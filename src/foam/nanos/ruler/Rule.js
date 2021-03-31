@@ -31,9 +31,11 @@
     'foam.nanos.auth.AuthorizationException',
     'foam.nanos.auth.AuthService',
     'foam.nanos.auth.User',
+    'foam.nanos.auth.Subject',
     'foam.nanos.dao.Operation',
     'foam.nanos.logger.Logger',
-    'java.util.Collection'
+    'java.util.Collection',
+    'java.util.Date'
   ],
 
   tableColumns: [
@@ -325,10 +327,13 @@
         try {
           if ( getPredicate() instanceof MQLExpr ) {
             RulerData data = new RulerData();
+            Subject subject = (Subject) x.get("subject");
             data.setN(obj);
             data.setO(oldObj);
-            data.setUser((User)x.get("user"));
-            data.setRealUser((User)x.get("realUser"));
+            data.setUser(subject.getUser());
+            data.setRealUser(subject.getRealUser());
+            data.setSpid(subject.getUser().getSpid());
+            data.setDateTime(new Date());
             return getPredicate().f(data);
           } else {
             return getPredicate().f(x.put("NEW", obj).put("OLD", oldObj));

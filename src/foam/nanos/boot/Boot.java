@@ -50,7 +50,7 @@ public class Boot {
     }
 
     root_.put(foam.nanos.fs.Storage.class,
-        new foam.nanos.fs.FileSystemStorage(datadir));
+      new foam.nanos.fs.FileSystemStorage(datadir));
 
     // Used for all the services that will be required when Booting
     serviceDAO_ = new JDAO(((foam.core.ProxyX) root_).getX(), new foam.dao.MDAO(NSpec.getOwnClassInfo()), "services", cluster);

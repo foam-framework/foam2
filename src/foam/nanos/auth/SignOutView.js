@@ -32,9 +32,9 @@ foam.CLASS({
       this.SUPER();
       var self = this;
       this.auth.logout().then(function() {
+        localStorage.removeItem('defaultSession');
         self.window.location.hash = '';
         self.window.location.reload();
-        localStorage.removeItem('defaultSession');
       });
     }
   ]

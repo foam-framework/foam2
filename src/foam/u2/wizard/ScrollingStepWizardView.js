@@ -212,26 +212,28 @@ foam.CLASS({
       var isCurrent = wizardlet == this.data.currentWizardlet;
       var self = this;
       return e
-        .start()
-          .addClass(self.myClass('heading'))
-          .add(wizardlet.slot(function (indicator) {
-            return self.E()
-              .style({
-                // TODO: move to CSS axiom
-                display: 'inline-block',
-                float: 'left',
-                'margin-right': '15px'
-              })
-              .start(self.CircleIndicator, self.configureIndicator(
-                wizardlet, isCurrent, self.calculateWizardletDisplayNumber(
-                  wizardlet, self.data.wizardlets)
-              ))
-              .end()
-          }))
-          .start('h2') // ???: Should this really be h2?
-            .translate(wizardlet.capability.id+'.name', wizardlet.capability.name)
-          .end()
-        .end()
+        .add(wizardlet.slot(function (isVisible) {
+          if ( ! isVisible ) return self.E();
+          return self.E()
+            .addClass(self.myClass('heading'))
+            .add(wizardlet.slot(function (indicator) {
+              return self.E()
+                .style({
+                  // TODO: move to CSS axiom
+                  display: 'inline-block',
+                  float: 'left',
+                  'margin-right': '15px'
+                })
+                .start(self.CircleIndicator, self.configureIndicator(
+                  wizardlet, isCurrent, self.calculateWizardletDisplayNumber(
+                    wizardlet, self.data.wizardlets)
+                ))
+                .end()
+            }))
+            .start('h2') // ???: Should this really be h2?
+              .translate(wizardlet.capability.id+'.name', wizardlet.capability.name)
+            .end()
+        }));
     },
     function renderWizardletSections(e, wizardlet, wi) {
       var self = this;
@@ -258,6 +260,9 @@ foam.CLASS({
     {
       name: 'submit',
       label: 'Done',
+      isEnabled: function (data$config, data$allValid) {
+        return ! data$config.requireAll || data$allValid;
+      },
       code: function (x) {
         for ( let w of this.data.wizardlets ) {
           if ( w.submit ) w.submit();
