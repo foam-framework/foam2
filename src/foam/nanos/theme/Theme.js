@@ -163,6 +163,11 @@ foam.CLASS({
       section: 'navigation'
     },
     {
+      class: 'String',
+      name: 'defaultLocaleLanguage',
+      value: 'en'
+    },
+    {
       class: 'Map',
       name: 'headConfig'
     },
@@ -244,11 +249,6 @@ foam.CLASS({
       class: 'Code',
       name: 'customCSS',
       section: 'sectionCss'
-    },
-    {
-      class: 'String',
-      name: 'defaultLanguageLocale',
-      value: 'en'
     },
     {
       class: 'String',

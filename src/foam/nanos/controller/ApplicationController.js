@@ -364,7 +364,7 @@ foam.CLASS({
         self.setPrivate_('__subContext__', client.__subContext__);
 
         await self.fetchTheme();
-        foam.locale = localStorage.getItem('localeLanguage') || self.theme.defaultLanguageLocale;
+        foam.locale = localStorage.getItem('localeLanguage') || self.theme.defaultLocaleLanguage;
 
         await client.translationService.initLatch;
         self.installLanguage();
