@@ -176,6 +176,7 @@ FOAM_FILES([
   { name: "foam/java/Util", flags:['java'] },
 
   { name: "foam/util/Timer" },
+  { name: "foam/util/AddressUtil" },
   { name: "foam/util/EmailTest" },
   { name: "foam/util/PasswordTest" },
   { name: "foam/util/SecurityUtilTest" },
@@ -854,6 +855,7 @@ FOAM_FILES([
   { name: "io/c9/ace/Theme" },
 
   { name: "foam/u2/view/date/AbstractDateView" },
+  { name: "foam/u2/view/date/RODateView" },
   { name: "foam/u2/view/date/CalendarDatePicker" },
   { name: "foam/u2/view/date/DateTimePicker" },
   { name: "foam/u2/view/date/Month" },

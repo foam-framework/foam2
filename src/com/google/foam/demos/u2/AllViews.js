@@ -166,6 +166,11 @@ foam.CLASS({
     },
     {
       class: 'Int',
+      name: 'tooltip',
+      view: { class: 'foam.u2.view.IntView', tooltip: 'Please enter a number.' }
+    },
+    {
+      class: 'Int',
       name: 'intWithIntView',
       view: {
         class: 'foam.u2.view.IntView',
@@ -360,9 +365,12 @@ foam.CLASS({
       class: 'Date',
       name: 'dateRWAndRO',
       view: {
-        class: 'foam.u2.view.DualView',
-        viewa: 'foam.u2.DateView',
-        viewb: {class: 'foam.u2.DateView', mode: foam.u2.DisplayMode.RO}
+        class: 'foam.u2.MultiView',
+        views: [
+          'foam.u2.view.DateView',
+          'foam.u2.view.DateView',
+          {class: 'foam.u2.view.DateView', mode: foam.u2.DisplayMode.RO}
+        ]
       }
     },
     {

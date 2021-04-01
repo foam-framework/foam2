@@ -1082,6 +1082,32 @@ foam.CLASS({
 var a = demo.bank.AccountTester.create(null);
 a.test();
 
+##  Package imports exports demo
+Package and imports/exports demo
+--
+foam.CLASS({
+  name: 'A',
+  methods: [ function toString() { return 'A'; } ]
+});
+foam.CLASS({
+  name: 'B',
+  methods: [ function toString() { return 'B'; } ]
+});
+foam.CLASS({
+  name: 'C',
+  requires: ['A'],
+  methods: [ function toString() { return this.A.create().toString(); } ]
+});
+
+var c = C.create();
+print(c.toString());
+
+c.A = B;
+print(c.toString());
+
+c = C.create({A: B});
+print(c.toString());
+
 
 ##  Class Refinement
 Refinement upgrades the existing class rather than create a new sub-class

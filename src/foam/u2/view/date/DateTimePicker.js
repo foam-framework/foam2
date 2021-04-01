@@ -261,7 +261,7 @@ foam.CLASS({
       class: 'String',
       name: 'icon',
       expression: function(isOpen_) {
-        return this.data && isOpen_ ? 'images/cancel-round.svg' : 'images/calendar.svg';
+        return this.data && isOpen_ ? '/images/cancel-round.svg' : '/images/calendar.svg';
       }
     }
   ],
@@ -295,7 +295,7 @@ foam.CLASS({
               .end()
               .start()
                 .addClass('date-display-image').enableClass('date-display-image-cancel', self.slot(function(icon) {
-                  return icon === 'images/cancel-round.svg';
+                  return icon === '/images/cancel-round.svg';
                 }))
                 .start('img')
                   .attrs({ src: self.icon$ })
@@ -323,7 +323,7 @@ foam.CLASS({
             .start()
               .addClass('year')
               .start('img')
-                .attrs({ src: 'images/arrow-left-white.svg' })
+                .attrs({ src: '/images/arrow-left-white.svg' })
                 .addClass('arrow-left')
                 .on('click', this.updateDate)
                 .on('click', function() { self.year--; })
@@ -332,7 +332,7 @@ foam.CLASS({
                 .addClass('year-number')
               .end()
               .start('img')
-                .attrs({ src: 'images/arrow-right-white.svg' })
+                .attrs({ src: '/images/arrow-right-white.svg' })
                 .addClass('arrow-right')
                 .on('click', this.updateDate)
                 .on('click', function() { self.year++; })
@@ -346,7 +346,7 @@ foam.CLASS({
                 .on('click', this.updateDate)
                 .on('click', function() { self.monthIndex--; })
                 .start('img')
-                  .attrs({ src: 'images/arrow-left-black.svg' })
+                  .attrs({ src: '/images/arrow-left-black.svg' })
                   .addClass('arrow-black')
                 .end()
               .end()
@@ -359,7 +359,7 @@ foam.CLASS({
                 .on('click', this.updateDate)
                 .on('click', function() { self.monthIndex++; })
                 .start('img')
-                  .attrs({ src: 'images/arrow-right-black.svg' })
+                  .attrs({ src: '/images/arrow-right-black.svg' })
                   .addClass('arrow-black')
                 .end()
               .end()
