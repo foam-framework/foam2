@@ -157,7 +157,11 @@ foam.CLASS({
     {
       name: 'data',
       postSet: function(o, n) {
+<<<<<<< HEAD
         if ( o !== n && ! foam.Null.isInstance(n) ) this.choice = this.findChoiceByData(n) || [n, n.label || n];
+=======
+        if ( o !== n ) this.choice = this.findChoiceByData(n) || [n, (n && n.label) || n];
+>>>>>>> afa65eb480c68d3477beb4b9e9e08ce4679ae20d
       }
     },
     {
