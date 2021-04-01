@@ -28,6 +28,7 @@ var classes = [
   'foam.core.IntHolder',
   'foam.core.StringHolder',
   'foam.core.BooleanHolder',
+  'foam.core.RequiredBooleanHolder',
   'foam.glang.EndOfTimeSpan',
   'foam.glang.EndOfDay',
   'foam.glang.EndOfWeek',
