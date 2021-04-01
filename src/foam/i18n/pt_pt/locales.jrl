@@ -637,10 +637,20 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.UserCreatedByAwa
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"notifications.label",target:"Notificações"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"notifications.browseTitle",target:"Notificações"})
-p({class:"foam.i18n.Locale",locale:"pt",source:"notifications.browseSubtitle",target:"Notificações"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"notifications.browseSubtitle",target:"Ver tudo Notificações"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"approvals.label",target:"Aprovação Pedido"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"approvals.browseTitle",target:"Aprovação Pedido"})
-p({class:"foam.i18n.Locale",locale:"pt",source:"approvals.browseSubtitle",target:"Aprovação Pedido"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"approvals.browseSubtitle",target:"Ver tudo Aprovação Pedido"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"integration.api-dig.label",target:"DIG - Data Integration Gateway"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"integration.api-dig.browseTitle",target:"Chamadas DIG API"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"integration.api-dig.browseSubtitle",target:"Um endpoint de API que oferece suporte a todas as operações DAO"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"integration.api-sugar.label",target:"SUGAR - Service API"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"integration.api-sugar.browseTitle",target:"Chamadas SUGAR API"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"integration.api-sugar.browseSubtitle",target:"Chamadas de API para serviços"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"integration.api-dug.label",target:"DUG - Data Update Gateway"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"integration.api-dug.browseTitle",target:"DUG Webhooks"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"integration.api-dug.browseSubtitle",target:"Webhooks acionados por operações DAO"})
+
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.date.DateTimePicker.SELECT_DATE",target:"Selecione a Data"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.date.DateTimePicker.SELECT_DATE",target:"Selecione a Data"})
 
