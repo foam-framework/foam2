@@ -225,6 +225,10 @@ foam.CLASS({
         this.onDetach(this.of$.sub(this.updateChoices));
         this.updateChoices();
         await this.choicesLoaded;
+        if ( this.state == this.UNLOADED ) return;
+        if ( this.state == this.OUTPUT ) {
+          await new Promise(resolve => this.onload.sub(resolve))
+        }
       }
 
       this.onDetach(this.data$.relateTo(
