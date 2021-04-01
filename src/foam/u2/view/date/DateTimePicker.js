@@ -214,6 +214,10 @@ foam.CLASS({
     }
   `,
 
+  messages: [
+    { name: 'SELECT_DATE', message: 'Select date' }
+  ],
+
   properties: [
     {
       type: 'Boolean',
@@ -238,7 +242,7 @@ foam.CLASS({
       name: 'date',
       expression: function(day, year, month) {
         if ( ! this.data ) {
-          return 'Select date';
+          return this.SELECT_DATE;
         }
         return this.formatMonth(month.name) + ' ' + day + ' ' + year;
       }
@@ -248,7 +252,7 @@ foam.CLASS({
       name: 'dateTime',
       expression: function(day, year, month, hour12, minute, period) {
         if ( ! this.data ) {
-          return 'Select date';
+          return this.SELECT_DATE;
         }
         return this.formatMonth(month.name) + ' ' + day + ' ' + year + ', ' + hour12 + ':' + minute + ' ' + period;
       }
