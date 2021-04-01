@@ -191,9 +191,9 @@ foam.LIB({
       if ( prev && prev.name !== key ) {
         throw 'Class constant conflict: ' +
           this.id + '.' + cName + ' from: ' + key + ' and ' + prev.name;
+      } else {
+        this.prototype[cName] = this[cName] = value;
       }
-
-      this.prototype[cName] = this[cName] = value;
     },
 
     function isInstance(o) {

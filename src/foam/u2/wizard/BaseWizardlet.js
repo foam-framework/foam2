@@ -44,6 +44,14 @@ foam.CLASS({
       class: 'Class'
     },
     {
+      name: 'data',
+      postSet: function (_, n) {
+        if ( this.of && this.WizardletAware.isInstance(n) ) {
+          n.installInWizardlet(this);
+        }
+      }
+    },
+    {
       name: 'title',
       class: 'String'
     },
@@ -76,6 +84,11 @@ foam.CLASS({
       }
     },
     { name: 'atLeastOneSectionVisible_', class: 'Boolean', value: true },
+    {
+      name: 'reloadAfterSave',
+      class: 'Boolean',
+      value: true
+    },
     {
       name: 'loading',
       class: 'Boolean'
@@ -162,7 +175,11 @@ foam.CLASS({
       code: function () {
         var self = this;
         var filter = foam.u2.wizard.Slot.filter;
+        var customUpdateSlot = false;
         if ( this.of && this.WizardletAware.isSubClass(this.of) ) {
+          customUpdateSlot = this.data && this.data.customUpdateSlot;
+        }
+        if ( customUpdateSlot ) {
           var s = foam.core.FObject.create();
           this.data$
             .map(data => {

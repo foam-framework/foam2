@@ -176,6 +176,7 @@ FOAM_FILES([
   { name: "foam/java/Util", flags:['java'] },
 
   { name: "foam/util/Timer" },
+  { name: "foam/util/AddressUtil" },
   { name: "foam/util/EmailTest" },
   { name: "foam/util/PasswordTest" },
   { name: "foam/util/SecurityUtilTest" },
@@ -495,6 +496,7 @@ FOAM_FILES([
   { name: "foam/u2/CheckBox", flags: ['web'] },
   { name: "foam/u2/CitationView", flags: ['web'] },
   { name: "foam/u2/PopupView", flags: ['web'] },
+  { name: "foam/u2/view/date/DateView2", flags: ['web'] },
   { name: "foam/u2/DateView", flags: ['web'] },
   { name: "foam/u2/DateTimeView", flags: ['web'] },
   { name: "foam/u2/RangeView", flags: ['web'] },

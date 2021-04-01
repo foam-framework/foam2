@@ -293,7 +293,9 @@
           });
         } catch (x) {}
       },
-      visibility: 'RO'
+      readVisibility: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'HIDDEN'
     },
     {
       class: 'String',

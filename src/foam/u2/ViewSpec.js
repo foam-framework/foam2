@@ -30,12 +30,12 @@ foam.CLASS({
     {
       installInClass: function(cls) {
         cls.createView = function(spec, args, self, ctx, disableWarning) {
-          if ( foam.String.isInstance(spec) || spec === undefined || spec === null )
-            return foam.u2.Element.create(args, ctx).setNodeName(spec || 'div');
-
           if ( foam.core.FObject.isInstance(ctx) ) {
             ctx = ctx.__subContext__;
           }
+
+          if ( foam.String.isInstance(spec) || spec === undefined || spec === null )
+            return foam.u2.Element.create(args, ctx).setNodeName(spec || 'div');
 
           if ( foam.u2.Element.isInstance(spec) ) {
             if ( foam.debug && ! disableWarning ) {

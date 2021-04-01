@@ -19,9 +19,11 @@ foam.CLASS({
       font-weight: 500;
       letter-spacing: normal;
       line-height: 24px;
-      max-width: 79px;
-      padding: 0 8px;
+      min-width: 60px;
+      padding: 0 12px;
       text-align: center;
+      width: -webkit-max-content;
+      width: -moz-max-content;
     }
   `,
 
