@@ -71,7 +71,6 @@ foam.CLASS({
       updateVisibility: 'RO',
       readVisibility: 'RO',
       transient: true,
-      storageTransient: true,
       expression: function () {
         return [this];
       },
