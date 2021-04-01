@@ -40,6 +40,11 @@ foam.CLASS({
       position: relative;
     }
 
+    ^badge {
+      position: absolute;
+      bottom: 12px; 
+    }
+
     ^badge > * {
       border-radius: 0px 11.2px 11.2px 0px !important;
       height: 24px;
@@ -110,17 +115,11 @@ foam.CLASS({
           })
           .add(this.slot(function(cjStatus) {
             if ( ! cjStatus ) return;
+            var badge = foam.u2.view.ReadOnlyEnumView.create({ data: cjStatus });
             return this.E()
-              .addClass(style.myClass('tooltip'))
-              .start('span')
-                .addClass(style.myClass('tooltiptext'))
-                .addClass(style.myClass('tooltip-bottom'))
-                .enableClass(style.myClass('tooltipDisabled'), self.tooltipEnabled, true)
-                .add(cjStatus.documentation)
-              .end()
-              .start()
+              .start('', { tooltip: cjStatus.documentation })
                 .addClass(this.myClass('badge'))
-                .add(foam.u2.view.ReadOnlyEnumView.create({ data: cjStatus }))
+                .add(badge)
               .end();
           }))
           .add(this.slot(function(isRenewable) {

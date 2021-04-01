@@ -31,7 +31,7 @@ foam.CLASS({
       installInClass: function(cls) {
         cls.createView = function(spec, args, self, ctx, disableWarning) {
           if ( foam.String.isInstance(spec) || spec === undefined || spec === null )
-            return foam.u2.Element.create(null, ctx).setNodeName(spec || 'div');
+            return foam.u2.Element.create(args, ctx).setNodeName(spec || 'div');
 
           if ( foam.core.FObject.isInstance(ctx) ) {
             ctx = ctx.__subContext__;
@@ -62,7 +62,6 @@ foam.CLASS({
               var cls = foam.core.FObject.isSubClass(spec.class) ? spec.class : ctx.lookup(spec.class);
               if ( ! cls ) {
                 foam.assert(false, 'ViewSpec specifies unknown class: ', spec.class);
-                debugger;
               }
               ret = cls.create(spec, ctx).copyFrom(args || {});
             }
