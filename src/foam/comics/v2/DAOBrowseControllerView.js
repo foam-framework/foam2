@@ -152,18 +152,19 @@ foam.CLASS({
                 .start(self.Cols)
                   .start()
                     .addClass(self.myClass('browse-title'))
-                    .translate(menuId + ".title", config$browseTitle)
+                    .translate(menuId + ".browseTitle", config$browseTitle)
                   .end()
                   .startContext({ data: self }).tag(self.CREATE).endContext()
                   .callIf(config$primaryAction, function() {
                     this.startContext({ data: self }).tag(config$primaryAction, { size: 'LARGE' }).endContext();
                   })
                 .end()
-                .callIf(config$browseSubtitle.length > 0, function() {
+                .callIf((menuId + ".browseSubtitle").length > 0, function() {
                   this
                     .start()
                       .addClass(self.myClass('browse-subtitle'))
-                      .translate(menuId + ".subTitle", config$browseSubtitle)
+                      .translate(self.cls_.id + '.VIEW_ALL', self.VIEW_ALL)
+                      .translate(menuId + ".browseSubtitle", config$browseTitle)
                     .end();
                 })
               .end()

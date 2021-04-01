@@ -56,6 +56,7 @@ foam.CLASS({
 
   imports: [
     'auth',
+    'currentMenu?',
     'memento',
     'stack',
     'translationService'
@@ -117,7 +118,9 @@ foam.CLASS({
       name: 'backLabel',
       expression: function(config$browseTitle) {
         var allMsg = ctrl.__subContext__.translationService.getTranslation(foam.locale, 'foam.comics.v2.DAOSummaryView.ALL', this.ALL);
-        return allMsg + config$browseTitle;
+        var menuId = this.currentMenu ? this.currentMenu.id : this.config.of.id;
+        var title = ctrl.__subContext__.translationService.getTranslation(foam.locale, menuId + '.browseTitle', config$browseTitle);
+        return allMsg + title;
       }
     },
     {
