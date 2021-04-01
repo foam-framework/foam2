@@ -50,6 +50,12 @@ foam.CLASS({
       // documentation: 'When true, $$DOC{ref:".data"} is updated on every keystroke, rather than on blur.'
     },
     {
+      class: 'Boolean',
+      name: 'autofocus',
+      attribute: true,
+      documentation: 'If enabled, field gains focus when added to screen.'
+    },
+    {
       class: 'Int',
       name: 'size'
     },
