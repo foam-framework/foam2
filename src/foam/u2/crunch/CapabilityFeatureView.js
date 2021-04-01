@@ -115,11 +115,10 @@ foam.CLASS({
           })
           .add(this.slot(function(cjStatus) {
             if ( ! cjStatus ) return;
-            var badge = foam.u2.view.ReadOnlyEnumView.create({ data: cjStatus });
             return this.E()
               .start('', { tooltip: cjStatus.documentation })
                 .addClass(this.myClass('badge'))
-                .add(badge)
+                .add(foam.u2.view.ReadOnlyEnumView.create({ data: cjStatus }))
               .end();
           }))
           .add(this.slot(function(isRenewable) {
