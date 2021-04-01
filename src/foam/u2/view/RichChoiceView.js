@@ -342,7 +342,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'fullObject_',
-      documentation: `
+      documentation: `uye
         The full object from the DAO. This property is only used internally, you
         do not need to set it as a consumer of this view.
       `
@@ -385,6 +385,7 @@ foam.CLASS({
       name: 'choosePlaceholder',
       documentation: 'Replaces choose from placeholder with passed in string.',
       expression: function(of) {
+      debugger;
         var plural = of.model_.plural.toLowerCase();
         return this.CHOOSE_FROM + ' ' + plural + '...';
       }
@@ -434,6 +435,7 @@ foam.CLASS({
       // passed to the selectionView to use it if it wants to.
       this.onDetach(this.data$.sub(this.onDataUpdate));
       this.onDataUpdate();
+      debugger;
 
       // Set up an event listener on the window so we can close the dropdown
       // when the user clicks somewhere else.
@@ -494,6 +496,7 @@ foam.CLASS({
                 .start()
                   .addClass(this.myClass('custom-selection-view'))
                   .add(this.slot((data) => {
+                    debugger;
                     return this.E().tag(self.selectionView, {
                       data: data,
                       fullObject$: this.fullObject_$,
@@ -712,6 +715,7 @@ foam.CLASS({
 
       methods: [
         function initE() {
+        debugger;
 
           this.style({
             'overflow': 'hidden',
@@ -720,7 +724,7 @@ foam.CLASS({
           });
 
           var summary = this.fullObject$.map(o => {
-            return o ? o.toSummary() : this.defaultSelectionPrompt;
+            return ( o && o.toSummary() ) ? o.toSummary() : this.defaultSelectionPrompt;
           });
           var summaryWithoutSlot = this.fullObject && this.fullObject.toSummary()
             ? this.fullObject.toSummary()
