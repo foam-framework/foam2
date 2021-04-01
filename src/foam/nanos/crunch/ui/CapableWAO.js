@@ -34,7 +34,8 @@ foam.CLASS({
       return this.capable.getCapablePayloadDAO().put(
         this.makePayload(wizardlet)
       ).then(payload => {
-        this.load_(wizardlet, payload);
+        if ( wizardlet.reloadAfterSave ) this.load_(wizardlet, payload);
+        else wizardlet.loading = false;
         if ( wizardlet.isValid ) {
           wizardlet.status = this.CapabilityJunctionStatus.ACTION_REQUIRED;
         }

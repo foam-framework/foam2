@@ -24,6 +24,13 @@ foam.CLASS({
     'foam.u2.wizard.internal.WizardletAutoSaveSlot'
   ],
 
+  constants: [
+    {
+      name: 'SAVE_DELAY',
+      value: 1200
+    }
+  ],
+
   properties: [
     {
       name: 'id',
@@ -35,6 +42,14 @@ foam.CLASS({
     {
       name: 'of',
       class: 'Class'
+    },
+    {
+      name: 'data',
+      postSet: function (_, n) {
+        if ( this.of && this.WizardletAware.isInstance(n) ) {
+          n.installInWizardlet(this);
+        }
+      }
     },
     {
       name: 'title',
@@ -69,6 +84,11 @@ foam.CLASS({
       }
     },
     { name: 'atLeastOneSectionVisible_', class: 'Boolean', value: true },
+    {
+      name: 'reloadAfterSave',
+      class: 'Boolean',
+      value: true
+    },
     {
       name: 'loading',
       class: 'Boolean'
@@ -155,14 +175,18 @@ foam.CLASS({
       code: function () {
         var self = this;
         var filter = foam.u2.wizard.Slot.filter;
+        var customUpdateSlot = false;
         if ( this.of && this.WizardletAware.isSubClass(this.of) ) {
+          customUpdateSlot = this.data && this.data.customUpdateSlot;
+        }
+        if ( customUpdateSlot ) {
           var s = foam.core.FObject.create();
           this.data$
             .map(data => {
               var updateSlot = data.getUpdateSlot();
               return this.WizardletAutoSaveSlot.create({
                 other: filter(updateSlot, v => v && ! self.loading),
-                delay: 700 // TODO: constant
+                delay: self.SAVE_DELAY
               });
             })
             .valueSub(() => { if ( ! self.loading ) s.pub(true); });
@@ -171,7 +195,7 @@ foam.CLASS({
         var sl = this.FObjectRecursionSlot.create({ obj$: this.data$ });
         return filter(this.WizardletAutoSaveSlot.create({
           other: filter(sl, () => ! self.loading),
-          delay: 700
+          delay: self.SAVE_DELAY
         }), () => ! self.loading);
       }
     }

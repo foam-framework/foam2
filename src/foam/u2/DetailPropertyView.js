@@ -28,9 +28,10 @@ foam.CLASS({
       display: block;
       float: left;
       font-size: 15px;
-      padding: 4px 8px 4px 8px;
+      padding: 4px 32px 4px 6px;
       text-align: left;
       vertical-align: top;
+      white-space: nowrap;
     }
     .foam-u2-PropertyView-view {
       padding: 2px 8px 2px 6px;
@@ -55,22 +56,29 @@ foam.CLASS({
   methods: [
     function initE() {
       var prop = this.prop;
-      this.
-        show(prop.createVisibilityFor(this.__context__.data$, this.controllerMode$).map(function(m) {
-          return m != foam.u2.DisplayMode.HIDDEN;
-        })).
-        addClass(this.myClass()).
-        addClass('foam-u2-PropertyView').
-        addClass('foam-u2-PropertyView-prop-' + prop.name).
-        start('td').addClass('foam-u2-PropertyView-label').add(this.label).end().
-        start('td').addClass('foam-u2-PropertyView-view').
-        callIf( ! this.label, function() {
-          this.style({'width': '100%'});
-        }).
-        add(
-          prop,
-          prop.units && this.E('span').addClass('foam-u2-PropertyView-units').add(' ', prop.units)).
-        end();
+
+      this.show(
+        prop.createVisibilityFor(
+          this.__context__.data$,
+          this.controllerMode$).map(m => m != foam.u2.DisplayMode.HIDDEN));
+
+      this.add(this.shown$.map(shown => {
+        return this.E().
+          callIf(shown, () => {
+            this.addClass(this.myClass()).
+            addClass('foam-u2-PropertyView').
+            addClass('foam-u2-PropertyView-prop-' + prop.name).
+            start('td').addClass('foam-u2-PropertyView-label').add(this.label).end().
+            start('td').addClass('foam-u2-PropertyView-view').
+            callIf( ! this.label, function() {
+              this.style({'width': '100%'});
+            }).
+            add(
+              prop,
+              prop.units && this.E('span').addClass('foam-u2-PropertyView-units').add(' ', prop.units)).
+            end();
+          })
+      }));
     }
   ]
 });

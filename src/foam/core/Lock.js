@@ -12,13 +12,15 @@ foam.CLASS({
     function test__() {
       var lock = foam.core.Lock.create();
 
+      /*
       // Wihtout Locking
       for ( let i = 0 ; i < 10 ; i++ ) {
         setTimeout(function() {
           console.log('start task ' + i);
-          setTimeout(function() { console.log('end task ' + i); resolve(); }, Math.random()*1000);
+          setTimeout(function() { console.log('end task ' + i); }, Math.random()*1000);
         }, 0);
       }
+      */
 
       // With Locking
       for ( let i = 0 ; i < 10 ; i++ ) {
@@ -32,9 +34,7 @@ foam.CLASS({
     }
   ],
 
-  documentation: `
-    A binary Semaphore / Lock.
-  `,
+  documentation: 'A binary Semaphore / Lock.',
 
   properties: [
     {
@@ -45,10 +45,7 @@ foam.CLASS({
 
   methods: [
     function then(resolve) {
-      var release;
-      var oldPromise = this.promise;
-      this.promise = new Promise(resolve => { release = resolve; });
-      oldPromise.then(() => { return resolve().then(release); });
+      this.promise = this.promise.then(resolve);
     }
   ]
 });
