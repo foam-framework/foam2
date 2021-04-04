@@ -3784,6 +3784,7 @@ foam.CLASS({
     'foam.mlang.sink.Sequence',
     'foam.mlang.sink.Sum',
     'foam.mlang.sink.Unique',
+    'foam.mlang.StringLength',
     'foam.mlang.Absolute',
     'foam.mlang.sink.Average',
     'foam.mlang.Mux',
@@ -3878,7 +3879,8 @@ foam.CLASS({
 
     function INSTANCE_OF(cls) { return this.IsInstanceOf.create({ targetClass: cls }); },
     function CLASS_OF(cls) { return this.IsClassOf.create({ targetClass: cls }); },
-    function MQL(mql) { return this.MQLExpr.create({query: mql}); }
+    function MQL(mql) { return this.MQLExpr.create({query: mql}); },
+    function STRING_LENGTH(a) { return this._unary_("StringLength", a); }
   ]
 });
 
