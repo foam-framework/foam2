@@ -143,11 +143,11 @@ foam.CLASS({
       ClusterConfigSupport support = (ClusterConfigSupport) x.get("clusterConfigSupport");
       PM pm = PM.create(x, getClass().getSimpleName(), getServiceName(), dop);
 
-     // REVIEW: set context to null after init so it's not marshalled across network. Periodically have contexts being marshalled
       ClusterCommand cmd = null;
       if ( obj instanceof ClusterCommand ) {
         cmd = (ClusterCommand) obj;
       } else {
+        // REVIEW: set context to null after init so it's not marshalled across network. Periodically have contexts being marshalled
         if ( obj instanceof ContextAware ) {
           ((ContextAware) obj).setX(null);
         }
