@@ -88,7 +88,7 @@ Columns: validation format, parsing format, example`,
           ["SAFF FFAA AAAA AAAA AAAA AAAA", "", "SA03 8000 0000 6080 1016 7519"],
           ["SCFF UUUU FFFF FFFF FFFF FFFF FFFF UUU", "", "SC18 SSCB 1101 0000 0000 0000 1497 USD"],
           ["SEFF FFFF FFFF FFFF FFFF FFFF", "SEkk bbbc cccc cccc cccc cccc", "SE45 5000 0000 0583 9825 7466"],
-          ["SIFF FFFF FFFF FFFF FFF", "SIkk bbss sccc cccc ccc", "SI56 2633 0001 2039 086"],
+          ["SIFF FFFF FFFF FFFF FFF", "SIkk bbss sccc cccc cxx", "SI56 2633 0001 2039 086"], // Slovenia, check digits are appended to the accountNumber
           ["SKFF FFFF FFFF FFFF FFFF FFFF", "SKkk bbbb ssss sscc cccc cccc", "SK31 1200 0000 1987 4263 7541"],
           ["SMFF UFFF FFFF FFFA AAAA AAAA AAA", "", "SM86 U032 2509 8000 0000 0270 100"],
           ["STFF FFFF FFFF FFFF FFFF FFFF F", "", "ST68 0001 0001 0051 8453 1011 2"],
