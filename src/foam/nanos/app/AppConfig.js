@@ -22,7 +22,22 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'version'
+      name: 'version',
+      visibility: 'RO',
+      storageTransient: true,
+      javaSetter: `
+      // Explicitly set in bootscript from jar manifest or services.0.
+      // Ignore updates from runtime journals.  If updates are not
+      // supressed, then on next upgrade the VirtualHostRoutingServlet
+      // will craft an index.html with references to a, now, non-existant
+      // foam-bin js file.
+      synchronized ( this ) {
+        if ( ! versionIsSet_ ) {
+          version_ = val;
+          versionIsSet_ = true;
+        }
+      }
+      `,
     },
     {
       class: 'String',
@@ -64,17 +79,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'appLink',
-      value: 'https://www.apple.com/lae/ios/app-store/'
+      value: 'https://www.apple.com/lae/ios/app-store/',
+      visibility: 'HIDDEN'
     },
     {
       class: 'String',
       name: 'playLink',
-      value: 'https://play.google.com/store?hl=en'
-    },
-    {
-      class: 'Boolean',
-      name: 'forceHttps',
-      value: false
+      value: 'https://play.google.com/store?hl=en',
+      visibility: 'HIDDEN'
     },
     {
       class: 'String',
