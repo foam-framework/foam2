@@ -497,7 +497,6 @@ Columns: validation format, parsing format, example`,
               break;
             case 'k': // iban checksum
               ibanChecksum.append(next);
-              previous = ibanChecksum;
               break;
             case 'm': // currency code
               accountNumber.append(next);
