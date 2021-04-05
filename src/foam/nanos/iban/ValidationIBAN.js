@@ -58,7 +58,7 @@ Columns: validation format, parsing format, example`,
           ["IEFF UUUU FFFF FFFF FFFF FF", "IEkk bbbb ssss sscc cccc cc", "IE29 AIBK 9311 5212 3456 78"],
           ["ILFF FFFF FFFF FFFF FFFF FFF", "", "IL62 0108 0000 0009 9999 999"],
           ["ISFF FFFF FFFF FFFF FFFF FFFF FF", "", "IS14 0159 2600 7654 5510 7303 39"],
-          ["ITFF UFFF FFFF FFFA AAAA AAAA AAA", "ITkk xbbb bbss sssc cccc cccc ccc", "IT60 X054 2811 1010 0000 0123 456"],
+          ["ITFF UFFF FFFF FFFA AAAA AAAA AAA", "ITkk xbbb bbss sssc cccc cccc ccc", "IT60 X054 2811 1010 0000 0123 456"], // Italy, don't include the check digit to the Iban checksum
           ["IQFF UUUU FFFA AAAA AAAA AAA", "", "IQ98 NBIQ 8501 2345 6789 012"],
           ["JOFF AAAA FFFF FFFF FFFF FFFF FFFF FF", "", "JO15 AAAA 1234 5678 9012 3456 7890 12"],
           ["KWFF UUUU AAAA AAAA AAAA AAAA AAAA AA", "", "KW81 CBKU 0000 0000 0000 1234 5601 01"],
@@ -512,8 +512,10 @@ Columns: validation format, parsing format, example`,
             case 't': // account type
               accountType.append(next);
               break;
-            case 'x': // national check digits
-              // previous.append(next);
+            case 'x': // add to previous
+              if ( previous != null )
+                previous.append(next);
+
               break;
             case '0': // Zero
               previous.append('0');
