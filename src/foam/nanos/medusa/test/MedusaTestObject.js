@@ -23,5 +23,25 @@
        class: 'String',
        name: 'description'
      },
+     {
+       class: 'String',
+       name: 'storageTransientData',
+       storageTransient: true
+     },
+     {
+       class: 'String',
+       name: 'transientData',
+       transient: true
+     },
+     {
+       class: 'String',
+       name: 'clusterTransientData',
+       clusterTransient: true
+     },
+     {
+       class: 'String',
+       name: 'networkTransientData',
+       networkTransient: true
+     }
    ]
  });

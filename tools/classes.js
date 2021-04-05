@@ -572,6 +572,7 @@ var classes = [
   'foam.lib.ExternalPropertyPredicate',
   'foam.lib.StorageOptionalPropertyPredicate',
   'foam.lib.StoragePropertyPredicate',
+  'foam.lib.StorageTransientPropertyPredicate',
   'foam.lib.ClusterPropertyPredicate',
   'foam.lib.AndPropertyPredicate',
   'foam.lib.parse.Parser',

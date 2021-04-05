@@ -95,7 +95,12 @@ This is the heart of Medusa.`,
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
-      getLogger().debug("put", replaying.getIndex(), replaying.getReplayIndex(), entry.toSummary(), "from", entry.getNode());
+      if ( replaying.getReplaying() ) {
+        getLogger().debug("put", replaying.getIndex(), replaying.getReplayIndex(), entry.toSummary(), "from", entry.getNode());
+        if ( entry.getIndex() % 10000 == 0 ) {
+          getLogger().info("put", replaying.getIndex(), replaying.getReplayIndex(), entry.toSummary(), "from", entry.getNode());
+        }
+      }
       PM pm = null;
       try {
         if ( replaying.getIndex() > entry.getIndex() ) {
@@ -406,6 +411,24 @@ This is the heart of Medusa.`,
             FObject old = dao.find_(x, nu.getProperty("id"));
             if (  old != null ) {
               nu = old.fclone().copyFrom(nu);
+            }
+
+            if ( ! SafetyUtil.isEmpty(entry.getTransientData()) ) {
+              FObject tran = x.create(JSONParser.class).parseString(entry.getTransientData(), cls);
+              if ( tran == null ) {
+                getLogger().error("Failed to parse", entry.getIndex(), entry.getNSpecName(), cls, entry.getTransientData());
+              } else {
+                // Explicitly copy only storageTransient to avoid copying defaults
+                var props = tran.getClassInfo().getAxiomsByClass(foam.core.PropertyInfo.class);
+                var i     = props.iterator();
+                while ( i.hasNext() ) {
+                  foam.core.PropertyInfo prop = i.next();
+                  if ( prop.getStorageTransient() &&
+                       ! prop.getClusterTransient() ) {
+                    prop.set(nu, prop.get(tran));
+                  }
+                }
+              }
             }
 
             if ( DOP.PUT == entry.getDop() ) {
