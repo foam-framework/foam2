@@ -33,7 +33,9 @@ foam.CLASS({
     function put_(x, obj) {
       return new Promise(resolve => {
         this.lock.then(() => {
-          resolve(this.SUPER(x, obj));
+          return this.delegate.put_(x, obj).then((o) => {
+            resolve(o);
+          });
         });
       });
     },
@@ -41,7 +43,9 @@ foam.CLASS({
     function remove_(x, obj) {
       return new Promise(resolve => {
         this.lock.then(() => {
-          resolve(this.SUPER(x, obj));
+          return this.delegate.remove_(x, obj).then((o) => {
+            resolve(o);
+          });
         });
       });
     },
@@ -49,7 +53,9 @@ foam.CLASS({
     function removeAll_(x, sink, skip, limit, order, predicate) {
       return new Promise(resolve => {
         this.lock.then(() => {
-          resolve(this.SUPER(x, sink, skip, limit, order, predicate));
+          return this.delegate.removeAll_(x, sink, skip, limit, order, predicate).then((o) => {
+            resolve(o);
+          });
         });
       });
     },

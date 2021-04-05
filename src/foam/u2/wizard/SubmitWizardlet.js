@@ -9,11 +9,15 @@ foam.CLASS({
   name: 'SubmitWizardlet',
   extends: 'foam.nanos.crunch.ui.CapabilityWizardlet',
 
+  imports: [
+    'wizardlets'
+  ],
+
   properties: [
     ['isVisible', false],
     {
       name: 'of',
-      value: 'foam.core.BooleanHolder'
+      value: 'foam.core.RequiredBooleanHolder'
     },
     {
       name: 'sections',
@@ -23,9 +27,7 @@ foam.CLASS({
     },
     {
       name: 'isValid',
-      expression: function (data) {
-        return this.data && this.data.value;
-      }
+      value: true
     }
   ],
 
@@ -34,6 +36,10 @@ foam.CLASS({
       class: 'foam.u2.wizard.axiom.WizardAction',
       name: 'submit',
       code: function (x) {
+        let availableWizardlets = this.wizardlets.filter(w => w.isAvailable);
+        for ( let i in availableWizardlets ) {
+          if ( ! availableWizardlets[i].isValid ) return;
+        }
         this.data.value = true;
       }
     }
