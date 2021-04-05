@@ -233,6 +233,7 @@ FOAM_FILES([
   { name: "foam/dao/SQLStatement" },
   { name: "foam/dao/CSVSink" },
   { name: "foam/dao/LimitedDAO" },
+  { name: "foam/dao/LockDAO" },
   { name: "foam/dao/SkipDAO" },
   { name: "foam/dao/OrderedDAO", flags: ['web'] },
   { name: "foam/dao/InternalException" },
