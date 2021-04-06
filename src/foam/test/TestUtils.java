@@ -56,7 +56,6 @@ public class TestUtils {
    */
   public static User createTestUser() {
     User user  = new User();
-    user.setId(1);
     user.setFirstName("John");
     user.setLastName("Smith");
     user.setEmail("john@example.com");
