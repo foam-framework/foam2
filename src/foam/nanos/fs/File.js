@@ -86,7 +86,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'address',
-      label: 'Download Link'
+      label: 'Download Link',
       transient: true,
       expression: function (id) {
         var sessionId = localStorage['defaultSession'];
