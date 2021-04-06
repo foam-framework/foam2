@@ -64,9 +64,7 @@ public class Auth {
   */
   public static X sudo(X x, User user, Group group) {
     x = sudo(x, user);
-    x = group == null ?
-      x.put("group", (Group) ((DAO) x.get("groupDAO")).find(user.getGroup())) :
-      x.put("group", group);
+    x = x.put("group", group);
     return x;
   }
 
@@ -94,9 +92,7 @@ public class Auth {
    */
   public static X sudo(X x, User user, User realUser, Group group) {
     x = sudo(x, user, realUser);
-    x = group == null ?
-      x.put("group", (Group) ((DAO) x.get("groupDAO")).find(user.getGroup())) :
-      x.put("group", group);
+    x = x.put("group", group);
     return x;
   }
 
