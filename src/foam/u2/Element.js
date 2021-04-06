@@ -1199,7 +1199,7 @@ foam.CLASS({
     },
 
     function myCls(opt_extra) {
-      console.warn('Deprecated use of Element.myCls(). Use myClass() instead.');
+      console.error('Deprecated use of Element.myCls(). Use myClass() instead.');
       return this.myClass(opt_extra);
     },
 
@@ -1515,7 +1515,7 @@ foam.CLASS({
 
     // TODO: remove
     function enableCls(cls, enabled, opt_negate) {
-      console.warn('Deprecated use of Element.enableCls(). Use enableClass() instead.');
+      console.error('Deprecated use of Element.enableCls(). Use enableClass() instead.');
       return this.enableClass(cls, enabled, opt_negate);
     },
 
@@ -1543,7 +1543,7 @@ foam.CLASS({
 
     // TODO: remove
     function removeCls(cls) {
-      console.warn('Deprecated use of Element.removeCls(). Use removeClass() instead.');
+      console.error('Deprecated use of Element.removeCls(). Use removeClass() instead.');
       return this.removeClass(cls);
     },
 
@@ -2952,7 +2952,7 @@ foam.CLASS({
       `,
       name: 'tableProperties',
       setter: function(_, ps) {
-        console.warn("Deprecated use of tableProperties. Use 'tableColumns' instead.");
+        console.error("Deprecated use of tableProperties. Use 'tableColumns' instead.");
         this.tableColumns = ps;
       }
     },
