@@ -17,10 +17,6 @@ foam.CLASS({
     'wizardlets',
     'rootCapability'
   ],
-
-  implements: [
-    'foam.core.ContextAgent'
-  ],
   
   properties: [
     {
@@ -38,7 +34,7 @@ foam.CLASS({
           allValid = w.isValid;
         }
         var ucj = await w.save();
-        if ( ucj.targetId == this.rootCapability.id ) topLevelUCJ = ucj;
+        if ( ucj && ucj.targetId == this.rootCapability.id ) topLevelUCJ = ucj;
       });
       if ( this.onSave ) {
         await this.onSave(allValid, topLevelUCJ);

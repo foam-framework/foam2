@@ -211,7 +211,7 @@ p({
       "class":"foam.comics.v2.DAOControllerConfig",
       "daoKey":"digDAO",
       "browseTitle": "DIG API Calls",
-      "browseSubtitle": "An API endpoint that supports all DAO operations.",
+      "browseSubtitle": "An API endpoint that supports all DAO operations",
       "createTitle": "Create a New API Call"
     }
   },
@@ -227,7 +227,7 @@ p({
       "class": "foam.comics.v2.DAOControllerConfig",
       "daoKey": "ruleDAO",
       "browseTitle": "DUG Webhooks",
-      "browseSubtitle": "Webhooks triggered by DAO operations.",
+      "browseSubtitle": "Webhooks triggered by DAO operations",
       "createTitle": "Create a New Webhook",
       "predicate": {
         "class": "foam.mlang.predicate.IsInstanceOf",
@@ -248,7 +248,7 @@ p({
       "class":"foam.comics.v2.DAOControllerConfig",
       "daoKey":"sugarDAO",
       "browseTitle": "SUGAR API Calls",
-      "browseSubtitle": "API calls for services.",
+      "browseSubtitle": "API calls for services",
       "createTitle": "Create a Service API Call"
     }
   },
@@ -273,7 +273,7 @@ p({
       "class": "foam.comics.v2.DAOControllerConfig",
       "daoKey": "myNotificationDAO",
       "browseTitle": "Notifications",
-      "browseSubtitle": "View all notifications",
+      "browseSubtitle": "View all Notifications",
       "createPredicate":{"class":"foam.mlang.predicate.False"},
       "editPredicate":{"class":"foam.mlang.predicate.False"},
       "deletePredicate":{"class":"foam.mlang.predicate.False"},

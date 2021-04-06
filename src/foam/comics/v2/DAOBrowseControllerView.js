@@ -16,6 +16,7 @@ foam.CLASS({
 
   imports: [
     'auth',
+    'currentMenu?',
     'memento',
     'stack'
   ],
@@ -139,8 +140,8 @@ foam.CLASS({
     this.SUPER();
 
     var self = this;
-
-      this.addClass(this.myClass())
+    var menuId = this.currentMenu ? this.currentMenu.id : this.config.of.id;
+    this.addClass(this.myClass())
       .add(this.slot(function(data, config, config$of, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction) {
         return self.E()
           .start(self.Rows)
@@ -150,7 +151,7 @@ foam.CLASS({
                 .start(self.Cols)
                   .start()
                     .addClass(self.myClass('browse-title'))
-                    .translate(config$of.id + ".model_.plural", config$of.name)
+                    .translate(menuId + ".browseTitle", config$browseTitle)
                   .end()
                   .startContext({ data: self }).tag(self.CREATE).endContext()
                   .callIf(config$primaryAction, function() {
@@ -161,8 +162,15 @@ foam.CLASS({
                   this
                     .start()
                       .addClass(self.myClass('browse-subtitle'))
+                      .translate(menuId + ".browseSubtitle", config$browseSubtitle)
+                    .end();
+                })
+                .callIf(! config$browseSubtitle, function() {
+                  this
+                    .start()
+                      .addClass(self.myClass('browse-subtitle'))
                       .translate(self.cls_.id + '.VIEW_ALL', self.VIEW_ALL)
-                      .translate(config$of.id + ".model_.plural", config$of.name)
+                      .translate(menuId + ".browseTitle", config$browseTitle)
                     .end();
                 })
               .end()

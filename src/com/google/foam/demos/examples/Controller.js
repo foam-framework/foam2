@@ -130,6 +130,9 @@ foam.CLASS({
           var self = this;
           this.dom.removeAllChildren();
           var scope = {
+            el: function() {
+              return self.dom.el();
+            },
             E: function(opt_nodeName) {
               return self.Element.create({nodeName: opt_nodeName});
             },
@@ -184,6 +187,9 @@ foam.CLASS({
       name: 'text',
       adapt: function(_, text) { return text.trim(); },
       documentation: 'Description of the script.',
+      xxxview: {
+        class: 'foam.u2.ReadWriteView', nodeName: 'span'
+      },
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 120 }
     },
     {
@@ -299,7 +305,7 @@ foam.CLASS({
     },
 
     function createTestData() {
-      var s = `
+      var s = /*`
 ## Introduction
 ##  Lib
 ##  Models
@@ -330,16 +336,51 @@ foam.CLASS({
 ##  Classes
 ##  Slots
 ## DAOs
+*/
+`
 ## U2
-##  Welcome
-First U2 Example
---
-add('testing');
-
 ##  Background
-First U2 Example
+U2 is FOAM's native UI library.
+It is named U2 because it is FOAM's second UI library.
+The first UI library was template based, but U2 is based on an Internal Domain Specific Language (IDSL) or Embedded Domain Specific Language (EDSL).
+This IDSL is used to describe virtual DOM structures.
+DOM is the browser's native API for manipulating the page conents, and stands for Document Object Model.
+A Virtual-DOM is an API which mirrors the real DOM API but does so in JS.
+The advantages of a Virtual-DOM are:
+1. It is faster because it can batch updates across the slow JS <-> C++ bridge.
+2. It is more secure because, unlike template-based approaches, it isn't prone to Cross-Site-Scripting (XSS) attacks.
+3. It can offer higher-level features and smooth over browser incompatibilites.
+4. It doesn't require a template parser, which can either make builds faster or the download size smaller, depending on where the template parsing is performed.
+Improved security was the primary motivation for U2.
+
+All U2 components extend foam.u2.Element, which loosely modelled after the DOM <a href="https://www.w3schools.com/jsref/dom_obj_all.asp">Element<a> class.
 --
 add('testing');
+##  Virtual vs. Real DOM
+--
+console.profile('p1');
+function test1() {
+var startTime = performance.now();
+var node = foam.u2.Element.create({nodeName: 'UL'});     // Create a <ul> node
+for ( var i = 0 ; i < 100 ; i++ )
+  node.start('li').add("text" + i).end();                // Append an <li>
+
+//add(node);
+print(performance.now() - startTime);
+}
+test1();
+console.profileEnd('p1');
+
+var startTime = performance.now();
+var node = document.createElement("UL");               // Create a <ul> node
+for ( var i = 0 ; i < 100 ; i++ ) {
+  var li = document.createElement("LI")
+  li.appendChild(document.createTextNode("text" + i)); // Append an <li>
+  node.appendChild(li);
+}
+//el().appendChild(node);
+print(performance.now() - startTime);
+
 
 ##  DSL
 ##  Intro1
@@ -1040,6 +1081,32 @@ foam.CLASS({
 });
 var a = demo.bank.AccountTester.create(null);
 a.test();
+
+##  Package imports exports demo
+Package and imports/exports demo
+--
+foam.CLASS({
+  name: 'A',
+  methods: [ function toString() { return 'A'; } ]
+});
+foam.CLASS({
+  name: 'B',
+  methods: [ function toString() { return 'B'; } ]
+});
+foam.CLASS({
+  name: 'C',
+  requires: ['A'],
+  methods: [ function toString() { return this.A.create().toString(); } ]
+});
+
+var c = C.create();
+print(c.toString());
+
+c.A = B;
+print(c.toString());
+
+c = C.create({A: B});
+print(c.toString());
 
 
 ##  Class Refinement

@@ -28,6 +28,7 @@ var classes = [
   'foam.core.IntHolder',
   'foam.core.StringHolder',
   'foam.core.BooleanHolder',
+  'foam.core.RequiredBooleanHolder',
   'foam.glang.EndOfTimeSpan',
   'foam.glang.EndOfDay',
   'foam.glang.EndOfWeek',
@@ -852,6 +853,7 @@ var classes = [
   'foam.nanos.crunch.predicate.StatusChangedTo',
   'foam.nanos.crunch.predicate.IsAgent',
   'foam.nanos.crunch.predicate.CapabilityJunctionTransitionToStatus',
+  'foam.nanos.crunch.predicate.IsAgentUpdate',
 
   //authservice
   'foam.nanos.auth.CapabilityAuthService',

@@ -119,13 +119,15 @@ foam.CLASS({
         .start()
           .add(this.slot(function(cjStatus) {
             return this.E().addClass(style.myClass('tooltip'))
-              .add(cjStatus.label).addClass(style.myClass('badge'))
-              .style({ 'background-color': cjStatus.background })
+              .start()
+                .addClass(this.myClass('badge'))
+                .add(foam.u2.view.ReadOnlyEnumView.create({ data: cjStatus }))
+              .end()
               .start('span')
                 .addClass(style.myClass('tooltiptext'))
                 .enableClass(style.myClass('tooltipDisabled'), self.tooltipEnabled, true)
                 .add(cjStatus.documentation)
-              .end()
+              .end();
           }))
           .add(this.slot(function(isRenewable) {
             return isRenewable ? this.E()

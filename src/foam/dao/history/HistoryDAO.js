@@ -37,6 +37,19 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'historyDAO'
+    },
+    {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'putPredicate',
+      factory: function () {
+        return foam.mlang.predicate.True.create();
+      },
+      javaFactory: `
+        return foam.mlang.MLang.TRUE;
+      `,
+      documentation: `
+        The condition under which a history record should be added
+      `
     }
   ],
 
@@ -115,6 +128,7 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
+      if ( ! getPutPredicate().f(x.put("NEW", obj)) ) return super.put_(x, obj);
       Subject subject = (Subject) ((Session) x.get(Session.class)).getContext().get("subject");
 
       FObject current = this.find_(x, obj);

@@ -39,3 +39,29 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'RequiredBooleanHolder',
+  extends: 'foam.core.BooleanHolder',
+
+  messages: [
+    { name: 'WRONG_VALUE', message: 'Wrong value' }
+  ],
+
+  properties: [
+    {
+      name: 'value',
+      class: 'Boolean',
+      validationPredicates: [
+        {
+          args: ['value'],
+          predicateFactory: function(e) {
+            return e.EQ(foam.core.RequiredBooleanHolder.VALUE, true);
+          },
+          errorMessage: 'WRONG_VALUE'
+        }
+      ]
+    }
+  ]
+});

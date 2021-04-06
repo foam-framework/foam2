@@ -501,8 +501,9 @@ foam.CLASS({
           var slot = this.slot(function(data, data$delegate, order, updateValues) {
             // Make sure the DAO set here responds to ordering when a user clicks
             // on a table column header to sort by that column.
-            if ( this.order ) dao = dao.orderBy(this.order);
             var proxy = view.ProxyDAO.create({ delegate: dao });
+            if ( this.order ) proxy = proxy.orderBy(this.order);
+            
 
             var canObjBeBuildFromProjection = true;
 

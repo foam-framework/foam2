@@ -1701,10 +1701,18 @@ return false
     {
       name: 'partialEval',
       code: function partialEval() {
-        if ( ! this.Constant.isInstance(this.arg2) ) return this;
+        var value = this.arg2;
+        if ( this.Constant.isInstance(this.arg2) ) value = this.arg2.value;
 
-        return ( ! this.arg2.value ) || this.arg2.value.length === 0 ?
-            this.FALSE : this;
+        if ( ! value )
+          return this.FALSE;
+
+        if ( foam.Array.isInstance(value) && value.length == 1 ) return this.Eq.create({
+          arg1: this.arg1,
+          arg2: value[0]
+        });
+
+        return this;
       },
       javaCode: `
         if ( getArg2() instanceof ArrayBinary || getArg2() instanceof Constant ) {
@@ -2075,6 +2083,12 @@ return !FOAM_utils.equals(v1, v2)
     {
       name: 'createStatement',
       javaCode: 'return " " + getArg1().createStatement() + " <> " + getArg2().createStatement() + " ";'
+    },
+    function toMQL() {
+      var arg2 = this.arg2ToMQL();
+      if ( ! arg2 )
+        return null;
+      return '-' + this.arg1.name + '=' + arg2;
     }
   ]
 });
@@ -2259,7 +2273,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Not',
   extends: 'foam.mlang.predicate.AbstractPredicate',
-  implements: [ 'foam.core.Serializable' ],
+  implements: [ 'foam.core.Serializable', { path: 'foam.mlang.Expressions', flags: ['js'], java: false } ],
 
   documentation: 'Unary Predicate which negates the value of its argument.',
 
@@ -2286,7 +2300,40 @@ foam.CLASS({
     },
     {
       name: 'partialEval',
-      code: function() { return this; },
+      code: function() {
+        if ( this.arg1 && this.arg1.partialEval ) {
+          this.arg1 = this.arg1.partialEval();
+        }
+        if ( this.Not.isInstance(this.arg1) ) {
+          this.arg1 = this.arg1.partialEval();
+          if ( ! this.arg2 ) {
+            return this.arg1;
+          }
+        } else if ( this.Eq.isInstance(this.arg1) ) {
+          return this.Neq.create({arg1: this.arg1.arg1, arg2: this.arg1.arg2});
+        } else if (this.Neq.isInstance(this.arg1)) {
+          return this.Eq.create({arg1: this.arg1.arg1, arg2: this.arg1.arg2});
+        } else if (this.Lt.isInstance(this.arg1)) {
+          return this.Gte.create({arg1: this.arg1.arg1, arg2: this.arg1.arg2});
+        } else if (this.Gte.isInstance(this.arg1)) {
+          return this.Lt.create({arg1: this.arg1.arg1, arg2: this.arg1.arg2});
+        } else if (this.Gt.isInstance(this.arg1)) {
+          return this.Lte.create({arg1: this.arg1.arg1, arg2: this.arg1.arg22});
+        } else if (this.Lte.isInstance(this.arg1)) {
+          return this.Gt.create({arg1: this.arg1.arg1, arg2: this.arg1.arg2});
+        } else if (this.And.isInstance(this.arg1)) {
+          for ( var i = 0; i < this.arg1.args.length; i++ ) {
+            this.arg1.args[i] = this.Not.create(this.arg1.args[i]);
+          }
+          return this.Or.create({args: this.arg1.args[i]});
+        } else if (this.Or.isInstance(this.arg1)) {
+          for ( var i = 0; i < this.arg1.args.length; i++ ) {
+            this.arg1.args[i] = this.Not.create(this.arg1.args[i]);
+          }
+          return this.And.create({args: this.arg1.args[i]});
+        }
+        return this;
+      },
       javaCode:
       `Not predicate = (Not) this.fclone();
     if ( this.arg1_ instanceof Not )
@@ -3737,6 +3784,7 @@ foam.CLASS({
     'foam.mlang.sink.Sequence',
     'foam.mlang.sink.Sum',
     'foam.mlang.sink.Unique',
+    'foam.mlang.StringLength',
     'foam.mlang.Absolute',
     'foam.mlang.sink.Average',
     'foam.mlang.Mux',
@@ -3831,7 +3879,8 @@ foam.CLASS({
 
     function INSTANCE_OF(cls) { return this.IsInstanceOf.create({ targetClass: cls }); },
     function CLASS_OF(cls) { return this.IsClassOf.create({ targetClass: cls }); },
-    function MQL(mql) { return this.MQLExpr.create({query: mql}); }
+    function MQL(mql) { return this.MQLExpr.create({query: mql}); },
+    function STRING_LENGTH(a) { return this._unary_("StringLength", a); }
   ]
 });
 
@@ -3973,7 +4022,8 @@ foam.CLASS({
       type: 'Predicate',
       code: function(model) {
         var qp = foam.parse.QueryParser.create({of: model.id});
-        return qp.parseString(this.query) || foam.mlang.predicate.False.create();
+        var pred = qp.parseString(this.query);
+        return pred ? pred.partialEval() : foam.mlang.predicate.False.create();
       },
       javaCode: `
         QueryParser parser = new QueryParser(model);
@@ -3985,7 +4035,7 @@ foam.CLASS({
         if (ps == null)
           return new False();
 
-        return (foam.mlang.predicate.Nary) ps.value();
+        return ((foam.mlang.predicate.Nary) ps.value()).partialEval();
       `
     },
     function toString() {

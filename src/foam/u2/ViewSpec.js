@@ -34,6 +34,9 @@ foam.CLASS({
             ctx = ctx.__subContext__;
           }
 
+          if ( foam.String.isInstance(spec) || spec === undefined || spec === null )
+            return foam.u2.Element.create(args, ctx).setNodeName(spec || 'div');
+
           if ( foam.u2.Element.isInstance(spec) ) {
             if ( foam.debug && ! disableWarning ) {
               console.warn('Warning: Use of literal View as ViewSpec: ', spec.cls_.id);
@@ -84,9 +87,6 @@ foam.CLASS({
 
             return ret;
           }
-
-          if ( foam.String.isInstance(spec) || spec === undefined || spec === null )
-            return foam.u2.Element.create({ nodeName: spec || 'div' }, ctx);
 
           throw 'Invalid ViewSpec, must provide an Element, Slot, toE()-able, Function, {create: function() {}}, {class: \'name\'}, Class, or String, but received: ' + spec;
         };
