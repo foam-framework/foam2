@@ -773,7 +773,7 @@ model from which to test ServiceProvider ID (spid)`,
         if ( logger == null ) {
           logger = new foam.nanos.logger.StdoutLogger();
         }
-        
+
         logger = new PrefixLogger(new Object[] {
           this.getClass().getSimpleName()
         }, logger);
@@ -976,9 +976,7 @@ model from which to test ServiceProvider ID (spid)`,
       }
 
       if ( this.order ) {
-        for ( var i = 0; i <  this.order.length; i++ ) {
-          dao = dao.orderBy(this.order[i]);
-        }
+        dao = dao.orderBy(this.order);
       }
 
       if ( this.timing ) {

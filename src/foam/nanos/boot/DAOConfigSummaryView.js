@@ -18,18 +18,18 @@ foam.CLASS({
 
       properties: [
         {
-          class: 'foam.u2.ViewSpecWithJava',
+          class: 'foam.u2.ViewSpec',
           name: 'viewView',
           factory: function() {
             return {
               class: 'foam.u2.view.ObjAltView',
               views: [
-                [ {class: 'foam.u2.DetailView'},                 'Detail' ],
-                [ {class: 'foam.u2.detail.TabbedDetailView'},    'Tabbed' ],
-                [ {class: 'foam.u2.detail.SectionedDetailView'}, 'Sectioned' ],
-                [ {class: 'foam.u2.detail.MDDetailView'},        'Material' ],
-                [ {class: 'foam.u2.detail.WizardSectionsView'},  'Wizard' ],
-                [ {class: 'foam.u2.detail.VerticalDetailView'},  'Vertical' ]
+                [ {class: 'foam.u2.DetailView'},                 this.DETAIL ],
+                [ {class: 'foam.u2.detail.TabbedDetailView'},    this.TABBED ],
+                [ {class: 'foam.u2.detail.SectionedDetailView'}, this.SECTIONED ],
+                [ {class: 'foam.u2.detail.MDDetailView'},        this.MATERIAL ],
+                [ {class: 'foam.u2.detail.WizardSectionsView'},  this.WIZARD ],
+                [ {class: 'foam.u2.detail.VerticalDetailView'},  this.VERTICAL ]
               ]
             };
           }
@@ -44,18 +44,18 @@ foam.CLASS({
 
       properties: [
         {
-          class: 'foam.u2.ViewSpecWithJava',
+          class: 'foam.u2.ViewSpec',
           name: 'viewView',
           factory: function() {
             return {
               class: 'foam.u2.view.ObjAltView',
               views: [
-                [ {class: 'foam.u2.DetailView'},                 'Detail' ],
-                [ {class: 'foam.u2.detail.TabbedDetailView'},    'Tabbed' ],
-                [ {class: 'foam.u2.detail.SectionedDetailView'}, 'Sectioned' ],
-                [ {class: 'foam.u2.detail.MDDetailView'},        'Material' ],
-                [ {class: 'foam.u2.detail.WizardSectionsView'},  'Wizard' ],
-                [ {class: 'foam.u2.detail.VerticalDetailView'},  'Vertical' ]
+                [ {class: 'foam.u2.DetailView'},                 this.DETAIL ],
+                [ {class: 'foam.u2.detail.TabbedDetailView'},    this.TABBED ],
+                [ {class: 'foam.u2.detail.SectionedDetailView'}, this.SECTIONED ],
+                [ {class: 'foam.u2.detail.MDDetailView'},        this.MATERIAL ],
+                [ {class: 'foam.u2.detail.WizardSectionsView'},  this.WIZARD ],
+                [ {class: 'foam.u2.detail.VerticalDetailView'},  this.VERTICAL ]
               ]
             };
           }
@@ -86,7 +86,7 @@ foam.CLASS({
       imports: [ 'memento', 'stack' ],
 
       exports: [
-        'currentMemento as memento'
+        'currentMemento_ as memento'
       ],
 
       css: `
@@ -106,7 +106,7 @@ foam.CLASS({
           class: 'foam.u2.ViewSpec',
           name: 'inner'
         },
-        'currentMemento'
+        'currentMemento_'
       ],
 
       methods: [
@@ -114,7 +114,7 @@ foam.CLASS({
           this.SUPER();
 
           if ( this.memento )
-            this.currentMemento$ = this.memento.tail$;
+            this.currentMemento_$ = this.memento.tail$;
 
           this.
             start().
@@ -182,6 +182,11 @@ foam.CLASS({
     'memento'
   ],
 
+  messages: [
+    { name: 'CONTROLLER1', message: 'Controller 1' },
+    { name: 'CONTROLLER2', message: 'Controller 2' }
+  ],
+
   properties: [
     {
       name: 'data',
@@ -209,11 +214,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'currentMemento_',
-      postSet: function(o, n) {
-        if ( this.memento )
-          this.memento.tail = n;
-      }
+      name: 'currentMemento_'
     }
   ],
 
@@ -295,8 +296,8 @@ foam.CLASS({
               .attrs({title: spec.description})
               .on('click', function() {
                 if ( self.memento ) {
-                  self.memento.tail = self.Memento.create({ head: spec.id });
-                  self.memento.tail.parent = self.memento;
+                  var tail = self.Memento.create({ head: spec.id, tail: self.Memento.create() });
+                  self.memento.tail$.set(tail);
                 }
               });
 
@@ -321,22 +322,23 @@ foam.CLASS({
         });
       });
 
-      if ( this.memento )
+      if ( this.memento ) {
         this.onDetach(this.memento.tail$.sub(this.mementoChange));
-      this.mementoChange();
+      }
+      this.mementoChange(true);
     }
   ],
 
   listeners: [
-    function mementoChange() {
+    function mementoChange(isInitializing) {
       var m = this.memento;
 
-      if ( ! m || ! m.tail ) {
-        if ( this.currentMemento_ ) this.stack.back();
+      if ( ! m || ! m.tail || m.tail.head.length == 0 ) {
+        if ( ! isInitializing && ! m.tail ) this.stack.back();
         return;
       }
 
-      var x = this.__subContext__.createSubContext();
+      var x = this.__subContext__.createSubContext({ memento: this.memento });
       x.register(this.DAOUpdateControllerView, 'foam.comics.DAOUpdateControllerView');
       x.register(this.CustomDAOSummaryView,    'foam.comics.v2.DAOSummaryView');
       x.register(this.CustomDAOUpdateView,     'foam.comics.v2.DAOUpdateView');
@@ -354,14 +356,14 @@ foam.CLASS({
                 class: this.BrowserView,
                 stack: this.stack
               },
-              'Controller 1'
+              this.CONTROLLER1
             ],
             [
               {
                 class: this.DAOBrowseControllerView,
                 stack: this.stack
               },
-              'Controller 2'
+              this.CONTROLLER2
             ]
           ]
         }

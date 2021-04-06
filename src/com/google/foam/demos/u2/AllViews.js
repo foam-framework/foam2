@@ -166,6 +166,11 @@ foam.CLASS({
     },
     {
       class: 'Int',
+      name: 'tooltip',
+      view: { class: 'foam.u2.view.IntView', tooltip: 'Please enter a number.' }
+    },
+    {
+      class: 'Int',
       name: 'intWithIntView',
       view: {
         class: 'foam.u2.view.IntView',
@@ -360,9 +365,12 @@ foam.CLASS({
       class: 'Date',
       name: 'dateRWAndRO',
       view: {
-        class: 'foam.u2.view.DualView',
-        viewa: 'foam.u2.DateView',
-        viewb: {class: 'foam.u2.DateView', mode: foam.u2.DisplayMode.RO}
+        class: 'foam.u2.MultiView',
+        views: [
+          'foam.u2.view.DateView',
+          'foam.u2.view.DateView',
+          {class: 'foam.u2.view.DateView', mode: foam.u2.DisplayMode.RO}
+        ]
       }
     },
     {
@@ -398,6 +406,21 @@ foam.CLASS({
     {
       class: 'Double',
       name: 'defaultDouble'
+    },
+    {
+      class: 'Float',
+      name: 'multiViewFloat',
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          { class: 'foam.u2.TextField', placeholder: 'textfield', onKey: true },
+          { class: 'foam.u2.FloatView', placeholder: 'floatview', onKey: true },
+          { class: 'foam.u2.TextField', onKey: false },
+          { class: 'foam.u2.FloatView', onKey: false },
+          { class: 'foam.u2.FloatView', onKey: false, precision: 2 },
+          { class: 'foam.u2.FloatView', onKey: false, precision: 2, trimZeros: false }
+        ]
+      }
     },
     {
       class: 'StringArray',
@@ -506,6 +529,18 @@ foam.CLASS({
       class: 'Image',
       name: 'imageView',
       view: 'foam.u2.view.ImageView',
+      value: 'Dragon.png'
+    },
+    {
+      class: 'Image',
+      name: 'dualImageView',
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          'foam.u2.TextField',
+          'foam.u2.view.ImageView'
+        ]
+      },
       value: 'Dragon.png'
     },
     {

@@ -9,26 +9,22 @@ p({
   "status":1,
   "code":
   """
-    // DO BEFORE RUNNING: Modify this global variable in script to send email to the particular test account you are using
-    EMAIL_DESTINATION = "testemail@domain.com";
-
+    import foam.nanos.notification.email.EmailMessage;
+    import foam.nanos.notification.email.SMTPEmailService;
+    import foam.nanos.notification.email.Status;
+    import foam.nanos.auth.User;
+    import foam.nanos.auth.Subject;
+    import java.util.HashMap;
     import foam.util.Emails.EmailsUtility;
-    email = x.get("email");
-    print("email: " + email.getClass());
-    user = x.get("subject").getUser();
-    print("user: " + user.getId());
-    message = new foam.nanos.notification.email.EmailMessage();
-    message.setTo(new String[] { EMAIL_DESTINATION });
-    message.setSubject("test");
-    message.setBody("test");
-    print("message: " + message);
-    EmailsUtility.sendEmailFromTemplate(x, null, message, null, null);
-    message = new foam.nanos.notification.email.EmailMessage();
-    message.setTo(new String[] { EMAIL_DESTINATION });
-    map = new java.util.HashMap();
-    map.put("content", user.getFirstName());
+    user = ((Subject) x.get("subject")).getUser();
+    //Configure sending email inside the string array.
+    String[] emails = new String[]{user.getEmail()};
+    EmailMessage message = new EmailMessage.Builder(x)
+              .setTo(emails)
+              .build();
+    HashMap map = new HashMap();
+    map.put("content", "test");
     EmailsUtility.sendEmailFromTemplate(x, user, message, "testEmail", map);
-    print("DONE");
   """,
   "output":"",
   "notes":""

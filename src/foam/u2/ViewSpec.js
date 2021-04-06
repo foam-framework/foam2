@@ -34,6 +34,9 @@ foam.CLASS({
             ctx = ctx.__subContext__;
           }
 
+          if ( foam.String.isInstance(spec) || spec === undefined || spec === null )
+            return foam.u2.Element.create(args, ctx).setNodeName(spec || 'div');
+
           if ( foam.u2.Element.isInstance(spec) ) {
             if ( foam.debug && ! disableWarning ) {
               console.warn('Warning: Use of literal View as ViewSpec: ', spec.cls_.id);
@@ -57,8 +60,17 @@ foam.CLASS({
               ret = spec.create(args, ctx);
             } else {
               var cls = foam.core.FObject.isSubClass(spec.class) ? spec.class : ctx.lookup(spec.class);
-              if ( ! cls ) foam.assert(false, 'ViewSpec specifies unknown class: ', spec.class);
+              if ( ! cls ) {
+                foam.assert(false, 'ViewSpec specifies unknown class: ', spec.class);
+                debugger;
+              }
               ret = cls.create(spec, ctx).copyFrom(args || {});
+            }
+
+            if ( spec.children ) {
+              for ( var i = 0 ; i < spec.children.length ; i++ ) {
+                ret.tag(spec.children[0]);
+              }
             }
 
             foam.assert(
@@ -76,9 +88,6 @@ foam.CLASS({
             return ret;
           }
 
-          if ( foam.String.isInstance(spec) || spec === undefined || spec === null )
-            return foam.u2.Element.create({ nodeName: spec || 'div' }, ctx);
-
           throw 'Invalid ViewSpec, must provide an Element, Slot, toE()-able, Function, {create: function() {}}, {class: \'name\'}, Class, or String, but received: ' + spec;
         };
       }
@@ -86,20 +95,20 @@ foam.CLASS({
   ],
 
   properties: [
-    /* TODO: uncomment this to fix ViewSpecs converting into Views when loading.
     [
       'fromJSON',
       function fromJSON(value, ctx, prop, json) {
+        /** Prevents viewspecs from converting to views when loaded from JSON. **/
         return value;
       }
     ],
-    */
     ['view', { class: 'foam.u2.view.MapView' }],
     [ 'adapt', function(_, spec, prop) {
       return foam.String.isInstance(spec) ? { class: spec } : spec ;
     } ],
     [ 'displayWidth', 80 ]
     /*
+    TODO: do on the Java side also.
     [ 'toJSON', function(value) {
       Output as string if 'class' is only defined value.
     } ]

@@ -60,6 +60,9 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'name'
+    },
+    {
       // Accepts function and string
       name: 'title'
     },

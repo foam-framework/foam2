@@ -22,7 +22,7 @@ foam.CLASS({
     'currentData as data',
     'currentData as objData',
     'controllerMode',
-    'currentMemento as memento'
+    'currentMemento_ as memento'
   ],
 
   imports: [
@@ -109,7 +109,7 @@ foam.CLASS({
       },
     },
     ['nodeName', 'DIV'],
-    'currentMemento'
+    'currentMemento_'
   ],
 
   css: `
@@ -205,7 +205,7 @@ foam.CLASS({
       var self = this;
 
       if ( this.memento )
-        this.currentMemento$ = this.memento.tail$;
+        this.currentMemento_$ = this.memento.tail$;
 
       var hasTabs = false;
       this.add(this.slot(function(of, properties, actions) {

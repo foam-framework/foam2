@@ -191,9 +191,9 @@ foam.LIB({
       if ( prev && prev.name !== key ) {
         throw 'Class constant conflict: ' +
           this.id + '.' + cName + ' from: ' + key + ' and ' + prev.name;
+      } else {
+        this.prototype[cName] = this[cName] = value;
       }
-
-      this.prototype[cName] = this[cName] = value;
     },
 
     function isInstance(o) {
@@ -985,7 +985,8 @@ foam.CLASS({
           // for each object since they are of the exact same
           // type.
           if ( o.hasOwnProperty(name) || props[i].factory ) {
-            this[name] = o[name];
+            if ( ! props[i].copyValueFrom || ! props[i].copyValueFrom(this, o) )
+              this[name] = o[name];
           }
         }
         return this;
@@ -998,11 +999,8 @@ foam.CLASS({
           var name = props[i].name;
           var otherProp = o.cls_.getAxiomByName(name);
           if ( otherProp && foam.core.Property.isInstance(otherProp) ) {
-            if ( this[name] && this[name].copyFrom ) {
-              this[name].copyFrom(o[name])
-            } else {
+            if ( ! props[i].copyValueFrom || ! props[i].copyValueFrom(this, o) )
               this[name] = o[name];
-            }
           }
         }
         return this;

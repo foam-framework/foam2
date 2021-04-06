@@ -102,6 +102,15 @@ foam.CLASS({
     },
     {
       class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedByAgent',
+      section: 'supportDetails',
+      readPermissionRequired: true,
+      writePermissionRequired: true,
+      storageOptional: true
+    },
+    {
+      class: 'Reference',
       of: 'foam.nanos.boot.NSpec',
       label: 'Data Access Object (DAO)',
       name: 'daoKey',

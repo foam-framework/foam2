@@ -24,6 +24,10 @@ foam.CLASS({
     'memento'
   ],
 
+  requires: [
+    'foam.parse.QueryParser'
+  ],
+
   css: `
     ^ {
       margin: 16px;
@@ -122,13 +126,20 @@ foam.CLASS({
     {
       name: 'criteria'
     },
-    'isInit'
+    'isInit',
+    {
+      name: 'queryParser',
+      factory: function() {
+        return this.QueryParser.create({ of: this.dao.of || this.__subContext__.lookup(this.property.forClass_) });
+      }
+    }
   ],
 
   methods: [
     function initE() {
       this.SUPER();
       var self = this;
+
       this.addClass(this.myClass())
         .start().addClass(this.myClass('container-property'))
           .enableClass(this.myClass('container-property-active'), this.active$)
@@ -149,8 +160,25 @@ foam.CLASS({
         .end();
 
       this.isInit = true;
+
+      if ( this.memento && this.memento.head.length != 0 ) {
+        var predicate = this.getPredicateFromMemento();
+        if ( predicate ) {
+          this.filterController.setExistingPredicate(0, this.property.name, predicate.partialEval());
+        }
+      }
+
       this.isFiltering();
       this.isInit = false;
+    },
+    
+    function getPredicateFromMemento() {
+      if ( this.memento && this.memento.head.length > 0 ) {
+        var predicate = this.queryParser.parseString(this.memento.head);
+        if ( predicate ) {
+          return predicate.partialEval();
+        }
+      }
     }
   ],
 
@@ -172,6 +200,7 @@ foam.CLASS({
       // Restore the search view using an existing predicate for that view
       // This requires that every search view implements restoreFromPredicate
       var existingPredicate = this.filterController.getExistingPredicate(this.criteria, this.property);
+
       if ( existingPredicate ) {
         this.view_.restoreFromPredicate(existingPredicate);
       }
@@ -191,25 +220,15 @@ foam.CLASS({
         if ( ! this.view_ || ! this.memento )
           return;
 
-        if ( ! this.memento.paramsObj.f ) {
-          this.memento.paramsObj.f = [];
-        }
-
-        this.memento.paramsObj.f = this.memento.paramsObj.f.filter(f => f.n !== this.property.name || f.criteria !== this.criteria );
-
         var pred;
         if ( Object.keys(this.view_.predicate).length > 0 && ! foam.mlang.predicate.True.isInstance(this.view_.predicate) )
-        pred =  this.view_.predicate.toMQL && this.view_.predicate.toMQL();
+          pred =  this.view_.predicate.toMQL && this.view_.predicate.toMQL();
 
         if ( pred ) {
-          var newFilterValue = { criteria: this.criteria, n: this.property.name, pred: pred }
-          this.memento.paramsObj.f.push(newFilterValue);
+          this.memento.head = pred ? pred : '';
+        } else {
+          this.memento.head = '';
         }
-        if ( this.memento && this.memento.paramsObj.f && this.memento.paramsObj.f.length === 0 ) {
-          delete this.memento.paramsObj.f;
-        }
-
-        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
       }
       
       // Since the existing predicates are lazy loaded (on opening the view),

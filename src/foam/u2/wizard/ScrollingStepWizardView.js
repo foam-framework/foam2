@@ -11,18 +11,26 @@ foam.CLASS({
   mixins: ['foam.u2.wizard.WizardletRenderUtils'],
   documentation: `Displays all wizardlets in a scrolling page.`,
 
+  imports: [ 'sequence?' ],
+
   messages: [
-    { name: 'NO_ACTION_LABEL', message: 'Done' }
+    { name: 'NO_ACTION_LABEL', message: 'Done' },
+    { name: 'SAVE_LABEL', message: 'Save' },
   ],
 
   requires: [
     'foam.u2.tag.CircleIndicator',
+    'foam.u2.crunch.wizardflow.SaveAllAgent',
     'foam.u2.wizard.WizardPosition',
     'foam.u2.wizard.WizardletIndicator'
   ],
 
   css: `
-    ^mainView > * > *:not(:last-child) {
+    ^ {
+      --foamMargin: 20px;
+    }
+
+    ^mainView > * > *:not(:last-child):not(^heading) {
       margin-bottom: 64px;
     }
 
@@ -32,14 +40,16 @@ foam.CLASS({
       --actionBarHeight: calc(
         2*var(--actionBarTbPadding) + var(--buttonHeight));
       --lrPadding: 48px;
+      --tbPadding: var(--lrPadding);
       position: relative;
     }
 
-    ^rightside ^entry {
+    ^ ^rightside ^entry, ^ ^rightside ^hide-X-entry {
       flex-grow: 1;
       overflow-y: auto;
-      padding: var(--lrPadding);
-      padding-bottom: calc(var(--lrPadding) + var(--actionBarHeight))
+      padding: var(--tbPadding) var(--lrPadding);
+      padding-bottom: calc(var(--tbPadding) - var(--foamMargin));
+      /* padding-bottom: calc(var(--lrPadding) + var(--actionBarHeight)) */
     }
 
     ^rightside ^actions {
@@ -56,6 +66,11 @@ foam.CLASS({
       /* TODO: Themes don't support this, so color is static */
       border-top: 2px solid hsla(240,100%,80%,0.8);
     }
+
+    ^heading h2 {
+      margin: 0px;
+    }
+
   `,
 
   properties: [
@@ -109,6 +124,16 @@ foam.CLASS({
       expression: function (data$wizardlets) {
         return data$wizardlets.filter(w => w.submit).length > 0;
       }
+    },
+    {
+      name: 'willSave',
+      documentation: `
+        Used to change submit button text between 'Done' and 'Save' depending
+        on if auto-save is on.
+      `,
+      factory: function () {
+        return this.sequence && this.sequence.contains('SaveAllAgent');
+      }
     }
   ],
 
@@ -120,6 +145,8 @@ foam.CLASS({
         this.data.wizardPosition = this.scrollWizardPosition;
       }));
       this
+        .addClass(this.myClass()) // Used to fix CSS precedence with parent
+        .enableClass(this.myClass('fullscreen'), this.fullScreen$)
         .start(this.Grid)
           .addClass(this.myClass('fix-grid'))
           .start(this.GUnit, { columns: 4 })
@@ -160,7 +187,9 @@ foam.CLASS({
                 .tag(this.SUBMIT, {
                   label: this.hasAction
                     ? this.ACTION_LABEL
-                    : this.NO_ACTION_LABEL
+                    : this.willSave
+                      ? this.SAVE_LABEL
+                      : this.NO_ACTION_LABEL
                 })
               .endContext()
             .end()
@@ -183,25 +212,28 @@ foam.CLASS({
       var isCurrent = wizardlet == this.data.currentWizardlet;
       var self = this;
       return e
-        .start()
-          .add(wizardlet.slot(function (indicator) {
-            return self.E()
-              .style({
-                // TODO: move to CSS axiom
-                display: 'inline-block',
-                float: 'left',
-                'margin-right': '15px'
-              })
-              .start(self.CircleIndicator, self.configureIndicator(
-                wizardlet, isCurrent, self.calculateWizardletDisplayNumber(
-                  wizardlet, self.data.wizardlets)
-              ))
-              .end()
-          }))
-          .start('h2') // ???: Should this really be h2?
-            .add(wizardlet.title)
-          .end()
-        .end()
+        .add(wizardlet.slot(function (isVisible) {
+          if ( ! isVisible ) return self.E();
+          return self.E()
+            .addClass(self.myClass('heading'))
+            .add(wizardlet.slot(function (indicator) {
+              return self.E()
+                .style({
+                  // TODO: move to CSS axiom
+                  display: 'inline-block',
+                  float: 'left',
+                  'margin-right': '15px'
+                })
+                .start(self.CircleIndicator, self.configureIndicator(
+                  wizardlet, isCurrent, self.calculateWizardletDisplayNumber(
+                    wizardlet, self.data.wizardlets)
+                ))
+                .end()
+            }))
+            .start('h2') // ???: Should this really be h2?
+              .translate(wizardlet.capability.id+'.name', wizardlet.capability.name)
+            .end()
+        }));
     },
     function renderWizardletSections(e, wizardlet, wi) {
       var self = this;
@@ -228,6 +260,9 @@ foam.CLASS({
     {
       name: 'submit',
       label: 'Done',
+      isEnabled: function (data$config, data$allValid) {
+        return ! data$config.requireAll || data$allValid;
+      },
       code: function (x) {
         for ( let w of this.data.wizardlets ) {
           if ( w.submit ) w.submit();

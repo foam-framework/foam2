@@ -103,6 +103,16 @@ foam.CLASS({
       section: 'supportDetails'
     },
     {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedByAgent',
+      section: 'supportDetails',
+      readPermissionRequired: true,
+      writePermissionRequired: true,
+      storageOptional: true,
+      section: 'supportDetails'
+    },
+    {
       class: 'String',
       name: 'serviceKey',
       label: 'Service',

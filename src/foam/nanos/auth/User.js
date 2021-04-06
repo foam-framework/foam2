@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'User',
+  plural: 'Users',
 
   implements: [
     'foam.nanos.auth.Authorizable',
@@ -202,7 +203,7 @@ foam.CLASS({
       class: 'String',
       name: 'firstName',
       shortName: 'fn',
-      documentation: 'The first name of the User.',      
+      documentation: 'The first name of the User.',
       section: 'userInformation',
       order: 70,
       gridColumns: 6,
@@ -284,7 +285,7 @@ foam.CLASS({
       name: 'email',
       label: {
         'en' :'Email Address',
-        'fr' :'Adresse e-mail'
+        'fr' :'Adresse Email'
       },
       includeInDigest: true,
       containsPII: true,
@@ -810,7 +811,7 @@ foam.CLASS({
         }
 
         // check for two-factor authentication
-        if ( this.getTwoFactorEnabled() && ! session.getContext().getBoolean("twoFactorSuccess") ) {
+        if ( this.getTwoFactorEnabled() && ! session.getTwoFactorSuccess() ) {
           throw new AuthenticationException("User requires two-factor authentication");
         }
 

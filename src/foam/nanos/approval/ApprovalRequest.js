@@ -7,6 +7,7 @@
  foam.CLASS({
   package: 'foam.nanos.approval',
   name: 'ApprovalRequest',
+  plural: 'ApprovalRequests',
   documentation: 'Approval requests are stored in approvalRequestDAO and' +
   'represent a single approval request for a single user.',
 
@@ -133,25 +134,28 @@
       visibility: 'RO',
       tableCellFormatter: function(_,obj) {
         let self = this;
-        this.__subSubContext__[obj.daoKey].find(obj.objId).then(requestObj => {
-          let referenceSummaryString = `ID:${obj.objId}`;
+        try {
+          this.__subSubContext__[obj.daoKey].find(obj.objId).then(requestObj => {
+            let referenceSummaryString = `ID:${obj.objId}`;
 
-          if ( requestObj ){
-            Promise.resolve(requestObj.toSummary()).then(function(requestObjSummary) {
-              if ( requestObjSummary ){
-                referenceSummaryString = requestObjSummary;
-              }
+            if ( requestObj ){
+              Promise.resolve(requestObj.toSummary()).then(function(requestObjSummary) {
+                if ( requestObjSummary ){
+                  referenceSummaryString = requestObjSummary;
+                }
 
-              self.add(referenceSummaryString);
-            })
-          }
-        });
+                self.add(referenceSummaryString);
+              })
+            }
+          });
+        } catch (x) {}
       },
       view: function(_, X) {
         let slot = foam.core.SimpleSlot.create();
         let data = X.data;
 
-        X[data.daoKey].find(data.objId).then(requestObj => {
+
+        X[data.daoKey] && X[data.daoKey].find(data.objId).then(requestObj => {
           let referenceSummaryString = `ID:${data.objId}`;
 
           if ( requestObj ){
@@ -163,7 +167,7 @@
               slot.set(referenceSummaryString);
             })
           }
-        })
+        });
 
         return {
           class: 'foam.u2.view.ValueView',
@@ -271,23 +275,27 @@
       },
       tableCellFormatter: function(approver, data) {
         let self = this;
-        this.__subSubContext__.userDAO.find(approver).then(user => {
-          if ( data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
-            self.add(user ? user.toSummary() : `User #${approver}`);
-          } else if ( data.isTrackingRequest ) {
-            self.add(data.TRACKING);
-          } else if ( user ) {
-            if ( self.__subSubContext__.user.id != user.id ) {
-              self.add(user.toSummary());
+        try {
+          this.__subSubContext__.userDAO.find(approver).then(user => {
+            if ( data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
+              self.add(user ? user.toSummary() : `User #${approver}`);
+            } else if ( data.isTrackingRequest ) {
+              self.add(data.TRACKING);
+            } else if ( user ) {
+              if ( self.__subSubContext__.user.id != user.id ) {
+                self.add(user.toSummary());
+              } else {
+                self.add(data.PENDING);
+              }
             } else {
-              self.add(data.PENDING);
+              self.add(`User #${approver}`);
             }
-          } else {
-            self.add(`User #${approver}`);
-          }
-        });
+          });
+        } catch (x) {}
       },
-      visibility: 'RO'
+      readVisibility: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'HIDDEN'
     },
     {
       class: 'String',
@@ -375,6 +383,16 @@
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
+      includeInDigest: true,
+      section: 'approvalRequestInformation',
+      order: 130,
+      gridColumns: 6,
+      readPermissionRequired: true
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedByAgent',
       includeInDigest: true,
       section: 'approvalRequestInformation',
       order: 130,
@@ -497,7 +515,7 @@
       documentation: `
         ID of obj displayed in view reference
         To be used in view reference action when the approvalrequest
-        needs to specify its own reference, for example in the case of 
+        needs to specify its own reference, for example in the case of
         UserCapabilityJunctions where data is null.
       `
     },
@@ -513,7 +531,7 @@
       documentation: `
         Daokey of obj displayed in view reference.
         To be used in view reference action when the approvalrequest
-        needs to specify its own reference, for example in the case of 
+        needs to specify its own reference, for example in the case of
         UserCapabilityJunctions where data is null.
       `
     },
@@ -740,7 +758,7 @@
           property = X[daoKey].of.ID;
           objId = property.adapt.call(property, self.objId, self.objId, property);
         }
-        
+
         return X[daoKey]
           .find(objId)
           .then(obj => {
@@ -815,7 +833,7 @@
               }),
               mementoHead: null,
               backLabel: 'Back'
-            });
+            }, X);
           })
           .catch(err => {
             console.warn(err.message || err);

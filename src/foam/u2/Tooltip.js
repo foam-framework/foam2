@@ -77,7 +77,7 @@ foam.CLASS({
               'left': left
             });
           }
-        }, 500);
+        }, 100);
       });
 
       self.target.on('mousedown',  self.close);
@@ -103,6 +103,6 @@ foam.CLASS({
       }
 
       this.target.on('mouseover', this.onMouseOver);
-    },
-  ],
+    }
+  ]
 });

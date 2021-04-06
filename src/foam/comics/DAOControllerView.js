@@ -32,6 +32,7 @@ foam.CLASS({
 
   exports: [
     'as controllerView',
+    'currentMemento_ as memento',
     'data.selection as selection',
     'data.data as dao',
     'data.filteredTableColumns as filteredTableColumns',
@@ -132,7 +133,8 @@ foam.CLASS({
           class: 'foam.comics.DAOUpdateControllerView'
         };
       }
-    }
+    },
+    'currentMemento_'
   ],
 
   reactions: [
@@ -145,6 +147,33 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
+      var summaryViewParent;
+
+      var reciprocalSearch = foam.u2.ViewSpec.createView({
+        class: 'foam.u2.view.ReciprocalSearch',
+        data$: this.data.predicate$
+      }, {}, self, self.__subContext__.createSubContext({ memento: this.memento }));
+
+      var searchView = foam.u2.ViewSpec.createView({
+        class: 'foam.u2.view.SimpleSearch',
+        data$: this.data.predicate$
+      }, {}, self, reciprocalSearch.__subContext__.createSubContext());
+
+      if ( this.data.searchMode === this.SearchMode.FULL ) {
+        summaryViewParent = reciprocalSearch;
+      }
+      if ( this.data.searchMode === this.SearchMode.SIMPLE ) {
+        summaryViewParent = searchView;
+      }
+
+      var summaryView = foam.u2.ViewSpec.createView(this.summaryView, {
+        data$: this.data.filteredDAO$,
+        multiSelectEnabled: !! this.data.relationship,
+        selectedObjects$: this.data.selectedObjects$
+      }, {}, summaryViewParent);
+
+      this.currentMemento_ = summaryView.memento;
+
       this.data.border.add(
         this.E()
           .addClass(this.myClass())
@@ -176,12 +205,7 @@ foam.CLASS({
               this.start()
                 .hide(self.data.searchHidden$)
                 .addClass(self.myClass('full-search-container'))
-                .add(self.cls.PREDICATE.clone().copyFrom({
-                  view: {
-                    class: 'foam.u2.view.ReciprocalSearch',
-                    searchValue: self.memento && self.memento.paramsObj.s
-                  }
-                }))
+                .add(reciprocalSearch)
               .end();
             })
             .start().addClass(this.myClass('manual-width-adjust'))
@@ -190,12 +214,7 @@ foam.CLASS({
                 .callIf(this.data.searchMode === this.SearchMode.SIMPLE, function() {
                   this
                     .start()
-                      .add(self.cls.PREDICATE.clone().copyFrom({
-                        view: {
-                          class: 'foam.u2.view.SimpleSearch',
-                          searchValue: self.memento && self.memento.paramsObj.s
-                        }
-                      }))
+                      .add(searchView)
                     .end();
                 })
                 .start().show(self.mode$.map(m => m === foam.u2.DisplayMode.RW))
@@ -207,11 +226,7 @@ foam.CLASS({
                   .add()
                 .end()
               .end()
-              .tag(this.summaryView, {
-                data$: this.data.filteredDAO$,
-                multiSelectEnabled: !! this.data.relationship,
-                selectedObjects$: this.data.selectedObjects$
-              })
+              .add(summaryView)
             .end()
           .end()
         .end());

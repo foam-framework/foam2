@@ -157,7 +157,7 @@ foam.CLASS({
     {
       name: 'data',
       postSet: function(o, n) {
-        if ( o !== n ) this.choice = this.findChoiceByData(n) || [n, n.label || n];
+        if ( o !== n && ! foam.Null.isInstance(n) ) this.choice = this.findChoiceByData(n) || [n, n.label || n];
       }
     },
     {
@@ -213,6 +213,7 @@ foam.CLASS({
     },
 
     function initE() {
+      this.SUPER();
       var self = this;
 
       if ( ! this.choice && this.choices.length == 1 ) this.data = this.choices[0][0];

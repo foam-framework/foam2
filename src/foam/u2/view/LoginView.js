@@ -55,7 +55,7 @@ foam.CLASS({
 
   /* ON RIGHT SIDE ALL **** */
   ^ .centerVertical {
-    padding-top: 3vh; 
+    padding-top: 3vh;
     max-width: 30vw;
     margin: 0 auto;
   }
@@ -221,6 +221,7 @@ foam.CLASS({
 
     function initE() {
       this.SUPER();
+      var self = this;
       this.document.addEventListener('keyup', this.onKeyPressed);
       this.onDetach(() => {
         this.document.removeEventListener('keyup', this.onKeyPressed);

@@ -163,6 +163,11 @@ foam.CLASS({
       section: 'navigation'
     },
     {
+      class: 'String',
+      name: 'defaultLocaleLanguage',
+      value: 'en'
+    },
+    {
       class: 'Map',
       name: 'headConfig'
     },
@@ -473,6 +478,26 @@ foam.CLASS({
       name: 'lastModifiedBy',
       includeInDigest: true,
       documentation: `The unique identifier of the user.`,
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      tableCellFormatter: function(value, obj, axiom) {
+        this.__subSubContext__.userDAO
+          .find(value)
+          .then((user) => {
+            if ( user ) {
+              this.add(user.legalName);
+            }
+          })
+          .catch((error) => {
+            this.add(value);
+          });
+      },
+      section: 'administration'
+    },
+    {
+      class: 'Long',
+      name: 'lastModifiedByAgent',
+      includeInDigest: true,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       tableCellFormatter: function(value, obj, axiom) {

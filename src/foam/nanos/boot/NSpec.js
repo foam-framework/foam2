@@ -209,7 +209,7 @@ foam.CLASS({
       javaGetter: 'return getName();',
       getter: function() { return this.name; }
     }
-    // TODO: permissions, lazy, parent
+    // TODO: permissions, parent
   ],
 
   methods: [
@@ -242,7 +242,7 @@ foam.CLASS({
         'NoSuchFieldException',
         'IOException',
         'Exception'
-      ],
+      ]
     },
     {
       name: 'checkAuthorization',

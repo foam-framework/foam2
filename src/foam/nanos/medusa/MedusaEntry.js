@@ -179,6 +179,15 @@ The data of a MedusaEntry is the json delta of the original put or remove DAO op
       includeInDigest: false,
     },
     {
+      name: 'lastModifiedByAgent',
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      visibility: 'HIDDEN',
+      value: 2,
+      storageOptional: true,
+      includeInDigest: false,
+    },
+    {
       name: 'lastModified',
       label: 'Stored',
       class: 'DateTime',

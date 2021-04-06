@@ -135,6 +135,10 @@ foam.CLASS({
     {
       name: 'submitted',
       class: 'Boolean'
+    },
+    {
+      name: 'allValid',
+      class: 'Boolean'
     }
   ],
 
@@ -166,6 +170,12 @@ foam.CLASS({
               sectionPosition, isAvailable$.get());
           }));
         });
+
+        // Bind validity listener for wizardlet validity
+        var isValid$ = w.isValid$;
+        this.wsub.onDetach(isValid$.sub(() => {
+          this.onWizardletValidity(wizardletIndex, isValid$.get());
+        }));
 
       });
 
@@ -304,6 +314,9 @@ foam.CLASS({
         wizardletIndex: this.wizardPosition.wizardletIndex,
         sectionIndex: this.wizardPosition.sectionIndex,
       });
+    },
+    function onWizardletValidity(wizardletIndex, value) {
+      this.allValid = this.wizardlets.filter(w => ! w.isValid).length == 0;
     },
     function onSectionAvailability(sectionPosition, value) {
       // If a previous position became available, move the wizard back
