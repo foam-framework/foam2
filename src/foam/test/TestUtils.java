@@ -8,52 +8,21 @@ package foam.test;
 
 import foam.core.ClassInfo;
 import foam.core.X;
+import foam.core.FObject;
 import foam.dao.DAO;
 import foam.dao.MDAO;
+import foam.dao.ProxyDAO;
+import foam.dao.SequenceNumberDAO;
 import foam.nanos.auth.Group;
+import foam.nanos.auth.GroupPermissionJunction;
 import foam.nanos.auth.User;
 import foam.nanos.fs.File;
 import foam.nanos.session.Session;
+import foam.util.Auth;
 /**
  * Helper methods to make writing tests easier.
  */
 public class TestUtils {
-
-  /**
-    Create a simple session context with a test user, group and auth related DAOs.
-    Includes self contained bareUserDAO and groupDAO so no user or group journals
-    are updated related to the authorization of the current user.
-    @param spid create test context acting within specified spid
-  */
-
-  public static X createTestContext(X x, String spid) {
-    x = mockDAO(x, "localUserDAO");
-    x = mockDAO(x, "groupPermissionJunctionDAO");
-    x = mockDAO(x, "groupDAO");
-
-    DAO userDAO = (DAO) x.get("localUserDAO");
-    DAO groupDAO = (DAO) x.get("localGroupDAO");
-
-    Group group = new Group.Builder(x)
-      .setId("test")
-      .build();
-    group = (Group) groupDAO.put(group);
-
-    User user = createTestUser();
-    user.setGroup("test");
-    user.setSpid(spid);
-    user.setId(900);
-    user = (User) userDAO.put(user);
-
-    Session testUserSession = new Session.Builder(x).setUserId(user.getId()).build();
-    X testX = testUserSession.applyTo(x);
-    testX = testX.put(Session.class, testUserSession);
-    testX.put("group", group);
-    testUserSession.setContext(testX);
-
-    return testX;
-  }
-
   /**
    * Mock out a DAO in the given context by replacing it with an undecorated, empty MDAO.
    * Will keep the same 'of' type.
@@ -68,12 +37,25 @@ public class TestUtils {
   }
 
   /**
+   * Create mockDAOs required by the Auth Service
+  */
+  public static X createAuthMockDAO(X x) {
+    x = mockDAO(x, "localUserDAO");
+    x = mockDAO(x, "localGroupPermissionJunctionDAO");
+    x = mockDAO(x, "localGroupDAO");
+    x = mockDAO(x, "userCapabilityJunctionDAO");
+    x = applyDAOProxy(x, "userDAO", new SequenceNumberDAO.Builder(x).build(), (DAO) x.get("localUserDAO"));
+    x = applyDAOProxy(x, "groupPermissionJunctionDAO", new ProxyDAO.Builder(x).build(), (DAO) x.get("localGroupPermissionJunctionDAO"));
+    x = applyDAOProxy(x, "groupDAO", new ProxyDAO.Builder(x).build(), (DAO) x.get("localGroupDAO"));
+    return x;
+  }
+
+  /**
    * Creates a user with some properties populated for testing.
    * @return A dummy user with populated fields.
    */
   public static User createTestUser() {
     User user  = new User();
-    user.setId(1);
     user.setFirstName("John");
     user.setLastName("Smith");
     user.setEmail("john@example.com");
@@ -83,6 +65,68 @@ public class TestUtils {
     user.setLifecycleState(foam.nanos.auth.LifecycleState.ACTIVE);
     user.setEnabled(true);
     return user;
+  }
+
+  /**
+   * Creates a user with some properties populated for testing.
+   * @param group sets group to new user.
+   * @return A dummy user with populated fields.
+   */
+  public static User createTestUser(String group) {
+    User user  = createTestUser();
+    user.setGroup(group);
+    return user;
+  }
+
+  /**
+    Applies a decorator/proxyDAO on provided DAO and set in context provided if daoName is given.
+    @param daoName key of proxiedDAO in context
+    @param proxy the proxyDAO to delegate to @param dao
+    @param dao proxyDAO' delegate
+   */
+  public static X applyDAOProxy(X x, String daoName, ProxyDAO proxy, DAO dao) {
+    proxy.setDelegate(dao);
+    return x.put(daoName, proxy);
+  }
+
+  /**
+    Create a simple session context with a test user, group and auth related DAOs.
+    Includes self contained bareUserDAO and groupDAO so no user or group journals
+    are updated related to the authorization of the current user.
+    Auto authorize as admin with * permission under group {test_admin_group}
+    and creates a test user and sets an empty test group {test_group} with no permissions.
+    @param spid create test context acting within specified spid
+  */
+
+  public static X createTestContext(X x, String spid) {
+    x = createAuthMockDAO(x);
+    DAO userDAO = (DAO) x.get("userDAO");
+    DAO groupDAO = (DAO) x.get("groupDAO");
+
+    Group group = new Group.Builder(x)
+      .setId("test_group")
+      .build();
+    group = (Group) groupDAO.put(group);
+
+    Group admin_group = new Group.Builder(x)
+      .setId("test_admin_group")
+      .build();
+    admin_group = (Group) groupDAO.put(admin_group);
+    Auth.applyPermissionToGroup(x, admin_group.getId(), "*");
+
+    User user = createTestUser();
+    user.setGroup("test_group");
+    user.setSpid(spid);
+    user.setId(900);
+    user = (User) userDAO.put(user);
+
+    User adminUser = createTestUser();
+    adminUser.setGroup("test_admin_group");
+    adminUser.setSpid(spid);
+    adminUser.setId(1);
+    adminUser = (User) userDAO.put(adminUser);
+
+    return Auth.sudo(x, adminUser, admin_group);
   }
 
   /**
