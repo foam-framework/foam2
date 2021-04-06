@@ -434,6 +434,7 @@ var classes = [
   'foam.nanos.medusa.MedusaTestingDAO',
   'foam.nanos.medusa.MedusaUniqueDAO',
   'foam.nanos.medusa.MedusaType',
+  'foam.nanos.medusa.PrimaryNotFoundException',
   'foam.nanos.medusa.PromotedPurgeAgent',
   'foam.nanos.medusa.PurgeSink',
   'foam.nanos.medusa.RegionStatus',
