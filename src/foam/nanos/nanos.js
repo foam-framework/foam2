@@ -207,6 +207,7 @@ FOAM_FILES([
   { name: 'foam/nanos/medusa/MedusaUniqueDAO' },
   { name: 'foam/nanos/medusa/MedusaType' },
   { name: 'foam/nanos/medusa/NodeCView' },
+  { name: 'foam/nanos/medusa/PrimaryNotFoundException' },
   { name: 'foam/nanos/medusa/PromotedPurgeAgent' },
   { name: 'foam/nanos/medusa/PurgeSink' },
   { name: 'foam/nanos/medusa/RegionCView' },

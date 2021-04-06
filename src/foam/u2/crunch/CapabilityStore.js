@@ -90,7 +90,6 @@ foam.CLASS({
 
     ^perFeature {
       display: flex;
-      padding-bottom: 55px;
     }
 
     ^left-arrow {
