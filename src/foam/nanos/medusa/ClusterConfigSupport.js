@@ -508,11 +508,6 @@ configuration for contacting the primary node.`,
       } else {
         throw new foam.core.FOAMException("ClusterConfig not found: "+getConfigId());
       }
-      // Disable cron until Primary determined.
-      foam.nanos.cron.CronScheduler cronScheduler = (foam.nanos.cron.CronScheduler) getX().get("cronScheduler");
-      if ( cronScheduler != null ) {
-        cronScheduler.setEnabled(false);
-      }
       `
     },
     {
