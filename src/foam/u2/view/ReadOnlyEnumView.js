@@ -36,7 +36,8 @@ foam.CLASS({
         .addClass(this.myClass())
         .style({
           'background-color': this.data.background,
-          'color': this.data.color
+          'color': this.data.color,
+          'border': this.data.background == '#FFFFFF' ? '1px solid' : 'none'
         })
         .start()
           .addClass(this.myClass('label'))
