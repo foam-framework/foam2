@@ -12,53 +12,17 @@ import foam.core.FObject;
 import foam.dao.DAO;
 import foam.dao.MDAO;
 import foam.dao.ProxyDAO;
-import foam.dao.java.JDAO;
 import foam.dao.SequenceNumberDAO;
 import foam.nanos.auth.Group;
 import foam.nanos.auth.GroupPermissionJunction;
 import foam.nanos.auth.User;
 import foam.nanos.fs.File;
 import foam.nanos.session.Session;
+import foam.util.Auth;
 /**
  * Helper methods to make writing tests easier.
  */
 public class TestUtils {
-
-  /**
-    Mock the authorization of a user acting within the context provided.
-    *Mimics login as user in context*
-    @param user User that will be the "user" within context' subject (You can think of it as the main user of the session)
-    @param group Group that the context will be applying its permission list from
-   */
-  public static X mockActingUser(X x, User user, Group group) {
-    Session session = new Session.Builder(x).setUserId(user.getId()).build();
-    X testX = session.applyTo(session.getContext());
-    testX = testX.put(Session.class, session);
-    testX = group == null ?
-        testX.put("group", (Group) ((DAO) testX.get("groupDAO")).find(user.getGroup())) :
-        testX.put("group", group);
-    session.setContext(testX);
-    return testX;
-  }
-
-  /**
-    Mock the authorization of a user acting as another user within the context provided.
-    *Mimic login as user acting as another user in context*
-    @param user User that will be the "user" within context' subject (You can think of it as the main user of the session)
-    @param realUser User that will be acting as the @param user. References realUser within context' subject.
-    @param group Group the context will be applying its permission list from.
-   */
-  public static X mockActAsUser(X x, User user, User realUser, Group group) {
-    Session session = new Session.Builder(x)
-      .setUserId(user.getId())
-      .setAgentId(realUser.getId())
-      .build();
-    x = x.put(Session.class, session);
-    x.put("group", group);
-    session.setContext(session.applyTo(session.getContext()));
-    return x;
-  }
-
   /**
    * Mock out a DAO in the given context by replacing it with an undecorated, empty MDAO.
    * Will keep the same 'of' type.
@@ -73,14 +37,6 @@ public class TestUtils {
   }
 
   /**
-   * Sets the delegate of the provided DAO
-   */
-  public static FObject chainProxy(FObject dao, FObject delegate) {
-    dao.setDelegate(delegate);
-    return dao;
-  }
-
-  /**
    * Create mockDAOs required by the Auth Service
   */
   public static X createAuthMockDAO(X x) {
@@ -92,64 +48,6 @@ public class TestUtils {
     x = applyDAOProxy(x, "groupPermissionJunctionDAO", new ProxyDAO.Builder(x).build(), (DAO) x.get("localGroupPermissionJunctionDAO"));
     x = applyDAOProxy(x, "groupDAO", new ProxyDAO.Builder(x).build(), (DAO) x.get("localGroupDAO"));
     return x;
-  }
-
-  /**
-    Applies a decorator/proxyDAO on provided DAO and set in context provided if daoName is given.
-    @param daoName key of proxiedDAO in context
-    @param proxy the proxyDAO to delegate to @param dao
-    @param dao proxyDAO' delegate
-   */
-  public static X applyDAOProxy(X x, String daoName, ProxyDAO proxy, DAO dao) {
-    proxy.setDelegate(dao);
-    return x.put(daoName, proxy);
-  }
-
-  /**
-   * Simple create group helper method
-   * @param groupId identifier of the group being created.
-   * returns group.
-   */
-  public static Group createGroup(X x, String groupId) {
-    DAO groupDAO = (DAO) x.get("groupDAO");
-    return (Group) groupDAO.put(new Group.Builder(x).setId(groupId).build());
-  }
-
-  /**
-   * Simple create group helper method
-   * @param groupId identifier of the group being created.
-   * @param parentId identifier of the groups parent.
-   * returns group.
-   */
-  public static Group createGroup(X x, String groupId, String parentId) {
-    DAO groupDAO = (DAO) x.get("groupDAO");
-    return (Group) groupDAO.put(new Group.Builder(x).setId(groupId).setId(parentId).build());
-  }
-
-  /**
-   * Applies permission to the provided group' permission list.
-   * @param String groupId to apply the permission to (String ID)
-   * @param String permission to be granted to group found with @param groupId
-   */
-  public static void applyPermissionToGroup(X x, String groupId, String permission) {
-    DAO groupPermissionJunctionDAO = (DAO) x.get("groupPermissionJunctionDAO");
-    groupPermissionJunctionDAO.put(
-      new GroupPermissionJunction.Builder(x)
-        .setSourceId(groupId)
-        .setTargetId(permission)
-        .build()
-    );
-  }
-
-  /**
-   * Applies permission to the provided group' permission list.
-   * @param String groupId associate to group to apply @param permissions to.
-   * @param String[] permissions to be granted to group with @param groupId.
-  */
-  public static void applyPermissionToGroup(X x, String groupId, String[] permissions) {
-    for ( String permission : permissions ) {
-      applyPermissionToGroup(x, groupId, permission);
-    }
   }
 
   /**
@@ -182,6 +80,17 @@ public class TestUtils {
   }
 
   /**
+    Applies a decorator/proxyDAO on provided DAO and set in context provided if daoName is given.
+    @param daoName key of proxiedDAO in context
+    @param proxy the proxyDAO to delegate to @param dao
+    @param dao proxyDAO' delegate
+   */
+  public static X applyDAOProxy(X x, String daoName, ProxyDAO proxy, DAO dao) {
+    proxy.setDelegate(dao);
+    return x.put(daoName, proxy);
+  }
+
+  /**
     Create a simple session context with a test user, group and auth related DAOs.
     Includes self contained bareUserDAO and groupDAO so no user or group journals
     are updated related to the authorization of the current user.
@@ -204,7 +113,7 @@ public class TestUtils {
       .setId("test_admin_group")
       .build();
     admin_group = (Group) groupDAO.put(admin_group);
-    applyPermissionToGroup(x, admin_group.getId(), "*");
+    Auth.applyPermissionToGroup(x, admin_group.getId(), "*");
 
     User user = createTestUser();
     user.setGroup("test_group");
@@ -218,7 +127,7 @@ public class TestUtils {
     adminUser.setId(1);
     adminUser = (User) userDAO.put(adminUser);
 
-    return mockActingUser(x, adminUser, admin_group);
+    return Auth.sudo(x, adminUser, admin_group);
   }
 
   /**
