@@ -543,7 +543,6 @@ var classes = [
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
   'foam.dao.FixedSizeDAO',
-  'foam.mop.MOP',
   'foam.nanos.export.ClientGoogleSheetsExportService',
   'foam.nanos.export.ExportDriverRegistry',
   'foam.nanos.export.GoogleSheetsBasedExportDriver',
@@ -917,7 +916,6 @@ var abstractClasses = [
 
 var skeletons = [
   'foam.dao.DAO',
-  'foam.mop.MOP',
   'foam.nanos.app.AppConfigService',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.AgentAuthService',
@@ -943,7 +941,6 @@ var skeletons = [
 var proxies = [
   'foam.dao.DAO',
   'foam.dao.Sink',
-  'foam.mop.MOP',
   'foam.lib.Outputter',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
