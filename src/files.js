@@ -990,7 +990,6 @@ FOAM_FILES([
   { name: "foam/u2/layout/MDProfileImageView", flags: ['web'] },
   { name: "foam/u2/layout/MDToolbarView", flags: ['web'] },
   { name: "foam/u2/dao/MDDAOList", flags: ['web'] },
-  { name: "foam/u2/mcw/DetailPropertyView", flags: ['web'] },
   { name: 'foam/u2/layout/MDRowView', flags: ['web']},
   { name: 'foam/u2/layout/MDCitationView', flags: ['web']},
   { name: 'foam/u2/layout/MDDAOController', flags: ['web']},
