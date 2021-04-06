@@ -240,6 +240,7 @@ foam.CLASS({
                 /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i)
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -258,6 +259,7 @@ foam.CLASS({
                 /^\d{5}(?:[-\s]\d{4})?$/i)
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -278,6 +280,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -298,6 +301,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -318,6 +322,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -340,6 +345,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -360,6 +366,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -380,6 +387,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -400,6 +408,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -420,6 +429,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -440,6 +450,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -460,6 +471,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -480,6 +492,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -500,6 +513,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -520,6 +534,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -540,6 +555,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -560,6 +576,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -580,6 +597,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -600,6 +618,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -620,6 +639,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -640,6 +660,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -660,6 +681,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -680,6 +702,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -700,6 +723,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -720,6 +744,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -740,6 +765,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -760,6 +786,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -780,6 +807,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -800,6 +828,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -820,6 +849,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -840,6 +870,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {
@@ -860,6 +891,7 @@ foam.CLASS({
               )
             );
           },
+          errorMessage: 'INVALID_POSTAL_CODE',
           jsErr: function(X) {
             let postalCodeError = X.translationService.getTranslation(foam.locale, `${X.countryId.toLowerCase()}.foam.nanos.auth.Address.POSTAL_CODE.error`);
             if ( ! postalCodeError ) {

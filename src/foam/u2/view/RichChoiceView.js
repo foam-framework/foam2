@@ -720,7 +720,7 @@ foam.CLASS({
           });
 
           var summary = this.fullObject$.map(o => {
-            return o ? o.toSummary() : this.defaultSelectionPrompt;
+            return ( o && o.toSummary() ) || this.defaultSelection;
           });
           var summaryWithoutSlot = this.fullObject && this.fullObject.toSummary()
             ? this.fullObject.toSummary()

@@ -119,7 +119,14 @@ public abstract class AbstractFObjectPropertyInfo
     this.set(diff, d);
     return d != null;
   }
-  
+
+  @Override
+  public void validateObj(X x, FObject obj) {
+    if ( isSet(obj) ) {
+      ((FObject) get(obj)).validate(x);
+    }
+  }
+
   public String getSQLType() {
     return "";
   }
