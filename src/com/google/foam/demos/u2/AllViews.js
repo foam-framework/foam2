@@ -166,6 +166,11 @@ foam.CLASS({
     },
     {
       class: 'Int',
+      name: 'tooltip',
+      view: { class: 'foam.u2.view.IntView', tooltip: 'Please enter a number.' }
+    },
+    {
+      class: 'Int',
       name: 'intWithIntView',
       view: {
         class: 'foam.u2.view.IntView',
@@ -273,6 +278,16 @@ foam.CLASS({
       name: 'choiceView',
       view: {
         class: 'foam.u2.view.ChoiceView',
+        size: 10,
+        choices: ['Yes', 'No', 'Maybe']
+      }
+    },
+    {
+      class: 'String',
+      name: 'choiceViewWithSize',
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+        size: 3,
         choices: ['Yes', 'No', 'Maybe']
       }
     },
@@ -347,6 +362,18 @@ foam.CLASS({
       name: 'defaultDate'
     },
     {
+      class: 'Date',
+      name: 'dateRWAndRO',
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          'foam.u2.view.DateView',
+          'foam.u2.view.DateView',
+          {class: 'foam.u2.view.DateView', mode: foam.u2.DisplayMode.RO}
+        ]
+      }
+    },
+    {
       class: 'DateTime',
       name: 'defaultDateTime'
     },
@@ -379,6 +406,21 @@ foam.CLASS({
     {
       class: 'Double',
       name: 'defaultDouble'
+    },
+    {
+      class: 'Float',
+      name: 'multiViewFloat',
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          { class: 'foam.u2.TextField', placeholder: 'textfield', onKey: true },
+          { class: 'foam.u2.FloatView', placeholder: 'floatview', onKey: true },
+          { class: 'foam.u2.TextField', onKey: false },
+          { class: 'foam.u2.FloatView', onKey: false },
+          { class: 'foam.u2.FloatView', onKey: false, precision: 2 },
+          { class: 'foam.u2.FloatView', onKey: false, precision: 2, trimZeros: false }
+        ]
+      }
     },
     {
       class: 'StringArray',
@@ -487,6 +529,18 @@ foam.CLASS({
       class: 'Image',
       name: 'imageView',
       view: 'foam.u2.view.ImageView',
+      value: 'Dragon.png'
+    },
+    {
+      class: 'Image',
+      name: 'dualImageView',
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          'foam.u2.TextField',
+          'foam.u2.view.ImageView'
+        ]
+      },
       value: 'Dragon.png'
     },
     {

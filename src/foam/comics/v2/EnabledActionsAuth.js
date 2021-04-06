@@ -32,7 +32,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'operation',
-          type: 'foam.nanos.ruler.Operations'
+          type: 'foam.nanos.dao.Operation'
         },
         {
           name: 'obj',

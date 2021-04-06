@@ -22,6 +22,7 @@ foam.CLASS({
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.nanos.logger.Logger',
+    'foam.nanos.session.Session',
     'java.util.ArrayList',
     'java.util.Date',
     'static foam.mlang.MLang.EQ',
@@ -36,6 +37,19 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'historyDAO'
+    },
+    {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'putPredicate',
+      factory: function () {
+        return foam.mlang.predicate.True.create();
+      },
+      javaFactory: `
+        return foam.mlang.MLang.TRUE;
+      `,
+      documentation: `
+        The condition under which a history record should be added
+      `
     }
   ],
 
@@ -80,21 +94,6 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'formatUserName',
-      visibility: 'protected',
-      type: 'String',
-      args: [
-        { type: 'User', name: 'user ' }
-      ],
-      documentation: 'Formats a User record to the following string: LastName, FirstName (ID)',
-      javaCode: `
-        if ( user == null ) return "";
-        return user.getLastName() +", " +
-            user.getFirstName() +
-            "(" + user.getId() + ")";
-      `
-    },
-    {
       name: 'getUpdatedProperties',
       visibility: 'protected',
       type: 'PropertyUpdate[]',
@@ -129,9 +128,9 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-      Subject subject = (Subject) x.get("subject");
-      User user = subject.getUser();
-      User agent = subject.getRealUser();
+      if ( ! getPutPredicate().f(x.put("NEW", obj)) ) return super.put_(x, obj);
+      Subject subject = (Subject) ((Session) x.get(Session.class)).getContext().get("subject");
+
       FObject current = this.find_(x, obj);
       Object objectId = obj.getProperty("id");
 
@@ -141,9 +140,8 @@ foam.CLASS({
         objectId = persistObject.getProperty("id");
         HistoryRecord historyRecord = new HistoryRecord();
         historyRecord.setObjectId(objectId);
-        historyRecord.setUser(formatUserName(user));
-        historyRecord.setAgent(formatUserName(agent));
         historyRecord.setTimestamp(new Date());
+        historyRecord.setSubject(subject);
         getHistoryDAO().put_(x, historyRecord);
         return persistObject;
       } else {
@@ -151,9 +149,8 @@ foam.CLASS({
           // add new history record
           HistoryRecord historyRecord = new HistoryRecord();
           historyRecord.setObjectId(objectId);
-          historyRecord.setUser(formatUserName(user));
-          historyRecord.setAgent(formatUserName(agent));
           historyRecord.setTimestamp(new Date());
+          historyRecord.setSubject(subject);
           FObjectFormatter formatter = formatter__.get();
           if ( ! formatter.maybeOutputDelta(current, obj) ) {
             return super.put_(x, obj);

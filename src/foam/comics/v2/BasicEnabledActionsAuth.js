@@ -33,7 +33,7 @@ foam.CLASS({
       args: [
         {
           name: 'operation',
-          type: 'foam.nanos.ruler.Operations'
+          type: 'foam.nanos.dao.Operation'
         },
         {
           name: 'obj',
@@ -43,11 +43,11 @@ foam.CLASS({
       javaCode: `
         String outputString = getModelName().toLowerCase();
 
-        if ( SafetyUtil.equals(operation, foam.nanos.ruler.Operations.CREATE ) ) {
+        if ( SafetyUtil.equals(operation, foam.nanos.dao.Operation.CREATE ) ) {
           outputString += ".create";
-        } else if ( SafetyUtil.equals(operation, foam.nanos.ruler.Operations.UPDATE) ) {
+        } else if ( SafetyUtil.equals(operation, foam.nanos.dao.Operation.UPDATE) ) {
           outputString += ".update." + obj.getProperty("id");
-        } else if ( SafetyUtil.equals(operation, foam.nanos.ruler.Operations.REMOVE) ) {
+        } else if ( SafetyUtil.equals(operation, foam.nanos.dao.Operation.REMOVE) ) {
           outputString += ".remove." + obj.getProperty("id");
         } else {
           throw new RuntimeException(new UnsupportedOperationException(operation.getLabel()));
@@ -57,14 +57,14 @@ foam.CLASS({
       `,
       code: function(operation, obj) {
         let outputString = this.modelName.toLowerCase();
-        if ( operation === foam.nanos.ruler.Operations.CREATE ) {
+        if ( operation === foam.nanos.dao.Operation.CREATE ) {
           outputString += '.create';
-        } else if ( operation === foam.nanos.ruler.Operations.UPDATE ) {
+        } else if ( operation === foam.nanos.dao.Operation.UPDATE ) {
           outputString += '.update.' + obj.id;
-        } else if ( operation === foam.nanos.ruler.Operations.REMOVE ) {
+        } else if ( operation === foam.nanos.dao.Operation.REMOVE ) {
           outputString += '.remove.' + obj.id;
         } else {
-          throw new Error("Unsupported operation: "+operation.label);
+          throw new Error("Unsupported operation: " + operation.label);
         }
 
         return outputString;

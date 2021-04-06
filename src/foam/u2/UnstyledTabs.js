@@ -29,11 +29,16 @@ foam.CLASS({
     {
       name: 'updateMemento',
       class: 'Boolean'
-    }
+    },
+    'currentMemento_'
   ],
 
   methods: [
     function init() {
+
+      if ( this.memento )
+        this.currentMemento_$ = this.memento.tail$;
+
       this.
         addClass(this.myClass()).
         start('div', null, this.tabRow$).
@@ -52,7 +57,7 @@ foam.CLASS({
         this.tabRow.start('span').
           addClass(this.myClass('tab')).
           enableClass('selected', tab.selected$).
-          on('click', function() { 
+          on('click', function() {
             this.selected = tab;
             this.setMementoWithSelectedTab(tab);
           }.bind(this)).
@@ -64,12 +69,14 @@ foam.CLASS({
 
       this.SUPER(tab);
     },
+
     function setMementoWithSelectedTab() {
       if ( ! this.updateMemento )
         return;
       if ( this.memento ) {
-        this.memento.paramsObj.sT = this.selected.label;
-        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
+        if ( ! this.currentMemento_ )
+          this.currentMemento_ = foam.nanos.controller.Memento.create();
+        this.currentMemento_.head = this.selected.label;
       }
     }
   ]

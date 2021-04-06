@@ -19,9 +19,37 @@ foam.CLASS({
     'foam.u2.view.MapView'
   ],
 
-  constants: [
+  classes: [
     {
-      name: 'DEFAULT_TYPES',
+      name: 'Choice',
+      properties: [
+        {
+          class: 'String',
+          name: 'label'
+        },
+        {
+          name: 'type'
+        },
+        {
+          class: 'foam.u2.ViewSpec',
+          name: 'view'
+        },
+        {
+          class: 'Function',
+          documentation: `
+            A function that takes an argument and makes a best effort in
+            converting that into the current type. See DEFAULT_TYPES for
+            examples.
+          `,
+          name: 'toType'
+        }
+      ]
+    }
+  ],
+
+  properties: [
+    {
+      name: 'types',
       factory: function() {
         return [
           foam.u2.view.AnyView.Choice.create({
@@ -73,6 +101,14 @@ foam.CLASS({
             }
           }),
           foam.u2.view.AnyView.Choice.create({
+            label: 'Enum',
+            type: foam.core.AbstractEnum,
+            view: foam.u2.view.EnumView,
+            toType: function(o) {
+              return foam.core.AbstractEnum.isInstance(o) ? o : foam.core.AbstractEnum.create();
+            }
+          }),
+          foam.u2.view.AnyView.Choice.create({
             label: 'Array',
             type: foam.Array,
             view: foam.u2.view.ArrayView,
@@ -91,48 +127,17 @@ foam.CLASS({
           })
         ];
       }
-    }
-  ],
-
-  classes: [
-    {
-      name: 'Choice',
-      properties: [
-        {
-          class: 'String',
-          name: 'label'
-        },
-        {
-          name: 'type'
-        },
-        {
-          class: 'foam.u2.ViewSpec',
-          name: 'view'
-        },
-        {
-          class: 'Function',
-          documentation: `
-            A function that takes an argument and makes a best effort in
-            converting that into the current type. See DEFAULT_TYPES for
-            examples.
-          `,
-          name: 'toType'
-        }
-      ]
-    }
-  ],
-
-  properties: [
-    {
-      name: 'types',
-      factory: function() {
-        return this.DEFAULT_TYPES;
-      }
     },
     {
       name: 'selected',
       expression: function(data, types) {
         var type = foam.typeOf(data);
+        // Hack for Enum values.
+        if ( type == foam.core.FObject ) {
+          if ( foam.core.AbstractEnum.isInstance(data) ) {
+            type = foam.core.AbstractEnum;
+          }
+        }
         var choice = types.find(t => type == t.type);
         if ( ! choice ) {
           console.warn("Unable to find view for type!");

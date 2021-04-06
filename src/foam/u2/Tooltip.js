@@ -14,6 +14,8 @@ foam.CLASS({
     'window'
   ],
 
+  requires: ['foam.u2.TooltipView'],
+
   properties: [
     {
       name: 'text',
@@ -25,12 +27,12 @@ foam.CLASS({
       documentation: 'The tooltip will be positioned relative to this element.',
       required: true
     },
-    {
-      type: 'Boolean',
-      name: 'opened',
-      value: false
-    },
-    'timer'
+    'timer',
+    'screenWidth',
+    'top',
+    'left',
+    'right',
+    'tooltipStore'
   ],
 
   methods: [
@@ -38,71 +40,92 @@ foam.CLASS({
       this.target.removeAttribute('title');
       this.target.on('mouseover', this.loadTooltip);
       this.SUPER();
-      this.add(this.text);
-      this.addClass(this.myClass());
+    },
+
+    function setTooltip(evt) {
+      this.tooltipStore = this.TooltipView.create({ data: this.text });
+      var domRect      = this.target.el().getBoundingClientRect();
+      this.screenWidth = this.window.innerWidth;
+      var screenHeight = this.window.innerHeight;
+      var scrollY      = this.window.scrollY;
+      var height       = this.tooltipStore.getBoundingClientRect().height;
+      this.top = (domRect.top - scrollY > screenHeight / 2) ?
+        evt.pageY - 30 - height : evt.pageY + 20;
+      if ( domRect.left > 3 * (this.screenWidth / 4) ) {
+        this.left = 'auto';
+        this.right = this.screenWidth - evt.pageX + 10;
+      } else {
+        this.left = evt.pageX + 10;
+        this.right = 'auto';
+      }
+      this.tooltipStore.style({
+        'max-width': (this.screenWidth / 4)+'px',
+          'top': this.top$,
+          'left': this.left$,
+          'right': this.right$
+      });
+      this.tooltipStore.write();
     }
   ],
 
   listeners: [
-    function onMouseOver() {
-      var self = this;
-      this.target.on('mousemove', function(evt) {
-        if ( self.timer !== undefined ) {
-          clearTimeout(self.timer);
-        }
-        self.timer = setTimeout(function() {
-          if ( ! self.opened ) {
-            self.document.body.insertAdjacentHTML('beforeend', self.outerHTML);
-
-            var domRect      = self.target.el().getBoundingClientRect();
-            var screenWidth  = self.window.innerWidth;
-            var screenHeight = self.window.innerHeight;
-            var scrollY      = self.window.scrollY;
-            var selfRect     = self.el().getBoundingClientRect();
-            var height       = self.el().getBoundingClientRect().height;
-            var top          = (domRect.top - scrollY > screenHeight / 2) ? evt.pageY - 30 - height : evt.pageY + 30;
-            var left         = (domRect.left > screenWidth / 2) ? evt.pageX - 20 - selfRect.width  :  evt.pageX + 20;
-
-            self.opened = true;
-            self.load();
-            self.style({
-              'background': 'rgba(80, 80, 80, 0.9)',
-              'border-radius': '5px',
-              'color': 'white',
-              'padding': '5px 8px',
-              'position': 'absolute',
-              'z-index': '2000',
-              'max-width': (screenWidth / 4)+'px',
-              'top': top,
-              'left': left
-            });
-          }
-        }, 500);
+    function onMouseOver(evt) {
+      if ( this.timer !== undefined ) {
+        clearTimeout(this.timer);
+      }
+      this.timer = setTimeout(() => {
+        this.setTooltip(evt);
+      }, 100);
+      this.target.on('mousemove', evt => {
+        this.close();
+        this.setTooltip(evt);
       });
-
-      self.target.on('mousedown',  self.close);
-      self.target.on('mouseleave', self.close);
-      self.target.on('touchstart', self.close);
-      self.target.on('unload',     self.close);
     },
 
     function close() {
-      if ( this.opened ) {
-        this.remove();
-        this.opened = false;
+      if ( this.tooltipStore ) {
+        this.tooltipStore.remove();
       }
       clearTimeout(this.timer);
     },
 
-    function loadTooltip() {
-      if ( ! this.target || ! this.target.el() ) return;
-
-      var oldTips = this.document.getElementsByClassName(this.myClass());
-      for ( var i = 0 ; i < oldTips.length ; i++ ) {
-        oldTips[i].remove();
+    function loadTooltip(evt) {
+      if ( ! this.target || ! this.target.el() ) {
+        console.error('Target not found');
+        return;
       }
-
       this.target.on('mouseover', this.onMouseOver);
-    },
-  ],
+      this.target.on('mousedown', this.close);
+      this.target.on('mouseleave', this.close);
+      this.target.on('mouseout', this.close);
+      this.target.on('touchstart', this.close);
+      this.target.on('unload', this.close);
+      this.onMouseOver(evt);
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'TooltipView',
+  extends: 'foam.u2.View',
+
+  documentation: 'Tooltip view to be used by the tooltip handler',
+
+  methods: [
+    function initE(data) {
+      this.SUPER();
+      this
+      .add(this.data)
+      .style({
+        'background': 'rgba(80, 80, 80, 0.9)',
+        'border-radius': '5px',
+        'color': 'white',
+        'padding': '5px 8px',
+        'position': 'absolute',
+        'z-index': '2000',
+      });
+    }
+  ]
 });

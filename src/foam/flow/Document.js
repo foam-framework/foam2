@@ -128,7 +128,9 @@ foam.CLASS({
             seq1(1, '<foam', sym('attributes'), '>'),
             join(until('</foam>'))),
 
-          'attributes': repeat(sym('attrib-key-value'), ' '),
+          'attributes': seq(
+            repeat(sym('attrib-key-value'), ' '),
+            optional(sym('ws'))),
 
           'attrib-key-value': seq(sym('attrib-key'),
                                   '="',
@@ -436,7 +438,7 @@ foam.CLASS({
         },
 
         'attributes': function(v) {
-          return v.reduce(function(a, kv) {
+          return v[0].reduce(function(a, kv) {
             a[kv[0]] = kv[1];
             return a;
           }, {});

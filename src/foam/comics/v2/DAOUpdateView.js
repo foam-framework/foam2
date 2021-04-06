@@ -63,11 +63,17 @@ foam.CLASS({
 
   exports: [
     'controllerMode',
-    'currentMemento as memento'
+    'currentMemento_ as memento'
   ],
 
   messages: [
-    { name: 'BACK', message: 'Back' }
+    { name: 'BACK', message: 'Back' },
+    { name: 'DETAIL', message: 'Detail' },
+    { name: 'TABBED', message: 'Tabbed' },
+    { name: 'SECTIONED', message: 'Sectioned' },
+    { name: 'MATERIAL', message: 'Material' },
+    { name: 'WIZARD', message: 'Wizard' },
+    { name: 'VERTICAL', message: 'Vertical' }
   ],
 
   properties: [
@@ -94,17 +100,25 @@ foam.CLASS({
       }
     },
     {
-      class: 'foam.u2.ViewSpecWithJava',
+      class: 'foam.u2.ViewSpec',
       name: 'viewView',
       expression: function() {
         return foam.u2.detail.SectionedDetailView;
       }
     },
-    'currentMemento',
+    'currentMemento_',
     {
       class: 'String',
       name: 'mementoHead',
-      value: 'Edit'
+      getter: function() {
+        if ( this.data.id ) {
+          var id = '' + this.data.id;
+          if ( id && foam.core.MultiPartID.isInstance(this.data.cls_.ID) ) {
+            id = id.substr(1, id.length - 2).replaceAll(':', '=');
+          }
+          return 'edit::' + id;
+        }
+      }
     }
   ],
 
@@ -154,7 +168,7 @@ foam.CLASS({
       this.SUPER();
 
       if ( this.memento )
-        this.currentMemento$ = this.memento.tail$;
+        this.currentMemento_$ = this.memento.tail$;
 
       this
         .addClass(this.myClass())
@@ -183,9 +197,11 @@ foam.CLASS({
               .start(config$viewBorder)
                 .start().addClass(this.myClass('view-container'))
                   .add(self.slot(function(viewView) {
-                    return self.E().tag(viewView, {
+                    var view = foam.u2.ViewSpec.createView(viewView, {
                       data$: self.workingData$
-                    });
+                    }, self, self.__subContext__.createSubContext({ memento: self.memento }));
+
+                    return self.E().add(view);
                   }))
                 .end()
               .end()

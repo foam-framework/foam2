@@ -81,6 +81,19 @@ foam.CLASS({
   ],
 
   methods: [
+    function init() {
+      /*
+       We hide Elements by adding this style rather than setting
+       'display: none' directly because then when we re-show the
+       Element we don't need to remember its desired 'display' value.
+      */
+      this.installCSS(`
+        .foam-u2-Element-hidden {
+          display: none !important;
+        }
+      `, 'global', 'Window');
+    },
+
     function getElementById(id) {
       return this.document.getElementById(id);
     },
@@ -197,14 +210,14 @@ foam.CLASS({
       this.window.cancelAnimationFrame(id);
     },
     function installCSS(text, id, opt_eid) {
-      var eid = foam.u2.Element.NEXT_ID();
       /* Create a new <style> tag containing the given CSS code. */
-      this.document && this.document.head.insertAdjacentHTML(
+      this.document && this.document.head && this.document.head.insertAdjacentHTML(
         'beforeend',
         '<style id="' + opt_eid + '" owner="' + id + '">' + text + '</style>');
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',

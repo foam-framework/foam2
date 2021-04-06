@@ -42,6 +42,7 @@ foam.CLASS({
       of: 'foam.u2.wizard.Wizardlet',
       postSet: function (_, n) {
         this.setupWizardletListeners(n);
+        this.determineWizardActions(n);
       }
     },
     {
@@ -134,6 +135,10 @@ foam.CLASS({
     {
       name: 'submitted',
       class: 'Boolean'
+    },
+    {
+      name: 'allValid',
+      class: 'Boolean'
     }
   ],
 
@@ -166,8 +171,20 @@ foam.CLASS({
           }));
         });
 
+        // Bind validity listener for wizardlet validity
+        var isValid$ = w.isValid$;
+        this.wsub.onDetach(isValid$.sub(() => {
+          this.onWizardletValidity(wizardletIndex, isValid$.get());
+        }));
+
       });
 
+    },
+    function determineWizardActions(wizardlets) {
+      // TODO: If we ever need wizardlets to add new actions to the wizard,
+      //       rather than just overriding existing ones, we can create a list
+      //       of pseudo-actions here by iterating over all the wizardlets and
+      //       finding axioms of type foam.u2.wizard.axiom.WizardAction.
     },
     function detach() {
       this.wsub.detach();
@@ -297,6 +314,9 @@ foam.CLASS({
         wizardletIndex: this.wizardPosition.wizardletIndex,
         sectionIndex: this.wizardPosition.sectionIndex,
       });
+    },
+    function onWizardletValidity(wizardletIndex, value) {
+      this.allValid = this.wizardlets.filter(w => ! w.isValid).length == 0;
     },
     function onSectionAvailability(sectionPosition, value) {
       // If a previous position became available, move the wizard back

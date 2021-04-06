@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'MedusaRegistryService',
 
   implements: [
+    'foam.core.ContextAware',
     'foam.nanos.medusa.MedusaRegistry'
   ],
 
@@ -34,19 +35,20 @@ foam.CLASS({
       name: 'medusaEntryDAO',
       class: 'FObjectProperty',
       of: 'foam.dao.DAO',
-      javaFactory: 'return (foam.dao.DAO) getX().get("internalMedusaDAO");'
+      javaFactory: 'return (foam.dao.DAO) getX().get("internalMedusaDAO");',
+      visibility: 'HIDDEN'
     },
     {
       name: 'latches',
       class: 'Map',
       javaFactory: `return new HashMap();`,
-      visibility: 'RO'
+      visibility: 'HIDDEN'
     },
     {
       name: 'entries',
       class: 'Map',
       javaFactory: `return new HashMap();`,
-      visibility: 'RO'
+      visibility: 'HIDDEN'
     },
     {
       name: 'logger',

@@ -37,7 +37,7 @@ foam.CLASS({
     'realm',
     'lastModified'
   ],
-  
+
   properties: [
     {
       documentation: 'Local network IP or DNS name, or id to look up in HostDAO',
@@ -227,6 +227,22 @@ foam.CLASS({
     {
       documentation: `The id of the user who created the transaction.`,
       name: 'lastModifiedBy',
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      visibility: 'RO',
+      storageOptional: true,
+      tableCellFormatter: function(value, obj) {
+        obj.userDAO.find(value).then(function(user) {
+          if ( user ) {
+            if ( user.email ) {
+              this.add(user.email);
+            }
+          }
+        }.bind(this));
+      }
+    },
+    {
+      name: 'lastModifiedByAgent',
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       visibility: 'RO',

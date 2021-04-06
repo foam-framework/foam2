@@ -24,7 +24,7 @@ foam.CLASS({
     'foam.nanos.crunch.CapabilityJunctionPayload',
     'foam.nanos.crunch.CapabilityJunctionStatus',
     'foam.nanos.approval.ApprovalStatus',
-    'foam.nanos.ruler.Operations',
+    'foam.nanos.dao.Operation',
     'foam.nanos.auth.Subject',
     'java.util.Map'
   ],
@@ -48,7 +48,7 @@ foam.CLASS({
 
             DAO capablePayloadDAO = capableObjectToReput.getCapablePayloadDAO(x);
 
-            if ( approvable.getOperation() == Operations.CREATE ){
+            if ( approvable.getOperation() == Operation.CREATE ){
               try {
                 CapabilityJunctionPayload capablePayloadToUpdate = (CapabilityJunctionPayload)
                   CapabilityJunctionPayload.getOwnClassInfo().newInstance();

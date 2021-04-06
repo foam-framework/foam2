@@ -165,7 +165,7 @@ NOTE: duplicated in SocketConnectionReplyBox
       String replyBoxId = null;
       if ( replyBox != null ) {
         replyBoxId = java.util.UUID.randomUUID().toString();
-        getReplyBoxes().put(replyBoxId, new BoxHolder(replyBox, PM.create(getX(), this.getOwnClassInfo(), getHost()+":"+getPort()+":roundtrip")));
+        getReplyBoxes().put(replyBoxId, new BoxHolder(replyBox, PM.create(getX(), this.getOwnClassInfo().getId(), getHost()+":"+getPort()+":roundtrip")));
         SocketClientReplyBox box = new SocketClientReplyBox(replyBoxId);
         if ( replyBox instanceof ReplyBox ) {
           ((ReplyBox)replyBox).setDelegate(box);
@@ -279,17 +279,23 @@ NOTE: duplicated in SocketConnectionReplyBox
             }
             String replyBoxId = (String) msg.getAttributes().get(REPLY_BOX_ID);
             if ( replyBoxId != null ) {
+              Box replyBox = null;
               BoxHolder holder = (BoxHolder) getReplyBoxes().get(replyBoxId);
               if ( holder != null ) {
-                Box replyBox = holder.getBox();
+                replyBox = holder.getBox();
                 pm = holder.getPm();
                 pm.log(x);
-                getReplyBoxes().remove(replyBoxId);
-                replyBox.send(msg);
               } else {
+                getLogger().warning("BoxHolder not found", replyBoxId);
+                replyBox = (Box) msg.getAttributes().get("replyBox");
+              }
+              if ( replyBox == null ) {
                 getLogger().error("ReplyBox not found", replyBoxId);
+                ((foam.dao.DAO) x.get("alarmDAO")).put(new foam.nanos.alarming.Alarm("ReplyBox not found"));
                 throw new RuntimeException("ReplyBox not found. message: "+message);
               }
+              getReplyBoxes().remove(replyBoxId);
+              replyBox.send(msg);
             } else {
               Object o = msg.getObject();
               if ( o != null &&

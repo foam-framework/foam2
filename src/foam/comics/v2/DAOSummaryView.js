@@ -56,14 +56,26 @@ foam.CLASS({
 
   imports: [
     'auth',
+    'currentMenu?',
     'memento',
-    'stack'
+    'stack',
+    'translationService'
   ],
 
   exports: [
     'controllerMode',
     'as objectSummaryView',
-    'currentMemento as memento'
+    'currentMemento_ as memento'
+  ],
+
+  messages: [
+    { name: 'DETAIL', message: 'Detail' },
+    { name: 'TABBED', message: 'Tabbed' },
+    { name: 'SECTIONED', message: 'Sectioned' },
+    { name: 'MATERIAL', message: 'Material' },
+    { name: 'WIZARD', message: 'Wizard' },
+    { name: 'VERTICAL', message: 'Vertical' },
+    { name: 'ALL', message: 'All ' }
   ],
 
   properties: [
@@ -95,7 +107,7 @@ foam.CLASS({
       }
     },
     {
-      class: 'foam.u2.ViewSpecWithJava',
+      class: 'foam.u2.ViewSpec',
       name: 'viewView',
       factory: function() {
         return foam.u2.detail.TabbedDetailView;
@@ -105,7 +117,10 @@ foam.CLASS({
       class: 'String',
       name: 'backLabel',
       expression: function(config$browseTitle) {
-        return 'All ' + config$browseTitle;
+        var allMsg = ctrl.__subContext__.translationService.getTranslation(foam.locale, 'foam.comics.v2.DAOSummaryView.ALL', this.ALL);
+        var menuId = this.currentMenu ? this.currentMenu.id : this.config.of.id;
+        var title = ctrl.__subContext__.translationService.getTranslation(foam.locale, menuId + '.browseTitle', config$browseTitle);
+        return allMsg + title;
       }
     },
     {
@@ -114,12 +129,18 @@ foam.CLASS({
         return () => this.stack.back();
       }
     },
-    'currentMemento',
+    'currentMemento_',
     {
       class: 'String',
       name: 'mementoHead',
-      factory: function() {
-        return this.idOfRecord;
+      getter: function() {
+        if ( ! this.memento || ! this.memento.tail || this.memento.tail.head != 'edit' ) {
+          var id = '' + this.idOfRecord;
+          if ( id && foam.core.MultiPartID.isInstance(this.config.of.ID) ) {
+            id = id.substr(1, id.length - 2).replaceAll(':', '=');
+          }
+          return 'view::' + id;
+        }
       }
     },
     'idOfRecord'
@@ -135,7 +156,7 @@ foam.CLASS({
       isEnabled: function(config, data) {
         if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
           try {
-            let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.UPDATE, data);
+            let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.dao.Operation.UPDATE, data);
 
             return this.auth.check(null, permissionString);
           } catch(e) {
@@ -154,6 +175,8 @@ foam.CLASS({
       code: function() {
         if ( ! this.stack ) return;
 
+        if ( this.memento.tail )
+          this.memento.tail.head = 'edit';
         this.stack.push({
           class:  'foam.comics.v2.DAOUpdateView',
           data:   this.data,
@@ -167,7 +190,7 @@ foam.CLASS({
       isEnabled: function(config, data) {
         if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
           try {
-            let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.CREATE, data);
+            let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.dao.Operation.CREATE, data);
 
             return this.auth.check(null, permissionString);
           } catch(e) {
@@ -201,7 +224,7 @@ foam.CLASS({
       isEnabled: function(config, data) {
         if ( config.CRUDEnabledActionsAuth && config.CRUDEnabledActionsAuth.isEnabled ) {
           try {
-            let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.ruler.Operations.REMOVE, data);
+            let permissionString = config.CRUDEnabledActionsAuth.enabledActionsAuth.permissionFactory(foam.nanos.dao.Operation.REMOVE, data);
 
             return this.auth.check(null, permissionString);
           } catch(e) {
@@ -235,8 +258,19 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.SUPER();
-      if ( this.memento )
-        this.currentMemento$ = this.memento.tail$;
+      if ( this.memento ) {
+        var m = this.memento;
+        var counter = 0;
+
+        // counter < 2 is as at this point we need to skip 2 memento
+        // head of first one will be column selection
+        // and second will be DAOSummaryView mode
+        while ( m.tail != null && counter < 2 ) {
+          m = m.tail;
+          counter++;
+        }
+        this.currentMemento_ = m;
+      }
 
       var promise = this.data ? Promise.resolve(this.data) : this.config.unfilteredDAO.inX(this.__subContext__).find(this.idOfRecord);
 
@@ -244,7 +278,7 @@ foam.CLASS({
       // to this view from the edit view on the stack.
       promise.then(d => {
         if ( d ) self.data = d;
-        if ( self.currentMemento && self.currentMemento.tail && self.currentMemento.tail.head.toLowerCase() === 'edit' ) {
+        if ( self.memento && self.memento.tail && self.memento.tail.head.toLowerCase() === 'edit' ) {
           self.edit();
         } else {
           this

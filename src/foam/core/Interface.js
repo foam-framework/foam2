@@ -84,7 +84,7 @@ foam.CLASS({
     {
       installInClass: function(cls) {
         cls.create = function() {
-          throw new Error("Cannot instantiate an Interface.");
+          throw new Error("Cannot instantiate Interface: " + this.name);
         };
       }
     }

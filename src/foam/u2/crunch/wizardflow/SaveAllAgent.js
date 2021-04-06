@@ -7,22 +7,38 @@
 foam.CLASS({
   package: 'foam.u2.crunch.wizardflow',
   name: 'SaveAllAgent',
+  flags: ['web'],
   documentation: `
     Currently used by CapableView to pre-save junctions for immediate
     invalidation of the model. This agent saves wizardlets in order.
   `,
 
   imports: [
-    'wizardlets'
+    'wizardlets',
+    'rootCapability'
   ],
-
-  implements: [
-    'foam.core.ContextAgent'
+  
+  properties: [
+    {
+      class: 'Function',
+      name: 'onSave'
+    }
   ],
 
   methods: [
     async function execute() {
-      await foam.Promise.inOrder(this.wizardlets, w => w.save());
+      let allValid = true;
+      let topLevelUCJ;
+      await foam.Promise.inOrder(this.wizardlets, async w => {
+        if ( allValid ) {
+          allValid = w.isValid;
+        }
+        var ucj = await w.save();
+        if ( ucj && ucj.targetId == this.rootCapability.id ) topLevelUCJ = ucj;
+      });
+      if ( this.onSave ) {
+        await this.onSave(allValid, topLevelUCJ);
+      }
     }
   ]
 });

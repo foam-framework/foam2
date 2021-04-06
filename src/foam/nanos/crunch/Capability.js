@@ -27,6 +27,7 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'java.util.Date',
     'java.util.List',
+    'javax.security.auth.AuthPermission',
     'static foam.mlang.MLang.*'
   ],
 
@@ -89,6 +90,18 @@ foam.CLASS({
       class: 'Image',
       documentation: `Path to capability icon`,
       section: 'uiSettings',
+      view: {
+        class: 'foam.u2.MultiView',
+        horizontal: false,
+        views: [
+          {
+            class: 'foam.u2.view.StringView'
+          },
+          {
+            class: 'foam.u2.view.ImageView'
+          }
+        ]
+      },
       includeInDigest: false
     },
     {
@@ -104,7 +117,7 @@ foam.CLASS({
       view: {
         class: 'foam.u2.tag.TextArea',
         rows: 12,
-        cols: 120
+        cols: 100
       },
       includeInDigest: false
     },
@@ -127,6 +140,7 @@ foam.CLASS({
       name: 'enabled',
       class: 'Boolean',
       value: true,
+      view: { class: 'foam.u2.CheckBox', showLabel: false },
       includeInDigest: true,
       documentation: `Capability is ignored by system when enabled is false.
       user will lose permissions implied by this capability and upper level capabilities will ignore this prerequisite`
@@ -230,7 +244,8 @@ foam.CLASS({
       name: 'reviewRequired',
       class: 'Boolean',
       includeInDigest: true,
-      permissionRequired: true
+      permissionRequired: true,
+      view: { class: 'foam.u2.CheckBox', showLabel: false }
     },
     {
       name: 'associatedEntity',
@@ -256,6 +271,7 @@ foam.CLASS({
         Defines a wizardlet to display this capability in a wizard. This
         wizardlet will display after this capability's prerequisites.
       `,
+      hidden: true,
       factory: function() {
         return foam.nanos.crunch.ui.CapabilityWizardlet.create({}, this);
       },
@@ -264,6 +280,7 @@ foam.CLASS({
     {
       class: 'Object',
       name: 'beforeWizardlet',
+      hidden: true,
       documentation: `
         A wizardlet to display before this capability's prerequisites, and only
         if this capability is at the end of a prerequisite group returned by
@@ -292,7 +309,6 @@ foam.CLASS({
     }
   ],
 
-
   methods: [
     {
       name: 'toSummary',
@@ -314,47 +330,13 @@ foam.CLASS({
       documentation: `Checks if a permission or capability string is implied by the current capability`,
       javaCode: `
         if ( ! this.getEnabled() ) return false;
-
-        // check if permission is a capability string implied by this permission
-        if ( this.stringImplies(this.getName(), permission) ) return true;
-
-        String[] inherentPermissions = this.getInherentPermissions();
-        for ( String permissionName : inherentPermissions ) {
-          if ( this.stringImplies(permissionName, permission) ) return true;
+        for ( String grantedPermission : this.getPermissionsGranted() ) {
+          if ( new AuthPermission(grantedPermission).implies(new AuthPermission(permission)) ) return true;
         }
-
-        String[] permissionsGranted = this.getPermissionsGranted();
-        for ( String permissionName : permissionsGranted ) {
-          if ( this.stringImplies(permissionName, permission) ) return true;
-        }
-
-        CrunchService crunchService = (CrunchService) x.get("crunchService");
-        var prereqs = crunchService.getPrereqs(getId());
-
-        if ( prereqs != null && prereqs.size() > 0 ) {
-          DAO capabilityDAO = (DAO) x.get("capabilityDAO");
-          for ( var capId : prereqs ) {
-            Capability capability = (Capability) capabilityDAO.find(capId);
-            if ( capability != null && capability.implies(x, permission) ) return true;
-          }
+        for ( String inherentPermission : this.getInherentPermissions() ) {
+          if ( new AuthPermission(inherentPermission).implies(new AuthPermission(permission)) ) return true;
         }
         return false;
-      `
-    },
-    {
-      name: 'stringImplies',
-      type: 'Boolean',
-      args: [
-        { name: 's1', type: 'String' },
-        { name: 's2', type: 'String' }
-      ],
-      documentation: `check if s1 implies s2 where s1 and s2 are permission or capability strings`,
-      javaCode: `
-      if ( s1.equals(s2) ) return true;
-      if ( s1.isBlank() || s2.isBlank() ) return false;
-      if ( s1.charAt( s1.length() - 1) != '*' || ( s1.length() - 2 > s2.length() ) ) return false;
-      if ( s2.length() <= s1.length() - 2 ) return s1.substring( 0, s1.length() -2 ).equals( s2.substring( 0, s1.length() - 2 ) );
-      return s1.substring( 0, s1.length() - 1 ).equals( s2.substring( 0, s1.length() -1 ) );
       `
     },
     {
@@ -537,6 +519,21 @@ foam.CLASS({
                   ucj.getStatus() != CapabilityJunctionStatus.PENDING &&
                   ucj.getStatus() != CapabilityJunctionStatus.APPROVED ) return true;
         return false;
+      `
+    },
+    {
+      name: 'getImpliedData',
+      documentation: `
+        A subclass of Capability can override this to define what gets stored
+        when a UCJ is saved with null data.
+      `,
+      args: [
+        { name: 'x', javaType: 'foam.core.X' },
+        { name: 'ucj', javaType: 'foam.nanos.crunch.UserCapabilityJunction' }
+      ],
+      type: 'FObject',
+      javaCode: `
+        return null;
       `
     }
   ]

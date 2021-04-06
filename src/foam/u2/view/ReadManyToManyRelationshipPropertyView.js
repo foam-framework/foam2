@@ -45,7 +45,7 @@ foam.CLASS({
       this.__subContext__.createSubContext({ memento: null }));
       
 
-      this.tag(view);
+      this.add(view);
     },
     function click(obj, id) {
       if ( ! this.stack ) return;

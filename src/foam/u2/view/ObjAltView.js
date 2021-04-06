@@ -11,11 +11,14 @@ foam.CLASS({
 
   imports: [ 'memento' ],
 
+  requires: [ 'foam.u2.view.RadioView' ],
+
   documentation: "Like AltView, but for Objects instead of DAO's.",
 
   css: `
     ^ { margin: auto; }
-    ^ select { height: 26px }
+    ^ .foam-u2-view-RadioView.foam-u2-view-RadioView-horizontal-radio .choice {
+    }
   `,
 
   properties: [
@@ -30,22 +33,21 @@ foam.CLASS({
     {
       name: 'selectedView',
       view: function(_, X) {
-        return foam.u2.view.ChoiceView.create(
-          {choices: X.data.views},
+        return X.data.RadioView.create(
+          {choices: X.data.views, isHorizontal: true, columns: 8},
           X.createSubContext({controllerMode: foam.u2.ControllerMode.EDIT})
         );
       },
       postSet: function() {
-        if ( ! this.memento )
+        if ( ! this.memento || ! this.memento.tail )
           return;
-          
+
         var view = this.views.find(v => v[0] === this.selectedView);
         if ( view ) {
-          this.memento.paramsObj.sV = view[1];
+          this.memento.tail.head = view[1];
         } else {
-          delete this.memento.paramsObj.sV;
+          this.memento.tail.head = '';
         }
-        this.memento.paramsObj = foam.Object.clone(this.memento.paramsObj);
       }
     },
     {
@@ -58,8 +60,12 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      if ( this.memento && this.memento.paramsObj.sV ) {
-        var view = this.views.find(v => v[1] === this.memento.paramsObj.sV);
+      if ( this.memento && ! this.memento.tail ) {
+        this.memento.tail = foam.nanos.controller.Memento.create();
+      }
+
+      if ( this.memento && this.memento.tail && this.memento.tail.head.length != 0 ) {
+        var view = this.views.find(v => v[1] === this.memento.tail.head);
         if ( view ) {
           this.selectedView = view[0];
         } else {

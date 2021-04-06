@@ -48,7 +48,7 @@
       tableWidth: 80
     },
     {
-      class: 'FObjectProperty',
+      class: 'JSFObject',
       name: 'handler',
       documentation: 'View initialized when menu is launched.',
       view: {
@@ -91,6 +91,11 @@
       name: 'activeIcon',
       documentation: 'Active icon associated to the menu item.',
       displayWidth: 80
+    },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'border',
+      factory: function() { return { class: 'foam.u2.borders.NullBorder' }; }
     },
     {
       class: 'FObjectArray',

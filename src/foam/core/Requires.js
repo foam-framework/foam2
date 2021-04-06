@@ -51,14 +51,18 @@ foam.CLASS({
         return this.path.split('.').pop();
       },
     },
-    'path',
-    'flags',
+    // Lower priority so it is set after Properties, so that it can override
+    // Property constants if there is a conflict.
+    [ 'priority', 90 ],
+     'path',
+    'flags'
   ],
 
   methods: [
     function installInProto(proto) {
       var name = this.name;
       var path = this.path;
+      var setCls;
 
       // Create a private_ clone of the Class with the create() method decorated
       // to pass 'this' as the context if not explicitly provided.  This ensures
@@ -66,7 +70,7 @@ foam.CLASS({
       Object.defineProperty(proto, name, {
         get: function requiresGetter() {
           if ( ! this.hasOwnPrivate_(name) ) {
-            var cls    = (this.__context__ || foam).lookup(path);
+            var cls    = setCls || (this.__context__ || foam).lookup(path);
             var parent = this;
             foam.assert(cls, 'Requires: Unknown class: ', path);
 
@@ -77,12 +81,17 @@ foam.CLASS({
 
           return this.getPrivate_(name);
         },
+        set: function(cls) {
+          this.clearPrivate_(name);
+          setCls = cls;
+        },
         configurable: true,
         enumerable: false
       });
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Model',

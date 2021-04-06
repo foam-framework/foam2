@@ -53,6 +53,7 @@ foam.CLASS({
     {
       name: 'isAvailablePromise',
       factory: () => Promise.resolve(),
+      hidden: true
     },
     {
       name: 'isAvailable',
@@ -67,6 +68,7 @@ foam.CLASS({
     },
     {
       name: 'wao',
+      hidden: true,
       factory: function () {
         return this.UserCapabilityJunctionWAO.create({}, this.__context__);
       }

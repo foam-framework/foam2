@@ -27,11 +27,10 @@ foam.CLASS({
       max-width: calc(100vw - 48px);
       max-height: calc(100vh - 116px);
       overflow-y: auto;
-
-      /* TODO: Left the below height as temp fix, need to figure out better way to handle properties rendering in the modal visibly */
-      height: 80vh;
+      min-width: 20vw;
     }
     ^title {
+      max-width: fit-content;
       padding: 32px 0px;
       font-size: 1.5em;
       font-weight: bold;
@@ -62,7 +61,7 @@ foam.CLASS({
       class: 'String',
       name: 'title',
       expression: function(isModalRequired) {
-        if ( isModalRequired ) return 'Please provide fill out the following (required)';
+        if ( isModalRequired ) return 'Please fill out the following (required)';
         return 'Please fill out the following (optional)';
       }
     },
@@ -89,7 +88,7 @@ foam.CLASS({
           .addClass(this.myClass('main'))
           .start()
             .addClass(this.myClass('title'))
-            .add(this.title)
+            .add(this.title$)
           .end()
           .startContext({ data: this, controllerMode: this.ControllerMode.EDIT })
           .tag(this.SectionedDetailPropertyView, {

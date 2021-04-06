@@ -22,6 +22,10 @@ foam.CLASS({
       background: rgba(0,0,0,0);
       color: initial;
     }
+    ^ {
+      padding-bottom: 0;
+      padding-top: 0 ;
+    }
   `,
 
   properties: [
@@ -54,6 +58,8 @@ foam.CLASS({
         .addClass(this.myClass())
         .attrs({ size: this.size$ })
         .attrSlot().linkFrom(this.data$);
+
+      if ( this.size ) this.style({height: 'auto'});
 
       this.setChildren(this.slot(function(choices, placeholder, header) {
         var cs = [];

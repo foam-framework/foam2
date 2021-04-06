@@ -42,14 +42,7 @@ foam.CLASS({
 
     'bsh.EvalError',
     'bsh.Interpreter',
-
-    'foam.nanos.script.jShell.EvalInstruction',
-    'foam.nanos.script.jShell.InstructionPresentation',
     'jdk.jshell.JShell',
-    'jdk.jshell.execution.DirectExecutionControl',
-    'jdk.jshell.spi.ExecutionControl',
-    'jdk.jshell.spi.ExecutionControlProvider',
-    'jdk.jshell.spi.ExecutionEnv',
 
     'foam.core.*',
     'foam.dao.*',
@@ -275,6 +268,13 @@ foam.CLASS({
       documentation: 'User who last modified script'
     },
     {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedByAgent',
+      includeInDigest: true,
+      documentation: 'Agent acting user who last modified script'
+    },
+    {
       class: 'DateTime',
       name: 'lastModified',
       includeInDigest: false,
@@ -379,9 +379,9 @@ foam.CLASS({
     {
       name: 'runScript',
       code: function() {
-        var log = function() {
+        var log = () => {
           this.output += Array.from(arguments).join('') + '\n';
-        }.bind(this);
+        };
         try {
           with ({ log: log, print: log, x: this.__context__ })
           return Promise.resolve(eval(this.code));
@@ -397,41 +397,29 @@ foam.CLASS({
       ],
       javaCode: `
         canRun(x);
-
         PM               pm          = new PM.Builder(x).setKey(Script.getOwnClassInfo().getId()).setName(getId()).build();
         RuntimeException thrown      = null;
         Language         l           = getLanguage();
-
         Thread.currentThread().setPriority(getPriority());
 
         try {
-          if ( l == foam.nanos.script.Language.JSHELL ) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            PrintStream ps = new PrintStream(baos);
-            String print = null;
-            try {
-              JShell jShell = (JShell) createInterpreter(x,ps);
-              print = new JShellExecutor().execute(x, jShell, getCode());
-              ps.print(print);
-            } catch (Throwable e) {
-              Logger logger = (Logger) x.get("logger");
-              logger.error(this.getClass().getSimpleName(), "runScript", getId(), e);
-            } finally {
-              pm.log(x);
-            }
-            setLastRun(new Date());
-            setLastDuration(pm.getTime());
-            ps.flush();
-            setOutput(baos.toString());
-          } else if ( l == foam.nanos.script.Language.BEANSHELL ) {
             ByteArrayOutputStream baos  = new ByteArrayOutputStream();
             PrintStream           ps    = new PrintStream(baos);
-            Interpreter           shell = (Interpreter) createInterpreter(x, null);
 
             try {
-              setOutput("");
-              shell.setOut(ps);
-              shell.eval(getCode());
+              if ( l == foam.nanos.script.Language.BEANSHELL ) {
+                Interpreter shell = (Interpreter) createInterpreter(x, null);
+                setOutput("");
+                shell.setOut(ps);
+                shell.eval(getCode());
+              } else if ( l == foam.nanos.script.Language.JSHELL ) {
+                String print = null;
+                JShell jShell = (JShell) createInterpreter(x,ps);
+                print = new JShellExecutor().execute(x, jShell, getCode());
+                ps.print(print);
+              } else {
+                throw new RuntimeException("Script language not supported");
+              }
             } catch (Throwable t) {
               thrown = new RuntimeException(t);
               ps.println();
@@ -443,13 +431,11 @@ foam.CLASS({
               pm.log(x);
             }
 
-            setLastRun(new Date());
-            setLastDuration(pm.getTime());
-            ps.flush();
-            setOutput(baos.toString());
-          } else {
-            throw new RuntimeException("Script language not supported");
-          }
+          setLastRun(new Date());
+          setLastDuration(pm.getTime());
+          ps.flush();
+          setOutput(baos.toString());
+
           ScriptEvent event = new ScriptEvent(x);
           event.setLastRun(this.getLastRun());
           event.setLastDuration(this.getLastDuration());
@@ -555,7 +541,7 @@ foam.CLASS({
               this.status = this.ScriptStatus.UNSCHEDULED;
               this.__context__[this.daoKey].put(this);
             },
-            (err) => {
+            (e) => {
               var notification = this.Notification.create();
               notification.userId = this.subject && this.subject.realUser ?
                 this.subject.realUser.id : this.user.id;
@@ -566,8 +552,8 @@ foam.CLASS({
               notification.transient = true;
               this.__subContext__.notificationDAO.put(notification);
 
-              this.output += '\n' + err.stack;
-              console.log(err);
+              this.output += '\n' + e.stack;
+              console.log(e);
               this.status = this.ScriptStatus.ERROR;
               this.__context__[this.daoKey].put(this);
             }

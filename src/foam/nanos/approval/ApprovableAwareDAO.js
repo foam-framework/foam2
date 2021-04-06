@@ -29,7 +29,7 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.nanos.auth.UserQueryService',
     'foam.nanos.logger.Logger',
-    'foam.nanos.ruler.Operations',
+    'foam.nanos.dao.Operation',
     'java.util.ArrayList',
     'java.util.Iterator',
     'java.util.List',
@@ -134,7 +134,7 @@ foam.CLASS({
       args: [
         { name: 'x', type: 'Context' },
         { name: 'obj', type: 'FObject' },
-        { name: 'operation', javaType: 'foam.nanos.ruler.Operations' },
+        { name: 'operation', javaType: 'foam.nanos.dao.Operation' },
         { name: 'user', javaType: 'foam.nanos.auth.User' }
       ],
       javaType: 'List<Long>',
@@ -199,10 +199,10 @@ foam.CLASS({
         return super.put_(x,obj);
       }
 
-      Operations operation = lifecycleObj.getLifecycleState() == LifecycleState.DELETED ? Operations.REMOVE :
+      Operation operation = lifecycleObj.getLifecycleState() == LifecycleState.DELETED ? Operation.REMOVE :
         ( ( currentObjectInDAO == null || ((LifecycleAware) currentObjectInDAO).getLifecycleState() == LifecycleState.PENDING ) ?
-            Operations.CREATE :
-            Operations.UPDATE
+            Operation.CREATE :
+            Operation.UPDATE
         );
 
       List<Long> approverIds = findApprovers(x, (FObject) obj, operation, user);
@@ -220,7 +220,7 @@ foam.CLASS({
       DAO filteredApprovalRequestDAO;
       String hashedId = ""; // not needed for remove case
 
-      if ( operation == Operations.REMOVE ){
+      if ( operation == Operation.REMOVE ){
         filteredApprovalRequestDAO = (DAO) approvalRequestDAO
           .where(
             foam.mlang.MLang.AND(
@@ -307,7 +307,7 @@ foam.CLASS({
 
         if ( fulfilledRequest.getStatus() == ApprovalStatus.APPROVED ) {
 
-          if ( operation == Operations.CREATE ){
+          if ( operation == Operation.CREATE ){
             lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
           }
           return super.put_(x,obj);
@@ -324,7 +324,7 @@ foam.CLASS({
       ApprovalRequest approvalRequest;
 
       // remove doesn't need an approvable to be generated since we already have the object
-      if ( operation == Operations.REMOVE ){
+      if ( operation == Operation.REMOVE ){
         approvalRequest = new ApprovalRequest.Builder(x)
           .setDaoKey(getServiceName())
           .setServerDaoKey(getDaoKey())
@@ -342,7 +342,7 @@ foam.CLASS({
         FObject objectToDiffAgainst = currentObjectInDAO;
 
         // diffing against an empty object gives us the properties in map form for create
-        if ( operation == Operations.CREATE ){
+        if ( operation == Operation.CREATE ){
           try {
             objectToDiffAgainst = (FObject) obj.getClassInfo().newInstance();
           } catch (Exception e){

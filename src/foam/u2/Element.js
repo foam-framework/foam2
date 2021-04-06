@@ -128,12 +128,7 @@ foam.CLASS({
     },
     {
       name: 'name',
-      factory: function() { return 'CSS-' + this.$UID; }
-    },
-    {
-      name: 'installedDocuments_',
-      factory: function() { return {}; },
-      transient: true
+      factory: function() { return 'CSS-' + Math.abs(foam.util.hashCode(this.code)); }
     },
     {
       class: 'Boolean',
@@ -146,15 +141,29 @@ foam.CLASS({
   ],
 
   methods: [
-    function asKey(document, cls) {
-      return this.expands_ ? document.$UID + '.' + cls.id : document.$UID;
+    function maybeInstallInDocument(X, cls) {
+      var document = X.document;
+      if ( ! document ) return;
+      var installedStyles = document.installedStyles || ( document.installedStyles = {} );
+      if ( this.expands_ ) {
+        var map = installedStyles[this.$UID] || (installedStyles[this.$UID] = {});
+        if ( ! map[cls.id] ) {
+          map[cls.id] = true;
+          X.installCSS(this.expandCSS(cls, this.code), cls.id);
+        }
+      } else {
+        if ( ! installedStyles[this.$UID] ) {
+          installedStyles[this.$UID] = true;
+          X.installCSS(this.expandCSS(cls, this.code), cls.id);
+        }
+      }
     },
 
     function installInClass(cls) {
       // Install myself in this Window, if not already there.
-      var oldCreate    = cls.create;
-      var axiom        = this;
-      var isFirstCSS   = ! cls.private_.hasCSS;
+      var oldCreate   = cls.create;
+      var axiom       = this;
+      var isFirstCSS  = ! cls.private_.hasCSS;
 
       if ( isFirstCSS ) cls.private_.hasCSS = true;
 
@@ -173,11 +182,7 @@ foam.CLASS({
 
         if ( ! lastClassToInstallCSSFor || lastClassToInstallCSSFor == cls ) {
           // Install CSS if not already installed in this document for this cls
-          var key = axiom.asKey(X.document, this);
-          if ( X.document && ! axiom.installedDocuments_[key] ) {
-            X.installCSS(axiom.expandCSS(this, axiom.code), this.id);
-            axiom.installedDocuments_[key] = true;
-          }
+          axiom.maybeInstallInDocument(X, this);
         }
 
         if ( ! lastClassToInstallCSSFor && ! this.model_.inheritCSS ) {
@@ -254,7 +259,8 @@ foam.CLASS({
     function sanitizeText(text) {
       if ( ! text ) return text;
       text = text.toString();
-      return text.replace(/[&<"']/g, function(m) {
+      if ( text.search(/[&<"']/) == -1 ) return text;
+      return text.replace(/[&<"']/g, (m) => {
         switch ( m ) {
           case '&': return '&amp;';
           case '<': return '&lt;';
@@ -339,6 +345,8 @@ foam.CLASS({
 
   documentation: 'Initial state of a newly created Element.',
 
+  axioms: [ foam.pattern.Singleton.create() ],
+
   methods: [
     function output(out) {
       this.initE();
@@ -367,7 +375,7 @@ foam.CLASS({
     function load() {
       if ( this.hasOwnProperty('elListeners') ) {
         var ls = this.elListeners;
-        for ( var i = 0 ; i < ls.length ; i+=2 ) {
+        for ( var i = 0 ; i < ls.length ; i += 2 ) {
           this.addEventListener_(ls[i], ls[i+1]);
         }
       }
@@ -709,6 +717,7 @@ foam.CLASS({
       `,
       name: 'PSEDO_ATTRIBUTES',
       value: {
+        valueAsDate: true,
         value: true,
         checked: true
       }
@@ -818,14 +827,14 @@ foam.CLASS({
 
     {
       name: '__ID__',
-      value: [ 0 ]
+      value: [ 1 ]
     },
 
     {
       name: 'NEXT_ID',
       flags: ['js'],
       value: function() {
-        return 'v' + this.__ID__[ 0 ]++;
+        return this.__ID__[ 0 ]++;
       }
     },
 
@@ -847,17 +856,6 @@ foam.CLASS({
     }
   ],
 
-  css: `
-    /*
-     We hide Elements by adding this style rather than setting
-     'display: none' directly because then when we re-show the
-     Element we don't need to remember it's desired 'display' value.
-    */
-    .foam-u2-Element-hidden {
-      display: none !important;
-    }
-  `,
-
   messages: [
     {
       name: 'SELECT_BAD_USAGE',
@@ -867,7 +865,8 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'String',
+      // TODO: class is needed to fix the Java build, but this shouldn't be building for Java anyway.
+      class: 'Object',
       name: 'id',
       transient: true,
       factory: function() { return this.NEXT_ID(); }
@@ -886,10 +885,8 @@ foam.CLASS({
       transient: true,
       topics: [],
       delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
-          map(function(m) { return m.name; }),
-      factory: function() {
-        return this.INITIAL;
-      },
+        map(function(m) { return m.name; }),
+      factory: function() { return this.INITIAL; },
       postSet: function(oldState, state) {
         if ( state === this.LOADED ) {
           this.pub('onload');
@@ -1020,7 +1017,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'scrollHeight',
+      name: 'scrollHeight'
     },
     {
       class: 'Int',
@@ -1089,35 +1086,50 @@ foam.CLASS({
     },
 
     function initKeyMap_(keyMap, cls) {
-      var count = 0;
+      var keyMap;
 
-      var as = cls.getAxiomsByClass(foam.core.Action);
+      if ( ! cls.hasOwnProperty('keyMap__') ) {
+        var count = 0;
+        keyMap = {};
 
-      for ( var i = 0 ; i < as.length ; i++ ) {
-        var a = as[i];
+        var as = cls.getAxiomsByClass(foam.core.Action);
 
-        for ( var j = 0 ; a.keyboardShortcuts && j < a.keyboardShortcuts.length ; j++, count++ ) {
-          var key = a.keyboardShortcuts[j];
+        for ( var i = 0 ; i < as.length ; i++ ) {
+          var a = as[i];
 
-          // First, lookup named codes, then convert numbers to char codes,
-          // otherwise, assume we have a single character string treated as
-          // a character to be recognized.
-          if ( this.NAMED_CODES[key] ) {
-            key = this.NAMED_CODES[key];
-          } else if ( typeof key === 'number' ) {
-            key = String.fromCharCode(key);
+          for ( var j = 0 ; a.keyboardShortcuts && j < a.keyboardShortcuts.length ; j++, count++ ) {
+            var key = a.keyboardShortcuts[j];
+
+            // First, lookup named codes, then convert numbers to char codes,
+            // otherwise, assume we have a single character string treated as
+            // a character to be recognized.
+            if ( this.NAMED_CODES[key] ) {
+              key = this.NAMED_CODES[key];
+            } else if ( typeof key === 'number' ) {
+              key = String.fromCharCode(key);
+            }
+
+            keyMap[key] = a;// .maybeCall.bind(a, this.__subContext__, this);
+            /*
+            keyMap[key] = opt_value ?
+              function() { a.maybeCall(this.__subContext__, opt_value.get()); } :
+              a.maybeCall.bind(action, self.X, self) ;
+            */
           }
-
-          keyMap[key] = a.maybeCall.bind(a, this.__subContext__, this);
-          /*
-          keyMap[key] = opt_value ?
-            function() { a.maybeCall(this.__subContext__, opt_value.get()); } :
-            a.maybeCall.bind(action, self.X, self) ;
-          */
         }
+
+        if ( count == 0 ) keyMap = null;
+
+        cls.keyMap__ = keyMap;
       }
 
-      return count;
+      if ( ! keyMap ) return null;
+
+      var map = {};
+
+      for ( var key in keyMap ) map[key] = keyMap[key].maybeCall.bind(keyMap[key], this.__subContext__, this);
+
+      return map;
     },
 
     function initTooltip() {
@@ -1130,12 +1142,10 @@ foam.CLASS({
 
     function initKeyboardShortcuts() {
       /* Initializes keyboard shortcuts. */
-      var keyMap = {}
-      var count = this.initKeyMap_(keyMap, this.cls_);
+      var keyMap = this.initKeyMap_(keyMap, this.cls_);
 
       //      if ( this.of ) count += this.initKeyMap_(keyMap, this.of);
-
-      if ( count ) {
+      if ( keyMap ) {
         this.keyMap_ = keyMap;
         var target = this.parentNode || this;
 
@@ -1150,6 +1160,7 @@ foam.CLASS({
 
     function el() {
       /* Return this Element's real DOM element, if loaded. */
+      // Caching this call doesn't appear to help performance.
       return this.getElementById(this.id);
     },
 
@@ -1210,6 +1221,7 @@ foam.CLASS({
       return f(opt_extra);
     },
 
+    // TODO: what is this for?
     function instanceClass(opt_extra) {
       return this.myClass(this.id + '-' + opt_extra);
     },
@@ -1501,6 +1513,7 @@ foam.CLASS({
       return this;
     },
 
+    // TODO: remove
     function enableCls(cls, enabled, opt_negate) {
       console.warn('Deprecated use of Element.enableCls(). Use enableClass() instead.');
       return this.enableClass(cls, enabled, opt_negate);
@@ -1528,6 +1541,7 @@ foam.CLASS({
       return this;
     },
 
+    // TODO: remove
     function removeCls(cls) {
       console.warn('Deprecated use of Element.removeCls(). Use removeClass() instead.');
       return this.removeClass(cls);
@@ -1610,6 +1624,17 @@ foam.CLASS({
       /* Create a new Element and add it as a child. Return the child. */
       var c = this.createChild_(spec, args);
       this.add(c);
+
+/*
+      if ( this.content ) {
+        this.add(c);
+      } else {
+        c.parentNode = this;
+        this.childNodes.push(c);
+        this.onAddChildren(c);
+      }
+      */
+
       if ( slot ) slot.set(c);
       return c;
     },
@@ -1646,6 +1671,13 @@ foam.CLASS({
     function toE() { return this; },
 
     function add_(cs, parentNode) {
+      // Common case is one String, so optimize that case.
+      if ( cs.length == 1 && typeof cs[0] === 'string' ) {
+        this.childNodes.push(this.sanitizeText(cs[0]));
+        this.onAddChildren(cs[0]);
+        return this;
+      }
+
       /* Add Children to this Element. */
       var es = [];
       var Y = this.__subSubContext__;
@@ -1656,38 +1688,32 @@ foam.CLASS({
         // Remove null values
         if ( c === undefined || c === null ) {
           // nop
+        } else if ( c.toE ) {
+          var e = c.toE(null, Y);
+          if ( foam.core.Slot.isInstance(e) ) {
+            var v = this.slotE_(c);
+            if ( Array.isArray(v) ) {
+              for ( var j = 0 ; j < v.length ; j++ ) {
+                var u = v[j];
+                es.push(u.toE ? u.toE(null, Y) : u);
+              }
+            } else {
+              es.push(v.toE ? v.toE(null, Y) : v);
+            }
+          } else {
+            es.push(e);
+          }
         } else if ( Array.isArray(c) ) {
           for ( var j = 0 ; j < c.length ; j++ ) {
             var v = c[j];
             es.push(v.toE ? v.toE(null, Y) : v);
           }
-        } else if ( foam.core.Slot.isInstance(c) ) {
-          var v = this.slotE_(c);
-          if ( Array.isArray(v) ) {
-            for ( var j = 0 ; j < v.length ; j++ ) {
-              var u = v[j];
-              es.push(u.toE ? u.toE(null, Y) : u);
-            }
-          } else {
-            es.push(v.toE ? v.toE(null, Y) : v);
-          }
-        } else if ( c.toE ) {
-          var e = c.toE(null, Y);
-          if ( foam.core.Slot.isInstance(e) ) {
-            e = this.slotE_(e);
-          }
-          es.push(e);
         } else if ( c.then ) {
           this.add(this.PromiseSlot.create({ promise: c }));
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
-        } else if ( this.translationService && c && c.data && c.data.id ) {
-          // TODO: remove
-          var key = c.data.id + '.' + c.clsInfo;
-          console.log('DEPRECATED, use translate() instead ******************* add translate ', key, c.default);
-          var translation = this.translationService.getTranslation(foam.locale, key, c.default);
-          return this.add(translation);
         } else {
+          // String or Number
           es.push(c);
         }
       }
@@ -1880,31 +1906,26 @@ foam.CLASS({
         serializing an Element hierarchy.
         Call toString() on the OutputStream to get output.
       */
-      var self = this;
-      var buf = [];
+      var buf = '';
       var Element = foam.u2.Element;
-      var Entity  = self.Entity;
+      var Entity  = this.Entity;
       var f = function templateOut(/* arguments */) {
         for ( var i = 0 ; i < arguments.length ; i++ ) {
           var o = arguments[i];
           if ( o === null || o === undefined ) {
             // NOP
           } else if ( typeof o === 'string' ) {
-            buf.push(o);
+            buf += o;
           } else if ( typeof o === 'number' ) {
-            buf.push(o);
+            buf += o;
           } else if ( Element.isInstance(o) || Entity.isInstance(o) ) {
             o.output(f);
-          } else if ( o === null || o === undefined ) {
-            buf.push(o);
           }
         }
       };
 
       f.toString = function() {
-        if ( buf.length === 0 ) return '';
-        if ( buf.length > 1 ) return buf.join('');
-        return buf[0];
+        return buf;
       };
 
       return f;
@@ -2455,19 +2476,9 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DateViewRefinement',
   refines: 'foam.core.Date',
-  requires: [ 'foam.u2.view.DateView', 'foam.u2.view.date.DateTimePicker' ],
+  requires: [ 'foam.u2.view.DateView' ],
   properties: [
-    [ 'view', function() {
-      // Detect if the browser has date support. If it does use the browsers default
-      // date picker, otherwise use the foam date picker.
-      let e = document.createElement('input');
-      e.setAttribute('type', 'date');
-      // If a browser doesn't support date, the type  will default to text
-      if ( e.type !== 'text' ) {
-        return { class: 'foam.u2.view.DateView' };
-      }
-      return { class: 'foam.u2.view.date.DateTimePicker' };
-    } ]
+    [ 'view', { class: 'foam.u2.view.DateView' } ]
   ]
 });
 
@@ -2525,7 +2536,7 @@ foam.CLASS({
   requires: [ 'foam.u2.view.CurrencyView' ],
   properties: [
     [ 'displayWidth', 15 ],
-    [ 'view', { class: 'foam.u2.view.CurrencyView' } ]
+    [ 'view', { class: 'foam.u2.view.CurrencyView', onKey: false } ]
   ]
 });
 
@@ -2801,7 +2812,6 @@ foam.CLASS({
       documentation: 'The actual error message. Null or the empty string ' +
           'when there is no error.',
     }
-
   `,
 
   exports: [ 'data' ],

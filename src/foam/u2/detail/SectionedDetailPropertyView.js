@@ -98,7 +98,7 @@ foam.CLASS({
     ^ .foam-u2-tag-Select {
       width: 100%;
       box-shadow: none;
-      background: #ffffff url('images/dropdown-icon.svg') no-repeat 99% 50%;
+      background: #ffffff url('/images/dropdown-icon.svg') no-repeat 99% 50%;
       -webkit-appearance: none;
       cursor: pointer;
     }
@@ -253,6 +253,9 @@ foam.CLASS({
                 .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                 .start()
                   .style({ 'flex-grow': 1, 'max-width': '100%' })
+                  .callIf( prop.view.class == 'foam.u2.CheckBox', function() {
+                    this.style({ 'margin': '20px' });
+                  })
                   .tag(prop, { mode$: self.mode$ })
                   .callIf(prop.validationStyleEnabled, function() {
                     this.enableClass(self.myClass('error'), errorSlot);
@@ -261,7 +264,7 @@ foam.CLASS({
                 .callIf(prop.help, function() {
                   this.start()
                     .addClass(self.myClass('tooltip'))
-                    .start({class: 'foam.u2.tag.Image', data: 'images/question-icon.svg'})
+                    .start({class: 'foam.u2.tag.Image', data: '/images/question-icon.svg'})
                       .addClass(self.myClass('helper-icon'))
                     .end()
 
@@ -289,7 +292,7 @@ foam.CLASS({
                       .show(errorSlot)
                       .start({
                         class: 'foam.u2.tag.Image',
-                        data: 'images/inline-error-icon.svg',
+                        data: '/images/inline-error-icon.svg',
                         displayHeight: '16px',
                         displayWidth: '16px'
                       })

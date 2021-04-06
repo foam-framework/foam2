@@ -7,6 +7,7 @@
  foam.CLASS({
   package: 'foam.nanos.approval',
   name: 'ApprovalRequest',
+  plural: 'ApprovalRequests',
   documentation: 'Approval requests are stored in approvalRequestDAO and' +
   'represent a single approval request for a single user.',
 
@@ -24,7 +25,7 @@
     'foam.dao.DAO',
     'foam.nanos.auth.*',
     'foam.nanos.logger.Logger',
-    'foam.nanos.ruler.Operations',
+    'foam.nanos.dao.Operation',
     'java.util.ArrayList',
     'java.util.List',
     'static foam.mlang.MLang.*'
@@ -133,25 +134,28 @@
       visibility: 'RO',
       tableCellFormatter: function(_,obj) {
         let self = this;
-        this.__subSubContext__[obj.daoKey].find(obj.objId).then(requestObj => {
-          let referenceSummaryString = `ID:${obj.objId}`;
+        try {
+          this.__subSubContext__[obj.daoKey].find(obj.objId).then(requestObj => {
+            let referenceSummaryString = `ID:${obj.objId}`;
 
-          if ( requestObj ){
-            Promise.resolve(requestObj.toSummary()).then(function(requestObjSummary) {
-              if ( requestObjSummary ){
-                referenceSummaryString = requestObjSummary;
-              }
+            if ( requestObj ){
+              Promise.resolve(requestObj.toSummary()).then(function(requestObjSummary) {
+                if ( requestObjSummary ){
+                  referenceSummaryString = requestObjSummary;
+                }
 
-              self.add(referenceSummaryString);
-            })
-          }
-        });
+                self.add(referenceSummaryString);
+              })
+            }
+          });
+        } catch (x) {}
       },
       view: function(_, X) {
         let slot = foam.core.SimpleSlot.create();
         let data = X.data;
 
-        X[data.daoKey].find(data.objId).then(requestObj => {
+
+        X[data.daoKey] && X[data.daoKey].find(data.objId).then(requestObj => {
           let referenceSummaryString = `ID:${data.objId}`;
 
           if ( requestObj ){
@@ -163,7 +167,7 @@
               slot.set(referenceSummaryString);
             })
           }
-        })
+        });
 
         return {
           class: 'foam.u2.view.ValueView',
@@ -193,7 +197,7 @@
     },
     {
       class: 'Enum',
-      of: 'foam.nanos.ruler.Operations',
+      of: 'foam.nanos.dao.Operation',
       name: 'operation',
       label: 'Action',
       includeInDigest: false,
@@ -271,23 +275,27 @@
       },
       tableCellFormatter: function(approver, data) {
         let self = this;
-        this.__subSubContext__.userDAO.find(approver).then(user => {
-          if ( data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
-            self.add(user ? user.toSummary() : `User #${approver}`);
-          } else if ( data.isTrackingRequest ) {
-            self.add(data.TRACKING);
-          } else if ( user ) {
-            if ( self.__subSubContext__.user.id != user.id ) {
-              self.add(user.toSummary());
+        try {
+          this.__subSubContext__.userDAO.find(approver).then(user => {
+            if ( data.status != foam.nanos.approval.ApprovalStatus.REQUESTED ) {
+              self.add(user ? user.toSummary() : `User #${approver}`);
+            } else if ( data.isTrackingRequest ) {
+              self.add(data.TRACKING);
+            } else if ( user ) {
+              if ( self.__subSubContext__.user.id != user.id ) {
+                self.add(user.toSummary());
+              } else {
+                self.add(data.PENDING);
+              }
             } else {
-              self.add(data.PENDING);
+              self.add(`User #${approver}`);
             }
-          } else {
-            self.add(`User #${approver}`);
-          }
-        });
+          });
+        } catch (x) {}
       },
-      visibility: 'RO'
+      readVisibility: 'RO',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'HIDDEN'
     },
     {
       class: 'String',
@@ -326,7 +334,12 @@
       includeInDigest: true,
       section: 'approvalRequestInformation',
       order: 110,
-      gridColumns: 3
+      gridColumns: 3,
+      tableCellFormatter: function(value, obj, axiom) {
+        this.__subSubContext__.userDAO
+          .find(value)
+          .then(user => this.add(user ? user.toSummary() : `ID: ${value}`));
+      }
     },
     {
       class: 'Reference',
@@ -337,6 +350,21 @@
       order: 115,
       gridColumns: 3,
       readPermissionRequired: true
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdFor',
+      includeInDigest: true,
+      section: 'approvalRequestInformation',
+      order: 116,
+      gridColumns: 3,
+      tableCellFormatter: function(value, obj, axiom) {
+        var defaultOutput = value ? `ID: ${value}`: "N/A";
+        this.__subSubContext__.userDAO
+          .find(value)
+          .then(user => this.add(user ? user.toSummary() : defaultOutput));
+      }
     },
     {
       class: 'DateTime',
@@ -355,6 +383,16 @@
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
+      includeInDigest: true,
+      section: 'approvalRequestInformation',
+      order: 130,
+      gridColumns: 6,
+      readPermissionRequired: true
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedByAgent',
       includeInDigest: true,
       section: 'approvalRequestInformation',
       order: 130,
@@ -477,7 +515,7 @@
       documentation: `
         ID of obj displayed in view reference
         To be used in view reference action when the approvalrequest
-        needs to specify its own reference, for example in the case of 
+        needs to specify its own reference, for example in the case of
         UserCapabilityJunctions where data is null.
       `
     },
@@ -493,7 +531,7 @@
       documentation: `
         Daokey of obj displayed in view reference.
         To be used in view reference action when the approvalrequest
-        needs to specify its own reference, for example in the case of 
+        needs to specify its own reference, for example in the case of
         UserCapabilityJunctions where data is null.
       `
     },
@@ -556,7 +594,7 @@
         throw new RuntimeException("Invalid dao key for the approval request object.");
       }
 
-      if ( getOperation() != Operations.CREATE ){
+      if ( getOperation() != Operation.CREATE ){
         FObject obj = dao.inX(x).find(getObjId());
         if ( obj == null ) {
           logger.error(this.getClass().getSimpleName(), "ObjId not found", getObjId());
@@ -672,7 +710,7 @@
         // Do not show the action if the request was reject or approved and removed
         if ( self.status == foam.nanos.approval.ApprovalStatus.REJECTED ||
             ( self.status == foam.nanos.approval.ApprovalStatus.APPROVED &&
-              self.operation == foam.nanos.ruler.Operations.REMOVE) ) {
+              self.operation == foam.nanos.dao.Operation.REMOVE) ) {
              return false;
         }
 
@@ -705,7 +743,7 @@
 
         // This should already be filtered out by the isAvailable, but adding here as duplicate protection
         if ( self.status == foam.nanos.approval.ApprovalStatus.REJECTED ||
-           (self.status == foam.nanos.approval.ApprovalStatus.APPROVED && self.operation == foam.nanos.ruler.Operations.REMOVE) ) {
+           (self.status == foam.nanos.approval.ApprovalStatus.APPROVED && self.operation == foam.nanos.dao.Operation.REMOVE) ) {
              console.warn('Object is inaccessible')
              return;
         }
@@ -720,7 +758,7 @@
           property = X[daoKey].of.ID;
           objId = property.adapt.call(property, self.objId, self.objId, property);
         }
-        
+
         return X[daoKey]
           .find(objId)
           .then(obj => {
@@ -729,7 +767,7 @@
             // If the dif of objects is calculated and stored in Map(obj.propertiesToUpdate),
             // this is for updating object approvals
             if ( obj.propertiesToUpdate ) {
-              if ( obj.operation === foam.nanos.ruler.Operations.CREATE ) {
+              if ( obj.operation === foam.nanos.dao.Operation.CREATE ) {
                 var temporaryNewObject = obj.of.create({}, X);
 
                 var propsToUpdate = obj.propertiesToUpdate;
@@ -795,7 +833,7 @@
               }),
               mementoHead: null,
               backLabel: 'Back'
-            });
+            }, X);
           })
           .catch(err => {
             console.warn(err.message || err);

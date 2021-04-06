@@ -20,7 +20,8 @@ foam.CLASS({
 
   exports: [
     'as filterController',
-    'as data'
+    'as data',
+    'currentMemento_ as memento'
   ],
 
   properties: [
@@ -62,12 +63,19 @@ foam.CLASS({
       name: 'showCount',
       value: true
     },
-    'searchValue'
+    'currentMemento_'
   ],
 
   methods: [
     function initE() {
       var self = this;
+
+      if ( this.memento ) {
+        if ( ! this.memento.tail ) {
+          this.memento.tail = foam.nanos.controller.Memento.create();
+        }
+        this.currentMemento_$ = this.memento.tail$;
+      }
 
       this.dao.on.sub(this.updateTotalCount);
       this.updateTotalCount();
@@ -82,7 +90,6 @@ foam.CLASS({
       var generalQueryView = foam.u2.ViewSpec.createView(
         { 
           class: 'foam.u2.search.TextSearchView',
-          searchValue: this.searchValue
         },
         {
           richSearch: true,

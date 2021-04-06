@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.auth',
-  name: 'UserTwoFactoryRefinement',
+  name: 'UserRefinements',
   refines: 'foam.nanos.auth.User',
 
   properties: [

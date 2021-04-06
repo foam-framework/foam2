@@ -191,9 +191,9 @@ foam.LIB({
       if ( prev && prev.name !== key ) {
         throw 'Class constant conflict: ' +
           this.id + '.' + cName + ' from: ' + key + ' and ' + prev.name;
+      } else {
+        this.prototype[cName] = this[cName] = value;
       }
-
-      this.prototype[cName] = this[cName] = value;
     },
 
     function isInstance(o) {
@@ -920,6 +920,18 @@ foam.CLASS({
       return this.cls_.create(m, opt_X || this.__context__);
     },
 
+    function shallowClone(opt_X) {
+      /** Create a shallow copy of this object. **/
+      var m = {};
+      for ( var key in this.instance_ ) {
+        if ( this.instance_[key] === undefined ) continue; // Skip previously cleared keys.
+
+        var value = this[key];
+        m[key] = value;
+      }
+      return this.cls_.create(m, opt_X || this.__context__);
+    },
+
     /**
       Copy property values from the supplied object or map.
 
@@ -973,7 +985,8 @@ foam.CLASS({
           // for each object since they are of the exact same
           // type.
           if ( o.hasOwnProperty(name) || props[i].factory ) {
-            this[name] = o[name];
+            if ( ! props[i].copyValueFrom || ! props[i].copyValueFrom(this, o) )
+              this[name] = o[name];
           }
         }
         return this;
@@ -986,7 +999,8 @@ foam.CLASS({
           var name = props[i].name;
           var otherProp = o.cls_.getAxiomByName(name);
           if ( otherProp && foam.core.Property.isInstance(otherProp) ) {
-            this[name] = o[name];
+            if ( ! props[i].copyValueFrom || ! props[i].copyValueFrom(this, o) )
+              this[name] = o[name];
           }
         }
         return this;

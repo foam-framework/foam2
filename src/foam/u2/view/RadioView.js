@@ -20,46 +20,45 @@ foam.CLASS({
   name: 'RadioView',
   extends: 'foam.u2.view.ChoiceView',
 
-  requires: [
-    'foam.u2.DisplayMode'
-  ],
+  requires: [ 'foam.u2.DisplayMode' ],
 
   css: `
-    ^ { 
+    ^ {
       padding: 4px 0;
     }
 
-    ^horizontal-radio { 
-      display: flex;
-      align-items: center;
+    ^horizontal-radio {
       align-content: center;
+      align-items: center;
+      display: flex;
       flex-wrap: wrap;
     }
 
     ^ .choice {
-      margin-bottom: 16px;
       font-size: 16px;
-    }
-
-    ^.foam-u2-view-RadioView-horizontal-radio .choice {
-      flex-basis: calc(100% / 3);
+      margin-bottom: 16px;
+      white-space: nowrap;
     }
 
     ^ label {
+      color: #444;
       margin-left: 12px;
-      color: #444; 
     }
   `,
 
   properties: [
     {
       class: 'Boolean',
-      name: 'isHorizontal',
-      value: false
+      name: 'isHorizontal'
     },
     {
       class: 'Boolean',
       name: 'isDisabled'
+    },
+    {
+      class: 'Int',
+      name: 'columns',
+      value: 3
     }
   ],
 
@@ -82,8 +81,8 @@ foam.CLASS({
     },
 
     function updateMode_(mode) {
-      this.isDisabled = mode === this.DisplayMode.RO ||
-                        mode === this.DisplayMode.DISABLED;
+      this.isDisabled =
+        mode === this.DisplayMode.RO || mode === this.DisplayMode.DISABLED;
     }
   ],
 
@@ -95,21 +94,20 @@ foam.CLASS({
 
       this.removeAllChildren();
 
-      this.add(this.choices.map(function(c) {
+      this.add(this.choices.map(c => {
         return this.E('div').
           addClass('choice').
+            callIf(this.columns != -1, function() { this.style({'flex-basis': (100 / self.columns) + '%'}) }).
           start('input').
             attrs({
               type: 'radio',
               name: self.getAttribute('name') + 'Choice' + String.fromCharCode("A".charCodeAt(0) + (index++)),
-              value: c[0],
+              value: c[1],
               checked: self.slot(function (data) { return data === c[0]; }),
               disabled: self.isDisabled$
             }).
             setID(id = self.NEXT_ID()).
-            on('change', function(evt) {
-              self.data = c[0];
-            }).
+            on('change', function(evt) { self.data = c[0]; }).
           end().
           start('label').
             attrs({for: id}).
@@ -117,7 +115,7 @@ foam.CLASS({
               add(c[1]).
             end().
           end();
-      }.bind(this)));
+      }));
     }
   ]
 });

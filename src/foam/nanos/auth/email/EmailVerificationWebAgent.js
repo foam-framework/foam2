@@ -20,6 +20,8 @@ foam.CLASS({
     'foam.nanos.notification.email.DAOResourceLoader',
     'foam.nanos.notification.email.EmailTemplate',
     'foam.nanos.notification.email.EmailTemplateEngine',
+    'foam.nanos.theme.Theme',
+    'foam.nanos.theme.Themes',
     'java.io.PrintWriter',
     'java.util.HashMap',
     'javax.servlet.http.HttpServletRequest',
@@ -55,7 +57,7 @@ foam.CLASS({
 
         TranslationService ts = (TranslationService) x.get("translationService");
         Subject subject = (Subject) x.get("subject");
-        String local = ((User) subject.getRealUser()).getLanguage().getCode().toString();
+        String local = user.getLanguage().getCode().toString();
         String translatedMsg = "";
 
         String             message          = ts.getTranslation(local, getClassInfo().getId()+ ".EMAIL_VERIFIED_SUCCESS", this.EMAIL_VERIFIED_SUCCESS);
@@ -86,8 +88,16 @@ foam.CLASS({
           message = translatedMsg + "<br>" + msg;
         } finally {
           EmailTemplateEngine templateEngine = (EmailTemplateEngine) x.get("templateEngine");
+          foam.nanos.theme.Theme theme = getTheme(x, user);
           HashMap args = new HashMap();
           args.put("msg", message);
+          if ( theme != null ) {
+            args.put("appName", theme.getAppName());
+          }
+          if ( user != null ) {
+            String url = user.findGroup(x).getAppConfig(x).getUrl();
+            args.put("logo", url + "/" + theme.getLogo());
+          }
           EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(
             x,
             "verify-email-link",
@@ -104,6 +114,22 @@ foam.CLASS({
             }
           }
         }
+      `
+    },
+    {
+      name: 'getTheme',
+      type: 'foam.nanos.theme.Theme',
+      args: [
+        { name: 'x', javaType: 'foam.core.X' },
+        { name: 'user', javaType: 'foam.nanos.auth.User' }
+      ],
+      javaCode: `
+        if ( user != null ) {
+          foam.core.X userX = x.put("subject", new Subject.Builder(x).setUser(user).build());
+          Theme theme = ((Themes) x.get("themes")).findTheme(userX);
+          return theme;
+        }
+        return null;
       `
     }
   ]

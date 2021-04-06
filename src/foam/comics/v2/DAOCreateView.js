@@ -56,7 +56,7 @@ foam.CLASS({
   ],
   exports: [
     'controllerMode',
-    'currentMemento as memento'
+    'currentMemento_ as memento'
   ],
   properties: [
     {
@@ -75,18 +75,18 @@ foam.CLASS({
       }
     },
     {
-      class: 'foam.u2.ViewSpecWithJava',
+      class: 'foam.u2.ViewSpec',
       name: 'viewView',
-      expression: function() {
-        return foam.u2.detail.SectionedDetailView;
+      factory: function() {
+        return this.config.createView;
       }
     },
     {
       class: 'String',
       name: 'mementoHead',
-      value: 'Create'
+      value: 'create'
     },
-    'currentMemento'
+    'currentMemento_'
   ],
   actions: [
     {
@@ -96,7 +96,7 @@ foam.CLASS({
       },
       code: function() {
         var cData = this.data;
-        
+
         this.config.dao.put(cData).then((o) => {
           this.data = o;
           this.finished.pub();
@@ -114,7 +114,7 @@ foam.CLASS({
           this.stack.back();
         }, (e) => {
           this.throwError.pub(e);
-          
+
           if ( e.exception && e.exception.userFeedback  ) {
             var currentFeedback = e.exception.userFeedback;
             while ( currentFeedback ) {
@@ -137,7 +137,7 @@ foam.CLASS({
       this.SUPER();
 
       if ( this.memento )
-        this.currentMemento$ = this.memento.tail$;
+        this.currentMemento_$ = this.memento.tail$;
 
       this
         .addClass(this.myClass())
