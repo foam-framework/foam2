@@ -96,7 +96,7 @@ This is the heart of Medusa.`,
       MedusaEntry entry = (MedusaEntry) obj;
       ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
       if ( replaying.getReplaying() ) {
-        getLogger().debug("put", replaying.getIndex(), replaying.getReplayIndex(), entry.toSummary(), "from", entry.getNode());
+        // getLogger().debug("put", replaying.getIndex(), replaying.getReplayIndex(), entry.toSummary(), "from", entry.getNode());
         if ( entry.getIndex() % 10000 == 0 ) {
           getLogger().info("put", replaying.getIndex(), replaying.getReplayIndex(), entry.toSummary(), "from", entry.getNode());
         }
@@ -400,12 +400,20 @@ This is the heart of Medusa.`,
               cls = ((foam.dao.MDAO) dao).getOf().getObjClass();
             } else {
               getLogger().error("mdao", entry.getIndex(), entry.getNSpecName(), dao.getClass().getSimpleName(), "Unable to determine class", data);
-              throw new RuntimeException("Error parsing data.");
+              Alarm alarm = new Alarm("Unknown class");
+              alarm.setClusterable(false);
+              alarm.setNote("Index: "+entry.getIndex()+"\\nNSpec: "+entry.getNSpecName());
+              alarm = (Alarm) ((DAO) x.get("alarmDAO")).put(alarm);
+              throw new MedusaException("Unknown class");
             }
             FObject nu = x.create(JSONParser.class).parseString(entry.getData(), cls);
             if ( nu == null ) {
               getLogger().error("Failed to parse", entry.getIndex(), entry.getNSpecName(), cls, entry.getData());
-              throw new RuntimeException("Error parsing data.");
+              Alarm alarm = new Alarm("Failed to parse");
+              alarm.setClusterable(false);
+              alarm.setNote("Index: "+entry.getIndex()+"\\nNSpec: "+entry.getNSpecName());
+              alarm = (Alarm) ((DAO) x.get("alarmDAO")).put(alarm);
+              throw new MedusaException("Failed to parse");
             }
 
             FObject old = dao.find_(x, nu.getProperty("id"));
@@ -418,11 +426,11 @@ This is the heart of Medusa.`,
               if ( tran == null ) {
                 getLogger().error("Failed to parse", entry.getIndex(), entry.getNSpecName(), cls, entry.getTransientData());
               } else {
-                // Explicitly copy only storageTransient to avoid copying defaults
                 var props = tran.getClassInfo().getAxiomsByClass(foam.core.PropertyInfo.class);
                 var i     = props.iterator();
                 while ( i.hasNext() ) {
                   foam.core.PropertyInfo prop = i.next();
+                  // Explicitly copy only storageTransient to avoid copying defaults
                   if ( prop.getStorageTransient() &&
                        ! prop.getClusterTransient() ) {
                     prop.set(nu, prop.get(tran));

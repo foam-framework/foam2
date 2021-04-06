@@ -23,9 +23,6 @@ It then marshalls it to the primary mediator, and waits on a response.`,
     'foam.dao.RemoveSink',
     'foam.lib.formatter.FObjectFormatter',
     'foam.lib.formatter.JSONFObjectFormatter',
-    'static foam.mlang.MLang.AND',
-    'static foam.mlang.MLang.EQ',
-    'static foam.mlang.MLang.NOT',
     'foam.log.LogLevel',
     'foam.nanos.alarming.Alarm',
     'foam.nanos.logger.PrefixLogger',
@@ -82,12 +79,9 @@ It then marshalls it to the primary mediator, and waits on a response.`,
     @Override
     protected JSONFObjectFormatter initialValue() {
       JSONFObjectFormatter formatter = new JSONFObjectFormatter();
-      formatter.setQuoteKeys(false); // default
-      formatter.setOutputShortNames(true); // default
-      formatter.setOutputDefaultValues(false);
-      formatter.setOutputClassNames(false); // default
-      formatter.setOutputDefaultClassNames(false); // default
-      formatter.setOutputReadableDates(false);
+      formatter.setOutputShortNames(true);
+      formatter.setOutputClassNames(false);
+      formatter.setOutputDefaultClassNames(false);
       formatter.setPropertyPredicate(
         new foam.lib.AndPropertyPredicate(new foam.lib.PropertyPredicate[] {
           new foam.lib.StoragePropertyPredicate(),
@@ -108,12 +102,9 @@ It then marshalls it to the primary mediator, and waits on a response.`,
     @Override
     protected JSONFObjectFormatter initialValue() {
       JSONFObjectFormatter formatter = new JSONFObjectFormatter();
-      formatter.setQuoteKeys(false); // default
-      formatter.setOutputShortNames(true); // default
-      formatter.setOutputDefaultValues(false);
+      formatter.setOutputShortNames(true);
       formatter.setOutputClassNames(false);
       formatter.setOutputDefaultClassNames(false);
-      formatter.setOutputReadableDates(false);
       formatter.setPropertyPredicate(
         new foam.lib.AndPropertyPredicate(new foam.lib.PropertyPredicate[] {
           new foam.lib.StorageTransientPropertyPredicate(),
@@ -216,15 +207,13 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       javaCode: `
       ClusterCommand cmd = new ClusterCommand(x, getNSpec().getName(), dop, obj);
       getLogger().debug("update", "secondary", dop, obj.getProperty("id"), "send");
-      // PM pm = PM.create(x, this.getClass().getSimpleName(), "secondary", "cmd");
-      PM pm = new PM(this.getClass().getSimpleName(), "secondary", "cmd");
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "secondary", "cmd");
       cmd = (ClusterCommand) getClientDAO().cmd_(x, cmd);
       pm.log(x);
       cmd.logHops(x);
       getLogger().debug("update", "secondary", dop, obj.getProperty("id"), "receive", cmd.getMedusaEntryId());
       if ( cmd.getMedusaEntryId() > 0 ) {
-        // pm = PM.create(x, this.getClass().getSimpleName(), "secondary", "registry", "wait");
-        pm = new PM(this.getClass().getSimpleName(), "secondary", "registry", "wait");
+        pm = PM.create(x, this.getClass().getSimpleName(), "secondary", "registry", "wait");
         MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
         registry.wait(x, (Long) cmd.getMedusaEntryId());
         pm.log(x);
@@ -287,8 +276,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       ],
       javaType: 'foam.core.FObject',
       javaCode: `
-      // PM pm = PM.create(x, this.getClass().getSimpleName(), "primary");
-      PM pm = new PM(this.getClass().getSimpleName(), "primary");
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "primary");
       ClusterCommand cmd = null;
       if ( obj instanceof ClusterCommand ) {
         cmd = (ClusterCommand) obj;
@@ -480,8 +468,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       ],
       type: 'FObject',
       javaCode: `
-      // PM pm = PM.create(x, this.getClass().getSimpleName(), "submit");
-      PM pm = new PM(this.getClass().getSimpleName(), "submit");
+      PM pm = PM.create(x, this.getClass().getSimpleName(), "submit");
       MedusaEntry entry = x.create(MedusaEntry.class);
       try {
         PM pmLink = new PM(this.getClass().getSimpleName(), "submit", "link");
