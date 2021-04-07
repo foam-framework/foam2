@@ -4044,6 +4044,111 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'NamedProperty',
+  extends: 'foam.mlang.AbstractExpr',
+  implements: [ 'foam.core.Serializable' ],
+
+  javaImports: [
+    'foam.core.ClassInfo',
+    'foam.core.FObject',
+    'foam.lib.parse.PStream',
+    'foam.lib.parse.ParserContext',
+    'foam.lib.parse.ParserContext',
+    'foam.lib.parse.ParserContextImpl',
+    'foam.lib.parse.StringPStream',
+    'foam.mlang.Constant',
+    'foam.parse.QueryParser',
+    'java.util.Map',
+    'java.util.concurrent.ConcurrentHashMap'
+  ],
+
+  axioms: [
+    foam.pattern.Multiton.create({property: 'propName'}),
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(
+          `
+  protected final static Map map__ = new ConcurrentHashMap();
+  public static NamedProperty create(String propName) {
+    NamedProperty p = (NamedProperty) map__.get(propName);
+
+    if ( p == null ) {
+      p = new NamedProperty();
+      p.setPropName(propName);
+      map__.put(propName, p);
+    }
+
+    return p;
+  }
+ `
+        );
+      }
+    }
+  ],
+
+  properties: [
+    {
+      class: 'Map',
+      name: 'specializations_',
+      factory: function() { return {}; },
+      javaFactory: 'return new java.util.concurrent.ConcurrentHashMap<ClassInfo, foam.mlang.Expr>();'
+    },
+    {
+      class: 'String',
+      name: 'propName'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      code: function(o) {
+        return this.specialization(o.model_);
+      },
+      javaCode: `
+        if ( ! ( obj instanceof FObject ) )
+          return false;
+
+        return specialization(((FObject)obj).getClassInfo()).f(obj);
+      `
+    },
+    {
+      name: 'specialization',
+      args: [ { name: 'model', type: 'ClassInfo' } ],
+      type: 'Predicate',
+      code: function(model) {
+        return this.specializations_[model.name] ||
+          ( this.specializations_[model.name] = this.specialize(model) );
+      },
+      javaCode: `
+        if ( getSpecializations_().get(model) == null ) getSpecializations_().put(model, specialize(model));
+        return (Predicate) getSpecializations_().get(model);
+      `
+    },
+    {
+      name: 'specialize',
+      args: [ { name: 'model', type: 'ClassInfo' } ],
+      type: 'Predicate',
+      code: function(model) {
+        for ( var i = 0; i < model.properties.length; i++  ) {
+        var prop = model.properties[i];
+          if ( this.propName == prop.name || this.propName == prop.name || this.propName == prop.name ) return prop;
+        }
+        return;
+      },
+      javaCode: `
+        return null;
+      `
+    },
+    function toString() {
+      return '(' + this.query + ')';
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
