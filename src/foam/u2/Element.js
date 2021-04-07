@@ -2552,7 +2552,7 @@ foam.CLASS({
       expression: function(label, labelFormatter) {
         return {
           class: 'foam.u2.CheckBox',
-          label: label,
+          label: this.help,
           labelFormatter: labelFormatter
         };
       }

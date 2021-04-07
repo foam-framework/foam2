@@ -588,12 +588,6 @@ foam.CLASS({
       view: { class: 'foam.u2.CheckBox', label: "Label goes here"}
     },
     {
-      class: 'Boolean',
-      name: 'mdCheckboxBoolean',
-      label: 'MD CheckBox',
-      view: { class: 'foam.u2.md.CheckBox' }
-    },
-    {
       class: 'String',
       name: 'htmlView',
       value: '<b>bold</b><br/><i>italic</i>',

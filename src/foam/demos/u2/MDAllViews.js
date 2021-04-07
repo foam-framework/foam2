@@ -443,7 +443,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'mdCheckboxBoolean',
       label: 'MD CheckBox',
-      view: { class: 'foam.u2.md.CheckBox' }
+      view: { class: 'foam.u2.CheckBox' }
     },
     {
       class: 'String',

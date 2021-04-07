@@ -19,7 +19,7 @@ foam.CLASS({
     'foam.nanos.column.ColumnConfigToPropertyConverter',
     'foam.nanos.column.CommonColumnHandler',
     'foam.nanos.column.TableColumnOutputter',
-    'foam.u2.md.CheckBox',
+    'foam.u2.CheckBox',
     'foam.u2.md.OverlayDropdown',
     'foam.u2.tag.Image',
     'foam.u2.view.EditColumnsView',
