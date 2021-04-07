@@ -1,6 +1,6 @@
 // admin
 p({"class":"foam.nanos.menu.Menu","id":"admin","label":"Admin","handler":{"class":"foam.nanos.menu.SubMenu"},"parent":""})
-p({"class":"foam.nanos.menu.Menu","id":"admin.all-views","label":"All Views","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"com.google.foam.demos.u2.AllViews"}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.all-views","label":"All Views","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.demos.u2.AllViews"}},"parent":"admin"})
 p({
   "class":"foam.nanos.menu.Menu",
   "id":"admin.countries",
