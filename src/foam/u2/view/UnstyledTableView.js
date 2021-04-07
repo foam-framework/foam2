@@ -473,7 +473,7 @@ foam.CLASS({
     },
     {
       name: 'rowsFrom',
-      code: function(dao) {
+      code: function(dao, top) {
         /**
          * Given a DAO, add a tbody containing the data from the DAO to the
          * table and return a reference to the tbody.
@@ -523,7 +523,11 @@ foam.CLASS({
             var nastedPropertyNamesAndItsIndexes = view.columnHandler.buildArrayOfNestedPropertyNamesAndCorrespondingIndexesInArray(propertyNamesToQuery);
 
             var tbodyElement = this.E();
-            tbodyElement.
+            tbodyElement.style({
+                position: 'absolute',
+                width: '100%',
+                top: top + 'px'
+              }).
               addClass(view.myClass('tbody'));
               valPromises.then(function(values) {
 

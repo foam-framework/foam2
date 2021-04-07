@@ -348,12 +348,7 @@
           var page = this.currentTopPage_ + i;
           if ( this.renderedPages_[page] ) continue;
           var dao = this.data$proxy.limit(this.pageSize).skip(page * this.pageSize);
-          var tbody = this.table_.slotE_(this.table_.rowsFrom(dao));
-          tbody.style({
-            position: 'absolute',
-            width: '100%',
-            top: this.TABLE_HEAD_HEIGHT + page * this.pageSize * this.rowHeight + 'px'
-          });
+          var tbody = this.table_.slotE_(this.table_.rowsFrom(dao, this.TABLE_HEAD_HEIGHT + page * this.pageSize * this.rowHeight));
           this.table_.add(tbody);
           this.renderedPages_[page] = tbody;
         }
