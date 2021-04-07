@@ -38,13 +38,13 @@ Columns: validation format, parsing format, example`,
           ["CRFF FFFF FFFF FFFF FFFF FF", "", "CR72 0123 0000 0171 5490 15"],
           ["CYFF FFFF FFFF AAAA AAAA AAAA AAAA", "CYkk bbbs ssss cccc cccc cccc cccc", "CY17 0020 0128 0000 0012 0052 7600"],
           ["CZFF FFFF FFFF FFFF FFFF FFFF", "", "CZ65 0800 0000 1920 0014 5399"],
-          ["DEFF FFFF FFFF FFFF FFFF FF", "DEkk bbbb bbbb cccc cccc cc", "DE89 3704 0044 0532 0130 00"],
+          ["DEFF FFFF FFFF FFFF FFFF FF", "DEkk ssss ssss cccc cccc cc", "DE89 3704 0044 0532 0130 00"],
           ["DKFF FFFF FFFF FFFF FF", "", "DK50 0040 0440 1162 43"],
           ["DOFF UUUU FFFF FFFF FFFF FFFF FFFF", "", "DO28 BAGR 0000 0001 2124 5361 1324"],
-          ["EEFF FFFF FFFF FFFF FFFF", "EEkk bbss cccc cccc cccx", "EE38 2200 2210 2014 5685"],
+          ["EEFF FFFF FFFF FFFF FFFF", "EEkk bbss cccc cccc cccx", "EE38 2200 2210 2014 5685"], // Estonia, check digit is appended to the accountNumber
           ["EGFF FFFF FFFF FFFF FFFF FFFF FFFF F", "", "EG80 0002 0001 5678 9012 3451 8000 2"],
-          ["ESFF FFFF FFFF FFFF FFFF FFFF", "ESkk bbbb ssss xxcc cccc cccc", "ES91 2100 0418 4502 0005 1332"],
-          ["FIFF FFFF FFFF FFFF FF", "FIkk bbbb bbcc cccc cx", "FI21 1234 5600 0007 85"],
+          ["ESFF FFFF FFFF FFFF FFFF FFFF", "ESkk bbbb ssss xccc cccc cccc", "ES91 2100 0418 4502 0005 1332"], // Spain, the first check digit goes to branch the second goes to accountNumber
+          ["FIFF FFFF FFFF FFFF FF", "FIkk ssss sscc cccc cx", "FI21 1234 5600 0007 85"],
           ["FOFF FFFF FFFF FFFF FF", "", "FO62 6460 0001 6316 34"],
           ["FRFF FFFF FFFF FFAA AAAA AAAA AFF", "FRkk bbbb bsss sscc cccc cccc cxx", "FR14 2004 1010 0505 0001 3M02 606"],
           ["GBFF UUUU FFFF FFFF FFFF FF", "GBkk bbbb ssss sscc cccc cc", "GB29 NWBK 6016 1331 9268 19"],
@@ -58,7 +58,7 @@ Columns: validation format, parsing format, example`,
           ["IEFF UUUU FFFF FFFF FFFF FF", "IEkk bbbb ssss sscc cccc cc", "IE29 AIBK 9311 5212 3456 78"],
           ["ILFF FFFF FFFF FFFF FFFF FFF", "", "IL62 0108 0000 0009 9999 999"],
           ["ISFF FFFF FFFF FFFF FFFF FFFF FF", "", "IS14 0159 2600 7654 5510 7303 39"],
-          ["ITFF UFFF FFFF FFFA AAAA AAAA AAA", "ITkk xbbb bbss sssc cccc cccc ccc", "IT60 X054 2811 1010 0000 0123 456"],
+          ["ITFF UFFF FFFF FFFA AAAA AAAA AAA", "ITkk xbbb bbss sssc cccc cccc ccc", "IT60 X054 2811 1010 0000 0123 456"], // Italy, don't include the check digit to the Iban checksum
           ["IQFF UUUU FFFA AAAA AAAA AAA", "", "IQ98 NBIQ 8501 2345 6789 012"],
           ["JOFF AAAA FFFF FFFF FFFF FFFF FFFF FF", "", "JO15 AAAA 1234 5678 9012 3456 7890 12"],
           ["KWFF UUUU AAAA AAAA AAAA AAAA AAAA AA", "", "KW81 CBKU 0000 0000 0000 1234 5601 01"],
@@ -81,14 +81,14 @@ Columns: validation format, parsing format, example`,
           ["PKFF UUUU AAAA AAAA AAAA AAAA", "", "PK36 SCBL 0000 0011 2345 6702"],
           ["PLFF FFFF FFFF FFFF FFFF FFFF FFFF", "", "PL61 1090 1014 0000 0712 1981 2874"],
           ["PSFF UUUU AAAA AAAA AAAA AAAA AAAA A", "", "PS92 PALS 0000 0000 0400 1234 5670 2"],
-          ["PTFF FFFF FFFF FFFF FFFF FFFF F", "PTkk bbbb ssss cccc cccc cccx x", "PT50 0002 0123 1234 5678 9015 4"],
+          ["PTFF FFFF FFFF FFFF FFFF FFFF F", "PTkk bbbb ssss cccc cccc cccx x", "PT50 0002 0123 1234 5678 9015 4"], // Portugal, check digits are appended to the accountNumber
           ["QAFF UUUU AAAA AAAA AAAA AAAA AAAA A", "", "QA30 AAAA 1234 5678 9012 3456 7890 1"],
           ["ROFF UUUU AAAA AAAA AAAA AAAA", "", "RO49 AAAA 1B31 0075 9384 0000"],
-          ["RSFF FFFF FFFF FFFF FFFF FF", "", "RS35 2600 0560 1001 6113 79"],
+          ["RSFF FFFF FFFF FFFF FFFF FF", "RSkk bbbc cccc cccc cccc xx", "RS35 2600 0560 1001 6113 79"], // Serbia, check digits are appended to the accountNumber
           ["SAFF FFAA AAAA AAAA AAAA AAAA", "", "SA03 8000 0000 6080 1016 7519"],
           ["SCFF UUUU FFFF FFFF FFFF FFFF FFFF UUU", "", "SC18 SSCB 1101 0000 0000 0000 1497 USD"],
           ["SEFF FFFF FFFF FFFF FFFF FFFF", "SEkk bbbc cccc cccc cccc cccc", "SE45 5000 0000 0583 9825 7466"],
-          ["SIFF FFFF FFFF FFFF FFF", "SIkk bbss sccc cccc cxx", "SI56 2633 0001 2039 086"],
+          ["SIFF FFFF FFFF FFFF FFF", "SIkk bbss sccc cccc cxx", "SI56 2633 0001 2039 086"], // Slovenia, check digits are appended to the accountNumber
           ["SKFF FFFF FFFF FFFF FFFF FFFF", "SKkk bbbb ssss sscc cccc cccc", "SK31 1200 0000 1987 4263 7541"],
           ["SMFF UFFF FFFF FFFA AAAA AAAA AAA", "", "SM86 U032 2509 8000 0000 0270 100"],
           ["STFF FFFF FFFF FFFF FFFF FFFF F", "", "ST68 0001 0001 0051 8453 1011 2"],
@@ -159,7 +159,7 @@ Columns: validation format, parsing format, example`,
     { name: 'LENGTH_MISMATCHED_1',  message: 'IBAN length mismatch for country code. Was expecting' },
     { name: 'LENGTH_MISMATCHED_2',  message: 'characters but found' },
     { name: 'INVALID_CHARACTER',    message: 'Invalid character at position' },
-    { name: 'INVALID_CHECKSUM',     message: 'IBAN country code mismatched' }
+    { name: 'INVALID_CHECKSUM',     message: 'Invalid IBAN checksum' }
   ],
 
   methods: [
@@ -284,7 +284,7 @@ Columns: validation format, parsing format, example`,
         let num = this.toNumber(iban);
         let checksum = this.mod(num, 97);
 
-        if ( checksum != 1 ) return `${this.INVALID_CHECKSUM} ${checksum}`;
+        if ( checksum != 1 ) return this.INVALID_CHECKSUM;
 
         return 'passed';
       },
@@ -301,7 +301,9 @@ Columns: validation format, parsing format, example`,
         if ( format == null ) throw new ValidationException(UNKNOWN_COUNTRY_CODE + cc);
 
         if ( iban.length() != format.length() + 2 )
-          throw new ValidationException(LENGTH_MISMATCHED_1 + (format.length() + 2) + LENGTH_MISMATCHED_2 + iban.length());
+          throw new ValidationException(
+            String.format("%s %d %s %d",
+              LENGTH_MISMATCHED_1, format.length() + 2, LENGTH_MISMATCHED_2, iban.length()));
 
         for ( int i = 0 ; i < format.length() ; i++ ) {
           if ( ! validateChar(format.charAt(i), iban.charAt(i+2) )) throw new ValidationException(INVALID_CHARACTER + (i+2));
@@ -310,7 +312,7 @@ Columns: validation format, parsing format, example`,
         String num = toNumber(iban);
         int checksum = mod(num, 97);
 
-        if ( checksum != 1 ) throw new ValidationException(INVALID_CHECKSUM + checksum);
+        if ( checksum != 1 ) throw new ValidationException(INVALID_CHECKSUM);
       `
     },
     {
@@ -459,7 +461,11 @@ Columns: validation format, parsing format, example`,
           return null;
         }
 
-        char[]        format             = ((String) temp[1]).replaceAll(" ","").trim().toCharArray();
+        char[] format = ((String) temp[1]).replaceAll(" ","").trim().toCharArray();
+        if ( iban.length() != format.length ) {
+          return null;
+        }
+
         StringBuilder previous           = null;
         StringBuilder bankCode           = new StringBuilder();
         StringBuilder branch             = new StringBuilder();
@@ -491,7 +497,6 @@ Columns: validation format, parsing format, example`,
               break;
             case 'k': // iban checksum
               ibanChecksum.append(next);
-              previous = ibanChecksum;
               break;
             case 'm': // currency code
               accountNumber.append(next);
@@ -507,7 +512,9 @@ Columns: validation format, parsing format, example`,
               accountType.append(next);
               break;
             case 'x': // add to previous
-              previous.append(next);
+              if ( previous != null )
+                previous.append(next);
+
               break;
             case '0': // Zero
               previous.append('0');
