@@ -41,11 +41,11 @@ foam.CLASS({
     ^:checked:after{
       position:relative;
       top:1;
-      content: url("images/checkmark-white.svg");
+      content: url("/images/checkmark-white.svg");
     }
     ^ input:focus + label::before {
       content: ''
-      box-shadow: 0 0 0 3px /*%PRIMARY2%*/ #ffbf47;     
+      box-shadow: 0 0 0 3px /*%PRIMARY2%*/ #ffbf47;
     }
     ^:hover {
       cursor: pointer
@@ -58,31 +58,32 @@ foam.CLASS({
   methods: [
     function initE() {
       this.SUPER();
-      this.setAttribute('type', 'checkbox');
-      this
-        .addClass(this.myClass())
-        .on('click', function() {
-          if ( this.getAttribute('disabled') ) return;
-          this.data = ! this.data;
-        }.bind(this));
 
       var self = this;
+
+      this
+        .setAttribute('type', 'checkbox')
+        .addClass(this.myClass())
+        .on('click', this.onClick);
 
       if ( this.showLabel ) {
         this.start('label')
           .addClass(this.myClass('label'))
           .addClass(this.myClass('noselect'))
+          .on('click', this.onClick)
           .callIfElse(this.labelFormatter,
             this.labelFormatter,
-            function() {
-              this.add(self.label$);
-          })
-          .on('click', function() {
-            if ( self.getAttribute('disabled') ) return;
-            this.data = ! this.data;
-          }.bind(this))
+            function() { this.add(self.label$); }
+          )
         .end();
       }
+    }
+  ],
+
+  listeners: [
+    function onClick() {
+      if ( this.getAttribute('disabled') ) return;
+      this.data = ! this.data;
     }
   ]
 });
