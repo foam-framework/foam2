@@ -13,6 +13,7 @@ foam.CLASS({
 
   methods: [
     function launch(X, menu) {
+      var self = this;
       X.stack.push(
         () => {
           // Set the menuId and call the menuListener so that the
