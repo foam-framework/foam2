@@ -19,6 +19,10 @@ foam.CLASS({
       display: grid;
     }
 
+    ^wrapper {
+      overflow-x: auto;
+    }
+
     ^ m3 {
       font-size: 16px;
       font-weight: bold;
@@ -242,6 +246,7 @@ foam.CLASS({
             foam.core.ConstantSlot.create({ value: null });
 
           return self.E()
+          .addClass(this.myClass('wrapper'))
             .start(self.Rows)
               .callIf(prop$label && prop.view.class != 'foam.u2.CheckBox', function() {
                 this.start('m3')
@@ -250,7 +255,7 @@ foam.CLASS({
                 .end();
               })
               .start()
-                .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
+                .style({ 'position': 'relative', 'width': '100%' })
                 .start()
                   .style({ 'flex-grow': 1, 'max-width': '100%' })
                   .callIf( prop.view.class == 'foam.u2.CheckBox', function() {
