@@ -85,9 +85,21 @@ The data of a MedusaEntry is the json delta of the original put or remove DAO op
       storageTransient: true
     },
     {
-      document: 'Stringified FObject',
+      document: 'Stringified FObject of non storageTransient properties',
       class: 'String',
       name: 'data',
+      visibility: 'RO',
+      view: {
+        class: 'foam.u2.tag.TextArea',
+        rows: 4,
+        cols: 144
+      }
+    },
+    {
+      document: 'Stringified FObject of only storageTransient properties',
+      class: 'String',
+      name: 'transientData',
+      storageTransient: true,
       visibility: 'RO',
       view: {
         class: 'foam.u2.tag.TextArea',
