@@ -29,9 +29,12 @@ foam.CLASS({
       class: 'String',
       name: 'stringValue',
       view: function(_, X) {
-        return X.data.slot(function(width) {
-          return foam.u2.TextField.create({size: width, data$: this.stringValue$, placeholder: width});
-        });
+        return {
+          class: 'foam.u2.TextField',
+          data$: this.stringValue$,
+          size$: this.width$,
+          placeholder$: this.width$
+        };
       }
     },
     {
@@ -48,14 +51,17 @@ foam.CLASS({
     {
       name: 'daysOfWeek',
       view: function(_, X) {
-        return X.data.slot(function(typeOfDays) {
-          var map = {
-            All: [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ],
-            'Week Days': [ 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday' ],
-            Weekends: [ 'Sunday', 'Saturday' ],
-          };
-          return foam.u2.view.ChoiceView.create({choices: map[typeOfDays], data$: this.daysOfWeek$});
-        });
+        var map = {
+          All: [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ],
+          'Week Days': [ 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday' ],
+          Weekends: [ 'Sunday', 'Saturday' ],
+        };
+
+        return {
+          class: 'foam.u2.view.ChoiceView',
+          choices$: this.typeOfDays.map(typeOfDays => map[typeOfDays]),
+          data$: this.daysOfWeek$
+        };
       }
     }
   ]
