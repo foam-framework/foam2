@@ -210,6 +210,12 @@ foam.CLASS({
       display: flex;
       align-items: center;
     }
+
+    ^CheckBoxWrapper {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
   `,
 
   requires: [
@@ -243,7 +249,7 @@ foam.CLASS({
 
           return self.E()
             .start(self.Rows)
-              .callIf(prop$label && prop.view.class != 'foam.u2.CheckBox', function() {
+              .callIf(prop$label, function() {
                 this.start('m3')
                   .add(prop.label)
                   .style({ 'line-height': '2' })
@@ -252,9 +258,10 @@ foam.CLASS({
               .start()
                 .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                 .start()
+                
                   .style({ 'flex-grow': 1, 'max-width': '100%' })
                   .callIf( prop.view.class == 'foam.u2.CheckBox', function() {
-                    this.style({ 'margin': '20px' });
+                    this.addClass(this.myClass('CheckBoxWrapper'));
                   })
                   .tag(prop, { mode$: self.mode$ })
                   .callIf(prop.validationStyleEnabled, function() {

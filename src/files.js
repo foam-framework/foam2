@@ -970,7 +970,6 @@ FOAM_FILES([
   { name: "foam/u2/layout/MDDAOUpdateController" },
   { name: "foam/u2/layout/MDStackView" },
   { name: "foam/u2/layout/MDDAOCreateController" },
-  { name: "foam/u2/md/CheckBox", flags: ['web'] },
   { name: "foam/u2/property/MDInput", flags: ['web'] },
   { name: "foam/u2/property/MDTextField", flags: ['web'] },
   { name: "foam/u2/property/MDCalendar", flags: ['web'] },
