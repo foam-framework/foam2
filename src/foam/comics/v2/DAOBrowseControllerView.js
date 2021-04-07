@@ -125,12 +125,25 @@ foam.CLASS({
       },
       code: function() {
         if ( ! this.stack ) return;
-        this.stack.push({
-          class: 'foam.comics.v2.DAOCreateView',
-          data: ((this.config.factory && this.config.factory$cls) ||  this.data.of).create({ mode: 'create'}, this),
-          config$: this.config$,
-          of: this.data.of
-        }, this.__subContext__);
+
+        if ( this.config.DAOCreateView ){
+          this.stack.push({
+            class: 'foam.comics.v2.DAOCreateView',
+            data: ((this.config.factory && this.config.factory$cls) ||  this.data.of).create({ mode: 'create'}, this),
+            config$: this.config$,
+            of: this.data.of
+          }, this.__subContext__);
+        } else {
+          this.stack.push(
+            eval(this.config.wizardDetailView.class).create({
+              model: this.data.of.id || this.config.of.id,
+              data: this.selection,
+              detailView: this.config.detailView.class,
+              menu: this.config.menu,
+              controllerMode: foam.u2.ControllerMode.CREATE,
+              isEdit: true
+          }, this.__subContext__));
+        }
       }
     }
   ],
@@ -142,7 +155,9 @@ foam.CLASS({
     var self = this;
     var menuId = this.currentMenu ? this.currentMenu.id : this.config.of.id;
     this.addClass(this.myClass())
-      .add(this.slot(function(data, config, config$of, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction) {
+    //.add(this.slot(function(data, config, config$of, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction) {
+
+      .add(this.slot(function(data, config, config$of, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction, config$createTitle) {
         return self.E()
           .start(self.Rows)
             .addClass(self.myClass('container'))
