@@ -155,8 +155,8 @@ foam.CLASS({
     var self = this;
     var menuId = this.currentMenu ? this.currentMenu.id : this.config.of.id;
     this.addClass(this.myClass())
-      .add(this.slot(function(data, config, config$of, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction) {
-      //.add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction, config$createTitle) {
+      //.add(this.slot(function(data, config, config$of, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction) {
+        .add(this.slot(function(data, config, config$browseBorder, config$browseViews, config$browseTitle, config$browseSubtitle, config$primaryAction, config$createTitle, config$of) {
         return self.E()
           .start(self.Rows)
             .addClass(self.myClass('container'))
@@ -167,9 +167,9 @@ foam.CLASS({
                     .addClass(self.myClass('browse-title'))
                     .translate(menuId + ".browseTitle", config$browseTitle)
                   .end()
-                  .startContext({ data: self })
-                    .tag(self.CREATE, { label: config$createTitle })
-                  .endContext()
+                  // .startContext({ data: self })
+                  //   .tag(self.CREATE, { label: config$createTitle })
+                  // .endContext()
                   .callIf(config$primaryAction, function() {
                     this.startContext({ data: self }).tag(config$primaryAction, { size: 'LARGE' }).endContext();
                   })
