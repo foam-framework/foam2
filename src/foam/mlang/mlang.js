@@ -4050,16 +4050,14 @@ foam.CLASS({
   extends: 'foam.mlang.AbstractExpr',
   implements: [ 'foam.core.Serializable' ],
 
+  documentation: `Stores propName as a property and returns property when f() is called.`,
+
   javaImports: [
     'foam.core.ClassInfo',
     'foam.core.FObject',
-    'foam.lib.parse.PStream',
-    'foam.lib.parse.ParserContext',
-    'foam.lib.parse.ParserContext',
-    'foam.lib.parse.ParserContextImpl',
-    'foam.lib.parse.StringPStream',
-    'foam.mlang.Constant',
-    'foam.parse.QueryParser',
+    'foam.core.PropertyInfo',
+    'foam.mlang.Expr',
+    'java.util.List',
     'java.util.Map',
     'java.util.concurrent.ConcurrentHashMap'
   ],
@@ -4094,7 +4092,7 @@ foam.CLASS({
       class: 'Map',
       name: 'specializations_',
       factory: function() { return {}; },
-      javaFactory: 'return new java.util.concurrent.ConcurrentHashMap<ClassInfo, foam.mlang.Expr>();'
+      javaFactory: 'return new java.util.concurrent.ConcurrentHashMap<ClassInfo, Expr>();'
     },
     {
       class: 'String',
@@ -4112,39 +4110,54 @@ foam.CLASS({
         if ( ! ( obj instanceof FObject ) )
           return false;
 
-        return specialization(((FObject)obj).getClassInfo()).f(obj);
+        return specialization(((FObject)obj).getClassInfo());
       `
     },
     {
       name: 'specialization',
       args: [ { name: 'model', type: 'ClassInfo' } ],
-      type: 'Predicate',
+      type: 'Expr',
       code: function(model) {
         return this.specializations_[model.name] ||
           ( this.specializations_[model.name] = this.specialize(model) );
       },
       javaCode: `
-        if ( getSpecializations_().get(model) == null ) getSpecializations_().put(model, specialize(model));
-        return (Predicate) getSpecializations_().get(model);
+        if ( getSpecializations_().get(model) == null ) {
+          Expr prop = specialize(model);
+          if ( prop != null ) getSpecializations_().put(model, specialize(model));
+        }
+        return (Expr) getSpecializations_().get(model);
       `
     },
     {
       name: 'specialize',
       args: [ { name: 'model', type: 'ClassInfo' } ],
-      type: 'Predicate',
+      type: 'Expr',
       code: function(model) {
         for ( var i = 0; i < model.properties.length; i++  ) {
         var prop = model.properties[i];
-          if ( this.propName == prop.name || this.propName == prop.name || this.propName == prop.name ) return prop;
+          if ( this.propName == prop.name || this.propName == prop.shortName || prop.aliases.includes(this.propName) ) return prop;
         }
         return;
       },
       javaCode: `
+        List<PropertyInfo> properties  = model.getAxiomsByClass(PropertyInfo.class);
+
+        for ( PropertyInfo prop : properties ) {
+          if ( prop.getName().equals(getPropName()) || prop.getShortName() != null && prop.getShortName().equals(getPropName()) ) return prop;
+
+          if ( prop.getAliases().length != 0 ) {
+            for ( int i = 0; i < prop.getAliases().length; i++) {
+              if ( getPropName().equals(prop.getAliases()[i]) ) return prop;
+            }
+          }
+        }
+
         return null;
       `
     },
     function toString() {
-      return '(' + this.query + ')';
+      return '(' + this.propName + ')';
     }
   ]
 });
