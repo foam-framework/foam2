@@ -31,9 +31,9 @@ foam.CLASS({
       view: function(_, X) {
         return {
           class: 'foam.u2.TextField',
-          data$: this.stringValue$,
-          size$: this.width$,
-          placeholder$: this.width$
+          data$: X.data.stringValue$,
+          size$: X.data.width$,
+          placeholder$: X.data.width$
         };
       }
     },
@@ -59,8 +59,8 @@ foam.CLASS({
 
         return {
           class: 'foam.u2.view.ChoiceView',
-          choices$: this.typeOfDays.map(typeOfDays => map[typeOfDays]),
-          data$: this.daysOfWeek$
+          choices$: X.data.typeOfDays$.map(typeOfDays => map[typeOfDays]),
+          data$: X.data.daysOfWeek$
         };
       }
     }

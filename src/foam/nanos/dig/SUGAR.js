@@ -180,7 +180,7 @@ foam.CLASS({
       view: function(_, X) {
         return {
           class: 'foam.u2.view.ChoiceView',
-          choices$: this.serviceKey.map(serviceKey => {
+          choices$: X.data.serviceKey$.map(serviceKey => {
             var service = this.__context__[serviceKey];
 
             if ( ! service ) return;
@@ -195,7 +195,7 @@ foam.CLASS({
             
             return methods.map(m => m.name).sort();
           }),
-          data$: this.method$
+          data$: X.data.method$
         };
       },
       postSet: function(old, nu) {
