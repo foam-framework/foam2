@@ -61,7 +61,7 @@ foam.CLASS({
         return {
           class: 'foam.u2.TextField',
           mode: foam.u2.DisplayMode.RO,
-          data$: this.result.map(result => { return result ? result : ''; })
+          data$: X.data.result$.map(result => { return result ? result : ''; })
         };
       }
     },
