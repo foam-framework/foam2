@@ -120,7 +120,7 @@ var classes = [
   'foam.nanos.app.AppConfig',
   'foam.nanos.app.ContextLookupAppConfigService',
   'foam.nanos.http.WebAgent',
-  'com.google.foam.demos.heroes.Hero',
+  'foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
   'foam.box.RemoteException',
   'foam.box.RPCMessage',
