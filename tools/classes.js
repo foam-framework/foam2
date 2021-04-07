@@ -120,7 +120,7 @@ var classes = [
   'foam.nanos.app.AppConfig',
   'foam.nanos.app.ContextLookupAppConfigService',
   'foam.nanos.http.WebAgent',
-  'com.google.foam.demos.heroes.Hero',
+  'foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
   'foam.box.RemoteException',
   'foam.box.RPCMessage',
@@ -434,6 +434,7 @@ var classes = [
   'foam.nanos.medusa.MedusaTestingDAO',
   'foam.nanos.medusa.MedusaUniqueDAO',
   'foam.nanos.medusa.MedusaType',
+  'foam.nanos.medusa.PrimaryNotFoundException',
   'foam.nanos.medusa.PromotedPurgeAgent',
   'foam.nanos.medusa.PurgeSink',
   'foam.nanos.medusa.RegionStatus',
@@ -542,7 +543,6 @@ var classes = [
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
   'foam.dao.FixedSizeDAO',
-  'foam.mop.MOP',
   'foam.nanos.export.ClientGoogleSheetsExportService',
   'foam.nanos.export.ExportDriverRegistry',
   'foam.nanos.export.GoogleSheetsBasedExportDriver',
@@ -916,7 +916,6 @@ var abstractClasses = [
 
 var skeletons = [
   'foam.dao.DAO',
-  'foam.mop.MOP',
   'foam.nanos.app.AppConfigService',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.AgentAuthService',
@@ -942,7 +941,6 @@ var skeletons = [
 var proxies = [
   'foam.dao.DAO',
   'foam.dao.Sink',
-  'foam.mop.MOP',
   'foam.lib.Outputter',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',

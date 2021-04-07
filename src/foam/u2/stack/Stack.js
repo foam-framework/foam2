@@ -91,13 +91,14 @@ foam.CLASS({
       this.stack_[pos] = [v, parent, opt_id];
       this.pos = pos;
     },
+
     function deleteMemento(mementoToDelete) {
       /** setting the last not null memento in memento chain to null to update application controller memento value on stack.back **/
       var m = this.memento;
-      if ( ! m )
-        return;
+      if ( ! m ) return;
+
       var tail = this.memento.tail;
-      
+
       if ( tail == null ) {
         this.memento.value$.set('');
         return;

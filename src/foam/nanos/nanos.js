@@ -207,6 +207,7 @@ FOAM_FILES([
   { name: 'foam/nanos/medusa/MedusaUniqueDAO' },
   { name: 'foam/nanos/medusa/MedusaType' },
   { name: 'foam/nanos/medusa/NodeCView' },
+  { name: 'foam/nanos/medusa/PrimaryNotFoundException' },
   { name: 'foam/nanos/medusa/PromotedPurgeAgent' },
   { name: 'foam/nanos/medusa/PurgeSink' },
   { name: 'foam/nanos/medusa/RegionCView' },
@@ -542,8 +543,8 @@ FOAM_FILES([
   // google
   { name: "foam/nanos/geocode/GoogleMapsCredentials" },
 
-  { name: "com/google/foam/demos/u2/AllViews" },
-  { name: "com/google/foam/demos/u2/MDAllViews" },
+  { name: "foam/demos/u2/AllViews" },
+  { name: "foam/demos/u2/MDAllViews" },
 
   //IBAN
   { name: "foam/nanos/iban/IBANInfo" },

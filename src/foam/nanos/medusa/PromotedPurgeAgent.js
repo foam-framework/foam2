@@ -123,7 +123,7 @@ foam.CLASS({
         );
         Count count = (Count) dao.select(COUNT());
         if ( count.getValue() > 0 ) {
-          getLogger().info("purging", count.getValue());
+          getLogger().debug("purging", count.getValue());
           dao.select(new PurgeSink(x, new foam.dao.RemoveSink(x, dao)));
         }
       } catch ( Throwable t ) {
