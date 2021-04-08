@@ -19,10 +19,6 @@ foam.CLASS({
       display: grid;
     }
 
-    ^wrapper {
-      overflow-x: auto;
-    }
-
     ^ m3 {
       font-size: 16px;
       font-weight: bold;
@@ -261,7 +257,7 @@ foam.CLASS({
                 .end();
               })
               .start()
-                .style({ 'position': 'relative', 'width': '100%' })
+                .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                 .start()
                 
                   .style({ 'flex-grow': 1, 'max-width': '100%' })
@@ -274,23 +270,9 @@ foam.CLASS({
                   })
                 .end()
                 .callIf(prop.help, function() {
-                  this.start()
-                    .addClass(self.myClass('tooltip'))
+                  this.start('', { tooltip: prop.help })
                     .start({class: 'foam.u2.tag.Image', data: '/images/question-icon.svg'})
                       .addClass(self.myClass('helper-icon'))
-                    .end()
-
-                    .start()
-                      .addClass(self.myClass('tooltip-container'))
-                      .start()
-                        .addClass(self.myClass('helper-text'))
-                        .start('p')
-                          .add(prop.help)
-                        .end()
-                      .end()
-                      .start()
-                        .addClass(self.myClass('arrow-right'))
-                      .end()
                     .end()
                   .end();
                 })
