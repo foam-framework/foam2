@@ -169,9 +169,9 @@
       DAO dao  = (DAO)x.get(daoId);
       if ( dao == null ) return -1;
       int recordsInserted = 0;
-      for ( FObject obj: objs ) {
+      for ( int i = 0; i < objs.size(); i++ ) {
         try {
-          dao.put(obj);
+          objs.set(i, dao.put(objs.get(i)));
           recordsInserted++;
         } catch ( Throwable t ) {
           Logger logger = (Logger) x.get("logger");
