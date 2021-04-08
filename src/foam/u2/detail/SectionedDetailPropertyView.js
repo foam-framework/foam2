@@ -17,6 +17,7 @@ foam.CLASS({
     ^ {
       /* Add for fixing UI issue in Safari */
       display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(0,1fr));
     }
 
     ^ m3 {
