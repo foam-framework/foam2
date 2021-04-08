@@ -133,7 +133,7 @@ foam.CLASS({
                 .add(ucj.status.label)
                 .on('click', function() {
                   var menu = 'admin.data';
-                  var dao = 'userCapabilityJunctionDAO::::::::::::::::::::::::view';
+                  var dao = 'userCapabilityJunctionDAO::::::::::::::::::::::view';
                   self.memento.value = [menu, dao, ucj.id].join(foam.nanos.controller.Memento.SEPARATOR);
                 })
               .end()
