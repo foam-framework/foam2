@@ -111,8 +111,8 @@ foam.CLASS({
             .add(capability.id)
             .on('click', function() {
               var menu = 'admin.data';
-              var dao = self.calculateMemento.call(self, 'capabilityDAO');//::::::::::::::::::::::::view';//"capabilityDAO::::::::::::::view"
-              self.memento.value = [menu, dao, capability.id].join(foam.nanos.controller.Memento.SEPARATOR);
+              var calculatedPreRecordViewMemento = self.calculateMemento.call(self, 'capabilityDAO');
+              self.memento.value = [menu, calculatedPreRecordViewMemento, capability.id].join(foam.nanos.controller.Memento.SEPARATOR);
             })
           .end()
           .callIf(ucj !== null, function () {
@@ -133,8 +133,8 @@ foam.CLASS({
                 .add(ucj.status.label)
                 .on('click', function() {
                   var menu = 'admin.data';
-                  var dao = self.calculateMemento.call(self, 'userCapabilityJunctionDAO');//'userCapabilityJunctionDAO::::::::::::::::::::::view';
-                  self.memento.value = [menu, dao, ucj.id].join(foam.nanos.controller.Memento.SEPARATOR);
+                  var calculatedPreRecordViewMemento = self.calculateMemento.call(self, 'userCapabilityJunctionDAO');
+                  self.memento.value = [menu, calculatedPreRecordViewMemento, ucj.id].join(foam.nanos.controller.Memento.SEPARATOR);
                 })
               .end()
               ;
