@@ -38,14 +38,20 @@ public class SubX extends ProxyX {
 
   @Override
   public X put(Object key, Object value) {
-    getX().put(key, value);
-    return this;
+    if ( getX() instanceof ProxyX ) {
+      getX().put(key, value);
+      return this;
+    }
+    return new SubX(root_, parent_).put(key, value);
   }
 
   @Override
   public X putFactory(Object key, XFactory factory) {
-    getX().putFactory(key, factory);
-    return this;
+    if ( getX() instanceof ProxyX ) {
+      getX().putFactory(key, factory);
+      return this;
+    }
+    return new SubX(root_, parent_).putFactory(key, factory);
   }
 
   @Override
