@@ -323,7 +323,7 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
         // Support hierarchical SPID context
         var subX = rtn.cd(user.getSpid());
         if ( subX != null ) {
-          rtn = subX;
+          rtn = reset(subX);
         }
         rtn = rtn
           .put("subject", subject)
