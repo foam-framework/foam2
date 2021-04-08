@@ -357,13 +357,16 @@ foam.CLASS({
         rows: 8, cols: 80,
       }
     },
+    /*
     {
       class: 'Date',
       name: 'defaultDate'
     },
+    */
     {
       class: 'Date',
       name: 'dateRWAndRO',
+      factory: function() { return new Date(); },
       view: {
         class: 'foam.u2.MultiView',
         views: [

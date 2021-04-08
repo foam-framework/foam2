@@ -27,17 +27,28 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.SUPER();
       this.setAttribute('type', 'date');
       this.setAttribute('max', '9999-12-31');
       this.setAttribute('placeholder', this.DATE_FORMAT);
+
+      this.SUPER();
+
       // Scroll listener needed because DateView generates scroll event
       // in some foreign locales which conflicts with ScrollWizard.
       this.on('scroll', (e) => { e.preventDefault(); e.stopPropagation(); });
     },
 
     function link() {
-      this.onDetach(this.data$.linkTo(this.attrSlot('valueAsDate')));
+      this.onDetach(this.data$.relateTo(
+        this.attrSlot('value'),
+        function(date) {
+          if ( foam.Number.isInstance(date) ) date = new Date(date);
+          return date ? date.toISOString().substring(0,10) : '';
+        },
+        function(value) {
+          return value ? Date.parse(value) : null;
+        }
+      ));
     }
   ]
 });
