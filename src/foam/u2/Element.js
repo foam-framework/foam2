@@ -717,8 +717,7 @@ foam.CLASS({
       `,
       name: 'PSEDO_ATTRIBUTES',
       value: {
-        valueAsDate: true,
-        value: true,
+        value:   true,
         checked: true
       }
     },
@@ -2143,8 +2142,9 @@ foam.CLASS({
           var value = attr.value;
 
           if ( value !== false ) {
-            out(' ', name);
-            out('="', foam.String.isInstance(value) ? value.replace(/"/g, '&quot;') : value, '"');
+            out(' ', name, '="');
+            out(foam.String.isInstance(value) ? value.replace(/"/g, '&quot;') : value);
+            out('"');
           }
         }
       }
