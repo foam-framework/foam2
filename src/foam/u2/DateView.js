@@ -39,16 +39,25 @@ foam.CLASS({
     },
 
     function link() {
-      this.onDetach(this.data$.relateTo(
-        this.attrSlot('value'),
-        function(date) {
-          if ( foam.Number.isInstance(date) ) date = new Date(date);
-          return date ? date.toISOString().substring(0,10) : '';
-        },
-        function(value) {
-          return value ? Date.parse(value) : null;
-        }
-      ));
+      var self = this;
+      var slot = this.attrSlot();
+
+      var date = this.data;
+
+      function updateSlot() {
+        date = self.data;
+        if ( foam.Number.isInstance(date) ) date = new Date(date);
+        slot.set(date ? date.toISOString().substring(0,10) : '');
+      }
+
+      updateSlot();
+
+      this.on('blur', () => {
+        var value = slot.get();
+        this.data = value && Date.parse(value);
+      });
+
+      this.onDetach(this.data$.sub(updateSlot));
     }
   ]
 });
