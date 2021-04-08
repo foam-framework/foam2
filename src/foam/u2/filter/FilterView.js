@@ -48,28 +48,31 @@ foam.CLASS({
     }
 
     ^container-drawer {
-      max-height: 0;
-      overflow: hidden;
-
-      transition: all 0.24s linear;
-
-      display: flex;
-
       border: 1px solid transparent;
       border-radius: 5px;
+      display: flex;
+      max-height: 0;
+      overflow: hidden;
+      transition: all 0.24s linear;
+      -webkit-transition: all 0.24s linear;
+      -moz-transition: all 0.24s linear;
     }
 
     ^container-drawer-open {
+      align-items: center;
       border-color: #cbcfd4;
       margin-top: 24px;
-      max-height: 500px;
+      max-height: -webkit-fill-available;
+      max-height:-moz-available;
+      overflow: auto;
+      padding: 24px;
     }
 
     ^container-filters {
-      display: flex;
-      flex: 1;
-      flex-wrap: wrap;
-      align-items: center;
+      display: grid;
+      grid-gap: 24px 16px;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 3fr));
+      width: 100%;
     }
 
     ^general-field {
@@ -143,14 +146,14 @@ foam.CLASS({
     }
 
     ^link-mode.clear {
-      color: red;
-      margin: 24px 16px;
+      align-self: center;
+      color: /*%DESTRUCTIVE3%*/ red;
       flex-shrink: 0;
-      align-self: flex-start;
+      margin-right: 0;
     }
 
     ^link-mode.clear:hover {
-      color: darkred;
+      color: /*%DESTRUCTIVE1%*/ darkred;
     }
 
     ^message-advanced {
