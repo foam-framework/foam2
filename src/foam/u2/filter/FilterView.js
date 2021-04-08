@@ -71,7 +71,7 @@ foam.CLASS({
     ^container-filters {
       display: grid;
       grid-gap: 24px 16px;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 3fr));
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       width: 100%;
     }
 
