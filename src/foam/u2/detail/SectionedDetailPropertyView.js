@@ -246,7 +246,7 @@ foam.CLASS({
             foam.core.ConstantSlot.create({ value: null });
 
           return self.E()
-          .addClass(this.myClass('wrapper'))
+            .addClass(this.myClass('wrapper'))
             .start(self.Rows)
               .callIf(prop$label && prop.view.class != 'foam.u2.CheckBox', function() {
                 this.start('m3')
