@@ -521,6 +521,8 @@ FOAM_FILES([
   { name: 'foam/nanos/crunch/extra/ReviewCapabilityData' },
   { name: 'foam/nanos/crunch/extra/ReviewWizard' },
   { name: 'foam/nanos/crunch/extra/ImplyReviewedAction' },
+  //test
+  { name: 'foam/nanos/crunch/test/CrunchTestSupport' },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },

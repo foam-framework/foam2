@@ -59,6 +59,10 @@ abstract class AbstractX
     return ((FacetManager)get("facetManager")).create(type, args, this);
   }
 
+  public X cd(String path) {
+    return cd(this, path);
+  }
+
   public void append(StringBuilder sb) {
     sb.append("[context]");
   }
