@@ -50,7 +50,10 @@ foam.CLASS({
     ^:hover {
       cursor: pointer
     }
-    span, input[type='checkbox']{
+    ^ input[type='checkbox']{
+      vertical-align:middle;
+    }
+    ^label > span{
       vertical-align:middle;
     }
     `,
