@@ -122,7 +122,7 @@ public abstract class AbstractFObjectPropertyInfo
 
   @Override
   public void validateObj(X x, FObject obj) {
-    if ( isSet(obj) && getRequired()) {
+    if ( isSet(obj) && getRequired() ) {
       var value = get(obj);
       if ( value != null ) {
         ((FObject) value).validate(x);
