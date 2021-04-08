@@ -111,7 +111,7 @@ foam.CLASS({
             .add(capability.id)
             .on('click', function() {
               var menu = 'admin.data';
-              var dao = 'capabilityDAO::::::::::::::::::::::::view';
+              var dao = self.calculateMemento.call(self, 'capabilityDAO');//::::::::::::::::::::::::view';//"capabilityDAO::::::::::::::view"
               self.memento.value = [menu, dao, capability.id].join(foam.nanos.controller.Memento.SEPARATOR);
             })
           .end()
@@ -133,7 +133,7 @@ foam.CLASS({
                 .add(ucj.status.label)
                 .on('click', function() {
                   var menu = 'admin.data';
-                  var dao = 'userCapabilityJunctionDAO::::::::::::::::::::::view';
+                  var dao = self.calculateMemento.call(self, 'userCapabilityJunctionDAO');//'userCapabilityJunctionDAO::::::::::::::::::::::view';
                   self.memento.value = [menu, dao, ucj.id].join(foam.nanos.controller.Memento.SEPARATOR);
                 })
               .end()
@@ -141,6 +141,44 @@ foam.CLASS({
           })
         .end()
         ;
+    },
+    function calculateMemento(daoName) {
+      var dao = this.__context__[daoName];
+      var of = dao && dao.of;
+
+      var count = 5;//as there one memento for controller view, one for search, one for scroll record and one for table columns and the next memento is "free"
+
+      //number of filters calculation
+      if ( of ) {
+        var columns = of.getAxiomByName('searchColumns');
+        columns = columns && columns.columns;
+        if ( ! columns ) {
+          columns = of.getAxiomByName('tableColumns');
+          columns = columns && columns.columns;
+        }
+  
+        if ( columns ) {
+          columns = columns.filter(function(c) {
+            var axiom = of.getAxiomByName(c);
+            return axiom && axiom.searchView;
+          });
+        } else {
+          columns =  of.getAxiomsByClass(foam.core.Property)
+          .filter((prop) => prop.searchView && ! prop.hidden)
+          .map(foam.core.Property.NAME.f);
+        }
+
+        count += columns.length;
+      }
+      
+      var mementoValue = daoName;
+      while ( count > 0 ) {
+        mementoValue += foam.nanos.controller.Memento.SEPARATOR;
+        count--;
+      }
+      mementoValue += 'view';
+
+      return mementoValue;
     }
   ]
 });
