@@ -49,7 +49,7 @@ foam.CLASS({
       border-radius: 50%;
       border-style: solid;
       border-width: 2px;
-      border-color: /*%GRAY3%*/ gray;
+      border-color: /*%GREY2%*/ gray;
       background: transparent;
     }
     ^ input[type='radio']+ label:after{
