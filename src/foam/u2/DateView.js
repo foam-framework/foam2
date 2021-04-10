@@ -35,26 +35,34 @@ foam.CLASS({
 
       // Scroll listener needed because DateView generates scroll event
       // in some foreign locales which conflicts with ScrollWizard.
-      this.on('scroll', (e) => { e.preventDefault(); e.stopPropagation(); });
+      this.on('scroll', e => { e.preventDefault(); e.stopPropagation(); });
+
+      this.on('focus',  e => { console.log('focus', e); });
+      this.on('blur',   e => { console.log('blur', e); });
+      this.on('input',  e => { console.log('input', e); });
+      this.on('change', e => { console.log('change', e); });
+      this.on('beforeinput', e => { console.log('beforeinput', e); });
     },
 
     function link() {
       var self = this;
       var slot = this.attrSlot();
 
-      var date = this.data;
-
       function updateSlot() {
-        date = self.data;
+        var date = self.data;
         if ( foam.Number.isInstance(date) ) date = new Date(date);
-        slot.set(date ? date.toISOString().substring(0,10) : '');
+        if ( ! date || date.getTime() == 0 ) {
+          slot.set('');
+        } else {
+          slot.set(date ? date.toISOString().substring(0,10) : '');
+        }
       }
 
       updateSlot();
 
       this.on('blur', () => {
         var value = slot.get();
-        this.data = value && Date.parse(value);
+        this.data = value ? Date.parse(value) : new Date(0);
       });
 
       this.onDetach(this.data$.sub(updateSlot));

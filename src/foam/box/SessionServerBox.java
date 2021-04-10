@@ -111,9 +111,6 @@ public class SessionServerBox
       if ( session == null ) {
         session = new Session((X) getX().get(Boot.ROOT));
         session.setId(sessionID == null ? "anonymous" : sessionID);
-        // non-clustered until we can determine priviledge of user.
-        // this allows admin to login to a medusa cluster before replay is complete.
-        session.setClusterable(false);
         session = (Session) sessionDAO.put(session);
       }
       if ( req != null ) {
