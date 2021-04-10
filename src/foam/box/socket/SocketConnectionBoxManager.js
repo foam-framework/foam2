@@ -29,10 +29,9 @@ foam.CLASS({
     'java.net.SocketAddress',
     'java.net.SocketException',
     'java.net.SocketTimeoutException',
-    'javax.net.ssl.SSLSocket',
-    'javax.net.ssl.SSLSocketFactory',
     'javax.net.ssl.SSLContext',
-    'javax.net.ssl.SSLSocket'
+    'javax.net.ssl.SSLSocket',
+    'javax.net.ssl.SSLSocketFactory'
   ],
 
   properties: [
