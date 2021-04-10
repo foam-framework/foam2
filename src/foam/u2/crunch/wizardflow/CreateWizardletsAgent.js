@@ -47,8 +47,10 @@ foam.CLASS({
       var rootWizardlet = this.getWizardlet(capabilityDesired);
       var beforeWizardlet = this.getWizardlet(capabilityDesired, true);
 
-      if ( beforeWizardlet )
+      if ( beforeWizardlet ){
         beforeWizardlet.isAvailable$.follow(rootWizardlet.isAvailable$);
+        rootWizardlet.data$ = beforeWizardlet.data$;
+      }
 
       var addPrerequisite = (wizardlet) => {
         var defaultPrerequisiteHandling = true;

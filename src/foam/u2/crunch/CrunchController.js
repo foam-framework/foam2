@@ -137,10 +137,11 @@ foam.CLASS({
         return this.createWizardSequence(capable.capabilityIds[0], x)
           .reconfigure('LoadCapabilitiesAgent', {
             waoSetting: this.LoadCapabilitiesAgent.WAOSetting.CAPABLE })
-          .addBefore('SkipGrantedAgent',this.ShowPreexistingAgent)
+          .remove('SkipGrantedAgent')
           .remove('CheckRootIdAgent')
           .remove('CheckPendingAgent')
           .remove('CheckNoDataAgent')
+          .addBefore('RequirementsPreviewAgent',this.ShowPreexistingAgent)
           .add(this.MaybeDAOPutAgent)
           ;
       }
