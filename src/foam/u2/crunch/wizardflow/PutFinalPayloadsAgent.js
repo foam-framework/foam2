@@ -38,7 +38,6 @@ foam.CLASS({
         filteredWizard => {
           return filteredWizard.save()
             .then((data) => {
-              this.crunchService.pub('updateJunction');
               return Promise.resolve();
             })
         }
