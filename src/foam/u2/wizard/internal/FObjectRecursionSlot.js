@@ -53,6 +53,11 @@ foam.CLASS({
         ];
       }
     },
+    {
+      name: 'excludeProperties',
+      class: 'StringArray',
+      factory: () => []
+    },
     'cleanup_', // detachable to cleanup old subs when obj changes
   ],
 
@@ -87,6 +92,7 @@ foam.CLASS({
 
       for ( let prop of props ) {
         if ( this.excludeAxioms.some(v => prop.cls_.id == v) ) continue;
+        if ( this.excludeProperties.some(v => prop.name == v) ) continue;
         let prop$ = prop.toSlot(o);
         if ( foam.core.FObjectProperty.isInstance(prop) ) {
           if ( this.parentRefs.includes(prop$) ) continue;
