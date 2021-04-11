@@ -24,6 +24,7 @@ foam.CLASS({
     'foam.u2.wizard.WizardletIndicator',
     'foam.u2.wizard.WizardletSection',
     'foam.u2.wizard.WAO',
+    'foam.u2.wizard.ProxyWAO',
     'foam.u2.wizard.internal.FObjectRecursionSlot',
     'foam.u2.wizard.internal.WizardletAutoSaveSlot'
   ],
@@ -127,7 +128,7 @@ foam.CLASS({
       of: 'foam.u2.wizard.WAO',
       flags: ['web'],
       factory: function () {
-        this.WAO.create();
+        this.ProxyWAO.create();
       }
     },
     {
