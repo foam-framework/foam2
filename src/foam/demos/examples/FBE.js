@@ -64,7 +64,27 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.demos.examples',
-  name: 'CodeReadWriteView',
+  name: 'CodeView',
+  extends: 'foam.u2.tag.TextArea',
+
+  properties: [
+    [ 'cols', 120 ]
+  ],
+
+  methods: [
+    function initE() {
+      this.SUPER();
+      var updateRows = () => this.setAttribute('rows', Math.max(4, this.data.split('\n').length+2));
+      this.data$.sub(updateRows);
+      updateRows();
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.demos.examples',
+  name: 'TextView',
   extends: 'foam.u2.ReadWriteView',
 
   methods: [
@@ -205,7 +225,7 @@ foam.CLASS({
       name: 'text',
       adapt: function(_, text) { return text.trim(); },
       documentation: 'Description of the script.',
-      view: 'foam.demos.examples.CodeReadWriteView'
+      view: 'foam.demos.examples.TextView'
     },
     {
       class: 'Code',
@@ -217,7 +237,7 @@ foam.CLASS({
         var end   = s.lastIndexOf('}');
         return ( start >= 0 && end >= 0 ) ? s.substring(start + 2, end) : '';
       },
-      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 120 }
+      view: 'foam.demos.examples.CodeView'
     }
   ],
 
