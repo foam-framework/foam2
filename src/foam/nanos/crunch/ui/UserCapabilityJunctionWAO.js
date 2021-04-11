@@ -32,6 +32,7 @@ foam.CLASS({
 
   methods: [
     function save(wizardlet) {
+      if ( wizardlet.loading ) return;
       if ( ! wizardlet.isAvailable ) return Promise.resolve();
       var wData = wizardlet.data ? wizardlet.data.clone() : null;
       wizardlet.loading = true;
@@ -76,7 +77,10 @@ foam.CLASS({
       wizardlet.status = ucj.status;
 
       // No 'of'? No problem
-      if ( ! wizardlet.of ) return;
+      if ( ! wizardlet.of ) {
+        wizardlet.loading = false;
+        return;
+      }
 
       // Load UCJ data to wizardlet
       var loadedData = wizardlet.of.create({}, wizardlet);
