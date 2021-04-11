@@ -32,7 +32,7 @@ foam.CLASS({
 
   methods: [
     function save(wizardlet) {
-      if ( wizardlet.loading ) return;
+      if ( wizardlet.loading ) return Promise.resolve();
       if ( ! wizardlet.isAvailable ) return Promise.resolve();
       var wData = wizardlet.data ? wizardlet.data.clone() : null;
       wizardlet.loading = true;
@@ -43,7 +43,6 @@ foam.CLASS({
         wizardlet.capability.id, wData, null
       );
       return p.then((ucj) => {
-        this.crunchService.pub('grantedJunction');
         if ( wizardlet.reloadAfterSave ) this.load_(wizardlet, ucj);
         else {
           wizardlet.status = ucj.status;
@@ -56,7 +55,6 @@ foam.CLASS({
       return this.crunchService.updateJunction( null,
         wizardlet.capability.id, null, null
       ).then((ucj) => {
-        this.crunchService.pub('updateJunction');
         return ucj;
       });
     },

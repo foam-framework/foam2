@@ -37,11 +37,13 @@ foam.CLASS({
       // in some foreign locales which conflicts with ScrollWizard.
       this.on('scroll', e => { e.preventDefault(); e.stopPropagation(); });
 
+/*
       this.on('focus',  e => { console.log('focus', e); });
       this.on('blur',   e => { console.log('blur', e); });
       this.on('input',  e => { console.log('input', e); });
       this.on('change', e => { console.log('change', e); });
       this.on('beforeinput', e => { console.log('beforeinput', e); });
+      */
     },
 
     function link() {
@@ -51,7 +53,7 @@ foam.CLASS({
       function updateSlot() {
         var date = self.data;
         if ( foam.Number.isInstance(date) ) date = new Date(date);
-        if ( ! date || date.getTime() == 0 ) {
+        if ( ! date ) {
           slot.set('');
         } else {
           slot.set(date ? date.toISOString().substring(0,10) : '');
@@ -62,7 +64,7 @@ foam.CLASS({
 
       this.on('blur', () => {
         var value = slot.get();
-        this.data = value ? Date.parse(value) : new Date(0);
+        this.data = value ? Date.parse(value) : undefined;
       });
 
       this.onDetach(this.data$.sub(updateSlot));
