@@ -52,6 +52,7 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.MaybeDAOPutAgent',
     'foam.u2.crunch.wizardflow.ShowPreexistingAgent',
     'foam.u2.crunch.wizardflow.SaveAllAgent',
+    'foam.u2.crunch.wizardflow.CapabilityStoreAgent',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
     'foam.u2.crunch.CapabilityInterceptView',
@@ -113,6 +114,7 @@ foam.CLASS({
           .add(this.AutoSaveWizardletsAgent)
           .add(this.StepWizardAgent)
           .add(this.PutFinalPayloadsAgent)
+          .add(this.CapabilityStoreAgent)
           // .add(this.TestAgent)
           ;
       }
