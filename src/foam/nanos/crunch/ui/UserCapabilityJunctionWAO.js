@@ -33,6 +33,7 @@ foam.CLASS({
   methods: [
     function save(wizardlet) {
       if ( wizardlet.loading ) return Promise.resolve();
+      if ( ! wizardlet.isAvailable ) return Promise.resolve();
       var wData = wizardlet.data ? wizardlet.data.clone() : null;
       wizardlet.loading = true;
       let p = this.subject ? this.crunchService.updateJunctionFor(
