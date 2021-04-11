@@ -37,11 +37,13 @@ foam.CLASS({
       // in some foreign locales which conflicts with ScrollWizard.
       this.on('scroll', e => { e.preventDefault(); e.stopPropagation(); });
 
+/*
       this.on('focus',  e => { console.log('focus', e); });
       this.on('blur',   e => { console.log('blur', e); });
       this.on('input',  e => { console.log('input', e); });
       this.on('change', e => { console.log('change', e); });
       this.on('beforeinput', e => { console.log('beforeinput', e); });
+      */
     },
 
     function link() {
