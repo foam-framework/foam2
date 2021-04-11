@@ -680,3 +680,4 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.IncrementalStepWi
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.IncrementalStepWizardView.CONFIRM_MSG",target:"Saída"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.IncrementalStepWizardView.DISMISS_MSG",target:"Tem certeza de que deseja sair desta tela?"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.IncrementalStepWizardView.CONTINUE_MSG",target:"Volte"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.comics.v2.DAOBrowserView.REFRESH_MSG",target:"Atualização solicitada ..."})
