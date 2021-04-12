@@ -196,7 +196,7 @@ foam.CLASS({
             this.cjStatus = this.CapabilityJunctionStatus.GRANTED;
           }
           else if ( ucj && ucj.status === this.CapabilityJunctionStatus.ACTION_REQUIRED ) {
-            this.window.location.reload();
+            this.crunchService.pub('grantedJunction');
           } else {
             this.statusUpdate();
           }
