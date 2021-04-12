@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'ReadOnlyEnumView',
   extends: 'foam.u2.View',
 
+  imports: [
+    'theme'
+  ],
+
   css: `
     ^{
       border-radius: 11.2px;
@@ -30,7 +34,7 @@ foam.CLASS({
   documentation: 'Creates badges with rounded/squared sides based on display context',
 
   methods: [
-    function initE(data) {
+    function initE() {
       this.SUPER();
       this
         .addClass(this.myClass())
