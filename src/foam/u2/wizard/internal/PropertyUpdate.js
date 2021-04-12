@@ -23,6 +23,10 @@ foam.CLASS({
       tableCellFormatter: function (value, obj, axiom) {
         this.add(value.join('.'));
       }
+    },
+    {
+      name: 'seqNo',
+      class: 'Int'
     }
   ]
 });

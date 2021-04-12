@@ -16,7 +16,8 @@ foam.CLASS({
   requires: [
     'foam.u2.wizard.internal.PropertyUpdate',
     'foam.dao.MDAO',
-    'foam.u2.view.ScrollTableView'
+    'foam.u2.view.ScrollTableView',
+    'foam.u2.borders.CollapseBorder',
   ],
 
   css: `
@@ -36,6 +37,7 @@ foam.CLASS({
       color: #FFF;
       padding: 2pt 8pt;
       font-size: 12pt;
+      margin-bottom: 4pt;
     }
   `,
 
@@ -65,41 +67,43 @@ foam.CLASS({
       }
       this.propertyUpdateDAO = this.MDAO.create({ of: this.PropertyUpdate });
       var s = this.wizardlet.getDataUpdateSub();
+      var seqNo = 0;
       s.sub(() => {
-        this.propertyUpdateDAO.put(this.PropertyUpdate.create({
-          id: s.get()
-        }));
-        console.log('happen', this.id);
+        var propertyUpdate = s.get();
+        if ( ! this.PropertyUpdate.isInstance(propertyUpdate) ) {
+          propertyUpdate = this.PropertyUpdate.create({
+            path: '%unknown%'
+          });
+        }
+        propertyUpdate.seqNo = ++seqNo;
+        this.propertyUpdateDAO.put(propertyUpdate);
         this.reloadCount++;
       });
     },
     function initE() {
-      this.onDetach(() => {
-        console.log('----');
-        debugger;
-      });
       this.SUPER();
       this
         .addClass(this.myClass())
+        .start()
+          .addClass(this.myClass('title'))
+          .add('Developer Tools')
+        .end()
+        .start()
+          .addClass(this.myClass('subtitle'))
+          .add(this.wizardlet.title$)
+        .end()
         .startContext({ controllerMode: 'VIEW' })
-          .start()
-            .addClass(this.myClass('title'))
-            .add('Developer Tools')
+          .start(this.CollapseBorder, { title: 'Property Updates' })
+            .tag(this.ScrollTableView, {
+              data$: this.propertyUpdateDAO$.map(dao =>
+                dao.orderBy(this.PropertyUpdate.SEQ_NO))
+            })
           .end()
-          .start()
-            .addClass(this.myClass('subtitle'))
-            .add(this.wizardlet.title$)
-          .end()
-          .start()
-              .tag(this.reloadCount$)
-              .tag(this.RELOAD_COUNT)
-          .end()
-          .tag(this.ScrollTableView, {
-            data$: this.propertyUpdateDAO$
-          })
-          .start()
-            .tag(this.SAVE)
-            .tag(this.LOAD_ACTION)
+          .start(this.CollapseBorder, { title: 'Debug Actions' })
+            .start()
+              .tag(this.SAVE)
+              .tag(this.LOAD_ACTION)
+            .end()
           .end()
         .endContext()
         ;
