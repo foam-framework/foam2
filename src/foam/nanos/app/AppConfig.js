@@ -24,19 +24,20 @@ foam.CLASS({
       documentation: 'Set at startup in bootscript.',
       class: 'String',
       name: 'version',
-      visibility: 'RO',
-      storageTransient: true,
       javaSetter: `
       // Explicitly set in bootscript from jar manifest or services.0.
       // Ignore updates from runtime journals.  If updates are not
       // supressed, then on next upgrade the VirtualHostRoutingServlet
       // will craft an index.html with references to a, now, non-existant
-      // foam-bin js file.
+      // foam-bin-x.y.z.js file.
       synchronized ( this ) {
-        if ( ! versionIsSet_ ) {
+        version_ = foam.nanos.app.AppConfig.class.getPackage().getImplementationVersion();
+        if ( foam.util.SafetyUtil.isEmpty(version_) ||
+             "1.0.0".equals(version_) ) {
           version_ = val;
-          versionIsSet_ = true;
         }
+        versionIsSet_ = true;
+        System.out.println("AppConfig,out,versionIsSet_,"+versionIsSet_+",new,"+version_);
       }
       `
     },
