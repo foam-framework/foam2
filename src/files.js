@@ -534,6 +534,7 @@ FOAM_FILES([
   { name: "foam/u2/view/MultiBoxInputView", flags: ['web'] },
   { name: "foam/u2/FragmentedTextField", flags: ['web'] },
   { name: "foam/u2/FragmentedTextFieldFragment", flags: ['web'] },
+  { name: "foam/u2/FormattedTextField", flags: ['web'] },
   { name: "foam/u2/view/UserPropertyAvailabilityView", flags: ['web'] },
   { name: "foam/u2/view/FObjectView", flags: ['web'] },
   { name: "foam/u2/view/CollapseableDetailView", flags: ['web'] },
