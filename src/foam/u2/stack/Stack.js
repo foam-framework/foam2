@@ -55,6 +55,15 @@ foam.CLASS({
       expression: function(pos) {
         return this.stack_[pos] || null;
       }
+    },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'topNonPopup',
+      hidden: true,
+      expression: function(pos) {
+        while ( pos >= 0 && this.stack_[pos][3].popup ) pos--;
+        return this.stack_[pos] || null;
+      }
     }
   ],
 
@@ -70,7 +79,7 @@ foam.CLASS({
       return i < 0 ? this.stack_[this.pos + i + 1] : this.stack_[i];
     },
 
-    function push(v, parent, opt_id) {
+    function push(v, parent, opt_id, opt_hint) {
       /** opt_id - used to give some unique id to the view being pushed. If it matches the current view then push() ignored. **/
 
       // Avoid feedback of views updating mementos causing themselves to be re-inserted
@@ -88,7 +97,7 @@ foam.CLASS({
 
       this.depth = pos + 1;
       this.stack_.length = this.depth;
-      this.stack_[pos] = [v, parent, opt_id];
+      this.stack_[pos] = [v, parent, opt_id, opt_hint || {}];
       this.pos = pos;
     },
 
