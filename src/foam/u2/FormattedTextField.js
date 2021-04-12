@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * Copyright 2021 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -58,13 +58,11 @@ foam.CLASS({
   ],
 
   methods: [
-    function init() {
+    function initE() {
       this.resetState();
       this.formattedData$.sub(this.formatData);
-      this.formattedData = this.__context__.data.data || '';
-    },
+      this.formattedData = this.data || '';
 
-    function initE() {
       var input = foam.u2.TextField.create({ onKey: true, data$: this.formattedData$ });
       input.setAttribute('maxlength', this.placeholder.length);
 
