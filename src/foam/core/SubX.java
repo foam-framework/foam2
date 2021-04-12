@@ -20,9 +20,13 @@ public class SubX extends ProxyX {
   protected String parent_;
 
   public SubX(Supplier<X> root, String parent) {
-    setX(new ProxyX());
+    this(root, parent, new ProxyX());
+  }
+
+  public SubX(Supplier<X> root, String parent, X delegate) {
     root_ = root;
     parent_ = parent;
+    setX(delegate);
   }
 
   private X getParent() {
@@ -42,7 +46,7 @@ public class SubX extends ProxyX {
       getX().put(key, value);
       return this;
     }
-    return new SubX(root_, parent_).put(key, value);
+    return new SubX(root_, parent_, new ProxyX(getX())).put(key, value);
   }
 
   @Override
@@ -51,7 +55,7 @@ public class SubX extends ProxyX {
       getX().putFactory(key, factory);
       return this;
     }
-    return new SubX(root_, parent_).putFactory(key, factory);
+    return new SubX(root_, parent_, new ProxyX(getX())).putFactory(key, factory);
   }
 
   @Override
