@@ -16,13 +16,14 @@ foam.CLASS({
   css: `
     ^{
       border-radius: 11.2px;
+      border: 1px solid;
       font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 10px;
       font-stretch: normal;
       font-style: normal;
       font-weight: 500;
       letter-spacing: normal;
-      line-height: 24px;
+      line-height: 2.2em;
       min-width: 60px;
       padding: 0 12px;
       text-align: center;
@@ -35,17 +36,18 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      var data = this.data;
       this.SUPER();
       this
         .addClass(this.myClass())
         .style({
-          'background-color': this.data.background,
-          'color': this.data.color,
-          'border': this.data.background == '#FFFFFF' ? '1px solid' : 'none'
+          'background-color': data.background,
+          'color': data.color,
+          'border-color': data.background == '#FFFFFF' || ! data.background ? data.color : data.background
         })
         .start()
           .addClass(this.myClass('label'))
-          .add(this.data.label)
+          .add(data.label)
         .end();
     }
   ]
