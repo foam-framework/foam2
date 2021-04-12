@@ -9,9 +9,9 @@ foam.CLASS({
   name: 'ReadOnlyEnumView',
   extends: 'foam.u2.View',
 
-  imports: [
-    'theme'
-  ],
+  requires: ['foam.u2.tag.CircleIndicator'],
+
+  imports: ['theme'],
 
   css: `
     ^{
@@ -23,27 +23,50 @@ foam.CLASS({
       font-style: normal;
       font-weight: 500;
       letter-spacing: normal;
-      line-height: 2.2em;
+      line-height: 2.1em;
       min-width: 60px;
       padding: 0 12px;
       text-align: center;
       width: -webkit-max-content;
       width: -moz-max-content;
+      display: inline-flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+    ^icon{
+      margin-right: 10px;
     }
   `,
 
   documentation: 'Creates badges with rounded/squared sides based on display context',
 
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'showGlyph'
+    }
+  ],
+
   methods: [
     function initE() {
       var data = this.data;
       this.SUPER();
+      var icon = {
+        size: 14,
+        backgroundColor: data.color,
+        icon: this.theme.glyphs.checkmark.getDataUrl({
+          fill: data.background ? data.background : data.color
+        })
+      };
       this
         .addClass(this.myClass())
         .style({
           'background-color': data.background,
           'color': data.color,
           'border-color': data.background == '#FFFFFF' || ! data.background ? data.color : data.background
+        })
+        .callIf(this.showGlyph, () =>{
+          this.start(this.CircleIndicator, icon).addClass(this.myClass('icon')).end()
         })
         .start()
           .addClass(this.myClass('label'))
