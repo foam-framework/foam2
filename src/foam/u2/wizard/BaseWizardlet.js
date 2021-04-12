@@ -19,6 +19,7 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.core.SimpleSlot',
     'foam.u2.detail.AbstractSectionedDetailView',
     'foam.u2.wizard.WizardletAware',
     'foam.u2.wizard.WizardletIndicator',
@@ -178,32 +179,22 @@ foam.CLASS({
         This is useful for checking if a wizardlet has unsaved changes.
       `,
       code: function () {
-        var self = this;
         var filter = foam.u2.wizard.Slot.filter;
-        var customUpdateSlot = false;
-        if ( this.of && this.WizardletAware.isSubClass(this.of) ) {
-          customUpdateSlot = this.data && this.data.customUpdateSlot;
-        }
-        if ( customUpdateSlot ) {
-          var s = foam.core.FObject.create();
-          this.data$
-            .map(data => {
-              var updateSlot = data.getUpdateSlot();
-              this.wizardCloseSub.onDetach(updateSlot);
-              return this.WizardletAutoSaveSlot.create({
-                other: filter(updateSlot, v => v && ! self.loading),
-                delay: self.SAVE_DELAY
-              });
-            })
-            .valueSub(() => { if ( ! self.loading ) s.pub(true); });
-          return s;
-        }
-        var sl = this.FObjectRecursionSlot.create({ obj$: this.data$ });
-        this.wizardCloseSub.onDetach(sl);
-        return filter(this.WizardletAutoSaveSlot.create({
-          other: filter(sl, () => ! self.loading),
-          delay: self.SAVE_DELAY
-        }), () => ! self.loading);
+        var s = this.SimpleSlot.create();
+        var slotSlot = this.data$
+          .map(data => {
+            var updateSlot = (
+              this.WizardletAware.isInstance(data) &&
+              data.customUpdateSlot
+            ) ? data.getUpdateSlot()
+              : this.FObjectRecursionSlot.create({ obj: data });
+            return this.WizardletAutoSaveSlot.create({
+              other: filter(updateSlot, () => ! this.loading),
+              delay: this.SAVE_DELAY
+            });
+          });
+        slotSlot.valueSub(() => { s.set(slotSlot.get().get()); });
+        return s;
       }
     }
   ],
