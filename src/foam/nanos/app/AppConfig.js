@@ -37,7 +37,6 @@ foam.CLASS({
           version_ = val;
         }
         versionIsSet_ = true;
-        System.out.println("AppConfig,out,versionIsSet_,"+versionIsSet_+",new,"+version_);
       }
       `
     },
