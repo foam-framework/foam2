@@ -22,7 +22,8 @@ foam.CLASS({
   ],
 
   exports: [
-    'memento'
+    'memento',
+    'config'
   ],
 
   requires: [
@@ -202,9 +203,12 @@ foam.CLASS({
                       .addClass(self.myClass('altview-container'))
                     .end();
                 })
-                .add(self.slot(function(browseView) {
-                  return self.E().tag(browseView, { data: data, config: config });
-                }))
+                .call(function(){
+                  var e = this;
+                  this.add(self.slot(function(browseView) {
+                    return self.E().tag(browseView, { config$: e.__subContext__.config$ });
+                  }))
+                })
               .end()
             .end()
           .end();
