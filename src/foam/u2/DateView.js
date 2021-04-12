@@ -47,11 +47,15 @@ foam.CLASS({
     },
 
     function link() {
-      var self = this;
-      var slot = this.attrSlot();
+      if ( this.linked ) return;
+      this.linked = true;
+      var self    = this;
+      var focused = false;
+      var slot    = this.attrSlot(); //null, this.onKey ? 'input' : null);
 
       function updateSlot() {
         var date = self.data;
+        if ( focused ) return;
         if ( foam.Number.isInstance(date) ) date = new Date(date);
         if ( ! date ) {
           slot.set('');
@@ -60,13 +64,21 @@ foam.CLASS({
         }
       }
 
-      updateSlot();
-
-      this.on('blur', () => {
+      function updateData() {
         var value = slot.get();
-        this.data = value ? Date.parse(value) : undefined;
-      });
+        self.data = value ? Date.parse(value) : undefined;
+      }
 
+      if ( this.onKey ) {
+        var focused = false;
+        this.on('focus', () => { focused = true; });
+        this.on('blur',  () => { focused = false; });
+        this.on('change', updateData);
+      } else {
+        this.on('blur', updateData);
+      }
+
+      updateSlot();
       this.onDetach(this.data$.sub(updateSlot));
     }
   ]
