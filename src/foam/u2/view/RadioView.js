@@ -142,7 +142,7 @@ foam.CLASS({
           start('input').
             attrs({
               type: 'radio',
-              name: self.getAttribute('name'),
+              name: self.getAttribute('name') + self.$UID,
               value: c[1],
               checked: self.slot(function (data) { return data == c[0]; }),
               disabled: self.isDisabled$
