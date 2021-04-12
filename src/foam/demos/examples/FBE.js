@@ -181,6 +181,12 @@ foam.CLASS({
             },
             add: function() {
               self.dom.add.apply(self.dom, arguments);
+            },
+            start: function() {
+              return self.dom.start.apply(self.dom, arguments);
+            },
+            tag: function() {
+              return self.dom.start.apply(self.dom, arguments);
             }
           };
           with ( scope ) {
@@ -425,7 +431,26 @@ print(performance.now() - startTime);
 ##  Intro2
 ##   SubIntro
 ##  Fluent Interface
+##  Hello World!
+Let's use U2 to say hello
+--
+add(foam.u2.Element.create().add('Hello World!'));
 ##  nodeName
+If you inspect the HTML output from the Hellow World! example, you'll notice that it is a div tag.<br>
+However, if you want to change it to another type, you can specify the node's name with the nodeName property.
+--
+add(foam.u2.Element.create({nodeName: 'b'}).add('Hello World!'));
+## Short Form
+Given it is so common to want to create new Elements from within other Elements, Element has a method called start()
+which is used to add another Element to it.
+--
+start('b').add('Hello again!').end();
+## Tag
+In the above example we wanted to add text inside of the <b> tag, so we started with start() and then called add() before end()-ing the tag.
+But if you didn't need to add() anything inside the tag, you could just use the tag() method. The next two lines are equivalent:
+--
+start('input').end();
+tag('input');
 ##  v2
 ##  ControllerMode
 ##  DisplayMode
