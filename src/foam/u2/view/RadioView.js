@@ -144,7 +144,7 @@ foam.CLASS({
               type: 'radio',
               name: self.getAttribute('name'),
               value: c[1],
-              checked: self.slot(function (data) { return data === c[0]; }),
+              checked: self.slot(function (data) { return data == c[0]; }),
               disabled: self.isDisabled$
             }).
             setID(id = self.NEXT_ID()).
