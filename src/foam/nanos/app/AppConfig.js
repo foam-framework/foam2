@@ -32,8 +32,7 @@ foam.CLASS({
       // foam-bin-x.y.z.js file.
       synchronized ( this ) {
         version_ = foam.nanos.app.AppConfig.class.getPackage().getImplementationVersion();
-        if ( foam.util.SafetyUtil.isEmpty(version_) ||
-             "1.0.0".equals(version_) ) {
+        if ( foam.util.SafetyUtil.isEmpty(version_) ) {
           version_ = val;
         }
         versionIsSet_ = true;
