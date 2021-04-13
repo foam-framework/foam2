@@ -13,6 +13,10 @@ foam.CLASS({
     'foam.mlang.Expressions'
   ],
 
+  requires: [
+    'foam.core.NullAgent'
+  ],
+
   exports: [
     'as sequence'
   ],
@@ -84,40 +88,48 @@ foam.CLASS({
       }
       return false;
     },
+    function get(name) {
+      for ( let ca of this.contextAgentSpecs ) {
+        if ( name == ca.name ) {
+          return ca;
+        }
+      }
+    },
     function remove(name) {
-      this.contextAgentSpecs$remove(this.EQ(
-        this.Step.NAME, name));
+      this.contextAgentSpecs$replace(this.EQ(
+        this.Step.NAME, name
+      ), this.Step.create({
+        name: name,
+        spec: this.NullAgent
+      }));
       return this;
     },
 
     // Launching a sequence
 
     function execute() {
-      // Call ContextAgents sequentially while reducing to a Promise
-      var p = Promise.resolve(this.__subContext__);
-      return this.contextAgentSpecs.reduce((p, seqspec) => {
-        var contextAgent = null;
-        return p.then(x => {
-          if ( this.halted_ ) return Promise.resolve(x);
-
-          var spec = seqspec.spec;
-          var args = seqspec.args;
-
-          // Note: logic copied from ViewSpec; maybe this should be in stdlib
-          if ( spec.create ) {
-            contextAgent = spec.create(args, x);
-          } else {
-            var cls = foam.core.FObject.isSubClass(spec.class)
-              ? spec.class : ctx.lookup(spec.class);
-            if ( ! cls ) foam.assert(false,
-              'Argument to Sequence.add specifies unknown class: ', spec.class);
-            contextAgent = cls.create(spec, x).copyFrom(args || {});
-          }
-
-          // Call the context agent and pass its exports to the next one
-          return contextAgent.execute().then(() => contextAgent.__subContext__);
-        })
-      }, p);
+      let i = 0;
+      let nextStep = x => {
+        if ( i >= this.contextAgentSpecs.length ) return Promise.resolve(x);
+        if ( this.halted_ ) return Promise.resolve(x);
+        let seqspec = this.contextAgentSpecs[i++];
+        var spec = seqspec.spec;
+        var args = seqspec.args;
+        // Note: logic copied from ViewSpec; maybe this should be in stdlib
+        if ( spec.create ) {
+          contextAgent = spec.create(args, x);
+        } else {
+          var cls = foam.core.FObject.isSubClass(spec.class)
+            ? spec.class : ctx.lookup(spec.class);
+          if ( ! cls ) foam.assert(false,
+            'Argument to Sequence.add specifies unknown class: ', spec.class);
+          contextAgent = cls.create(spec, x).copyFrom(args || {});
+        }
+        // Call the context agent and pass its exports to the next one
+        return contextAgent.execute().then(
+          () => nextStep(contextAgent.__subContext__));
+      };
+      return nextStep(this.__subContext__)
     },
 
     // Sequence runtime commands

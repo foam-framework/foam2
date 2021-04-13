@@ -66,7 +66,27 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'image',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      readVisibility: 'RO',
+      transient: true,
+      expression: function () {
+        return [this];
+      },
+      view: function() {
+        let dataSlot = foam.core.SimpleSlot.create({value: [this]});
+        let selectSlot = foam.core.SimpleSlot.create({value: 0});
+        return foam.nanos.fs.fileDropZone.FilePreview.create({
+          data$: dataSlot,
+          selected$: selectSlot
+        });
+      }
+    },
+    {
+      class: 'String',
       name: 'address',
+      label: 'Download Link',
       transient: true,
       expression: function (id) {
         var sessionId = localStorage['defaultSession'];
@@ -76,7 +96,8 @@ foam.CLASS({
           url += '?sessionId=' + sessionId;
         }
         return url;
-      }
+      },
+      view: 'foam.nanos.dig.LinkView'
     },
     {
       class: 'Blob',

@@ -156,7 +156,7 @@ foam.CLASS({
             cfg.setPingTime(pm.getEndTime() - pm.getStartTime());
             getDao().put_(x, cfg);
           } else {
-            getLogger().warning("client,find", cfg.getId(), "null");
+            getLogger().warning("client,find", config.getId(), "null");
           }
         } catch ( Throwable t ) {
           pm.error(x, t);

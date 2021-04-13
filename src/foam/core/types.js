@@ -159,7 +159,7 @@ foam.CLASS({
         if ( d == foam.Date.MAX_DATE || d == foam.Date.MIN_DATE ) return d;
         if ( foam.Date.isInstance(d) ) {
           // Convert the Date to Noon time in GMT /*its timezone*/.
-          d = new Date(d.getTime() - (d.getTime() % (1000*60*60*24)) + (12*60 /*+ d.getTimezoneOffset()*/) * 60000);
+          d = new Date(d.getTime() - (d.getTime() % (1000*60*60*24)) + (12*60 + d.getTimezoneOffset()) * 60000);
         }
         return d;
       }
@@ -385,6 +385,22 @@ foam.CLASS({
               }
             }
             this[self.name] = newArry;
+          }
+        },
+        configurable: true
+      });
+      Object.defineProperty(proto, self.name + '$replace', {
+        get: function classGetter() {
+          return function (predicate, value) {
+            // Faster than splice or filter as of the time this was added
+            let arry = this[self.name];
+            for ( let i=0 ; i < arry.length ; i++ ) {
+              if ( predicate.f(arry[i]) ) {
+                arry[i] = value;
+              }
+            }
+            // Force property update
+            this.propertyChange.pub(self.name, this.slot(self.name));
           }
         },
         configurable: true

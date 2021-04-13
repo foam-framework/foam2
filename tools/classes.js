@@ -28,6 +28,7 @@ var classes = [
   'foam.core.IntHolder',
   'foam.core.StringHolder',
   'foam.core.BooleanHolder',
+  'foam.core.RequiredBooleanHolder',
   'foam.glang.EndOfTimeSpan',
   'foam.glang.EndOfDay',
   'foam.glang.EndOfWeek',
@@ -119,7 +120,7 @@ var classes = [
   'foam.nanos.app.AppConfig',
   'foam.nanos.app.ContextLookupAppConfigService',
   'foam.nanos.http.WebAgent',
-  'com.google.foam.demos.heroes.Hero',
+  'foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
   'foam.box.RemoteException',
   'foam.box.RPCMessage',
@@ -436,6 +437,7 @@ var classes = [
   'foam.nanos.medusa.MedusaTestingDAO',
   'foam.nanos.medusa.MedusaUniqueDAO',
   'foam.nanos.medusa.MedusaType',
+  'foam.nanos.medusa.PrimaryNotFoundException',
   'foam.nanos.medusa.PromotedPurgeAgent',
   'foam.nanos.medusa.PurgeSink',
   'foam.nanos.medusa.RegionStatus',
@@ -544,7 +546,6 @@ var classes = [
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
   'foam.dao.FixedSizeDAO',
-  'foam.mop.MOP',
   'foam.nanos.export.ClientGoogleSheetsExportService',
   'foam.nanos.export.ExportDriverRegistry',
   'foam.nanos.export.GoogleSheetsBasedExportDriver',
@@ -683,6 +684,7 @@ var classes = [
   'foam.nanos.ruler.Ruled',
   'foam.nanos.ruler.Rule',
   'foam.nanos.ruler.RuledDAO',
+  'foam.nanos.ruler.RulerData',
   'foam.nanos.ruler.test.RuledDAOTest',
   'foam.nanos.ruler.test.RuledDummy',
   'foam.nanos.ruler.RulerDAO',
@@ -854,6 +856,7 @@ var classes = [
   'foam.nanos.crunch.predicate.StatusChangedTo',
   'foam.nanos.crunch.predicate.IsAgent',
   'foam.nanos.crunch.predicate.CapabilityJunctionTransitionToStatus',
+  'foam.nanos.crunch.predicate.IsAgentUpdate',
 
   //authservice
   'foam.nanos.auth.CapabilityAuthService',
@@ -916,7 +919,6 @@ var abstractClasses = [
 
 var skeletons = [
   'foam.dao.DAO',
-  'foam.mop.MOP',
   'foam.nanos.app.AppConfigService',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.AgentAuthService',
@@ -942,7 +944,6 @@ var skeletons = [
 var proxies = [
   'foam.dao.DAO',
   'foam.dao.Sink',
-  'foam.mop.MOP',
   'foam.lib.Outputter',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',

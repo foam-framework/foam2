@@ -54,20 +54,23 @@
     if ( typeof window !== 'undefined' && ! window.FOAM_ROOT ) window.FOAM_ROOT = path;
 
     var loadedMap = {};
+    var scripts = '';
 
-    return function(filename) {
-      if ( loadedMap[filename] ) {
+    return function(filename, opt_batch) {
+      if ( filename && loadedMap[filename] ) {
         console.warn(`Duplicated load of '${filename}'`);
         return;
       }
       loadedMap[filename] = true;
-      /*
-      var script = document.createElement("script");
-      script.src = path + filename + '.js';
-      document.head.appendChild(script);
-      */
-      document.writeln(
-        '<script type="text/javascript" src="' + path + filename + '.js"></script>\n');
+
+      if ( filename ) {
+        scripts += '<script type="text/javascript" src="' + path + filename + '.js"></script>\n';
+      }
+
+      if ( ! opt_batch ) {
+        document.writeln(scripts);
+        scripts = '';
+      }
     };
   }
 
@@ -78,6 +81,7 @@
     if ( typeof global !== 'undefined' && ! global.FOAM_ROOT ) global.FOAM_ROOT = path;
 
     return function (filename) {
+      if ( ! filename ) return;
       if ( typeof global !== 'undefined' ) {
         // Set document.currentScript.src, as expected by EndBoot.js
         let normalPath = global.imports.path.relative(
@@ -101,15 +105,17 @@
       createLoadBrowser();
   }
 
-  this.FOAM_FILES = function(files) {
+  this.FOAM_FILES = async function(files) {
     var load = getLoader();
 
     files.
       map(function(f) { return f.name; }).
-      forEach(load);
+      forEach(f => load(f, true));
+
+    load(null, false);
 
   //  delete this.FOAM_FILES;
   };
 
-  getLoader()('files');
+  getLoader()('files', false);
 })();

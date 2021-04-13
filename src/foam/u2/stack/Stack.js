@@ -91,25 +91,25 @@ foam.CLASS({
       this.stack_[pos] = [v, parent, opt_id];
       this.pos = pos;
     },
-    function setToNullCurrentMemento() {
+
+    function deleteMemento(mementoToDelete) {
       /** setting the last not null memento in memento chain to null to update application controller memento value on stack.back **/
       var m = this.memento;
-      if ( ! m )
-        return;
+      if ( ! m ) return;
+
       var tail = this.memento.tail;
-      
+
       if ( tail == null ) {
         this.memento.value$.set('');
         return;
       }
 
-      while ( true ) {
-        if ( tail.tail == null ) {
-          m.tail$.set(null);
-          return;
-        }
-        m = tail;
-        tail = tail.tail;
+      while ( m != null && m.tail != null && m.tail.value.indexOf(mementoToDelete) != 0 ) {
+        m = m.tail;
+      }
+
+      if ( m && m.tail ) {
+        m.tail$.set(null);
       }
     },
     function findCurrentMemento() {
@@ -130,7 +130,7 @@ foam.CLASS({
       name: 'back',
       // icon: 'arrow_back',
       isEnabled: function(pos) { return pos > 0; },
-      code: function() {
+      code: function(X) {
         var isMementoSetWithView = false;
 
         //check if the class of the view to which current position points has property MEMENTO_HEAD
@@ -141,7 +141,7 @@ foam.CLASS({
           if ( foam.String.isInstance(classObj) ) {
             classObj = foam.lookup(this.stack_[this.pos][0].class);
           }
-          var obj = classObj.create(this.stack_[this.pos][0]);
+          var obj = classObj.create(this.stack_[this.pos][0], X);
           if ( obj && obj.mementoHead ) {
             isMementoSetWithView = true;
           }
@@ -154,7 +154,7 @@ foam.CLASS({
         this.pos--;
 
         if ( isMementoSetWithView )
-          this.setToNullCurrentMemento();
+          this.deleteMemento(obj.mementoHead);
       }
     },
     {

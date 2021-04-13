@@ -157,6 +157,13 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
     },
     {
       class: 'Boolean',
+      name: 'twoFactorSuccess',
+      visibility: 'HIDDEN',
+      value: false,
+      networkTransient: true
+    },
+    {
+      class: 'Boolean',
       name: 'clusterable',
       value: true,
       visibility: 'HIDDEN',
@@ -312,6 +319,12 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
         Subject subject = new Subject();
         subject.setUser(agent);
         subject.setUser(user);
+
+        // Support hierarchical SPID context
+        var subX = rtn.cd(user.getSpid());
+        if ( subX != null ) {
+          rtn = reset(subX);
+        }
         rtn = rtn
           .put("subject", subject)
           .put("spid", user.getSpid())

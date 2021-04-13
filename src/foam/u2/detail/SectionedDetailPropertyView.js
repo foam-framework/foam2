@@ -17,6 +17,7 @@ foam.CLASS({
     ^ {
       /* Add for fixing UI issue in Safari */
       display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(0,1fr));
     }
 
     ^ m3 {
@@ -210,6 +211,12 @@ foam.CLASS({
       display: flex;
       align-items: center;
     }
+
+    ^CheckBoxWrapper {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
   `,
 
   requires: [
@@ -242,8 +249,9 @@ foam.CLASS({
             foam.core.ConstantSlot.create({ value: null });
 
           return self.E()
+            .addClass(this.myClass('wrapper'))
             .start(self.Rows)
-              .callIf(prop$label && prop.view.class != 'foam.u2.CheckBox', function() {
+              .callIf(prop$label, function() {
                 this.start('m3')
                   .add(prop.label)
                   .style({ 'line-height': '2' })
@@ -252,9 +260,10 @@ foam.CLASS({
               .start()
                 .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
                 .start()
+                
                   .style({ 'flex-grow': 1, 'max-width': '100%' })
                   .callIf( prop.view.class == 'foam.u2.CheckBox', function() {
-                    this.style({ 'margin': '20px' });
+                    this.addClass(this.myClass('CheckBoxWrapper'));
                   })
                   .tag(prop, { mode$: self.mode$ })
                   .callIf(prop.validationStyleEnabled, function() {
@@ -262,23 +271,9 @@ foam.CLASS({
                   })
                 .end()
                 .callIf(prop.help, function() {
-                  this.start()
-                    .addClass(self.myClass('tooltip'))
+                  this.start('', { tooltip: prop.help })
                     .start({class: 'foam.u2.tag.Image', data: '/images/question-icon.svg'})
                       .addClass(self.myClass('helper-icon'))
-                    .end()
-
-                    .start()
-                      .addClass(self.myClass('tooltip-container'))
-                      .start()
-                        .addClass(self.myClass('helper-text'))
-                        .start('p')
-                          .add(prop.help)
-                        .end()
-                      .end()
-                      .start()
-                        .addClass(self.myClass('arrow-right'))
-                      .end()
                     .end()
                   .end();
                 })

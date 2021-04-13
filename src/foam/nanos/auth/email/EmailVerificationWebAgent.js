@@ -57,7 +57,7 @@ foam.CLASS({
 
         TranslationService ts = (TranslationService) x.get("translationService");
         Subject subject = (Subject) x.get("subject");
-        String local = ((User) subject.getRealUser()).getLanguage().getCode().toString();
+        String local = user.getLanguage().getCode().toString();
         String translatedMsg = "";
 
         String             message          = ts.getTranslation(local, getClassInfo().getId()+ ".EMAIL_VERIFIED_SUCCESS", this.EMAIL_VERIFIED_SUCCESS);
@@ -96,7 +96,7 @@ foam.CLASS({
           }
           if ( user != null ) {
             String url = user.findGroup(x).getAppConfig(x).getUrl();
-            args.put("logo", url + "/" + theme.getLogo());
+            args.put("logo", url + "/" + theme.getLoginImage());
           }
           EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(
             x,

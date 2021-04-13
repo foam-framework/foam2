@@ -13,13 +13,14 @@ foam.CLASS({
 
   methods: [
     function launch(X, menu) {
+      var self = this;
       X.stack.push(
         () => {
           // Set the menuId and call the menuListener so that the
           // hash is updated properly when stack.back() is called.
           this.pushMenu(menu);
           this.menuListener && this.menuListener(menu);
-          return foam.u2.ViewSpec.createView(menu.border, {}, this, X).tag(this.createView(X, menu));
+          return menu.border ? {... menu.border, children: [ this.createView(X, menu) ]} : menu;
         },
         X,
         menu.id);

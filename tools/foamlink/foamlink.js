@@ -19,9 +19,9 @@ global.FOAM_FLAGS = {
   swift: true,
 };
 
-require(projRoot + 'foam2/src/foam.js');
-require(projRoot + 'foam2/src/foam/nanos/nanos.js');
-require(projRoot + 'foam2/src/foam/support/support.js');
+require(projRoot + 'foam3/src/foam.js');
+require(projRoot + 'foam3/src/foam/nanos/nanos.js');
+require(projRoot + 'foam3/src/foam/support/support.js');
 
 function main () {
   if ( process.argv.length < 3 || typeof process.argv[2] !== 'string' ) {

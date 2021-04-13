@@ -257,11 +257,11 @@ foam.CLASS({
 //      console.log("result is ", test[0], test[1].length);
 
       console.time('template-util');
-//      console.profile('foam2');
+//      console.profile('foam3');
       for ( var i = 0 ; i < iters; i++ ) {
         this.parser.parseString(this.JAVA_SOURCE);
       }
-//      console.profileEnd('foam2');
+//      console.profileEnd('foam3');
       console.timeEnd('template-util');
 
     },

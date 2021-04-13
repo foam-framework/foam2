@@ -60,7 +60,7 @@ public class NSpecFactory
 
       Object ns = ns_;
       while ( ns != null ) {
-        if ( ns instanceof ContextAware ) {
+        if ( ns instanceof ContextAware && ! ( ns instanceof ProxyX ) ) {
           ((ContextAware) ns).setX(x_.getX());
         }
         if ( ns instanceof NSpecAware ) {

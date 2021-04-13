@@ -21,6 +21,7 @@ foam.CLASS({
     'menuDAO',
     'menuListener',
     'pushMenu',
+    'theme',
     'user'
   ],
 
@@ -91,7 +92,8 @@ foam.CLASS({
               query: self.menuSearch$,
               onClickAddOn: function(data) { self.openMenu(data); },
               selection$: self.currentMenu$,
-              formatter: function(data) { this.add(data.label); }
+              formatter: function(data) { this.add(data.label); },
+              defaultRoot: self.theme.navigationRootMenu
             })
           .end()
         .end()

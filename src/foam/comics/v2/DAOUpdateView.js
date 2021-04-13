@@ -63,7 +63,7 @@ foam.CLASS({
 
   exports: [
     'controllerMode',
-    'currentMemento as memento'
+    'currentMemento_ as memento'
   ],
 
   messages: [
@@ -106,11 +106,19 @@ foam.CLASS({
         return foam.u2.detail.SectionedDetailView;
       }
     },
-    'currentMemento',
+    'currentMemento_',
     {
       class: 'String',
       name: 'mementoHead',
-      value: 'Edit'
+      getter: function() {
+        if ( this.data.id ) {
+          var id = '' + this.data.id;
+          if ( id && foam.core.MultiPartID.isInstance(this.data.cls_.ID) ) {
+            id = id.substr(1, id.length - 2).replaceAll(':', '=');
+          }
+          return 'edit::' + id;
+        }
+      }
     }
   ],
 
@@ -160,7 +168,7 @@ foam.CLASS({
       this.SUPER();
 
       if ( this.memento )
-        this.currentMemento$ = this.memento.tail$;
+        this.currentMemento_$ = this.memento.tail$;
 
       this
         .addClass(this.myClass())
@@ -189,9 +197,11 @@ foam.CLASS({
               .start(config$viewBorder)
                 .start().addClass(this.myClass('view-container'))
                   .add(self.slot(function(viewView) {
-                    return self.E().tag(viewView, {
+                    var view = foam.u2.ViewSpec.createView(viewView, {
                       data$: self.workingData$
-                    });
+                    }, self, self.__subContext__.createSubContext({ memento: self.memento }));
+
+                    return self.E().add(view);
                   }))
                 .end()
               .end()

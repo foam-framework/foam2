@@ -25,7 +25,9 @@ foam.CLASS({
   will return the same (single) instance.
   `,
 
-  properties: [ [ 'name', 'create' ] ],
+  properties: [
+    [ 'name', 'create' ]
+  ],
 
   methods: [
     function installInClass(cls) {
@@ -38,7 +40,7 @@ foam.CLASS({
           return oldCreate.apply(this, arguments);
 
         return this.private_.instance_ ||
-            ( this.private_.instance_ = oldCreate.apply(this, arguments) );
+          ( this.private_.instance_ = oldCreate.apply(this, arguments) );
       };
     },
 

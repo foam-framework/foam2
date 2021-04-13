@@ -23,7 +23,8 @@ foam.CLASS({
       color: initial;
     }
     ^ {
-      padding: 0 !important;
+      padding-bottom: 0;
+      padding-top: 0 ;
     }
   `,
 

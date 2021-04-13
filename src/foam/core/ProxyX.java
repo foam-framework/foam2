@@ -82,4 +82,8 @@ public class ProxyX
   public <T> T create(Class<T> type, Map<String, Object> args) {
     return ((FacetManager) getX().get("facetManager")).create(type, args, this);
   }
+
+  public X cd(String path) {
+    return getX().cd(path);
+  }
 }

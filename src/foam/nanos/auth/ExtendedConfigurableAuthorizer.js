@@ -37,6 +37,7 @@ foam.CLASS({
   'java.util.Map',
   'java.util.concurrent.ConcurrentHashMap',
 
+  'static foam.mlang.MLang.*',
   'static foam.mlang.MLang.TRUE'
   ],
 
@@ -50,6 +51,11 @@ foam.CLASS({
       name: 'DAOKey',
       documentation: `Defines the daokey segment of the permission pertaining to your service.
           Checked in permission templates and applied in authorizer.`
+    },
+    {
+      class: 'Boolean',
+      name: 'cache',
+      documentation: `Toggles authorizer to use cache - caching has slow startup on initial DAO access but is improved after cache has been initialized.`
     },
     {
       class: 'Boolean',
@@ -164,15 +170,24 @@ foam.CLASS({
       ],
       documentation: `Check if user permissions match any of the template and object constructed permissions`,
       javaCode:  `
-        AuthService authService = (AuthService) x.get("auth");
-        Map<String,List> cache = (Map<String,List>) getTemplateCache(x);
         List<PermissionTemplateReference> templates = new ArrayList<PermissionTemplateReference>();
-        if ( cache.get(getDAOKey()) != null ) {
-          templates.addAll(cache.get(getDAOKey()));
+        if ( getCache() ) {
+          Map<String,List> cache = (Map<String,List>) getTemplateCache(x);
+          if ( cache.get(getDAOKey()) != null ) {
+            templates.addAll(cache.get(getDAOKey()));
+          }
+        } else {
+          templates = ((ArraySink) ((DAO) x.get("localPermissionTemplateReferenceDAO"))
+              .where(AND(
+                IN(getDAOKey(), PermissionTemplateReference.DAO_KEYS),
+                EQ(PermissionTemplateReference.OPERATION, op)
+              ))
+              .select(new ArraySink())).getArray();
         }
         if ( getEnableStandardAuthorizer() ) {
           templates.add(createStandardAuthorizationTemplate(op));
         }
+        AuthService authService = (AuthService) x.get("auth");
         if ( templates != null && ! templates.stream().filter(t -> t.getOperation().equals(op)).anyMatch(t -> authService.check(x, createPermission((PermissionTemplateReference) t, obj))) ) {
           ((foam.nanos.logger.Logger) x.get("logger")).debug("ExtendedConfigurableAuthorizer", "Permission denied");
           throw new AuthorizationException();

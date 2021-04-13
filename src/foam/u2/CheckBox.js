@@ -24,21 +24,34 @@ foam.CLASS({
 
   css: `
     ^ {
-      margin: 8px 0;
-      padding: 8px;
-    }
-    ^:disabled {
+      padding: 0px !important;
+      -webkit-appearance: none;
       appearance: none;
-      background: rgba(0,0,0,0);
-      border: none;
-      box-shadow: none;
-      outline: none;
-      padding-left: 0;
+      border-radius: 2px;
+      border: solid 2px /*%GRAY1%*/ #5a5a5a;
+      width: 18px;
+      height: 18px;
+      transition: background-color 140ms, border-color 140ms;
     }
-    input[type='checkbox']^:checked:disabled:after {
-      background: none;
-      box-shadow: none;
-      color: gray;
+    ^:checked {
+      background-color: /*%PRIMARY1%*/ #1e1f21;
+      border-color: /*%PRIMARY1%*/ #1e1f21;
+      fill: white;
+    }
+    ^:checked:after{
+      position:relative;
+      top:1;
+      content: url("/images/checkmark-white.svg");
+    }
+    ^ input:focus + label::before {
+      content: ''
+      box-shadow: 0 0 0 3px /*%PRIMARY2%*/ #ffbf47;
+    }
+    ^:hover {
+      cursor: pointer
+    }
+    ^ span, input[type='checkbox']{
+      vertical-align:middle;
     }
     `,
 
@@ -46,24 +59,31 @@ foam.CLASS({
     function initE() {
       this.SUPER();
 
-      this.addClass(this.myClass());
-      this.setAttribute('type', 'checkbox');
-
       var self = this;
+
+      this
+        .setAttribute('type', 'checkbox')
+        .addClass(this.myClass())
+        .on('click', this.onClick);
 
       if ( this.showLabel ) {
         this.start('label')
           .addClass(this.myClass('label'))
           .addClass(this.myClass('noselect'))
+          .on('click', this.onClick)
           .callIfElse(this.labelFormatter,
             this.labelFormatter,
-            function() { this.add(self.label$); })
-          .on('click', function() {
-            if ( self.getAttribute('disabled') ) return;
-            this.data = ! this.data;
-          }.bind(this))
+            function() { this.add(self.label$); }
+          )
         .end();
       }
+    }
+  ],
+
+  listeners: [
+    function onClick() {
+      if ( this.getAttribute('disabled') ) return;
+      this.data = ! this.data;
     }
   ]
 });

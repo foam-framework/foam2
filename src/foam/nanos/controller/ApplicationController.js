@@ -16,7 +16,7 @@
  */
 
 /*
-  Accessible through browser at location path static/foam2/src/foam/nanos/controller/index.html
+  Accessible through browser at location path static/foam3/src/foam/nanos/controller/index.html
   Available on browser console as ctrl. (exports axiom)
 */
 foam.CLASS({
@@ -362,6 +362,9 @@ foam.CLASS({
 
       this.clientPromise.then(async function(client) {
         self.setPrivate_('__subContext__', client.__subContext__);
+
+        await self.fetchTheme();
+        foam.locale = localStorage.getItem('localeLanguage') || self.theme.defaultLocaleLanguage;
 
         await client.translationService.initLatch;
         self.installLanguage();

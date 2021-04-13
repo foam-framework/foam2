@@ -58,12 +58,11 @@ foam.CLASS({
         }
       },
       view: function (_, X) {
-        return X.data.slot(function(result) {
-          return foam.u2.TextField.create({
-            mode: foam.u2.DisplayMode.RO,
-            data: result ? result.toString() : ''
-          });
-        });
+        return {
+          class: 'foam.u2.TextField',
+          mode: foam.u2.DisplayMode.RO,
+          data$: X.data.result$.map(result => { return result ? result : ''; })
+        };
       }
     },
     {

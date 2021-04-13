@@ -18,20 +18,18 @@ foam.CLASS({
 
   methods: [
     async function execute() {
-      var wizardletsToIgnore = [];
-
       for ( let wizardlet of this.wizardlets ){
-        if ( foam.nanos.crunch.ui.MinMaxCapabilityWizardlet.isInstance(wizardlet) ){
-          if ( wizardlet.status === this.CapabilityJunctionStatus.AVAILABLE ) {
-            wizardletsToIgnore.push(...wizardlet.choiceWizardlets);
-          }
-        }
-
         if (
-          wizardlet.status !== this.CapabilityJunctionStatus.AVAILABLE &&
-          ! wizardletsToIgnore.includes(wizardlet)
-        ) {
-          wizardlet.isAvailable = true;
+          foam.nanos.crunch.ui.MinMaxCapabilityWizardlet.isInstance(wizardlet) &&
+          wizardlet.data.selectedData.length > 0
+        ){
+          var selectedDataCapabilityIds = wizardlet.data.selectedData;
+
+          for ( let choiceWizardlet of wizardlet.choiceWizardlets ){
+            if ( selectedDataCapabilityIds.includes(choiceWizardlet.capability.id) ){
+              choiceWizardlet.isAvailable = true;
+            }
+          }
         }
       }
     }

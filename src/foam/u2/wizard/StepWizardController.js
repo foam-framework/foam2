@@ -135,6 +135,10 @@ foam.CLASS({
     {
       name: 'submitted',
       class: 'Boolean'
+    },
+    {
+      name: 'allValid',
+      class: 'Boolean'
     }
   ],
 
@@ -144,6 +148,8 @@ foam.CLASS({
 
       if ( this.wsub ) this.wsub.detach();
       this.wsub = this.FObject.create();
+
+      this.onWizardletValidity();
 
       var wi = 0, si = 0;
       wizardlets.forEach((w, wizardletIndex) => {
@@ -166,6 +172,12 @@ foam.CLASS({
               sectionPosition, isAvailable$.get());
           }));
         });
+
+        // Bind validity listener for wizardlet validity
+        var isValid$ = w.isValid$;
+        this.wsub.onDetach(isValid$.sub(() => {
+          this.onWizardletValidity();
+        }));
 
       });
 
@@ -304,6 +316,9 @@ foam.CLASS({
         wizardletIndex: this.wizardPosition.wizardletIndex,
         sectionIndex: this.wizardPosition.sectionIndex,
       });
+    },
+    function onWizardletValidity() {
+      this.allValid = this.wizardlets.filter(w => ! w.isValid).length == 0;
     },
     function onSectionAvailability(sectionPosition, value) {
       // If a previous position became available, move the wizard back

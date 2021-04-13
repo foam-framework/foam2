@@ -50,7 +50,7 @@ public class Boot {
     }
 
     root_.put(foam.nanos.fs.Storage.class,
-        new foam.nanos.fs.FileSystemStorage(datadir));
+      new foam.nanos.fs.FileSystemStorage(datadir));
 
     // Used for all the services that will be required when Booting
     serviceDAO_ = new JDAO(((foam.core.ProxyX) root_).getX(), new foam.dao.MDAO(NSpec.getOwnClassInfo()), "services", cluster);
@@ -64,16 +64,39 @@ public class Boot {
     ArraySink arr = (ArraySink) serviceDAO_.select(new ArraySink());
     List      l   = perfectList(arr.getArray());
 
+    // Record all sub contexts to be frozen along with the root context
+    var subContexts = new HashSet<String>();
     for ( int i = 0 ; i < l.size() ; i++ ) {
       NSpec sp = (NSpec) l.get(i);
       if ( ! sp.getEnabled() ) {
         logger.info("Disabled", sp.getName());
         continue;
       }
-      NSpecFactory factory = new NSpecFactory((ProxyX) root_, sp);
+
+      var x = root_;
+      var path = sp.getName().split("\\.");
+      var parent = new StringBuilder();
+
+      // Register path as sub context
+      for ( int j = 0; j < path.length - 1; j++ ) {
+        var contextName = path[j];
+        if ( x.get(contextName) == null ) {
+          var subX = new SubX(Boot.this::getX, parent.toString());
+          x.put(contextName, subX);
+        }
+        x = (X) x.get(contextName);
+
+        if ( parent.length() > 0 ) parent.append(".");
+        parent.append(contextName);
+        subContexts.add(parent.toString());
+      }
+
+      // Register service
+      var serviceName = path[path.length - 1];
+      NSpecFactory factory = new NSpecFactory((ProxyX) x, sp);
       factories_.put(sp.getName(), factory);
       logger.info("Registering", sp.getName());
-      root_.putFactory(sp.getName(), factory);
+      x.putFactory(serviceName, factory);
     }
 
     serviceDAO_.listen(new AbstractSink() {
@@ -106,6 +129,11 @@ public class Boot {
         return ((Subject) x.get("subject")).getRealUser();
       }
     });
+
+    // Freeze sub contexts
+    for ( var path : subContexts ) {
+      ((SubX) root_.cd(path)).freeze();
+    }
 
     // Revert root_ to non ProxyX to avoid letting children add new bindings.
     root_ = ((ProxyX) root_).getX();

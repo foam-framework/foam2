@@ -15,6 +15,40 @@ foam.INTERFACE({
   `,
 
   methods: [
-    { name: 'getUpdateSlot' }
+    { name: 'getUpdateSlot' },
+    { name: 'installInWizardlet' }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2.wizard',
+  name: 'AbstractWizardletAware',
+  implements: [
+    {
+      path: 'foam.u2.wizard.WizardletAware',
+      flags: ['web']
+    }
+  ],
+
+  requires: [
+    'foam.u2.wizard.internal.FObjectRecursionSlot'
+  ],
+
+  properties: [
+    {
+      name: 'customUpdateSlot',
+      class: 'Boolean',
+      hidden: true,
+      transient: true
+    }
+  ],
+
+  methods: [
+    function installInWizardlet(w) {
+    },
+    function getUpdateSlot() {
+      var sl = this.FObjectRecursionSlot.create({ obj: this });
+      return sl;
+    }
   ]
 });

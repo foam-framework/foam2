@@ -17,6 +17,7 @@ configuration for contacting the primary node.`,
   ],
 
   implements: [
+    'foam.core.ContextAware',
     'foam.nanos.NanoService'
   ],
 
@@ -100,6 +101,19 @@ configuration for contacting the primary node.`,
       visibility: 'RO'
     },
     {
+      documentation: 'Debugging tool to build the list of instances an command passes through.',
+      name: 'trace',
+      class: 'Boolean',
+      value: true
+    },
+    {
+      documentation: 'A single instance is using the medusa journal. No other clustering features are used.',
+      name: 'standAlone',
+      class: 'Boolean',
+      value: false,
+      visibility: 'RO'
+    },
+    {
       name: 'maxRetryAttempts',
       class: 'Int',
       documentation: 'Set to -1 to infinitely retry.',
@@ -114,7 +128,6 @@ configuration for contacting the primary node.`,
       name: 'threadPoolName',
       class: 'String',
       value: 'threadPool'
-//      value: 'medusaThreadPool'
     },
     {
       name: 'batchTimerInterval',
@@ -171,6 +184,7 @@ configuration for contacting the primary node.`,
     {
       name: 'mediatorQuorum',
       class: 'Int',
+      visibility: 'RO',
       javaFactory: `
       return (int) Math.floor(getMediatorCount() / 2) + 1;
       `
@@ -201,6 +215,7 @@ configuration for contacting the primary node.`,
       documentation: 'Enabled and Online nodes to achieve quorum. Entries are written out one to each bucket, so quorum requires a reply from at least x buckets.',
       name: 'nodeQuorum',
       class: 'Int',
+      visibility: 'RO',
       javaFactory: `
       return (int) Math.floor(getNodeGroups() / 2) + 1;
       `
@@ -208,6 +223,7 @@ configuration for contacting the primary node.`,
     {
       name: 'nodeGroups',
       class: 'Int',
+      visibility: 'RO',
       javaFactory: `
       int c = getNodeCount();
 
@@ -249,10 +265,10 @@ configuration for contacting the primary node.`,
     {
       name: 'nodeBuckets',
       class: 'List',
+      visibility: 'RO',
       javaFactory: `
       return new ArrayList();
-      `,
-      visibility: 'RO'
+      `
     },
     {
       documentation: 'Are sufficient nodes enabled and online? Require a quorum count of buckets and a quorum count of nodes in each bucket',
@@ -298,6 +314,7 @@ configuration for contacting the primary node.`,
       name: 'broadcastMediators',
       class: 'FObjectArray',
       of: 'foam.nanos.medusa.ClusterConfig',
+      visibility: 'HIDDEN',
       javaFactory: `
       ClusterConfig myConfig = getConfig(getX(), getConfigId());
       long zone = myConfig.getZone() + 1;
@@ -329,6 +346,7 @@ configuration for contacting the primary node.`,
       name: 'broadcastNARegionMediators',
       class: 'FObjectArray',
       of: 'foam.nanos.medusa.ClusterConfig',
+      visibility: 'HIDDEN',
       javaFactory: `
       ClusterConfig myConfig = getConfig(getX(), getConfigId());
       List<ClusterConfig> arr = (ArrayList) ((ArraySink) ((DAO) getX().get("localClusterConfigDAO"))
@@ -355,6 +373,7 @@ configuration for contacting the primary node.`,
       name: 'nextZone',
       class: 'FObjectProperty',
       of: 'foam.nanos.medusa.ClusterConfig',
+      visibility: 'RO',
       javaFactory: `
       ClusterConfig config = getConfig(getX(), getConfigId());
       long zone = config.getZone();
@@ -399,6 +418,7 @@ configuration for contacting the primary node.`,
       name: 'nextServer',
       class: 'FObjectProperty',
       of: 'foam.nanos.medusa.ClusterConfig',
+      visibility: 'RO',
       javaFactory: `
       ClusterConfig config = getConfig(getX(), getConfigId());
 
@@ -430,6 +450,7 @@ configuration for contacting the primary node.`,
       name: 'activeRegion',
       class: 'FObjectProperty',
       of: 'foam.nanos.medusa.ClusterConfig',
+      visibility: 'RO',
       javaFactory: `
       ClusterConfig config = getConfig(getX(), getConfigId());
       DAO clusterConfigDAO = (DAO) getX().get("clusterConfigDAO");
@@ -457,20 +478,6 @@ configuration for contacting the primary node.`,
         throw new RuntimeException("Active Region not found.");
       }
       `
-    },
-    {
-      documentation: 'Debugging tool to build the list of instances an command passes through.',
-      name: 'trace',
-      class: 'Boolean',
-      value: false
-    },
-    {
-      documentation: 'A single instance is using the medusa journal. No other clustering features are used.',
-      name: 'standAlone',
-      class: 'Boolean',
-//      value: true,
-      value: false,
-      visibility: 'RO'
     },
     {
       name: 'logger',
@@ -650,7 +657,7 @@ configuration for contacting the primary node.`,
         }
         return primaryConfig;
       } else {
-        throw new RuntimeException("Primary not found.");
+        throw new PrimaryNotFoundException();
       }
       } finally {
         pm.log(x);

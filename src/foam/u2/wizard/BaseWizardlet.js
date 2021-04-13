@@ -24,6 +24,13 @@ foam.CLASS({
     'foam.u2.wizard.internal.WizardletAutoSaveSlot'
   ],
 
+  constants: [
+    {
+      name: 'SAVE_DELAY',
+      value: 1200
+    }
+  ],
+
   properties: [
     {
       name: 'id',
@@ -35,6 +42,14 @@ foam.CLASS({
     {
       name: 'of',
       class: 'Class'
+    },
+    {
+      name: 'data',
+      postSet: function (_, n) {
+        if ( this.of && this.WizardletAware.isInstance(n) ) {
+          n.installInWizardlet(this);
+        }
+      }
     },
     {
       name: 'title',
@@ -64,9 +79,15 @@ foam.CLASS({
     {
       name: 'isVisible',
       class: 'Boolean',
-      expression: function (of, isAvailable) {
-        return isAvailable && of;
+      expression: function (of, isAvailable, atLeastOneSectionVisible_) {
+        return isAvailable && of && atLeastOneSectionVisible_;
       }
+    },
+    { name: 'atLeastOneSectionVisible_', class: 'Boolean', value: true },
+    {
+      name: 'reloadAfterSave',
+      class: 'Boolean',
+      value: true
     },
     {
       name: 'loading',
@@ -79,7 +100,7 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.u2.wizard.WizardletSection',
       factory: function () {
-        return foam.u2.detail.AbstractSectionedDetailView.create({
+        var sections = foam.u2.detail.AbstractSectionedDetailView.create({
           of: this.of,
         }, this).sections.map(section => this.WizardletSection.create({
           section: section,
@@ -88,6 +109,12 @@ foam.CLASS({
             this.data$,
           )
         }));
+        for ( let section of sections ) {
+          this.onDetach(section.isAvailable$.sub(
+            this.updateVisibilityFromSectionCount));
+        }
+        this.updateVisibilityFromSectionCount();
+        return sections;
       }
     },
     {
@@ -148,14 +175,18 @@ foam.CLASS({
       code: function () {
         var self = this;
         var filter = foam.u2.wizard.Slot.filter;
+        var customUpdateSlot = false;
         if ( this.of && this.WizardletAware.isSubClass(this.of) ) {
+          customUpdateSlot = this.data && this.data.customUpdateSlot;
+        }
+        if ( customUpdateSlot ) {
           var s = foam.core.FObject.create();
           this.data$
             .map(data => {
               var updateSlot = data.getUpdateSlot();
               return this.WizardletAutoSaveSlot.create({
                 other: filter(updateSlot, v => v && ! self.loading),
-                delay: 700 // TODO: constant
+                delay: self.SAVE_DELAY
               });
             })
             .valueSub(() => { if ( ! self.loading ) s.pub(true); });
@@ -164,9 +195,17 @@ foam.CLASS({
         var sl = this.FObjectRecursionSlot.create({ obj$: this.data$ });
         return filter(this.WizardletAutoSaveSlot.create({
           other: filter(sl, () => ! self.loading),
-          delay: 700
+          delay: self.SAVE_DELAY
         }), () => ! self.loading);
       }
+    }
+  ],
+
+  listeners: [
+    function updateVisibilityFromSectionCount() {
+      if ( ! this.sections ) return;
+      this.atLeastOneSectionVisible_ = this.sections.filter(
+        v => v.isAvailable).length > 0;
     }
   ]
 });

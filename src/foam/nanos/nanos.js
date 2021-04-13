@@ -125,7 +125,8 @@ FOAM_FILES([
   { name: "foam/nanos/auth/twofactor/AbstractTOTPAuthService" },
   { name: "foam/nanos/auth/twofactor/ClientOTPAuthService" },
   { name: "foam/nanos/auth/twofactor/TwoFactorSignInView" },
-  { name: "foam/nanos/auth/twofactor/refinements" },
+  { name: "foam/nanos/auth/twofactor/UserRefinements" },
+  { name: "foam/nanos/auth/twofactor/ThemeRefinements" },
   { name: "foam/nanos/auth/UserAndGroupAuthService" },
   { name: "foam/nanos/auth/UserQueryService" },
   { name: "foam/nanos/auth/SimpleUserQueryService" },
@@ -207,6 +208,7 @@ FOAM_FILES([
   { name: 'foam/nanos/medusa/MedusaUniqueDAO' },
   { name: 'foam/nanos/medusa/MedusaType' },
   { name: 'foam/nanos/medusa/NodeCView' },
+  { name: 'foam/nanos/medusa/PrimaryNotFoundException' },
   { name: 'foam/nanos/medusa/PromotedPurgeAgent' },
   { name: 'foam/nanos/medusa/PurgeSink' },
   { name: 'foam/nanos/medusa/RegionCView' },
@@ -489,6 +491,7 @@ FOAM_FILES([
   { name: 'foam/nanos/crunch/predicate/StatusChangedTo' },
   { name: 'foam/nanos/crunch/predicate/IsAgent' },
   { name: 'foam/nanos/crunch/predicate/CapabilityJunctionTransitionToStatus' },
+  { name: 'foam/nanos/crunch/predicate/IsAgentUpdate' },
   //spid
   { name: "foam/nanos/auth/CreateUserCapabilityJunctionOnSpidSet" },
   { name: "foam/nanos/auth/SetUserServiceProviderJunctionRuleAction" },
@@ -519,6 +522,8 @@ FOAM_FILES([
   { name: 'foam/nanos/crunch/extra/ReviewCapabilityData' },
   { name: 'foam/nanos/crunch/extra/ReviewWizard' },
   { name: 'foam/nanos/crunch/extra/ImplyReviewedAction' },
+  //test
+  { name: 'foam/nanos/crunch/test/CrunchTestSupport' },
 
   // approval
   { name: 'foam/nanos/approval/ApprovalRequest' },
@@ -541,8 +546,8 @@ FOAM_FILES([
   // google
   { name: "foam/nanos/geocode/GoogleMapsCredentials" },
 
-  { name: "com/google/foam/demos/u2/AllViews" },
-  { name: "com/google/foam/demos/u2/MDAllViews" },
+  { name: "foam/demos/u2/AllViews" },
+  { name: "foam/demos/u2/MDAllViews" },
 
   //IBAN
   { name: "foam/nanos/iban/IBANInfo" },

@@ -26,9 +26,11 @@ public class ConfigurableAuthorizerBenchmark
   extends AuthorizerBenchmark
 {
   public static final String CONFIGURATION_DAO_KEY = "userDAO";
+  public static boolean cache;
 
-  public ConfigurableAuthorizerBenchmark(X benchmarkContext_, Authorizer authorizer_, int recordAmount_, Operation operation_) {
+  public ConfigurableAuthorizerBenchmark(X benchmarkContext_, Authorizer authorizer_, int recordAmount_, Operation operation_, boolean cached) {
     super(benchmarkContext_, authorizer_, recordAmount_, operation_);
+    cache = cached;
   }
 
   @Override
@@ -37,6 +39,7 @@ public class ConfigurableAuthorizerBenchmark
 
     authorizer = new ExtendedConfigurableAuthorizer.Builder(userAuthorizedContext)
       .setDAOKey(CONFIGURATION_DAO_KEY)
+      .setCache(cache)
       .build();
     dao = new AuthorizationDAO.Builder(userAuthorizedContext)
       .setDelegate(dao)

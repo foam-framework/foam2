@@ -27,6 +27,7 @@ foam.CLASS({
     'foam.nanos.logger.Logger',
     'java.util.Date',
     'java.util.List',
+    'javax.security.auth.AuthPermission',
     'static foam.mlang.MLang.*'
   ],
 
@@ -89,6 +90,18 @@ foam.CLASS({
       class: 'Image',
       documentation: `Path to capability icon`,
       section: 'uiSettings',
+      view: {
+        class: 'foam.u2.MultiView',
+        horizontal: false,
+        views: [
+          {
+            class: 'foam.u2.view.StringView'
+          },
+          {
+            class: 'foam.u2.view.ImageView'
+          }
+        ]
+      },
       includeInDigest: false
     },
     {
@@ -317,37 +330,13 @@ foam.CLASS({
       documentation: `Checks if a permission or capability string is implied by the current capability`,
       javaCode: `
         if ( ! this.getEnabled() ) return false;
-
-        // check if permission is a capability string implied by this permission
-        if ( this.stringImplies(this.getName(), permission) ) return true;
-
-        String[] inherentPermissions = this.getInherentPermissions();
-        for ( String permissionName : inherentPermissions ) {
-          if ( this.stringImplies(permissionName, permission) ) return true;
+        for ( String grantedPermission : this.getPermissionsGranted() ) {
+          if ( new AuthPermission(grantedPermission).implies(new AuthPermission(permission)) ) return true;
         }
-
-        String[] permissionsGranted = this.getPermissionsGranted();
-        for ( String permissionName : permissionsGranted ) {
-          if ( this.stringImplies(permissionName, permission) ) return true;
+        for ( String inherentPermission : this.getInherentPermissions() ) {
+          if ( new AuthPermission(inherentPermission).implies(new AuthPermission(permission)) ) return true;
         }
-        
         return false;
-      `
-    },
-    {
-      name: 'stringImplies',
-      type: 'Boolean',
-      args: [
-        { name: 's1', type: 'String' },
-        { name: 's2', type: 'String' }
-      ],
-      documentation: `check if s1 implies s2 where s1 and s2 are permission or capability strings`,
-      javaCode: `
-      if ( s1.equals(s2) ) return true;
-      if ( s1.isBlank() || s2.isBlank() ) return false;
-      if ( s1.charAt( s1.length() - 1) != '*' || ( s1.length() - 2 > s2.length() ) ) return false;
-      if ( s2.length() <= s1.length() - 2 ) return s1.substring( 0, s1.length() -2 ).equals( s2.substring( 0, s1.length() - 2 ) );
-      return s1.substring( 0, s1.length() - 1 ).equals( s2.substring( 0, s1.length() -1 ) );
       `
     },
     {

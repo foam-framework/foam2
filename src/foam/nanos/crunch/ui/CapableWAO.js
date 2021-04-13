@@ -23,22 +23,24 @@ foam.CLASS({
 
   methods: [
     async function save(wizardlet) {
-      if ( wizardlet.isAvailable ){
+      if ( ! wizardlet.isAvailable ) return;
+      var wData = wizardlet.data ? wizardlet.data.clone() : null;
+      wizardlet.loading = true;
 
-        if ( wizardlet.status === this.CapabilityJunctionStatus.AVAILABLE ) {
+      if ( wizardlet.status === this.CapabilityJunctionStatus.AVAILABLE ) {
+        wizardlet.status = this.CapabilityJunctionStatus.ACTION_REQUIRED;
+      }
+
+      return this.capable.getCapablePayloadDAO().put(
+        this.makePayload(wizardlet)
+      ).then(payload => {
+        if ( wizardlet.reloadAfterSave ) this.load_(wizardlet, payload);
+        else wizardlet.loading = false;
+        if ( wizardlet.isValid ) {
           wizardlet.status = this.CapabilityJunctionStatus.ACTION_REQUIRED;
         }
-
-        return this.capable.getCapablePayloadDAO().put(
-          this.makePayload(wizardlet)
-        ).then(payload => {
-          this.load_(wizardlet, payload);
-          if ( wizardlet.isValid ) {
-            wizardlet.status = this.CapabilityJunctionStatus.ACTION_REQUIRED;
-          }
-          return payload;
-        });
-      }
+        return payload;
+      });
     },
     async function cancel(wizardlet) {
       if ( ! wizardlet.isLoaded ) return;
@@ -47,6 +49,8 @@ foam.CLASS({
       );
     },
     async function load(wizardlet) {
+      if ( wizardlet.loading ) return;
+
       var targetPayload = await this.capable.getCapablePayloadDAO().find(
         wizardlet.capability.id ) || this.targetPayload;
       this.load_(wizardlet, targetPayload);
@@ -71,7 +75,15 @@ foam.CLASS({
       if ( prop ) prop.set(loadedData, wizardlet.capability);
 
       // Finally, apply new data to wizardlet
-      wizardlet.data = loadedData;
+      if ( wizardlet.data ) {
+        wizardlet.data.copyFrom(loadedData);
+      } else {
+        wizardlet.data = loadedData;
+      }
+
+      foam.u2.wizard.Slot.blockFramed().then(() => {
+        wizardlet.loading = false;
+      });
     },
     function makePayload(wizardlet) {
       return this.CapabilityJunctionPayload.create({

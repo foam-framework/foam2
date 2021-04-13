@@ -10,6 +10,7 @@ import foam.core.*;
 import foam.lib.json.Whitespace;
 import foam.lib.parse.*;
 import foam.lib.parse.Action;
+import foam.lib.parse.Not;
 import foam.lib.parse.Optional;
 import foam.mlang.Expr;
 import foam.mlang.MLang;
@@ -163,7 +164,7 @@ public class QueryParser
     )));
     grammar.addAction("COMPOUND_SUB_QUERY_BODY", (val, x) -> compactToString(Arrays.stream((Object[]) val).map(s -> s instanceof String || s instanceof Character ? s : compactToString(s)).toArray()));
 
-    grammar.addSymbol("SIMPLE_SUB_QUERY", new Seq1(1, Literal.create("."), new Until(new Alt(Literal.create(" "), EOF.instance()))));
+    grammar.addSymbol("SIMPLE_SUB_QUERY", new Seq1(1, Literal.create("."), new Repeat(new Not(new Alt(Literal.create(" "), EOF.instance()), AnyChar.instance()))));
     grammar.addAction("SIMPLE_SUB_QUERY", (val, x) -> {
       MQLExpr mql = new MQLExpr();
       mql.setQuery(compactToString(val));
@@ -284,7 +285,7 @@ public class QueryParser
         Binary binary = values[2].equals("=") ? new Eq() : new Contains();
         binary.setArg1(prop);
         binary.setArg2(( value[i] instanceof Expr ) ?
-          ( Expr ) value[i] : new foam.mlang.Constant (value[i]));
+          ( Expr ) value[i] : new foam.mlang.Constant (value[i].equals("null") ? null : value[i]));
         vals[i] = binary;
       }
       or.setArgs(vals);
