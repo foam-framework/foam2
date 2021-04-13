@@ -194,6 +194,8 @@ foam.CLASS({
             });
           });
         slotSlot.valueSub(() => { s.set(slotSlot.get().get()); });
+        this.wizardCloseSub.onDetach(s);
+        this.wizardCloseSub.onDetach(slotSlot);
         return s;
       }
     }
