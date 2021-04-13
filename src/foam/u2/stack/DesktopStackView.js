@@ -26,7 +26,6 @@ foam.CLASS({
   css: '%CUSTOMCSS%',
 
   methods: [
-    // TODO: Why is this init() instead of initE()? Investigate and maybe fix.
     function listenStackView() {
       var self = this;
       this.data$.dot('top').sub(() => {
