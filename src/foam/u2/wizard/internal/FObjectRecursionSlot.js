@@ -42,6 +42,22 @@ foam.CLASS({
         return { obj: this.obj, cause: null };
       }
     },
+    {
+      name: 'excludeAxioms',
+      class: 'StringArray',
+      factory: function () {
+        return [
+          'foam.dao.ManyToManyRelationshipAxiom',
+          'foam.dao.OneToManyRelationshipAxiom',
+          'foam.dao.DAOProperty'
+        ];
+      }
+    },
+    {
+      name: 'excludeProperties',
+      class: 'StringArray',
+      factory: () => []
+    },
     'cleanup_', // detachable to cleanup old subs when obj changes
   ],
 
@@ -75,6 +91,8 @@ foam.CLASS({
       var props = o.cls_.getAxiomsByClass(foam.core.Property);
 
       for ( let prop of props ) {
+        if ( this.excludeAxioms.some(v => prop.cls_.id == v) ) continue;
+        if ( this.excludeProperties.some(v => prop.name == v) ) continue;
         let prop$ = prop.toSlot(o);
         if ( foam.core.FObjectProperty.isInstance(prop) ) {
           if ( this.parentRefs.includes(prop$) ) continue;
@@ -85,6 +103,8 @@ foam.CLASS({
           }, this);
 
           cleanup.onDetach(propR$.sub(() => {
+            // ???: make this log a debug mode feature
+            // console.log('update', o && o.cls_.id, prop.name, o, propR$, prop, this);
             this.value = { obj: o, cause: propR$ };
           }));
 

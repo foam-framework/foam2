@@ -28,14 +28,14 @@ foam.CLASS({
       -webkit-appearance: none;
       appearance: none;
       border-radius: 2px;
-      border: solid 2px /*%GRAY1%*/ #5a5a5a;
+      border: solid 2px /*%GREY2%*/ #5a5a5a;
       width: 18px;
       height: 18px;
       transition: background-color 140ms, border-color 140ms;
     }
     ^:checked {
-      background-color: /*%PRIMARY1%*/ #1e1f21;
-      border-color: /*%PRIMARY1%*/ #1e1f21;
+      background-color: /*%PRIMARY3%*/ #1e1f21;
+      border-color: /*%PRIMARY3%*/ #1e1f21;
       fill: white;
     }
     ^:checked:after{
@@ -50,7 +50,7 @@ foam.CLASS({
     ^:hover {
       cursor: pointer
     }
-    span, input[type='checkbox']{
+    ^ span, input[type='checkbox']{
       vertical-align:middle;
     }
     `,

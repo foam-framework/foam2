@@ -49,11 +49,6 @@ foam.CLASS({
       java.util.Random r = ThreadLocalRandom.current();
       return new UUID(r.nextLong(), r.nextLong()).toString();
       `
-    },
-    {
-      name: 'delegate',
-      class: 'FObjectProperty',
-      of: 'foam.box.Box'
     }
   ],
 

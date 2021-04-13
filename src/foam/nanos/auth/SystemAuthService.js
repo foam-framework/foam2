@@ -19,11 +19,9 @@ foam.CLASS({
       name: 'check',
       javaCode: `
         User user = ((Subject) x.get("subject")).getUser();
-        boolean isAdmin = user != null
-          && ( user.getId() == foam.nanos.auth.User.SYSTEM_USER_ID
-          || "admin".equals(user.getGroup())
-          || "system".equals(user.getGroup()));
-        return isAdmin || getDelegate().check(x, permission);
+        Group group = (Group) x.get("group");
+        boolean isSystem = user != null && user.getId() == foam.nanos.auth.User.SYSTEM_USER_ID;
+        return isSystem || group != null && group.implies(x, new AuthPermission("*")) || getDelegate().check(x, permission);
       `
     }
   ]

@@ -35,28 +35,50 @@ foam.CLASS({
 
       // Scroll listener needed because DateView generates scroll event
       // in some foreign locales which conflicts with ScrollWizard.
-      this.on('scroll', (e) => { e.preventDefault(); e.stopPropagation(); });
+      this.on('scroll', e => { e.preventDefault(); e.stopPropagation(); });
+
+/*
+      this.on('focus',  e => { console.log('focus', e); });
+      this.on('blur',   e => { console.log('blur', e); });
+      this.on('input',  e => { console.log('input', e); });
+      this.on('change', e => { console.log('change', e); });
+      this.on('beforeinput', e => { console.log('beforeinput', e); });
+      */
     },
 
     function link() {
-      var self = this;
-      var slot = this.attrSlot();
-
-      var date = this.data;
+      if ( this.linked ) return;
+      this.linked = true;
+      var self    = this;
+      var focused = false;
+      var slot    = this.attrSlot(); //null, this.onKey ? 'input' : null);
 
       function updateSlot() {
-        date = self.data;
+        var date = self.data;
+        if ( focused ) return;
         if ( foam.Number.isInstance(date) ) date = new Date(date);
-        slot.set(date ? date.toISOString().substring(0,10) : '');
+        if ( ! date ) {
+          slot.set('');
+        } else {
+          slot.set(date ? date.toISOString().substring(0,10) : '');
+        }
+      }
+
+      function updateData() {
+        var value = slot.get();
+        self.data = value ? Date.parse(value) : undefined;
+      }
+
+      if ( this.onKey ) {
+        var focused = false;
+        this.on('focus', () => { focused = true; });
+        this.on('blur',  () => { focused = false; });
+        this.on('change', updateData);
+      } else {
+        this.on('blur', updateData);
       }
 
       updateSlot();
-
-      this.on('blur', () => {
-        var value = slot.get();
-        this.data = value && Date.parse(value);
-      });
-
       this.onDetach(this.data$.sub(updateSlot));
     }
   ]

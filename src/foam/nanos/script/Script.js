@@ -31,6 +31,14 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.*',
+    'foam.dao.*',
+    'static foam.mlang.MLang.*',
+    'foam.nanos.auth.*',
+    'foam.nanos.logger.PrefixLogger',
+    'foam.nanos.logger.Logger',
+    'foam.nanos.pm.PM',
+
     'java.io.BufferedReader',
     'java.io.ByteArrayOutputStream',
     'java.io.PrintStream',
@@ -42,19 +50,7 @@ foam.CLASS({
 
     'bsh.EvalError',
     'bsh.Interpreter',
-    'jdk.jshell.JShell',
-
-    'foam.core.*',
-    'foam.dao.*',
-    'static foam.mlang.MLang.*',
-    'foam.nanos.auth.*',
-    'foam.nanos.logger.PrefixLogger',
-    'foam.nanos.auth.*',
-    'foam.nanos.logger.Logger',
-    'foam.nanos.pm.PM',
-    'java.io.ByteArrayOutputStream',
-    'java.io.PrintStream',
-    'java.util.Date',
+    'jdk.jshell.JShell'
   ],
 
   tableColumns: [

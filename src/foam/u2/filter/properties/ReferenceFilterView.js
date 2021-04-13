@@ -230,12 +230,14 @@ foam.CLASS({
         }
         if ( selectedOptions.length === 1 ) {
           var key = this.getKeyByValue(selectedOptions[0]);
-          key = parseInt(key) ? parseInt(key) : key;
+          if ( ! isNaN(key) )
+            key = parseInt(key) ? parseInt(key) : key;
           return this.EQ(this.property, key);
         }
         var keys = selectedOptions.map( (label) => {
           var key = this.getKeyByValue(label);
-          key = parseInt(key) ? parseInt(key) : key;
+          if ( ! isNaN(key) )
+            key = parseInt(key) ? parseInt(key) : key;
           return key;
         });
         return this.IN(this.property, keys);

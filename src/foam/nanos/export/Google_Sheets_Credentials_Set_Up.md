@@ -10,7 +10,7 @@ To set up credentials required for Google Sheets Export or Import follow through
       3.4 Double click on OAuth 2.0 Client IDs credentials available
       3.5 Use "DOWNLOAD JSON" button to download json
 4. Copy-paste data from json to the credentials record that you're creating
-5. Use url for web app for which you're creating google credentials as an ID (eg for localhost http://ablii:8080 or http://localhost:8080)
+5. Use your-domain as an ID
 6. Save credentials
 
 
