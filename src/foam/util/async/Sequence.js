@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.util.async',
   name: 'Sequence',
+  extends: 'foam.core.Fluent',
 
   implements: [
     'foam.core.ContextAgent',

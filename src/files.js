@@ -175,6 +175,8 @@ FOAM_FILES([
   { name: "foam/json2/Deserializer" },
   { name: "foam/java/Util", flags:['java'] },
 
+  { name: "foam/core/Fluent" },
+
   { name: "foam/util/Timer" },
   { name: "foam/util/AddressUtil" },
   { name: "foam/util/EmailTest" },
@@ -212,6 +214,7 @@ FOAM_FILES([
   { name: 'foam/u2/borders/BrowserSupportBorder', flags: ['web'] },
   { name: 'foam/u2/borders/NullBorder', flags: ['web'] },
   { name: 'foam/u2/borders/CardBorder', flags: ['web'] },
+  { name: 'foam/u2/borders/CollapseBorder', flags: ['web'] },
   { name: 'foam/u2/borders/MarginBorder', flags: ['web'] },
   { name: 'foam/u2/borders/SplitScreenBorder', flags: ['web'] },
   { name: 'foam/u2/borders/Block', flags: ['web'] },
@@ -662,6 +665,7 @@ FOAM_FILES([
   { name: "foam/u2/crunch/wizardflow/ShowPreexistingAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/SaveAllAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/CapabilityStoreAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/DebugAgent", flags: ['web', 'debug'] },
   { name: "foam/u2/crunch/wizardflow/lite/CapableDefaultConfigAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/DetachAgent", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityRequirementView", flags: ['web'] },
@@ -905,9 +909,13 @@ FOAM_FILES([
   // Step Wizard
   { name: "foam/u2/dialog/SimpleActionDialog" },
   { name: "foam/u2/tag/CircleIndicator" },
+  { name: "foam/u2/wizard/internal/PropertyUpdate" },
   { name: "foam/u2/wizard/internal/FObjectRecursionSlot" },
   { name: "foam/u2/wizard/internal/WizardletAutoSaveSlot" },
   { name: "foam/u2/wizard/internal/lib" },
+  { name: "foam/u2/wizard/WAO" },
+  { name: "foam/u2/wizard/ProxyWAO" },
+  { name: "foam/u2/wizard/NullWAO" },
   { name: "foam/u2/wizard/axiom/WizardAction" },
   { name: "foam/u2/wizard/WizardPosition" },
   { name: "foam/u2/wizard/Wizardlet" },
@@ -924,7 +932,6 @@ FOAM_FILES([
   { name: "foam/u2/wizard/ScrollingStepWizardView" },
   { name: "foam/u2/wizard/ScrollWizardletView" },
   { name: "foam/u2/wizard/DAOWizardlet" },
-  { name: "foam/u2/wizard/WAO" },
 
   // CRUNCH user interface
   { name: "foam/u2/crunch/wizardflow/SkipMode", flags: ['web'] },
