@@ -579,7 +579,7 @@ foam.LIB({
       code: foam.Function.memoize1(function(/* String= */ str) {
         if ( str === '' || str === null || foam.Undefined.isInstance(str) ) return '';
 
-        return this.capitalize(str.replace(/[a-z][A-Z]/g, function(a) {
+        return this.capitalize(str.replaceAll('_', ' ').replace(/[a-z][A-Z]/g, function(a) {
           return a.charAt(0) + ' ' + a.charAt(1);
         }));
       })
