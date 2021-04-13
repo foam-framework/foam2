@@ -51,13 +51,7 @@ foam.CLASS({
     function initE() {
       var data = this.data;
       this.SUPER();
-      var icon = {
-        size: 14,
-        backgroundColor: data.color,
-        icon: this.theme.glyphs.checkmark.getDataUrl({
-          fill: data.background ? data.background : data.color
-        })
-      };
+      var icon;
       this
         .addClass(this.myClass())
         .style({
@@ -65,7 +59,14 @@ foam.CLASS({
           'color': data.color,
           'border-color': data.background == '#FFFFFF' || ! data.background ? data.color : data.background
         })
-        .callIf(this.showGlyph, () =>{
+        .callIf(this.showGlyph && data.glyph, () =>{
+          icon = {
+            size: 14,
+            backgroundColor: data.color,
+            icon: data.glyph.getDataUrl({
+              fill: data.background ? data.background : data.color
+            })
+          };
           this.start(this.CircleIndicator, icon).addClass(this.myClass('icon')).end()
         })
         .start()

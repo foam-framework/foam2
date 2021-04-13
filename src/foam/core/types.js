@@ -949,3 +949,20 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'GlyphProperty',
+  extends: 'FObjectProperty',
+
+  requires: ['foam.core.Glyph'],
+
+  properties: [
+    {
+      name: 'adapt',
+      value: function(_, v, prop) {
+        return prop.Glyph.create({ template: v });
+      }
+    }
+  ]
+});
