@@ -672,6 +672,8 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.auth.ProfilePictureVi
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.IncrementalStepWizardView.ACTION_LABEL",target:"Enviar"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.IncrementalStepWizardView.CANCEL_LABEL",target:"Cancelar"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.IncrementalStepWizardView.GO_PREV.label",target:"Voltar"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.IncrementalStepWizardView.GO_NEXT.label",target:"Próximo"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.IncrementalStepWizardView.SAVE_IN_PROGRESS",target:"Salvando..."})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.IncrementalStepWizardView.ERROR_MSG",target:"A informação não foi enviada com sucesso, por favor tente novamente mais tarde"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.IncrementalStepWizardView.ERROR_MSG_DRAFT",target:"Ocorreu um erro ao salvar seu progresso"})
@@ -680,3 +682,4 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.IncrementalStepWi
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.IncrementalStepWizardView.CONFIRM_MSG",target:"Saída"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.IncrementalStepWizardView.DISMISS_MSG",target:"Tem certeza de que deseja sair desta tela?"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.IncrementalStepWizardView.CONTINUE_MSG",target:"Volte"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.comics.v2.DAOBrowserView.REFRESH_MSG",target:"Atualização solicitada ..."})

@@ -14,6 +14,10 @@ foam.CLASS({
     'foam.u2.wizard.Wizardlet'
   ],
 
+  imports: [
+    'wizardCloseSub'
+  ],
+
   requires: [
     'foam.u2.detail.AbstractSectionedDetailView',
     'foam.u2.wizard.WizardletAware',
@@ -184,6 +188,7 @@ foam.CLASS({
           this.data$
             .map(data => {
               var updateSlot = data.getUpdateSlot();
+              this.wizardCloseSub.onDetach(updateSlot);
               return this.WizardletAutoSaveSlot.create({
                 other: filter(updateSlot, v => v && ! self.loading),
                 delay: self.SAVE_DELAY
@@ -193,6 +198,7 @@ foam.CLASS({
           return s;
         }
         var sl = this.FObjectRecursionSlot.create({ obj$: this.data$ });
+        this.wizardCloseSub.onDetach(sl);
         return filter(this.WizardletAutoSaveSlot.create({
           other: filter(sl, () => ! self.loading),
           delay: self.SAVE_DELAY

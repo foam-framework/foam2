@@ -183,7 +183,7 @@ foam.CLASS({
     {
       name: 'statusUpdate',
       isMerged: true,
-      mergeDelay: 100,
+      mergeDelay: 2000,
       code: function() {
         if ( this.cjStatus != this.CapabilityJunctionStatus.PENDING &&
               this.cjStatus != this.CapabilityJunctionStatus.PENDING_REVIEW ) {
@@ -194,6 +194,9 @@ foam.CLASS({
             this.auth.cache = {};
             this.crunchService.pub('grantedJunction');
             this.cjStatus = this.CapabilityJunctionStatus.GRANTED;
+          }
+          else if ( ucj && ucj.status === this.CapabilityJunctionStatus.ACTION_REQUIRED ) {
+            this.crunchService.pub('grantedJunction');
           } else {
             this.statusUpdate();
           }

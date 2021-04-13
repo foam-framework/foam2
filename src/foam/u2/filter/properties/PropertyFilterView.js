@@ -167,7 +167,7 @@ foam.CLASS({
       this.isFiltering();
       this.isInit = false;
     },
-    
+
     function getPredicateFromMemento() {
       if ( this.memento && this.memento.head.length > 0 ) {
         var predicate = this.queryParser.parseString(this.memento.head);
@@ -220,13 +220,9 @@ foam.CLASS({
         if ( Object.keys(this.view_.predicate).length > 0 && ! foam.mlang.predicate.True.isInstance(this.view_.predicate) )
           pred =  this.view_.predicate.toMQL && this.view_.predicate.toMQL();
 
-        if ( pred ) {
-          this.memento.head = pred ? pred : '';
-        } else {
-          this.memento.head = '';
-        }
+        this.memento.head = pred ? pred : '';
       }
-      
+
       // Since the existing predicates are lazy loaded (on opening the view),
       // check to see if there is an existing predicate to use the correct label
       if ( this.filterController.getExistingPredicate(this.criteria, this.property) && this.firstTime_ ) {
