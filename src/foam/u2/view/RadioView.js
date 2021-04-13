@@ -24,7 +24,7 @@ foam.CLASS({
 
   css: `
     ^choice {
-      display: inline-block
+      display: inline-flex;
     }
     ^ input[type='radio']{
       padding: 0px !important;
@@ -36,17 +36,15 @@ foam.CLASS({
     }
     ^ input[type='radio']+ label{
       position: relative;
-      display: inline-block;
+      display: flex;
       cursor: pointer;
     }
     ^ input[type='radio']+ label:before{
       content: '';
-      display: inline-block;
-      vertical-align: middle;
-      width: 20px;
-      height: 20px;
+      width: 16px;
+      height: 16px;
       margin-right: 0.3rem;
-      border-radius: 50%;
+      border-radius: 100%;
       border-style: solid;
       border-width: 2px;
       border-color: /*%GREY2%*/ gray;
@@ -56,11 +54,12 @@ foam.CLASS({
       content: '';
       position: absolute;
       display: inline-block;
-      left: 6px;
-      top: 6px;
-      border-radius: 50%;
-      width: 12px;
-      height: 12px;
+      left: 0px;
+      top: 0px;
+      transform: translate(5px, 5px);
+      border-radius: 100%;
+      width: 10px;
+      height: 10px;
     }
     ^ input[type='radio']:checked + label:after{
       background: /*%PRIMARY3%*/ blue;
@@ -68,8 +67,8 @@ foam.CLASS({
     ^ input[type='radio']:checked + label:before{
       border-color: /*%PRIMARY3%*/ blue;
     }
-    input[type='radio']:focus + label::before {
-          box-shadow: 0 0px 2px /*%PRIMARY1%*/ blue;
+    ^ input[type='radio']:focus + label::before {
+      box-shadow: 0 0px 2px /*%PRIMARY1%*/ blue;
     }
     ^ .choice {
       font-size: 16px;
