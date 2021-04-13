@@ -125,45 +125,6 @@ foam.CLASS({
   ]
 });
 
-/*
-foam.CLASS({
-  package: 'foam.u2.crunch.wizardflow',
-  name: 'DebugWizardlet',
-  extends: 'foam.u2.crunch.BaseWizardlet',
-
-  requires: [
-    'foam.u2.crunch.NullWAO',
-    'foam.u2.wizard.WizardletSection'
-  ],
-
-  properties: [
-    {
-      name: 'friend',
-      class: 'FObjectProperty',
-      of: 'foam.u2.wizard.Wizardlet'
-    },
-    {
-      name: 'wao',
-      factory: function () {
-        return this.NullWAO.create();
-      }
-    },
-    {
-      name: 'sections',
-      factory: function () {
-        return [
-          this.WizardletSection.create({
-            customView: {
-              class: 'foam.u2.crunch.wizardflow.DebugWizardletView'
-            }
-          })
-        ];
-      }
-    }
-  ],
-});
-*/
-
 foam.CLASS({
   package: 'foam.u2.crunch.wizardflow',
   name: 'DebugWAO',
