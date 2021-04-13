@@ -4135,7 +4135,7 @@ foam.CLASS({
       type: 'Expr',
       code: function(model) {
         for ( var i = 0; i < model.properties.length; i++  ) {
-        var prop = model.properties[i];
+          var prop = model.properties[i];
           if ( this.propName == prop.name || this.propName == prop.shortName || prop.aliases.includes(this.propName) ) return prop;
         }
         return;
@@ -4146,10 +4146,8 @@ foam.CLASS({
         for ( PropertyInfo prop : properties ) {
           if ( prop.getName().equals(getPropName()) || prop.getShortName() != null && prop.getShortName().equals(getPropName()) ) return prop;
 
-          if ( prop.getAliases().length != 0 ) {
-            for ( int i = 0; i < prop.getAliases().length; i++) {
-              if ( getPropName().equals(prop.getAliases()[i]) ) return prop;
-            }
+          for ( int i = 0; i < prop.getAliases().length; i++) {
+            if ( getPropName().equals(prop.getAliases()[i]) ) return prop;
           }
         }
 
