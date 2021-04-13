@@ -663,7 +663,7 @@ FOAM_FILES([
   { name: "foam/u2/crunch/wizardflow/ShowPreexistingAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/SaveAllAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/CapabilityStoreAgent", flags: ['web'] },
-  { name: "foam/u2/crunch/wizardflow/DebugAgent", flags: ['web'] },
+  { name: "foam/u2/crunch/wizardflow/DebugAgent", flags: ['web', 'debug'] },
   { name: "foam/u2/crunch/wizardflow/lite/CapableDefaultConfigAgent", flags: ['web'] },
   { name: "foam/u2/crunch/wizardflow/DetachAgent", flags: ['web'] },
   { name: "foam/u2/crunch/CapabilityRequirementView", flags: ['web'] },

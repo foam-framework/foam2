@@ -10,6 +10,8 @@ foam.CLASS({
   documentation: `
     A domain-specific "language" - a model with chainable methods for
     constructing domain-specific objects, similar to using the builder pattern.
+
+    For creating "fluent" interfaces. See: https://en.wikipedia.org/wiki/Fluent_interface
   `,
 
   methods: [

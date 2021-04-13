@@ -50,9 +50,6 @@ foam.CLASS({
     {
       name: 'reloadCount',
       label: 'Reload Count',
-      postSet: function (o, n) {
-        console.log('--', o, n);
-      },
       class: 'Int'
     },
     'propertyUpdateDAO'
@@ -61,7 +58,6 @@ foam.CLASS({
   methods: [
     function init() {
       this.SUPER();
-      console.log(`Hello I exist ${this.id}`);
       if ( ! this.wizardlet ) {
         throw new Error('must be initialized with wizardlet');
       }
@@ -112,7 +108,6 @@ foam.CLASS({
 
   actions: [
     function save() {
-      console.log('AAA');
       try {
         this.wizardlet.save();
       } catch (e) {
