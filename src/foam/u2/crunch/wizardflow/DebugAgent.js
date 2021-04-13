@@ -23,21 +23,19 @@ foam.CLASS({
   css: `
     ^ {
       margin-top: 15pt;
-      /* using double borders here is only okay because it's a debugging tool */
       border: 3pt solid /*%DESTRUCTIVE3%*/ #C00;
+      border-radius: 6px;
     }
     ^title {
       background-color: /*%DESTRUCTIVE3%*/ #C00;
       color: #FFF;
-      padding: 8pt;
-      font-size: 14pt;
-    }
-    ^subtitle {
-      background-color: /*%DESTRUCTIVE4%*/ #C55;
-      color: #FFF;
       padding: 2pt 8pt;
       font-size: 12pt;
-      margin-bottom: 4pt;
+    }
+    ^ .foam-u2-borders-CollapseBorder.expanded {
+      border-bottom: 0;
+      border-left: 0;
+      border-right: 0;
     }
   `,
 
@@ -82,20 +80,23 @@ foam.CLASS({
         .addClass(this.myClass())
         .start()
           .addClass(this.myClass('title'))
-          .add('Developer Tools')
-        .end()
-        .start()
-          .addClass(this.myClass('subtitle'))
+          .add('Developer Tools: ')
           .add(this.wizardlet.title$)
         .end()
         .startContext({ controllerMode: 'VIEW' })
-          .start(this.CollapseBorder, { title: 'Property Updates' })
+          .start(this.CollapseBorder, {
+            title: 'Property Updates',
+            expanded: false
+          })
             .tag(this.ScrollTableView, {
               data$: this.propertyUpdateDAO$.map(dao =>
                 dao.orderBy(this.PropertyUpdate.SEQ_NO))
             })
           .end()
-          .start(this.CollapseBorder, { title: 'Debug Actions' })
+          .start(this.CollapseBorder, {
+            title: 'Debug Actions',
+            expanded: false
+          })
             .start()
               .tag(this.SAVE)
               .tag(this.LOAD_ACTION)
@@ -184,7 +185,7 @@ foam.CLASS({
       for ( let wizardlet of this.wizardlets ) {
         if ( wizardlet.isVisible ) {
           wizardlet.sections.push(this.WizardletSection.create({
-            title: 'Debug',
+            title: 'Developer Tools',
             isAvailable: true,
             customView: {
               class: 'foam.u2.crunch.wizardflow.DebugWizardletView',

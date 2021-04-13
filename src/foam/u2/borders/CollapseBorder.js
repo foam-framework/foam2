@@ -7,101 +7,94 @@
 foam.CLASS({
   package: 'foam.u2.borders',
   name: 'CollapseBorder',
-  extends: 'foam.u2.Element',
+  extends: 'foam.u2.Controller',
+
+  requires: [ 'foam.u2.ActionView' ],
 
   css: `
-    ^header {
-      background-color: %GREY1%;
-      color: %WHITE%;
-      display: flex;
-      align-content: space-between;
-      line-height: 20pt;
-      font-size: 14pt;
-    }
-
-    ^header > .foam-u2-ActionView {
-      height: 20pt;
-      margin-left: 0;
-      border-color: %GREY1%;
-      margin-left: 7pt;
-    }
-
-    ^header > ^title {
-      margin-left: 8pt;
-    }
-
-    ^footer {
-      background-color: %GREY1%;
-      height: 4pt;
-      border-bottom: 1pt solid %GREY2%;
-    }
-
     ^ {
-      margin-bottom: 4pt;
-      border-left: 2px solid %GREY1%;
-      border-right: 2px solid %GREY1%;
+      position: relative;
+      padding: 10px;
+      border-top: 1px solid #999;
+      margin-top: 16px;
     }
-
-    ^collapsed > *:not(^header) {
-      display: none;
+    ^.expanded {
+      border: 1px solid #999;
+      padding-left: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
+      padding-top: 20px;
+    }
+    ^control {
+      display: inline;
+      float: right;
+      height: 30px;
+      position: relative;
+      top: -10px;
+      width: 30px;
+    }
+    ^toolbar {
+      display: inline-block;
+      position: absolute;
+      padding: 3px;
+      width: calc(100% - 16px);
+      left: 8px;
+      top: -8px;
+      color: #666;
+    }
+    ^title {
+      background: white;
+      padding: 3px;
+      position: relative;
+      top: -3px;
+    }
+    ^control > .foam-u2-ActionView-toggle {
+      transform: rotate(-90deg);
+      transition: transform 0.3s;
+      border: none;
+      outline: none;
+      padding: 3px;
+      width: 30px;
+      height: 30px;
+    }
+    ^.expanded .foam-u2-ActionView-toggle {
+      transform: rotate(0deg);
+      transition: transform 0.3s;
     }
   `,
 
-  documentation: 'A stylized border. Intended for use when creating cards.',
-
   properties: [
-    {
-      name: 'title',
-      class: 'String'
-    },
+    'title',
     {
       class: 'Boolean',
-      name: 'isCollapsed',
+      name: 'expanded',
       value: true
-    }
-  ],
-
-  // TODO: copied from CollapseableDetailView - maybe it should use this border
-  actions: [
-    {
-      name: 'showAction',
-      label: '',
-      icon: 'images/expand-more.svg',
-      isAvailable: function(isCollapsed) { return isCollapsed; },
-      code: function() { this.isCollapsed = false; }
-    },
-    {
-      name: 'hideAction',
-      label: '',
-      icon: 'images/expand-less.svg',
-      isAvailable: function(isCollapsed) { return ! isCollapsed; },
-      code: function() { this.isCollapsed = true; }
     }
   ],
 
   methods: [
     function init() {
-      this
-        .start()
-          .addClass(this.myClass('header'))
-          .startContext({ data: this })
-            .tag(this.SHOW_ACTION, { buttonStyle: 'UNSTYLED' })
-            .tag(this.HIDE_ACTION, { buttonStyle: 'UNSTYLED' })
-          .endContext()
-          .start()
-            .addClass(this.myClass('title'))
-            .add(this.title$)
-          .end()
-        .end()
-    },
-    function initE() {
-      this
-        .addClass(this.myClass())
-        .enableClass(this.myClass('collapsed'), this.isCollapsed$)
-        .start()
-          .addClass(this.myClass('footer'))
-        .end()
-        ;
-    },
+      this.
+        addClass(this.myClass()).
+        enableClass('expanded', this.expanded$).
+        start('div').
+          addClass(this.myClass('toolbar')).
+          start('span').
+            addClass(this.myClass('title')).
+            add(this.title$).
+          end().
+          start('div').
+            addClass(this.myClass('control')).
+            tag(this.TOGGLE, {label: '\u25BD'}).
+          end().
+        end().
+        start('div', null, this.content$).
+          show(this.expanded$).
+          addClass(this.myClass('content')).
+        end();
+    }
+  ],
+
+  actions: [
+    function toggle() { this.expanded = ! this.expanded; }
   ]
 });
