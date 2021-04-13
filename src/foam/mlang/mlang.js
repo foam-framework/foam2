@@ -4157,7 +4157,7 @@ foam.CLASS({
       `
     },
     function toString() {
-      return '(' + this.propName + ')';
+      return this.propName;
     }
   ]
 });
