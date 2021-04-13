@@ -12,7 +12,8 @@ foam.ENUM({
       label: { en: 'pending', pt: 'pendente'},
       documentation: 'Our team is currently reviewing. Approvals may take up to 24 hours',
       background: '#FFFFFF',
-      color: '#865300'
+      color: '#865300',
+      glyph: 'pending'
     },
     {
       name: 'GRANTED',
@@ -20,19 +21,7 @@ foam.ENUM({
       documentation: 'The information you provided has been approved',
       background: '#FFFFFF',
       color: '#007328',
-      glyph: `
-      <?xml version="1.0" encoding="UTF-8"?>
-      <svg width="40px" height="40px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-          <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-              <g id="icon/complete/48x48" transform="translate(-4.000000, -4.000000)">
-                  <g id="round-check_circle-24px">
-                      <polygon id="Path" points="0 0 48 0 48 48 0 48"></polygon>
-                      <path d="M18.58,32.58 L11.4,25.4 C10.62,24.62 10.62,23.36 11.4,22.58 C12.18,21.8 13.44,21.8 14.22,22.58 L20,28.34 L33.76,14.58 C34.54,13.8 35.8,13.8 36.58,14.58 C37.36,15.36 37.36,16.62 36.58,17.4 L21.4,32.58 C20.64,33.36 19.36,33.36 18.58,32.58 Z" id="Shape" fill="%FILL%" fill-rule="nonzero"></path>
-                  </g>
-              </g>
-          </g>
-      </svg>
-      `
+      glyph: 'checkmark'
     },
     {
       name: 'EXPIRED',
@@ -78,7 +67,8 @@ foam.ENUM({
       expected to go to EXPIRED and have the user fill out more info. Used in the 
       Capable object junctions.`,
       background: '#FFFFFF',
-      color: '/*%DESTRUCTIVE2%*/ #A61414'
+      color: '/*%DESTRUCTIVE2%*/ #A61414',
+      glyph: 'exclamation'
     },
   ]
 });

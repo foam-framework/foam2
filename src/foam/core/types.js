@@ -961,7 +961,13 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(_, v, prop) {
-        return prop.Glyph.create({ template: v });
+        if ( ! v ) return;
+        if ( foam.String.isInstance(v) ) {
+          return prop.Glyph.create({ themeName: v });
+        }
+        if ( ! foam.core.FObject.isInstance(v) ) {
+          return prop.Glyph.create(v);
+        }
       }
     }
   ]

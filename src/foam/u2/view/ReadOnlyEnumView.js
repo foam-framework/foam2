@@ -34,7 +34,7 @@ foam.CLASS({
       align-items: center;
     }
     ^icon{
-      margin-right: 10px;
+      margin-right: 4px;
     }
   `,
 
@@ -63,11 +63,11 @@ foam.CLASS({
           icon = {
             size: 14,
             backgroundColor: data.color,
-            icon: data.glyph.getDataUrl({
+            icon: data.glyph.clone(this).getDataUrl({
               fill: data.background ? data.background : data.color
             })
           };
-          this.start(this.CircleIndicator, icon).addClass(this.myClass('icon')).end()
+          this.start(this.CircleIndicator, icon).addClass(this.myClass('icon')).end();
         })
         .start()
           .addClass(this.myClass('label'))
