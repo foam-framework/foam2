@@ -14,14 +14,16 @@ foam.CLASS({
       display: flex;
       position: relative;
       width: fit-content;
+      flex-direction: column;
+      justify-content: center;
     }
     ^placeholder::after {
       position: absolute;
       left: 9px;
-      top: 12px;
       content: attr(data-placeholder);
       pointer-events: none;
       opacity: 0.7;
+      font-size: 14px;
       letter-spacing: normal;
     }
   `,
