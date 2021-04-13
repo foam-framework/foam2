@@ -22,6 +22,7 @@ foam.CLASS({
   ],
 
   messages: [
+    { name: 'BACK_LABEL_ACJ', message: 'Back' },
     { name: 'SUCCESS_UPDATED', message: 'Successfuly updated onboarding information.'},
     { name: 'SUCCESS_REMOVED', message: 'Successfuly removed onboarding information.'}
   ],
@@ -90,6 +91,12 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      name: 'backLabel',
+      factory: function() {
+        return this.BACK_LABEL_ACJ;
+      }
+    },
     {
       class: 'foam.u2.ViewSpec',
       name: 'viewView',

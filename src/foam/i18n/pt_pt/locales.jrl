@@ -48,6 +48,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityFeature
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityFeatureView.CJ_STATUS.documentation",target:"\nArmazena o status do recurso de capacidade e é atualizado quando o usuário \n tenta preencher ou preencher os formulários CRUNCH. \n"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.crunch.CapabilityFeatureView.RENEW_DATA_LABEL",target:"Por favor reveja e atualize seus dados"})
 
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.AgentCapabilityJunctionDAOSummaryView.BACK_LABEL_ACJ",target:"Voltar"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.AgentCapabilityJunctionDAOSummaryView.SUCCESS_UPDATED",target:"Informações de integração atualizadas com êxito."})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.crunch.AgentCapabilityJunctionDAOSummaryView.SUCCESS_REMOVED",target:"Informações de integração removidas com sucesso."})
 
@@ -460,6 +461,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequ
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.SUCCESS_CANCELLED",target:"Você cancelou com sucesso este pedido"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.PENDING",target:"Pendente"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.TRACKING",target:"Rastreamento"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.BACK_LABEL",target:"Voltar"})
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.comics.v2.DAOSummaryView.BACK.label",target:"Voltar"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.comics.v2.DAOSummaryView.EDIT.label",target:"Editar"})
