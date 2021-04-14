@@ -46,7 +46,7 @@ The data of a MedusaEntry is the json delta of the original put or remove DAO op
       of: 'foam.dao.DOP',
       name: 'dop',
       visibility: 'RO',
-      tableWidth: 50
+      tableWidth: 100
     },
     {
       name: 'index',
