@@ -143,7 +143,6 @@ foam.CLASS({
     async function initE() {
       this.SUPER();
       var self = this;
-
       if ( Object.keys(this.supportedFormats).length == 0 ) {
         let s = await this.fileTypeDAO.select()
         s.array.forEach(type => {
@@ -175,11 +174,13 @@ foam.CLASS({
         .add(this.slot(function(files) {
           var e = this.E();
           for ( var i = 0; i < files.length; i++ ) {
+            debugger;
             e.tag({
               class: 'foam.nanos.fs.fileDropZone.FileCard',
               data: files[i],
               selected: this.selected,
-              index: i
+              index: i,
+              mode: self.controllerMode === self.controllerMode.VIEW ? foam.u2.DisplayMode.RO : foam.u2.DisplayMode.RW
             });
           }
           return e;
@@ -283,6 +284,9 @@ foam.CLASS({
     },
 
     function removeFile(atIndex) {
+      if ( this.controllerMode === this.controllerMode.VIEW ) {
+            return;
+      }
       var files = Array.from(this.files);
       files.splice(atIndex, 1);
       if ( this.selected === files.length )
@@ -300,6 +304,9 @@ foam.CLASS({
 
   listeners: [
     function onAddAttachmentClicked(e) {
+      if ( this.controllerMode === this.controllerMode.VIEW ) {
+            return;
+      }
       if ( typeof e.target != 'undefined' ) {
         if ( e.target.tagName == 'P' && e.target.tagName != 'A' ) {
           this.document.querySelector('.' + this.instanceClass(`input`)).click();
@@ -313,6 +320,9 @@ foam.CLASS({
     },
 
     function onDrop(e) {
+      if ( this.controllerMode === this.controllerMode.VIEW ) {
+        return;
+      }
       e.preventDefault();
       var files = [];
       var inputFile;
