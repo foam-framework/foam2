@@ -143,6 +143,7 @@ foam.CLASS({
     async function initE() {
       this.SUPER();
       var self = this;
+      
       if ( Object.keys(this.supportedFormats).length == 0 ) {
         let s = await this.fileTypeDAO.select()
         s.array.forEach(type => {
@@ -174,13 +175,11 @@ foam.CLASS({
         .add(this.slot(function(files) {
           var e = this.E();
           for ( var i = 0; i < files.length; i++ ) {
-            debugger;
             e.tag({
               class: 'foam.nanos.fs.fileDropZone.FileCard',
               data: files[i],
               selected: this.selected,
-              index: i,
-              mode: self.controllerMode === self.controllerMode.VIEW ? foam.u2.DisplayMode.RO : foam.u2.DisplayMode.RW
+              index: i
             });
           }
           return e;
@@ -305,7 +304,7 @@ foam.CLASS({
   listeners: [
     function onAddAttachmentClicked(e) {
       if ( this.controllerMode === this.controllerMode.VIEW ) {
-            return;
+        return;
       }
       if ( typeof e.target != 'undefined' ) {
         if ( e.target.tagName == 'P' && e.target.tagName != 'A' ) {
