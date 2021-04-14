@@ -4038,8 +4038,14 @@ foam.CLASS({
         return ((foam.mlang.predicate.Nary) ps.value()).partialEval();
       `
     },
-    function toString() {
-      return '(' + this.query + ')';
+    {
+      name: 'toString',
+      code: function toString() {
+        return '(' + this.query + ')';
+      },
+      javaCode: `
+        return "(" + getQuery() + ")";
+      `
     }
   ]
 });
