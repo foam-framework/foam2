@@ -143,7 +143,7 @@ foam.CLASS({
     async function initE() {
       this.SUPER();
       var self = this;
-      
+
       if ( Object.keys(this.supportedFormats).length == 0 ) {
         let s = await this.fileTypeDAO.select()
         s.array.forEach(type => {
@@ -284,7 +284,7 @@ foam.CLASS({
 
     function removeFile(atIndex) {
       if ( this.controllerMode === this.controllerMode.VIEW ) {
-            return;
+        return;
       }
       var files = Array.from(this.files);
       files.splice(atIndex, 1);
