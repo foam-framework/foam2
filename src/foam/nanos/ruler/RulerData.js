@@ -29,7 +29,7 @@
         if ( getO() == null ) {
           return new String[0];
         }
-        return (String[]) getN().diff(getO()).keySet().toArray();
+        return (String[]) getN().diff(getO()).keySet().toArray(String[]::new);
       `
     },
     {
