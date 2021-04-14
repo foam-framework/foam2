@@ -21,7 +21,7 @@ foam.CLASS({
       name: 'path',
       class: 'StringArray',
       tableCellFormatter: function (value, obj, axiom) {
-        this.add(value.join('.'));
+        this.add(value ? value.join('.') : '');
       }
     },
     {
