@@ -20,12 +20,10 @@ foam.CLASS({
   name: 'RadioView',
   extends: 'foam.u2.view.ChoiceView',
 
-  requires: [ 'foam.u2.DisplayMode' ],
-
+  requires: [ 'foam.u2.DisplayMode', 'foam.u2.tag.CircleIndicator' ],
+  imports: ['theme'],
   css: `
-    ^choice {
-      display: inline-flex;
-    }
+    /*hide default input*/
     ^ input[type='radio']{
       padding: 0px !important;
       -webkit-appearance: none;
@@ -38,37 +36,13 @@ foam.CLASS({
       position: relative;
       display: flex;
       cursor: pointer;
+      align-items: center;
     }
-    ^ input[type='radio']+ label:before{
-      content: '';
-      width: 16px;
-      height: 16px;
-      margin-right: 0.3rem;
-      border-radius: 100%;
-      border-style: solid;
-      border-width: 2px;
-      border-color: /*%GREY2%*/ gray;
-      background: transparent;
-    }
-    ^ input[type='radio']+ label:after{
-      content: '';
-      position: absolute;
-      display: inline-block;
-      left: 0px;
-      top: 0px;
-      transform: translate(5px, 5px);
-      border-radius: 100%;
-      width: 10px;
-      height: 10px;
-    }
-    ^ input[type='radio']:checked + label:after{
-      background: /*%PRIMARY3%*/ blue;
-    }
-    ^ input[type='radio']:checked + label:before{
-      border-color: /*%PRIMARY3%*/ blue;
-    }
-    ^ input[type='radio']:focus + label::before {
-      box-shadow: 0 0px 2px /*%PRIMARY1%*/ blue;
+
+    ^ *,
+    *:before,
+    *:after {
+      box-sizing: border-box;
     }
     ^ .choice {
       font-size: 16px;
@@ -84,6 +58,52 @@ foam.CLASS({
     ^ span{
       vertical-align: middle;
     }
+
+    /* Primary Styling */
+    ^radio-inner{
+      content: '';
+      width: 100%;
+      height: 100%;
+      box-shadow: inset 0.5em 0.5em /*%PRIMARY3%*/ blue;
+      background: /*%PRIMARY3%*/ blue;
+      border-radius: 50%;
+      transition: 180ms transform ease;
+      transform: scale(0);
+    }
+    ^radio-outer{
+      content: '';
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      width: 1em;
+      height: 1em;
+      border-radius: 50%;
+      border: 2px solid;
+      border-color: /*%GREY2%*/ gray;
+      margin-right: 0.3em;
+      transform: scale(1);
+      transition: border-color ease 280ms;
+    }
+
+    /*Selected*/
+    ^radio-inner.checked{
+      transform: scale(0.5);
+    }
+    ^radio-outer.checked {
+      border-color: /*%PRIMARY3%*/ blue;
+    }
+
+    /* Disabled */
+    ^radio-outer.disabled{
+      border-color: /*%GREY4%*/ gray;
+    }
+
+    /* Focus */
+    ^ input[type='radio']:focus + label > ^radio-outer{
+      box-shadow: 0 0px 2px /*%PRIMARY1%*/ blue;
+    }
+
   `,
 
   properties: [
@@ -135,6 +155,7 @@ foam.CLASS({
       this.removeAllChildren();
 
       this.add(this.choices.map(c => {
+        var isChecked$ = self.slot(function(data) { return data == c[0]; });
         return this.E('div').
           addClass('choice').
             callIf(this.columns != -1, function() { this.style({'flex-basis': (100 / self.columns) + '%'}) }).
@@ -143,7 +164,7 @@ foam.CLASS({
               type: 'radio',
               name: self.getAttribute('name') + self.$UID,
               value: c[1],
-              checked: self.slot(function (data) { return data == c[0]; }),
+              checked: isChecked$,
               disabled: self.isDisabled$
             }).
             setID(id = self.NEXT_ID()).
@@ -151,6 +172,16 @@ foam.CLASS({
           end().
           start('label').
             attrs({for: id}).
+            start().
+              addClass(this.myClass('radio-outer')).
+              enableClass('disabled', self.isDisabled$).
+              enableClass('checked', isChecked$).
+              start().
+                addClass(this.myClass('radio-inner')).
+                enableClass('disabled', self.isDisabled$).
+                enableClass('checked', isChecked$).
+              end().
+            end().
             start('span').
               add(c[1]).
             end().
