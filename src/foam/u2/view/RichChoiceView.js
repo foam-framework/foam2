@@ -286,7 +286,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'clearOnReopen',
-      documentation: 'clear filter on drop-drown reopen if set to true',
+      documentation: 'clear filter on dropdown reopen if set to true',
       value: true
     },
     {
