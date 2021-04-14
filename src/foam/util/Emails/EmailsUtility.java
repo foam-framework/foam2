@@ -111,24 +111,24 @@ public class EmailsUtility {
       }
 
       String url = appConfig.getUrl().replaceAll("/$", "");
-      templateArgs.put("logo", theme.getLogo());
+      templateArgs.put("logo", (url + "/" + theme.getLogo()));
       templateArgs.put("appLink", url);
       templateArgs.put("appName", (theme.getAppName()));
 
       templateArgs.put("locale", user.getLanguage().getCode().toString());
-
+  
       foam.nanos.auth.Address address = supportConfig.getSupportAddress();
       templateArgs.put("supportAddress", address == null ? "" : address.toSummary());
       templateArgs.put("supportPhone", (supportConfig.getSupportPhone()));
       templateArgs.put("supportEmail", (supportConfig.getSupportEmail()));
-
+  
       // personal support user
       User psUser = supportConfig.findPersonalSupportUser(x);
       templateArgs.put("personalSupportPhone", psUser == null ? "" : psUser.getPhoneNumber());
       templateArgs.put("personalSupportEmail", psUser == null ? "" : psUser.getEmail());
       templateArgs.put("personalSupportFirstName", psUser == null ? "" : psUser.getFirstName());
       templateArgs.put("personalSupportFullName", psUser == null ? "" : psUser.getLegalName());
-
+      
       emailMessage.setTemplateArguments(templateArgs);
     }
 
