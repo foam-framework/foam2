@@ -27,7 +27,7 @@ foam.CLASS({
 
             expr3: alt(
               //sym('fun'),
-              //sym('variable'),
+              sym('cell'),
               sym('number'),
               sym('group')),
 
@@ -65,7 +65,7 @@ foam.CLASS({
                 seq(str(repeat(sym('digit'))), '.', str(plus(sym('digit')))),
                 plus(sym('digit')))))),
 
-            cell: seq(sym('col'), sym('row')),
+            cell: sym('symbol'),
 
             col: alt(sym('az'), sym('AZ')),
 
@@ -141,7 +141,7 @@ foam.CLASS({
           var f = parseFloat(s);
           return foam.core.ConstantSlot.create({value: f});
         },
-        cell: function(a) { return cell(a[0] + a[1]).numValue$; },
+        cell: function(a) { return cell(a[0]).numValue$; },
         vargs: function(a) {
           return foam.core.ExpressionSlot.create({
             code: function() {
@@ -210,6 +210,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'value'
+    },
+    {
+      name: 'numValue',
+      expression: function(value) { return parseFloat(value); }
     }
   ],
 
@@ -230,7 +234,7 @@ foam.CLASS({
           .add('=')
         .end()
         .start('span')
-          .add(this.VALUE)
+          .add(this.value$)
         .end();
 
         var s;
@@ -444,23 +448,8 @@ foam.CLASS({
     },
 
     function cell(name) {
-      var self   = this;
-      var cell   = this.cells[name];
-      var cancel = null;
-
-      if ( ! cell ) {
-        cell = this.cells[name] = this.Cell.create();
-        var s;
-        cell.formula$.sub(function(_, __, ___, formula$) {
-          s && s.detach();
-
-          var slot = self.parser.parseString(formula$.get());
-          cancel && cancel.detach();
-          s = cell.data$.follow(slot)
-        });
-      }
-
-      return cell;
+      var ret = this.rows.find(row => row.id === name);
+      return ret;
     }
   ]
 });
