@@ -152,17 +152,25 @@ foam.CLASS({
   name: 'Row',
   extends: 'foam.u2.Controller',
 
+  css: `
+    ^ .property-id input {
+      font-weight: 700;
+    }
+  `,
+
   properties: [
     {
       class: 'String',
-      name: 'name'
+      name: 'id',
+      width: 10
     },
     {
       class: 'String',
-      name: 'formula'
+      name: 'formula',
+      width: 50
     },
     {
-      class: 'Object',
+      class: 'String',
       name: 'value'
     }
   ],
@@ -172,12 +180,13 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start('span')
-          .add(this.NAME)
+          .add(this.ID)
         .end()
         .start('span')
           .add(this.FORMULA)
         .end()
         .start('span')
+          .style({padding: 4, 'font-weight': 800})
           .add('=')
         .end()
         .start('span')
@@ -336,8 +345,12 @@ foam.CLASS({
 //this.loadCells({"A0":"<div style=\"width:200px;\"><b><u>Benchmark</u></b></div>","B0":"<b><u>IndexedDB</u></b>","C0":"<b><u>DAO</u></b>","A1":"Create Albums","B1":"190","C1":"366","A2":"Create Photos","B2":"2772","C2":"2492","A3":"Select All Albums","B3":"168","C3":"1.93","A4":"Select All Photos","B4":"1361","C4":"3.86","B5":"1.43","C5":"0.06","B6":"1.56","C6":"0.63","B7":"10.28","C7":"1.12","D0":"<b><u>Speedup</u></b>","D1":"=div(B1,C1)","D2":"=div(B2,C2)","D3":"=div(B3,C3)","D4":"=div(B4,C4)","A5":"Single Key Query","D5":"=div(B5,C5)","A6":"Multi-Key Query","D6":"=div(B6,C6)","A7":"Multi-Key Query","D7":"=div(B7,C7)","A8":"Multi-Key Query","B8":"102","C8":"12.24","D8":"=div(B8,C8)","A9":"Multi-Key Query","B9":"561","C9":"15.24","D9":"=div(B9,C9)","A10":"Indexed Field Query","B10":"4.63","C10":"0.46","D10":"=div(B10,C10)","A11":"Ad-Hoc Query","B11":"658","C11":"9.91","D11":"=div(B11,C11)","A12":"Simple Inner-Join","B12":"721","C12":"9.55","D12":"=div(B12,C12)","A13":"Inner-Join Aggregation","B13":"647","C13":"38.56","D13":"=div(B13,C13)","A14":"Order-By","B14":"59","C14":"0.55","D14":"=div(B14,C14)","A15":"Order and Group By","B15":"1232","C15":"3.63","D15":"=div(B15,C15)","A16":"<b>Average:</b>","B16":"=SUM(B1:B15)","C16":"=SUM(C1:C15)","D16":"=div(B14,C14)"});
     },
 
+    function nextRowId() {
+      return String.fromCharCode(65 + this.rows.length);
+    },
+
     function addRow() {
-      var row = this.Row.create();
+      var row = this.Row.create({id: this.nextRowId()});
       this.rows.push(row);
       this.add(row);
     },
