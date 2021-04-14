@@ -13,13 +13,13 @@ foam.CLASS({
   ],
 
   properties: [
-    [ 'color',       'white' ],
+    [ 'color',       null ],
     [ 'border',      'blue' ],
     [ 'radius',      12 ],
     [ 'width',       26 ],
     [ 'height',      26 ],
-    [ 'x',           21 ],
-    [ 'y',           21 ],
+    [ 'x',           13.5 ],
+    [ 'y',           13.5 ],
     [ 'arcWidth',    1.5 ],
     [ 'autoRepaint', true ],
     [ 'selected',    true ],
