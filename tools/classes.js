@@ -43,6 +43,7 @@ var classes = [
   'foam.mlang.predicate.Or',
   'foam.mlang.predicate.AbstractPredicate',
   'foam.mlang.predicate.Nary',
+  'foam.mlang.predicate.NamedProperty',
   'foam.mlang.predicate.Unary',
   'foam.mlang.predicate.Binary',
   'foam.mlang.predicate.ArrayBinary',

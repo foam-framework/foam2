@@ -10,7 +10,7 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.crunch.CapabilityJunctionStatus',
-    'foam.nanos.crunch.ui.UserCapabilityJunctionWAO',
+    'foam.u2.wizard.ProxyWAO',
     'foam.u2.wizard.WizardletIndicator'
   ],
 
@@ -70,7 +70,7 @@ foam.CLASS({
       name: 'wao',
       hidden: true,
       factory: function () {
-        return this.UserCapabilityJunctionWAO.create({}, this.__context__);
+        return this.ProxyWAO.create({}, this.__context__);
       }
     },
     {
