@@ -17,24 +17,34 @@ foam.CLASS({
       factory: function() {
         return function(alt, sym, seq1, seq, literalIC, repeat, str, optional, plus, range, anyChar) {
           return {
-            START: alt(sym('number'), sym('formula'), sym('string')),
+            START: sym('expr'),
 
-            formula: seq1(1, '=', sym('expr')),
+            expr: seq(sym('expr1'), optional(seq(alt('+', '-'), sym('expr')))),
 
-            expr: alt(
+            expr1: seq(sym('expr2'), optional(seq(alt('*', '/'), sym('expr1')))),
+
+            expr2: seq(sym('expr3'), optional(seq('^', sym('expr2')))),
+
+            expr3: alt(
+              //sym('fun'),
+              //sym('variable'),
               sym('number'),
-              sym('cell'),
+              sym('group')),
+
+            xxxexpr: alt(
+              //sym('cell'),
               sym('add'),
+              sym('number'),
               sym('sub'),
               sym('mul'),
               sym('div'),
               sym('mod'),
               sym('sum'),
               sym('prod'),
-              sym('flow')
+              //sym('flow')
             ),
 
-            add:  seq(literalIC('add('),  sym('expr'), ',', sym('expr'), ')'),
+            add:  seq(sym('number'), '+', sym('number')),
             sub:  seq(literalIC('sub('),  sym('expr'), ',', sym('expr'), ')'),
             mul:  seq(literalIC('mul('),  sym('expr'), ',', sym('expr'), ')'),
             div:  seq(literalIC('div('),  sym('expr'), ',', sym('expr'), ')'),
@@ -46,6 +56,8 @@ foam.CLASS({
             vargs: repeat(alt(sym('range'), sym('expr')), ','),
 
             range: seq(sym('col'), sym('row'), ':', sym('col'), sym('row')),
+
+            group: seq1(1, '(', sym('expr'), ')'),
 
             number: str(seq(
               optional('-'),
@@ -83,7 +95,29 @@ foam.CLASS({
       var scope = this.cells.scope;
 
       this.addActions({
-        add: function(a) { return slot(function() { return a[1].get() + a[3].get(); }, a[1], a[3]); },
+        expr: function(a) {
+          if ( ! a[1] ) return a[0];
+          return slot(
+            a[1][0] == '+' ?
+              function(a, b) { return a + b; } :
+              function(a, b) { return a - b; } ,
+            a[0],
+            a[1][1]);
+        },
+        expr1: function(a) {
+          if ( ! a[1] ) return a[0];
+          return slot(
+            a[1][0] == '*' ?
+              function(a, b) { return a * b; } :
+              function(a, b) { return a / b; } ,
+            a[0],
+            a[1][1]);
+        },
+        expr2: function(a) {
+          if ( ! a[1] ) return a[0];
+          return slot(function(a, b) { return Math.pow(a, b); }, a[0], a[1][1]);
+        },
+        add: function(a) { return slot(function() { return a[0].get() + a[2].get(); }, a[0], a[2]); },
         sub: function(a) { return slot(function() { return a[1].get() - a[3].get(); }, a[1], a[3]); },
         mul: function(a) { return slot(function() { return a[1].get() * a[3].get(); }, a[1], a[3]); },
         div: function(a) { return slot(function() { return a[1].get() / a[3].get(); }, a[1], a[3]); },
@@ -147,10 +181,13 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'com.google.flow',
   name: 'Row',
   extends: 'foam.u2.Controller',
+
+  imports: [ 'parser' ],
 
   css: `
     ^ .property-id input {
@@ -166,7 +203,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'formula',
+      name: 'expression',
+      onKey: true,
       width: 50
     },
     {
@@ -177,13 +215,15 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      this.SUPER();
+
       this
         .addClass(this.myClass())
         .start('span')
           .add(this.ID)
         .end()
         .start('span')
-          .add(this.FORMULA)
+          .add(this.EXPRESSION)
         .end()
         .start('span')
           .style({padding: 4, 'font-weight': 800})
@@ -192,6 +232,14 @@ foam.CLASS({
         .start('span')
           .add(this.VALUE)
         .end();
+
+        var s;
+        this.expression$.sub(() => {
+          s && s.detach();
+
+          var slot = this.parser.parseString(this.expression);
+          s = this.value$.follow(slot)
+        });
     }
   ]
 });
@@ -209,7 +257,7 @@ foam.CLASS({
   ],
 
   imports: [ 'scope?' ], // Used by flow() function
-  exports: [ 'as cells' ],
+  exports: [ 'as cells', 'parser' ],
 
   classes: [
     {
@@ -394,8 +442,6 @@ foam.CLASS({
       }
       return map;
     },
-
-    function cellName(c, r) { return String.fromCharCode(65 + c) + r; },
 
     function cell(name) {
       var self   = this;
