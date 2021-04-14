@@ -30,7 +30,6 @@ foam.CLASS({
     'columns',
     'hoverSelection',
     'selection',
-    'subStack as stack',
     'memento'
   ],
 
@@ -261,12 +260,6 @@ foam.CLASS({
           return foam.nanos.column.ColumnConfigToPropertyConverter.create();
         return this.__context__.columnConfigToPropertyConverter;
       }
-    },
-    {
-      name: 'subStack',
-      factory: function() {
-        return foam.nanos.approval.NoBackStack.create({delegate: this.stack});
-      },
     },
     'currentMemento_'
   ],
