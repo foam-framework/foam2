@@ -88,15 +88,18 @@ foam.CLASS({
       margin: auto;
       padding-bottom: 24px;
     }
+    ^ .property-dataType {
+      margin-right: 24px;
+    }
     ^ .foam-u2-tag-Select {
-      width: 190px;
+      width: 100%;
       height: 40px;
       border-radius: 0;
       padding: 6px 10px;
       border: solid 1px rgba(164, 179, 184, 0.5);
       background-color: white;
       outline: none;
-      background: #ffffff url('/images/dropdown-icon.svg') no-repeat 99% 50%;
+      background: #ffffff url('/images/dropdown-icon.svg') no-repeat 98% 50%;
       -webkit-appearance: none;
     }
     ^ .foam-u2-ModalHeader {
@@ -109,6 +112,12 @@ foam.CLASS({
       border: solid 1px #59A5D5;
     }
     ^ .label{
+      font-family: IBM Plex Sans;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 11px;
+      line-height: 14px;
+      color: #000000;
       margin: 10px 0px 0px 24px;
     }
     ^ .note {
