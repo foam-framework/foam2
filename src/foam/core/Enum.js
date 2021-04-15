@@ -331,8 +331,7 @@ foam.CLASS({
     },
     {
       class: 'GlyphProperty',
-      name: 'glyph',
-      value: null
+      name: 'glyph'
     }
   ],
 

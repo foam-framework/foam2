@@ -958,6 +958,7 @@ foam.CLASS({
   requires: ['foam.core.Glyph'],
 
   properties: [
+    ['value', null],
     {
       name: 'adapt',
       value: function(_, v, prop) {
