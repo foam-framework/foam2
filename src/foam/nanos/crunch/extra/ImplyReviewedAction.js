@@ -69,7 +69,7 @@ foam.CLASS({
         var crunchService = (CrunchService) x.get("crunchService");
 
         var caps = (ReviewCapability[]) ((ArraySink) capabilityDAO.where(AND(
-          IN(Capability.ID, crunchService.getPrereqs(x, reviewWizard.getId())),
+          IN(Capability.ID, crunchService.getPrereqs(x, reviewWizard.getId(), null)),
           INSTANCE_OF(ReviewCapability.class)
         )).select(new ArraySink())).getArray().toArray(new ReviewCapability[0]);
 

@@ -99,7 +99,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
         continue;
       }
       alreadyListed.add(sourceCapabilityId);
-      var prereqsList = getPrereqs(x, sourceCapabilityId);
+      var prereqsList = getPrereqs(x, sourceCapabilityId, null);
       var prereqs = prereqsList == null ? new String[0] : prereqsList.stream()
           .filter(c -> ! alreadyListed.contains(c))
           .toArray(String[]::new);
@@ -166,7 +166,8 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
 
   // gets prereq list of a cap from the prereqsCache_
   // if cache returned is null, try to find prereqs directly from prerequisitecapabilityjunctiondao
-  public synchronized List<String> getPrereqs(X x, String capId) {
+  public synchronized List<String> getPrereqs(X x, String capId, UserCapabilityJunction ucj) {
+    if ( ucj != null ) x = x.put("subject", ucj.getSubject(x));
     Map<String, List<String>> prereqsCache_ = getPrereqsCache(x);
     if ( prereqsCache_ != null ) return prereqsCache_.get(capId);
 
@@ -542,7 +543,7 @@ public class ServerCrunchService extends ContextAwareSupport implements CrunchSe
     UserCapabilityJunction ucj = crunchService.getJunction(x, capabilityId);
     if ( ! capability.getEnabled() ) return false;
 
-    var prereqs = getPrereqs(x.put("subject", ucj.getSubject(x)), capabilityId);
+    var prereqs = getPrereqs(x, capabilityId, ucj);
     boolean topLevelRenewable = ucj != null && ucj.getStatus() == CapabilityJunctionStatus.GRANTED && ucj.getIsRenewable();
 
     if ( prereqs == null || prereqs.size() == 0 || topLevelRenewable ) return topLevelRenewable;
