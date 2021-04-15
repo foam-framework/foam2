@@ -285,6 +285,12 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'clearOnReopen',
+      documentation: 'clear filter on dropdown reopen if set to true',
+      value: true
+    },
+    {
+      class: 'Boolean',
       name: 'isOpen_',
       documentation: `
         An internal property used to determine whether the options list is
@@ -292,7 +298,7 @@ foam.CLASS({
       `,
       postSet: function(_, nv) {
         if ( nv && ! this.hasBeenOpenedYet_ ) this.hasBeenOpenedYet_ = true;
-        if ( ! nv ) {
+        if ( ! nv && this.clearOnReopen ) {
           this.clearProperty('filter_');
           this.sections.forEach((section) => {
             section.clearProperty('filteredDAO');
