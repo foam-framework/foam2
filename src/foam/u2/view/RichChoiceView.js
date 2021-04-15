@@ -706,10 +706,6 @@ foam.CLASS({
           name: 'defaultSelectionPrompt'
         },
         {
-          class: 'String',
-          name: 'defaultSelectionPromptSource'
-        },
-        {
           name: 'fullObject',
           documentation: `
             The full object. It's not used here in the default selection view,
