@@ -29,7 +29,8 @@ foam.INTERFACE({
       type: 'java.util.List<String>',
       args: [
         { name: 'x', type: 'Context' },
-        { name: 'capId', type: 'String' }
+        { name: 'capId', type: 'String' },
+        { name: 'ucj', type: 'foam.nanos.crunch.UserCapabilityJunction' }
       ],
       flags: ['java']
     },
