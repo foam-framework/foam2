@@ -20,6 +20,7 @@ foam.CLASS({
 
   requires: [
     'foam.u2.tag.CircleIndicator',
+    'foam.u2.borders.LoadingBorder',
     'foam.u2.crunch.wizardflow.SaveAllAgent',
     'foam.u2.wizard.WizardPosition',
     'foam.u2.wizard.WizardletIndicator'
@@ -203,7 +204,13 @@ foam.CLASS({
         this.add(wizardlet.slot(function (isAvailable, isVisible) {
           if ( ! isVisible ) return self.E();
           var e2 = self.renderWizardletHeading(self.E(), wizardlet);
-          return self.renderWizardletSections(e2, wizardlet, wi);
+          return e2
+            .start(self.LoadingBorder, { loading$: wizardlet.loading$ })
+              .call(function () {
+                self.renderWizardletSections(this, wizardlet, wi);
+              })
+            .end()
+            ;
         }));
       });
     },
