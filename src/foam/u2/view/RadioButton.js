@@ -33,20 +33,18 @@ foam.CLASS({
           return this.theme ? this.theme.grey4 : '#E7EAEC';
         }
         if ( isSelected ) {
-          return this.theme ? this.theme.primary3 : '#406dea';
+          return this.theme ? this.theme.primary3 : '#406DEA';
         }
         return this.theme ? this.theme.grey2 : '#9BA1A6';
       }
     },
     {
       name: 'isDisabled',
-      class: 'Boolean',
-      value: false
+      class: 'Boolean'
     },
     {
       name: 'isSelected',
-      class: 'Boolean',
-      value: false
+      class: 'Boolean'
     }
   ],
 
