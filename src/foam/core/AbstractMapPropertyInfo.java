@@ -36,7 +36,7 @@ public abstract class AbstractMapPropertyInfo
       if ( v1 == null && v2 == null ) continue;
       if ( v2 == null ) return 1;
       if ( v1 == null ) return -1;
-      if ( v1 instanceof Comparable)
+      if ( v1 instanceof Comparable )
         result = ((Comparable) v1).compareTo(v2);
       else if ( v1.getClass().isArray() )
         result = SafetyUtil.compare((Object[]) v1, (Object[]) v2);
