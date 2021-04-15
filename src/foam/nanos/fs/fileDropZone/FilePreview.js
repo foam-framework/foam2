@@ -26,16 +26,17 @@ foam.CLASS({
         .start('div')
           .addClass('file-image-div' + this.id)
           .style({
-            'width:': 'auto',
-            'max-height': '244px',
-            'max-width': '300px',
+            'height': '300px',
+            'width': '500px',
             'display': 'none'
           })
           .start('img')
             .addClass('file-image' + this.id)
             .style({
-              'max-width': '100%',
-              'max-height': '100%'
+              'height': '100%',
+              'width': '100%',
+              'object-fit': 'contain',
+              'object-position': 'left'
             })
           .end()
         .end()
