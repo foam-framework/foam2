@@ -22,7 +22,6 @@ foam.CLASS({
 
   requires: [ 'foam.u2.DisplayMode', 'foam.u2.view.RadioButton' ],
 
-  imports: ['theme'],
   css: `
     /*hide default input*/
     ^ input[type='radio']{
@@ -58,7 +57,6 @@ foam.CLASS({
     }
     /* Focus */
     ^ input[type='radio']:focus + label > ^radio-outer > .radio{
-      // box-shadow: 0 0px 2px /*%PRIMARY1%*/ blue;
       filter: drop-shadow( 0px 0px 1px rgba(0, 0, 0, .5));
     }
   `,

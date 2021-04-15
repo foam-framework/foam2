@@ -28,23 +28,25 @@ foam.CLASS({
   properties: [
     {
       name: 'selectedColor',
-      expression: function (isSelected, isDisabled) {
+      expression: function(isSelected, isDisabled) {
         if ( isDisabled ) {
-          return this.theme.grey4;
-        } else {
-          return isSelected ? this.theme.primary3 : this.theme.grey2;
+          return this.theme ? this.theme.grey4 : '#E7EAEC';
         }
+        if ( isSelected ) {
+          return this.theme ? this.theme.primary3 : '#406dea';
+        }
+        return this.theme ? this.theme.grey2 : '#9BA1A6';
       }
     },
     {
       name: 'isDisabled',
       class: 'Boolean',
-      value: false,
+      value: false
     },
     {
       name: 'isSelected',
       class: 'Boolean',
-      value: false,
+      value: false
     }
   ],
 
@@ -54,12 +56,12 @@ foam.CLASS({
         .addClass('radio')
         .attrs({ width: 20, height: 20 })
         .start('circle')
-        .attrs({ cx: 10, cy: 10, r: 8, 'stroke': this.selectedColor$, 'stroke-width': 2, 'transform-origin': '0 0', fill: 'none' })
+          .attrs({ cx: 10, cy: 10, r: 8, 'stroke': this.selectedColor$, 'stroke-width': 2, 'transform-origin': '0 0', fill: 'none' })
         .end()
         .start('circle')
-        .addClass(this.myClass('innerCircle'))
-        .enableClass('selected', this.isSelected$)
-        .attrs({ cx: 10, cy: 10, r: 0, fill: this.selectedColor$ })
+          .addClass(this.myClass('innerCircle'))
+          .enableClass('selected', this.isSelected$)
+          .attrs({ cx: 10, cy: 10, r: 0, fill: this.selectedColor$ })
         .end();
     }
   ]
