@@ -51,7 +51,6 @@ foam.CLASS({
     function initE() {
       var data = this.data;
       this.SUPER();
-      var icon;
       this
         .addClass(this.myClass())
         .style({
@@ -60,7 +59,7 @@ foam.CLASS({
           'border-color': data.background == '#FFFFFF' || ! data.background ? data.color : data.background
         })
         .callIf(this.showGlyph && data.glyph, () =>{
-          icon = {
+          var icon = {
             size: 14,
             backgroundColor: data.color,
             icon: data.glyph.clone(this).getDataUrl({
