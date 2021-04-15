@@ -695,7 +695,7 @@ foam.CLASS({
                       this.order = this.DESC(prop.property);
                     else
                       this.order = prop.property;
-                    dao = dao.orderBy(this.order);
+                    proxy = dao.orderBy(this.order);
                   }
                 }
               }
