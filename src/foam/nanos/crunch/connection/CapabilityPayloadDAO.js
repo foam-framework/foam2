@@ -210,7 +210,9 @@ foam.CLASS({
                 catch (IllegalStateException | IllegalArgumentException ie) {
                   validationErrors.put(key, ie.getMessage());
                 } catch (ValidationException ve) {
-                  validationErrors.put(key, ve.getErrorMessage());
+                  validationErrors.put(
+                    String.format("%s[%s]", key, ve.getPropName()), 
+                    ve.getErrorMessage());
                 } catch (CompoundException ce) {
                   for ( var t : ce.getExceptions() ) {
                     if ( t instanceof ValidationException ) {
