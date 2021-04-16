@@ -725,13 +725,9 @@ foam.CLASS({
             'text-overflow': 'ellipsis'
           });
 
-          var summary = this.fullObject$.map(o => {
-            return ( o && o.toSummary() ) || this.defaultSelection;
-          });
-          var summaryWithoutSlot = this.fullObject && this.fullObject.toSummary()
-            ? this.fullObject.toSummary()
-            : this.defaultSelectionPrompt;
-          return this.translate(summaryWithoutSlot, summary);
+          return this.add(this.fullObject$.map(o => {
+            return ( o && o.toSummary() ) || this.defaultSelectionPrompt;
+          }));
         }
       ]
     },

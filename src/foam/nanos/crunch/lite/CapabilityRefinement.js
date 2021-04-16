@@ -25,7 +25,7 @@ foam.CLASS({
       name: 'getCapableChainedStatus',
       javaCode: `
         CrunchService crunchService = (CrunchService) x.get("crunchService");
-        List<String> prereqCapIds = crunchService.getPrereqs(getId());
+        List<String> prereqCapIds = crunchService.getPrereqs(x, getId(), null);
 
         if ( prereqCapIds == null || prereqCapIds.size() == 0 ) return GRANTED;
 

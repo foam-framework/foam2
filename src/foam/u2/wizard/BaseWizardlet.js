@@ -143,6 +143,11 @@ foam.CLASS({
         return isValid ? this.WizardletIndicator.COMPLETED
           : this.WizardletIndicator.PLEASE_FILL;
       }
+    },
+    {
+      name: '__subSubContext__',
+      documentation: 'Current subContext to use when creating view.',
+      factory: function() { return this.__subContext__; }
     }
   ],
 
@@ -198,6 +203,10 @@ foam.CLASS({
         this.wizardCloseSub.onDetach(slotSlot);
         return s;
       }
+    },
+    function pushContext(m) {
+      this.__subSubContext__ = this.__subSubContext__.createSubContext(m);
+      if ( this.data ) this.data = this.data.clone(this.__subSubContext__);
     }
   ],
 
