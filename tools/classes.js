@@ -261,6 +261,7 @@ var classes = [
   'foam.nanos.auth.Authorizer',
   'foam.nanos.auth.AuthorizationDAO',
   'foam.nanos.auth.AuthenticationException',
+  'foam.nanos.auth.AssignableAware',
   'foam.nanos.auth.EnabledAware',
   'foam.nanos.auth.EnabledAwareDummy',
   'foam.nanos.auth.GroupPermissionJunction',
@@ -889,6 +890,7 @@ var classes = [
   'foam.nanos.approval.ApprovalDAO',
   'foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer',
   'foam.nanos.approval.PopulateApprovalRequestsDAO',
+  'foam.nanos.approval.ApprovalRequestAssignedToRule',
 
   'foam.core.NumberSet',
 

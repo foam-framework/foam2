@@ -539,6 +539,7 @@ FOAM_FILES([
   { name: 'foam/nanos/approval/FulfilledNestedJournalApprovablePredicate' },
   { name: 'foam/nanos/approval/FulfilledApprovableRule' },
   { name: 'foam/nanos/approval/PopulateApprovalRequestsDAO' },
+  { name: 'foam/nanos/approval/ApprovalRequestAssignedToRule' },
 
   //authservice
   { name: "foam/nanos/auth/CapabilityAuthService" },

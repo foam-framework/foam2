@@ -12,6 +12,7 @@
   'represent a single approval request for a single user.',
 
   implements: [
+    'foam.nanos.auth.AssignableAware',
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.LastModifiedAware',
@@ -58,7 +59,7 @@
     'description',
     'classification',
     'objId',
-    'approver.legalName',
+    'assignedTo.legalName',
     'status',
     'memo'
   ],
@@ -555,10 +556,19 @@
       name: 'approvableHashKey',
       includeInDigest: true,
       hidden: true
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'assignedTo'
     }
   ],
 
   messages: [
+    {
+      name: 'SUCCESS_ASSIGNED',
+      message: 'You have successfully assigned this request'
+    },
     {
       name: 'SUCCESS_APPROVED',
       message: 'You have successfully approved this request'
@@ -570,6 +580,10 @@
     {
       name: 'SUCCESS_CANCELLED',
       message: 'You have successfully cancelled this request'
+    },
+    {
+      name: 'ASSIGN_TITLE',
+      message: 'Select an assignee'
     },
     {
       name: 'PENDING',
@@ -844,6 +858,22 @@
           });
       },
       tableWidth: 100
+    },
+    {
+      name: 'assign',
+      section: 'approvalRequestInformation',
+      code: function(X) {        
+        var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
+        objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+          class: "foam.u2.PropertyModal",
+          property: this.ASSIGNED_TO.clone().copyFrom({ label: '' }),
+          isModalRequired: true,
+          data$: X.data$,
+          propertyData$: X.data.assignedTo$,
+          title: this.ASSIGN_TITLE,
+          onExecute: this.assignRequestL.bind(this, X)
+        }));
+      }
     }
   ],
 
@@ -881,6 +911,23 @@
 
           X.stack.back();
         }, e => {
+          this.throwError.pub(e);
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
+        });
+      }
+    },
+    {
+      name: 'assignRequestL',
+      code: function(X) {
+        var assignedApprovalRequest = this.clone();
+
+        this.approvalRequestDAO.put(assignedApprovalRequest).then(_ => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.notify(this.SUCCESS_ASSIGNED, '', this.LogLevel.INFO, true);
+
+          X.stack.back();
+        }, (e) => {
           this.throwError.pub(e);
           this.notify(e.message, '', this.LogLevel.ERROR, true);
         });
