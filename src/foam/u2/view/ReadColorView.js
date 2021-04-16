@@ -41,6 +41,7 @@ foam.CLASS({
           .add(this.data$)
         .end()
         .nbsp()
+        .nbsp()
         .start()
           .addClass(this.myClass('white'))
           .add(this.data$)
