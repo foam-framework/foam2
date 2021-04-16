@@ -111,7 +111,8 @@ foam.CLASS({
       this.isDelete = false;
       this.includeTrailingDelimiter = true;
       this.formatted = false;
-      this.data = this.returnFormatted ? this.formattedData : this.formattedData.replace(/\D/g,'');
+      if ( this.hasOwnProperty('formattedData') )
+        this.data = this.returnFormatted ? this.formattedData : this.formattedData.replace(/\D/g,'');
     }
   ],
 
