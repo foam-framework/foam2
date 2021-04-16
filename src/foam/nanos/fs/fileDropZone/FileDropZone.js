@@ -166,7 +166,7 @@ foam.CLASS({
         .callIf(this.isMultipleFiles, function() {
           this.start('input')
             .addClass(this.myClass('input'))
-            .addClass(this.instanceClass(`input`))
+            .addClass(this.instanceClass('input'))
             .attrs({
               type: 'file',
               accept: this.getSupportedTypes(),
@@ -179,7 +179,7 @@ foam.CLASS({
         .callIf(! this.isMultipleFiles, function() {
           this.start('input')
             .addClass(this.myClass('input'))
-            .addClass(this.instanceClass(`input`))
+            .addClass(this.instanceClass('input'))
             .attrs({
               type: 'file',
               accept: this.getSupportedTypes()
@@ -195,7 +195,7 @@ foam.CLASS({
               .start('label').addClass(this.myClass('link'))
                 .add(this.LABEL_BROWSE)
                 .attrs({
-                for: 'file-upload'
+                  for: 'file-upload'
                 })
                 .on('click', this.onAddAttachmentClicked)
               .end()
@@ -223,8 +223,8 @@ foam.CLASS({
           return e;
         }, this.files$))
         .on('drop', this.onDrop)
-        .on('dragover', (e) => { e.preventDefault() })
-        .on('dragenter', (e) => { e.preventDefault() });
+        .on('dragover', e => e.preventDefault() )
+        .on('dragenter', e => e.preventDefault() );
     },
 
     function getSupportedTypes(readable) {
