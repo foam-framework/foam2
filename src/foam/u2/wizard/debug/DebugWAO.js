@@ -13,8 +13,15 @@ foam.CLASS({
   topics: ['waoEvent'],
 
   properties: [
-    { name: 'listen', class: 'Boolean', value: true },
-    { name: 'trap', class: 'Boolean' }
+    {
+      class: 'Boolean',
+      name: 'listen',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'trap'
+    }
   ],
 
   methods: [

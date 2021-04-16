@@ -865,13 +865,7 @@ foam.CLASS({
       class: 'Object',
       name: 'id',
       transient: true,
-      // factory: function() { return this.NEXT_ID(); }
-      factory: function() {
-        var id = this.NEXT_ID();
-        if ( ! window.idToE ) window.idToE = {};
-        window.idToE[id] = this;
-        return id;
-      }
+      factory: function() { return this.NEXT_ID(); }
     },
     {
       class: 'Enum',

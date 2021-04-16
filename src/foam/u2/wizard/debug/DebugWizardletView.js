@@ -10,8 +10,8 @@ foam.CLASS({
   extends: 'foam.u2.Controller',
 
   imports: [
-    'wizardlets',
-    'debugContextIntercept'
+    'debugContextIntercept',
+    'wizardlets'
   ],
 
   requires: [
@@ -19,8 +19,8 @@ foam.CLASS({
     'foam.u2.borders.CollapseBorder',
     'foam.u2.view.ScrollTableView',
     'foam.u2.wizard.debug.DebugWAO',
-    'foam.u2.wizard.debug.WAOEvent',
     'foam.u2.wizard.debug.PropertyEvent',
+    'foam.u2.wizard.debug.WAOEvent',
     'foam.u2.wizard.debug.WizardEvent',
     'foam.u2.wizard.internal.PropertyUpdate'
   ],
