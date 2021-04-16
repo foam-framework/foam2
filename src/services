@@ -222,7 +222,6 @@ p({
   "serviceScript":`
     return new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
-      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("languageDAO"))
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("languages")
       .setOf(foam.nanos.auth.Language.getOwnClassInfo())
