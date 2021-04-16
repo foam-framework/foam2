@@ -99,7 +99,7 @@ foam.CLASS({
     ^ .foam-u2-tag-Select {
       width: 100%;
       box-shadow: none;
-      background: #ffffff url('/images/dropdown-icon.svg') no-repeat 99% 50%;
+      background: #ffffff url('/images/dropdown-icon.svg') no-repeat 98% 50%;
       -webkit-appearance: none;
       cursor: pointer;
     }

@@ -93,7 +93,7 @@ foam.CLASS({
       if ( wizardlet.data ) {
         wizardlet.data.copyFrom(loadedData);
       } else {
-        wizardlet.data = loadedData.clone(this.__subContext__);
+        wizardlet.data = loadedData.clone(wizardlet.__subSubContext__);
       }
 
       foam.u2.wizard.Slot.blockFramed().then(() => {

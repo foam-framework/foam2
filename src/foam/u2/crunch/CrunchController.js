@@ -54,6 +54,7 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.ShowPreexistingAgent',
     'foam.u2.crunch.wizardflow.SaveAllAgent',
     'foam.u2.crunch.wizardflow.CapabilityStoreAgent',
+    'foam.u2.crunch.wizardflow.DebugContextInterceptAgent',
     'foam.u2.crunch.wizardflow.DebugAgent',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',

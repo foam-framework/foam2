@@ -22,6 +22,7 @@ foam.CLASS({
     'foam.nanos.auth.*',
     'foam.nanos.auth.Subject',
     'foam.nanos.boot.NSpec',
+    'foam.nanos.crunch.ServerCrunchService',
     'foam.nanos.logger.Logger',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.theme.Theme',
@@ -330,7 +331,8 @@ List entries are of the form: 172.0.0.0/24 - this would restrict logins to the 1
           .put("spid", user.getSpid())
           .put("logger", new PrefixLogger(prefix, (Logger) x.get("logger")))
           .put("twoFactorSuccess", getContext().get("twoFactorSuccess"))
-          .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY));
+          .put(CachingAuthService.CACHE_KEY, getContext().get(CachingAuthService.CACHE_KEY))
+          .put(ServerCrunchService.CACHE_KEY, getContext().get(ServerCrunchService.CACHE_KEY));
 
         // We need to do this after the user and agent have been put since
         // 'getCurrentGroup' depends on them being in the context.

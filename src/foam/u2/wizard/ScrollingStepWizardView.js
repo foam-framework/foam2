@@ -20,6 +20,7 @@ foam.CLASS({
 
   requires: [
     'foam.u2.tag.CircleIndicator',
+    'foam.u2.borders.LoadingBorder',
     'foam.u2.crunch.wizardflow.SaveAllAgent',
     'foam.u2.wizard.WizardPosition',
     'foam.u2.wizard.WizardletIndicator'
@@ -62,9 +63,7 @@ foam.CLASS({
         var(--actionBarHeight) - var(--actionBarTbPadding));
       background-color: rgba(255,255,255,0.7);
       backdrop-filter: blur(5px);
-
-      /* TODO: Themes don't support this, so color is static */
-      border-top: 2px solid hsla(240,100%,80%,0.8);
+      box-shadow: 0px -1px 3px rgba(0, 0, 0, 0.3);
     }
 
     ^heading h2 {
@@ -203,7 +202,13 @@ foam.CLASS({
         this.add(wizardlet.slot(function (isAvailable, isVisible) {
           if ( ! isVisible ) return self.E();
           var e2 = self.renderWizardletHeading(self.E(), wizardlet);
-          return self.renderWizardletSections(e2, wizardlet, wi);
+          return e2
+            .start(self.LoadingBorder, { loading$: wizardlet.loading$ })
+              .call(function () {
+                self.renderWizardletSections(this, wizardlet, wi);
+              })
+            .end()
+            ;
         }));
       });
     },

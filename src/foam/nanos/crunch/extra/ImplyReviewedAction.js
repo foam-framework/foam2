@@ -14,6 +14,7 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.nanos.auth.Subject',
     'foam.nanos.crunch.Capability',
     'foam.nanos.crunch.CrunchService',
     'foam.nanos.crunch.UserCapabilityJunction',
@@ -68,7 +69,7 @@ foam.CLASS({
         var crunchService = (CrunchService) x.get("crunchService");
 
         var caps = (ReviewCapability[]) ((ArraySink) capabilityDAO.where(AND(
-          IN(Capability.ID, crunchService.getPrereqs(reviewWizard.getId())),
+          IN(Capability.ID, crunchService.getPrereqs(x, reviewWizard.getId(), null)),
           INSTANCE_OF(ReviewCapability.class)
         )).select(new ArraySink())).getArray().toArray(new ReviewCapability[0]);
 
