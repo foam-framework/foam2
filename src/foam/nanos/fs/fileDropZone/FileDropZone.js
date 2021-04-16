@@ -283,6 +283,9 @@ foam.CLASS({
     },
 
     function removeFile(atIndex) {
+      if ( this.controllerMode === this.controllerMode.VIEW ) {
+        return;
+      }
       var files = Array.from(this.files);
       files.splice(atIndex, 1);
       if ( this.selected === files.length )
@@ -300,6 +303,9 @@ foam.CLASS({
 
   listeners: [
     function onAddAttachmentClicked(e) {
+      if ( this.controllerMode === this.controllerMode.VIEW ) {
+        return;
+      }
       if ( typeof e.target != 'undefined' ) {
         if ( e.target.tagName == 'P' && e.target.tagName != 'A' ) {
           this.document.querySelector('.' + this.instanceClass(`input`)).click();
@@ -313,6 +319,9 @@ foam.CLASS({
     },
 
     function onDrop(e) {
+      if ( this.controllerMode === this.controllerMode.VIEW ) {
+        return;
+      }
       e.preventDefault();
       var files = [];
       var inputFile;

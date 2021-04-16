@@ -29,7 +29,7 @@ foam.CLASS({
         wizardlet.pushContext(ctxIntercept.createInterceptedValues(
           wizardlet.__subSubContext__
         ));
-        if ( wizardlet.isVisible ) {
+        if ( wizardlet.of ) {
           wizardlet.sections.push(this.WizardletSection.create({
             wizardlet: wizardlet,
             title: 'Developer Tools',

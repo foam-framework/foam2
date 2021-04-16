@@ -318,9 +318,24 @@ foam.CLASS({
 
       //set memento's selected columns
       if ( this.memento ) {
-        this.memento.head = this.columns_.map(c => {
-          return this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c);
-        }).join(',');
+        if ( this.memento.head.length != 0 ) {
+          var columns = this.memento.head.split(',');
+          for ( var c of columns ) {
+            if ( this.shouldColumnBeSorted(c) && ! c.includes('.')) {
+              var prop = view.props.find(p => p.fullPropertyName === c.substr(0, c.length - 1) );
+              if ( prop ) {
+                if ( c[c.length - 1] === this.DESCENDING_ORDER_CHAR )
+                  this.order = this.DESC(prop.property);
+                else
+                  this.order = prop.property;
+              }
+            }
+          }
+        } else {
+          this.memento.head = this.columns_.map(c => {
+            return this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c);
+          }).join(',');
+        }
       }
 
       //otherwise on adding new column creating new EditColumnsView, which is closed by default
@@ -684,22 +699,6 @@ foam.CLASS({
 
               return tbodyElement;
             });
-
-            if ( this.memento && this.memento.head.length != 0 ) {
-              var columns = this.memento.head.split(',');
-              for ( var c of columns ) {
-                if ( this.shouldColumnBeSorted(c) && ! c.includes('.')) {
-                  var prop = view.props.find(p => p.fullPropertyName === c.substr(0, c.length - 1) );
-                  if ( prop ) {
-                    if ( c[c.length - 1] === this.DESCENDING_ORDER_CHAR )
-                      this.order = this.DESC(prop.property);
-                    else
-                      this.order = prop.property;
-                    dao = dao.orderBy(this.order);
-                  }
-                }
-              }
-            }
           return slot;
         }
       },
