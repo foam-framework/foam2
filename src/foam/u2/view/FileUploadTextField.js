@@ -8,12 +8,13 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'FileUploadTextField',
   extends: 'foam.u2.View',
+
   properties: [
     {
       name: 'data',
       hidden: true,
       postSet: function(_, n) {
-        this.isSet = !!n;
+        this.isSet = !! n;
       }
     },
     {
@@ -25,6 +26,27 @@ foam.CLASS({
       name: 'fileInput_'
     }
   ],
+
+  methods: [
+    function initE() {
+      this.SUPER();
+      this
+        .startContext({ data: this })
+          .addClass(this.myClass())
+          .start('input', null, this.fileInput_$)
+            .hide()
+            .attrs({type: 'file'})
+            .on('change', this.onFileUpload)
+          .end()
+          .add(this.UPLOAD)
+          .start('span')
+            .style({'margin-left': '8px'})
+            .add(this.IS_SET)
+          .end()
+        .endContext();
+    }
+  ],
+
   actions: [
     {
       name: 'upload',
@@ -36,6 +58,7 @@ foam.CLASS({
       }
     }
   ],
+
   listeners: [
     {
       name: 'onFileUpload',
@@ -46,32 +69,13 @@ foam.CLASS({
         if ( el.files.length == 0 ) return;
         var file = el.files[0];
         var reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = (e) => {
           var csv = e.target.result;
           this.data = csv;
-        }.bind(this);
+        };
         reader.readAsBinaryString(file);
         el.value = '';
       }
-    }
-  ],
-  methods: [
-    function initE() {
-      this.SUPER();
-      this
-        .startContext({ data: this })
-          .addClass(this.myClass())
-          .start('input', null, this.fileInput_$)
-            .hide()
-            .attrs({ type: 'file' })
-            .on('change', this.onFileUpload)
-          .end()
-          .add(this.UPLOAD)
-          .start('span')
-            .style({'margin-left': '8px'})
-            .add(this.IS_SET)
-          .end()
-        .endContext();
     }
   ]
 });
