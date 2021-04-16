@@ -37,7 +37,7 @@ foam.CLASS({
       border-radius: 3px;
       box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.16);
       box-sizing: border-box;
-      padding: 12px 16px;
+      padding: 10px 16px;
 
       -webkit-transition: all .15s ease-in-out;
       -moz-transition: all .15s ease-in-out;
@@ -51,7 +51,8 @@ foam.CLASS({
     }
 
     ^ img {
-      margin-right: 4px;
+      /*TODO: Remove this important once Action button CSS is fixed*/
+      margin-right: 0px !important;
       width: 16px;
       height: 16px;
     }
@@ -62,6 +63,9 @@ foam.CLASS({
       font-size: 14px;
       color: /*%BLACK%*/ #1e1f21;
       line-height: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     ^name:hover {
@@ -83,6 +87,11 @@ foam.CLASS({
     ^close-action {
       margin-left: auto;
       padding: 0;
+    }
+
+    ^close-action:focus {
+      /*TODO: Remove this important once Action button CSS is fixed*/
+      border: 1px solid /*%PRIMARY1%*/ #406DEA !important;
     }
 
     ^close-action span {
@@ -115,11 +124,7 @@ foam.CLASS({
       this.addClass(this.myClass())
         .start({ class: 'foam.u2.tag.Image', data: 'images/attach-icon.svg' }).end()
         .start('p').addClass(this.myClass('name'))
-          .add(this.slot(function(filename) {
-            var len = filename.length;
-            return ( len > 35 ) ? (filename.substr(0, 20) +
-              '...' + filename.substr(len - 10, len)) : filename;
-          }, this.data.filename$))
+          .add(this.data.filename)
           .on('click', this.viewFile)
         .end()
         .start(this.REMOVE_FILE_X, {

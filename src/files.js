@@ -532,6 +532,7 @@ FOAM_FILES([
   { name: "foam/u2/view/EnumLegendView", flags: ['web'] },
   { name: "foam/u2/view/RadioButton", flags: ['web'] },
   { name: "foam/u2/view/LoginView", flags: ['web'] },
+  { name: "foam/u2/view/DocumentUploadView", flags: ['web'] },
   { name: "foam/u2/view/ValueView", flags: ['web'] },
   { name: "foam/u2/view/LiteralValueView", flags: ['web'] },
   { name: "foam/u2/view/PreView", flags: ['web'] },
