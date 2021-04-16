@@ -112,7 +112,7 @@ foam.CLASS({
       border: solid 1px #59A5D5;
     }
     ^ .label{
-      font-family: IBM Plex Sans;
+      font-family: /*%FONT1%*/ 'IBM Plex Sans'; 
       font-style: normal;
       font-weight: normal;
       font-size: 11px;
