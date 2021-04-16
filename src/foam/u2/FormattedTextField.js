@@ -138,7 +138,7 @@ foam.CLASS({
             // if a delimiter has been inserted at an index before pos, increment pos
             if ( index <= digitsBeforeSelectionStart ) pos += format.length;
             // on delete, if index is 0, i.e., string begins with delimiter, increment startingPos
-            if ( this.isDelete && startingPos == 0 && this.data.length > 0 ) startingPos += format.length;
+            if ( this.isDelete && startingPos == 0 && index == 0 ) startingPos += format.length;
           }
         }
         if ( temp != this.formattedData ) {
