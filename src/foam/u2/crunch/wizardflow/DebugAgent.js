@@ -183,7 +183,7 @@ foam.CLASS({
   methods: [
     async function execute() {
       for ( let wizardlet of this.wizardlets ) {
-        if ( wizardlet.isVisible ) {
+        if ( wizardlet.of ) {
           wizardlet.sections.push(this.WizardletSection.create({
             title: 'Developer Tools',
             isAvailable: true,

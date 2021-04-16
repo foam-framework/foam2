@@ -62,9 +62,7 @@ foam.CLASS({
         var(--actionBarHeight) - var(--actionBarTbPadding));
       background-color: rgba(255,255,255,0.7);
       backdrop-filter: blur(5px);
-
-      /* TODO: Themes don't support this, so color is static */
-      border-top: 2px solid hsla(240,100%,80%,0.8);
+      box-shadow: 0px -1px 3px rgba(0, 0, 0, 0.3);
     }
 
     ^heading h2 {
