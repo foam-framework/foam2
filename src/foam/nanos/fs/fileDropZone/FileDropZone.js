@@ -155,10 +155,10 @@ foam.CLASS({
       var self = this;
 
       if ( Object.keys(this.supportedFormats).length == 0 ) {
-        let s = await this.fileTypeDAO.select()
+        let s = await this.fileTypeDAO.select();
         s.array.forEach(type => {
           this.supportedFormats[type.toSummary()] = type.abbreviation;
-        })
+        });
       }
 
       this
@@ -172,7 +172,6 @@ foam.CLASS({
               accept: this.getSupportedTypes(),
               multiple: 'multiple'
             })
-            .setID(id = 'file-upload')
             .on('change', this.onChange)
           .end();
         })
@@ -184,7 +183,6 @@ foam.CLASS({
               type: 'file',
               accept: this.getSupportedTypes()
             })
-            .setID(id = 'file-upload')
             .on('change', this.onChange)
           .end();
         })
