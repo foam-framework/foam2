@@ -203,7 +203,7 @@ foam.CLASS({
           if ( ! isVisible ) return self.E();
           var e2 = self.renderWizardletHeading(self.E(), wizardlet);
           return e2
-            .start(self.LoadingBorder, { loading$: wizardlet.loading$ })
+            .start(self.LoadingBorder, { loading: false })
               .call(function () {
                 self.renderWizardletSections(this, wizardlet, wi);
               })
