@@ -24,8 +24,10 @@ public class SubX extends ProxyX {
   /**
    * Keys of all services added to the subX.
    *
-   * Storing {@code serviceKeys} allows preventing {@code get(key)} call from
-   * propagating to the parent context when overriding a service as null.
+   * Storing {@code serviceKeys} to allow overriding a service as null. Eg,
+   * subX.put("group", null) would override "group" as null so that the next
+   * subX.get("group") call returns null instead of propagating the lookup of
+   * "group" key in the parent context.
    */
   protected Set serviceKeys_;
 
@@ -126,8 +128,8 @@ public class SubX extends ProxyX {
   }
 
   /**
-   * Remove a service/object from the subX. Therefore allowing the next
-   * {@code get(key)} call to propagate the lookup to the parent context.
+   * Remove a service/object from the subX so that {@code subX.get(key)} call
+   * can propagate the lookup to the parent context properly.
    *
    * @param key Key to be removed
    * @return SubX
