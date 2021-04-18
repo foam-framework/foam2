@@ -28,9 +28,9 @@ foam.INTERFACE({
       name: 'getPrereqs',
       type: 'java.util.List<String>',
       args: [
-        { name: 'x', type: 'Context' },
+        { name: 'x',     type: 'Context' },
         { name: 'capId', type: 'String' },
-        { name: 'ucj', type: 'foam.nanos.crunch.UserCapabilityJunction' }
+        { name: 'ucj',   type: 'foam.nanos.crunch.UserCapabilityJunction' }
       ],
       flags: ['java']
     },
