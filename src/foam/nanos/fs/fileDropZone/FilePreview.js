@@ -14,7 +14,7 @@ foam.CLASS({
 
   css: `
   ^container{
-    margin: 0; 
+    margin: 0;
     padding: 0;
     flex-grow: 1;
     overflow: hidden;
