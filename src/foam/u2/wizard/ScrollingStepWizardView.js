@@ -142,9 +142,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function init() {
-      console.log('scroll wizard view', this);
-    },
     function initE() {
       var self = this;
       window.testing_ = self;
