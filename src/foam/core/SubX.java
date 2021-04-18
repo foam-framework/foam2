@@ -124,4 +124,17 @@ public class SubX extends ProxyX {
       setX(((ProxyX) getX()).getX());
     }
   }
+
+  /**
+   * Remove a service/object from the subX. Therefore allowing the next
+   * {@code get(key)} call to propagate the lookup to the parent context.
+   *
+   * @param key Key to be removed
+   * @return SubX
+   */
+  public X rm(Object key) {
+    var subX = (SubX) put(key, null);
+    subX.serviceKeys_.remove(key);
+    return subX;
+  }
 }
