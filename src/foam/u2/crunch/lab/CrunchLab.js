@@ -73,7 +73,7 @@ foam.CLASS({
           class: 'foam.u2.view.RichChoiceView',
           search: true,
           allowClearingSelection: true,
-          rowView: { class: this.RichChoiceSummaryIdRowView },
+          rowView: { class: 'foam.u2.view.RichChoiceSummaryIdRowView' },
           sections: [
             {
               heading: 'Users',
@@ -97,7 +97,7 @@ foam.CLASS({
           class: 'foam.u2.view.RichChoiceView',
           search: true,
           allowClearingSelection: true,
-          rowView: { class: this.RichChoiceSummaryIdRowView },
+          rowView: { class: 'foam.u2.view.RichChoiceSummaryIdRowView' },
           sections: [
             {
               heading: 'Users',
@@ -118,7 +118,7 @@ foam.CLASS({
           class: 'foam.u2.view.RichChoiceView',
           search: true,
           allowClearingSelection: true,
-          rowView: { class: this.RichChoiceSummaryIdRowView },
+          rowView: { class: 'foam.u2.view.RichChoiceSummaryIdRowView' },
           sections: [
             {
               heading: 'Capabilities',
