@@ -41,6 +41,7 @@ FOAM_FILES([
   { name: "foam/core/EndBoot" },
   { name: "foam/core/Script" },
   { name: "foam/pattern/Faceted" },
+  { name: "foam/core/Glyph" },
   { name: "foam/core/types" },
   { name: "foam/core/Duration" },
   { name: "foam/core/FObjectArray" },
