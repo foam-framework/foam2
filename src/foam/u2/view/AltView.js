@@ -116,8 +116,6 @@ foam.CLASS({
         } else {
           this.memento.tail.head = '';
         }
-      } else {
-        self.setMementoWithSelectedView();
       }
 
       this.addClass(this.myClass())

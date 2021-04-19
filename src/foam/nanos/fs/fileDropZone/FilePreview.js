@@ -14,7 +14,7 @@ foam.CLASS({
 
   css: `
   ^container{
-    margin: 0; 
+    margin: 0;
     padding: 0;
     flex-grow: 1;
     overflow: hidden;
@@ -50,7 +50,7 @@ foam.CLASS({
             .style({
               'flex': 1,
               'object-fit': 'contain',
-              'max-height': '100%',
+              'height': '100%',
               'max-width': '100%',
               'object-position': 'left'
             })
