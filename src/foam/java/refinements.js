@@ -2126,7 +2126,7 @@ foam.CLASS({
 
           arr.push(`val.get${name}())`);
         }
-        return 'return ' + arr.join('-') + ';';
+        return 'return ' + arr.join(' + "-" + ') + ';';
       }
     }
   ]
