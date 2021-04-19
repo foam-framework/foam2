@@ -30,8 +30,12 @@ foam.CLASS({
     function onPopState() {
       this.value = this.window.location.hash.substr(1);
     },
-    function onValueChange() {
-      this.window.location.hash = this.value;
+    {
+      name: 'onValueChange',
+      isFramed: true,
+      code: function() {
+        this.window.location.hash = this.value;
+      }
     }
   ]
 });
