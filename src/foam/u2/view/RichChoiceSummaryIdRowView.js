@@ -11,7 +11,7 @@ foam.CLASS({
 
   documentation: 'Appends object id after object summary in RichChoiceViews',
 
-  // duplicates css, properties,methods from RichChoiceView.DefaultRowView
+  // duplicates css and most of initE method from RichChoiceView.DefaultRowView
   css: `
         ^row {
           background: white;
@@ -24,13 +24,6 @@ foam.CLASS({
           cursor: pointer;
         }
       `,
-
-  properties: [
-    {
-      name: 'data',
-      documentation: 'The selected object.'
-    }
-  ],
 
   methods: [
     function initE() {
