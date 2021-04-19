@@ -20,6 +20,7 @@ foam.CLASS({
 
   requires: [
     'foam.core.SimpleSlot',
+    'foam.u2.borders.LoadingLevel',
     'foam.u2.detail.AbstractSectionedDetailView',
     'foam.u2.wizard.WizardletAware',
     'foam.u2.wizard.WizardletIndicator',
@@ -33,7 +34,13 @@ foam.CLASS({
   constants: [
     {
       name: 'SAVE_DELAY',
-      value: 1200
+      value: 5000,
+      documentation: 'How long input must be idle before an auto-save'
+    },
+    {
+      name: 'SAVE_WARN_DELAY',
+      value: 3500,
+      documentation: 'How long to show small spinner before an auto-save'
     }
   ],
 
@@ -82,6 +89,7 @@ foam.CLASS({
         does not display even if some sections are available.
       `,
     },
+
     {
       name: 'isVisible',
       class: 'Boolean',
@@ -97,7 +105,11 @@ foam.CLASS({
     },
     {
       name: 'loading',
-      class: 'Boolean'
+      class: 'Boolean',
+      postSet: function (_, n) {
+        if ( n ) this.loadingLevel = this.LoadingLevel.LOADING;
+        else this.loadingLevel = this.LoadingLevel.IDLE;
+      }
     },
     {
       name: 'sections',
@@ -143,6 +155,11 @@ foam.CLASS({
         return isValid ? this.WizardletIndicator.COMPLETED
           : this.WizardletIndicator.PLEASE_FILL;
       }
+    },
+    {
+      name: 'loadingLevel',
+      class: 'Enum',
+      of: 'foam.u2.borders.LoadingLevel'
     },
     {
       name: '__subSubContext__',
@@ -194,8 +211,13 @@ foam.CLASS({
             ) ? data.getUpdateSlot()
               : this.FObjectRecursionSlot.create({ obj: data });
             return this.WizardletAutoSaveSlot.create({
+              // Clear pending auto-saves if we start saving or finish loading
+              saveEvent: this.loading$,
+              // Listen to property updates if not loading
               other: filter(updateSlot, () => ! this.loading),
-              delay: this.SAVE_DELAY
+              delay: this.SAVE_DELAY,
+              saveWarnDelay: this.SAVE_WARN_DELAY,
+              loadingLevel$: this.loadingLevel$
             });
           });
         slotSlot.valueSub(() => { s.set(slotSlot.get().get()); });
