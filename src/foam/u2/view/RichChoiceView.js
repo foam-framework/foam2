@@ -657,13 +657,6 @@ foam.CLASS({
         }
       `,
 
-      properties: [
-        {
-          name: 'data',
-          documentation: 'The selected object.'
-        }
-      ],
-
       methods: [
         function initE() {
           var summary = this.data.toSummary();
