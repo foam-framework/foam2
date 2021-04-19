@@ -321,10 +321,9 @@ foam.CLASS({
       `
     },
     {
-      name: 'implies',
+      name: 'grantsPermission',
       type: 'Boolean',
       args: [
-        { name: 'x', type: 'Context' },
         { name: 'permission', type: 'String' }
       ],
       documentation: `Checks if a permission or capability string is implied by the current capability`,
@@ -335,6 +334,34 @@ foam.CLASS({
         }
         for ( String inherentPermission : this.getInherentPermissions() ) {
           if ( new AuthPermission(inherentPermission).implies(new AuthPermission(permission)) ) return true;
+        }
+        return false;
+      `
+    },
+    {
+      name: 'implies',
+      type: 'Boolean',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'permission', type: 'String' }
+      ],
+      documentation: `Checks if a permission or capability string is implied by the current capability`,
+      javaCode: `
+        if ( this.grantsPermission(permission) ) return true;
+
+        // temporary prevent infinite loop when checking the permission "predicatedprerequisite.read.*"
+        // TODO : prerequisite checking below may be/probably is unnecessary
+        if ( PredicatedPrerequisiteCapabilityJunctionDAO.PERMISSION.equals(permission) ) return false;
+
+        CrunchService crunchService = (CrunchService) x.get("crunchService");
+        var prereqs = crunchService.getPrereqs(x, getId(), null);
+
+        if ( prereqs != null && prereqs.size() > 0 ) {
+          DAO capabilityDAO = (DAO) x.get("capabilityDAO");
+          for ( var capId : prereqs ) {
+            Capability capability = (Capability) capabilityDAO.find(capId);
+            if ( capability != null && capability.grantsPermission(permission) ) return true;
+          }
         }
         return false;
       `
@@ -404,7 +431,7 @@ foam.CLASS({
           subject.setUser((User) userDAO.find(ucj.getSourceId()));
         }
 
-        var prereqs = crunchService.getPrereqs(getId());
+        var prereqs = crunchService.getPrereqs(x, getId(), ucj);
         CapabilityJunctionStatus prereqChainedStatus = null;
         if ( prereqs != null ) {
           for ( var capId : prereqs ) {
@@ -494,7 +521,7 @@ foam.CLASS({
         boolean shouldReopenTopLevel = shouldReopenUserCapabilityJunction(ucj);
         if ( shouldReopenTopLevel ) return true;
 
-        var prereqs = crunchService.getPrereqs(getId());
+        var prereqs = crunchService.getPrereqs(x, getId(), ucj);
         if ( prereqs == null || prereqs.size() == 0 ) return false;
 
         for ( var capId : prereqs ) {

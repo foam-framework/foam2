@@ -40,6 +40,10 @@ foam.CLASS({
             UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
             UserCapabilityJunction old = (UserCapabilityJunction) userCapabilityJunctionDAO.find(ucj.getId());
 
+            X effectiveX = x;
+            Subject junctionSubject = ucj.getSubject(x);
+            effectiveX = x.put("subject", junctionSubject);
+
             Long effectiveUserId = ( ucj instanceof AgentCapabilityJunction ) ? ((AgentCapabilityJunction) ucj).getEffectiveUser() : null;
             DAO filteredUserCapabilityJunctionDAO = (DAO) userCapabilityJunctionDAO
               .where(OR(
@@ -56,7 +60,7 @@ foam.CLASS({
                 // )
               ));
 
-            String[] dependentIds = crunchService.getDependentIds(x, ucj.getTargetId());
+            String[] dependentIds = crunchService.getDependentIds(effectiveX, ucj.getTargetId());
 
             List<UserCapabilityJunction> ucjsToReput = new ArrayList<UserCapabilityJunction>();
 
@@ -72,10 +76,6 @@ foam.CLASS({
 
               ucjsToReput.add((UserCapabilityJunction) ucjToReput.fclone());
             }
-
-            X effectiveX = x;
-            Subject junctionSubject = ucj.getSubject(x);
-            effectiveX = x.put("subject", junctionSubject);
 
             for ( UserCapabilityJunction ucjToReput : ucjsToReput ) {
               if ( ucjToReput.getStatus() == CapabilityJunctionStatus.GRANTED ) {

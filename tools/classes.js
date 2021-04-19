@@ -43,6 +43,7 @@ var classes = [
   'foam.mlang.predicate.Or',
   'foam.mlang.predicate.AbstractPredicate',
   'foam.mlang.predicate.Nary',
+  'foam.mlang.predicate.NamedProperty',
   'foam.mlang.predicate.Unary',
   'foam.mlang.predicate.Binary',
   'foam.mlang.predicate.ArrayBinary',
@@ -819,6 +820,7 @@ var classes = [
   //daos
   'foam.nanos.crunch.connection.CapabilityPayloadDAO',
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
+  'foam.nanos.crunch.PredicatedPrerequisiteCapabilityJunctionDAO',
   //rules
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
   'foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate',

@@ -121,6 +121,10 @@
     }
   ],
 
+  messages: [
+    { name: 'BACK_LABEL', message: 'Back' }
+  ],
+
   properties: [
     {
       // TODO: True fix will be with ReferenceView
@@ -800,7 +804,7 @@
                     deletePredicate: foam.mlang.predicate.False.create()
                   }),
                   mementoHead: null,
-                  backLabel: 'Back'
+                  backLabel: self.BACK_LABEL
                 });
               } else {
                 of = obj.of;
@@ -832,7 +836,7 @@
                 deletePredicate: foam.mlang.predicate.False.create()
               }),
               mementoHead: null,
-              backLabel: 'Back'
+              backLabel: self.BACK_LABEL
             }, X);
           })
           .catch(err => {

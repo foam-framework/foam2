@@ -330,7 +330,7 @@ foam.CLASS({
             addClass(this.myClass('index')).
             select(this.data, function(e) {
               return this.E()
-                .style({padding: '4px'})
+                .style({padding: '4px', 'padding-left': (16 * e.id.split('.').length  - 12)+ 'px'})
                 .add(e.id, ' ', e.title)
                 .enableClass('selected', self.selected$.map(s => s == e.id))
                 .on('mouseenter', () => { self.selected = e.id; })

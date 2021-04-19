@@ -306,7 +306,9 @@ foam.CLASS({
       class: 'String',
       name: 'label',
       transient: true,
-      factory: function() { return this.name; }
+      factory: function() {
+        return this.name.toUpperCase() == this.name ? this.name.split('_').map(l => foam.String.labelize(l.toLowerCase())).join(' ') : this.name;
+      }
     },
     {
       class: 'String',

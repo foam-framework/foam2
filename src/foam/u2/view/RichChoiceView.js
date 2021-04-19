@@ -76,6 +76,10 @@ foam.CLASS({
   name: 'RichChoiceView',
   extends: 'foam.u2.View',
 
+  requires: [
+    'foam.u2.view.RichChoiceViewI18NComparator'
+  ],
+
   documentation: `
     This is similar to foam.u2.view.ChoiceView, but lets you provide views for
     the selection and options instead of strings. This allows you to create
@@ -285,6 +289,12 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'clearOnReopen',
+      documentation: 'clear filter on dropdown reopen if set to true',
+      value: true
+    },
+    {
+      class: 'Boolean',
       name: 'isOpen_',
       documentation: `
         An internal property used to determine whether the options list is
@@ -292,7 +302,7 @@ foam.CLASS({
       `,
       postSet: function(_, nv) {
         if ( nv && ! this.hasBeenOpenedYet_ ) this.hasBeenOpenedYet_ = true;
-        if ( ! nv ) {
+        if ( ! nv && this.clearOnReopen ) {
           this.clearProperty('filter_');
           this.sections.forEach((section) => {
             section.clearProperty('filteredDAO');
@@ -414,7 +424,10 @@ foam.CLASS({
     },
     {
       name: 'comparator',
-      documentation: 'Optional comparator for ordering choices.'
+      documentation: 'Optional comparator for ordering choices.',
+      factory: function() {
+        return this.RichChoiceViewI18NComparator.create();
+      }
     }
   ],
 
@@ -549,7 +562,7 @@ foam.CLASS({
                             .translate(section.heading, section.heading)
                           .end()
                           .start()
-                            .select(section.filteredDAO$proxy, (obj) => {
+                            .select(section.filteredDAO$proxy, obj => {
                               return this.E()
                                 .start(self.rowView, { data: obj })
                                   .enableClass('disabled', section.disabled)
@@ -651,13 +664,6 @@ foam.CLASS({
         }
       `,
 
-      properties: [
-        {
-          name: 'data',
-          documentation: 'The selected object.'
-        }
-      ],
-
       methods: [
         function initE() {
           var summary = this.data.toSummary();
@@ -719,13 +725,9 @@ foam.CLASS({
             'text-overflow': 'ellipsis'
           });
 
-          var summary = this.fullObject$.map(o => {
-            return ( o && o.toSummary() ) || this.defaultSelection;
-          });
-          var summaryWithoutSlot = this.fullObject && this.fullObject.toSummary()
-            ? this.fullObject.toSummary()
-            : this.defaultSelectionPrompt;
-          return this.translate(summaryWithoutSlot, summary);
+          return this.add(this.fullObject$.map(o => {
+            return ( o && o.toSummary() ) || this.defaultSelectionPrompt;
+          }));
         }
       ]
     },

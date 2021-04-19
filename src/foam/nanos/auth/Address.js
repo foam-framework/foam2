@@ -669,7 +669,7 @@ foam.CLASS({
             return postalCodeError ? postalCodeError : X.INVALID_POSTAL_CODE;
           }
         },
-        // Portugal
+        // Portugal: "NNNN-NNN", "NNNN NNN"
         {
           args: ['postalCode', 'countryId'],
           predicateFactory: function(e) {
@@ -677,7 +677,7 @@ foam.CLASS({
               e.NEQ(foam.nanos.auth.Address.COUNTRY_ID, 'PT'),
               e.REG_EXP(
                 foam.nanos.auth.Address.POSTAL_CODE,
-                /^\d{4}$/
+                /^\d{4}[- ]{0,1}\d{3}$/
               )
             );
           },

@@ -16,7 +16,10 @@ foam.CLASS({
     updated, the value of this slot is a wrapper object containing the FObject
     being listened to; it is in the following format: { obj: [FObject] }
   `,
-  requires: [ 'foam.core.ExpressionSlot' ],
+  requires: [
+    'foam.core.ExpressionSlot',
+    'foam.u2.wizard.internal.PropertyUpdate',
+  ],
 
   properties: [
     {
@@ -31,6 +34,10 @@ foam.CLASS({
         Object references already seen. This is used to prevent infinite
         recursion.
       `
+    },
+    {
+      name: 'path',
+      class: 'StringArray'
     },
     {
       name: 'testProp',
@@ -100,12 +107,13 @@ foam.CLASS({
           let propR$ = this.cls_.create({
             obj$: prop$,
             parentRefs: [ ...this.parentRefs, prop$, o ],
+            path: [ ...this.path, prop.name ]
           }, this);
 
           cleanup.onDetach(propR$.sub(() => {
             // ???: make this log a debug mode feature
             // console.log('update', o && o.cls_.id, prop.name, o, propR$, prop, this);
-            this.value = { obj: o, cause: propR$ };
+            this.value = propR$.get();
           }));
 
           continue;
@@ -115,10 +123,12 @@ foam.CLASS({
           let updateArray = arry => {
             innerCleanup.detach();
             innerCleanup = foam.core.FObject.create();
+            let i = 0;
             for ( let elem of arry ) {
               let elemR$ = this.cls_.create({
                 obj: elem,
-                parentRefs: [ ...this.parentRefs, prop$, o ]
+                parentRefs: [ ...this.parentRefs, prop$, o ],
+                path: [ ...this.path, i++ ]
               }, this);
               innerCleanup.onDetach(elemR$.sub(() => {
                 this.value = { obj: elem, cause: elemR$ };
@@ -127,13 +137,18 @@ foam.CLASS({
           };
           cleanup.onDetach(prop$.sub(() => {
             updateArray(prop$.get());
-            this.value = { obj: o, cause: prop$ };
+            this.value = this.PropertyUpdate.create({
+              path: [ ...this.path, prop.name ]
+            });
           }));
           updateArray(prop$.get());
           continue;
         }
         prop$.sub(() => {
           this.value = { obj: o, cause: prop$ };
+          this.value = this.PropertyUpdate.create({
+            path: [ ...this.path, prop.name ]
+          });
         });
       }
     }

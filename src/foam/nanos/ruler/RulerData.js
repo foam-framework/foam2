@@ -23,6 +23,16 @@
       documentation: 'new object'
     },
     {
+      class: 'StringArray',
+      name: 'diff',
+      javaFactory: `
+        if ( getO() == null ) {
+          return new String[0];
+        }
+        return (String[]) getN().diff(getO()).keySet().toArray(String[]::new);
+      `
+    },
+    {
       class: 'FObjectProperty',
       name: 'user',
       documentation: 'user in the current context'

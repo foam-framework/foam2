@@ -330,7 +330,7 @@ public class JSONFObjectFormatter
 
     String before = builder().toString();
     reset();
-    for ( int i = 0; i < size; i++ ) {
+    for ( int i = 0 ; i < size ; i++ ) {
       PropertyInfo prop = (PropertyInfo) axioms.get(i);
       if ( prop.includeInID() || prop.compare(oldFObject, newFObject) != 0 ) {
         if ( delta > 0 ) {
@@ -340,10 +340,11 @@ public class JSONFObjectFormatter
         outputProperty(newFObject, prop);
 
         delta += 1;
-        if ( prop.includeInID() )
+        if ( prop.includeInID() ) {
           ids += 1;
-        else if ( optionalPredicate_.propertyPredicateCheck(getX(), of, prop) )
+        } else if ( optionalPredicate_.propertyPredicateCheck(getX(), of, prop) ) {
           optional += 1;
+        }
       }
     }
     String output = builder().toString();

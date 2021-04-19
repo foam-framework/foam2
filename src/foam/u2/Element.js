@@ -7,12 +7,8 @@
 /*
 TODO:
  - Remove use of E() and replace with create-ing axiom to add same behaviour.
- - create 'inner' element which defaults to this. add() adds to inner to make
-   creating borders simple
  - start('leftPanel') should work for locating pre-existing named spaces
- - start, tag, and add() should use standard helper method
- - Fix handling of Slots that return arrays.
- - Properly handle insertBefore_ of an element that's already been inserted?
+ - Don't generate .java and remove need for flags: ['js'].
 */
 
 foam.ENUM({
@@ -41,12 +37,10 @@ foam.ENUM({
   values: [
     {
       name: 'CREATE',
-      label: 'Create',
       modePropertyName: 'createVisibility'
     },
     {
       name: 'VIEW',
-      label: 'View',
       modePropertyName: 'readVisibility',
       restrictDisplayMode: function(mode) {
         return mode == foam.u2.DisplayMode.RW ? foam.u2.DisplayMode.RO : mode;
@@ -54,7 +48,6 @@ foam.ENUM({
     },
     {
       name: 'EDIT',
-      label: 'Edit',
       modePropertyName: 'updateVisibility'
     }
   ]
@@ -75,10 +68,10 @@ foam.ENUM({
   ],
 
   values: [
-    { name: 'RW',       label: 'Read-Write' },
-    { name: 'DISABLED', label: 'Disabled' },
-    { name: 'RO',       label: 'Read-Only' },
-    { name: 'HIDDEN',   label: 'Hidden', restrictDisplayMode: function() { return foam.u2.DisplayMode.HIDDEN; } }
+    { name: 'RW', label: 'Read-Write' },
+    { name: 'DISABLED' },
+    { name: 'RO', label: 'Read-Only' },
+    { name: 'HIDDEN', restrictDisplayMode: function() { return foam.u2.DisplayMode.HIDDEN; } }
   ]
 });
 

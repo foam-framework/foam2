@@ -357,12 +357,11 @@ foam.CLASS({
         rows: 8, cols: 80,
       }
     },
-    /*
     {
       class: 'Date',
-      name: 'defaultDate'
+      name: 'defaultDate',
+      postSet: function (o,n) { console.log('date', n); }
     },
-    */
     {
       class: 'Date',
       name: 'dateRWAndRO',
@@ -370,15 +369,29 @@ foam.CLASS({
       view: {
         class: 'foam.u2.MultiView',
         views: [
-          'foam.u2.view.DateView',
-          'foam.u2.view.DateView',
-          {class: 'foam.u2.view.DateView', mode: foam.u2.DisplayMode.RO}
+          { class: 'foam.u2.view.DateView', onKey: false },
+          { class: 'foam.u2.view.DateView', onKey: false },
+          { class: 'foam.u2.view.DateView', mode: foam.u2.DisplayMode.RO }
+        ]
+      }
+    },
+    {
+      class: 'Date',
+      name: 'dateRWAndROOnKey',
+      factory: function() { return new Date(); },
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          { class: 'foam.u2.view.DateView', onKey: true },
+          { class: 'foam.u2.view.ValueView' },
+          { class: 'foam.u2.view.DateView', onKey: true },
+          { class: 'foam.u2.view.DateView', mode: foam.u2.DisplayMode.RO }
         ]
       }
     },
     {
       class: 'DateTime',
-      name: 'defaultDateTime'
+      name: 'defaultDateTime',
     },
     {
       class: 'Time',
@@ -589,6 +602,34 @@ foam.CLASS({
       class: 'Boolean',
       name: 'defaultBooleanWithLabel',
       view: { class: 'foam.u2.CheckBox', label: "Label goes here"}
+    },
+    {
+      class: 'Boolean',
+      name: 'booleanWithRadio',
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.RadioView',
+          choices: [
+            [true, 'Yes'],
+            [false, 'No']
+          ],
+          isHorizontal: true
+        };
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'booleanWithRadio2',
+      view: function(_, X) {
+        return {
+          class: 'foam.u2.view.RadioView',
+          choices: [
+            [true, 'Yes'],
+            [false, 'No']
+          ],
+          isHorizontal: true
+        };
+      }
     },
     {
       class: 'String',
