@@ -33,7 +33,6 @@ foam.CLASS({
   css: `
     ^ {
       box-sizing: border-box;
-      max-width: 15vw;
       max-height: 45vh;
       height: 100%;
       padding: 16px;
