@@ -146,7 +146,7 @@ foam.CLASS({
               console.log(this);
               var arr = [];
               for ( var prop in this.instance_ ) {
-                arr.push(! this[prop] ? '' : this[prop].toSummary ? this[prop].toSummary() : this[prop].toString() );
+                arr.push(! this[prop] ? '' : this[prop].toString() );
               }
               return arr.join('-');
             },
