@@ -8,7 +8,6 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'RichChoiceViewI18NComparator',
 
-
   imports: [
     'translationService?'
   ],
