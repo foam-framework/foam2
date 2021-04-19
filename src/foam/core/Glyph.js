@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2021 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Glyph',
@@ -18,13 +24,6 @@ foam.CLASS({
       }
     },
     {
-      name: 'previewUrl',
-      class: 'Image',
-      expression: function(template) {
-        //
-      }
-    },
-    {
       name: 'themeName',
       class: 'String'
     }
@@ -33,11 +32,10 @@ foam.CLASS({
   methods: [
     function expandSVG(values) {
       var val = this.template;
-      debugger;
       for ( k in values ) if ( values.hasOwnProperty(k) ) {
         let K = k.toUpperCase();
         val = val.replace(
-          new RegExp('%' + K + '%(?!\\*/)', 'g'),
+          new RegExp('/\\*%' + K + '%\\*/[^\\"]*', 'g'),
           values[k]
         );
       }
