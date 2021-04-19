@@ -76,6 +76,10 @@ foam.CLASS({
   name: 'RichChoiceView',
   extends: 'foam.u2.View',
 
+  requires: [
+    'foam.u2.view.RichChoiceViewI18NComparator'
+  ],
+
   documentation: `
     This is similar to foam.u2.view.ChoiceView, but lets you provide views for
     the selection and options instead of strings. This allows you to create
@@ -420,7 +424,10 @@ foam.CLASS({
     },
     {
       name: 'comparator',
-      documentation: 'Optional comparator for ordering choices.'
+      documentation: 'Optional comparator for ordering choices.',
+      factory: function() {
+        return this.RichChoiceViewI18NComparator.create();
+      }
     }
   ],
 
@@ -555,7 +562,7 @@ foam.CLASS({
                             .translate(section.heading, section.heading)
                           .end()
                           .start()
-                            .select(section.filteredDAO$proxy, (obj) => {
+                            .select(section.filteredDAO$proxy, obj => {
                               return this.E()
                                 .start(self.rowView, { data: obj })
                                   .enableClass('disabled', section.disabled)
