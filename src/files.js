@@ -428,6 +428,7 @@ FOAM_FILES([
   { name: "foam/dao/ClientDAO" },
   { name: "foam/dao/NotificationClientDAO" },
   { name: "foam/dao/PollingClientDAO" },
+  { name: "foam/dao/PurgeRecordCmd" },
   { name: "foam/dao/StreamingClientDAO" },
   { name: "foam/dao/RequestResponseClientDAO" },
   { name: "foam/box/InvalidMessageException" },
