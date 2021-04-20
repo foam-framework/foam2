@@ -11,12 +11,14 @@ foam.CLASS({
 
   imports: [
     'debugContextIntercept',
+    'sequence',
     'wizardlets'
   ],
 
   requires: [
     'foam.dao.MDAO',
     'foam.u2.borders.CollapseBorder',
+    'foam.u2.borders.LoadingLevel',
     'foam.u2.view.ScrollTableView',
     'foam.u2.wizard.debug.DebugWAO',
     'foam.u2.wizard.debug.PropertyEvent',
@@ -79,7 +81,9 @@ foam.CLASS({
           }));
         })
       }
+      var autoSaveEnabled = this.sequence.contains('AutoSaveWizardletsAgent');
       s.sub(() => {
+        if ( ! autoSaveEnabled ) this.wizardlet.loadingLevel = this.LoadingLevel.IDLE;
         var propertyUpdate = s.get();
         if ( ! this.PropertyUpdate.isInstance(propertyUpdate) ) {
           propertyUpdate = this.PropertyUpdate.create({

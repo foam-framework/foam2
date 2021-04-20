@@ -11,7 +11,8 @@ foam.CLASS({
   flags: ['web'],
 
   requires: [
-    'foam.nanos.crunch.CapabilityJunctionStatus'
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.u2.borders.LoadingLevel'
   ],
 
   imports: [
@@ -32,8 +33,8 @@ foam.CLASS({
 
   methods: [
     function save(wizardlet) {
-      if ( wizardlet.loading ) return Promise.resolve();
-      if ( ! wizardlet.isAvailable ) return Promise.resolve();
+      if ( wizardlet.loading ) return this.cancelSave_(wizardlet);
+      if ( ! wizardlet.isAvailable ) return this.cancelSave_(wizardlet);
       var wData = wizardlet.data ? wizardlet.data.clone() : null;
       wizardlet.loading = true;
       let p = this.subject ? this.crunchService.updateJunctionFor(
@@ -99,6 +100,10 @@ foam.CLASS({
       foam.u2.wizard.Slot.blockFramed().then(() => {
         wizardlet.loading = false;
       });
+    },
+    function cancelSave_(w) {
+      w.loadingLevel = this.LoadingLevel.IDLE;
+      return Promise.resolve();
     }
   ]
 });

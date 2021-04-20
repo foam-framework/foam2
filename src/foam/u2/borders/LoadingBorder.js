@@ -51,6 +51,8 @@ foam.CLASS({
 
       /* ease-out animation makes things feel stable */
       transition: all 200ms ease-out;
+
+      overflow: hidden;
     }
     ^overlay .foam-u2-LoadingSpinner {
       width: 50%;
