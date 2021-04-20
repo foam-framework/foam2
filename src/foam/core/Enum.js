@@ -330,6 +330,10 @@ foam.CLASS({
       class: 'StringArray',
       name: 'extraClasses',
       generateJava: false
+    },
+    {
+      class: 'GlyphProperty',
+      name: 'glyph'
     }
   ],
 
