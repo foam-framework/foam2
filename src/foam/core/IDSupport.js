@@ -143,7 +143,6 @@ foam.CLASS({
           {
             name: 'toString',
             code: function() {
-              console.log(this);
               var arr = [];
               for ( var prop in this.instance_ ) {
                 arr.push( ! this[prop] ? '' : this[prop].toString() );
