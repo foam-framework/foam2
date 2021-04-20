@@ -610,10 +610,6 @@
       message: 'Pending'
     },
     {
-      name: 'UNASSIGNED',
-      message: 'Unassigned'
-    },
-    {
       name: 'TRACKING',
       message: 'Tracking'
     }

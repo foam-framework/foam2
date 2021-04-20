@@ -461,6 +461,8 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequ
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.SUCCESS_APPROVED",target:"Você aprovou com sucesso este pedido"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.SUCCESS_REJECTED",target:"Você rejeitou com sucesso este pedido"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.SUCCESS_CANCELLED",target:"Você cancelou com sucesso este pedido"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.SUCCESS_ASSIGNED",target:"Você designou com sucesso este pedido"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.ASSIGN_TITLE",target:"selecione um cessionário"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.PENDING",target:"Pendente"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.TRACKING",target:"Rastreamento"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.BACK_LABEL",target:"Voltar"})
