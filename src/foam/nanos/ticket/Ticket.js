@@ -44,6 +44,7 @@ foam.CLASS({
     'type',
     // REVIEW: view fails to display when owner in tableColumn, the 2nd entry in allColumns is undefined.
     // 'owner',
+    'assignedTo.legalName',
     'createdBy.legalName',
     'lastModified',
     'status',
@@ -297,7 +298,8 @@ foam.CLASS({
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
-      name: 'assignedTo'
+      name: 'assignedTo',
+      section: 'infoSection'
     }
   ],
 
