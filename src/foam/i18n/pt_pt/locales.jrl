@@ -454,6 +454,8 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequ
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.REJECT.label",target:"Rejeitar"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.CANCEL.label",target:"Cancelar"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.VIEW_REFERENCE.label",target:"Ver Referência"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.ASSIGN.label",target:"Designo"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.ASSIGN_TO_ME.label",target:"Designo a mim"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.SECTION_APPROVAL_REQUEST_INFORMATION.title",target:"Aprovação Solicitação Informações"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.SECTION_SYSTEM_INFORMATION.title",target:"Sistema Informação"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.SUCCESS_APPROVED",target:"Você aprovou com sucesso este pedido"})
