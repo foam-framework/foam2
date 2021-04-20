@@ -61,7 +61,7 @@
     'classification',
     'objId',
     'approver.legalName',
-    'assignedTo',
+    'assignedTo.legalName',
     'status',
     'memo'
   ],
