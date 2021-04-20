@@ -13,6 +13,9 @@ foam.CLASS({
   `,
 
   properties: [
-    'id'
+    {
+      class: 'Object',
+      name: 'id'
+    }
   ]
 });
