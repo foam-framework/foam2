@@ -87,6 +87,10 @@ foam.CLASS({
         var offset = 50;
 
         var test_visible = el => {
+          // Offset parent might be a wrapping element, but we want the element
+          // who has the wizard scroller as its offsetParent
+          while ( el.offsetParent != this.scrollOffsetElement ) el = el.offsetParent;
+
           var sectTop = el.offsetTop - offset;
           var sectBot = sectTop + el.clientHeight;
           var mainTop = this.mainScrollElement.scrollTop;
@@ -114,6 +118,7 @@ foam.CLASS({
       }
     },
     'mainScrollElement',
+    'scrollOffsetElement',
     {
       name: 'hasAction',
       documentation: `
@@ -161,6 +166,13 @@ foam.CLASS({
           .end()
           .start(this.GUnit, { columns: 8 })
             .addClass(this.myClass('rightside'))
+            .call(function () {
+              self.onDetach(this.state$.sub(() => {
+                if ( this.state.cls_ == foam.u2.LoadedElementState ) {
+                  self.scrollOffsetElement = this.el();
+                }
+              }));
+            })
             .start()
               .call(function () {
                 self.onDetach(this.state$.sub(() => {
@@ -203,7 +215,7 @@ foam.CLASS({
           if ( ! isVisible ) return self.E();
           var e2 = self.renderWizardletHeading(self.E(), wizardlet);
           return e2
-            .start(self.LoadingBorder, { loading$: wizardlet.loading$ })
+            .start(self.LoadingBorder, { loading: false })
               .call(function () {
                 self.renderWizardletSections(this, wizardlet, wi);
               })

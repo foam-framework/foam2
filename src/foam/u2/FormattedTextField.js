@@ -53,6 +53,11 @@ foam.CLASS({
       },
       documentation: 'The placeholder text when the input has content'
     },
+    {
+      class: 'Boolean',
+      name: 'returnFormatted',
+      documentation: 'Used to configure whether or not to return the data with formatting'
+    },
     // booleans to configure state for formatting data
     'isDelete',
     'includeTrailingDelimiter',
@@ -106,6 +111,8 @@ foam.CLASS({
       this.isDelete = false;
       this.includeTrailingDelimiter = true;
       this.formatted = false;
+      if ( this.hasOwnProperty('formattedData') )
+        this.data = this.returnFormatted ? this.formattedData : this.formattedData.replace(/\D/g,'');
     }
   ],
 
@@ -113,7 +120,7 @@ foam.CLASS({
     {
       name: 'formatData',
       code: function () {
-        this.data = this.formattedData.replace(/\D/g,'');
+        var data = this.formattedData.replace(/\D/g,'');
         if ( this.formatted || this.formattedData.trim() == '' ) {
           this.resetState();
           return;
@@ -131,14 +138,14 @@ foam.CLASS({
         var index = 0;
         for ( const format of this.formatter ) {
           if ( typeof format === 'number' || ! isNaN(format) ) {
-            temp += this.data.substring(index, index += format);
-            if ( index > this.data.length || ( index == this.data.length && ! this.includeTrailingDelimiter ) ) break;
+            temp += data.substring(index, index += format);
+            if ( index > data.length || ( index == data.length && ! this.includeTrailingDelimiter ) ) break;
           } else if ( typeof format === 'string' ) {
             temp += format;
             // if a delimiter has been inserted at an index before pos, increment pos
             if ( index <= digitsBeforeSelectionStart ) pos += format.length;
             // on delete, if index is 0, i.e., string begins with delimiter, increment startingPos
-            if ( this.isDelete && startingPos == 0 && this.data.length > 0 ) startingPos += format.length;
+            if ( this.isDelete && startingPos == 0 && index == 0 ) startingPos += format.length;
           }
         }
         if ( temp != this.formattedData ) {
