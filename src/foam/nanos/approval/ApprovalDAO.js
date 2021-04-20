@@ -70,6 +70,11 @@ foam.CLASS({
               //puts object to its original dao
               try {
                 rePutObject(x, request);
+
+                // unassign request once resolved
+                request.setAssignedTo(0);
+                getDelegate().put(request);
+
               } catch ( Exception e ) {
                 request.setStatus(ApprovalStatus.REQUESTED);
                 getDelegate().put(request);
@@ -78,6 +83,7 @@ foam.CLASS({
             } else {
               // since no more needs to be done with the request from this point onwards
               request.setIsFulfilled(true);
+              request.setAssignedTo(0);
               getDelegate().put(request);
             }
           }

@@ -50,6 +50,7 @@
     'currentMenu',
     'notify',
     'stack',
+    'subject',
     'summaryView?',
     'objectSummaryView?'
   ],
@@ -59,7 +60,8 @@
     'description',
     'classification',
     'objId',
-    'assignedTo.legalName',
+    'approver.legalName',
+    'assignedTo',
     'status',
     'memo'
   ],
@@ -79,11 +81,27 @@
   axioms: [
     {
       class: 'foam.comics.v2.CannedQuery',
-      label: 'Pending',
+      label: 'Assigned',
       predicateFactory: function(e) {
         return e.EQ(
-          foam.nanos.approval.ApprovalRequest.STATUS,
-          foam.nanos.approval.ApprovalStatus.REQUESTED
+          foam.nanos.approval.ApprovalRequest.ASSIGNED_TO,
+          foam.nanos.approval.ApprovalRequest.APPROVER
+        );
+      }
+    },
+    {
+      class: 'foam.comics.v2.CannedQuery',
+      label: 'Pending',
+      predicateFactory: function(e) {
+        return e.AND(
+          e.EQ(
+            foam.nanos.approval.ApprovalRequest.STATUS,
+            foam.nanos.approval.ApprovalStatus.REQUESTED
+          ),
+          e.EQ(
+            foam.nanos.approval.ApprovalRequest.ASSIGNED_TO,
+            0
+          )
         );
       }
     },
@@ -560,7 +578,9 @@
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
-      name: 'assignedTo'
+      name: 'assignedTo',
+      section: 'approvalRequestInformation',
+      order: 65
     }
   ],
 
@@ -588,6 +608,10 @@
     {
       name: 'PENDING',
       message: 'Pending'
+    },
+    {
+      name: 'UNASSIGNED',
+      message: 'Unassigned'
     },
     {
       name: 'TRACKING',
@@ -862,6 +886,12 @@
     {
       name: 'assign',
       section: 'approvalRequestInformation',
+      isAvailable: function(status){
+        return status === this.ApprovalStatus.REQUESTED;
+      },
+      availablePermissions: [
+        "approval.assign.*"
+      ],
       code: function(X) {        
         var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
         objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
@@ -873,6 +903,27 @@
           title: this.ASSIGN_TITLE,
           onExecute: this.assignRequestL.bind(this, X)
         }));
+      }
+    },
+    {
+      name: 'assignToMe',
+      section: 'approvalRequestInformation',
+      isAvailable: function(subject, assignedTo, status){
+        return (subject.user.id !== assignedTo) && (status === this.ApprovalStatus.REQUESTED);
+      },
+      code: function(X) {        
+        var assignedApprovalRequest = this.clone();
+        assignedApprovalRequest.assignedTo = X.subject.user.id;
+
+        this.approvalRequestDAO.put(assignedApprovalRequest).then(req => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.notify(this.SUCCESS_ASSIGNED, '', this.LogLevel.INFO, true);
+          X.stack.back();
+        }, e => {
+          this.throwError.pub(e);
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
+        });
       }
     }
   ],
@@ -907,7 +958,7 @@
         this.approvalRequestDAO.put(rejectedApprovalRequest).then(o => {
           this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
           this.finished.pub();
-          this.notify(this.SUCCESS_REJECTED, '', this.LogLevel.INFO, true);
+          this.notify(this.SUCCESS_ASSIGNED, '', this.LogLevel.INFO, true);
 
           X.stack.back();
         }, e => {
