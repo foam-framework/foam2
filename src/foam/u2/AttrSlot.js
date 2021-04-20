@@ -34,7 +34,7 @@ foam.CLASS({
 
   methods: [
     function get() {
-      return  this.element.getAttribute(this.property);
+      return this.element.getAttribute(this.property);
       /*
       if ( this.value === undefined ) {
         this.value = this.element.getAttribute(this.property);
@@ -53,7 +53,7 @@ foam.CLASS({
       // The next line is necessary to fire a change event.
       // This is necessary because DOM isn't proper MVC and
       // doesn't fire a change event when the value is explicitly set.
-      // this.value = value;
+      this.value = value;
     },
 
     function sub(l) {
