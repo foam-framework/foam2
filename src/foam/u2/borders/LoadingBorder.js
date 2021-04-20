@@ -25,6 +25,10 @@ foam.CLASS({
   name: 'LoadingBorder',
   extends: 'foam.u2.Element',
 
+  imports: [
+    'theme'
+  ],
+
   requires: [
     'foam.u2.LoadingSpinner',
     'foam.u2.borders.LoadingLevel'
@@ -43,7 +47,7 @@ foam.CLASS({
       /* extra width covers right-side padding of wizard */
       width: calc(100% + 2*48px);
       height: 100%;
-      background-color: rgba(0,0,0,0.7);
+      background-color: hsla(216,33%,97%,0.9);
 
       /* negative margin covers left-side padding of wizard */
       margin: 0 -48px;
@@ -100,7 +104,11 @@ foam.CLASS({
         .start()
           .addClass(this.myClass('overlay'))
           .addClass(this.loadingLevel$.map(v => this.myClass(v.name.toLowerCase())))
-          .tag(this.LoadingSpinner)
+          .tag(this.LoadingSpinner, {
+            imagePath: this.theme.glyphs.spinner.getDataUrl({
+              fill: this.theme.primary3
+            })
+          })
         .end()
         .start('div', null, this.content$)
           .on('keypress', this.onKey)
