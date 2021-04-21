@@ -590,6 +590,10 @@
       message: 'You have successfully assigned this request'
     },
     {
+      name: 'SUCCESS_UNASSIGNED',
+      message: 'You have successfully unassigned this request'
+    },
+    {
       name: 'SUCCESS_APPROVED',
       message: 'You have successfully approved this request'
     },
@@ -915,7 +919,32 @@
           this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
           this.finished.pub();
           this.notify(this.SUCCESS_ASSIGNED, '', this.LogLevel.INFO, true);
-          X.stack.back();
+          if ( X.currentMenu.id !== X.stack.top[2] ) {
+            X.stack.back();
+          }
+        }, e => {
+          this.throwError.pub(e);
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
+        });
+      }
+    },
+    {
+      name: 'unassignMe',
+      section: 'approvalRequestInformation',
+      isAvailable: function(subject, assignedTo, status){
+        return (subject.user.id === assignedTo) && (status === this.ApprovalStatus.REQUESTED);
+      },
+      code: function(X) {        
+        var unassignedApprovalRequest = this.clone();
+        unassignedApprovalRequest.assignedTo = 0;
+
+        this.approvalRequestDAO.put(unassignedApprovalRequest).then(req => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.notify(this.SUCCESS_UNASSIGNED, '', this.LogLevel.INFO, true);
+          if ( X.currentMenu.id !== X.stack.top[2] ) {
+            X.stack.back();
+          }
         }, e => {
           this.throwError.pub(e);
           this.notify(e.message, '', this.LogLevel.ERROR, true);
