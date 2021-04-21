@@ -17,15 +17,16 @@
   css: `
     ^{
       display: inline-grid;
-      gird-template-columns: repeat(12, 1fr);
-      gap: 24x 12px;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 24px 24px;
       justify-items: start;
     }
     ^left-container{
-      grid-column: 1 / span 3;
+      grid-column: 1 / 5;
+      width: 100%;
     }
     ^right-container{
-      grid-column: 4 / 12;
+      grid-column: 5 / 12;
     }
   `,
 
@@ -36,7 +37,7 @@
       this
         .addClass(this.myClass())
         .start()
-          .addClass(this.myClass('left-contianer'))
+          .addClass(this.myClass('left-container'))
           .add(this.FileDropZone.create({
             files$: this.data$,
             selected$: selectSlot

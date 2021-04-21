@@ -2116,6 +2116,18 @@ foam.CLASS({
 
         return str;
       }
+    },
+    {
+      name: 'toString',
+      factory: function() {
+        var arr = [];
+        for ( var i = 0 ; i < this.propNames.length ; i++ ) {
+          var name = foam.String.capitalize(this.propNames[i]);
+
+          arr.push(`val.get${name}())`);
+        }
+        return 'return ' + arr.join(' + "-" + ') + ';';
+      }
     }
   ]
 });

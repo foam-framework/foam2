@@ -12,14 +12,16 @@ foam.ENUM({
       label: { en: 'pending', pt: 'pendente'},
       documentation: 'Our team is currently reviewing. Approvals may take up to 24 hours',
       background: '#FFFFFF',
-      color: '#865300'
+      color: '#865300',
+      glyph: 'pending'
     },
     {
       name: 'GRANTED',
       label: { en: 'granted', pt: 'concedida'},
       documentation: 'The information you provided has been approved',
       background: '#FFFFFF',
-      color: '#007328'
+      color: '#007328',
+      glyph: 'checkmark'
     },
     {
       name: 'EXPIRED',
@@ -65,7 +67,8 @@ foam.ENUM({
       expected to go to EXPIRED and have the user fill out more info. Used in the 
       Capable object junctions.`,
       background: '#FFFFFF',
-      color: '/*%DESTRUCTIVE2%*/ #A61414'
+      color: '/*%DESTRUCTIVE2%*/ #A61414',
+      glyph: 'exclamation'
     },
   ]
 });

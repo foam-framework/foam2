@@ -234,6 +234,8 @@ p({
   serviceScript: `
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.crunch.ui.WizardState.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("wizardStates")
       .build();
   `,
   client: "{\"of\":\"foam.nanos.crunch.ui.WizardState\"}"

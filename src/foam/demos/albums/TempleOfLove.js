@@ -66,6 +66,19 @@ foam.CLASS({
           color:'green'
         }));
       }
+
+      // this.redraw();
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'redraw',
+      isFramed: true,
+      code: function() {
+        this.invalidate();
+        this.redraw();
+      }
     }
   ]
 });
