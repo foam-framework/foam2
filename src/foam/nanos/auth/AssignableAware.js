@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * Copyright 2021 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -11,14 +11,14 @@ foam.INTERFACE({
   methods: [
     {
       name: 'getAssignedTo',
-      type: 'long',
+      type: 'long'
     },
     {
       name: 'setAssignedTo',
       args: [
         {
           name: 'user',
-          type: 'long',
+          type: 'long'
         }
       ]
     }
