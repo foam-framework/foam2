@@ -397,10 +397,16 @@ This is the heart of Medusa.`,
               getLogger().error("mdao", entry.getIndex(), entry.getNSpecName(), dao.getClass().getSimpleName(), "Unable to determine class", data);
               throw new RuntimeException("Error parsing data.");
             }
-            FObject nu = x.create(JSONParser.class).parseString(entry.getData(), cls);
+            FObject nu = null;
+            try {
+              nu = x.create(JSONParser.class).parseString(entry.getData(), cls);
+            } catch ( Exception e ) {
+              getLogger().error("Failed to parse", entry.getIndex(), entry.getNSpecName(), cls, entry.getData());
+              throw new MedusaException("Error parsing data.", e);
+            }
             if ( nu == null ) {
               getLogger().error("Failed to parse", entry.getIndex(), entry.getNSpecName(), cls, entry.getData());
-              throw new RuntimeException("Error parsing data.");
+              throw new MedusaException("Error parsing data.");
             }
 
             FObject old = dao.find_(x, nu.getProperty("id"));

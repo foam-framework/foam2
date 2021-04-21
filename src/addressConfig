@@ -1,0 +1,3 @@
+p({"class":"foam.nanos.auth.AddressConfig", "country":"BR", "streetNumber":1, "streetName":0, "suite":2})
+p({"class":"foam.nanos.auth.AddressConfig", "country":"CA", "streetNumber":0, "streetName":1, "suite":2})
+p({"class":"foam.nanos.auth.AddressConfig", "country":"US", "streetNumber":0, "streetName":1, "suite":2})
