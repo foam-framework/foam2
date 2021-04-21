@@ -15,6 +15,7 @@ foam.CLASS({
     'foam.nanos.auth.Authorizable',
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
+    'foam.nanos.auth.AssignableAware',
     'foam.nanos.auth.LastModifiedAware',
     'foam.nanos.auth.LastModifiedByAware',
     'foam.nanos.auth.ServiceProviderAware'
@@ -43,6 +44,7 @@ foam.CLASS({
     'type',
     // REVIEW: view fails to display when owner in tableColumn, the 2nd entry in allColumns is undefined.
     // 'owner',
+    'assignedTo.legalName',
     'createdBy.legalName',
     'lastModified',
     'status',
@@ -292,6 +294,12 @@ foam.CLASS({
         }
         return spid_;
       `
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'assignedTo',
+      section: 'infoSection'
     }
   ],
 
