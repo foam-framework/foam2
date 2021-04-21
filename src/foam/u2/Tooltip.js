@@ -39,6 +39,7 @@ foam.CLASS({
     function init() {
       this.target.removeAttribute('title');
       this.target.on('mouseover', this.loadTooltip);
+      this.target.onDetach(this.close);
       this.SUPER();
     },
 
