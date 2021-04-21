@@ -55,6 +55,7 @@ foam.CLASS({
 
   tableColumns: [
     'id',
+    'name',
     'description',
     'lastDuration',
     'lastRun',
@@ -113,6 +114,12 @@ foam.CLASS({
       class: 'String',
       name: 'id',
       includeInDigest: true,
+      tableWidth: 300
+    },
+    {
+      class: 'String',
+      name: 'name',
+      documentation: 'name of the script',
       tableWidth: 300
     },
     {
