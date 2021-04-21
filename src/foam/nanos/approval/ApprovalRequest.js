@@ -964,7 +964,7 @@
       }
     },
     {
-      name: 'assignRequestL',
+      name: 'assignRequest',
       code: function(X) {
         var assignedApprovalRequest = this.clone();
 
