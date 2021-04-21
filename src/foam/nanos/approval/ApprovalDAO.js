@@ -44,7 +44,7 @@ foam.CLASS({
       javaCode: `
         ApprovalRequest nu = (ApprovalRequest) obj;
         ApprovalRequest old = (ApprovalRequest) getDelegate().inX(x).find(nu.getId());
-        ApprovalRequest request = (ApprovalRequest) getDelegate().inX(x).put(obj);
+        ApprovalRequest request = (ApprovalRequest) (getDelegate().inX(x).put(obj)).fclone();
 
         if ( old != null && old.getStatus() != request.getStatus()
           || old == null && request.getStatus() != ApprovalStatus.REQUESTED
