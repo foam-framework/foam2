@@ -155,19 +155,19 @@ foam.CLASS({
           if ( this.cjStatus === this.CapabilityJunctionStatus.ACTION_REQUIRED ) {
             this.auth.check(this.ctrl.__subContext__, 'certifydatareviewed.rw.reviewed').then(result => {
               if ( ! result &&
-                ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-49' ||
-                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-13' ||
-                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-12' ||
-                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-11'
+                ( ucj.targetId == 'crunch.onboarding.br.brazil-onboarding' ||
+                  ucj.targetId == 'crunch.onboarding.unlock-us-payments' ||
+                  ucj.targetId == 'crunch.onboarding.unlock-ca-international-payments' ||
+                  ucj.targetId == 'crunch.onboarding.unlock-ca-ca-payments'
                 ) ) {
                 this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
               }
             }).catch(err => {
               if ( err.data && err.data.id === 'foam.nanos.crunch.CapabilityIntercept' &&
-                ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-49' ||
-                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-13' ||
-                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-12' ||
-                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-11'
+                ( ucj.targetId == 'crunch.onboarding.br.brazil-onboarding' ||
+                  ucj.targetId == 'crunch.onboarding.unlock-us-payments' ||
+                  ucj.targetId == 'crunch.onboarding.unlock-ca-international-payments' ||
+                  ucj.targetId == 'crunch.onboarding.unlock-ca-ca-payments'
                 ) ) {
                 this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
               } else throw err;
