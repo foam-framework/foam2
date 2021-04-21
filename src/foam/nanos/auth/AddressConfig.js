@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 The FOAM Authors. All Rights Reserved.
+ * Copyright 2021 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -8,25 +8,27 @@
   package: 'foam.nanos.auth',
   name: 'AddressConfig',
 
-  ids: ['countryId'],
+  documentation: 'Base class for storing street address component order',
+
+  ids: ['country'],
 
   properties: [
     {
       class: 'Reference',
       targetDAOKey: 'countryDAO',
-      name: 'countryId',
+      name: 'country',
       of: 'foam.nanos.auth.Country'
     },
     {
-      class: 'String',
+      class: 'Int',
       name: 'streetNumber'
     },
     {
-      class: 'String',
+      class: 'Int',
       name: 'streetName'
     },
     {
-      class: 'String',
+      class: 'Int',
       name: 'suite'
     }
   ]
