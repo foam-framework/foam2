@@ -34,8 +34,7 @@ foam.CLASS({
 
   methods: [
     function get() {
-      this.value = this.element.getAttribute(this.property);
-      return this.value;
+      return this.element.getAttribute(this.property);
     },
 
     function set(value) {
