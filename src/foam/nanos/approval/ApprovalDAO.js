@@ -44,7 +44,7 @@ foam.CLASS({
       javaCode: `
         ApprovalRequest nu = (ApprovalRequest) obj;
         ApprovalRequest old = (ApprovalRequest) getDelegate().inX(x).find(nu.getId());
-        ApprovalRequest request = (ApprovalRequest) getDelegate().inX(x).put(obj);
+        ApprovalRequest request = (ApprovalRequest) (getDelegate().inX(x).put(obj)).fclone();
 
         if ( old != null && old.getStatus() != request.getStatus()
           || old == null && request.getStatus() != ApprovalStatus.REQUESTED
@@ -70,6 +70,11 @@ foam.CLASS({
               //puts object to its original dao
               try {
                 rePutObject(x, request);
+
+                // unassign request once resolved
+                request.setAssignedTo(0);
+                getDelegate().put(request);
+
               } catch ( Exception e ) {
                 request.setStatus(ApprovalStatus.REQUESTED);
                 getDelegate().put(request);
@@ -78,6 +83,7 @@ foam.CLASS({
             } else {
               // since no more needs to be done with the request from this point onwards
               request.setIsFulfilled(true);
+              request.setAssignedTo(0);
               getDelegate().put(request);
             }
           }

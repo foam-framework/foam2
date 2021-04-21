@@ -215,6 +215,7 @@ var classes = [
   'foam.dao.SequenceNumberDAOTest',
   'foam.dao.PipelinePMDAO',
   'foam.dao.PMDAO',
+  'foam.dao.PurgeRecordCmd',
   'foam.dao.UniqueConstraintException',
   'foam.nanos.pm.PMFactory',
   'foam.nanos.pm.PMInfo',
@@ -261,6 +262,7 @@ var classes = [
   'foam.nanos.auth.Authorizer',
   'foam.nanos.auth.AuthorizationDAO',
   'foam.nanos.auth.AuthenticationException',
+  'foam.nanos.auth.AssignableAware',
   'foam.nanos.auth.EnabledAware',
   'foam.nanos.auth.EnabledAwareDummy',
   'foam.nanos.auth.GroupPermissionJunction',
@@ -345,6 +347,7 @@ var classes = [
   'foam.nanos.auth.UserAndGroupAuthService',
   'foam.nanos.auth.EnabledCheckAuthService',
   'foam.nanos.auth.CommonPassword',
+  'foam.nanos.auth.AddressConfig',
   'foam.nanos.http.HttpParameters',
   'foam.nanos.http.DefaultHttpParameters',
   'foam.nanos.http.SendErrorHandler',
@@ -890,6 +893,7 @@ var classes = [
   'foam.nanos.approval.ApprovalDAO',
   'foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer',
   'foam.nanos.approval.PopulateApprovalRequestsDAO',
+  'foam.nanos.approval.ApprovalRequestAssignedToRule',
 
   'foam.core.NumberSet',
 

@@ -345,10 +345,21 @@ foam.CLASS({
         { name: 'x', type: 'Context' },
         { name: 'permission', type: 'String' }
       ],
-      documentation: `Checks if a permission or capability string is implied by the current capability`,
+      documentation: `Checks if a permission or capability string is implied by the current capability or its prereqs`,
       javaCode: `
         if ( this.grantsPermission(permission) ) return true;
-
+        return this.prerequisiteImplies(x, permission);
+      `
+    },
+    {
+      name: 'prerequisiteImplies',
+      type: 'Boolean',
+      args: [
+        { name: 'x', type: 'Context' },
+        { name: 'permission', type: 'String' }
+      ],
+      documentation: `Checks if a permission or capability string is implied by the prerequisites of a capability`,
+      javaCode: `
         // temporary prevent infinite loop when checking the permission "predicatedprerequisite.read.*"
         // TODO : prerequisite checking below may be/probably is unnecessary
         if ( PredicatedPrerequisiteCapabilityJunctionDAO.PERMISSION.equals(permission) ) return false;

@@ -123,6 +123,13 @@ foam.CLASS({
           c.package + '.' + c.name + 'Id' :
           c.name + 'Id';
 
+      var arr = [];
+      for ( var i = 0 ; i < this.propNames.length ; i++ ) {
+        var name = foam.String.capitalize(this.propNames[i]);
+        arr.push(`get${name}()`);
+      }
+      var javaToStringMethod = 'return ' + arr.join(' + "-" + ') + ';';
+
       foam.CLASS({
         package: c.package,
         name: c.name + 'Id',
@@ -133,8 +140,16 @@ foam.CLASS({
           return prop.clone();
         }),
         methods: [
-          function toString() {
-            return foam.json.Compact.stringify(this, this.cls_);
+          {
+            name: 'toString',
+            code: function() {
+              var arr = [];
+              for ( var prop in this.instance_ ) {
+                arr.push( this[prop] ? this[prop].toString() : '' );
+              }
+              return arr.join('-');
+            },
+            javaCode: javaToStringMethod
           }
         ]
       });

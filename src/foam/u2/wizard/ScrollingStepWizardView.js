@@ -70,6 +70,10 @@ foam.CLASS({
       margin: 0px;
     }
 
+    ^heading {
+      display: flex;
+      align-items: center;
+    }
   `,
 
   properties: [

@@ -40,7 +40,7 @@ foam.CLASS({
 
     function set(value) {
       // consume redundant sets
-      if ( value == this.value ) return;
+      // if ( value == this.value ) return;
 
       this.element.setAttribute(this.property, value);
 
