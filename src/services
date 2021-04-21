@@ -1065,7 +1065,7 @@ p({
 
 p({
   "class":"foam.nanos.boot.NSpec",
-  "name":"AddressConfigDAO",
+  "name":"addressConfigDAO",
   "description": "A DAO that stores address formatting for different countries",
   "serve":true,
   "serviceScript": """
