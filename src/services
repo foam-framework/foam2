@@ -1062,3 +1062,23 @@ p({
   """,
   "client": "{\"of\":\"foam.counter.Counter\"}"
 })
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"AddressConfigDAO",
+  "description": "A DAO that stores address formatting for different countries",
+  "serve":true,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("addressConfig")
+      .setOf(foam.nanos.auth.AddressConfig.getOwnClassInfo())
+      .build();
+  """,
+   "client":
+  """
+    {
+      "of":"foam.nanos.auth.AddressConfig"
+    }
+  """
+})
