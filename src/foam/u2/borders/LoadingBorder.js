@@ -117,11 +117,6 @@ foam.CLASS({
   `,
 
   properties: [
-    // {
-    //   class: 'Boolean',
-    //   name: 'loading',
-    //   value: true
-    // }
     {
       name: 'loadingLevel',
       class: 'Enum',
