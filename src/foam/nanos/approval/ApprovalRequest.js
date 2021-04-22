@@ -910,7 +910,7 @@
           data$: X.data$,
           propertyData$: X.data.assignedTo$,
           title: this.ASSIGN_TITLE,
-          onExecute: this.assignRequestL.bind(this, X)
+          onExecute: this.assignRequest.bind(this, X)
         }));
       }
     },
