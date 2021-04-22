@@ -337,7 +337,11 @@ public class JSONFObjectFormatter
           append(',');
           addInnerNewline();
         }
-        outputProperty(newFObject, prop);
+        if ( prop.get(newFObject) instanceof FObject ) {
+          if ( ! maybeOutputDelta(((FObject)prop.get(newFObject)), ((FObject)prop.get(oldFObject))) ) continue;
+        } else {
+          outputProperty(newFObject, prop);
+        }
 
         delta += 1;
         if ( prop.includeInID() ) {
