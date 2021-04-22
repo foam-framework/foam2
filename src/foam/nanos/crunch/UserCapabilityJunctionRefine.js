@@ -119,7 +119,8 @@ foam.CLASS({
       javaGetter: `
         return this;
       `,
-      hidden: true
+      hidden: true,
+      externalTransient: true
     },
     {
       name: 'lifecycleState',
