@@ -39,12 +39,6 @@ foam.CLASS({
     foam.u2.tag.Select.
   `,
 
-  css: `
-    ^ .foam-u2-tag-Select {
-      height: 32px;
-    }
-  `,
-
   properties: [
     {
       class: 'String',
