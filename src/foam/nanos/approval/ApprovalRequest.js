@@ -875,7 +875,7 @@
               }),
               mementoHead: null,
               backLabel: self.BACK_LABEL
-            }, X);
+            }, X.createSubContext({stack: self.stack}));
           })
           .catch(err => {
             console.warn(err.message || err);
