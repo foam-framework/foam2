@@ -1070,6 +1070,7 @@ p({
   "serve":true,
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("addressConfigDAO"))
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("addressConfig")
       .setOf(foam.nanos.auth.AddressConfig.getOwnClassInfo())
