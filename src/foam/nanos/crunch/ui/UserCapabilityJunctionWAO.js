@@ -52,11 +52,12 @@ foam.CLASS({
       });
     },
     function cancel(wizardlet) {
-      return this.crunchService.updateJunction( null,
-        wizardlet.capability.id, null, null
-      ).then((ucj) => {
-        return ucj;
-      });
+      let p = this.subject ? this.crunchService.updateJunctionFor(
+        null, wizardlet.capability.id, null, null, this.subject.user, this.subject.realUser
+      ) : this.crunchService.updateJunction(
+        null, wizardlet.capability.id, null, null
+      );
+      return p.then(ucj => { return ucj; });
     },
     function load(wizardlet) {
       if ( wizardlet.loading ) return;

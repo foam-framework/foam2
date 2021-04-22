@@ -12,6 +12,7 @@ foam.CLASS({
   documentation: 'Service Provider Capability',
 
   javaImports: [
+    'foam.core.X',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.mlang.predicate.AbstractPredicate',
@@ -63,6 +64,13 @@ foam.CLASS({
   ],
 
   methods: [
+    {
+      name: 'grantsPermission',
+      javaCode: `
+        X x = foam.core.XLocator.get();
+        return super.grantsPermission(permission) || prerequisiteImplies(x, permission);
+      `
+    },
     {
       name: 'setupSpid',
       args: [

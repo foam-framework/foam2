@@ -69,3 +69,30 @@ p({
   "saveHistory":false,
   "lifecycleState":1
 })
+
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"bef37ddd-39ed-49be-8770-2e40b410858c",
+  "name":"ApprovalRequest update assignedTo",
+  "priority":150,
+  "ruleGroup":"approvals",
+  "documentation":"Handle a change to assignedTo",
+  "daoKey":"approvalRequestDAO",
+  "operation":3,
+  "after":true,
+  "predicate":{
+    "class":"foam.mlang.predicate.And",
+    "args":[
+        {
+            "class":"foam.nanos.ruler.predicate.PropertyChangePredicate",
+            "propName":"assignedTo"
+        }
+    ]
+  },
+  "action":{
+    "class":"foam.nanos.approval.ApprovableApprovalRequestsRule"
+  },    
+  "enabled":true,
+  "saveHistory":false,
+  "lifecycleState":1
+})
