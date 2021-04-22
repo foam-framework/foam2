@@ -67,8 +67,7 @@ foam.CLASS({
     {
       name: 'grantsPermission',
       javaCode: `
-        X x = foam.core.XLocator.get();
-        return super.grantsPermission(permission) || prerequisiteImplies(x, permission);
+        return super.grantsPermission(permission) || prerequisiteImplies(getX(), permission);
       `
     },
     {
