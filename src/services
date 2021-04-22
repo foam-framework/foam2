@@ -222,7 +222,7 @@ p({
   "serviceScript":`
     return new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
-      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("languageDAO"))
+      .setAuthorize(true)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .setJournalName("languages")
       .setOf(foam.nanos.auth.Language.getOwnClassInfo())
@@ -1061,4 +1061,25 @@ p({
     return dao;
   """,
   "client": "{\"of\":\"foam.counter.Counter\"}"
+})
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"addressConfigDAO",
+  "description": "A DAO that stores address formatting for different countries",
+  "serve":true,
+  "serviceScript": """
+    return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorizer(new foam.nanos.auth.GlobalReadAuthorizer("addressConfigDAO"))
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("addressConfig")
+      .setOf(foam.nanos.auth.AddressConfig.getOwnClassInfo())
+      .build();
+  """,
+   "client":
+  """
+    {
+      "of":"foam.nanos.auth.AddressConfig"
+    }
+  """
 })
