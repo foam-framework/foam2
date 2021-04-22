@@ -34,7 +34,7 @@ foam.CLASS({
   methods: [
     function save(wizardlet, options) {
       options = {
-        ...{ reloadData: true },
+        reloadData: true,
         ...options
       };
       if ( wizardlet.loading ) return this.cancelSave_(wizardlet);
