@@ -6,11 +6,7 @@
 
 package foam.lib.formatter;
 
-import foam.core.ClassInfo;
-import foam.core.FEnum;
-import foam.core.FObject;
-import foam.core.PropertyInfo;
-import foam.core.X;
+import foam.core.*;
 import foam.lib.json.OutputJSON;
 import foam.util.SafetyUtil;
 import java.lang.reflect.Array;
@@ -337,7 +333,7 @@ public class JSONFObjectFormatter
           append(',');
           addInnerNewline();
         }
-        if ( prop.get(newFObject) instanceof FObject ) {
+        if ( prop instanceof AbstractFObjectPropertyInfo ) {
           if ( ! maybeOutputDelta(((FObject)prop.get(newFObject)), ((FObject)prop.get(oldFObject))) ) continue;
         } else {
           outputProperty(newFObject, prop);
