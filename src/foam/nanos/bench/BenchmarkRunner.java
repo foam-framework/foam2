@@ -238,7 +238,6 @@ public class BenchmarkRunner
         stats.put(FAIL, fail.get());
         stats.put(TOTAL, pass.get() + fail.get());
         stats.put(OPS, String.format("%.02f", (complete / duration)));
-        stats.put("DURATION", String.format("%.02f", duration));
         stats.put(OPSPT, String.format("%.02f", (complete / duration) / (float) threads));
         stats.put(MEMORY, String.format("%.02f", (((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())) / 1024.0 / 1024.0 / 1024.0)));
 
