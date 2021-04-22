@@ -32,11 +32,18 @@ foam.CLASS({
   ],
 
   methods: [
-    function save(wizardlet) {
+    function save(wizardlet, options) {
+      options = {
+        ...{ reloadData: true },
+        ...options
+      };
       if ( wizardlet.loading ) return this.cancelSave_(wizardlet);
       if ( ! wizardlet.isAvailable ) return this.cancelSave_(wizardlet);
       var wData = wizardlet.data ? wizardlet.data.clone() : null;
       wizardlet.loading = true;
+      if ( wizardlet.reloadAfterSave && options.reloadData ) {
+        wizardlet.loadingLevel = this.LoadingLevel.LOADING;
+      }
       let p = this.subject ? this.crunchService.updateJunctionFor(
         null, wizardlet.capability.id, wData, null,
         this.subject.user, this.subject.realUser
@@ -44,8 +51,10 @@ foam.CLASS({
         wizardlet.capability.id, wData, null
       );
       return p.then((ucj) => {
-        if ( wizardlet.reloadAfterSave ) this.load_(wizardlet, ucj);
-        else {
+        if ( wizardlet.reloadAfterSave && options.reloadData ) {
+          wizardlet.loadingLevel = this.LoadingLevel.IDLE;
+          this.load_(wizardlet, ucj);
+        } else {
           wizardlet.status = ucj.status;
           wizardlet.loading = false;
         }

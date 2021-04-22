@@ -34,14 +34,18 @@ foam.CLASS({
     'foam.u2.borders.LoadingLevel'
   ],
 
+  messages: [
+    {
+      name: 'MESSAGE',
+      message: 'Please wait...'
+    }
+  ],
+
   css: `
     ^ {
       position: relative;
     }
     ^overlay {
-      display: flex;
-      justify-content: center;
-      align-items: center;
       position: absolute;
       top: 0; left: 0;
       /* extra width covers right-side padding of wizard */
@@ -55,12 +59,29 @@ foam.CLASS({
 
       /* ease-out animation makes things feel stable */
       transition: all 200ms ease-out;
-
+    }
+    ^container {
+      position: sticky;
+      top: 15pt;
+      height: 32pt;
+      padding: 15pt;
+      background-color: /*%WHITE%*/ #fff;
+      border: 1pt solid %GREY3%;
+      border-right: none;
+      transition: all 200ms ease-out;
+      margin-left: calc(100% - 62pt);
+      border-radius: 8pt 0 0 8pt;
+    }
+    ^overlay^loading ^container {
+      margin-left: 0;
+      border-radius: 0;
+      border-left: 0;
       overflow: hidden;
     }
     ^overlay .foam-u2-LoadingSpinner {
-      width: 50%;
-      height: 50%;
+      display: inline-block;
+      width: 32pt;
+      height: 32pt
 
       /* ease-out animation makes things feel stable */
       transition: all 200ms ease-out;
@@ -69,18 +90,29 @@ foam.CLASS({
       width: 100%;
       height: 100%;
     }
+    ^overlay^loading .foam-u2-LoadingSpinner {
+      margin-left: 15pt;
+    }
 
     ^overlay^idle {
       opacity: 0;
       pointer-events: none;
     }
     ^overlay^pending {
-      opacity: 0.5;
+      opacity: 1;
+      background-color: hsla(216,33%,97%,0);
       pointer-events: none;
     }
-    ^overlay^pending .foam-u2-LoadingSpinner {
-      width: 20%;
-      height: 20%;
+    ^message {
+      display: none;
+      line-height: 32pt;
+      font-size: 24pt;
+      margin-left: 15pt;
+      color: /*%PRIMARY3*/ #604aff;
+    }
+    ^overlay^loading ^message {
+      display: inline-block;
+      vertical-align: top;
     }
   `,
 
@@ -104,11 +136,18 @@ foam.CLASS({
         .start()
           .addClass(this.myClass('overlay'))
           .addClass(this.loadingLevel$.map(v => this.myClass(v.name.toLowerCase())))
-          .tag(this.LoadingSpinner, {
-            imagePath: this.theme.glyphs.spinner.getDataUrl({
-              fill: this.theme.primary3
+          .start()
+            .addClass(this.myClass('container'))
+            .tag(this.LoadingSpinner, {
+              imagePath: this.theme.glyphs.spinner.getDataUrl({
+                fill: this.theme.primary3
+              })
             })
-          })
+            .start()
+              .addClass(this.myClass('message'))
+              .add(this.MESSAGE)
+            .end()
+          .end()
         .end()
         .start('div', null, this.content$)
           .on('keypress', this.onKey)

@@ -19,20 +19,9 @@ foam.CLASS({
       class: 'Int',
       value: 5000
     },
-    {
-      name: 'saveWarnDelay',
-      class: 'Int',
-      value: 3500
-    },
-    {
-      name: 'loadingLevel',
-      class: 'Enum',
-      of: 'foam.u2.borders.LoadingLevel'
-    },
     'saveEvent',
     'other',
     'timeout_',
-    'animationTimeout_',
     'cleanup_', // detachable to cleanup old subs when obj changes
   ],
 
@@ -41,7 +30,6 @@ foam.CLASS({
       // Save event clears any pending saves
       this.saveEvent.sub(() => {
         this.timeout_ && clearTimeout(this.timeout_);
-        this.animationTimeout_ && clearTimeout(this.animationTimeout_);
       });
       var attach = function(delay, other) {
         this.cleanup();
@@ -49,14 +37,6 @@ foam.CLASS({
         this.cleanup_.onDetach(other.sub(() => {
           // Clear existing timeouts
           this.timeout_ && clearTimeout(this.timeout_);
-          this.animationTimeout_ && clearTimeout(this.animationTimeout_);
-          // Hide loading spinner only if it was in warning state
-          if ( this.loadingLevel == this.LoadingLevel.PENDING ) {
-            this.loadingLevel = this.LoadingLevel.IDLE;
-          }
-          this.animationTimeout_ = setTimeout(() => {
-            this.loadingLevel = this.LoadingLevel.PENDING;
-          }, this.saveWarnDelay);
           this.timeout_ = setTimeout(this.update.bind(this, other), delay);
         }));
       };
@@ -69,9 +49,7 @@ foam.CLASS({
     },
     function cleanup() { this.cleanup_ && this.cleanup_.detach(); },
     function update(s) {
-      this.animationTimeout_ && clearTimeout(this.animationTimeout_);
       this.clearProperty('timeout_');
-      this.clearProperty('animationTimeout_');
       this.value = s.get();
     }
   ]

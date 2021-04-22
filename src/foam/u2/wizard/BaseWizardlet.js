@@ -34,14 +34,11 @@ foam.CLASS({
   constants: [
     {
       name: 'SAVE_DELAY',
-      value: 5000,
+      // TODO: once changes are made to input views to reduce property updates,
+      //       this can be decreased to around 100-200ms
+      value: 1000,
       documentation: 'How long input must be idle before an auto-save'
     },
-    {
-      name: 'SAVE_WARN_DELAY',
-      value: 3500,
-      documentation: 'How long to show small spinner before an auto-save'
-    }
   ],
 
   properties: [
@@ -107,8 +104,7 @@ foam.CLASS({
       name: 'loading',
       class: 'Boolean',
       postSet: function (_, n) {
-        if ( n ) this.loadingLevel = this.LoadingLevel.LOADING;
-        else this.loadingLevel = this.LoadingLevel.IDLE;
+        if ( ! n ) this.LoadingLevel = this.LoadingLevel.IDLE;
       }
     },
     {
@@ -175,9 +171,9 @@ foam.CLASS({
     function createView(data) {
       return null;
     },
-    async function save() {
+    async function save(options) {
       this.indicator = this.WizardletIndicator.SAVING;
-      var ret = await this.wao.save(this);
+      var ret = await this.wao.save(this, options);
       this.clearProperty('indicator');
       this.saveEvent.pub(ret);
       return ret;
@@ -216,8 +212,6 @@ foam.CLASS({
               // Listen to property updates if not loading
               other: filter(updateSlot, () => ! this.loading),
               delay: this.SAVE_DELAY,
-              saveWarnDelay: this.SAVE_WARN_DELAY,
-              loadingLevel$: this.loadingLevel$
             });
           });
         slotSlot.valueSub(() => { s.set(slotSlot.get().get()); });
