@@ -10,13 +10,14 @@ foam.CLASS({
   implements: [ 'foam.u2.wizard.WAO' ],
   flags: ['web'],
 
-  requires: [
-    'foam.nanos.crunch.CapabilityJunctionStatus',
-    'foam.u2.borders.LoadingLevel'
-  ],
-
   imports: [
     'crunchService'
+  ],
+
+  requires: [
+    'foam.core.Lock',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.u2.borders.LoadingLevel'
   ],
 
   properties: [
@@ -28,38 +29,39 @@ foam.CLASS({
         The requested subject associated to the ucj. Should only be set
         when used by a permissioned back-office user.
       `
+    },
+    {
+      name: 'saveLock',
+      class: 'FObjectProperty',
+      of: 'foam.core.Lock',
+      documentation: `
+        Save operations that are not marked 'disposable' will be queued using
+        this lock.
+      `,
+      factory: function () {
+        return this.Lock.create();
+      }
     }
   ],
 
   methods: [
     function save(wizardlet, options) {
       options = {
+        // 'reloadData' causes a wizardlet to reload from the server response
         reloadData: true,
+        // 'disposable' prevents this save from being queued
+        disposable: false,
         ...options
       };
-      if ( wizardlet.loading ) return this.cancelSave_(wizardlet);
-      if ( ! wizardlet.isAvailable ) return this.cancelSave_(wizardlet);
-      var wData = wizardlet.data ? wizardlet.data.clone() : null;
-      wizardlet.loading = true;
-      if ( wizardlet.reloadAfterSave && options.reloadData ) {
-        wizardlet.loadingLevel = this.LoadingLevel.LOADING;
+      if ( wizardlet.loading ) {
+        // If this is not a disposable save, it must be enqueued
+        if ( ! options.disposable ) this.saveLock.then(
+          this.save_.bind(this, wizardlet, options));
+
+        return this.cancelSave_(wizardlet);
       }
-      let p = this.subject ? this.crunchService.updateJunctionFor(
-        null, wizardlet.capability.id, wData, null,
-        this.subject.user, this.subject.realUser
-      ) : this.crunchService.updateJunction(null,
-        wizardlet.capability.id, wData, null
-      );
-      return p.then((ucj) => {
-        if ( wizardlet.reloadAfterSave && options.reloadData ) {
-          wizardlet.loadingLevel = this.LoadingLevel.IDLE;
-          this.load_(wizardlet, ucj);
-        } else {
-          wizardlet.status = ucj.status;
-          wizardlet.loading = false;
-        }
-        return ucj;
-      });
+      if ( ! wizardlet.isAvailable ) return this.cancelSave_(wizardlet);
+      return this.save_(wizardlet, options);
     },
     function cancel(wizardlet) {
       let p = this.subject ? this.crunchService.updateJunctionFor(
@@ -81,6 +83,31 @@ foam.CLASS({
       return p.then(ucj => {
         this.load_(wizardlet, ucj);
       });
+    },
+    function save_(wizardlet, options) {
+      var wData = wizardlet.data ? wizardlet.data.clone() : null;
+      wizardlet.loading = true;
+      if ( wizardlet.reloadAfterSave && options.reloadData ) {
+        wizardlet.loadingLevel = this.LoadingLevel.LOADING;
+      }
+      let p = this.subject ? this.crunchService.updateJunctionFor(
+        null, wizardlet.capability.id, wData, null,
+        this.subject.user, this.subject.realUser
+      ) : this.crunchService.updateJunction(null,
+        wizardlet.capability.id, wData, null
+      );
+      p = p.then((ucj) => {
+        if ( wizardlet.reloadAfterSave && options.reloadData ) {
+          wizardlet.loadingLevel = this.LoadingLevel.IDLE;
+          this.load_(wizardlet, ucj);
+        } else {
+          wizardlet.status = ucj.status;
+          wizardlet.loading = false;
+        }
+        return ucj;
+      });
+      this.saveLock.then(p);
+      return p;
     },
     function load_(wizardlet, ucj) {
       wizardlet.status = ucj.status;
