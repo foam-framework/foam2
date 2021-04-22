@@ -64,26 +64,22 @@ public class SubX extends ProxyX {
 
   @Override
   public X put(Object key, Object value) {
-    serviceKeys_.add(key);
     if ( getX() instanceof ProxyX ) {
       getX().put(key, value);
+      serviceKeys_.add(key);
       return this;
     }
-
-    var delegate = new ProxyX(getX()).put(SERVICE_KEYS, new HashSet(serviceKeys_));
-    return new SubX(root_, parent_, delegate).put(key, value);
+    return ((SubX) fclone().put(key, value)).freeze();
   }
 
   @Override
   public X putFactory(Object key, XFactory factory) {
-    serviceKeys_.add(key);
     if ( getX() instanceof ProxyX ) {
       getX().putFactory(key, factory);
+      serviceKeys_.add(key);
       return this;
     }
-
-    var delegate = new ProxyX(getX()).put(SERVICE_KEYS, new HashSet(serviceKeys_));
-    return new SubX(root_, parent_, delegate).putFactory(key, factory);
+    return ((SubX) fclone().putFactory(key, factory)).freeze();
   }
 
   @Override
@@ -121,10 +117,11 @@ public class SubX extends ProxyX {
     return cd(getX(), path);
   }
 
-  public void freeze() {
+  public X freeze() {
     if ( getX() instanceof ProxyX ) {
       setX(((ProxyX) getX()).getX());
     }
+    return this;
   }
 
   /**
@@ -138,5 +135,15 @@ public class SubX extends ProxyX {
     var subX = (SubX) put(key, null);
     subX.serviceKeys_.remove(key);
     return subX;
+  }
+
+  public X fclone() {
+    var x = getX();
+    while ( x instanceof ProxyX ) {
+      x = ((ProxyX) x).getX();
+    }
+
+    return new SubX(root_, parent_, new ProxyX(
+      x.put(SERVICE_KEYS, new HashSet(serviceKeys_))));
   }
 }

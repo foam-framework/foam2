@@ -114,13 +114,15 @@ foam.CLASS({
 
   css: `
     ^ .foam-u2-ActionView-addRow {
-      margin: 8px 0;
+      background: transparent;
+      border: none;
+      padding-left: 0;
     }
 
     ^ .foam-u2-ActionView-remove {
-      align-self: flex-start;
       background: transparent;
-      margin-left: 4px;
+      display: contents;
+      margin-right: 4px;
       padding: 0;
     }
 
@@ -155,9 +157,6 @@ foam.CLASS({
                   .startContext({ data: row })
                     .start(self.Cols)
                       .addClass(self.myClass('value-view-container'))
-                      .start(valueView, { data$: row.value$ })
-                        .addClass(self.myClass('value-view'))
-                      .end()
                       .tag(self.Row.REMOVE, {
                         isDestructive: true,
                         // icon: '/images/remove-circle.svg',
@@ -166,13 +165,19 @@ foam.CLASS({
                         icon: "data:image/svg+xml;utf8,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath fill='%23d9170e' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z'/%3E%3C/svg%3E",
                         buttonStyle: 'UNSTYLED'
                       })
+                      .start(valueView, { data$: row.value$ })
+                        .addClass(self.myClass('value-view'))
+                      .end()
                     .end()
                   .endContext();
                 row.onDetach(row.sub(self.updateDataWithoutFeedback));
               });
         }))
         .startContext({ data: this })
-          .tag(this.ADD_ROW, { buttonStyle: 'SECONDARY' })
+          .tag(this.ADD_ROW, {
+            icon: "data:image/svg+xml;utf8,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath fill='%2317d90e' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z'/%3E%3C/svg%3E",
+            buttonStyle: 'UNSTYLED'
+          })
         .endContext();
     }
   ],

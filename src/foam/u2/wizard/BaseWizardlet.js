@@ -15,7 +15,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'wizardCloseSub'
+    'wizardCloseSub?'
   ],
 
   requires: [
@@ -215,8 +215,14 @@ foam.CLASS({
             });
           });
         slotSlot.valueSub(() => { s.set(slotSlot.get().get()); });
-        this.wizardCloseSub.onDetach(s);
-        this.wizardCloseSub.onDetach(slotSlot);
+        if ( this.wizardCloseSub ) {
+          this.wizardCloseSub.onDetach(s);
+          this.wizardCloseSub.onDetach(slotSlot);
+        } else {
+          console.error(
+            'wizardlet update listener will not detach! ' +
+            'This wizardlet my be used from an invalid context');
+        }
         return s;
       }
     },

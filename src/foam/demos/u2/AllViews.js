@@ -303,6 +303,32 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'choiceViewWithMultipleViews',
+      value: 'Yes',
+      view: {
+        class: 'foam.u2.MultiView',
+        views: [
+          {
+            class: 'foam.u2.view.ChoiceView',
+            size: 10,
+            choices: ['Yes', 'No', 'Maybe']
+          },
+          {
+            class: 'foam.u2.view.ChoiceView',
+            size: 3,
+            choices: ['Yes', 'No', 'Maybe']
+          },
+          {
+            class: 'foam.u2.view.ChoiceView',
+            placeholder: 'placeholder',
+            choices: ['Yes', 'No', 'Maybe']
+          },
+          'foam.u2.TextField'
+        ]
+      }
+    },
+    {
+      class: 'String',
       name: 'choiceViewWithValues',
       view: {
         class: 'foam.u2.view.ChoiceView',

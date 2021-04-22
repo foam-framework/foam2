@@ -30,6 +30,7 @@ foam.CLASS({
     'columns',
     'hoverSelection',
     'selection',
+    'subStack as stack',
     'memento'
   ],
 
@@ -260,6 +261,17 @@ foam.CLASS({
           return foam.nanos.column.ColumnConfigToPropertyConverter.create();
         return this.__context__.columnConfigToPropertyConverter;
       }
+    },
+    {
+      name: 'subStack',
+      factory: function() {
+        // we export NoBackStack from table view, 
+        // so that actions which have stack.back worked just fine from DAOSummaryView
+        // but had no effect on stack if the acction is called from context menu.
+        // so if such an action is called from DAOSummaryView we go back to TableView
+        // but if such an action is called from TableView we stay on the TableView screen
+        return foam.nanos.approval.NoBackStack.create({delegate: this.stack});
+      },
     },
     'currentMemento_'
   ],
