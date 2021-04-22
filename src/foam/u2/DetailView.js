@@ -135,9 +135,13 @@ foam.CLASS({
       width: 70%;
     }
 
-    
-    /* 
-     * Styles for table contents 
+    ^title {
+      padding: 6px;
+      font-weight: 500;
+    }
+
+    /*
+     * Styles for table contents
      */
 
     ^ table .foam-u2-stack-StackView {
