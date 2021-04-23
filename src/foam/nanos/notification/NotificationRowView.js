@@ -126,7 +126,9 @@
             }
           })
         },
-        confirmationRequired: true
+        confirmationRequired: function() {
+          return true;
+        },
       },
       function hideNotificationType(X) {
         var self = X.rowView;

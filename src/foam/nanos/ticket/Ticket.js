@@ -363,7 +363,9 @@ foam.CLASS({
     {
       name: 'close',
       tableWidth: 70,
-      confirmationRequired: true,
+      confirmationRequired: function() {
+        return true;
+      },
       isAvailable: function(status, id) {
         return status != 'CLOSED' &&
                id > 0;
