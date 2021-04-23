@@ -379,17 +379,17 @@ foam.CLASS({
     function onDragOver(e) {
       e.preventDefault();
       e.stopPropagation();
-      e.currentTarget.style.setProperty('background-color', this.theme.primary5 ? this.theme.primary5 : this.ON_DRAG_OVER_BG_COLOR);
+      e.currentTarget.style.setProperty('background-color', this.theme ? this.theme.primary5 : this.ON_DRAG_OVER_BG_COLOR);
     },
     function onDragLeave(e) {
       e.preventDefault();
       e.stopPropagation();
-      e.currentTarget.style.setProperty( 'background-color', this.theme.white ? this.theme.white : '#ffffff' );
+      e.currentTarget.style.setProperty( 'background-color', this.theme ? this.theme.white : '#ffffff' );
     },
     function onDrop(e) {
       e.preventDefault();
       e.stopPropagation();
-      e.currentTarget.style.setProperty('background-color', this.theme.white ? this.theme.white : '#ffffff');
+      e.currentTarget.style.setProperty('background-color', this.theme ? this.theme.white : '#ffffff');
       this.onDragAndDropParentFunction(this.index, parseInt(e.dataTransfer.getData('draggableId')));
     }
   ]
