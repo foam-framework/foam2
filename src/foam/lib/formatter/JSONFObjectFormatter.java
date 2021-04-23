@@ -334,7 +334,7 @@ public class JSONFObjectFormatter
           addInnerNewline();
         }
         if ( prop instanceof AbstractFObjectPropertyInfo && oldFObject != null ) {
-          if ( ! maybeOutputDelta(((FObject)prop.get(newFObject)), ((FObject)prop.get(oldFObject))) ) continue;
+          if ( ! maybeOutputDelta(((FObject)prop.get(oldFObject)), ((FObject)prop.get(newFObject))) ) continue;
         } else {
           outputProperty(newFObject, prop);
         }
