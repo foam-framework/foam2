@@ -126,23 +126,22 @@ foam.CLASS({
     }
 
     ^disabled-button-container>button {
-      width: -webkit-fill-available;
-      width: fill-available;
       background-color: /*%WHITE%*/ #FFFFFF;
+      color: /*%GREY4%*/ grey;
+      justify-content: flex-start;
       text-align: left;
       white-space: nowrap;
-      justify-content: flex-start;
-      color: /*%GREY4%*/ grey;
+      width: fill-available;
+      width: -webkit-fill-available;
     }
 
     ^button-container>button {
-      width: -webkit-fill-available;
-      width: fill-available;
       background-color: /*%WHITE%*/ #FFFFFF;
+      justify-content: flex-start;
       text-align: left;
       white-space: nowrap;
-      justify-content: flex-start;
-      background-color: /*%WHITE%*/ white;
+      width: fill-available;
+      width: -webkit-fill-available;
     }
 
     ^button-container>button:hover {
