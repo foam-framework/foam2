@@ -207,7 +207,7 @@ foam.CLASS({
       `,
       javaCode: `
         Logger logger = (Logger) x.get("logger");
-        if ( capability.getId().equals("554af38a-8225-87c8-dfdf-eeb15f71215f-1a5") ) {
+        if ( capability.getId().equals("crunch.onboarding.signing-officer-information") ) {
           logger.debug(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-1a5, " + putObject + "). - subject", x.get("subject"));
           logger.debug(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-1a5, " + putObject + "). - user", ((foam.nanos.auth.Subject) x.get("subject")).getUser());
           logger.debug(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-1a5, " + putObject + "). - realuser", ((foam.nanos.auth.Subject) x.get("subject")).getRealUser());
@@ -221,14 +221,14 @@ foam.CLASS({
         if ( daoKey == null ) return null;
 
         DAO dao = (DAO) x.get(daoKey);
-        if ( capability.getId().equals("554af38a-8225-87c8-dfdf-eeb15f71215f-1a5") ) {
+        if ( capability.getId().equals("crunch.onboarding.signing-officer-information") ) {
           logger.debug(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-1a5, " + putObject + "). - is dao null", dao == null);
         }
         if ( dao == null ) return null;
 
         FObject objectToSave;                                                  // Identify or create data to go into dao.
         String contextDAOFindKey = (String) capability.getContextDAOFindKey();
-        if ( capability.getId().equals("554af38a-8225-87c8-dfdf-eeb15f71215f-1a5") ) {
+        if ( capability.getId().equals("crunch.onboarding.signing-officer-information") ) {
           logger.debug(this.getClass().getSimpleName(), "ucjRefine.saveDataToDAO(x, f-1a5, " + putObject + "). - contextdaofindkey", contextDAOFindKey);
         }
 
@@ -236,7 +236,7 @@ foam.CLASS({
           if ( contextDAOFindKey.toLowerCase().contains("subject") ) {         // 1- Case if subject lookup
             String[] words = foam.util.StringUtil.split(contextDAOFindKey, '.');
             objectToSave = getSubject(x);
-            if ( capability.getId().equals("554af38a-8225-87c8-dfdf-eeb15f71215f-1a5") ) {
+            if ( capability.getId().equals("crunch.onboarding.signing-officer-information") ) {
               logger.debug(this.getClass().getSimpleName(), "getSubject(x). - objectToSave", objectToSave);
             }
 
@@ -245,19 +245,19 @@ foam.CLASS({
 
             if ( words[1].toLowerCase().equals("user") ) {
               objectToSave = ((Subject) objectToSave).getUser();
-              if ( capability.getId().equals("554af38a-8225-87c8-dfdf-eeb15f71215f-1a5") ) {
+              if ( capability.getId().equals("crunch.onboarding.signing-officer-information") ) {
                 logger.debug(this.getClass().getSimpleName(), "contextdaofindkey == subject.user - objectToSave", objectToSave);
               }
             } else if ( words[1].toLowerCase().equals("realuser") ) {
 
-              if ( capability.getId().equals("554af38a-8225-87c8-dfdf-eeb15f71215f-1a5") ) {
+              if ( capability.getId().equals("crunch.onboarding.signing-officer-information") ) {
                 logger.debug(this.getClass().getSimpleName(), "contextdaofindkey == subject.realUser - objectToSave", objectToSave);
               }
               objectToSave = ((Subject) objectToSave).getRealUser();
             }
             try {
               objectToSave = dao.find(((User)objectToSave).getId());
-              if ( capability.getId().equals("554af38a-8225-87c8-dfdf-eeb15f71215f-1a5") ) {
+              if ( capability.getId().equals("crunch.onboarding.signing-officer-information") ) {
                 logger.debug(this.getClass().getSimpleName(), "dao.find(objectToSave) - objectToSave", objectToSave);
               }
             } catch(Exception e) {
@@ -265,7 +265,7 @@ foam.CLASS({
             }
           } else {                                                              // 2- Case if anything other then subject specified
             objectToSave = (FObject) x.get(contextDAOFindKey);
-            if ( capability.getId().equals("554af38a-8225-87c8-dfdf-eeb15f71215f-1a5") ) {
+            if ( capability.getId().equals("crunch.onboarding.signing-officer-information") ) {
               logger.debug(this.getClass().getSimpleName(), "this is just wrong", objectToSave);
             }
 
