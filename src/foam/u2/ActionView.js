@@ -75,11 +75,14 @@ foam.CLASS({
       cursor: pointer;
     }
 
+    /* Unstyled */
+    ^unstyled {
+      background-color: none;
+      border: none;
+      color: inherit;
+    }
 
-    /*
-     * Primary
-     */
-
+    /* Primary */
     ^primary {
       background-color: /*%PRIMARY3%*/ #406dea;
       border-color: /*%SECONDARY1%*/ #4a33f4;
@@ -104,9 +107,7 @@ foam.CLASS({
       border: 1px solid /*%PRIMARY4%*/ #a7beff;
     }
 
-    /*
-     * Primary destructive
-     */
+    /* Primary destructive */
 
     ^primary-destructive {
       background-color: /*%DESTRUCTIVE3%*/ #d9170e;
@@ -131,9 +132,7 @@ foam.CLASS({
     }
 
 
-    /*
-     * Secondary
-     */
+    /* Secondary */
 
     ^secondary {
       background-color: white;
@@ -161,9 +160,7 @@ foam.CLASS({
     }
 
 
-    /*
-     * Secondary destructive
-     */
+    /* Secondary destructive */
 
     ^secondary-destructive {
       background-color: white;
@@ -183,9 +180,7 @@ foam.CLASS({
     }
 
 
-    /*
-     * Tertiary
-     */
+    /* Tertiary */
 
     ^tertiary {
       background: none;
@@ -211,9 +206,7 @@ foam.CLASS({
     }
 
 
-    /*
-     * Tertiary destructive
-     */
+    /* Tertiary destructive */
 
     ^tertiary-destructive {
       background-color: transparent;
@@ -235,9 +228,7 @@ foam.CLASS({
     }
 
 
-    /*
-     * Sizes
-     */
+    /* Sizes */
 
     ^small {
       font-size: 10px;
