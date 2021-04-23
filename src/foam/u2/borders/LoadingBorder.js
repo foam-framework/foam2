@@ -51,7 +51,7 @@ foam.CLASS({
       /* extra width covers right-side padding of wizard */
       width: calc(100% + 2*48px);
       height: 100%;
-      background-color: hsla(216,33%,97%,0.9);
+      background-color: hsla(216,33%,97%,0.7);
 
       /* negative margin covers left-side padding of wizard */
       margin: 0 -48px;
