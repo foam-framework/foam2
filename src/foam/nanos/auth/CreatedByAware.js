@@ -15,7 +15,12 @@ foam.INTERFACE({
       name: 'createdBy',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      documentation: 'User who created the entry'
+      documentation: 'User who created the entry',
+      tableCellFormatter: function(value, obj, axiom) {
+        this.__subSubContext__.userDAO
+          .find(value)
+          .then(user => this.add(user ? user.legalName : `ID: ${value}`));
+      }
     },
     {
       class: 'Reference',
@@ -23,7 +28,7 @@ foam.INTERFACE({
       name: 'createdByAgent',
       documentation: 'Agent acting as User who created the entry',
       createVisibility: 'HIDDEN',
-      updateVisibility: 'RO',
+      updateVisibility: 'RO'
     }
   ]
 });
