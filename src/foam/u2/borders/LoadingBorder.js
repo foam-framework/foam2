@@ -72,12 +72,6 @@ foam.CLASS({
       margin-left: calc(100% - 62pt);
       border-radius: 8pt 0 0 8pt;
     }
-    ^overlay^loading ^container {
-      margin-left: 0;
-      border-radius: 0;
-      border-left: 0;
-      overflow: hidden;
-    }
     ^overlay .foam-u2-LoadingSpinner {
       display: inline-block;
       width: 32pt;
@@ -89,9 +83,6 @@ foam.CLASS({
     ^overlay .foam-u2-LoadingSpinner img {
       width: 100%;
       height: 100%;
-    }
-    ^overlay^loading .foam-u2-LoadingSpinner {
-      margin-left: 15pt;
     }
 
     ^overlay^idle {
@@ -109,10 +100,6 @@ foam.CLASS({
       font-size: 24pt;
       margin-left: 15pt;
       color: /*%PRIMARY3*/ #604aff;
-    }
-    ^overlay^loading ^message {
-      display: inline-block;
-      vertical-align: top;
     }
   `,
 
