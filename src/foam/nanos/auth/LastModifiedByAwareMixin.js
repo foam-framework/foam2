@@ -20,7 +20,12 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       documentation: 'User who last modified entry',
-      storageOptional: true
+      storageOptional: true,
+      tableCellFormatter: function(value, obj, axiom) {
+        this.__subSubContext__.userDAO
+          .find(value)
+          .then(user => this.add(user ? user.legalName : `ID: ${value}`));
+      }
     },
     {
       class: 'Reference',
@@ -29,7 +34,12 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       documentation: 'Agent acting as User who last modified entry',
-      storageOptional: true
+      storageOptional: true,
+      tableCellFormatter: function(value, obj, axiom) {
+        this.__subSubContext__.userDAO
+          .find(value)
+          .then(user => this.add(user ? user.legalName : `ID: ${value}`));
+      }
     }
   ]
 });

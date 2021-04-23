@@ -15,12 +15,7 @@ foam.INTERFACE({
       name: 'createdBy',
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
-      documentation: 'User who created the entry',
-      tableCellFormatter: function(value, obj, axiom) {
-        this.__subSubContext__.userDAO
-          .find(value)
-          .then(user => this.add(user ? user.legalName : `ID: ${value}`));
-      }
+      documentation: 'User who created the entry'
     },
     {
       class: 'Reference',
