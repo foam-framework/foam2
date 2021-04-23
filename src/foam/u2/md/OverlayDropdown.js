@@ -24,16 +24,18 @@ foam.CLASS({
     }
 
     ^ {
-      background: white;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
+      background-color: /*%WHITE%*/ #ffffff;
+      border: 1px solid #DADDE2;
+      box-sizing: border-box;
+      box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1), 0px 4px 6px rgba(0, 0, 0, 0.05);
+      border-radius: 4px;
       display: block;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 400;
       overflow-x: hidden;
       overflow-y: hidden;
       position: absolute;
-      padding-bottom: -20px;
-      margin-bottom: -20px;
+      padding: 8px;
       z-index: 1010;
       transform: translate(-100%, 12px);
     }

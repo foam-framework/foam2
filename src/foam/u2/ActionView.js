@@ -75,6 +75,15 @@ foam.CLASS({
       cursor: pointer;
     }
 
+    /*
+     * Unstlyed
+     */
+
+    ^unstlyed {
+      background-color: none;
+      border: none;
+      color: inherit;
+    }
 
     /*
      * Primary
