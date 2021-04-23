@@ -28,6 +28,14 @@ foam.CLASS({
     }
   `,
 
+  constants: [
+    {
+      type: 'Array',
+      name: 'BACKSPACE_OR_DELETE',
+      value: [8 /*backspace*/, 46 /*delete*/]
+    }
+  ],
+
   properties: [
     {
       class: 'Array',
@@ -85,7 +93,7 @@ foam.CLASS({
             }
           })
           .on('keydown', evt => {
-            if ( evt.keyCode == 8 || evt.keyCode == 46 ) this.setStateOnDelete(evt);
+            if ( this.BACKSPACE_OR_DELETE.includes(evt.keyCode) ) this.setStateOnDelete(evt);
           });
     },
 
