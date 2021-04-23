@@ -317,7 +317,7 @@ foam.CLASS({
     },
     {
       name: 'buttonState',
-      factory: function() { return this.action && this.action.confirmationRequired ? this.ButtonState.CONFIRM : this.ButtonState.NO_CONFIRM; }
+      factory: function() { return this.ButtonState.NO_CONFIRM; }
     },
     {
       name: 'data',
@@ -346,7 +346,7 @@ foam.CLASS({
         that data is deleted in some way.
       `,
       factory: function() {
-        return this.action.confirmationRequired;
+        return false;
       }
     },
     {
@@ -378,12 +378,19 @@ foam.CLASS({
       this.addContent();
 
       if ( this.action ) {
+        if ( this.action.confirmationRequired ) {
+          var cRSlot$ = this.action.createConfirmationRequired$(this.__context__, this.data);
+          this.onDetach(cRSlot$.sub(() => this.setConfirm(cRSlot$.get())));
+          this.setConfirm(cRSlot$.get());
+        }
         this.attrs({name: this.action.name, 'aria-label': this.action.ariaLabel });
 
         this.enableClass(this.myClass('unavailable'), this.action.createIsAvailable$(this.__context__, this.data), true);
         this.attrs({ disabled: this.action.createIsEnabled$(this.__context__, this.data).map((e) => e ? false : 'disabled') });
 
-        this.addClass(this.myClass(this.styleClass_));
+        this.addClass(this.slot(function(styleClass_) {
+          return this.myClass(styleClass_);
+        }));
         this.addClass(this.myClass(this.size.label.toLowerCase()));
       }
     },
@@ -460,6 +467,19 @@ foam.CLASS({
         this.removeAllChildren();
         this.addContent();
         this.buttonState = this.ButtonState.CONFIRM;
+      }
+    },
+    {
+      name: 'setConfirm',
+      code: function(confirm) {
+        let newState = confirm ? this.ButtonState.CONFIRM : this.ButtonState.NO_CONFIRM;
+        let stateChange = this.buttonState != newState;
+        this.buttonState = newState;
+        this.isDestructive = confirm;
+        if ( stateChange ) {
+          this.removeAllChildren();
+          this.addContent();
+        }
       }
     }
   ]
