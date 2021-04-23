@@ -725,8 +725,12 @@ foam.CLASS({
             'text-overflow': 'ellipsis'
           });
 
-          return this.fullObject && this.fullObject.toSummary() ?
-            this.translate(this.fullObject.toSummary(), this.fullObject.toSummary()) : this.add(this.defaultSelectionPrompt);
+          if ( this.fullObject ) {
+            var summary = this.fullObject.toSummary();
+            return this.translate(summary, summary);
+          } else {
+            return this.add(this.defaultSelectionPrompt);
+          }
         }
       ]
     },
