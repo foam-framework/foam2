@@ -51,7 +51,7 @@ foam.CLASS({
     {
       name: 'imagePath',
       class: 'String',
-      value: 'images/ic-loading.svg'
+      value: '/images/ic-loading.svg'
     }
   ],
 

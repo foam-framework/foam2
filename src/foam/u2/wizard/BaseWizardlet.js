@@ -38,7 +38,7 @@ foam.CLASS({
       //       this can be decreased to around 100-200ms
       value: 1000,
       documentation: 'How long input must be idle before an auto-save'
-    },
+    }
   ],
 
   properties: [
@@ -84,7 +84,7 @@ foam.CLASS({
         Specify the availability of this wizardlet. If true, wizardlet is
         available iff at least one section is available. If false, wizardlet
         does not display even if some sections are available.
-      `,
+      `
     },
 
     {
