@@ -45,6 +45,14 @@ foam.CLASS({
     }
   `,
 
+  constants: [
+    {
+      type: 'Array',
+      name: 'BACKSPACE_OR_DELETE',
+      value: [8 /*backspace*/, 46 /*delete*/]
+    }
+  ],
+
   properties: [
     {
       name: 'delegates',
@@ -91,7 +99,7 @@ foam.CLASS({
           this.currentIndex = i;
         })
         u2Elem.on('keydown', (evt) => {
-          if ( evt.keyCode == 8 || evt.keyCode == 46 ) {
+          if ( this.BACKSPACE_OR_DELETE.includes(evt.keyCode) ) {
             evt.preventDefault();
             evt.stopPropagation();
             this.onDelete();
