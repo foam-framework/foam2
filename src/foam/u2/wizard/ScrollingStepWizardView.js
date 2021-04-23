@@ -16,6 +16,7 @@ foam.CLASS({
   messages: [
     { name: 'NO_ACTION_LABEL', message: 'Done' },
     { name: 'SAVE_LABEL', message: 'Save' },
+    { name: 'REJECT_LABEL', message: 'Reject' }
   ],
 
   requires: [
@@ -142,6 +143,17 @@ foam.CLASS({
       factory: function () {
         return this.sequence && this.sequence.contains('SaveAllAgent');
       }
+    },
+    {
+      name: 'willReject',
+      documentation: `
+        Used to put submit button in confirmationRequired mode and change the
+        button test from 'Done' to 'Reject' when in approvalMode and the wizard 
+        has at least on invalid wizardlet.
+      `,
+      expression: function( data$config$approvalMode, data$allValid ) {
+        return data$config$approvalMode && ! data$allValid;
+      }
     }
   ],
 
@@ -200,11 +212,12 @@ foam.CLASS({
               .addClass(this.myClass('actions'))
               .startContext({ data: self })
                 .tag(this.SUBMIT, {
-                  label: this.hasAction
-                    ? this.ACTION_LABEL
-                    : this.willSave
-                      ? this.SAVE_LABEL
-                      : this.NO_ACTION_LABEL
+                  label: this.slot(function(hasAction, willReject, willSave) {
+                    if ( willReject ) return this.REJECT_LABEL;
+                    if ( hasAction ) return this.ACTION_LABEL;
+                    if ( willSave ) return this.SAVE_LABEL;
+                    return this.NO_ACTION_LABEL;
+                  })
                 })
               .endContext()
             .end()
@@ -281,6 +294,9 @@ foam.CLASS({
     {
       name: 'submit',
       label: 'Done',
+      confirmationRequired: function(willReject) {
+        return willReject;
+      },
       isEnabled: function (data$config, data$allValid) {
         return ! data$config.requireAll || data$allValid;
       },

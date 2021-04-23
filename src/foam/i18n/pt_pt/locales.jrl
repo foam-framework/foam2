@@ -208,6 +208,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollWizardletVi
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollWizardletView.SAVE.label",target:"Salve"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollingStepWizardView.SAVE_LABEL",target:"Salve"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollingStepWizardView.NO_ACTION_LABEL",target:"Feito"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollingStepWizardView.REJECT_LABEL",target:"Rejeitar"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.DAOWizardlet.OF.label",target:"do"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.DAOWizardlet.DATA.label",target:"dados"})
 
@@ -468,6 +469,8 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequ
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.PENDING",target:"Pendente"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.TRACKING",target:"Rastreamento"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.BACK_LABEL",target:"Voltar"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.ActionView.CONFIRM",target:"Confirme"})
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.comics.v2.DAOSummaryView.BACK.label",target:"Voltar"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.comics.v2.DAOSummaryView.EDIT.label",target:"Editar"})
