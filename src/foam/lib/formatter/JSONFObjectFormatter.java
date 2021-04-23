@@ -333,7 +333,7 @@ public class JSONFObjectFormatter
           append(',');
           addInnerNewline();
         }
-        if ( prop instanceof AbstractFObjectPropertyInfo && oldFObject != null 
+        if ( prop instanceof AbstractFObjectPropertyInfo && oldFObject != null &&
              prop.get(oldFObject) != null && prop.get(newFObject) != null
         ) {
           if ( ! maybeOutputDelta(((FObject)prop.get(oldFObject)), ((FObject)prop.get(newFObject))) ) continue;
