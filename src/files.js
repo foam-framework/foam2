@@ -192,7 +192,6 @@ FOAM_FILES([
   { name: "foam/web/URLState", flags: ['web'] },
   { name: "lib/input", flags: ['web'] },
   { name: "foam/box/Remote" },
-  { name: 'foam/audio/Beep' },
   { name: 'foam/u2/ConfirmationModal', flags: ['web'] },
   { name: 'foam/u2/DeleteModal', flags: ['web'] },
   { name: 'foam/u2/EasyModal', flags: ['web'] },
