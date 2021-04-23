@@ -99,7 +99,9 @@ foam.CLASS({
   actions: [
     {
       name: 'exit',
-      confirmationRequired: true,
+      confirmationRequired: function() {
+        return true;
+      },
       code: function(x) {
         x.stack.back();
       }

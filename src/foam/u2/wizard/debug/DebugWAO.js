@@ -25,15 +25,15 @@ foam.CLASS({
   ],
 
   methods: [
-    async function save(w) {
-      if ( this.listen ) this.waoEvent.pub('save', w);
+    async function save(...args) {
+      if ( this.listen ) this.waoEvent.pub('save', ...args);
       if ( this.trap ) return;
-      return await this.SUPER(w);
+      return await this.SUPER(...args);
     },
-    async function load(w) {
-      if ( this.listen ) this.waoEvent.pub('load', w);
+    async function load(...args) {
+      if ( this.listen ) this.waoEvent.pub('load', ...args);
       if ( this.trap ) return;
-      return await this.SUPER(w);
+      return await this.SUPER(...args);
     }
   ]
 });

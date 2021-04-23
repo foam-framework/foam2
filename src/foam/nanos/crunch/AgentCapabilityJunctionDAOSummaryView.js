@@ -52,7 +52,8 @@ foam.CLASS({
         'foam.u2.ControllerMode',
         'foam.u2.crunch.wizardflow.SaveAllAgent',
         'foam.u2.stack.Stack',
-        'foam.u2.stack.StackView'
+        'foam.u2.stack.StackView',
+        'foam.u2.wizard.StepWizardConfig'
       ],
 
       properties: [
@@ -76,6 +77,12 @@ foam.CLASS({
             .reconfigure('ConfigureFlowAgent', {
               popupMode: false
             })
+            .reconfigure('StepWizardAgent', {
+              config: this.StepWizardConfig.create({
+                approvalMode: true
+              })
+            })
+            .remove('LoadTopConfig')
             .remove('RequirementsPreviewAgent')
             .remove('SkipGrantedAgent')
             .remove('WizardStateAgent')

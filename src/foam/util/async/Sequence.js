@@ -83,7 +83,7 @@ foam.CLASS({
     },
     function contains(name) {
       for ( let ca of this.contextAgentSpecs ) {
-        if ( name == ca.name ) {
+        if ( name == ca.name && ca.spec !== this.NullAgent ) {
           return true;
         }
       }
