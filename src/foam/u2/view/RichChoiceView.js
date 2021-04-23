@@ -728,9 +728,9 @@ foam.CLASS({
           if ( this.fullObject ) {
             var summary = this.fullObject.toSummary();
             return this.translate(summary, summary);
-          } else {
-            return this.add(this.defaultSelectionPrompt);
           }
+
+          return this.add(this.defaultSelectionPrompt);
         }
       ]
     },
