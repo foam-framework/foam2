@@ -186,6 +186,32 @@ public class JSONFObjectFormatter
     append(':');
     p.formatJSON(this, o);
   }
+
+  protected boolean maybeOutPutFObjectProperty(FObject newFObject, FObject oldFObject, PropertyInfo prop) {
+
+    if ( prop instanceof AbstractFObjectPropertyInfo && oldFObject != null &&
+      prop.get(oldFObject) != null && prop.get(newFObject) != null
+    ) {
+      String before = builder().toString();
+      reset();
+      if ( maybeOutputDelta(((FObject)prop.get(oldFObject)), ((FObject)prop.get(newFObject))) ) {
+        String after = builder().toString();
+        reset();
+        append(before);
+        outputKey(getPropertyName(prop));
+        append(':');
+        append(after);
+        return true;
+      }
+      else {
+        append(before);
+        return false;
+      }
+    } else {
+      outputProperty(newFObject, prop);
+      return true;
+    }
+  }
 /*
   public void outputMap(Object... values) {
     if ( values.length % 2 != 0 ) {
@@ -333,15 +359,9 @@ public class JSONFObjectFormatter
           append(',');
           addInnerNewline();
         }
-        if ( prop instanceof AbstractFObjectPropertyInfo && oldFObject != null &&
-             prop.get(oldFObject) != null && prop.get(newFObject) != null
-        ) {
-          if ( ! maybeOutputDelta(((FObject)prop.get(oldFObject)), ((FObject)prop.get(newFObject))) ) continue;
-        } else {
-          outputProperty(newFObject, prop);
-        }
+         if ( maybeOutPutFObjectProperty(newFObject, oldFObject, prop) ) delta += 1;
 
-        delta += 1;
+
         if ( prop.includeInID() ) {
           ids += 1;
         } else if ( optionalPredicate_.propertyPredicateCheck(getX(), of, prop) ) {
