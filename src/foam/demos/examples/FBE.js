@@ -477,6 +477,22 @@ tag('input');
 ##  addClass() / cssClass() / addClasses()
 ##  enableCls() / enableClass()
 ##  myClass()
+--
+foam.CLASS({
+  package: 'some.good.package',
+  name: 'Test',
+  extends: 'foam.u2.Element',
+  css: ' ^ { background: pink; }',
+  methods: [
+    function initE() {
+      this.SUPER();
+      this.addClass(this.myClass());
+      this.add(this.myClass());
+    }
+  ]
+});
+add(some.good.package.Test.create());
+
 ##  removeClass()
 ##  setAttribute()
 ##  removeAttribute()
