@@ -203,14 +203,11 @@ public class JSONFObjectFormatter
         append(after);
         return true;
       }
-      else {
-        append(before);
-        return false;
-      }
-    } else {
-      outputProperty(newFObject, prop);
-      return true;
+      append(before);
+      return false;
     }
+    outputProperty(newFObject, prop);
+    return true;
   }
 /*
   public void outputMap(Object... values) {
