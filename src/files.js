@@ -216,6 +216,7 @@ FOAM_FILES([
   { name: 'foam/u2/borders/NullBorder', flags: ['web'] },
   { name: 'foam/u2/borders/CardBorder', flags: ['web'] },
   { name: 'foam/u2/borders/CollapseBorder', flags: ['web'] },
+  { name: 'foam/u2/borders/DetachedBorder', flags: ['web'] },
   { name: 'foam/u2/borders/MarginBorder', flags: ['web'] },
   { name: 'foam/u2/borders/SplitScreenBorder', flags: ['web'] },
   { name: 'foam/u2/borders/LoadingBorder', flags: ['web'] },
