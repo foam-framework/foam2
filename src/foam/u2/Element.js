@@ -2054,7 +2054,7 @@ foam.CLASS({
         }
         var first = Array.isArray(e) ? e[0] : e;
 
-        if ( first.state == first.INITIAL ) {
+        if ( first && first.state == first.INITIAL ) {
           // updated requested before initial element loaded
           // not a problem, just defer loading
           first.onload.sub(foam.events.oneTime(l));
