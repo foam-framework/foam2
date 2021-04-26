@@ -201,7 +201,8 @@ foam.CLASS({
       e.stopPropagation();
     },
     function onClose() {
-      this.menuSearch = '';
+      if ( this.menuSearch )
+        this.menuSearch = '';
       this.columns.forEach(c => c.onClose());
     },
     function onTopLevelPropertiesDragAndDrop(targetIndex, draggableIndex) {
