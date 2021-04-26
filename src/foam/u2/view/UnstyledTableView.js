@@ -508,19 +508,6 @@ foam.CLASS({
           var view = this;
           view.props = this.returnPropertiesForColumns(view, view.columns_);
 
-          var actions = {};
-          var actionsMerger = action => { actions[action.name] = action; };
-
-          // Model actions
-          view.of.getAxiomsByClass(foam.core.Action).forEach(actionsMerger);
-          // Context menu actions
-          view.contextMenuActions.forEach(actionsMerger);
-
-          // storing the base actions for resetting after merges
-          var baseActions = {
-            ...actions
-          };
-
           // with this code error created slot.get cause promise return
           // FIX ME
           var slot = this.slot(function(data, data$delegate, order, updateValues) {
@@ -698,7 +685,7 @@ foam.CLASS({
                   }
 
                   // Object actions
-                  obj.cls_.getAxiomsByClass(foam.core.Action).forEach(actionsMerger);
+                  var actions = view.getActionsForRow(obj);
                   tableRowElement
                     .start()
                       .addClass(view.myClass('td')).
@@ -711,11 +698,6 @@ foam.CLASS({
                       }).
                     end();
                   tbodyElement.add(tableRowElement);
-
-                  // reset actions back to base state
-                  actions = {
-                    ...baseActions
-                  }
                 }
               });
 
@@ -743,6 +725,23 @@ foam.CLASS({
       },
       function returnMementoColumnNameDisregardSorting(c) {
         return c && this.shouldColumnBeSorted(c) ? c.substr(0, c.length - 1) : c;
+      },
+      function returnMementoColumnNameDisregardSorting(c) {
+        return c && this.shouldColumnBeSorted(c) ? c.substr(0, c.length - 1) : c;
+      },
+      {
+        name: 'getActionsForRow',
+        code: function(obj) {
+          var actions = {};
+          var actionsMerger = action => { actions[action.name] = action; };
+
+          // Model actions
+          obj.cls_.getAxiomsByClass(foam.core.Action).forEach(actionsMerger);
+          // Context menu actions
+          this.contextMenuActions.forEach(actionsMerger);
+
+          return actions;
+        }
       }
   ]
 });
