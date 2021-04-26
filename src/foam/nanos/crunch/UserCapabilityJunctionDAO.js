@@ -125,7 +125,7 @@ foam.CLASS({
 
         // do not allow updates to sourceId/targetId properties
         AuthService auth = (AuthService) x.get("auth");
-        if ( old != null && ! ucj.getSourceId().equals(old.getSourceId()) && ! auth.check(x, SOURCE_CAPABILITY_ID_CHANGE) ) throw new RuntimeException(this.ERROR_TWO);
+        if ( old != null && ucj.getSourceId() != old.getSourceId() && ! auth.check(x, SOURCE_CAPABILITY_ID_CHANGE) ) throw new RuntimeException(this.ERROR_TWO);
         if ( old != null && ! ucj.getTargetId().equals(old.getTargetId()) && ! auth.check(x, TARGET_CAPABILITY_ID_CHANGE) ) throw new RuntimeException(this.ERROR_THREE);
 
         // if ucj data is set but does not match expected data, do not put
