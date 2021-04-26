@@ -20,6 +20,7 @@ foam.CLASS({
 
   requires: [
     'foam.core.SimpleSlot',
+    'foam.u2.borders.LoadingLevel',
     'foam.u2.detail.AbstractSectionedDetailView',
     'foam.u2.wizard.WizardletAware',
     'foam.u2.wizard.WizardletIndicator',
@@ -33,7 +34,10 @@ foam.CLASS({
   constants: [
     {
       name: 'SAVE_DELAY',
-      value: 1200
+      // TODO: once changes are made to input views to reduce property updates,
+      //       this can be decreased to around 100-200ms
+      value: 1000,
+      documentation: 'How long input must be idle before an auto-save'
     }
   ],
 
@@ -80,8 +84,9 @@ foam.CLASS({
         Specify the availability of this wizardlet. If true, wizardlet is
         available iff at least one section is available. If false, wizardlet
         does not display even if some sections are available.
-      `,
+      `
     },
+
     {
       name: 'isVisible',
       class: 'Boolean',
@@ -97,7 +102,10 @@ foam.CLASS({
     },
     {
       name: 'loading',
-      class: 'Boolean'
+      class: 'Boolean',
+      postSet: function (_, n) {
+        if ( ! n ) this.LoadingLevel = this.LoadingLevel.IDLE;
+      }
     },
     {
       name: 'sections',
@@ -145,6 +153,11 @@ foam.CLASS({
       }
     },
     {
+      name: 'loadingLevel',
+      class: 'Enum',
+      of: 'foam.u2.borders.LoadingLevel'
+    },
+    {
       name: '__subSubContext__',
       documentation: 'Current subContext to use when creating view.',
       factory: function() { return this.__subContext__; }
@@ -158,9 +171,9 @@ foam.CLASS({
     function createView(data) {
       return null;
     },
-    async function save() {
+    async function save(options) {
       this.indicator = this.WizardletIndicator.SAVING;
-      var ret = await this.wao.save(this);
+      var ret = await this.wao.save(this, options);
       this.clearProperty('indicator');
       this.saveEvent.pub(ret);
       return ret;
@@ -194,8 +207,11 @@ foam.CLASS({
             ) ? data.getUpdateSlot()
               : this.FObjectRecursionSlot.create({ obj: data });
             return this.WizardletAutoSaveSlot.create({
+              // Clear pending auto-saves if we start saving or finish loading
+              saveEvent: this.loading$,
+              // Listen to property updates if not loading
               other: filter(updateSlot, () => ! this.loading),
-              delay: this.SAVE_DELAY
+              delay: this.SAVE_DELAY,
             });
           });
         slotSlot.valueSub(() => { s.set(slotSlot.get().get()); });

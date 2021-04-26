@@ -673,7 +673,13 @@
           this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
           this.finished.pub();
           this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
-          X.stack.back();
+
+          if (
+            X.stack.top && 
+            ( X.currentMenu.id !== X.stack.top[2] )
+          ) {
+            X.stack.back();
+          }
         }, e => {
           this.throwError.pub(e);
           this.notify(e.message, '', this.LogLevel.ERROR, true);
@@ -731,7 +737,10 @@
 
           X.notify(this.SUCCESS_CANCELLED, '', this.LogLevel.INFO, true);
 
-          if ( X.currentMenu.id !== X.stack.top[2] ) {
+          if (
+            X.stack.top && 
+            ( X.currentMenu.id !== X.stack.top[2] )
+          ) {
             X.stack.back();
           }
         }, e => {
@@ -901,7 +910,7 @@
           data$: X.data$,
           propertyData$: X.data.assignedTo$,
           title: this.ASSIGN_TITLE,
-          onExecute: this.assignRequestL.bind(this, X)
+          onExecute: this.assignRequest.bind(this, X)
         }));
       }
     },
@@ -919,7 +928,10 @@
           this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
           this.finished.pub();
           this.notify(this.SUCCESS_ASSIGNED, '', this.LogLevel.INFO, true);
-          if ( X.currentMenu.id !== X.stack.top[2] ) {
+          if (
+            X.stack.top && 
+            ( X.currentMenu.id !== X.stack.top[2] )
+          ) {
             X.stack.back();
           }
         }, e => {
@@ -942,7 +954,10 @@
           this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
           this.finished.pub();
           this.notify(this.SUCCESS_UNASSIGNED, '', this.LogLevel.INFO, true);
-          if ( X.currentMenu.id !== X.stack.top[2] ) {
+          if (
+            X.stack.top && 
+            ( X.currentMenu.id !== X.stack.top[2] )
+          ) {
             X.stack.back();
           }
         }, e => {
@@ -966,7 +981,12 @@
           this.finished.pub();
           this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
 
-          X.stack.back();
+          if (
+            X.stack.top && 
+            ( X.currentMenu.id !== X.stack.top[2] )
+          ) {
+            X.stack.back();
+          }
         }, e => {
           this.throwError.pub(e);
           this.notify(e.message, '', this.LogLevel.ERROR, true);
@@ -984,8 +1004,13 @@
           this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
           this.finished.pub();
           this.notify(this.SUCCESS_ASSIGNED, '', this.LogLevel.INFO, true);
-
-          X.stack.back();
+          
+          if (
+            X.stack.top && 
+            ( X.currentMenu.id !== X.stack.top[2] )
+          ) {
+            X.stack.back();
+          }
         }, e => {
           this.throwError.pub(e);
           this.notify(e.message, '', this.LogLevel.ERROR, true);
@@ -1002,7 +1027,12 @@
           this.finished.pub();
           this.notify(this.SUCCESS_ASSIGNED, '', this.LogLevel.INFO, true);
 
-          X.stack.back();
+          if (
+            X.stack.top && 
+            ( X.currentMenu.id !== X.stack.top[2] )
+          ) {
+            X.stack.back();
+          }
         }, (e) => {
           this.throwError.pub(e);
           this.notify(e.message, '', this.LogLevel.ERROR, true);

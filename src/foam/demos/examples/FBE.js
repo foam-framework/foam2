@@ -477,6 +477,30 @@ tag('input');
 ##  addClass() / cssClass() / addClasses()
 ##  enableCls() / enableClass()
 ##  myClass()
+--
+foam.CLASS({
+  package: 'some.good.package',
+  name: 'Test',
+  extends: 'foam.u2.Element',
+  css: \`
+    ^ { background: pink; }
+    ^subsection { background: green; }
+  \`,
+  methods: [
+    function initE() {
+      this.SUPER();
+      this.
+        addClass(this.myClass()).
+        add(this.myClass()).
+        start().
+          addClass(this.myClass('subsection')).
+          add(this.myClass('subsection')).
+        end();
+    }
+  ]
+});
+add(some.good.package.Test.create());
+
 ##  removeClass()
 ##  setAttribute()
 ##  removeAttribute()

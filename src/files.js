@@ -332,6 +332,12 @@ FOAM_FILES([
   { name: "foam/nanos/logger/DAOLogger" },
   { name: "foam/nanos/logger/LoggingDAO" },
 
+  // Auth Mixins
+  { name: "foam/nanos/auth/CreatedAwareMixin" },
+  { name: "foam/nanos/auth/CreatedByAwareMixin" },
+  { name: "foam/nanos/auth/LastModifiedAwareMixin" },
+  { name: "foam/nanos/auth/LastModifiedByAwareMixin" },
+
   { name: "foam/nanos/script/Language", flags: ['java', 'web'] },
 
   { name: "foam/dao/EasyDAO" },

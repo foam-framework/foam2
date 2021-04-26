@@ -106,9 +106,9 @@ foam.CLASS({
       // Return true to prevent wizardlet from being pushed normally
       return true;
     },
-    async function save() {
-      await foam.Promise.inOrder(this.delegates, d => d.save());
-      return await this.wao.save(this);
+    async function save(...args) {
+      await foam.Promise.inOrder(this.delegates, d => d.save(...args));
+      return await this.wao.save(this, ...args);
     },
     async function cancel() {
       await foam.Promise.inOrder(this.delegates, d => d.cancel());

@@ -177,7 +177,7 @@ foam.CLASS({
       justify-content: space-between;
       width: 100%;
 
-      height: /*%INPUTHEIGHT%*/ 32px;
+      height: /*%INPUTHEIGHT%*/ 34px;
       font-size: 14px;
       padding-left: /*%INPUTHORIZONTALPADDING%*/ 8px;
       padding-right: /*%INPUTHORIZONTALPADDING%*/ 8px;
@@ -224,7 +224,7 @@ foam.CLASS({
       border: none;
       padding-left: /*%INPUTHORIZONTALPADDING%*/ 8px;
       padding-right: /*%INPUTHORIZONTALPADDING%*/ 8px;
-      height: /*%INPUTHEIGHT%*/ 32px;
+      height: /*%INPUTHEIGHT%*/ 34px;
     }
 
     ^ .search img {
@@ -251,7 +251,7 @@ foam.CLASS({
       border-left: 1px;
       padding-left: /*%INPUTHORIZONTALPADDING%*/ 8px;
       padding-right: /*%INPUTHORIZONTALPADDING%*/ 8px;
-      height: /*%INPUTHEIGHT%*/ 32px;
+      height: /*%INPUTHEIGHT%*/ 34px;
       border-left: 1px solid;
       border-color: /*%GREY3%*/ #cbcfd4;
       margin-left: 12px;
@@ -725,9 +725,12 @@ foam.CLASS({
             'text-overflow': 'ellipsis'
           });
 
-          return this.add(this.fullObject$.map(o => {
-            return ( o && o.toSummary() ) || this.defaultSelectionPrompt;
-          }));
+          if ( this.fullObject ) {
+            var summary = this.fullObject.toSummary();
+            return this.translate(summary, summary);
+          }
+
+          return this.add(this.defaultSelectionPrompt);
         }
       ]
     },

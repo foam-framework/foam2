@@ -265,7 +265,7 @@ foam.CLASS({
     {
       name: 'subStack',
       factory: function() {
-        // we export NoBackStack from table view, 
+        // we export NoBackStack from table view,
         // so that actions which have stack.back worked just fine from DAOSummaryView
         // but had no effect on stack if the acction is called from context menu.
         // so if such an action is called from DAOSummaryView we go back to TableView
@@ -523,7 +523,7 @@ foam.CLASS({
             // on a table column header to sort by that column.
             var proxy = view.ProxyDAO.create({ delegate: dao });
             if ( this.order ) proxy = proxy.orderBy(this.order);
-            
+
 
             var canObjBeBuildFromProjection = true;
 

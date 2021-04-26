@@ -4,13 +4,41 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+foam.ENUM({
+  package: 'foam.u2.borders',
+  name: 'LoadingLevel',
+  values: [
+    {
+      name: 'idle',
+    },
+    {
+      name: 'pending',
+    },
+    {
+      name: 'loading',
+    }
+  ]
+});
+
 foam.CLASS({
   package: 'foam.u2.borders',
   name: 'LoadingBorder',
   extends: 'foam.u2.Element',
 
+  imports: [
+    'theme'
+  ],
+
   requires: [
-    'foam.u2.LoadingSpinner'
+    'foam.u2.LoadingSpinner',
+    'foam.u2.borders.LoadingLevel'
+  ],
+
+  messages: [
+    {
+      name: 'MESSAGE',
+      message: 'Please wait...'
+    }
   ],
 
   css: `
@@ -18,35 +46,68 @@ foam.CLASS({
       position: relative;
     }
     ^overlay {
-      display: flex;
-      justify-content: center;
-      align-items: center;
       position: absolute;
       top: 0; left: 0;
       /* extra width covers right-side padding of wizard */
       width: calc(100% + 2*48px);
       height: 100%;
-      background-color: rgba(0,0,0,0.7 );
+      background-color: hsla(216,33%,97%,0.7);
 
       /* negative margin covers left-side padding of wizard */
       margin: 0 -48px;
       z-index: 1000;
+
+      /* ease-out animation makes things feel stable */
+      transition: all 200ms ease-out;
+    }
+    ^container {
+      position: sticky;
+      top: 15pt;
+      height: 32pt;
+      padding: 15pt;
+      background-color: /*%WHITE%*/ #fff;
+      border: 1pt solid %GREY3%;
+      border-right: none;
+      transition: all 200ms ease-out;
+      margin-left: calc(100% - 62pt);
+      border-radius: 8pt 0 0 8pt;
     }
     ^overlay .foam-u2-LoadingSpinner {
-      width: 50%;
-      height: 50%;
+      display: inline-block;
+      width: 32pt;
+      height: 32pt
+
+      /* ease-out animation makes things feel stable */
+      transition: all 200ms ease-out;
     }
     ^overlay .foam-u2-LoadingSpinner img {
       width: 100%;
       height: 100%;
     }
+
+    ^overlay^idle {
+      opacity: 0;
+      pointer-events: none;
+    }
+    ^overlay^pending {
+      opacity: 1;
+      background-color: hsla(216,33%,97%,0);
+      pointer-events: none;
+    }
+    ^message {
+      display: none;
+      line-height: 32pt;
+      font-size: 24pt;
+      margin-left: 15pt;
+      color: /*%PRIMARY3*/ #604aff;
+    }
   `,
 
   properties: [
     {
-      class: 'Boolean',
-      name: 'loading',
-      value: true
+      name: 'loadingLevel',
+      class: 'Enum',
+      of: 'foam.u2.borders.LoadingLevel'
     }
   ],
 
@@ -56,8 +117,19 @@ foam.CLASS({
         .addClass(this.myClass())
         .start()
           .addClass(this.myClass('overlay'))
-          .show(this.loading$)
-          .tag(this.LoadingSpinner)
+          .addClass(this.loadingLevel$.map(v => this.myClass(v.name.toLowerCase())))
+          .start()
+            .addClass(this.myClass('container'))
+            .tag(this.LoadingSpinner, {
+              imagePath: this.theme.glyphs.spinner.getDataUrl({
+                fill: this.theme.primary3
+              })
+            })
+            .start()
+              .addClass(this.myClass('message'))
+              .add(this.MESSAGE)
+            .end()
+          .end()
         .end()
         .start('div', null, this.content$)
           .on('keypress', this.onKey)
@@ -69,7 +141,7 @@ foam.CLASS({
 
   listeners: [
     function onKey(e) {
-      if ( this.loading ) {
+      if ( this.loadingLevel == this.LoadingLevel.LOADING ) {
         e.preventDefault();
         e.stopPropagation();
       }

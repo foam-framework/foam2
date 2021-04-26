@@ -24,14 +24,15 @@ foam.CLASS({
 
   css: `
     ^ {
-      padding: 0px !important;
       -webkit-appearance: none;
       appearance: none;
       border-radius: 2px;
       border: solid 2px /*%GREY2%*/ #5a5a5a;
-      width: 18px;
       height: 18px;
+      margin: 7px 0;
+      padding: 0px !important;
       transition: background-color 140ms, border-color 140ms;
+      width: 18px;
     }
     ^:checked {
       background-color: /*%PRIMARY3%*/ #1e1f21;

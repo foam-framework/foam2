@@ -22,6 +22,9 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(o, f, prop) {
+        if ( foam.String.isInstance(f) ) {
+          return foam.lookup(f).create();
+        }
         if ( foam.Function.isInstance(f) ) {
           return prop.FnFormatter.create({f: f});
         }
@@ -237,6 +240,21 @@ foam.CLASS({
             });
           }
         }));
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'ReferenceToSummaryCellFormatter',
+
+  methods: [
+    function format(e, value, obj, axiom) {
+      try {
+        obj[axiom.name + '$find'].then(o => e.add(o.toSummary()), r => e.add(value));
+      } catch (x) {
       }
     }
   ]

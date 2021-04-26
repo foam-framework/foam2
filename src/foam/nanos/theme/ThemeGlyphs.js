@@ -10,7 +10,7 @@ foam.CLASS({
   name: 'ThemeGlyphs',
 
   documentation: `
-    Stores svgs for standard glyphs. 
+    Stores svgs for standard glyphs.
     SVG properties can have variables and fallback values. Look at fill properties for formatting.
   `,
 
@@ -24,7 +24,7 @@ foam.CLASS({
       class: 'GlyphProperty',
       of: 'foam.core.Glyph',
       factory: function() {
-        return { template: ` 
+        return { template: `
         <?xml version="1.0" encoding="UTF-8"?>
         <svg width="40px" height="40px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
             <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -44,7 +44,7 @@ foam.CLASS({
       class: 'GlyphProperty',
       of: 'foam.core.Glyph',
       factory: function() {
-        return { template: ` 
+        return { template: `
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
             <path fill="/*%FILL%*/ #ffffff" fill-rule="nonzero" d="M 12 0 z m 0 13.2 c -0.66 0 -1.2 -0.54 -1.2 -1.2 V 7.2 c 0 -0.66 0.54 -1.2 1.2 -1.2 c 0.66 0 1.2 0.54 1.2 1.2 V 12 c 0 0.66 -0.54 1.2 -1.2 1.2 z m 1.2 4.8 h -2.4 v -2.4 h 2.4 V 18 z"/>
         </svg>
@@ -82,6 +82,20 @@ foam.CLASS({
         <path d="M9 16H11V14H9V16ZM10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM10 18C5.59 18 2 14.41 2 10C2 5.59 5.59 2 10 2C14.41 2 18 5.59 18 10C18 14.41 14.41 18 10 18ZM10 4C7.79 4 6 5.79 6 8H8C8 6.9 8.9 6 10 6C11.1 6 12 6.9 12 8C12 10 9 9.75 9 13H11C11 10.75 14 10.5 14 8C14 5.79 12.21 4 10 4Z" fill="/*%FILL%*/ #FFFFFF"/>
         </svg>
         ` };
+      }
+    },
+    {
+      name: 'spinner',
+      class: 'FObjectProperty',
+      of: 'foam.core.Glyph',
+      factory: function () {
+        return this.Glyph.create({
+          template: `
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+    <path fill="%FILL%" fill-rule="nonzero" d="M14.927 10.839a6.194 6.194 0 0 1-6.723 4.318A6.188 6.188 0 0 1 2.83 9.613l1.271.972a.392.392 0 0 0 .477-.623L2.751 8.564a.392.392 0 0 0-.55.073L.803 10.464a.393.393 0 0 0 .624.477l.667-.873a6.972 6.972 0 0 0 6.01 5.868 6.975 6.975 0 0 0 7.573-4.865.392.392 0 1 0-.75-.232zm1.676-4.008l-.723.943a6.972 6.972 0 0 0-5.984-5.72A6.978 6.978 0 0 0 2.323 6.92a.392.392 0 1 0 .75.232 6.196 6.196 0 0 1 6.722-4.318 6.192 6.192 0 0 1 5.35 5.283l-1.215-.93a.392.392 0 1 0-.477.623l1.825 1.398a.393.393 0 0 0 .55-.073l1.398-1.826a.394.394 0 0 0-.073-.55.391.391 0 0 0-.55.073z"/>
+</svg>
+          `
+        })
       }
     }
   ]
