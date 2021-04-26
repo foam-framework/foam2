@@ -60,6 +60,7 @@
     'description',
     'classification',
     'objId',
+    'createdFor',
     'approver.legalName',
     'assignedTo.legalName',
     'status',
