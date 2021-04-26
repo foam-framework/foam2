@@ -284,7 +284,7 @@ foam.CLASS({
                         })
                           .style({
                             'justify-content': 'flex-start',
-                            'margin': '0 8px 0 0'
+                            margin: '0 8px 0 0'
                           })
                         .end()
                         .start()
