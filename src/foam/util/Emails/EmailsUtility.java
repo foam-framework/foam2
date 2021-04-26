@@ -112,6 +112,7 @@ public class EmailsUtility {
 
       String url = appConfig.getUrl().replaceAll("/$", "");
       templateArgs.put("logo", (url + "/" + theme.getLogo()));
+      templateArgs.put("largeLogo", (url + "/" + theme.getLargeLogo()));
       templateArgs.put("appLink", url);
       templateArgs.put("appName", (theme.getAppName()));
 
