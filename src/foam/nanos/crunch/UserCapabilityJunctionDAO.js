@@ -79,7 +79,7 @@ foam.CLASS({
       Subject subject = (Subject) x.get("subject");
       User user = (User) subject.getUser();
       User realUser = (User) subject.getRealUser();
-      
+
       AuthService auth = (AuthService) x.get("auth");
       if ( auth.check(x, "*") ) return getDelegate();
       return getDelegate().where(
@@ -87,7 +87,7 @@ foam.CLASS({
           EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
           EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId())
         )
-      ); 
+      );
       `
     },
     {
