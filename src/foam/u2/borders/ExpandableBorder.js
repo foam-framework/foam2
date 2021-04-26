@@ -6,10 +6,10 @@
 
  foam.CLASS({
   package: 'foam.u2.borders',
-  name: 'DetachedBorder',
+  name: 'ExpandableBorder',
   extends: 'foam.u2.Element',
 
-  documentation: 'Adds a collapsable card that can be triggered by any boolean value',
+  documentation: 'Adds a collapsable card div that can be triggered by any boolean value',
 
   css: `
     ^ {

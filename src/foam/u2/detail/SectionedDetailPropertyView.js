@@ -188,11 +188,6 @@ foam.CLASS({
       align-items: center;
     }
 
-    ^CheckBoxWrapper {
-      display: inline-flex;
-      align-items: center;
-      justify-content: flex-start;
-    }
   `,
 
   requires: [
@@ -202,7 +197,7 @@ foam.CLASS({
     'foam.u2.layout.Rows',
     'foam.u2.ControllerMode',
     'foam.u2.DisplayMode',
-    'foam.u2.borders.DetachedBorder',
+    'foam.u2.borders.ExpandableBorder',
     'foam.u2.tag.CircleIndicator'
   ],
 
@@ -248,9 +243,6 @@ foam.CLASS({
                   .style({ 'position': 'relative', 'display': 'flex', 'flex-wrap': 'wrap', 'width': '100%' })
                   .start()
                     .style({ 'flex-grow': 1, 'max-width': '100%' })
-                    .callIf( prop.view.class == 'foam.u2.CheckBox', function() {
-                      this.addClass(this.myClass('CheckBoxWrapper'));
-                    })
                     .tag(prop, { mode$: self.mode$ })
                     .callIf(prop.validationStyleEnabled, function() {
                       this.enableClass(self.myClass('error'), errorSlot);
@@ -299,8 +291,8 @@ foam.CLASS({
               .end()
               .callIf(prop.help, function() {
                 this
-                  .start(self.DetachedBorder, { expanded$: self.helpEnabled$, title: self.HELP })
-                    .style({ 'flex-basis': '100%', 'margin-top': '8px' })
+                  .start(self.ExpandableBorder, { expanded$: self.helpEnabled$, title: self.HELP })
+                    .style({ 'flex-basis': '100%', 'margin-top': '8px', width: '100%' })
                     .start('p').add(prop.help).end()
                   .end();
               })
