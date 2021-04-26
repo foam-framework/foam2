@@ -516,6 +516,11 @@ foam.CLASS({
           // Context menu actions
           view.contextMenuActions.forEach(actionsMerger);
 
+          // storing the base actions for resetting after merges
+          var baseActions = {
+            ...actions
+          };
+
           // with this code error created slot.get cause promise return
           // FIX ME
           var slot = this.slot(function(data, data$delegate, order, updateValues) {
@@ -693,7 +698,7 @@ foam.CLASS({
                   }
 
                   // Object actions
-                  obj.cls_.getOwnAxiomsByClass(foam.core.Action).forEach(actionsMerger);
+                  obj.cls_.getAxiomsByClass(foam.core.Action).forEach(actionsMerger);
                   tableRowElement
                     .start()
                       .addClass(view.myClass('td')).
@@ -706,6 +711,11 @@ foam.CLASS({
                       }).
                     end();
                   tbodyElement.add(tableRowElement);
+
+                  // reset actions back to base state
+                  actions = {
+                    ...baseActions
+                  }
                 }
               });
 
