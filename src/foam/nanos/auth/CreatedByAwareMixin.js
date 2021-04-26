@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.auth',
-  name: 'CreatedByAware',
+  name: 'CreatedByAwareMixin',
 
   implements: [
     'foam.nanos.auth.CreatedByAware'
