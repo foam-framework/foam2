@@ -201,7 +201,7 @@ foam.CLASS({
     'foam.u2.tag.CircleIndicator'
   ],
 
-  imports: ['theme'],
+  imports: ['theme?'],
 
   properties: [
     'prop',
@@ -252,7 +252,7 @@ foam.CLASS({
                     this.start().addClass(self.myClass('helper-icon'))
                       .start('', { tooltip: self.LEARN_MORE })
                         .start(self.CircleIndicator, {
-                          icon: self.theme.glyphs.helpIcon.getDataUrl({ fill: self.theme.black }),
+                          icon: self.theme ? self.theme.glyphs.helpIcon.getDataUrl({ fill: self.theme.black }) : '/images/question-icon.svg',
                           size: 20
                         })
                           .on('click', () => { self.helpEnabled = ! self.helpEnabled; })
