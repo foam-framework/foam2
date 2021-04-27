@@ -30,9 +30,12 @@ foam.CLASS({
     }
 
     ^helper-icon {
+      cursor: pointer;
+      float: right;
       padding-left: 12px;
-      width: 20px;
-      height: 20px;
+      user-select: none; 
+      -moz-user-select: none; 
+      -webkit-user-select: none; 
     }
 
     ^tooltip {
@@ -47,33 +50,6 @@ foam.CLASS({
       height: auto;
       line-height: 1.5;
       margin-right: 3px;
-    }
-
-    ^helper-text {
-      background-color: rgba(0, 0, 0, 0.8);
-      color: #fff;
-      border-radius: 5px;
-      direction: ltr;
-      max-height: 106px;
-      margin-top: -16px;
-      overflow: hidden;
-    }
-
-    ^helper-text p {
-      padding: 0 16px;
-      margin: 16px 0;
-      margin-right: 8px; /* give right padding to scroll bar */
-      height: calc(100% - 32px); /* compensate for padding top and bottom */
-      overflow-y: auto;
-    }
-
-    ^helper-text p::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ^helper-text p::-webkit-scrollbar-thumb {
-      background-color: grey;
-      border-radius: 5px;
     }
 
     ^arrow-right {
@@ -99,7 +75,7 @@ foam.CLASS({
     ^ .foam-u2-tag-Select {
       width: 100%;
       box-shadow: none;
-      background: #ffffff url('/images/dropdown-icon.svg') no-repeat 99% 50%;
+      background: #ffffff url('/images/dropdown-icon.svg') no-repeat 98% 50%;
       -webkit-appearance: none;
       cursor: pointer;
     }
@@ -212,11 +188,6 @@ foam.CLASS({
       align-items: center;
     }
 
-    ^CheckBoxWrapper {
-      display: inline-flex;
-      align-items: center;
-      justify-content: flex-start;
-    }
   `,
 
   requires: [
@@ -225,11 +196,21 @@ foam.CLASS({
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
     'foam.u2.ControllerMode',
-    'foam.u2.DisplayMode'
+    'foam.u2.DisplayMode',
+    'foam.u2.borders.ExpandableBorder',
+    'foam.u2.tag.CircleIndicator'
   ],
 
+  imports: ['theme?'],
+
   properties: [
-    'prop'
+    'prop',
+    ['helpEnabled', false]
+  ],
+
+  messages: [
+    { name: 'HELP', message: 'Help' },
+    { name: 'LEARN_MORE', message: 'Click to learn more' }
   ],
 
   methods: [
@@ -250,59 +231,69 @@ foam.CLASS({
 
           return self.E()
             .addClass(this.myClass('wrapper'))
-            .start(self.Rows)
-              .callIf(prop$label, function() {
-                this.start('m3')
-                  .add(prop.label)
-                  .style({ 'line-height': '2' })
-                .end();
-              })
-              .start()
-                .style({ 'position': 'relative', 'display': 'inline-flex', 'width': '100%' })
-                .start()
-                
-                  .style({ 'flex-grow': 1, 'max-width': '100%' })
-                  .callIf( prop.view.class == 'foam.u2.CheckBox', function() {
-                    this.addClass(this.myClass('CheckBoxWrapper'));
-                  })
-                  .tag(prop, { mode$: self.mode$ })
-                  .callIf(prop.validationStyleEnabled, function() {
-                    this.enableClass(self.myClass('error'), errorSlot);
-                  })
-                .end()
-                .callIf(prop.help, function() {
-                  this.start('', { tooltip: prop.help })
-                    .start({class: 'foam.u2.tag.Image', data: '/images/question-icon.svg'})
-                      .addClass(self.myClass('helper-icon'))
-                    .end()
+            .start()
+              .start(self.Rows)
+                .callIf(prop$label, function() {
+                  this.start('m3')
+                    .add(prop.label)
+                    .style({ 'line-height': '2' })
                   .end();
                 })
-              .end()
-              .callIf(prop.validationTextVisible && ( mode === self.DisplayMode.RW || mode === self.DisplayMode.DISABLED ), function() {
-                this
+                .start()
+                  .style({ 'position': 'relative', 'display': 'flex', 'flex-wrap': 'wrap', 'width': '100%' })
                   .start()
-                    .style({ 'align-items': 'center' })
-                    .start(self.Cols)
-                      .addClass(self.myClass('validation-container'))
-                      .show(errorSlot)
-                      .start({
-                        class: 'foam.u2.tag.Image',
-                        data: '/images/inline-error-icon.svg',
-                        displayHeight: '16px',
-                        displayWidth: '16px'
-                      })
-                        .style({
-                          'justify-content': 'flex-start',
-                          'margin': '0 8px 0 0'
+                    .style({ 'flex-grow': 1, 'max-width': '100%' })
+                    .tag(prop, { mode$: self.mode$ })
+                    .callIf(prop.validationStyleEnabled, function() {
+                      this.enableClass(self.myClass('error'), errorSlot);
+                    })
+                  .end()
+                  .callIf(prop.help, function() {
+                    this.start().addClass(self.myClass('helper-icon'))
+                      .start('', { tooltip: self.LEARN_MORE })
+                        .start(self.CircleIndicator, {
+                          icon: self.theme ? self.theme.glyphs.helpIcon.getDataUrl({ fill: self.theme.black }) : '/images/question-icon.svg',
+                          size: 20
                         })
+                          .on('click', () => { self.helpEnabled = ! self.helpEnabled; })
+                        .end()
                       .end()
-                      .start()
-                        .style({ 'flex-grow': 1 })
-                        .add(errorSlot.map((s) => {
-                          return self.E().add(s);
-                        }))
+                    .end();
+                  })
+                .end()
+                .callIf(prop.validationTextVisible && ( mode === self.DisplayMode.RW || mode === self.DisplayMode.DISABLED ), function() {
+                  this
+                    .start()
+                      .style({ 'align-items': 'center' })
+                      .start(self.Cols)
+                        .addClass(self.myClass('validation-container'))
+                        .show(errorSlot)
+                        .start({
+                          class: 'foam.u2.tag.Image',
+                          data: '/images/inline-error-icon.svg',
+                          displayHeight: '16px',
+                          displayWidth: '16px'
+                        })
+                          .style({
+                            'justify-content': 'flex-start',
+                            margin: '0 8px 0 0'
+                          })
+                        .end()
+                        .start()
+                          .style({ 'flex-grow': 1 })
+                          .add(errorSlot.map(s => {
+                            return self.E().add(s);
+                          }))
+                        .end()
                       .end()
-                    .end()
+                    .end();
+                })
+              .end()
+              .callIf(prop.help, function() {
+                this
+                  .start(self.ExpandableBorder, { expanded$: self.helpEnabled$, title: self.HELP })
+                    .style({ 'flex-basis': '100%', 'margin-top': '8px', width: '100%' })
+                    .start('p').add(prop.help).end()
                   .end();
               })
             .end();

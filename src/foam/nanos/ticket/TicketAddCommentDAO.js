@@ -31,6 +31,7 @@ foam.CLASS({
       ((DAO) x.get("ticketCommentDAO")).put_(x, tc);
       ticket = (Ticket) ticket.fclone();
       ticket.setComment("");
+      ticket = (Ticket) getDelegate().put_(x, ticket);
     }
     return ticket;
       `

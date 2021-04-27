@@ -111,7 +111,7 @@ foam.CLASS({
         out.println("<link rel=\\"icon\\" type=\\"image/png\\" sizes=\\"32x32\\" href=\\"/favicon/favicon-32x32.png\\">");
         out.println("<link rel=\\"icon\\" type=\\"image/png\\" sizes=\\"16x16\\" href=\\"/favicon/favicon-16x16.png\\">");
         out.println("<link rel=\\"manifest\\" href=\\"/favicon/manifest.json\\">");
-        out.println("<link rel=\\"mask-icon\\" href=\\"/favicon/safari-pinned-tab.svg\\" color=\\"#5bbad5\\">");
+        out.println("<link rel=\\"mask-icon\\" href=\\"/favicon/safari-pinned-tab.svg\\" color=\\"#406dea\\">");
         out.println("<link rel=\\"shortcut icon\\" href=\\"/favicon/favicon.ico\\">");
         out.println("<meta name=\\"msapplication-config\\" content=\\"/favicon/browserconfig.xml\\">");
         out.println("<meta name=\\"theme-color\\" content=\\"#ffffff\\">");

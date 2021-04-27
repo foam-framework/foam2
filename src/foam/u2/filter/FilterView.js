@@ -292,7 +292,9 @@ foam.CLASS({
       var self = this;
 
       var counter = 0;
-      this.updateCurrentMemento(counter);
+      counter = this.updateCurrentMementoAndReturnCounter(counter);
+
+      counter = this.filters.length;
       //memento which will be exported to table view
       if ( self.currentMemento_ ) self.currentMemento_ = self.currentMemento_.tail;
       
@@ -301,7 +303,7 @@ foam.CLASS({
       this.addClass(self.myClass())
         .add(this.slot(function(filters) {
 
-          self.updateCurrentMemento.bind(self)(counter);
+          counter = self.updateCurrentMementoAndReturnCounter.call(self, counter);
 
           self.generalSearchField = foam.u2.ViewSpec.createView(self.TextSearchView, {
             richSearch: true,
@@ -474,7 +476,7 @@ foam.CLASS({
       }
     },
 
-    function updateCurrentMemento(counter) {
+    function updateCurrentMementoAndReturnCounter() {
       if ( this.memento ) {
         var m = this.memento;
         //i + 1 as there is a textSearch that we also need for memento
@@ -493,7 +495,7 @@ foam.CLASS({
 
       if ( this.currentMemento_ && this.currentMemento_.tail ) {
         var m = this.memento;
-        counter = 0;
+        var counter = 0;
 
         while ( counter < this.filters.length &&  m != null ) {
           m = m.tail;
@@ -504,6 +506,7 @@ foam.CLASS({
             continue;
         }
       }
+      return counter;
     }
   ]
 });

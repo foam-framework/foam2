@@ -13,6 +13,9 @@ foam.CLASS({
   properties: [
     {
       name: 'value'
+    },
+    {
+      name: 'feedback_'
     }
   ],
 
@@ -28,10 +31,22 @@ foam.CLASS({
 
   listeners: [
     function onPopState() {
+      if ( this.feedback_ ) return;
+      
+      this.feedback_ = true;
       this.value = this.window.location.hash.substr(1);
+      this.feedback_ = false;
     },
-    function onValueChange() {
-      this.window.location.hash = this.value;
+    {
+      name: 'onValueChange',
+      isFramed: true,
+      code: function() {
+        if ( this.feedback_ ) return;
+
+        this.feedback_ = true;
+        this.window.location.hash = this.value;
+        this.feedback_ = false;
+      }
     }
   ]
 });

@@ -426,7 +426,7 @@ foam.CLASS({
         // Second highest precedence: If one user is acting as another, return the
         // group on the junction between them.
         if ( user != null ) {
-          if ( agent != null && agent != user ) {
+          if ( agent != null && agent.getId() != user.getId() ) {
             DAO agentJunctionDAO = (DAO) x.get("agentJunctionDAO");
             UserUserJunction junction = (UserUserJunction) agentJunctionDAO.find(
               AND(

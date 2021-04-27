@@ -126,25 +126,26 @@ foam.CLASS({
     }
 
     ^disabled-button-container>button {
-      background-color: white!important;
-      color: grey;
-      border-color: white!important;
-      box-shadow: none!important;
+      background-color: /*%WHITE%*/ #FFFFFF;
+      color: /*%GREY4%*/ grey;
+      justify-content: flex-start;
+      text-align: left;
+      white-space: nowrap;
+      width: fill-available;
+      width: -webkit-fill-available;
     }
 
     ^button-container>button {
-      background-color: white!important;
-      color: /*%BLACK%*/ #1e1f21;
-      border-color: white!important;
-      box-shadow: none!important;
+      background-color: /*%WHITE%*/ #FFFFFF;
+      justify-content: flex-start;
+      text-align: left;
+      white-space: nowrap;
+      width: fill-available;
+      width: -webkit-fill-available;
     }
 
     ^button-container>button:hover {
-      border-color: white!important;
-    }
-
-    ^disabled-button-container>button:hover {
-      border-color: white!important;
+      background-color: /*%PRIMARY5%*/ #E5F1FC;
     }
   `,
 
@@ -197,7 +198,7 @@ foam.CLASS({
         this
             .start()
               .addClass(action.createIsEnabled$(self.__context__, self.obj).map( e => e ? self.myClass('button-container') : self.myClass('disabled-button-container')))
-              .add(action)
+              .tag(action, { buttonStyle: 'UNSTYLED' })
               .attrs({
                 disabled: action.createIsEnabled$(self.__context__, self.obj).map(function(e) {
                   return ! e;

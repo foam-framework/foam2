@@ -93,7 +93,7 @@ foam.CLASS({
               var crunchService = (CrunchService) x.get("crunchService");
               var payloadDAO = (DAO) capableNewObj.getCapablePayloadDAO(x);
 
-              List<String> prereqIdsList = crunchService.getPrereqs(newCapablePayload.getCapability());
+              List<String> prereqIdsList = crunchService.getPrereqs(x, newCapablePayload.getCapability(), null);
 
               if ( prereqIdsList != null && prereqIdsList.size() > 0 ) {
                 String[] prereqIds = prereqIdsList.toArray(new String[prereqIdsList.size()]);

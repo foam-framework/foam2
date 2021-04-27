@@ -75,11 +75,14 @@ foam.CLASS({
       cursor: pointer;
     }
 
+    /* Unstyled */
+    ^unstyled {
+      background-color: none;
+      border: none;
+      color: inherit;
+    }
 
-    /*
-     * Primary
-     */
-
+    /* Primary */
     ^primary {
       background-color: /*%PRIMARY3%*/ #406dea;
       border-color: /*%SECONDARY1%*/ #4a33f4;
@@ -104,9 +107,7 @@ foam.CLASS({
       border: 1px solid /*%PRIMARY4%*/ #a7beff;
     }
 
-    /*
-     * Primary destructive
-     */
+    /* Primary destructive */
 
     ^primary-destructive {
       background-color: /*%DESTRUCTIVE3%*/ #d9170e;
@@ -131,9 +132,7 @@ foam.CLASS({
     }
 
 
-    /*
-     * Secondary
-     */
+    /* Secondary */
 
     ^secondary {
       background-color: white;
@@ -161,9 +160,7 @@ foam.CLASS({
     }
 
 
-    /*
-     * Secondary destructive
-     */
+    /* Secondary destructive */
 
     ^secondary-destructive {
       background-color: white;
@@ -183,9 +180,7 @@ foam.CLASS({
     }
 
 
-    /*
-     * Tertiary
-     */
+    /* Tertiary */
 
     ^tertiary {
       background: none;
@@ -211,9 +206,7 @@ foam.CLASS({
     }
 
 
-    /*
-     * Tertiary destructive
-     */
+    /* Tertiary destructive */
 
     ^tertiary-destructive {
       background-color: transparent;
@@ -235,9 +228,7 @@ foam.CLASS({
     }
 
 
-    /*
-     * Sizes
-     */
+    /* Sizes */
 
     ^small {
       font-size: 10px;
@@ -317,7 +308,7 @@ foam.CLASS({
     },
     {
       name: 'buttonState',
-      factory: function() { return this.action && this.action.confirmationRequired ? this.ButtonState.CONFIRM : this.ButtonState.NO_CONFIRM; }
+      factory: function() { return this.ButtonState.NO_CONFIRM; }
     },
     {
       name: 'data',
@@ -346,7 +337,7 @@ foam.CLASS({
         that data is deleted in some way.
       `,
       factory: function() {
-        return this.action.confirmationRequired;
+        return false;
       }
     },
     {
@@ -378,12 +369,19 @@ foam.CLASS({
       this.addContent();
 
       if ( this.action ) {
+        if ( this.action.confirmationRequired ) {
+          var cRSlot$ = this.action.createConfirmationRequired$(this.__context__, this.data);
+          this.onDetach(cRSlot$.sub(() => this.setConfirm(cRSlot$.get())));
+          this.setConfirm(cRSlot$.get());
+        }
         this.attrs({name: this.action.name, 'aria-label': this.action.ariaLabel });
 
         this.enableClass(this.myClass('unavailable'), this.action.createIsAvailable$(this.__context__, this.data), true);
         this.attrs({ disabled: this.action.createIsEnabled$(this.__context__, this.data).map((e) => e ? false : 'disabled') });
 
-        this.addClass(this.myClass(this.styleClass_));
+        this.addClass(this.slot(function(styleClass_) {
+          return this.myClass(styleClass_);
+        }));
         this.addClass(this.myClass(this.size.label.toLowerCase()));
       }
     },
@@ -460,6 +458,19 @@ foam.CLASS({
         this.removeAllChildren();
         this.addContent();
         this.buttonState = this.ButtonState.CONFIRM;
+      }
+    },
+    {
+      name: 'setConfirm',
+      code: function(confirm) {
+        let newState = confirm ? this.ButtonState.CONFIRM : this.ButtonState.NO_CONFIRM;
+        let stateChange = this.buttonState != newState;
+        this.buttonState = newState;
+        this.isDestructive = confirm;
+        if ( stateChange ) {
+          this.removeAllChildren();
+          this.addContent();
+        }
       }
     }
   ]

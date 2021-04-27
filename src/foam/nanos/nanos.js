@@ -114,6 +114,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/Subject" },
   { name: "foam/nanos/auth/PriorPassword" },
   { name: "foam/nanos/auth/ruler/AddPasswordHistoryAction" },
+  { name: "foam/nanos/auth/ruler/PreventDuplicateEmailAction" },
   { name: "foam/nanos/auth/ruler/PreventDuplicateUsernameAction" },
   { name: "foam/nanos/auth/ruler/EnsurePropertyOnCreateRule" },
   { name: "foam/nanos/auth/test/PasswordPolicyTest" },
@@ -131,6 +132,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/UserQueryService" },
   { name: "foam/nanos/auth/SimpleUserQueryService" },
   { name: "foam/nanos/auth/ExtendedConfigurableAuthorizer" },
+  { name: "foam/nanos/auth/AssignableAware" },
   { name: "foam/nanos/theme/Theme" },
   { name: "foam/nanos/theme/ThemeGlyphs" },
   { name: "foam/nanos/theme/ThemeDomain" },
@@ -423,6 +425,7 @@ FOAM_FILES([
   { name: "foam/nanos/ruler/predicate/PropertyEQValue" },
   { name: "foam/nanos/ruler/predicate/PropertyNEQValue" },
   { name: "foam/nanos/ruler/predicate/NewEqOld" },
+  { name: "foam/nanos/ruler/predicate/IsClassPredicate" },
   { name: "foam/nanos/ruler/predicate/IsInstancePredicate" },
   { name: "foam/nanos/ruler/predicate/PropertyIsInstance" },
   { name: "foam/nanos/ruler/predicate/PropertyIsClass" },
@@ -478,6 +481,7 @@ FOAM_FILES([
   //daos
   { name: "foam/nanos/crunch/UserCapabilityJunctionDAO" },
   { name: "foam/nanos/crunch/connection/CapabilityPayloadDAO" },
+  { name: "foam/nanos/crunch/PredicatedPrerequisiteCapabilityJunctionDAO" },
   //rules
   { name: "foam/nanos/crunch/SendNotificationOnTopLevelCapabilityStatusUpdate" },
   { name: "foam/nanos/crunch/IsUserCapabilityJunctionStatusUpdate" },
@@ -540,6 +544,7 @@ FOAM_FILES([
   { name: 'foam/nanos/approval/FulfilledNestedJournalApprovablePredicate' },
   { name: 'foam/nanos/approval/FulfilledApprovableRule' },
   { name: 'foam/nanos/approval/PopulateApprovalRequestsDAO' },
+  { name: 'foam/nanos/approval/ApprovalRequestAssignedToRule' },
 
   //authservice
   { name: "foam/nanos/auth/CapabilityAuthService" },

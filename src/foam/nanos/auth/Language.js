@@ -13,40 +13,43 @@ foam.CLASS({
     'foam.nanos.auth.EnabledAware'
   ],
 
-  ids: [ 'code', 'variant' ],
+  ids: [
+    'code',
+    'variant'
+  ],
 
   properties: [
     {
-      class: "String",
-      name: "code"
+      class: 'String',
+      name: 'code'
     },
     {
-      class: "String",
-      name: "name"
+      class: 'String',
+      name: 'name'
     },
     {
       class: 'String',
       name: 'nativeName',
       factory: function() {
-        return this.name
+        return this.name;
       }
     },
     {
-      class: "Boolean",
-      name: "enabled",
+      class: 'Boolean',
+      name: 'enabled',
       value: true
     },
     {
-      class: "String",
-      name: "variant",
-      value: ""
+      class: 'String',
+      name: 'variant',
+      value: ''
     }
   ],
   methods: [
     {
       name: 'toString',
       code: function() {
-        return this.variant === "" ? this.code : this.code + "-" + this.variant
+        return this.variant === '' ? this.code : this.code + '-' + this.variant;
       },
       javaCode: `
         return "".equals(getVariant()) ? getCode() : getCode() + "-" + getVariant();

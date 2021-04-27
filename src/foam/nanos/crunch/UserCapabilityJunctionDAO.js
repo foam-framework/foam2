@@ -28,6 +28,19 @@ foam.CLASS({
     { name: 'ERROR_CAPABILITY_NOT_FOUND', message: 'Capability not found ' }
   ],
 
+  constants: [
+    {
+      name: 'TARGET_CAPABILITY_ID_CHANGE',
+      type: 'String',
+      value: 'usercapabilityjunction.update.targetid'
+    },
+    {
+      name: 'SOURCE_CAPABILITY_ID_CHANGE',
+      type: 'String',
+      value: 'usercapabilityjunction.update.sourceid'
+    }
+  ],
+
   methods: [
     {
       name: 'checkOwnership',
@@ -66,7 +79,7 @@ foam.CLASS({
       Subject subject = (Subject) x.get("subject");
       User user = (User) subject.getUser();
       User realUser = (User) subject.getRealUser();
-      
+
       AuthService auth = (AuthService) x.get("auth");
       if ( auth.check(x, "*") ) return getDelegate();
       return getDelegate().where(
@@ -74,7 +87,7 @@ foam.CLASS({
           EQ(UserCapabilityJunction.SOURCE_ID, user.getId()),
           EQ(UserCapabilityJunction.SOURCE_ID, realUser.getId())
         )
-      ); 
+      );
       `
     },
     {
@@ -111,8 +124,9 @@ foam.CLASS({
         UserCapabilityJunction old = (UserCapabilityJunction) super.find_(x, ucj.getId());
 
         // do not allow updates to sourceId/targetId properties
-        if ( old != null && ucj.getSourceId() != old.getSourceId() ) throw new RuntimeException(this.ERROR_TWO);
-        if ( old != null && ! ucj.getTargetId().equals(old.getTargetId()) ) throw new RuntimeException(this.ERROR_THREE);
+        AuthService auth = (AuthService) x.get("auth");
+        if ( old != null && ucj.getSourceId() != old.getSourceId() && ! auth.check(x, SOURCE_CAPABILITY_ID_CHANGE) ) throw new RuntimeException(this.ERROR_TWO);
+        if ( old != null && ! ucj.getTargetId().equals(old.getTargetId()) && ! auth.check(x, TARGET_CAPABILITY_ID_CHANGE) ) throw new RuntimeException(this.ERROR_THREE);
 
         // if ucj data is set but does not match expected data, do not put
         Capability capability = (Capability) ucj.findTargetId(x);

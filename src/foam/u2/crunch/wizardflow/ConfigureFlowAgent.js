@@ -15,7 +15,8 @@ foam.CLASS({
 
   exports: [
     'pushView',
-    'popView'
+    'popView',
+    'wizardCloseSub'
   ],
 
   requires: [
@@ -23,6 +24,14 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      class: 'FObjectProperty',
+      name: 'wizardCloseSub',
+      of: 'foam.core.FObject',
+      factory: function() {
+        return foam.core.FObject.create();
+      }
+    },
     {
       name: 'popupMode',
       class: 'Boolean',

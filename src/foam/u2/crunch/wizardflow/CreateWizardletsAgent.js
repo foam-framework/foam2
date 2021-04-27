@@ -24,7 +24,8 @@ foam.CLASS({
   requires: [
     'foam.nanos.crunch.MinMaxCapability',
     'foam.nanos.crunch.ui.CapableWAO',
-    'foam.nanos.crunch.ui.PrerequisiteAwareWizardlet'
+    'foam.nanos.crunch.ui.PrerequisiteAwareWizardlet',
+    'foam.u2.wizard.ProxyWAO'
   ],
 
   properties: [
@@ -91,10 +92,22 @@ foam.CLASS({
     },
     function getWizardlet(capability, isBefore) {
         let wizardlet = capability[isBefore ? 'beforeWizardlet' : 'wizardlet'];
-        return wizardlet && wizardlet.clone(this.__subContext__).copyFrom({
-          capability: capability,
-          wao: this.getWAO()
-        });
+        if ( ! wizardlet ) return null;
+        wizardlet = wizardlet.clone(this.__subContext__);
+
+        // TODO: check if there are still models dependiing on this behaviour
+        wizardlet.copyFrom({ capability: capability });
+
+        var wao = wizardlet.wao;
+        while ( this.ProxyWAO.isInstance(wao) ) {
+          // If there's already something at the end, don't replace it
+          if ( wao.delegate && ! this.ProxyWAO.isInstance(wao.delegate) ) break;
+          if ( ! wao.delegate ) {
+            wao.delegate = this.getWAO();
+          }
+        }
+
+        return wizardlet;
     },
     function isPrerequisiteAware(wizardlet) {
       return this.PrerequisiteAwareWizardlet.isInstance(wizardlet);

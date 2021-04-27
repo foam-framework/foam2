@@ -17,13 +17,16 @@
 
 foam.CLASS({
   package: 'foam.nanos.crunch',
-  name: 'MinMaxCapabilityData', 
-  
+  name: 'MinMaxCapabilityData',
+  mixins: ['foam.u2.wizard.AbstractWizardletAware'],
+
   documentation: `
     A model for the data store on MinMaxCapability
   `,
 
-  properties: [  
+  properties: [
+    // TODO: Why isn't this working?
+    ['customUpdateSlot', true],
     {
       name: 'selectedData',
       class: 'StringArray',
@@ -31,6 +34,29 @@ foam.CLASS({
         return [];
       },
       javaFactory: 'return new String[0];',
+      postSet: function (o, n) {
+        if ( ! foam.util.equals(o, n) ) {
+          this.selectedDataStable = n;
+        }
+      }
+    },
+    {
+      name: 'selectedDataStable',
+      documentation: 'A more stable array property for wizard updates',
+      class: 'StringArray'
     }
   ],
+
+  methods: [
+    function init () {
+      // TODO: Why is this needed?
+      this.customUpdateSlot = true;
+    },
+    {
+      name: 'getUpdateSlot',
+      code: function (helpers) {
+        return this.selectedDataStable$;
+      }
+    }
+  ]
 });

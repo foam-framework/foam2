@@ -258,7 +258,7 @@
             config$: this.config$,
             of: this.data.of
           }, this.__subContext__.createSubContext({ memento: this.table_.memento }));
-        } else {
+        } else if ( this.table_.memento.tail.tail && this.table_.memento.tail.tail.head ) {
           var id = this.table_.memento.tail.tail.head;
           if ( ! foam.core.MultiPartID.isInstance(this.data.of.ID) ) {
             id = this.data.of.ID.fromString(id);

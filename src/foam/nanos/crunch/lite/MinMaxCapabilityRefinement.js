@@ -42,7 +42,7 @@ foam.CLASS({
       `,
       javaCode: `
         CrunchService crunchService = (CrunchService) x.get("crunchService");
-        List<String> prereqCapIds = crunchService.getPrereqs(getId());
+        List<String> prereqCapIds = crunchService.getPrereqs(x, getId(), null);
 
         int numberGranted = 0;
         int numberPending = 0;
