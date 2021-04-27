@@ -127,7 +127,7 @@ foam.CLASS({
             this.add(self.DebugAgent)
           })
           .add(this.StepWizardAgent)
-          .add(this.PutFinalPayloadsAgent)
+          .add(this.SaveAllAgent)
           .add(this.DetachAgent)
           .add(this.CapabilityStoreAgent)
           // .add(this.TestAgent)
