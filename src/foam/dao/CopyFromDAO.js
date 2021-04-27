@@ -120,7 +120,7 @@ foam.CLASS({
           if ( ofObject.isPropertySet("id") ) {
             delegateObject = (FObject) getDelegate().find(obj.getProperty("id"));
             delegateObject = delegateObject.copyFrom(ofObject);
-          }else {
+          } else {
             delegateObject = (FObject) getTo().newInstance();
             delegateObject = delegateObject.copyFrom(ofObject);
             //TODO the id should be undefined, that it will be set automatically
