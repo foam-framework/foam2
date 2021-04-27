@@ -42,11 +42,7 @@ foam.CLASS({
           })
         .end();
       this.ctrl.add(popup);
-      this.onDetach({
-        detach: () => {
-          popup.close();
-        }
-      });
+      this.onDetach(popup.close.bind(popup));
     }
   ]
 });
