@@ -165,6 +165,8 @@ foam.CLASS({
         this.currentMemento_$ = this.memento.tail$;
 
       var hasTabs = false;
+      self.start().addClass(self.myClass('title')).add(self.title$).end();
+
       this.add(this.slot(function(of, properties, actions) {
         if ( ! of ) return '';
 
@@ -174,8 +176,6 @@ foam.CLASS({
         // to data causes views and actions from the old class to get
         // bound to data of a new class, which causes problems.
         self.currentData = self.data;
-
-        self.start().addClass(self.myClass('title')).add(self.title$).end();
 
         var tabs = foam.u2.Tabs.create({}, self);
 
