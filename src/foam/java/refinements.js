@@ -1614,6 +1614,26 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.java',
+  name: 'FormattedStringJavaRefinement',
+  refines: 'foam.core.FormattedString',
+  flags: ['java'],
+
+  properties: [
+    {
+      name: 'javaSetter',
+      factory: () => {
+        return `
+          assertNotFrozen();
+          val = val.replaceAll("[^\\\\\d]", "");
+          ${this.name}_ = val;
+          ${this.name}IsSet_ = true;`;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
   name: 'FObjectPropertyJavaRefinement',
   refines: 'foam.core.FObjectProperty',
   flags: ['java'],
