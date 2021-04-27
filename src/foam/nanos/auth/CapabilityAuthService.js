@@ -97,12 +97,18 @@ foam.CLASS({
           AbstractPredicate predicate = new AbstractPredicate(x) {
             @Override
             public boolean f(Object obj) {
+              Logger logger = (Logger) x.get("logger");
               UserCapabilityJunction ucj = (UserCapabilityJunction) obj;
               if ( ucj.getStatus() == CapabilityJunctionStatus.GRANTED ) {
                 Capability c = (Capability) capabilityDAO.find(ucj.getTargetId());
-                c.setX(x);
-                if ( c != null && ! c.isDeprecated(x) && c.grantsPermission(permission) ) {
-                  return true;
+                if ( c != null &&
+                    ! c.isDeprecated(x) ) {
+                  c.setX(x);
+                  if ( c.grantsPermission(permission) ) {
+                   return true;
+                  }
+                } else if ( c == null ) {
+                  logger.warning(this.getClass().getSimpleName(), "capabilityCheck", "targetId not found", ucj);
                 }
               }
               return false;
