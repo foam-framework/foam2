@@ -694,26 +694,18 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.IncrementalStepWi
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.IncrementalStepWizardView.DISMISS_MSG",target:"Tem certeza de que deseja sair desta tela?"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.IncrementalStepWizardView.CONTINUE_MSG",target:"Volte"})
 
-/** DAOBrowserView **/
+/* DAO Browser View */
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.comics.v2.DAOBrowserView.REFRESH_MSG",target:"Atualização solicitada ..."})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.comics.v2.DAOBrowserView.REFRESH_TABLE.toolTip",target:"Tabela de atualização"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.comics.v2.DAOBrowserView.EXPORT.toolTip",target:"Exportar dados da tabela"})
 
-/** Report Script **/
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.script.Script.ID.label",target:"ID"})
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.script.Script.NAME.label",target:"Nome"})
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.script.Script.DESCRIPTION.label",target:"Descrição"})
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.script.Script.LAST_DURATION.label",target:"Última duração"})
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.script.Script.LAST_RUN.label",target:"Última corrida"})
-p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.script.Script.STATUS.label",target:"Status"})
-
-/** ScriptStatus **/
+/* Script Status */
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.script.ScriptStatus.SCHEDULED.label",target:"Agendado"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.script.ScriptStatus.UNSCHEDULED.label",target:"Não programado"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.script.ScriptStatus.RUNNING.label",target:"Operativo"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.script.ScriptStatus.ERROR.label",target:"Erro"})
 
-/** Countries **/
+/* Countries */
 p({class:"foam.i18n.Locale",locale:"pt",source:"Austria.name",target:"Áustria"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"Belgium.name",target:"Bélgica"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"Brazil.name",target:"Brasil"})
