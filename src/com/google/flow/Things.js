@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'com.google.flow',
   name: 'Clock',
-  extends: 'com.google.foam.demos.clock.Clock',
+  extends: 'foam.demos.clock.Clock',
   implements: [ 'foam.physics.Physical' ],
   properties: [
     [ 'gravity', 1 ],
