@@ -1617,6 +1617,10 @@ foam.CLASS({
   name: 'FormattedStringJavaRefinement',
   refines: 'foam.core.FormattedString',
   flags: ['java'],
+  documentation: `
+    Override setter for formattedstrings so that we only store the unformatted data
+    TODO: Add the ability to get a formatted version of the data 
+  `,  
 
   properties: [
     {
