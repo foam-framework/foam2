@@ -124,7 +124,7 @@ foam.CLASS({
             delegateObject = (FObject) getTo().newInstance();
             delegateObject = delegateObject.copyFrom(ofObject);
             //TODO the id should be undefined, that it will be set automatically
-            delegateObject.setProperty("id", new Long(0));
+            delegateObject.setProperty("id", null);
           }
         } catch ( Exception ex ) {
           throw new RuntimeException("Cannot adapt to delegate: " + ex.getMessage(), ex);
