@@ -157,30 +157,9 @@ foam.CLASS({
               isRenewable => this.isRenewable = isRenewable
             );
           }
-          if ( this.cjStatus === this.CapabilityJunctionStatus.ACTION_REQUIRED ) {
-            this.auth.check(this.ctrl.__subContext__, 'certifydatareviewed.rw.reviewed').then(result => {
-              if ( ! result &&
-                ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-49' ||
-                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-13' ||
-                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-12' ||
-                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-11'
-                ) ) {
-                this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
-              }
-            }).catch(err => {
-              if ( err.data && err.data.id === 'foam.nanos.crunch.CapabilityIntercept' &&
-                ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-49' ||
-                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-13' ||
-                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-12' ||
-                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-11'
-                ) ) {
-                this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
-              } else throw err;
-            });
-
-            if ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-20' ) {
+          if ( this.cjStatus === this.CapabilityJunctionStatus.ACTION_REQUIRED &&
+               ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-20') {
               this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
-            }
           }
         });
       }
