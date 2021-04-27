@@ -668,11 +668,11 @@ foam.LIB({
       };
     })(),
     function applyFormat(string, formatString, placeholder, escapeChar) {
-      placeholder = placeholder || 'x';
-      escapeChar = escapeChar || '\\';
+      placeholder   = placeholder || 'x';
+      escapeChar    = escapeChar  || '\\';
       var newString = '';
-      var escaping = false;
-      var safe = true;
+      var escaping  = false;
+      var safe      = true;
       formatString.split('').forEach(chr => {
         if ( escaping ) {
           newString += chr;
@@ -693,10 +693,9 @@ foam.LIB({
           return;
         }
         newString += chr;
-      })
+      });
       safe = safe && string.length == 0;
-      if ( ! safe ) console.warn(
-        'performed foam.String.applyMask with unsafe inputs');
+      if ( ! safe ) console.warn('performed foam.String.applyMask with unsafe inputs');
       return newString;
     }
   ]
