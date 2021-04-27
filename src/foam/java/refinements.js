@@ -1628,6 +1628,7 @@ foam.CLASS({
       factory: function() {
         return `
           assertNotFrozen();
+          // remove all non-numeric characters
           val = val.replaceAll("[^\\\\\d]", "");
           ${this.name}_ = val;
           ${this.name}IsSet_ = true;`;

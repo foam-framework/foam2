@@ -115,7 +115,11 @@ foam.CLASS({
   properties: [
     {
       name:'formatter',
-      value:[]
+      value:[],
+      documentation: `
+        An array of integers and strings of delimiters used to format the property
+        where integer values represent number of digits at its location
+      `
     }
   ]
 });
