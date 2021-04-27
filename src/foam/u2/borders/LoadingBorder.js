@@ -25,10 +25,6 @@ foam.CLASS({
   name: 'LoadingBorder',
   extends: 'foam.u2.Element',
 
-  imports: [
-    'theme'
-  ],
-
   requires: [
     'foam.u2.LoadingSpinner',
     'foam.u2.borders.LoadingLevel'
@@ -61,21 +57,18 @@ foam.CLASS({
       transition: all 200ms ease-out;
     }
     ^container {
-      position: sticky;
-      top: 15pt;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       height: 32pt;
       padding: 15pt;
-      background-color: /*%WHITE%*/ #fff;
-      border: 1pt solid %GREY3%;
-      border-right: none;
       transition: all 200ms ease-out;
-      margin-left: calc(100% - 62pt);
-      border-radius: 8pt 0 0 8pt;
     }
     ^overlay .foam-u2-LoadingSpinner {
       display: inline-block;
       width: 32pt;
-      height: 32pt
+      height: 32pt;
 
       /* ease-out animation makes things feel stable */
       transition: all 200ms ease-out;
@@ -118,18 +111,16 @@ foam.CLASS({
         .start()
           .addClass(this.myClass('overlay'))
           .addClass(this.loadingLevel$.map(v => this.myClass(v.name.toLowerCase())))
-          .start()
-            .addClass(this.myClass('container'))
-            .tag(this.LoadingSpinner, {
-              imagePath: this.theme.glyphs.spinner.getDataUrl({
-                fill: this.theme.primary3
-              })
-            })
-            .start()
-              .addClass(this.myClass('message'))
-              .add(this.MESSAGE)
-            .end()
-          .end()
+          .add(this.slot(loadingLevel=> {
+            return loadingLevel != this.LoadingLevel.IDLE ? this.E().start()
+              .addClass(this.myClass('container'))
+              .tag(this.LoadingSpinner)
+              .start()
+                .addClass(this.myClass('message'))
+                .add(this.MESSAGE)
+              .end()
+            .end() : this.E();
+          }))
         .end()
         .start('div', null, this.content$)
           .on('keypress', this.onKey)
