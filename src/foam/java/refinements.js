@@ -1625,7 +1625,7 @@ foam.CLASS({
   properties: [
     {
       name: 'javaSetter',
-      factory: () => {
+      factory: function() {
         return `
           assertNotFrozen();
           val = val.replaceAll("[^\\\\\d]", "");
