@@ -106,6 +106,20 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'FormattedString',
+  extends: 'String',
+  documentation: 'A delimiter separated string of digits',
+
+  properties: [
+    {
+      name:'formatter',
+      value:[]
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.core',
