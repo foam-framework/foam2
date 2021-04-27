@@ -17,7 +17,7 @@ foam.CLASS({
     'wizardlets',
     'rootCapability'
   ],
-  
+
   properties: [
     {
       class: 'Function',

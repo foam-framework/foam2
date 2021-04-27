@@ -13,7 +13,8 @@
   `,
 
   imports: [
-    'wizardCloseSub'
+    'wizardCloseSub',
+    'spinnerAgent?'
   ],
 
   implements: [

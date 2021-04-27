@@ -55,6 +55,8 @@ foam.CLASS({
     'foam.u2.crunch.wizardflow.SaveAllAgent',
     'foam.u2.crunch.wizardflow.CapabilityStoreAgent',
     'foam.u2.crunch.wizardflow.DebugContextInterceptAgent',
+    'foam.u2.crunch.wizardflow.SpinnerAgent',
+    'foam.u2.crunch.wizardflow.DetachSpinnerAgent',
     'foam.u2.crunch.wizardflow.DebugAgent',
     'foam.util.async.Sequence',
     'foam.u2.borders.MarginBorder',
@@ -127,8 +129,10 @@ foam.CLASS({
             this.add(self.DebugAgent)
           })
           .add(this.StepWizardAgent)
-          .add(this.SaveAllAgent)
           .add(this.DetachAgent)
+          .add(this.SpinnerAgent)
+          .add(this.SaveAllAgent)
+          .add(this.DetachSpinnerAgent)
           .add(this.CapabilityStoreAgent)
           // .add(this.TestAgent)
           ;
