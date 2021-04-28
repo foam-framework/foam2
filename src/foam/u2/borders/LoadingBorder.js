@@ -61,15 +61,10 @@ foam.CLASS({
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      height: 32pt;
       padding: 15pt;
       transition: all 200ms ease-out;
     }
     ^overlay .foam-u2-LoadingSpinner {
-      display: inline-block;
-      width: 32pt;
-      height: 32pt;
-
       /* ease-out animation makes things feel stable */
       transition: all 200ms ease-out;
     }
@@ -106,6 +101,7 @@ foam.CLASS({
 
   methods: [
     function init() {
+      var self = this;
       this
         .addClass(this.myClass())
         .start()
@@ -114,7 +110,7 @@ foam.CLASS({
           .add(this.slot(loadingLevel=> {
             return loadingLevel != this.LoadingLevel.IDLE ? this.E().start()
               .addClass(this.myClass('container'))
-              .tag(this.LoadingSpinner)
+              .tag(this.LoadingSpinner, { size: 32 })
               .start()
                 .addClass(this.myClass('message'))
                 .add(this.MESSAGE)

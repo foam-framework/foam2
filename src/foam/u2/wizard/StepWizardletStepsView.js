@@ -288,7 +288,10 @@ foam.CLASS({
   listeners: [
     {
       name: 'setScrollPos',
+      isFramed: true,
       code: function() {
+        if ( this.state == this.UNLOADED ) return;
+        if ( this.state != this.LOADED ) { this.setScrollPos(); return; }
         let currI = 0;
         for ( let w = 0 ; w < this.data.wizardlets.length ; w++ ) {
           let wizardlet = this.data.wizardlets[w];
