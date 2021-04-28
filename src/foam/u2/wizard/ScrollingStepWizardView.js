@@ -16,7 +16,11 @@ foam.CLASS({
   messages: [
     { name: 'NO_ACTION_LABEL', message: 'Done' },
     { name: 'SAVE_LABEL', message: 'Save' },
-    { name: 'REJECT_LABEL', message: 'Reject' }
+    { name: 'REJECT_LABEL', message: 'Reject' },
+    {
+      name: 'NETWORK_FALURE_MESSAGE',
+      message: 'There is a problem connecting to the server. Please wait.'
+    }
   ],
 
   requires: [
@@ -74,6 +78,21 @@ foam.CLASS({
     ^heading {
       display: flex;
       align-items: center;
+    }
+
+    ^network-failure-banner {
+      position: sticky;
+      top: 0;
+      background-color: %DESTRUCTIVE2%f0;
+      color: %WHITE%;
+      height: 30px;
+      font-size: 18px;
+      line-height: 30px;
+      text-align: center;
+      z-index: 1000;
+      padding: 15px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
     }
   `,
 
@@ -148,7 +167,7 @@ foam.CLASS({
       name: 'willReject',
       documentation: `
         Used to put submit button in confirmationRequired mode and change the
-        button test from 'Done' to 'Reject' when in approvalMode and the wizard 
+        button test from 'Done' to 'Reject' when in approvalMode and the wizard
         has at least on invalid wizardlet.
       `,
       expression: function( data$config$approvalMode, data$allValid ) {
@@ -204,6 +223,13 @@ foam.CLASS({
               .addClass(this.myClass('mainView'))
               // TODO: deprecate this hide-X-entry class
               .addClass(this.hideX ? this.myClass('hide-X-entry') : this.myClass('entry'))
+              .add(this.slot(function (data$someFailures) {
+                return data$someFailures
+                  ? this.E()
+                    .addClass(this.myClass('network-failure-banner'))
+                    .add(this.NETWORK_FALURE_MESSAGE)
+                  : this.E();
+              }))
               .add(this.slot(function (data$wizardlets) {
                 return self.renderWizardlets(this.E(), data$wizardlets);
               }))
@@ -297,7 +323,8 @@ foam.CLASS({
       confirmationRequired: function(willReject) {
         return willReject;
       },
-      isEnabled: function (data$config, data$allValid) {
+      isEnabled: function (data$config, data$allValid, data$someFailures) {
+        if ( data$someFailures ) return false;
         return ! data$config.requireAll || data$allValid;
       },
       code: function (x) {

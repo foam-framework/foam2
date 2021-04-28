@@ -16,6 +16,9 @@ foam.ENUM({
     },
     {
       name: 'SAVING'
+    },
+    {
+      name: 'NETWORK_FAILURE'
     }
   ]
 });
