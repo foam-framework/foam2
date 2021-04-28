@@ -20,11 +20,6 @@ foam.CLASS({
       grid-template-columns: repeat(auto-fit, minmax(0,1fr));
     }
 
-    ^ m3 {
-      font-size: 16px;
-      font-weight: bold;
-    }
-
     ^validation-container {
       margin-top: 6px;
     }
@@ -234,7 +229,8 @@ foam.CLASS({
             .start()
               .start(self.Rows)
                 .callIf(prop$label, function() {
-                  this.start('m3')
+                  this.start('p')
+                    .addClass('semiBold')
                     .add(prop.label)
                     .style({ 'line-height': '2' })
                   .end();
