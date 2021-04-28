@@ -209,6 +209,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollWizardletVi
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollingStepWizardView.SAVE_LABEL",target:"Salve"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollingStepWizardView.NO_ACTION_LABEL",target:"Feito"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollingStepWizardView.REJECT_LABEL",target:"Rejeitar"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.ScrollingStepWizardView.NETWORK_FAILURE_MESSAGE",target:"Há um problema de conexão com o servidor. Por favor, aguarde."})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.DAOWizardlet.OF.label",target:"do"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.wizard.DAOWizardlet.DATA.label",target:"dados"})
 

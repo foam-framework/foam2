@@ -18,7 +18,7 @@ foam.CLASS({
     { name: 'SAVE_LABEL', message: 'Save' },
     { name: 'REJECT_LABEL', message: 'Reject' },
     {
-      name: 'NETWORK_FALURE_MESSAGE',
+      name: 'NETWORK_FAILURE_MESSAGE',
       message: 'There is a problem connecting to the server. Please wait.'
     }
   ],
@@ -227,7 +227,7 @@ foam.CLASS({
                 return data$someFailures
                   ? this.E()
                     .addClass(this.myClass('network-failure-banner'))
-                    .add(this.NETWORK_FALURE_MESSAGE)
+                    .add(this.NETWORK_FAILURE_MESSAGE)
                   : this.E();
               }))
               .add(this.slot(function (data$wizardlets) {
