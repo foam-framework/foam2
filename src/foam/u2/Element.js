@@ -2443,6 +2443,24 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'FormattedStringViewRefinement',
+  refines: 'foam.core.FormattedString',
+  requires: [ 'foam.u2.FormattedTextField' ],
+  properties: [
+    {
+      name: 'view',
+      factory: function() {
+        return {
+          class: 'foam.u2.FormattedTextField',
+          formatter: this.formatter,
+          returnFormatted: false
+        };
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.u2',

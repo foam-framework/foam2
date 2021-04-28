@@ -71,7 +71,7 @@ foam.CLASS({
       }
     },
     function capabilityIdToSupportMethod(capabilityId) {
-      return '_'+capabilityId.replaceAll('-','_');
+      return capabilityId.replaceAll(/\.|-/g,'_');
     },
     function addPending(...caps) {
       for ( let cap of caps ) {

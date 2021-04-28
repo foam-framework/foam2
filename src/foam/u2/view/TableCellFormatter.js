@@ -356,3 +356,21 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'FormattedStringTableCellFormatterRefinement',
+  refines: 'foam.core.FormattedString',
+
+  properties: [
+    {
+      class: 'foam.u2.view.TableCellFormatter',
+      name: 'tableCellFormatter',
+      value: function(val, _, prop) {
+        var format = prop.formatter.join('').replace(/\d+/g, function(match) { return 'x'.repeat(match); });
+        this.add(foam.String.applyFormat(val, format));
+      }
+    }
+  ]
+});
