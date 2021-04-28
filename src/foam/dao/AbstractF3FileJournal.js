@@ -438,7 +438,15 @@ try {
         if ( prop.isSet(diffFObject) ) {
           if ( prop instanceof AbstractFObjectPropertyInfo && prop.get(oldFObject) != null
             && prop.get(diffFObject) != null ) {
-            mergeFObject((FObject)prop.get(oldFObject), (FObject) prop.get(diffFObject));
+            FObject oldOb = (FObject)prop.get(oldFObject);
+            FObject diffOb =((FObject) prop.get(diffFObject)).fclone();
+            if ( oldOb.getClassInfo() != diffOb.getClassInfo() ) {
+              diffOb.copyFrom(oldOb);
+              // have to explicitly set the value because diffOb is a clone
+              prop.set(oldFObject, mergeFObject(diffOb, (FObject) prop.get(diffFObject)));
+            } else {
+              mergeFObject(oldOb, (FObject) prop.get(diffFObject));
+            }
             return;
           } else {
             prop.set(oldFObject, prop.get(diffFObject));
