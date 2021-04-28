@@ -667,37 +667,48 @@ foam.LIB({
         return map[val] || (map[val] = val.toString());
       };
     })(),
-    function applyFormat(string, formatString, placeholder, escapeChar) {
-      placeholder = placeholder || 'x';
-      escapeChar = escapeChar || '\\';
-      var newString = '';
-      var escaping = false;
-      var safe = true;
-      formatString.split('').forEach(chr => {
-        if ( escaping ) {
-          newString += chr;
-          escaping = false;
-          return;
-        }
-        if ( chr == escapeChar ) {
-          escaping = true;
-          return;
-        }
-        if ( chr == placeholder ) {
-          if ( string.length < 1 ) {
-            safe = false;
+    {
+      name: 'applyFormat',
+      documentation: `
+        Format a string by including delimiter characters to match the specified
+        format string, where 'x' represents a character from the input and any
+        other character is added to the output literally.
+
+        Examples:
+          applyFormat('12345', 'xx-xx/x') // 12-34/5
+          applyFormat('12345', '??x??x?', '?') // 12x34x5
+      `,
+      code: function applyFormat(string, formatString, placeholder, escapeChar) {
+        placeholder   = placeholder || 'x';
+        escapeChar    = escapeChar  || '\\';
+        var newString = '';
+        var escaping  = false;
+        var safe      = true;
+        formatString.split('').forEach(chr => {
+          if ( escaping ) {
+            newString += chr;
+            escaping = false;
             return;
           }
-          newString += string[0];
-          string = string.slice(1);
-          return;
-        }
-        newString += chr;
-      })
-      safe = safe && string.length == 0;
-      if ( ! safe ) console.warn(
-        'performed foam.String.applyMask with unsafe inputs');
-      return newString;
+          if ( chr == escapeChar ) {
+            escaping = true;
+            return;
+          }
+          if ( chr == placeholder ) {
+            if ( string.length < 1 ) {
+              safe = false;
+              return;
+            }
+            newString += string[0];
+            string = string.slice(1);
+            return;
+          }
+          newString += chr;
+        });
+        safe = safe && string.length == 0;
+        if ( ! safe ) console.warn('performed foam.String.applyMask with unsafe inputs');
+        return newString;
+      }
     }
   ]
 });
