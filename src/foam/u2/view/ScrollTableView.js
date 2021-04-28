@@ -174,7 +174,7 @@
     },
     {
       name: 'dblClickListenerAction',
-      factory: () => {
+      factory: function() {
         return function(obj, id) {
           if ( ! this.stack ) return;
 
