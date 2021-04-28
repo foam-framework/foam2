@@ -36,7 +36,10 @@ foam.CLASS({
             fill: this.theme.white
           }),
         };
-      } else if ( wizardlet.indicator == this.WizardletIndicator.SAVING ) {
+      } else if (
+        wizardlet.indicator == this.WizardletIndicator.SAVING ||
+        wizardlet.indicator == this.WizardletIndicator.NETWORK_FAILURE
+      ) {
         args = {
           ...args,
           indicateProcessing: true,
@@ -44,16 +47,6 @@ foam.CLASS({
           borderColorHover: 'rgba(0,0,0,0)',
           label: '' + number
         };
-      } else if ( wizardlet.indicator == this.WizardletIndicator.NETWORK_FAILURE ) {
-        args = {
-          ...args,
-          borderColor: this.theme.destructive2,
-          borderColorHover: this.theme.destructive2,
-          backgroundColor: this.theme.destructive2,
-          icon: this.theme.glyphs.networkError.getDataUrl({
-            fill: this.theme.white
-          })
-        }
       } else {
         args = {
           ...args,
