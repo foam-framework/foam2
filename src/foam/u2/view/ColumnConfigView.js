@@ -499,8 +499,7 @@ foam.CLASS({
   name: 'ColumnViewBody',
   extends: 'foam.u2.View',
   requires: [
-    'foam.u2.view.RootColumnConfigPropView',
-    'foam.u2.view.SubColumnSelectConfig'//remove me
+    'foam.u2.view.RootColumnConfigPropView'
   ],
 
   properties: [
@@ -509,25 +508,14 @@ foam.CLASS({
       expression: function(data$subColumnSelectConfig) {
         var arr = [];
         for ( var i = 0 ; i < this.data.subColumnSelectConfig.length ; i++ ) {
-          if ( this.data.subColumnSelectConfig[i].rootProperty[0] == '' ) {
-            arr.push(this.RootColumnConfigPropView.create({
-              index: i,
-              prop:this.data.subColumnSelectConfig[i],
-              onDragAndDrop:this.onDragAndDrop,
-              onSelectionChanged:this.onSelectionChanged,
-              onSelectionChangedParentFunction:this.onChildrenSelectionChanged.bind(this),//full of doubts regarding this
-              onDragAndDropParentFunction: this.onChildrenDragAndDrop.bind(this),
-            }));
-          } else {
-            arr.push(this.RootColumnConfigPropView.create({
-              index: i,
-              prop:this.data.subColumnSelectConfig[i],
-              onDragAndDrop:this.onDragAndDrop,
-              onSelectionChanged:this.onSelectionChanged,
-              onSelectionChangedParentFunction:this.onChildrenSelectionChanged.bind(this),
-              onDragAndDropParentFunction: this.onChildrenDragAndDrop.bind(this),
-            }));
-          }
+          arr.push(this.RootColumnConfigPropView.create({
+            index: i,
+            prop:this.data.subColumnSelectConfig[i],
+            onDragAndDrop:this.onDragAndDrop,
+            onSelectionChanged:this.onSelectionChanged,
+            onSelectionChangedParentFunction:this.onChildrenSelectionChanged.bind(this),
+            onDragAndDropParentFunction: this.onChildrenDragAndDrop.bind(this),
+          }));
         }
         return arr;
       }
