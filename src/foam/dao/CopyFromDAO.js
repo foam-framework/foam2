@@ -116,8 +116,14 @@ foam.CLASS({
         FObject ofObject;
         try {
           ofObject = (FObject) obj;
-          delegateObject = (FObject) getTo().newInstance();
-          delegateObject = delegateObject.copyFrom(ofObject);
+
+          if ( ofObject.isPropertySet("id") ) {
+            delegateObject = (FObject) getDelegate().find(obj.getProperty("id"));
+            delegateObject = delegateObject.copyFrom(ofObject);
+          } else {
+            delegateObject = (FObject) getTo().newInstance();
+            delegateObject = delegateObject.copyFrom(ofObject);
+          }
         } catch ( Exception ex ) {
           throw new RuntimeException("Cannot adapt to delegate: " + ex.getMessage(), ex);
         }
@@ -179,7 +185,7 @@ foam.CLASS({
         return order;
       `
     },
-    { 
+    {
       name: 'adaptPredicate',
       type: 'foam.mlang.predicate.Predicate',
       args: [
@@ -241,9 +247,9 @@ foam.CLASS({
           if ( getOf().isInstance(id) ) {
             id = adaptToDelegate(x, (FObject) id);
           }
-          
+
           FObject innerObject = getDelegate().find_(x, id);
-          
+
           // Do not attempt to convert if the object is null
           if ( innerObject == null ) return null;
 
