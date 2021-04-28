@@ -52,7 +52,26 @@ p({
   "client":"{\"of\":\"foam.nanos.notification.email.EmailMessage\"}"
 })
 
-p({"class":"foam.nanos.boot.NSpec", "name":"emailPropertyService",             "serviceScript": "import foam.core.FObject;\n import foam.nanos.notification.email.EmailTemplateApplyEmailPropertyService;\n import foam.nanos.notification.email.ChainedPropertyService;\n import foam.nanos.notification.email.EmailConfigEmailPropertyService;\n import foam.nanos.notification.email.EmailPropertyService;\n import foam.nanos.notification.email.GroupEmailTemplateService; \nEmailPropertyService[] eps = new EmailPropertyService[3];\n eps[0] = new EmailTemplateApplyEmailPropertyService.Builder(x).build();\n eps[1] = new GroupEmailTemplateService.Builder(x).build();\n eps[2] = new EmailConfigEmailPropertyService.Builder(x).build(); \nreturn new ChainedPropertyService.Builder(x).setData(eps).build();"}})
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"emailPropertyService",
+  "serviceScript": """
+    import foam.core.FObject;
+    import foam.nanos.notification.email.EmailTemplateApplyEmailPropertyService;
+    import foam.nanos.notification.email.ChainedPropertyService;
+    import foam.nanos.notification.email.EmailConfigEmailPropertyService;
+    import foam.nanos.notification.email.EmailPropertyService;
+    import foam.nanos.notification.email.GroupEmailTemplateService;
+    import foam.nanos.notification.email.EmailMessageValidationPropertyService;
+
+    EmailPropertyService[] eps = new EmailPropertyService[4];
+    eps[0] = new EmailTemplateApplyEmailPropertyService.Builder(x).build();
+    eps[1] = new GroupEmailTemplateService.Builder(x).build();
+    eps[2] = new EmailConfigEmailPropertyService.Builder(x).build();
+    eps[3] = new EmailMessageValidationPropertyService.Builder(x).build();
+    return new ChainedPropertyService.Builder(x).setData(eps).build();
+  """
+})
 
 p({
   "class":"foam.nanos.boot.NSpec",
