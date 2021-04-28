@@ -119,6 +119,7 @@ foam.CLASS({
       documentation: `
         An array of integers and strings of delimiters used to format the property
         where integer values represent number of digits at its location
+        E.g., [3, '.', 3, '.', 3, '.', 3]
       `
     }
   ]
