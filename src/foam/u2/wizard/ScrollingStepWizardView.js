@@ -37,7 +37,7 @@ foam.CLASS({
     }
 
     ^mainView > * > *:not(:last-child):not(^heading) {
-      margin-bottom: 64px;
+      margin-bottom: 40px;
     }
 
     ^rightside {
@@ -71,13 +71,10 @@ foam.CLASS({
       box-shadow: 0px -1px 3px rgba(0, 0, 0, 0.3);
     }
 
-    ^heading h2 {
-      margin: 0px;
-    }
-
     ^heading {
       display: flex;
       align-items: center;
+      margin-bottom: 40px;
     }
 
     ^network-failure-banner {
@@ -290,14 +287,14 @@ foam.CLASS({
                 ))
                 .end()
             }))
-            .start('h2') // ???: Should this really be h2?
+            .start('h3')
               .translate(wizardlet.capability.id+'.name', wizardlet.capability.name)
-            .end()
+            .end();
         }));
     },
     function renderWizardletSections(e, wizardlet, wi) {
       var self = this;
-      return e.forEach(wizardlet.sections, function (section, si) {
+      return e.start(self.Grid).forEach(wizardlet.sections, function (section, si) {
         var position = self.WizardPosition.create({
           wizardletIndex: wi,
           sectionIndex: si,
@@ -312,7 +309,7 @@ foam.CLASS({
             }
           }));
         }));
-      });
+      }).end();
     }
   ],
 
