@@ -16,6 +16,7 @@ foam.CLASS({
     'foam.core.PropertyInfo',
     'foam.core.ProxyX',
     'foam.core.X',
+    'foam.core.AbstractFObjectPropertyInfo',
     'foam.lib.formatter.FObjectFormatter',
     'foam.lib.formatter.JSONFObjectFormatter',
     'foam.lib.json.ExprParser',
@@ -435,7 +436,13 @@ try {
       args: [ 'FObject oldFObject', 'FObject diffFObject', 'foam.core.PropertyInfo prop' ],
       javaCode: `
         if ( prop.isSet(diffFObject) ) {
-          prop.set(oldFObject, prop.get(diffFObject));
+          if ( prop instanceof AbstractFObjectPropertyInfo && prop.get(oldFObject) != null
+            && prop.get(diffFObject) != null ) {
+            mergeFObject((FObject)prop.get(oldFObject), (FObject) prop.get(diffFObject));
+            return;
+          } else {
+            prop.set(oldFObject, prop.get(diffFObject));
+          }
         }
       `
     }
