@@ -137,7 +137,8 @@ public class EmailsUtility {
     try {
       cts.apply(userX, group, emailMessage, templateArgs);
     } catch (Exception e) {
-      logger.error(e);
+
+      logger.error("Problem with template: " + templateName, e);
       return;
     }
 
