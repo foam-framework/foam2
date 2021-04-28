@@ -447,7 +447,6 @@ try {
             } else {
               mergeFObject(oldOb, (FObject) prop.get(diffFObject));
             }
-            return;
           } else {
             prop.set(oldFObject, prop.get(diffFObject));
           }
