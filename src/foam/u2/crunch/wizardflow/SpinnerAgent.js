@@ -33,6 +33,7 @@ foam.CLASS({
     async function execute() {
       var popup = this.Popup.create({
         closeable: false,
+        isStyled: false
       })
         .start(this.LoadingSpinner)
           .style({
