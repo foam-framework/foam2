@@ -36,12 +36,15 @@ foam.CLASS({
             fill: this.theme.white
           }),
         };
-      } else if ( wizardlet.indicator == this.WizardletIndicator.SAVING ) {
+      } else if (
+        wizardlet.indicator == this.WizardletIndicator.SAVING ||
+        wizardlet.indicator == this.WizardletIndicator.NETWORK_FAILURE
+      ) {
         args = {
           ...args,
           indicateProcessing: true,
-          borderColor: this.theme.grey2,
-          borderColorHover: this.theme.grey2,
+          borderColor: 'rgba(0,0,0,0)',
+          borderColorHover: 'rgba(0,0,0,0)',
           label: '' + number
         };
       } else {
@@ -244,45 +247,6 @@ foam.CLASS({
         })
         .translate(title, title);
     },
-    function configureIndicator(wizardlet, isCurrent, number) {
-      var args = {
-        size: 24, borderThickness: 2,
-      };
-      if ( wizardlet.indicator == this.WizardletIndicator.COMPLETED ) {
-        args = {
-          ...args,
-          borderColor: this.theme.approval3,
-          backgroundColor: this.theme.approval3,
-          borderColorHover: this.theme.approval3,
-          icon: this.theme.glyphs.checkmark.getDataUrl({
-            fill: this.theme.white
-          }),
-        };
-      } else if ( wizardlet.indicator == this.WizardletIndicator.SAVING ) {
-        args = {
-          ...args,
-          indicateProcessing: true,
-          borderColor: this.theme.grey2,
-          borderColorHover: this.theme.grey2,
-          label: '' + number
-        };
-      } else {
-        args = {
-          ...args,
-          borderColor: this.theme.grey2,
-          borderColorHover: this.theme.grey2,
-          label: '' + number
-        };
-      }
-      if ( isCurrent ) {
-        args = {
-          ...args,
-          borderColor: this.theme.black,
-          borderColorHover: this.theme.black
-        };
-      }
-      return args;
-    }
   ],
 
   listeners: [
@@ -301,6 +265,6 @@ foam.CLASS({
         var scrollTop = this.childNodes[0].childNodes[currI].el().offsetTop;
         this.parentNode.el().scrollTop = scrollTop - padding;
       }
-    },
+    }
   ]
 });

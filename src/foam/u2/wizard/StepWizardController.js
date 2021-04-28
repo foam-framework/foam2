@@ -11,6 +11,7 @@ foam.CLASS({
   requires: [
     'foam.core.FObject',
     'foam.u2.wizard.WizardPosition',
+    'foam.u2.wizard.WizardletIndicator',
     'foam.u2.wizard.StepWizardConfig'
   ],
 
@@ -139,6 +140,10 @@ foam.CLASS({
     {
       name: 'allValid',
       class: 'Boolean'
+    },
+    {
+      name: 'someFailures',
+      class: 'Boolean'
     }
   ],
 
@@ -177,6 +182,12 @@ foam.CLASS({
         var isValid$ = w.isValid$;
         this.wsub.onDetach(isValid$.sub(() => {
           this.onWizardletValidity();
+        }));
+
+        // Bind indicator listener for wizardlet validity
+        var indicator$ = w.indicator$;
+        this.wsub.onDetach(indicator$.sub(() => {
+          this.onWizardletIndicator(wizardletIndex, indicator$.get());
         }));
 
       });
@@ -319,6 +330,14 @@ foam.CLASS({
     },
     function onWizardletValidity() {
       this.allValid = this.wizardlets.filter(w => ! w.isValid).length == 0;
+    },
+    function onWizardletIndicator(wizardletIndex, value) {
+      if ( value == this.WizardletIndicator.NETWORK_FAILURE ) {
+        this.someFailures = true;
+        return;
+      }
+      this.someFailures = !! this.wizardlets.filter(
+        w => w.indicator == this.WizardletIndicator.NETWORK_FAILURE).length;
     },
     function onSectionAvailability(sectionPosition, value) {
       // If a previous position became available, move the wizard back
