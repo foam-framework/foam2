@@ -98,6 +98,7 @@ foam.CLASS({
     MACROS: [
       'logoBackgroundColour',
       'customCSS',
+      'font1',
       'primary1',
       'primary2',
       'primary3',

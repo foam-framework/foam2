@@ -138,7 +138,7 @@
          * is not equal to the homeDenomination
          *
          */
-        amount = Math.floor(amount);
+        amount = Math.round(amount);
         var isNegative = amount < 0;
         amount = amount.toString();
         if ( isNegative ) amount = amount.substring(1);

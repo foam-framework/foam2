@@ -1614,6 +1614,31 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.java',
+  name: 'FormattedStringJavaRefinement',
+  refines: 'foam.core.FormattedString',
+  flags: ['java'],
+  documentation: `
+    Override setter for formattedstrings so that we only store the unformatted data
+    TODO: Add the ability to get a formatted version of the data 
+  `,  
+
+  properties: [
+    {
+      name: 'javaSetter',
+      factory: function() {
+        return `
+          assertNotFrozen();
+          // remove all non-numeric characters
+          val = val.replaceAll("[^\\\\\d]", "");
+          ${this.name}_ = val;
+          ${this.name}IsSet_ = true;`;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
   name: 'FObjectPropertyJavaRefinement',
   refines: 'foam.core.FObjectProperty',
   flags: ['java'],

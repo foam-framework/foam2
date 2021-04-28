@@ -103,7 +103,7 @@ foam.CLASS({
       class: 'foam.u2.ViewSpec',
       name: 'viewView',
       expression: function() {
-        return foam.u2.detail.SectionedDetailView;
+        return foam.u2.detail.TabbedDetailView;
       }
     },
     'currentMemento_',

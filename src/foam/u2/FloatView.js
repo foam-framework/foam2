@@ -109,8 +109,8 @@ foam.CLASS({
 
     function dataToText(val) {
       return foam.Undefined.isInstance(this.precision) ?
-      '' + val :
-      this.formatNumber(val) ;
+        '' + val :
+        this.formatNumber(val) ;
     },
 
     function textToData(text) {

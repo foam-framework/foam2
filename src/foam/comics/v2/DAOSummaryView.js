@@ -262,9 +262,10 @@ foam.CLASS({
   ],
 
   methods: [
-    function initE() {
+    async function initE() {
       var self = this;
       this.SUPER();
+      this.data = await this.config.dao.find(this.data);
       if ( this.memento ) {
         var m = this.memento;
         var counter = 0;
