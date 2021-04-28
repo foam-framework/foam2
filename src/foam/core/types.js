@@ -106,6 +106,25 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'FormattedString',
+  extends: 'String',
+  documentation: 'A delimiter separated string of digits',
+
+  properties: [
+    {
+      name:'formatter',
+      value:[],
+      documentation: `
+        An array of integers and strings of delimiters used to format the property
+        where integer values represent number of digits at its location
+        E.g., [3, '.', 3, '.', 3, '.', 3]
+      `
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.core',
