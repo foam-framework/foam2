@@ -12,6 +12,7 @@ import foam.lib.json.Outputter;
 import foam.util.SecurityUtil;
 import java.security.*;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
@@ -291,18 +292,30 @@ public interface FObject
 
   }
 
-  default FObject copyFrom(FObject obj) {
+  default FObject copyFrom(FObject from) {
     List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
-    for ( PropertyInfo p : props ) {
-      try {
-        if ( p.isSet(obj) ) p.set(this, p.get(obj));
-      } catch (ClassCastException e) {
+    for ( PropertyInfo prop : props ) {
+      if ( prop.isSet(from) ) {
+        Object fromObj = prop.get(from);
+        Object toObj = prop.get(this);
+        if ( prop instanceof AbstractFObjectPropertyInfo &&
+             fromObj != null &&
+             toObj != null ) {
+          ((FObject) toObj).copyFrom((FObject) fromObj);
+          fromObj = toObj;
+        }
+
         try {
-          PropertyInfo p2 = (PropertyInfo) obj.getClassInfo().getAxiomByName(p.getName());
-          if ( p2 != null ) {
-            if ( p2.isSet(obj) ) p.set(this, p2.get(obj));
-          }
-        } catch (ClassCastException ignore) {}
+          prop.set(this, fromObj);
+        } catch (ClassCastException e) {
+          try {
+            PropertyInfo p2 = (PropertyInfo) from.getClassInfo().getAxiomByName(prop.getName());
+            if ( p2 != null &&
+                 p2.isSet(from) ) {
+              prop.set(this, p2.get(from));
+            }
+          } catch (ClassCastException ignore) {}
+        }
       }
     }
     return this;

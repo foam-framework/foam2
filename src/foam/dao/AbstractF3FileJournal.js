@@ -413,45 +413,6 @@ try {
         ps = eps.apply(parser, x);
         return eps.getMessage();
       `
-    },
-    {
-      name: 'mergeFObject',
-      type: 'foam.core.FObject',
-      documentation: 'Add diff property to old property',
-      args: ['FObject oldFObject', 'FObject diffFObject' ],
-      javaCode: `
-        //get PropertyInfos
-        List list = oldFObject.getClassInfo().getAxiomsByClass(PropertyInfo.class);
-        Iterator e = list.iterator();
-
-        while( e.hasNext() ) {
-          PropertyInfo prop = (PropertyInfo) e.next();
-          mergeProperty(oldFObject, diffFObject, prop);
-        }
-        return diffFObject.copyFrom(oldFObject);
-      `
-    },
-    {
-      name: 'mergeProperty',
-      args: [ 'FObject oldFObject', 'FObject diffFObject', 'foam.core.PropertyInfo prop' ],
-      javaCode: `
-        if ( prop.isSet(diffFObject) ) {
-          if ( prop instanceof AbstractFObjectPropertyInfo && prop.get(oldFObject) != null
-            && prop.get(diffFObject) != null ) {
-            FObject oldOb = (FObject)prop.get(oldFObject);
-            FObject diffOb =((FObject) prop.get(diffFObject)).fclone();
-            if ( oldOb.getClassInfo() != diffOb.getClassInfo() ) {
-              diffOb.copyFrom(oldOb);
-              // have to explicitly set the value because diffOb is a clone
-              prop.set(oldFObject, mergeFObject(diffOb, (FObject) prop.get(diffFObject)));
-            } else {
-              mergeFObject(oldOb, (FObject) prop.get(diffFObject));
-            }
-          } else {
-            prop.set(oldFObject, prop.get(diffFObject));
-          }
-        }
-      `
     }
   ]
 });
