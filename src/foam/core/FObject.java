@@ -294,29 +294,25 @@ public interface FObject
   default FObject copyFrom(FObject obj) {
     List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
     for ( PropertyInfo p : props ) {
-      PropertyInfo prop = null;
       try {
         if ( p.isSet(obj) ) {
-          prop = p;
+          Object from = p.get(obj);
+          Object to = p.get(this);
+          if ( p instanceof AbstractFObjectPropertyInfo &&
+               from != null &&
+               to != null ) {
+            from = ((FObject) to).copyFrom((FObject) from);
+          }
+          p.set(this, from);
         }
       } catch (ClassCastException e) {
         try {
           PropertyInfo p2 = (PropertyInfo) obj.getClassInfo().getAxiomByName(p.getName());
           if ( p2 != null &&
                p2.isSet(obj) ) {
-            prop = p2;
+            p2.set(this, p2.get(obj));
           }
         } catch (ClassCastException ignore) {}
-      }
-      if ( prop != null ) {
-        Object from = prop.get(obj);
-        Object to = prop.get(this);
-        if ( prop instanceof AbstractFObjectPropertyInfo &&
-             from != null &&
-             to != null ) {
-          from = ((FObject) to).copyFrom((FObject) from);
-        }
-        prop.set(this, from);
       }
     }
     return this;
