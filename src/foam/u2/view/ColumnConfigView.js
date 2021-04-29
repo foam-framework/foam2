@@ -247,6 +247,8 @@ foam.CLASS({
           for ( var j = 0 ; j < propSelectedTraversed.length ; j++ ) {
             if ( foam.Array.isInstance(propSelectedTraversed[j]) )
               arr.push(propSelectedTraversed[j].filter(Boolean).join('.'));
+            else if ( propSelectedTraversed[j] )
+              arr.push(propSelectedTraversed[j]);
           }
         }
       }
@@ -683,9 +685,13 @@ foam.CLASS({
         for ( var i = 0 ; i < this.subColumnSelectConfig.length ; i++ ) {
           if ( this.subColumnSelectConfig[i].isPropertySelected ) {
             var childProps = this.subColumnSelectConfig[i].returnSelectedProps();
-            if ( this.rootProperty[0] )
-              childProps.splice(0, 0, this.rootProperty[0]);
-            arr.push(childProps);
+            if ( ! childProps.length ) {
+              arr.push(this.rootProperty[0]);
+            } else {
+              for ( var j = 0 ; j < childProps.length ; j++ ) {
+                arr.push([this.rootProperty[0], childProps[j]].filter(Boolean).join('.'));
+              }
+            }
           }
         }
         if ( arr && arr.length > 0 )
@@ -693,7 +699,7 @@ foam.CLASS({
       }
       if ( this.level === 0 ) {
         if ( foam.Array.isInstance(this.rootProperty) )
-          return [[this.rootProperty[0]]];
+          return [this.rootProperty[0]];
         return [this.rootProperty];
       }
       return [this.rootProperty[0]];
