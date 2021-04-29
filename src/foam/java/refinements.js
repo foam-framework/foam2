@@ -673,7 +673,7 @@ return sb.toString();`
                 type: 'Object'
               }
             ],
-            body: `return compareTo(o) == 0;`
+            body: `if ( o == null ) return false; if ( o.getClass() != getClass() ) return false; return compareTo(o) == 0;`
           });
         }
 

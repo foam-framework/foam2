@@ -62,7 +62,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'dataString',
-      documentation: 'File converted to base64 string'
+      documentation: 'File converted to base64 string',
+      postSet: function() {
+        this.instance_.data = undefined;
+      }
     },
     {
       class: 'String',
@@ -117,6 +120,7 @@ foam.CLASS({
         return null;
       `,
       getter: function() {
+        if ( this.instance_.data ) return this.instance_.data;
         if ( this.dataString ) {
           let b64Data = this.dataString.split(',')[1];
           const b64toBlob = (b64Data, contentType = this.mimeType, sliceSize = 512) => {
@@ -134,10 +138,10 @@ foam.CLASS({
               byteArrays.push(new Uint8Array(byteNumbers));
             }
 
-            return new Blob(byteArrays, {type: contentType});
+            return this.instance_.data = new Blob(byteArrays, { type: contentType });
           }
 
-          return this.BlobBlob.create({blob: b64toBlob(b64Data)});
+          return this.instance_.data = this.BlobBlob.create({ blob: b64toBlob(b64Data) });
         }
 
         return this.instance_.data || null;
