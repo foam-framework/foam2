@@ -413,6 +413,46 @@ try {
         ps = eps.apply(parser, x);
         return eps.getMessage();
       `
+    },
+    {
+      name: 'mergeFObject',
+      type: 'foam.core.FObject',
+      documentation: 'Add diff property to old property',
+      args: ['FObject oldFObject', 'FObject diffFObject' ],
+      javaCode: `
+        //get PropertyInfos
+        List list = oldFObject.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+        Iterator e = list.iterator();
+
+        while( e.hasNext() ) {
+          PropertyInfo prop = (PropertyInfo) e.next();
+          mergeProperty(oldFObject, diffFObject, prop);
+        }
+        return oldFObject.copyFrom(diffFObject);
+      `
+    },
+    {
+      name: 'mergeProperty',
+      args: [ 'FObject oldFObject', 'FObject diffFObject', 'foam.core.PropertyInfo prop' ],
+      javaCode: `
+        if ( prop.isSet(diffFObject) ) {
+          if ( prop instanceof AbstractFObjectPropertyInfo && prop.get(oldFObject) != null
+            && prop.get(diffFObject) != null ) {
+            FObject nestedDiffFObj = (FObject) prop.get(diffFObject);
+            FObject oldNestedFObj = (FObject) prop.get(oldFObject);
+            if ( oldNestedFObj.getClassInfo() != nestedDiffFObj.getClassInfo() ) {
+              FObject nestedOldDiff = nestedDiffFObj.fclone();
+              nestedOldDiff.copyFrom(oldNestedFObj);
+              // have to explicitly set the value because nestedOldDiff is a clone
+              prop.set(oldFObject, mergeFObject(nestedOldDiff, nestedDiffFObj));
+            } else {
+              mergeFObject(oldNestedFObj, nestedDiffFObj);
+            }
+          } else {
+            prop.set(oldFObject, prop.get(diffFObject));
+          }
+        }
+      `
     }
   ]
 });
