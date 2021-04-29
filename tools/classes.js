@@ -895,6 +895,7 @@ var classes = [
   'foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer',
   'foam.nanos.approval.PopulateApprovalRequestsDAO',
   'foam.nanos.approval.ApprovalRequestAssignedToRule',
+  'foam.nanos.approval.ApprovalRequestClassificationEnum',
 
   'foam.core.NumberSet',
 
