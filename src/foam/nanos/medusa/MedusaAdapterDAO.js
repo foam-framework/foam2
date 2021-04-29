@@ -88,6 +88,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
       formatter.setOutputDefaultClassNames(true); // default
       formatter.setOutputReadableDates(false);
       formatter.setPropertyPredicate(new foam.lib.StoragePropertyPredicate());
+      formatter.setCalculateNestedDelta(false);
       return formatter;
     }
 
