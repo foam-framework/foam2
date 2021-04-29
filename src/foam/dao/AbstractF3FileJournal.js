@@ -428,7 +428,8 @@ try {
           PropertyInfo prop = (PropertyInfo) e.next();
           mergeProperty(oldFObject, diffFObject, prop);
         }
-        return oldFObject.copyFrom(diffFObject);
+        // it's backwards in case when we override the "class" was changed
+        return diffFObject.copyFrom(oldFObject);
       `
     },
     {
