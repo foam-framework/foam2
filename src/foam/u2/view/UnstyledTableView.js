@@ -556,12 +556,12 @@ foam.CLASS({
                   }).
                   callIf(view.click && ! view.disableUserSelection, function() {
                     tableRowElement.on('click', function() {
-                      view.click(null, obj.id);
+                      view.click(obj, obj.id);
                     });
                   }).
                   callIf(view.dblclick && ! view.disableUserSelection, function() {
                     tableRowElement.on('dblclick', function() {
-                      view.dblclick(null, obj.id);
+                      view.dblclick(obj, obj.id);
                     });
                   }).
                   callIf( ! view.disableUserSelection, function() {
