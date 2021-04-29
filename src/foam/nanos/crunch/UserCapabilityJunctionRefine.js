@@ -102,6 +102,7 @@ foam.CLASS({
           }
         };
       },
+      tableWidth: 250,
       tableCellFormatter: function(value, obj, axiom) {
         this.__subSubContext__.capabilityDAO
           .find(value)
