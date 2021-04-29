@@ -310,17 +310,17 @@ public interface FObject
       }
       if ( prop != null ) {
         Object from = prop.get(obj);
-        Object to = prop.get(this);
-        if ( prop instanceof AbstractFObjectPropertyInfo &&
-             from != null &&
-             to != null ) {
-          try {
+        try {
+          Object to = prop.get(this);
+          if ( prop instanceof AbstractFObjectPropertyInfo &&
+               from != null &&
+               to != null ) {
             from = ((FObject) to).fclone().copyFrom((FObject) from);
-          } catch (ClassCastException e1) {
-            System.out.println("copyFrom.p2.FObject: "+e1.getMessage());
           }
-          prop.set(this, from);
+        } catch (ClassCastException e1) {
+          System.out.println("copyFrom: "+e1.getMessage());
         }
+        prop.set(this, from);
       }
     }
     return this;
