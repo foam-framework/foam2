@@ -298,24 +298,28 @@ public interface FObject
       PropertyInfo fromProp = (PropertyInfo) fromInfo.getAxiomByName(p.getName());
       try {
         if ( fromProp == null ) continue;
-      Object from = fromProp.get(obj);
-      Object to   = p.get(this);
-      if ( p instanceof AbstractFObjectPropertyInfo &&
-           from != null && from instanceof FObject &&
-           to != null && to instanceof FObject ) {
-        if ( ((FObject) to).getClassInfo() != ((FObject) from).getClassInfo() ) {
-          FObject fromClone = ((FObject) from).fclone();
-          fromClone.copyFrom((FObject)to);
-          // have to explicitly set the value because fromClone is a clone
-          p.set(this, fromClone.copyFrom((FObject) from));
+        Object from = fromProp.get(obj);
+        // TODO: remove when 'logger' properties addressed in the framework
+        if ( from instanceof foam.nanos.logger.Logger ) continue;
+        Object to   = p.get(this);
+        if ( p instanceof AbstractFObjectPropertyInfo &&
+             from != null && from instanceof FObject &&
+             to != null && to instanceof FObject ) {
+          if ( ((FObject) to).getClassInfo() != ((FObject) from).getClassInfo() ) {
+            // Create an instance of the 'other' class, copy into it, then replace on this.
+            FObject fromClone = ((FObject) from).fclone();
+            fromClone.copyFrom((FObject)to);
+            p.set(this, fromClone.copyFrom((FObject) from));
+          } else {
+            p.set(this, ((FObject) to).fclone().copyFrom((FObject) from));
+          }
         } else {
-          p.set(this, ((FObject) to).fclone().copyFrom((FObject) from));
+          p.set(this, from);
         }
-      } else {
-        p.set(this, from);
-      }
       } catch (RuntimeException e) {
-        System.out.println(getClassInfo().getId()+" fromInfo: "+fromInfo.getId()+" prop: "+p.getName());
+        // NOTE: do not log with logger.
+        // TODO: remove when system is stable.
+        System.err.println("WARN: copyFrom to: "+getClassInfo().getId()+" from: "+fromInfo.getId()+" prop: "+p.getName());
         e.printStackTrace();
       }
     }
