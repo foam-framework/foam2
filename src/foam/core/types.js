@@ -820,7 +820,7 @@ foam.CLASS({
     function copyValueFrom(targetObj, sourceObj) {
       var name = this.name;
       if ( targetObj[name] && sourceObj[name] ) {
-        targetObj[name].copyFrom(sourceObj[name])
+        targetObj[name].copyFrom(sourceObj[name]);
         return true;
       }
       return false;
