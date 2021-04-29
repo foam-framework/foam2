@@ -301,7 +301,7 @@ public interface FObject
           if ( p instanceof AbstractFObjectPropertyInfo &&
                from != null &&
                to != null ) {
-            from = ((FObject) to).copyFrom((FObject) from);
+            from = ((FObject) to).fclone().copyFrom((FObject) from);
           }
           p.set(this, from);
         }
