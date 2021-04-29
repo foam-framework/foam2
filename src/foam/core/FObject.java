@@ -292,35 +292,31 @@ public interface FObject
   }
 
   default FObject copyFrom(FObject obj) {
-    List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    List<PropertyInfo> props    = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    ClassInfo       fromInfo = obj.getClassInfo();
     for ( PropertyInfo p : props ) {
-      PropertyInfo prop = null;
+      PropertyInfo fromProp = (PropertyInfo) fromInfo.getAxiomByName(p.getName());
       try {
-        if ( p.isSet(obj) ) {
-          prop = p;
+        if ( fromProp == null ) continue;
+      Object from = fromProp.get(obj);
+      Object to   = p.get(this);
+      if ( p instanceof AbstractFObjectPropertyInfo &&
+           from != null && from instanceof FObject &&
+           to != null && to instanceof FObject ) {
+        if ( ((FObject) to).getClassInfo() != ((FObject) from).getClassInfo() ) {
+          FObject fromClone = ((FObject) from).fclone();
+          fromClone.copyFrom((FObject)to);
+          // have to explicitly set the value because fromClone is a clone
+          p.set(this, fromClone.copyFrom((FObject) from));
+        } else {
+          p.set(this, ((FObject) to).fclone().copyFrom((FObject) from));
         }
-      } catch (ClassCastException e) {
-        try {
-          PropertyInfo p2 = (PropertyInfo) obj.getClassInfo().getAxiomByName(p.getName());
-          if ( p2 != null &&
-               p2.isSet(obj) ) {
-            prop = p2;
-          }
-        } catch (ClassCastException ignore) {}
+      } else {
+        p.set(this, from);
       }
-      if ( prop != null ) {
-        Object from = prop.get(obj);
-        try {
-          Object to = prop.get(this);
-          if ( prop instanceof AbstractFObjectPropertyInfo &&
-               from != null &&
-               to != null ) {
-            from = ((FObject) to).fclone().copyFrom((FObject) from);
-          }
-        } catch (ClassCastException e1) {
-          System.out.println("copyFrom: "+e1.getMessage());
-        }
-        prop.set(this, from);
+      } catch (RuntimeException e) {
+        System.out.println(getClassInfo().getId()+" fromInfo: "+fromInfo.getId()+" prop: "+p.getName());
+        e.printStackTrace();
       }
     }
     return this;
