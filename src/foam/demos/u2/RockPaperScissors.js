@@ -96,7 +96,7 @@ foam.CLASS({
       name: 'rounds',
       label: '',
       of: 'foam.demos.u2.Round',
-      view: { class: 'foam.u2.view.TitledArrayView', enableAdding: false, enableRemoving: false }
+      view: { class: 'foam.u2.view.FObjectArrayView', enableAdding: false, enableRemoving: false }
     }
   ],
 
