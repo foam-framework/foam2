@@ -445,7 +445,7 @@ foam.CLASS({
       var self = this;
       this.SUPER();
       this
-        .on('click', this.toggleSelection)
+        .on('click', this.toggleExpanded)
           .start()
             .addClass(this.myClass('some-padding'))
             .style({
@@ -482,7 +482,6 @@ foam.CLASS({
   listeners: [
     function toggleSelection(e) {
       e.stopPropagation();
-      // this.data.expanded = ! this.data.expanded;
       if ( ! this.data.hasSubProperties || foam.core.Reference.isInstance(this.data.prop) ) {
         if ( ! this.data.isPropertySelected )
           this.data.expanded = false;
@@ -491,7 +490,8 @@ foam.CLASS({
     },
     function toggleExpanded(e) {
       e.stopPropagation();
-      this.data.expanded = ! this.data.expanded;
+      if ( this.data.hasSubProperties )
+        this.data.expanded = ! this.data.expanded;
     }
   ]
 });
