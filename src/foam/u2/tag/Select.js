@@ -26,19 +26,20 @@ foam.CLASS({
       appearance: none;
       -moz-appearance: none;
       -webkit-appearance: none;
-      width: 100%;
-      box-shadow: none;
       background: #ffffff url('/images/dropdown-icon.svg') no-repeat;
       background-position: right 0.9em top 50%, 0 0; 
+      box-shadow: none;
       cursor: pointer;
+      max-width: 100%;
+      width: 100%;
     }
     ^ option {
       padding: 4px;
       width: 100%;
     }
     ^.expanded{
-      padding: 0;
       background: none;
+      padding: 0;
     }
   `,
 
