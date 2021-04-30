@@ -56,8 +56,10 @@ foam.CLASS({
     },
     {
       name: 'dynamicPlaceholder',
-      expression: function(placeholder, formattedData) {
-        return formattedData + placeholder.substring(formattedData.length);
+      expression: function(placeholder, formattedData, mode) {
+        return mode === foam.u2.DisplayMode.RW ? 
+          formattedData + placeholder.substring(formattedData.length)
+          : '';
       },
       documentation: 'The placeholder text when the input has content'
     },
@@ -78,7 +80,7 @@ foam.CLASS({
       this.formattedData$.sub(this.formatData);
       this.formattedData = this.data || '';
 
-      var input = foam.u2.TextField.create({ onKey: true, data$: this.formattedData$ });
+      var input = foam.u2.TextField.create({ onKey: true, data$: this.formattedData$, mode$: this.mode$ });
       input.setAttribute('maxlength', this.placeholder.length);
 
       return this

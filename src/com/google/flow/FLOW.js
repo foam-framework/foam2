@@ -13,7 +13,7 @@ foam.CLASS({
     [ 'autoRepaint', true ],
     [ 'width', 800 ],
     [ 'height', 600 ],
-    [ 'color', '#f3f3f3' ],
+    [ 'color', '#f3f3f3' ]
   ]
 });
 
@@ -96,6 +96,7 @@ foam.CLASS({
       }
     }
   ],
+
   actions: [
     {
       name: 'deleteRow',
@@ -385,7 +386,6 @@ foam.CLASS({
     {
       name: 'properties',
       view: function(args, x) {
-        debugger;
         return {
           class: 'com.google.flow.TreeView',
           relationship: com.google.flow.PropertyPropertyChildrenRelationship,
@@ -604,7 +604,7 @@ foam.CLASS({
   ],
 
   listeners: [
-    function onPropertyPut(_, __, p) {
+    function onPropertyPut(_, __, ___, p) {
       var o = p.value;
 
       this.scope[p.name] = p.value;

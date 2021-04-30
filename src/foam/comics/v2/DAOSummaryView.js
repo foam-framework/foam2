@@ -182,7 +182,7 @@ foam.CLASS({
       code: function() {
         if ( ! this.stack ) return;
 
-        if ( this.memento.tail )
+        if ( this.memento && this.memento.tail )
           this.memento.tail.head = 'edit';
         this.stack.push({
           class:  'foam.comics.v2.DAOUpdateView',
@@ -262,9 +262,10 @@ foam.CLASS({
   ],
 
   methods: [
-    function initE() {
+    async function initE() {
       var self = this;
       this.SUPER();
+      this.data = await this.config.dao.find(this.data);
       if ( this.memento ) {
         var m = this.memento;
         var counter = 0;

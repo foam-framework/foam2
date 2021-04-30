@@ -43,16 +43,7 @@ foam.CLASS({
       align-items: center;
     }
 
-    ^browse-title {
-      font-size: 36px;
-      font-weight: 600;
-      line-height: 1.33;
-      color: #1e1f21;
-    }
-
     ^browse-subtitle {
-      font-size: 18px;
-      line-height: 1.56;
       color: #5e6061;
       width: 50%;
     }
@@ -149,7 +140,7 @@ foam.CLASS({
               .start()
                 .addClass(self.myClass('header-container'))
                 .start(self.Cols)
-                  .start()
+                  .start('h1')
                     .addClass(self.myClass('browse-title'))
                     .translate(menuId + ".browseTitle", config$browseTitle)
                   .end()

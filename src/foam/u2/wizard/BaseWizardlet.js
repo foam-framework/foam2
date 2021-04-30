@@ -188,6 +188,9 @@ foam.CLASS({
       await this.wao.load(this);
       return this;
     },
+    function reportNetworkFailure() {
+      this.indicator = this.WizardletIndicator.NETWORK_FAILURE;
+    },
     {
       name: 'getDataUpdateSub',
       documentation: `

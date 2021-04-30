@@ -17,7 +17,7 @@ foam.CLASS({
     'wizardlets',
     'rootCapability'
   ],
-  
+
   properties: [
     {
       class: 'Function',
@@ -27,17 +27,30 @@ foam.CLASS({
 
   methods: [
     async function execute() {
-      let allValid = true;
-      let topLevelUCJ;
-      await foam.Promise.inOrder(this.wizardlets, async w => {
-        if ( allValid ) {
-          allValid = w.isValid;
-        }
-        var ucj = await w.save();
-        if ( ucj && ucj.targetId == this.rootCapability.id ) topLevelUCJ = ucj;
-      });
+      let state = {
+        allValid: true,
+        topLevelUCJ: null
+      };
+      await this.save(state);
       if ( this.onSave ) {
-        await this.onSave(allValid, topLevelUCJ);
+        await this.onSave(state.allValid, state.topLevelUCJ);
+      }
+    },
+    async function save(state) {
+      try {
+        await foam.Promise.inOrder(this.wizardlets, async w => {
+          if ( state.allValid ) state.allValid = w.isValid;
+          var ucj = await w.save();
+          if ( ucj && ucj.targetId == this.rootCapability.id ) state.topLevelUCJ = ucj;
+        });
+      } catch (e) {
+        console.error(e);
+        await new Promise(resolve => {
+          setTimeout(async () => {
+            await this.save(state);
+            resolve();
+          }, 5000);
+        });
       }
     }
   ]

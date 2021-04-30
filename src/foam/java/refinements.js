@@ -673,7 +673,7 @@ return sb.toString();`
                 type: 'Object'
               }
             ],
-            body: `return compareTo(o) == 0;`
+            body: `if ( o == null ) return false; if ( o.getClass() != getClass() ) return false; return compareTo(o) == 0;`
           });
         }
 
@@ -1607,6 +1607,31 @@ foam.CLASS({
       name: 'sqlType',
       expression: function(width) {
         return 'VARCHAR(' + width + ')';
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'FormattedStringJavaRefinement',
+  refines: 'foam.core.FormattedString',
+  flags: ['java'],
+  documentation: `
+    Override setter for formattedstrings so that we only store the unformatted data
+    TODO: Add the ability to get a formatted version of the data 
+  `,  
+
+  properties: [
+    {
+      name: 'javaSetter',
+      factory: function() {
+        return `
+          assertNotFrozen();
+          // remove all non-numeric characters
+          val = val.replaceAll("[^\\\\\d]", "");
+          ${this.name}_ = val;
+          ${this.name}IsSet_ = true;`;
       }
     }
   ]

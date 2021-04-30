@@ -38,10 +38,10 @@ foam.CLASS({
       // you select focus the screen changes its value to '',
       // so that you don't have to delete the 0.00 to enter your
       // value.
-      this.on('focus', function() {
+      this.on('focus', () => {
         var view = this.attrSlot(null, this.onKey ? 'input' : null);
-       if ( ! this.data ) { view.set(''); }
-      }.bind(this));
+        if ( ! this.data ) { view.set(''); }
+      });
     }
   ]
 });

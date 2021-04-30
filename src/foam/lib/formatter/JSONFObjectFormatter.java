@@ -71,6 +71,7 @@ public class JSONFObjectFormatter
   protected boolean outputClassNames_        = true;
   protected boolean outputReadableDates_     = false;
   protected boolean outputDefaultClassNames_ = true;
+  protected boolean calculateDeltaForNestedFObjects_ = true;
 
   public JSONFObjectFormatter(X x) {
     super(x);
@@ -356,7 +357,12 @@ public class JSONFObjectFormatter
           append(',');
           addInnerNewline();
         }
-         if ( maybeOutPutFObjectProperty(newFObject, oldFObject, prop) ) delta += 1;
+        if ( calculateDeltaForNestedFObjects_ ) {
+          if (maybeOutPutFObjectProperty(newFObject, oldFObject, prop)) delta += 1;
+        } else {
+          outputProperty(newFObject, prop);
+          delta += 1;
+        }
 
 
         if ( prop.includeInID() ) {
@@ -507,6 +513,11 @@ public class JSONFObjectFormatter
 
   public JSONFObjectFormatter setQuoteKeys(boolean quoteKeys) {
     quoteKeys_ = quoteKeys;
+    return this;
+  }
+
+  public JSONFObjectFormatter setCalculateNestedDelta(boolean calculateNestedDelta) {
+    calculateDeltaForNestedFObjects_ = calculateNestedDelta;
     return this;
   }
 

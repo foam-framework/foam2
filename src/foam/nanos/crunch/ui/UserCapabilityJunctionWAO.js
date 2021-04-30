@@ -69,7 +69,8 @@ foam.CLASS({
       ) : this.crunchService.updateJunction(
         null, wizardlet.capability.id, null, null
       );
-      return p.then(ucj => { return ucj; });
+      return p.then(ucj => { return ucj; })
+        .catch(this.reportNetworkFailure.bind(this, wizardlet, 'cancel', null));
     },
     function load(wizardlet) {
       if ( wizardlet.loading ) return;
@@ -82,7 +83,7 @@ foam.CLASS({
       );
       return p.then(ucj => {
         this.load_(wizardlet, ucj);
-      });
+      }).catch(this.reportNetworkFailure.bind(this, wizardlet, 'load', null));
     },
     function save_(wizardlet, options) {
       var wData = wizardlet.data ? wizardlet.data.clone() : null;
@@ -106,6 +107,7 @@ foam.CLASS({
         }
         return ucj;
       });
+      p.catch(this.reportNetworkFailure.bind(this, wizardlet, 'save', options));
       this.saveLock.then(p);
       return p;
     },
@@ -141,6 +143,19 @@ foam.CLASS({
     function cancelSave_(w) {
       w.loadingLevel = this.LoadingLevel.IDLE;
       return Promise.resolve();
+    },
+    function reportNetworkFailure(w, op, args, e) {
+      w.loadingLevel = this.LoadingLevel.IDLE;
+      w.loading = false;
+      console.error('WAO caught network failure', e);
+      setTimeout(() => {
+        this[op](w, args).then(() => {
+          w.clearProperty('indicator');
+        });
+      }, 5000);
+      w.reportNetworkFailure(e, {
+        retry: 5000 // to indicate to the user if we want this
+      });
     }
   ]
 });

@@ -4,6 +4,7 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.app.AppConfig;
 import foam.nanos.notification.email.EmailConfig;
+import foam.nanos.alarming.Alarm;
 import foam.nanos.app.SupportConfig;
 import foam.nanos.auth.Subject;
 import foam.nanos.auth.User;
@@ -117,19 +118,19 @@ public class EmailsUtility {
       templateArgs.put("appName", (theme.getAppName()));
 
       templateArgs.put("locale", user.getLanguage().getCode().toString());
-  
+
       foam.nanos.auth.Address address = supportConfig.getSupportAddress();
       templateArgs.put("supportAddress", address == null ? "" : address.toSummary());
       templateArgs.put("supportPhone", (supportConfig.getSupportPhone()));
       templateArgs.put("supportEmail", (supportConfig.getSupportEmail()));
-  
+
       // personal support user
       User psUser = supportConfig.findPersonalSupportUser(x);
       templateArgs.put("personalSupportPhone", psUser == null ? "" : psUser.getPhoneNumber());
       templateArgs.put("personalSupportEmail", psUser == null ? "" : psUser.getEmail());
       templateArgs.put("personalSupportFirstName", psUser == null ? "" : psUser.getFirstName());
       templateArgs.put("personalSupportFullName", psUser == null ? "" : psUser.getLegalName());
-      
+
       emailMessage.setTemplateArguments(templateArgs);
     }
 
@@ -138,7 +139,11 @@ public class EmailsUtility {
     try {
       cts.apply(userX, group, emailMessage, templateArgs);
     } catch (Exception e) {
-      logger.error(e);
+      Alarm alarm = new Alarm("EmailTemplate");
+      alarm.setNote(templateName +": " + e.getMessage());
+      ((DAO) x.get("alarmDAO")).put(alarm);
+
+      logger.error("Problem with template: " + templateName, e);
       return;
     }
 

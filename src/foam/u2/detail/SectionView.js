@@ -24,12 +24,16 @@ foam.CLASS({
   ],
 
   css: `
+
+    ^section-title {
+      padding-bottom: 16px;
+    }
+
     .subtitle {
       color: /*%GREY2%*/ #9ba1a6;
       font-size: 14px;
       line-height: 1.5;
-      margin-bottom: 15px;
-      white-space: pre-line;
+      margin-bottom: 16px;
     }
   `,
 
@@ -125,10 +129,10 @@ foam.CLASS({
                   code: section.title
                 });
                 if ( slot$.value ) {
-                  this.start('h2').add(slot$.value).end();
+                  this.start('h5').add(slot$.value.toUpperCase()).addClass(self.myClass('section-title')).end();
                 }
               } else {
-                this.start('h2').add(section.title).end();
+                this.start('h5').add(section.title.toUpperCase()).addClass(self.myClass('section-title')).end();
               }
             })
             .callIf(section$subTitle, function() {
@@ -139,14 +143,14 @@ foam.CLASS({
                   code: section.subTitle
                 });
                 if ( slot$.value ) {
-                  this.start().addClass('subtitle').add(slot$.value).end();
+                  this.start('p').addClass('subtitle').add(slot$.value).end();
                 }
               } else {
-                this.start().addClass('subtitle').add(section.subTitle).end();
+                this.start('p').addClass('subtitle').add(section.subTitle).end();
               }
             })
             .add(this.slot(function(loadLatch) {
-              var view = this.E().start(self.Grid);
+              var view = this.E().start(self.Grid).style({ 'grid-gap': '16px 12px' });
 
               if ( loadLatch ) {
                 view.forEach(section.properties, function(p, index) {
