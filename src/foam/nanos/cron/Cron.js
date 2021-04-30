@@ -115,10 +115,7 @@ foam.CLASS({
       ],
       type: 'Boolean',
       javaCode: `
-        if ( ! getClusterable() ) {
-          return true;
-        }
-        if ( getStatus() == ScriptStatus.SCHEDULED ) {
+        if ( getClusterable() ) {
           foam.nanos.medusa.ClusterConfigSupport support = (foam.nanos.medusa.ClusterConfigSupport) x.get("clusterConfigSupport");
           if ( support != null &&
                ! support.cronEnabled(x) ) {
