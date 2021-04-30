@@ -116,6 +116,30 @@
     {
       name: 'COMPLIANCE_TRANSACTION',
       label: 'Compliance Transaction'
+    },
+    {
+      name: 'CAPABLE_CREATED_APPROVAL',
+      label: 'Capable Created Approval'
+    },
+    {
+      name: 'APPROVABLE_REQUEST',
+      label: 'Approvable Request'
+    },
+    {
+      name: 'SUDO_TICKET_APPROVAL',
+      label: 'Sudo Ticket Approval'
+    },
+    {
+      name: 'NATURE_CODE_APPROVAL',
+      label: 'Nature Code Approval'
+    },
+    {
+      name: 'ACCOUNT_ROLE_APPROVAL',
+      label: 'Account Role Approval'
+    },
+    {
+      name: 'ACCOUNT_APPROVABLE_REQUEST',
+      label: 'Account Approvable Request'
     }
   ]
 });

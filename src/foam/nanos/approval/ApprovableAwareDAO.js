@@ -21,6 +21,7 @@ foam.CLASS({
     'foam.nanos.approval.Approvable',
     'foam.nanos.approval.ApprovableAware',
     'foam.nanos.approval.ApprovalRequest',
+    'foam.nanos.approval.ApprovalRequestClassificationEnum',
     'foam.nanos.approval.ApprovalStatus',
     'foam.mlang.predicate.Predicate',
     'foam.nanos.auth.LifecycleAware',
@@ -216,7 +217,7 @@ foam.CLASS({
           getDelegate().put(o, sub);
         }
       };
-      
+
       DAO filteredApprovalRequestDAO;
       String hashedId = ""; // not needed for remove case
 
@@ -281,8 +282,8 @@ foam.CLASS({
         .getDelegate())
         .getArray();
 
-      // if the new list of approvers include users who are not in the original list of approvers, we want to send them the ar 
-      // we dont need the proxysink for this operation sink if this is non-empty, we do not need to know if there's any 
+      // if the new list of approvers include users who are not in the original list of approvers, we want to send them the ar
+      // we dont need the proxysink for this operation sink if this is non-empty, we do not need to know if there's any
       // new approvers to whom an approvalrequest for this operation should be sent.
       List fulfilledRequests = ((ArraySink) filteredApprovalRequestDAO
         .where(foam.mlang.MLang.OR(
@@ -291,7 +292,7 @@ foam.CLASS({
           foam.mlang.MLang.EQ(ApprovalRequest.STATUS, ApprovalStatus.CANCELLED)
         )).inX(getX()).select(new ArraySink())).getArray();
 
-      if ( pendingRequests.size() > 0 && fulfilledRequests.size() == 0 && approverIds.size() == 0 ) 
+      if ( pendingRequests.size() > 0 && fulfilledRequests.size() == 0 && approverIds.size() == 0 )
         throw new RuntimeException("There is an outstanding approval for this request.");
 
       if ( fulfilledRequests.size() == 1 ) {
@@ -302,7 +303,7 @@ foam.CLASS({
         if ( lastModifiedBy == null ) lastModifiedBy = new User.Builder(x).setId(fulfilledRequest.getLastModifiedBy()).build();
         Subject subject = new Subject.Builder(x).setUser(lastModifiedBy).build();
         X approvalX = getX().put("subject", subject);
-          
+
         approvalRequestDAO.inX(approvalX).put(fulfilledRequest);
 
         if ( fulfilledRequest.getStatus() == ApprovalStatus.APPROVED ) {
@@ -311,10 +312,10 @@ foam.CLASS({
             lifecycleObj.setLifecycleState(LifecycleState.ACTIVE);
           }
           return super.put_(x,obj);
-        } 
+        }
 
         return null;  // as request has been REJECTED or CANCELLED
-      } 
+      }
 
       if ( fulfilledRequests.size() > 1 ) {
         logger.error(ERROR_MSG2);
@@ -329,7 +330,8 @@ foam.CLASS({
           .setDaoKey(getServiceName())
           .setServerDaoKey(getDaoKey())
           .setObjId(String.valueOf(obj.getProperty("id")))
-          .setClassification(getOf().getObjClass().getSimpleName())
+          .setClassificationEnum(ApprovalRequestClassificationEnum.APPROVABLE_REQUEST)
+          .setDescription(getOf().getObjClass().getSimpleName())
           .setOperation(operation)
           .setCreatedBy(user.getId())
           .setStatus(ApprovalStatus.REQUESTED).build();
@@ -351,7 +353,7 @@ foam.CLASS({
         }
 
         Map propertiesToApprove = objectToDiffAgainst.diff(obj);
-      
+
         // No change, just returns obj
         if ( propertiesToApprove.isEmpty() ) {
           return obj;
@@ -370,7 +372,8 @@ foam.CLASS({
         approvalRequest = new ApprovalRequest.Builder(x)
           .setDaoKey("approvableDAO")
           .setObjId(approvable.getId())
-          .setClassification(getOf().getObjClass().getSimpleName())
+          .setClassificationEnum(ApprovalRequestClassificationEnum.APPROVABLE_REQUEST)
+          .setDescription(getOf().getObjClass().getSimpleName())
           .setOperation(operation)
           .setCreatedBy(user.getId())
           .setStatus(ApprovalStatus.REQUESTED).build();

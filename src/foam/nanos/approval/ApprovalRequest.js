@@ -51,17 +51,16 @@
     'ctrl',
     'currentMenu',
     'notify',
+    'objectSummaryView?',
     'stack',
     'subject',
-    'summaryView?',
-    'objectSummaryView?'
+    'summaryView?'
   ],
 
   tableColumns: [
     'id',
     'description',
     'classificationEnum',
-    'classification',
     'objId',
     'createdFor',
     'approver.legalName',
@@ -327,7 +326,6 @@
     {
       class: 'String',
       name: 'classification',
-      //label: 'Approval Type',
       section: 'approvalRequestInformation',
       order: 80,
       gridColumns: 6,
@@ -341,7 +339,7 @@
         EQ(ApprovalRequest.REQUEST_REFERENCE, "reference")
       )`,
       storageTransient: true,
-      //hidden: true,
+      hidden: true,
       javaSetter: `
         // for legacy property(classification) migration
         classification_ = val;
@@ -369,7 +367,10 @@
       gridColumns: 6,
       includeInDigest: false,
       tableWidth: 450,
-      view: { class: 'foam.u2.TextField', onKey: true }
+      view: { class: 'foam.u2.EnumView' },
+      tableCellFormatter: function(value, obj) {
+        this.add(value.label);
+      }
     },
     {
       class: 'DateTime',
@@ -683,10 +684,10 @@
       name: 'toSummary',
       type: 'String',
       code: function() {
-        return `(${this.classification}) ${this.operation}`;
+        return this.classificationEnum.label;
       },
       javaCode: `
-        return foam.util.SafetyUtil.isEmpty(getClassification()) ? "" : "(" + getClassification() + ")" + getOperation().toString();
+        return getClassificationEnum().getLabel();
       `
     },
     {
