@@ -45,18 +45,11 @@ foam.CLASS({
       align-items: center;
       outline: none;
       border: 1px solid transparent;
+      box-sizing: border-box;
     }
 
     ^ + ^ {
       margin-left: 8px;
-    }
-
-    ^ img {
-      margin-right: 4px;
-    }
-
-    ^:focus {
-      border-width: 2px;
     }
 
     ^:hover:not(:disabled) {
@@ -85,78 +78,63 @@ foam.CLASS({
     /* Primary */
     ^primary {
       background-color: /*%PRIMARY3%*/ #406dea;
-      border-color: /*%SECONDARY1%*/ #4a33f4;
-      color: white;
+      color: /*%WHITE%*/ white;
+      box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.06), 0px 1px 3px rgba(0, 0, 0, 0.1);
     }
 
     ^primary:hover:not(:disabled) {
       background-color: /*%PRIMARY2%*/ #144794;
-      border-color: /*%PRIMARY1%*/ #202341;
-      border: 1px solid #294798;
     }
 
-    ^primary:focus:not(:hover) {
-      border-color: #23186c;
-      box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
-    }
     ^primary:focus:hover {
-      border: 2px solid #23186c;
+      border-color: /*%PRIMARY1%*/ #202341;
     }
+
     ^primary:disabled {
-      background-color: /*%PRIMARY4%*/ #a7beff;
-      border: 1px solid /*%PRIMARY4%*/ #a7beff;
+      background-color: /*%PRIMARY4%*/ #C6D2FF;
     }
 
     /* Primary destructive */
 
     ^primary-destructive {
       background-color: /*%DESTRUCTIVE3%*/ #d9170e;
-      border: 1px solid /*%DESTRUCTIVE3%*/ #d9170e;
-      color: white;
+      color: /*%WHITE%*/ white;
     }
 
     ^primary-destructive:hover:not(:disabled) {
       background-color: /*%DESTRUCTIVE2%*/ #a61414;
-      border-color: /*%DESTRUCTIVE1%*/ #a61414;
     }
 
     ^primary-destructive:focus {
-      border: 2px solid #a61414;
-      box-shadow: 0 1px 2px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 1px rgba(255, 255, 255, 0.06);
-      padding: 7px 15px;
+      border: 2px solid /*%DESTRUCTIVE1%*/ #631414;
+      box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.06);
     }
 
     ^primary-destructive:disabled {
-      background-color: /*%DESTRUCTIVE5%*/ #fbedec;
-      border-color: /*%DESTRUCTIVE4%*/ #ed8e8d;
+      background-color: /*%DESTRUCTIVE5%*/ #E5D2D0;
     }
 
 
     /* Secondary */
 
     ^secondary {
-      background-color: white;
-      border: 1px solid /*%PRIMARY3%*/ #406dea;
-      color: /*%PRIMARY3%*/ #406dea;
+      background-color: /*%WHITE%*/ white;
+      border: 1px solid /*%GREY3%*/ #B2B6BD;
+      color: /*%GREY1%*/ #494F59;
     }
 
-    ^secondary:hover {
-      background-color: white;
-      border-color: /*%PRIMARY2%*/ #144794;
-      color: /*%PRIMARY2%*/ #144794;
+    ^secondary:hover:not(:disabled) {
+      background-color: /*%GREY5%*/ #B2B6BD;
     }
 
-    ^secondary:focus:not(:hover) {
-      border-color: /*%SECONDARY2%*/ #432de7;
-      color: /*%PRIMARY2%*/ #144794;
-    }
-    ^secondary:focus:hover {
-      border: 2px solid /*%SECONDARY2%*/ #432de7;
+    ^secondary:focus {
+      border: 1px solid /*%PRIMARY3%*/ #406DEA;
     }
 
     ^secondary:disabled {
-      border-color: /*%PRIMARY4%*/ #a7beff;
-      color: /*%PRIMARY4%*/ #a7beff;
+      background-color: /*%GREY5%*/ #F5F7FA;
+      border-color: /*%GREY4%*/ #DADDE2;
+      color: /*%GREY4%*/ #DADDE2;
     }
 
 
@@ -164,19 +142,22 @@ foam.CLASS({
 
     ^secondary-destructive {
       background-color: white;
-      border-color: /*%DESTRUCTIVE3%*/ #d9170e;
-      color: /*%DESTRUCTIVE3%*/ #d9170e;
+      border: 1px solid /*%GREY3%*/ #B2B6BD;
+      color: /*%DESTRUCTIVE2%*/ #d9170e;
     }
 
     ^secondary-destructive:hover {
-      background-color: white;
+      background-color: /*%GREY5%*/ #B2B6BD;
+    }
+
+    ^secondary-destructive:focus {
       border-color: /*%DESTRUCTIVE2%*/ #a61414;
-      color: /*%DESTRUCTIVE2%*/ #a61414;
     }
 
     ^secondary-destructive:disabled {
-      border-color: /*%DESTRUCTIVE5%*/ #fbedec;
-      color: /*%DESTRUCTIVE5%*/ #fbedec;
+      background-color: /*%GREY5%*/ #F5F7FA;
+      border-color: /*%GREY4%*/ #DADDE2;
+      color: /*%DESTRUCTIVE5%*/ #E5D2D0;
     }
 
 
@@ -185,24 +166,20 @@ foam.CLASS({
     ^tertiary {
       background: none;
       border: 1px solid transparent;
-      box-shadow: none;
       color: /*%GREY1%*/ #5E6061;
     }
 
     ^tertiary:hover:not(:disabled) {
-      color: /*%PRIMARY3%*/ #406dea;
+      background-color: /*%GREY5%*/ #F5F7FA;
     }
 
-    ^tertiary:focus:not(:hover) {
-      border-color: /*%SECONDARY1%*/ #4a33f4;
-    }
-
-    ^tertiary:focus:hover {
-      border: 2px solid /*%SECONDARY1%*/ #4a33f4;
+    ^tertiary:focus {
+      background-color: /*%GREY5%*/ #F5F7FA;
+      color: /*%PRIMARY3%*/ #494F59;
     }
 
     ^tertiary:disabled {
-      color: /*%GREY3%*/ #cbcfd4;
+      color: /*%GREY4%*/ #DADDE2;
     }
 
 
@@ -211,52 +188,84 @@ foam.CLASS({
     ^tertiary-destructive {
       background-color: transparent;
       border-color: transparent;
-      color: /*%BLACK%*/ #1e1f21;
+      color: /*%DESTRUCTIVE5%*/ #5E6061;
     }
 
     ^tertiary-destructive:hover:not(:disabled) {
-      background-color: transparent;
-      border-color: transparent;
+      background-color: /*%GREY5%*/ #F5F7FA;
     }
 
-    ^tertiary-destructive:focus:not(:hover) {
-      border-bottom-color: /*%PRIMARY3%*/ #406dea;
+    ^tertiary-destructive:focus {
+      background-color: /*%GREY5%*/ #F5F7FA;
+      color: /*%DESTRUCTIVE3%*/ #494F59;
     }
 
     ^tertiary-destructive:disabled {
-      color: /*%GREY3%*/ #cbcfd4;
+      color: /*%GREY4%*/ #DADDE2;
+    }
+
+    /* Link */
+
+    ^link {
+      background: none;
+      color: /*%GREY1%*/ #5E6061;
+    }
+
+    ^link:hover {
+      text-decoration: underline;
+      color: /*%GREY2%*/ #6B778C;
+    }
+
+    ^link:focus {
+      color: /*%PRIMARY3%*/ #406DEA;
     }
 
 
     /* Sizes */
 
     ^small {
-      font-size: 10px;
-      padding: 8px 16px;
+      padding: 6px 10px;
+    }
+
+    ^small > img {
+      width: 16px;
+      height: 16px;
     }
 
     ^medium {
-      font-size: 14px;
-      padding: 9px 16px;
+      padding: 8px 12px;
+    }
+
+    ^medium > img {
+      width: 24px;
+      height: 24px;
     }
 
     ^large {
-      font-size: 16px;
-      padding: 13px 16px;
+      padding: 12px 12px;
     }
 
-    ^tertiary^small,
-    ^tertiary^medium,
-    ^tertiary^large {
+    ^large > img {
+      width: 32px;
+      height: 32px;
+    }
+
+    ^iconOnly{
+      padding: 8px !important;
+    }
+
+    ^link^small,
+    ^link^medium,
+    ^link^large {
       padding-left: 0;
       padding-right: 0;
     }
 
-    ^tertiary^small:focus,
-    ^tertiary^medium:focus,
-    ^tertiary^large:focus {
-      padding-left: 1px;
-      padding-right: 1px;
+    ^link^small > img,
+    ^link^medium > img,
+    ^link^large > img {
+      width: 14px;
+      height: 14px;
     }
   `,
 
@@ -383,6 +392,7 @@ foam.CLASS({
           return this.myClass(styleClass_);
         }));
         this.addClass(this.myClass(this.size.label.toLowerCase()));
+        this.enableClass(this.myClass('iconOnly'), ! this.label);
       }
     },
 
@@ -394,8 +404,10 @@ foam.CLASS({
     function addContent() {
       /** Add text or icon to button. **/
       if ( this.icon ) {
-        // this.nodeName = 'a';
-        this.start('img').attr('src', this.icon$).end();
+        this.start('img')
+          .style({ 'margin-right': this.label ? '4px' : 0 })
+          .attr('src', this.icon$)
+        .end();
       } else if ( this.iconFontName ) {
         this.nodeName = 'i';
         this.cssClass(this.action.name);
@@ -405,7 +417,11 @@ foam.CLASS({
       }
 
       if ( this.label ) {
-        this.add(this.label$);
+        if ( this.buttonStyle == this.buttonStyle.LINK ) {
+          this.start('p').add(this.label$).end();
+        } else {
+          this.start('h6').add(this.label$).end();
+        }
       }
     }
   ],
