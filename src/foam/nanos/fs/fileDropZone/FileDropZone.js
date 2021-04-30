@@ -61,24 +61,14 @@ foam.CLASS({
       opacity: 0;
       position: absolute;
     }
-    ^title {
-      font-size: 16px;
-      font-weight: 900;
-      margin: 0;
-    }
     ^or {
       display: inline-block;
-      vertical-align: bottom;
-      margin:0;
-      margin-top: 8px;
     }
     ^link {
       display: inline-block;
       cursor: pointer;
       color: /*%PRIMARY3%*/ #406dea;
-      margin: 0;
       margin-left: 5px;
-      margin-top: 8px;
     }
     ^input:focus + ^instruction-container > ^browse-container > ^link{
       border: 1px solid;
@@ -187,7 +177,7 @@ foam.CLASS({
         })
         .start().addClass(this.myClass('instruction-container')).enableClass('selection', this.files$.map((v) => { return v.length > 0; }))
           .start().addClass(this.myClass('browse-container'))
-            .start('p').addClass(this.myClass('title')).add(this.title || this.LABEL_DEFAULT_TITLE).end()
+            .start('p').addClass('semiBold').add(this.title || this.LABEL_DEFAULT_TITLE).end()
               .start('p').addClass(this.myClass('or')).add(this.LABEL_OR).end()
               .start('label').addClass(this.myClass('link'))
                 .add(this.LABEL_BROWSE)

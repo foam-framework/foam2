@@ -428,6 +428,7 @@ try {
           PropertyInfo prop = (PropertyInfo) e.next();
           mergeProperty(oldFObject, diffFObject, prop);
         }
+        // it's backwards in case when we override the "class" was changed
         return diffFObject.copyFrom(oldFObject);
       `
     },
@@ -438,14 +439,15 @@ try {
         if ( prop.isSet(diffFObject) ) {
           if ( prop instanceof AbstractFObjectPropertyInfo && prop.get(oldFObject) != null
             && prop.get(diffFObject) != null ) {
-            FObject oldOb = (FObject)prop.get(oldFObject);
-            FObject diffOb =((FObject) prop.get(diffFObject)).fclone();
-            if ( oldOb.getClassInfo() != diffOb.getClassInfo() ) {
-              diffOb.copyFrom(oldOb);
-              // have to explicitly set the value because diffOb is a clone
-              prop.set(oldFObject, mergeFObject(diffOb, (FObject) prop.get(diffFObject)));
+            FObject nestedDiffFObj = (FObject) prop.get(diffFObject);
+            FObject oldNestedFObj = (FObject) prop.get(oldFObject);
+            if ( oldNestedFObj.getClassInfo() != nestedDiffFObj.getClassInfo() ) {
+              FObject nestedOldDiff = nestedDiffFObj.fclone();
+              nestedOldDiff.copyFrom(oldNestedFObj);
+              // have to explicitly set the value because nestedOldDiff is a clone
+              prop.set(oldFObject, mergeFObject(nestedOldDiff, nestedDiffFObj));
             } else {
-              mergeFObject(oldOb, (FObject) prop.get(diffFObject));
+              mergeFObject(oldNestedFObj, nestedDiffFObj);
             }
           } else {
             prop.set(oldFObject, prop.get(diffFObject));
