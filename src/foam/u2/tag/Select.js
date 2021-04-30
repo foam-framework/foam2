@@ -23,10 +23,22 @@ foam.CLASS({
       color: initial;
     }
     ^ {
-      padding: 0 !important;
+      appearance: none;
+      -moz-appearance: none;
+      -webkit-appearance: none;
+      width: 100%;
+      box-shadow: none;
+      background: #ffffff url('/images/dropdown-icon.svg') no-repeat;
+      background-position: right 0.9em top 50%, 0 0; 
+      cursor: pointer;
     }
     ^ option {
       padding: 4px;
+      width: 100%;
+    }
+    ^.expanded{
+      padding: 0;
+      background: none;
     }
   `,
 
@@ -59,6 +71,7 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .attrs({size: this.size$})
+        .enableClass('expanded', this.size != 0 )
         .attrSlot().linkFrom(this.data$);
 
       if ( this.size ) this.style({height: 'auto'});
