@@ -564,7 +564,7 @@ foam.CLASS({
                       view.dblclick(obj, obj.id);
                     });
                   }).
-                  callIf( view.click && ! view.disableUserSelection, function() {
+                  callIf( ! view.disableUserSelection, function() {
                     tableRowElement.on('click', function(evt) {
                       // If we're clicking somewhere to close the context menu,
                       // don't do anything.
@@ -580,12 +580,10 @@ foam.CLASS({
                           view.selection = v;
                           if ( view.importSelection$ ) view.importSelection = v;
                           if ( view.editRecord$ ) view.editRecord(v);
-                          view.click(null, obj.id);
                         });
                       } else {
                         if ( view.importSelection$ ) view.importSelection = thisObjValue;
                         if ( view.editRecord$ ) view.editRecord(thisObjValue);
-                        view.click(null, obj.id);
                       }
                     });
                   }).

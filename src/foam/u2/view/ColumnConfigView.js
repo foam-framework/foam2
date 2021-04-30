@@ -745,8 +745,7 @@ foam.CLASS({
           ( foam.String.isInstance(c) && c.split('.').length >= this.level && c.split('.')[this.level] === this.rootProperty[0] );
         });
 
-        //
-        if ( selectedColumn.find(c => foam.String.isInstance(c) && c.split('.').length == ( this.level + 1 ) ) ) {
+        if ( selectedColumn.find(c => foam.String.isInstance(c) && c.split('.').length == ( this.level + 1 )) ) {
           selectedSubProperties.push(['', 'To Summary']);
         } else {
           otherSubProperties.push(['', 'To Summary']);
