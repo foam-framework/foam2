@@ -1,13 +1,13 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2021 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'TitledArrayView',
-  extends: 'foam.u2.view.ArrayView',
+  extends: 'foam.u2.view.FObjectArrayView',
 
   imports: ['theme'],
 
@@ -22,24 +22,6 @@ foam.CLASS({
   `,
 
   properties: [
-    {
-      class: 'Class',
-      name: 'of'
-    },
-    {
-      name: 'defaultNewItem',
-      expression: function(of) {
-        return foam.core.InterfaceModel.isInstance(of.model_)
-          ? null
-          : of.create(null, this.__subContext__);
-      }
-    },
-    {
-      name: 'valueView',
-      expression: function(of) {
-        return { class: 'foam.u2.DetailView' };
-      }
-    },
     { name: 'name' }
   ],
 
@@ -89,10 +71,6 @@ foam.CLASS({
             icon: this.theme ? this.theme.glyphs.plus.getDataUrl({ fill: this.theme.grey1 }) : "data:image/svg+xml;utf8,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath fill='%2317d90e' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z'/%3E%3C/svg%3E"
           })
         .endContext();
-    },
-    function fromProperty(p) {
-      this.SUPER(p);
-      if ( ! this.of && p.of ) this.of = p.of;
     }
   ]
 });

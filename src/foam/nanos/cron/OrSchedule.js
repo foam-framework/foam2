@@ -28,7 +28,7 @@ foam.CLASS({
       of: 'foam.nanos.cron.Schedule',
       view: () => {
         return {
-          class: 'foam.u2.view.TitledArrayView',
+          class: 'foam.u2.view.FObjectArrayView',
           of: 'foam.nanos.cron.Schedule',
           defaultNewItem: foam.nanos.cron.IntervalSchedule.create({
             start: "2019-10-14",
