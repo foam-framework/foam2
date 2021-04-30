@@ -672,10 +672,16 @@ foam.LIB({
       documentation: `
         Format a string by including delimiter characters to match the specified
         format string, where 'x' represents a character from the input and any
-        other character is added to the output literally.
+        other character is added to the output literally. The placeholder ('x')
+        can be escaped using the the escape character ('\\').
+
+        'placeholder' allows changing the placeholder character from 'x' to
+        something else. 'escapeChar' allows changing the character that escapes
+        the placeholder character.
 
         Examples:
           applyFormat('12345', 'xx-xx/x') // 12-34/5
+          applyFormat('12345', 'xx\\\\xxx/x') // 12x34/5
           applyFormat('12345', '??x??x?', '?') // 12x34x5
       `,
       code: function applyFormat(string, formatString, placeholder, escapeChar) {
