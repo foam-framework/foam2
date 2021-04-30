@@ -20,11 +20,6 @@ foam.CLASS({
       grid-template-columns: repeat(auto-fit, minmax(0,1fr));
     }
 
-    ^ m3 {
-      font-size: 16px;
-      font-weight: bold;
-    }
-
     ^validation-container {
       margin-top: 6px;
     }
@@ -69,15 +64,6 @@ foam.CLASS({
       right: 25px;
       width: 380px;
       z-index: 10;
-    }
-
-    /* Necessary to style the border radius. This should probably be in Select itself. */
-    ^ .foam-u2-tag-Select {
-      width: 100%;
-      box-shadow: none;
-      background: #ffffff url('/images/dropdown-icon.svg') no-repeat 98% 50%;
-      -webkit-appearance: none;
-      cursor: pointer;
     }
 
     ^error .foam-u2-tag-TextArea,
@@ -234,7 +220,8 @@ foam.CLASS({
             .start()
               .start(self.Rows)
                 .callIf(prop$label, function() {
-                  this.start('m3')
+                  this.start('p')
+                    .addClass('semiBold')
                     .add(prop.label)
                     .style({ 'line-height': '2' })
                   .end();

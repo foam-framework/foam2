@@ -554,9 +554,14 @@ foam.CLASS({
                   on('mouseover', function() {
                     view.hoverSelection = obj;
                   }).
+                  callIf(view.click && ! view.disableUserSelection, function() {
+                    tableRowElement.on('click', function() {
+                      view.click(obj, obj.id);
+                    });
+                  }).
                   callIf(view.dblclick && ! view.disableUserSelection, function() {
                     tableRowElement.on('dblclick', function() {
-                      view.dblclick(null, obj.id);
+                      view.dblclick(obj, obj.id);
                     });
                   }).
                   callIf( view.click && ! view.disableUserSelection, function() {

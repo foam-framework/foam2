@@ -17,6 +17,7 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.mlang.sink.Count',
+    'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.util.Email',
     'foam.util.SafetyUtil',
@@ -44,12 +45,20 @@ foam.CLASS({
           throw new RuntimeException(INVALID_ERROR);
         }
 
+        // Check against the spid of the user who is submitting the request in
+        // case the user.spid is not set (or was cleared by PermissionedPropertyDAO).
+        var spid = user.getSpid();
+        if ( SafetyUtil.isEmpty(spid) ) {
+          var subject = (Subject) x.get("subject");
+          spid = subject.getUser().getSpid();
+        }
+
         Count count = new Count();
         count = (Count) userDAO
             .where(AND(
               EQ(User.TYPE, user.getType()),
               EQ(User.EMAIL, user.getEmail()),
-              EQ(User.SPID, user.getSpid()),
+              EQ(User.SPID, spid),
               NEQ(User.ID,  user.getId())
             )).limit(1).select(count);
 

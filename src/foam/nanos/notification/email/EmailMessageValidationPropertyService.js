@@ -25,11 +25,6 @@ foam.CLASS({
       type: 'foam.nanos.notification.email.EmailMessage',
       javaCode: `
 
-        // FROM:
-        if ( ! emailMessage.isPropertySet("from") ) {
-          throw new InvalidParameterException("From property is not set");
-        }
-
         // TO:
         if ( ! emailMessage.isPropertySet("to") ) {
           throw new InvalidParameterException("To property is not set");

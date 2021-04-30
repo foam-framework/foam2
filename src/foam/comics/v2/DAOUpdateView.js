@@ -27,6 +27,10 @@ foam.CLASS({
       padding: 32px
     }
 
+    ^topContainer{
+      grid-gap: 32px 12px;
+    }
+
     ^ .foam-u2-ActionView-back {
       display: flex;
       align-self: flex-start;
@@ -51,6 +55,7 @@ foam.CLASS({
     'foam.log.LogLevel',
     'foam.u2.layout.Cols',
     'foam.u2.layout.Rows',
+    'foam.u2.layout.Grid',
     'foam.u2.ControllerMode',
     'foam.u2.dialog.NotificationMessage'
   ],
@@ -174,7 +179,8 @@ foam.CLASS({
         .addClass(this.myClass())
         .add(self.slot(function(data, config$viewBorder) {
           return self.E()
-            .start(self.Rows)
+            .start(self.Grid)
+              .addClass(this.myClass('topContainer'))
               .start(self.Rows)
                 // we will handle this in the StackView instead
                 .startContext({ data: self.stack })
