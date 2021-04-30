@@ -262,10 +262,9 @@ foam.CLASS({
   ],
 
   methods: [
-    async function initE() {
+    function initE() {
       var self = this;
       this.SUPER();
-      this.data = await this.config.dao.find(this.data);
       if ( this.memento ) {
         var m = this.memento;
         var counter = 0;
@@ -279,7 +278,7 @@ foam.CLASS({
         }
       }
 
-      var promise = this.data ? Promise.resolve(this.data) : this.config.unfilteredDAO.inX(this.__subContext__).find(this.idOfRecord);
+      var promise = this.config.unfilteredDAO.inX(this.__subContext__).find(this.data ? this.data.id : this.idOfRecord);
 
       // Get a fresh copy of the data, especially when we've been returned
       // to this view from the edit view on the stack.
