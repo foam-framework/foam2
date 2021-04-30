@@ -135,7 +135,6 @@ foam.CLASS({
       class: 'Long',
       name: 'id',
       documentation: 'The ID for the User.',
-      final: true,
       tableWidth: 100,
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
