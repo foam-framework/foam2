@@ -9,6 +9,14 @@ foam.CLASS({
   name: 'DocumentationView',
   extends: 'foam.u2.View',
 
+  imports: [
+    'memento'
+  ],
+
+  requires: [
+    'foam.nanos.controller.Memento'
+  ],
+
   css: `
     ^ table { width: 100%; }
     ^ td , ^ th {
@@ -52,6 +60,11 @@ foam.CLASS({
   ],
 
   methods: [
+    function init() {
+      var docId = (v => v.length > 1 ? v[1] : null)(
+        this.memento.value.split(this.Memento.SEPARATOR));
+      if ( docId ) this.docKey = docId;
+    },
     function initE() {
       var dao = this.__context__[this.daoKey];
       this.addClass(this.myClass());
