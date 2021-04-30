@@ -38,18 +38,6 @@ foam.CLASS({
       name: 'valueView',
       expression: function(of) {
         return { class: 'foam.u2.DetailView' };
-        /*
-        return {
-          class: 'foam.u2.view.CollapseableDetailView',
-          view: {
-            class: 'foam.u2.view.DraftDetailView',
-            view: {
-              class: 'foam.u2.view.FObjectView',
-              of: of
-            }
-          }
-        };
-        */
       }
     },
     { name: 'name' }
