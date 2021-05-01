@@ -156,24 +156,25 @@ foam.CLASS({
   ],
 
   requires: [
-//    'com.google.dxf.ui.DXFDiagram',
+    'com.google.flow.Calc',
     'com.google.flow.Canvas',
     'com.google.flow.Circle',
-    'com.google.flow.Ellipse',
     'com.google.flow.DetailPropertyView',
+    'com.google.flow.Ellipse',
+    'com.google.flow.FLOW',
     'com.google.flow.Halo',
     'com.google.flow.Property',
-    'com.google.flow.FLOW',
-    'foam.demos.sevenguis.Cells',
     'foam.dao.EasyDAO',
+    'foam.demos.sevenguis.Cells',
+    'foam.google.flow.TreeView',
     'foam.graphics.Box',
     'foam.graphics.CView',
     'foam.physics.Physical',
     'foam.physics.PhysicsEngine',
     'foam.u2.PopupView',
     'foam.u2.TableView',
-    'foam.google.flow.TreeView',
     'foam.util.Timer'
+//    'com.google.dxf.ui.DXFDiagram',
   ],
 
   exports: [
@@ -449,6 +450,14 @@ foam.CLASS({
         return this.Cells.create({rows: 28, columns:8}).style({width:'650px'});
       }
     },
+    {
+      name: 'calc',
+      factory: function() {
+        this.Calc.getAxiomsByClass(foam.core.Property).forEach(function(p) { p.hidden = true; });
+
+        return this.Calc.create().style({width:'650px'});
+      }
+    },
     'mouseTarget',
     {
       name: 'position',
@@ -531,6 +540,10 @@ foam.CLASS({
               end().
               start(foam.u2.Tab, {label: 'sheet1'}).
                 start(this.sheet).
+                end().
+              end().
+              start(foam.u2.Tab, {label: 'calc1'}).
+                start(this.calc).
                 end().
               end().
               start(foam.u2.Tab, {label: '+'}).
