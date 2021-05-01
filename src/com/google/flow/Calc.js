@@ -141,7 +141,10 @@ foam.CLASS({
           var f = parseFloat(s);
           return foam.core.ConstantSlot.create({value: f});
         },
-        cell: function(a) { return cell(a[0]).numValue$; },
+        cell: function(a) {
+          var c = cell(a);
+          return c.numValue$;
+        },
         vargs: function(a) {
           return foam.core.ExpressionSlot.create({
             code: function() {
@@ -343,11 +346,21 @@ foam.CLASS({
           this.addRow(watch);
         }));
       }
+      return row;
+    },
+
+    function addHiddenRow(id, expression) {
+      var row = this.Row.create({id: id, expression: expression});
+      this.rows.push(row);
+      return row;
     },
 
     function initE() {
       this.SUPER();
       var self = this;
+
+      this.rows.push(this.Row.create({id: 'PI', numValue: Math.PI}));
+      this.rows.push(this.Row.create({id: 'E', numValue: Math.E}));
 
       this.addRow();
       this.addRow();
