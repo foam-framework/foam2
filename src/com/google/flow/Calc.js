@@ -190,8 +190,25 @@ foam.CLASS({
   imports: [ 'parser' ],
 
   css: `
+    ^ * {
+      font: 24px roboto, arial, sans-serif;
+    }
+    ^value {
+      font: 24px roboto, arial, sans-serif;
+    }
     ^ .property-id input {
       font-weight: 700;
+    }
+    ^ .foam-u2-ReadWriteView {
+      display: inline-block;
+      width: 302px;
+    }
+    ^ .foam-u2-ReadWriteView span span {
+      font: 24px roboto, arial, sans-serif;
+    }
+    ^ input {
+      height: 34px;
+      font: 24px roboto, arial, sans-serif;
     }
   `,
 
@@ -199,6 +216,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
+      view: 'foam.u2.ReadWriteView',
       width: 10
     },
     {
@@ -234,6 +252,7 @@ foam.CLASS({
           .add('=')
         .end()
         .start('span')
+          .addClass(this.myClass('value'))
           .add(this.value$)
         .end();
 
