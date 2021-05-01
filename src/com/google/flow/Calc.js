@@ -229,7 +229,7 @@ foam.CLASS({
       width: 50
     },
     {
-      class: 'String',
+      // class: 'String',
       name: 'value'
     },
     {
@@ -327,13 +327,22 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'com.google.flow.Row',
       name: 'rows'
+    },
+    {
+      name: 'nextRowId_',
+      value: 'a'
     }
   ],
 
   methods: [
     function nextRowId() {
-      // 65 for A, 97 for 'a'
-      return String.fromCharCode(97 + this.rows.length);
+      var advance = () => {
+        this.nextRowId_ = String.fromCharCode(this.nextRowId_.charCodeAt(0) + 1);
+      };
+      while ( this.cell(this.nextRowId_) ) advance();
+      var ret = this.nextRowId_;
+      advance();
+      return ret;
     },
 
     function addRow(watch) {
@@ -358,9 +367,11 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
-
-      this.rows.push(this.Row.create({id: 'PI', numValue: Math.PI}));
-      this.rows.push(this.Row.create({id: 'E', numValue: Math.E}));
+      var row;
+      this.rows.push(row = this.Row.create({id: 'PI', value: Math.PI}));
+      this.add(row);
+      this.rows.push(this.Row.create({id: 'E', value: Math.E}));
+      this.rows.push(this.Row.create({id: 'random', value: Math.random}));
 
       this.addRow();
       this.addRow();
