@@ -26,10 +26,14 @@ foam.CLASS({
             expr2: seq(sym('expr3'), optional(seq('^', sym('expr2')))),
 
             expr3: alt(
-              //sym('fun'),
+              sym('fun'),
               sym('cell'),
               sym('number'),
               sym('group')),
+
+            fun: seq(
+              sym('symbol'),
+              '()'),
 
             xxxexpr: alt(
               //sym('cell'),
@@ -140,6 +144,10 @@ foam.CLASS({
         number: function(s) {
           var f = parseFloat(s);
           return foam.core.ConstantSlot.create({value: f});
+        },
+        fun: function(a) {
+          var c = cell(a[0]);
+          return foam.core.ConstantSlot.create({value: c.value()});
         },
         cell: function(a) {
           var c = cell(a);
