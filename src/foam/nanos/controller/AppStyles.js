@@ -20,6 +20,84 @@ foam.CLASS({
       background: /*%GREY5%*/ #f5f7fa;
       margin: 0;
     }
+
+    /* TYPOGRAPHY */ 
+    h1{
+      font-style: normal;
+      font-weight: 700;
+      font-size: 35px;
+      line-height: 40px;
+      margin: 0;
+    }
+    h2{
+      font-style: normal;
+      font-weight: 600;
+      font-size: 29px;
+      line-height: 32px;
+      margin: 0;
+    }
+    h3{
+      font-style: normal;
+      font-weight: 600;
+      font-size: 24px;
+      line-height: 28px;
+      margin: 0;
+    }
+    h4{
+      font-style: normal;
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 24px;
+      margin: 0;
+    }
+    h5{
+      font-style: normal;
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 20px;
+      margin: 0;
+    }
+    h6{
+      font-style: normal;
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 18px;
+      margin: 0;
+    }
+    p {
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 24px;
+      margin: 0;
+    }
+    p.large {
+      font-size: 18px;
+      line-height: 32px;
+      margin: 0;
+    }
+    p.semiBold{
+      font-style: normal;
+      font-weight: 600;
+      margin: 0;
+    }
+    p.bold{
+      font-style: normal;
+      font-weight: 700;
+    }
+    p.legalText{
+      font-style: normal;
+      font-weight: normal;
+      font-size: 11px;
+      line-height: 14px;
+    }
+    p.label{
+      font-style: normal;
+      font-weight: 500;
+      font-size: 11px;
+      line-height: 14px;
+    }
+    
     .New {
       width: 35px;
       height: 20px;

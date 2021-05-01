@@ -78,6 +78,11 @@ foam.CLASS({
         this.expectedStatuses[cap] = this.CapabilityJunctionStatus.PENDING;
       }
     },
+    function addActionRequired(...caps){
+      for ( let cap of caps ) {
+        this.expectedStatuses[cap] = this.CapabilityJunctionStatus.ACTION_REQUIRED;
+      }
+    },
     function ignore(...caps) {
       this.ignoreList.push(...caps);
     }

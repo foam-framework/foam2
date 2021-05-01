@@ -17,6 +17,7 @@ foam.CLASS({
     'foam.nanos.menu.DocumentFileMenu',
     'foam.dao.ArrayDAO',
     'foam.dao.PromisedDAO',
+    'foam.nanos.controller.Memento',
     'foam.nanos.menu.Menu'
   ],
 
@@ -32,7 +33,7 @@ foam.CLASS({
         this.documentDAO
           .select((doc) => {
             var menu = this.Menu.create({
-              id:     'document.' + doc.id,
+              id:     this.id + this.Memento.SEPARATOR + doc.id,
               // label:  doc.title,
               label:  foam.String.labelize(doc.id),
               parent: this.id,
@@ -54,4 +55,3 @@ foam.CLASS({
     }
   ]
 });
-

@@ -66,15 +66,6 @@ foam.CLASS({
       z-index: 10;
     }
 
-    /* Necessary to style the border radius. This should probably be in Select itself. */
-    ^ .foam-u2-tag-Select {
-      width: 100%;
-      box-shadow: none;
-      background: #ffffff url('/images/dropdown-icon.svg') no-repeat 98% 50%;
-      -webkit-appearance: none;
-      cursor: pointer;
-    }
-
     ^error .foam-u2-tag-TextArea,
     ^error .foam-u2-tag-Select,
     ^error .foam-u2-TextField,

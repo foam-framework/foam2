@@ -119,9 +119,7 @@ foam.CLASS({
     try {
       while ( true ) {
         foam.nanos.medusa.ClusterConfigSupport support = (foam.nanos.medusa.ClusterConfigSupport) x.get("clusterConfigSupport");
-        if ( getEnabled() &&
-             ( support == null ||
-               support.cronEnabled(x) ) ) {
+        if ( getEnabled() ) {
           Date now = new Date();
 
           getCronDAO().where(
@@ -141,8 +139,12 @@ foam.CLASS({
                                Cron cron = (Cron) ((FObject) obj).fclone();
                                PM pm = new PM(this.getClass().getSimpleName(), "cronjob", cron.getId());
                                try {
-                                 cron.setStatus(ScriptStatus.SCHEDULED);
-                                 getCronDAO().put(cron);
+                                 if ( ! cron.getClusterable() ||
+                                      support == null ||
+                                      support.cronEnabled(x) ) {
+                                   cron.setStatus(ScriptStatus.SCHEDULED);
+                                   getCronDAO().put(cron);
+                                 }
                                } catch (Throwable t) {
                                  logger.error(this.getClass(), "Error scheduling cron job", cron.getId(), t.getMessage(), t);
                                  pm.error(x, t);
