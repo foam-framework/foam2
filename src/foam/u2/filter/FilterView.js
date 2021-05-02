@@ -297,7 +297,7 @@ foam.CLASS({
       counter = this.filters.length;
       //memento which will be exported to table view
       if ( self.currentMemento_ ) self.currentMemento_ = self.currentMemento_.tail;
-      
+
       this.onDetach(this.filterController$.dot('isAdvanced').sub(this.isAdvancedChanged));
       var selectedLabel = ctrl.__subContext__.translationService.getTranslation(foam.locale, 'foam.u2.filter.FilterView.SELECTED', this.SELECTED);
       this.addClass(self.myClass())
@@ -334,7 +334,7 @@ foam.CLASS({
           .start()
             .style({overflow: 'hidden'})
             .add(this.filterController.slot(function (totalCount, resultsCount) {
-              return self.E().addClass(self.myClass('float-result-count')).add(`${resultsCount.toLocaleString(foam.locale)} of ${totalCount.toLocaleString(foam.locale)}` + selectedLabel);
+              return self.E().addClass(self.myClass('float-result-count')).add(`${resultsCount.toLocaleString(foam.locale)} of ${totalCount.toLocaleString(foam.locale)} ` + selectedLabel);
             }))
           .end()
           .add(this.filterController.slot(function (criterias) {
