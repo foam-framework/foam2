@@ -47,7 +47,7 @@ p({
   },
   "parent":"admin"
 })
-p({"class":"foam.nanos.menu.Menu","id":"admin.menus","label":"Menus","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"menuDAO","summaryView":{"class":"foam.nanos.menu.TreeAltView"}},"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"admin.menus","label":"Menus","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"menuDAO","summaryView":{"class":"foam.nanos.menu.TreeAltView","relationship":"foam.nanos.menu.MenuMenuChildrenRelationship"}},"parent":"admin"})
 //p({"class":"foam.nanos.menu.Menu","id":"admin.menus","label":"Menus","handler":{"class":"foam.nanos.menu.DAOMenu2","config":{"class":"foam.comics.v2.DAOControllerConfig","daoKey":"menuDAO"}},"parent":"admin"})
 p({
   "class":"foam.nanos.menu.Menu",
@@ -255,7 +255,7 @@ p({
   "parent":"integration"
 })
 p({"class":"foam.nanos.menu.Menu","id":"integration.model-doc","label":"UML API Models","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.doc.ModelBrowser","allowedModels":{"net.nanopay.fx.afex.AFEXLog":true}}},"parent":"integration"})
-p({"class":"foam.flow.DocumentMenu","id":"admin.flowdoc","label":"FLOW Documents","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.boot.DAOConfigSummaryView"}},"parent":"admin"})
+p({"class":"foam.flow.DocumentMenu","id":"admin.flowdoc","label":"FLOW Documents","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.doc.DocumentationView"}},"parent":"admin"})
 
 // settings
 p({"class":"foam.nanos.menu.Menu","id":"set-password","label":"Change Password","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.ChangePasswordView"}},"order":100,"parent":"settings"})

@@ -964,7 +964,7 @@ foam.CLASS({
     function paintSelf(x) {
       x.beginPath();
       x.moveTo(this.xCoordinates[0], this.yCoordinates[0]);
-      for ( var i = 1; i < this.xCoordinates.length; i++ ) {
+      for ( var i = 1 ; i < this.xCoordinates.length ; i++ ) {
         x.lineTo(this.xCoordinates[i], this.yCoordinates[i]);
       }
       x.lineWidth = this.lineWidth;
@@ -1048,6 +1048,37 @@ foam.CLASS({
       });
     }
   ]
+});
+
+
+foam.CLASS({
+  package: 'foam.graphics',
+  name: 'RegularPolygon',
+  extends: 'foam.graphics.Arc',
+
+  properties: [
+    { class: 'Int', name: 'sides' }
+  ],
+
+  methods: [
+    function paintSelf(x) {
+      var r = this.radius, sides = this.sides;
+      x.beginPath();
+      for ( var i = 0 ; i <= sides + 1 ; i++ ) {
+        x[i ? 'lineTo' : 'moveTo'](
+          r * Math.cos(2*Math.PI*i/sides),
+          r * Math.sin(2*Math.PI*i/sides));
+      }
+
+      if ( this.color ) x.fill();
+
+      if ( this.border ) {
+        x.lineWidth = this.arcWidth;
+        x.stroke();
+      }
+    }
+  ]
+
 });
 
 

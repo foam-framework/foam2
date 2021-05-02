@@ -7,12 +7,8 @@
 /*
 TODO:
  - Remove use of E() and replace with create-ing axiom to add same behaviour.
- - create 'inner' element which defaults to this. add() adds to inner to make
-   creating borders simple
  - start('leftPanel') should work for locating pre-existing named spaces
- - start, tag, and add() should use standard helper method
- - Fix handling of Slots that return arrays.
- - Properly handle insertBefore_ of an element that's already been inserted?
+ - Don't generate .java and remove need for flags: ['js'].
 */
 
 foam.ENUM({
@@ -41,12 +37,10 @@ foam.ENUM({
   values: [
     {
       name: 'CREATE',
-      label: 'Create',
       modePropertyName: 'createVisibility'
     },
     {
       name: 'VIEW',
-      label: 'View',
       modePropertyName: 'readVisibility',
       restrictDisplayMode: function(mode) {
         return mode == foam.u2.DisplayMode.RW ? foam.u2.DisplayMode.RO : mode;
@@ -54,7 +48,6 @@ foam.ENUM({
     },
     {
       name: 'EDIT',
-      label: 'Edit',
       modePropertyName: 'updateVisibility'
     }
   ]
@@ -75,10 +68,10 @@ foam.ENUM({
   ],
 
   values: [
-    { name: 'RW',       label: 'Read-Write' },
-    { name: 'DISABLED', label: 'Disabled' },
-    { name: 'RO',       label: 'Read-Only' },
-    { name: 'HIDDEN',   label: 'Hidden', restrictDisplayMode: function() { return foam.u2.DisplayMode.HIDDEN; } }
+    { name: 'RW', label: 'Read-Write' },
+    { name: 'DISABLED' },
+    { name: 'RO', label: 'Read-Only' },
+    { name: 'HIDDEN', restrictDisplayMode: function() { return foam.u2.DisplayMode.HIDDEN; } }
   ]
 });
 
@@ -717,8 +710,7 @@ foam.CLASS({
       `,
       name: 'PSEDO_ATTRIBUTES',
       value: {
-        valueAsDate: true,
-        value: true,
+        value:   true,
         checked: true
       }
     },
@@ -1860,6 +1852,7 @@ foam.CLASS({
     },
 
     function callOn(obj, f, args) {
+      /** Call the method named f on obj with the supplied args. **/
       obj[f].apply(obj, [this].concat(args));
       return this;
     },
@@ -2061,7 +2054,7 @@ foam.CLASS({
         }
         var first = Array.isArray(e) ? e[0] : e;
 
-        if ( first.state == first.INITIAL ) {
+        if ( first && first.state == first.INITIAL ) {
           // updated requested before initial element loaded
           // not a problem, just defer loading
           first.onload.sub(foam.events.oneTime(l));
@@ -2143,8 +2136,9 @@ foam.CLASS({
           var value = attr.value;
 
           if ( value !== false ) {
-            out(' ', name);
-            out('="', foam.String.isInstance(value) ? value.replace(/"/g, '&quot;') : value, '"');
+            out(' ', name, '="');
+            out(foam.String.isInstance(value) ? value.replace(/"/g, '&quot;') : value);
+            out('"');
           }
         }
       }
@@ -2449,6 +2443,24 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'FormattedStringViewRefinement',
+  refines: 'foam.core.FormattedString',
+  requires: [ 'foam.u2.FormattedTextField' ],
+  properties: [
+    {
+      name: 'view',
+      factory: function() {
+        return {
+          class: 'foam.u2.FormattedTextField',
+          formatter: this.formatter,
+          returnFormatted: false
+        };
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.u2',

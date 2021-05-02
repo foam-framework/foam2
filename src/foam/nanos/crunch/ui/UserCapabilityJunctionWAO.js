@@ -10,12 +10,14 @@ foam.CLASS({
   implements: [ 'foam.u2.wizard.WAO' ],
   flags: ['web'],
 
-  requires: [
-    'foam.nanos.crunch.CapabilityJunctionStatus'
-  ],
-
   imports: [
     'crunchService'
+  ],
+
+  requires: [
+    'foam.core.Lock',
+    'foam.nanos.crunch.CapabilityJunctionStatus',
+    'foam.u2.borders.LoadingLevel'
   ],
 
   properties: [
@@ -27,37 +29,48 @@ foam.CLASS({
         The requested subject associated to the ucj. Should only be set
         when used by a permissioned back-office user.
       `
+    },
+    {
+      name: 'saveLock',
+      class: 'FObjectProperty',
+      of: 'foam.core.Lock',
+      documentation: `
+        Save operations that are not marked 'disposable' will be queued using
+        this lock.
+      `,
+      factory: function () {
+        return this.Lock.create();
+      }
     }
   ],
 
   methods: [
-    function save(wizardlet) {
-      if ( ! wizardlet.isAvailable ) return Promise.resolve();
-      var wData = wizardlet.data ? wizardlet.data.clone() : null;
-      wizardlet.loading = true;
-      let p = this.subject ? this.crunchService.updateJunctionFor(
-        null, wizardlet.capability.id, wData, null,
-        this.subject.user, this.subject.realUser
-      ) : this.crunchService.updateJunction(null,
-        wizardlet.capability.id, wData, null
-      );
-      return p.then((ucj) => {
-        this.crunchService.pub('grantedJunction');
-        if ( wizardlet.reloadAfterSave ) this.load_(wizardlet, ucj);
-        else {
-          wizardlet.status = ucj.status;
-          wizardlet.loading = false;
-        }
-        return ucj;
-      });
+    function save(wizardlet, options) {
+      options = {
+        // 'reloadData' causes a wizardlet to reload from the server response
+        reloadData: true,
+        // 'disposable' prevents this save from being queued
+        disposable: false,
+        ...options
+      };
+      if ( wizardlet.loading ) {
+        // If this is not a disposable save, it must be enqueued
+        if ( ! options.disposable ) this.saveLock.then(
+          this.save_.bind(this, wizardlet, options));
+
+        return this.cancelSave_(wizardlet);
+      }
+      if ( ! wizardlet.isAvailable ) return this.cancelSave_(wizardlet);
+      return this.save_(wizardlet, options);
     },
     function cancel(wizardlet) {
-      return this.crunchService.updateJunction( null,
-        wizardlet.capability.id, null, null
-      ).then((ucj) => {
-        this.crunchService.pub('updateJunction');
-        return ucj;
-      });
+      let p = this.subject ? this.crunchService.updateJunctionFor(
+        null, wizardlet.capability.id, null, null, this.subject.user, this.subject.realUser
+      ) : this.crunchService.updateJunction(
+        null, wizardlet.capability.id, null, null
+      );
+      return p.then(ucj => { return ucj; })
+        .catch(this.reportNetworkFailure.bind(this, wizardlet, 'cancel', null));
     },
     function load(wizardlet) {
       if ( wizardlet.loading ) return;
@@ -70,13 +83,42 @@ foam.CLASS({
       );
       return p.then(ucj => {
         this.load_(wizardlet, ucj);
+      }).catch(this.reportNetworkFailure.bind(this, wizardlet, 'load', null));
+    },
+    function save_(wizardlet, options) {
+      var wData = wizardlet.data ? wizardlet.data.clone() : null;
+      wizardlet.loading = true;
+      if ( wizardlet.reloadAfterSave && options.reloadData ) {
+        wizardlet.loadingLevel = this.LoadingLevel.LOADING;
+      }
+      let p = this.subject ? this.crunchService.updateJunctionFor(
+        null, wizardlet.capability.id, wData, null,
+        this.subject.user, this.subject.realUser
+      ) : this.crunchService.updateJunction(null,
+        wizardlet.capability.id, wData, null
+      );
+      p = p.then((ucj) => {
+        if ( wizardlet.reloadAfterSave && options.reloadData ) {
+          wizardlet.loadingLevel = this.LoadingLevel.IDLE;
+          this.load_(wizardlet, ucj);
+        } else {
+          wizardlet.status = ucj.status;
+          wizardlet.loading = false;
+        }
+        return ucj;
       });
+      p.catch(this.reportNetworkFailure.bind(this, wizardlet, 'save', options));
+      this.saveLock.then(p);
+      return p;
     },
     function load_(wizardlet, ucj) {
       wizardlet.status = ucj.status;
 
       // No 'of'? No problem
-      if ( ! wizardlet.of ) return;
+      if ( ! wizardlet.of ) {
+        wizardlet.loading = false;
+        return;
+      }
 
       // Load UCJ data to wizardlet
       var loadedData = wizardlet.of.create({}, wizardlet);
@@ -91,11 +133,28 @@ foam.CLASS({
       if ( wizardlet.data ) {
         wizardlet.data.copyFrom(loadedData);
       } else {
-        wizardlet.data = loadedData.clone(this.__subContext__);
+        wizardlet.data = loadedData.clone(wizardlet.__subSubContext__);
       }
 
       foam.u2.wizard.Slot.blockFramed().then(() => {
         wizardlet.loading = false;
+      });
+    },
+    function cancelSave_(w) {
+      w.loadingLevel = this.LoadingLevel.IDLE;
+      return Promise.resolve();
+    },
+    function reportNetworkFailure(w, op, args, e) {
+      w.loadingLevel = this.LoadingLevel.IDLE;
+      w.loading = false;
+      console.error('WAO caught network failure', e);
+      setTimeout(() => {
+        this[op](w, args).then(() => {
+          w.clearProperty('indicator');
+        });
+      }, 5000);
+      w.reportNetworkFailure(e, {
+        retry: 5000 // to indicate to the user if we want this
       });
     }
   ]

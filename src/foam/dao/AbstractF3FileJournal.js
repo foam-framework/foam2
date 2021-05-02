@@ -16,6 +16,7 @@ foam.CLASS({
     'foam.core.PropertyInfo',
     'foam.core.ProxyX',
     'foam.core.X',
+    'foam.core.AbstractFObjectPropertyInfo',
     'foam.lib.formatter.FObjectFormatter',
     'foam.lib.formatter.JSONFObjectFormatter',
     'foam.lib.json.ExprParser',
@@ -243,6 +244,8 @@ try {
               if ( isLast ) getWriter().flush();
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
+            } finally {
+              fmt.reset();
             }
           }
         });
@@ -425,6 +428,7 @@ try {
           PropertyInfo prop = (PropertyInfo) e.next();
           mergeProperty(oldFObject, diffFObject, prop);
         }
+        // it's backwards in case when we override the "class" was changed
         return diffFObject.copyFrom(oldFObject);
       `
     },
@@ -433,7 +437,21 @@ try {
       args: [ 'FObject oldFObject', 'FObject diffFObject', 'foam.core.PropertyInfo prop' ],
       javaCode: `
         if ( prop.isSet(diffFObject) ) {
-          prop.set(oldFObject, prop.get(diffFObject));
+          if ( prop instanceof AbstractFObjectPropertyInfo && prop.get(oldFObject) != null
+            && prop.get(diffFObject) != null ) {
+            FObject nestedDiffFObj = (FObject) prop.get(diffFObject);
+            FObject oldNestedFObj = (FObject) prop.get(oldFObject);
+            if ( oldNestedFObj.getClassInfo() != nestedDiffFObj.getClassInfo() ) {
+              FObject nestedOldDiff = nestedDiffFObj.fclone();
+              nestedOldDiff.copyFrom(oldNestedFObj);
+              // have to explicitly set the value because nestedOldDiff is a clone
+              prop.set(oldFObject, mergeFObject(nestedOldDiff, nestedDiffFObj));
+            } else {
+              mergeFObject(oldNestedFObj, nestedDiffFObj);
+            }
+          } else {
+            prop.set(oldFObject, prop.get(diffFObject));
+          }
         }
       `
     }

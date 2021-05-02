@@ -339,7 +339,7 @@ foam.CLASS({
         toCSVLabel:              this.javaToCSVLabel,
         fromCSVLabelMapping:     this.javaFromCSVLabelMapping,
         formatJSON:              this.javaFormatJSON,
-        sheetsOutput:            this.sheetsOutput2
+        sheetsOutput:            this.sheetsOutput
       });
     },
 
@@ -673,7 +673,7 @@ return sb.toString();`
                 type: 'Object'
               }
             ],
-            body: `return compareTo(o) == 0;`
+            body: `if ( o == null ) return false; if ( o.getClass() != getClass() ) return false; return compareTo(o) == 0;`
           });
         }
 
@@ -1614,6 +1614,31 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.java',
+  name: 'FormattedStringJavaRefinement',
+  refines: 'foam.core.FormattedString',
+  flags: ['java'],
+  documentation: `
+    Override setter for formattedstrings so that we only store the unformatted data
+    TODO: Add the ability to get a formatted version of the data 
+  `,  
+
+  properties: [
+    {
+      name: 'javaSetter',
+      factory: function() {
+        return `
+          assertNotFrozen();
+          // remove all non-numeric characters
+          val = val.replaceAll("[^\\\\\d]", "");
+          ${this.name}_ = val;
+          ${this.name}IsSet_ = true;`;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
   name: 'FObjectPropertyJavaRefinement',
   refines: 'foam.core.FObjectProperty',
   flags: ['java'],
@@ -2115,6 +2140,18 @@ foam.CLASS({
         }
 
         return str;
+      }
+    },
+    {
+      name: 'toString',
+      factory: function() {
+        var arr = [];
+        for ( var i = 0 ; i < this.propNames.length ; i++ ) {
+          var name = foam.String.capitalize(this.propNames[i]);
+
+          arr.push(`val.get${name}())`);
+        }
+        return 'return ' + arr.join(' + "-" + ') + ';';
       }
     }
   ]

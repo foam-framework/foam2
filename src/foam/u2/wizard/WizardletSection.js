@@ -75,17 +75,20 @@ foam.CLASS({
       expression: function(section) {
         return section && section.navTitle;
       }
-    }
+    },
   ],
 
   methods: [
     function createView(opt_spec) {
       if ( ! opt_spec ) opt_spec = {};
+      var ctx = this.wizardlet.__subSubContext__.createSubContext();
+
       if ( this.customView ) {
         return this.ViewSpec.createView(
-          this.customView, null, this, this.__subContext__);
+          this.customView, null, this, ctx);
       }
-      var ctx = this.__subContext__.createSubContext();
+
+      
       ctx.register(
         this.VerticalDetailView,
         'foam.u2.detail.SectionedDetailView'

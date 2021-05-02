@@ -111,7 +111,7 @@ foam.CLASS({
         out.println("<link rel=\\"icon\\" type=\\"image/png\\" sizes=\\"32x32\\" href=\\"/favicon/favicon-32x32.png\\">");
         out.println("<link rel=\\"icon\\" type=\\"image/png\\" sizes=\\"16x16\\" href=\\"/favicon/favicon-16x16.png\\">");
         out.println("<link rel=\\"manifest\\" href=\\"/favicon/manifest.json\\">");
-        out.println("<link rel=\\"mask-icon\\" href=\\"/favicon/safari-pinned-tab.svg\\" color=\\"#5bbad5\\">");
+        out.println("<link rel=\\"mask-icon\\" href=\\"/favicon/safari-pinned-tab.svg\\" color=\\"#406dea\\">");
         out.println("<link rel=\\"shortcut icon\\" href=\\"/favicon/favicon.ico\\">");
         out.println("<meta name=\\"msapplication-config\\" content=\\"/favicon/browserconfig.xml\\">");
         out.println("<meta name=\\"theme-color\\" content=\\"#ffffff\\">");
@@ -180,7 +180,7 @@ foam.CLASS({
       if ( headConfig == null || ! headConfig.containsKey("customFonts") || customFontsFailed ) {
         out.println("<link href=\\"https://fonts.googleapis.com/css?family=Roboto:100,300,400,500\\" rel=\\"stylesheet\\">");
         out.println("<link href=\\"https://fonts.googleapis.com/css?family=Lato:400,400i,700,700i,900,900i\\" rel=\\"stylesheet\\">");
-        out.println("<link href=\\"https://fonts.googleapis.com/css?family=IBM+Plex+Sans&display=swap\\" rel=\\"stylesheet\\">");
+        out.println("<link href=\\"https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap\\" rel=\\"stylesheet\\">");
       }
       `
     },

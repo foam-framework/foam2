@@ -406,7 +406,13 @@ This is the heart of Medusa.`,
               alarm = (Alarm) ((DAO) x.get("alarmDAO")).put(alarm);
               throw new MedusaException("Unknown class");
             }
-            FObject nu = x.create(JSONParser.class).parseString(entry.getData(), cls);
+            FObject nu = null;
+            try {
+              nu = x.create(JSONParser.class).parseString(entry.getData(), cls);
+            } catch ( Exception e ) {
+              getLogger().error("Failed to parse", entry.getIndex(), entry.getNSpecName(), cls, entry.getData());
+              throw new MedusaException("Error parsing data.", e);
+            }
             if ( nu == null ) {
               getLogger().error("Failed to parse", entry.getIndex(), entry.getNSpecName(), cls, entry.getData());
               Alarm alarm = new Alarm("Failed to parse");

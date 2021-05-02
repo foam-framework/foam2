@@ -19,12 +19,12 @@ foam.CLASS({
       max-width: 200px;
     }
     ^search {
-      margin: 5px;
-      margin-bottom: 8px;
+      margin: 0px;
+      padding: 0px 8px;
+      padding-bottom: 16px;
     }
-
-    input[type="search"] {
-      width: 290px;
+    ^ input[type='search']{
+      width: 100%;
     }
   `,
   properties: [
@@ -201,7 +201,8 @@ foam.CLASS({
       e.stopPropagation();
     },
     function onClose() {
-      this.menuSearch = '';
+      if ( this.menuSearch )
+        this.menuSearch = '';
       this.columns.forEach(c => c.onClose());
     },
     function onTopLevelPropertiesDragAndDrop(targetIndex, draggableIndex) {
@@ -245,7 +246,9 @@ foam.CLASS({
           var propSelectedTraversed = this.views[i].prop.returnSelectedProps();
           for ( var j = 0 ; j < propSelectedTraversed.length ; j++ ) {
             if ( foam.Array.isInstance(propSelectedTraversed[j]) )
-              arr.push(propSelectedTraversed[j].join('.'));
+              arr.push(propSelectedTraversed[j].filter(Boolean).join('.'));
+            else if ( propSelectedTraversed[j] )
+              arr.push(propSelectedTraversed[j]);
           }
         }
       }
@@ -281,7 +284,7 @@ foam.CLASS({
           return this.resetProperties(views, startUnselectedIndex-1, draggableIndex);
       }
 
-      while(startUnselectedIndex < views.length) {
+      while ( startUnselectedIndex < views.length ) {
         var currentProp = this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(views[draggableIndex].prop.rootProperty);
         var comparedToProp =  this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(views[startUnselectedIndex].prop.rootProperty);
         if ( currentProp.toLowerCase().localeCompare(comparedToProp.toLowerCase()) < 0 ) {
@@ -298,6 +301,7 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'RootColumnConfigPropView',
   extends: 'foam.u2.Controller',
+  imports: ['theme'],
   properties: [
     // {
     //   class: 'Boolean',
@@ -337,11 +341,6 @@ foam.CLASS({
   ],
   constants: [
     {
-      name: 'DEFAULT_BG_COLOR',
-      type: 'String',
-      value: 'rgb(249, 249, 249)'
-    },
-    {
       name: 'ON_DRAG_OVER_BG_COLOR',
       type: 'String',
       value: '#e5f1fc'
@@ -376,24 +375,24 @@ foam.CLASS({
     }
   ],
   listeners: [
-    function onDragStart(e){
+    function onDragStart(e) {
       e.dataTransfer.setData('draggableId', this.index);
       e.stopPropagation();
     },
-    function onDragOver(e){
+    function onDragOver(e) {
       e.preventDefault();
       e.stopPropagation();
-      e.currentTarget.style.setProperty("background-color", this.ON_DRAG_OVER_BG_COLOR);
+      e.currentTarget.style.setProperty('background-color', this.theme ? this.theme.primary5 : this.ON_DRAG_OVER_BG_COLOR);
     },
-    function onDragLeave(e){
+    function onDragLeave(e) {
       e.preventDefault();
       e.stopPropagation();
-      e.currentTarget.style.setProperty("background-color", this.DEFAULT_BG_COLOR);
+      e.currentTarget.style.setProperty( 'background-color', this.theme ? this.theme.white : '#ffffff' );
     },
     function onDrop(e) {
       e.preventDefault();
       e.stopPropagation();
-      e.currentTarget.style.setProperty("background-color", this.DEFAULT_BG_COLOR);
+      e.currentTarget.style.setProperty('background-color', this.theme ? this.theme.white : '#ffffff');
       this.onDragAndDropParentFunction(this.index, parseInt(e.dataTransfer.getData('draggableId')));
     }
   ]
@@ -404,6 +403,8 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'ColumnViewHeader',
   extends: 'foam.u2.View',
+
+  requires: ['foam.u2.CheckBox'],
   css: `
 
   ^selected {
@@ -411,17 +412,23 @@ foam.CLASS({
   }
   ^some-padding {
     text-align: left;
-    padding: 3px;
-    height: 14px;
+    font-size: 14px;
+    line-height: 24px;
+    padding: 4px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  ^some-padding:hover {
+    background-color: /*%PRIMARY5%*/ #E5F1FC;
+    border-radius: 4px;
+  }
+  ^label {
+    display: flex;
+    align-items: center;
+    justify-content: start;
   }
   `,
-  constants: [
-    {
-      name: 'CHECK_MARK',
-      type: 'String',
-      value: '\u2713'
-    }
-  ],
   properties: [
     'onSelectionChangedParentFunction',
     {
@@ -439,22 +446,24 @@ foam.CLASS({
       this.SUPER();
       this
         .on('click', this.toggleExpanded)
-        .start()
           .start()
             .addClass(this.myClass('some-padding'))
             .style({
-              'padding-left' : self.data.level * 15 + 15 + 'px',
-              'padding-right' : '15px'
+              'padding-left': self.data.level * 16 + 8 + 'px',
+              'padding-right': '8px'
             })
-            .start('span')
-              .show(this.data.isPropertySelected$)
-              .add(this.CHECK_MARK)
+            .start()
+              .addClass(this.myClass('label'))
+              .start()
+                .add(this.CheckBox.create({ data$: this.data.isPropertySelected$ }))
+                .on('click', this.toggleSelection)
+              .end()
+              .start()
+                .style({'padding-left' : '12px'})
+                .add(this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(this.data.rootProperty))
+              .end()
             .end()
-            .start('span')
-              .style({'padding-left' : this.data.isPropertySelected$.map(function(s) { return s ? '4px' : '13px';})})
-              .add(this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(this.data.rootProperty))
-            .end()
-            .start('span')
+            .start()
               .show(this.data.hasSubProperties)
               .style({
                 'vertical-align': 'middle',
@@ -467,20 +476,22 @@ foam.CLASS({
               .on('click', this.toggleExpanded)
               .add('\u2303')
             .end()
-          .end()
-        .end();
+          .end();
     }
   ],
   listeners: [
-    function toggleExpanded(e) {
+    function toggleSelection(e) {
       e.stopPropagation();
-      this.data.expanded = ! this.data.expanded;
       if ( ! this.data.hasSubProperties || foam.core.Reference.isInstance(this.data.prop) ) {
-        this.data.isPropertySelected = ! this.data.isPropertySelected;
         if ( ! this.data.isPropertySelected )
           this.data.expanded = false;
         this.onSelectionChangedParentFunction(this.data.isPropertySelected, this.data.index);
       }
+    },
+    function toggleExpanded(e) {
+      e.stopPropagation();
+      if ( this.data.hasSubProperties )
+        this.data.expanded = ! this.data.expanded;
     }
   ]
 });
@@ -490,9 +501,9 @@ foam.CLASS({
   name: 'ColumnViewBody',
   extends: 'foam.u2.View',
   requires: [
-    'foam.u2.view.RootColumnConfigPropView',
-    'foam.u2.view.SubColumnSelectConfig'
+    'foam.u2.view.RootColumnConfigPropView'
   ],
+
   properties: [
     {
       name: 'views',
@@ -556,7 +567,7 @@ foam.CLASS({
         //to re-check if isPropertySelected changed
         if ( this.data.isPropertySelected !== isColumnSelected ) {
           var anySelected = this.data.subColumnSelectConfig.find(s => s.isPropertySelected);
-          if ( ! ( this.data.isPropertySelected && ! anySelected && foam.core.Reference.isInstance(this.data.prop) ) ) {
+          if ( foam.core.Reference.isInstance(this.data.prop) ) {
             this.data.isPropertySelected = typeof anySelected !== 'undefined';
             //close if not selected
             if ( ! this.data.isPropertySelected )
@@ -619,7 +630,7 @@ foam.CLASS({
     {
       name: 'isPropertySelected',
       class: 'Boolean',
-      expression: function() {
+      factory: function() {
         var thisPropName = this.columnHandler.checkIfArrayAndReturnPropertyNameForRootProperty(this.rootProperty);
         return typeof this.selectedColumns.find(s => {
           var propName = foam.String.isInstance(s) ? s.split('.') : s.name;
@@ -674,8 +685,13 @@ foam.CLASS({
         for ( var i = 0 ; i < this.subColumnSelectConfig.length ; i++ ) {
           if ( this.subColumnSelectConfig[i].isPropertySelected ) {
             var childProps = this.subColumnSelectConfig[i].returnSelectedProps();
-            childProps.splice(0, 0, this.rootProperty[0]);
-            arr.push(childProps);
+            if ( ! childProps.length ) {
+              arr.push(this.rootProperty[0]);
+            } else {
+              for ( var j = 0 ; j < childProps.length ; j++ ) {
+                arr.push([this.rootProperty[0], childProps[j]].filter(Boolean).join('.'));
+              }
+            }
           }
         }
         if ( arr && arr.length > 0 )
@@ -683,7 +699,7 @@ foam.CLASS({
       }
       if ( this.level === 0 ) {
         if ( foam.Array.isInstance(this.rootProperty) )
-          return [[this.rootProperty[0]]];
+          return [this.rootProperty[0]];
         return [this.rootProperty];
       }
       return [this.rootProperty[0]];
@@ -709,11 +725,14 @@ foam.CLASS({
       return this.showOnSearch;
     },
     function returnSubColumnSelectConfig(subProperties, level, expanded) {
+      var arr = [];
+
       if ( ! this.of || ! this.of.getAxiomByName || subProperties.length === 0 || ! expanded )
-          return [];
-        var arr = [];
+          return arr;
         var l = level + 1;
         var r = this.of.getAxiomByName(this.rootProperty[0]);
+        if ( ! r )
+          return arr;
 
         var selectedSubProperties = [];
         var otherSubProperties = [];
@@ -723,8 +742,14 @@ foam.CLASS({
         var selectedColumn = this.selectedColumns.filter(c => {
           var thisSelectedColumn = foam.String.isInstance(c) ? c : c.name;
           return ( ! foam.String.isInstance(c) && this.level === 0 && thisSelectedColumn === thisRootPropName ) ||
-          ( foam.String.isInstance(c) && c.split('.').length > this.level && c.split('.')[this.level] === this.rootProperty[0] );
+          ( foam.String.isInstance(c) && c.split('.').length >= this.level && c.split('.')[this.level] === this.rootProperty[0] );
         });
+
+        if ( selectedColumn.find(c => foam.String.isInstance(c) && c.split('.').length == ( this.level + 1 )) ) {
+          selectedSubProperties.push(['', 'To Summary']);
+        } else {
+          otherSubProperties.push(['', 'To Summary']);
+        }
 
         for ( var i = 0 ; i < subProperties.length ; i++ ) {
           //the comparison mentioned above is working with the assumption that columns which are specified in 'tableColumns' are top-level properties and
@@ -744,13 +769,14 @@ foam.CLASS({
             selectedColumns$: this.selectedColumns$,
             level: l,
             parentExpanded$: this.expanded$,
-            of: r.of
+            of: r.of,
+            isPropertySelected: true
           }));
         }
 
         for ( var i = 0 ; i < otherSubProperties.length ; i++ ) {
           arr.push(this.cls_.create({
-            index: selectedSubProperties.length+i,
+            index: selectedSubProperties.length + i,
             rootProperty: otherSubProperties[i],
             selectedColumns$: this.selectedColumns$,
             level:l, parentExpanded$: this.expanded$,

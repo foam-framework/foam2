@@ -12,6 +12,7 @@
   'represent a single approval request for a single user.',
 
   implements: [
+    'foam.nanos.auth.AssignableAware',
     'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.CreatedByAware',
     'foam.nanos.auth.LastModifiedAware',
@@ -49,6 +50,7 @@
     'currentMenu',
     'notify',
     'stack',
+    'subject',
     'summaryView?',
     'objectSummaryView?'
   ],
@@ -58,7 +60,9 @@
     'description',
     'classification',
     'objId',
+    'createdFor',
     'approver.legalName',
+    'assignedTo.legalName',
     'status',
     'memo'
   ],
@@ -78,11 +82,27 @@
   axioms: [
     {
       class: 'foam.comics.v2.CannedQuery',
-      label: 'Pending',
+      label: 'Assigned',
       predicateFactory: function(e) {
         return e.EQ(
-          foam.nanos.approval.ApprovalRequest.STATUS,
-          foam.nanos.approval.ApprovalStatus.REQUESTED
+          foam.nanos.approval.ApprovalRequest.ASSIGNED_TO,
+          foam.nanos.approval.ApprovalRequest.APPROVER
+        );
+      }
+    },
+    {
+      class: 'foam.comics.v2.CannedQuery',
+      label: 'Pending',
+      predicateFactory: function(e) {
+        return e.AND(
+          e.EQ(
+            foam.nanos.approval.ApprovalRequest.STATUS,
+            foam.nanos.approval.ApprovalStatus.REQUESTED
+          ),
+          e.EQ(
+            foam.nanos.approval.ApprovalRequest.ASSIGNED_TO,
+            0
+          )
         );
       }
     },
@@ -119,6 +139,10 @@
       view: { class: 'foam.comics.v2.DAOBrowserView' },
       icon: 'images/list-view.svg',
     }
+  ],
+
+  messages: [
+    { name: 'BACK_LABEL', message: 'Back' }
   ],
 
   properties: [
@@ -551,10 +575,25 @@
       name: 'approvableHashKey',
       includeInDigest: true,
       hidden: true
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'assignedTo',
+      section: 'approvalRequestInformation',
+      order: 65
     }
   ],
 
   messages: [
+    {
+      name: 'SUCCESS_ASSIGNED',
+      message: 'You have successfully assigned this request'
+    },
+    {
+      name: 'SUCCESS_UNASSIGNED',
+      message: 'You have successfully unassigned this request'
+    },
     {
       name: 'SUCCESS_APPROVED',
       message: 'You have successfully approved this request'
@@ -566,6 +605,10 @@
     {
       name: 'SUCCESS_CANCELLED',
       message: 'You have successfully cancelled this request'
+    },
+    {
+      name: 'ASSIGN_TITLE',
+      message: 'Select an assignee'
     },
     {
       name: 'PENDING',
@@ -631,7 +674,13 @@
           this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
           this.finished.pub();
           this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
-          X.stack.back();
+
+          if (
+            X.stack.top && 
+            ( X.currentMenu.id !== X.stack.top[2] )
+          ) {
+            X.stack.back();
+          }
         }, e => {
           this.throwError.pub(e);
           this.notify(e.message, '', this.LogLevel.ERROR, true);
@@ -689,7 +738,10 @@
 
           X.notify(this.SUCCESS_CANCELLED, '', this.LogLevel.INFO, true);
 
-          if ( X.currentMenu.id !== X.stack.top[2] ) {
+          if (
+            X.stack.top && 
+            ( X.currentMenu.id !== X.stack.top[2] )
+          ) {
             X.stack.back();
           }
         }, e => {
@@ -798,9 +850,9 @@
                     editPredicate: foam.mlang.predicate.False.create(),
                     createPredicate: foam.mlang.predicate.False.create(),
                     deletePredicate: foam.mlang.predicate.False.create()
-                  }),
+                  }, X),
                   mementoHead: null,
-                  backLabel: 'Back'
+                  backLabel: self.BACK_LABEL
                 });
               } else {
                 of = obj.of;
@@ -830,16 +882,90 @@
                 editPredicate: foam.mlang.predicate.False.create(),
                 createPredicate: foam.mlang.predicate.False.create(),
                 deletePredicate: foam.mlang.predicate.False.create()
-              }),
+              }, X),
               mementoHead: null,
-              backLabel: 'Back'
-            }, X);
+              backLabel: self.BACK_LABEL
+            }, X.createSubContext({stack: self.stack}));
           })
           .catch(err => {
             console.warn(err.message || err);
           });
       },
       tableWidth: 100
+    },
+    {
+      name: 'assign',
+      section: 'approvalRequestInformation',
+      isAvailable: function(status){
+        return status === this.ApprovalStatus.REQUESTED;
+      },
+      availablePermissions: [
+        "approval.assign.*"
+      ],
+      code: function(X) {        
+        var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
+        objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+          class: "foam.u2.PropertyModal",
+          property: this.ASSIGNED_TO.clone().copyFrom({ label: '' }),
+          isModalRequired: true,
+          data$: X.data$,
+          propertyData$: X.data.assignedTo$,
+          title: this.ASSIGN_TITLE,
+          onExecute: this.assignRequest.bind(this, X)
+        }));
+      }
+    },
+    {
+      name: 'assignToMe',
+      section: 'approvalRequestInformation',
+      isAvailable: function(subject, assignedTo, status){
+        return (subject.user.id !== assignedTo) && (status === this.ApprovalStatus.REQUESTED);
+      },
+      code: function(X) {        
+        var assignedApprovalRequest = this.clone();
+        assignedApprovalRequest.assignedTo = X.subject.user.id;
+
+        this.approvalRequestDAO.put(assignedApprovalRequest).then(req => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.notify(this.SUCCESS_ASSIGNED, '', this.LogLevel.INFO, true);
+          if (
+            X.stack.top && 
+            ( X.currentMenu.id !== X.stack.top[2] )
+          ) {
+            X.stack.back();
+          }
+        }, e => {
+          this.throwError.pub(e);
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
+        });
+      }
+    },
+    {
+      name: 'unassignMe',
+      section: 'approvalRequestInformation',
+      isAvailable: function(subject, assignedTo, status){
+        return (subject.user.id === assignedTo) && (status === this.ApprovalStatus.REQUESTED);
+      },
+      code: function(X) {        
+        var unassignedApprovalRequest = this.clone();
+        unassignedApprovalRequest.assignedTo = 0;
+
+        this.approvalRequestDAO.put(unassignedApprovalRequest).then(req => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.notify(this.SUCCESS_UNASSIGNED, '', this.LogLevel.INFO, true);
+          if (
+            X.stack.top && 
+            ( X.currentMenu.id !== X.stack.top[2] )
+          ) {
+            X.stack.back();
+          }
+        }, e => {
+          this.throwError.pub(e);
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
+        });
+      }
     }
   ],
 
@@ -856,7 +982,12 @@
           this.finished.pub();
           this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
 
-          X.stack.back();
+          if (
+            X.stack.top && 
+            ( X.currentMenu.id !== X.stack.top[2] )
+          ) {
+            X.stack.back();
+          }
         }, e => {
           this.throwError.pub(e);
           this.notify(e.message, '', this.LogLevel.ERROR, true);
@@ -873,10 +1004,37 @@
         this.approvalRequestDAO.put(rejectedApprovalRequest).then(o => {
           this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
           this.finished.pub();
-          this.notify(this.SUCCESS_REJECTED, '', this.LogLevel.INFO, true);
-
-          X.stack.back();
+          this.notify(this.SUCCESS_ASSIGNED, '', this.LogLevel.INFO, true);
+          
+          if (
+            X.stack.top && 
+            ( X.currentMenu.id !== X.stack.top[2] )
+          ) {
+            X.stack.back();
+          }
         }, e => {
+          this.throwError.pub(e);
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
+        });
+      }
+    },
+    {
+      name: 'assignRequest',
+      code: function(X) {
+        var assignedApprovalRequest = this.clone();
+
+        this.approvalRequestDAO.put(assignedApprovalRequest).then(_ => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.notify(this.SUCCESS_ASSIGNED, '', this.LogLevel.INFO, true);
+
+          if (
+            X.stack.top && 
+            ( X.currentMenu.id !== X.stack.top[2] )
+          ) {
+            X.stack.back();
+          }
+        }, (e) => {
           this.throwError.pub(e);
           this.notify(e.message, '', this.LogLevel.ERROR, true);
         });

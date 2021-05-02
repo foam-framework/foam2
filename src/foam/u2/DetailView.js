@@ -122,7 +122,7 @@ foam.CLASS({
 
     ^toolbar {
       display: flex;
-      padding-top: 8px;
+      padding: 6px 12px;
       flex-wrap: wrap;
     }
 
@@ -135,9 +135,13 @@ foam.CLASS({
       width: 70%;
     }
 
-    
-    /* 
-     * Styles for table contents 
+    ^title {
+      padding: 6px;
+      font-weight: 500;
+    }
+
+    /*
+     * Styles for table contents
      */
 
     ^ table .foam-u2-stack-StackView {
@@ -153,53 +157,6 @@ foam.CLASS({
     }
   `,
 
-  /*
-  TODO: port old FOAM1 CSS
-      ^ {
-        background: #fdfdfd;
-        border: solid 1px #dddddd;
-        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-        display: inline-block;
-        margin: 5px;
-        padding: 3px;
-      }
-      ^ table {
-        padding-bottom: 2px;
-      }
-      ^title {
-        color: #333;
-        float: left;
-        font-size: 14px;
-        font-weight: bold;
-        margin-bottom: 8px;
-        padding: 2px;
-      }
-      ^toolbar {
-        margin-left: 5px;
-      }
-      ^ input {
-        border: solid 1px #aacfe4;
-        font-size: 10px;
-        margin: 2px 0 0px 2px;
-        padding: 4px 2px;
-      }
-      ^ textarea {
-        border: solid 1px #aacfe4;
-        float: left;
-        font-size: 10px;
-        margin: 2px 0 0px 2px;
-        overflow: auto;
-        padding: 4px 2px;
-        width: 191px;
-      }
-      ^ select {
-        border: solid 1px #aacfe4;
-        font-size: 10px;
-        margin: 2px 0 0px 2px;
-        padding: 4px 2px;
-      }
-  */
-
   methods: [
     function initE() {
       var self = this;
@@ -208,6 +165,8 @@ foam.CLASS({
         this.currentMemento_$ = this.memento.tail$;
 
       var hasTabs = false;
+      self.start().addClass(self.myClass('title')).add(self.title$).end();
+
       this.add(this.slot(function(of, properties, actions) {
         if ( ! of ) return '';
 
@@ -217,8 +176,6 @@ foam.CLASS({
         // to data causes views and actions from the old class to get
         // bound to data of a new class, which causes problems.
         self.currentData = self.data;
-
-        self.start().addClass(self.myClass('title')).add(self.title$).end();
 
         var tabs = foam.u2.Tabs.create({}, self);
 

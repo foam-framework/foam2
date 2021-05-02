@@ -39,8 +39,9 @@ public class CapabilityTest extends Test {
     x = TestUtils.mockDAO(x, "localUserDAO");
     x = TestUtils.mockDAO(x, "capabilityDAO");
     x = TestUtils.mockDAO(x, "deprecatedCapabilityJunctionDAO");
-    x = TestUtils.mockDAO(x, "prerequisiteCapabilityJunctionDAO");
-    DAO dao = new foam.nanos.crunch.UserCapabilityJunctionDAO.Builder(x).setDelegate(new MDAO(UserCapabilityJunction.getOwnClassInfo())).build();
+    DAO dao = new foam.nanos.crunch.PredicatedPrerequisiteCapabilityJunctionDAO.Builder(x).setDelegate(new MDAO(CapabilityCapabilityJunction.getOwnClassInfo())).build();
+    x = x.put("prerequisiteCapabilityJunctionDAO", dao);
+    dao = new foam.nanos.crunch.UserCapabilityJunctionDAO.Builder(x).setDelegate(new MDAO(UserCapabilityJunction.getOwnClassInfo())).build();
     dao = new RulerDAO(x, dao, "userCapabilityJunctionDAO");
     x = x.put("userCapabilityJunctionDAO", dao);
     dao = new RulerDAO(x, (DAO) x.get("deprecatedCapabilityJunctionDAO"), "deprecatedCapabilityJunctionDAO");

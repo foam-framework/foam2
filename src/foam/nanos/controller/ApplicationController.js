@@ -51,7 +51,7 @@ foam.CLASS({
     'foam.u2.crunch.CrunchController',
     'foam.u2.borders.MarginBorder',
     'foam.u2.stack.Stack',
-    'foam.u2.stack.StackView',
+    'foam.u2.stack.DesktopStackView',
     'foam.u2.dialog.NotificationMessage',
     'foam.nanos.session.SessionTimer',
     'foam.u2.dialog.Popup',
@@ -98,6 +98,7 @@ foam.CLASS({
     MACROS: [
       'logoBackgroundColour',
       'customCSS',
+      'font1',
       'primary1',
       'primary2',
       'primary3',
@@ -434,7 +435,7 @@ foam.CLASS({
             .start()
               .addClass('stack-wrapper')
               .tag({
-                class: 'foam.u2.stack.StackView',
+                class: 'foam.u2.stack.DesktopStackView',
                 data: this.stack,
                 showActions: false
               })

@@ -6,11 +6,7 @@
 
 package foam.lib.formatter;
 
-import foam.core.ClassInfo;
-import foam.core.FEnum;
-import foam.core.FObject;
-import foam.core.PropertyInfo;
-import foam.core.X;
+import foam.core.*;
 import foam.lib.json.OutputJSON;
 import foam.util.SafetyUtil;
 import java.lang.reflect.Array;
@@ -75,6 +71,7 @@ public class JSONFObjectFormatter
   protected boolean outputClassNames_        = true;
   protected boolean outputReadableDates_     = false;
   protected boolean outputDefaultClassNames_ = true;
+  protected boolean calculateDeltaForNestedFObjects_ = true;
 
   public JSONFObjectFormatter(X x) {
     super(x);
@@ -131,10 +128,6 @@ public class JSONFObjectFormatter
     append(value);
   }
 
-  protected void outputBoolean(Boolean value) {
-    output(value.booleanValue());
-  }
-
   public void output(String[] arr) {
     output((Object[]) arr);
   }
@@ -189,6 +182,28 @@ public class JSONFObjectFormatter
     outputKey(getPropertyName(p));
     append(':');
     p.formatJSON(this, o);
+  }
+
+  protected boolean maybeOutPutFObjectProperty(FObject newFObject, FObject oldFObject, PropertyInfo prop) {
+    if ( prop instanceof AbstractFObjectPropertyInfo && oldFObject != null &&
+      prop.get(oldFObject) != null && prop.get(newFObject) != null
+    ) {
+      String before = builder().toString();
+      reset();
+      if ( maybeOutputDelta(((FObject)prop.get(oldFObject)), ((FObject)prop.get(newFObject))) ) {
+        String after = builder().toString();
+        reset();
+        append(before);
+        outputKey(getPropertyName(prop));
+        append(':');
+        append(after);
+        return true;
+      }
+      append(before);
+      return false;
+    }
+    outputProperty(newFObject, prop);
+    return true;
   }
 /*
   public void outputMap(Object... values) {
@@ -253,7 +268,7 @@ public class JSONFObjectFormatter
         output((Object[]) value);
       }
     } else if ( value instanceof Boolean ) {
-      outputBoolean((Boolean) value);
+      output(((Boolean) value).booleanValue());
     } else if ( value instanceof Date ) {
       outputDateValue((Date) value);
     } else if ( value instanceof Map ) {
@@ -299,7 +314,7 @@ public class JSONFObjectFormatter
     }
   }
 
-  protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
+  protected boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
     if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
 
     Object value = prop.get(fo);
@@ -330,20 +345,26 @@ public class JSONFObjectFormatter
 
     String before = builder().toString();
     reset();
-    for ( int i = 0; i < size; i++ ) {
+    for ( int i = 0 ; i < size ; i++ ) {
       PropertyInfo prop = (PropertyInfo) axioms.get(i);
       if ( prop.includeInID() || prop.compare(oldFObject, newFObject) != 0 ) {
         if ( delta > 0 ) {
           append(',');
           addInnerNewline();
         }
-        outputProperty(newFObject, prop);
+        if ( calculateDeltaForNestedFObjects_ ) {
+          if (maybeOutPutFObjectProperty(newFObject, oldFObject, prop)) delta += 1;
+        } else {
+          outputProperty(newFObject, prop);
+          delta += 1;
+        }
 
-        delta += 1;
-        if ( prop.includeInID() )
+
+        if ( prop.includeInID() ) {
           ids += 1;
-        else if ( optionalPredicate_.propertyPredicateCheck(getX(), of, prop) )
+        } else if ( optionalPredicate_.propertyPredicateCheck(getX(), of, prop) ) {
           optional += 1;
+        }
       }
     }
     String output = builder().toString();
@@ -487,6 +508,11 @@ public class JSONFObjectFormatter
 
   public JSONFObjectFormatter setQuoteKeys(boolean quoteKeys) {
     quoteKeys_ = quoteKeys;
+    return this;
+  }
+
+  public JSONFObjectFormatter setCalculateNestedDelta(boolean calculateNestedDelta) {
+    calculateDeltaForNestedFObjects_ = calculateNestedDelta;
     return this;
   }
 

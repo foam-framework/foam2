@@ -23,7 +23,7 @@ foam.INTERFACE({
       name: 'createdByAgent',
       documentation: 'Agent acting as User who created the entry',
       createVisibility: 'HIDDEN',
-      updateVisibility: 'RO',
+      updateVisibility: 'RO'
     }
   ]
 });

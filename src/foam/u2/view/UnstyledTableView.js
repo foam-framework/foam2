@@ -265,6 +265,11 @@ foam.CLASS({
     {
       name: 'subStack',
       factory: function() {
+        // we export NoBackStack from table view,
+        // so that actions which have stack.back worked just fine from DAOSummaryView
+        // but had no effect on stack if the acction is called from context menu.
+        // so if such an action is called from DAOSummaryView we go back to TableView
+        // but if such an action is called from TableView we stay on the TableView screen
         return foam.nanos.approval.NoBackStack.create({delegate: this.stack});
       },
     },
@@ -325,9 +330,24 @@ foam.CLASS({
 
       //set memento's selected columns
       if ( this.memento ) {
-        this.memento.head = this.columns_.map(c => {
-          return this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c);
-        }).join(',');
+        if ( this.memento.head.length != 0 ) {
+          var columns = this.memento.head.split(',');
+          for ( var c of columns ) {
+            if ( this.shouldColumnBeSorted(c) && ! c.includes('.')) {
+              var prop = view.props.find(p => p.fullPropertyName === c.substr(0, c.length - 1) );
+              if ( prop ) {
+                if ( c[c.length - 1] === this.DESCENDING_ORDER_CHAR )
+                  this.order = this.DESC(prop.property);
+                else
+                  this.order = prop.property;
+              }
+            }
+          }
+        } else {
+          this.memento.head = this.columns_.map(c => {
+            return this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c);
+          }).join(',');
+        }
       }
 
       //otherwise on adding new column creating new EditColumnsView, which is closed by default
@@ -488,14 +508,6 @@ foam.CLASS({
           var view = this;
           view.props = this.returnPropertiesForColumns(view, view.columns_);
 
-          var actions = {};
-          var actionsMerger = action => { actions[action.name] = action; };
-
-          // Model actions
-          view.of.getAxiomsByClass(foam.core.Action).forEach(actionsMerger);
-          // Context menu actions
-          view.contextMenuActions.forEach(actionsMerger);
-
           // with this code error created slot.get cause promise return
           // FIX ME
           var slot = this.slot(function(data, data$delegate, order, updateValues) {
@@ -503,7 +515,7 @@ foam.CLASS({
             // on a table column header to sort by that column.
             var proxy = view.ProxyDAO.create({ delegate: dao });
             if ( this.order ) proxy = proxy.orderBy(this.order);
-            
+
 
             var canObjBeBuildFromProjection = true;
 
@@ -542,17 +554,12 @@ foam.CLASS({
                   on('mouseover', function() {
                     view.hoverSelection = obj;
                   }).
-                  callIf(view.click && ! view.disableUserSelection, function() {
-                    tableRowElement.on('click', function() {
-                      view.click(null, obj.id);
-                    });
-                  }).
                   callIf(view.dblclick && ! view.disableUserSelection, function() {
                     tableRowElement.on('dblclick', function() {
                       view.dblclick(null, obj.id);
                     });
                   }).
-                  callIf( ! view.disableUserSelection, function() {
+                  callIf( view.click && ! view.disableUserSelection, function() {
                     tableRowElement.on('click', function(evt) {
                       // If we're clicking somewhere to close the context menu,
                       // don't do anything.
@@ -568,6 +575,8 @@ foam.CLASS({
                           view.selection = v;
                           if ( view.importSelection$ ) view.importSelection = v;
                           if ( view.editRecord$ ) view.editRecord(v);
+                          view.importSelection = v;
+                          view.click(null, obj.id);
                         });
                       } else {
                         if ( view.importSelection$ ) view.importSelection = thisObjValue;
@@ -673,7 +682,7 @@ foam.CLASS({
                   }
 
                   // Object actions
-                  obj.cls_.getOwnAxiomsByClass(foam.core.Action).forEach(actionsMerger);
+                  var actions = view.getActionsForRow(obj);
                   tableRowElement
                     .start()
                       .addClass(view.myClass('td')).
@@ -691,22 +700,6 @@ foam.CLASS({
 
               return tbodyElement;
             });
-
-            if ( this.memento && this.memento.head.length != 0 ) {
-              var columns = this.memento.head.split(',');
-              for ( var c of columns ) {
-                if ( this.shouldColumnBeSorted(c) && ! c.includes('.')) {
-                  var prop = view.props.find(p => p.fullPropertyName === c.substr(0, c.length - 1) );
-                  if ( prop ) {
-                    if ( c[c.length - 1] === this.DESCENDING_ORDER_CHAR )
-                      this.order = this.DESC(prop.property);
-                    else
-                      this.order = prop.property;
-                    dao = dao.orderBy(this.order);
-                  }
-                }
-              }
-            }
           return slot;
         }
       },
@@ -729,6 +722,23 @@ foam.CLASS({
       },
       function returnMementoColumnNameDisregardSorting(c) {
         return c && this.shouldColumnBeSorted(c) ? c.substr(0, c.length - 1) : c;
+      },
+      function returnMementoColumnNameDisregardSorting(c) {
+        return c && this.shouldColumnBeSorted(c) ? c.substr(0, c.length - 1) : c;
+      },
+      {
+        name: 'getActionsForRow',
+        code: function(obj) {
+          var actions = {};
+          var actionsMerger = action => { actions[action.name] = action; };
+
+          // Model actions
+          obj.cls_.getAxiomsByClass(foam.core.Action).forEach(actionsMerger);
+          // Context menu actions
+          this.contextMenuActions.forEach(actionsMerger);
+
+          return actions;
+        }
       }
   ]
 });

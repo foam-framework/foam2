@@ -50,6 +50,16 @@ public class DAOResourceLoader
             ));
       }
 
+      if ( emailTemplate == null &&
+           ! SafetyUtil.isEmpty(groupId) ) {
+        emailTemplate = (EmailTemplate) emailTemplateDAO
+          .find(
+            AND(
+              EQ(EmailTemplate.NAME, name),
+              EQ(EmailTemplate.GROUP, "*")
+            ));
+      }
+
       if ( emailTemplate != null ) {
         return emailTemplate;
       }

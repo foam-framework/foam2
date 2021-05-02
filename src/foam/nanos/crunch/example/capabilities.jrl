@@ -1,6 +1,6 @@
 p({
   "class": "foam.nanos.crunch.Capability",
-  "id": "4EB60BAE-E915-4464-9D1B-4099F22E9144",
+  "id": "crunch.example",
   "name": "Example Capability",
   "enabled": true,
   "visible": false
