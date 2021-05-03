@@ -1,14 +1,14 @@
 <title>FOAMLink Documentation</title>
-<h1>FOAMLink Documentation</h1>
+<h2>FOAMLink Documentation</h2>
 
 FOAMLink walks the file tree to generate a map, associating model IDs with their respective files and vice-versa.
 
 FOAMLink also processes "foamlink.js" files at any directory level of your FOAM project. This manifest file allows you to ignore certain files and directories, and even inject temporary code before processing for meta information.
 
-<h2>Current State</h2>
+<h4>Current State</h4>
 Currently FOAMLink is only used by the `genjava.js` script. Later it could act as a drop-in replacement for the current convention of manually registering source files in "files.js" - i.e. the ClassLoader in the web browser would use the FOAMLink data file to locate classes. 
 
-<h2>Using FOAMLink</h2>
+<h4>Using FOAMLink</h4>
 
 To invoke FOAMLink, issue the following command:
 <code>
@@ -19,11 +19,11 @@ The file specified - example_output_file.json in the example above - is the outp
 
 FOAMLink expects a foamlink.js file to be in the working directory. It will follow the commands given by this file before it starts walking the file tree.
 
-<h3>FOAMLink "foamlink.js" Manifest Files</h3>
+<h4>FOAMLink "foamlink.js" Manifest Files</h4>
 
 The foamlink.js manifest tells FOAMLink where to look for source files, what subdirectories or files need to be ignored, and more.
 
-<h4>ROOTS command</h4>
+<h5>ROOTS command</h5>
 The ROOTS command specifies "root variables" that may be referred to by models in a directory. These are usually top-level package identifiers.
 
 <code>
@@ -34,7 +34,7 @@ The example above ensures model sources can refer to com.a.b.c or net.d.e.f with
 
 The "foom" variable should not be included in ROOTS as this is handled specially by FOAMLink.
 
-<h4>REPO command</h4>
+<h5>REPO command</h5>
 
 The REPO command tells FOAMLink that source files exist in a particular directory. The root foamlink.js file (the one in the working directory when FOAMLink is run) must contain at least one REPO command for FOAMLink to generate a useful output.
 
@@ -43,7 +43,7 @@ The following example tells FOAMLink to walk files under myproject/src relative 
 REPO("myproject/src");
 </code>
 
-<h4>IGNORE command</h4>
+<h5>IGNORE command</h5>
 
 The IGNORE command is useful when there are Javascript files that do not define FOAM models and should not be invoked by FOAMLink. Remember that FOAMLink executes the javascript files and assumes they contain model declarations like foam.CLASS().
 
@@ -54,11 +54,11 @@ IGNORE("com/example/cli_tools");
 
 From this example, it follows that filepaths in a foamlink.js file are relative to the location of that file.
 
-<h4>BROKEN command</h4>
+<h5>BROKEN command</h5>
 
 BROKEN is a semantic alias for IGNORE. It is meant to be used to indicate a file is ignored because it is currently broken rather than because it doesn't contain model definitions.
 
-<h4>MANUAL command</h4>
+<h5>MANUAL command</h5>
 
 The MANUAL command is useful when certain files cannot be processed by FOAMLink. This could happen for files that define FOAM models, but also depend on other variables provided by their intended environment. MANUAL takes two arguments: a file path, and a list of model IDs.
 
@@ -70,7 +70,7 @@ MANUAL('com/example/test/tests.js', [
 ]);
 </code>
 
-<h4>INJECT command</h4>
+<h5>INJECT command</h5>
 
 The INJECT command is meant to be used sparingly. It allows specifying code that should be inserted at the top of a file before FOAMLink runs it (perhaps to populate variables that model definitions depend on). Note that this only affects the file while it is processed by FOAMLink, and does not affect the file contents as loaded by FOAM.
 
@@ -82,11 +82,11 @@ INJECT('path/to/example.js', `
 `);
 </code>
 
-<h4>VERSION command</h4>
+<h5>VERSION command</h5>
 
 This currently does not do anything, but is reserved for future use.
 
-<h3>Enhance genJava with FOAMLink</h3>
+<h4>Enhance genJava with FOAMLink</h4>
 The FOAMLink data file can be used to improve the performance of genJava, allowing it to only generate Java code for source files that were changed.
 
 To improve genJava performance:
@@ -101,9 +101,9 @@ To improve genJava performance:
 When the `FOAMLINK_DATA` environment variable is set, genjava will use the FOAMLink data file to determine what classes belong to modified files, and regenerate only those classes in Java.
 
 
-<h2>Foamlink Story</h2>
+<h4>Foamlink Story</h4>
 
-<h3>Enter genJava</h3>
+<h4>Enter genJava</h4>
 
 <ul>
   <li>The genJava script was unaware of which files have been modified</li>
@@ -111,11 +111,11 @@ When the `FOAMLINK_DATA` environment variable is set, genjava will use the FOAML
   <li>genJava will work for entries in classes.js that aren't in files.js, therefore requiring a files.js entry would break backwards compatibility</li>
 </ul>
 
-<h3>Enter foam.apploader.ClassLoader</h3>
+<h4>Enter foam.apploader.ClassLoader</h4>
 
 When a model is loaded using the ClassLoader, the result is not consistent with files.js. The reason for this is ClassLoader finds files based on the classname, and therefore doesn't support having multiple models in a file.
 
-<h3>Enter "walking all the files and generating a map of model IDs to filenames"</h3>
+<h4>Enter "walking all the files and generating a map of model IDs to filenames"</h4>
 
 Okay so this was complicated. Without invoking the classloader (that would be a bit of a catch 22) or depending on files.js, there were two options for processing the javascript files for meta information:
 <ul>
