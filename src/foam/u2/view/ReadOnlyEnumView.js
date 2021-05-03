@@ -11,7 +11,7 @@ foam.CLASS({
 
   requires: ['foam.u2.tag.CircleIndicator'],
 
-  imports: ['theme', 'returnExpandedCSS'],
+  imports: ['returnExpandedCSS', 'theme'],
 
   css: `
     ^{
@@ -56,14 +56,14 @@ foam.CLASS({
         .style({
           'background-color': background,
           'color': color,
-          'border-color': background == '#FFFFFF' || ! background ? color : background
+          'border-color': background != '#FFFFFF' || background ? background : color
         })
         .callIf(this.showGlyph && data.glyph, () =>{
           var icon = {
             size: 14,
             backgroundColor: color,
             icon: data.glyph.clone(this).getDataUrl({
-              fill: background ? background : color
+              fill: background || color
             })
           };
           this.start(this.CircleIndicator, icon).addClass(this.myClass('icon')).end();
