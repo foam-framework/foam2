@@ -102,6 +102,12 @@ foam.CLASS({
         });
     },
 
+    function load() {
+      this.SUPER();
+      // compute and set the minWidth from the maxlength of the input
+      this.el().style['min-width'] = this.dynamicPlaceholder.length + 'em';
+    },
+
     function setStateOnDelete(evt) {
       this.isDelete = true;
       this.includeTrailingDelimiter = false;
