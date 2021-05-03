@@ -21,9 +21,9 @@ foam.CLASS({
   constants: { CSS_CLASS: 'foam-u2-view-TableView' },
 
   css: `
-    .foam-comics-BrowserView-foam-nanos-pm-PMInfo .foam-u2-ActionView-clearAll { margin-bottom: 6px; }
-    .foam-comics-BrowserView-foam-nanos-pm-PMInfo .foam-u2-ActionView-create { display: none; }
-    .foam-comics-BrowserView-foam-nanos-pm-PMInfo .foam-u2-ActionView-edit   { display: none; }
+    ^ .foam-u2-ActionView-clearAll { margin-bottom: 10px; }
+    ^ .foam-u2-ActionView-create { display: none; }
+    ^ .foam-u2-ActionView-edit   { display: none; }
   `,
 
   properties: [
@@ -45,6 +45,7 @@ foam.CLASS({
       // is broken if loaded before any tableviews
       this.TableView.create();
 
+      this.addClass('foam-nanos-pm-PMTableView');
       this.add(this.CLEAR_ALL);
       this.columns_.push([this.CLEAR, null]);
 
