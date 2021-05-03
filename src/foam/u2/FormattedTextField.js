@@ -13,7 +13,7 @@ foam.CLASS({
     ^ {
       display: flex;
       position: relative;
-      width: fit-content;
+      width: fit-content; /* remove */
       flex-direction: column;
       justify-content: center;
     }
@@ -25,9 +25,11 @@ foam.CLASS({
       opacity: 0.7;
       font-size: 14px;
       letter-spacing: normal;
+      inline-size: fit-content;
     }
   `,
 
+  // imports: ['window'],
   constants: [
     {
       type: 'Array',
@@ -57,8 +59,9 @@ foam.CLASS({
     {
       name: 'dynamicPlaceholder',
       expression: function(placeholder, formattedData, mode) {
-        return mode === foam.u2.DisplayMode.RW ? 
-          formattedData + placeholder.substring(formattedData.length)
+        return mode === foam.u2.DisplayMode.RW ?
+          (formattedData || '') + 
+          placeholder.substring(formattedData && formattedData.length || 0)
           : '';
       },
       documentation: 'The placeholder text when the input has content'
