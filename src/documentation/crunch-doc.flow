@@ -80,8 +80,6 @@ the intercept.
 The options available for StepWizardConfig are in the scope of wizard documentation.
 </p>
 
-<!-- TODO: link wizard documentation -->
-
 <p>
 As an example, the following journal entry describes a capability that will
 configure the wizard to disallow skipping sections.

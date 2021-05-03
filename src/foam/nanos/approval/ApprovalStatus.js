@@ -14,8 +14,8 @@
       label: { en: 'Requested', pt: 'Requeridos'},
       ordinal: 0,
       documentation: 'Request pending.',
-      color: '/*%WARNING2%*/ #a61414',
-      background: '/*%WARNING5%*/ #fbedec',
+      color: '/*%WARNING2%*/ #D57D11',
+      background: '/*%WARNING5%*/ #FFF4DE',
     },
     {
       name: 'APPROVED',
@@ -30,8 +30,8 @@
       label: { en: 'Rejected', pt: 'Rejeitado'},
       ordinal: 2,
       documentation: 'Request was rejected.',
-      color: '/*%DESTRUCTIVE2%*/ #816819',
-      background: '/*%DESTRUCTIVE5%*/ #fbe88f',
+      color: '/*%DESTRUCTIVE2%*/ #A61414',
+      background: '/*%DESTRUCTIVE5%*/ #FFE9E7',
     },
     {
       name: 'CANCELLED',

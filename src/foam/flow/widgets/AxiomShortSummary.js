@@ -12,6 +12,12 @@ foam.CLASS({
     Brief summary of axioms for overview documentation.
   `,
 
+  css: `
+    ^preformatted {
+      white-space: pre;
+    }
+  `,
+
   properties: [
     {
       name: 'of',
@@ -53,7 +59,10 @@ foam.CLASS({
               .start('tr')
                 .start('td').add(ax.name).end()
                 .callOn(self, 'generateAxiomClassFields', [ax])
-                .start('td').add(ax.documentation).end()
+                .start('td')
+                  .addClass(self.myClass('preformatted'))
+                  .add(ax.documentation)
+                .end()
               .end()
           })
         .end()
