@@ -296,13 +296,13 @@ It then marshalls it to the primary mediator, and waits on a response.`,
           // Create a medusa entry for transient changes regardless of non-transient
           // This Option generates gaps on the Node ledges, and complicates replay
           // in it's current form.
-          // String transientData = transientData(x, nu, old, dop);
-          // if ( ! SafetyUtil.isEmpty(data) ||
-          //      ! SafetyUtil.isEmpty(transientData) ) {
+          String transientData = transientData(x, nu, old, dop);
+          if ( ! SafetyUtil.isEmpty(data) ||
+               ! SafetyUtil.isEmpty(transientData) ) {
 
-          // Create a medusa entry only when non-transient changes
-          if ( ! SafetyUtil.isEmpty(data) ) {
-            String transientData = transientData(x, nu, old, dop);
+//          // Create a medusa entry only when non-transient changes
+//          if ( ! SafetyUtil.isEmpty(data) ) {
+//            String transientData = transientData(x, nu, old, dop);
             MedusaEntry entry = (MedusaEntry) submit(x, data, transientData, dop);
             getLogger().debug("updatePrimary", "primary", dop, nu.getProperty("id"), "entry", entry.toSummary());
             if ( cmd != null ) {

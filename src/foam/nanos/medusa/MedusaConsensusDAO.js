@@ -206,7 +206,12 @@ This is the heart of Medusa.`,
         MedusaEntry.CONSENSUS_HASHES.clear(entry);
 
         dagger.verify(x, entry);
-        dagger.updateLinks(x, entry);
+        if ( ! SafetyUtil.isEmpty(entry.getData()) ) {
+          // Only non-transient entries can be used for links,
+          // as only non-transient are stored on the nodes.
+          dagger.updateLinks(x, entry);
+        }
+
         // test to save a synchronized call
         if ( entry.getIndex() > dagger.getGlobalIndex(x) ) {
           // Required on Secondaries.
@@ -330,9 +335,10 @@ This is the heart of Medusa.`,
                 }
               }
             } else {
-              // If stalled on nextIndex and nextIndex + 1 exists and has conenssus, test if nextIndex exists in nodes, if not, skip.
+              // If stalled on nextIndex and nextIndex + 1 exists and has consensus, test if nextIndex exists in nodes, if not, skip.
               if ( nextIndex == replaying.getIndex() + 1 &&
-                   ( System.currentTimeMillis() - nextIndexSince ) > 10000 ) {
+                   ( replaying.getReplaying() ||
+                     ( System.currentTimeMillis() - nextIndexSince ) > 10000 ) ) {
                 gap(x, nextIndex, nextIndexSince);
               }
             }
@@ -532,7 +538,8 @@ This is the heart of Medusa.`,
       `
     },
     {
-      documentation: 'Test for gap, investigate, attempt recovery.',
+      documentation: `Test for gap, investigate, attempt recovery.
+During replay gaps are treated differently; If the index after the gap is ready for promotion, then promote it. During normal operation gaps are not expected and a wait strategy is invoked.`,
       name: 'gap',
       args: [
         {
@@ -578,6 +585,16 @@ This is the heart of Medusa.`,
             // ignore
           }
           if ( entry != null ) {
+
+            ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
+            if ( replaying.getReplaying() ) {
+              // Set global index to the gap index. Then
+              // the promoter will look for the entry after the gap.
+              getLogger().info("gap", "skip", index);
+              replaying.updateIndex(x, index);
+              return;
+            }
+
             getLogger().warning("gap", "investigating", index);
             // REVIEW: countEntryOnNodes no longer available as
             // nodes don't keep an mdao of entries.
@@ -622,7 +639,6 @@ This is the heart of Medusa.`,
                 // Recovery - set global index to the gap index. Then
                 // the promoter will look for the entry after the gap.
                 getLogger().info("gap", "recovery", index);
-                ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
                 replaying.updateIndex(x, index);
 
                 alarm.setIsActive(false);
