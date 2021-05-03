@@ -802,3 +802,4 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequ
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequestClassificationEnum.NATURE_CODE_APPROVAL.label",target:"Aprovação do código da natureza"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequestClassificationEnum.ACCOUNT_ROLE_APPROVAL.label",target:"Aprovação de função de conta"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequestClassificationEnum.ACCOUNT_APPROVABLE_REQUEST.label",target:"Solicitação de conta aprovada"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequestClassificationEnum.TRANSACTION_REQUEST.label",target:"Aprovação de transação Solicitação"})

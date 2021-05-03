@@ -140,6 +140,10 @@
     {
       name: 'ACCOUNT_APPROVABLE_REQUEST',
       label: 'Account Approvable Request'
+    },
+    {
+      name: 'TRANSACTION_REQUEST',
+      label: 'Transaction Approval Request'
     }
   ]
 });
