@@ -64,7 +64,8 @@ foam.CLASS({
         }.bind(this));
       },
       required: true,
-      updateVisibility: 'RO'
+      updateVisibility: 'RO',
+      storageOptional: true
     },
     {
       class: 'Long',
