@@ -26,10 +26,14 @@ foam.CLASS({
             expr2: seq(sym('expr3'), optional(seq('^', sym('expr2')))),
 
             expr3: alt(
-              //sym('fun'),
+              sym('fun'),
               sym('cell'),
               sym('number'),
               sym('group')),
+
+            fun: seq(
+              sym('symbol'),
+              '()'),
 
             xxxexpr: alt(
               //sym('cell'),
@@ -141,7 +145,14 @@ foam.CLASS({
           var f = parseFloat(s);
           return foam.core.ConstantSlot.create({value: f});
         },
-        cell: function(a) { return cell(a[0]).numValue$; },
+        fun: function(a) {
+          var c = cell(a[0]);
+          return foam.core.ConstantSlot.create({value: c.value()});
+        },
+        cell: function(a) {
+          var c = cell(a);
+          return c.numValue$;
+        },
         vargs: function(a) {
           return foam.core.ExpressionSlot.create({
             code: function() {
@@ -190,8 +201,25 @@ foam.CLASS({
   imports: [ 'parser' ],
 
   css: `
+    ^ * {
+      font: 24px roboto, arial, sans-serif;
+    }
+    ^value {
+      font: 24px roboto, arial, sans-serif;
+    }
     ^ .property-id input {
       font-weight: 700;
+    }
+    ^ .foam-u2-ReadWriteView {
+      display: inline-block;
+      width: 302px;
+    }
+    ^ .foam-u2-ReadWriteView span span {
+      font: 24px roboto, arial, sans-serif;
+    }
+    ^ input {
+      height: 34px;
+      font: 24px roboto, arial, sans-serif;
     }
   `,
 
@@ -199,6 +227,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
+      view: 'foam.u2.ReadWriteView',
       width: 10
     },
     {
@@ -208,7 +237,7 @@ foam.CLASS({
       width: 50
     },
     {
-      class: 'String',
+      // class: 'String',
       name: 'value'
     },
     {
@@ -234,6 +263,7 @@ foam.CLASS({
           .add('=')
         .end()
         .start('span')
+          .addClass(this.myClass('value'))
           .add(this.value$)
         .end();
 
@@ -262,80 +292,6 @@ foam.CLASS({
 
   imports: [ 'scope?' ], // Used by flow() function
   exports: [ 'as cells', 'parser' ],
-
-  classes: [
-    {
-      name: 'Cell',
-      extends: 'foam.u2.ReadWriteView',
-
-      requires: [ 'foam.u2.tag.Input', 'foam.u2.HTMLElement' ],
-
-      documentation: `
-        Doesn't build inner views until value is set or user clicks on view.
-        This complicates the design but saves memory and startup time.
-      `,
-
-      css: `
-        ^ > span {
-          display: block;
-          height: 15px;
-          padding: 2px;
-          width: 100%;
-        }
-        ^ > input {
-          border: none;
-          outline: 1px solid blue;
-          outline-offset: 0;
-          padding-left: 2px;
-          width: 100%;
-        }
-      `,
-
-      properties: [
-        [ 'nodeName', 'span' ],
-        {
-          name: 'formula',
-          displayWidth: 10
-        },
-        {
-          name: 'data',
-          adapt: function(_, v) {
-            var ret = parseFloat(v);
-            return ret && ! Number.isInteger(ret) ? ret.toFixed(2) : v;
-          },
-          displayWidth: 12
-        },
-        {
-          name: 'numValue',
-          expression: function(data) { return parseFloat(data); }
-        }
-      ],
-
-      methods: [
-        function initE() {
-          this.SUPER();
-          this.addClass(this.myClass());
-        },
-
-        function isLoaded() { return true; },
-
-        // function isLoaded() { return this.value; },
-        // function listenForLoad() { this.value$.sub(this.onDataLoad); },
-        function toReadE() {
-          return this.HTMLElement.create(
-            {nodeName: 'span'},
-            this).add(this.data$);
-        },
-
-        function toWriteE() {
-          this.formula$.sub(this.onDataLoad);
-          var e = this.Input.create(); //this.E('input');
-          e.data$ = this.formula$;
-          return e;
-        }
-      ]
-    }
-  ],
 
   css: `
     ^ tr, ^ td, ^ th, ^ input {
@@ -379,59 +335,56 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'com.google.flow.Row',
       name: 'rows'
+    },
+    {
+      name: 'nextRowId_',
+      value: 'a'
     }
   ],
 
   methods: [
-    function init() {
-      this.SUPER();
-
-      return;
-      // Two sample spreadsheets
-      // Spreadsheet taken from Visicalc
- this.loadCells({"A0":"<b><u>Item</u></b>","B0":"<b><u>No.</u></b>","C0":"<b><u>Unit</u></b>","D0":"<b><u>Cost</u></b>","A1":"Muck Rake","B1":"43","C1":"12.95","D1":"=mul(B1,C1)","A2":"Buzz Cut","B2":"15","C2":"6.76","D2":"=mul(B2,C2)","A3":"Toe Toner","B3":"250","C3":"49.95","D3":"=mul(B3,C3)","A4":"Eye Snuff","B4":"2","C4":"4.95","D4":"=mul(B4,C4)","C5":"Subtotal","D5":"=sum(D1:D4)","B6":"9.75","C6":"Tax","D6":"=div(mul(B6,D5),100)","C7":"<b>Total</b>","D7":"=add(D5,D6)"});
-
-      // Spreadsheet to test all functions
-      // this.loadCells({"A0":"<b>Formulas</b>","B0":"<b>Values</b>","A1":" 1","B1":"1","A2":" 10","B2":"10","A3":" 10.12","B3":"10.12","A4":" -10.1","B4":"-10.1","A5":" foobar","B5":"foobar","A6":" =add(1,2)","B6":"=add(1,2)","A7":" =sub(2,1)","B7":"=sub(2,1)","A8":" =mul(2,3)","B8":"=mul(2,3)","A9":" =div(9,3)","B9":"=div(9,3)","A10":" =mod(8,3)","B10":"=mod(8,3)","A11":" =add(mul(2,3),div(3,2))","B11":"=add(mul(2,3),div(3,2))","A12":" =A1","B12":"=A1","A13":" =add(A1,B1)","B13":"=add(A1,B1)","A14":" =sum(1,2,3,4,5)","B14":"=sum(1,2,3,4,5)","A15":" =sum(B6:B10)","B15":"=sum(B6:B10)","A16":" =prod(B6:B10)","B16":"=prod(B6:B10)"});
-
-//this.loadCells({"A0":"<div style=\"width:200px;\"><b><u>Benchmark</u></b></div>","B0":"<b><u>IndexedDB</u></b>","C0":"<b><u>DAO</u></b>","A1":"Create Albums","B1":"190","C1":"366","A2":"Create Photos","B2":"2772","C2":"2492","A3":"Select All Albums","B3":"168","C3":"1.93","A4":"Select All Photos","B4":"1361","C4":"3.86","B5":"1.43","C5":"0.06","B6":"1.56","C6":"0.63","B7":"10.28","C7":"1.12","D0":"<b><u>Speedup</u></b>","D1":"=div(B1,C1)","D2":"=div(B2,C2)","D3":"=div(B3,C3)","D4":"=div(B4,C4)","A5":"Single Key Query","D5":"=div(B5,C5)","A6":"Multi-Key Query","D6":"=div(B6,C6)","A7":"Multi-Key Query","D7":"=div(B7,C7)","A8":"Multi-Key Query","B8":"102","C8":"12.24","D8":"=div(B8,C8)","A9":"Multi-Key Query","B9":"561","C9":"15.24","D9":"=div(B9,C9)","A10":"Indexed Field Query","B10":"4.63","C10":"0.46","D10":"=div(B10,C10)","A11":"Ad-Hoc Query","B11":"658","C11":"9.91","D11":"=div(B11,C11)","A12":"Simple Inner-Join","B12":"721","C12":"9.55","D12":"=div(B12,C12)","A13":"Inner-Join Aggregation","B13":"647","C13":"38.56","D13":"=div(B13,C13)","A14":"Order-By","B14":"59","C14":"0.55","D14":"=div(B14,C14)","A15":"Order and Group By","B15":"1232","C15":"3.63","D15":"=div(B15,C15)","A16":"<b>Average:</b>","B16":"=SUM(B1:B15)","C16":"=SUM(C1:C15)","D16":"=div(B14,C14)"});
-    },
-
     function nextRowId() {
-      return String.fromCharCode(65 + this.rows.length);
+      var advance = () => {
+        this.nextRowId_ = String.fromCharCode(this.nextRowId_.charCodeAt(0) + 1);
+      };
+      while ( this.cell(this.nextRowId_) ) advance();
+      var ret = this.nextRowId_;
+      advance();
+      return ret;
     },
 
-    function addRow() {
+    function addRow(watch) {
       var row = this.Row.create({id: this.nextRowId()});
       this.rows.push(row);
       this.add(row);
+
+      if ( watch ) {
+        row.expression$.sub(foam.events.oneTime(() => {
+          this.addRow(watch);
+        }));
+      }
+      return row;
+    },
+
+    function addHiddenRow(id, expression) {
+      var row = this.Row.create({id: id, expression: expression});
+      this.rows.push(row);
+      return row;
     },
 
     function initE() {
       this.SUPER();
       var self = this;
+      var row;
+      this.rows.push(row = this.Row.create({id: 'PI', value: Math.PI}));
+      this.add(row);
+      this.rows.push(this.Row.create({id: 'E', value: Math.E}));
+      this.rows.push(this.Row.create({id: 'random', value: Math.random}));
 
       this.addRow();
       this.addRow();
       this.addRow();
-      this.addRow();
-/*
-      this.setNodeName('table').addClass(this.myClass()).attrs({cellspacing: 0}).
-        start('tr').
-          tag('th').
-          repeat(0, this.columns-1, function (i) {
-            this.start('th').add(String.fromCharCode(65 + i)).end();
-          }).
-        end().
-        repeat(0, this.rows-1, function(i) {
-          this.start('tr').
-            start('th').add(i).end().
-            repeat(0, this.columns-1, function(j) {
-              this.start('td').add(self.cell(self.cellName(j, i))).end();
-            }).
-          end();
-        });
-        */
+      this.addRow(true);
     },
 
     function loadCells(map) {

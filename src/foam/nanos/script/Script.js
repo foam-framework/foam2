@@ -352,23 +352,6 @@ foam.CLASS({
       ],
       type: 'Boolean',
       javaCode: `
-        // Run on all instances if:
-        // - startup "main" script, or
-        // - not-clusterable, or
-        // - a suitable cluster configuration
-
-        String startScript = System.getProperty("foam.main", "main");
-        if ( this instanceof foam.nanos.cron.Cron &&
-             getStatus() == ScriptStatus.SCHEDULED &&
-             ! getId().equals(startScript) &&
-             getClusterable() ) {
-          foam.nanos.medusa.ClusterConfigSupport support = (foam.nanos.medusa.ClusterConfigSupport) x.get("clusterConfigSupport");
-          if ( support != null &&
-               ! support.cronEnabled(x) ) {
-            ((Logger) x.get("logger")).warning(this.getClass().getSimpleName(), "execution disabled.", getId(), getDescription());
-            throw new ClientRuntimeException(this.getClass().getSimpleName() + " " + EXECUTION_DISABLED);
-          }
-        }
         return true;
       `
     },

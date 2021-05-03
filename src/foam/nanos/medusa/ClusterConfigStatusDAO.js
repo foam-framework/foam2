@@ -108,15 +108,6 @@ foam.CLASS({
         bucketNodes(x);
       }
 
-      // Changing Primary - stop/start cron scheduler.
-      if ( myConfig.getType() == MedusaType.MEDIATOR &&
-           nu.getId() == myConfig.getId() &&
-           nu.getIsPrimary() != old.getIsPrimary() ) {
-        foam.nanos.cron.CronScheduler scheduler = (foam.nanos.cron.CronScheduler) x.get("cronScheduler");
-        scheduler.setEnabled(nu.getIsPrimary());
-        getLogger().info("cronScheduler,enabled", scheduler.getEnabled());
-      }
-
       return nu;
       `
     },

@@ -71,7 +71,7 @@ foam.CLASS({
       args: [
         { name: 'x', type: 'Context' },
         { name: 'request', type: 'ApprovalRequest' },
-        { name: 'capableObj', type: 'Capable' },
+        { name: 'obj', type: 'FObject' },
         { name: 'capablePayloadObj', type: 'CapabilityJunctionPayload' }
       ],
       javaCode: `
@@ -169,7 +169,7 @@ foam.CLASS({
                   .setDescription(capName + FOR + objName + " - id:" + String.valueOf(obj.getProperty("id")))
                   .setStatus(ApprovalStatus.REQUESTED).build();
 
-                approvalRequest = decorateApprovalRequest(x, approvalRequest, capableObj, capablePayload);
+                approvalRequest = decorateApprovalRequest(x, approvalRequest, obj, capablePayload);
 
                 approvalRequestDAO.put_(getX(), approvalRequest);
               } catch (Exception e){

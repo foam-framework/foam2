@@ -128,10 +128,6 @@ public class JSONFObjectFormatter
     append(value);
   }
 
-  protected void outputBoolean(Boolean value) {
-    output(value.booleanValue());
-  }
-
   public void output(String[] arr) {
     output((Object[]) arr);
   }
@@ -189,7 +185,6 @@ public class JSONFObjectFormatter
   }
 
   protected boolean maybeOutPutFObjectProperty(FObject newFObject, FObject oldFObject, PropertyInfo prop) {
-
     if ( prop instanceof AbstractFObjectPropertyInfo && oldFObject != null &&
       prop.get(oldFObject) != null && prop.get(newFObject) != null
     ) {
@@ -273,7 +268,7 @@ public class JSONFObjectFormatter
         output((Object[]) value);
       }
     } else if ( value instanceof Boolean ) {
-      outputBoolean((Boolean) value);
+      output(((Boolean) value).booleanValue());
     } else if ( value instanceof Date ) {
       outputDateValue((Date) value);
     } else if ( value instanceof Map ) {
@@ -319,7 +314,7 @@ public class JSONFObjectFormatter
     }
   }
 
-  protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
+  protected boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
     if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
 
     Object value = prop.get(fo);

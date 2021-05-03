@@ -12,7 +12,9 @@ foam.RELATIONSHIP({
   cardinality: '1:*',
   sourceProperty: {
     section: 'scriptEvents',
-    visibility: 'RO',
+    createVisibility: 'HIDDEN',
+    updateVisibility: 'RO',
+    readVisibility: 'RO',
     tableCellFormatter: function(value, obj, axiom) {
       var dao = this.__subSubContext__[foam.String.daoize(this.type)];
       if ( dao ) {

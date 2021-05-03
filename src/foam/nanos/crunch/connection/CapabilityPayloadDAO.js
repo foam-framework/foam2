@@ -25,7 +25,8 @@ foam.CLASS({
     'foam.nanos.crunch.connection.CapabilityPayload',
     'foam.nanos.crunch.CrunchService',
     'foam.nanos.crunch.UserCapabilityJunction',
-    'foam.nanos.logger.Logger',
+    'foam.nanos.logger.Logger', 
+    'foam.nanos.logger.PrefixLogger',
     'foam.nanos.pm.PM',
     'foam.util.SafetyUtil',
     'java.util.ArrayList',
@@ -51,6 +52,21 @@ foam.CLASS({
 
   messages: [
     { name: 'PENDING_APPROVAL', message: 'Capability pending approval' }
+  ],
+
+  properties: [
+    {
+      name: 'logger',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      transient: true,
+      visibility: 'HIDDEN',
+      javaFactory: `
+        return new PrefixLogger(new Object[] {
+          this.getClass().getSimpleName()
+        }, (Logger) getX().get("logger"));
+      `
+    }
   ],
 
   axioms: [
@@ -223,8 +239,7 @@ foam.CLASS({
                     }
                   }
                 } catch (Throwable t) {
-                  Logger logger = (Logger) x.get("logger");
-                  logger.warning("Unexpected exception validating " + key + ": ", t);
+                  getLogger().warning("Unexpected exception validating " + key + ": ", t);
                 }
               }
             }
@@ -300,12 +315,15 @@ foam.CLASS({
               dataObj = currentDataObj;
             } 
             
-            ((CrunchService) x.get("crunchService")).updateJunction(x, cap.getId(), dataObj, null);
+            UserCapabilityJunction ucj = (UserCapabilityJunction) ((CrunchService) x.get("crunchService")).updateJunction(x, cap.getId(), dataObj, null);
+            getLogger().debug(
+              "Updated capability: " + cap.getName() + " - " + cap.getId(), 
+              "Status: " + ucj.getStatus(), 
+              "Source: " + ((ucj.findSourceId(x) != null) ? ucj.getSourceId() + " - " + ucj.findSourceId(x).toSummary() : ucj.getSourceId()));
           } else if ( item instanceof List ) {
             processCapabilityList(x, (List) item, capabilityDataObjects, currentCapabilityDataObjects);
           } else {
-            Logger logger = (Logger) x.get("logger");
-            logger.warning("Ignoring unexpected item in grant path " + item);
+            getLogger().warning("Ignoring unexpected item in grant path " + item);
           }
         }
       `

@@ -242,7 +242,7 @@ foam.CLASS({
             getLogger().info("verify", "bootstrap", entry.getIndex());
             return;
           }
-          getLogger().error("verify", entry.getIndex(), "parent not found", entry.getIndex1(), "entry", entry.toSummary(), entry.getNode());
+          getLogger().error("Hash Verification Failed", "verify", entry.getIndex(), "parent not found", entry.getIndex1(), "entry", entry.toSummary(), entry.getNode());
           throw new DaggerException("Hash Verification Failed on: "+entry.toSummary()+" from: "+entry.getNode());
         }
         MedusaEntry parent2 = (MedusaEntry) dao.find(EQ(MedusaEntry.INDEX, entry.getIndex2()));
@@ -254,8 +254,8 @@ foam.CLASS({
             getLogger().info("verify", "bootstrap", entry.getIndex());
             return;
           }
-          getLogger().error("verify", entry.getIndex(), "parent not found", entry.getIndex2(), "entry", entry.toSummary(), entry.getNode());
-          throw new DaggerException("Hash Verification Failed on: "+entry.toSummary()+" from: "+entry.getNode());
+          getLogger().error("Hash verification failed", "verify", entry.getIndex(), "parent not found", entry.getIndex2(), "entry", entry.toSummary(), entry.getNode());
+          throw new DaggerException("Hash verification failed on: "+entry.toSummary()+" from: "+entry.getNode());
         }
 
         try {
@@ -269,7 +269,7 @@ foam.CLASS({
           }
           String calculatedHash = byte2Hex(md.digest());
           if ( ! calculatedHash.equals(entry.getHash()) ) {
-            getLogger().error("verify", entry.getIndex(), "hash", "fail", entry.toSummary());
+            getLogger().error("Hash verification failed", "verify", entry.getIndex(), "hash", "fail", entry.toSummary());
             throw new DaggerException("Hash verification failed on: "+entry.toSummary());
           }
         } catch ( java.security.NoSuchAlgorithmException e ) {
