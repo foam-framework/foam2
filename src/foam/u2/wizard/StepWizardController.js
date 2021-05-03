@@ -24,6 +24,10 @@ foam.CLASS({
       name: 'config',
       class: 'FObjectProperty',
       of: 'foam.u2.wizard.StepWizardConfig',
+      documentation: `
+        Configuration for the wizard. Some configurattion properties are not
+        applicable to all wizard views.
+      `,
       factory: function() {
         return this.StepWizardConfig.create();
       }
@@ -41,6 +45,10 @@ foam.CLASS({
       name: 'wizardlets',
       class: 'FObjectArray',
       of: 'foam.u2.wizard.Wizardlet',
+      documentation: `
+        An array containing all the wizardlets to use in this wizard. This may
+        include wizardlets with isAvailable initially set to false.
+      `,
       postSet: function (_, n) {
         this.setupWizardletListeners(n);
         this.determineWizardActions(n);
@@ -49,7 +57,10 @@ foam.CLASS({
     {
       name: 'wizardPosition',
       documentation: `
-        Wizardlet position
+        A WizardPosition instance specifying the index of the wizardlet and
+        section that is considered the "current" section. For the incremental
+        view, this is the current screen; for the scrolling view, this is the
+        first section that is below the top of the visible portion of the wizard.
       `,
       class: 'FObjectProperty',
       of: 'foam.u2.wizard.WizardPosition',
