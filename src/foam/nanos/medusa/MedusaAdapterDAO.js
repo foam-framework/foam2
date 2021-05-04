@@ -236,7 +236,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
             return nu;
           }
         }
-        // TODO/REVIEW
+
         getLogger().error("update", "secondary", dop, obj.getProperty("id"), "result,null");
         Alarm alarm = new Alarm();
         alarm.setClusterable(false);
