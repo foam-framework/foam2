@@ -345,7 +345,8 @@ This is the heart of Medusa.`,
           } finally {
             pm.log(x);
           }
-          if ( entry == null ) {
+          if ( entry == null &&
+               ! replaying.getReplaying() ) {
             try {
               synchronized ( promoterLock_ ) {
                 promoterLock_.wait(getTimerInterval());
@@ -585,7 +586,6 @@ During replay gaps are treated differently; If the index after the gap is ready 
             // ignore
           }
           if ( entry != null ) {
-
             ReplayingInfo replaying = (ReplayingInfo) x.get("replayingInfo");
             if ( replaying.getReplaying() ) {
               // Set global index to the gap index. Then
@@ -595,75 +595,63 @@ During replay gaps are treated differently; If the index after the gap is ready 
               return;
             }
 
-            getLogger().warning("gap", "investigating", index);
-            // REVIEW: countEntryOnNodes no longer available as
-            // nodes don't keep an mdao of entries.
-            // long nodeCount = support.countEntryOnNodes(x, index);
-            long mediatorCount = support.countEntryOnMediators(x, index);
-            long nodeCount = 0L;
-            if ( nodeCount == 0L ) {
-              getLogger().warning("gap", "found", index);
-              Alarm alarm = new Alarm();
-              alarm.setClusterable(false);
-              alarm.setName("Medusa Gap");
-              alarm.setIsActive(true);
-              alarm.setNote("Index: "+index+"\\n"+"Dependencies: UNKNOWN");
-              alarm = (Alarm) ((DAO) x.get("alarmDAO")).put(alarm);
-              config.setErrorMessage("gap detected, investigating...");
+            getLogger().warning("gap", "found", index);
+            Alarm alarm = new Alarm();
+            alarm.setClusterable(false);
+            alarm.setName("Medusa Gap");
+            alarm.setIsActive(true);
+            alarm.setNote("Index: "+index+"\\n"+"Dependencies: UNKNOWN");
+            alarm = (Alarm) ((DAO) x.get("alarmDAO")).put(alarm);
+            config.setErrorMessage("gap detected, investigating...");
+            ((DAO) x.get("clusterConfigDAO")).put(config);
+
+            // Test for gap index dependencies - of course can only look
+            // ahead as far as we have entries locally.
+            // TODO: Combine these two counts into a sequence.
+            Count lookAhead = (Count) dao
+              .where(
+                  GT(MedusaEntry.INDEX, index)
+                )
+              .select(COUNT());
+            Count dependencies = (Count) dao
+              .where(
+                OR(
+                  EQ(MedusaEntry.INDEX1, index),
+                  EQ(MedusaEntry.INDEX2, index)
+                ))
+              .select(COUNT());
+
+            // REVIEW: This is quick and dirty.
+            // look ahead, keep reducing threshold over time
+            Long lookAheadThreshold = 10L;
+            Long minutes = (long) (System.currentTimeMillis() - since) / (1000 * 60);
+            lookAheadThreshold = Math.max(1, lookAheadThreshold - minutes);
+
+            if ( ((Long)dependencies.getValue()).intValue() == 0 &&
+                 ((Long)lookAhead.getValue()).intValue() > lookAheadThreshold ) {
+              // Recovery - set global index to the gap index. Then
+              // the promoter will look for the entry after the gap.
+              getLogger().info("gap", "recovery", index);
+              replaying.updateIndex(x, index);
+
+              alarm.setIsActive(false);
+              alarm.setNote("Index: "+index+"\\n"+"Dependencies: NO");
+              ((DAO) x.get("alarmDAO")).put(alarm);
+              config.setErrorMessage("");
               ((DAO) x.get("clusterConfigDAO")).put(config);
-
-              // Test for gap index dependencies - of course can only look
-              // ahead as far as we have entries locally.
-              // TODO: Combine these two counts into a sequence.
-              Count lookAhead = (Count) dao
-                .where(
-                    GT(MedusaEntry.INDEX, index)
-                  )
-                .select(COUNT());
-              Count dependencies = (Count) dao
-                .where(
-                  OR(
-                    EQ(MedusaEntry.INDEX1, index),
-                    EQ(MedusaEntry.INDEX2, index)
-                  ))
-                .select(COUNT());
-
-              // REVIEW: This is quick and dirty.
-              // look ahead, keep reducing threshold over time
-              Long lookAheadThreshold = 10L;
-              Long minutes = (long) (System.currentTimeMillis() - since) / (1000 * 60);
-              lookAheadThreshold = Math.max(1, lookAheadThreshold - minutes);
-
-              if ( ((Long)dependencies.getValue()).intValue() == 0 &&
-                   ((Long)lookAhead.getValue()).intValue() > lookAheadThreshold ) {
-                // Recovery - set global index to the gap index. Then
-                // the promoter will look for the entry after the gap.
-                getLogger().info("gap", "recovery", index);
-                replaying.updateIndex(x, index);
-
-                alarm.setIsActive(false);
-                alarm.setNote("Index: "+index+"\\n"+"Dependencies: NO");
-                ((DAO) x.get("alarmDAO")).put(alarm);
-                config.setErrorMessage("");
-                ((DAO) x.get("clusterConfigDAO")).put(config);
-              } else {
-                if ( ((Long)lookAhead.getValue()).intValue() > lookAheadThreshold ) {
-                  getLogger().error("gap", "index", index, "dependencies", dependencies.getValue(), "lookAhead", lookAhead.getValue(), "lookAhead threshold",lookAheadThreshold);
-                  alarm.setNote("Index: "+index+"\\n"+"Dependencies: YES");
-                  alarm.setSeverity(foam.log.LogLevel.ERROR);
-                  ((DAO) x.get("alarmDAO")).put(alarm);
-                  config.setErrorMessage("gap with dependencies");
-                  ((DAO) x.get("clusterConfigDAO")).put(config);
-                  throw new MedusaException("gap with dependencies");
-                } else {
-                  getLogger().info("gap", "investigating", index, "dependencies", dependencies.getValue(), "lookAhead", lookAhead.getValue(), "lookAhead threshold",lookAheadThreshold);
-                }
-              }
             } else {
-              getLogger().info("gap", "not-found", index);
+              if ( ((Long)lookAhead.getValue()).intValue() > lookAheadThreshold ) {
+                getLogger().error("gap", "index", index, "dependencies", dependencies.getValue(), "lookAhead", lookAhead.getValue(), "lookAhead threshold",lookAheadThreshold);
+                alarm.setNote("Index: "+index+"\\n"+"Dependencies: YES");
+                alarm.setSeverity(foam.log.LogLevel.ERROR);
+                ((DAO) x.get("alarmDAO")).put(alarm);
+                config.setErrorMessage("gap with dependencies");
+                ((DAO) x.get("clusterConfigDAO")).put(config);
+                throw new MedusaException("gap with dependencies");
+              } else {
+                getLogger().info("gap", "investigating", index, "dependencies", dependencies.getValue(), "lookAhead", lookAhead.getValue(), "lookAhead threshold",lookAheadThreshold);
+              }
             }
-          } else {
-            getLogger().info("gap", "not-found", index);
           }
         }
       } catch (Throwable t) {
