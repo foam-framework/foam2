@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'TitledArrayView',
   extends: 'foam.u2.view.FObjectArrayView',
 
+  documentation: 'View for FObjectArrays that includes a header row with a title and a delete button',
   imports: ['theme'],
 
   css: `
@@ -22,7 +23,10 @@ foam.CLASS({
   `,
 
   properties: [
-    { name: 'name' }
+    {
+      name: 'name',
+      documentation: 'This proprerty is used to populate the header for each individual array element'
+    }
   ],
 
   methods: [
@@ -42,11 +46,10 @@ foam.CLASS({
                 var row = self.Row.create({ index: i, value: e });
                 this
                   .startContext({ data: row })
-
                     .addClass(self.myClass('value-view-container'))
                     .start(self.Cols)
                       .addClass(self.myClass('header-row'))
-                      .start('h5').add((self.name ? self.name : foam.String.labelize(e.cls_.name)) + ' #' + (i+1) ).end()
+                      .start('h5').add((self.name || foam.String.labelize(e.cls_.name)) + ' #' + (i+1) ).end()
                       .tag(self.Row.REMOVE, {
                         isDestructive: true,
                         // icon: '/images/remove-circle.svg',
