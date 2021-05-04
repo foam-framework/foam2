@@ -21,8 +21,6 @@
     'foam.core.ArraySlot',
     'foam.u2.borders.CardBorder',
     'foam.u2.detail.SectionView',
-    'foam.u2.layout.Grid',
-    'foam.u2.layout.GUnit',
     'foam.u2.Tab',
     'foam.u2.Tabs'
   ],
@@ -44,6 +42,10 @@
       white-space: nowrap;
       border-top-left-radius: 6px;
       border-top-right-radius: 6px;
+    }
+    
+    ^ .foam-u2-borders-CardBorder {
+      padding: 14px 24px;
     }
   `,
 
@@ -77,12 +79,12 @@
             .add(arraySlot.map((visibilities) => {
               var availableSections = visibilities.length == sections.length ? sections.filter((_, i) => visibilities[i]) : sections;
               var e = availableSections.length == 1 ? 
-                this.E().start(foam.u2.borders.CardBorder)
+                this.E().start(self.CardBorder)
                   .tag(self.SectionView, { data$: self.data$, section: availableSections[0], showTitle: false })
                 .end() :
                 this.E()
                 .start(self.Tabs, {}, self.tabs$)
-                  .forEach(availableSections, function(s, i) {
+                  .forEach(availableSections, function(s) {
                     var title$ = foam.Function.isInstance(s.title) ?
                       foam.core.ExpressionSlot.create({
                         obj: self.data,
