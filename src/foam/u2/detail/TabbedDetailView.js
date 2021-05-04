@@ -75,34 +75,24 @@
 
           return self.E()
             .add(arraySlot.map((visibilities) => {
-              if ( visibilities.length == sections.length ) {
-              var availableSections = sections.filter((s, i) => {
-                return visibilities[i];
-              })
-              if ( availableSections.length == 1 ) {
-                return this.start(self.SectionView, { data$: self.data$, section: availableSections[0], showTitle: false }).end();
-              }
-            }
-
-
-              // console.log('visibilities', visibilities);
-              // console.log('sections', sections);
-              // var numAvailSections = 0;
-              // console.log('numAvailSections', numAvailSections);
-              var e = this.E()
+              var availableSections = visibilities.length == sections.length ? sections.filter((_, i) => visibilities[i]) : sections;
+              var e = availableSections.length == 1 ? 
+                this.E().start(foam.u2.borders.CardBorder)
+                  .tag(self.SectionView, { data$: self.data$, section: availableSections[0], showTitle: false })
+                .end() :
+                this.E()
                 .start(self.Tabs, {}, self.tabs$)
-                  // .forEach(sections, function(_, i) { if ( ! visibilities[i] ) return; else numAvailSections++ })
-                  .forEach(sections, function(s, i) {
-                    if ( ! visibilities[i] ) return;
-                    // if ( numAvailSections > 1 ) {
-                      var title$ = foam.Function.isInstance(s.title) ?
-                        foam.core.ExpressionSlot.create({
-                          obj: self.data,
-                          code: s.title
-                        }) :
-                        s.title$;
-                      var tab = foam.core.SimpleSlot.create();
-                      this.start(self.Tab, { label$: title$ || self.defaultSectionLabel, selected: self.memento && self.memento.tail && self.memento.tail.head === s.title }, tab)
+                  .forEach(availableSections, function(s, i) {
+                    var title$ = foam.Function.isInstance(s.title) ?
+                      foam.core.ExpressionSlot.create({
+                        obj: self.data,
+                        code: s.title
+                      }) :
+                      s.title$;
+
+                    var tab = foam.core.SimpleSlot.create();
+                    this
+                      .start(self.Tab, { label$: title$ || self.defaultSectionLabel, selected: self.memento && self.memento.tail && self.memento.tail.head === s.title }, tab)
                         .call(function() {
                           var sectionView = foam.u2.ViewSpec.createView(self.SectionView, {
                             data$: self.data$,
@@ -113,10 +103,9 @@
                           this.add(sectionView)
                         })
                       .end();
-                    // } else this.start(self.SectionView, { data$: self.data$, section: s, showTitle: false }).end();
                   })
                 .end();
-              self.tabs.updateMemento = true;
+              self.tabs && ( self.tabs.updateMemento = true );
               return e;
             }))
         }));
