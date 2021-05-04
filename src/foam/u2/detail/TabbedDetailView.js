@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-foam.CLASS({
+ foam.CLASS({
   package: 'foam.u2.detail',
   name: 'TabbedDetailView',
   extends: 'foam.u2.detail.AbstractSectionedDetailView',
@@ -75,20 +75,33 @@ foam.CLASS({
 
           return self.E()
             .add(arraySlot.map((visibilities) => {
-              var numAvailSections = 0;
+              if ( visibilities.length == sections.length ) {
+              var availableSections = sections.filter((s, i) => {
+                return visibilities[i];
+              })
+              if ( availableSections.length == 1 ) {
+                return this.start(self.SectionView, { data$: self.data$, section: availableSections[0], showTitle: false }).end();
+              }
+            }
+
+
+              // console.log('visibilities', visibilities);
+              // console.log('sections', sections);
+              // var numAvailSections = 0;
+              // console.log('numAvailSections', numAvailSections);
               var e = this.E()
                 .start(self.Tabs, {}, self.tabs$)
-                  .forEach(sections, function(_, i) { if ( ! visibilities[i] ) return; else numAvailSections++ })
+                  // .forEach(sections, function(_, i) { if ( ! visibilities[i] ) return; else numAvailSections++ })
                   .forEach(sections, function(s, i) {
                     if ( ! visibilities[i] ) return;
-                    var title$ = foam.Function.isInstance(s.title) ?
-                      foam.core.ExpressionSlot.create({
-                        obj: self.data,
-                        code: s.title
-                      }) :
-                      s.title$;
-                    var tab = foam.core.SimpleSlot.create();
-                    if ( numAvailSections > 1 ) {
+                    // if ( numAvailSections > 1 ) {
+                      var title$ = foam.Function.isInstance(s.title) ?
+                        foam.core.ExpressionSlot.create({
+                          obj: self.data,
+                          code: s.title
+                        }) :
+                        s.title$;
+                      var tab = foam.core.SimpleSlot.create();
                       this.start(self.Tab, { label$: title$ || self.defaultSectionLabel, selected: self.memento && self.memento.tail && self.memento.tail.head === s.title }, tab)
                         .call(function() {
                           var sectionView = foam.u2.ViewSpec.createView(self.SectionView, {
@@ -100,7 +113,7 @@ foam.CLASS({
                           this.add(sectionView)
                         })
                       .end();
-                    } else this.start(self.SectionView, { data$: self.data$, section: s, showTitle: false }).end();
+                    // } else this.start(self.SectionView, { data$: self.data$, section: s, showTitle: false }).end();
                   })
                 .end();
               self.tabs.updateMemento = true;
