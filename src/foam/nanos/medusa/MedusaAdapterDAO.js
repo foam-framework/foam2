@@ -425,6 +425,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
           if ( ! transientFormatter.maybeOutputDelta(old, obj) ) {
             return null;
           }
+          return transientFormatter.builder().toString();
         } else {
           transientFormatter.output(obj);
           String data = transientFormatter.builder().toString();
@@ -432,8 +433,8 @@ It then marshalls it to the primary mediator, and waits on a response.`,
                "{}".equals(data) ) {
             return null;
           }
+          return data;
         }
-        return transientFormatter.builder().toString();
       } finally {
         pm.log(x);
       }
@@ -474,9 +475,7 @@ It then marshalls it to the primary mediator, and waits on a response.`,
           entry.setTransientData(transientData);
         }
         pmLink.log(x);
-
         getLogger().debug("submit", entry.getId());
-
         MedusaRegistry registry = (MedusaRegistry) x.get("medusaRegistry");
         registry.register(x, (Long) entry.getId());
         PM pmPut = new PM(this.getClass().getSimpleName(), "submit", "put");
