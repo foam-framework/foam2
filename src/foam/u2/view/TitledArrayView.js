@@ -10,6 +10,7 @@ foam.CLASS({
   extends: 'foam.u2.view.FObjectArrayView',
 
   documentation: 'View for FObjectArrays that includes a header row with a title and a delete button',
+
   imports: ['theme'],
 
   css: `
