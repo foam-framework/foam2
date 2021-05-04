@@ -14,42 +14,43 @@ import foam.dao.DAO;
 import foam.mlang.sink.Sum;
 import foam.nanos.approval.ApprovalStatus;
 import foam.nanos.approval.ApprovalRequest;
+import foam.nanos.approval.ApprovalRequestClassificationEnum;
 
 import static foam.mlang.MLang.*;
 
 public class ApprovalRequestUtil {
 
-  public static DAO getAllRequests(X x, Object objId, String classification) {
+  public static DAO getAllRequests(X x, Object objId, ApprovalRequestClassificationEnum classification) {
     return getAllRequests(x, (DAO) x.get("approvalRequestDAO"), objId, classification);
   }
 
-  public static DAO getAllRequests(X x, DAO dao, Object objId, String classification) {
+  public static DAO getAllRequests(X x, DAO dao, Object objId, ApprovalRequestClassificationEnum classification) {
     return dao.where(AND(
       EQ(ApprovalRequest.OBJ_ID, objId),
-      EQ(ApprovalRequest.CLASSIFICATION, classification)
+      EQ(ApprovalRequest.CLASSIFICATION_ENUM, classification)
     ));
   }
 
-  public static DAO getAllApprovalRequests(X x, Object objId, String classification) {
+  public static DAO getAllApprovalRequests(X x, Object objId, ApprovalRequestClassificationEnum classification) {
     return getAllRequests(x, objId, classification).where(EQ(ApprovalRequest.STATUS, ApprovalStatus.REQUESTED));
   }
 
-  public static DAO getAllApprovedRequests(X x, Object objId, String classification) {
+  public static DAO getAllApprovedRequests(X x, Object objId, ApprovalRequestClassificationEnum classification) {
     return getAllRequests(x, objId, classification).where(EQ(ApprovalRequest.STATUS, ApprovalStatus.APPROVED));
   }
 
-  public static DAO getAllRejectedRequests(X x, Object objId, String classification) {
+  public static DAO getAllRejectedRequests(X x, Object objId, ApprovalRequestClassificationEnum classification) {
     return getAllRequests(x, objId, classification).where(EQ(ApprovalRequest.STATUS, ApprovalStatus.REJECTED));
   }
 
-  public static int getApprovedPoints(X x, Object objId, String classification) {
+  public static int getApprovedPoints(X x, Object objId, ApprovalRequestClassificationEnum classification) {
     return ((Double) ((Sum) getAllApprovedRequests(x, objId, classification).select(SUM(ApprovalRequest.POINTS))).getValue()).intValue();
   }
 
-  public static int getRejectedPoints(X x, Object objId, String classification) {
+  public static int getRejectedPoints(X x, Object objId, ApprovalRequestClassificationEnum classification) {
     return ((Double) ((Sum) getAllRejectedRequests(x, objId, classification).select(SUM(ApprovalRequest.POINTS))).getValue()).intValue();
   }
-  public static ApprovalStatus getStatus(X x, Object id, String classification) {
+  public static ApprovalStatus getStatus(X x, Object id, ApprovalRequestClassificationEnum classification) {
     ApprovalRequest request = (ApprovalRequest) ((ArraySink)getAllRequests(x, id, classification).select(new ArraySink())).getArray().get(0);
     return getApprovedPoints(x, id, classification) >= request.getRequiredPoints()
       ? ApprovalStatus.APPROVED

@@ -24,11 +24,13 @@
     'foam.core.FObject',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.nanos.approval.ApprovalRequestClassificationEnum',
     'foam.nanos.auth.*',
     'foam.nanos.logger.Logger',
     'foam.nanos.dao.Operation',
     'java.util.ArrayList',
     'java.util.List',
+    'foam.util.SafetyUtil',
     'static foam.mlang.MLang.*'
   ],
 
@@ -49,16 +51,16 @@
     'ctrl',
     'currentMenu',
     'notify',
+    'objectSummaryView?',
     'stack',
     'subject',
-    'summaryView?',
-    'objectSummaryView?'
+    'summaryView?'
   ],
 
   tableColumns: [
     'id',
     'description',
-    'classification',
+    'classificationEnum',
     'objId',
     'createdFor',
     'approver.legalName',
@@ -324,7 +326,6 @@
     {
       class: 'String',
       name: 'classification',
-      label: 'Approval Type',
       section: 'approvalRequestInformation',
       order: 80,
       gridColumns: 6,
@@ -336,7 +337,40 @@
       mlang.AND(
         EQ(ApprovalRequest.OBJ_ID, objectId),
         EQ(ApprovalRequest.REQUEST_REFERENCE, "reference")
-      )`
+      )`,
+      storageTransient: true,
+      hidden: true,
+      javaSetter: `
+        // for legacy property(classification) migration
+        classification_ = val;
+        if ( ! SafetyUtil.isEmpty(classification_) ) {
+          classificationIsSet_ = true;
+          if ( ! getClassificationEnumIsSet_() )
+            setClassificationEnum(ApprovalRequestClassificationEnum.forLabel(classification_));
+        }
+      `,
+      javaGetter: `
+        // returning enum val to legacy propery(classification)
+        if ( getClassificationEnumIsSet_() )
+          return getClassificationEnum().getLabel();
+
+        return classification_;
+      `
+    },
+    {
+      class: 'foam.core.Enum',
+      of: 'foam.nanos.approval.ApprovalRequestClassificationEnum',
+      name: 'classificationEnum',
+      label: 'Approval Type',
+      section: 'approvalRequestInformation',
+      order: 90,
+      gridColumns: 6,
+      includeInDigest: false,
+      tableWidth: 450,
+      view: { class: 'foam.u2.EnumView' },
+      tableCellFormatter: function(value, obj) {
+        this.add(value.label);
+      }
     },
     {
       class: 'DateTime',
@@ -650,10 +684,17 @@
       name: 'toSummary',
       type: 'String',
       code: function() {
-        return `(${this.classification}) ${this.operation}`;
+        return this.classificationEnum.label;
       },
       javaCode: `
-        return foam.util.SafetyUtil.isEmpty(getClassification()) ? "" : "(" + getClassification() + ")" + getOperation().toString();
+        return getClassificationEnum().getLabel();
+      `
+    },
+    {
+      name: 'getClassificationEnumIsSet_',
+      type: 'Boolean',
+      javaCode: `
+        return this.classificationEnumIsSet_;
       `
     }
   ],
@@ -676,7 +717,7 @@
           this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
 
           if (
-            X.stack.top && 
+            X.stack.top &&
             ( X.currentMenu.id !== X.stack.top[2] )
           ) {
             X.stack.back();
@@ -739,7 +780,7 @@
           X.notify(this.SUCCESS_CANCELLED, '', this.LogLevel.INFO, true);
 
           if (
-            X.stack.top && 
+            X.stack.top &&
             ( X.currentMenu.id !== X.stack.top[2] )
           ) {
             X.stack.back();
@@ -902,7 +943,7 @@
       availablePermissions: [
         "approval.assign.*"
       ],
-      code: function(X) {        
+      code: function(X) {
         var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
         objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: "foam.u2.PropertyModal",
@@ -921,7 +962,7 @@
       isAvailable: function(subject, assignedTo, status){
         return (subject.user.id !== assignedTo) && (status === this.ApprovalStatus.REQUESTED);
       },
-      code: function(X) {        
+      code: function(X) {
         var assignedApprovalRequest = this.clone();
         assignedApprovalRequest.assignedTo = X.subject.user.id;
 
@@ -930,7 +971,7 @@
           this.finished.pub();
           this.notify(this.SUCCESS_ASSIGNED, '', this.LogLevel.INFO, true);
           if (
-            X.stack.top && 
+            X.stack.top &&
             ( X.currentMenu.id !== X.stack.top[2] )
           ) {
             X.stack.back();
@@ -947,7 +988,7 @@
       isAvailable: function(subject, assignedTo, status){
         return (subject.user.id === assignedTo) && (status === this.ApprovalStatus.REQUESTED);
       },
-      code: function(X) {        
+      code: function(X) {
         var unassignedApprovalRequest = this.clone();
         unassignedApprovalRequest.assignedTo = 0;
 
@@ -956,7 +997,7 @@
           this.finished.pub();
           this.notify(this.SUCCESS_UNASSIGNED, '', this.LogLevel.INFO, true);
           if (
-            X.stack.top && 
+            X.stack.top &&
             ( X.currentMenu.id !== X.stack.top[2] )
           ) {
             X.stack.back();
@@ -983,7 +1024,7 @@
           this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
 
           if (
-            X.stack.top && 
+            X.stack.top &&
             ( X.currentMenu.id !== X.stack.top[2] )
           ) {
             X.stack.back();
@@ -1005,9 +1046,9 @@
           this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
           this.finished.pub();
           this.notify(this.SUCCESS_ASSIGNED, '', this.LogLevel.INFO, true);
-          
+
           if (
-            X.stack.top && 
+            X.stack.top &&
             ( X.currentMenu.id !== X.stack.top[2] )
           ) {
             X.stack.back();
@@ -1029,7 +1070,7 @@
           this.notify(this.SUCCESS_ASSIGNED, '', this.LogLevel.INFO, true);
 
           if (
-            X.stack.top && 
+            X.stack.top &&
             ( X.currentMenu.id !== X.stack.top[2] )
           ) {
             X.stack.back();
