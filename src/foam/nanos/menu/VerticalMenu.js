@@ -78,7 +78,8 @@ foam.CLASS({
         class: 'foam.u2.TextField',
         type: 'search',
         onKey: true,
-        ariaLabel: 'Menu Search'
+        ariaLabel: 'Menu Search',
+        autocomplete: false
       },
       value: ''
     }
