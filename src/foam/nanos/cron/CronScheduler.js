@@ -26,8 +26,11 @@ foam.CLASS({
     'foam.dao.AbstractSink',
     'foam.dao.DAO',
     'foam.dao.MapDAO',
+    'foam.log.LogLevel',
     'foam.mlang.MLang',
     'foam.mlang.sink.Min',
+    'foam.nanos.alarming.Alarm',
+    'foam.nanos.alarming.AlarmReason',
     'foam.nanos.auth.EnabledAware',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
@@ -146,7 +149,8 @@ foam.CLASS({
                                    getCronDAO().put(cron);
                                  }
                                } catch (Throwable t) {
-                                 logger.error(this.getClass(), "Error scheduling cron job", cron.getId(), t.getMessage(), t);
+                                 logger.error("Unable to schedule cron job", cron.getId(), t.getMessage(), t);
+                                 ((DAO) x.get("alarmDAO")).put(new Alarm(this.getClass().getSimpleName(), LogLevel.ERROR, AlarmReason.CONFIGURATION));
                                  pm.error(x, t);
                                } finally {
                                  pm.log(x);
