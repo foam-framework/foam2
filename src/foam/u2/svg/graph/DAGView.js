@@ -291,6 +291,7 @@ foam.CLASS({
         let arrow = this.ArrowPlan.create({
           // Swap these to enable arrowhead sharing
           // enterCellLane: 0,
+          enterCellLane: this.getCellLane(enterCell, Math.random()/*parent.id*/),
           enterCellLane: this.getCellLane(enterCell, parent.id),
           exitCellLane: this.getCellLane(exitCell, parent.id)
         });

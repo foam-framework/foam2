@@ -1,0 +1,38 @@
+<title>CRUNCH UI</title>
+
+<h1>CRUNCH Wizard</h1>
+
+The CRUNCH wizard is invoked through CrunchController. There are two ways that
+CrunchController might be invoked to display wizard:
+<ul>
+  <li>A capability is clicked in the Capability Store</li>
+  <li>A capability intercept is returned by the server during a request</li>
+</ul>
+
+The Capability Store imports `crunchController` and calls it when a capability
+is clicked. The store makes a call similar to the following:
+<code>
+this.crunchController.createWizardSequence(capability).execute()
+</code>
+
+More information on CrunchController and capability intercepts can be found in
+the
+<a href="/#admin.flowdoc::foam-nanos-crunch-doc">
+  CRUNCH Developer Documentation
+</a>
+
+<h2>Wizard Sequences</h2>
+
+CrunchController methods for invoking the wizard return instances of Sequence.
+A sequence contains a number of steps that can be reconfigured or removed before
+executing the whole chain. More information about sequences can be found in the
+documentation for
+<a href="/#admin.flowdoc::foam-util-async-doc">foam.util.async</a>.
+The following documentation is derived from the sequence, as sequences are
+self-documenting.
+
+<h3>Sequence from createWizardSequence</h3>
+<foam class="foam.flow.widgets.SequenceSummary" of="foam.u2.crunch.CrunchController" method="createWizardSequence" />
+
+<h3>Sequence from createCapableWizardSequence</h3>
+<foam class="foam.flow.widgets.SequenceSummary" of="foam.u2.crunch.CrunchController" method="createCapableWizardSequence" />

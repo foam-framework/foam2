@@ -829,6 +829,7 @@ FOAM_FILES([
   { name: "foam/flow/widgets/AxiomShortSummary" },
   { name: "foam/flow/widgets/MethodShortSummary" },
   { name: "foam/flow/widgets/PropertyShortSummary" },
+  { name: "foam/flow/widgets/SequenceSummary" },
   { name: "foam/flow/widgets/ModelSummary" },
   { name: "foam/flow/widgets/EnumSummary" },
   { name: "foam/flow/widgets/TabbedModelDocumentation" },
