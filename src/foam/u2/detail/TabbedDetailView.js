@@ -75,8 +75,10 @@ foam.CLASS({
 
           return self.E()
             .add(arraySlot.map((visibilities) => {
+              var numAvailSections = 0;
               var e = this.E()
                 .start(self.Tabs, {}, self.tabs$)
+                  .forEach(sections, function(_, i) { if ( ! visibilities[i] ) return; else numAvailSections++ })
                   .forEach(sections, function(s, i) {
                     if ( ! visibilities[i] ) return;
                     var title$ = foam.Function.isInstance(s.title) ?
@@ -85,10 +87,9 @@ foam.CLASS({
                         code: s.title
                       }) :
                       s.title$;
-
                     var tab = foam.core.SimpleSlot.create();
-                    this
-                      .start(self.Tab, { label$: title$ || self.defaultSectionLabel, selected: self.memento && self.memento.tail && self.memento.tail.head === s.title }, tab)
+                    if ( numAvailSections > 1 ) {
+                      this.start(self.Tab, { label$: title$ || self.defaultSectionLabel, selected: self.memento && self.memento.tail && self.memento.tail.head === s.title }, tab)
                         .call(function() {
                           var sectionView = foam.u2.ViewSpec.createView(self.SectionView, {
                             data$: self.data$,
@@ -99,6 +100,7 @@ foam.CLASS({
                           this.add(sectionView)
                         })
                       .end();
+                    } else this.start(self.SectionView, { data$: self.data$, section: s, showTitle: false }).end();
                   })
                 .end();
               self.tabs.updateMemento = true;
