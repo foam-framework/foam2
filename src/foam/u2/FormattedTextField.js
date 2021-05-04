@@ -13,7 +13,7 @@ foam.CLASS({
     ^ {
       display: flex;
       position: relative;
-      width: fit-content; /* remove */
+      width: fit-content;
       flex-direction: column;
       justify-content: center;
     }
