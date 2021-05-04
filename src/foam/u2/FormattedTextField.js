@@ -29,7 +29,6 @@ foam.CLASS({
     }
   `,
 
-  // imports: ['window'],
   constants: [
     {
       type: 'Array',
