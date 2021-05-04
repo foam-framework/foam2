@@ -25,6 +25,7 @@ foam.CLASS({
       opacity: 0.7;
       font-size: 14px;
       letter-spacing: normal;
+      inline-size: fit-content;
     }
   `,
 
@@ -57,8 +58,9 @@ foam.CLASS({
     {
       name: 'dynamicPlaceholder',
       expression: function(placeholder, formattedData, mode) {
-        return mode === foam.u2.DisplayMode.RW ? 
-          formattedData + placeholder.substring(formattedData.length)
+        return mode === foam.u2.DisplayMode.RW ?
+          (formattedData || '') + 
+          placeholder.substring(formattedData && formattedData.length || 0)
           : '';
       },
       documentation: 'The placeholder text when the input has content'
@@ -99,6 +101,12 @@ foam.CLASS({
         });
     },
 
+    function load() {
+      this.SUPER();
+      // compute and set the minWidth from the maxlength of the input
+      this.el().style['min-width'] = this.dynamicPlaceholder.length + 'em';
+    },
+
     function setStateOnDelete(evt) {
       this.isDelete = true;
       this.includeTrailingDelimiter = false;
@@ -118,6 +126,12 @@ foam.CLASS({
     },
 
     function resetState() {
+      if ( this.el() && window.getComputedStyle(this.el(), ':after').content !== ( '"' + this.dynamicPlaceholder + '"' ) ) {
+        // workaround for Safari isssue where attr(data-placeholder) is not
+        // being recalculated on data-placeholder changes
+        this.removeClass(this.myClass('placeholder'));
+        this.addClass(this.myClass('placeholder'));
+      }
       this.isDelete = false;
       this.includeTrailingDelimiter = true;
       this.formatted = false;
