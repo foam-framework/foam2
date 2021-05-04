@@ -514,7 +514,7 @@ foam.CLASS({
             enableAdding: true,
             enableRemoving: true,
             defaultNewItem: '',
-            propertyTitle: 'Element'
+            title: 'Element'
           },
           {
             class: 'foam.u2.view.FObjectArrayView',
@@ -559,7 +559,7 @@ foam.CLASS({
         enableAdding: true,
         enableRemoving: true,
         defaultNewItem: '',
-        propertyTitle: 'Title'
+        title: 'Title'
       },
       autoValidate: true,
       validationTextVisible: true,

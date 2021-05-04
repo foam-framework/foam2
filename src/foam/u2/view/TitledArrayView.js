@@ -24,7 +24,7 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'propertyTitle',
+      name: 'title',
       documentation: 'This property is used to populate the header for each individual array element'
     }
   ],
