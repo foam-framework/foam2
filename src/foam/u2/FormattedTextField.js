@@ -127,6 +127,12 @@ foam.CLASS({
     },
 
     function resetState() {
+      if ( this.el() && window.getComputedStyle(this.el(), ':after').content !== ( '"' + this.dynamicPlaceholder + '"' ) ) {
+        // workaround for Safari isssue where attr(data-placeholder) is not
+        // being recalculated on data-placeholder changes
+        this.removeClass(this.myClass('placeholder'));
+        this.addClass(this.myClass('placeholder'));
+      }
       this.isDelete = false;
       this.includeTrailingDelimiter = true;
       this.formatted = false;
