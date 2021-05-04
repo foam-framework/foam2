@@ -212,6 +212,7 @@ foam.CLASS({
     {
       name: 'clientPromise',
       factory: function() {
+        /** ignoreWarning */
         var self = this;
         return self.ClientBuilder.create({}, this).promise.then(function(cls) {
           self.client = cls.create(null, self);
