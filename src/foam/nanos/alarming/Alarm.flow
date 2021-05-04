@@ -1,8 +1,8 @@
 <title>Alarm Documentation</title>
 
-<h1>Alarm Documentation</h1>
+<h2>Alarm Documentation</h2>
 
-<h2>Introduction</h2>
+<h4>Introduction</h4>
 <p>An Alarm is high level system event reporting an unusual or unexpected event.
 For example, alarms are appropriate in scenarios such as:</p>
 <ul>
@@ -10,21 +10,21 @@ For example, alarms are appropriate in scenarios such as:</p>
   <li>missing configuration</li>
 </ul>
 
-<h2>Audience</h2>
+<h4>Audience</h4>
 <p>Alarms are intended to be monitored by a Network Operations Center (NOC). NOC operators are monitoring many systems, and generally do not have detailed knowledge of each system.  The Alarm is simply to bring attention to a problem that a System Engineer will address.</p>
 <p>As such, the alarm should have a short simple name, and just enough details in the <i>note</i> for System Engineer to narrow their search of the system and logs.</p>
 
-<h2>Notifications</h2>
+<h4>Notifications</h4>
 <p>Alarms with <b>severity</b> of <i>WARN</i> or <i>ERROR</i> automatically generated a <b>notification</b></p>
 
-<h2>Auto Generated Alarms</h2>
+<h4>Auto Generated Alarms</h4>
 <p>Alarms are automatically generated for <b>error PMs</b> <i>(pm.error)</i></p>
 
-<h2>Usage</h2>
+<h4>Usage</h4>
 <p>The Alarm <b>name</b> is the alarm id or key. Alarms default to severity <b>Warning</b> and when created are <b>active</b>.</p>
 
-<h3>Code Examples</h3>
-<h4>Alarm</h4>
+<h4>Code Examples</h4>
+<h5>Alarm</h5>
 <code>
   Alarm alarm = new Alarm.Builder(x)
                     .setName("Payment Provider CP Onboarding")
@@ -36,14 +36,14 @@ For example, alarms are appropriate in scenarios such as:</p>
   ((DAO) x.get("alarmDAO")).put(new Alarm("Payment Provider CP Onboarding", AlarmReason.TIMEOUT));
 </code>
 
-<h2>Programatically <b>stopping</b> an Alarm</h2>
+<h4>Programatically <b>stopping</b> an Alarm</h4>
 <p>To stop an alarm simply create a same <b>named</b> alarm with <b>active</b> false.</p>
 <code>
   ((DAO) x.get("alarmDAO")).put(new Alarm("Payment Provider CP Onboarding", false));
 </code>
 
-<h1>Alarm Config</h1>
-<h2>Supressing/Silencing/Ignoring Alarms</h2>
+<h2>Alarm Config</h2>
+<h4>Supressing/Silencing/Ignoring Alarms</h4>
 <p>AlarmConfig acts as a template which will change the behaviour of an Alarm.</p>
-<h3>Example</h3>
+<h4>Example</h4>
 <p>If a network endpoint is flooding the system with <i>network outage</i> alarms, an AlarmConfig can be created for this <b>name</b> which can change the severity and/or status of the alarm.  The AlarmConfig status could be <i>not active</i>, and all subsequent alarms will be disabled or inactive.</p>

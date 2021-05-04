@@ -1,6 +1,6 @@
 <title>Introduction to FLOW</title>
 
-<h1>Introduction to FLOW</h1>
+<h2>Introduction to FLOW</h2>
 
 <section name="intro">
 <p>FLOW is a text markup language for live documents in the
@@ -8,14 +8,14 @@ FOAM system.  It is a subset of HTML with added support for FOAM specific featur
 
 </section>
 <section name="features">
-<h2>Features</h2>
+<h4>Features</h4>
 A quick rundown of the features in FLOW
 <ul>
   <li>&lt;i&gt;<i>italics</i>&lt;/li&gt;</li>
   <li>&lt;b&gt;<b>bold</b>&lt;/b&gt;</li>
   <li>&lt;p&gt;Paragraph tags&lt;/p&gt;</li>
   <li>HTML entities: &amp;amp; -> &amp;</li>
-  <li><h3>Headers</h3></li>
+  <li><h4>Headers</h4></li>
   <li>
   Various lists, including:
   <ol>
@@ -80,7 +80,7 @@ foam.RELATIONSHIP({
 </section>
 
 <section name="todo">
-<h2>Items still to implement</h2>
+<h4>Items still to implement</h4>
 <ul>
 <li>Table of Contents support</li>
 <li>More robust linking for linking</li>

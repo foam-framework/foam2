@@ -1,10 +1,10 @@
 <title>FLOW Widgets</title>
 
-<h1>FLOW Widgets</h1>
+<h2>FLOW Widgets</h2>
 
 These convenient widgets help with documenting FOAM code in FLOW.
 
-<h2>PropertyShortSummary</h2>
+<h4>PropertyShortSummary</h4>
 
 PropertyShortSummary allows you to display a model's properties without
 additional model information. This can be useful to point out a few
@@ -21,7 +21,7 @@ The above code would display the following:
 
 <foam class="foam.flow.widgets.PropertyShortSummary" of="foam.nanos.cron.Cron" whitelist="['schedule','scheduledTime']" />
 
-<h2>ModelSummary</h2>
+<h4>ModelSummary</h4>
 
 ModelSummary displays properties of the model itself, such as its
 package, name, and documentation. The above table is a ModelSummary.
@@ -38,10 +38,10 @@ The above code would display the following:
 <foam class="foam.flow.widgets.ModelSummary" of="foam.nanos.cron.Cron" visibleModelProps="id,documentation" />
 
 
-<h2>EnumSummary</h2>
+<h4>EnumSummary</h4>
 
 <foam class="foam.flow.widgets.DocumentationIncomplete" status="todo" isSection="true" />
 
-<h2>DocumentationIncomplete</h2>
+<h4>DocumentationIncomplete</h4>
 
 <foam class="foam.flow.widgets.DocumentationIncomplete" status="todo" isSection="true" />
