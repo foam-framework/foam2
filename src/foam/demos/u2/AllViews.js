@@ -477,9 +477,14 @@ foam.CLASS({
     },
     {
       class: 'FObjectArray',
-      name: 'fobjectArray',
+      name: 'FObjectArrayMultiView',
       of: 'foam.demos.u2.SampleData',
-      view: { class: 'foam.u2.view.FObjectArrayView', valueView: 'foam.demos.heroes.CitationView' }
+      view: { class: 'foam.u2.MultiView',
+        views: [
+          { class: 'foam.u2.view.TitledArrayView', valueView: 'foam.demos.heroes.CitationView' },
+          { class: 'foam.u2.view.FObjectArrayView', valueView: 'foam.demos.heroes.CitationView' }
+        ]
+      }
     },
     {
       class: 'FObjectArray',
@@ -497,26 +502,40 @@ foam.CLASS({
     },
     {
       class: 'FObjectArray',
-      name: 'fobjectArray3',
+      name: 'FObjectArray3MultiView',
       of: 'foam.demos.u2.SampleData2',
       view: {
-        class: 'foam.u2.view.FObjectArrayView',
-        mode: 'RW',
-        enableAdding: true,
-        enableRemoving: true,
-        defaultNewItem: ''
+        class: 'foam.u2.MultiView',
+        horizontal: false,
+        views: [
+          {
+            class: 'foam.u2.view.TitledArrayView',
+            mode: 'RW',
+            enableAdding: true,
+            enableRemoving: true,
+            defaultNewItem: '',
+            title: 'Element'
+          },
+          {
+            class: 'foam.u2.view.FObjectArrayView',
+            mode: 'RW',
+            enableAdding: true,
+            enableRemoving: true,
+            defaultNewItem: ''
+          }
+        ]
       },
       autoValidate: true,
       validationTextVisible: true,
-      validateObj: function(fobjectArray3) {
-        if ( fobjectArray3.length < 1 )
-          return 'Please enter fobjectArray3 information'
+      validateObj: function(FObjectArray3MultiView) {
+        if ( FObjectArray3MultiView.length < 1 )
+          return 'Please enter FObjectArray3MultiView information'
 
-        for ( var i = 0; i < fobjectArray3.length; i++ ) {
-          if ( fobjectArray3[i].errors_$ != null ) {
-            fobjectArray3[i].errors_$.sub(this.errorsUpdate);
+        for ( var i = 0; i < FObjectArray3MultiView.length; i++ ) {
+          if ( FObjectArray3MultiView[i].errors_$ != null ) {
+            FObjectArray3MultiView[i].errors_$.sub(this.errorsUpdate);
 
-            return this.errorsUpdate(null, null, null, fobjectArray3[i].errors_$);
+            return this.errorsUpdate(null, null, null, FObjectArray3MultiView[i].errors_$);
           }
         }
       }
@@ -532,23 +551,24 @@ foam.CLASS({
     },
     {
       class: 'FObjectArray',
-      name: 'fobjectArray5',
+      name: 'TitledfobjectArray5',
       of: 'foam.demos.u2.SampleData3',
       view: {
-        class: 'foam.u2.view.FObjectArrayView',
+        class: 'foam.u2.view.TitledArrayView',
         mode: 'RW',
         enableAdding: true,
         enableRemoving: true,
-        defaultNewItem: ''
+        defaultNewItem: '',
+        title: 'Title'
       },
       autoValidate: true,
       validationTextVisible: true,
-      validateObj: function(fobjectArray5, fobjectArray5$errors) {
+      validateObj: function(TitledfobjectArray5, TitledfobjectArray5$errors) {
         console.log('called');
-        if ( fobjectArray5.length < 1 )
+        if ( TitledfobjectArray5.length < 1 )
           return 'Please enter fobjectArray5 information'
-        console.log('...', fobjectArray5$errors)
-        return fobjectArray5$errors
+        console.log('...', TitledfobjectArray5$errors);
+        return TitledfobjectArray5$errors;
       }
     },
     {

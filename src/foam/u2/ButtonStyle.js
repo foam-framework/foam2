@@ -12,6 +12,7 @@ foam.ENUM({
     { name: 'UNSTYLED' },
     { name: 'PRIMARY' },
     { name: 'SECONDARY' },
-    { name: 'TERTIARY' }
+    { name: 'TERTIARY' },
+    { name: 'LINK' }
   ]
 });

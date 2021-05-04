@@ -536,9 +536,9 @@ foam.CLASS({
 
             var tbodyElement = this.E();
             tbodyElement.style({
-                position: 'absolute',
+                position: top ? 'absolute' : '',
                 width: '100%',
-                top: top + 'px'
+                top: top ? top + 'px' : ''
               }).
               addClass(view.myClass('tbody'));
               valPromises.then(function(values) {
