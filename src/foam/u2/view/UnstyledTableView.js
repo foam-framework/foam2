@@ -419,8 +419,8 @@ foam.CLASS({
 
                 var tableWidth = view.columnHandler.returnPropertyForColumn(view.props, view.of, [ col, overrides], 'tableWidth');
                 var colTitle = view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col);
-                var colHeader = colTitle.length > 1 ? '../' + colTitle.slice(-1)[0] : colTitle.slice(-1)[0];
-                
+                var colHeader = (colTitle.length > 1 ? '../'  : '') + colTitle.slice(-1)[0];
+
                 this.start().
                   addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + prop.name))
