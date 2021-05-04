@@ -300,9 +300,6 @@ It then marshalls it to the primary mediator, and waits on a response.`,
           if ( ! SafetyUtil.isEmpty(data) ||
                ! SafetyUtil.isEmpty(transientData) ) {
 
-//          // Create a medusa entry only when non-transient changes
-//          if ( ! SafetyUtil.isEmpty(data) ) {
-//            String transientData = transientData(x, nu, old, dop);
             MedusaEntry entry = (MedusaEntry) submit(x, data, transientData, dop);
             getLogger().debug("updatePrimary", "primary", dop, nu.getProperty("id"), "entry", entry.toSummary());
             if ( cmd != null ) {
