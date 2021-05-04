@@ -283,7 +283,7 @@ foam.CLASS({
       value: 'scriptDAO',
       transient: true,
       visibility: 'HIDDEN',
-      documentation: `Name of dao to store script itself. To set from inheritor just change property value`
+      documentation: 'Name of dao to store script itself. To set from inheritor just change property value'
     },
     {
       class: 'String',
@@ -291,7 +291,7 @@ foam.CLASS({
       value: 'scriptEventDAO',
       transient: true,
       visibility: 'HIDDEN',
-      documentation: `Name of dao to store script run/event report. To set from inheritor just change property value`,
+      documentation: 'Name of dao to store script run/event report. To set from inheritor just change property value',
       tableWidth: 120
     },
     {

@@ -426,14 +426,14 @@ foam.CLASS({
                   addClass(view.myClass('th-' + prop.name))
                   .style({
                     'align-items': 'center',
-                    'display': 'flex',
-                    'flex': tableWidth ? `0 0 ${tableWidth}px` : '1 0 0',
+                    display: 'flex',
+                    flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0',
                     'justify-content': 'start',
                     'word-wrap': 'break-word'
                   })
                   .start('h6', { tooltip: colTitle.join('/') })
                     .style({
-                      'overflow': 'hidden',
+                      overflow: 'hidden',
                       'text-overflow': 'ellipsis'
                     })
                     .add(colHeader).
