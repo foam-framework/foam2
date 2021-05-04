@@ -2643,7 +2643,7 @@ foam.CLASS({
       name: 'view',
       expression: function(of) {
         return {
-          class: 'foam.u2.view.FObjectArrayView',
+          class: 'foam.u2.view.TitledArrayView',
           of: of
         };
       }

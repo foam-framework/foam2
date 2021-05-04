@@ -559,6 +559,7 @@ FOAM_FILES([
   { name: "foam/u2/view/ReadManyToManyRelationshipPropertyView", flags: ['web'] },
   { name: "foam/u2/view/ReferenceArrayView", flags: ['web'] },
   { name: "foam/u2/view/DraftDetailView", flags: ['web'] },
+  { name: "foam/u2/view/TitledArrayView", flags: ['web'] },
   { name: "foam/u2/view/FObjectArrayView", flags: ['web'] },
   { name: "foam/u2/view/ChoiceView", flags: ['web'] },
   { name: "foam/u2/view/UnstyledChooseNView", flags: ['web'] },

@@ -296,7 +296,7 @@ foam.CLASS({
                   // we will handle this in the StackView instead
                   .startContext({ onBack: self.onBack })
                     .tag(self.BACK, {
-                      buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                      buttonStyle: foam.u2.ButtonStyle.LINK,
                       icon: 'images/back-icon.svg',
                       label: self.backLabel
                     })
@@ -315,15 +315,15 @@ foam.CLASS({
                   .start(self.Cols).addClass(self.myClass('actions-header'))
                     .startContext({ data: self })
                       .tag(self.EDIT, {
-                        buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                        buttonStyle: foam.u2.ButtonStyle.LINK,
                         icon: 'images/edit-icon.svg'
                       })
                       .tag(self.COPY, {
-                        buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                        buttonStyle: foam.u2.ButtonStyle.LINK,
                         icon: 'images/copy-icon.svg'
                       })
                       .tag(self.DELETE, {
-                        buttonStyle: foam.u2.ButtonStyle.TERTIARY,
+                        buttonStyle: foam.u2.ButtonStyle.LINK,
                         icon: 'images/delete-icon.svg'
                       })
                     .endContext()

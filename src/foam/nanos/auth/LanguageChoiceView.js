@@ -49,11 +49,9 @@ foam.CLASS({
       border-top: 5px solid white;
       display: inline-block;
       float: right;
-      margin-top: 7px;
       margin-left: 7px;
     }
     ^ .foam-u2-ActionView-languageChoice {
-      display: inline-block;
       background: none !important;
       border: 0 !important;
       box-shadow: none !important;
