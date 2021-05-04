@@ -421,14 +421,14 @@ foam.CLASS({
       var fip         = 0;
 
 if ( factory && (
-     factory.toString().indexOf('/** ignoreWarning */') == -1) && ( 
+     factory.toString().indexOf('/* ignoreWarning */') == -1) && ( 
      factory.toString().indexOf('then(') != -1 ||
      factory.toString().indexOf('await') != -1 ) )
 {
   console.error('Invalid Asynchronous Function', proto.cls_.id + '.' + prop.name + '.factory=', factory);
 }
 if ( eFactory && (
-     eFactory.toString().indexOf('/** ignoreWarning */') == -1) && ( 
+     eFactory.toString().indexOf('/* ignoreWarning */') == -1) && ( 
      eFactory.toString().indexOf('then(') != -1 ||
      eFactory.toString().indexOf('await') != -1 ) )
 {

@@ -50,7 +50,7 @@ foam.CLASS({
     {
       name: 'promise',
       factory: function() {
-        /** ignoreWarning */
+        /* ignoreWarning */
         var self = this;
         return new Promise(function(resolve) {
           // TODO: Instead of generating a model, generate and return a context.
