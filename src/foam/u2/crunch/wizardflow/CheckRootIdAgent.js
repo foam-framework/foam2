@@ -8,6 +8,11 @@ foam.CLASS({
   package: 'foam.u2.crunch.wizardflow',
   name: 'CheckRootIdAgent',
 
+  documentation: `
+    Terminates the sequence here if it was invoked by one of the specified
+    capabilities.
+  `,
+
   imports: [
     'rootCapability',
     'sequence'

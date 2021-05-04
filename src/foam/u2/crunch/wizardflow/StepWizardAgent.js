@@ -7,11 +7,14 @@
 foam.CLASS({
   package: 'foam.u2.crunch.wizardflow',
   name: 'StepWizardAgent',
-
   implements: [
     'foam.core.ContextAgent',
     'foam.mlang.Expressions'
   ],
+  documentation: `
+    Opens the wizard. The scrolling wizard is used by default, but the provided
+    config object may specify the incremental wizard to be used instead.
+  `,
 
   imports: [
     'ctrl',

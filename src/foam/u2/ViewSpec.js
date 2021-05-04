@@ -34,8 +34,16 @@ foam.CLASS({
             ctx = ctx.__subContext__;
           }
 
-          if ( foam.String.isInstance(spec) || spec === undefined || spec === null )
-            return foam.u2.Element.create(args, ctx).setNodeName(spec || 'div');
+          if ( foam.String.isInstance(spec) || spec === undefined || spec === null ) {
+            var classes = [];
+            if ( spec && spec.includes('.') ) {
+              var classes = spec.split('.');
+              spec = classes.shift();
+            }
+            return foam.u2.Element.create(args, ctx)
+              .setNodeName(spec || 'div')
+              .addClasses(classes);
+          }
 
           if ( foam.u2.Element.isInstance(spec) ) {
             if ( foam.debug && ! disableWarning ) {

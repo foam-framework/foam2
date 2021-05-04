@@ -9,6 +9,10 @@ foam.CLASS({
   name: 'FilterGrantModeAgent',
   extends: 'foam.u2.crunch.wizardflow.FilterWizardletsAgent',
   implements: [ 'foam.mlang.Expressions' ],
+  documentation: `
+    Filters capability wizardlets based on the capability's grant mode.
+    By default, only those with AUTOMATIC grant mode will make it through.
+  `,
 
   requires: [
     'foam.nanos.crunch.ui.CapabilityWizardlet',
