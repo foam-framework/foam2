@@ -1,12 +1,12 @@
 <title>CRUNCH Lite</title>
-<h1>CRUNCH Lite</h1>
+<h2>CRUNCH Lite</h2>
 
 <foam class="foam.flow.widgets.DocumentationIncomplete" status="wip" />
 
 Note: code snippets are all written in Javascript syntax, although this is not
   meant to imply that every method called has a javascript implementation.
 
-<h2>What is `crunch.lite`?</h2>
+<h4>What is `crunch.lite`?</h4>
 
 CRUNCH Lite makes it possible for capability data to be stored on objects rather
 than in association with a user. This allows control over data a user has to
@@ -17,9 +17,9 @@ to choose at least one flavour. Because we know the configuration of icecream
 can be complicated, we choose to make Icecream implement Capable, which adds
 CRUNCH Lite features to our Icecream model.
 
-<h2>How-To</h2>
+<h4>How-To</h4>
 
-<h3>Implement `Capable`</h3>
+<h4>Implement `Capable`</h4>
 
 <code>
 foam.CLASS({
@@ -44,7 +44,7 @@ foam.CLASS({
 </code>
 
 
-<h3>Add a requirement to a Capable</h3>
+<h4>Add a requirement to a Capable</h4>
 
 To add a capability that a Capable object requires its own copy of, use the
 `addRequirement` method.
@@ -59,7 +59,7 @@ additional CRUNCH intercept if the user is missing this capability.
 myCapable.setUserCapabilityRequirements(['USER-CAPABILITY-ID']);
 </code>
 
-<h3>Verify Requirements</h3>
+<h4>Verify Requirements</h4>
 
 To verify that a capable object has one or more requirements, use the
 `verifyRequirements` method. This will throw IllegalStateException if any of
@@ -69,7 +69,7 @@ the capabilities listed are not granted.
 myCapable.verifyRequirements(x, ['MY-CAPABILITY-ID']);
 </code>
 
-<h3>Invoking a CRUNCH intercept</h3>
+<h4>Invoking a CRUNCH intercept</h4>
 
 <foam class="foam.flow.widgets.DocumentationIncomplete" status="todo" isSection="true" />
 

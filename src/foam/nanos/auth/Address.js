@@ -136,6 +136,12 @@ foam.CLASS({
         }, X);
       },
       required: true,
+      javaValidateObj: `
+        if ( ((Address) obj).getCountryId() != null && 
+          ( ((Address) obj).getRegionId() == null || ((Address) obj).getRegionId().trim().length() == 0 ) 
+        )
+          throw new IllegalStateException(((Address) obj).REGION_REQUIRED);
+      `,
       validateObj: function(regionId, countryId) {
         // If the country hasn't been selected yet, don't show this error.
         if ( countryId == null ) return;

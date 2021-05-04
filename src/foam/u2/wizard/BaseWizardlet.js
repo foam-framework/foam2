@@ -84,12 +84,19 @@ foam.CLASS({
         Specify the availability of this wizardlet. If true, wizardlet is
         available iff at least one section is available. If false, wizardlet
         does not display even if some sections are available.
+
+        Wizardlet availability determines whether or not the wizardlet will be
+        saved. An invisible wizardlet can still be available.
       `
     },
 
     {
       name: 'isVisible',
       class: 'Boolean',
+      documentation: `
+        Specify the visibility of this wizardlet. If true, 'createView' will
+        be called on any of this wizardlets visible sections.
+      `,
       expression: function (of, isAvailable, atLeastOneSectionVisible_) {
         return isAvailable && of && atLeastOneSectionVisible_;
       }
@@ -102,6 +109,10 @@ foam.CLASS({
     },
     {
       name: 'loading',
+      documentation: `
+        Indicates that the wizardlet's 'data' is being saved or modified by a
+        WAO.
+      `,
       class: 'Boolean',
       postSet: function (_, n) {
         if ( ! n ) this.LoadingLevel = this.LoadingLevel.IDLE;
@@ -136,6 +147,10 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.u2.wizard.WAO',
       flags: ['web'],
+      documentation: `
+        A wizardlet's WAO (Wizardlet Access Object) implements the behavior of
+        the save and load operations.
+      `,
       factory: function () {
         this.ProxyWAO.create();
       }
@@ -155,7 +170,11 @@ foam.CLASS({
     {
       name: 'loadingLevel',
       class: 'Enum',
-      of: 'foam.u2.borders.LoadingLevel'
+      of: 'foam.u2.borders.LoadingLevel',
+      documentation: `
+        Indicates the loading state the UI should present this wizardlet in.
+        This is used to control a LoadingBorder wraping the wizardlet.
+      `
     },
     {
       name: '__subSubContext__',

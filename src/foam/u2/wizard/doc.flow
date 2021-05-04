@@ -1,0 +1,59 @@
+<title>Modular Wizard Documentation</title>
+
+<h2>Wizardlet Models</h2>
+
+<h4>Wizardlet</h4>
+
+A wizardlet is an independent portion of a wizard. It describes its data, views,
+and how it's saved and loaded. Wizardlets can be visible, allowing a user to
+fill in their data; or invisible, providing hidden functionality for saving or
+acting on wizard events.
+
+<foam class="foam.flow.widgets.TabbedModelDocumentation" defaultTab="methods" of="foam.u2.wizard.Wizardlet" />
+
+<h4>WizardletSection</h4>
+
+Wizardlets are sectioned. By default, a wizardlet will contain WizardletSection
+instances derived from 'of's section axioms. The abstraction of WizardletSection
+allows adding custom views to a wizardlet independently from the data model.
+
+The MinMaxCapabilityWizardlet is an example where a custom WizardletSection is
+used to display a selection of choices.
+
+<foam class="foam.flow.widgets.TabbedModelDocumentation" defaultTab="properties" of="foam.u2.wizard.WizardletSection" />
+
+<h2>Wizards</h2>
+
+Wizards are created by combining StepWizardController with a compatible view.
+An instance of StepWizardController should be the value of the view's data
+property.
+
+<h4>StepWizardController</h4>
+
+StepWizardController implements the behaviour for a wizard. It creates listeners
+on all wizardlets to provide status properties like 'allValid' and
+'visitedWizardlets'. It also contains logic for skippiing unavailable wizardlets
+and moving the position backwards if a previous wizardlet becomes available.
+
+The following properties are useful to initialize when creating the controller:
+<foam class="foam.flow.widgets.PropertyShortSummary" of="foam.u2.wizard.StepWizardController" whitelist="['wizardlets', 'config', 'wizardPosition']" />
+
+<h4>IncrementalStepWizardView</h4>
+
+This is a view for StepWizardController implementing a "page by page" approach
+wizard navigation. Each section will be seen on a separate screen, and the user
+must click "next" to reach the next screen. Requiring the user to click next
+allows control over how they proceed, as they must provide valid data before
+continuing.
+
+<h4>ScrollingStepWizardView</h4>
+
+This is a view for StepWizardController implementing a single scrolling view
+containing all sections. This allows a user to fill in sections in any order
+they choose, making it ideal for cases where a user might not have all the
+requirement information immediately.
+
+<h4>StepWizardConfig</h4>
+
+This is the model used for the 'config' property of StepWizardController.
+<foam class="foam.flow.widgets.PropertyShortSummary" of="foam.u2.wizard.StepWizardConfig" />

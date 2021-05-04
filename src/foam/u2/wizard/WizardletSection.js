@@ -23,10 +23,15 @@ foam.CLASS({
       name: 'section',
       class: 'FObjectProperty',
       of: 'foam.layout.Section',
+      documentation: `
+        An optional property for the original model section. This property must
+        be set if customView is null.
+      `
     },
     {
       name: 'title',
       class: 'String',
+      documentation: 'Full title of this section.',
       expression: function(section) {
         return section && section.title;
       }
@@ -34,7 +39,10 @@ foam.CLASS({
     {
       name: 'wizardlet',
       class: 'FObjectProperty',
-      of: 'foam.u2.wizard.Wizardlet'
+      of: 'foam.u2.wizard.Wizardlet',
+      documentation: `
+        This is a reference to the aggregating wizardlet.
+      `
     },
     {
       name: 'data',
@@ -47,11 +55,19 @@ foam.CLASS({
     },
     {
       name: 'isAvailable',
-      class: 'Boolean'
+      class: 'Boolean',
+      documentation: `
+        This section is visible only when this property is true.
+      `
     },
     {
       name: 'isValid',
       class: 'Boolean',
+      documentation: `
+        Indicates if this section in isolation is valid. If a model section is
+        specified, this is determined automatically. For a custom view, this
+        property should be overridden.
+      `,
       expression: function (wizardlet$of, data, data$errors_) {
         if ( ! wizardlet$of ) return true;
         if ( ! data ) return false;
@@ -67,11 +83,16 @@ foam.CLASS({
     },
     {
       name: 'customView',
-      class: 'foam.u2.ViewSpec'
+      class: 'foam.u2.ViewSpec',
+      documentation: `
+        A view to display for this section. If the 'section' property is set,
+        this property will override it.
+      `
     },
     {
       name: 'navTitle',
       class: 'String',
+      documentation: 'Short title used for navigation menu items',
       expression: function(section) {
         return section && section.navTitle;
       }
@@ -88,7 +109,7 @@ foam.CLASS({
           this.customView, null, this, ctx);
       }
 
-      
+
       ctx.register(
         this.VerticalDetailView,
         'foam.u2.detail.SectionedDetailView'
