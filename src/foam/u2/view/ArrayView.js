@@ -113,25 +113,6 @@ foam.CLASS({
   ],
 
   css: `
-    ^ .foam-u2-ActionView-addRow {
-      background: transparent;
-      border: none;
-      padding-left: 0;
-    }
-
-    ^ .foam-u2-ActionView-remove {
-      background: transparent;
-      display: contents;
-      margin-right: 4px;
-      padding: 0;
-    }
-
-    ^ .foam-u2-ActionView-remove:focus {
-      border-width: 1px;
-      margin-left: 4px;
-      padding: 0;
-    }
-
     ^value-view {
       flex: 1;
     }
@@ -163,7 +144,7 @@ foam.CLASS({
                         // encode data as an embedded data URL of the SVG
                         // because then the GUI updates without flickering
                         icon: "data:image/svg+xml;utf8,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath fill='%23d9170e' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z'/%3E%3C/svg%3E",
-                        buttonStyle: 'UNSTYLED'
+                        buttonStyle: 'TERTIARY'
                       })
                       .start(valueView, { data$: row.value$ })
                         .addClass(self.myClass('value-view'))
@@ -176,7 +157,7 @@ foam.CLASS({
         .startContext({ data: this })
           .tag(this.ADD_ROW, {
             icon: "data:image/svg+xml;utf8,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath fill='%2317d90e' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z'/%3E%3C/svg%3E",
-            buttonStyle: 'UNSTYLED'
+            buttonStyle: 'TERTIARY'
           })
         .endContext();
     }

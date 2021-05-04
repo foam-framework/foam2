@@ -320,9 +320,14 @@ foam.CLASS({
     },
     {
       class: 'FObjectArray',
-      name: 'fobjectArray',
+      name: 'fobjectArrayMultiView',
       of: 'foam.demos.u2.SampleData',
-      view: { class: 'foam.u2.view.FObjectArrayView', valueView: 'foam.demos.heroes.CitationView' }
+      view: { class: 'foam.u2.MultiView',
+        views: [
+          { class: 'foam.u2.view.TitledArrayView', valueView: 'foam.demos.heroes.CitationView' },
+          { class: 'foam.u2.view.FObjectArrayView', valueView: 'foam.demos.heroes.CitationView' }
+        ]
+      }
     },
     {
       class: 'FObjectArray',
@@ -340,10 +345,10 @@ foam.CLASS({
     },
     {
       class: 'FObjectArray',
-      name: 'fobjectArray3',
+      name: 'titledfobjectArray3',
       of: 'foam.demos.u2.SampleData2',
       view: {
-        class: 'foam.u2.view.FObjectArrayView',
+        class: 'foam.u2.view.TitledArrayView',
         mode: 'RW',
         enableAdding: true,
         enableRemoving: true,
