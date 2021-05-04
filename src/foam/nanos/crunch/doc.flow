@@ -1,22 +1,22 @@
 <title>CRUNCH Developer Documentation</title>
 
-<h2>Purpose of this Document</h2>
+<h4>Purpose of this Document</h4>
 This document aims to describe CRUNCH internals and interfaces, but is not
 intended as a user guide. To get started with CRUNCH, see the documentation
 in `src/documentation/crunch-doc.flow`.
 
-<h2>CrunchController</h2>
+<h4>CrunchController</h4>
 
 CrunchController contains logic for handling CRUNCH intercepts and
 creating CRUNCH-specific wizard sequences. It should be provided by
 the application's main controller in an exported property named
 `crunchController`.
 
-<h3>CrunchController methods</h3>
+<h4>CrunchController methods</h4>
 
 <foam class="foam.flow.widgets.MethodShortSummary" of="foam.u2.crunch.CrunchController" />
 
-<h2>CapabilityIntercept</h2>
+<h4>CapabilityIntercept</h4>
 
 Capability intercepts (AKA CRUNCH intercepts) allow a server to abort
 a request and provide the client a list of capability IDs describing
@@ -24,7 +24,7 @@ capabilities the current subject must have. It may also return a
 Capable object describing additional information the the object must
 have to complete the request.
 
-<h3>Important Source Locations</h3>
+<h4>Important Source Locations</h4>
 - `foam.nanos.crunch.CapabilityIntercept` is an exception thrown
   when an action cannot be completed without CRUNCH requirements.
   When this exceptiono is thrown by the server, it results in an
@@ -36,9 +36,9 @@ have to complete the request.
   RemoteException, which prevents the CrunchIntercept (which is one)
   from being double-wrapped.
 
-<h3>Example</h3>
+<h4>Example</h4>
 
-<h2>Server-Side: Throwing Intercept for Subject Capabilities</h2>
+<h4>Server-Side: Throwing Intercept for Subject Capabilities</h4>
 
 The following is a typical example of throwing an intercept for a
 capability required by the `subject`. (note that `subject` has a
@@ -57,7 +57,7 @@ ex.addCapabilityId("crunch.example");
 throw ex;
 </foam>
 
-<h2>Client-Side: Handling a CapabilityIntercept</h2>
+<h4>Client-Side: Handling a CapabilityIntercept</h4>
 
 If a capability is thrown on the server it will usually be handled by
 the client opaquely - that is, if you called `myDAO.put(...)` from the

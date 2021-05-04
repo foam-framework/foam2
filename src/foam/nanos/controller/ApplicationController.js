@@ -83,6 +83,7 @@ foam.CLASS({
     'notify',
     'pushMenu',
     'requestLogin',
+    'returnExpandedCSS',
     'sessionID',
     'sessionTimer',
     'signUpEnabled',
@@ -575,6 +576,15 @@ foam.CLASS({
 
         this.installCSS(text, id, eid);
       }
+    },
+
+    function returnExpandedCSS(text) {
+      var text2 = text; 
+      for ( var i = 0 ; i < this.MACROS.length ; i++ ) {
+        let m = this.MACROS[i];
+        text2 = this.expandShortFormMacro(this.expandLongFormMacro(text, m), m);
+      }
+      return text2;
     },
 
     function pushMenu(menu, opt_forceReload) {

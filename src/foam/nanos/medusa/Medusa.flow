@@ -1,6 +1,6 @@
 <title>Medusa</title>
-<h1>Medusa</h1>
-<h1>Overview</h1>
+<h2>Medusa</h2>
+<h2>Overview</h2>
 <p>Medusa is nanopay’s high availability system.  Offering fault-tolerance, data redundancy, scalability, data protection.</p>
 
 <p>Why does nanopay have to implement their own high availability system?
@@ -8,21 +8,21 @@ Industry offerings are centered around traditional databases. Since nanopay empl
 
 <p>The Medusa system is composed of Mediators and Nodes.  Nodes are responsible for physical data persistence.  Each Node maintains a unique file based blockchain of entries it has received.  Mediators receive and execute Client requests, store the results via the Nodes, and respond to the Client when the results have been stored by a quorum (majority) of Nodes.</p>
 
-<h1>Setup</h1>
+<h2>Setup</h2>
 <p>See deployment/cluster_1/README.txt or deployment/cluster_2/README.txt for instructions deploying a local cluster of 1+1 or 2+2.</p>
 
-<h1>Functional Overview</h1>
-<h2>Replay</h2>
-<h2>DR Sync</h2>
+<h2>Functional Overview</h2>
+<h4>Replay</h4>
+<h4>DR Sync</h4>
 
-<h1>Implementation Overview</h1>
-<h2>TODO</h2>
+<h2>Implementation Overview</h2>
+<h4>TODO</h4>
 <ul>
 <li>Index gap detection and recovery</li>
 <li></li>
 </ul>
 
-<h1>Terms and Definitions</h1>
+<h2>Terms and Definitions</h2>
 <dl>
 <dt>Replay</dt>
 <dd><p>Replay is the act of loading a journal from the filesystem into memory.  On startup the Nodes will replay once to validate their journal, and to determine the mininum and maximum index they have.  The mediators will request replay from the nodes.</p>
@@ -36,6 +36,6 @@ Industry offerings are centered around traditional databases. Since nanopay empl
 </dl>
 
 
-<h1>Viewing Data</h1>
+<h2>Viewing Data</h2>
 <p>Medusa entries can view from the Mediators.</p>
 <p>Menu <b>Medusa Entry</b></p>

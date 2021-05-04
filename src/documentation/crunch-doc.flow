@@ -1,6 +1,6 @@
 <title>CRUNCH Documentation</title>
 
-<h1>Continuous Reactive User Nano-Capability Hierarchy</h1>
+<h2>Continuous Reactive User Nano-Capability Hierarchy</h2>
 
 <foam class="foam.flow.widgets.DocumentationIncomplete" status="wip" />
 
@@ -8,14 +8,14 @@
 CRUNCH is a CORE subsystem that enables flexible definitions of incremental steps users can take to gain access to features of an application. A key principle of CRUNCH is the user will only enter new information at the time it's required to perform an action. (although it is possible to have users add information ahead of time also)
 </p>
 
-<h2>Purpose of this Document</h2>
+<h4>Purpose of this Document</h4>
 This document aims to help a developer use CRUNCH within a larger application.
 For documentation on CRUNCH internals, see `.flow` documents inside the
 `foam.nanos.crunch` package itself.
 
-<h2>CRUNCH Concepts</h2>
+<h4>CRUNCH Concepts</h4>
 
-<h3>Capability</h3>
+<h4>Capability</h4>
 
 <p>
 A `Capability` is an action that can be performed on the system. Most capabilities will simply be instances of `foam.nanos.crunch.Capability` in the journal, although subclasses of Capability can be used when special behaviours are desired.
@@ -29,7 +29,7 @@ Basic configuration of a capability includes specifying what permissions it gran
 A capability may also depend on other capabilities by its `prerequisites` relationship. In this way, CRUNCH facilitates controlled and incremental aquisition of capabilities.
 </p>
 
-<h4>Specify Permissions</h4>
+<h5>Specify Permissions</h5>
 <p>
 To specify permissions, use the following property.
 
@@ -40,7 +40,7 @@ To specify permissions, use the following property.
 Specifying permissions is optional. A capability which grants no permissions can be useful for grouping other capabilities.
 </p>
 
-<h4>Specify Required Information</h4>
+<h5>Specify Required Information</h5>
 <p>
 A capability may require some input from the user. For example, a capability allowing a user to create new content may require their acceptance of a privacy policy.
 </p>
@@ -62,9 +62,9 @@ The `daoKey` property can be used to specify another DAO where the data will be 
 The `contextDAOFindKey` property allows an object in the context to be used as a starting point for the object that is stored in the DAO specified by `daoKey`. For example, a capability which sets a property of `User` can specify `subject.user` as the `contextDAOFindKey`.
 </p>
 
-<h4>Configure how capabilities appear in a wizard</h4>
+<h5>Configure how capabilities appear in a wizard</h5>
 
-<h3>Wizard configuration with root capability</h3>
+<h4>Wizard configuration with root capability</h4>
 
 <p>
 Whenever a CRUNCH wizard is started, the root capability is able to configure
@@ -79,8 +79,6 @@ the intercept.
 <p>
 The options available for StepWizardConfig are in the scope of wizard documentation.
 </p>
-
-<!-- TODO: link wizard documentation -->
 
 <p>
 As an example, the following journal entry describes a capability that will
@@ -100,21 +98,21 @@ p({
 })
 </code>
 
-<h3>Wizardlet configuration for a specific capability</h3>
+<h4>Wizardlet configuration for a specific capability</h4>
 
-<h4>Specify When the Capability Appears</h4>
+<h5>Specify When the Capability Appears</h5>
 <foam class="foam.flow.widgets.DocumentationIncomplete" status="todo" isSection="true" />
 
-<h3>Capability Prerequisites</h3>
+<h4>Capability Prerequisites</h4>
 <foam class="foam.flow.widgets.DocumentationIncomplete" status="todo" isSection="true" />
 
-<h3>CRUNCH Intercepts</h3>
+<h4>CRUNCH Intercepts</h4>
 <foam class="foam.flow.widgets.DocumentationIncomplete" status="todo" isSection="true" />
 
-<h3>Capability Categories</h3>
+<h4>Capability Categories</h4>
 <foam class="foam.flow.widgets.DocumentationIncomplete" status="todo" isSection="true" />
 
-<h3>Capability User Associations</h3>
+<h4>Capability User Associations</h4>
 <p>
 Some applications may support an "acting as" behaviour for users; for example: a user may act on behalf of a company or organization, which is another type of user. When using CORE's application logic, the object `subject` in context has two properties to determine each user.
 
@@ -133,10 +131,10 @@ Setting `associatedEntity` to one of these values will affect which user CRUNCH 
 <foam class="foam.flow.widgets.EnumSummary" of="foam.nanos.crunch.AssociatedEntity" />
 </p>
 
-<h2>Subclasses of Capability</h2>
+<h4>Subclasses of Capability</h4>
 <foam class="foam.flow.widgets.DocumentationIncomplete" status="todo" isSection="true" />
 
-<h2>CRUNCH Rules</h2>
+<h4>CRUNCH Rules</h4>
 <foam class="foam.flow.widgets.DocumentationIncomplete" status="todo" isSection="true" />
 
 notes: ValidateUCJDataOnPut sets of-less cap to PENDING, then

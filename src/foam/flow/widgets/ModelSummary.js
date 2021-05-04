@@ -4,6 +4,27 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+foam.ENUM({
+  package: 'foam.flow.widgets',
+  name: 'ModelType',
+
+  values: [
+    {
+      name: 'CLASS',
+      background: '#D57D11',
+      color: '#FFFFFF'
+    },
+    {
+      name: 'ENUM',
+      color: '#865300'
+    },
+    {
+      name: 'INTERFACE',
+      color: '#007328'
+    }
+  ]
+});
+
 foam.CLASS({
   package: 'foam.flow.widgets',
   name: 'ModelSummary',
@@ -18,13 +39,30 @@ foam.CLASS({
 
   requires: [
     'foam.core.PromiseSlot',
-    'foam.u2.Element'
+    'foam.flow.widgets.ModelType',
+    'foam.u2.Element',
+    'foam.u2.view.ReadOnlyEnumView'
   ],
 
   properties: [
     {
       name: 'of',
       class: 'Class'
+    },
+    {
+      name: 'modelType',
+      class: 'Enum',
+      of: 'foam.flow.widgets.ModelType',
+      expression: function (of) {
+        const typeMapping = [
+          [foam.core.AbstractInterface, this.ModelType.INTERFACE],
+          [foam.core.AbstractEnum, this.ModelType.ENUM]
+        ];
+        for ( let mapping of typeMapping ) {
+          if ( mapping[0].isSubClass(of) ) return mapping[1];
+        }
+        return this.ModelType.CLASS;
+      }
     },
     {
       name: 'showProperties',
@@ -50,7 +88,7 @@ foam.CLASS({
     {
       name: 'adapters',
       factory: () => ({
-        implements: arry => arry.map(impl => impl.path).join(', ')
+        implements: arry => (arry || []).map(impl => impl.path).join(', ')
       })
     },
     {
@@ -72,6 +110,12 @@ foam.CLASS({
           .start('tr')
             .start('th').add('Property').end()
             .start('th').add('Value').end()
+          .end()
+          .start('tr')
+            .start('td').add('type').end()
+            .start('td')
+              .tag(this.ReadOnlyEnumView, { data$: this.modelType$ })
+            .end()
           .end()
           .forEach(this.visibleModelProps, function (p) {
             var value = self.of.model_[p];
