@@ -15,7 +15,9 @@ foam.CLASS({
   extends: 'foam.u2.view.AltView',
 
   requires: [
-    'foam.nanos.menu.Menu'
+    'foam.nanos.menu.Menu',
+    'foam.u2.view.ScrollTableView',
+    'foam.u2.view.TreeView'
   ],
 
   properties: [
