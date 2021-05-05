@@ -418,16 +418,25 @@ foam.CLASS({
                   return;
 
                 var tableWidth = view.columnHandler.returnPropertyForColumn(view.props, view.of, [ col, overrides], 'tableWidth');
+                var colTitle = view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col);
+                var colHeader = (colTitle.length > 1 ? '../'  : '') + colTitle.slice(-1)[0];
 
                 this.start().
                   addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + prop.name))
-                  .style({ flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0', 'word-wrap' : 'break-word', 'white-space' : 'normal'})
-                  .start()
+                  .style({
+                    'align-items': 'center',
+                    display: 'flex',
+                    flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0',
+                    'justify-content': 'start',
+                    'word-wrap': 'break-word'
+                  })
+                  .start('h6', { tooltip: colTitle.join('/') })
                     .style({
-                      'display': 'inline-block',
+                      overflow: 'hidden',
+                      'text-overflow': 'ellipsis'
                     })
-                    .add(view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col)).
+                    .add(colHeader).
                   end()./*
                   .forEach(
                     view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col),
@@ -440,14 +449,7 @@ foam.CLASS({
                       }).
                       callIf(prop.label !== '', function() {
                         this.start()
-                          .style({
-                            'display': 'inline-block',
-                            'position': 'absolute'
-                          })
                           .start('img')
-                            .style({
-                              'margin-top': '2px'
-                            })
                             .attr('src', this.slot(function(order) {
                               if ( prop === order ) {
                                 currArrow = view.ascIcon;
