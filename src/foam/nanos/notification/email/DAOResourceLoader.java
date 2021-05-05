@@ -25,49 +25,59 @@ import java.util.List;
 import static foam.mlang.MLang.*;
 
 public class DAOResourceLoader
-    extends ContextAwareSupport
-    implements ResourceLoader
+  extends    ContextAwareSupport
+  implements ResourceLoader
 {
+  protected String groupId_;
+  protected String locale_;
+
   public static EmailTemplate findTemplate(X x, String name, String groupId, String locale) {
     DAO groupDAO = (DAO) x.get("groupDAO");
     DAO emailTemplateDAO = (DAO) x.get("localEmailTemplateDAO");
 
+    /*
+    TODO:
+
+    name  group locale spid
+      Y     Y     Y     Y
+      Y     Y     Y     *
+      Y     Y     *     Y
+      Y     Y     *     *
+      Y     *     *     Y
+      Y     *     *     *
+    */
+
     do {
       EmailTemplate emailTemplate = (EmailTemplate) emailTemplateDAO
         .find(
-              AND(
-                  EQ(EmailTemplate.NAME, name),
-                  EQ(EmailTemplate.GROUP, ! SafetyUtil.isEmpty(groupId) ? groupId : "*"),
-                  EQ(EmailTemplate.LOCALE, locale)
-                  ));
+          AND(
+            EQ(EmailTemplate.NAME,   name),
+            EQ(EmailTemplate.GROUP,  SafetyUtil.isEmpty(groupId) ? "*" : groupId),
+            EQ(EmailTemplate.LOCALE, locale)
+          ));
 
       if ( emailTemplate == null ) {
         emailTemplate = (EmailTemplate) emailTemplateDAO
           .find(
             AND(
-              EQ(EmailTemplate.NAME, name),
-              EQ(EmailTemplate.GROUP, ! SafetyUtil.isEmpty(groupId) ? groupId : "*")
+              EQ(EmailTemplate.NAME,  name),
+              EQ(EmailTemplate.GROUP, SafetyUtil.isEmpty(groupId) ? "*" : groupId)
             ));
       }
 
-      if ( emailTemplate == null &&
-           ! SafetyUtil.isEmpty(groupId) ) {
+      if ( emailTemplate == null && ! SafetyUtil.isEmpty(groupId) ) {
         emailTemplate = (EmailTemplate) emailTemplateDAO
           .find(
             AND(
-              EQ(EmailTemplate.NAME, name),
+              EQ(EmailTemplate.NAME,  name),
               EQ(EmailTemplate.GROUP, "*")
             ));
       }
 
-      if ( emailTemplate != null ) {
-        return emailTemplate;
-      }
+      if ( emailTemplate != null ) return emailTemplate;
 
       // exit condition, no emails even with wildcard group so return null
-      if ( "*".equals(groupId) ) {
-        return null;
-      }
+      if ( "*".equals(groupId) ) return null;
 
       Group group = (Group) groupDAO.find(groupId);
       groupId = ( group != null && ! SafetyUtil.isEmpty(group.getParent()) ) ? group.getParent() : "*";
@@ -76,13 +86,10 @@ public class DAOResourceLoader
     return null;
   }
 
-  protected String groupId_;
-  protected String locale_;
-
   public DAOResourceLoader(X x, String groupId, String locale) {
     setX(x);
     this.groupId_ = groupId;
-    this.locale_ = locale;
+    this.locale_  = locale;
   }
 
   @Override
