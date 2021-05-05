@@ -1634,6 +1634,121 @@ foam.CLASS({
           ${this.name}IsSet_ = true;`;
       }
     }
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var body = this.buildGetFormatted(cls.name, this.name);
+      info.method({
+        name: 'getFormatted',
+        visibility: 'public',
+        type: 'String',
+        args: [
+          {
+            name: 'o',
+            type: 'Object'
+          }
+        ],
+        body: body
+      });
+      return info;
+    },
+
+    function buildJavaClass(cls) {
+      this.SUPER(cls);
+      var capitalized = foam.String.capitalize(this.name);
+      var constantize = foam.String.constantize(this.name);
+      cls.field({
+        name: 'formatted' + capitalized + 'IsSet_',
+        type: 'boolean',
+        visibility: 'private',
+        initializer: 'true;'
+      });
+      cls.method({
+        name: 'getFormatted' + capitalized,
+        visibility: 'public',
+        synchronized: this.synchronized,
+        type: 'String',
+        body: `return Formatted${capitalized}Factory_();`
+      });
+      cls.method({
+        name: 'setFormatted' + capitalized,
+        visibility: 'public',
+        synchronized: this.synchronized,
+        type: 'void',
+        args: [ { type: 'String',  name: 'val' } ],
+        body: ""
+      });
+      cls.method({
+        name: 'clearFormatted' + capitalized,
+        visibility: 'public',
+        synchronized: this.synchronized,
+        type: 'void',
+        body: ""
+      });
+      cls.method({
+        name: 'Formatted' + capitalized + 'Factory_',
+        visibility: 'protected',
+        synchronized: this.synchronized,
+        type: 'String',
+        body: `
+        try {
+          java.lang.reflect.Method method = ${cls.name}.${constantize}.getClass().getMethod("getFormatted", Object.class);
+          return (String) method.invoke(${cls.name}.${constantize}, (Object) this);
+        } 
+        catch (NoSuchMethodException e) { }
+        catch (IllegalAccessException e) { }
+        catch (java.lang.reflect.InvocationTargetException e) { }
+        return this.get${capitalized}();
+        `
+      });
+
+      cls.field({
+        name: 'FORMATTED_' + constantize,
+        visibility: 'public',
+        static: true,
+        final: true,
+        type: 'foam.core.PropertyInfo',
+        initializer: this.createFormattedJavaPropInfo(cls)
+      });
+    },
+
+    function buildGetFormatted(cls, prop) {
+      var str = `
+        if ( ! ((${cls}) o).${prop}IsSet_ ) return "";
+        StringBuilder ret = new StringBuilder(((${cls}) o).${prop}_);
+      `;
+      var index = 0;
+      this.formatter.forEach(c => {
+        if ( !isNaN(c) ) index += c;
+        else {
+          str += `
+            if ( ret.length() < ${index} ) return ret.toString();
+            ret.insert(${index}, "${c}");
+          `
+          index++;
+        }
+      });
+
+      return str += `return ret.length() > ${index} ? ret.toString().substring(0, ${index}) : ret.toString();`
+    },
+
+    function createFormattedJavaPropInfo(cls) {
+      var capitalized = foam.String.capitalize(this.name);
+      return foam.java.PropertyInfo.create({
+        sourceCls:               cls,
+        propAliases:             [],
+        propName:                'formatted'+capitalized,
+        propType:                this.javaType,
+        extends:                 this.javaInfoType,
+        includeInDigest:         true,
+        includeInSignature:      false,
+        compare:                 '',
+        comparePropertyToObject: '',
+        comparePropertyToValue:  ''
+      });
+    },
   ]
 });
 
