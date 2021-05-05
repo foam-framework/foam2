@@ -19,10 +19,10 @@ foam.CLASS({
 
   css: `
     ^ {
-      max-width: 40vw;
-      max-height: 70vh;
+      max-width: 60vw;
+      max-height: 75vh;
       overflow: auto;
-      margin: 28px;
+      margin: 24px;
     }
 
     ^ .titles {
