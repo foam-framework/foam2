@@ -11,23 +11,15 @@ foam.CLASS({
 
   documentation: `Skip writing to underlying JDAO if only transientDate.`,
 
-  properties: [
-    {
-      name: 'jdao',
-      class: 'foam.dao.DAOProperty',
-    }
-  ],
-
   axioms: [
     {
       name: 'javaExtras',
       buildJavaClass: function (cls) {
         cls.extras.push(`
-          public MedusaNodeJDAO(foam.core.X x, foam.dao.DAO delegate, foam.dao.java.JDAO jdao) {
+          public MedusaNodeJDAO(foam.core.X x, foam.dao.DAO delegate) {
             setX(x);
             setOf(foam.nanos.medusa.MedusaEntry.getOwnClassInfo());
-            setDelegate(delegate); // mdao
-            setJdao(jdao);
+            setDelegate(delegate); // jdao
           }
         `);
       }
@@ -40,9 +32,8 @@ foam.CLASS({
       javaCode: `
       MedusaEntry entry = (MedusaEntry) obj;
       if ( ! foam.util.SafetyUtil.isEmpty(entry.getData()) ) {
-        return getJdao().put_(x, obj);
+        return getDelegate().put_(x, obj);
       }
-//      return getDelegate().put_(x, obj);
       return obj;
       `
     }
