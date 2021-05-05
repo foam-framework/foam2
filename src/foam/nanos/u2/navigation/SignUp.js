@@ -205,7 +205,6 @@ foam.CLASS({
     {
       name: 'login',
       label: 'Get started',
-      buttonStyle: 'PRIMARY',
       isEnabled: function(errors_, isLoading_) {
         return ! errors_ && ! isLoading_;
       },

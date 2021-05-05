@@ -193,11 +193,10 @@ foam.CLASS({
             .callIfElse(self.data.createLabel, function() {
               this.tag(self.data.primaryAction, {
                 label: self.translationService.getTranslation(foam.locale, `${self.parentNode.createControllerView.menu}.createLabel`, self.data.createLabel),
-                size: 'LARGE',
-                buttonStyle: foam.u2.ButtonStyle.PRIMARY
+                size: 'LARGE'
               });
             }, function() {
-              this.start().tag(self.data.primaryAction, { size: 'LARGE', buttonStyle: foam.u2.ButtonStyle.PRIMARY }).end();
+              this.start().tag(self.data.primaryAction, { size: 'LARGE' }).end();
             })
           .end()
           .start()
@@ -222,7 +221,7 @@ foam.CLASS({
                   .forEach(self.cls.getAxiomsByClass(foam.core.Action).filter(action => {
                     return action.name !== self.data.primaryAction.name;
                   }), function(action) {
-                    this.tag(action, { buttonStyle: 'LINK' });
+                    this.tag(action, { buttonStyle: 'TERTIARY' });
                   })
                   .add()
                 .end()
