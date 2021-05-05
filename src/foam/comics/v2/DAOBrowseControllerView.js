@@ -144,9 +144,9 @@ foam.CLASS({
                     .addClass(self.myClass('browse-title'))
                     .translate(menuId + ".browseTitle", config$browseTitle)
                   .end()
-                  .startContext({ data: self }).tag(self.CREATE, { buttonStyle: foam.u2.ButtonStyle.PRIMARY }).endContext()
+                  .startContext({ data: self }).tag(self.CREATE).endContext()
                   .callIf(config$primaryAction, function() {
-                    this.startContext({ data: self }).tag(config$primaryAction, { size: 'LARGE', buttonStyle: 'PRIMARY' }).endContext();
+                    this.startContext({ data: self }).tag(config$primaryAction, { size: 'LARGE' }).endContext();
                   })
                 .end()
                 .callIf(config$browseSubtitle.length > 0, function() {

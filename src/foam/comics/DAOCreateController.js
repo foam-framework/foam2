@@ -53,7 +53,6 @@ foam.CLASS({
   actions: [
     {
       name: 'save',
-      buttonStyle: 'PRIMARY',
       isEnabled: function(dao, data$errors_, inProgress) { return !! dao && ! inProgress && ! data$errors_; },
       code: function() {
         this.inProgress = true;

@@ -185,7 +185,7 @@ foam.CLASS({
                 // we will handle this in the StackView instead
                 .startContext({ data: self.stack })
                   .tag(self.stack.BACK, {
-                    buttonStyle: foam.u2.ButtonStyle.LINK,
+                    buttonStyle: foam.u2.ButtonStyle.TERTIARY,
                     icon: 'images/back-icon.svg',
                     label: this.BACK
                   })
@@ -196,7 +196,7 @@ foam.CLASS({
                     .addClass(this.myClass('account-name'))
                     .addClass('truncate-ellipsis')
                   .end()
-                  .startContext({ data: self }).tag(self.SAVE, { buttonStyle: 'PRIMARY' }).endContext()
+                  .startContext({ data: self }).add(self.SAVE).endContext()
                 .end()
               .end()
 

@@ -44,11 +44,6 @@ foam.CLASS({
     {
       class: 'String',
       generateJava: false,
-      name: 'buttonStyle'
-    },
-    {
-      class: 'String',
-      generateJava: false,
       name: 'label',
       expression: function(name) { return foam.String.labelize(name); }
     },
