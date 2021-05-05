@@ -240,7 +240,8 @@ foam.CLASS({
                     if ( hasAction ) return this.ACTION_LABEL;
                     if ( willSave ) return this.SAVE_LABEL;
                     return this.NO_ACTION_LABEL;
-                  })
+                  }),
+                  buttonStyle: 'PRIMARY'
                 })
               .endContext()
             .end()

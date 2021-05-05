@@ -143,7 +143,8 @@ foam.CLASS({
         .addClass(this.myClass())
         .tag('span', null, this.optionsBtn_$)
         .start(this.LANGUAGE_CHOICE, {
-          label: label
+          label: label,
+          buttonStyle: 'PRIMARY'
         })
         .start('div')
           .addClass(this.myClass('carrot'))

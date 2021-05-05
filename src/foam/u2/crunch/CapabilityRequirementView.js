@@ -141,8 +141,8 @@ foam.CLASS({
         .end()
       .start().addClass('actionPosition')
         .startContext({ data: this })
-          .start(this.GET_STARTED).end()
-          .start(this.CANCEL, { buttonStyle: 'SECONDARY' }).end()
+          .tag(this.GET_STARTED, { buttonStyle: 'PRIMARY' })
+          .tag(this.CANCEL, { buttonStyle: 'SECONDARY' })
         .endContext()
       .end();
     }
