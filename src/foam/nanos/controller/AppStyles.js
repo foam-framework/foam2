@@ -88,13 +88,13 @@ foam.CLASS({
     p.legalText{
       font-style: normal;
       font-weight: normal;
-      font-size: 11px;
+      font-size: 12px;
       line-height: 14px;
     }
     p.label{
       font-style: normal;
-      font-weight: 500;
-      font-size: 11px;
+      font-weight: 600;
+      font-size: 12px;
       line-height: 14px;
     }
     

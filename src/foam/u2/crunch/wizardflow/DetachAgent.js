@@ -9,7 +9,7 @@
   name: 'DetachAgent',
   flags: ['web'],
   documentation: `
-    todo.
+    Detaches listeners to wizardlet properties.
   `,
 
   imports: [

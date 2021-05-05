@@ -23,8 +23,8 @@ foam.CLASS({
 
   messages: [
     { name: 'BACK_LABEL_ACJ', message: 'Back' },
-    { name: 'SUCCESS_UPDATED', message: 'Successfuly updated onboarding information.'},
-    { name: 'SUCCESS_REMOVED', message: 'Successfuly removed onboarding information.'}
+    { name: 'SUCCESS_UPDATED', message: 'Successfuly updated onboarding information'},
+    { name: 'SUCCESS_REMOVED', message: 'Successfuly removed onboarding information'}
   ],
 
   css: `
@@ -64,13 +64,13 @@ foam.CLASS({
         }
       ],
       methods: [
-        async function initE() {          
+        async function initE() {
           var user = await this.userDAO.find(this.ucj.effectiveUser);
           var realUser = await this.userDAO.find(this.ucj.sourceId);
           var subject = this.Subject.create({ user: user, realUser: realUser });
           var stack = this.Stack.create();
           var x = this.__subContext__.createSubContext({ stack: stack, subject: subject, controllerMode: this.ControllerMode.EDIT });
-          
+
           this.crunchController.createWizardSequence(this.ucj.targetId, x)
             .reconfigure('LoadCapabilitiesAgent', {
               subject: subject })

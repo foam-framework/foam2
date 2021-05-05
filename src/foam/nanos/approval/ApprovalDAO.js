@@ -49,7 +49,7 @@ foam.CLASS({
         if ( old != null && old.getStatus() != request.getStatus()
           || old == null && request.getStatus() != ApprovalStatus.REQUESTED
         ) {
-          DAO requests = ApprovalRequestUtil.getAllRequests(x, getDelegate().inX(x), request.getObjId(), request.getClassification());
+          DAO requests = ApprovalRequestUtil.getAllRequests(x, getDelegate().inX(x), request.getObjId(), request.getClassificationEnum());
           // if not a cancellation request and points are sufficient to consider object approved
           var currentPoints = getCurrentPoints(requests);
           var currentRejectedPoints = getCurrentRejectedPoints(requests);

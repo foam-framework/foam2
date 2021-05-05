@@ -21,8 +21,6 @@ foam.CLASS({
     'foam.core.ArraySlot',
     'foam.u2.borders.CardBorder',
     'foam.u2.detail.SectionView',
-    'foam.u2.layout.Grid',
-    'foam.u2.layout.GUnit',
     'foam.u2.Tab',
     'foam.u2.Tabs'
   ],
@@ -44,6 +42,10 @@ foam.CLASS({
       white-space: nowrap;
       border-top-left-radius: 6px;
       border-top-right-radius: 6px;
+    }
+    
+    ^ .foam-u2-borders-CardBorder {
+      padding: 14px 24px;
     }
   `,
 
@@ -75,10 +77,14 @@ foam.CLASS({
 
           return self.E()
             .add(arraySlot.map((visibilities) => {
-              var e = this.E()
+              var availableSections = visibilities.length == sections.length ? sections.filter((_, i) => visibilities[i]) : sections;
+              var e = availableSections.length == 1 ? 
+                this.E().start(self.CardBorder)
+                  .tag(self.SectionView, { data$: self.data$, section: availableSections[0], showTitle: false })
+                .end() :
+                this.E()
                 .start(self.Tabs, {}, self.tabs$)
-                  .forEach(sections, function(s, i) {
-                    if ( ! visibilities[i] ) return;
+                  .forEach(availableSections, function(s) {
                     var title$ = foam.Function.isInstance(s.title) ?
                       foam.core.ExpressionSlot.create({
                         obj: self.data,
@@ -101,7 +107,7 @@ foam.CLASS({
                       .end();
                   })
                 .end();
-              self.tabs.updateMemento = true;
+              self.tabs && ( self.tabs.updateMemento = true );
               return e;
             }))
         }));
