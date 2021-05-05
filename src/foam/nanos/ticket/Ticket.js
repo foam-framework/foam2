@@ -27,10 +27,10 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.ticket.TicketStatus',
     'foam.dao.AbstractDAO',
-    'foam.u2.dialog.Popup',
-    'foam.log.LogLevel'
+    'foam.log.LogLevel',
+    'foam.nanos.ticket.TicketStatus',
+    'foam.u2.dialog.Popup'
   ],
 
   javaImports: [
@@ -42,16 +42,16 @@ foam.CLASS({
   ],
 
   imports: [
-    'userDAO',
-    'ticketDAO',
-    'ticketStatusDAO',
     'ctrl',
     'currentMenu',
     'notify',
+    'objectSummaryView?',
     'stack',
     'subject',
     'summaryView?',
-    'objectSummaryView?'
+    'ticketDAO',
+    'ticketStatusDAO',
+    'userDAO'
   ],
 
   tableColumns: [
