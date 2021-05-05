@@ -21,8 +21,16 @@ foam.CLASS({
     'foam.nanos.auth.ServiceProviderAware'
   ],
 
+  topics: [
+    'finished',
+    'throwError'
+  ],
+
   requires: [
+    'foam.dao.AbstractDAO',
+    'foam.log.LogLevel',
     'foam.nanos.ticket.TicketStatus',
+    'foam.u2.dialog.Popup'
   ],
 
   javaImports: [
@@ -34,9 +42,16 @@ foam.CLASS({
   ],
 
   imports: [
-    'userDAO',
+    'ctrl',
+    'currentMenu',
+    'notify',
+    'objectSummaryView?',
+    'stack',
+    'subject',
+    'summaryView?',
     'ticketDAO',
-    'ticketStatusDAO'
+    'ticketStatusDAO',
+    'userDAO'
   ],
 
   tableColumns: [
@@ -49,6 +64,17 @@ foam.CLASS({
     'lastModified',
     'status',
     'title'
+  ],
+
+  messages: [
+    {
+      name: 'SUCCESS_ASSIGNED',
+      message: 'You have successfully assigned this ticket'
+    },
+    {
+      name: 'SUCCESS_UNASSIGNED',
+      message: 'You have successfully unassigned this ticket'
+    }
   ],
 
   sections: [
@@ -372,10 +398,110 @@ foam.CLASS({
       },
       code: function() {
         this.status = 'CLOSED';
+        this.assignedTo = 0;
         this.ticketDAO.put(this).then(function(ticket) {
           this.copyFrom(ticket);
         }.bind(this));
       }
     },
+    {
+      name: 'assign',
+      section: 'infoSection',
+      isAvailable: function(status){
+        return status === 'CLOSED';
+      },
+      availablePermissions: [
+        "ticket.assign.*"
+      ],
+      code: function(X) {        
+        var objToAdd = X.objectSummaryView ? X.objectSummaryView : X.summaryView;
+        objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+          class: "foam.u2.PropertyModal",
+          property: this.ASSIGNED_TO.clone().copyFrom({ label: '' }),
+          isModalRequired: true,
+          data$: X.data$,
+          propertyData$: X.data.assignedTo$,
+          title: this.ASSIGN_TITLE,
+          onExecute: this.assignTicket.bind(this, X)
+        }));
+      }
+    },
+    {
+      name: 'assignToMe',
+      section: 'infoSection',
+      isAvailable: function(subject, assignedTo, status){
+        return (subject.user.id !== assignedTo) && (status === 'OPEN');
+      },
+      code: function(X) {
+        var assignedTicket = this.clone();
+        assignedTicket.assignedTo = X.subject.user.id;
+
+        this.ticketDAO.put(assignedTicket).then(req => {
+          this.ticketDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.notify(this.SUCCESS_ASSIGNED, '', this.LogLevel.INFO, true);
+          if (
+            X.stack.top && 
+            ( X.currentMenu.id !== X.stack.top[2] )
+          ) {
+            X.stack.back();
+          }
+        }, e => {
+          this.throwError.pub(e);
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
+        });
+      }
+    },
+    {
+      name: 'unassignMe',
+      section: 'infoSection',
+      isAvailable: function(subject, assignedTo, status){
+        return (subject.user.id === assignedTo) && (status === 'OPEN');
+      },
+      code: function(X) {        
+        var unassignedTicket = this.clone();
+        unassignedTicket.assignedTo = 0;
+
+        this.ticketDAO.put(unassignedTicket).then(req => {
+          this.ticketDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.notify(this.SUCCESS_UNASSIGNED, '', this.LogLevel.INFO, true);
+          if (
+            X.stack.top && 
+            ( X.currentMenu.id !== X.stack.top[2] )
+          ) {
+            X.stack.back();
+          }
+        }, e => {
+          this.throwError.pub(e);
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
+        });
+      }
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'assignTicket',
+      code: function(X) {
+        var assignedTicket = this.clone();
+
+        this.ticketDAO.put(assignedTicket).then(_ => {
+          this.ticketDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.notify(this.SUCCESS_ASSIGNED, '', this.LogLevel.INFO, true);
+
+          if (
+            X.stack.top && 
+            ( X.currentMenu.id !== X.stack.top[2] )
+          ) {
+            X.stack.back();
+          }
+        }, (e) => {
+          this.throwError.pub(e);
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
+        });
+      }
+    }
   ]
 });

@@ -471,6 +471,9 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequ
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.TRACKING",target:"Rastreamento"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.BACK_LABEL",target:"Voltar"})
 
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.ticket.Ticket.SUCCESS_CANCELLED",target:"Você cancelou com sucesso este tíquete"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.ticket.Ticket.SUCCESS_ASSIGNED",target:"Você designou com sucesso este tíquete"})
+
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.ActionView.CONFIRM",target:"Confirme"})
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.comics.v2.DAOSummaryView.BACK.label",target:"Voltar"})
