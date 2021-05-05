@@ -7,10 +7,13 @@
 foam.CLASS({
   package: 'foam.u2.crunch.wizardflow',
   name: 'LoadTopConfig',
-
   implements: [
     'foam.core.ContextAware'
   ],
+
+  documentation: `
+    Allows the top-level capability to configure the wizard and this sequence.
+  `,
 
   imports: [
     'rootCapability',
