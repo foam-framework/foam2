@@ -307,7 +307,7 @@ foam.CLASS({
                       .addClass(self.myClass('account-name'))
                       .addClass('truncate-ellipsis')
                     .end()
-                    .startContext({ data }).add(self.primary).endContext()
+                    .startContext({ data }).tag(self.primary, { buttonStyle: 'PRIMARY'}).endContext()
                   .end()
                 .end()
 

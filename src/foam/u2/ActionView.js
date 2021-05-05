@@ -106,7 +106,7 @@ foam.CLASS({
     }
 
     ^primary-destructive:focus {
-      border: 2px solid /*%DESTRUCTIVE1%*/ #631414;
+      border: 1px solid /*%DESTRUCTIVE1%*/ #631414;
       box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.06);
     }
 
@@ -336,7 +336,7 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.u2.ButtonStyle',
       name: 'buttonStyle',
-      value: 'PRIMARY'
+      factory: function(action) { return this.action.buttonStyle || 'SECONDARY'; }
     },
     {
       class: 'Boolean',
@@ -417,7 +417,7 @@ foam.CLASS({
       }
 
       if ( this.label ) {
-        if ( this.buttonStyle == this.buttonStyle.LINK ) {
+        if ( this.buttonStyle == 'LINK' || this.buttonStyle == 'UNSTYLED' ) {
           this.start('p').add(this.label$).end();
         } else {
           this.start('h6').add(this.label$).end();
@@ -439,7 +439,7 @@ foam.CLASS({
         } else if ( this.buttonState == this.ButtonState.CONFIRM ) {
           this.buttonState = this.ButtonState.DEBOUNCE;
           this.removeAllChildren();
-          this.add(this.CONFIRM);
+          this.start('h6').add(this.CONFIRM).end();
           this.debounce();
         } else if ( this.buttonState == this.ButtonState.ARMED ) {
           this.buttonState = this.ButtonState.CONFIRM;
