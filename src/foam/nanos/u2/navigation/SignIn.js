@@ -118,6 +118,7 @@ foam.CLASS({
     {
       name: 'login',
       label: 'Sign in',
+      buttonStyle: 'PRIMARY',
       // if you use isAvailable or isEnabled - with model error_, then note that auto validate will not
       // work correctly. Chorme for example will not read a field auto populated without a user action
       code: async function(X) {
