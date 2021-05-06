@@ -442,6 +442,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequ
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.CREATED_BY.label",target:"Criado Por"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.CREATED_BY_AGENT.label",target:"Criado Por Agente"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.CREATED_FOR.label",target:"Criado Para"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.ASSIGNED_TO.label",target:"Atribuído A"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.LAST_MODIFIED.label",target:"Última Modificação"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.LAST_MODIFIED_BY.label",target:"Última Modificação Por"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequest.MEMO.label",target:"Memorando"})
