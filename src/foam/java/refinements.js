@@ -1619,7 +1619,7 @@ foam.CLASS({
   flags: ['java'],
   documentation: `
     Override setter for formattedstrings so that we only store the unformatted data
-    TODO: Add the ability to get a formatted version of the data 
+    and generate method to return a formatted version of the data
   `,  
 
   properties: [
@@ -1633,6 +1633,8 @@ foam.CLASS({
           val = val.replaceAll("[^\\\\\d]", "");
           ${this.name}_ = val;
           ${this.name}IsSet_ = true;
+
+          // on property set, set the formatted version of this property as well
           ${formattedName}Factory_();`;
       }
     }
@@ -1649,6 +1651,7 @@ foam.CLASS({
         args: [
           { name: 'o', type: 'Object'}
         ],
+        documentation: 'Returns a formatted version of this property',
         body: body
       });
       return info;
@@ -1670,7 +1673,6 @@ foam.CLASS({
           index++;
         }
       });
-
       return str += `return ret.length() > ${index} ? ret.toString().substring(0, ${index}) : ret.toString();`
     }
   ]

@@ -125,10 +125,10 @@ foam.CLASS({
   ],
 
   methods: [
+    // create an extra property: formatted${propname} used to access
+    // a formatted version of this string
     function installInClass(cls) {
       this.SUPER(cls);
-      // create a formatted${propname} property used to access
-      // a formatted version of this string
       var capitalized = foam.String.capitalize(this.name);
       var constantize = foam.String.constantize(this.name);
       var prop = foam.core.String.create({
