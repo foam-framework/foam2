@@ -1647,10 +1647,7 @@ foam.CLASS({
         visibility: 'public',
         type: 'String',
         args: [
-          {
-            name: 'o',
-            type: 'Object'
-          }
+          { name: 'o', type: 'Object'}
         ],
         body: body
       });
