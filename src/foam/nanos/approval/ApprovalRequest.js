@@ -143,10 +143,6 @@
     }
   ],
 
-  messages: [
-    { name: 'BACK_LABEL', message: 'Back' }
-  ],
-
   properties: [
     {
       // TODO: True fix will be with ReferenceView
@@ -624,6 +620,10 @@
   ],
 
   messages: [
+    { 
+      name: 'BACK_LABEL',
+      message: 'Back'
+    },
     {
       name: 'SUCCESS_ASSIGNED',
       message: 'You have successfully assigned this request'
