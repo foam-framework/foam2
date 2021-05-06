@@ -1632,7 +1632,7 @@ foam.CLASS({
           // remove all non-numeric characters
           val = val.replaceAll("[^\\\\\d]", "");
           ${this.name}_ = val;
-          ${this.name}IsSet_ = true;
+          ${this.name}IsSet_ = true;`;
       }
     }
   ],
