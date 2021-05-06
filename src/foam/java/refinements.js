@@ -1654,30 +1654,6 @@ foam.CLASS({
       return info;
     },
 
-    function buildJavaClass(cls) {
-      this.SUPER(cls);
-      var capitalized = foam.String.capitalize(this.name);
-      var constantize = foam.String.constantize(this.name);
-      cls.method({
-        name: 'Formatted' + capitalized + 'Factory_',
-        visibility: 'protected',
-        synchronized: this.synchronized,
-        type: 'String',
-        body: `
-        try {
-          java.lang.reflect.Method method = ${cls.name}.${constantize}.getClass().getMethod("getFormatted", Object.class);
-          this.formatted${capitalized}_ = (String) method.invoke(${cls.name}.${constantize}, (Object) this);
-          this.formatted${capitalized}IsSet_ = true;
-          return this.formatted${capitalized}_;
-        } 
-        catch (NoSuchMethodException e) { }
-        catch (IllegalAccessException e) { }
-        catch (java.lang.reflect.InvocationTargetException e) { }
-        return "";
-        `
-      });
-    },
-
     function buildGetFormatted(cls, prop) {
       var str = `
         if ( ! ((${cls}) o).${prop}IsSet_ ) return "";
