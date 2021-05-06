@@ -811,3 +811,8 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequ
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequestClassificationEnum.TRANSACTION_REQUEST.label",target:"Aprovação de transação Solicitação"})
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.ArrayView.ADD_ROW.label",target:"adicionar"})
+
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.MemoModal.OK.label",target:"Tudo Bem"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.MemoModal.CANCEL.label",target:"Cancelar"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.MemoModal.NOTE_REQUIRED",target:"Forneça uma nota (obrigatório)"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.MemoModal.NOTE_OPTIONAL",target:"Forneça uma nota (opcional)"})
