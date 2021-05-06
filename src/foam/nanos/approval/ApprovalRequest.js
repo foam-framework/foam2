@@ -713,7 +713,8 @@
       section: 'approvalRequestInformation',
       isAvailable: function(isTrackingRequest, status, subject, assignedTo) {
         if ( status !== this.ApprovalStatus.REQUESTED ) return false;
-        return ! isTrackingRequest && (subject.realUser.id === assignedTo);
+        if ( assignedTo !== 0 && subject.realUser.id !== assignedTo ) return false;
+        return ! isTrackingRequest;
       },
       code: function(X) {
         var approvedApprovalRequest = this.clone();
@@ -741,7 +742,8 @@
       section: 'approvalRequestInformation',
       isAvailable: function(isTrackingRequest, status, subject, assignedTo) {
         if ( status !== this.ApprovalStatus.REQUESTED ) return false;
-        return ! isTrackingRequest && (subject.realUser.id === assignedTo);
+        if ( assignedTo !== 0 && subject.realUser.id !== assignedTo ) return false;
+        return ! isTrackingRequest;
       },
       code: function(X) {
         var objToAdd = X.objectSummaryView ?
@@ -764,6 +766,7 @@
           X.objectSummaryView : X.summaryView;
         objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
           class: 'foam.u2.MemoModal',
+          isMemoRequired: true,
           onExecute: this.addMemoL.bind(this, X)
         }));
       }
@@ -773,7 +776,8 @@
       section: 'approvalRequestInformation',
       isAvailable: function(isTrackingRequest, status, subject, assignedTo) {
         if ( status !== this.ApprovalStatus.REQUESTED ) return false;
-        return ! isTrackingRequest && (subject.realUser.id === assignedTo);
+        if ( assignedTo !== 0 && subject.realUser.id !== assignedTo ) return false;
+        return ! isTrackingRequest;
       },
       code: function(X) {
         var objToAdd = X.objectSummaryView ?
@@ -791,7 +795,8 @@
       section: 'approvalRequestInformation',
       isAvailable: function(isTrackingRequest, status, subject, assignedTo) {
         if ( status !== this.ApprovalStatus.REQUESTED ) return false;
-        return isTrackingRequest && (subject.realUser.id === assignedTo);
+        if ( assignedTo !== 0 && subject.realUser.id !== assignedTo ) return false;
+        return isTrackingRequest;
       },
       code: function(X) {
         var cancelledApprovalRequest = this.clone();
