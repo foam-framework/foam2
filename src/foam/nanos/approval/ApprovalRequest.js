@@ -637,6 +637,10 @@
       message: 'You have successfully approved this request'
     },
     {
+      name: 'SUCCESS_MEMO',
+      message: 'You have successfully added a memo'
+    },
+    {
       name: 'SUCCESS_REJECTED',
       message: 'You have successfully rejected this request'
     },
@@ -707,9 +711,9 @@
     {
       name: 'approve',
       section: 'approvalRequestInformation',
-      isAvailable: function(isTrackingRequest, status) {
+      isAvailable: function(isTrackingRequest, status, subject, assignedTo) {
         if ( status !== this.ApprovalStatus.REQUESTED ) return false;
-        return ! isTrackingRequest;
+        return ! isTrackingRequest && (subject.realUser.id === assignedTo);
       },
       code: function(X) {
         var approvedApprovalRequest = this.clone();
@@ -735,9 +739,9 @@
     {
       name: 'approveWithMemo',
       section: 'approvalRequestInformation',
-      isAvailable: function(isTrackingRequest, status) {
+      isAvailable: function(isTrackingRequest, status, subject, assignedTo) {
         if ( status !== this.ApprovalStatus.REQUESTED ) return false;
-        return ! isTrackingRequest;
+        return ! isTrackingRequest && (subject.realUser.id === assignedTo);
       },
       code: function(X) {
         var objToAdd = X.objectSummaryView ?
@@ -749,11 +753,27 @@
       }
     },
     {
-      name: 'reject',
+      name: 'addMemo',
       section: 'approvalRequestInformation',
       isAvailable: function(isTrackingRequest, status) {
         if ( status !== this.ApprovalStatus.REQUESTED ) return false;
         return ! isTrackingRequest;
+      },
+      code: function(X) {
+        var objToAdd = X.objectSummaryView ?
+          X.objectSummaryView : X.summaryView;
+        objToAdd.add(this.Popup.create({ backgroundColor: 'transparent' }).tag({
+          class: 'foam.u2.MemoModal',
+          onExecute: this.addMemoL.bind(this, X)
+        }));
+      }
+    },
+    {
+      name: 'reject',
+      section: 'approvalRequestInformation',
+      isAvailable: function(isTrackingRequest, status, subject, assignedTo) {
+        if ( status !== this.ApprovalStatus.REQUESTED ) return false;
+        return ! isTrackingRequest && (subject.realUser.id === assignedTo);
       },
       code: function(X) {
         var objToAdd = X.objectSummaryView ?
@@ -769,9 +789,9 @@
     {
       name: 'cancel',
       section: 'approvalRequestInformation',
-      isAvailable: function(isTrackingRequest, status) {
+      isAvailable: function(isTrackingRequest, status, subject, assignedTo) {
         if ( status !== this.ApprovalStatus.REQUESTED ) return false;
-        return isTrackingRequest;
+        return isTrackingRequest && (subject.realUser.id === assignedTo);
       },
       code: function(X) {
         var cancelledApprovalRequest = this.clone();
@@ -1026,6 +1046,29 @@
           this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
           this.finished.pub();
           this.notify(this.SUCCESS_APPROVED, '', this.LogLevel.INFO, true);
+
+          if (
+            X.stack.top &&
+            ( X.currentMenu.id !== X.stack.top[2] )
+          ) {
+            X.stack.back();
+          }
+        }, e => {
+          this.throwError.pub(e);
+          this.notify(e.message, '', this.LogLevel.ERROR, true);
+        });
+      }
+    },
+    {
+      name: 'addMemoL',
+      code: function(X, memo) {
+        var newMemoRequest = this.clone();
+        newMemoRequest.memo = memo;
+
+        this.approvalRequestDAO.put(newMemoRequest).then(req => {
+          this.approvalRequestDAO.cmd(this.AbstractDAO.RESET_CMD);
+          this.finished.pub();
+          this.notify(this.SUCCESS_MEMO, '', this.LogLevel.INFO, true);
 
           if (
             X.stack.top &&
