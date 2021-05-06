@@ -81,16 +81,46 @@ p({
   "operation":3,
   "after":true,
   "predicate":{
+    "class":"foam.nanos.ruler.predicate.PropertyChangePredicate",
+    "propName":"assignedTo"
+  },
+  "action":{
+    "class":"foam.nanos.approval.ApprovalRequestAssignedToRule"
+  },    
+  "enabled":true,
+  "saveHistory":false,
+  "lifecycleState":1
+})
+
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"2cc4d97d-a962-48a2-9b58-09da267f760a",
+  "name":"ApprovalRequest update memo",
+  "priority":150,
+  "ruleGroup":"approvals",
+  "documentation":"Handle a change to memo",
+  "daoKey":"approvalRequestDAO",
+  "operation":3,
+  "after":true,
+  "predicate":{
     "class":"foam.mlang.predicate.And",
     "args":[
-        {
-            "class":"foam.nanos.ruler.predicate.PropertyChangePredicate",
-            "propName":"assignedTo"
+      {
+        "class":"foam.nanos.ruler.predicate.PropertyEQValue",
+        "propName":"status",
+        "propValue":{
+          "class":"foam.nanos.approval.ApprovalStatus",
+          "ordinal":0
         }
+      },
+      {
+        "class":"foam.nanos.ruler.predicate.PropertyChangePredicate",
+        "propName":"memo"
+      }
     ]
   },
   "action":{
-    "class":"foam.nanos.approval.ApprovableApprovalRequestsRule"
+    "class":"foam.nanos.approval.ApprovalRequestMemoRule"
   },    
   "enabled":true,
   "saveHistory":false,
