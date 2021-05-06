@@ -86,11 +86,7 @@ foam.CLASS({
       name: 'columns_',
       expression: function(columns, of, editColumnsEnabled, selectedColumnNames, allColumns) {
         if ( ! of ) return [];
-        var cols;
-        if ( ! editColumnsEnabled )
-          cols = columns || allColumns;
-        else
-          cols = selectedColumnNames;
+        var cols = editColumnsEnabled ? selectedColumnNames : columns || allColumns;
         return this.filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(this, cols).map(c => foam.Array.isInstance(c) ? c : [c, null]);
       },
     },
@@ -100,6 +96,7 @@ foam.CLASS({
         return ! of ? [] : [].concat(
           of.getAxiomsByClass(foam.core.Property)
             .filter(p => ! p.hidden )
+            .filter(p => ! p.columnHidden )
             .map(a => a.name),
           of.getAxiomsByClass(foam.core.Action)
             .map(a => a.name)
@@ -351,7 +348,7 @@ foam.CLASS({
       }
 
       //otherwise on adding new column creating new EditColumnsView, which is closed by default
-      if (view.editColumnsEnabled)
+      if ( view.editColumnsEnabled )
         var editColumnView = foam.u2.view.EditColumnsView.create({data:view}, this);
 
       if ( this.filteredTableColumns$ ) {
@@ -414,12 +411,11 @@ foam.CLASS({
                 var prop = found ? found.property : view.of.getAxiomByName(view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(col));
                 var isFirstLevelProperty = view.columnHandler.canColumnBeTreatedAsAnAxiom(col) ? true : col.indexOf('.') === -1;
 
-                if ( ! prop )
-                  return;
+                if ( ! prop ) return;
 
                 var tableWidth = view.columnHandler.returnPropertyForColumn(view.props, view.of, [ col, overrides], 'tableWidth');
-                var colTitle = view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col);
-                var colHeader = (colTitle.length > 1 ? '../'  : '') + colTitle.slice(-1)[0];
+                var colTitle   = view.columnConfigToPropertyConverter.returnColumnHeader(view.of, col);
+                var colHeader  = (colTitle.length > 1 ? '../'  : '') + colTitle.slice(-1)[0];
 
                 this.start().
                   addClass(view.myClass('th')).
@@ -572,7 +568,7 @@ foam.CLASS({
                         return;
                       }
 
-                      if  ( !thisObjValue ) {
+                      if  ( ! thisObjValue ) {
                         dao.inX(ctrl.__subContext__).find(obj.id).then(v => {
                           view.selection = v;
                           if ( view.importSelection$ ) view.importSelection = v;
@@ -742,6 +738,19 @@ foam.CLASS({
           return actions;
         }
       }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'TableViewPropertyRefinement',
+  refines: 'foam.core.Property',
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'columnHidden'
+    }
   ]
 });
 
