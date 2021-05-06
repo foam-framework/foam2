@@ -278,62 +278,64 @@ foam.CLASS({
         }
       }
 
+      var promise = this.config.unfilteredDAO.inX(this.__subContext__).find(this.data ? this.data.id : this.idOfRecord);
+
       // Get a fresh copy of the data, especially when we've been returned
       // to this view from the edit view on the stack.
-      if ( self.memento && self.memento.tail && self.memento.tail.head.toLowerCase() === 'edit' ) {
-        self.edit();
-      } else {
-        this
-        .addClass(this.myClass())
-        .add(self.slot(function(data, config$viewBorder, viewView) {
-          return this.config.unfilteredDAO.inX(this.__subContext__).find(data ? data.id : self.idOfRecord).then(d => {
-            if ( ! d ) d = data;
+      promise.then(d => {
+        if ( d ) self.data = d;
+        if ( self.memento && self.memento.tail && self.memento.tail.head.toLowerCase() === 'edit' ) {
+          self.edit();
+        } else {
+          this
+          .addClass(this.myClass())
+          .add(self.slot(function(data, config$viewBorder, viewView) {
             return self.E()
-            .start(self.Rows)
               .start(self.Rows)
-                // we will handle this in the StackView instead
-                .startContext({ onBack: self.onBack })
-                  .tag(self.BACK, {
-                    buttonStyle: foam.u2.ButtonStyle.LINK,
-                    icon: 'images/back-icon.svg',
-                    label: self.backLabel
-                  })
-                .endContext()
-                .start(self.Cols).style({ 'align-items': 'center' })
-                  .start()
-                    .add(d && d.toSummary() ? d.toSummary() : '')
-                    .addClass(self.myClass('account-name'))
-                    .addClass('truncate-ellipsis')
-                  .end()
-                  .startContext({ data: d }).add(self.primary).endContext()
-                .end()
-              .end()
-
-              .start(self.Cols)
-                .start(self.Cols).addClass(self.myClass('actions-header'))
-                  .startContext({ data: self })
-                    .tag(self.EDIT, {
+                .start(self.Rows)
+                  // we will handle this in the StackView instead
+                  .startContext({ onBack: self.onBack })
+                    .tag(self.BACK, {
                       buttonStyle: foam.u2.ButtonStyle.LINK,
-                      icon: 'images/edit-icon.svg'
-                    })
-                    .tag(self.COPY, {
-                      buttonStyle: foam.u2.ButtonStyle.LINK,
-                      icon: 'images/copy-icon.svg'
-                    })
-                    .tag(self.DELETE, {
-                      buttonStyle: foam.u2.ButtonStyle.LINK,
-                      icon: 'images/delete-icon.svg'
+                      icon: 'images/back-icon.svg',
+                      label: self.backLabel
                     })
                   .endContext()
+                  .start(self.Cols).style({ 'align-items': 'center' })
+                    .start()
+                      .add(data && data.toSummary() ? data.toSummary() : '')
+                      .addClass(self.myClass('account-name'))
+                      .addClass('truncate-ellipsis')
+                    .end()
+                    .startContext({ data }).add(self.primary).endContext()
+                  .end()
                 .end()
-              .end()
-              .start(config$viewBorder)
-                .start(viewView, { data: d }).addClass(self.myClass('view-container')).end()
-              .end()
-            .end();
-          });
-        }));
-      }
+
+                .start(self.Cols)
+                  .start(self.Cols).addClass(self.myClass('actions-header'))
+                    .startContext({ data: self })
+                      .tag(self.EDIT, {
+                        buttonStyle: foam.u2.ButtonStyle.LINK,
+                        icon: 'images/edit-icon.svg'
+                      })
+                      .tag(self.COPY, {
+                        buttonStyle: foam.u2.ButtonStyle.LINK,
+                        icon: 'images/copy-icon.svg'
+                      })
+                      .tag(self.DELETE, {
+                        buttonStyle: foam.u2.ButtonStyle.LINK,
+                        icon: 'images/delete-icon.svg'
+                      })
+                    .endContext()
+                  .end()
+                .end()
+                .start(config$viewBorder)
+                  .start(viewView, { data }).addClass(self.myClass('view-container')).end()
+                .end()
+              .end();
+          }));
+        }
+      });
     }
   ]
 });
