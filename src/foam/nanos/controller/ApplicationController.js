@@ -709,6 +709,7 @@ foam.CLASS({
       var lastTheme = this.theme;
       try {
         this.theme = await this.Themes.create().findTheme(this);
+        this.appConfig.copyFrom(this.theme.appConfig)
       } catch (err) {
         this.notify(this.LOOK_AND_FEEL_NOT_FOUND, '', this.LogLevel.ERROR, true);
         console.error(err);
