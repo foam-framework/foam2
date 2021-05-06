@@ -122,6 +122,23 @@ foam.CLASS({
         E.g., [3, '.', 3, '.', 3, '.', 3]
       `
     }
+  ],
+
+  methods: [
+    function installInClass(cls) {
+      this.SUPER(cls);
+      // create a formatted${propname} property used to access
+      // a formatted version of this string
+      var capitalized = foam.String.capitalize(this.name);
+      var prop = foam.core.String.create({
+        forClass_: cls.id,
+        sourceCls_: cls,
+        name: 'formatted' + capitalized,
+        javaSetter: ``,
+        javaGetter: `return Formatted${capitalized}Factory_();`
+      });
+      cls.axiomMap_[prop.name] = prop;
+    }
   ]
 });
 

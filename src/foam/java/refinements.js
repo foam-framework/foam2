@@ -1626,12 +1626,14 @@ foam.CLASS({
     {
       name: 'javaSetter',
       factory: function() {
+        var formattedName = 'Formatted' + foam.String.capitalize(this.name);
         return `
           assertNotFrozen();
           // remove all non-numeric characters
           val = val.replaceAll("[^\\\\\d]", "");
           ${this.name}_ = val;
-          ${this.name}IsSet_ = true;`;
+          ${this.name}IsSet_ = true;
+          ${formattedName}Factory_();`;
       }
     }
   ],
@@ -1659,34 +1661,6 @@ foam.CLASS({
       this.SUPER(cls);
       var capitalized = foam.String.capitalize(this.name);
       var constantize = foam.String.constantize(this.name);
-      cls.field({
-        name: 'formatted' + capitalized + 'IsSet_',
-        type: 'boolean',
-        visibility: 'private',
-        initializer: 'true;'
-      });
-      cls.method({
-        name: 'getFormatted' + capitalized,
-        visibility: 'public',
-        synchronized: this.synchronized,
-        type: 'String',
-        body: `return Formatted${capitalized}Factory_();`
-      });
-      cls.method({
-        name: 'setFormatted' + capitalized,
-        visibility: 'public',
-        synchronized: this.synchronized,
-        type: 'void',
-        args: [ { type: 'String',  name: 'val' } ],
-        body: ""
-      });
-      cls.method({
-        name: 'clearFormatted' + capitalized,
-        visibility: 'public',
-        synchronized: this.synchronized,
-        type: 'void',
-        body: ""
-      });
       cls.method({
         name: 'Formatted' + capitalized + 'Factory_',
         visibility: 'protected',
@@ -1695,22 +1669,15 @@ foam.CLASS({
         body: `
         try {
           java.lang.reflect.Method method = ${cls.name}.${constantize}.getClass().getMethod("getFormatted", Object.class);
-          return (String) method.invoke(${cls.name}.${constantize}, (Object) this);
+          this.formatted${capitalized}_ = (String) method.invoke(${cls.name}.${constantize}, (Object) this);
+          this.formatted${capitalized}IsSet_ = true;
+          return this.formatted${capitalized}_;
         } 
         catch (NoSuchMethodException e) { }
         catch (IllegalAccessException e) { }
         catch (java.lang.reflect.InvocationTargetException e) { }
-        return this.get${capitalized}();
+        return "";
         `
-      });
-
-      cls.field({
-        name: 'FORMATTED_' + constantize,
-        visibility: 'public',
-        static: true,
-        final: true,
-        type: 'foam.core.PropertyInfo',
-        initializer: this.createFormattedJavaPropInfo(cls)
       });
     },
 
