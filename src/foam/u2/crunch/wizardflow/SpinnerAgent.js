@@ -53,7 +53,7 @@ foam.CLASS({
   name: 'DetachSpinnerAgent',
   flags: ['web'],
   documentation: `
-    todo.
+    Removes a loading spinner created by SpinnerAgent.
   `,
 
   imports: [

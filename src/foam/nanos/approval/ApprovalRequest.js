@@ -143,10 +143,6 @@
     }
   ],
 
-  messages: [
-    { name: 'BACK_LABEL', message: 'Back' }
-  ],
-
   properties: [
     {
       // TODO: True fix will be with ReferenceView
@@ -345,8 +341,12 @@
         classification_ = val;
         if ( ! SafetyUtil.isEmpty(classification_) ) {
           classificationIsSet_ = true;
-          if ( ! getClassificationEnumIsSet_() )
-            setClassificationEnum(ApprovalRequestClassificationEnum.forLabel(classification_));
+          if ( ! getClassificationEnumIsSet_() ) {
+            var e = ApprovalRequestClassificationEnum.forLabel(classification_);
+            if ( e != null ) {
+              setClassificationEnum(e);
+            }
+          }
         }
       `,
       javaGetter: `
@@ -365,7 +365,7 @@
       section: 'approvalRequestInformation',
       order: 90,
       gridColumns: 6,
-      includeInDigest: false,
+      includeInDigest: true,
       tableWidth: 450,
       view: { class: 'foam.u2.EnumView' },
       tableCellFormatter: function(value, obj) {
@@ -620,6 +620,10 @@
   ],
 
   messages: [
+    { 
+      name: 'BACK_LABEL',
+      message: 'Back'
+    },
     {
       name: 'SUCCESS_ASSIGNED',
       message: 'You have successfully assigned this request'

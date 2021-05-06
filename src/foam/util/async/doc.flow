@@ -1,0 +1,140 @@
+<title>foam.util.async</title>
+
+<h1>Sequence</h1>
+
+The Sequence class provides a way to execute a sequence of steps, where each
+step can import from the subcontext of the previous step. Every step implements
+ContextAgent, which means it has an asynchronous `execute` method which is
+called before passing context to the next step.
+
+Sequence extends Fluent. This means it implements an `add` method as well as
+some convenience methods for chaining (`callIf`, `call`, etc).
+
+The following example contains two steps. The first step takes 2 seconds to
+finish running and exports a recipient for a greeting message. The second step
+imports a recipient for a greeting message and displays "Hello {recipient}!" in
+a popup view.
+
+<foam class="foam.flow.widgets.TryItSnippet" language="JS">
+foam.CLASS({
+  package: 'example',
+  name: 'StepOne',
+  exports: ['recipient'],
+  properties: [
+    { name: 'recipient', value: 'World' }
+  ],
+  methods: [
+    async function execute() {
+      await new Promise(rslv => setTimeout(rslv, 2000));
+    }
+  ]
+});
+foam.CLASS({
+  package: 'example',
+  name: 'StepTwo',
+  imports: ['recipient'],
+  methods: [
+    async function execute() {
+      await new Promise(rslv => {
+        ctrl.add(foam.u2.dialog.Popup.create({
+          onClose: rslv
+        }).start('h1').add(`Hello, ${this.recipient}!`).end());
+      });
+    }
+  ]
+});
+var seq = foam.util.async.Sequence.create()
+  .add(example.StepOne)
+  .add(example.StepTwo);
+seq.execute();
+</foam>
+
+The following example has 10 steps created using a fluent foreach. In this
+example, `addAs` is being used instead of `add`. The only difference between
+`addAs` and `add` is there is an extra argument (the first argument for addAs)
+specifying a name for the step. By default, the step is named after its class,
+however; here the same class is used for each step, so it helps to distinguish
+them by some unique value.
+
+<foam class="foam.flow.widgets.TryItSnippet" language="JS">
+foam.CLASS({
+  package: 'example',
+  name: 'QuickMessage',
+  properties: [
+    { name: 'message', class: 'String' },
+    { name: 'delay', class: 'Int', value: 300 }
+  ],
+  methods: [
+    async function execute() {
+      await new Promise(rslv => {
+        var popup = foam.u2.dialog.Popup.create({
+          onClose: rslv
+        }).start('h1').add(this.message).end();
+        ctrl.add(popup);
+        setTimeout(() => { popup.close() }, this.delay);
+      });
+    }
+  ]
+});
+var seq = foam.util.async.Sequence.create()
+  .forEach(
+    'never gonna give you up never gonna let you down'.split(' '),
+    function(word, i) {
+      this.addAs(`Step${i}`, example.QuickMessage, { message: word })
+    }
+  );
+seq.execute();
+</foam>
+
+The next example is similar to the first, but the sequence is modified after
+using `reconfigure` and `addBefore`. Sequences can be cloned and mutated,
+which allows a lot of extensibility for existing sequences.
+
+<foam class="foam.flow.widgets.TryItSnippet" language="JS">
+foam.CLASS({
+  package: 'example',
+  name: 'QuickMessage',
+  properties: [
+    { name: 'message', class: 'String' },
+    { name: 'delay', class: 'Int', value: 300 }
+  ],
+  methods: [
+    async function execute() {
+      await new Promise(rslv => {
+        var popup = foam.u2.dialog.Popup.create({
+          onClose: rslv
+        }).start('h1').add(this.message).end();
+        ctrl.add(popup);
+        setTimeout(() => { popup.close() }, this.delay);
+      });
+    }
+  ]
+});
+var seq = foam.util.async.Sequence.create()
+  .forEach(
+    'never gonna give you up never gonna let you down'.split(' '),
+    function(word, i) {
+      this.addAs(`Step${i}`, example.QuickMessage, { message: word })
+    }
+  );
+
+seq
+  .reconfigure('Step2', { delay: 450 })
+  .reconfigure('Step3', { delay: 450 })
+  .reconfigure('Step4', { delay: 450 })
+  .reconfigure('Step7', { delay: 450 })
+  .reconfigure('Step8', { delay: 450 })
+  .reconfigure('Step9', { delay: 450 })
+  .addBefore('Step5', example.QuickMessage, {
+    message: '...',
+    delay: 450
+  })
+  .add('Step9', example.QuickMessage, {
+    message: '...',
+    delay: 450
+  })
+  ;
+seq.execute();
+</foam>
+
+test

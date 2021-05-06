@@ -7,10 +7,14 @@
 foam.CLASS({
   package: 'foam.u2.crunch.wizardflow',
   name: 'CreateWizardletsAgent',
-
   implements: [
     'foam.core.ContextAgent'
   ],
+  documentation: `
+    Creates wizardlets corresponding to the capabilities in context. A
+    capability may have up to two wizardlets - one appearing before its
+    prerequisites, and one appearing after.
+  `,
 
   imports: [
     'capabilities',

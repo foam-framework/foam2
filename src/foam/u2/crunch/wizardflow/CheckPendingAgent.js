@@ -7,11 +7,13 @@
 foam.CLASS({
   package: 'foam.u2.crunch.wizardflow',
   name: 'CheckPendingAgent',
-
   implements: [
     'foam.core.ContextAgent',
     'foam.mlang.Expressions'
   ],
+  documentation: `
+    Prevents pending or granted capabilities from invoking the wizard.
+  `,
 
   imports: [
     'capabilityDAO',

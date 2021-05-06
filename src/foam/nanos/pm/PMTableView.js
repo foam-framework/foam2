@@ -46,7 +46,7 @@ foam.CLASS({
       this.TableView.create();
 
       this.addClass('foam-nanos-pm-PMTableView');
-      this.add(this.CLEAR_ALL);
+      this.startContext({data: this}).add(this.CLEAR_ALL).endContext();
       this.columns_.push([this.CLEAR, null]);
 
       this.SUPER();
@@ -68,6 +68,8 @@ foam.CLASS({
       name: 'clearAll',
       code: function(X) {
         X.pmInfoDAO.removeAll();
+        X.pmInfoDAO.select(console);
+        this.updateValues = ! this.updateValues;
       }
     }
   ],

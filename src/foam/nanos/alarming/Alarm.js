@@ -58,6 +58,13 @@ foam.CLASS({
     setIsActive(true);
     setReason(reason);
   }
+
+  public Alarm(String name, foam.log.LogLevel severity, AlarmReason reason) {
+    setName(name);
+    setIsActive(true);
+    setSeverity(severity);
+    setReason(reason);
+  }
           `
         }));
       }

@@ -42,7 +42,7 @@ foam.CLASS({
     },
     function addAs(name, spec, args) {
       this.contextAgentSpecs$push(this.Step.create({
-        name: spec.name,
+        name: name,
         spec: spec,
         args: args
       }));

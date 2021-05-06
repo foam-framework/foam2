@@ -10,6 +10,10 @@ foam.CLASS({
   implements: [
     'foam.core.ContextAgent'
   ],
+  documentation: `
+    You are in development mode. This context agent adds a debug section to
+    each wizardlet.
+  `,
 
   imports: [
     'wizardlets'
