@@ -39,9 +39,9 @@
             DAO approvalRequestDAO = (DAO) getX().get("approvalRequestDAO");
 
             List<ApprovalRequest> requestsToUpdate = ((ArraySink) requests
-            .where(foam.mlang.MLang.AND(
+            .where(
               foam.mlang.MLang.NEQ(ApprovalRequest.ASSIGNED_TO, request.getAssignedTo())
-            )).select(new ArraySink())).getArray();
+            ).select(new ArraySink())).getArray();
 
             for ( ApprovalRequest requestToUpdate : requestsToUpdate ){
               requestToUpdate.setAssignedTo(request.getAssignedTo());
