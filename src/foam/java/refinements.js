@@ -1633,9 +1633,6 @@ foam.CLASS({
           val = val.replaceAll("[^\\\\\d]", "");
           ${this.name}_ = val;
           ${this.name}IsSet_ = true;
-
-          // on property set, set the formatted version of this property as well
-          ${formattedName}Factory_();`;
       }
     }
   ],
