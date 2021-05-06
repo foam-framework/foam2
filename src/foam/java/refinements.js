@@ -1699,23 +1699,7 @@ foam.CLASS({
       });
 
       return str += `return ret.length() > ${index} ? ret.toString().substring(0, ${index}) : ret.toString();`
-    },
-
-    function createFormattedJavaPropInfo(cls) {
-      var capitalized = foam.String.capitalize(this.name);
-      return foam.java.PropertyInfo.create({
-        sourceCls:               cls,
-        propAliases:             [],
-        propName:                'formatted'+capitalized,
-        propType:                this.javaType,
-        extends:                 this.javaInfoType,
-        includeInDigest:         true,
-        includeInSignature:      false,
-        compare:                 '',
-        comparePropertyToObject: '',
-        comparePropertyToValue:  ''
-      });
-    },
+    }
   ]
 });
 
