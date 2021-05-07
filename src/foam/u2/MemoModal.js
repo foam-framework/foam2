@@ -48,7 +48,9 @@ foam.CLASS({
   messages: [
     { name: 'CONFIRM_DELETE_1', message: 'Are you sure you want to delete' },
     { name: 'SUCCESS_MSG', message: ' deleted' },
-    { name: 'FAIL_MSG', message: 'Failed to delete' }
+    { name: 'FAIL_MSG', message: 'Failed to delete' },
+    { name: 'NOTE_REQUIRED', message: 'Please provide a note (required)'},
+    { name: 'NOTE_OPTIONAL', message: 'Please provide a note (optional)'}
   ],
 
   properties: [
@@ -60,8 +62,8 @@ foam.CLASS({
       class: 'String',
       name: 'title',
       expression: function(isMemoRequired) {
-        if ( isMemoRequired ) return 'Please provide a note (required)';
-        return 'Please provide a note (optional)';
+        if ( isMemoRequired ) return this.NOTE_REQUIRED;
+        return this.NOTE_OPTIONAL;
       }
     },
     {

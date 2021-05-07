@@ -1665,8 +1665,9 @@ foam.CLASS({
     function add_(cs, parentNode) {
       // Common case is one String, so optimize that case.
       if ( cs.length == 1 && typeof cs[0] === 'string' ) {
-        this.childNodes.push(this.sanitizeText(cs[0]));
-        this.onAddChildren(cs[0]);
+        var sanitized = this.sanitizeText(cs[0]);
+        this.childNodes.push(sanitized);
+        this.onAddChildren(sanitized);
         return this;
       }
 

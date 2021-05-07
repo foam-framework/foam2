@@ -6,10 +6,10 @@
 
  foam.CLASS({
   package: 'foam.nanos.approval',
-  name: 'ApprovalRequestAssignedToRule',
+  name: 'ApprovalRequestMemoRule',
 
   documentation: `
-    A rule to determine what to update assignedTo for all other
+    A rule to determine what to update memo for all other
     outstanding approval requests.
   `,
 
@@ -40,15 +40,15 @@
 
             List<ApprovalRequest> requestsToUpdate = ((ArraySink) requests
             .where(
-              foam.mlang.MLang.NEQ(ApprovalRequest.ASSIGNED_TO, request.getAssignedTo())
+              foam.mlang.MLang.NEQ(ApprovalRequest.MEMO, request.getMemo())
             ).select(new ArraySink())).getArray();
 
             for ( ApprovalRequest requestToUpdate : requestsToUpdate ){
-              requestToUpdate.setAssignedTo(request.getAssignedTo());
+              requestToUpdate.setMemo(request.getMemo());
               approvalRequestDAO.put(requestToUpdate);
             }
           }
-        }, "Updated the assignedTo for all other requests");
+        }, "Updated the memo for all other requests");
       `
     }
   ]
