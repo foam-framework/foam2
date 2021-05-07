@@ -59,12 +59,10 @@
 
   tableColumns: [
     'id',
-    'description',
+    'referenceSummary',
     'classificationEnum',
-    'objId',
     'createdFor',
-    'approver',
-    'assignedTo',
+    'assignedTo.legalName',
     'status',
     'memo'
   ],
@@ -152,7 +150,7 @@
       order: 21,
       gridColumns: 6,
       transient: true,
-      tableWidth: 200,
+      tableWidth: 250,
       visibility: 'RO',
       tableCellFormatter: function(_,obj) {
         let self = this;
