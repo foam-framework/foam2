@@ -86,7 +86,7 @@ foam.CLASS({
       name: 'junctionModel',
       expression: function(junctionName) {
         return (this.package ? this.package + '.' : '') + junctionName;
-    }
+      }
     },
     {
       class: 'String',
