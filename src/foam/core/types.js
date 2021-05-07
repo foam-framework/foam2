@@ -135,6 +135,7 @@ foam.CLASS({
         forClass_: cls.id,
         sourceCls_: cls,
         name: 'formatted' + capitalized,
+        hidden: true,
         javaSetter: ``,
         javaGetter: `return Formatted${capitalized}Factory_();`,
         javaFactory: `
