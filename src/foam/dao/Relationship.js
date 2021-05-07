@@ -41,7 +41,7 @@ foam.CLASS({
       class: 'String',
       transient: true,
       hidden: true,
-      getter: function() {
+      factory: function() {
         var s = this.sourceModel;
         var t = this.targetModel;
         return s.substring(s.lastIndexOf('.') + 1) +
