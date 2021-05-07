@@ -196,8 +196,7 @@
   ],
 
   reactions: [
-    ['', 'propertyChange.currentTopPage_', 'updateRenderedPages_'],
-    ['', 'propertyChange.table_',          'updateRenderedPages_']
+    ['', 'propertyChange.currentTopPage_', 'updateRenderedPages_']
   ],
 
   methods: [
@@ -295,6 +294,8 @@
           window.removeEventListener('resize', this.updateTableHeight);
         });
       }
+
+      this.onDetach(this.table_$.sub(this.updateRenderedPages_));
     }
   ],
 
