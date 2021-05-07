@@ -84,11 +84,7 @@ foam.CLASS({
     },
     {
       name: 'columns_',
-      expression: function(columns, of, editColumnsEnabled, selectedColumnNames, allColumns) {
-        if ( ! of ) return [];
-        var cols = editColumnsEnabled ? selectedColumnNames : columns || allColumns;
-        return this.filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(this, cols).map(c => foam.Array.isInstance(c) ? c : [c, null]);
-      },
+      factory: function() { return []; }
     },
     {
       name: 'allColumns',
@@ -113,8 +109,7 @@ foam.CLASS({
     {
       name: 'columns',
       expression: function(of, allColumns, isColumnChanged) {
-        if ( ! of )
-          return [];
+        if ( ! of ) return [];
         var tc = of.getAxiomByName('tableColumns');
         return tc ? tc.columns : allColumns;
       }
@@ -324,6 +319,12 @@ foam.CLASS({
 
       this.currentMemento_ = null;
 
+      this.columns$.sub(this.updateColumns_);
+      this.of$.sub(this.updateColumns_);
+      this.editColumnsEnabled$.sub(this.updateColumns_);
+      this.selectedColumnNames$.sub(this.updateColumns_);
+      this.allColumns$.sub(this.updateColumns_);
+      this.updateColumns_();
 
       //set memento's selected columns
       if ( this.memento ) {
@@ -738,6 +739,21 @@ foam.CLASS({
           return actions;
         }
       }
+  ],
+
+  listeners: [
+    {
+      name: 'updateColumns_',
+      isFramed: true,
+      code: function(columns, of, editColumnsEnabled, selectedColumnNames, allColumns) {
+        if ( ! this.of ) return [];
+        var cols = this.editColumnsEnabled ? this.selectedColumnNames : this.columns || this.allColumns;
+        this.columns_ = this.filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(this, cols).map(
+          c => foam.Array.isInstance(c) ?
+            c :
+            [c, null]);
+      }
+    }
   ]
 });
 
@@ -750,7 +766,16 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'columnHidden'
-    }
+    },
+    {
+      class: 'Boolean',
+      documentation: `
+        When set to true, the '<model>.column.<property>' permission is required for a
+        user to be able to read this property. If false, any user can see the
+        value of this property in a table column.
+      `,
+      name: 'columnPermissionRequired'
+    },
   ]
 });
 
