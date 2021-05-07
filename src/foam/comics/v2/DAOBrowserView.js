@@ -119,7 +119,7 @@ foam.CLASS({
   `,
 
   messages: [
-    { name: 'REFRESH_MSG', message: 'Refresh Requested ... ' }
+    { name: 'REFRESH_MSG', message: 'Refresh Requested... ' }
   ],
 
   imports: [
@@ -244,7 +244,7 @@ foam.CLASS({
       code: function(X) {
         this.config.dao.cmd_(X, foam.dao.CachingDAO.PURGE);
         this.config.dao.cmd_(X, foam.dao.AbstractDAO.RESET_CMD);
-        this.ctrl.notify(this.REFRESH_MSG, '', this.LogLevel.INFO, true);
+        this.ctrl.notify(this.REFRESH_MSG, '', this.LogLevel.INFO, true, '/images/Progress.svg');
       }
     },
     {
