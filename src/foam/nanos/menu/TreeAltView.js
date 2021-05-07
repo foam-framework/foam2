@@ -16,7 +16,8 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.menu.Menu',
-    'foam.u2.view.TableView'
+    'foam.u2.view.ScrollTableView',
+    'foam.u2.view.TreeView'
   ],
 
   properties: [
@@ -24,15 +25,15 @@ foam.CLASS({
   ],
 
   methods: [
-    function init(){
-      var relationship = typeof this.relationship === 'object' ? 
+    function init() {
+      var relationship = typeof this.relationship === 'object' ?
         relationship :
         foam.lookup(this.relationship);
 
       this.views = [
         [
-          { 
-            class: 'foam.u2.view.TableView'
+          {
+            class: 'foam.u2.view.ScrollTableView'
           },
          'Table'
         ],
