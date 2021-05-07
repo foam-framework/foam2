@@ -35,6 +35,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'auth?',
     'click?',
     'dblclick?',
     'editRecord?',
@@ -747,11 +748,28 @@ foam.CLASS({
       isFramed: true,
       code: function(columns, of, editColumnsEnabled, selectedColumnNames, allColumns) {
         if ( ! this.of ) return [];
+        var auth = this.auth;
+        var self = this;
+
         var cols = this.editColumnsEnabled ? this.selectedColumnNames : this.columns || this.allColumns;
-        this.columns_ = this.filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(this, cols).map(
+        Promise.all(this.filterColumnsThatAllColumnsDoesNotIncludeForArrayOfColumns(this, cols).map(
           c => foam.Array.isInstance(c) ?
             c :
-            [c, null]);
+            [c, null]
+        ).map(c => {
+          if ( auth ) {
+            var axiom = self.of.getAxiomByName(c[0]);
+            if ( axiom.columnPermissionRequired ) {
+              var clsName  = self.of.name.toLowerCase();
+              var propName = axiom.name.toLowerCase();
+              return auth.check(null, `${clsName}.column.${propName}`).then(function(enabled) {
+                return enabled && c;
+              });
+            }
+          }
+          return c;
+        }))
+        .then(columns => this.columns_ = columns.filter(c => c));
       }
     }
   ]
