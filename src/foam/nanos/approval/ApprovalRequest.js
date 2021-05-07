@@ -364,11 +364,7 @@
       order: 90,
       gridColumns: 6,
       includeInDigest: true,
-      tableWidth: 450,
-      view: { class: 'foam.u2.EnumView' },
-      tableCellFormatter: function(value, obj) {
-        this.add(value.label);
-      }
+      tableWidth: 450
     },
     {
       class: 'DateTime',
