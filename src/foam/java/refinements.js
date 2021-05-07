@@ -1619,13 +1619,14 @@ foam.CLASS({
   flags: ['java'],
   documentation: `
     Override setter for formattedstrings so that we only store the unformatted data
-    TODO: Add the ability to get a formatted version of the data 
+    and generate method to return a formatted version of the data
   `,  
 
   properties: [
     {
       name: 'javaSetter',
       factory: function() {
+        var formattedName = 'Formatted' + foam.String.capitalize(this.name);
         return `
           assertNotFrozen();
           // remove all non-numeric characters
@@ -1633,6 +1634,43 @@ foam.CLASS({
           ${this.name}_ = val;
           ${this.name}IsSet_ = true;`;
       }
+    }
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var body = this.buildGetFormatted(cls.name, this.name);
+      info.method({
+        name: 'getFormatted',
+        visibility: 'public',
+        type: 'String',
+        args: [
+          { name: 'o', type: 'Object'}
+        ],
+        documentation: 'Returns a formatted version of this property',
+        body: body
+      });
+      return info;
+    },
+
+    function buildGetFormatted(cls, prop) {
+      var str = `
+        if ( ! ((${cls}) o).${prop}IsSet_ ) return "";
+        StringBuilder ret = new StringBuilder(((${cls}) o).${prop}_);
+      `;
+      var index = 0;
+      this.formatter.forEach(c => {
+        if ( !isNaN(c) ) index += c;
+        else {
+          str += `
+            if ( ret.length() < ${index} ) return ret.toString();
+            ret.insert(${index}, "${c}");
+          `
+          index++;
+        }
+      });
+      return str += `return ret.length() > ${index} ? ret.toString().substring(0, ${index}) : ret.toString();`
     }
   ]
 });
