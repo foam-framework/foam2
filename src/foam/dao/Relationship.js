@@ -73,13 +73,19 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'junctionModel',
-      expression: function(sourceModel, targetModel) {
+      name: 'junctionName',
+      factory: function(sourceModel, targetModel) {
         var source = sourceModel.substring(sourceModel.lastIndexOf('.') + 1);
         var target = targetModel.substring(targetModel.lastIndexOf('.') + 1);
 
-        return (this.package ? this.package + '.' : '') +
-          source + target + 'Junction';
+        return  source + target + 'Junction';
+      }
+    },
+    {
+      class: 'String',
+      name: 'junctionModel',
+      expression: function(junctionName) {
+        return (this.package ? this.package + '.' : '') + junctionName;
     }
     },
     {
