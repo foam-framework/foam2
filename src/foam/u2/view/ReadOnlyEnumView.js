@@ -50,7 +50,8 @@ foam.CLASS({
       this.SUPER();
       var color = this.returnExpandedCSS(this.data.color);
       var background = this.returnExpandedCSS(this.data.background);
-      var isPill = this.data.FANCY;
+      debugger;
+      var isPill = this.isFancy(this.data.VALUES);
       this
         .enableClass(this.myClass('pill'), isPill)
         .addClass(this.myClass())
@@ -73,6 +74,14 @@ foam.CLASS({
           () => { this.start().add(data.label).end(); },
           () => { this.start('p').add(data.label).end(); }
         );
+    },
+    {
+      name: 'isFancy',
+      code: foam.Function.memoize1(function(values) {
+        for ( value of values ) {
+          if ( value.color || value.background ) { return true; }
+        }
+      })
     }
   ]
 });

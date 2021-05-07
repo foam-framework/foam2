@@ -181,11 +181,6 @@ foam.CLASS({
     function installInClass(cls) {
       var e = cls.create(this.definition);
       cls.installConstant(this.name, e);
-      if ( ! cls.getAxiomByName('FANCY') ) { cls.installAxiom(foam.core.Constant.create({ name: 'FANCY', value: false })); }
-      var a = cls.getAxiomByName('FANCY');
-      if ( ! a.value ) {
-        a.value = !! e.color || !! e.background;
-      }
       cls.VALUES.push(e);
     }
   ]
