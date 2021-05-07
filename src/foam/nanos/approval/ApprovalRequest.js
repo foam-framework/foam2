@@ -63,8 +63,8 @@
     'classificationEnum',
     'objId',
     'createdFor',
-    'approver.legalName',
-    'assignedTo.legalName',
+    'approver',
+    'assignedTo',
     'status',
     'memo'
   ],
