@@ -620,7 +620,7 @@ foam.CLASS({
       });
     },
 
-    function notify(toastMessage, toastSubMessage, severity, transient) {
+    function notify(toastMessage, toastSubMessage, severity, transient, icon) {
       var notification = this.Notification.create();
       notification.userId = this.subject && this.subject.realUser ?
         this.subject.realUser.id : this.user.id;
@@ -629,6 +629,7 @@ foam.CLASS({
       notification.toastState = this.ToastState.REQUESTED;
       notification.severity = severity;
       notification.transient = transient;
+      notification.icon = icon;
       this.__subContext__.notificationDAO.put(notification);
     }
   ],
@@ -663,7 +664,8 @@ foam.CLASS({
           this.add(this.NotificationMessage.create({
             message: obj.toastMessage,
             type: obj.severity,
-            description: obj.toastSubMessage
+            description: obj.toastSubMessage,
+            icon: obj.icon
           }));
           var clonedNotification = obj.clone();
           clonedNotification.toastState = this.ToastState.DISPLAYED;
