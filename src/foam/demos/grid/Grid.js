@@ -10,11 +10,11 @@ foam.CLASS({
   package: 'foam.demos.grid',
   name: 'Resource',
 
-  tableProperties: [ 'description', 'url' ],
+ tableColumns: [ 'description', 'url' ],
 
   properties: [
     { name: 'id', hidden: true },
-    { class: 'String', name: 'description', width: 25 },
+    { class: 'String', name: 'description', width: 50 },
     { class: 'String', name: 'url',         width: 50 }
   ]
 });
