@@ -212,8 +212,21 @@ foam.CLASS({
       ^ .foam-u2-ActionView { margin: 10px; }
       ^cmd { box-shadow: 3px 3px 6px 0 gray; width: 100%; margin-bottom: 8px; }
       ^properties { margin-right: 8px; height: auto; }
-      ^properties .foam-u2-view-TreeViewRow { xxxposition: relative; }
-      ^properties .foam-u2-ActionView, ^properties .foam-u2-ActionView:hover { background: white; padding: 0; position: absolute; right: 2px; border: none; margin: 2px 2px 0 0; }
+      ^properties .foam-u2-view-TreeViewRow { position: relative; }
+      ^properties .foam-u2-ActionView, ^properties .foam-u2-ActionView:hover {
+        background: none;
+        border: none;
+        box-shadow: none;
+        color: gray;
+        font-size: medium;
+        height: 6px;
+        margin: 2px 2px 0 0;
+        outline: none;
+        padding: 4px;
+        position: absolute;
+        right: 0;
+        top: 12px;
+      }
       .foam-u2-Tabs { padding-top: 0 !important; margin-right: -8px; }
       input[type="range"] { width: 60px; height: 15px; }
       input[type="color"] { width: 60px; }
