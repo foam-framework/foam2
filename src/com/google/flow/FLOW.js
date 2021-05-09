@@ -651,7 +651,7 @@ foam.CLASS({
       }
     },
 
-    function onPropertyRemove(_, __, p) {
+    function onPropertyRemove(_, __, ___, p) {
       var o = p.value;
 
       delete this.scope[p.name];
