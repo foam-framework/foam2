@@ -65,7 +65,12 @@ foam.CLASS({
   name: 'ReactiveDetailView',
   extends: 'foam.u2.DetailView',
 
-  requires: [ 'com.google.flow.DetailPropertyView' ]
+  requires: [ 'com.google.flow.DetailPropertyView' ],
+
+  css: `
+    ^ { margin: inherit !important; }
+    ^ table { width: auto !important; }
+  `
 });
 
 
