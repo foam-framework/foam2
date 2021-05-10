@@ -54,9 +54,9 @@ foam.CLASS({
       display: flex;
       justify-content: space-between;
       margin: auto;
-      max-width: 30vw;
+      max-width: max(30vw, 400px);
+      min-width: max(20vw, 300px);
       padding: 12px 16px;
-      width: 20vw;
     }
     @keyframes fade {
       0% { opacity: 0; transform: translateX(300px);}
@@ -82,6 +82,11 @@ foam.CLASS({
       vertical-align: middle;
       white-space: nowrap;
       word-wrap: break-word;
+    }
+    ^title{
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: -webkit-fill-available;
     }
     ^description {
       color: /*%GREY2%*/ #6B778C;
@@ -163,7 +168,7 @@ foam.CLASS({
               .addClass(this.myClass('status-icon'))
             .end()
             .start().addClass(this.myClass('content'))
-              .start('h6')
+              .start('h6').addClass(this.myClass('title'))
                 .callIfElse(foam.String.isInstance(this.message), function() {
                   this.add(self.message);
                   console.log(self.message);
