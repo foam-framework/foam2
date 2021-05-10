@@ -56,7 +56,7 @@ foam.CLASS({
         .style({
           'background-color': background,
           'color': color,
-          'border-color': background != '#FFFFFF' || background ? background : color
+          'border-color': background == '#FFFFFF' || ! background ? color : background
         })
         .callIf(this.showGlyph && data.glyph, () =>{
           var icon = {
