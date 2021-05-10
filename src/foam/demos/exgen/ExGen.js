@@ -13,7 +13,7 @@ foam.CLASS({
       properties: [
         {
           class: 'String',
-          name: 'name',
+          name: 'name'
         },
         {
           class: 'Int',
@@ -174,6 +174,7 @@ foam.CLASS({
 
         .add('Seconds: ')
         .tag({class: foam.u2.ProgressView, data$: this.timer.second$.map(s=>100*s/60)})
+        .tag()
         .start('span')
           .style({width: '10px', display: 'inline-block', 'padding-left': '4px', 'vertical-align': 'middle'})
           .start('span')
