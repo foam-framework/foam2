@@ -35,12 +35,11 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.addClass(this.myClass());
-      var self = this;
 
       this.start('iframe')
         .attrs({ srcdoc: this.data })
-        .on('load', function() { self.resizeIFrame(this) }
-      ).end();
+        .on('load', evt => this.resizeIFrame(evt.target))
+      .end();
     },
 
     function resizeIFrame(el) {
