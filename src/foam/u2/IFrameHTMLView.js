@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.u2',
   name: 'IFrameHTMLView',
-  extends: 'foam.u2.HTMLElement',
+  extends: 'foam.u2.View',
 
   css: `
     iframe {
@@ -15,10 +15,6 @@ foam.CLASS({
       padding: 8px;
     }
   `,
-
-  properties: [
-    'data'
-  ],
 
   methods: [    
     function initE() {
