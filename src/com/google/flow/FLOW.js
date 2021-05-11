@@ -199,9 +199,10 @@ foam.CLASS({
         color: #444;
         }
 
+      ^ .foam-u2-Tabs-tabRow { display: flex; }
       ^ { display: flex; }
       ^ > * { padding-left: 16px; padding-right: 16px; }
-      ^tools, ^properties, ^sheet { box-shadow: 3px 3px 6px 0 gray; height: 100%; }
+      ^tools, ^properties, ^sheet { box-shadow: 3px 3px 6px 0 gray; height: 100%; padding: 1px; }
       ^sheet { width: 100%; overflow-y: auto; }
       ^tools thead, ^properties thead { display: none }
       ^tools tr { height: 30px }
@@ -211,8 +212,22 @@ foam.CLASS({
       ^ canvas { border: none; }
       ^ .foam-u2-ActionView { margin: 10px; }
       ^cmd { box-shadow: 3px 3px 6px 0 gray; width: 100%; margin-bottom: 8px; }
+      ^properties { margin-right: 8px; height: auto; }
       ^properties .foam-u2-view-TreeViewRow { position: relative; }
-      ^properties .foam-u2-ActionView, ^properties .foam-u2-ActionView:hover { background: white; padding: 0; position: absolute; right: 2px; border: none; margin: 2px 2px 0 0; }
+      ^properties .foam-u2-ActionView, ^properties .foam-u2-ActionView:hover {
+        background: none;
+        border: none;
+        box-shadow: none;
+        color: gray;
+        font-size: medium;
+        height: 6px;
+        margin: 2px 2px 0 0;
+        outline: none;
+        padding: 4px;
+        position: absolute;
+        right: 0;
+        top: 12px;
+      }
       .foam-u2-Tabs { padding-top: 0 !important; margin-right: -8px; }
       input[type="range"] { width: 60px; height: 15px; }
       input[type="color"] { width: 60px; }
@@ -509,10 +524,6 @@ foam.CLASS({
 
       this.
           addClass(this.myClass()).
-          start('div').
-            addClass(this.myClass('tools')).
-            start(this.TOOLS, {selection$: this.currentTool$}).end().
-          end().
           start('center').
             start(this.CMD_LINE).
               addClass(this.myClass('cmd')).
@@ -530,6 +541,11 @@ foam.CLASS({
 //            tag('br').
             start(foam.u2.Tabs).
               start(foam.u2.Tab, {label: 'canvas1'}).
+                style({display: 'flex'}).
+                start('div').
+                  addClass(this.myClass('tools')).
+                  start(this.TOOLS, {selection$: this.currentTool$}).end().
+                end().
                 start(this.canvas).
 //                  on('click',       this.onClick).
                   on('mousedown',   this.onMouseDown).
@@ -636,7 +652,7 @@ foam.CLASS({
       }
     },
 
-    function onPropertyRemove(_, __, p) {
+    function onPropertyRemove(_, __, ___, p) {
       var o = p.value;
 
       delete this.scope[p.name];

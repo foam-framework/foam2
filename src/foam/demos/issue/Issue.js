@@ -5,8 +5,16 @@
  */
 
 foam.CLASS({
-  package: 'com.foamdev.demo.issue',
+  package: 'foam.demos.issue',
   name: 'Issue',
+
+  mixins: [
+    'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware',
+//    'foam.nanos.auth.AssignableAware',
+    'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.auth.LastModifiedByAware'
+  ],
 
   properties:
   [
@@ -14,6 +22,11 @@ foam.CLASS({
       class: 'Int',
       name: 'id',
       help: 'ID of the issue, unique to this project.'
+    },
+    {
+      class: 'Boolean',
+      name: 'shared',
+      value: true
     },
     /*
     {
@@ -45,7 +58,14 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'summary',
+      width: 100,
+      help: 'One-line summary of the issue.'
+    },
+    {
+      class: 'String',
       name: 'description',
+      view: { class: 'foam.u2.tag.TextArea', rows: 10, cols: 100 },
       help: 'Description of the issue.'
     },
     {
@@ -82,21 +102,26 @@ foam.CLASS({
       help: 'Person to whom this issue is currently assigned.',
     },
     */
+    /*
     {
       class: 'Date',
       name: 'published',
       help: 'Date and time the issue was originally published.'
     },
+    */
     {
       class: 'Boolean',
       name: 'starred',
-      help: 'Whether the authenticated user has starred this issue.'
+      transient: true,
+      xxxhelp: 'Whether the authenticated user has starred this issue.'
     },
+    /*
     {
       class: 'Int',
       name: 'stars',
       help: 'Number of stars this issue has.'
     },
+    */
     {
       class: 'String',
       name: 'state',
@@ -106,16 +131,13 @@ foam.CLASS({
       class: 'String',
       name: 'status',
       help: 'Status of this issue.'
-    },
-    {
-      class: 'String',
-      name: 'summary',
-      help: 'One-line summary of the issue.'
-    },
+    }
+    /*
     {
       class: 'Date',
       name: 'updated',
       help: 'Date and time the issue was last updated.'
     }
+    */
   ]
 });

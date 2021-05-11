@@ -166,6 +166,10 @@ foam.CLASS({
       name: 'transient'
     },
     {
+      class: 'String',
+      name: 'icon'
+    },
+    {
       class: 'Boolean',
       name: 'broadcasted',
       documentation: 'Determines if notification is sent to all users in a group or system.'

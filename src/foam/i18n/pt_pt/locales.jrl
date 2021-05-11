@@ -809,6 +809,7 @@ p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequ
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequestClassificationEnum.ACCOUNT_ROLE_APPROVAL.label",target:"Aprovação de função de conta"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequestClassificationEnum.ACCOUNT_APPROVABLE_REQUEST.label",target:"Solicitação de conta aprovada"})
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequestClassificationEnum.TRANSACTION_REQUEST.label",target:"Aprovação de transação Solicitação"})
+p({class:"foam.i18n.Locale",locale:"pt",source:"foam.nanos.approval.ApprovalRequestClassificationEnum.NATURE_CODE_DOCUMENT_APPROVAL.label",target:"Código da Natureza Documento Aprovação"})
 
 p({class:"foam.i18n.Locale",locale:"pt",source:"foam.u2.view.ArrayView.ADD_ROW.label",target:"adicionar"})
 

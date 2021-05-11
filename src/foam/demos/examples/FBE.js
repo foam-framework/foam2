@@ -486,6 +486,23 @@ foam.CLASS({
     ^ { background: pink; }
     ^subsection { background: green; }
   \`,
+  classes: [
+    {
+       name: 'SubTest',
+       extends: 'foam.u2.Element',
+       css: \`
+         ^ { background: pink; }
+       \`,
+       methods: [
+         function initE() {
+           this.SUPER();
+            this.
+              addClass(this.myClass()).
+              add(this.myClass());
+         }
+       ]
+    }
+  ],
   methods: [
     function initE() {
       this.SUPER();
@@ -496,6 +513,7 @@ foam.CLASS({
           addClass(this.myClass('subsection')).
           add(this.myClass('subsection')).
         end();
+      this.add(this.SubTest.create({}, this));
     }
   ]
 });

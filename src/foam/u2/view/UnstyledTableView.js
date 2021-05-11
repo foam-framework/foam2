@@ -759,7 +759,7 @@ foam.CLASS({
         ).map(c => {
           if ( auth ) {
             var axiom = self.of.getAxiomByName(c[0]);
-            if ( axiom.columnPermissionRequired ) {
+            if ( axiom && axiom.columnPermissionRequired ) {
               var clsName  = self.of.name.toLowerCase();
               var propName = axiom.name.toLowerCase();
               return auth.check(null, `${clsName}.column.${propName}`).then(function(enabled) {

@@ -39,104 +39,71 @@ foam.CLASS({
       display: flex;
       justify-content: center;
       position: fixed;
-      top: 25px;
-      width: 100vw;
+      right: 32px;
+      top: 24px;
       z-index: 15000;
     }
     ^inner {
-      width: 90vw;
-      height: 50px;
-      max-width: 1024px;
-      margin: auto;
-      padding: 8px 24px;
+      align-items: center;
       animation-name: fade;
       animation-duration: 10s;
-      font-size: 14px;
-      line-height: 1.33;
-      letter-spacing: 0.2px;
+      background: /*%WHITE%*/ white;
+      border: 1px solid /*%GREY4%*/ #DADDE2;
       border-radius: 3px;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
-      background: #e2f2dd;
+      box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1), 0px 4px 6px rgba(0, 0, 0, 0.05);
       display: flex;
       justify-content: space-between;
-      align-items: center;
-    }
-    ^banner {
-      background-color: #32bf5e;
-      height: 4px;
-      width: inherit;
-      max-width: 1072px;
-      margin-left: -24px;
-      border-top-left-radius: 3px;
-      border-top-right-radius: 3px;
-      position: absolute;
-      top: 0;
+      margin: auto;
+      max-width: max(30vw, 400px);
+      min-width: max(20vw, 300px);
+      padding: 12px 16px;
     }
     @keyframes fade {
-      0% { opacity: 0; }
-      10% { opacity: 1; }
+      0% { opacity: 0; transform: translateX(300px);}
+      10% { opacity: 1; transform: translateX(0px);}
       80% { opacity: 1; }
       100% { opacity: 0; }
     }
+    ^outer-content{
+      align-items: center;
+      display: flex;
+      width: -webkit-fill-available;
+    }
     ^status-icon {
-      width: 20px;
-      height: 20px;
-      margin-right: 16px;
-      vertical-align: middle;
+      align-items: center;
+      height: 32px;
+      justify-content: center;
+      margin-right: 1em;
+      max-width: max(10%, 32px);
+      width: 32px;
     }
     ^content {
-      display: inline-block;
+      max-width: 80%;
       vertical-align: middle;
-      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      font-size: 16px;
-      font-weight: 600;
-      color: #19402e;
-      letter-spacing: normal;
+      white-space: nowrap;
+      word-wrap: break-word;
+    }
+    ^title{
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: -webkit-fill-available;
     }
     ^description {
-      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      font-size: 14px;
-      font-weight: normal;
-      line-height: 1.43;
-      letter-spacing: normal;
-      color: #19402e;
-      margin-left: 36px;
-    }
-    ^error-background {
-      background: #fff6f6;
-    }
-    ^warning-background {
-      background: #fdf8de;
-    }
-    ^error-banner {
-      background: #d9170e;
-    }
-    ^warning-banner {
-      background: #eedc00;
-    }
-    ^error-content {
-      color: #631414;
-    }
-    ^warning-content {
-      color: #816819;
-    }
-    ^link-icon {
-      display: inline-block;
-      margin-top: 2px;
-      vertical-align: middle;
-      margin-right: 0 !important;
-      width: 16px;
-      height: 16px;
+      color: /*%GREY2%*/ #6B778C;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: -webkit-fill-available;
     }
     ^close-icon {
       background-image: url("images/round-close-icon.svg");
       background-size: 12px 12px;
-      cursor:pointer;
+      cursor: pointer;
       height: 12px;
       opacity: 0.5;
       width: 12px;
       position: absolute;
-      top: 18;
+      top: 1em;
+      right: 1em;
     }
     ^close-icon:hover {
       opacity: 1;
@@ -149,85 +116,82 @@ foam.CLASS({
       name: 'type'
     },
     'message',
-    'description'
+    'description',
+    'icon'
   ],
 
   methods: [
 
     function initE() {
       var self = this;
-
       var indicator;
-      if ( this.type == this.LogLevel.ERROR ) {
-        console.error('notification: ' + this.message);
-        indicator = {
-          size: 18,
-          backgroundColor: this.theme.destructive3,
-          borderColor: this.theme.destructive3,
-          icon: this.theme.glyphs.exclamation.getDataUrl({
-            fill: this.theme.white
-          })
-        };
-      } else if ( this.type == this.LogLevel.WARN ) {
-        console.warn('notification: ' + this.message);
-        indicator = {
-          size: 18,
-          icon: 'images/baseline-warning-yellow.svg'
-        };
+      if ( ! this.icon ) {
+        if ( this.type == this.LogLevel.ERROR ) {
+          console.error('notification: ' + this.message);
+          indicator = {
+            size: 32,
+            backgroundColor: this.theme.destructive3,
+            borderColor: this.theme.destructive3,
+            icon: this.theme.glyphs.exclamation.getDataUrl({
+              fill: this.theme.white
+            })
+          };
+        } else if ( this.type == this.LogLevel.WARN ) {
+          console.warn('notification: ' + this.message);
+          indicator = {
+            size: 32,
+            icon: 'images/baseline-warning-yellow.svg'
+          };
+        } else {
+          console.info('notification: ' + this.message);
+          indicator = {
+            size: 32,
+            backgroundColor: this.theme.approval3,
+            borderColor: this.theme.approval3,
+            icon: this.theme.glyphs.checkmark.getDataUrl({
+              fill: this.theme.white
+            })
+          };
+        }
       } else {
-        console.info('notification: ' + this.message);
         indicator = {
-          size: 18,
-          backgroundColor: this.theme.approval3,
-          borderColor: this.theme.approval3,
-          icon: this.theme.glyphs.checkmark.getDataUrl({
-            fill: this.theme.white
-          })
+          size: 32,
+          icon$: this.icon$
         };
       }
       this
         .addClass(this.myClass())
         .start().addClass(this.myClass('inner'))
-          .enableClass(this.myClass('error-background'), this.type == this.LogLevel.ERROR)
-          .enableClass(this.myClass('warning-background'), this.type == this.LogLevel.WARN)
-          .start('div').addClass(this.myClass('banner'))
-            .enableClass(this.myClass('error-banner'), this.type == this.LogLevel.ERROR)
-            .enableClass(this.myClass('warning-banner'), this.type == this.LogLevel.WARN)
-          .end()
           .start()
+            .addClass(this.myClass('outer-content'))
             .start(this.CircleIndicator, indicator)
               .addClass(this.myClass('status-icon'))
             .end()
             .start().addClass(this.myClass('content'))
-              .enableClass(this.myClass('error-content'), this.type == this.LogLevel.ERROR)
-              .enableClass(this.myClass('warning-content'), this.type == this.LogLevel.WARN)
-              .callIfElse(foam.String.isInstance(this.message), function() {
-                this.add(self.message);
-                console.log(self.message);
-              }, function() {
-                this.tag(self.message);
-                console.log(self.message);
-              })
-            .end()
-            .start().addClass(this.myClass('description'))
-              .enableClass(this.myClass('error-content'), this.type == this.LogLevel.ERROR)
-              .enableClass(this.myClass('warning-content'), this.type == this.LogLevel.WARN)
-              .callIfElse(foam.String.isInstance(this.description), function() {
-                this.add(self.description);
-                console.log(self.description);
-              }, function() {
-                this.tag(self.description);
-                console.log(self.description);
-              })
+              .start('h6').addClass(this.myClass('title'))
+                .callIfElse(foam.String.isInstance(this.message), function() {
+                  this.add(self.message);
+                  console.log(self.message);
+                }, function() {
+                  this.tag(self.message);
+                  console.log(self.message);
+                })
+              .end()
+              .start('p').addClass(this.myClass('description'))
+                .callIfElse(foam.String.isInstance(this.description), function() {
+                  this.add(self.description);
+                  console.log(self.description);
+                }, function() {
+                  this.tag(self.description);
+                  console.log(self.description);
+                })
+              .end()
             .end()
           .end()
           .startContext({ data: this })
             .start()
-              .addClass(this.myClass('link-icon'))
-              .start()
                 .addClass(this.myClass('close-icon'))
-                .on('click', () => this.remove())
-              .end()
+                .tag(self.REMOVE_NOTIFICATION, { buttonStyle: 'LINK', label: '' })
             .end()
           .endContext()
         .end();
@@ -235,6 +199,13 @@ foam.CLASS({
       setTimeout(() => {
         this.remove();
       }, 9900);
+    }
+  ],
+
+  actions: [
+    {
+      name: 'removeNotification',
+      code: function() { this.remove(); }
     }
   ]
 });

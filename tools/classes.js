@@ -740,6 +740,7 @@ var classes = [
   'foam.nanos.dig.exception.ExternalAPIException',
   'foam.nanos.dig.exception.EmptyParameterException',
   'foam.nanos.dig.exception.GeneralException',
+  'foam.nanos.dig.exception.TemporaryExternalAPIException',
 
   'foam.nanos.app.SupportConfig',
 

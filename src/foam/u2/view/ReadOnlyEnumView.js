@@ -14,10 +14,9 @@ foam.CLASS({
   imports: ['returnExpandedCSS', 'theme'],
 
   css: `
-    ^{
+    ^pill{
       border-radius: 11.2px;
       border: 1px solid;
-      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 10px;
       font-weight: 500;
       letter-spacing: normal;
@@ -51,14 +50,16 @@ foam.CLASS({
       this.SUPER();
       var color = this.returnExpandedCSS(this.data.color);
       var background = this.returnExpandedCSS(this.data.background);
+      var isPill = this.isFancy(this.data.VALUES);
       this
+        .enableClass(this.myClass('pill'), isPill)
         .addClass(this.myClass())
         .style({
           'background-color': background,
           'color': color,
-          'border-color': background != '#FFFFFF' || background ? background : color
+          'border-color': background == '#FFFFFF' || ! background ? color : background
         })
-        .callIf(this.showGlyph && data.glyph, () =>{
+        .callIf(this.showGlyph && data.glyph, () => {
           var icon = {
             size: 14,
             backgroundColor: color,
@@ -68,9 +69,18 @@ foam.CLASS({
           };
           this.start(this.CircleIndicator, icon).addClass(this.myClass('icon')).end();
         })
-        .start()
-          .add(data.label)
-        .end();
+        .callIfElse(isPill,
+          () => { this.start().add(data.label).end(); },
+          () => { this.start('p').add(data.label).end(); }
+        );
+    },
+    {
+      name: 'isFancy',
+      code: foam.Function.memoize1(function(values) {
+        for ( value of values ) {
+          if ( value.color || value.background ) { return true; }
+        }
+      })
     }
   ]
 });

@@ -103,9 +103,14 @@ foam.CLASS({
         modelString = modelString.replace('local', '');
         modelString = modelString.replace('DAO', '');
 
-        return `(${modelString}:${this.objId}) UPDATE`;
+        return this.__subContext__[this.daoKey].find(this.objId).then(obj => {
+          return obj 
+            ? `${modelString}: ${obj.toSummary()}`
+            :  `(${modelString}:${this.objId}) UPDATE`
+        });
       },
       javaCode: `
+        // TODO: update after crunch time
         if ( foam.util.SafetyUtil.isEmpty(getDaoKey()) || getObjId() == null )
           return "";
         String modelString = getDaoKey().replace("local", "").replace("DAO", "");

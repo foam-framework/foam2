@@ -41,7 +41,7 @@ foam.CLASS({
       class: 'String',
       transient: true,
       hidden: true,
-      getter: function() {
+      factory: function() {
         var s = this.sourceModel;
         var t = this.targetModel;
         return s.substring(s.lastIndexOf('.') + 1) +
@@ -73,14 +73,20 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'junctionModel',
-      expression: function(sourceModel, targetModel) {
-        var source = sourceModel.substring(sourceModel.lastIndexOf('.') + 1);
-        var target = targetModel.substring(targetModel.lastIndexOf('.') + 1);
+      name: 'junctionName',
+      factory: function() {
+        var source = this.sourceModel.substring(this.sourceModel.lastIndexOf('.') + 1);
+        var target = this.targetModel.substring(this.targetModel.lastIndexOf('.') + 1);
 
-        return (this.package ? this.package + '.' : '') +
-          source + target + 'Junction';
-    }
+        return  source + target + 'Junction';
+      }
+    },
+    {
+      class: 'String',
+      name: 'junctionModel',
+      expression: function(junctionName) {
+        return (this.package ? this.package + '.' : '') + junctionName;
+      }
     },
     {
       class: 'String',

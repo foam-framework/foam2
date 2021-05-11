@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'com.foamdev.demos.maze',
+  package: 'foam.demos.maze',
   name: 'Robot',
   extends: 'foam.graphics.CView',
 
@@ -109,7 +109,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.foamdev.demos.maze',
+  package: 'foam.demos.maze',
   name: 'Question1',
   label: 'Question',
   properties: [
@@ -136,7 +136,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.foamdev.demos.maze',
+  package: 'foam.demos.maze',
   name: 'Question2',
   label: 'Question',
   properties: [
@@ -163,7 +163,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.foamdev.demos.maze',
+  package: 'foam.demos.maze',
   name: 'Question3',
   label: 'Question',
   properties: [
@@ -190,7 +190,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.foamdev.demos.maze',
+  package: 'foam.demos.maze',
   name: 'Question4',
   label: 'Question',
   properties: [
@@ -215,7 +215,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.foamdev.demos.maze',
+  package: 'foam.demos.maze',
   name: 'Question5',
   label: 'Question',
   properties: [
@@ -242,7 +242,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.foamdev.demos.maze',
+  package: 'foam.demos.maze',
   name: 'Question6',
   label: 'Question',
   properties: [
@@ -269,7 +269,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.foamdev.demos.maze',
+  package: 'foam.demos.maze',
   name: 'Question7',
   label: 'Question',
   properties: [
@@ -296,7 +296,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.foamdev.demos.maze',
+  package: 'foam.demos.maze',
   name: 'Question8',
   label: 'Question',
   properties: [
@@ -323,7 +323,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.foamdev.demos.maze',
+  package: 'foam.demos.maze',
   name: 'Question9',
   label: 'Question',
   properties: [
@@ -350,7 +350,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.foamdev.demos.maze',
+  package: 'foam.demos.maze',
   name: 'Door',
   extends: 'foam.graphics.Box',
 
@@ -406,7 +406,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.foamdev.demos.maze',
+  package: 'foam.demos.maze',
   name: 'Wall',
   extends: 'foam.graphics.Box',
   properties: [
@@ -416,7 +416,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.foamdev.demos.maze',
+  package: 'foam.demos.maze',
   name: 'Exit',
   extends: 'foam.graphics.Box',
   properties: [
@@ -426,7 +426,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.foamdev.demos.maze',
+  package: 'foam.demos.maze',
   name: 'Bullet',
   extends: 'foam.graphics.Circle',
 
@@ -461,27 +461,27 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.foamdev.demos.maze',
+  package: 'foam.demos.maze',
   name: 'Game',
   extends: 'foam.u2.Element',
 
   documentation: 'Javascript quiz canvas game.',
 
   requires: [
-    'com.foamdev.demos.maze.Door',
-    'com.foamdev.demos.maze.Exit',
-    'com.foamdev.demos.maze.Bullet',
-    'com.foamdev.demos.maze.Question1',
-    'com.foamdev.demos.maze.Question2',
-    'com.foamdev.demos.maze.Question3',
-    'com.foamdev.demos.maze.Question4',
-    'com.foamdev.demos.maze.Question5',
-    'com.foamdev.demos.maze.Question6',
-    'com.foamdev.demos.maze.Question7',
-    'com.foamdev.demos.maze.Question8',
-    'com.foamdev.demos.maze.Question9',
-    'com.foamdev.demos.maze.Robot',
-    'com.foamdev.demos.maze.Wall',
+    'foam.demos.maze.Door',
+    'foam.demos.maze.Exit',
+    'foam.demos.maze.Bullet',
+    'foam.demos.maze.Question1',
+    'foam.demos.maze.Question2',
+    'foam.demos.maze.Question3',
+    'foam.demos.maze.Question4',
+    'foam.demos.maze.Question5',
+    'foam.demos.maze.Question6',
+    'foam.demos.maze.Question7',
+    'foam.demos.maze.Question8',
+    'foam.demos.maze.Question9',
+    'foam.demos.maze.Robot',
+    'foam.demos.maze.Wall',
     'foam.animation.Animation',
     'foam.audio.Speak',
     'foam.graphics.Box',

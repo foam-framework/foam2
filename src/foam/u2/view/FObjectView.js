@@ -210,11 +210,11 @@ foam.CLASS({
         return d ? d.cls_.id : '';
       }
 
-      var classToData = function(c) {
+      var classToData = (c) => {
         if ( ! c ) return undefined;
         var m = c && this.__context__.lookup(c, true);
         return m.create(this.data ? this.copyOldData(this.data) : null, this);
-      }.bind(this);
+      };
 
       this.dataWasProvided_ = !! this.data;
 

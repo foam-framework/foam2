@@ -122,6 +122,37 @@ foam.CLASS({
         E.g., [3, '.', 3, '.', 3, '.', 3]
       `
     }
+  ],
+
+  methods: [
+    // create an extra property: formatted${propname} used to access
+    // a formatted version of this string
+    function installInClass(cls) {
+      this.SUPER(cls);
+      var capitalized = foam.String.capitalize(this.name);
+      var constantize = foam.String.constantize(this.name);
+      var prop = foam.core.String.create({
+        forClass_: cls.id,
+        sourceCls_: cls,
+        name: 'formatted' + capitalized,
+        hidden: true,
+        javaSetter: ``,
+        javaGetter: `return Formatted${capitalized}Factory_();`,
+        javaFactory: `
+          try {
+            java.lang.reflect.Method method = ${cls.name}.${constantize}.getClass().getMethod("getFormatted", Object.class);
+            this.formatted${capitalized}_ = (String) method.invoke(${cls.name}.${constantize}, (Object) this);
+            this.formatted${capitalized}IsSet_ = true;
+            return this.formatted${capitalized}_;
+          } 
+          catch (NoSuchMethodException e) { }
+          catch (IllegalAccessException e) { }
+          catch (java.lang.reflect.InvocationTargetException e) { }
+          return null;
+        `
+      });
+      cls.axiomMap_[prop.name] = prop;
+    }
   ]
 });
 

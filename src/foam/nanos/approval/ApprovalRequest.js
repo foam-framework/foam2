@@ -59,11 +59,9 @@
 
   tableColumns: [
     'id',
-    'description',
+    'referenceSummary',
     'classificationEnum',
-    'objId',
     'createdFor',
-    'approver.legalName',
     'assignedTo.legalName',
     'status',
     'memo'
@@ -152,7 +150,7 @@
       order: 21,
       gridColumns: 6,
       transient: true,
-      tableWidth: 200,
+      tableWidth: 250,
       visibility: 'RO',
       tableCellFormatter: function(_,obj) {
         let self = this;
@@ -366,11 +364,7 @@
       order: 90,
       gridColumns: 6,
       includeInDigest: true,
-      tableWidth: 450,
-      view: { class: 'foam.u2.EnumView' },
-      tableCellFormatter: function(value, obj) {
-        this.add(value.label);
-      }
+      tableWidth: 450
     },
     {
       class: 'DateTime',

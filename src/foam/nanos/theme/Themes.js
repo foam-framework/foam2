@@ -100,6 +100,7 @@ Later themes:
               theme = theme && theme.copyFrom(groupTheme) || groupTheme;
               if ( !! group.defaultMenu ) {
                 theme.defaultMenu = group.defaultMenu;
+                theme.logoRedirect = group.defaultMenu;
               }
               break;
             }
@@ -197,6 +198,7 @@ Later themes:
             theme = (Theme) theme.fclone().copyFrom(groupTheme);
             if ( ! SafetyUtil.isEmpty(group.getDefaultMenu()) ) {
               theme.setDefaultMenu(group.getDefaultMenu());
+              theme.setLogoRedirect(group.getDefaultMenu());
             }
             break;
           }

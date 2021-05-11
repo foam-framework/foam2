@@ -56,7 +56,7 @@ foam.CLASS({
       view: {
         class: 'foam.u2.MultiView',
         views: [
-          { class: 'foam.u2.HTMLView' },
+          { class: 'foam.u2.IFrameHTMLView' },
           { class: 'foam.u2.tag.TextArea', rows: 40, cols: 150}
         ]
       }

@@ -70,6 +70,7 @@ foam.CLASS({
     },
 
     function installInClass(cls) {
+      this.model.package = cls.id;
       cls[this.model.name] = this.model.buildClass();
       // TODO: the inner-class name doesn't include the outer class name,
       // which is why we need to add it. But this also breaks CSS, so that
@@ -80,7 +81,7 @@ foam.CLASS({
     function installInProto(proto) {
       // get class already created in installInClass();
       var name = this.model.name;
-      var cls = proto.cls_[name];
+      var cls  = proto.cls_[name];
 
       // Create a private_ clone of the Class with the create() method decorated
       // to pass 'this' as the context if not explicitly provided.  This ensures

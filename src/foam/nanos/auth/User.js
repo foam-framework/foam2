@@ -485,6 +485,9 @@ foam.CLASS({
             }
           }
         };
+      },
+      tableCellFormatter: function(val) {
+        this.translate(`${val}.label`, val);
       }
     },
     {
