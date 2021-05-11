@@ -173,7 +173,8 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       tableWidth: 140,
-      storageTransient: true
+      storageTransient: true,
+      storageOptional: true
     },
     {
       class: 'Duration',
@@ -182,7 +183,8 @@ foam.CLASS({
       createVisibility: 'HIDDEN',
       updateVisibility: 'RO',
       tableWidth: 125,
-      storageTransient: true
+      storageTransient: true,
+      storageOptional: true
     },
     {
       class: 'Enum',
@@ -215,7 +217,8 @@ foam.CLASS({
       value: 'UNSCHEDULED',
       javaValue: 'ScriptStatus.UNSCHEDULED',
       tableWidth: 120,
-      storageTransient: true
+      storageTransient: true,
+      storageOptional: true
     },
     {
       class: 'Code',

@@ -17,6 +17,8 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.dao.DOP',
+    'foam.nanos.alarming.Alarm',
+    'foam.nanos.alarming.AlarmReason',
     'foam.nanos.logger.PrefixLogger',
     'foam.nanos.logger.Logger',
     'foam.nanos.pm.PM'
@@ -141,6 +143,7 @@ foam.CLASS({
       int retryDelay = 10;
 
       PM pm = PM.create(x, getClass().getSimpleName(), getName(), dop);
+      Alarm alarm = null;
       try {
         while ( true ) {
           try {
@@ -153,22 +156,22 @@ foam.CLASS({
             } else {
               throw new UnsupportedOperationException("Unknown operation: "+dop);
             }
-          } catch ( RuntimeException e ) {
+          } catch ( ClusterException | MedusaException e ) {
             getLogger().debug("submit", e.getMessage());
             pm.error(x, e);
             throw e;
           } catch ( Throwable t ) {
-            // getLogger().error(t.getMessage(), t);
-            getLogger().error(t.getMessage());
+            getLogger().warning(t.getMessage());
 
             if ( getMaxRetryAttempts() > -1 &&
                  retryAttempt >= getMaxRetryAttempts() ) {
               getLogger().warning("retryAttempt >= maxRetryAttempts", retryAttempt, getMaxRetryAttempts());
-
-              // TODO: Alarm
+              if ( alarm == null ) {
+                alarm = new Alarm(this.getClass().getSimpleName()+"."+getName(), AlarmReason.TIMEOUT);
+               ((DAO) x.get("alarmDAO")).put_(x, alarm);
+              }
               pm.error(x, "Retry limit reached.", t);
               throw new RuntimeException("Rejected, retry limit reached.", t);
-              //break;
             }
             retryAttempt += 1;
 
@@ -184,8 +187,11 @@ foam.CLASS({
               Thread.currentThread().interrupt();
               pm.error(x, t);
               throw t;
-              // break;
             }
+          }
+          if ( alarm != null ) {
+            alarm.setIsActive(false);
+            ((DAO) x.get("alarmDAO")).put_(x, alarm);
           }
         }
       } finally {
