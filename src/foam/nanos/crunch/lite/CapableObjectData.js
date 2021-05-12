@@ -14,12 +14,14 @@ foam.CLASS({
       class: 'FObjectArray',
       // javaType: 'java.util.List<foam.nanos.crunch.crunchlite.CapablePayload>',
       of: 'foam.nanos.crunch.CapabilityJunctionPayload',
+      columnPermissionRequired: true,
       section: 'capabilityInformation',
       autoValidate: true
     },
     {
       name: 'userCapabilityRequirements',
       class: 'StringArray',
+      columnPermissionRequired: true,
       section: 'capabilityInformation'
     },
     {
@@ -32,12 +34,14 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'capabilityIds',
+      columnPermissionRequired: true,
       section: 'capabilityInformation',
       visibility: 'HIDDEN'
     },
     {
       class: 'String',
       name: 'DAOKey',
+      columnPermissionRequired: true,
       section: 'capabilityInformation',
       visibility: 'HIDDEN'
     }
