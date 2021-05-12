@@ -89,16 +89,6 @@ foam.CLASS({
     },
     {
       name: 'allColumns',
-      expression: function(of) {
-        return ! of ? [] : [].concat(
-          of.getAxiomsByClass(foam.core.Property)
-            .filter(p => ! p.hidden )
-            .filter(p => ! p.columnHidden )
-            .map(a => a.name),
-          of.getAxiomsByClass(foam.core.Action)
-            .map(a => a.name)
-        );
-      }
     },
     {
       name: 'selectedColumnNames',
@@ -319,6 +309,13 @@ foam.CLASS({
       var view = this;
 
       this.currentMemento_ = null;
+
+      const asyncRes = await this.filterUnpermited(view.of.getAxiomsByClass(foam.core.Property));
+      this.allColumns = ! view.of ? [] : [].concat(
+        asyncRes.map(a => a.name),
+        view.of.getAxiomsByClass(foam.core.Action)
+        .map(a => a.name)
+      );
 
       this.columns$.sub(this.updateColumns_);
       this.of$.sub(this.updateColumns_);
@@ -725,6 +722,10 @@ foam.CLASS({
       },
       function returnMementoColumnNameDisregardSorting(c) {
         return c && this.shouldColumnBeSorted(c) ? c.substr(0, c.length - 1) : c;
+      },
+      async function filterUnpermited(arr) {
+        const results = await Promise.all(arr.map( async p => p.hidden? false: ! p.columnPermissionRequired || await this.auth.check(null, `${this.of.name}.column.${p.name}`)));
+        return arr.filter((_v, index) => results[index]);
       },
       {
         name: 'getActionsForRow',
