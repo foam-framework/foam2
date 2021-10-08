@@ -10,7 +10,7 @@ foam.CLASS({
   extends: 'com.foamdev.demos.extendsDemo.HelloView',
 
 //   imports: [
-//     'helloUser111'
+//     'propFromController'
 //   ],
 
   methods: [
