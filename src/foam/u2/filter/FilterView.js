@@ -48,28 +48,31 @@ foam.CLASS({
     }
 
     ^container-drawer {
-      max-height: 0;
-      overflow: hidden;
-
-      transition: all 0.24s linear;
-
-      display: flex;
-
       border: 1px solid transparent;
       border-radius: 5px;
+      display: flex;
+      max-height: 0;
+      overflow: hidden;
+      transition: all 0.24s linear;
+      -webkit-transition: all 0.24s linear;
+      -moz-transition: all 0.24s linear;
     }
 
     ^container-drawer-open {
+      align-items: center;
       border-color: #cbcfd4;
       margin-top: 24px;
-      max-height: 500px;
+      max-height: -webkit-fill-available;
+      max-height:-moz-available;
+      overflow: auto;
+      padding: 24px;
     }
 
     ^container-filters {
-      display: flex;
-      flex: 1;
-      flex-wrap: wrap;
-      align-items: center;
+      display: grid;
+      grid-gap: 24px 16px;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      width: 100%;
     }
 
     ^general-field {
@@ -143,14 +146,14 @@ foam.CLASS({
     }
 
     ^link-mode.clear {
-      color: red;
-      margin: 24px 16px;
+      align-self: center;
+      color: /*%DESTRUCTIVE3%*/ red;
       flex-shrink: 0;
-      align-self: flex-start;
+      margin-right: 0;
     }
 
     ^link-mode.clear:hover {
-      color: darkred;
+      color: /*%DESTRUCTIVE1%*/ darkred;
     }
 
     ^message-advanced {
@@ -289,7 +292,9 @@ foam.CLASS({
       var self = this;
 
       var counter = 0;
-      this.updateCurrentMemento(counter);
+      counter = this.updateCurrentMementoAndReturnCounter(counter);
+
+      counter = this.filters.length;
       //memento which will be exported to table view
       if ( self.currentMemento_ ) self.currentMemento_ = self.currentMemento_.tail;
       
@@ -298,7 +303,7 @@ foam.CLASS({
       this.addClass(self.myClass())
         .add(this.slot(function(filters) {
 
-          self.updateCurrentMemento.bind(self)(counter);
+          counter = self.updateCurrentMementoAndReturnCounter.call(self, counter);
 
           self.generalSearchField = foam.u2.ViewSpec.createView(self.TextSearchView, {
             richSearch: true,
@@ -471,7 +476,7 @@ foam.CLASS({
       }
     },
 
-    function updateCurrentMemento(counter) {
+    function updateCurrentMementoAndReturnCounter() {
       if ( this.memento ) {
         var m = this.memento;
         //i + 1 as there is a textSearch that we also need for memento
@@ -490,7 +495,7 @@ foam.CLASS({
 
       if ( this.currentMemento_ && this.currentMemento_.tail ) {
         var m = this.memento;
-        counter = 0;
+        var counter = 0;
 
         while ( counter < this.filters.length &&  m != null ) {
           m = m.tail;
@@ -501,6 +506,7 @@ foam.CLASS({
             continue;
         }
       }
+      return counter;
     }
   ]
 });

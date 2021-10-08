@@ -16,15 +16,17 @@ foam.CLASS({
   css: `
     ^:disabled {
       appearance: none;
-      -moz-appearance:none;
-      -webkit-appearance:none;
+      -moz-appearance: none;
+      -webkit-appearance: none;
       border: none;
       background: rgba(0,0,0,0);
       color: initial;
     }
     ^ {
-      padding-bottom: 0;
-      padding-top: 0 ;
+      padding: 0 !important;
+    }
+    ^ option {
+      padding: 4px;
     }
   `,
 
@@ -56,7 +58,7 @@ foam.CLASS({
 
       this
         .addClass(this.myClass())
-        .attrs({ size: this.size$ })
+        .attrs({size: this.size$})
         .attrSlot().linkFrom(this.data$);
 
       if ( this.size ) this.style({height: 'auto'});
@@ -98,8 +100,9 @@ foam.CLASS({
     },
 
     function updateMode_(mode) {
-      var disabled = mode === foam.u2.DisplayMode.DISABLED ||
-          mode === foam.u2.DisplayMode.RO;
+      var disabled =
+        mode === foam.u2.DisplayMode.DISABLED ||
+        mode === foam.u2.DisplayMode.RO;
       this.setAttribute('disabled', disabled);
     }
   ]

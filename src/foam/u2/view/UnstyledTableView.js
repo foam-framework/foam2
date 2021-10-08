@@ -19,7 +19,7 @@ foam.CLASS({
     'foam.nanos.column.ColumnConfigToPropertyConverter',
     'foam.nanos.column.CommonColumnHandler',
     'foam.nanos.column.TableColumnOutputter',
-    'foam.u2.md.CheckBox',
+    'foam.u2.CheckBox',
     'foam.u2.md.OverlayDropdown',
     'foam.u2.tag.Image',
     'foam.u2.view.EditColumnsView',
@@ -265,6 +265,11 @@ foam.CLASS({
     {
       name: 'subStack',
       factory: function() {
+        // we export NoBackStack from table view,
+        // so that actions which have stack.back worked just fine from DAOSummaryView
+        // but had no effect on stack if the acction is called from context menu.
+        // so if such an action is called from DAOSummaryView we go back to TableView
+        // but if such an action is called from TableView we stay on the TableView screen
         return foam.nanos.approval.NoBackStack.create({delegate: this.stack});
       },
     },
@@ -325,9 +330,24 @@ foam.CLASS({
 
       //set memento's selected columns
       if ( this.memento ) {
-        this.memento.head = this.columns_.map(c => {
-          return this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c);
-        }).join(',');
+        if ( this.memento.head.length != 0 ) {
+          var columns = this.memento.head.split(',');
+          for ( var c of columns ) {
+            if ( this.shouldColumnBeSorted(c) && ! c.includes('.')) {
+              var prop = view.props.find(p => p.fullPropertyName === c.substr(0, c.length - 1) );
+              if ( prop ) {
+                if ( c[c.length - 1] === this.DESCENDING_ORDER_CHAR )
+                  this.order = this.DESC(prop.property);
+                else
+                  this.order = prop.property;
+              }
+            }
+          }
+        } else {
+          this.memento.head = this.columns_.map(c => {
+            return this.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(c);
+          }).join(',');
+        }
       }
 
       //otherwise on adding new column creating new EditColumnsView, which is closed by default
@@ -473,7 +493,7 @@ foam.CLASS({
     },
     {
       name: 'rowsFrom',
-      code: function(dao) {
+      code: function(dao, top) {
         /**
          * Given a DAO, add a tbody containing the data from the DAO to the
          * table and return a reference to the tbody.
@@ -488,14 +508,6 @@ foam.CLASS({
           var view = this;
           view.props = this.returnPropertiesForColumns(view, view.columns_);
 
-          var actions = {};
-          var actionsMerger = action => { actions[action.name] = action; };
-
-          // Model actions
-          view.of.getAxiomsByClass(foam.core.Action).forEach(actionsMerger);
-          // Context menu actions
-          view.contextMenuActions.forEach(actionsMerger);
-
           // with this code error created slot.get cause promise return
           // FIX ME
           var slot = this.slot(function(data, data$delegate, order, updateValues) {
@@ -503,7 +515,7 @@ foam.CLASS({
             // on a table column header to sort by that column.
             var proxy = view.ProxyDAO.create({ delegate: dao });
             if ( this.order ) proxy = proxy.orderBy(this.order);
-            
+
 
             var canObjBeBuildFromProjection = true;
 
@@ -523,7 +535,11 @@ foam.CLASS({
             var nastedPropertyNamesAndItsIndexes = view.columnHandler.buildArrayOfNestedPropertyNamesAndCorrespondingIndexesInArray(propertyNamesToQuery);
 
             var tbodyElement = this.E();
-            tbodyElement.
+            tbodyElement.style({
+                position: 'absolute',
+                width: '100%',
+                top: top + 'px'
+              }).
               addClass(view.myClass('tbody'));
               valPromises.then(function(values) {
 
@@ -669,7 +685,7 @@ foam.CLASS({
                   }
 
                   // Object actions
-                  obj.cls_.getOwnAxiomsByClass(foam.core.Action).forEach(actionsMerger);
+                  var actions = view.getActionsForRow(obj);
                   tableRowElement
                     .start()
                       .addClass(view.myClass('td')).
@@ -687,22 +703,6 @@ foam.CLASS({
 
               return tbodyElement;
             });
-
-            if ( this.memento && this.memento.head.length != 0 ) {
-              var columns = this.memento.head.split(',');
-              for ( var c of columns ) {
-                if ( this.shouldColumnBeSorted(c) && ! c.includes('.')) {
-                  var prop = view.props.find(p => p.fullPropertyName === c.substr(0, c.length - 1) );
-                  if ( prop ) {
-                    if ( c[c.length - 1] === this.DESCENDING_ORDER_CHAR )
-                      this.order = this.DESC(prop.property);
-                    else
-                      this.order = prop.property;
-                    dao = dao.orderBy(this.order);
-                  }
-                }
-              }
-            }
           return slot;
         }
       },
@@ -725,6 +725,23 @@ foam.CLASS({
       },
       function returnMementoColumnNameDisregardSorting(c) {
         return c && this.shouldColumnBeSorted(c) ? c.substr(0, c.length - 1) : c;
+      },
+      function returnMementoColumnNameDisregardSorting(c) {
+        return c && this.shouldColumnBeSorted(c) ? c.substr(0, c.length - 1) : c;
+      },
+      {
+        name: 'getActionsForRow',
+        code: function(obj) {
+          var actions = {};
+          var actionsMerger = action => { actions[action.name] = action; };
+
+          // Model actions
+          obj.cls_.getAxiomsByClass(foam.core.Action).forEach(actionsMerger);
+          // Context menu actions
+          this.contextMenuActions.forEach(actionsMerger);
+
+          return actions;
+        }
       }
   ]
 });

@@ -32,6 +32,7 @@
     ^ {
       overflow: auto;
       padding-bottom: 20px;
+      height: 100%;
     }
     ^table {
       position: relative;
@@ -257,7 +258,7 @@
             config$: this.config$,
             of: this.data.of
           }, this.__subContext__.createSubContext({ memento: this.table_.memento }));
-        } else {
+        } else if ( this.table_.memento.tail.tail && this.table_.memento.tail.tail.head ) {
           var id = this.table_.memento.tail.tail.head;
           if ( ! foam.core.MultiPartID.isInstance(this.data.of.ID) ) {
             id = this.data.of.ID.fromString(id);
@@ -347,12 +348,7 @@
           var page = this.currentTopPage_ + i;
           if ( this.renderedPages_[page] ) continue;
           var dao = this.data$proxy.limit(this.pageSize).skip(page * this.pageSize);
-          var tbody = this.table_.slotE_(this.table_.rowsFrom(dao));
-          tbody.style({
-            position: 'absolute',
-            width: '100%',
-            top: this.TABLE_HEAD_HEIGHT + page * this.pageSize * this.rowHeight + 'px'
-          });
+          var tbody = this.table_.slotE_(this.table_.rowsFrom(dao, this.TABLE_HEAD_HEIGHT + page * this.pageSize * this.rowHeight));
           this.table_.add(tbody);
           this.renderedPages_[page] = tbody;
         }

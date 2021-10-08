@@ -87,7 +87,7 @@ foam.CLASS({
         int numberPending = 0;
 
         // Get list of prerequisite capability ids
-        List<String> prereqCapabilityIds = crunchService.getPrereqs(getId());
+        List<String> prereqCapabilityIds = crunchService.getPrereqs(x, getId(), ucj);
 
         // this is under the assumption that minmaxCapabilities should always have prerequisites
         // and that min is never less than 1
@@ -145,7 +145,7 @@ foam.CLASS({
         boolean shouldReopenTopLevel = shouldReopenUserCapabilityJunction(ucj);
         if ( shouldReopenTopLevel ) return true;
 
-        var prereqs = crunchService.getPrereqs(getId());
+        var prereqs = crunchService.getPrereqs(x, getId(), ucj);
         if ( prereqs == null || prereqs.size() == 0 ) return false;
 
         int numberGrantedNotReopenable = 0;
@@ -193,7 +193,7 @@ foam.CLASS({
       type: 'FObject',
       javaCode: `
         var crunchService = (CrunchService) x.get("crunchService");
-        List<String> ids = crunchService.getPrereqs(getId());
+        List<String> ids = crunchService.getPrereqs(x, getId(), ucj);
         var ucjDAO = (DAO) x.get("userCapabilityJunctionDAO");
 
         List<UserCapabilityJunction> ucjs = ((ArraySink) ucjDAO

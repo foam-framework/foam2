@@ -47,6 +47,7 @@ foam.CLASS({
 
     ^badge > * {
       border-radius: 0px 11.2px 11.2px 0px !important;
+      border-style: none !important;
       height: 24px;
       width: 79px;
     }
@@ -118,7 +119,7 @@ foam.CLASS({
             return this.E()
               .start('', { tooltip: cjStatus.documentation })
                 .addClass(this.myClass('badge'))
-                .add(foam.u2.view.ReadOnlyEnumView.create({ data: cjStatus }))
+                .add(this.ReadOnlyEnumView.create({ data: cjStatus, showGlyph: true }))
               .end();
           }))
           .add(this.slot(function(isRenewable) {
@@ -151,30 +152,9 @@ foam.CLASS({
               isRenewable => this.isRenewable = isRenewable
             );
           }
-          if ( this.cjStatus === this.CapabilityJunctionStatus.ACTION_REQUIRED ) {
-            this.auth.check(this.ctrl.__subContext__, 'certifydatareviewed.rw.reviewed').then(result => {
-              if ( ! result &&
-                ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-49' ||
-                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-13' ||
-                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-12' ||
-                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-11'
-                ) ) {
-                this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
-              }
-            }).catch(err => {
-              if ( err.data && err.data.id === 'foam.nanos.crunch.CapabilityIntercept' &&
-                ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-49' ||
-                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-13' ||
-                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-12' ||
-                  ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-11'
-                ) ) {
-                this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
-              } else throw err;
-            });
-
-            if ( ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-20' ) {
+          if ( this.cjStatus === this.CapabilityJunctionStatus.ACTION_REQUIRED &&
+               ucj.targetId == '554af38a-8225-87c8-dfdf-eeb15f71215f-20' ) {
               this.cjStatus = this.CapabilityJunctionStatus.PENDING_REVIEW;
-            }
           }
         });
       }
@@ -182,7 +162,7 @@ foam.CLASS({
     {
       name: 'statusUpdate',
       isMerged: true,
-      mergeDelay: 100,
+      mergeDelay: 2000,
       code: function() {
         if ( this.cjStatus != this.CapabilityJunctionStatus.PENDING &&
               this.cjStatus != this.CapabilityJunctionStatus.PENDING_REVIEW ) {
@@ -193,6 +173,9 @@ foam.CLASS({
             this.auth.cache = {};
             this.crunchService.pub('grantedJunction');
             this.cjStatus = this.CapabilityJunctionStatus.GRANTED;
+          }
+          else if ( ucj && ucj.status === this.CapabilityJunctionStatus.ACTION_REQUIRED ) {
+            this.crunchService.pub('grantedJunction');
           } else {
             this.statusUpdate();
           }

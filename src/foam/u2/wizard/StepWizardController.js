@@ -149,6 +149,8 @@ foam.CLASS({
       if ( this.wsub ) this.wsub.detach();
       this.wsub = this.FObject.create();
 
+      this.onWizardletValidity();
+
       var wi = 0, si = 0;
       wizardlets.forEach((w, wizardletIndex) => {
 
@@ -174,7 +176,7 @@ foam.CLASS({
         // Bind validity listener for wizardlet validity
         var isValid$ = w.isValid$;
         this.wsub.onDetach(isValid$.sub(() => {
-          this.onWizardletValidity(wizardletIndex, isValid$.get());
+          this.onWizardletValidity();
         }));
 
       });
@@ -315,7 +317,7 @@ foam.CLASS({
         sectionIndex: this.wizardPosition.sectionIndex,
       });
     },
-    function onWizardletValidity(wizardletIndex, value) {
+    function onWizardletValidity() {
       this.allValid = this.wizardlets.filter(w => ! w.isValid).length == 0;
     },
     function onSectionAvailability(sectionPosition, value) {

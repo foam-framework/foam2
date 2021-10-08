@@ -48,6 +48,7 @@ foam.CLASS({
     'foam.u2.Tab',
     'foam.u2.crunch.lab.CapabilityGraphNodeView',
     'foam.u2.detail.SectionedDetailPropertyView',
+    'foam.u2.view.RichChoiceSummaryIdRowView',
     'foam.u2.svg.TreeGraph',
     'foam.u2.svg.graph.DAGView',
     'foam.u2.svg.map2d.IdPropertyPlacementPlanDecorator',
@@ -72,6 +73,7 @@ foam.CLASS({
           class: 'foam.u2.view.RichChoiceView',
           search: true,
           allowClearingSelection: true,
+          rowView: { class: 'foam.u2.view.RichChoiceSummaryIdRowView' },
           sections: [
             {
               heading: 'Users',
@@ -95,6 +97,7 @@ foam.CLASS({
           class: 'foam.u2.view.RichChoiceView',
           search: true,
           allowClearingSelection: true,
+          rowView: { class: 'foam.u2.view.RichChoiceSummaryIdRowView' },
           sections: [
             {
               heading: 'Users',
@@ -115,6 +118,7 @@ foam.CLASS({
           class: 'foam.u2.view.RichChoiceView',
           search: true,
           allowClearingSelection: true,
+          rowView: { class: 'foam.u2.view.RichChoiceSummaryIdRowView' },
           sections: [
             {
               heading: 'Capabilities',

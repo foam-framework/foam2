@@ -10,7 +10,7 @@ Build fully featured high performance apps in less time using FOAM.
 
 [http://foamdev.com](http://foamdev.com)
 
-[![Build Status](https://travis-ci.org/foam-framework/foam2.svg?branch=master)](https://travis-ci.org/foam-framework/foam2)
+[![Build Status](https://travis-ci.org/foam-framework/foam3.svg?branch=master)](https://travis-ci.org/foam-framework/foam3)
 
 ## Feature Oriented Active Modeller
 
@@ -52,11 +52,11 @@ tools by doing the following.
 
 The FOAM Application Controller allows you to access components of your foam 
 app by using the browser & displaying it as a GUI. 
-To access, run the following in the parent directory of foam2:
+To access, run the following in the parent directory of foam3:
 
 * Build java (see above)
 
-* Run foam2/./tools/nanos.sh
+* Run foam3/./tools/nanos.sh
 
 * Visit http://localhost:8080/src/foam/nanos/controller/index.html
 

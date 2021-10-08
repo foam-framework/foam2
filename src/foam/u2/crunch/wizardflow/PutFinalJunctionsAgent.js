@@ -38,7 +38,6 @@ foam.CLASS({
         filteredWizard => {
           return this.crunchService.updateJunction(null, filteredWizard.capability.id, null, null)
             .then((ucj) => {
-              this.crunchService.pub('updateJunction');
               return ucj;
             })
         }

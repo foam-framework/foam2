@@ -14,7 +14,7 @@ Let's dive right in.
 
      There are only four required tools for this tutorial. The following list includes links to locations where the required tools may be downloaded:
 
-     1. [FOAM framework](https://github.com/foam-framework/foam2.git)
+     1. [FOAM framework](https://github.com/foam-framework/foam3.git)
      2. [GIT GUI](https://www.sourcetreeapp.com/)
      3. [Python](https://www.python.org/downloads/) (Python is our recommended local web server)
      4. [Tutorial Companion File](../bundle.zip)
@@ -30,14 +30,14 @@ Let's dive right in.
      <font color="#555555" > POWERED</font></font></a>';
      {% endhighlight %}
 
-   The FOAM library is split across many files, but you only need to include this one JS file in your HTML document: `foam2/src/foam.js`.  
+   The FOAM library is split across many files, but you only need to include this one JS file in your HTML document: `foam3/src/foam.js`.  
 
 1. Create and save a new HTML file in your project directory called `$PROJECT/index.html` with the following contents:
 
      {% highlight html %}
      <html>
        <head>
-         <script src="foam2/src/foam.js"></script>
+         <script src="foam3/src/foam.js"></script>
          <script src="foam_powered.js"></script>
        </head>
        <body>

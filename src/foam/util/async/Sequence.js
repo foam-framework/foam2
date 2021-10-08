@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.util.async',
   name: 'Sequence',
+  extends: 'foam.core.Fluent',
 
   implements: [
     'foam.core.ContextAgent',
@@ -82,7 +83,7 @@ foam.CLASS({
     },
     function contains(name) {
       for ( let ca of this.contextAgentSpecs ) {
-        if ( name == ca.name ) {
+        if ( name == ca.name && ca.spec !== this.NullAgent ) {
           return true;
         }
       }

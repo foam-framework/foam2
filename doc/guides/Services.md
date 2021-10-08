@@ -3,7 +3,7 @@
 ### Server
 1. Create foam.Interface for Service
 
-Eg: https://github.com/foam-framework/foam2/blob/master/src/foam/nanos/auth/AuthService.js
+Eg: https://github.com/foam-framework/foam3/blob/master/src/foam/nanos/auth/AuthService.js
 
 
 If you method is returning some value to the client, make sure to include
@@ -32,7 +32,7 @@ var skeletons = [
 
 ### CLIENT SIDE
 4. Create stub for Service on the client side
-Eg: https://github.com/foam-framework/foam2/blob/master/src/foam/nanos/auth/ClientAuthService.js
+Eg: https://github.com/foam-framework/foam3/blob/master/src/foam/nanos/auth/ClientAuthService.js
 
 5. Add Service to foam.nano.client.Client.js
 Eg:

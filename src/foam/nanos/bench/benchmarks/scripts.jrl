@@ -5,37 +5,60 @@ p({
 	"code": `
 		import foam.nanos.bench.*;
 		import foam.nanos.bench.benchmarks.*;
-    import foam.nanos.ruler.Operations;
+    import foam.nanos.dao.Operation;
 
 		x = x.put("pmLogger", null);
 		authorizer = new foam.nanos.auth.StandardAuthorizer("user");
-		b = new AuthorizerBenchmark(authorizer, 100, Operations.READ);
+		b = new AuthorizerBenchmark(x, authorizer, 100, Operation.READ);
 		builder = new BenchmarkRunner.Builder(x)
 			.setInvocationCount(1)
 			.setBenchmark(b)
 			.build();
 		builder.execute(x);
 
-		b = new AuthorizerBenchmark(authorizer, 100, Operations.UPDATE);
+		b = new AuthorizerBenchmark(x, authorizer, 100, Operation.UPDATE);
 		builder = new BenchmarkRunner.Builder(x)
 			.setInvocationCount(1)
 			.setBenchmark(b)
 			.build();
 		builder.execute(x);
 
-		b = new AuthorizerBenchmark(authorizer, 100, Operations.CREATE);
+		b = new AuthorizerBenchmark(x, authorizer, 100, Operation.CREATE);
 		builder = new BenchmarkRunner.Builder(x)
 			.setInvocationCount(1)
 			.setBenchmark(b)
 			.build();
 		builder.execute(x);
 
-		b = new AuthorizerBenchmark(authorizer, 100, Operations.REMOVE);
+		b = new AuthorizerBenchmark(x, authorizer, 100, Operation.REMOVE);
 		builder = new BenchmarkRunner.Builder(x)
 			.setInvocationCount(1)
 			.setBenchmark(b)
 			.build();
 		builder.execute(x);
+	`
+})
+
+p({
+	"class": "foam.nanos.script.Script",
+	"id": "BenchmarkConfigurableAuthorizer",
+	"description": "Benchmark Configurable Authorizer.",
+	"code": `
+import foam.nanos.bench.*;
+import foam.nanos.bench.benchmarks.*;
+import foam.nanos.dao.Operation;
+import foam.nanos.bench.*;
+import foam.nanos.bench.benchmarks.*;
+import foam.nanos.dao.Operation;
+
+x = x.put("pmLogger", null);
+b = new ConfigurableAuthorizerBenchmark(x, null, 10, Operation.READ, false);
+builder = new BenchmarkRunner.Builder(x)
+  .setInvocationCount(1000)
+  .setBenchmark(b)
+  .build();
+
+builder.execute(x);
 	`
 })
 

@@ -87,7 +87,7 @@ foam.CLASS({
       expression: function(name) {
         return foam.String.pluralize(name);
       }
-    },
+    }
   ]
 });
 

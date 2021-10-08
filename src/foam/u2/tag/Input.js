@@ -21,7 +21,6 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   css: `
-    ^:read-only { border: none; background: rgba(0,0,0,0); }
     /* Still show outline when focused as read-only to help accessibility *
     ^:read-only:focus { outline: 1px solid rgb(238, 238, 238); }
   `,

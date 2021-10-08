@@ -7,12 +7,8 @@
 /*
 TODO:
  - Remove use of E() and replace with create-ing axiom to add same behaviour.
- - create 'inner' element which defaults to this. add() adds to inner to make
-   creating borders simple
  - start('leftPanel') should work for locating pre-existing named spaces
- - start, tag, and add() should use standard helper method
- - Fix handling of Slots that return arrays.
- - Properly handle insertBefore_ of an element that's already been inserted?
+ - Don't generate .java and remove need for flags: ['js'].
 */
 
 foam.ENUM({
@@ -41,12 +37,10 @@ foam.ENUM({
   values: [
     {
       name: 'CREATE',
-      label: 'Create',
       modePropertyName: 'createVisibility'
     },
     {
       name: 'VIEW',
-      label: 'View',
       modePropertyName: 'readVisibility',
       restrictDisplayMode: function(mode) {
         return mode == foam.u2.DisplayMode.RW ? foam.u2.DisplayMode.RO : mode;
@@ -54,7 +48,6 @@ foam.ENUM({
     },
     {
       name: 'EDIT',
-      label: 'Edit',
       modePropertyName: 'updateVisibility'
     }
   ]
@@ -75,10 +68,10 @@ foam.ENUM({
   ],
 
   values: [
-    { name: 'RW',       label: 'Read-Write' },
-    { name: 'DISABLED', label: 'Disabled' },
-    { name: 'RO',       label: 'Read-Only' },
-    { name: 'HIDDEN',   label: 'Hidden', restrictDisplayMode: function() { return foam.u2.DisplayMode.HIDDEN; } }
+    { name: 'RW', label: 'Read-Write' },
+    { name: 'DISABLED' },
+    { name: 'RO', label: 'Read-Only' },
+    { name: 'HIDDEN', restrictDisplayMode: function() { return foam.u2.DisplayMode.HIDDEN; } }
   ]
 });
 
@@ -717,8 +710,7 @@ foam.CLASS({
       `,
       name: 'PSEDO_ATTRIBUTES',
       value: {
-        valueAsDate: true,
-        value: true,
+        value:   true,
         checked: true
       }
     },
@@ -1199,7 +1191,7 @@ foam.CLASS({
     },
 
     function myCls(opt_extra) {
-      console.warn('Deprecated use of Element.myCls(). Use myClass() instead.');
+      console.error('Deprecated use of Element.myCls(). Use myClass() instead.');
       return this.myClass(opt_extra);
     },
 
@@ -1515,7 +1507,7 @@ foam.CLASS({
 
     // TODO: remove
     function enableCls(cls, enabled, opt_negate) {
-      console.warn('Deprecated use of Element.enableCls(). Use enableClass() instead.');
+      console.error('Deprecated use of Element.enableCls(). Use enableClass() instead.');
       return this.enableClass(cls, enabled, opt_negate);
     },
 
@@ -1543,7 +1535,7 @@ foam.CLASS({
 
     // TODO: remove
     function removeCls(cls) {
-      console.warn('Deprecated use of Element.removeCls(). Use removeClass() instead.');
+      console.error('Deprecated use of Element.removeCls(). Use removeClass() instead.');
       return this.removeClass(cls);
     },
 
@@ -1860,6 +1852,7 @@ foam.CLASS({
     },
 
     function callOn(obj, f, args) {
+      /** Call the method named f on obj with the supplied args. **/
       obj[f].apply(obj, [this].concat(args));
       return this;
     },
@@ -2061,7 +2054,7 @@ foam.CLASS({
         }
         var first = Array.isArray(e) ? e[0] : e;
 
-        if ( first.state == first.INITIAL ) {
+        if ( first && first.state == first.INITIAL ) {
           // updated requested before initial element loaded
           // not a problem, just defer loading
           first.onload.sub(foam.events.oneTime(l));
@@ -2143,8 +2136,9 @@ foam.CLASS({
           var value = attr.value;
 
           if ( value !== false ) {
-            out(' ', name);
-            out('="', foam.String.isInstance(value) ? value.replace(/"/g, '&quot;') : value, '"');
+            out(' ', name, '="');
+            out(foam.String.isInstance(value) ? value.replace(/"/g, '&quot;') : value);
+            out('"');
           }
         }
       }
@@ -2552,7 +2546,7 @@ foam.CLASS({
       expression: function(label, labelFormatter) {
         return {
           class: 'foam.u2.CheckBox',
-          label: label,
+          label: this.help,
           labelFormatter: labelFormatter
         };
       }
@@ -2952,7 +2946,7 @@ foam.CLASS({
       `,
       name: 'tableProperties',
       setter: function(_, ps) {
-        console.warn("Deprecated use of tableProperties. Use 'tableColumns' instead.");
+        console.error("Deprecated use of tableProperties. Use 'tableColumns' instead.");
         this.tableColumns = ps;
       }
     },

@@ -22,6 +22,7 @@ foam.CLASS({
   ],
 
   messages: [
+    { name: 'BACK_LABEL_ACJ', message: 'Back' },
     { name: 'SUCCESS_UPDATED', message: 'Successfuly updated onboarding information.'},
     { name: 'SUCCESS_REMOVED', message: 'Successfuly removed onboarding information.'}
   ],
@@ -51,7 +52,8 @@ foam.CLASS({
         'foam.u2.ControllerMode',
         'foam.u2.crunch.wizardflow.SaveAllAgent',
         'foam.u2.stack.Stack',
-        'foam.u2.stack.StackView'
+        'foam.u2.stack.StackView',
+        'foam.u2.wizard.StepWizardConfig'
       ],
 
       properties: [
@@ -75,6 +77,12 @@ foam.CLASS({
             .reconfigure('ConfigureFlowAgent', {
               popupMode: false
             })
+            .reconfigure('StepWizardAgent', {
+              config: this.StepWizardConfig.create({
+                approvalMode: true
+              })
+            })
+            .remove('LoadTopConfig')
             .remove('RequirementsPreviewAgent')
             .remove('SkipGrantedAgent')
             .remove('WizardStateAgent')
@@ -90,6 +98,12 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      name: 'backLabel',
+      factory: function() {
+        return this.BACK_LABEL_ACJ;
+      }
+    },
     {
       class: 'foam.u2.ViewSpec',
       name: 'viewView',

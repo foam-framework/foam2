@@ -29,6 +29,7 @@ foam.CLASS({
       font-size: 14px;
       line-height: 1.5;
       margin-bottom: 15px;
+      white-space: pre-line;
     }
   `,
 

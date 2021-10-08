@@ -16,6 +16,7 @@ foam.CLASS({
   requires: [
     'foam.dao.DAOSink',
     'foam.dao.PromisedDAO',
+    'foam.dao.PurgeRecordCmd',
     'foam.dao.QuickSink'
   ],
 
@@ -123,7 +124,11 @@ foam.CLASS({
     function cmd_(x, obj) {
       if ( obj == this.PURGE ) {
         this.cache = {};
-      } else {
+      } 
+      else if ( this.PurgeRecordCmd.isInstance(obj) ) {
+        delete this.cache[obj.id];
+      }
+      else {
         this.SUPER(x, obj);
       }
     }

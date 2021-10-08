@@ -342,6 +342,7 @@ foam.LIB({
       m.order = foam.__count++;
 
       var r = foam.dao.Relationship.create(m, opt_ctx);
+      foam.register(r);
       foam.package.registerClass(r);
 
       // Latch the junction right away, we have no idea when source or

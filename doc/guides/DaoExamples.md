@@ -6,8 +6,8 @@ Foam 1 version can be found [here](http://foam-framework.github.io/foam/foam/dem
 #### Running these examples with Chrome console.
 
 ```sh
-git clone https://github.com/foam-framework/foam2.git
-cd foam2 && npm install
+git clone https://github.com/foam-framework/foam3.git
+cd foam3 && npm install
 python -m SimpleHTTPServer 
 # opens browser at localhost:8000
 # open chrome console, you should see something like:
@@ -17,8 +17,8 @@ python -m SimpleHTTPServer
 #### Running these examples with node REPL
 
 ```sh
-git clone https://github.com/foam-framework/foam2.git
-cd foam2 && npm install
+git clone https://github.com/foam-framework/foam3.git
+cd foam3 && npm install
 node
 > require("./src/foam.js");
 # > core boot time:  23
@@ -114,7 +114,7 @@ guitarDAO.bulkLoad(guitarArray);
 // we declare mLang here, the foam "modelled language"
 // in simple terms, mlang is foam's own "SQL syntax"
 // it's used to filter and manipulate DAO operations.
-// https://github.com/foam-framework/foam2/blob/master/src/foam/mlang/mlang.js
+// https://github.com/foam-framework/foam3/blob/master/src/foam/mlang/mlang.js
 var expr = foam.mlang.Expressions.create();
 ```
 

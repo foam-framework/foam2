@@ -1,11 +1,11 @@
-FOAM2_HOME ?= .
+FOAM3_HOME ?= .
 
-foam2_SRC_DIR = src
-foam2_CLASSES = tools/classes.js
+foam3_SRC_DIR = src
+foam3_CLASSES = tools/classes.js
 
 # Format for dependencies from maven is
 # <groupId>:<artifactId>:<version>
-foam2_MAVEN_DEPS = \
+foam3_MAVEN_DEPS = \
 	javax.json:javax.json-api:1.0 \
 	javax.mail:javax.mail-api:1.6.2 \
 	com.sun.mail:imap:1.6.3 \
@@ -78,21 +78,21 @@ foam2_MAVEN_DEPS = \
 	com.google.appengine:appengine-api-1.0-sdk:1.9.24 \
 	io.methvin:directory-watcher:0.9.10
 
-java_JARS = foam2
+java_JARS = foam3
 
 include build-aux/tools.mk
 include build-aux/java.mk
 
-nanos: nanos.in $(foam2_JAR)
-	sed -e 's,@CLASSPATH[@],$(foam2_CLASSPATH):$(abspath $(foam2_JAR)),g' $< > $@
+nanos: nanos.in $(foam3_JAR)
+	sed -e 's,@CLASSPATH[@],$(foam3_CLASSPATH):$(abspath $(foam3_JAR)),g' $< > $@
 	chmod +x $@
 
 all: nanos
 
 .PHONY: run
 
-run: nanos $(foam2_JAR)
+run: nanos $(foam3_JAR)
 	./$< -d --datadir src
 
-test: nanos $(foam2_JAR)
+test: nanos $(foam3_JAR)
 	./$< -t --datadir src

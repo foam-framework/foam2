@@ -49,7 +49,7 @@ foam.INTERFACE({
       async: true,
       type: 'FObject',
       swiftThrows: true,
-      args: [ 'Context x', 'FObject obj' ]
+      args: 'Context x, FObject obj'
     },
     {
       name: 'remove',
@@ -66,7 +66,7 @@ foam.INTERFACE({
       async: true,
       type: 'FObject',
       swiftThrows: true,
-      args: [ 'Context x', 'FObject obj' ]
+      args: 'Context x, FObject obj'
     },
     {
       name: 'find',
@@ -77,14 +77,14 @@ foam.INTERFACE({
       If the object is found, the promise resolves with the object.
       If the object is not found, it returns null.
       `,
-      args: [ 'Object id' ]
+      args: 'Object id'
     },
     {
       name: 'find_',
       async: true,
       type: 'FObject',
       swiftThrows: true,
-      args: [ 'Context x', 'Object id' ]
+      args: 'Context x, Object id'
     },
     {
       name: 'select',
@@ -94,7 +94,7 @@ foam.INTERFACE({
       documentation: `The primary way to read objects from a DAO is select(sink) that will retrieve a collection of results and will send them (callback) to the sink. A simple select(sink) returns all record in the DAO.
         If you don\'t specify a Sink when calling select(), a foam.dao.ArraySink will be created by default and passed to the resolved Promise:
       `,
-      args: [ 'foam.dao.Sink sink' ]
+      args: 'foam.dao.Sink sink'
     },
     {
       name: 'select_',
@@ -209,7 +209,7 @@ foam.INTERFACE({
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
       type: 'Void',
       swiftThrows: true,
-      args: [ 'foam.dao.Sink sink' ]
+      args: 'foam.dao.Sink sink'
     },
     {
       name: 'pipe_', // TODO: return a promise? don't put pipe and listen here?
@@ -243,40 +243,37 @@ foam.INTERFACE({
       swiftThrows: true,
       // TODO: would be better to make type Comparator...
       // to be compabile with JS.
-      args: ['foam.mlang.order.Comparator comparator' ]
+      args: 'foam.mlang.order.Comparator comparator'
     },
     {
       name: 'skip',
       type: 'foam.dao.DAO',
       swiftThrows: true,
-      args: [ 'Long count' ]
+      args: 'Long count'
     },
     {
       name: 'limit',
       type: 'foam.dao.DAO',
       swiftThrows: true,
-      args: [ 'Long count' ]
+      args: 'Long count'
     },
     {
       name: 'inX',
       type: 'foam.dao.DAO',
-      args: [ 'Context x' ]
+      args: 'Context x'
     },
     {
       name: 'cmd',
       async: true,
       type: 'Any',
-      args: [ 'Any obj' ]
+      args: 'Any obj'
     },
     {
       name: 'cmd_',
       async: true,
       type: 'Any',
       swiftThrows: true,
-      args: [
-        'Context x',
-        'Any obj'
-      ]
+      args: 'Context x, Any obj'
     },
     {
       name: 'getOf',

@@ -85,6 +85,20 @@ There are several different implementations of the `Authorizer` interface:
 * `StandardAuthorizer`
   * Generates permissions in the conventional form `"<model name>.<operation>.<object id>"` (eg: `"user.read.42"`) and uses permission checks to determine whether the user has access or not.
   * `StandardAuthorizer` is useful when you don't have any complex authorization requirements and you would like to use a simple group and permission system to manage access to a DAO. It doesn't require any additional configuration and works out of the box for any model.
+* `ExtendedConfigurableAuthorizer`
+  * Allows for grouped object access based on object values and templates configured. Templates reference a DAOKey array detailing when to apply to an authorizer, which also defines a DAOKey. A permission template further defines properties used to construct the permission string.
+  * `ExtendedConfigurableAuthorizer` Provides runtime authorization updates through updates to PermissionTemplateReferences.
+  * The Authorizer requires configuration, if no permissionTemplateReferences are attributed to the authorizer, the default behaviour of the StandardAuthorizer will apply.
+  * Example:
+      A PermissionTemplateReference with a daokey of ['userDAO'], operation "read" and PermissionTemplateProperties [{ class: "PermissionTemplateProperty", propertyReference: "language"}] would check the value of language against an object attempting to be authorized.
+
+      In this case the userDAO would permit the user access to all users that match its property values to the permissions available to the requestor.
+      The requestor may have the following permission 'userdao.read.en' granting access to all users with the values of language 'en'.
+
+      In the case where conflicts may arise from properties holding similar values, a common one for example may be color, you can set impliesValue on the PermissionTemplateProperty referenced in the list of your PermissionTemplateReference, using the example above, will check for a permission of userdao.read.language[en].
+
+  * Permissions created from templates are lowercase.
+  * Ranges are not supported. 
 * `GlobalReadAuthorizer`
   * Almost identical to `StandardAuthorizer`, but performs no authorization checks to read data.
   * Useful when you have a DAO that contains data that should be readable by any user without permission, but you still want users to need permissions to create, update, or delete data.

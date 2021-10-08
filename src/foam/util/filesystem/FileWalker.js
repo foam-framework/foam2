@@ -15,7 +15,7 @@ foam.CLASS({
     and reports the following to these 4 topics:
     - files: An object with information about the files in a directory.
         For example:
-          { directory: 'foam2/src/foam/model',
+          { directory: 'foam3/src/foam/model',
             files: {
               "Model.js": {/* lstat object */} } }
     - directoryStart: the path of a directory being walked
