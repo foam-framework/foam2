@@ -726,6 +726,12 @@ var classes = [
   'foam.nanos.auth.UserPasswordHashingDAO',
   'foam.dao.ValidatingDAO',
 
+  // DAO Debugging
+  'foam.dao.debug.PutPathDAO',
+  'foam.dao.debug.PutPathElement',
+  'foam.dao.debug.PutPathAware',
+  'foam.dao.debug.PutPathTracking',
+
   // Support Files
   'foam.support.model.TicketMessage',
   'foam.support.model.SupportEmail',

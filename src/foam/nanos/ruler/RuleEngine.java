@@ -8,6 +8,7 @@ package foam.nanos.ruler;
 
 import foam.core.*;
 import foam.dao.DAO;
+import foam.dao.debug.PutPathAware;
 import foam.nanos.auth.*;
 import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
@@ -178,6 +179,13 @@ public class RuleEngine extends ContextAwareSupport {
   private void applyRule(Rule rule, FObject obj, FObject oldObj, Agency agency) {
     ProxyX readOnlyX = new ReadOnlyDAOContext(userX_);
     rule.apply(readOnlyX, obj, oldObj, this, rule, agency);
+    if ( obj instanceof PutPathAware ) {
+      ((PutPathAware) obj).describePut(
+        readOnlyX,
+        String.format("APPLY %s/%s", rule.getName(), rule.getId()),
+        rule.getDocumentation()
+      );
+    }
   }
 
   private boolean isRuleActive(Rule rule, RuleAction action) {
@@ -220,6 +228,13 @@ public class RuleEngine extends ContextAwareSupport {
           nu = reloadObject(obj, oldObj, nu, rule.getAfter());
           try {
             rule.asyncApply(x, nu, oldObj, RuleEngine.this, rule);
+            if ( obj instanceof PutPathAware ) {
+              ((PutPathAware) obj).describePut(
+                x,
+                String.format("ASYNC APPLY %s/%s", rule.getName(), rule.getId()),
+                rule.getDocumentation()
+              );
+            }
             saveHistory(rule, nu);
           } catch (Exception ex) {
             logger.warning("Retry asyncApply rule(" + rule.getId() + ").", ex);
