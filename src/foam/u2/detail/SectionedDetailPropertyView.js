@@ -238,7 +238,13 @@ foam.CLASS({
         .add(this.slot(function(mode, prop, prop$label) {
 
           var errorSlot = prop.validateObj && prop.validationTextVisible ?
-            this.data.slot(prop.validateObj) :
+            this.data.slot([[prop.name], function() {
+              var self = this;
+              if ( ! self.hasOwnProperty(prop.name) ) return '';
+              if ( Array.isArray(prop.validateObj) ) 
+                return prop.validateObj[1].apply(self, prop.validateObj[0]);
+              return prop.validateObj.apply(self, foam.Function.argNames(prop.validateObj).map(function(arg) { return self[arg]; }));
+            }]) :
             foam.core.ConstantSlot.create({ value: null });
 
           return self.E()
