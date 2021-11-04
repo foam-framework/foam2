@@ -16,6 +16,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
       name: 'predicate',
+      transient: true,
       expression: function(predicateFactory) {
         return predicateFactory ?
           predicateFactory(foam.mlang.ExpressionsSingleton.create()) :
