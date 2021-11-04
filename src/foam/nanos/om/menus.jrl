@@ -50,3 +50,15 @@ p({
   },
   "parent":"admin"
 })
+p({
+  "class": "foam.nanos.menu.Menu",
+  "id": "admin.omdashboard",
+  "label": "OM Dashboard",
+  "handler": {
+    "class": "foam.nanos.menu.ViewMenu",
+    "view": {
+      "class": "foam.nanos.om.OMDashboard"
+    }
+  },
+  "parent":"admin"
+})

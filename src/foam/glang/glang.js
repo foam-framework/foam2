@@ -75,6 +75,80 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.glang',
+  name: 'StartOf1Minute',
+  extends: 'foam.glang.AbstractDateGlang',
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        var m = ts.getMinutes();
+        ts.setMinutes(m, 0);
+        ts.setMilliseconds(0);
+        return ts;
+      }
+    }
+  ]
+});
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'EndOf1Minute', 
+ extends: 'foam.glang.AbstractDateGlang',
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        var m = ts.getMinutes();
+        ts.setMinutes(m, 59);
+        ts.setMilliseconds(999);
+        return ts;
+      },
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'StartOf5Minute',
+  extends: 'foam.glang.AbstractDateGlang',
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        var m = ts.getMinutes();
+        var t = Math.floor(m/5);
+        m = t * 5;
+        ts.setMinutes(m, 0);
+        ts.setMilliseconds(0);
+        return ts;
+      }
+    }
+  ]
+});
+foam.CLASS({
+  package: 'foam.glang',
+  name: 'EndOf5Minute', 
+ extends: 'foam.glang.AbstractDateGlang',
+  methods: [
+    {
+      name: 'f',
+      code: function(obj) {
+        var ts = new Date(this.delegate.f(obj));
+        var m = ts.getMinutes();
+        var t = Math.floor(m/5);
+        m = t * 5 + 4.59;
+        ts.setMinutes(m, 59);
+        ts.setMilliseconds(999);
+        return ts;
+      },
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.glang',
   name: 'StartOfHour',
   extends: 'foam.glang.AbstractDateGlang',
   methods: [
@@ -83,6 +157,7 @@ foam.CLASS({
       code: function(obj) {
         var ts = new Date(this.delegate.f(obj));
         ts.setMinutes(0, 0);
+        ts.setMilliseconds(0);
         return ts;
       }
     }
