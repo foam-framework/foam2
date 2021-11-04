@@ -1,0 +1,2 @@
+"value" hidden by "factory"
+- StringArray can't have value property

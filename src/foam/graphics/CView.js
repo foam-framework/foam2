@@ -968,8 +968,10 @@ foam.CLASS({
         x.lineTo(this.xCoordinates[i], this.yCoordinates[i]);
       }
       x.lineWidth = this.lineWidth;
-      x.strokeStyle = this.color;
-      x.stroke();
+
+      x.closePath();
+      if ( this.color ) x.fill();
+      if ( this.lineWidth !== 0 ) x.stroke();
     }
   ]
 });
