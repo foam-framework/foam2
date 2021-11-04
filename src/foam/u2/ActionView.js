@@ -47,10 +47,6 @@ foam.CLASS({
       border: 1px solid transparent;
     }
 
-    ^ + ^ {
-      margin-left: 8px;
-    }
-
     ^ img {
       margin-right: 4px;
     }
