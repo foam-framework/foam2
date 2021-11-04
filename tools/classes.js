@@ -883,6 +883,7 @@ var classes = [
   'foam.nanos.approval.ApprovableAware',
   'foam.nanos.approval.ApprovableApprovalRequestsPredicate',
   'foam.nanos.approval.ApprovableApprovalRequestsRule',
+  'foam.nanos.approval.ApproveApprovalRequestsRule',
   'foam.nanos.approval.FulfilledApprovablePredicate',
   'foam.nanos.approval.FulfilledNestedJournalApprovablePredicate',
   'foam.nanos.approval.FulfilledApprovableRule',

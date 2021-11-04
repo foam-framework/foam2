@@ -84,3 +84,16 @@ p({
   "action":{"class":"foam.nanos.crunch.ReputDependentUCJs"},
   "lifecycleState":1
 })
+p({
+  "class":"foam.nanos.ruler.Rule",
+  "id":"5b3f3a76-5689-74ac-57e7-f1e115e899eb",
+  "name":"Approve approval request",
+  "priority":100,
+  "ruleGroup":"crunch",
+  "daoKey":"approvalRequestDAO",
+  "operation":0,
+  "after":true,
+  "enabled":false,
+  "action":{ "class":"foam.nanos.approval.ApproveApprovalRequestsRule" },
+  "lifecycleState":1
+})
