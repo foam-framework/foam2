@@ -590,12 +590,12 @@ if ( ( skip > 0 ) && ( skip < AbstractDAO.MAX_SAFE_INTEGER ) ) {
   sink = new SkipSink(skip, 0, sink);
 }
 
-if ( order != null ) {
-  sink = new OrderedSink(order, null, sink);
-}
-
 if ( predicate != null && predicate.partialEval() != null && ! ( predicate instanceof foam.mlang.predicate.True) ) {
   sink = new PredicatedSink(predicate, sink);
+}
+
+if ( order != null ) {
+  sink = new OrderedSink(order, null, sink);
 }
 
 return sink;
