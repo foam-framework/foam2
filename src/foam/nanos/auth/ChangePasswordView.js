@@ -119,7 +119,7 @@ foam.CLASS({
   methods: [
     function initE() {
       const self = this;
-      const logo = this.theme.largeLogo || this.theme.logo;
+      const logo = this.theme.logo;
 
       this.addClass(this.myClass())
         // header

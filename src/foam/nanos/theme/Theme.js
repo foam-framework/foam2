@@ -29,7 +29,8 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.theme.ThemeGlyphs'
+    'foam.nanos.theme.ThemeGlyphs',
+    'foam.nanos.theme.LogoImages'
   ],
 
   tableColumns: [
@@ -215,6 +216,13 @@ foam.CLASS({
       class: 'Color',
       name: 'logoBackgroundColour',
       documentation: 'The logo background colour to display in the application.',
+      section: 'images'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.theme.LogoImages',
+      name: 'logoImages',
+      documentation: 'contains 6 different logos to be chosen',
       section: 'images'
     },
     {

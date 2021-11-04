@@ -37,8 +37,8 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start(this.Image, {
-          data$: this.slot(function(theme$largeLogoEnabled, theme$logo, theme$largeLogo) {
-            return theme$largeLogoEnabled ? theme$largeLogo : theme$logo;
+          data$: this.slot(function(theme$logo, theme$logoImages) {
+            return theme$logoImages.smallLightOnDark ? theme$logoImages.smallLightOnDark : theme$logo;
           })
         })
           .addClass('logo')

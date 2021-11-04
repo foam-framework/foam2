@@ -226,7 +226,7 @@ foam.CLASS({
       this.onDetach(() => {
         this.document.removeEventListener('keyup', this.onKeyPressed);
       });
-      let logo = this.theme.largeLogo ? this.theme.largeLogo : this.theme.logo;
+      let logo = this.theme.logo;
       // CREATE MODEL VIEW
       var right = this.Element.create({}, this)
       // Header on-top of rendering model
