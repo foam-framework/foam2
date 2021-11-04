@@ -489,6 +489,7 @@ FOAM_FILES([
   { name: "foam/u2/tag/TextArea", flags: ['web'] },
   { name: "foam/u2/util/NumberShortener", flags: ['web'] },
   { name: "foam/u2/TextField", flags: ['web'] },
+  { name: "foam/u2/FormattedTextField", flags: ['web'] },
   { name: "foam/u2/TextInputCSS", flags: ['web'] },
   { name: "foam/u2/IntView", flags: ['web'] },
   { name: "foam/u2/FloatView", flags: ['web'] },
