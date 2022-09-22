@@ -6,7 +6,7 @@
     "fake-indexeddb": "^2.1.0",
     "istanbul": "^0.4.2",
     "jasmine": "^2.4.1",
-    "jshint": "^2.9.1"
+    "jshint": "^2.13.5"
   },
   "scripts": {
     "test": "JASMINE_CONFIG_PATH=jasmine_node.json jasmine",
