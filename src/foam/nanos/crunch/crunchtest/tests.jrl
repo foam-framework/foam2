@@ -1,3 +1,4 @@
 // p({"class":"foam.nanos.crunch.crunchtest.CapabilityTest","id":"CapabilityTest","description":"test capability and junctions related"})
 //p({"class":"foam.nanos.crunch.crunchtest.CapableTest","id":"CapableTest","description":"test CRUNCH lite behaviour"})
 p({"class":"foam.nanos.crunch.crunchtest.CapabilityReopenTest","id":"CapabilityReopenTest","description":"test Capability/MinmaxCapability maybeReopen behaviour"})
+p({"class":"foam.nanos.crunch.crunchtest.PredicatedPCJDAOTest","id":"PredicatedPCJDAOTest","description":"test adding predicate to prerequisiteCapabilityJunctions"})

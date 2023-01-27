@@ -143,6 +143,7 @@ p({
   "name":"prerequisiteCapabilityJunctionDAO",
   "serve":true,
   "serviceScript":"""
+    decorator = new foam.nanos.crunch.PredicatedPrerequisiteCapabilityJunctionDAO.Builder(x).build();
     dao = new foam.dao.EasyDAO.Builder(x)
       .setPm(true)
       .setPipelinePm(true)
@@ -151,6 +152,7 @@ p({
       .setJournalName("prerequisiteCapabilityJunctions")
       .setOf(foam.nanos.crunch.CapabilityCapabilityJunction.getOwnClassInfo())
       .setOrder(new foam.core.PropertyInfo[] {foam.nanos.crunch.CapabilityCapabilityJunction.PRIORITY})
+      .setDecorator(decorator)
       .build();
     dao.addPropertyIndex(new foam.core.PropertyInfo[] { foam.nanos.crunch.CapabilityCapabilityJunction.SOURCE_ID });
 
