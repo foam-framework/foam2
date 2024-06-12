@@ -9,6 +9,13 @@ foam.CLASS({
   name: 'FObjectArrayView',
   extends: 'foam.u2.view.ArrayView',
 
+  css: `
+    ^ .foam-u2-DetailView {
+      border: 1px solid #ddd;
+      margin-bottom: 8px;
+    }
+  `,
+
   properties: [
     {
       class: 'Class',

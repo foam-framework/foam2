@@ -6,6 +6,7 @@
 
 package foam.box;
 
+import foam.core.SubX;
 import foam.core.X;
 import foam.core.XLocator;
 import foam.dao.DAO;
@@ -111,9 +112,6 @@ public class SessionServerBox
       if ( session == null ) {
         session = new Session((X) getX().get(Boot.ROOT));
         session.setId(sessionID == null ? "anonymous" : sessionID);
-        // non-clustered until we can determine priviledge of user.
-        // this allows admin to login to a medusa cluster before replay is complete.
-        session.setClusterable(false);
         session = (Session) sessionDAO.put(session);
       }
       if ( req != null ) {
@@ -178,6 +176,12 @@ public class SessionServerBox
         logger.warning("Missing permission", group != null ? group.getId() : "NO GROUP");
         msg.replyWithException(e);
         return;
+      }
+
+      // Sub context might have service override for the delegate
+      if ( effectiveContext instanceof SubX ) {
+        ((Skeleton) getDelegate()).setDelegateObject(
+          effectiveContext.get(getX().get(NSpec.class).getId()));
       }
 
       msg.getLocalAttributes().put("x", effectiveContext);

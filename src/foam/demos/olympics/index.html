@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Olympic Medals</title>
+
+<!-- FOAM core -->
+<script src="../../../foam.js"></script>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+.outer-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.inner-container {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+</style>
+
+<!-- Application code -->
+<script src="./Medal.js"></script>
+<script src="./Controller.js"></script>
+
+<body class="fullbleed">
+  <div class="outer-container">
+    <div id="container" class="inner-container">
+    </div>
+  </div>
+
+<script>
+var ctrl = foam.lookup('foam.demos.olympics.Controller').create();
+document.getElementById('container').insertAdjacentHTML('beforeend',
+    ctrl.outerHTML);
+ctrl.load();
+</script>
+
+</body>

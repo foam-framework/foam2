@@ -66,6 +66,8 @@ foam.CLASS({
               if ( isLast ) getWriter().flush();
             } catch (Throwable t) {
               getLogger().error("Failed to write put entry to journal", t);
+            }  finally {
+              fmt.reset();
             }
           }
         });

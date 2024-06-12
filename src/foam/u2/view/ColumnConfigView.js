@@ -19,12 +19,12 @@ foam.CLASS({
       max-width: 200px;
     }
     ^search {
-      margin: 5px;
-      margin-bottom: 8px;
+      margin: 0px;
+      padding: 0px 8px;
+      padding-bottom: 16px;
     }
-
-    input[type="search"] {
-      width: 290px;
+    ^ input[type='search']{
+      width: 100%;
     }
   `,
   properties: [
@@ -201,7 +201,8 @@ foam.CLASS({
       e.stopPropagation();
     },
     function onClose() {
-      this.menuSearch = '';
+      if ( this.menuSearch )
+        this.menuSearch = '';
       this.columns.forEach(c => c.onClose());
     },
     function onTopLevelPropertiesDragAndDrop(targetIndex, draggableIndex) {
@@ -281,7 +282,7 @@ foam.CLASS({
           return this.resetProperties(views, startUnselectedIndex-1, draggableIndex);
       }
 
-      while(startUnselectedIndex < views.length) {
+      while ( startUnselectedIndex < views.length ) {
         var currentProp = this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(views[draggableIndex].prop.rootProperty);
         var comparedToProp =  this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(views[startUnselectedIndex].prop.rootProperty);
         if ( currentProp.toLowerCase().localeCompare(comparedToProp.toLowerCase()) < 0 ) {
@@ -298,6 +299,7 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'RootColumnConfigPropView',
   extends: 'foam.u2.Controller',
+  imports: ['theme'],
   properties: [
     // {
     //   class: 'Boolean',
@@ -337,11 +339,6 @@ foam.CLASS({
   ],
   constants: [
     {
-      name: 'DEFAULT_BG_COLOR',
-      type: 'String',
-      value: 'rgb(249, 249, 249)'
-    },
-    {
       name: 'ON_DRAG_OVER_BG_COLOR',
       type: 'String',
       value: '#e5f1fc'
@@ -376,24 +373,24 @@ foam.CLASS({
     }
   ],
   listeners: [
-    function onDragStart(e){
+    function onDragStart(e) {
       e.dataTransfer.setData('draggableId', this.index);
       e.stopPropagation();
     },
-    function onDragOver(e){
+    function onDragOver(e) {
       e.preventDefault();
       e.stopPropagation();
-      e.currentTarget.style.setProperty("background-color", this.ON_DRAG_OVER_BG_COLOR);
+      e.currentTarget.style.setProperty('background-color', this.theme ? this.theme.primary5 : this.ON_DRAG_OVER_BG_COLOR);
     },
-    function onDragLeave(e){
+    function onDragLeave(e) {
       e.preventDefault();
       e.stopPropagation();
-      e.currentTarget.style.setProperty("background-color", this.DEFAULT_BG_COLOR);
+      e.currentTarget.style.setProperty( 'background-color', this.theme ? this.theme.white : '#ffffff' );
     },
     function onDrop(e) {
       e.preventDefault();
       e.stopPropagation();
-      e.currentTarget.style.setProperty("background-color", this.DEFAULT_BG_COLOR);
+      e.currentTarget.style.setProperty('background-color', this.theme ? this.theme.white : '#ffffff');
       this.onDragAndDropParentFunction(this.index, parseInt(e.dataTransfer.getData('draggableId')));
     }
   ]
@@ -404,6 +401,8 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'ColumnViewHeader',
   extends: 'foam.u2.View',
+
+  requires: ['foam.u2.CheckBox'],
   css: `
 
   ^selected {
@@ -411,17 +410,23 @@ foam.CLASS({
   }
   ^some-padding {
     text-align: left;
-    padding: 3px;
-    height: 14px;
+    font-size: 14px;
+    line-height: 24px;
+    padding: 4px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  ^some-padding:hover {
+    background-color: /*%PRIMARY5%*/ #E5F1FC;
+    border-radius: 4px;
+  }
+  ^label {
+    display: flex;
+    align-items: center;
+    justify-content: start;
   }
   `,
-  constants: [
-    {
-      name: 'CHECK_MARK',
-      type: 'String',
-      value: '\u2713'
-    }
-  ],
   properties: [
     'onSelectionChangedParentFunction',
     {
@@ -438,23 +443,25 @@ foam.CLASS({
       var self = this;
       this.SUPER();
       this
-        .on('click', this.toggleExpanded)
-        .start()
+        .on('click', this.toggleSelection)
           .start()
             .addClass(this.myClass('some-padding'))
             .style({
-              'padding-left' : self.data.level * 15 + 15 + 'px',
-              'padding-right' : '15px'
+              'padding-left': self.data.level * 16 + 8 + 'px',
+              'padding-right': '8px'
             })
-            .start('span')
-              .show(this.data.isPropertySelected$)
-              .add(this.CHECK_MARK)
+            .start()
+              .addClass(this.myClass('label'))
+              .start()
+                .add(this.CheckBox.create({ data$: this.data.isPropertySelected$ }))
+                .on('click', this.toggleSelection)
+              .end()
+              .start()
+                .style({'padding-left' : '12px'})
+                .add(this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(this.data.rootProperty))
+              .end()
             .end()
-            .start('span')
-              .style({'padding-left' : this.data.isPropertySelected$.map(function(s) { return s ? '4px' : '13px';})})
-              .add(this.columnHandler.checkIfArrayAndReturnRootPropertyHeader(this.data.rootProperty))
-            .end()
-            .start('span')
+            .start()
               .show(this.data.hasSubProperties)
               .style({
                 'vertical-align': 'middle',
@@ -467,20 +474,23 @@ foam.CLASS({
               .on('click', this.toggleExpanded)
               .add('\u2303')
             .end()
-          .end()
-        .end();
+          .end();
     }
   ],
   listeners: [
-    function toggleExpanded(e) {
+    function toggleSelection(e) {
       e.stopPropagation();
-      this.data.expanded = ! this.data.expanded;
+      // this.data.expanded = ! this.data.expanded;
       if ( ! this.data.hasSubProperties || foam.core.Reference.isInstance(this.data.prop) ) {
         this.data.isPropertySelected = ! this.data.isPropertySelected;
         if ( ! this.data.isPropertySelected )
           this.data.expanded = false;
         this.onSelectionChangedParentFunction(this.data.isPropertySelected, this.data.index);
       }
+    },
+    function toggleExpanded(e) {
+      e.stopPropagation();
+      this.data.expanded = ! this.data.expanded;
     }
   ]
 });
@@ -493,6 +503,7 @@ foam.CLASS({
     'foam.u2.view.RootColumnConfigPropView',
     'foam.u2.view.SubColumnSelectConfig'
   ],
+
   properties: [
     {
       name: 'views',

@@ -85,6 +85,8 @@ public class CapableTest extends Test {
   public X createTestX(X x) {
     x = TestUtils.mockDAO(x, "capabilityDAO");
     x = TestUtils.mockDAO(x, "prerequisiteCapabilityJunctionDAO");
+    DAO dao = new foam.nanos.crunch.PredicatedPrerequisiteCapabilityJunctionDAO.Builder(x).setDelegate(new foam.dao.MDAO(CapabilityCapabilityJunction.getOwnClassInfo())).build();
+    x = x.put("prerequisiteCapabilityJunctionDAO", dao);
 
     capabilityDAO = (DAO)
       x.get("capabilityDAO");

@@ -29,7 +29,7 @@ foam.CLASS({
       value: 10000,
     },
     {
-      name: 'limit',
+      name: 'indexLimit',
       class: 'Long',
       value: 20000
     },
@@ -72,7 +72,7 @@ foam.CLASS({
       }
 
       indexes_.add(entry.getIndex());
-      if ( indexes_.size() > getLimit() ) {
+      if ( indexes_.size() > getIndexLimit() ) {
         long last = (long) indexes_.last();
         Iterator<Long> iter = indexes_.headSet(last - getRetain()).iterator();
         while( iter.hasNext() ) {

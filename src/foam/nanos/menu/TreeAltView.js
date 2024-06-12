@@ -19,8 +19,16 @@ foam.CLASS({
     'foam.u2.view.TableView'
   ],
 
+  properties: [
+    'relationship'
+  ],
+
   methods: [
     function init(){
+      var relationship = typeof this.relationship === 'object' ? 
+        relationship :
+        foam.lookup(this.relationship);
+
       this.views = [
         [
           { 
@@ -30,7 +38,7 @@ foam.CLASS({
         ],
         [ {
             class: 'foam.u2.view.TreeView',
-            relationship: foam.nanos.menu.MenuMenuChildrenRelationship,
+            relationship: relationship,
             startExpanded: true,
             formatter: function(data) { this.add(data.label); }
           }, 'Tree' ]

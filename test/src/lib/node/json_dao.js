@@ -19,7 +19,7 @@ describe('JSONFileDAO', function() {
   var path = require('path');
   var fs = require('fs');
   var JSONFileDAO = foam.dao.node.JSONFileDAO;
-  var tmpDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'foam2_tests', ''));
+  var tmpDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'foam3_tests', ''));
   var tmpFile = path.join(tmpDir, 'test.json');
   genericDAOTestBattery(function(model) {
     try { fs.unlinkSync(tmpFile); } catch(e) {}

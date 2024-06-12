@@ -66,7 +66,7 @@ foam.CLASS({
           if ( newStatus == PENDING ){
             var crunchService = (CrunchService) x.get("crunchService");
             payload.setStatus(REJECTED);
-            List<String> prereqIdsList = crunchService.getPrereqs(payload.getCapability());
+            List<String> prereqIdsList = crunchService.getPrereqs(x, payload.getCapability(), null);
 
             if ( prereqIdsList != null && prereqIdsList.size() > 0 ){
               String[] prereqIds = prereqIdsList.toArray(new String[prereqIdsList.size()]);

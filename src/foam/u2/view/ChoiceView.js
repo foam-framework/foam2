@@ -39,12 +39,6 @@ foam.CLASS({
     foam.u2.tag.Select.
   `,
 
-  css: `
-    ^ .foam-u2-tag-Select {
-      height: 32px;
-    }
-  `,
-
   properties: [
     {
       class: 'String',
@@ -314,18 +308,19 @@ foam.CLASS({
             this.choices = s.projection;
           });
           return;
-        } else {
-          this.warn('Inefficient ChoiceView. Consider creating transient _choiceText_ property on ' + of.id + ' DAO, prop: ' + this.prop_);
-          /* Ex.:
-          {
-            class: 'String',
-            name: '_choiceText_',
-            transient: true,
-            javaGetter: 'return getName();',
-            getter: function() { return this.name; }
-          }
-          */
         }
+
+        this.warn('Inefficient ChoiceView. Consider creating transient _choiceText_ property on ' + of.id + ' DAO, prop: ' + this.prop_);
+        /* Ex.:
+        {
+          class: 'String',
+          name: '_choiceText_',
+          transient: true,
+          javaGetter: 'return getName();',
+          getter: function() { return this.name; }
+        }
+        */
+
         var p = this.mode === foam.u2.DisplayMode.RW ?
           dao.select().then(s => s.array) :
           dao.find(this.data).then(o => o ? [o] : []);

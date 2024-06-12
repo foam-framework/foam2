@@ -47,6 +47,11 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'angle'
+    },
+    {
+      name: 'imagePath',
+      class: 'String',
+      value: '/images/ic-loading.svg'
     }
   ],
 
@@ -56,7 +61,7 @@ foam.CLASS({
 
       this
         .addClass(this.myClass()).enableClass('hidden', this.isHidden$)
-        .start({ class: 'foam.u2.tag.Image', data: 'images/ic-loading.svg' })
+        .start({ class: 'foam.u2.tag.Image', data$: this.imagePath$ })
           .style({transform: this.angle$.map(a => 'rotate(' + a + 'deg)')})
         .end()
         .start()

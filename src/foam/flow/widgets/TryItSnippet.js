@@ -74,7 +74,9 @@ foam.CLASS({
     {
       name: 'run',
       tableWidth: 90,
-      confirmationRequired: true,
+      confirmationRequired: function() {
+        return true;
+      },
       code: function() {
         return this.script.run();
       }

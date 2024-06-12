@@ -31,12 +31,14 @@ foam.CLASS({
       border-bottom: solid 1px #CBCFD4;
     }
     ^title{
-      font-family: /*%FONT1%*/ Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      font-size: 18px;
+      font-family: /*%FONT1%*/ 'IBM Plex Sans';
+      font-style: normal;
       font-weight: 600;
-      color: #1E1F21;
+      font-size: 24px;
+      line-height: 28px;
+      color: #000000;
       margin: 0;
-      flex: 1;
+      flex: none;
     }
     ^ .foam-u2-ActionView-closeModal{
       background: transparent !important;

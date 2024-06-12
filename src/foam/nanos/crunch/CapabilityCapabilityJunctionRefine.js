@@ -49,6 +49,16 @@ foam.CLASS({
         If a prerequisite is considered a "precondition", it must be granted
         before the corresponding dependant is shown in the capability store.
       `
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
+      name: 'predicate',
+      view: { class: 'foam.u2.view.JSONTextView' },
+      javaFactory: `
+        return foam.mlang.MLang.TRUE;
+      `,
+      documentation: 'The condition under which this capabilitycapabilityjunction would hold.'
     }
   ]
 });

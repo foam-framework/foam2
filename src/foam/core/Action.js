@@ -64,10 +64,11 @@ foam.CLASS({
       generateJava: false
     },
     {
-      class: 'Boolean',
+      class: 'Function',
       generateJava: false,
       name: 'confirmationRequired',
-      documentation: 'If confirmation is required. Recommended for destructive actions.'
+      documentation: 'If confirmation is required. Recommended for destructive actions.',
+      value: null
     },
     {
       class: 'String',
@@ -136,14 +137,21 @@ foam.CLASS({
       generateJava: false,
       name: 'availablePermissions',
       documentation: `Permissions required for the action to be available.
-If empty than no permissions are required.`
+If empty then no permissions are required.`
     },
     {
       class: 'StringArray',
       generateJava: false,
       name: 'enabledPermissions',
       documentation: `Permissions required for the action to be enabled.
-If empty than no permissions are required.`,
+If empty then no permissions are required.`,
+    },
+    {
+      class: 'StringArray',
+      generateJava: false,
+      name: 'confirmationRequiredPermissions',
+      documentation: `Permissions required for the action to be confirmation required state.
+If empty then no permissions are required.`
     },
     {
       name: 'enabledPermissionsSlot_',
@@ -152,6 +160,11 @@ If empty than no permissions are required.`,
     },
     {
       name: 'availablePermissionsSlot_',
+      generateJava: false,
+      transient: true
+    },
+    {
+      name: 'confirmationRequiredPermissionsSlot_',
       generateJava: false,
       transient: true
     },
@@ -234,6 +247,10 @@ If empty than no permissions are required.`,
 
     function createIsAvailable$(x, data) {
       return this.createSlotFor_(x, data, this.isAvailable, 'available');
+    },
+    
+    function createConfirmationRequired$(x, data) {
+      return this.createSlotFor_(x, data, this.confirmationRequired, 'confirmationRequired');
     },
 
     function getRunning$(data) {

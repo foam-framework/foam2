@@ -43,6 +43,7 @@ var classes = [
   'foam.mlang.predicate.Or',
   'foam.mlang.predicate.AbstractPredicate',
   'foam.mlang.predicate.Nary',
+  'foam.mlang.predicate.NamedProperty',
   'foam.mlang.predicate.Unary',
   'foam.mlang.predicate.Binary',
   'foam.mlang.predicate.ArrayBinary',
@@ -120,7 +121,7 @@ var classes = [
   'foam.nanos.app.AppConfig',
   'foam.nanos.app.ContextLookupAppConfigService',
   'foam.nanos.http.WebAgent',
-  'com.google.foam.demos.heroes.Hero',
+  'foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
   'foam.box.RemoteException',
   'foam.box.RPCMessage',
@@ -214,6 +215,7 @@ var classes = [
   'foam.dao.SequenceNumberDAOTest',
   'foam.dao.PipelinePMDAO',
   'foam.dao.PMDAO',
+  'foam.dao.PurgeRecordCmd',
   'foam.dao.UniqueConstraintException',
   'foam.nanos.pm.PMFactory',
   'foam.nanos.pm.PMInfo',
@@ -259,7 +261,11 @@ var classes = [
   'foam.nanos.auth.AgentJunctionStatus',
   'foam.nanos.auth.Authorizer',
   'foam.nanos.auth.AuthorizationDAO',
+  'foam.nanos.auth.PermissionTemplateReference',
+  'foam.nanos.auth.PermissionTemplateProperty',
+  'foam.nanos.auth.ExtendedConfigurableAuthorizer',
   'foam.nanos.auth.AuthenticationException',
+  'foam.nanos.auth.AssignableAware',
   'foam.nanos.auth.EnabledAware',
   'foam.nanos.auth.EnabledAwareDummy',
   'foam.nanos.auth.GroupPermissionJunction',
@@ -344,6 +350,7 @@ var classes = [
   'foam.nanos.auth.UserAndGroupAuthService',
   'foam.nanos.auth.EnabledCheckAuthService',
   'foam.nanos.auth.CommonPassword',
+  'foam.nanos.auth.AddressConfig',
   'foam.nanos.http.HttpParameters',
   'foam.nanos.http.DefaultHttpParameters',
   'foam.nanos.http.SendErrorHandler',
@@ -543,7 +550,6 @@ var classes = [
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
   'foam.dao.FixedSizeDAO',
-  'foam.mop.MOP',
   'foam.nanos.export.ClientGoogleSheetsExportService',
   'foam.nanos.export.ExportDriverRegistry',
   'foam.nanos.export.GoogleSheetsBasedExportDriver',
@@ -820,6 +826,7 @@ var classes = [
   //daos
   'foam.nanos.crunch.connection.CapabilityPayloadDAO',
   'foam.nanos.crunch.UserCapabilityJunctionDAO',
+  'foam.nanos.crunch.PredicatedPrerequisiteCapabilityJunctionDAO',
   //rules
   'foam.nanos.crunch.SendNotificationOnTopLevelCapabilityStatusUpdate',
   'foam.nanos.crunch.IsUserCapabilityJunctionStatusUpdate',
@@ -889,6 +896,7 @@ var classes = [
   'foam.nanos.approval.ApprovalDAO',
   'foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer',
   'foam.nanos.approval.PopulateApprovalRequestsDAO',
+  'foam.nanos.approval.ApprovalRequestAssignedToRule',
 
   'foam.core.NumberSet',
 
@@ -917,7 +925,6 @@ var abstractClasses = [
 
 var skeletons = [
   'foam.dao.DAO',
-  'foam.mop.MOP',
   'foam.nanos.app.AppConfigService',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.AgentAuthService',
@@ -943,7 +950,6 @@ var skeletons = [
 var proxies = [
   'foam.dao.DAO',
   'foam.dao.Sink',
-  'foam.mop.MOP',
   'foam.lib.Outputter',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',

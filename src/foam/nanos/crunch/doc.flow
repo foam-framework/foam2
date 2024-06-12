@@ -53,7 +53,7 @@ re-sending (or aborting) the request.
 <foam class="foam.flow.widgets.TryItSnippet" server="true">
 import foam.nanos.crunch.CapabilityIntercept;
 var ex = new CapabilityIntercept();
-ex.addCapabilityId("4EB60BAE-E915-4464-9D1B-4099F22E9144");
+ex.addCapabilityId("crunch.example");
 throw ex;
 </foam>
 
@@ -73,7 +73,7 @@ user already has it granted.
 
 <foam class="foam.flow.widgets.TryItSnippet" server="true">
 var intercept = foam.nanos.crunch.CapabilityIntercept.create({
-  capabilities: ['4EB60BAE-E915-4464-9D1B-4099F22E9144']
+  capabilities: ['crunch.example']
 });
 x.crunchController.handleIntercept(intercept);
 </foam>

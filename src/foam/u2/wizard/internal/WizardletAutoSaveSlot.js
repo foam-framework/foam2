@@ -9,12 +9,17 @@ foam.CLASS({
   name: 'WizardletAutoSaveSlot',
   extends: 'foam.core.SimpleSlot',
 
+  requires: [
+    'foam.u2.borders.LoadingLevel'
+  ],
+
   properties: [
     {
       name: 'delay',
       class: 'Int',
-      value: 200
+      value: 5000
     },
+    'saveEvent',
     'other',
     'timeout_',
     'cleanup_', // detachable to cleanup old subs when obj changes
@@ -22,13 +27,16 @@ foam.CLASS({
 
   methods: [
     function init() {
+      // Save event clears any pending saves
+      this.saveEvent.sub(() => {
+        this.timeout_ && clearTimeout(this.timeout_);
+      });
       var attach = function(delay, other) {
         this.cleanup();
         this.cleanup_ = foam.core.FObject.create();
         this.cleanup_.onDetach(other.sub(() => {
-          if ( this.timeout_ ) {
-            clearTimeout(this.timeout_);
-          }
+          // Clear existing timeouts
+          this.timeout_ && clearTimeout(this.timeout_);
           this.timeout_ = setTimeout(this.update.bind(this, other), delay);
         }));
       };

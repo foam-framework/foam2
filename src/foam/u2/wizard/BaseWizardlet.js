@@ -14,12 +14,19 @@ foam.CLASS({
     'foam.u2.wizard.Wizardlet'
   ],
 
+  imports: [
+    'wizardCloseSub?'
+  ],
+
   requires: [
+    'foam.core.SimpleSlot',
+    'foam.u2.borders.LoadingLevel',
     'foam.u2.detail.AbstractSectionedDetailView',
     'foam.u2.wizard.WizardletAware',
     'foam.u2.wizard.WizardletIndicator',
     'foam.u2.wizard.WizardletSection',
     'foam.u2.wizard.WAO',
+    'foam.u2.wizard.ProxyWAO',
     'foam.u2.wizard.internal.FObjectRecursionSlot',
     'foam.u2.wizard.internal.WizardletAutoSaveSlot'
   ],
@@ -27,7 +34,10 @@ foam.CLASS({
   constants: [
     {
       name: 'SAVE_DELAY',
-      value: 1200
+      // TODO: once changes are made to input views to reduce property updates,
+      //       this can be decreased to around 100-200ms
+      value: 1000,
+      documentation: 'How long input must be idle before an auto-save'
     }
   ],
 
@@ -74,8 +84,9 @@ foam.CLASS({
         Specify the availability of this wizardlet. If true, wizardlet is
         available iff at least one section is available. If false, wizardlet
         does not display even if some sections are available.
-      `,
+      `
     },
+
     {
       name: 'isVisible',
       class: 'Boolean',
@@ -91,7 +102,10 @@ foam.CLASS({
     },
     {
       name: 'loading',
-      class: 'Boolean'
+      class: 'Boolean',
+      postSet: function (_, n) {
+        if ( ! n ) this.LoadingLevel = this.LoadingLevel.IDLE;
+      }
     },
     {
       name: 'sections',
@@ -123,7 +137,7 @@ foam.CLASS({
       of: 'foam.u2.wizard.WAO',
       flags: ['web'],
       factory: function () {
-        this.WAO.create();
+        this.ProxyWAO.create();
       }
     },
     {
@@ -137,6 +151,16 @@ foam.CLASS({
         return isValid ? this.WizardletIndicator.COMPLETED
           : this.WizardletIndicator.PLEASE_FILL;
       }
+    },
+    {
+      name: 'loadingLevel',
+      class: 'Enum',
+      of: 'foam.u2.borders.LoadingLevel'
+    },
+    {
+      name: '__subSubContext__',
+      documentation: 'Current subContext to use when creating view.',
+      factory: function() { return this.__subContext__; }
     }
   ],
 
@@ -147,9 +171,9 @@ foam.CLASS({
     function createView(data) {
       return null;
     },
-    async function save() {
+    async function save(options) {
       this.indicator = this.WizardletIndicator.SAVING;
-      var ret = await this.wao.save(this);
+      var ret = await this.wao.save(this, options);
       this.clearProperty('indicator');
       this.saveEvent.pub(ret);
       return ret;
@@ -173,31 +197,38 @@ foam.CLASS({
         This is useful for checking if a wizardlet has unsaved changes.
       `,
       code: function () {
-        var self = this;
         var filter = foam.u2.wizard.Slot.filter;
-        var customUpdateSlot = false;
-        if ( this.of && this.WizardletAware.isSubClass(this.of) ) {
-          customUpdateSlot = this.data && this.data.customUpdateSlot;
+        var s = this.SimpleSlot.create();
+        var slotSlot = this.data$
+          .map(data => {
+            var updateSlot = (
+              this.WizardletAware.isInstance(data) &&
+              data.customUpdateSlot
+            ) ? data.getUpdateSlot()
+              : this.FObjectRecursionSlot.create({ obj: data });
+            return this.WizardletAutoSaveSlot.create({
+              // Clear pending auto-saves if we start saving or finish loading
+              saveEvent: this.loading$,
+              // Listen to property updates if not loading
+              other: filter(updateSlot, () => ! this.loading),
+              delay: this.SAVE_DELAY,
+            });
+          });
+        slotSlot.valueSub(() => { s.set(slotSlot.get().get()); });
+        if ( this.wizardCloseSub ) {
+          this.wizardCloseSub.onDetach(s);
+          this.wizardCloseSub.onDetach(slotSlot);
+        } else {
+          console.error(
+            'wizardlet update listener will not detach! ' +
+            'This wizardlet my be used from an invalid context');
         }
-        if ( customUpdateSlot ) {
-          var s = foam.core.FObject.create();
-          this.data$
-            .map(data => {
-              var updateSlot = data.getUpdateSlot();
-              return this.WizardletAutoSaveSlot.create({
-                other: filter(updateSlot, v => v && ! self.loading),
-                delay: self.SAVE_DELAY
-              });
-            })
-            .valueSub(() => { if ( ! self.loading ) s.pub(true); });
-          return s;
-        }
-        var sl = this.FObjectRecursionSlot.create({ obj$: this.data$ });
-        return filter(this.WizardletAutoSaveSlot.create({
-          other: filter(sl, () => ! self.loading),
-          delay: self.SAVE_DELAY
-        }), () => ! self.loading);
+        return s;
       }
+    },
+    function pushContext(m) {
+      this.__subSubContext__ = this.__subSubContext__.createSubContext(m);
+      if ( this.data ) this.data = this.data.clone(this.__subSubContext__);
     }
   ],
 

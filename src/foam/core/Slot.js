@@ -64,10 +64,20 @@ foam.CLASS({
       along the chain changes.
     */
     function dot(name) {
-      return this.SubSlot.create({
-        parent: this,
-        name:   name
-      });
+      var i = name.indexOf('$');
+      if ( i != -1 ) {
+        var left  = name.substring(0, i);
+        var right = name.substring(i + 1);
+        return this.SubSlot.create({
+          parent: this,
+          name:   left
+        }).dot(right);
+      } else {
+        return this.SubSlot.create({
+          parent: this,
+          name:   name
+        });
+      }
     },
 
     // TODO: remove when all code ported

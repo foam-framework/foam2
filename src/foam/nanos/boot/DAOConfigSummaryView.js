@@ -154,6 +154,7 @@ foam.CLASS({
     }
     ^section {
       display: inline-grid;
+      vertical-align: baseline;
     }
     ^header {
       background: /*%BLACK%*/ #1e1f21;

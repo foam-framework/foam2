@@ -9,12 +9,12 @@
 IGNORE('lib/dao_test.js');
 // TODO: when genJava allows: IGNORE('com/google/foam/demos');
 IGNORE('com/google/net/proto_gen.js');
-IGNORE('com/google/foam/demos/tabata/main.js');
+IGNORE('foam/demos/tabata/main.js');
 IGNORE('com/google/foam/experimental/Promise_test.js');
-IGNORE('com/google/foam/demos/examples/bench.js');
+IGNORE('foam/demos/examples/bench.js');
 
 // these files depend on global objects and should not be loaded by foamlink
-IGNORE('com/google/foam/demos/u2');
+IGNORE('foam/demos/u2');
 
 // === Files in this section should be processed by foamlink
 //     but cannot be due to code invoked during loading

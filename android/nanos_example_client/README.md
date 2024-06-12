@@ -10,7 +10,7 @@ https://gradle.org/
 
 3. Build foam.
 
-From the foam2 directory
+From the foam3 directory
 ```
 $ cd build
 $ sh gen.sh
@@ -20,7 +20,7 @@ $ mvn package
 4. Copy foam jar to libs directory
 
 ```
-$ cp foam2/build/outputs/foam-1.0-SNAPSHOT.jar libs
+$ cp foam3/build/outputs/foam-1.0-SNAPSHOT.jar libs
 ```
 
 5. Add a file local.properties that points to your SDK

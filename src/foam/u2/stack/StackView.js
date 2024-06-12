@@ -46,6 +46,7 @@ foam.CLASS({
     function init() {
       this.setNodeName('div');
       this.addClass(this.myClass());
+      this.addClass('foam-u2-stack-StackView');
 
       if ( this.showActions ) {
         this.start('actions')
@@ -53,54 +54,53 @@ foam.CLASS({
         .end();
       }
 
-      this.add(this.slot(function(s) {
-        if ( ! s ) return this.E('span');
+      this.listenStackView();
+    },
+    function listenStackView() {
+      this.add(this.slot(s => this.renderStackView(s), this.data$.dot('top')));
+    },
+    function renderStackView(s) {
+      if ( ! s ) return this.E('span');
 
-        var view   = s[0];
-        var parent = s[1];
+      var view   = s[0];
+      var parent = s[1];
 
-        var X;
-        if ( ! parent ) {
-          X = this.__subSubContext__;
-        } else {
-          if ( parent.isContext ) {
-            X = parent;
-          } else if ( parent.__subContext__ ) {
-            X = parent.__subContext__;
-          } else {
-            // I'm not sure how this is a good idea, KGR
-            // TODO: find all places we do this and see if we can replace
-            // with case 1 above.
+      var X = this.getContextFromParent(parent);
 
-            // Do a bit of a dance with the context, to ensure that exports from
-            // "parent" are available to "view"
-            X = this.__subSubContext__.createSubContext(parent);
+      var v = foam.u2.ViewSpec.createView(view, null, this, X);
+      if ( X.memento && v.mementoHead ) {
+        var currMemento = this.data.findCurrentMemento();
+        //we need to check if memento is already set
+        //for example when we copy-paste url
+
+        if ( currMemento.value == '' )
+          currMemento.value = v.mementoHead;
+        else {
+          //X.memento.head is parent view head
+          //so the v view mementoHead is X.memento.tail.head
+
+          if ( this.shouldMementoValueBeChanged(X.ctrl.memento.value, v.mementoHead) ) {
+            var m = this.Memento.create();
+
+            m.value = v.mementoHead;
+            currMemento.tail = m;
           }
         }
+      }
+      return v;
+    },
 
-        var v = foam.u2.ViewSpec.createView(view, null, this, X);
-        if ( X.memento && v.mementoHead ) {
-          var currMemento = this.data.findCurrentMemento();
-          //we need to check if memento is already set
-          //for example when we copy-paste url
+    function getContextFromParent(parent) {
+      if ( ! parent ) return this.__subSubContext__;
+      if ( parent.isContext ) return parent;
+      if ( parent.__subContext__ ) return parent.__subContext__;
 
-          if ( currMemento.value == '' )
-            currMemento.value = v.mementoHead;
-          else {
-            //X.memento.head is parent view head
-            //so the v view mementoHead is X.memento.tail.head
 
-            if ( this.shouldMementoValueBeChanged(X.ctrl.memento.value, v.mementoHead) ) {
-              var m = this.Memento.create();
-
-              m.value = v.mementoHead;
-              currMemento.tail = m;
-            }
-          }
-        }
-        return v;
-
-      }, this.data$.dot('top')));
+      // Do a bit of a dance with the context, to ensure that exports from
+      // "parent" are available to "view"
+      // TODO: revisit KGR's comment from earlier; this may not be needed
+      console.warn('parent is neither an element nor a context');
+      return this.__subSubContext__.createSubContext(parent);
     },
 
     function shouldMementoValueBeChanged(mementoValue, mementoHead) {

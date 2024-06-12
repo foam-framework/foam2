@@ -23,7 +23,7 @@ foam.RELATIONSHIP({
           this.add(value);
         });
       }
-    },
+    }
   },
   targetProperty: {
     label: 'Script Id',

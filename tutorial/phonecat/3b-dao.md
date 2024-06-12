@@ -142,7 +142,7 @@ The `rowView` in the `DAOList` above is called `PhoneCitationView`. The above co
     {% highlight html %}
     <html>
       <head>
-        <script language="javascript" src="foam2/src/foam.js"></script>
+        <script language="javascript" src="foam3/src/foam.js"></script>
         <script src="Phone.js"></script>
         <script src="phones.js"></script>
         <script src="Controller.js"></script>

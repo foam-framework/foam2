@@ -55,7 +55,8 @@ public class SafetyUtil {
       return -1;
     }
 
-    if ( ! (o1 instanceof Comparable && o2 instanceof Comparable) ) return 0;
+    if ( o1.equals(o2) ||
+      ! ( o1 instanceof Comparable || o2 instanceof Comparable ) ) return 0;
     if ( ! (o2 instanceof Comparable) ) return 1;
     if ( ! (o1 instanceof Comparable) ) return -1;
 

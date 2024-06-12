@@ -40,7 +40,6 @@ foam.CLASS({
           };
           // Handle an array property update
           var subToArray = val => {
-            console.log('subbing to', val);
             var errorSlots = val.map(v => v.errors_$);
             setErrors(val.map(v => v.errors_));
 

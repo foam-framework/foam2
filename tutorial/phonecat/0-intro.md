@@ -41,7 +41,7 @@ This tutorial is for people who are familiar with Javascript and building web ap
 
 There are only four required tools for this tutorial. The following list includes links to locations where the required tools may be downloaded::
 
-1. [FOAM framework](https://github.com/foam-framework/foam2.git)
+1. [FOAM framework](https://github.com/foam-framework/foam3.git)
 1. [GIT GUI](https://www.sourcetreeapp.com/)
 1. [Python](https://www.python.org/downloads/) (Python is our recommended local web server)
 1. [Tutorial Companion File](../bundle.zip)

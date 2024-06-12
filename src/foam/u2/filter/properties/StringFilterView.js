@@ -240,7 +240,7 @@ foam.CLASS({
                     .start().addClass(self.myClass('container-option'))
                       .on('click', () => self.deselectOption(index))
                       .start({
-                        class: 'foam.u2.md.CheckBox',
+                        class: 'foam.u2.CheckBox',
                         data: true,
                         showLabel: true,
                         label: option ? self.getLabelWithCount(option) : self.LABEL_EMPTY
@@ -273,7 +273,7 @@ foam.CLASS({
                     .start().addClass(self.myClass('container-option'))
                       .on('click', () => self.selectOption(index))
                       .start({
-                        class: 'foam.u2.md.CheckBox',
+                        class: 'foam.u2.CheckBox',
                         data: false,
                         showLabel: true,
                         label: option ? self.getLabelWithCount(option) : self.LABEL_EMPTY

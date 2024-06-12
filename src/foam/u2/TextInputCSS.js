@@ -23,7 +23,7 @@ foam.CLASS({
       value: `
         ^ {
           min-width: 64px;
-          height: /*%INPUTHEIGHT%*/ 32px;
+          height: /*%INPUTHEIGHT%*/ 34px;
           font-size: 14px;
           padding-left: /*%INPUTHORIZONTALPADDING%*/ 8px;
           padding-right: /*%INPUTHORIZONTALPADDING%*/ 8px;

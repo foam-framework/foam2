@@ -6,11 +6,7 @@
 
 package foam.lib.formatter;
 
-import foam.core.ClassInfo;
-import foam.core.FEnum;
-import foam.core.FObject;
-import foam.core.PropertyInfo;
-import foam.core.X;
+import foam.core.*;
 import foam.lib.json.OutputJSON;
 import foam.util.SafetyUtil;
 import java.lang.reflect.Array;
@@ -190,6 +186,29 @@ public class JSONFObjectFormatter
     append(':');
     p.formatJSON(this, o);
   }
+
+  protected boolean maybeOutPutFObjectProperty(FObject newFObject, FObject oldFObject, PropertyInfo prop) {
+
+    if ( prop instanceof AbstractFObjectPropertyInfo && oldFObject != null &&
+      prop.get(oldFObject) != null && prop.get(newFObject) != null
+    ) {
+      String before = builder().toString();
+      reset();
+      if ( maybeOutputDelta(((FObject)prop.get(oldFObject)), ((FObject)prop.get(newFObject))) ) {
+        String after = builder().toString();
+        reset();
+        append(before);
+        outputKey(getPropertyName(prop));
+        append(':');
+        append(after);
+        return true;
+      }
+      append(before);
+      return false;
+    }
+    outputProperty(newFObject, prop);
+    return true;
+  }
 /*
   public void outputMap(Object... values) {
     if ( values.length % 2 != 0 ) {
@@ -330,20 +349,21 @@ public class JSONFObjectFormatter
 
     String before = builder().toString();
     reset();
-    for ( int i = 0; i < size; i++ ) {
+    for ( int i = 0 ; i < size ; i++ ) {
       PropertyInfo prop = (PropertyInfo) axioms.get(i);
       if ( prop.includeInID() || prop.compare(oldFObject, newFObject) != 0 ) {
         if ( delta > 0 ) {
           append(',');
           addInnerNewline();
         }
-        outputProperty(newFObject, prop);
+         if ( maybeOutPutFObjectProperty(newFObject, oldFObject, prop) ) delta += 1;
 
-        delta += 1;
-        if ( prop.includeInID() )
+
+        if ( prop.includeInID() ) {
           ids += 1;
-        else if ( optionalPredicate_.propertyPredicateCheck(getX(), of, prop) )
+        } else if ( optionalPredicate_.propertyPredicateCheck(getX(), of, prop) ) {
           optional += 1;
+        }
       }
     }
     String output = builder().toString();

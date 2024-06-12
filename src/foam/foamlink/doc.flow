@@ -12,7 +12,7 @@ Currently FOAMLink is only used by the `genjava.js` script. Later it could act a
 
 To invoke FOAMLink, issue the following command:
 <code>
-node foam2/tools/foamlink.js example_output_file.json
+node foam3/tools/foamlink.js example_output_file.json
 </code>
 
 The file specified - example_output_file.json in the example above - is the output file FOAMLink will produce. This is called the <b>FOAMLink data file</b>. It contains associations between model IDs and file paths.
@@ -95,7 +95,7 @@ To improve genJava performance:
   path of the FOAMLink data file.
     <code>export FOAMLINK_DATA="example_output_file.json"</code></li>
   <li>Pass a list of files modified when invoking the genjava script. This is a JSON object with a key `modified` set to a list of file paths relative to the project directory. For example:
-    <code>node foam2/tools/genjava.js myproject/classes.js build/java myprpject/src '{"modified": ["myproject/src/com/example/Model.js"]}'</code></li>
+    <code>node foam3/tools/genjava.js myproject/classes.js build/java myprpject/src '{"modified": ["myproject/src/com/example/Model.js"]}'</code></li>
 </ol>
 
 When the `FOAMLINK_DATA` environment variable is set, genjava will use the FOAMLink data file to determine what classes belong to modified files, and regenerate only those classes in Java.

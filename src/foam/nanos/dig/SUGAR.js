@@ -178,22 +178,25 @@ foam.CLASS({
       documentation: 'the methods list of the picked service key',
       section: 'details',
       view: function(_, X) {
-        return X.data.slot(function(serviceKey) {
-          var service = this.__context__[serviceKey];
+        return {
+          class: 'foam.u2.view.ChoiceView',
+          choices$: X.data.serviceKey$.map(serviceKey => {
+            var service = this.__context__[serviceKey];
 
-          if ( ! service ) return;
-
-          if ( ! service.cls_.getAxiomByName('delegate') ) return;
-
-          var of = foam.lookup(service.cls_.getAxiomByName('delegate').of);
-
-          if ( ! of ) return;
-
-          var methods = of.getOwnAxiomsByClass(foam.core.Method);
-          var methodNames = methods.map(function(m) { return m.name; }).sort();
-
-          return foam.u2.view.ChoiceView.create({ choices: methodNames, data$: this.method$ });
-        });
+            if ( ! service ) return;
+  
+            if ( ! service.cls_.getAxiomByName('delegate') ) return;
+  
+            var of = foam.lookup(service.cls_.getAxiomByName('delegate').of);
+  
+            if ( ! of ) return;
+  
+            var methods = of.getOwnAxiomsByClass(foam.core.Method);
+            
+            return methods.map(m => m.name).sort();
+          }),
+          data$: X.data.method$
+        };
       },
       postSet: function(old, nu) {
         if ( old != nu ) {

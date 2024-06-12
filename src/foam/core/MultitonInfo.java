@@ -36,6 +36,7 @@ public class MultitonInfo<T>
         for ( Map.Entry<String, Object> entry : args.entrySet() ) {
           ((FObject)obj).setProperty(entry.getKey(), entry.getValue());
         }
+        if ( key == null ) return obj;
         instanceMap.put(key, obj);
       } catch (java.lang.Exception e) {
         e.printStackTrace();

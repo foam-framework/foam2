@@ -230,12 +230,14 @@ foam.CLASS({
         }
         if ( selectedOptions.length === 1 ) {
           var key = this.getKeyByValue(selectedOptions[0]);
-          key = parseInt(key) ? parseInt(key) : key;
+          if ( ! isNaN(key) )
+            key = parseInt(key) ? parseInt(key) : key;
           return this.EQ(this.property, key);
         }
         var keys = selectedOptions.map( (label) => {
           var key = this.getKeyByValue(label);
-          key = parseInt(key) ? parseInt(key) : key;
+          if ( ! isNaN(key) )
+            key = parseInt(key) ? parseInt(key) : key;
           return key;
         });
         return this.IN(this.property, keys);
@@ -290,7 +292,7 @@ foam.CLASS({
               .start().addClass(self.myClass('container-option'))
                 .on('click', () => self.deselectOption(index))
                 .start({
-                  class: 'foam.u2.md.CheckBox',
+                  class: 'foam.u2.CheckBox',
                   data: true,
                   showLabel: true,
                   label: option ? self.getLabelWithCount(option) : self.LABEL_EMPTY
@@ -323,7 +325,7 @@ foam.CLASS({
               .start().addClass(self.myClass('container-option'))
                 .on('click', () => self.selectOption(index))
                 .start({
-                  class: 'foam.u2.md.CheckBox',
+                  class: 'foam.u2.CheckBox',
                   data: false,
                   showLabel: true,
                   label: option ? self.getLabelWithCount(option) : self.LABEL_EMPTY

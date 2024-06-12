@@ -29,13 +29,15 @@ import foam.test.TestUtils;
 public class AuthorizerBenchmark
   implements Benchmark
 {
+  protected X benchmarkContext;
   protected X userAuthorizedContext;
   protected DAO dao = new MDAO(User.getOwnClassInfo());
   protected Authorizer authorizer;
   protected int recordAmount;
   protected Operation operation;
 
-  public AuthorizerBenchmark(Authorizer authorizer_, int recordAmount_, Operation operation_) {
+  public AuthorizerBenchmark(X benchmarkContext_, Authorizer authorizer_, int recordAmount_, Operation operation_) {
+    benchmarkContext = benchmarkContext_;
     authorizer = authorizer_;
     recordAmount = recordAmount_;
     operation = operation_;
@@ -109,6 +111,6 @@ public class AuthorizerBenchmark
 
   @Override
   public void teardown(X x, java.util.Map stats) {
-    dao.inX(x).removeAll();
+    dao.inX(benchmarkContext).removeAll();
   }
 }

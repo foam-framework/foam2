@@ -19,7 +19,8 @@ foam.CLASS({
     'menuListener',
     'loginSuccess',
     'menuDAO',
-    'pushMenu'
+    'pushMenu',
+    'theme'
   ],
 
   requires: [
@@ -109,7 +110,8 @@ foam.CLASS({
               selection: self.currentMenu,
               formatter: function(data) {
                 this.translate(data.id + '.label', data.label);
-              }
+              },
+              defaultRoot: self.theme.navigationRootMenu
             })
           .end()
         .end()

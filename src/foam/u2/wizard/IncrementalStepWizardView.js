@@ -290,7 +290,9 @@ foam.CLASS({
       isAvailable: function () {
         return this.showDiscardOption;
       },
-      confirmationRequired: true,
+      confirmationRequired: function() {
+        return true;
+      },
       code: function(x) {
         this.onClose(x, false);
       }

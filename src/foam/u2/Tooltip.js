@@ -39,16 +39,17 @@ foam.CLASS({
     function init() {
       this.target.removeAttribute('title');
       this.target.on('mouseover', this.loadTooltip);
+      this.target.onDetach(this.close);
       this.SUPER();
     },
 
     function setTooltip(evt) {
       this.tooltipStore = this.TooltipView.create({ data: this.text });
-      var domRect      = this.target.el().getBoundingClientRect();
-      this.screenWidth = this.window.innerWidth;
-      var screenHeight = this.window.innerHeight;
-      var scrollY      = this.window.scrollY;
-      var height       = this.tooltipStore.getBoundingClientRect().height;
+      var domRect       = this.target.el().getBoundingClientRect();
+      this.screenWidth  = this.window.innerWidth;
+      var screenHeight  = this.window.innerHeight;
+      var scrollY       = this.window.scrollY;
+      var height        = this.tooltipStore.getBoundingClientRect().height;
       this.top = (domRect.top - scrollY > screenHeight / 2) ?
         evt.pageY - 30 - height : evt.pageY + 20;
       if ( domRect.left > 3 * (this.screenWidth / 4) ) {
@@ -60,8 +61,8 @@ foam.CLASS({
       }
       this.tooltipStore.style({
         'max-width': (this.screenWidth / 4)+'px',
-          'top': this.top$,
-          'left': this.left$,
+          'top':   this.top$,
+          'left':  this.left$,
           'right': this.right$
       });
       this.tooltipStore.write();
@@ -94,12 +95,12 @@ foam.CLASS({
         console.error('Target not found');
         return;
       }
-      this.target.on('mouseover', this.onMouseOver);
-      this.target.on('mousedown', this.close);
+      this.target.on('mouseover',  this.onMouseOver);
+      this.target.on('mousedown',  this.close);
       this.target.on('mouseleave', this.close);
-      this.target.on('mouseout', this.close);
+      this.target.on('mouseout',   this.close);
       this.target.on('touchstart', this.close);
-      this.target.on('unload', this.close);
+      this.target.on('unload',     this.close);
       this.onMouseOver(evt);
     }
   ]
@@ -119,12 +120,12 @@ foam.CLASS({
       this
       .add(this.data)
       .style({
-        'background': 'rgba(80, 80, 80, 0.9)',
+        'background':    'rgba(80, 80, 80, 0.9)',
         'border-radius': '5px',
-        'color': 'white',
-        'padding': '5px 8px',
-        'position': 'absolute',
-        'z-index': '2000',
+        'color':         'white',
+        'padding':       '5px 8px',
+        'position':      'absolute',
+        'z-index':       '2000'
       });
     }
   ]

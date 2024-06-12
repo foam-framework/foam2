@@ -96,7 +96,7 @@ foam.CLASS({
           }
           if ( user != null ) {
             String url = user.findGroup(x).getAppConfig(x).getUrl();
-            args.put("logo", url + "/" + theme.getLogo());
+            args.put("logo", url + "/" + theme.getLoginImage());
           }
           EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(
             x,

@@ -76,6 +76,10 @@ foam.CLASS({
   name: 'RichChoiceView',
   extends: 'foam.u2.View',
 
+  requires: [
+    'foam.u2.view.RichChoiceViewI18NComparator'
+  ],
+
   documentation: `
     This is similar to foam.u2.view.ChoiceView, but lets you provide views for
     the selection and options instead of strings. This allows you to create
@@ -173,7 +177,7 @@ foam.CLASS({
       justify-content: space-between;
       width: 100%;
 
-      height: /*%INPUTHEIGHT%*/ 32px;
+      height: /*%INPUTHEIGHT%*/ 34px;
       font-size: 14px;
       padding-left: /*%INPUTHORIZONTALPADDING%*/ 8px;
       padding-right: /*%INPUTHORIZONTALPADDING%*/ 8px;
@@ -220,7 +224,7 @@ foam.CLASS({
       border: none;
       padding-left: /*%INPUTHORIZONTALPADDING%*/ 8px;
       padding-right: /*%INPUTHORIZONTALPADDING%*/ 8px;
-      height: /*%INPUTHEIGHT%*/ 32px;
+      height: /*%INPUTHEIGHT%*/ 34px;
     }
 
     ^ .search img {
@@ -247,7 +251,7 @@ foam.CLASS({
       border-left: 1px;
       padding-left: /*%INPUTHORIZONTALPADDING%*/ 8px;
       padding-right: /*%INPUTHORIZONTALPADDING%*/ 8px;
-      height: /*%INPUTHEIGHT%*/ 32px;
+      height: /*%INPUTHEIGHT%*/ 34px;
       border-left: 1px solid;
       border-color: /*%GREY3%*/ #cbcfd4;
       margin-left: 12px;
@@ -285,6 +289,12 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'clearOnReopen',
+      documentation: 'clear filter on dropdown reopen if set to true',
+      value: true
+    },
+    {
+      class: 'Boolean',
       name: 'isOpen_',
       documentation: `
         An internal property used to determine whether the options list is
@@ -292,7 +302,7 @@ foam.CLASS({
       `,
       postSet: function(_, nv) {
         if ( nv && ! this.hasBeenOpenedYet_ ) this.hasBeenOpenedYet_ = true;
-        if ( ! nv ) {
+        if ( ! nv && this.clearOnReopen ) {
           this.clearProperty('filter_');
           this.sections.forEach((section) => {
             section.clearProperty('filteredDAO');
@@ -414,7 +424,10 @@ foam.CLASS({
     },
     {
       name: 'comparator',
-      documentation: 'Optional comparator for ordering choices.'
+      documentation: 'Optional comparator for ordering choices.',
+      factory: function() {
+        return this.RichChoiceViewI18NComparator.create();
+      }
     }
   ],
 
@@ -549,7 +562,7 @@ foam.CLASS({
                             .translate(section.heading, section.heading)
                           .end()
                           .start()
-                            .select(section.filteredDAO$proxy, (obj) => {
+                            .select(section.filteredDAO$proxy, obj => {
                               return this.E()
                                 .start(self.rowView, { data: obj })
                                   .enableClass('disabled', section.disabled)
@@ -651,13 +664,6 @@ foam.CLASS({
         }
       `,
 
-      properties: [
-        {
-          name: 'data',
-          documentation: 'The selected object.'
-        }
-      ],
-
       methods: [
         function initE() {
           var summary = this.data.toSummary();
@@ -719,13 +725,12 @@ foam.CLASS({
             'text-overflow': 'ellipsis'
           });
 
-          var summary = this.fullObject$.map(o => {
-            return ( o && o.toSummary() ) || this.defaultSelection;
-          });
-          var summaryWithoutSlot = this.fullObject && this.fullObject.toSummary()
-            ? this.fullObject.toSummary()
-            : this.defaultSelectionPrompt;
-          return this.translate(summaryWithoutSlot, summary);
+          if ( this.fullObject ) {
+            var summary = this.fullObject.toSummary();
+            return this.translate(summary, summary);
+          }
+
+          return this.add(this.defaultSelectionPrompt);
         }
       ]
     },

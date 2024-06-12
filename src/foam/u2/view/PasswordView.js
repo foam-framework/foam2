@@ -30,7 +30,7 @@ foam.CLASS({
 
   css: `
     ^ .input-image {
-      --fieldSize: /*%INPUTHEIGHT%*/ 32px;
+      --fieldSize: /*%INPUTHEIGHT%*/ 34px;
       position: absolute;
       width: 16px;
       height: calc( var(--fieldSize) / 1.2);

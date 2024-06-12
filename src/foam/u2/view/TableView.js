@@ -12,6 +12,7 @@ foam.CLASS({
   css: `
     ^ {
       overflow-x: unset;
+      height: 100%;
     }
 
     ^tbody {

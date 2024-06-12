@@ -45,10 +45,11 @@ public class NSpecFactory
     creatingThread_ = Thread.currentThread();
 
     PM     pm     = new PM(this.getClass(), spec_.getName());
+    X      nx     = x_ instanceof SubX ? x_ : x_.getX();
 
     try {
       logger.info("Creating Service", spec_.getName());
-      var service = spec_.createService(x_.getX().put(NSpec.class, spec_).put("logger", logger), null);
+      var service = spec_.createService(nx.put(NSpec.class, spec_).put("logger", logger), null);
       if ( service instanceof DAO ) {
         if ( ns_ == null ) {
           ns_ = new ProxyDAO();
@@ -61,7 +62,7 @@ public class NSpecFactory
       Object ns = ns_;
       while ( ns != null ) {
         if ( ns instanceof ContextAware && ! ( ns instanceof ProxyX ) ) {
-          ((ContextAware) ns).setX(x_.getX());
+          ((ContextAware) ns).setX(nx);
         }
         if ( ns instanceof NSpecAware ) {
           if ( ((NSpecAware) ns).getNSpec() == null ) {
@@ -82,7 +83,7 @@ public class NSpecFactory
     } catch (Throwable t) {
       logger.error("Error Creating Service", spec_.getName(), t);
     } finally {
-      pm.log(x_.getX());
+      pm.log(nx);
       creatingThread_ = null;
     }
   }

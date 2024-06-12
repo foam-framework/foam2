@@ -43,6 +43,12 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.core.Argument',
       name: 'args',
+      adapt: function(o, n, prop) {
+        if ( foam.String.isInstance(n) ) {
+          n = n.split(',');
+        }
+        return foam.core.FObjectArray.ADAPT.value.call(this, o, n, prop);
+      },
       adaptArrayElement: function(e, obj) {
         if ( foam.String.isInstance(e) ) {
           // Matches strings in the form [(type)] (name)
@@ -97,6 +103,6 @@ foam.CLASS({
       result.args = resultArgs; // To trigger the adaptArrayElement
 
       return result;
-    },
+    }
   ]
 });
