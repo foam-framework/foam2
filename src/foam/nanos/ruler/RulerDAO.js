@@ -23,6 +23,7 @@ foam.CLASS({
     'foam.dao.AbstractSink',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
+    'foam.dao.debug.PutPathAware',
     'foam.mlang.order.Desc',
     'foam.mlang.predicate.Predicate',
     'foam.mlang.sink.GroupBy',
@@ -122,6 +123,10 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `FObject oldObj = getDelegate().find_(x, obj);
+if ( obj instanceof PutPathAware ) {
+  ((PutPathAware) obj).describePut(x, "RulerDAO", "Before RulerDAO");
+}
+
 Map rulesList = getRulesList();
 if ( oldObj == null ) {
   applyRules(x, obj, oldObj, (GroupBy) rulesList.get(getCreateBefore()));

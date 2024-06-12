@@ -8,7 +8,10 @@ foam.CLASS({
   package: 'foam.nanos.crunch',
   name: 'UserCapabilityJunctionRefine',
   refines: 'foam.nanos.crunch.UserCapabilityJunction',
-  mixins: [ 'foam.nanos.crunch.CapabilityJunctionPayload' ],
+  mixins: [
+    'foam.nanos.crunch.CapabilityJunctionPayload',
+    'foam.dao.debug.PutPathTracking'
+  ],
   implements: [ 'foam.nanos.auth.LifecycleAware' ],
 
   documentation: `
