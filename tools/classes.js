@@ -753,8 +753,17 @@ var classes = [
   // Testing support
   'foam.test.TestEnum',
   'foam.test.AllSerializableProperties',
+  'foam.test.testdata.RandomEmailProducer',
   'foam.nanos.test.EchoService',
   'foam.nanos.test.SerializationTestEchoService',
+
+  // Test data generator
+  'foam.test.testdata.TestDataPopulator',
+  'foam.test.testdata.StringProducer',
+  'foam.test.testdata.RandomStringProducer',
+  'foam.test.testdata.RandomHexStringProducer',
+  'foam.test.testdata.RandomFirstNameProducer',
+  'foam.test.testdata.RandomLastNameProducer',
 
   // Ace Editor
   'io.c9.ace.Config',
