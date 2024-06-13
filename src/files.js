@@ -753,6 +753,7 @@ FOAM_FILES([
   { name: "foam/net/node/PathnameRouter", flags: ['node'] },
   { name: "foam/net/node/RequestIdentifier", flags: ['node'] },
   { name: "foam/net/node/CacheHandler", flags: ['node'] },
+  { name: "foam/net/node/CORSHandler", flags: ['node'] },
   { name: "foam/net/node/FileHandler", flags: ['node'] },
   { name: "foam/net/node/DirTreeHandler", flags: ['node'] },
   { name: "foam/net/node/RestDAOHandler", flags: ['node'] },
