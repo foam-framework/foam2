@@ -70,6 +70,8 @@ p({
   "serviceScript":`
     return new foam.dao.EasyDAO.Builder(x)
       .setOf(foam.nanos.alarming.OMName.getOwnClassInfo())
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("omNames")
       .build();
     `
   ,"client":"{\"of\":\"foam.nanos.alarming.OMName\"}"

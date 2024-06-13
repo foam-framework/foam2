@@ -543,6 +543,10 @@ FOAM_FILES([
   // google
   { name: "foam/nanos/geocode/GoogleMapsCredentials" },
 
+  { name: "foam/nanos/om/OMDashboard" },
+  { name: "foam/nanos/om/OMDashboardCountChart" },
+  { name: "foam/nanos/om/OMFrequency" },
+
   { name: "com/google/foam/demos/u2/AllViews" },
   { name: "com/google/foam/demos/u2/MDAllViews" },
 
