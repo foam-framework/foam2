@@ -135,6 +135,7 @@ FOAM_FILES([
   { name: "foam/nanos/theme/ThemeDomain" },
   { name: "foam/nanos/theme/ThemeDomainsDAO" },
   { name: "foam/nanos/theme/Themes" },
+  { name: "foam/nanos/theme/LogoImages" },
   { name: "foam/nanos/bench/Benchmark" },
   { name: "foam/nanos/boot/NSpec" },
   { name: "foam/nanos/boot/NSpecAware" },
