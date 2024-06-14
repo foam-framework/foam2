@@ -847,6 +847,7 @@ FOAM_FILES([
   { name: "foam/u2/view/MapView" },
   { name: "foam/u2/view/AnyView" },
   { name: "foam/u2/view/ArrayView" },
+  { name: "foam/u2/view/ActionArrayView" },
 
   { name: "io/c9/ace/Config" },
   { name: "io/c9/ace/Editor" },
