@@ -351,21 +351,13 @@ console.log("Done.");
       }, '');
     },
 
-    function execute() {
-      var self = this;
-
-      var E = foam.mlang.ExpressionsSingleton.create();
-
+    function createBareModelDAO(
+      includeScripts, includeLibs, includeRelationships
+    ) {
       var modelDAO = foam.dao.EasyDAO.create({
         daoType: 'MDAO',
         of: foam.core.Model
       });
-
-      var pred = self.enabledFeatures.map(f => E.IN(f, foam.core.Model.FLAGS))
-      pred.push(E.NOT(E.HAS(foam.core.Model.FLAGS)));
-      pred = E.OR.apply(E, pred);
-
-      modelDAO = modelDAO.where(pred).orderBy(foam.core.Model.ORDER)
 
       function inflate(model) {
         return model.cls_ ? model :
@@ -383,25 +375,45 @@ console.log("Done.");
         });
 
       // Instantiate models for SCRIPTs, LIBs, and RELATIONSHIPs.
-      foam.__SCRIPTS__.forEach(function(s) {
-        s.class = 'foam.core.Script';
-        modelDAO.put(inflate(s));
-      });
-
-      (function() {
-        var libs = {};
-        foam.__LIBS__.forEach(function(l) {
-          if ( ! foam.Number.isInstance(libs[l.name])) libs[l.name] = 0;
-          l.iteration = libs[l.name]++;
-          l.class = 'foam.build.Library';
-          modelDAO.put(inflate(l));
+      if ( includeScripts ) {
+        foam.__SCRIPTS__.forEach(function(s) {
+          s.class = 'foam.core.Script';
+          modelDAO.put(inflate(s));
         });
-      })();
+      }
 
-      (foam.__RELATIONSHIPS__ || []).forEach(function(r) {
-        r.class = 'foam.dao.Relationship';
-        modelDAO.put(inflate(r));
-      });
+      if ( includeLibs ) {
+        (function() {
+          var libs = {};
+          foam.__LIBS__.forEach(function(l) {
+            if ( ! foam.Number.isInstance(libs[l.name])) libs[l.name] = 0;
+            l.iteration = libs[l.name]++;
+            l.class = 'foam.build.Library';
+            modelDAO.put(inflate(l));
+          });
+        })();
+      }
+
+      if ( includeRelationships ) {
+        (foam.__RELATIONSHIPS__ || []).forEach(function(r) {
+          r.class = 'foam.dao.Relationship';
+          modelDAO.put(inflate(r));
+        });
+      }
+
+      return modelDAO;
+    },
+
+    function execute() {
+      var self = this;
+
+      var E = foam.mlang.ExpressionsSingleton.create();
+
+      var modelDAO = this.createBareModelDAO(true, true, true);
+      var pred = self.enabledFeatures.map(f => E.IN(f, foam.core.Model.FLAGS))
+      pred.push(E.NOT(E.HAS(foam.core.Model.FLAGS)));
+      pred = E.OR.apply(E, pred);
+      modelDAO = modelDAO.where(pred).orderBy(foam.core.Model.ORDER);
 
       var serializer = foam.json.Outputter.create({
         pretty: true,
