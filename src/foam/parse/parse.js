@@ -427,6 +427,27 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.parse',
+  name: 'Implied',
+
+  documentation: `Returns a value without affecting the
+    parser state.`,
+
+  properties: [
+    {
+      name: 'value',
+    }
+  ],
+
+  methods: [
+    function parse(ps) {
+      return ps.setValue(this.value);
+    },
+
+    function toString() { return 'implied(' + this.SUPER() + ')'; }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.parse',
@@ -490,7 +511,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 foam.CLASS({
   package: 'foam.parse',
@@ -611,6 +631,59 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  package: 'foam.parse',
+  name: 'UntilEscaped',
+  extends: 'foam.parse.ParserDecorator',
+
+  documentation: `Matches any characters until the terminating pattern,
+    unless terminating pattern has a leading escape pattern.
+    Consumes and discards the terminating pattern when found.  Fails if termination was never found.`,
+
+  properties: [
+    {
+      name: 'esc',
+      class: 'foam.parse.ParserProperty',
+      final: true
+    },
+    {
+      name: 'term',
+      class: 'foam.parse.ParserProperty',
+      final: true
+    }
+  ],
+
+  methods: [
+    function parse(ps, obj) {
+      var ret = [];
+      var esc = this.esc;
+      var term = this.term;
+
+      while ( ps.valid ) {
+        var res;
+
+        if ( res = ps.apply(esc, obj) ) {
+          ret.push(res.value);
+          ps = res;
+          continue;
+        }
+
+        if ( res = ps.apply(term, obj) ) {
+          return res.setValue(ret);
+        }
+
+        ret.push(ps.head);
+        ps = ps.tail;
+      }
+      return undefined;
+    },
+
+    function toString() {
+      return 'untilEscaped(' + this.SUPER() + ')';
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.parse',
@@ -803,7 +876,9 @@ foam.CLASS({
     'foam.parse.Substring',
     'foam.parse.Symbol',
     'foam.parse.Until',
+    'foam.parse.UntilEscaped',
     'foam.parse.Join',
+    'foam.parse.Implied',
   ],
 
   axioms: [ foam.pattern.Singleton.create() ],
@@ -863,6 +938,13 @@ foam.CLASS({
     function until(p) {
       return this.Until.create({
         p: p
+      });
+    },
+
+    function untilEscaped(esc, term) {
+      return this.UntilEscaped.create({
+        esc: esc,
+        term: term,
       });
     },
 
@@ -943,6 +1025,12 @@ foam.CLASS({
 
     function anyChar() {
       return this.AnyChar.create();
+    },
+
+    function implied(value) {
+      return this.Implied.create({
+        value: value,
+      });
     }
   ]
 });
