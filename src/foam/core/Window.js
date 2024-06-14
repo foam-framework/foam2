@@ -230,6 +230,13 @@ foam.CLASS({
     },
     function cancelAnimationFrame(id) {
       this.clearTimeout(id);
+    },
+    function installCSS(text, id, opt_eid) {
+      var eid = foam.u2.Element.NEXT_ID();
+      /* Create a new <style> tag containing the given CSS code. */
+      console.log(
+        "Attempt to install CSS on node server" +
+        ( opt_eid ) ? ': ' + opt_eid : '');
     }
   ]
 });
