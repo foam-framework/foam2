@@ -95,9 +95,30 @@ foam.CLASS({
           : prereqSections.concat(sections);
       }
     },
+    {
+      name: 'isValid',
+      class: 'Boolean',
+      expression: function (of, data, delegates, data$errors_) {
+        if ( ! this.of ) return true;
+        for ( let wizardlet of delegates ) {
+          if ( ! wizardlet.isValid ) return false;
+        }
+        if ( data$errors_ && data$errors_.length > 0 ) {
+          return false;
+        }
+        return true;
+      }
+    }
   ],
 
   methods: [
+    function init() {
+      foam.core.ArraySlot.create({
+        slots: this.delegates.map(wizardlet => wizardlet.isValid$)
+      }).sub(() => {
+        this.propertyChange.pub('data', this.data);
+      });
+    },
     function addPrerequisite(wizardlet) {
       // Add prerequisite to delegate wizardlets
       // TODO: investigate why this.delegates$push doesn't work here
