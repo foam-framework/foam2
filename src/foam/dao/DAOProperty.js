@@ -34,7 +34,19 @@ foam.CLASS({
       value: 'HIDDEN'
     },
     ['transient', true],
-    ['of', 'foam.dao.DAO'],
+    {
+      class: 'Class',
+      name: 'of',
+      value: 'foam.dao.DAO',
+      assertValue: function(ofValue) {
+        var type = foam.lookup(ofValue);
+        foam.assert(foam.dao.DAO.isSubClass(type),
+          `DAOProperty's type (specified by 'of') must be a ` +
+          `subclass of DAO, but the ` +
+          `type for '${this.name}' is '${ofValue}'. ` +
+          `(that's not a DAO)`);
+      }
+    },
     {
       name: 'javaInfoType',
       flags: ['java'],
